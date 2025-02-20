@@ -43,3 +43,30 @@ if __name__ == "__main__":
 
     orchestrator = AgentOrchestrator(agents_config)
     orchestrator.execute_workflow("generate_newsletter")
+
+# ... (previous code)
+
+# Import all the new agents
+# ...
+
+class AgentOrchestrator:
+    # ... (previous code)
+
+    def __init__(self, agents_config):
+        # ... (previous code)
+        # Add instantiation logic for all the new agents
+        # ...
+
+    def execute_workflow(self, task):
+        # ... (previous code)
+        if task in self.workflow:
+            for agent_name in self.workflow[task]:
+                agent = self.agents[agent_name]
+                # Add method calls for all the new agents
+                if agent_name == "geopolitical_risk_agent":
+                    risks = agent.assess_geopolitical_risks()
+                    print(f"Geopolitical Risks: {risks}")
+                elif agent_name == "industry_specialist_agent":
+                    trends = agent.analyze_industry()
+                    print(f"Industry Trends: {trends}")
+                # ... other agent calls
