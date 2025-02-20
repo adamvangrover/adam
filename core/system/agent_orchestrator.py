@@ -1,8 +1,16 @@
 # core/system/agent_orchestrator.py
 
 from core.agents.market_sentiment_agent import MarketSentimentAgent
-from core.agents.macroeconomic_analysis_agent import MacroeconomicAnalysisAgent  # Import other agents
-# ... import other agents
+from core.agents.macroeconomic_analysis_agent import MacroeconomicAnalysisAgent
+from core.agents.geopolitical_risk_agent import GeopoliticalRiskAgent
+from core.agents.industry_specialist_agent import IndustrySpecialistAgent
+from core.agents.fundamental_analyst_agent import FundamentalAnalyst
+from core.agents.technical_analyst_agent import TechnicalAnalyst
+from core.agents.risk_assessment_agent import RiskAssessor
+from core.agents.newsletter_layout_specialist_agent import NewsletterLayoutSpecialist
+from core.agents.data_verification_agent import DataVerificationAgent
+from core.agents.lexica_agent import LexicaAgent
+from core.agents.archive_manager_agent import ArchiveManagerAgent
 
 class AgentOrchestrator:
     def __init__(self, agents_config):
@@ -12,26 +20,67 @@ class AgentOrchestrator:
                 self.agents[agent_name] = MarketSentimentAgent(config)
             elif agent_name == "macroeconomic_analysis_agent":
                 self.agents[agent_name] = MacroeconomicAnalysisAgent(config)
-            # ... instantiate other agents
-        self.workflow = {  # Define a basic workflow (example)
-            "generate_newsletter": [
-                "market_sentiment_agent",
-                "macroeconomic_analysis_agent",
-                # ... other agents needed for the newsletter
-            ]
+            elif agent_name == "geopolitical_risk_agent":
+                self.agents[agent_name] = GeopoliticalRiskAgent(config)
+            elif agent_name == "industry_specialist_agent":
+                self.agents[agent_name] = IndustrySpecialistAgent(config)
+            elif agent_name == "fundamental_analyst_agent":
+                self.agents[agent_name] = FundamentalAnalyst(config)
+            elif agent_name == "technical_analyst_agent":
+                self.agents[agent_name] = TechnicalAnalyst(config)
+            elif agent_name == "risk_assessment_agent":
+                self.agents[agent_name] = RiskAssessor(config)
+            elif agent_name == "newsletter_layout_specialist_agent":
+                self.agents[agent_name] = NewsletterLayoutSpecialist(config)
+            elif agent_name == "data_verification_agent":
+                self.agents[agent_name] = DataVerificationAgent(config)
+            elif agent_name == "lexica_agent":
+                self.agents[agent_name] = LexicaAgent(config)
+            elif agent_name == "archive_manager_agent":
+                self.agents[agent_name] = ArchiveManagerAgent(config)
+
+        self.workflows = {
+            "generate_newsletter": {
+                "agents": [
+                    "market_sentiment_agent",
+                    "macroeconomic_analysis_agent",
+                    "geopolitical_risk_agent",
+                    "industry_specialist_agent",
+                    "newsletter_layout_specialist_agent"
+                ],
+                "dependencies": {}  # No dependencies for this workflow
+            },
+            "perform_company_analysis": {
+                "agents": [
+                    "fundamental_analyst_agent",
+                    "technical_analyst_agent",
+                    "risk_assessment_agent"
+                ],
+                "dependencies": {
+                    "risk_assessment_agent": ["fundamental_analyst_agent", "technical_analyst_agent"]
+                }
+            }
         }
 
-    def execute_workflow(self, task):
-        if task in self.workflow:
-            for agent_name in self.workflow[task]:
-                agent = self.agents[agent_name]
-                if agent_name == "market_sentiment_agent":
-                    sentiment = agent.analyze_sentiment()
-                    print(f"Market Sentiment: {sentiment}")
-                elif agent_name == "macroeconomic_analysis_agent":
-                    # Call macroeconomic analysis method
-                    pass
-                # ... call other agent methods
+    def execute_workflow(self, task, **kwargs):
+        if task in self.workflows:
+            workflow = self.workflows[task]
+            completed_agents =  # Keep track of completed agents
+            for agent_name in workflow["agents"]:
+                # Check for dependencies
+                if agent_name in workflow["dependencies"]:
+                    dependencies = workflow["dependencies"][agent_name]
+                    # Ensure all dependencies have run
+                    if all(dep in completed_agents for dep in dependencies):
+                        # Gather outputs from dependencies
+                        dependency_outputs = {dep: self.agents[dep].outputs for dep in dependencies}
+                        self.agents[agent_name].run(dependency_outputs=dependency_outputs, **kwargs)
+                        completed_agents.append(agent_name)
+                    else:
+                        print(f"Agent {agent_name} is waiting for dependencies: {dependencies}")
+                else:
+                    self.agents[agent_name].run(**kwargs)
+                    completed_agents.append(agent_name)
         else:
             print(f"Unknown task: {task}")
 
@@ -43,30 +92,4 @@ if __name__ == "__main__":
 
     orchestrator = AgentOrchestrator(agents_config)
     orchestrator.execute_workflow("generate_newsletter")
-
-# ... (previous code)
-
-# Import all the new agents
-# ...
-
-class AgentOrchestrator:
-    # ... (previous code)
-
-    def __init__(self, agents_config):
-        # ... (previous code)
-        # Add instantiation logic for all the new agents
-        # ...
-
-    def execute_workflow(self, task):
-        # ... (previous code)
-        if task in self.workflow:
-            for agent_name in self.workflow[task]:
-                agent = self.agents[agent_name]
-                # Add method calls for all the new agents
-                if agent_name == "geopolitical_risk_agent":
-                    risks = agent.assess_geopolitical_risks()
-                    print(f"Geopolitical Risks: {risks}")
-                elif agent_name == "industry_specialist_agent":
-                    trends = agent.analyze_industry()
-                    print(f"Industry Trends: {trends}")
-                # ... other agent calls
+    orchestrator.execute_workflow("perform_company_analysis")
