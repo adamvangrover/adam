@@ -1,7 +1,7 @@
 # core/agents/data_verification_agent.py
 
 import pandas as pd
-#... (import other necessary libraries)
+import numpy as np
 
 class DataVerificationAgent:
     def __init__(self, config):
@@ -23,9 +23,17 @@ class DataVerificationAgent:
 
         # 1. Cross-referencing (example)
         if source_name == "financial_news_api":
-            #... (fetch similar data from another source, e.g., market_data_api)
-            #... (compare the data and flag discrepancies)
-            pass  # Placeholder for actual implementation
+            # Fetch similar data from another source (e.g., market_data_api)
+            try:
+                alternative_data = self.data_sources['market_data_api'].get_price_data(
+                    symbol=data['symbol'], period='daily'
+                )
+                #... (compare the data and flag discrepancies)
+                # Example: Compare the closing price from both sources
+                if abs(data['close'] - alternative_data['close'][-1]) > 0.1:  # Allow for a small tolerance
+                    return False, "Data discrepancy between financial_news_api and market_data_api"
+            except Exception as e:
+                return False, f"Error fetching alternative data: {e}"
 
         # 2. Data Type Validation
         if data_type:
@@ -38,7 +46,9 @@ class DataVerificationAgent:
                 return False, f"Data outside expected range: {expected_range}"
 
         # 4. Outlier Detection (example using IQR)
-        #... (implement outlier detection using IQR or other methods)
+        if isinstance(data, (list, pd.Series, np.ndarray)):
+            #... (implement outlier detection using IQR or other methods)
+            pass  # Placeholder for actual implementation
 
         # 5. Source Credibility and Rumor Detection
         #... (assess source credibility and check for potential rumors)
