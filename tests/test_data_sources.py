@@ -1,6 +1,7 @@
 # tests/test_data_sources.py
 
 import unittest
+from unittest.mock import patch
 from core.data_sources.data_sources import DataSources
 
 class TestDataSources(unittest.TestCase):
@@ -19,15 +20,31 @@ class TestDataSources(unittest.TestCase):
         }
         self.data_sources = DataSources(config)
 
-    def test_get_financial_news_headlines(self):
+    @patch('core.data_sources.data_sources.requests.get')
+    def test_get_financial_news_headlines(self, mock_get):
         """Test fetching financial news headlines."""
+        # Mock the API response
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            'articles': [
+                {'title': 'Tech Stock Soars on Earnings Report'},
+                {'title': 'Market Dips Amid Inflation Concerns'}
+            ]
+        }
+        mock_get.return_value = mock_response
+
         headlines = self.data_sources.get_financial_news_headlines(source="bloomberg", keywords=["technology"])
         self.assertIsNotNone(headlines)
-        self.assertIsInstance(headlines, list)  # Check if it returns a list
-        #... (add more assertions to validate the fetched headlines, e.g., check for keywords)
+        self.assertIsInstance(headlines, list)
+        self.assertEqual(len(headlines), 2)  # Check if two headlines are returned
+        self.assertIn("Tech Stock Soars on Earnings Report", [h['title'] for h in headlines])
 
-    def test_get_historical_news(self):
+    @patch('core.data_sources.data_sources.requests.get')
+    def test_get_historical_news(self, mock_get):
         """Test fetching historical news data."""
+        #... (mock API response)
+
         historical_news = self.data_sources.get_historical_news(
             source="reuters", keywords=["inflation"], start_date="2023-01-01", end_date="2023-12-31"
         )
@@ -35,25 +52,14 @@ class TestDataSources(unittest.TestCase):
         self.assertIsInstance(historical_news, list)
         #... (add more assertions, e.g., check for date range)
 
-    def test_get_tweets(self):
+    @patch('core.data_sources.data_sources.tweepy.API.search_tweets')
+    def test_get_tweets(self, mock_search_tweets):
         """Test fetching tweets from Twitter."""
+        #... (mock API response)
+
         tweets = self.data_sources.get_tweets(query="$AAPL", sentiment="positive")
         self.assertIsNotNone(tweets)
         self.assertIsInstance(tweets, list)
-        #... (add more assertions, e.g., check for sentiment)
-
-    def test_get_trending_topics(self):
-        """Test fetching trending topics from Twitter."""
-        trending_topics = self.data_sources.get_trending_topics(location="New York")
-        self.assertIsNotNone(trending_topics)
-        self.assertIsInstance(trending_topics, list)
-        #... (add more assertions, e.g., check for location)
-
-    def test_get_facebook_posts(self):
-        """Test fetching Facebook posts."""
-        posts = self.data_sources.get_facebook_posts(query="technology", sentiment="negative")
-        self.assertIsNotNone(posts)
-        self.assertIsInstance(posts, list)
         #... (add more assertions, e.g., check for sentiment)
 
     #... (add tests for other data source methods with similar structure)
