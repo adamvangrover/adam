@@ -2,7 +2,6 @@
 
 import unittest
 from core.data_sources.data_sources import DataSources
-#... (import other necessary modules and classes)
 
 class TestDataSources(unittest.TestCase):
     def setUp(self):
@@ -24,27 +23,40 @@ class TestDataSources(unittest.TestCase):
         """Test fetching financial news headlines."""
         headlines = self.data_sources.get_financial_news_headlines(source="bloomberg", keywords=["technology"])
         self.assertIsNotNone(headlines)
-        #... (add more assertions to validate the fetched headlines)
+        self.assertIsInstance(headlines, list)  # Check if it returns a list
+        #... (add more assertions to validate the fetched headlines, e.g., check for keywords)
 
     def test_get_historical_news(self):
         """Test fetching historical news data."""
-        historical_news = self.data_sources.get_historical_news(source="reuters", keywords=["inflation"], start_date="2023-01-01", end_date="2023-12-31")
+        historical_news = self.data_sources.get_historical_news(
+            source="reuters", keywords=["inflation"], start_date="2023-01-01", end_date="2023-12-31"
+        )
         self.assertIsNotNone(historical_news)
-        #... (add more assertions to validate the fetched historical news)
+        self.assertIsInstance(historical_news, list)
+        #... (add more assertions, e.g., check for date range)
 
     def test_get_tweets(self):
         """Test fetching tweets from Twitter."""
         tweets = self.data_sources.get_tweets(query="$AAPL", sentiment="positive")
         self.assertIsNotNone(tweets)
-        #... (add more assertions to validate the fetched tweets)
+        self.assertIsInstance(tweets, list)
+        #... (add more assertions, e.g., check for sentiment)
 
     def test_get_trending_topics(self):
         """Test fetching trending topics from Twitter."""
         trending_topics = self.data_sources.get_trending_topics(location="New York")
         self.assertIsNotNone(trending_topics)
-        #... (add more assertions to validate the fetched trending topics)
+        self.assertIsInstance(trending_topics, list)
+        #... (add more assertions, e.g., check for location)
 
-    #... (add tests for other data source methods)
+    def test_get_facebook_posts(self):
+        """Test fetching Facebook posts."""
+        posts = self.data_sources.get_facebook_posts(query="technology", sentiment="negative")
+        self.assertIsNotNone(posts)
+        self.assertIsInstance(posts, list)
+        #... (add more assertions, e.g., check for sentiment)
+
+    #... (add tests for other data source methods with similar structure)
 
 if __name__ == '__main__':
     unittest.main()
