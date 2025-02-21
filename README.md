@@ -21,7 +21,7 @@ Adam v15.4 is an AI-powered system designed to provide sophisticated investors w
 
 ## Installation
 
-1. **Clone the repository:** `git clone [URL_GOES_HERE]`
+1. **Clone the repository:** `git clone [https://github.com/adamvangrover/adam]`
 2. **Install dependencies:** `pip install -r requirements.txt`
 
 ## Configuration
