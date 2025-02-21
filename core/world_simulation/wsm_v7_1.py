@@ -1,12 +1,50 @@
 # core/world_simulation/wsm_v7_1.py
 
 import random
-#... (import other necessary libraries)
+import numpy as np
+from mesa import Agent, Model
+from mesa.time import RandomActivation
+from mesa.datacollection import DataCollector
 
-class WorldSimulationModel:
+class MarketAgent(Agent):
+    def __init__(self, unique_id, model, risk_aversion):
+        super().__init__(unique_id, model)
+        self.risk_aversion = risk_aversion
+        self.portfolio = {'cash': 1000}  # Initial portfolio
+
+    def step(self):
+        #... (implement agent behavior, e.g., trading logic based on risk aversion and market conditions)
+        pass  # Placeholder for actual implementation
+
+class WorldSimulationModel(Model):
     def __init__(self, config):
+        super().__init__()
         self.data_sources = config.get('data_sources', {})
-        #... (initialize other components, e.g., agent-based model, machine learning models)
+        self.num_agents = config.get('num_agents', 100)
+        self.schedule = RandomActivation(self)
+        #... (initialize other components, e.g., market parameters, data collectors)
+
+        # Create agents
+        for i in range(self.num_agents):
+            risk_aversion = random.uniform(0, 1)  # Randomly assign risk aversion
+            agent = MarketAgent(i, self, risk_aversion)
+            self.schedule.add(agent)
+
+        # Data collector
+        self.datacollector = DataCollector(
+            model_reporters={
+                "Stock Prices": lambda m: {k: v[-1] for k, v in m.stock_prices.items()},
+                "Economic Indicators": lambda m: m.economic_indicators
+            },
+            agent_reporters={
+                "Portfolio": lambda a: a.portfolio
+            }
+        )
+
+    def step(self):
+        #... (update market conditions, e.g., stock prices, economic indicators)
+        self.datacollector.collect(self)
+        self.schedule.step()
 
     def simulate_market_conditions(self, inputs):
         #... (generate simulated market conditions based on the provided inputs)
