@@ -11,6 +11,7 @@ from core.agents.newsletter_layout_specialist_agent import NewsletterLayoutSpeci
 from core.agents.data_verification_agent import DataVerificationAgent
 from core.agents.lexica_agent import LexicaAgent
 from core.agents.archive_manager_agent import ArchiveManagerAgent
+#... (add imports for other agents as needed)
 
 class AgentOrchestrator:
     def __init__(self, agents_config):
@@ -38,6 +39,7 @@ class AgentOrchestrator:
                 self.agents[agent_name] = LexicaAgent(config)
             elif agent_name == "archive_manager_agent":
                 self.agents[agent_name] = ArchiveManagerAgent(config)
+            #... (add instantiation for other agents)
 
         self.workflows = {
             "generate_newsletter": {
@@ -59,36 +61,49 @@ class AgentOrchestrator:
                 "dependencies": {
                     "risk_assessment_agent": ["fundamental_analyst_agent", "technical_analyst_agent"]
                 }
-            }
+            },
+            #... (add more workflows)
         }
 
     def execute_workflow(self, task, **kwargs):
-        if task in self.workflows:
-            workflow = self.workflows[task]
-            completed_agents =
-            for agent_name in workflow["agents"]:
-                # Check for dependencies
-                if agent_name in workflow["dependencies"]:
-                    dependencies = workflow["dependencies"][agent_name]
-                    # Ensure all dependencies have run
-                    if all(dep in completed_agents for dep in dependencies):
-                        # Gather outputs from dependencies
-                        dependency_outputs = {dep: self.agents[dep].outputs for dep in dependencies}
-                        try:
-                            self.agents[agent_name].run(dependency_outputs=dependency_outputs, **kwargs)
-                            completed_agents.append(agent_name)
-                        except Exception as e:
-                            print(f"Error running agent {agent_name}: {e}")
-                    else:
-                        print(f"Agent {agent_name} is waiting for dependencies: {dependencies}")
-                else:
+        # Dynamic Workflow Selection (example)
+        if task == "analyze_investment":
+            if kwargs.get('investment_type') == "stock":
+                workflow = self.workflows["perform_company_analysis"]
+            elif kwargs.get('investment_type') == "portfolio":
+                workflow = self.workflows.get("analyze_portfolio")  # Get the workflow if it exists
+                if not workflow:
+                    print(f"Workflow not found for portfolio analysis.")
+                    return
+            #... (add more conditions)
+        else:
+            workflow = self.workflows.get(task)
+            if not workflow:
+                print(f"Unknown task: {task}")
+                return
+
+        completed_agents =
+        for agent_name in workflow["agents"]:
+            # Check for dependencies
+            if agent_name in workflow["dependencies"]:
+                dependencies = workflow["dependencies"][agent_name]
+                # Ensure all dependencies have run
+                if all(dep in completed_agents for dep in dependencies):
+                    # Gather outputs from dependencies
+                    dependency_outputs = {dep: self.agents[dep].outputs for dep in dependencies}
                     try:
-                        self.agents[agent_name].run(**kwargs)
+                        self.agents[agent_name].run(dependency_outputs=dependency_outputs, **kwargs)
                         completed_agents.append(agent_name)
                     except Exception as e:
                         print(f"Error running agent {agent_name}: {e}")
-        else:
-            print(f"Unknown task: {task}")
+                else:
+                    print(f"Agent {agent_name} is waiting for dependencies: {dependencies}")
+            else:
+                try:
+                    self.agents[agent_name].run(**kwargs)
+                    completed_agents.append(agent_name)
+                except Exception as e:
+                    print(f"Error running agent {agent_name}: {e}")
 
 # Example usage (would be called by a main script)
 if __name__ == "__main__":
@@ -99,3 +114,4 @@ if __name__ == "__main__":
     orchestrator = AgentOrchestrator(agents_config)
     orchestrator.execute_workflow("generate_newsletter")
     orchestrator.execute_workflow("perform_company_analysis")
+    #... (add execution of other workflows)
