@@ -8,6 +8,7 @@ const messageHandler = {
 
     // Handle different message types (text, charts, tables, etc.)
     if (typeof message === 'object') {
+      // Example: Handle chart data
       if (message.type === 'chart') {
         const chartCanvas = document.createElement('canvas');
         chatMessage.appendChild(chartCanvas);
@@ -15,6 +16,7 @@ const messageHandler = {
       }
       //... (handle other message types)
     } else {
+      // Sanitize output before displaying
       const sanitizedMessage = this.sanitizeOutput(message);
       chatMessage.textContent = sanitizedMessage;
     }
@@ -24,12 +26,16 @@ const messageHandler = {
   },
 
   sanitizeOutput(message) {
+    //... (implement output sanitization to prevent XSS vulnerabilities)
+    // Example: Escape HTML special characters
     return message.replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
   },
+
+  //... (add more message handling functions)
 };
 
 // API Communication Module
@@ -106,7 +112,7 @@ function generateIndustryAnalysis(message) {
     if (industries.includes(requestedIndustry)) {
       industry = requestedIndustry;
     } else {
-      return `Sorry, I don't have specific analysis for ${requestedIndustry} yet. Try one of these: ${industries.join(', ')}`;
+      return `Sorry, I don't have analysis for ${requestedIndustry} yet. Try one of these: ${industries.join(', ')}`;
     }
   }
 
@@ -204,14 +210,56 @@ function generatePortfolioOptimization() {
   return `Based on your ${riskTolerance} risk tolerance, your optimized portfolio is expected to generate a return of ${expectedReturn} over the next year.`;
 }
 
+// Function to display README content
 function getREADMEContent() {
-  // Fetch the README content
-  return fetch('../../README.md')
-  .then(response => response.text())
-  .catch(error => {
-      console.error('Error fetching README:', error);
-      return "Error fetching README.";
-    });
+  // Initialize conversation state
+  let currentREADMEQuestion = 0;
+  const readmeQuestions = [
+    "Would you like a quick overview of what I can do?",
+    "What would you like to know more about?",
+    "Would you like to dive deeper into any specific feature?",
+    "Perhaps you're curious about the technology behind me?",
+    "Are you interested in exploring the code and contributing to my development?",
+    "Is there anything else I can help you with?"
+  ];
+
+  // Function to handle user response and provide next question
+  function handleREADMEresponse(userResponse) {
+    const response = userResponse.toLowerCase();
+    let message = "";
+
+    if (currentREADMEQuestion === 0) {
+      if (response.includes('yes')) {
+        message = `I'm Adam v15.4, an AI-powered system designed to provide sophisticated investors with actionable insights and personalized investment recommendations. My capabilities include market analysis, investment research, risk management, and personalized insights. I'm still under development, but I'm learning and growing every day!`;
+      } else {
+        message = "No problem. Feel free to ask me anything about the Adam v15.4 project or its features.";
+      }
+    } else if (currentREADMEQuestion === 1) {
+      if (response.includes('market analysis')) {
+        message = "I can provide market sentiment analysis, macroeconomic analysis, and geopolitical risk assessment. Would you like to know more about any of these?";
+      } else if (response.includes('investment research')) {
+        message = "I can analyze different industries, perform fundamental analysis on companies, and provide technical analysis tools. What would you like to explore further?";
+      }
+      //... (handle other features)
+    } else if (currentREADMEQuestion === 2) {
+      //... (provide detailed explanations of specific features)
+    }
+    //... (handle other questions)
+
+    // Update conversation state and prompt the next question
+    currentREADMEQuestion++;
+    if (currentREADMEQuestion < readmeQuestions.length) {
+      message += " " + readmeQuestions[currentREADMEQuestion];
+    }
+
+    return message;
+  }
+
+  // Start the README conversation
+  return `Welcome to the Adam v15.4 chatbot demo! This chatbot provides a glimpse into the capabilities of the full Adam v15.4 system, which is designed to be a comprehensive financial analysis tool for sophisticated investors.
+
+${readmeQuestions[currentREADMEQuestion]}
+`;
 }
 
 function generateGenericResponse(message) {
@@ -248,18 +296,7 @@ sendButton.addEventListener('click', () => {
 
   // Send message to API and display response
   apiCommunicator.sendMessage(userMessage, (response) => {
-    // Handle the asynchronous response from the API
-    if (response instanceof Promise) {
-      response.then(
-        (readmeContent) => uiUpdater.updateChatWindow(readmeContent, 'bot'),
-        (error) => {
-          console.error('Error fetching README:', error);
-          uiUpdater.updateChatWindow("Error fetching README.", 'bot');
-        }
-      );
-    } else {
-      uiUpdater.updateChatWindow(response, 'bot');
-    }
+    uiUpdater.updateChatWindow(response, 'bot');
   });
 });
 
