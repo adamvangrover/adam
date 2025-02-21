@@ -2,7 +2,7 @@
 
 import pandas as pd
 from fpdf import FPDF
-#... (import other necessary libraries)
+import matplotlib.pyplot as plt
 
 def generate_portfolio_performance_report(portfolio_data):
     """
@@ -14,8 +14,28 @@ def generate_portfolio_performance_report(portfolio_data):
     Returns:
         str: The generated report as a string (e.g., in HTML or plain text format).
     """
-    #... (implementation for generating the report, including calculations, formatting, and visualization)
-    pass  # Placeholder for actual implementation
+
+    # Extract portfolio data
+    holdings = portfolio_data.get('holdings',)
+    total_value = portfolio_data.get('total_value', 0)
+    returns = portfolio_data.get('returns', 0)
+    #... (extract other relevant metrics)
+
+    # Generate report content (example in plain text format)
+    report = f"""
+    Portfolio Performance Report
+
+    Total Value: ${total_value:,.2f}
+    Returns: {returns:.2f}%
+
+    Holdings:
+    """
+    for holding in holdings:
+        report += f"  - {holding['asset']}: {holding['quantity']} shares (Value: ${holding['value']:,.2f})\n"
+
+    #... (add more details, visualizations, etc.)
+
+    return report
 
 def generate_risk_assessment_report(risk_data):
     """
@@ -27,8 +47,25 @@ def generate_risk_assessment_report(risk_data):
     Returns:
         str: The generated report as a string.
     """
-    #... (implementation for generating the report, including formatting and visualization)
-    pass  # Placeholder for actual implementation
+
+    # Extract risk data
+    risk_factors = risk_data.get('risk_factors', {})
+    overall_risk_score = risk_data.get('overall_risk_score', 0)
+
+    # Generate report content
+    report = f"""
+    Risk Assessment Report
+
+    Overall Risk Score: {overall_risk_score:.2f}
+
+    Risk Factors:
+    """
+    for factor, score in risk_factors.items():
+        report += f"  - {factor}: {score:.2f}\n"
+
+    #... (add more details, visualizations, etc.)
+
+    return report
 
 def generate_market_summary_report(market_data):
     """
@@ -40,11 +77,29 @@ def generate_market_summary_report(market_data):
     Returns:
         str: The generated report as a string.
     """
-    #... (implementation for generating the report, including formatting and visualization)
-    pass  # Placeholder for actual implementation
+
+    # Extract market data
+    sentiment = market_data.get('sentiment', {})
+    macro_indicators = market_data.get('macro_indicators', {})
+    #... (extract other relevant data)
+
+    # Generate report content
+    report = f"""
+    Market Summary Report
+
+    Market Sentiment: {sentiment.get('summary', 'N/A')}
+
+    Key Macroeconomic Indicators:
+    """
+    for indicator, value in macro_indicators.items():
+        report += f"  - {indicator}: {value:.2f}\n"
+
+    #... (add more details, visualizations, etc.)
+
+    return report
 
 #... (add other report generation functions as needed)
 
 if __name__ == "__main__":
     #... (example usage of the report generation functions)
-    pass  # Placeholder for actual implementation
+    pass
