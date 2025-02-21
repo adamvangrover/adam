@@ -14,48 +14,34 @@ from core.agents.lexica_agent import LexicaAgent
 from core.agents.archive_manager_agent import ArchiveManagerAgent
 
 class TestMarketSentimentAgent(unittest.TestCase):
-    def setUp(self):
-        """Setup method to create an instance of MarketSentimentAgent."""
-        config = {
-            'data_sources': ['financial_news_api'],
-            'sentiment_threshold': 0.6
-        }
-        self.agent = MarketSentimentAgent(config)
+    #... (existing code)
 
     def test_analyze_sentiment(self):
         """Test analyzing market sentiment."""
         sentiment = self.agent.analyze_sentiment()
         self.assertIsNotNone(sentiment)
-        #... (add more assertions to validate the sentiment analysis)
+        self.assertIn(sentiment, ["positive", "negative", "neutral"])  # Check if sentiment is valid
 
 class TestMacroeconomicAnalysisAgent(unittest.TestCase):
-    def setUp(self):
-        """Setup method to create an instance of MacroeconomicAnalysisAgent."""
-        config = {
-            'data_sources': ['government_stats_api'],
-            'indicators': ['GDP', 'inflation']
-        }
-        self.agent = MacroeconomicAnalysisAgent(config)
+    #... (existing code)
 
     def test_analyze_macroeconomic_data(self):
         """Test analyzing macroeconomic data."""
         data = self.agent.analyze_macroeconomic_data()
         self.assertIsNotNone(data)
-        #... (add more assertions to validate the macroeconomic analysis)
+        self.assertIn('GDP_growth', data)  # Check if GDP growth is present
+        self.assertIn('inflation', data)  # Check if inflation is present
 
 class TestGeopoliticalRiskAgent(unittest.TestCase):
-    def setUp(self):
-        """Setup method to create an instance of GeopoliticalRiskAgent."""
-        config = {}  # Add any necessary configuration
-        self.agent = GeopoliticalRiskAgent(config)
+    #... (existing code)
 
     def test_assess_geopolitical_risks(self):
         """Test assessing geopolitical risks."""
         risks = self.agent.assess_geopolitical_risks()
         self.assertIsNotNone(risks)
-        #... (add more assertions to validate the geopolitical risk assessment)
+        self.assertIsInstance(risks, list)  # Check if risks is a list
 
-#... (add test classes for other agents)
+#... (add test classes for other agents with similar structure)
 
 if __name__ == '__main__':
     unittest.main()
