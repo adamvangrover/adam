@@ -1,19 +1,22 @@
+# core/agents/fundamental_analyst_agent.py
+
 import csv
 import os
+from core.utils.data_utils import send_message
 
-class FundamentalAnalyst:
+class FundamentalAnalystAgent:
     def __init__(self, config):
-        self.data_sources = config.get('data_sources', {})  # Access configured data sources
-        self.output_dir = config.get('output_dir', 'data')  # Directory to store CSV output
+        self.data_sources = config.get('data_sources', {})
+        self.output_dir = config.get('output_dir', 'data')
 
     def analyze_company(self, company_data):
         print(f"Analyzing company fundamentals for {company_data['name']}...")
         financial_statements = company_data['financial_statements']
-        
+
         # 1. Financial Statement Analysis and CSV Export
         if 'income_statement' in financial_statements:
-            self.export_to_csv(financial_statements['income_statement'], 
-                               f"{company_data['name']}_income_statement.csv")
+            self.export_to_csv(financial_statements['income_statement'],
+                              f"{company_data['name']}_income_statement.csv")
         #... (export other statements like balance sheet, cash flow)
 
         # 2. Credit Metrics Calculation
@@ -36,7 +39,7 @@ class FundamentalAnalyst:
         # 7. Narrative Generation (Example)
         narrative = f"""
         Company: {company_data['name']}
-        
+
         Key Findings:
         - Revenue Growth: {revenue_growth:.2f}%
         - EBITDA Margin: {ebitda_margin:.2f}%
@@ -50,6 +53,10 @@ class FundamentalAnalyst:
         {company_data['name']} has demonstrated a {revenue_growth:.2f}% revenue growth rate. 
         However, the company's EBITDA margin of {ebitda_margin:.2f}% suggests...
         """
+
+        # Send analysis results to message queue
+        message = {'agent': 'fundamental_analyst_agent', 'company_analysis': narrative}
+        send_message(message)
 
         return narrative
 
