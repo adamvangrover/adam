@@ -4,6 +4,9 @@ import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
+from ta.trend import SMAIndicator, MACD
+from ta.momentum import RSIIndicator
+#... (import other necessary libraries for technical indicators and patterns)
 
 class TechnicalAnalyst:
     def __init__(self, config):
@@ -20,10 +23,10 @@ class TechnicalAnalyst:
 
         # 1. Feature Engineering
         df = pd.DataFrame(price_data)
-        df['SMA_50'] = df['close'].rolling(window=50).mean()
-        df['SMA_200'] = df['close'].rolling(window=200).mean()
-        df['RSI'] = self.calculate_rsi(df['close'])
-        df['MACD'] = self.calculate_macd(df['close'])
+        df['SMA_50'] = SMAIndicator(close=df['close'], window=50).sma_indicator()
+        df['SMA_200'] = SMAIndicator(close=df['close'], window=200).sma_indicator()
+        df['RSI'] = RSIIndicator(close=df['close'], window=14).rsi()
+        df['MACD'] = MACD(close=df['close'], window_slow=26, window_fast=12, window_sign=9).macd()
         #... (add other technical indicators and features)
 
         # 2. ML Model Training (if requested)
@@ -46,25 +49,6 @@ class TechnicalAnalyst:
         #... (analyze technical indicators and patterns, e.g., moving average crossovers, candlestick patterns)
 
         return signal
-
-    def calculate_rsi(self, prices, period=14):
-        #... (calculate RSI)
-        delta = prices.diff()
-        gain = (delta.where(delta > 0, 0.0)).fillna(0.0)
-        loss = (-delta.where(delta < 0, 0.0)).fillna(0.0)
-        avg_gain = gain.rolling(window=period).mean()
-        avg_loss = loss.rolling(window=period).mean()
-        rs = avg_gain / avg_loss
-        rsi = 100 - (100 / (1 + rs))
-        return rsi
-
-    def calculate_macd(self, prices, short_window=12, long_window=26, signal_window=9):
-        #... (calculate MACD)
-        short_ema = prices.ewm(span=short_window, adjust=False).mean()
-        long_ema = prices.ewm(span=long_window, adjust=False).mean()
-        macd_line = short_ema - long_ema
-        signal_line = macd_line.ewm(span=signal_window, adjust=False).mean()
-        return macd_line, signal_line
 
     def prepare_training_data(self, df):
         #... (prepare features and labels for training)
