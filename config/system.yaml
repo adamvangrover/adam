@@ -1,1 +1,30 @@
-system.yaml
+# core/config/system.yaml
+
+# Task Scheduler Configuration
+tasks:
+  - name: generate_daily_newsletter
+    schedule: daily
+    parameters:
+      recipients:
+        - user1@example.com
+        - user2@example.com
+      #... (add other parameters for the newsletter)
+  - name: update_market_data
+    schedule: hourly
+  - name: perform_weekly_analysis
+    schedule: weekly
+    parameters:
+      #... (add parameters for the weekly analysis)
+
+# Resource Limits
+resource_limits:
+  cpu_limit: 80  # Percentage
+  memory_limit: 80  # Percentage
+
+# Logging Configuration
+logging:
+  level: INFO  # or "DEBUG", "WARNING", "ERROR"
+  file: logs/adam.log
+
+# Other System Parameters
+#...
