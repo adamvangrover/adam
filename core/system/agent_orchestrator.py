@@ -65,7 +65,7 @@ class AgentOrchestrator:
     def execute_workflow(self, task, **kwargs):
         if task in self.workflows:
             workflow = self.workflows[task]
-            completed_agents =  # Keep track of completed agents
+            completed_agents =
             for agent_name in workflow["agents"]:
                 # Check for dependencies
                 if agent_name in workflow["dependencies"]:
@@ -74,13 +74,19 @@ class AgentOrchestrator:
                     if all(dep in completed_agents for dep in dependencies):
                         # Gather outputs from dependencies
                         dependency_outputs = {dep: self.agents[dep].outputs for dep in dependencies}
-                        self.agents[agent_name].run(dependency_outputs=dependency_outputs, **kwargs)
-                        completed_agents.append(agent_name)
+                        try:
+                            self.agents[agent_name].run(dependency_outputs=dependency_outputs, **kwargs)
+                            completed_agents.append(agent_name)
+                        except Exception as e:
+                            print(f"Error running agent {agent_name}: {e}")
                     else:
                         print(f"Agent {agent_name} is waiting for dependencies: {dependencies}")
                 else:
-                    self.agents[agent_name].run(**kwargs)
-                    completed_agents.append(agent_name)
+                    try:
+                        self.agents[agent_name].run(**kwargs)
+                        completed_agents.append(agent_name)
+                    except Exception as e:
+                        print(f"Error running agent {agent_name}: {e}")
         else:
             print(f"Unknown task: {task}")
 
