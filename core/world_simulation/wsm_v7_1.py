@@ -13,7 +13,19 @@ class MarketAgent(Agent):
         self.portfolio = {'cash': 1000}  # Initial portfolio
 
     def step(self):
-        #... (implement agent behavior, e.g., trading logic based on risk aversion and market conditions)
+        # 1. Observe market conditions
+        current_prices = self.model.stock_prices
+        economic_indicators = self.model.economic_indicators
+
+        # 2. Make investment decisions (example)
+        if economic_indicators['GDP_growth'][-1] > 2.5 and current_prices['AAPL'][-1] < 180:
+            # Buy AAPL if GDP growth is strong and price is below 180
+            self.buy_stock('AAPL', 100)  # Buy 100 shares of AAPL
+
+        #... (add more complex decision-making logic based on risk aversion and other factors)
+
+    def buy_stock(self, symbol, quantity):
+        #... (implement logic to buy stock, updating portfolio and market prices)
         pass  # Placeholder for actual implementation
 
 class WorldSimulationModel(Model):
@@ -22,6 +34,8 @@ class WorldSimulationModel(Model):
         self.data_sources = config.get('data_sources', {})
         self.num_agents = config.get('num_agents', 100)
         self.schedule = RandomActivation(self)
+        self.stock_prices = {'AAPL':, 'MSFT':}  # Initial stock prices
+        self.economic_indicators = {'GDP_growth':, 'inflation':}  # Initial economic indicators
         #... (initialize other components, e.g., market parameters, data collectors)
 
         # Create agents
@@ -42,33 +56,11 @@ class WorldSimulationModel(Model):
         )
 
     def step(self):
-        #... (update market conditions, e.g., stock prices, economic indicators)
-        self.datacollector.collect(self)
+        # Update market conditions (example)
+        self.stock_prices['AAPL'].append(self.stock_prices['AAPL'][-1] * (1 + random.uniform(-0.05, 0.05)))
+        self.stock_prices['MSFT'].append(self.stock_prices['MSFT'][-1] * (1 + random.uniform(-0.05, 0.05)))
+        self.economic_indicators['GDP_growth'].append(self.economic_indicators['GDP_growth'][-1] + random.uniform(-0.1, 0.1))
+        #... (update other market parameters)
+
         self.schedule.step()
-
-    def simulate_market_conditions(self, inputs):
-        #... (generate simulated market conditions based on the provided inputs)
-        #... (use agent-based modeling, Monte Carlo simulation, or other techniques)
-        simulated_market_data = {
-            'stock_prices': {
-                'AAPL':,  # Example simulated prices for AAPL
-                'MSFT':,  # Example simulated prices for MSFT
-                #... (add more stocks)
-            },
-            'economic_indicators': {
-                'GDP_growth':,  # Example simulated GDP growth rates
-                'inflation':,  # Example simulated inflation rates
-                #... (add more indicators)
-            },
-            #... (add other simulated data)
-        }
-        return simulated_market_data
-
-    def generate_scenarios(self, num_scenarios=10):
-        #... (generate multiple scenarios by varying input parameters)
-        scenarios =
-        for i in range(num_scenarios):
-            #... (vary input parameters, e.g., economic growth, geopolitical events)
-            simulated_data = self.simulate_market_conditions(inputs)
-            scenarios.append(simulated_data)
-        return scenarios
+        self.datacollector.collect(self)
