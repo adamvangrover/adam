@@ -1,1 +1,15 @@
 adam.log
+
+# In any agent or module
+
+import logging
+
+# Configure logging
+logging.basicConfig(filename='logs/adam.log', level=logging.INFO,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+def some_function():
+    try:
+        #... (code that might raise an exception)
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
