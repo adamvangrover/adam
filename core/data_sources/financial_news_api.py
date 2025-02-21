@@ -1,26 +1,34 @@
 # core/data_sources/financial_news_api.py
 
-import random
+import requests
+from textblob import TextBlob
 
-class SimulatedFinancialNewsAPI:
-    def get_headlines(self):
-        # Simulate fetching news headlines
-        headlines = [
-            "Tech Stocks Surge on AI Breakthrough",
-            "Inflation Concerns Weigh on Market",
-            "Central Bank Holds Interest Rates Steady",
-            "Geopolitical Tensions Rise in Eastern Europe",
-            "New Healthcare Regulations Announced"
-        ]
-        # Simulate some variability in the news (positive/negative sentiment)
-        simulated_sentiment = random.choice(["positive", "negative", "neutral"])
-        return headlines, simulated_sentiment
+class FinancialNewsAPI:
+    def __init__(self, config):
+        self.api_keys = config.get('api_keys', {})
 
-# Example usage
-if __name__ == "__main__":
-    api = SimulatedFinancialNewsAPI()
-    headlines, sentiment = api.get_headlines()
-    print("Simulated News Headlines:")
-    for headline in headlines:
-        print(f"- {headline}")
-    print(f"Overall Sentiment: {sentiment}")
+    def get_headlines(self, source="bloomberg", keywords=None, sentiment=None):
+        if source == "bloomberg":
+            #... (use requests library to fetch news headlines from Bloomberg API)
+            #... (apply sentiment analysis using TextBlob or other sentiment analysis libraries)
+            #... (filter news based on keywords and sentiment)
+            pass  # Placeholder for actual implementation
+        elif source == "reuters":
+            #... (use requests library to fetch news headlines from Reuters API)
+            #... (apply sentiment analysis using TextBlob or other sentiment analysis libraries)
+            #... (filter news based on keywords and sentiment)
+            pass  # Placeholder for actual implementation
+        #... (add more news sources)
+        return headlines
+
+    def get_historical_news(self, source="bloomberg", keywords=None, start_date=None, end_date=None):
+        if source == "bloomberg":
+            #... (fetch historical news data from Bloomberg API)
+            #... (filter news based on keywords and date range)
+            pass  # Placeholder for actual implementation
+        elif source == "reuters":
+            #... (fetch historical news data from Reuters API)
+            #... (filter news based on keywords and date range)
+            pass  # Placeholder for actual implementation
+        #... (add more news sources)
+        return historical_news
