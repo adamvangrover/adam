@@ -2,7 +2,8 @@
 
 import tweepy
 from textblob import TextBlob
-#... (import other necessary libraries for Facebook, Instagram, TikTok, etc.)
+from facebook_scraper import get_posts
+#... (import other necessary libraries for Instagram, TikTok, etc.)
 
 class SocialMediaAPI:
     def __init__(self, config):
@@ -23,10 +24,24 @@ class SocialMediaAPI:
         #... (implementation for identifying influencers on Twitter)
 
     def get_facebook_posts(self, query, count=100, sentiment=None):
-        #... (implementation for fetching posts from Facebook)
-        #... (apply sentiment analysis)
-        #... (filter posts based on sentiment)
-        pass  # Placeholder for actual implementation
+        posts =
+        try:
+            for post in get_posts(query, pages=int(count/10)):  # Assuming 10 posts per page
+                post_text = post['text']
+                # Perform sentiment analysis
+                analysis = TextBlob(post_text)
+                post_sentiment = analysis.sentiment.polarity
+                # Filter posts based on sentiment
+                if sentiment:
+                    if (sentiment == "positive" and post_sentiment > 0) or \
+                       (sentiment == "negative" and post_sentiment < 0) or \
+                       (sentiment == "neutral" and post_sentiment == 0):
+                        posts.append({'text': post_text, 'sentiment': post_sentiment})
+                else:
+                    posts.append({'text': post_text, 'sentiment': post_sentiment})
+        except Exception as e:
+            print(f"Error fetching Facebook posts: {e}")
+        return posts
 
     def get_instagram_posts(self, query, count=100, sentiment=None):
         #... (implementation for fetching posts from Instagram)
