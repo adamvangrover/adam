@@ -4,7 +4,7 @@ from core.agents.market_sentiment_agent import MarketSentimentAgent
 from core.agents.macroeconomic_analysis_agent import MacroeconomicAnalysisAgent
 from core.agents.geopolitical_risk_agent import GeopoliticalRiskAgent
 from core.agents.industry_specialist_agent import IndustrySpecialistAgent
-from core.agents.fundamental_analyst_agent import FundamentalAnalyst
+from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
 from core.agents.technical_analyst_agent import TechnicalAnalyst
 from core.agents.risk_assessment_agent import RiskAssessor
 from core.agents.newsletter_layout_specialist_agent import NewsletterLayoutSpecialist
@@ -26,7 +26,7 @@ class AgentOrchestrator:
             elif agent_name == "industry_specialist_agent":
                 self.agents[agent_name] = IndustrySpecialistAgent(config)
             elif agent_name == "fundamental_analyst_agent":
-                self.agents[agent_name] = FundamentalAnalyst(config)
+                self.agents[agent_name] = FundamentalAnalystAgent(config)
             elif agent_name == "technical_analyst_agent":
                 self.agents[agent_name] = TechnicalAnalyst(config)
             elif agent_name == "risk_assessment_agent":
@@ -92,7 +92,13 @@ class AgentOrchestrator:
                     # Gather outputs from dependencies
                     dependency_outputs = {dep: self.agents[dep].outputs for dep in dependencies}
                     try:
-                        self.agents[agent_name].run(dependency_outputs=dependency_outputs, **kwargs)
+                        # Check if the agent uses message queue communication
+                        if hasattr(self.agents[agent_name], 'use_message_queue') and \
+                           self.agents[agent_name].use_message_queue:
+                            self.agents[agent_name].run(dependency_outputs=dependency_outputs, **kwargs)
+                        else:
+                            # Execute the agent's run method directly
+                            self.agents[agent_name].run(**kwargs)
                         completed_agents.append(agent_name)
                     except Exception as e:
                         print(f"Error running agent {agent_name}: {e}")
@@ -100,7 +106,13 @@ class AgentOrchestrator:
                     print(f"Agent {agent_name} is waiting for dependencies: {dependencies}")
             else:
                 try:
-                    self.agents[agent_name].run(**kwargs)
+                    # Check if the agent uses message queue communication
+                    if hasattr(self.agents[agent_name], 'use_message_queue') and \
+                       self.agents[agent_name].use_message_queue:
+                        self.agents[agent_name].run(**kwargs)
+                    else:
+                        # Execute the agent's run method directly
+                        self.agents[agent_name].run(**kwargs)
                     completed_agents.append(agent_name)
                 except Exception as e:
                     print(f"Error running agent {agent_name}: {e}")
