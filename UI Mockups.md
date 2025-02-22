@@ -184,5 +184,3 @@ This document provides a textual representation of the UI mockups for the Adam v
 *   These mockups provide a high-level overview of the UI design.
 *   The actual implementation may involve more detailed elements and interactions.
 *   User feedback and testing will be crucial in refining the UI design and ensuring a positive user experience.
-
-This comprehensive textual representation of the UI mockups can be included in the GitHub repository as a Markdown file (e.g., `ui_mockups.md`), providing a clear and accessible blueprint for the UI development of Adam v15.4's web application.
