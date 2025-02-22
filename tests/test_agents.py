@@ -6,13 +6,22 @@ from core.agents.market_sentiment_agent import MarketSentimentAgent
 from core.agents.macroeconomic_analysis_agent import MacroeconomicAnalysisAgent
 from core.agents.geopolitical_risk_agent import GeopoliticalRiskAgent
 from core.agents.industry_specialist_agent import IndustrySpecialistAgent
-#... (import other agents)
+from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
+from core.agents.technical_analyst_agent import TechnicalAnalyst
+from core.agents.risk_assessment_agent import RiskAssessor
+from core.agents.newsletter_layout_specialist_agent import NewsletterLayoutSpecialist
+from core.agents.data_verification_agent import DataVerificationAgent
+from core.agents.lexica_agent import LexicaAgent
+from core.agents.archive_manager_agent import ArchiveManagerAgent
+from core.agents.echo_agent import EchoAgent
+
+#... (other imports)
 
 class TestMarketSentimentAgent(unittest.TestCase):
     def setUp(self):
         """Setup method to create an instance of MarketSentimentAgent."""
         config = {
-            'data_sources': {'financial_news_api': Mock()},  # Mock the data source
+            'data_sources': {'financial_news_api': Mock()},
             'sentiment_threshold': 0.6
         }
         self.agent = MarketSentimentAgent(config)
@@ -30,6 +39,34 @@ class TestMarketSentimentAgent(unittest.TestCase):
         mock_send_message.assert_called_once_with(
             {'agent': 'market_sentiment_agent', 'sentiment': 'neutral'}
         )  # Check if message is sent
+
+    @patch('core.agents.market_sentiment_agent.send_message')
+    def test_analyze_sentiment_with_positive_news(self, mock_send_message):
+        """Test analyzing market sentiment with positive news."""
+        # Mock the data source's response with positive sentiment
+        self.agent.data_sources['financial_news_api'].get_headlines.return_value = (
+            ["Positive headline 1", "Positive headline 2"], "positive"
+        )
+
+        sentiment = self.agent.analyze_sentiment()
+        self.assertEqual(sentiment, "positive")
+        mock_send_message.assert_called_once_with(
+            {'agent': 'market_sentiment_agent', 'sentiment': 'positive'}
+        )
+
+    @patch('core.agents.market_sentiment_agent.send_message')
+    def test_analyze_sentiment_with_negative_news(self, mock_send_message):
+        """Test analyzing market sentiment with negative news."""
+        # Mock the data source's response with negative sentiment
+        self.agent.data_sources['financial_news_api'].get_headlines.return_value = (
+            ["Negative headline 1", "Negative headline 2"], "negative"
+        )
+
+        sentiment = self.agent.analyze_sentiment()
+        self.assertEqual(sentiment, "negative")
+        mock_send_message.assert_called_once_with(
+            {'agent': 'market_sentiment_agent', 'sentiment': 'negative'}
+        )
 
 class TestMacroeconomicAnalysisAgent(unittest.TestCase):
     def setUp(self):
@@ -54,6 +91,17 @@ class TestMacroeconomicAnalysisAgent(unittest.TestCase):
         mock_send_message.assert_called_once_with(
             {'agent': 'macroeconomic_analysis_agent', 'insights': insights}
         )
+
+    @patch('core.agents.macroeconomic_analysis_agent.send_message')
+    def test_analyze_macroeconomic_data_with_high_gdp_growth(self, mock_send_message):
+        """Test analyzing macroeconomic data with high GDP growth."""
+        # Mock the data source's responses with high GDP growth
+        self.agent.data_sources['government_stats_api'].get_gdp.return_value =
+        self.agent.data_sources['government_stats_api'].get_inflation.return_value =
+
+        insights = self.agent.analyze_macroeconomic_data()
+        self.assertEqual(insights['GDP_growth_trend'], 'positive')  # Check if GDP growth trend is positive
+
 
 class TestGeopoliticalRiskAgent(unittest.TestCase):
     def setUp(self):
