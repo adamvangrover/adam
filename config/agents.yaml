@@ -1,34 +1,236 @@
 # config/agents.yaml
 
-market_sentiment_agent:
-  data_sources:
-    - financial_news_api
-    - social_media_api
-  sentiment_threshold: 0.6  # Example
+agents:
+  market_sentiment_agent:
+    persona: "Market Whisperer"
+    description: "A keen observer of market sentiment, adept at deciphering the collective wisdom of the crowd."
+    data_sources:
+      - financial_news_api
+      - social_media_api
+    sentiment_analysis_method: "ensemble"  # Use a combination of techniques
+    sentiment_threshold: 0.7  # High threshold for significant sentiment shifts
+    alert_on_significant_shifts: true
+    communication_style: "concise and insightful"
 
-macroeconomic_analysis_agent:
-  data_sources:
-    - government_statistical_agencies
-  indicators:
-    - GDP
-    - inflation
-    - unemployment
+  macroeconomic_analysis_agent:
+    persona: "Economic Oracle"
+    description: "A master of macroeconomic analysis, adept at interpreting economic indicators and forecasting trends."
+    data_sources:
+      - government_stats_api
+    indicators:
+      - GDP
+      - inflation
+      - unemployment
+      - interest rates
+    analysis_frequency: "daily"
+    forecast_horizon: "1 year"
+    alert_on_key_indicators: true
+    communication_style: "detailed and informative"
 
-# ... other agents
+  geopolitical_risk_agent:
+    persona: "Global Sentinel"
+    description: "A vigilant guardian, assessing geopolitical risks and their potential impact on the world stage."
+    data_sources:
+      - news_api
+      - political_databases
+    risk_assessment_framework: "multi-factor"
+    risk_tolerance: "conservative"
+    alert_on_high_risk_events: true
+    communication_style: "concise and actionable"
 
-# ... (previous entries)
+  industry_specialist_agent:
+    # Configuration for each industry specialist will be defined separately
+    technology:
+      persona: "Tech Visionary"
+      description: "A technology enthusiast with a deep understanding of the industry's trends and innovations."
+      data_sources:
+        - technology_news_api
+        - technology_market_data
+      focus_areas:
+        - AI
+        - cloud computing
+        - cybersecurity
+      alert_on_emerging_trends: true
+      communication_style: "enthusiastic and informative"
 
-geopolitical_risk_agent:
-  # Add configuration if needed
+    healthcare:
+      persona: "Medical Sage"
+      description: "A healthcare expert with a deep understanding of the industry's trends, innovations, and regulations."
+      data_sources:
+        - healthcare_news_api
+        - clinical_trial_databases
+        - fda_filings
+      focus_areas:
+        - drug development
+        - medical devices
+        - healthcare policy
+      alert_on_clinical_trial_results: true
+      communication_style: "analytical and precise"
 
-industry_specialist_agent:
-  sector: "technology"  # or "healthcare", "energy", etc.
+    energy:
+      persona: "Energy Guru"
+      description: "An energy expert with a deep understanding of the industry's trends, innovations, and regulations."
+      data_sources:
+        - energy_news_api
+        - energy_market_data
+        - government_energy_reports
+      focus_areas:
+        - renewable energy
+        - oil and gas
+        - energy infrastructure
+      alert_on_energy_price_changes: true
+      communication_style: "data-driven and insightful"
 
-data_verification_agent:
-  # Add configuration if needed
+    financials:
+      persona: "Financial Maestro"
+      description: "A financial expert with a deep understanding of the industry's trends, regulations, and key players."
+      data_sources:
+        - financial_news_api
+        - financial_market_data
+        - regulatory_filings
+      focus_areas:
+        - banking
+        - insurance
+        - asset management
+      alert_on_financial_regulations: true
+      communication_style: "concise and insightful"
 
-lexica_agent:
-  # Add configuration if needed
+    industrials:
+      persona: "Industrialist"
+      description: "An expert in the industrials sector, with a deep understanding of manufacturing, supply chains, and economic trends."
+      data_sources:
+        - industrials_news_api
+        - economic_data
+        - manufacturing_reports
+      focus_areas:
+        - manufacturing
+        - aerospace
+        - construction
+      alert_on_economic_indicators: true
+      communication_style: "data-driven and insightful"
 
-archive_manager_agent:
-  archive_dir: "core/libraries_and_archives"
+    materials:
+      persona: "Materials Maven"
+      description: "An expert in the materials sector, with a deep understanding of commodity markets, supply chains, and sustainability."
+      data_sources:
+        - materials_news_api
+        - commodity_market_data
+        - sustainability_reports
+      focus_areas:
+        - mining
+        - metals
+        - chemicals
+      alert_on_commodity_price_changes: true
+      communication_style: "analytical and precise"
+
+    #... (configurations for other industries)
+
+  fundamental_analyst_agent:
+    persona: "Financial Detective"
+    description: "A meticulous analyst, uncovering the hidden value and risks in financial statements."
+    data_sources:
+      - company_filings
+      - financial_databases
+    valuation_models:
+      - DCF
+      - comparable company analysis
+    risk_assessment_method: "quantitative and qualitative"
+    communication_style: "analytical and precise"
+
+  technical_analyst_agent:
+    persona: "Chart Whisperer"
+    description: "A master of technical analysis, deciphering patterns and signals in the charts."
+    data_sources:
+      - market_data_api
+    indicators:
+      - moving averages
+      - RSI
+      - MACD
+    chart_patterns:
+      - head and shoulders
+      - double top/bottom
+      - flags and pennants
+    trading_strategy: "trend following"
+    communication_style: "visual and concise"
+
+  risk_assessment_agent:
+    persona: "Risk Guardian"
+    description: "A cautious and vigilant protector, assessing and mitigating investment risks."
+    data_sources:
+      - market_data_api
+      - company_data
+      - macroeconomic_data
+    risk_metrics:
+      - volatility
+      - beta
+      - VaR
+      - CVaR
+    risk_models:
+      - credit scoring models
+      - Monte Carlo simulation
+    communication_style: "clear and informative"
+
+  newsletter_layout_specialist_agent:
+    persona: "Narrative Weaver"
+    description: "A master storyteller, crafting compelling narratives from market data and insights."
+    data_sources:
+      - all agents
+    template: "dynamic"  # Adapts to different content and styles
+    visualization_tools:
+      - charts
+      - graphs
+      - tables
+    communication_style: "engaging and informative"
+
+  data_verification_agent:
+    persona: "Truth Seeker"
+    description: "A meticulous fact-checker, ensuring data accuracy and reliability."
+    data_sources:
+      - all data sources
+    verification_methods:
+      - cross-referencing
+      - data type validation
+      - outlier detection
+      - source credibility assessment
+    communication_style: "precise and reliable"
+
+  lexica_agent:
+    persona: "Knowledge Navigator"
+    description: "A master of information retrieval, navigating the vast sea of data to find relevant knowledge."
+    data_sources:
+      - web pages
+      - news articles
+      - reports
+      - databases
+    search_methods:
+      - keyword-based search
+      - natural language processing (NLP)
+      - semantic analysis
+    communication_style: "informative and concise"
+
+  archive_manager_agent:
+    persona: "Memory Keeper"
+    description: "A meticulous organizer, preserving and managing the collective knowledge and history of Adam v15.4."
+    data_storage:
+      - market overviews
+      - company recommendations
+      - newsletters
+      - reports
+    data_management_methods:
+      - version control
+      - data backup and recovery
+      - access control
+    communication_style: "organized and efficient"
+
+  echo_agent:
+    persona: "Adam's Echo"
+    description: "A reflection of Adam v15.4, simulating a chatbot UI and providing a user-friendly interface."
+    ui_type: "chatbot"
+    communication_style: "conversational and helpful"
+    expert_network:
+      - 3 corporations
+      - 5-7 sub-organizations per corporation
+      - 3 experts per team
+    reasoning_methods:
+      - GRPO
+      - chain-of-thought
