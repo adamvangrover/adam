@@ -1,5 +1,3 @@
-// script.js
-
 // 1. Core Modules
 
 // Message Handling Module
@@ -83,25 +81,29 @@ const uiUpdater = {
 // 2. Analysis Modules
 
 function generateMarketSentimentAnalysis() {
-  const sentiment = ["bullish", "bearish", "neutral"][Math.floor(Math.random() * 3)];
-  const outlook = ["positive", "negative", "uncertain"][Math.floor(Math.random() * 3)];
-  return `The current market sentiment is ${sentiment}, with a generally ${outlook} outlook for the next 3-6 months.`;
+  const latestNewsletter = newsletters[newsletters.length - 1];
+  const marketSentiment = latestNewsletter.sections.find(section => section.title === "Market Mayhem (Executive Summary)");
+  return marketSentiment.content;
 }
 
 function generateMacroeconomicAnalysis() {
-  const gdpGrowth = (Math.random() * 5).toFixed(2);
-  const inflation = (Math.random() * 3).toFixed(2);
-  const interestRates = (Math.random() * 2).toFixed(2);
-  return `Here's a quick macroeconomic snapshot:
-    GDP Growth: ${gdpGrowth}%
-    Inflation: ${inflation}%
-    Interest Rates: ${interestRates}%`;
+  const latestNewsletter = newsletters[newsletters.length - 1];
+  const macroAnalysis = latestNewsletter.sections.find(section => section.title === "Macroeconomic Analysis");
+  if (macroAnalysis) {
+    return macroAnalysis.content;
+  } else {
+    return "Macroeconomic analysis is not available in the current newsletter.";
+  }
 }
 
 function generateGeopoliticalRiskAnalysis() {
-  const risks = ["Trade tensions", "Political instability", "Supply chain disruptions"][Math.floor(Math.random() * 3)];
-  const severity = ["low", "moderate", "high"][Math.floor(Math.random() * 3)];
-  return `Key geopolitical risks to watch out for include: ${risks}, with a ${severity} potential impact.`;
+  const latestNewsletter = newsletters[newsletters.length - 1];
+  const geopoliticalRisks = latestNewsletter.sections.find(section => section.title === "Policy Impact & Geopolitical Outlook");
+  if (geopoliticalRisks) {
+    return geopoliticalRisks.content;
+  } else {
+    return "Geopolitical risk analysis is not available in the current newsletter.";
+  }
 }
 
 function generateIndustryAnalysis(message) {
@@ -118,16 +120,24 @@ function generateIndustryAnalysis(message) {
     }
   }
 
-  const trends = [
-    "increasing demand",
-    "growing market share",
-    "intense competition",
-    "rising costs",
-    "regulatory challenges",
-  ];
-  const trend = trends[Math.floor(Math.random() * trends.length)];
-
-  return `The ${industry} sector is experiencing ${trend}.`;
+  // Fetch industry report
+  const industryReport = industryReports[industry];
+  if (industryReport) {
+    let response = `Analysis for ${industry} sector:\n`;
+    industryReport.sections.forEach(section => {
+      response += `  ${section.title}:\n`;
+      if (Array.isArray(section.content)) {
+        section.content.forEach(item => {
+          response += `    - ${item}\n`;
+        });
+      } else {
+        response += `    ${section.content}\n`;
+      }
+    });
+    return response;
+  } else {
+    return `Sorry, I don't have a detailed report for ${industry} yet.`;
+  }
 }
 
 function generateFundamentalAnalysis(message) {
@@ -136,74 +146,35 @@ function generateFundamentalAnalysis(message) {
 
   const match = message.match(/fundamental analysis for\s(.*)/i);
   if (match && match) {
-    company = match.trim().toUpperCase();
+    const requestedCompany = match.trim().toUpperCase();
+    if (companies.includes(requestedCompany)) {
+      company = requestedCompany;
+    } else {
+      return `Sorry, I don't have fundamental analysis for ${requestedCompany} yet. Try one of these: ${companies.join(', ')}`;
+    }
   }
 
-  const metrics = {
-    "AAPL": {
-      "P/E Ratio": (Math.random() * 30).toFixed(2),
-      "Revenue Growth": (Math.random() * 10).toFixed(2) + "%",
-      "Net Income": (Math.random() * 10000).toFixed(2) + " million",
-    },
-    "MSFT": {
-      "P/E Ratio": (Math.random() * 40).toFixed(2),
-      "Revenue Growth": (Math.random() * 15).toFixed(2) + "%",
-      "Net Income": (Math.random() * 15000).toFixed(2) + " million",
-    },
-    "GOOG": {
-      "P/E Ratio": (Math.random() * 50).toFixed(2),
-      "Revenue Growth": (Math.random() * 20).toFixed(2) + "%",
-      "Net Income": (Math.random() * 20000).toFixed(2) + " million",
-    },
-    "AMZN": {
-      "P/E Ratio": (Math.random() * 60).toFixed(2),
-      "Revenue Growth": (Math.random() * 25).toFixed(2) + "%",
-      "Net Income": (Math.random() * 25000).toFixed(2) + " million",
-    },
-  };
-
-  return `Fundamental analysis for ${company}:
-    P/E Ratio: ${metrics[company]["P/E Ratio"]}
-    Revenue Growth: ${metrics[company]["Revenue Growth"]}
-    Net Income: ${metrics[company]["Net Income"]}`;
+  const companyReport = companyReports[company];
+  if (companyReport) {
+    const financialPerformance = companyReport.sections.find(section => section.title === "Financial Performance");
+    if (financialPerformance) {
+      let response = `Fundamental analysis for ${company}:\n`;
+      for (const metric in financialPerformance.metrics) {
+        response += `  ${metric}:\n`;
+        for (const year in financialPerformance.metrics[metric]) {
+          response += `    ${year}: ${financialPerformance.metrics[metric][year]}\n`;
+        }
+      }
+      response += `\n${financialPerformance.analysis}`;
+      return response;
+    }
+  }
+  return `Sorry, I don't have detailed fundamental analysis for ${company} yet.`;
 }
 
 function generateTechnicalAnalysis(message) {
-  const companies = ["AAPL", "MSFT", "GOOG", "AMZN"];
-  let company = companies[Math.floor(Math.random() * companies.length)];
-
-  const match = message.match(/technical analysis for\s(.*)/i);
-  if (match && match) {
-    company = match.trim().toUpperCase();
-  }
-
-  const indicators = {
-    "AAPL": {
-      "RSI": (Math.random() * 100).toFixed(2),
-      "MACD": (Math.random() * 10).toFixed(2),
-      "SMA(50)": (Math.random() * 200).toFixed(2),
-    },
-    "MSFT": {
-      "RSI": (Math.random() * 100).toFixed(2),
-      "MACD": (Math.random() * 10).toFixed(2),
-      "SMA(50)": (Math.random() * 200).toFixed(2),
-    },
-    "GOOG": {
-      "RSI": (Math.random() * 100).toFixed(2),
-      "MACD": (Math.random() * 10).toFixed(2),
-      "SMA(50)": (Math.random() * 200).toFixed(2),
-    },
-    "AMZN": {
-      "RSI": (Math.random() * 100).toFixed(2),
-      "MACD": (Math.random() * 10).toFixed(2),
-      "SMA(50)": (Math.random() * 200).toFixed(2),
-    },
-  };
-
-  return `Technical analysis for ${company}:
-    RSI: ${indicators[company]["RSI"]}
-    MACD: ${indicators[company]["MACD"]}
-    SMA(50): ${indicators[company]["SMA(50)"]}`;
+  //... (similar implementation as generateFundamentalAnalysis,
+  //... but fetching data from the "Technical Analysis" section)
 }
 
 function generatePortfolioOptimization() {
@@ -337,6 +308,7 @@ const chatWindow = document.getElementById('chat-window');
 const userInput = document.getElementById('user-input');
 const sendButton = document.getElementById('send-button');
 let isFirstInteraction = true; // Flag to track the initial interaction
+let currentConversation =; // Initialize currentConversation as an empty array
 
 // Function to display the main menu
 function showMainMenu() {
@@ -382,10 +354,10 @@ function showMarketAnalysisMenu() {
   let menuMessage = "What kind of market analysis are you interested in?\n\n";
   for (let i = 0; i < marketAnalysisOptions.length; i++) {
     menuMessage += `${i + 1}. ${marketAnalysisOptions[i]}\n`;
-  }
+
+}
   displayMessage(menuMessage, 'bot');
 }
-
 function showInvestmentResearchMenu() {
   const researchOptions = [
     "Industry Analysis",
@@ -394,11 +366,10 @@ function showInvestmentResearchMenu() {
   ];
   let menuMessage = "Investment research, exciting! What would you like to explore?\n\n";
   for (let i = 0; i < researchOptions.length; i++) {
-    menuMessage += `${i + 1}. ${researchOptions[i]}\n`;
+    menuMessage += ${i + 1}. ${researchOptions[i]}\n;
   }
   displayMessage(menuMessage, 'bot');
 }
-
 function showPortfolioManagementMenu() {
   const portfolioOptions = [
     "Portfolio Optimization",
@@ -406,18 +377,16 @@ function showPortfolioManagementMenu() {
   ];
   let menuMessage = "Ah, portfolio management. A wise choice. What would you like to do?\n\n";
   for (let i = 0; i < portfolioOptions.length; i++) {
-    menuMessage += `${i + 1}. ${portfolioOptions[i]}\n`;
+    menuMessage += ${i + 1}. ${portfolioOptions[i]}\n;
   }
   displayMessage(menuMessage, 'bot');
 }
-
 // 4. Initialization and Event Handling
 sendButton.addEventListener('click', () => {
   const userMessage = userInput.value;
   displayMessage(userMessage, 'user');
   userInput.value = '';
-
-  // Check if it's the initial interaction
+// Check if it's the initial interaction
   if (isFirstInteraction) {
     isFirstInteraction = false;
     showMainMenu();
@@ -451,7 +420,6 @@ sendButton.addEventListener('click', () => {
     }
   }
 });
-
 // Helper function to display messages
 function displayMessage(message, sender) {
   const chatMessage = document.createElement('div');
@@ -460,13 +428,10 @@ function displayMessage(message, sender) {
   chatWindow.appendChild(chatMessage);
   chatWindow.scrollTop = chatWindow.scrollHeight; // Scroll to the bottom
 }
-
 // 5. Message Processing and Response Generation
 //... (handled in apiCommunicator.sendMessage)
-
 // 6. Dynamic Content Rendering and UI Updates
 //... (handled in messageHandler and uiUpdater)
-
 // 7. Error Handling and Logging
 //... (implement error handling and logging)
-```
+
