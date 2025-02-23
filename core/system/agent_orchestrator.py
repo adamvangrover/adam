@@ -25,6 +25,7 @@ class AgentOrchestrator:
     def __init__(self, agents_config):
         self.agents = {}
         for agent_name, config in agents_config.items():
+            # Instantiate each agent based on its configuration
             if agent_name == "market_sentiment_agent":
                 self.agents[agent_name] = MarketSentimentAgent(config)
             elif agent_name == "macroeconomic_analysis_agent":
@@ -59,6 +60,7 @@ class AgentOrchestrator:
                 self.agents[agent_name] = SenseWeaver(config)
             #... (add instantiation for other agents)
 
+        # Define predefined workflows with agent execution order and dependencies
         self.workflows = {
             "generate_newsletter": {
                 "agents": [
@@ -84,6 +86,9 @@ class AgentOrchestrator:
         }
 
     def execute_workflow(self, task, **kwargs):
+        """
+        Executes the specified workflow with the given parameters.
+        """
         # Dynamic Workflow Selection (example)
         if task == "analyze_investment":
             if kwargs.get('investment_type') == "stock":
@@ -140,6 +145,7 @@ class AgentOrchestrator:
         Runs the specified analysis type with the given parameters.
         """
         try:
+            # Route the analysis request to the appropriate agent
             if analysis_type == "market_sentiment":
                 return self.agents["market_sentiment_agent"].run(**kwargs)
             elif analysis_type == "macroeconomic":
@@ -163,16 +169,16 @@ class AgentOrchestrator:
         """
         Adds a new agent to the orchestrator.
         """
-
-        #... (instantiate the new agent and add it to self.agents)
+        # Instantiate the new agent based on its type and configuration
+        #... (Implementation for adding a new agent)
         pass  # Placeholder for actual implementation
 
     def update_agent_prompt(self, agent_name, **kwargs):
         """
         Updates the prompt of an existing agent.
         """
-
-        #... (fetch the agent and update its prompt)
+        # Fetch the agent and update its prompt with the new parameters
+        #... (Implementation for updating agent prompt)
         pass  # Placeholder for actual implementation
 
 # Example usage (would be called by a main script)
