@@ -31,14 +31,12 @@ Adam v17.0 is a sophisticated AI-powered financial analytics system designed to 
 * **Automated Updates:** Continuously updates the knowledge graph and other data sources to ensure accuracy and relevance.
 * **Community-Driven Development:** Encourages community contributions and feedback to enhance Adam's capabilities.
 
+'''
+
 ## Getting Started
 
-1.  **Clone the Repository:**
+'''
 
-   ```bash
-   git clone [https://github.com/adamvangrover/adam.git](https://github.com/adamvangrover/adam.git)
-   cd adam
-````
 
 1.  **Clone the Repository:**
 
