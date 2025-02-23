@@ -1,0 +1,56 @@
+openapi: 3.0.0
+info:
+  title: Adam v17.0 API
+  version: v1
+servers:
+  - url: /api/v1
+
+paths:
+  /:
+    post:
+      summary: Adam v17.0 API Endpoint
+      description: This is the unified API endpoint for interacting with all of Adam's functionalities.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                module:
+                  type: string
+                  description: The module to access (e.g., "valuation", "risk_management", "market_sentiment").
+                action:
+                  type: string
+                  description: The action to perform within the module (e.g., "get_dcf_valuation", "get_var", "get_sentiment").
+                parameters:
+                  type: object
+                  description: The parameters for the action.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: object
+                    description: The results of the API request.
+        '400':
+          description: Bad Request - Invalid request format or parameters.
+        '500':
+          description: Internal Server Error - An unexpected error occurred.
+
+components:
+  schemas:
+    # Define common response schemas or data models here, if any.
+    # Example:
+    # DCFValuation:
+    #   type: object
+    #   properties:
+    #     company:
+    #       type: string
+    #     valuation:
+    #       type: number
+    #       format: float
