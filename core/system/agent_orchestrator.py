@@ -11,6 +11,12 @@ from core.agents.newsletter_layout_specialist_agent import NewsletterLayoutSpeci
 from core.agents.data_verification_agent import DataVerificationAgent
 from core.agents.lexica_agent import LexicaAgent
 from core.agents.archive_manager_agent import ArchiveManagerAgent
+from core.agents.agent_forge import AgentForge
+from core.agents.prompt_tuner import PromptTuner
+from core.agents.code_alchemist import CodeAlchemist
+from core.agents.lingua_maestro import LinguaMaestro
+from core.agents.sense_weaver import SenseWeaver
+
 #... (add imports for other agents as needed)
 
 class AgentOrchestrator:
@@ -39,6 +45,16 @@ class AgentOrchestrator:
                 self.agents[agent_name] = LexicaAgent(config)
             elif agent_name == "archive_manager_agent":
                 self.agents[agent_name] = ArchiveManagerAgent(config)
+            elif agent_name == "agent_forge":
+                self.agents[agent_name] = AgentForge(config, self)  # Pass orchestrator reference
+            elif agent_name == "prompt_tuner":
+                self.agents[agent_name] = PromptTuner(config, self)  # Pass orchestrator reference
+            elif agent_name == "code_alchemist":
+                self.agents[agent_name] = CodeAlchemist(config)
+            elif agent_name == "lingua_maestro":
+                self.agents[agent_name] = LinguaMaestro(config)
+            elif agent_name == "sense_weaver":
+                self.agents[agent_name] = SenseWeaver(config)
             #... (add instantiation for other agents)
 
         self.workflows = {
@@ -116,6 +132,22 @@ class AgentOrchestrator:
                     completed_agents.append(agent_name)
                 except Exception as e:
                     print(f"Error running agent {agent_name}: {e}")
+
+    def add_agent(self, agent_name, agent_type, **kwargs):
+        """
+        Adds a new agent to the orchestrator.
+        """
+
+        #... (instantiate the new agent and add it to self.agents)
+        pass  # Placeholder for actual implementation
+
+    def update_agent_prompt(self, agent_name, **kwargs):
+        """
+        Updates the prompt of an existing agent.
+        """
+
+        #... (fetch the agent and update its prompt)
+        pass  # Placeholder for actual implementation
 
 # Example usage (would be called by a main script)
 if __name__ == "__main__":
