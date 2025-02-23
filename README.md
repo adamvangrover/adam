@@ -77,5 +77,4 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 
 This updated `README.md` provides a comprehensive overview of Adam v17.0, its key features, and instructions for getting started. It also includes links to other relevant documentation and contribution guidelines.
 
-I'm ready to proceed with the next file (`docs/user_guide.md`). Should I continue?
 ```
