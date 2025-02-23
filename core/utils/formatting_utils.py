@@ -1,4 +1,5 @@
-//formatting_utils.py
+# core/utils/formatting_utils.py
+
 from flask import jsonify
 
 def format_data(data, format="json"):
