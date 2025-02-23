@@ -1,13 +1,11 @@
-# core/system/agent_orchestrator.py
-
 from core.agents.market_sentiment_agent import MarketSentimentAgent
 from core.agents.macroeconomic_analysis_agent import MacroeconomicAnalysisAgent
 from core.agents.geopolitical_risk_agent import GeopoliticalRiskAgent
 from core.agents.industry_specialist_agent import IndustrySpecialistAgent
 from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
-from core.agents.technical_analyst_agent import TechnicalAnalyst
-from core.agents.risk_assessment_agent import RiskAssessor
-from core.agents.newsletter_layout_specialist_agent import NewsletterLayoutSpecialist
+from core.agents.technical_analyst_agent import TechnicalAnalystAgent
+from core.agents.risk_assessment_agent import RiskAssessmentAgent
+from core.agents.newsletter_layout_specialist_agent import NewsletterLayoutSpecialistAgent
 from core.agents.data_verification_agent import DataVerificationAgent
 from core.agents.lexica_agent import LexicaAgent
 from core.agents.archive_manager_agent import ArchiveManagerAgent
@@ -16,6 +14,10 @@ from core.agents.prompt_tuner import PromptTuner
 from core.agents.code_alchemist import CodeAlchemist
 from core.agents.lingua_maestro import LinguaMaestro
 from core.agents.sense_weaver import SenseWeaver
+from core.utils.api_utils import (
+    get_knowledge_graph_data,
+    update_knowledge_graph_node,
+)
 
 #... (add imports for other agents as needed)
 
@@ -34,11 +36,11 @@ class AgentOrchestrator:
             elif agent_name == "fundamental_analyst_agent":
                 self.agents[agent_name] = FundamentalAnalystAgent(config)
             elif agent_name == "technical_analyst_agent":
-                self.agents[agent_name] = TechnicalAnalyst(config)
+                self.agents[agent_name] = TechnicalAnalystAgent(config)
             elif agent_name == "risk_assessment_agent":
-                self.agents[agent_name] = RiskAssessor(config)
+                self.agents[agent_name] = RiskAssessmentAgent(config)
             elif agent_name == "newsletter_layout_specialist_agent":
-                self.agents[agent_name] = NewsletterLayoutSpecialist(config)
+                self.agents[agent_name] = NewsletterLayoutSpecialistAgent(config)
             elif agent_name == "data_verification_agent":
                 self.agents[agent_name] = DataVerificationAgent(config)
             elif agent_name == "lexica_agent":
@@ -110,7 +112,7 @@ class AgentOrchestrator:
                     try:
                         # Check if the agent uses message queue communication
                         if hasattr(self.agents[agent_name], 'use_message_queue') and \
-                           self.agents[agent_name].use_message_queue:
+                                self.agents[agent_name].use_message_queue:
                             self.agents[agent_name].run(dependency_outputs=dependency_outputs, **kwargs)
                         else:
                             # Execute the agent's run method directly
@@ -124,7 +126,7 @@ class AgentOrchestrator:
                 try:
                     # Check if the agent uses message queue communication
                     if hasattr(self.agents[agent_name], 'use_message_queue') and \
-                       self.agents[agent_name].use_message_queue:
+                            self.agents[agent_name].use_message_queue:
                         self.agents[agent_name].run(**kwargs)
                     else:
                         # Execute the agent's run method directly
@@ -132,6 +134,30 @@ class AgentOrchestrator:
                     completed_agents.append(agent_name)
                 except Exception as e:
                     print(f"Error running agent {agent_name}: {e}")
+
+    def run_analysis(self, analysis_type, **kwargs):
+        """
+        Runs the specified analysis type with the given parameters.
+        """
+        try:
+            if analysis_type == "market_sentiment":
+                return self.agents["market_sentiment_agent"].run(**kwargs)
+            elif analysis_type == "macroeconomic":
+                return self.agents["macroeconomic_analysis_agent"].run(**kwargs)
+            elif analysis_type == "geopolitical_risk":
+                return self.agents["geopolitical_risk_agent"].run(**kwargs)
+            elif analysis_type == "industry_specific":
+                return self.agents["industry_specialist_agent"].run(**kwargs)
+            elif analysis_type == "fundamental":
+                return self.agents["fundamental_analyst_agent"].run(**kwargs)
+            elif analysis_type == "technical":
+                return self.agents["technical_analyst_agent"].run(**kwargs)
+            elif analysis_type == "risk_assessment":
+                return self.agents["risk_assessment_agent"].run(**kwargs)
+            else:
+                return {"error": "Invalid analysis type."}
+        except Exception as e:
+            return {"error": str(e)}
 
     def add_agent(self, agent_name, agent_type, **kwargs):
         """
