@@ -1,0 +1,135 @@
+# Adam v17.0 Example Configuration File
+
+# This file provides a template for configuring Adam v17.0,
+# showcasing best practices, naming conventions, and proposed
+# hierarchies for different deployment scenarios.
+
+# Knowledge Graph Configuration
+knowledge_graph:
+  path: data/knowledge_graph.json  # Path to the knowledge graph file
+  # format: json  # Optional: Specify the format of the knowledge graph file (default: json)
+  # storage: local  # Optional: Specify the storage type (local, cloud, etc.)
+  #... other knowledge graph-specific configurations...
+
+# API Configuration
+api:
+  host: 0.0.0.0  # Host for the API server (0.0.0.0 for all interfaces)
+  port: 5000  # Port for the API server
+  # authentication:
+  #   enabled: true  # Enable or disable API authentication
+  #   method: token  # Authentication method (e.g., token, API key)
+  #   #... other authentication-related configurations...
+  #... other API-specific configurations...
+
+# Agent Configuration
+agents:
+  market_sentiment_agent:
+    # Configuration for the Market Sentiment Agent
+    enabled: true  # Enable or disable the agent
+    data_sources:
+      - news_api
+      - twitter_api
+    sentiment_analysis_method: lexicon_based  # or machine_learning_based
+    #... other agent-specific configuration...
+
+  macroeconomic_analysis_agent:
+    # Configuration for the Macroeconomic Analysis Agent
+    enabled: true  # Enable or disable the agent
+    data_sources:
+      - fred_api
+      - ecb_api
+    macroeconomic_model: var  # or dsge
+    #... other agent-specific configuration...
+
+  #... other agents...
+
+# Data Sources Configuration
+data_sources:
+  news_api:
+    api_key: YOUR_NEWS_API_KEY
+    #... other data source-specific configuration...
+
+  twitter_api:
+    consumer_key: YOUR_CONSUMER_KEY
+    consumer_secret: YOUR_CONSUMER_SECRET
+    access_token: YOUR_ACCESS_TOKEN
+    access_token_secret: YOUR_ACCESS_TOKEN_SECRET
+    #... other data source-specific configuration...
+
+  #... other data sources...
+
+# Analysis Modules Configuration
+analysis_modules:
+  fundamental_analysis:
+    # Configuration for the Fundamental Analysis Module
+    enabled: true  # Enable or disable the module
+    valuation_method: dcf  # or comparables
+    #... other module-specific configuration...
+
+  technical_analysis:
+    # Configuration for the Technical Analysis Module
+    enabled: true  # Enable or disable the module
+    indicators:
+      - rsi
+      - macd
+    #... other module-specific configuration...
+
+  #... other analysis modules...
+
+# Reporting Configuration
+reporting:
+  format: json  # or csv, html, etc.
+  #... other reporting configurations...
+
+# Logging Configuration
+logging:
+  level: INFO  # or DEBUG, WARNING, ERROR, CRITICAL
+  #... other logging configurations...
+
+# Deployment Scenarios
+
+# Standalone Module Deployment
+# To deploy a specific module as a standalone service,
+# enable only that module and its required agents and data sources.
+# For example, to deploy only the Fundamental Analysis module:
+#
+# analysis_modules:
+#   fundamental_analysis:
+#     enabled: true
+#   technical_analysis:
+#     enabled: false
+#   #... other analysis modules...
+#
+# agents:
+#   fundamental_analyst_agent:
+#     enabled: true
+#   #... other agents...
+#
+# data_sources:
+#   financial_statements_api:
+#     #... configuration...
+#   #... other data sources...
+
+# Cross-Platform Deployment
+# Adam v17.0 is designed to be platform-agnostic.
+# You can deploy it on various operating systems (Windows, macOS, Linux)
+# and cloud platforms (AWS, Azure, GCP) by adjusting the
+# relevant configurations in this file and the deployment scripts.
+
+# Cross-Language and Engine Integration
+# Adam v17.0 can be integrated with different language models and engines
+# by modifying the agent configurations and API integrations.
+# For example, you can configure an agent to use a different LLM
+# by specifying the engine and API key in its configuration.
+
+# Customization
+# You can further customize Adam v17.0 by modifying the Python code
+# and configuration files directly. For example, you can:
+#
+# * Add new agents or modules.
+# * Modify existing agent behavior or analysis methods.
+# * Integrate with new data sources or APIs.
+# * Create custom reporting formats.
+#
+# Refer to the User Guide and API Documentation for more detailed
+# instructions and examples.
