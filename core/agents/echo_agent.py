@@ -3,6 +3,7 @@
 import os
 import json
 from core.utils.data_utils import send_message, receive_messages
+from core.utils.api_utils import get_knowledge_graph_data
 
 class EchoAgent:
     def __init__(self, config):
@@ -44,6 +45,15 @@ class EchoAgent:
         #... (enhance the output with insights from the expert network)
         return output
 
+    def get_knowledge_graph_context(self, query):
+        """
+        Retrieves relevant context from the knowledge graph based on the query.
+        """
+        #... (Implementation for fetching knowledge graph context)
+        # This could involve using the get_knowledge_graph_data function from api_utils.py
+        # to retrieve relevant nodes and edges based on the query.
+        pass  # Placeholder for actual implementation
+
     def run(self, **kwargs):
         # 1. Receive task from message queue
         receive_messages(queue='echo_agent_tasks', callback=self.process_task)
@@ -60,5 +70,8 @@ class EchoAgent:
         elif task_type == 'enhance_output':
             enhanced_output = self.enhance_output(task['output'], **task.get('kwargs', {}))
             #... (send enhanced output back to the requesting agent)
+        elif task_type == 'get_knowledge_graph_context':
+            context = self.get_knowledge_graph_context(task['query'])
+            #... (send context back to the requesting agent)
 
         #... (handle other task types)
