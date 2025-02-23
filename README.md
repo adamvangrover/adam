@@ -31,11 +31,8 @@ Adam v17.0 is a sophisticated AI-powered financial analytics system designed to 
 * **Automated Updates:** Continuously updates the knowledge graph and other data sources to ensure accuracy and relevance.
 * **Community-Driven Development:** Encourages community contributions and feedback to enhance Adam's capabilities.
 
-'''
 
-## Getting Started
-
-'''
+## **Getting Started**
 
 
 1.  **Clone the Repository:**
