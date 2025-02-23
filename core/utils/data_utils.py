@@ -1,27 +1,167 @@
-# core/utils/data_utils.py
+#core/utils/data_utils.py
 
-def clean_data(data):
-    # Placeholder for data cleaning logic
-    print("Cleaning data...")
-    # Simulated cleaned data
-    cleaned_data = data  # For now, just return the original data
-    return cleaned_data
-
-def format_data(data, format_type):
-    # Placeholder for data formatting logic
-    print(f"Formatting data to {format_type}...")
-    # Simulated formatted data
-    formatted_data = data  # For now, just return the original data
-    return formatted_data
-
-# core/utils/data_utils.py
-
-import pika
+import re
 import json
+import pandas as pd
+import numpy as np
+from datetime import datetime
+import pika
 
 # RabbitMQ connection parameters
 RABBITMQ_HOST = 'localhost'  # Or your RabbitMQ server address
 RABBITMQ_QUEUE = 'adam_data'  # A common queue for Adam data exchange
+
+
+def clean_data(data, data_type):
+    """
+    Cleans data based on its type.
+
+    Args:
+      data: The data to be cleaned.
+      data_type: The type of data (e.g., "text", "numerical", "time_series").
+
+    Returns:
+      The cleaned data.
+    """
+    if data_type == "text":
+        return clean_text_data(data)
+    elif data_type == "numerical":
+        return clean_numerical_data(data)
+    elif data_type == "time_series":
+        return clean_time_series_data(data)
+    else:
+        raise ValueError("Invalid data type.")
+
+
+def clean_text_data(text):
+    """
+    Cleans text data by removing irrelevant characters and formatting.
+
+    Args:
+      text: The text data to be cleaned.
+
+    Returns:
+      The cleaned text data.
+    """
+    # Remove special characters and punctuation
+    text = re.sub(r"[^a-zA-Z0-9\s]", "", text)
+    # Convert to lowercase
+    text = text.lower()
+    # Remove extra whitespace
+    text = " ".join(text.split())
+    return text
+
+
+def clean_numerical_data(data):
+    """
+    Cleans numerical data by handling missing values and outliers.
+
+    Args:
+      data: The numerical data to be cleaned.
+
+    Returns:
+      The cleaned numerical data.
+    """
+    # Handle missing values (replace with mean, median, etc.)
+    # Identify and handle outliers (e.g., remove, transform)
+    #... (Implementation for cleaning numerical data)
+    return data  # Placeholder for actual implementation
+
+
+def clean_time_series_data(data):
+    """
+    Cleans time series data by handling missing values, smoothing, and detrending.
+
+    Args:
+      data: The time series data to be cleaned.
+
+    Returns:
+      The cleaned time series data.
+    """
+    # Handle missing values (interpolation, forward/backward fill, etc.)
+    # Smooth the data (moving average, exponential smoothing, etc.)
+    # Detrend the data (differencing, time series decomposition, etc.)
+    #... (Implementation for cleaning time series data)
+    return data  # Placeholder for actual implementation
+
+
+def validate_data(data, data_type, constraints):
+    """
+    Validates data against specified constraints.
+
+    Args:
+      data: The data to be validated.
+      data_type: The type of data (e.g., "text", "numerical", "time_series").
+      constraints: A dictionary of constraints (e.g., {"min_value": 0, "max_value": 100}).
+
+    Returns:
+      True if the data is valid, False otherwise.
+    """
+    if data_type == "numerical":
+        # Check if data is within the specified range
+        if "min_value" in constraints and data < constraints["min_value"]:
+            return False
+        if "max_value" in constraints and data > constraints["max_value"]:
+            return False
+    elif data_type == "text":
+        # Check if data matches a specific pattern (e.g., email format)
+        if "pattern" in constraints and not re.match(constraints["pattern"], data):
+            return False
+    #... (Add more validation checks for other data types)
+    return True
+
+
+def transform_data(data, transformation_type):
+    """
+    Transforms data based on the specified transformation type.
+
+    Args:
+      data: The data to be transformed.
+      transformation_type: The type of transformation (e.g., "standardize", "normalize", "log_transform").
+
+    Returns:
+      The transformed data.
+    """
+    if transformation_type == "standardize":
+        # Standardize the data (mean=0, std=1)
+        return (data - data.mean()) / data.std()
+    elif transformation_type == "normalize":
+        # Normalize the data (min=0, max=1)
+        return (data - data.min()) / (data.max() - data.min())
+    elif transformation_type == "log_transform":
+        # Apply log transformation to the data
+        return np.log(data)
+    else:
+        raise ValueError("Invalid transformation type.")
+
+
+def convert_to_datetime(date_str, format="%Y-%m-%d"):
+    """
+    Converts a date string to a datetime object.
+
+    Args:
+      date_str: The date string to be converted.
+      format: The format of the date string (default: "%Y-%m-%d").
+
+    Returns:
+      A datetime object representing the date.
+    """
+    return datetime.strptime(date_str, format)
+
+
+def convert_to_dataframe(data, columns=None):
+    """
+    Converts data to a Pandas DataFrame.
+
+    Args:
+      data: The data to be converted (e.g., list of lists, dictionary).
+      columns: A list of column names (optional).
+
+    Returns:
+      A Pandas DataFrame.
+    """
+    return pd.DataFrame(data, columns=columns)
+
 
 def send_message(message, queue=RABBITMQ_QUEUE):
     """
@@ -40,6 +180,7 @@ def send_message(message, queue=RABBITMQ_QUEUE):
         print(f"Sent message to queue '{queue}': {message}")
     except Exception as e:
         print(f"Error sending message to RabbitMQ: {e}")
+
 
 def receive_messages(queue=RABBITMQ_QUEUE, callback=None):
     """
@@ -65,3 +206,5 @@ def receive_messages(queue=RABBITMQ_QUEUE, callback=None):
         channel.start_consuming()
     except Exception as e:
         print(f"Error receiving messages from RabbitMQ: {e}")
+
+# Add more data utility functions as needed
