@@ -1,4 +1,4 @@
-# core/agents/agent_forge.py
+#core/agents/agent_forge.py
 
 import os
 import importlib
@@ -18,19 +18,62 @@ class AgentForge:
         """
         Creates a new agent based on the specified type and parameters.
         """
-
-        if agent_type in self.agent_templates:
-            template = self.agent_templates[agent_type]
-            #... (generate agent code based on template and parameters)
-            #... (save agent code to file)
-            #... (import and initialize the new agent)
-
-            # Inform orchestrator about the new agent
-            self.orchestrator.add_agent(agent_name, agent_type, **kwargs)
-            return True
-        else:
-            print(f"Agent template not found for type: {agent_type}")
+        try:
+            if agent_type in self.agent_templates:
+                template = self.agent_templates[agent_type]
+                # Generate agent code based on template and parameters
+                agent_code = self.generate_agent_code(template, agent_name, **kwargs)
+                # Save agent code to file
+                self.save_agent_code(agent_name, agent_code)
+                # Import and initialize the new agent
+                new_agent = self.initialize_agent(agent_name, **kwargs)
+                # Inform orchestrator about the new agent
+                self.orchestrator.add_agent(agent_name, agent_type, **kwargs)
+                return True
+            else:
+                print(f"Agent template not found for type: {agent_type}")
+                return False
+        except Exception as e:
+            print(f"Error creating agent: {e}")
             return False
+
+    def generate_agent_code(self, template, agent_name, **kwargs):
+        """
+        Generates Python code for the new agent based on the template and parameters.
+        """
+        #... (Implementation for generating agent code)
+        # This could involve using string formatting or template engines like Jinja2
+        # to replace placeholders in the template with the provided parameters.
+        pass  # Placeholder for actual implementation
+
+    def save_agent_code(self, agent_name, agent_code):
+        """
+        Saves the generated agent code to a Python file.
+        """
+        try:
+            file_path = os.path.join(self.output_dir, f"{agent_name}.py")
+            with open(file_path, "w") as f:
+                f.write(agent_code)
+            print(f"Agent code saved to: {file_path}")
+        except Exception as e:
+            print(f"Error saving agent code: {e}")
+
+    def initialize_agent(self, agent_name, **kwargs):
+        """
+        Imports and initializes the newly created agent.
+        """
+        try:
+            # Import the agent module dynamically
+            module_name = f"core.agents.{agent_name}"
+            module = importlib.import_module(module_name)
+            # Get the agent class from the module
+            agent_class = getattr(module, agent_name.capitalize())  # Assuming class name is capitalized
+            # Instantiate the agent with provided parameters
+            agent_instance = agent_class(**kwargs)
+            return agent_instance
+        except Exception as e:
+            print(f"Error initializing agent: {e}")
+            return None
 
     def refine_agent_prompt(self, agent_name, **kwargs):
         """
