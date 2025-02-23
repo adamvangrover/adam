@@ -59,10 +59,15 @@ Adam v17.0 is a sophisticated AI-powered financial analytics system designed to 
     python scripts/main.py
     ```
 
+## Accessing and Utilizing the Knowledge Graph and API
+
+  * **Knowledge Graph:** The knowledge graph data is stored in the `data/knowledge_graph.json` file. You can access and query this data directly or through the API.
+  * **API:** The Adam v17.0 API provides a unified interface for interacting with the system, including accessing the knowledge graph, running analysis modules, and generating reports. Detailed API documentation is available in the `docs/api_docs.yaml` file.
+
 ## Documentation
 
-  * **User Guide:** [docs/user\_guide.md](https://www.google.com/url?sa=E&source=gmail&q=docs/user_guide.md)
-  * **API Documentation:** [docs/api\_docs.yaml](https://www.google.com/url?sa=E&source=gmail&q=docs/api_docs.yaml)
+  * **User Guide:** [docs/user\_guide.md](docs/user_guide.md)
+  * **API Documentation:** [docs/api\_docs.yaml](docs/api_docs.yaml)
   * **Contribution Guidelines:** [CONTRIBUTING.md](https://www.google.com/url?sa=E&source=gmail&q=CONTRIBUTING.md)
 
 ## Contributing
@@ -74,6 +79,9 @@ Contributions are welcome\! Please check [CONTRIBUTING.md](https://www.google.co
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
 ```
+```
+
+
 
 This updated `README.md` provides a comprehensive overview of Adam v17.0, its key features, and instructions for getting started. It also includes links to other relevant documentation and contribution guidelines.
 
