@@ -1,244 +1,98 @@
 // 1. Core Modules
 
-// Message Handling Module
-const messageHandler = {
-    sendMessage(message, sender) {
-        const chatMessage = document.createElement('div');
-        chatMessage.classList.add('chat-message', sender);
+// Import message handling functions from message_handler.js
+import { sendMessage, sanitizeOutput } from './message_handler.js';
 
-        // Handle different message types (text, charts, tables, etc.)
-        if (typeof message === 'object') {
-            // Example: Handle chart data
-            if (message.type === 'chart') {
-                const chartCanvas = document.createElement('canvas');
-                chatMessage.appendChild(chartCanvas);
-                //... (use a charting library to draw the chart)
-            }
-            //... (handle other message types)
-        } else {
-            // Sanitize output before displaying
-            const sanitizedMessage = this.sanitizeOutput(message);
-            chatMessage.textContent = sanitizedMessage;
-        }
+// Import API communication functions from api_communicator.js
+import { sendMessageToAPI } from './api_communicator.js';
 
-        chatWindow.appendChild(chatMessage);
-        chatWindow.scrollTop = chatWindow.scrollHeight;
-    },
+// Import UI update functions from ui_updater.js
+import {
+    updateChatWindow,
+    updateKnowledgeGraphVisualization,
+    displayMarkdownContent,
+    toggleAdvancedMode
+} from './ui_updater.js';
 
-    sanitizeOutput(message) {
-        //... (implement output sanitization to prevent XSS vulnerabilities)
-        // Example: Escape HTML special characters
-        return message.replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#039;");
-    },
+// Import analysis modules from analysis_modules.js
+import {
+    generateMarketSentimentAnalysis,
+    generateMacroeconomicAnalysis,
+    generateGeopoliticalRiskAnalysis,
+    generateIndustryAnalysis,
+    generateFundamentalAnalysis,
+    generateTechnicalAnalysis,
+    generatePortfolioOptimization
+} from './analysis_modules.js';
 
-    //... (add more message handling functions)
-};
+// Import UI components from ui_components.js
+import {
+    chatWindow,
+    userInput,
+    sendButton,
+    knowledgeGraphVisualization,
+    markdownViewer,
+    advancedModeButton
+} from './ui_components.js';
 
-// API Communication Module
-const apiCommunicator = {
-    sendMessage(message, callback) {
-        console.log('Sending message to API:', message);
-        // Make actual API call using fetch or XMLHttpRequest
-        fetch('/api/v1', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                //... (construct the API request payload based on user message)
-                // This will likely involve natural language processing (NLP)
-                // to extract the intent and parameters from the user's message.
-            })
-        })
-          .then(response => response.json())
-          .then(data => {
-                // Handle the API response
-                if (response.ok) {
-                    callback(data.results);
-                } else {
-                    // Handle API errors gracefully
-                    console.error('API Error:', data.error);
-                    callback("I encountered an error while processing your request. Please try again later.");
-                }
-            })
-          .catch(error => {
-                console.error('API Error:', error);
-                callback("Error communicating with the API.");
-            });
-    },
-};
+// Import menu functions from menu_functions.js
+import {
+    showMainMenu,
+    handleMenuSelection,
+    showMarketAnalysisMenu,
+    showInvestmentResearchMenu,
+    showPortfolioManagementMenu
+} from './menu_functions.js';
 
-// UI Update Module
-const uiUpdater = {
-    updateChatWindow(message, sender) {
-        messageHandler.sendMessage(message, sender);
-    },
+// Import utility functions from utils.js
+import { displayMessage } from './utils.js';
 
-    updateKnowledgeGraphVisualization(data) {
-        // Update the knowledge graph visualization with the new data
-        //... (Implementation for knowledge graph visualization)
-        // This could involve using a library like D3.js or Vis.js
-        // to render the knowledge graph dynamically based on the data received from the API.
-    },
+// 2. Event Handlers
 
-    displayMarkdownContent(markdownContent) {
-        // Convert markdown to HTML and display it in the markdown viewer
-        //... (Implementation for markdown rendering)
-        // This could involve using a library like marked.js or showdown.js
-        // to convert the markdown text to HTML and then display it in the markdownViewer element.
-    },
+// 4. Initialization and Event Handling
+sendButton.addEventListener('click', () => {
+    const userMessage = userInput.value;
+    displayMessage(userMessage, 'user');
+    userInput.value = '';
 
-    toggleAdvancedMode() {
-        isAdvancedMode =!isAdvancedMode;
-        // Update UI based on advanced mode status
-        if (isAdvancedMode) {
-            // Show advanced features and configurations
-            //... (Implementation for showing advanced features)
-            advancedModeButton.textContent = "Basic Mode";
-        } else {
-            // Hide advanced features and configurations
-            //... (Implementation for hiding advanced features)
-            advancedModeButton.textContent = "Advanced Mode";
-        }
-    },
-
-    //... (add more UI update functions)
-};
-
-// 2. Analysis Modules
-
-function generateMarketSentimentAnalysis() {
-    const latestNewsletter = newsletters[newsletters.length - 1];
-    const marketSentiment = latestNewsletter.sections.find(section => section.title === "Market Mayhem (Executive Summary)");
-    return marketSentiment.content;
-}
-
-function generateMacroeconomicAnalysis() {
-    const latestNewsletter = newsletters[newsletters.length - 1];
-    const macroAnalysis = latestNewsletter.sections.find(section => section.title === "Macroeconomic Analysis");
-    if (macroAnalysis) {
-        return macroAnalysis.content;
+    // Check if it's the initial interaction
+    if (isFirstInteraction) {
+        isFirstInteraction = false;
+        showMainMenu();
     } else {
-        return "Macroeconomic analysis is not available in the current newsletter.";
-    }
-}
-
-function generateGeopoliticalRiskAnalysis() {
-    const latestNewsletter = newsletters[newsletters.length - 1];
-    const geopoliticalRisks = latestNewsletter.sections.find(section => section.title === "Policy Impact & Geopolitical Outlook");
-    if (geopoliticalRisks) {
-        return geopoliticalRisks.content;
-    } else {
-        return "Geopolitical risk analysis is not available in the current newsletter.";
-    }
-}
-
-function generateIndustryAnalysis(message) {
-    const industries = ["Technology", "Healthcare", "Energy", "Financials", "Consumer Discretionary", "Consumer Staples", "Industrials", "Materials", "Utilities", "Real Estate", "Telecommunication Services"];
-    let industry = industries[Math.floor(Math.random() * industries.length)];
-
-    const match = message.match(/industry analysis for\s(.*)/i);
-    if (match && match) {
-        const requestedIndustry = match.trim();
-        if (industries.includes(requestedIndustry)) {
-            industry = requestedIndustry;
+        // Handle menu selection or other user input
+        if (currentConversation.length > 0) {
+            const response = handleREADMEresponse(userMessage);
+            displayMessage(response, 'bot');
         } else {
-            return `Sorry, I don't have analysis for ${requestedIndustry} yet. Try one of these: ${industries.join(', ')}`;
-        }
-    }
-
-    // Fetch industry report
-    const industryReport = industryReports[industry];
-    if (industryReport) {
-        let response = `Analysis for ${industry} sector:\n`;
-        industryReport.sections.forEach(section => {
-            response += `  ${section.title}:\n`;
-            if (Array.isArray(section.content)) {
-                section.content.forEach(item => {
-                    response += `    - ${item}\n`;
-                });
+            // Check if the user message matches any button functionality
+            if (userMessage.toLowerCase().includes('market sentiment')) {
+                showMarketSentiment();
+            } else if (userMessage.toLowerCase().includes('macroeconomic')) {
+                showMacroeconomicAnalysis();
+            } else if (userMessage.toLowerCase().includes('geopolitical')) {
+                showGeopoliticalRisks();
+            } else if (userMessage.toLowerCase().includes('industry analysis')) {
+                showIndustryAnalysis(userMessage);
+            } else if (userMessage.toLowerCase().includes('fundamental analysis')) {
+                showFundamentalAnalysis(userMessage);
+            } else if (userMessage.toLowerCase().includes('technical analysis')) {
+                showTechnicalAnalysis(userMessage);
+            } else if (userMessage.toLowerCase().includes('portfolio optimization')) {
+                showPortfolioOptimization();
             } else {
-                response += `    ${section.content}\n`;
+                // If no button functionality is matched, send the message to the API
+                apiCommunicator.sendMessage(userMessage, (response) => {
+                    uiUpdater.updateChatWindow(response, 'bot');
+                });
             }
-        });
-        return response;
-    } else {
-        return `Sorry, I don't have a detailed report for ${industry} yet.`;
-    }
-}
-
-function generateFundamentalAnalysis(message) {
-    const companies = ["AAPL", "MSFT", "GOOG", "AMZN"];
-    let company = companies[Math.floor(Math.random() * companies.length)];
-
-    const match = message.match(/fundamental analysis for\s(.*)/i);
-    if (match && match) {
-        const requestedCompany = match.trim().toUpperCase();
-        if (companies.includes(requestedCompany)) {
-            company = requestedCompany;
-        } else {
-            return `Sorry, I don't have fundamental analysis for ${requestedCompany} yet. Try one of these: ${companies.join(', ')}`;
         }
     }
+});
 
-    const companyReport = companyReports[company];
-    if (companyReport) {
-        const financialPerformance = companyReport.sections.find(section => section.title === "Financial Performance");
-        if (financialPerformance) {
-            let response = `Fundamental analysis for ${company}:\n`;
-            for (const metric in financialPerformance.metrics) {
-                response += `  ${metric}:\n`;
-                for (const year in financialPerformance.metrics[metric]) {
-                    response += `    ${year}: ${financialPerformance.metrics[metric][year]}\n`;
-                }
-            }
-            response += `\n${financialPerformance.analysis}`;
-            return response;
-        }
-    }
-    return `Sorry, I don't have detailed fundamental analysis for ${company} yet.`;
-}
+//... (Other event handlers)
 
-function generateTechnicalAnalysis(message) {
-    //... (similar implementation as generateFundamentalAnalysis,
-    //... but fetching data from the "Technical Analysis" section)
-    const companies = ["AAPL", "MSFT", "GOOG", "AMZN"];
-    let company = companies[Math.floor(Math.random() * companies.length)];
-
-    const match = message.match(/technical analysis for\s(.*)/i);
-    if (match && match) {
-        const requestedCompany = match.trim().toUpperCase();
-        if (companies.includes(requestedCompany)) {
-            company = requestedCompany;
-        } else {
-            return `Sorry, I don't have technical analysis for ${requestedCompany} yet. Try one of these: ${companies.join(', ')}`;
-        }
-    }
-
-    const companyReport = companyReports[company];
-    if (companyReport) {
-        const technicalAnalysis = companyReport.sections.find(section => section.title === "Technical Analysis");
-        if (technicalAnalysis) {
-            let response = `Technical analysis for ${company}:\n`;
-            technicalAnalysis.indicators.forEach(indicator => {
-                response += `  - ${indicator.name}: <span class="math-inline">\{indicator\.value\} \(</span>{indicator.signal})\n`;
-            });
-            response += `\n${technicalAnalysis.analysis}`;
-            return response;
-        }
-    }
-    return `Sorry, I don't have detailed technical analysis for ${company} yet.`;
-}
-
-function generatePortfolioOptimization() {
-    const riskTolerance = ["conservative", "moderate", "aggressive"][Math.floor(Math.random() * 3)];
-    const expectedReturn = (Math.random() * 20).toFixed(2) + "%";
-    return `Based on your ${riskTolerance} risk tolerance, your optimized portfolio is expected to generate a return of ${expectedReturn} over the next year.`;
-}
+// 3. Helper Functions
 
 // Function to display README content
 function getREADMEContent() {
@@ -258,69 +112,76 @@ function getREADMEContent() {
         const response = userResponse.toLowerCase();
         let message = "";
 
-        if (currentREADMEQuestion === 0) {
-            if (response.includes('yes')) {
-                message = `I'm Adam v15.4, an AI-powered system designed to provide sophisticated investors with actionable insights and personalized investment recommendations. My capabilities include market analysis, investment research, risk management, and personalized insights. I'm still under development, but I'm learning and growing every day!`;
-            } else if (response.includes('no')) {
-                message = "No problem. Feel free to ask me anything about the Adam v15.4 project or its features.";
-            } else {
-                message = "I didn't understand your response. Please answer with 'yes' or 'no'.";
-                currentREADMEQuestion--;
-            }
-        } else if (currentREADMEQuestion === 1) {
-            if (response.includes('market analysis')) {
-                message = "I can provide market sentiment analysis, macroeconomic analysis, and geopolitical risk assessment. Would you like to know more about any of these? (sentiment, macro, geopolitical)";
-            } else if (response.includes('investment research')) {
-                message = "I can analyze different industries, perform fundamental analysis on companies, and provide technical analysis tools. What would you like to explore further? (industry, fundamental, technical)";
-            } else if (response.includes('risk management')) {
-                message = "I can assess various types of investment risk, provide risk mitigation strategies, and simulate market conditions using a World Simulation Model. Would you like to know more about any of these? (risk assessment, mitigation, simulation)";
-            } else if (response.includes('personalized insights')) {
-                message = "I can offer personalized investment recommendations and generate customized newsletters based on your risk tolerance and investment goals. Would you like to know more about either of these? (recommendations, newsletters)";
-            } else {
-                message = "I'm not sure I understand. Please ask about one of the following: market analysis, investment research, risk management, or personalized insights.";
-                currentREADMEQuestion--;
-            }
-        } else if (currentREADMEQuestion === 2) {
-            if (response.includes('yes')) {
-                message = "Great! Which feature would you like to dive deeper into? (market sentiment, macroeconomic analysis, geopolitical risk assessment, industry analysis, fundamental analysis, technical analysis, risk assessment, risk mitigation, simulation, recommendations, newsletters)";
-            } else if (response.includes('no')) {
-                message = "No problem. Perhaps you're curious about the technology behind me? (architecture, agents, data sources)";
-            } else {
-                message = "I didn't understand your response. Please answer with 'yes' or 'no'.";
-                currentREADMEQuestion--;
-            }
-        } else if (currentREADMEQuestion === 3) {
-            if (response.includes('architecture')) {
-                message = "I'm built on a modular, agent-based architecture, with specialized agents for different tasks. Would you like to know more about the agents, data sources, or analysis modules? (agents, data sources, analysis modules)";
-            } else if (response.includes('agents')) {
-                message = "I have various agents, including a Market Sentiment Agent, Macroeconomic Analysis Agent, Geopolitical Risk Agent, and more. Would you like to know more about any specific agent? (yes/no)";
-            } else if (response.includes('data sources')) {
-                message = "I gather data from various sources, including financial news APIs, social media, government statistics, and market data providers. Would you like to know more about any specific data source? (yes/no)";
-            } else {
-                message = "I'm not sure I understand. Please ask about one of the following: architecture, agents, or data sources.";
-                currentREADMEQuestion--;
-            }
-        } else if (currentREADMEQuestion === 4) {
-            if (response.includes('repository')) {
-                message = "You can find the full repository and its detailed README here: [https://github.com/adamvangrover/adam](https://github.com/adamvangrover/adam)";
-            } else if (response.includes('deployment')) {
-                message = "I can be deployed in various ways, including direct deployment, virtual environment, Docker container, or cloud platforms. Would you like to know more about any of these? (direct, virtual, docker, cloud)";
-            } else if (response.includes('contributing')) {
-                message = "Contributions are welcome! You can contribute by reporting bugs, suggesting enhancements, or submitting code changes. See the [CONTRIBUTING.md](https://github.com/adamvangrover/adam/blob/main/CONTRIBUTING.md) file for more details.";
-            } else {
-                message = "I'm not sure I understand. Please ask about one of the following: repository, deployment, or contributing.";
-                currentREADMEQuestion--;
-            }
-        } else if (currentREADMEQuestion === 5) {
-            if (response.includes('yes')) {
-                message = "Great! What else would you like to know about? (market analysis, investment research, risk management, personalized insights, architecture, agents, data sources, repository, deployment, contributing)";
-                currentREADMEQuestion = 1; // Go back to exploring features
-            } else if (response.includes('no')) {
-                message = "Thanks for exploring the Adam v15.4 chatbot demo! Feel free to reach out if you have any further questions.";
-            } else {
-                message = "I didn't understand your response. Please answer with 'yes' or 'no'.";
-                currentREADMEQuestion--;
-            }
+        switch (currentREADMEQuestion) {
+            case 0:
+                if (response.includes('yes')) {
+                    message = `I'm Adam v17.0, an AI-powered system designed to provide sophisticated investors with actionable insights and personalized investment recommendations. My capabilities include market analysis, investment research, risk management, and personalized insights. I'm continuously learning and growing!`;
+                } else if (response.includes('no')) {
+                    message = "No problem. Feel free to ask me anything about the Adam v17.0 project or its features.";
+                } else {
+                    message = "I didn't understand your response. Please answer with 'yes' or 'no'.";
+                    currentREADMEQuestion--;
+                }
+                break;
+            case 1:
+                if (response.includes('market analysis')) {
+                    message = "I can provide market sentiment analysis, macroeconomic analysis, and geopolitical risk assessment. Would you like to know more about any of these? (sentiment, macro, geopolitical)";
+                } else if (response.includes('investment research')) {
+                    message = "I can analyze different industries, perform fundamental analysis on companies, and provide technical analysis tools. What would you like to explore further? (industry, fundamental, technical)";
+                } else if (response.includes('risk management')) {
+                    message = "I can assess various types of investment risk, provide risk mitigation strategies, and simulate market conditions using a World Simulation Model. Would you like to know more about any of these? (risk assessment, mitigation, simulation)";
+                } else if (response.includes('personalized insights')) {
+                    message = "I can offer personalized investment recommendations and generate customized newsletters based on your risk tolerance and investment goals. Would you like to know more about either of these? (recommendations, newsletters)";
+                } else {
+                    message = "I'm not sure I understand. Please ask about one of the following: market analysis, investment research, risk management, or personalized insights.";
+                    currentREADMEQuestion--;
+                }
+                break;
+            case 2:
+                if (response.includes('yes')) {
+                    message = "Great! Which feature would you like to dive deeper into? (market sentiment, macroeconomic analysis, geopolitical risk assessment, industry analysis, fundamental analysis, technical analysis, risk assessment, risk mitigation, simulation, recommendations, newsletters)";
+                } else if (response.includes('no')) {
+                    message = "No problem. Perhaps you're curious about the technology behind me? (architecture, agents, data sources)";
+                } else {
+                    message = "I didn't understand your response. Please answer with 'yes' or 'no'.";
+                    currentREADMEQuestion--;
+                }
+                break;
+            case 3:
+                if (response.includes('architecture')) {
+                    message = "I'm built on a modular, agent-based architecture, with specialized agents for different tasks. Would you like to know more about the agents, data sources, or analysis modules? (agents, data sources, analysis modules)";
+                } else if (response.includes('agents')) {
+                    message = "I have various agents, including a Market Sentiment Agent, Macroeconomic Analysis Agent, Geopolitical Risk Agent, and more. Would you like to know more about any specific agent? (yes/no)";
+                } else if (response.includes('data sources')) {
+                    message = "I gather data from various sources, including financial news APIs, social media, government statistics, and market data providers. Would you like to know more about any specific data source? (yes/no)";
+                } else {
+                    message = "I'm not sure I understand. Please ask about one of the following: architecture, agents, or data sources.";
+                    currentREADMEQuestion--;
+                }
+                break;
+            case 4:
+                if (response.includes('repository')) {
+                    message = "You can find the full repository and its detailed README here: [https://github.com/adamvangrover/adam](https://github.com/adamvangrover/adam)";
+                } else if (response.includes('deployment')) {
+                    message = "I can be deployed in various ways, including direct deployment, virtual environment, Docker container, or cloud platforms. Would you like to know more about any of these? (direct, virtual, docker, cloud)";
+                } else if (response.includes('contributing')) {
+                    message = "Contributions are welcome! You can contribute by reporting bugs, suggesting enhancements, or submitting code changes. See the [CONTRIBUTING.md](https://github.com/adamvangrover/adam/blob/main/CONTRIBUTING.md) file for more details.";
+                } else {
+                    message = "I'm not sure I understand. Please ask about one of the following: repository, deployment, or contributing.";
+                    currentREADMEQuestion--;
+                }
+                break;
+            case 5:
+                if (response.includes('yes')) {
+                    message = "Great! What else would you like to know about? (market analysis, investment research, risk management, personalized insights, architecture, agents, data sources, repository, deployment, contributing)";
+                    currentREADMEQuestion = 1; // Go back to exploring features
+                } else if (response.includes('no')) {
+                    message = "Thanks for exploring the Adam v17.0 chatbot demo! Feel free to reach out if you have any further questions.";
+                } else {
+                    message = "I didn't understand your response. Please answer with 'yes' or 'no'.";
+                    currentREADMEQuestion--;
+                }
+                break;
         }
 
         // Update conversation state and prompt the next question
@@ -333,7 +194,7 @@ function getREADMEContent() {
     }
 
     // Start the README conversation
-    return `Welcome to the Adam v15.4 chatbot demo! This chatbot provides a glimpse into the capabilities of the full Adam v15.4 system, which is designed to be a comprehensive financial analysis tool for sophisticated investors.
+    return `Welcome to the Adam v17.0 chatbot demo! This chatbot provides a glimpse into the capabilities of the full Adam v17.0 system, which is designed to be a comprehensive financial analysis tool for sophisticated investors.
 
 ${readmeQuestions[currentREADMEQuestion]}
 `;
@@ -360,9 +221,6 @@ function generateGenericResponse(message) {
     }
 }
 
-
-//... (Implementations for analysis modules, using the API to retrieve data)
-
 // 3. UI Components
 const chatWindow = document.getElementById('chat-window');
 const userInput = document.getElementById('user-input');
@@ -378,8 +236,15 @@ let currentConversation =; // Initialize currentConversation as an empty array
 function toggleAdvancedMode() {
     isAdvancedMode =!isAdvancedMode;
     // Update UI based on advanced mode status
-    //... (Implementation for toggling advanced mode)
-    pass  // Placeholder for implementation
+    if (isAdvancedMode) {
+        // Show advanced features and configurations
+        //... (Implementation for showing advanced features)
+        advancedModeButton.textContent = "Basic Mode";
+    } else {
+        // Hide advanced features and configurations
+        //... (Implementation for hiding advanced features)
+        advancedModeButton.textContent = "Advanced Mode";
+    }
 }
 
 // Function to display the main menu
@@ -397,11 +262,12 @@ function showMainMenu() {
     }
     displayMessage(menuMessage, 'bot');
 }
+
 // Function to handle menu selection
 function handleMenuSelection(userResponse) {
     const response = userResponse.toLowerCase();
     if (response.includes('1') || response.includes('overview')) {
-        displayMessage("Adam v15.4 is a sophisticated AI for financial market analysis and personalized insights. It's designed to help investors like you make informed decisions.", 'bot');
+        displayMessage("Adam v17.0 is a sophisticated AI for financial market analysis and personalized insights. It's designed to help investors like you make informed decisions.", 'bot');
     } else if (response.includes('2') || response.includes('market analysis')) {
         showMarketAnalysisMenu();
     } else if (response.includes('3') || response.includes('investment research')) {
@@ -415,6 +281,7 @@ function handleMenuSelection(userResponse) {
         displayMessage("I'm sorry, I didn't understand your request. Please try again.", 'bot');
     }
 }
+
 function showMarketAnalysisMenu() {
     const marketAnalysisOptions = [
         "Market Sentiment Analysis",
@@ -423,10 +290,11 @@ function showMarketAnalysisMenu() {
     ];
     let menuMessage = "What kind of market analysis are you interested in?\n\n";
     for (let i = 0; i < marketAnalysisOptions.length; i++) {
-        menuMessage += ${i + 1}. ${marketAnalysisOptions[i]}\n;
-}
+        menuMessage += `${i + 1}. ${marketAnalysisOptions[i]}\n`;
+    }
     displayMessage(menuMessage, 'bot');
 }
+
 function showInvestmentResearchMenu() {
     const researchOptions = [
         "Industry Analysis",
@@ -435,10 +303,11 @@ function showInvestmentResearchMenu() {
     ];
     let menuMessage = "Investment research, exciting! What would you like to explore?\n\n";
     for (let i = 0; i < researchOptions.length; i++) {
-        menuMessage += ${i + 1}. ${researchOptions[i]}\n;
+        menuMessage += `${i + 1}. ${researchOptions[i]}\n`;
     }
     displayMessage(menuMessage, 'bot');
 }
+
 function showPortfolioManagementMenu() {
     const portfolioOptions = [
         "Portfolio Optimization",
@@ -446,11 +315,10 @@ function showPortfolioManagementMenu() {
     ];
     let menuMessage = "Ah, portfolio management. A wise choice. What would you like to do?\n\n";
     for (let i = 0; i < portfolioOptions.length; i++) {
-        menuMessage += ${i + 1}. ${portfolioOptions[i]}\n;
+        menuMessage += `${i + 1}. ${portfolioOptions[i]}\n`;
     }
     displayMessage(menuMessage, 'bot');
 }
-
 
 //... (Additional menu functions)
 
