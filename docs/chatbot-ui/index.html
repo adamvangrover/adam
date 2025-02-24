@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Adam v15.4 Chatbot</title>
+  <title>Adam v17.0 Chatbot</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
 </head>
 <body>
   <div id="chat-window">
     <div class="chat-message bot">
-      Hello! I'm Adam v15.4, your AI companion for navigating the financial markets. How can I assist you today?
+      Hello! I'm Adam v17.0, your AI companion for navigating the financial markets. How can I assist you today?
     </div>
   </div>
 
@@ -24,9 +26,38 @@
     <button onclick="showFundamentalAnalysis()">Fundamental Analysis</button>
     <button onclick="showTechnicalAnalysis()">Technical Analysis</button>
     <button onclick="showPortfolioOptimization()">Portfolio Optimization</button>
+
+    <button onclick="showKnowledgeGraph()">Knowledge Graph</button>
     <button onclick="showREADME()">README</button>
+    <button onclick="showUserGuide()">User Guide</button>
+    <button onclick="showAPIDocs()">API Documentation</button>
+
+    <button onclick="toggleAdvancedMode()" id="advanced-mode-button">Advanced Mode</button>
+  </div>
+
+  <div id="content-area">
+    <div id="markdown-viewer"></div>
+    <div id="knowledge-graph-visualization"></div>
+
+    <div id="react-root"></div>
   </div>
 
   <script src="script.js"></script>
+
+  <script type="text/babel">
+    // React component definitions (example)
+    function MyComponent(props) {
+      return (
+        <div>
+          <h1>Hello, {props.name}</h1>
+          <p>This is a React component.</p>
+        </div>
+      );
+    }
+
+    // Rendering React components (example)
+    const root = ReactDOM.createRoot(document.getElementById('react-root'));
+    root.render(<MyComponent name="Adam" />);
+  </script>
 </body>
 </html>
