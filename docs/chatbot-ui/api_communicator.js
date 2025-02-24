@@ -11,9 +11,11 @@ const apiCommunicator = {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                //... (construct the API request payload based on user message)
+                // Construct the API request payload based on user message
                 // This will likely involve natural language processing (NLP)
                 // to extract the intent and parameters from the user's message.
+                // For now, we'll just send the raw message as a parameter
+                message: message
             })
         })
           .then(response => response.json())
