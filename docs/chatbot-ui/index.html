@@ -1,55 +1,89 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Adam v17.0 Chatbot</title>
+  <title>Adam v18.0 Chatbot</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/intro.js@4.3.0/minified/intro.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intro.js@4.3.0/minified/introjs.min.css">
+  <style>
+    #landing-page-chatbot {
+      display: block; /* Show the landing page chatbot initially */
+    }
+
+    #functional-chatbot {
+      display: none; /* Hide the functional chatbot initially */
+    }
+  </style>
 </head>
 <body>
-  <div id="chat-window">
-    <div class="chat-message bot">
-      Hello! I'm Adam v17.0, your AI companion for navigating the financial markets. How can I assist you today?
+  <div id="landing-page-chatbot">
+    <div class="chatbot-container">
+      <div class="chatbot-header">
+        <h2>Welcome to Adam v18.0!</h2>
+      </div>
+      <div class="chatbot-body">
+        <div class="chatbot-message">
+          Hello! I'm Adam v18.0, your AI-powered financial analyst. I can help you unlock market insights and optimize your investment strategies.
+        </div>
+        <div class="chatbot-message">
+          What would you like to explore first?
+        </div>
+        <div class="chatbot-options">
+          <button onclick="showVideoOverview()">Watch Video Overview</button>
+          <button onclick="startInteractiveTutorial()">Start Interactive Tutorial</button>
+          <button onclick="startGuidedTour()">Take Guided Tour</button>
+          <button onclick="showAdvancedMode()">Proceed to Advanced Analysis</button>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div id="input-area">
-    <input type="text" id="user-input" placeholder="Type your message...">
-    <button id="send-button">Send</button>
-  </div>
+  <div id="functional-chatbot">
+    <div id="chat-window">
+      <div class="chat-message bot">
+        Hello! I'm Adam v18.0, your AI companion for navigating the financial markets. How can I assist you today?
+      </div>
+    </div>
 
-  <div id="menu">
-    <button onclick="showMarketSentiment()">Market Sentiment</button>
-    <button onclick="showMacroeconomicAnalysis()">Macroeconomic Analysis</button>
-    <button onclick="showGeopoliticalRisks()">Geopolitical Risks</button>
-    <button onclick="showIndustryAnalysis()">Industry Analysis</button>
-    <button onclick="showFundamentalAnalysis()">Fundamental Analysis</button>
-    <button onclick="showTechnicalAnalysis()">Technical Analysis</button>
-    <button onclick="showPortfolioOptimization()">Portfolio Optimization</button>
+    <div id="input-area">
+      <input type="text" id="user-input" placeholder="Type your message...">
+      <button id="send-button">Send</button>
+    </div>
 
-    <button onclick="showKnowledgeGraph()">Knowledge Graph</button>
-    <button onclick="showREADME()">README</button>
-    <button onclick="showUserGuide()">User Guide</button>
-    <button onclick="showAPIDocs()">API Documentation</button>
+    <div id="menu">
+      <button onclick="showMarketSentiment()">Market Sentiment</button>
+      <button onclick="showMacroeconomicAnalysis()">Macroeconomic Analysis</button>
+      <button onclick="showGeopoliticalRisks()">Geopolitical Risks</button>
+      <button onclick="showIndustryAnalysis()">Industry Analysis</button>
+      <button onclick="showFundamentalAnalysis()">Fundamental Analysis</button>
+      <button onclick="showTechnicalAnalysis()">Technical Analysis</button>
+      <button onclick="showPortfolioOptimization()">Portfolio Optimization</button>
 
-    <button onclick="toggleAdvancedMode()" id="advanced-mode-button">Advanced Mode</button>
-  </div>
+      <button onclick="showKnowledgeGraph()">Knowledge Graph</button>
+      <button onclick="showREADME()">README</button>
+      <button onclick="showUserGuide()">User Guide</button>
+      <button onclick="showAPIDocs()">API Documentation</button>
 
-  <div id="content-area">
-    <div id="markdown-viewer"></div>
-    <div id="knowledge-graph-visualization"></div>
+      <button onclick="toggleAdvancedMode()" id="advanced-mode-button">Advanced Mode</button>
+    </div>
 
-    <div id="react-root"></div>
-  </div>
+    <div id="content-area">
+      <div id="markdown-viewer"></div>
+      <div id="knowledge-graph-visualization"></div>
 
-  <div id="readme-links">
-    <a href="https://github.com/adamvangrover/adam/blob/main/README.md" target="_blank">Root README</a> |
-    <a href="https://github.com/adamvangrover/adam/blob/main/core/agents/AGENTS.md" target="_blank">AGENTS README</a>
-    <a href="https://github.com/adamvangrover/adam/blob/main/docs/adam_v15.4_guide.md" target="_blank">v15 GUIDE</a> 
-    <a href="https://github.com/adamvangrover/adam/blob/main/docs/getting_started.md" target="_blank">GETTING STARTED</a> 
-    <a href="https://github.com/adamvangrover/adam/blob/main/docs/user_guide.md" target="_blank">USER GUIDE</a> 
+      <div id="react-root"></div>
+    </div>
 
-    
+    <div id="readme-links">
+      <a href="https://github.com/adamvangrover/adam/blob/main/README.md" target="_blank">Root README</a> |
+      <a href="https://github.com/adamvangrover/adam/blob/main/core/agents/AGENTS.md" target="_blank">AGENTS README</a>
+      <a href="https://github.com/adamvangrover/adam/blob/main/docs/adam_v15.4_guide.md" target="_blank">v15 GUIDE</a> 
+      <a href="https://github.com/adamvangrover/adam/blob/main/docs/getting_started.md" target="_blank">GETTING STARTED</a> 
+      <a href="https://github.com/adamvangrover/adam/blob/main/docs/user_guide.md" target="_blank">USER GUIDE</a> 
+    </div>
   </div>
 
   <script src="message_handler.js"></script>
@@ -77,6 +111,62 @@
     // Rendering React components (example)
     const root = ReactDOM.createRoot(document.getElementById('react-root'));
     root.render(<MyComponent name="Adam" />);
+  </script>
+
+  <script>
+    function showVideoOverview() {
+      // Placeholder for video overview
+      alert("Video overview is not available in this demo. Please refer to the documentation for a detailed walkthrough of Adam's capabilities.");
+    }
+
+    function startInteractiveTutorial() {
+      introJs().setOptions({
+        steps: [
+          {
+            intro: "Welcome to the Adam v18.0 interactive tutorial! Let's explore its key features and functionalities."
+          },
+          {
+            element: '#landing-page-chatbot',
+            intro: "This is the landing page chatbot, your guide to Adam v18.0. It provides an overview of the system, setup instructions, user guide, and more."
+          },
+          {
+            element: '#functional-chatbot',
+            intro: "This is the functional chatbot, where you can interact with the AI engine, access the knowledge graph, run analysis modules, and generate reports."
+          },
+          {
+            element: '#chat-window',
+            intro: "This is the chat window where you can interact with Adam and receive responses."
+          },
+          {
+            element: '#input-area',
+            intro: "Type your messages and questions here, then click 'Send' to communicate with Adam."
+          },
+          {
+            element: '#menu',
+            intro: "These menu options provide access to various analysis modules, knowledge graph exploration, and system documentation."
+          },
+          {
+            element: '#content-area',
+            intro: "This area displays the results of your analysis, visualizations, reports, and other information retrieved from Adam."
+          },
+          {
+            element: '#readme-links',
+            intro: "These links provide access to the README files, user guide, and API documentation."
+          }
+        ]
+      }).start();
+    }
+
+    function startGuidedTour() {
+      // Placeholder for guided tour
+      alert("Guided tour is not available in this demo. However, you can explore the User Guide and API Documentation for detailed information on how to use Adam v18.0.");
+    }
+
+    function showAdvancedMode() {
+      // Hide the landing page chatbot and show the functional chatbot
+      document.getElementById('landing-page-chatbot').style.display = 'none';
+      document.getElementById('functional-chatbot').style.display = 'block';
+    }
   </script>
 </body>
 </html>
