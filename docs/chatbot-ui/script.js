@@ -384,3 +384,55 @@ function displayMessage(message, sender) {
 // 7. Error Handling and Logging
 //... (Implement error handling and logging)
 // This could involve catching errors from the API or other modules and displaying appropriate messages to the user.
+
+
+
+
+// ... (Existing code)
+
+// Function to display the landing page chatbot
+function showLandingPageChatbot() {
+  const landingPageChatbot = document.getElementById('landing-page-chatbot');
+  landingPageChatbot.style.display = 'block';
+}
+
+// Function to hide the landing page chatbot
+function hideLandingPageChatbot() {
+  const landingPageChatbot = document.getElementById('landing-page-chatbot');
+  landingPageChatbot.style.display = 'none';
+}
+
+// Function to show the video overview (placeholder)
+function showVideoOverview() {
+  alert("Video overview is not available in this demo. Please refer to the documentation for a detailed walkthrough of Adam's capabilities.");
+}
+
+// Function to start the interactive tutorial
+function startInteractiveTutorial() {
+  introJs().setOptions({
+    steps: [
+      // ... (Intro.js steps for the interactive tutorial)
+    ]
+  }).start();
+}
+
+// Function to start the guided tour (placeholder)
+function startGuidedTour() {
+  alert("Guided tour is not available in this demo. However, you can explore the User Guide and API Documentation for detailed information on how to use Adam v18.0.");
+}
+
+// Function to show the advanced (functional) chatbot
+function showAdvancedMode() {
+  hideLandingPageChatbot();
+  document.getElementById('functional-chatbot').style.display = 'block';
+}
+
+// ... (Other functions)
+
+// Initialization
+// ...
+
+// Show the landing page chatbot initially
+showLandingPageChatbot();
+
+// ... (Event listeners and other code)
