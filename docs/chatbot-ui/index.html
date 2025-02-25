@@ -21,6 +21,14 @@
       color: #007bff; /* Blue color for highlights */
       font-weight: bold;
     }
+
+    .chatbot-links {
+      margin-top: 10px;
+    }
+    .chatbot-links a {
+      display: block;
+      margin-bottom: 5px;
+    }
   </style>
 </head>
 <body>
@@ -34,13 +42,34 @@
           Hello! I'm Adam v18.0, your AI-powered financial analyst. I can help you unlock market insights and optimize your investment strategies.
         </div>
         <div class="chatbot-message">
-          What would you like to explore first?
+          Here are some quick links to get you started:
+        </div>
+        <div class="chatbot-links">
+          <a href="https://github.com/adamvangrover/adam" target="_blank">Adam v18.0 GitHub Repository</a>
+          <a href="https://github.com/adamvangrover/adam/blob/main/README.md" target="_blank">README</a>
+          <a href="https://github.com/adamvangrover/adam/blob/main/docs/user_guide.md" target="_blank">User Guide</a>
+        </div>
+        <div class="chatbot-message">
+          You can also ask me some basic questions about Adam v18.0 or the financial markets. For example:
+        </div>
+        <div class="chatbot-message">
+          * What is Adam v18.0?
+          * How does Adam v18.0 work?
+          * What are the benefits of using Adam v18.0?
+          * What are some common financial terms?
+        </div>
+        <div class="chatbot-message">
+          Or, if you're just here for some fun, try asking me a joke or a riddle!
         </div>
         <div class="chatbot-options">
           <button onclick="showVideoOverview()">Watch Video Overview</button>
           <button onclick="startInteractiveTutorial()">Start Interactive Tutorial</button>
           <button onclick="startGuidedTour()">Take Guided Tour</button>
           <button onclick="showAdvancedMode()">Proceed to Advanced Analysis</button>
+        </div>
+        <div id="landing-page-input-area">
+          <input type="text" id="landing-page-input" placeholder="Type your message...">
+          <button id="landing-page-send-button">Send</button>
         </div>
       </div>
     </div>
@@ -84,9 +113,9 @@
 
     <div id="readme-links">
       <a href="https://github.com/adamvangrover/adam/blob/main/README.md" target="_blank">Root README</a> |
-      <a href="https://github.com/adamvangrover/adam/blob/main/core/agents/AGENTS.md" target="_blank">AGENTS README</a>
-      <a href="https://github.com/adamvangrover/adam/blob/main/docs/adam_v15.4_guide.md" target="_blank">v15 GUIDE</a> 
-      <a href="https://github.com/adamvangrover/adam/blob/main/docs/getting_started.md" target="_blank">GETTING STARTED</a> 
+      <a href="https://github.com/adamvangrover/adam/blob/main/core/agents/AGENTS.md" target="_blank">AGENTS README</a> |
+      <a href="https://github.com/adamvangrover/adam/blob/main/docs/adam_v15.4_guide.md" target="_blank">v15 GUIDE</a> |
+      <a href="https://github.com/adamvangrover/adam/blob/main/docs/getting_started.md" target="_blank">GETTING STARTED</a> |
       <a href="https://github.com/adamvangrover/adam/blob/main/docs/user_guide.md" target="_blank">USER GUIDE</a> 
     </div>
   </div>
@@ -125,6 +154,67 @@
       alert("Video overview is not available in this demo. Please refer to the documentation for a detailed walkthrough of Adam's capabilities.");
     }
 
+    function startInteractiveTutorial() {
+      introJs().setOptions({
+        steps: [
+          {
+            intro: "Welcome to the Adam v18.0 interactive tutorial! Let's explore its key features and functionalities."
+          },
+          {
+            element: '#landing-page-chatbot',
+            intro: "This is the landing page chatbot, your guide to Adam v18.0. It provides an overview of the system, setup instructions, user guide, and more."
+          },
+          {
+            element: '#functional-chatbot',
+            intro: "This is the functional chatbot, where you can interact with the AI engine, access the knowledge graph, run analysis modules, and generate reports."
+          },
+          {
+            element: '#chat-window',
+            intro: "This is the chat window where you can interact with Adam and receive responses."
+          },
+          {
+            element: '#input-area',
+            intro: "Type your messages and questions here, then click 'Send' to communicate with Adam."
+          },
+          {
+            element: '#menu',
+            intro: "These menu options provide access to various analysis modules, knowledge graph exploration, and system documentation."
+          },
+          {
+            element: '#content-area',
+            intro: "This area displays the results of your analysis, visualizations, reports, and other information retrieved from Adam."
+          },
+          {
+            element: '#readme-links',
+            intro: "These links provide access to the README files, user guide, and API documentation."
+          },
+          {
+            intro: "Congratulations! You've completed the interactive tutorial. Now you're well-equipped to explore the power of Adam v18.0. Feel free to experiment, ask questions, and unlock the insights that will empower your investment journey. <br><br> <span id='quiz'></span>"
+          }
+        ]
+      }).start().oncomplete(() => {
+        // Add a quiz after the tutorial
+        const quizContainer = document.getElementById('quiz');
+        quizContainer.innerHTML = `
+          <p>Quick Quiz:</p>
+          <p>Which of these is NOT a core component of the Adam v18.0 system?</p>
+          <button onclick="checkAnswer('agent_orchestrator')">Agent Orchestrator</button>
+          <button onclick="checkAnswer('knowledge_graph')">Knowledge Graph</button>
+          <button onclick="checkAnswer('landing_page_chatbot')">Landing Page Chatbot</button>
+          <button onclick="checkAnswer('data_manager')">Data Manager</button>
+        `;
+      });
+    }
+
+    function checkAnswer(answer) {
+      const incorrectAnswer = 'landing_page_chatbot'; 
+      if (answer === incorrectAnswer) {
+        alert("Correct! The Landing Page Chatbot is part of the UI demo, not the core Adam v18.0 system.");
+      } else {
+        alert("Not quite. Try reviewing the tutorial and the README again.");
+      }
+    }
+
     function startGuidedTour() {
       // Placeholder for guided tour
       alert("Guided tour is not available in this demo. However, you can explore the User Guide and API Documentation for detailed information on how to use Adam v18.0.");
@@ -135,6 +225,33 @@
       document.getElementById('landing-page-chatbot').style.display = 'none';
       document.getElementById('functional-chatbot').style.display = 'block';
     }
+
+    function handleLandingPageInput(userInput) {
+      const message = userInput.toLowerCase();
+      if (message.includes("what is adam v18.0")) {
+        displayMessage("Adam v18.0 is an AI-powered financial analysis system designed to provide comprehensive insights and strategic guidance for investors.", 'bot');
+      } else if (message.includes("how does adam v18.0 work")) {
+        displayMessage("Adam v18.0 uses a network of specialized agents, a knowledge graph, and real-time data to analyze market trends, assess risks, and provide investment recommendations.", 'bot');
+      } else if (message.includes("benefits of using adam v18.0")) {
+        displayMessage("Adam v18.0 can help you make informed investment decisions, save time and effort, and potentially improve your returns.", 'bot');
+      } else if (message.includes("financial terms")) {
+        displayMessage("Some common financial terms include: ROI (Return on Investment), P/E ratio (Price-to-Earnings ratio), and diversification. Do you have a specific term you'd like to know more about?", 'bot');
+      } else if (message.includes("joke")) {
+        displayMessage("Why don't scientists trust atoms? Because they make up everything!", 'bot');
+      } else if (message.includes("riddle")) {
+        displayMessage("I have cities, but no houses; forests, but no trees; and water, but no fish. What am I?", 'bot');
+      } else {
+        displayMessage("I'm still learning about the financial markets and how to answer your questions. Please try asking me something else.", 'bot');
+      }
+    }
+
+    // Add an event listener to the send button for the landing page chatbot
+    const landingPageInput = document.getElementById('landing-page-input');
+    const landingPageSendButton = document.getElementById('landing-page-send-button');
+    landingPageSendButton.addEventListener('click', function(event) {
+        handleLandingPageInput(landingPageInput.value);
+        landingPageInput.value = '';
+    });
   </script>
 </body>
 </html>
