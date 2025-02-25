@@ -1,45 +1,70 @@
 # scripts/run_adam.py
 
-import yaml
+import sys
+import os
 from core.system.agent_orchestrator import AgentOrchestrator
+from core.system.knowledge_base import KnowledgeBase
+from core.system.data_manager import DataManager
 from core.system.echo import Echo
+from core.utils.config_utils import load_config
+from core.utils.logging_utils import setup_logging
 from core.utils.api_utils import (
     get_knowledge_graph_data,
     update_knowledge_graph_node,
 )
 
+# ... (other imports)
+
 def main():
     """
-    Main execution script for Adam v17.0.
+    Main execution script for Adam v18.0.
     """
-    # Load configuration
-    with open("../config/config.yaml", "r") as f:
-        config = yaml.safe_load(f)
+    try:
+        # Load configuration
+        config = load_config()
 
-    # Initialize Agent Orchestrator and Echo System
-    agent_orchestrator = AgentOrchestrator(config.get("agents", {}))
-    echo_system = Echo(config.get("echo_system", {}))
+        # Set up logging
+        setup_logging(config)
 
-    # Example usage:
-    # 1. Run a specific analysis module
-    market_sentiment = agent_orchestrator.run_analysis("market_sentiment")
-    print("Market Sentiment Analysis:", market_sentiment)
+        # Initialize knowledge base
+        knowledge_base = KnowledgeBase(config)
 
-    # 2. Access and update the knowledge graph
-    dcf_data = get_knowledge_graph_data("Valuation", "DCF")
-    print("DCF Data:", dcf_data)
+        # Initialize data manager
+        data_manager = DataManager(config)
 
-    update_status = update_knowledge_graph_node("Valuation", "DCF", "discount_rate", 0.12)
-    print("Update Status:", update_status)
+        # Initialize agent orchestrator
+        agent_orchestrator = AgentOrchestrator(config, knowledge_base, data_manager)
 
-    # 3. Get insights from the Echo system
-    insights = echo_system.get_insights(query="What are the latest market trends?")
-    print("Echo Insights:", insights)
+        # Initialize Echo System
+        echo_system = Echo(config.get("echo_system", {}))
 
-    # 4. Execute a workflow
-    agent_orchestrator.execute_workflow("generate_newsletter")
+        # Start the agent orchestrator
+        agent_orchestrator.run()
 
-    #... (Add more examples and use cases)
+        # Example usage:
+        # 1. Run a specific analysis module
+        market_sentiment = agent_orchestrator.run_analysis("market_sentiment")
+        print("Market Sentiment Analysis:", market_sentiment)
+
+        # 2. Access and update the knowledge graph
+        dcf_data = get_knowledge_graph_data("Valuation", "DCF")
+        print("DCF Data:", dcf_data)
+
+        update_status = update_knowledge_graph_node("Valuation", "DCF", "discount_rate", 0.12)
+        print("Update Status:", update_status)
+
+        # 3. Get insights from the Echo system
+        insights = echo_system.get_insights(query="What are the latest market trends?")
+        print("Echo Insights:", insights)
+
+        # 4. Execute a workflow
+        agent_orchestrator.execute_workflow("generate_newsletter")
+
+        # ... (Add more examples and use cases)
+
+    except Exception as e:
+        print(f"Error running Adam v18.0: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
