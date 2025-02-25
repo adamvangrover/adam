@@ -95,8 +95,4 @@ Contributions are welcome\! Please check [CONTRIBUTING.md](https://www.google.co
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
 ```
-```
 
-
-
-```
