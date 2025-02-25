@@ -1,6 +1,6 @@
 #config/agents.yaml
 
-# Adam v17.0 Agents Configuration File
+# Adam v18.0 Agents Configuration File
 
 # Define common agent settings as defaults
 default: &defaults
@@ -9,6 +9,22 @@ default: &defaults
   api_integration: true
   update_frequency: daily
   refinement_method: user_feedback
+  xai:
+    enabled: true
+    method: shap  # or lime, etc.
+  data_validation:
+    enabled: true
+    rules:
+      - data_type_check
+      - range_check
+      - consistency_check
+  monitoring:
+    enabled: true
+    metrics:
+      - response_time
+      - accuracy
+      - resource_usage
+
 
 agents:
   market_sentiment_agent:
