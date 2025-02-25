@@ -10,29 +10,41 @@ adam/
 **File Content:**
 
 ````markdown
-# Adam v17.0: Advanced Financial Analytics System
 
-Adam v17.0 is a sophisticated AI-powered financial analytics system designed to provide comprehensive insights and strategic guidance for investors, analysts, and researchers. Built on a foundation of cutting-edge AI and a rich knowledge graph, Adam delivers:
+# Adam v18.0: Advanced Financial AI
 
-* **Market Sentiment Analysis:** Gauges investor sentiment through news articles, social media, and financial forums.
-* **Macroeconomic & Geopolitical Risk Assessment:** Identifies and analyzes macroeconomic and geopolitical risks and their potential impact on financial markets.
-* **Fundamental & Technical Stock Analysis:** Performs in-depth fundamental and technical analysis of stocks and other financial instruments.
-* **Automated Data Collection & Processing:** Collects and processes data from various sources, including financial APIs, databases, and public filings.
-* **Customizable Strategy Implementation:** Allows users to define and implement their own investment strategies based on Adam's insights.
-* **Knowledge Graph Integration:** Leverages a comprehensive knowledge graph of financial concepts and relationships to enhance analysis and decision-making.
-* **API Access:** Provides a unified API for seamless integration with other systems and data sources.
+**(Welcome to the new Adam v18.0! We've enhanced the user experience with a new landing page.
+[Explore the interactive demo here!](docs/chatbot-ui/index.html))**
+
+Adam v18.0 is a sophisticated AI-powered financial analytics system that builds upon the foundation of Adam v17.0. It is designed to provide comprehensive insights and strategic guidance for investors, analysts, and researchers. Adam v18.0 leverages cutting-edge AI, a rich knowledge graph, and an expanded network of specialized agents to deliver:
+
+* **Enhanced Market Sentiment Analysis:** Gauges investor sentiment with greater accuracy through advanced NLP techniques and emotion analysis, incorporating news articles, social media, and financial forums.
+* **Macroeconomic & Geopolitical Risk Assessment:** Identifies and analyzes macroeconomic and geopolitical risks and their potential impact on financial markets, incorporating real-time data and predictive modeling.
+* **Fundamental & Technical Stock Analysis:** Performs in-depth fundamental and technical analysis of stocks and other financial instruments, leveraging both traditional and alternative data sources.
+* **Automated Data Collection & Processing:** Collects and processes data from a wider range of sources, including financial APIs, databases, public filings, and alternative data providers.
+* **Customizable Strategy Implementation:** Allows users to define and implement their own investment strategies based on Adam's insights, with enhanced backtesting and optimization capabilities.
+* **Knowledge Graph Integration:** Leverages an expanded and refined knowledge graph of financial concepts and relationships to enhance analysis and decision-making.
+* **API Access:** Provides a unified API for seamless integration with other systems and data sources, with enhanced security and performance.
+* **Explainable AI (XAI):** Offers transparent explanations for recommendations and insights, increasing user trust and understanding.
+* **Automated Testing & Monitoring:** Incorporates continuous integration and deployment pipelines for code quality assurance and robust monitoring of agent performance and system health.
 
 ## Key Features
 
-* **Advanced AI Agents:** Specialized agents for market sentiment analysis, macroeconomic analysis, geopolitical risk assessment, fundamental analysis, technical analysis, and more.
-* **Knowledge Graph:** A rich knowledge graph of financial concepts and relationships, enabling deeper insights and context-aware analysis.
-* **Unified API:** A single API endpoint for accessing all of Adam's functionalities and data.
-* **Customizable Strategies:** Allows users to define and implement their own investment strategies based on Adam's insights.
+* **Advanced AI Agents:** Expanded network of specialized agents for market sentiment analysis, macroeconomic analysis, geopolitical risk assessment, fundamental analysis, technical analysis, and more.
+* **Enhanced Knowledge Graph:** A richer and more interconnected knowledge graph of financial concepts and relationships, enabling deeper insights and context-aware analysis.
+* **Unified API:** A single API endpoint for accessing all of Adam's functionalities and data, with improved security and performance.
+* **Customizable Strategies:** Enhanced capabilities for defining and implementing investment strategies, including backtesting and optimization tools.
 * **Automated Updates:** Continuously updates the knowledge graph and other data sources to ensure accuracy and relevance.
 * **Community-Driven Development:** Encourages community contributions and feedback to enhance Adam's capabilities.
-
+* **Explainable AI (XAI):** Provides transparent explanations for recommendations and insights.
+* **Automated Testing & Monitoring:** Ensures code quality and tracks agent performance and system health.
 
 ## Getting Started
+
+**(For a guided introduction to Adam v18.0, please use the new landing page:
+[Interactive Demo](docs/chatbot-ui/index.html))**
+
+
 
 ````
 
