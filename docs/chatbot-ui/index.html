@@ -227,37 +227,36 @@
             element: '#react-root',
             intro: "This section can house interactive React components for data visualization and analysis (not available in this demo)."
           },
-                {
-        element: '#readme-links',
-        intro: "These links offer quick access to important resources, including the README files, user guide, and API documentation. They're your go-to guides for understanding and utilizing Adam v18.0 effectively."
-      },
-      {
-        intro: "Congratulations! You've completed the interactive tutorial. Now you're well-equipped to explore the power of Adam v18.0. Feel free to experiment, ask questions, and unlock the insights that will empower your investment journey. <br><br> <span id='quiz'></span>"
+          {
+            element: '#readme-links',
+            intro: "These links provide access to the README files, user guide, and API documentation."
+          },
+          {
+            intro: "This concludes the interactive tutorial. Feel free to explore the system and its functionalities further! <br><br> <span id='quiz'></span>"
+          }
+        ]
+      }).start().oncomplete(() => {
+        // Add a quiz after the tutorial
+        const quizContainer = document.getElementById('quiz');
+        quizContainer.innerHTML = `
+          <p>Quick Quiz:</p>
+          <p>Which of these is NOT a core component of the Adam v18.0 system?</p>
+          <button onclick="checkAnswer('agent_orchestrator')">Agent Orchestrator</button>
+          <button onclick="checkAnswer('knowledge_graph')">Knowledge Graph</button>
+          <button onclick="checkAnswer('landing_page_chatbot')">Landing Page Chatbot</button>
+          <button onclick="checkAnswer('data_manager')">Data Manager</button>
+        `;
+      });
+    }
+
+    function checkAnswer(answer) {
+      const incorrectAnswer = 'landing_page_chatbot'; 
+      if (answer === incorrectAnswer) {
+        alert("Correct! The Landing Page Chatbot is part of the UI demo, not the core Adam v18.0 system.");
+      } else {
+        alert("Not quite. Try reviewing the tutorial and the README again.");
       }
-    ]
-  }).start().oncomplete(() => {
-    // Add a quiz after the tutorial
-    const quizContainer = document.getElementById('quiz');
-    quizContainer.innerHTML = `
-      <p>Quick Quiz:</p>
-      <p>Which of these is NOT a core component of the Adam v18.0 system?</p>
-      <button onclick="checkAnswer('agent_orchestrator')">Agent Orchestrator</button>
-      <button onclick="checkAnswer('knowledge_graph')">Knowledge Graph</button>
-      <button onclick="checkAnswer('landing_page_chatbot')">Landing Page Chatbot</button>
-      <button onclick="checkAnswer('data_manager')">Data Manager</button>
-    `;
-  });
-}
-
-function checkAnswer(answer) {
-  const incorrectAnswer = 'landing_page_chatbot'; 
-  if (answer === incorrectAnswer) {
-    alert("Correct! The Landing Page Chatbot is part of the UI demo, not the core Adam v18.0 system.");
-  } else {
-    alert("Not quite. Try reviewing the tutorial and the README again.");
-  }
-}
-
+    }
 
     function startGuidedTour() {
       // Placeholder for guided tour
@@ -321,21 +320,42 @@ function checkAnswer(answer) {
       const reportPath = document.getElementById('report-selection').value;
       // Fetch and display the selected report content
       fetch(`https://raw.githubusercontent.com/adamvangrover/adam/main/${reportPath}`)
-        .then(response => response.text())
+        .then(response => response.json()) // Fetch as JSON
         .then(data => {
           const reportContent = document.getElementById('report-content');
-          // Render the report content appropriately (e.g., using Marked for Markdown, or custom rendering for JSON)
-          reportContent.innerHTML = marked.parse(data); // Example using Marked for Markdown
+          reportContent.innerHTML = ''; // Clear previous content
+
+          // Create report title
+          const reportTitle = document.createElement('h2');
+          reportTitle.textContent = data.report_title;
+          reportContent.appendChild(reportTitle);
+
+          // Create report date and author
+          const reportDateAuthor = document.createElement('p');
+          reportDateAuthor.textContent = `Report Date: ${data.report_date}, Author: ${data.author}`;
+          reportContent.appendChild(reportDateAuthor);
+
+          // Create sections
+          data.sections.forEach(section => {
+            const sectionTitle = document.createElement('h3');
+            sectionTitle.textContent = section.title;
+            reportContent.appendChild(sectionTitle);
+
+            const sectionContent = document.createElement('p');
+            sectionContent.textContent = section.content;
+            reportContent.appendChild(sectionContent);
+          });
         });
     }
 
     // Add an event listener to the send button for the landing page chatbot
     const landingPageInput = document.getElementById('landing-page-input');
     const landingPageSendButton = document.getElementById('landing-page-send-button');
-    landingPageSendButton.addEventListener('click', function(event) {
-        handleLandingPageInput(landingPageInput.value);
-        landingPageInput.value = '';
-    });
-  </script>
+    landingPageSendButton.addEventListener(' click', function(event) {
+handleLandingPageInput(landingPageInput.value);
+landingPageInput.value = '';
+});
+</script>
 </body>
 </html>
+
