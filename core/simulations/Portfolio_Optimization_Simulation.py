@@ -5,8 +5,7 @@ from utils.api_communication import APICommunication
 from agents.Risk_Assessment_Agent import RiskAssessmentAgent
 from agents.Fundamental_Analysis_Agent import FundamentalAnalystAgent
 from agents.Technical_Analysis_Agent import TechnicalAnalystAgent
-from agents.Prediction_Market_Agent import PredictionMarketAgent
-from agents.Alternative_Data_Agent import AlternativeDataAgent
+from agents.Market_Sentiment_Agent import MarketSentimentAgent  # Updated import
 
 class PortfolioOptimizationSimulation:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):
@@ -24,8 +23,7 @@ class PortfolioOptimizationSimulation:
         self.risk_assessment_agent = RiskAssessmentAgent(knowledge_base_path)
         self.fundamental_analyst = FundamentalAnalystAgent(knowledge_base_path)
         self.technical_analyst = TechnicalAnalystAgent(knowledge_base_path)
-        self.prediction_market_agent = PredictionMarketAgent(knowledge_base_path)
-        self.alternative_data_agent = AlternativeDataAgent(knowledge_base_path)
+        self.market_sentiment_agent = MarketSentimentAgent(knowledge_base_path)  # Initialize Market Sentiment Agent
 
     def _load_knowledge_base(self):
         """
@@ -60,13 +58,12 @@ class PortfolioOptimizationSimulation:
         risk_assessment = self.risk_assessment_agent.assess_portfolio_risk(portfolio_data)
         fundamental_analysis = self.fundamental_analyst.analyze_portfolio(portfolio_data)
         technical_analysis = self.technical_analyst.analyze_portfolio_trends(portfolio_data)
-        prediction_market_data = self.prediction_market_agent.gather_prediction_market_data_for_portfolio(portfolio_data)
-        alternative_data = self.alternative_data_agent.gather_alternative_data_for_portfolio(portfolio_data)
+        market_sentiment = self.market_sentiment_agent.analyze_sentiment()  # Get market sentiment
 
         # 3. Optimization
         optimized_portfolio = self.optimize_portfolio(
             portfolio_data, risk_assessment, fundamental_analysis,
-            technical_analysis, prediction_market_data, alternative_data
+            technical_analysis, market_sentiment  # Include market sentiment in optimization
         )
 
         # 4. Generate Report
@@ -75,7 +72,7 @@ class PortfolioOptimizationSimulation:
         # 5. Save Results
         self.save_results(portfolio_data, optimized_portfolio, report)
 
-    def optimize_portfolio(self, portfolio_data, risk_assessment, fundamental_analysis, technical_analysis, prediction_market_data, alternative_data):
+    def optimize_portfolio(self, portfolio_data, risk_assessment, fundamental_analysis, technical_analysis, market_sentiment):
         """
         Optimizes the portfolio based on various factors and agent analysis.
 
@@ -84,8 +81,7 @@ class PortfolioOptimizationSimulation:
             risk_assessment (dict): Risk assessment results.
             fundamental_analysis (dict): Fundamental analysis results.
             technical_analysis (dict): Technical analysis results.
-            prediction_market_data (dict): Prediction market data.
-            alternative_data (dict): Alternative data.
+            market_sentiment (float): Overall market sentiment score.
 
         Returns:
             dict: The optimized portfolio, including asset allocation and performance metrics.
@@ -95,6 +91,8 @@ class PortfolioOptimizationSimulation:
         # to find the optimal asset allocation based on risk, return, and
         # other constraints.
         # ...
+        # Incorporate market sentiment into the optimization logic
+        # For example, adjust risk tolerance or asset allocation based on sentiment
 
         optimized_portfolio = {
             "assets": [
