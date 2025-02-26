@@ -1,6 +1,7 @@
 # core/agents/market_sentiment_agent.py
 
 from core.data_sources.financial_news_api import SimulatedFinancialNewsAPI
+from core.data_sources.prediction_market_api import SimulatedPredictionMarketAPI
 from core.utils.data_utils import send_message
 
 class MarketSentimentAgent:
@@ -8,18 +9,44 @@ class MarketSentimentAgent:
         self.data_sources = config['data_sources']
         self.sentiment_threshold = config['sentiment_threshold']
         self.news_api = SimulatedFinancialNewsAPI()
+        self.prediction_market_api = SimulatedPredictionMarketAPI()
 
     def analyze_sentiment(self):
-        headlines, sentiment = self.news_api.get_headlines()
+        # 1. Analyze News Sentiment
+        headlines, news_sentiment = self.news_api.get_headlines()
         print("Analyzing market sentiment from news headlines...")
-        # Placeholder for more sophisticated sentiment analysis
-        # (For now, we'll just return the simulated sentiment from the API)
+        # ... (Implement more sophisticated sentiment analysis for news)
 
-        # Send sentiment to message queue
-        message = {'agent': 'market_sentiment_agent', 'sentiment': sentiment}
+        # 2. Analyze Prediction Market Sentiment
+        prediction_market_sentiment = self.prediction_market_api.get_market_sentiment()
+        print("Analyzing market sentiment from prediction markets...")
+        # ... (Implement analysis of prediction market data)
+
+        # 3. Combine Sentiment
+        overall_sentiment = self.combine_sentiment(news_sentiment, prediction_market_sentiment)
+        print(f"Overall Market Sentiment: {overall_sentiment}")
+
+        # 4. Send sentiment to message queue
+        message = {'agent': 'market_sentiment_agent', 'sentiment': overall_sentiment}
         send_message(message)
 
-        return sentiment
+        return overall_sentiment
+
+    def combine_sentiment(self, news_sentiment, prediction_market_sentiment):
+        """
+        Combines sentiment from different sources into an overall sentiment score.
+
+        Args:
+            news_sentiment (float): Sentiment score from news analysis.
+            prediction_market_sentiment (float): Sentiment score from prediction markets.
+
+        Returns:
+            float: The overall sentiment score.
+        """
+        # ... (Implement logic to combine sentiment scores)
+        # This could involve weighting different sources or using a more
+        # sophisticated aggregation method.
+        pass
 
 # Example usage (eventually, this would be managed by the system)
 if __name__ == "__main__":
