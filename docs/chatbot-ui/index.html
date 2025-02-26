@@ -320,42 +320,21 @@
       const reportPath = document.getElementById('report-selection').value;
       // Fetch and display the selected report content
       fetch(`https://raw.githubusercontent.com/adamvangrover/adam/main/${reportPath}`)
-        .then(response => response.json()) // Fetch as JSON
+        .then(response => response.text())
         .then(data => {
           const reportContent = document.getElementById('report-content');
-          reportContent.innerHTML = ''; // Clear previous content
-
-          // Create report title
-          const reportTitle = document.createElement('h2');
-          reportTitle.textContent = data.report_title;
-          reportContent.appendChild(reportTitle);
-
-          // Create report date and author
-          const reportDateAuthor = document.createElement('p');
-          reportDateAuthor.textContent = `Report Date: ${data.report_date}, Author: ${data.author}`;
-          reportContent.appendChild(reportDateAuthor);
-
-          // Create sections
-          data.sections.forEach(section => {
-            const sectionTitle = document.createElement('h3');
-            sectionTitle.textContent = section.title;
-            reportContent.appendChild(sectionTitle);
-
-            const sectionContent = document.createElement('p');
-            sectionContent.textContent = section.content;
-            reportContent.appendChild(sectionContent);
-          });
+          // Render the report content appropriately (e.g., using Marked for Markdown, or custom rendering for JSON)
+          reportContent.innerHTML = marked.parse(data); // Example using Marked for Markdown
         });
     }
 
     // Add an event listener to the send button for the landing page chatbot
     const landingPageInput = document.getElementById('landing-page-input');
     const landingPageSendButton = document.getElementById('landing-page-send-button');
-    landingPageSendButton.addEventListener(' click', function(event) {
-handleLandingPageInput(landingPageInput.value);
-landingPageInput.value = '';
-});
-</script>
+    landingPageSendButton.addEventListener('click', function(event) {
+        handleLandingPageInput(landingPageInput.value);
+        landingPageInput.value = '';
+    });
+  </script>
 </body>
 </html>
-
