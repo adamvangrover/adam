@@ -227,16 +227,37 @@
             element: '#react-root',
             intro: "This section can house interactive React components for data visualization and analysis (not available in this demo)."
           },
-          {
-            element: '#readme-links',
-            intro: "These links provide access to the README files, user guide, and API documentation."
-          },
-          {
-            intro: "This concludes the interactive tutorial. Feel free to explore the system and its functionalities further!"
-          }
-        ]
-      }).start();
-    }
+                {
+        element: '#readme-links',
+        intro: "These links offer quick access to important resources, including the README files, user guide, and API documentation. They're your go-to guides for understanding and utilizing Adam v18.0 effectively."
+      },
+      {
+        intro: "Congratulations! You've completed the interactive tutorial. Now you're well-equipped to explore the power of Adam v18.0. Feel free to experiment, ask questions, and unlock the insights that will empower your investment journey. <br><br> <span id='quiz'></span>"
+      }
+    ]
+  }).start().oncomplete(() => {
+    // Add a quiz after the tutorial
+    const quizContainer = document.getElementById('quiz');
+    quizContainer.innerHTML = `
+      <p>Quick Quiz:</p>
+      <p>Which of these is NOT a core component of the Adam v18.0 system?</p>
+      <button onclick="checkAnswer('agent_orchestrator')">Agent Orchestrator</button>
+      <button onclick="checkAnswer('knowledge_graph')">Knowledge Graph</button>
+      <button onclick="checkAnswer('landing_page_chatbot')">Landing Page Chatbot</button>
+      <button onclick="checkAnswer('data_manager')">Data Manager</button>
+    `;
+  });
+}
+
+function checkAnswer(answer) {
+  const incorrectAnswer = 'landing_page_chatbot'; 
+  if (answer === incorrectAnswer) {
+    alert("Correct! The Landing Page Chatbot is part of the UI demo, not the core Adam v18.0 system.");
+  } else {
+    alert("Not quite. Try reviewing the tutorial and the README again.");
+  }
+}
+
 
     function startGuidedTour() {
       // Placeholder for guided tour
