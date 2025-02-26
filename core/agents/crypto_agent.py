@@ -1,4 +1,4 @@
-# core/agents/Crypto_Agent.py
+# core/agents/crypto_agent.py
 
 import json
 import datetime
