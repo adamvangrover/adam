@@ -61,6 +61,14 @@
         <div class="chatbot-message">
           Or, if you're just here for some fun, try asking me a joke or a riddle!
         </div>
+        <div class="chatbot-message">
+          Select a report to view:
+        </div>
+        <select id="report-selection">
+        </select>
+        <button onclick="displaySelectedReport()">View Report</button>
+        <div id="report-content"></div>
+
         <div class="chatbot-options">
           <button onclick="showVideoOverview()">Watch Video Overview</button>
           <button onclick="startInteractiveTutorial()">Start Interactive Tutorial</button>
@@ -271,6 +279,33 @@
       const chatWindow = document.getElementById(targetChatWindowId);
       chatWindow.appendChild(chatMessage);
       chatWindow.scrollTop = chatWindow.scrollHeight; // Scroll to the bottom
+    }
+
+    // Fetch the list of reports from the repository
+    fetch('https://api.github.com/repos/adamvangrover/adam/contents/core/libraries_and_archives/reports')
+      .then(response => response.json())
+      .then(data => {
+        const reportSelection = document.getElementById('report-selection');
+        data.forEach(item => {
+          if (item.type === 'file') {
+            const option = document.createElement('option');
+            option.value = item.path;
+            option.text = item.name;
+            reportSelection.add(option);
+          }
+        });
+      });
+
+    function displaySelectedReport() {
+      const reportPath = document.getElementById('report-selection').value;
+      // Fetch and display the selected report content
+      fetch(`https://raw.githubusercontent.com/adamvangrover/adam/main/${reportPath}`)
+        .then(response => response.text())
+        .then(data => {
+          const reportContent = document.getElementById('report-content');
+          // Render the report content appropriately (e.g., using Marked for Markdown, or custom rendering for JSON)
+          reportContent.innerHTML = marked.parse(data); // Example using Marked for Markdown
+        });
     }
 
     // Add an event listener to the send button for the landing page chatbot
