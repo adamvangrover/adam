@@ -1,4 +1,4 @@
-# core/agents/SNC_Analyst_Agent.py
+# core/agents/SNC_analyst_agent.py
 
 from enum import Enum
 
