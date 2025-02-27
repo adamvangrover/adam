@@ -1,4 +1,4 @@
-# core/agents/Legal_Agent.py
+# core/agents/legal_agent.py
 
 import json
 
