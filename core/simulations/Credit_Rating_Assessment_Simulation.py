@@ -1,10 +1,10 @@
-```python
 # core/simulations/Credit_Rating_Assessment_Simulation.py
 
 import json
 from agents.SNC_Analyst_Agent import SNCAnalystAgent
 from agents.Fundamental_Analysis_Agent import FundamentalAnalystAgent
 from agents.Industry_Specialist_Agent import IndustrySpecialistAgent
+from agents.Discussion_Chair_Agent import DiscussionChairAgent  # Import the Discussion Chair Agent
 
 class CreditRatingAssessmentSimulation:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):
@@ -21,8 +21,8 @@ class CreditRatingAssessmentSimulation:
         self.credit_analyst_1 = FundamentalAnalystAgent(knowledge_base_path)
         self.credit_analyst_2 = IndustrySpecialistAgent(knowledge_base_path)
         self.team_lead = SNCAnalystAgent(knowledge_base_path)
-        # Placeholder for Discussion Chair agent (to be implemented later)
-        self.discussion_chair = None
+        self.discussion_chair = DiscussionChairAgent(knowledge_base_path)  # Initialize the Discussion Chair Agent
+
 
     def _load_knowledge_base(self):
         """
@@ -101,42 +101,33 @@ class CreditRatingAssessmentSimulation:
         shared_knowledge_graph["final_regulatory_rating_recommendation"] = final_regulatory_rating_recommendation
         shared_knowledge_graph["discussion_transcript"] += f"## Team Lead:\n\n* **Final PD Rating Recommendation:** {final_pd_rating_recommendation}\n* **Final Regulatory Rating Recommendation:** {final_regulatory_rating_recommendation}\n* **Justification:** {team_lead_justification}\n\n"
 
-        # 4. Discussion Chair Decision (Placeholder for future implementation)
-        # final_pd_rating_decision, final_regulatory_rating_decision, chair_justification = self.discussion_chair.make_final_decision(shared_knowledge_graph)
+        # 4. Discussion Chair Decision
+        final_pd_rating_decision, final_regulatory_rating_decision, chair_justification = self.discussion_chair.make_final_decision(shared_knowledge_graph)
 
-        # shared_knowledge_graph["final_pd_rating_decision"] = final_pd_rating_decision
-        # shared_knowledge_graph["final_regulatory_rating_decision"] = final_regulatory_rating_decision
-        # shared_knowledge_graph["justification"] = chair_justification
-        # shared_knowledge_graph["discussion_transcript"] += f"## Discussion Chair:\n\n* **Final PD Rating Decision:** {final_pd_rating_decision}\n* **Final Regulatory Rating Decision:** {final_regulatory_rating_decision}\n* **Justification:** {chair_justification}\n\n"
+        shared_knowledge_graph["final_pd_rating_decision"] = final_pd_rating_decision
+        shared_knowledge_graph["final_regulatory_rating_decision"] = final_regulatory_rating_decision
+        shared_knowledge_graph["justification"] = chair_justification
+        shared_knowledge_graph["discussion_transcript"] += f"## Discussion Chair:\n\n* **Final PD Rating Decision:** {final_pd_rating_decision}\n* **Final Regulatory Rating Decision:** {final_regulatory_rating_decision}\n* **Justification:** {chair_justification}\n\n"
 
-        # 5. Generate Report
-        report = self.generate_report(shared_knowledge_graph)
+        # 5. Generate Output
+        output = {
+            "company_name": shared_knowledge_graph["company_name"],
+            "final_pd_rating": shared_knowledge_graph["final_pd_rating_decision"],
+            "final_regulatory_rating": shared_knowledge_graph["final_regulatory_rating_decision"],
+            "justification": shared_knowledge_graph["justification"],
+            "discussion_transcript": shared_knowledge_graph["discussion_transcript"]
+        }
 
         # 6. Save Results
-        self.save_results(shared_knowledge_graph, report)
+        self.save_results(output)
 
-    def generate_report(self, shared_knowledge_graph):
+    def save_results(self, output):
         """
-        Generates a credit rating assessment report.
+        Saves the simulation results to a JSON file.
 
         Args:
-            shared_knowledge_graph (dict): The shared knowledge graph containing simulation data.
-
-        Returns:
-            str: The generated report.
+            output (dict): The output of the simulation.
         """
-        # ... logic to generate report based on shared_knowledge_graph
-        # Can use a template or generate dynamically based on the data
+        # Placeholder for saving results logic
+        # ...
         pass
-
-    def save_results(self, shared_knowledge_graph, report):
-        """
-        Saves the simulation results to the knowledge base and a report file.
-
-        Args:
-            shared_knowledge_graph (dict): The shared knowledge graph containing simulation data.
-            report (str): The generated report.
-        """
-        # ... logic to save results to knowledge base and file
-        pass
-```
