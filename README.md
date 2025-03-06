@@ -100,11 +100,11 @@ Adam v19.1 is not just an AI; it's your partner in navigating the complexities o
 
   * **User Guide:** [docs/user\_guide.md](docs/user_guide.md)
   * **API Documentation:** [docs/api\_docs.yaml](docs/api_docs.yaml)
-  * **Contribution Guidelines:** [CONTRIBUTING.md](https://www.google.com/url?sa=E&source=gmail&q=CONTRIBUTING.md)
+  * **Contribution Guidelines:** [CONTRIBUTING.md](https://github.com/adamvangrover/adam/blob/main/CONTRIBUTING.md)
 
 ## Contributing
 
-Contributions are welcome\! Please check [CONTRIBUTING.md](https://www.google.com/url?sa=E&source=gmail&q=CONTRIBUTING.md) for guidelines.
+Contributions are welcome\! Please check [CONTRIBUTING.md](https://github.com/adamvangrover/adam/blob/main/CONTRIBUTING.md) for guidelines.
 
 ## License
 
@@ -400,11 +400,11 @@ Adam v19.1 offers interactive tutorials to guide you through its features and ca
   * **Simulations:** Running various simulations to analyze complex scenarios.
   * **Advanced Topics:** Customizing and extending the system, integrating with external systems, and contributing to the project.
 
-You can access the interactive tutorials here: \[https://github.com/adamvangrover/adam/blob/main/docs/tutorials.md]
+You can access the interactive tutorials here: https://github.com/adamvangrover/adam/blob/main/docs/tutorials.md
 
 ## Contributing
 
-Contributions to Adam v19.1 are welcome\! Please check the [CONTRIBUTING.md](https://www.google.com/url?sa=E&source=gmail&q=CONTRIBUTING.md) file for guidelines on how to contribute to the project.
+Contributions to Adam v19.1 are welcome\! Please check the [CONTRIBUTING.md](https://github.com/adamvangrover/adam/blob/main/CONTRIBUTING.md) file for guidelines on how to contribute to the project.
 
 ## Support and Feedback
 
