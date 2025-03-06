@@ -151,6 +151,41 @@
     <p>CCA involves identifying comparable companies (comps) in the same industry or sector, analyzing their valuation multiples (e.g., P/E, EV/EBITDA, P/B), and applying these multiples to the target company to estimate its value.</p>
     <button onclick="showInteractiveExample('comparables')">See an Example</button>
 
+<div id="cca-example" style="display: none;">
+  <p>Let's assume you want to value a company called "TargetCo" using CCA. You've identified three comparable companies with the following data:</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Company</th>
+        <th>P/E Ratio</th>
+        <th>Earnings per Share (EPS)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Comp A</td>
+        <td>20</td>
+        <td>$5</td>
+      </tr>
+      <tr>
+        <td>Comp B</td>
+        <td>25</td>
+        <td>$4</td>
+      </tr>
+      <tr>
+        <td>Comp C</td>
+        <td>30</td>
+        <td>$3</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>TargetCo's EPS is $6. Based on the comparable companies' data, what is your estimated value for TargetCo?</p>
+  <input type="number" id="cca-answer" placeholder="Enter your answer">
+  <button onclick="checkCCAAnswer()">Check Answer</button>
+  <p id="cca-feedback"></p>
+</div>
+<button onclick="showInteractiveExample('cca')">See an Example</button>
+    
     </div>
   <button onclick="closeLearningModule()">Close</button>
 </div>
@@ -409,6 +444,27 @@ function checkDCFAnswer() {
   }
 }
 
+function showInteractiveExample(concept) {
+  if (concept === 'cca') {
+    document.getElementById('cca-example').style.display = 'block';
+  }
+}
+
+function checkCCAAnswer() {
+  const userAnswer = parseFloat(document.getElementById('cca-answer').value);
+  // Calculate the average P/E ratio of comparable companies
+  const averagePE = (20 + 25 + 30) / 3;
+  // Calculate the estimated value based on the average P/E and TargetCo's EPS
+  const estimatedValue = averagePE * 6;
+  const feedback = document.getElementById('cca-feedback');
+
+  if (Math.abs(userAnswer - estimatedValue) < 0.01) {
+    feedback.textContent = "Correct! You have a good understanding of how to apply CCA.";
+  } else {
+    feedback.textContent = `Incorrect. The estimated value is ${estimatedValue}. Please review the CCA explanation and try again.`;
+  }
+}
+    
     // ... (Other functions)
     
     // Add an event listener to the send button for the landing page chatbot
