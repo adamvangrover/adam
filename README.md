@@ -400,7 +400,7 @@ Adam v19.1 offers interactive tutorials to guide you through its features and ca
   * **Simulations:** Running various simulations to analyze complex scenarios.
   * **Advanced Topics:** Customizing and extending the system, integrating with external systems, and contributing to the project.
 
-You can access the interactive tutorials here: \[link to tutorials]
+You can access the interactive tutorials here: \[https://github.com/adamvangrover/adam/blob/main/docs/tutorials.md]
 
 ## Contributing
 
