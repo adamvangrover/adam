@@ -1,5 +1,3 @@
-# scripts/run_adam.py
-
 import sys
 import os
 from core.system.agent_orchestrator import AgentOrchestrator
@@ -8,12 +6,8 @@ from core.system.data_manager import DataManager
 from core.system.echo import Echo
 from core.utils.config_utils import load_config
 from core.utils.logging_utils import setup_logging
-from core.utils.api_utils import (
-    get_knowledge_graph_data,
-    update_knowledge_graph_node,
-)
-
-# ... (other imports)
+from core.utils.api_utils import get_knowledge_graph_data, update_knowledge_graph_node
+from core.llm_plugin import LLMPlugin  # Import LLM plugin
 
 def main():
     """
@@ -38,6 +32,9 @@ def main():
         # Initialize Echo System
         echo_system = Echo(config.get("echo_system", {}))
 
+        # Initialize LLM plugin
+        llm_plugin = LLMPlugin(config.get("llm_plugin", {}))
+
         # Start the agent orchestrator
         agent_orchestrator.run()
 
@@ -57,7 +54,11 @@ def main():
         insights = echo_system.get_insights(query="What are the latest market trends?")
         print("Echo Insights:", insights)
 
-        # 4. Execute a workflow
+        # 4. Use the LLM plugin for content generation
+        generated_content = llm_plugin.generate_content("financial trends", "summarize the latest market news")
+        print("Generated Content:", generated_content)
+
+        # 5. Execute a workflow
         agent_orchestrator.execute_workflow("generate_newsletter")
 
         # ... (Add more examples and use cases)
