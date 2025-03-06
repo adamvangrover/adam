@@ -15,10 +15,10 @@ adam/
 ````
 **(Welcome to Adam v19.1, the most advanced version yet\! We've supercharged our capabilities with an expanded agent network, enhanced simulation workflows, and a more sophisticated knowledge base to deliver unparalleled financial analysis and investment insights.)**
 
-**[Explore the interactive demo here\!](docs/chatbot-ui/index.html)**
+**[Explore the interactive demo here\!](https://adamvangrover.github.io/adam/chatbot-ui/)**
 
 Adam v19.1 is not just an AI; it's your partner in navigating the complexities of the financial world. Whether you're an individual investor, a seasoned analyst, or a financial institution, Adam v19.1 empowers you with the knowledge and tools to make informed decisions and achieve your financial goals.
-
+````
 ## What's New in Adam v19.1?
 
   * **Expanded Agent Network:**
