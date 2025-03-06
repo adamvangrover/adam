@@ -59,7 +59,7 @@ Adam v19.1 is not just an AI; it's your partner in navigating the complexities o
   * **Feedback and Prompt Refinement Loop:**
       * **Continuously learns and adapts based on user feedback and new information.**
 
-'''
+````
 ## Getting Started
 
 1.  **Clone the Repository:**
