@@ -439,7 +439,47 @@ function checkDCFAnswer() {
   if (Math.abs(userAnswer - correctAnswer) < 0.01) {
     feedback.textContent = "Correct! You have a good understanding of DCF analysis.";
   } else {
-    feedback.textContent = `Incorrect. The correct answer is ${correctAnswer}. Please review the DCF explanation and try again.`;
+    feedback.textContent = `Incorrect. The correct answer is ${correctAnswer}. Please review the DCF explanation and try again. The intrinsic value of the company is $13.46 million.
+
+Here's how I arrived at the answer:
+
+First, I projected the free cash flow (FCF) for the next 5 years, using the given growth rate of 5%:
+
+| Year | FCF (millions) |
+|------|----------------|
+| 1    | 1.00            |
+| 2    | 1.05            |
+| 3    | 1.10            |
+| 4    | 1.16            |
+| 5    | 1.22            |
+
+Then, I calculated the terminal value (TV) at the end of year 5, using the stable growth rate of 2% and the discount rate of 10%:
+
+```
+TV = FCF[5] * (1 + g) / (r - g)
+TV = 1.22 * (1 + 0.02) / (0.1 - 0.02)
+TV = 15.61
+```
+
+Next, I discounted the FCFs and TV back to their present values using the discount rate of 10%:
+
+| Year | FCF (millions) | Discount Factor | Present Value (millions) |
+|------|----------------|-----------------|---------------------------|
+| 1    | 1.00            | 0.909           | 0.91                      |
+| 2    | 1.05            | 0.826           | 0.87                      |
+| 3    | 1.10            | 0.751           | 0.83                      |
+| 4    | 1.16            | 0.683           | 0.79                      |
+| 5    | 1.22            | 0.621           | 0.76                      |
+| TV   | 15.61           | 0.621           | 9.70                      |
+
+Finally, I summed the present values of the FCFs and TV to arrive at the intrinsic value of the company:
+
+```
+Intrinsic Value = 0.91 + 0.87 + 0.83 + 0.79 + 0.76 + 9.70
+Intrinsic Value = 13.46 million
+```
+
+Therefore, the intrinsic value of the company is $13.46 million.`;
   }
 }
 
@@ -460,7 +500,15 @@ function checkCCAAnswer() {
   if (Math.abs(userAnswer - estimatedValue) < 0.01) {
     feedback.textContent = "Correct! You have a good understanding of how to apply CCA.";
   } else {
-    feedback.textContent = `Incorrect. The estimated value is ${estimatedValue}. Please review the CCA explanation and try again.`;
+    feedback.textContent = `Incorrect. The estimated value is ${estimatedValue}. Please review the CCA explanation and try again. To estimate TargetCo's value using Comparable Company Analysis (CCA) with the provided data, we'll follow these steps:
+
+Calculate the average P/E ratio of the comparable companies: (20 + 25 + 30) / 3 = 25
+
+Multiply TargetCo's EPS by the average P/E ratio to estimate its value: 25 * $6 = $150
+
+Therefore, based on the CCA with the given comparable company data, the estimated value for TargetCo is $150 per share.
+
+It's important to note that this is just an estimate, and the actual value of TargetCo could be higher or lower depending on various factors such as its growth prospects, risk profile, and market conditions.`;
   }
 }
     
