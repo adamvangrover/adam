@@ -12,7 +12,7 @@ adam/
 ````markdown
 
 # Adam v19.1: Your AI-Powered Financial Analyst
-
+````
 **(Welcome to Adam v19.1, the most advanced version yet\! We've supercharged our capabilities with an expanded agent network, enhanced simulation workflows, and a more sophisticated knowledge base to deliver unparalleled financial analysis and investment insights.)**
 
 **[Explore the interactive demo here\!](docs/chatbot-ui/index.html)**
