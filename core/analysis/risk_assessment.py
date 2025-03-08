@@ -8,7 +8,9 @@ from datetime import datetime
 
 class RiskAssessor:
     """
-    Comprehensive risk assessment tool for investments, integrated with Adam v19.1's agent framework and knowledge graph.
+    Comprehensive risk assessment tool for investments, integrated with 
+    Adam v19.1's agent framework and knowledge graph. Includes Monte Carlo 
+    simulation for scenario analysis.
     """
     def __init__(self, config: Dict[str, Any]):
         """
@@ -17,9 +19,9 @@ class RiskAssessor:
         self.data_sources = config.get('data_sources', {})
         self.geopolitical_risk_agent = config.get('geopolitical_risk_agent', None)
         self.industry_specialist_agent = config.get('industry_specialist_agent', None)
-        self.prediction_market_agent = config.get('prediction_market_agent', None) # Integrate prediction market agent
-        self.macroeconomic_analysis_agent = config.get('macroeconomic_analysis_agent', None) # Integrate macroeconomic agent
-        self.alternative_data_agent = config.get('alternative_data_agent', None) # Integrate alternative data agent
+        self.prediction_market_agent = config.get('prediction_market_agent', None) 
+        self.macroeconomic_analysis_agent = config.get('macroeconomic_analysis_agent', None)
+        self.alternative_data_agent = config.get('alternative_data_agent', None)  
         self.risk_weights = config.get('risk_weights', {
             'market_risk': 0.2,
             'credit_risk': 0.3,
@@ -138,7 +140,7 @@ class RiskAssessor:
         for risk_type, risk_value in risk_factors.items():
             weight = self.risk_weights.get(risk_type, 0)
             if isinstance(risk_value, dict):
-                # if risk factor is a dictionary, average the values.
+                # If risk factor is a dictionary, average the values.
                 score = np.mean(list(risk_value.values()))
             else:
                 score = risk_value
@@ -148,31 +150,31 @@ class RiskAssessor:
     # Enhanced risk assessment methods
     def _generate_probability_weighted_scenarios(self, investment: Dict[str, Any]) -> List[Tuple[str, float]]:
         """
-        Generates probability-weighted scenarios by combining macroeconomic forecasts, geopolitical risks, 
-        and prediction market data.
+        Generates probability-weighted scenarios by combining macroeconomic forecasts, 
+        geopolitical risks, and prediction market data.
         """
         scenarios = []
-        # 1. Fetch macroeconomic scenarios from macroeconomic_analysis_agent
         macro_scenarios = self.macroeconomic_analysis_agent.generate_scenarios() if self.macroeconomic_analysis_agent else []
-        # 2. Fetch geopolitical risks from geopolitical_risk_agent
         geopolitical_risks = self.geopolitical_risk_agent.assess_geopolitical_risks() if self.geopolitical_risk_agent else []
-        # 3. Combine scenarios and risks
+        
         for macro_scenario in macro_scenarios:
             for risk in geopolitical_risks:
                 scenario_description = f"{macro_scenario} with {risk}"
-                # 4. Fetch probability from prediction_market_agent
-                probability = self.prediction_market_agent.get_scenario_probability(scenario_description) if self.prediction_market_agent else np.random.rand()
+                probability = self.prediction_market_agent.get_scenario_probability(
+                    scenario_description
+                ) if self.prediction_market_agent else np.random.rand()
                 scenarios.append((scenario_description, probability))
         return scenarios
 
     def _identify_early_warning_signals(self, investment: Dict[str, Any]) -> List[str]:
         """
-        Identifies early warning signals of potential risks by analyzing alternative data sources.
+        Identifies early warning signals of potential risks by analyzing 
+        alternative data sources.
         """
         signals = []
-        # 1. Fetch relevant data from alternative_data_agent
-        alternative_data = self.alternative_data_agent.get_data_for_asset(investment) if self.alternative_data_agent else {}
-        # 2. Analyze data for signals (example - social media sentiment)
+        alternative_data = self.alternative_data_agent.get_data_for_asset(
+            investment
+        ) if self.alternative_data_agent else {}
         if 'social_media_sentiment' in alternative_data:
             sentiment = alternative_data['social_media_sentiment']
             if sentiment < 0.2:
@@ -185,10 +187,51 @@ class RiskAssessor:
         Generates risk mitigation strategies based on identified risk factors.
         """
         mitigation_strategies = {}
-        # 1. Analyze risk factors and generate strategies
         if risk_factors.get('market_risk', {}).get('volatility') > 0.3:
             mitigation_strategies['market_risk'] = "Consider hedging strategies or diversification."
         if risk_factors.get('credit_risk') > 0.05:
             mitigation_strategies['credit_risk'] = "Monitor credit rating closely and consider credit default swaps."
         # ... Add more logic for other risk factors
         return mitigation_strategies
+
+    def run_monte_carlo_simulation(self, investment: Dict[str, Any], num_simulations: int = 1000) -> Dict[str, Any]:
+        """
+        Performs a Monte Carlo simulation to assess the range of potential outcomes for an investment.
+
+        Args:
+            investment: Dictionary containing investment information.
+            num_simulations: The number of simulations to run.
+
+        Returns:
+            A dictionary containing simulation results, such as:
+                - `expected_return`: The average return across all simulations.
+                - `value_at_risk`: The potential loss at a given confidence level.
+                - `other_metrics`: Other relevant risk metrics derived from the simulation.
+        """
+        print(f"Running Monte Carlo simulation for {investment.get('name', 'Unknown Investment')}...")
+        
+        # 1. Extract relevant data from the investment
+        # Example: Assuming investment has 'initial_value' and 'volatility'
+        initial_value = investment.get('initial_value', 100)
+        volatility = investment['market_risk']['volatility'] if 'market_risk' in investment else 0.2  # Use calculated volatility or a default value
+        time_horizon = investment.get('time_horizon', 1)  # Assuming a time horizon of 1 year for now
+
+        # 2. Generate random scenarios
+        daily_returns = np.random.normal(0, volatility / np.sqrt(252), (num_simulations, int(time_horizon * 252)))
+        cumulative_returns = (1 + daily_returns).cumprod(axis=1)
+        final_values = initial_value * cumulative_returns[:, -1]
+
+        # 3. Calculate risk metrics
+        expected_return = np.mean(final_values)
+        value_at_risk_95 = np.percentile(final_values, 5)  # 5th percentile for 95% confidence
+        # ... Calculate other risk metrics
+
+        results = {
+            'expected_return': expected_return,
+            'value_at_risk_95': value_at_risk_95,
+            # ... other metrics
+        }
+        print("Monte Carlo Simulation Results:")
+        for metric, value in results.items():
+            print(f"{metric}: {value:.2f}")
+        return results
