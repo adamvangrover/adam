@@ -367,19 +367,59 @@ agents:
       - Portfolio stress testing and scenario analysis
     data_sources:
       - market_data_api
-      - company_data
+        market_data_api:
+      api_key: "YOUR_MARKET_DATA_API_KEY" # Placeholder
+  - company_data
       - macroeconomic_data
-    risk_metrics:
-      - volatility
-      - beta
-      - VaR
-      - CVaR
-    risk_models:
-      - credit_scoring_models
-      - monte_carlo_simulation
-    alerting_thresholds:
-      portfolio_risk_level: 0.8  # Alert when the portfolio risk level exceeds 80%
-    communication_style: clear and informative with detailed risk reports
+  risk_metrics:
+    - volatility
+    - beta
+    - VaR
+    - CVaR
+  risk_models:
+    - credit_scoring_models
+    - monte_carlo_simulation
+  alerting_thresholds:
+    portfolio_risk_level: 0.8  # Alert when the portfolio risk level exceeds 80%
+    market_risk_level: 0.6
+    credit_risk_level: 0.7
+    liquidity_risk_level: 0.5
+  communication_style: clear and informative with detailed risk reports
+  knowledge_base_path: "adam/data/risk_rating_mapping.json"
+  debug_mode: false
+  risk_weights:
+    market_risk: 0.2
+    credit_risk: 0.3
+    liquidity_risk: 0.1
+    operational_risk: 0.1
+    geopolitical_risk: 0.1
+    industry_risk: 0.1
+    economic_risk: 0.05
+    volatility_risk: 0.025
+    currency_risk: 0.025
+  data_validation:
+    enabled: true
+    rules:
+      - field: financial_data.revenue
+        type: float
+        min: 0
+      - field: market_data.trading_volume
+        type: integer
+        min: 0
+      - field: loan_details.loan_amount
+        type: float
+        min: 0
+  monitoring:
+    enabled: true
+    metrics:
+      - response_time
+      - accuracy
+      - resource_usage
+      - market_risk_calculation_time
+      - credit_risk_calculation_time
+      - overall_risk_score_drift
+
+
 
   # Newsletter Layout Specialist Agent
   newsletter_layout_specialist_agent:
@@ -419,9 +459,11 @@ agents:
       data_discrepancy: 0.05  # Alert when the discrepancy between data sources exceeds 5%
     communication_style: precise and reliable with clear explanations of data discrepancies
 
+
   # Lexica Agent
   lexica_agent:
     <<: *defaults
+    type: rag-agent  # Classify as Retrieval Augmented Generation agent
     persona: Knowledge Navigator
     description: A master of information retrieval, navigating the vast sea of data and knowledge to find the most relevant and accurate information.
     expertise:
