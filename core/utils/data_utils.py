@@ -218,35 +218,45 @@ def receive_messages(queue=RABBITMQ_QUEUE, callback=None):
 
 # Add more data utility functions as needed
 
-def load_data(source_config: dict):
-    """Loads data from a file based on its type and path.
+def load_data(source_config: Dict[str, Any]) -> Optional[Union[Dict[str, Any], List[Any]]]:
+    """
+    Loads data from a file based on the provided configuration.
 
     Args:
-        source_config: A dictionary with 'type' and 'path' keys.
+        source_config: A dictionary containing the 'type' (json, yaml, csv) and 'path' of the data source.
 
     Returns:
-        The loaded data, or None if an error occurs.
+        The loaded data, or None if an error occurred.
     """
-    data_type = source_config.get('type')
-    file_path = Path(source_config.get('path'))
-
-    if not file_path.exists():
-        logging.error(f"Data file not found: {file_path}")
-        return None
     try:
-        if data_type == 'json':
-            with file_path.open('r') as f:
+        file_type = source_config.get("type")
+        file_path = source_config.get("path")
+
+        if not file_type or not file_path:
+            logging.error("Invalid source configuration: 'type' and 'path' are required.")
+            return None
+
+        if file_type == "json":
+            with open(file_path, 'r') as f:
                 return json.load(f)
-        elif data_type == 'csv':
-            with file_path.open('r') as f:
+        elif file_type == "yaml":
+            with open(file_path, 'r') as f:
+                return yaml.safe_load(f)
+        elif file_type == "csv":
+            with open(file_path, 'r') as f:
                 reader = csv.DictReader(f)
                 return list(reader)
-        elif data_type == 'yaml': #Adding yaml
-            with file_path.open('r') as f:
-                return yaml.safe_load(f)
         else:
-            logging.error(f"Unsupported data type: {data_type}")
+            logging.error(f"Unsupported file type: {file_type}")
             return None
+    except FileNotFoundError:
+        logging.error(f"File not found: {file_path}")
+        return None
+    except Exception as e:
+        logging.exception(f"Error loading data from {file_path}: {e}")
+        return None
+
+
 
     except (json.JSONDecodeError, IOError, yaml.YAMLError) as e:
         logging.error(f"Error loading data from {file_path}: {e}")
