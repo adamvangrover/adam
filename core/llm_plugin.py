@@ -67,3 +67,262 @@ class LLMPlugin:
         """
         prompt = f"Context: {context}\nQuestion: {question}\nAnswer:"
         return self.generate_content(prompt)
+
+# core/llm_plugin.py
+from abc import ABC, abstractmethod
+import openai  # Example: OpenAI
+import anthropic  # Example: Anthropic
+# ... import other LLM libraries as needed ...
+import logging
+from core.utils.config_utils import load_config
+from core.utils.token_utils import count_tokens as count_tokens_generic
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+
+class LLMBase(ABC):
+    """Abstract base class for LLM integrations."""
+
+    @abstractmethod
+    def generate_text(self, prompt: str, **kwargs) -> str:
+        """Generates text from a prompt.
+
+        Args:
+            prompt: The input prompt.
+            **kwargs: Model-specific parameters (e.g., temperature, max_tokens).
+
+        Returns:
+            The generated text.
+        """
+        pass
+
+    @abstractmethod
+    def get_token_count(self, text: str) -> int:
+        """Gets the token count for a given text."""
+        pass
+
+    @abstractmethod
+    def get_model_name(self) -> str:
+        """Returns the name of the LLM."""
+        pass
+
+    @abstractmethod
+    def get_context_length(self) -> int:
+      """Returns the LLM context length"""
+      pass
+
+class OpenAILLM(LLMBase):
+    """Implementation for OpenAI's LLMs."""
+
+    def __init__(self, api_key: str, model_name: str = "gpt-3.5-turbo"):
+        self.api_key = api_key
+        self.model_name = model_name
+        openai.api_key = self.api_key
+
+    def generate_text(self, prompt: str, **kwargs) -> str:
+        try:
+            response = openai.ChatCompletion.create(
+                model=self.model_name,
+                messages=[{"role": "user", "content": prompt}],
+                **kwargs
+            )
+            return response.choices[0].message['content'].strip()
+        except Exception as e:
+            logging.error(f"OpenAI API error: {e}")
+            return "" # Or raise the exception, or return a specific error message
+
+    def get_token_count(self, text: str) -> int:
+      # return count_tokens_generic(text, encoding_name='cl100k_base')
+      # The above generic one is not model specific, this one below is.
+      try:
+        encoding = tiktoken.encoding_for_model(self.model_name)
+        num_tokens = len(encoding.encode(text))
+        return num_tokens
+      except KeyError:
+        logging.warning(f"Model {self.model_name} not found, using 'cl100k_base' for token count.")
+        return count_tokens_generic(text) # Fallback
+      except Exception as e:
+            logging.error(f"Error counting tokens: {e}")
+            return 0  # Return 0 on error
+
+    def get_model_name(self) -> str:
+        return self.model_name
+
+    def get_context_length(self) -> int:
+        # Lookup table for context lengths (update as needed)
+        context_lengths = {
+            "gpt-3.5-turbo": 4096,
+            "gpt-4": 8192,
+            "gpt-4-32k": 32768,
+            # Add other models as needed
+        }
+        return context_lengths.get(self.model_name, 4096) # Default to 4096
+
+
+class AnthropicLLM(LLMBase):
+    """Implementation for Anthropic's LLMs."""
+
+    def __init__(self, api_key: str, model_name: str = "claude-2"):
+        self.api_key = api_key
+        self.model_name = model_name
+        self.client = anthropic.Anthropic(api_key=self.api_key)
+
+    def generate_text(self, prompt: str, **kwargs) -> str:
+        try:
+            response = self.client.completions.create(
+                model=self.model_name,
+                prompt=f"{anthropic.HUMAN_PROMPT}{prompt}{anthropic.AI_PROMPT}",
+                **kwargs
+            )
+            return response.completion.strip()
+        except Exception as e:
+            logging.error(f"Anthropic API error: {e}")
+            return ""
+
+    def get_token_count(self, text: str) -> int:
+        # return count_tokens_generic(text)  # Anthropic uses a different tokenizer
+        # Anthropic provides a way to count tokens:
+        return self.client.count_tokens(text)
+
+
+    def get_model_name(self) -> str:
+        return self.model_name
+
+    def get_context_length(self) -> int:
+        # Lookup table for context lengths (update as needed)
+        context_lengths = {
+          "claude-2": 100000,
+          "claude-instant-1": 100000
+        }
+        return context_lengths.get(self.model_name, 100000)  #Sensible default
+
+# Add other LLM implementations (GoogleVertexAILLM, etc.) as needed.
+
+class LLMPlugin:
+    """
+    Manages interactions with LLMs.  This is the main class that the rest of
+    the system will use.
+    """
+
+    def __init__(self, config_path: str = "config/llm_plugin.yaml"):
+        self.config = load_config(config_path)
+        self.llm = self._initialize_llm()
+
+    def _initialize_llm(self) -> LLMBase:
+        """Initializes the LLM based on the configuration."""
+        provider = self.config.get("provider", "openai").lower()  # Default to OpenAI
+
+        if provider == "openai":
+            api_key = self.config.get("openai_api_key")
+            model_name = self.config.get("openai_model_name", "gpt-3.5-turbo")
+            if not api_key:
+                raise ValueError("OpenAI API key not found in llm_plugin.yaml")
+            return OpenAILLM(api_key, model_name)
+        elif provider == "anthropic":
+            api_key = self.config.get("anthropic_api_key")
+            model_name = self.config.get("anthropic_model_name", "claude-2")
+            if not api_key:
+                raise ValueError("Anthropic API key not found in llm_plugin.yaml")
+            return AnthropicLLM(api_key, model_name)
+        # Add other providers (Google, Cohere, etc.) here
+        else:
+            raise ValueError(f"Unsupported LLM provider: {provider}")
+
+    def generate_text(self, prompt: str, **kwargs) -> str:
+        """Generates text using the configured LLM."""
+        if self.llm:
+            return self.llm.generate_text(prompt, **kwargs)
+        else:
+            logging.error("LLM not initialized.")
+            return ""
+
+    def get_token_count(self, text:str) -> int:
+        """Return token count"""
+        if self.llm:
+            return self.llm.get_token_count(text)
+        else:
+            logging.error("LLM not initialized.")
+            return 0
+
+    def get_context_length(self) -> int:
+      """Return the context length"""
+      if self.llm:
+        return self.llm.get_context_length()
+      else:
+        logging.error("LLM not initialized")
+        return 0 # A default
+
+# Example usage (for testing)
+if __name__ == "__main__":
+
+    # Create a dummy llm_plugin.yaml for testing purposes
+    dummy_config = {
+        "provider": "openai",
+        "openai_api_key": "YOUR_OPENAI_API_KEY",  # Replace with a test key or mock
+        "openai_model_name": "gpt-3.5-turbo"
+    }
+    with open("config/llm_plugin.yaml", "w") as f:
+        yaml.dump(dummy_config, f)
+
+    try:
+        plugin = LLMPlugin()
+        prompt = "What is the capital of France?"
+        generated_text = plugin.generate_text(prompt, max_tokens=50)
+        print(f"Generated text: {generated_text}")
+        token_count = plugin.get_token_count(prompt)
+        print(f"Token count: {token_count}")
+        print(f"Context Length: {plugin.get_context_length()}")
+    finally:
+        os.remove("config/llm_plugin.yaml") # Clean up
+
+# config/llm_plugin.yaml
+provider: openai  # Or "anthropic", "google", etc.
+openai_api_key: "YOUR_OPENAI_API_KEY"  # Replace with your actual API key
+openai_model_name: "gpt-3.5-turbo"  # Or "gpt-4", etc.
+
+# anthropic_api_key: "YOUR_ANTHROPIC_API_KEY"  # Uncomment and fill in when using Anthropic
+# anthropic_model_name: "claude-2"
+
+import os
+api_key = os.getenv("OPENAI_API_KEY", "fallback_value_if_needed")
+
+import tiktoken
+def count_tokens(text, model_name="gpt-4"):
+    try:
+        encoding = tiktoken.encoding_for_model(model_name)
+        return len(encoding.encode(text))
+    except KeyError:
+        return len(tiktoken.get_encoding("cl100k_base").encode(text))
+
+
+def _initialize_llm(self) -> LLMBase:
+    provider_map = {
+        "openai": OpenAILLM,
+        "anthropic": AnthropicLLM,
+        # Add future providers here
+    }
+    provider = self.config.get("provider", "openai").lower()
+    if provider in provider_map:
+        return provider_map[provider](
+            self.config.get(f"{provider}_api_key"),
+            self.config.get(f"{provider}_model_name")
+        )
+    raise ValueError(f"Unsupported LLM provider: {provider}")
+
+
+def generate_content(self, prompt: str, task: str = "default", **kwargs) -> str:
+    task_prompts = {
+        "summarize": f"Summarize the following text: {prompt}",
+        "qa": f"Context: {kwargs.get('context', '')}\nQuestion: {prompt}\nAnswer:"
+    }
+    prompt = task_prompts.get(task, prompt)
+    return self.generate_text(prompt, **kwargs)
+
+from unittest.mock import patch
+
+@patch("openai.ChatCompletion.create")
+def test_generate_text(mock_openai):
+    mock_openai.return_value = {"choices": [{"message": {"content": "Paris"}}]}
+    plugin = LLMPlugin()
+    assert plugin.generate_text("What is the capital of France?") == "Paris"
