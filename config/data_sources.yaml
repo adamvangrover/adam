@@ -1,39 +1,82 @@
-# core/config/data_sources.yaml
-
-financial_news_api:
-  api_keys:
-    bloomberg: YOUR_BLOOMBERG_API_KEY
-    reuters: YOUR_REUTERS_API_KEY
-    #... (add API keys for other news sources)
-
-social_media_api:
-  api_keys:
-    twitter:
-      consumer_key: YOUR_TWITTER_CONSUMER_KEY
-      consumer_secret: YOUR_TWITTER_CONSUMER_SECRET
-      access_token: YOUR_TWITTER_ACCESS_TOKEN
-      access_token_secret: YOUR_TWITTER_ACCESS_TOKEN_SECRET
-    facebook: YOUR_FACEBOOK_API_KEY
-    #... (add API keys for other social media platforms)
-
-government_stats_api:
-  api_keys:
-    bea_api_key: YOUR_BEA_API_KEY
-    bls_api_key: YOUR_BLS_API_KEY
-    #... (add API keys for other government data sources)
-
-market_data_api:
-  api_keys:
-    iex_cloud: YOUR_IEX_CLOUD_API_KEY
-    alpha_vantage: YOUR_ALPHA_VANTAGE_API_KEY
-    #... (add API keys for other market data providers)
-
-
 # config/data_sources.yaml
+
+# --- Local Data Files ---
 risk_ratings:
   type: json
   path: data/risk_rating_mapping.json
+
 market_baseline:
+  type: json
+  path: data/adam_market_baseline.json
+
+knowledge_base:
+  type: json
+  path: data/knowledge_base.json
+
+processed_data: # Example of a CSV file
+  type: csv
+  path: data/processed_data.csv
+
+deal_template:
+  type: json
+  path: data/deal_template.json
+
+dcf_valuation_template:
+  type: json
+  path: data/dcf_valuation_template.json
+
+dcf_model_template: #Another CSV
+    type: csv
+    path: data/dcf_model_template.csv
+
+ev_model_template: #Another CSV
+    type: csv
+    path: data/ev_model_template.csv
+
+example_user_portfolio:
     type: json
-    path: data/adam_market_baseline.json
-# Add more data sources as needed
+    path: data/example_user_portfolio.json
+
+example_user_profile:
+    type: json
+    path: data/example_user_profile.json
+
+global_risk_appetite:
+    type: csv
+    path: data/global_risk_appetite_barometer_20250224.csv
+
+adam_core_data:
+  type: json
+  path: data/adam_core_data.json
+
+knowledge_graph:
+    type: json
+    path: data/knowledge_graph.json
+
+# --- External Data Sources (APIs) ---
+#   These entries define the *names* of the data sources.
+#   The actual API keys and connection details should be handled
+#   SEPARATELY, for security reasons (e.g., in environment variables
+#   or a dedicated secrets management system).
+
+financial_news_api:
+  type: api
+  provider: bloomberg, reuters # List supported providers
+
+social_media_api:
+  type: api
+  provider: twitter, facebook
+
+government_stats_api:
+  type: api
+  provider: bea, bls
+
+market_data_api:
+  type: api
+  provider: iex_cloud, alpha_vantage
+
+# --- Database Example (Future) ---
+# database:
+#   type: database
+#   provider: postgresql  # Or mysql, sqlite, etc.
+#   connection_string:  # Placeholder - DO NOT put credentials here!
