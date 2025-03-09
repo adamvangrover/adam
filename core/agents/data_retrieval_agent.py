@@ -55,6 +55,54 @@ class DataRetrievalAgent(AgentBase):
 
 
     def get_risk_rating(self, company_id: str) -> Optional[str]:
+        """Retrieves the risk rating for a given company ID."""
+        try:
+            risk_mapping = load_data({"type": "json", "path": "data/risk_rating_mapping.json"})
+            if not isinstance(risk_mapping, dict):
+                logging.error("risk_rating_mapping.json did not load as a dictionary.")
+                return None
+            return risk_mapping.get(company_id)
+        except FileNotFoundError:
+            logging.error(f"Risk rating file not found for company ID: {company_id}")
+            return None
+        except Exception as e:
+            logging.exception(f"An unexpected error occurred: {e}")
+            return None
+
+    def get_market_data(self) -> Optional[Dict[str, Any]]:
+        """Retrieves market data (placeholder)."""
+        try:
+            # Placeholder for actual market data retrieval (e.g., from an API)
+            # For now, we return some dummy data from adam_market_baseline.
+           market_data = load_data({"type": "json", "path": "data/adam_market_baseline.json"})
+           return market_data
+        except Exception as e:
+            logging.exception(f"Error retrieving market data: {e}")
+            return None
+
+    def execute(self, input_data: str) -> Optional[Union[str, Dict[str, Any]]]:
+        """
+        Executes data retrieval based on the input.  The input is expected to be
+        a string that can be interpreted as a command (e.g., "risk_rating:ABC" or "market_data").
+        """
+        try:
+            if input_data.startswith("risk_rating:"):
+                company_id = input_data.split(":")[1]
+                return self.get_risk_rating(company_id)
+            elif input_data == "market_data":
+                return self.get_market_data()
+            elif input_data.startswith("kb:"):
+                query = input_data[3:] # Extract the query part
+                kb = KnowledgeBase()  # Instantiate KnowledgeBase
+                return kb.query(query) # Call the query method of KnowledgeBase.
+            else:
+                logging.warning(f"Unknown data retrieval command: {input_data}")
+                return None
+        except Exception as e:
+            logging.exception(f"Error in execute method: {e}")
+            return None
+    
+    def get_risk_rating(self, company_id: str) -> Optional[str]:
         """Retrieves the risk rating for a given company."""
         risk_data = load_data(self.data_sources_config['risk_ratings'])
         if risk_data:
