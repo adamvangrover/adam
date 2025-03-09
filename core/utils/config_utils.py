@@ -3,28 +3,32 @@
 import yaml
 import os  # Import the 'os' module
 import logging
+from typing import Dict, Any, Optional
+
 
 # Configure logging (consider moving to a central location)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-def load_config(config_path: str) -> dict:
+# core/utils/config_utils.py
+import yaml
+import logging
+from typing import Dict, Any, Optional
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+def load_config(file_path: str) -> Optional[Dict[str, Any]]:
     """
     Loads a YAML configuration file.
 
     Args:
-        config_path: The path to the YAML configuration file.
+        file_path: The path to the YAML configuration file.
 
     Returns:
-        A dictionary representing the configuration, or None if an error occurs.
+        The configuration as a dictionary, or None if an error occurred.
     """
     try:
-        # Check if the file exists
-        if not os.path.exists(config_path):
-            logging.error(f"Configuration file not found: {config_path}")
-            return {}  # Return an empty dictionary instead of None
-
-        with open(config_path, 'r') as file:
-            config = yaml.safe_load(file)
+        with open(file_path, 'r') as f:
+            return yaml.safe_load(f)
             if config is None: # Handle empty YAML files
                 logging.warning(f"Configuration file is empty: {config_path}")
                 return {} # Return empty dict
@@ -35,7 +39,13 @@ def load_config(config_path: str) -> dict:
     except Exception as e:
         logging.error(f"An unexpected error occurred while loading config: {e}")
         return {}
-
+    except FileNotFoundError:
+        logging.error(f"Config file not found: {file_path}")
+        return None
+    except Exception as e:
+        logging.exception(f"Error loading config from {file_path}: {e}")
+        return None
+        
 # Example Usage (you can remove this when you integrate it into your project)
 if __name__ == '__main__':
     # Create a dummy config file for testing
