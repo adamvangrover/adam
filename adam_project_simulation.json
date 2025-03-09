@@ -230,10 +230,12 @@
             }
          ]
      },
-  "example_interactions": [
+
+
+      "example_interactions": [
     {
       "user_input": "Run simulation: 'What is the risk rating of company ABC?'",
-      "simulated_response": "[QueryUnderstandingAgent]: Analyzing query...\n[QueryUnderstandingAgent]: Relevant agent: DataRetrievalAgent\n[DataRetrievalAgent]: Retrieving risk rating for company ABC...\n[DataRetrievalAgent]: The risk rating for ABC is low.\n[Result]: The risk rating for ABC is low."
+      "simulated_response": "[QueryUnderstandingAgent]: Analyzing query...\n[QueryUnderstandingAgent]: Relevant agent: DataRetrievalAgent\n[DataRetrievalAgent]: Executing command: risk_rating:ABC\n[DataRetrievalAgent]: Retrieving risk rating for ABC...\n[Result]: low"
     },
     {
       "user_input": "What is the purpose of the `AgentOrchestrator`?",
@@ -241,7 +243,7 @@
     },
      {
         "user_input": "Run a simulation: 'What is the current market sentiment?'",
-        "simulated_response": "[QueryUnderstandingAgent]: Analyzing query...\n[QueryUnderstandingAgent]: Relevant agent: MarketSentimentAgent\n[MarketSentimentAgent]: Analyzing market sentiment...\n[MarketSentimentAgent]: Current market sentiment: Positive\n[Result]: Positive"
+        "simulated_response": "[QueryUnderstandingAgent]: Analyzing query...\n[QueryUnderstandingAgent]: Relevant Agent: DataRetrievalAgent\n[DataRetrievalAgent]: Executing command: kb:What is the current market sentiment?\n[DataRetrievalAgent]: Querying Knowledge Base...\n[Result]: Positive"
     },
     {
       "user_input": "Show me the code for the `DataRetrievalAgent`'s `execute` method.",
@@ -253,4 +255,18 @@
     },
     {
         "user_input": "get file content for core/agents/data_retrieval_agent.py",
-        "simulated_response": "[Result]:\n```python\n# core/agents/data_retrieval_agent.py\nimport logging\nfrom typing import Optional, Union, List, Dict, Any\nfrom core.agents.agent_base import AgentBase\nfrom core.utils.config_utils import load_config\nfrom core.utils.data_utils import load_data\nfrom core.system.knowledge_base import KnowledgeBase  # Import KnowledgeBase\n\n# Configure logging\nlogging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')\n\nclass DataRetrievalAgent(AgentBase):\n    \"\"\"\n    Agent responsible for retrieving data from various sources.  Supports:\n    - Local files (JSON, CSV, YAML) via data_utils.\n    - A simple Knowledge Base (core.system.knowledge_base).\n    - Placeholder for future Knowledge
+        "simulated_response": "[Result]:\n`python\n# core/agents/data_retrieval_agent.py\nimport logging\nfrom typing import Optional, Union, List, Dict, Any\nfrom core.agents.agent_base import AgentBase\nfrom core.utils.config_utils import load_config\nfrom core.utils.data_utils import load_data\nfrom core.system.knowledge_base import KnowledgeBase\n\nlogging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')\n\nclass DataRetrievalAgent(AgentBase):\n    \"\"\"\n    Agent for retrieving data.\n    \"\"\"\n    def get_risk_rating(self, company_id: str) -> Optional[str]:\n        \"\"\"Retrieves risk rating.\"\"\"\n        try:\n            risk_mapping = load_data({\"type\": \"json\", \"path\": \"data/risk_rating_mapping.json\"})\n            if not isinstance(risk_mapping, dict):\n                logging.error(\"risk_rating_mapping.json did not load as a dictionary.\")\n                return None\n            return risk_mapping.get(company_id)\n        except FileNotFoundError:\n            logging.error(f\"Risk rating file not found: {company_id}\")\n            return None\n        except Exception as e:\n            logging.exception(f\"An unexpected error occurred: {e}\")\n            return None\n\n    def get_market_data(self) -> Optional[Dict[str, Any]]:\n        \"\"\"Retrieves market data.\"\"\"\n        try:\n           market_data = load_data({\"type\": \"json\", \"path\": \"data/adam_market_baseline.json\"})\n           return market_data\n        except Exception as e:\n            logging.exception(f\"Error retrieving market data: {e}\")\n            return None\n\n    def execute(self, input_data: str) -> Optional[Union[str, Dict[str, Any]]]:\n        \"\"\"Executes data retrieval based on input.\"\"\"\n        try:\n            if input_data.startswith(\"risk_rating:\"):\n                company_id = input_data.split(\":\")[1]\n                return self.get_risk_rating(company_id)\n            elif input_data == \"market_data\":\n                return self.get_market_data()\n            elif input_data.startswith(\"kb:\"):\n                query = input_data[3:]\n                kb = KnowledgeBase()\n                return kb.query(query)\n            else:\n                logging.warning(f\"Unknown command: {input_data}\")\n                return None\n        except Exception as e:\n            logging.exception(f\"Error in execute: {e}\")\n            return None\n`"
+    },
+    {
+        "user_input": "Run simulation: 'What is the market data?'",
+        "simulated_response": "[QueryUnderstandingAgent]: Analyzing query...\n[QueryUnderstandingAgent]: Relevant agent: DataRetrievalAgent\n[DataRetrievalAgent]: Executing command: market_data\n[DataRetrievalAgent]: Retrieving market data...\n[Result]: {'market_trends': [{'sector': 'technology', 'trend': 'positive'}]}"
+    },
+    {
+       "user_input": "Run simulation: 'risk rating for XYZ'",
+       "simulated_response": "[QueryUnderstandingAgent]: Analyzing query...\n[QueryUnderstandingAgent]: Relevant agent: DataRetrievalAgent\n[DataRetrievalAgent]: Executing command: risk_rating:XYZ\n[DataRetrievalAgent]: Retrieving risk rating for XYZ...\n[Result]: None"
+    },
+    {
+        "user_input": "clear scratchpad",
+        "simulated_response": "[Scratchpad]: Cleared"
+    }
+  ]
