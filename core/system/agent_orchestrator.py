@@ -61,6 +61,86 @@ AGENT_CLASSES = {
 }
 
 
+
+class AgentOrchestrator:
+    """
+    Manages the creation, execution, and communication of agents.
+    """
+    def __init__(self):
+        self.agents: Dict[str, AgentBase] = {}
+        self.config = load_config("config/agents.yaml")
+        if self.config is None:
+            logging.error("Failed to load agent configurations.")  # This will be caught by the init self-test
+        else:
+            self.load_agents()
+
+
+    def load_agents(self):
+        """Loads agents based on the configuration."""
+        if not self.config:
+            return
+
+        for agent_name, agent_config in self.config.items():
+            if agent_name == "_defaults": #skip if defaults
+                continue
+            try:
+                agent_class = self._get_agent_class(agent_name)
+                self.agents[agent_name] = agent_class(agent_config)  # Pass config to agent
+                logging.info(f"Agent loaded: {agent_name}")
+            except Exception as e:
+                logging.error(f"Failed to load agent {agent_name}: {e}")
+
+    def _get_agent_class(self, agent_name: str):
+        """Retrieves the agent class based on its name."""
+        agent_classes = {
+            "QueryUnderstandingAgent": QueryUnderstandingAgent,
+            "DataRetrievalAgent": DataRetrievalAgent,
+            "MarketSentimentAgent": MarketSentimentAgent,
+            "MacroeconomicAnalysisAgent": MacroeconomicAnalysisAgent,
+            "GeopoliticalRiskAgent": GeopoliticalRiskAgent,
+            "IndustrySpecialistAgent": IndustrySpecialistAgent,
+            "FundamentalAnalystAgent": FundamentalAnalystAgent,
+            "TechnicalAnalystAgent": TechnicalAnalystAgent,
+            "RiskAssessmentAgent": RiskAssessmentAgent,
+            "NewsletterLayoutSpecialistAgent": NewsletterLayoutSpecialistAgent,
+            "DataVerificationAgent": DataVerificationAgent,
+            "LexicaAgent": LexicaAgent,
+            "ArchiveManagerAgent": ArchiveManagerAgent,
+            "AgentForge": AgentForge,
+            "PromptTuner": PromptTuner,
+            "CodeAlchemist": CodeAlchemist,
+            "LinguaMaestro": LinguaMaestro,
+            "SenseWeaver": SenseWeaver,
+        }
+        return agent_classes.get(agent_name)
+
+    def get_agent(self, agent_name: str) -> Optional[AgentBase]:
+        """Retrieves an agent by name."""
+        return self.agents.get(agent_name)
+
+    def execute_agent(self, agent_name: str, *args, **kwargs) -> Optional[str]:
+        """Executes an agent with the given arguments."""
+        agent = self.get_agent(agent_name)
+        if agent:
+            try:
+                return agent.execute(*args, **kwargs)
+            except Exception as e:
+                logging.exception(f"Error executing agent {agent_name}: {e}")
+                return None
+        else:
+            logging.error(f"Agent not found: {agent_name}")
+            return None
+
+    def execute_workflow(self, workflow_name: str, **kwargs):
+        """
+        Executes a predefined workflow.  (Placeholder for now)
+        Workflows would be defined in config/workflows.yaml.
+        """
+        # TODO: Implement workflow execution logic.
+        logging.warning(f"Workflow execution not yet implemented for: {workflow_name}")
+        return None
+
+
 class BaseAgentOrchestrator:
     """
     Base class for managing agents and executing workflows.
