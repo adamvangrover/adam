@@ -1,0 +1,86 @@
+# config/workflow.yaml
+workflows:
+  - name: investment_analysis_workflow
+    description: Analyze investment opportunities and generate recommendations.
+    trigger: user_query
+    steps:
+      - agent: QueryUnderstandingAgent
+        input: user_query
+        output: relevant_agents
+        next_steps:
+          - condition: "len(relevant_agents) > 0"  # Proceed only if relevant agents are found
+            next_step: parallel_data_retrieval
+          - condition: "len(relevant_agents) == 0"
+            next_step: handle_no_relevant_agents
+
+      - name: parallel_data_retrieval  # Parallel execution block
+        type: parallel
+        steps:
+          - agent: "{agent}"  # Dynamically uses the agents identified by QueryUnderstandingAgent
+            input: user_query
+            output: "{agent}_data"  # Unique output variable for each agent
+            loop_variable: agent  #  Iterate over the list of 'relevant_agents'
+            loop_source: relevant_agents #  The source of the loop
+
+      - agent: ResultAggregationAgent
+        input: "{agent}_data" # this will take a *list* of all outputs.
+        # Note: Input is a list comprehension, gathers all outputs.
+        #       The template expands to e.g., [DataRetrievalAgent_data, MarketSentimentAgent_data, ...]
+        input_mapping: >-  # Explicitly handles combining the multiple input variables.
+          [{% for agent in relevant_agents %}
+            {{ agent }}_data
+          {%- if not loop.last -%},
+          {%- endif -%}
+          {%- endfor -%}]
+        output: aggregated_results
+        next_step: newsletter_generation
+
+      - agent: NewsletterLayoutSpecialistAgent
+        input: aggregated_results
+        output: newsletter_content
+        next_step: end
+
+      - name: handle_no_relevant_agents #Handles case with no agents.
+        agent: QueryUnderstandingAgent #Could be a different, dedicated agent.
+        input: user_query
+        output: error_message
+        next_step: end # Or could go to a different error handling flow.
+
+      - name: end  # Explicit end step (good practice)
+        type: end
+
+  - name: risk_assessment_workflow  # Separate Risk Assessment Workflow
+    description: Perform a comprehensive risk assessment.
+    trigger: risk_assessment_request
+    steps:
+      - agent: QueryUnderstandingAgent  # Initial query understanding
+        input: risk_assessment_request
+        output: relevant_risk_agents
+        next_steps:
+          - condition: "len(relevant_risk_agents) > 0"
+            next_step: parallel_risk_analysis
+          - condition: "len(relevant_risk_agents) == 0"
+            next_step: handle_no_relevant_agents  # Reuse the error handler
+
+      - name: parallel_risk_analysis
+        type: parallel
+        steps:
+          - agent: "{risk_agent}"  # Iterate over identified risk agents
+            input: risk_assessment_request
+            output: "{risk_agent}_risk_data"
+            loop_variable: risk_agent
+            loop_source: relevant_risk_agents
+
+      - agent: RiskAssessmentAgent # Aggregate results from specialized risk agents.
+        input: "{risk_agent}_risk_data"
+        input_mapping: >-
+          [{% for risk_agent in relevant_risk_agents %}
+            {{ risk_agent }}_risk_data
+          {%- if not loop.last -%},
+          {%- endif -%}
+          {%- endfor -%}]
+        output: overall_risk_assessment
+        next_step: end
+
+      - name: end  # Explicit end step
+        type: end
