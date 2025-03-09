@@ -6,6 +6,13 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 import pika
+import csv
+import logging
+import yaml #if needed
+from pathlib import Path
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # RabbitMQ connection parameters
 RABBITMQ_HOST = 'localhost'  # Or your RabbitMQ server address
@@ -208,3 +215,40 @@ def receive_messages(queue=RABBITMQ_QUEUE, callback=None):
         print(f"Error receiving messages from RabbitMQ: {e}")
 
 # Add more data utility functions as needed
+
+def load_data(source_config: dict):
+    """Loads data from a file based on its type and path.
+
+    Args:
+        source_config: A dictionary with 'type' and 'path' keys.
+
+    Returns:
+        The loaded data, or None if an error occurs.
+    """
+    data_type = source_config.get('type')
+    file_path = Path(source_config.get('path'))
+
+    if not file_path.exists():
+        logging.error(f"Data file not found: {file_path}")
+        return None
+    try:
+        if data_type == 'json':
+            with file_path.open('r') as f:
+                return json.load(f)
+        elif data_type == 'csv':
+            with file_path.open('r') as f:
+                reader = csv.DictReader(f)
+                return list(reader)
+        elif data_type == 'yaml': #Adding yaml
+            with file_path.open('r') as f:
+                return yaml.safe_load(f)
+        else:
+            logging.error(f"Unsupported data type: {data_type}")
+            return None
+
+    except (json.JSONDecodeError, IOError, yaml.YAMLError) as e:
+        logging.error(f"Error loading data from {file_path}: {e}")
+        return None
+# Example Usage: You would call it from within an agent, like this:
+#   data_sources = load_config("config/data_sources.yaml")
+#   risk_data = load_data(data_sources['risk_ratings'])
