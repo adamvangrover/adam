@@ -26,7 +26,34 @@ default: &defaults
       - resource_usage
 
 
-agents:
+agents:  # This top-level 'agents' key is REQUIRED
+  QueryUnderstandingAgent:
+    <<: *defaults
+    persona: "Query Understanding Agent"
+    description: "Analyzes user queries to determine relevant agents."
+    expertise: ["query analysis", "agent selection"]
+    prompt_template: |
+      Based on the following user query, identify the most relevant agents to handle the request.
+      Return a list of agent names. If no agents are relevant, return an empty list.
+      Available Agents: {available_agents}
+
+      User Query: {user_query}
+
+      Relevant Agents:
+
+  DataRetrievalAgent:
+    <<: *defaults
+    persona: "Data Retrieval Agent"
+    description: "Retrieves data from various sources based on requests."
+    expertise: ["data access", "data retrieval"]
+    # data_sources will be configured in data_sources.yaml
+
+  ResultAggregationAgent:
+    <<: *defaults
+    persona: "Result Aggregation Agent"
+    description: "Combines results from multiple agents."
+    expertise: ["data aggregation", "result summarization"]
+
   market_sentiment_agent:
     <<: *defaults  # Inherit default settings
     persona: Market Whisperer
