@@ -1,0 +1,112 @@
+#data/adam_market_baseline.json
+
+{
+  "market_baseline": {
+    "version": "19.1",
+    "version_notes": {
+      "19.1": "Initial baseline data structure, focused on modularity and future expansion. Includes synthetic global economic indicators and sample asset class data.",
+      "19.2": "Reserved for: Integration of real-time market data feeds, enhanced algorithmic trading simulations, and detailed human trading pattern analysis.",
+      "19.3": "Reserved for: Expansion of loan and asset valuation models, incorporation of quantum-inspired trading strategies, and refinement of machine learning data generation."
+    },
+    "simulation_metadata": {
+      "simulation_name": "Adam Market Baseline",
+      "creation_date": "2025-03-08T01:45:00Z",
+      "description": "Modular baseline market simulation data for Adam, designed for future expansion and integration with real-time data and advanced algorithms.",
+      "time_granularity": "daily",
+      "time_range": {
+        "start_date": "2020-01-01",
+        "end_date": "2025-03-08"
+      },
+      "random_seed": 12345
+    },
+    "data_modules": {
+      "global_economic_indicators": {
+        "module_version": "1.0",
+        "module_notes": "Initial module, provides synthetic data. Requires integration with real-time data sources for accurate representation of global economic conditions.",
+        "gdp_growth": [
+          {"date": "2020-01-01", "us": 0.02, "eu": 0.01, "china": 0.06}
+        ],
+        "inflation_rate": [
+          {"date": "2020-01-01", "us": 0.02, "eu": 0.01, "china": 0.03}
+        ],
+        "interest_rates": {
+          "federal_funds_rate": [
+            {"date": "2020-01-01", "rate": 0.0175}
+          ],
+          "treasury_yield_curve": [
+            {"date": "2020-01-01", "1M": 0.015, "10Y": 0.028}
+          ]
+        },
+        "market_sentiment": [
+          {"date": "2020-01-01", "sentiment_score": 0.8}
+        ]
+      },
+      "asset_classes": {
+        "module_version": "1.0",
+        "module_notes": "Base data for equities only. Requires extensive population with historical and real-time data for all asset classes.",
+        "equities": {
+          "stock_indices": {
+            "sp500": {
+              "historical_prices": [
+                {"date": "2020-01-01", "price": 3200}
+              ],
+              "volatility": [
+                {"date": "2020-01-01", "volatility": 0.15}
+              ],
+              "trading_volume": [
+                {"date": "2020-01-01", "volume": 1000000000}
+              ]
+            }
+          }
+        },
+        "fixed_income": {
+          "module_version": "0.1",
+          "module_notes": "Placeholder module. Requires population with data for government bonds, corporate bonds, asset-backed securities, and credit default swaps."
+        },
+        "derivatives": {
+          "module_version": "0.1",
+          "module_notes": "Placeholder module. Requires population with data for options, futures, and swaps."
+        },
+        "foreign_exchange": {
+          "module_version": "0.1",
+          "module_notes": "Placeholder module. Requires population with data for exchange rates and currency volatility."
+        },
+        "alternative_investments": {
+          "module_version": "0.1",
+          "module_notes": "Placeholder module. Requires population with data for real estate, commodities, and private equity."
+        }
+      },
+      "trading_strategies": {
+        "module_version": "1.0",
+        "module_notes": "Basic momentum trading strategy example. Requires expansion with diverse algorithmic strategies and human trading pattern analysis.",
+        "algorithmic_trading": [
+          {
+            "strategy_id": "momentum_1",
+            "strategy_type": "momentum",
+            "parameters": {
+              "lookback_period": 20
+            },
+            "simulated_trades": [
+              {"date": "2020-01-02", "trade": "buy", "asset": "sp500", "price": 3210}
+            ]
+          }
+        ],
+        "human_trading_patterns": {
+          "module_version": "0.1",
+          "module_notes": "Sentiment placeholder. Requires robust analysis of market sentiment and order book data."
+        }
+      },
+      "loan_asset_valuation": {
+        "module_version": "0.1",
+        "module_notes": "Placeholder module. Requires full implementation of loan portfolio management and asset valuation models.",
+        "loan_portfolios": []
+      },
+      "machine_learning_data": {
+        "module_version": "0.1",
+        "module_notes": "Placeholder module. Requires feature engineering and data generation for training machine learning models.",
+        "training_data": [],
+        "feature_definitions": {}
+      }
+    }
+  }
+}
