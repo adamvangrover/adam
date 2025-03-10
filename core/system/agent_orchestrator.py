@@ -8,7 +8,7 @@ from pathlib import Path
 from collections import deque
 from typing import Dict, Optional
 
-import asyncio #expand asynchronous communication // example use asyncio.gather to run the process_query method for agents concurrently
+import asyncio #expand asynchronous communication // example use asyncio.gather to run the process_query method for agents concurrently // example use asyncio.gather allow agents to work concurrently, potentially speeding up query processing
 import json
 
 from core.agents.agent_base import AgentBase
