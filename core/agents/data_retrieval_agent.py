@@ -5,6 +5,7 @@ from core.agents.agent_base import AgentBase
 from core.utils.config_utils import load_config
 from core.utils.data_utils import load_data
 from core.system.knowledge_base import KnowledgeBase  # Import KnowledgeBase
+from core.system.error_handler import DataNotFoundError, FileReadError
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -54,20 +55,23 @@ class DataRetrievalAgent(AgentBase):
             self.knowledge_base = None
 
 
-    def get_risk_rating(self, company_id: str) -> Optional[str]:
-        """Retrieves the risk rating for a given company ID."""
-        try:
-            risk_mapping = load_data({"type": "json", "path": "data/risk_rating_mapping.json"})
-            if not isinstance(risk_mapping, dict):
-                logging.error("risk_rating_mapping.json did not load as a dictionary.")
-                return None
-            return risk_mapping.get(company_id)
-        except FileNotFoundError:
-            logging.error(f"Risk rating file not found for company ID: {company_id}")
-            return None
-        except Exception as e:
-            logging.exception(f"An unexpected error occurred: {e}")
-            return None
+def get_risk_rating(self, company_id: str) -> str | None:
+    try:
+        data = self.load_data(self.data_sources["risk_ratings"])  # Assuming load_data exists
+        if data is None:
+            raise FileReadError(self.data_sources["risk_ratings"]["path"], "Could not load risk ratings file.")
+        if company_id not in data:
+            raise DataNotFoundError(company_id, "risk_ratings")
+        return data[company_id]
+    except FileReadError as e:
+        print(e)  # Or log the error
+        return None # Or raise again if you can't handle it
+    except DataNotFoundError as e:
+        print(e)
+        return None
+    except Exception as e: # It is a good idea to catch all other errors.
+        print(e)
+        return None
 
     def get_market_data(self) -> Optional[Dict[str, Any]]:
         """Retrieves market data (placeholder)."""
