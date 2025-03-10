@@ -1,0 +1,58 @@
+version: 1.0  # Schema version
+
+entities:  # Define the types of entities in the graph
+  Company:
+    properties:
+      name: str
+      sector: str
+      financials: dict
+      risk_rating: str
+  Market:
+    properties:
+      name: str
+      region: str
+      sentiment: str
+  Individual:
+    properties: str
+      name: str
+      role: str
+      expertise: list
+  Financial_Instrument:
+    properties:
+      name: str
+      type: str
+      market_data: dict
+  Economic_Indicator:
+    properties:
+      name: str
+      value: number
+      date: date
+  News_and_Events:
+    properties:
+      title: str
+      description: str
+      date: date
+      impact: str
+
+relationships:  # Define the types of relationships between entities
+  is_subsidiary_of:
+    source: Company
+    target: Company
+  competes_with:
+    source: Company
+    target: Company
+  is_related_to:
+    source: Entity
+    target: Entity
+  impacts:
+    source: Entity
+    target: Entity
+
+constraints:  # Define constraints on the graph structure
+  unique_company_name:
+    entity: Company
+    property: name
+  valid_risk_ratings:
+    entity: Company
+    property: risk_rating
+    values: [low, medium, high]
