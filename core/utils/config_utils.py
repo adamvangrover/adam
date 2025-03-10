@@ -4,6 +4,7 @@ import yaml
 import os  # Import the 'os' module
 import logging
 from typing import Dict, Any, Optional
+from core.system.error_handler import ConfigurationError
 
 
 # Configure logging (consider moving to a central location)
