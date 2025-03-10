@@ -1,5 +1,7 @@
 # core/system/error_handler.py
 
+from core.utils.config_utils import load_error_codes # Import the function
+
 class AdamError(Exception):
     """
     Base class for Adam-specific errors.  All custom exceptions should inherit from this.
