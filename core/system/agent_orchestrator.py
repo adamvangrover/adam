@@ -8,6 +8,8 @@ from pathlib import Path
 from collections import deque
 from typing import Dict, Optional
 
+import asyncio #expand asynchronous communication // example use asyncio.gather to run the process_query method for agents concurrently
+import json
 
 from core.agents.agent_base import AgentBase
 from core.llm_plugin import LLMPlugin
