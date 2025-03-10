@@ -272,3 +272,49 @@
   ]
 
 
+"example_interactions": [
+    {
+      "user_input": "risk ABC",
+      "simulated_response": "[QueryUnderstandingAgent]: Analyzing query...\n[QueryUnderstandingAgent]: Relevant agent: DataRetrievalAgent\n[DataRetrievalAgent]: Executing command: risk_rating:ABC\n[DataRetrievalAgent]: Retrieving risk rating for ABC...\n[Result]: low"
+    },
+    {
+      "user_input": "What is the purpose of the `AgentOrchestrator`?",
+      "simulated_response": "[Result]: The `AgentOrchestrator` manages agent execution and communication."
+    },
+     {
+        "user_input": "kb market_sentiment",
+        "simulated_response": "[QueryUnderstandingAgent]: Analyzing query...\n[QueryUnderstandingAgent]: Relevant Agent: DataRetrievalAgent\n[DataRetrievalAgent]: Executing command: kb:market_sentiment\n[DataRetrievalAgent]: Querying Knowledge Base...\n[Result]: Positive"
+    },
+    {
+      "user_input": "Show me the code for the `DataRetrievalAgent`'s `execute` method.",
+      "simulated_response": "[DataRetrievalAgent]: Retrieving code...\n[Result]:`python\nclass DataRetrievalAgent(AgentBase):\n    # ... (other methods) ...\n    def execute(self, input_data: str) -> str:\n        # ... (execute method implementation) ...\n`"
+    },
+    {
+        "user_input": "get file list",
+        "simulated_response": "[Result]: core/agents/agent_base.py, core/agents/query_understanding_agent.py, core/agents/data_retrieval_agent.py, core/agents/market_sentiment_agent.py, core/agents/macroeconomic_analysis_agent.py, core/agents/geopolitical_risk_agent.py, core/agents/industry_specialist_agent.py, core/agents/fundamental_analyst_agent.py, core/agents/technical_analyst_agent.py, core/agents/risk_assessment_agent.py, core/agents/newsletter_layout_specialist_agent.py, core/agents/data_verification_agent.py, core/agents/lexica_agent.py, core/agents/archive_manager_agent.py, core/agents/agent_forge.py, core/agents/prompt_tuner.py, core/agents/code_alchemist.py, core/agents/lingua_maestro.py, core/agents/sense_weaver.py, core/system/agent_orchestrator.py, core/system/interaction_loop.py, core/system/knowledge_base.py, core/utils/config_utils.py, core/utils/data_utils.py, core/utils/token_utils.py, core/llm_plugin.py, config/agents.yaml, config/data_sources.yaml, config/system.yaml, config/workflows.yaml, scripts/run_simple_simulation.py, data/risk_rating_mapping.json, data/knowledge_base.json, data/adam_market_baseline.json"
+    },
+    {
+        "user_input": "get file content for core/agents/data_retrieval_agent.py",
+        "simulated_response": "[Result]:\n`python\n# core/agents/data_retrieval_agent.py\nimport logging\nfrom typing import Optional, Union, List, Dict, Any\nfrom core.agents.agent_base import AgentBase\nfrom core.utils.config_utils import load_config\nfrom core.utils.data_utils import load_data\nfrom core.system.knowledge_base import KnowledgeBase\n\nlogging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')\n\nclass DataRetrievalAgent(AgentBase):\n    \"\"\"\n    Agent for retrieving data.\n    \"\"\"\n    def get_risk_rating(self, company_id: str) -> Optional[str]:\n        \"\"\"Retrieves risk rating.\"\"\"\n        try:\n            risk_mapping = load_data({\"type\": \"json\", \"path\": \"data/risk_rating_mapping.json\"})\n            if not isinstance(risk_mapping, dict):\n                logging.error(\"risk_rating_mapping.json did not load as a dictionary.\")\n                return None\n            return risk_mapping.get(company_id)\n        except FileNotFoundError:\n            logging.error(f\"Risk rating file not found: {company_id}\")\n            return None\n        except Exception as e:\n            logging.exception(f\"An unexpected error occurred: {e}\")\n            return None\n\n    def get_market_data(self) -> Optional[Dict[str, Any]]:\n        \"\"\"Retrieves market data.\"\"\"\n        try:\n           market_data = load_data({\"type\": \"json\", \"path\": \"data/adam_market_baseline.json\"})\n           return market_data\n        except Exception as e:\n            logging.exception(f\"Error retrieving market data: {e}\")\n            return None\n\n    def execute(self, input_data: str) -> Optional[Union[str, Dict[str, Any]]]:\n        \"\"\"Executes data retrieval based on input.\"\"\"\n        try:\n            if input_data.startswith(\"risk_rating:\"):\n                company_id = input_data.split(\":\")[1]\n                return self.get_risk_rating(company_id)\n            elif input_data == \"market_data\":\n                return self.get_market_data()\n            elif input_data.startswith(\"kb:\"):\n                query = input_data[3:]\n                kb = KnowledgeBase()\n                return kb.query(query)\n            else:\n                logging.warning(f\"Unknown command: {input_data}\")\n                return None\n        except Exception as e:\n            logging.exception(f\"Error in execute: {e}\")\n            return None\n`"
+    },
+    {
+        "user_input": "market",
+        "simulated_response": "[QueryUnderstandingAgent]: Analyzing query...\n[QueryUnderstandingAgent]: Relevant agent: DataRetrievalAgent\n[DataRetrievalAgent]: Executing command: market_data\n[DataRetrievalAgent]: Retrieving market data...\n[Result]: {'market_trends': [{'sector': 'technology', 'trend': 'positive'}]}"
+    },
+    {
+       "user_input": "risk XYZ",
+       "simulated_response": "[QueryUnderstandingAgent]: Analyzing query...\n[QueryUnderstandingAgent]: Relevant agent: DataRetrievalAgent\n[DataRetrievalAgent]: Executing command: risk_rating:XYZ\n[DataRetrievalAgent]: Retrieving risk rating for XYZ...\n[Result]: None"
+    },
+    {
+        "user_input": "updatekb market_sentiment:Bearish",
+        "simulated_response": "[Result]: Knowledge Base Updated: \"market_sentiment\" : \"Bearish\""
+    },
+     {
+        "user_input": "kb market_sentiment",
+        "simulated_response": "[QueryUnderstandingAgent]: Analyzing query...\n[QueryUnderstandingAgent]: Relevant Agent: DataRetrievalAgent\n[DataRetrievalAgent]: Executing command: kb:market_sentiment\n[DataRetrievalAgent]: Querying Knowledge Base...\n[Result]: Bearish"
+    },
+    {
+        "user_input": "clear scratchpad",
+        "simulated_response": "[Scratchpad]: Cleared"
+    }
+  ]
