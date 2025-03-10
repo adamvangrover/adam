@@ -26,10 +26,11 @@ class InteractionLoop:
         self.agent_orchestrator = AgentOrchestrator()
         self.echo = Echo()  # Initialize the Echo system (placeholder functionality)
         self.token_limit = self.config.get("token_limit", 4096)  # Default to 4096 if not specified
+        self.knowledge_base = KnowledgeBase() #instantiate knowledgebase        
         logging.info(f"InteractionLoop initialized with token limit: {self.token_limit}")
 
 
-    def process_input(self, user_input: str):
+    def process_input(self, user_input: str) -> str:
         """
         Processes a single user input and generates a response.
 
