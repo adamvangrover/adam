@@ -1,4 +1,262 @@
-import openai
+# core/llm_plugin.py
+import os
+import logging
+from abc import ABC, abstractmethod
+from typing import Dict, Any, Optional, List, Tuple
+from dotenv import load_dotenv
+import yaml  #if needed
+from core.utils.config_utils import load_config  # assuming load_config is now implemented
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+# Load environment variables from .env file
+load_dotenv()
+
+class LLMPluginError(Exception):
+    """Base class for LLM plugin exceptions."""
+    pass
+
+class LLMConfigurationError(LLMPluginError):
+    """Raised for configuration issues."""
+    pass
+
+class LLMAPIError(LLMPluginError):
+    """Raised for errors during API calls."""
+    pass
+
+class BaseLLMPlugin(ABC):
+    """Abstract base class for all LLM plugins."""
+
+    @abstractmethod
+    def query(self, prompt: str, **kwargs) -> str:
+        """
+        Sends a query to the LLM and returns the response.
+
+        Args:
+            prompt: The prompt to send to the LLM.
+            **kwargs:  Additional keyword arguments (e.g., for temperature, max_tokens).
+
+        Returns:
+            The LLM's response as a string.
+        """
+        pass
+
+    @abstractmethod
+    def identify_intent_and_entities(self, query: str) -> Tuple[str, Dict[str, Any], float]:
+        """
+        Identifies the intent and entities in a user query.
+
+        Args:
+            query: The user's query string.
+
+        Returns:
+            A tuple containing:
+            - The identified intent (e.g., "analyze_company", "get_stock_price").
+            - A dictionary of extracted entities (e.g., {"company": "Apple", "metric": "revenue"}).
+            - A confidence score (0.0 to 1.0).
+        """
+        pass
+
+class OpenAIPlugin(BaseLLMPlugin):
+    """LLM plugin for OpenAI's API."""
+
+    def __init__(self, model: str = "gpt-3.5-turbo", api_base: Optional[str] = None):
+        self.model = model
+        self.api_base = api_base
+        self.api_key = os.getenv("OPENAI_API_KEY")
+        if not self.api_key:
+            raise LLMConfigurationError("OPENAI_API_KEY not found in environment variables.")
+
+        # We import openai lazily, so the import error only occurs if this plugin is used.
+        try:
+            import openai
+            self.openai = openai
+            self.openai.api_key = self.api_key
+            if api_base:
+              self.openai.api_base = api_base
+        except ImportError:
+            raise LLMConfigurationError("OpenAI library not installed. Run 'pip install openai'.")
+        except Exception as e:
+            raise LLMConfigurationError(f"Error initializing OpenAI:{e}")
+
+    def query(self, prompt: str, **kwargs) -> str:
+        """Sends a query to the OpenAI API."""
+        try:
+            response = self.openai.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant."}, #Optional
+                    {"role": "user", "content": prompt}
+                ],
+                **kwargs  # Pass any additional parameters (temperature, max_tokens, etc.)
+            )
+            # Access the response correctly.  The structure changed.
+            return response.choices[0].message.content
+
+        except self.openai.OpenAIError as e:  # Catch OpenAI-specific errors
+            logger.exception(f"OpenAI API error: {e}")
+            raise LLMAPIError(f"OpenAI API error: {e}") from e
+        except Exception as e:  # Catch more generic errors
+            logger.exception(f"An unexpected error occurred: {e}")
+            raise LLMAPIError(f"An unexpected error occurred: {e}") from e
+
+    def identify_intent_and_entities(self, query: str) -> Tuple[str, Dict[str, Any], float]:
+        """Identifies intent and entities using OpenAI."""
+        prompt = f"""
+        Identify the intent and entities in the following user query.
+        Return the results in JSON format.  Include a confidence score (0.0 to 1.0).
+
+        Query: {query}
+
+        Example Response:
+        {{
+          "intent": "analyze_company",
+          "entities": {{"company": "Apple", "metric": "revenue"}},
+          "confidence": 0.95
+        }}
+        """
+        try:
+            response_text = self.query(prompt)
+            # Attempt to load the response as JSON.
+            try:
+                response_json = json.loads(response_text)
+            except json.JSONDecodeError:
+                raise LLMAPIError(f"Invalid JSON response from OpenAI: {response_text}")
+
+            intent = response_json.get("intent", "unknown")
+            entities = response_json.get("entities", {})
+            confidence = float(response_json.get("confidence", 0.0))  # Ensure it's a float.
+
+            return intent, entities, confidence
+
+        except Exception as e: # Catch general exception
+             logger.exception(f"Error identifying intent and entities: {e}")
+             return "unknown", {}, 0.0
+
+class CoherePlugin(BaseLLMPlugin):
+    """LLM plugin for Cohere's API (Placeholder - adapt from OpenAIPlugin)."""
+    def __init__(self, model: str = "command-xlarge-nightly"):
+        self.model = model
+        self.api_key = os.getenv("COHERE_API_KEY")
+
+        if not self.api_key:
+            raise LLMConfigurationError("COHERE_API_KEY not found in environment variables")
+
+        try:
+            import cohere
+            self.cohere = cohere.Client(self.api_key)
+        except ImportError:
+            raise LLMConfigurationError("Cohere library not installed.  Run 'pip install cohere'.")
+        except Exception as e:
+            raise LLMConfigurationError("Error initializing Cohere Client")
+
+    def query(self, prompt: str, **kwargs) -> str:
+        try:
+            response = self.cohere.chat(
+                message=prompt,
+                model = self.model,
+                **kwargs
+            )
+            return response.text
+        except Exception as e:
+            logger.exception("Cohere API Error")
+            raise LLMAPIError(f"Cohere API Error:{e}")
+
+    def identify_intent_and_entities(self, query: str) -> Tuple[str, Dict[str, Any], float]:
+        # TODO: IMPLEMENT. Use similar pattern as OpenAIPlugin
+        #For now return placeholders:
+        logger.warning("Cohere identify_intent_and_entities is a placeholder.")
+        return "unknown", {}, 0.0
+
+class LLMPluginFactory:
+    """Factory class for creating LLM plugin instances."""
+
+    @staticmethod
+    def create_plugin(config_path: str = "config/llm_plugins.yaml") -> BaseLLMPlugin:
+        """
+        Creates an LLM plugin instance based on the configuration.
+
+        Args:
+            config_path: Path to the LLM plugin configuration file.
+
+        Returns:
+            An instance of the appropriate BaseLLMPlugin subclass.
+
+        Raises:
+            LLMConfigurationError: If the configuration is invalid or the plugin cannot be created.
+        """
+        config = load_config(config_path)
+
+        if not config:
+            raise LLMConfigurationError(f"Could not load LLM plugin configuration from {config_path}")
+
+        active_plugin_name = config.get("active_plugin")
+        if not active_plugin_name:
+            raise LLMConfigurationError("No active_plugin specified in LLM plugin configuration.")
+
+        plugins_config = config.get("llm_plugins", {})
+        if active_plugin_name not in plugins_config:
+            raise LLMConfigurationError(f"Configuration for plugin '{active_plugin_name}' not found.")
+
+        plugin_config = plugins_config[active_plugin_name]
+        plugin_class_name = plugin_config.get("class")
+        if not plugin_class_name:
+            raise LLMConfigurationError(f"No 'class' specified for plugin '{active_plugin_name}'.")
+
+        # Dynamically import and instantiate the plugin class.
+        try:
+            module_name, class_name = plugin_class_name.rsplit('.', 1)
+            module = __import__(module_name, fromlist=[class_name])
+            plugin_class = getattr(module, class_name)
+            plugin_instance = plugin_class(**plugin_config)  # Pass config as keyword arguments
+            return plugin_instance
+        except (ImportError, AttributeError, TypeError) as e:
+            raise LLMConfigurationError(f"Could not create plugin '{active_plugin_name}': {e}") from e
+        except Exception as e: #Catch exception
+            logger.exception("Could not create plugin")
+            raise LLMConfigurationError(f"Could not create plugin: {e}")
+
+# --- Example Usage (and for testing) ---
+if __name__ == '__main__':
+    try:
+        # Create dummy llm_plugin.yaml
+        llm_config_data = {
+            'llm_plugins': {
+                'openai': {
+                    'class': 'core.llm_plugin.OpenAIPlugin',
+                    'model': 'gpt-3.5-turbo'
+                },
+            },
+            'active_plugin': 'openai'
+        }
+        with open('config/llm_plugins.yaml', 'w') as f:
+            yaml.dump(llm_config_data, f)
+        # ---
+        plugin = LLMPluginFactory.create_plugin()
+
+        # Test a query.
+        prompt = "What is the capital of France?"
+        response = plugin.query(prompt)
+        print(f"Response to '{prompt}': {response}")
+
+        # Test intent and entity identification.
+        query = "Analyze the financial performance of AAPL."
+        intent, entities, confidence = plugin.identify_intent_and_entities(query)
+        print(f"Query: {query}")
+        print(f"Intent: {intent}")
+        print(f"Entities: {entities}")
+        print(f"Confidence: {confidence}")
+
+    except LLMPluginError as e:
+        print(f"Error: {e}")
+    finally:
+        # Remove the dummy config file
+        if os.path.exists('config/llm_plugins.yaml'):
+            os.remove('config/llm_plugins.yaml')
+            
+            import openai
 
 class LLMPlugin:
     def __init__(self, config):
