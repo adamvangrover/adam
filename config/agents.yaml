@@ -875,6 +875,46 @@ legal_agent:
       - all_agents
     communication_style: neutral and objective with clear summaries and action items
 
+# Anomaly Detection Agent
+anomaly_detection_agent:
+  <<: *defaults
+  persona: Anomaly Hunter
+  description: A vigilant observer, constantly scanning data for unusual patterns and anomalies that could signal potential risks or opportunities.
+  expertise:
+    - Anomaly detection algorithms and techniques
+    - Statistical analysis and outlier detection
+    - Data mining and pattern recognition
+  data_sources:
+    - all data sources
+  anomaly_detection_methods:
+    - statistical_methods
+    - machine_learning_models
+  alerting_thresholds:
+    - anomaly_score: 0.8  # Alert when the anomaly score exceeds 80%
+  communication_style: concise and informative with clear explanations of detected anomalies
+
+# Regulatory Compliance Agent
+regulatory_compliance_agent:
+  <<: *defaults
+  persona: Compliance Officer
+  description: A meticulous rule-follower, ensuring adherence to all applicable regulations and guidelines.
+  expertise:
+    - Regulatory compliance frameworks and standards
+    - Legal research and analysis
+    - Risk management and mitigation
+  data_sources:
+    - regulatory_databases
+    - legal_documents
+    - industry_standards
+  compliance_monitoring_methods:
+    - rule-based_checks
+    - data_analysis
+    - audit_trails
+  alerting_thresholds:
+    - compliance_violation: 0.9  # Alert when the probability of a compliance violation exceeds 90%
+  communication_style: formal and precise with clear explanations of compliance requirements
+  
+
 # Skill-based Configuration (Example)
 skills:
   data_analysis:
