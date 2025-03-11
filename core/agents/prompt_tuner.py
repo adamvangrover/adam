@@ -2,107 +2,268 @@
 
 from langchain.prompts import PromptTemplate
 from core.utils.data_utils import send_message, receive_messages
+from typing import List, Dict
+import re
+from textblob import TextBlob  # Example NLP library
+import spacy  # Another example NLP library
+import json #knowledge base
 
-#... (import other necessary libraries)
+# ... (import other necessary libraries, e.g., for knowledge base interaction)
 
 class PromptTuner:
-    def __init__(self, config, orchestrator):
+
+    """
+    Refines and optimizes prompts for communication and analysis within the Adam v19.2 system.
+    """
+
+    
+    def __init__(self, config, orchestrator, knowledge_base: Dict):
         self.config = config
         self.orchestrator = orchestrator
         self.user_feedback_enabled = config.get('user_feedback_enabled', False)
         self.hallucination_detection_enabled = config.get('hallucination_detection_enabled', False)
+        self.nlp = spacy.load("en_core_web_sm")  # Load spaCy NLP model
+        self.knowledge_base = knowledge_base
 
-    def analyze_prompt(self, prompt, **kwargs):
+    def analyze_prompt(self, prompt: str, **kwargs) -> Dict:
         """
         Analyzes a prompt to identify potential issues or areas for improvement.
 
         Args:
-            prompt (str): The prompt to analyze.
+            prompt: The prompt to analyze.
             **kwargs: Additional parameters for prompt analysis.
 
         Returns:
-            dict: A dictionary containing analysis results and suggestions.
+            A dictionary containing analysis results and suggestions.
         """
 
-        #... (analyze prompt for clarity, conciseness, relevance, etc.)
-        #... (use NLP techniques or heuristics to identify potential issues)
         analysis_results = {
-            'clarity': 'high',
-            'conciseness': 'medium',
-            'relevance': 'high',
-            #... (add more analysis results)
+            'clarity': self._analyze_clarity(prompt),
+            'conciseness': self._analyze_conciseness(prompt),
+            'relevance': self._analyze_relevance(prompt),
+            'sentiment': self._analyze_sentiment(prompt),
+            'keywords': self._extract_keywords(prompt),
+            'entities': self._extract_entities(prompt),
+            # ... (add more analysis results)
         }
         return analysis_results
 
-    def contextualize_prompt(self, prompt, context, **kwargs):
+    def _analyze_clarity(self, prompt: str) -> str:
+        """
+        Analyzes the clarity of the prompt.
+
+        Args:
+            prompt: The prompt to analyze.
+
+        Returns:
+            A string representing the clarity level (e.g., 'high', 'medium', 'low').
+        """
+
+        # Check for ambiguity, use of jargon, complex sentence structures
+        # ... (Implement more sophisticated clarity analysis using NLP techniques)
+
+        # Example: Check for passive voice
+        doc = self.nlp(prompt)
+        passive_count = sum(1 for token in doc if token.dep_ == 'nsubjpass')
+        if passive_count > 1:
+            return 'medium'  # Consider it less clear if there are multiple passive voice constructions
+        else:
+            return 'high'
+
+    def _analyze_conciseness(self, prompt: str) -> str:
+        """
+        Analyzes the conciseness of the prompt.
+
+        Args:
+            prompt: The prompt to analyze.
+
+        Returns:
+            A string representing the conciseness level (e.g., 'high', 'medium', 'low').
+        """
+
+        # Check for unnecessary words, redundancy, repetition
+        # ... (Implement more advanced conciseness analysis using NLP techniques)
+
+        # Example: Check prompt length
+        if len(prompt.split()) > 20:
+            return 'low'
+        elif len(prompt.split()) > 10:
+            return 'medium'
+        else:
+            return 'high'
+
+    def _analyze_relevance(self, prompt: str) -> str:
+        """
+        Analyzes the relevance of the prompt to the task or context.
+
+        Args:
+            prompt: The prompt to analyze.
+
+        Returns:
+            A string representing the relevance level (e.g., 'high', 'medium', 'low').
+        """
+
+        # Check if the prompt focuses on the core task, avoids irrelevant information
+        # ... (Implement more context-aware relevance analysis)
+
+        # Example: Check for keywords related to the task
+        # (This requires defining task-specific keywords beforehand)
+        if 'financial analysis' in prompt.lower() or 'investment' in prompt.lower():
+            return 'high'
+        else:
+            return 'medium'
+
+    def _analyze_sentiment(self, prompt: str) -> str:
+        """
+        Analyzes the sentiment of the prompt.
+
+        Args:
+            prompt: The prompt to analyze.
+
+        Returns:
+            A string representing the sentiment (e.g., 'positive', 'negative', 'neutral').
+        """
+
+        # Use TextBlob for sentiment analysis
+        blob = TextBlob(prompt)
+        if blob.sentiment.polarity > 0.1:
+            return 'positive'
+        elif blob.sentiment.polarity < -0.1:
+            return 'negative'
+        else:
+            return 'neutral'
+
+    def _extract_keywords(self, prompt: str) -> List[str]:
+        """
+        Extracts keywords from the prompt.
+
+        Args:
+            prompt: The prompt to extract keywords from.
+
+        Returns:
+            A list of keywords.
+        """
+
+        # Use spaCy for keyword extraction
+        doc = self.nlp(prompt)
+        keywords = [token.text for token in doc if token.pos_ in ('NOUN', 'ADJ', 'VERB')]
+        return keywords
+
+    def _extract_entities(self, prompt: str) -> List[str]:
+        """
+        Extracts entities from the prompt.
+
+        Args:
+            prompt: The prompt to extract entities from.
+
+        Returns:
+            A list of entities.
+        """
+
+        # Use spaCy for entity recognition
+        doc = self.nlp(prompt)
+        entities = [ent.text for ent in doc.ents]
+        return entities
+
+    def contextualize_prompt(self, prompt: str, context: Dict, **kwargs) -> str:
         """
         Incorporates relevant context and information into a prompt.
 
         Args:
-            prompt (str): The prompt to contextualize.
-            context (dict): The context information to incorporate.
+            prompt: The prompt to contextualize.
+            context: The context information to incorporate.
             **kwargs: Additional parameters for prompt contextualization.
 
         Returns:
-            str: The contextualized prompt.
+            The contextualized prompt.
         """
 
-        #... (use string formatting or templating to incorporate context)
-        contextualized_prompt = f"{prompt} Context: {context}"  # Example
+        contextualized_prompt = prompt
+        for key, value in context.items():
+            contextualized_prompt = contextualized_prompt.replace(f"{{{key}}}", str(value))
         return contextualized_prompt
 
-    def prioritize_messages(self, messages, **kwargs):
+    def prioritize_messages(self, messages: List, **kwargs) -> List:
         """
         Prioritizes messages based on importance and relevance.
 
         Args:
-            messages (list): A list of messages to prioritize.
+            messages: A list of messages to prioritize.
             **kwargs: Additional parameters for message prioritization.
 
         Returns:
-            list: The prioritized list of messages.
+            The prioritized list of messages.
         """
 
-        #... (implement prioritization logic based on message content, sender, etc.)
-        return messages  # Placeholder for actual implementation
+        # Implement prioritization logic based on message content, sender, etc.
+        # ... (Use message urgency, sender authority, keywords, etc.)
 
-    def enhance_machine_readability(self, prompt, **kwargs):
+        return messages  # Placeholder
+
+    def enhance_machine_readability(self, prompt: str, **kwargs) -> str:
         """
         Enhances a prompt for better machine readability and interpretation.
 
         Args:
-            prompt (str): The prompt to enhance.
+            prompt: The prompt to enhance.
             **kwargs: Additional parameters for prompt enhancement.
 
         Returns:
-            str: The enhanced prompt.
+            The enhanced prompt.
         """
 
-        #... (use NLP techniques or formatting to improve machine readability)
-        return prompt  # Placeholder for actual implementation
+        # Remove unnecessary punctuation, standardize formatting, use keywords
+        # ... (Use NLP techniques or regular expressions for more advanced enhancement)
 
-    def suggest_prompt_to_user(self, prompt, suggestions):
+        # Example: Remove punctuation and convert to lowercase
+        enhanced_prompt = re.sub(r'[^\w\s]', '', prompt).lower()
+        return enhanced_prompt
+
+    def suggest_prompt_to_user(self, prompt: str, suggestions: List):
         """
         Suggests a refined prompt to the user.
         """
 
         if self.user_feedback_enabled:
-            #... (present prompt and suggestions to the user through an interface)
-            #... (allow user to accept or reject suggestions)
+            # Present prompt and suggestions to the user through an interface
+            # Allow user to accept or reject suggestions
+            # ... (Implement user interaction logic)
             pass
 
-    def detect_hallucinations(self, response, **kwargs):
+    def detect_hallucinations(self, response: str, **kwargs):
         """
         Detects potential hallucinations in a response.
         """
 
         if self.hallucination_detection_enabled:
-            #... (analyze response for inconsistencies, factual errors, or illogical statements)
-            #... (use NLP techniques or predefined rules)
+            # Analyze response for inconsistencies, factual errors, or illogical statements
+            # ... (Use NLP techniques, knowledge base validation, or predefined rules)
             pass
 
     def run(self):
-        #... (fetch prompt optimization requests)
-        #... (analyze prompts and apply optimization techniques)
-        #... (communicate optimized prompts)
+        # Fetch prompt optimization requests from a queue or API
+        # Analyze prompts and apply optimization techniques
+        # Communicate optimized prompts
+        # ... (Implement the main loop for fetching and processing prompts)
         pass
+
+
+# Example usage
+if __name__ == "__main__":
+    knowledge_base = json.load(open("knowledge_base.json"))
+    tuner = PromptTuner(knowledge_base)
+
+    prompt = "Analyze the performance of Tesla."
+    analysis = tuner.analyze_prompt(prompt)
+    print(analysis)
+
+    context = {"sentiment": "bullish"}
+    contextualized_prompt = tuner.contextualize_prompt(prompt, context)
+    print(contextualized_prompt)
+
+    messages = ["This is an important message.", "Urgent: This needs immediate attention."]
+    prioritized_messages = tuner.prioritize_messages(messages)
+    print(prioritized_messages)
+
+    enhanced_prompt = tuner.enhance_prompt(prompt)
+    print(enhanced_prompt)
