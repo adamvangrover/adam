@@ -227,4 +227,100 @@ This Excel workbook can be placed in a shared repository or a cloud drive, allow
 
 ---
 
-Let me know if this matches your expectations and if you'd like me to walk you through the exact Excel formulas used or assist with deployment steps!
+
+#json
+{
+  "clo_tranches": [
+    {"name": "Senior", "size": 200000000, "coupon": 0.045},
+    {"name": "Mezzanine 1", "size": 100000000, "coupon": 0.060},
+    {"name": "Mezzanine 2", "size": 50000000, "coupon": 0.080},
+    {"name": "Equity", "size": 50000000, "coupon": 0.120}
+  ],
+  "underlying_assets": [
+    {
+      "loan_id": "Loan 1",
+      "principal": 10000000,
+      "interest_rate": 0.080,
+      "credit_rating": "B2",
+      "maturity": 5,
+      "probability_of_default": 0.02,
+      "recovery_rate": 0.50
+    },
+    {
+      "loan_id": "Loan 2",
+      "principal": 15000000,
+      "interest_rate": 0.075,
+      "credit_rating": "B1",
+      "maturity": 7,
+      "probability_of_default": 0.015,
+      "recovery_rate": 0.45
+    }
+  ],
+  "market_conditions": {
+    "current_interest_rate": 0.035
+  },
+  "loan_amortization_schedule": [
+    {"loan_id": "Loan 1", "payment": 200000, "remaining_balance": 9800000},
+    {"loan_id": "Loan 2", "payment": 250000, "remaining_balance": 14750000}
+  ],
+  "cds_pricing": [
+    {
+      "asset_tranche": "Loan 1",
+      "probability_of_default": 0.02,
+      "loss_given_default": 0.50,
+      "cds_spread": 100
+    },
+    {
+      "asset_tranche": "Senior Tranche",
+      "probability_of_default": 0.005,
+      "loss_given_default": 0.20,
+      "cds_spread": 10
+    }
+  ],
+  "risk_metrics": {
+    "weighted_average_default_probability": 0.015,
+    "weighted_average_recovery_rate": 0.40,
+    "expected_loss": 6000000,
+    "senior_tranche_attachment_point": 0,
+    "senior_tranche_detachment_point": 0.10
+  }
+}
+
+#python
+import json
+
+# Load the JSON file
+with open('clo_analyzer.json', 'r') as f:
+    data = json.load(f)
+
+# Function to calculate loan amortization (simple example)
+def calculate_amortization(principal, interest_rate, years):
+    monthly_rate = interest_rate / 12
+    months = years * 12
+    payment = principal * (monthly_rate / (1 - (1 + monthly_rate) ** -months))
+    amortization_schedule = []
+    balance = principal
+    
+    for month in range(1, months + 1):
+        interest_payment = balance * monthly_rate
+        principal_payment = payment - interest_payment
+        balance -= principal_payment
+        amortization_schedule.append({
+            "month": month,
+            "payment": round(payment, 2),
+            "interest_payment": round(interest_payment, 2),
+            "principal_payment": round(principal_payment, 2),
+            "remaining_balance": round(balance, 2)
+        })
+    
+    return amortization_schedule
+
+# Example of processing one loan
+loan_1 = data['underlying_assets'][0]  # Loan 1 data
+amortization_schedule = calculate_amortization(
+    loan_1['principal'], loan_1['interest_rate'], loan_1['maturity']
+)
+
+# Print amortization schedule
+for entry in amortization_schedule:
+    print(f"Month {entry['month']}: Payment: {entry['payment']}, Interest: {entry['interest_payment']}, Principal: {entry['principal_payment']}, Remaining Balance: {entry['remaining_balance']}")
