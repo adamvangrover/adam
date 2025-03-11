@@ -134,8 +134,9 @@ model.fit(x_train, y_train, epochs=5)
 weights = model.get_weights()
 
 # Send weights to the server
+```
 Code for Model Aggregation:
-Python
+```Python
 
 import numpy as np
 
@@ -149,8 +150,9 @@ average_weights = np.mean(client_weights, axis=0)
 global_model.set_weights(average_weights)
 
 # Send the updated model to clients
+```
 Code for Performance Monitoring:
-Python
+```Python
 
 import prometheus_client
 
@@ -162,6 +164,7 @@ accuracy.set(global_model.evaluate(x_test, y_test)[1])
 
 # Start the Prometheus HTTP server
 prometheus_client.start_http_server(8000)
+```
 9. Tools and Resources
 
 Federated Learning Libraries and Frameworks:
