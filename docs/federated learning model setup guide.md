@@ -166,57 +166,61 @@ accuracy.set(global_model.evaluate(x_test, y_test)[1])
 prometheus_client.start_http_server(8000)
 ```
 **9. Tools and Resources**
-Federated Learning Libraries and Frameworks:
-TensorFlow Federated (TFF)
-PySyft
-OpenMined
+   
+   Federated Learning Libraries and Frameworks:
+   TensorFlow Federated (TFF)
+   PySyft
+   OpenMined
 
-Data Visualization Tools:
-TensorBoard
-Matplotlib
-Seaborn
+   Data Visualization Tools:
+   TensorBoard
+   Matplotlib
+   Seaborn
 
-Model Debugging and Analysis Tools:
-TensorFlow Debugger
-PyTorch Profiler
+   Model Debugging and Analysis Tools:
+   TensorFlow Debugger
+   PyTorch Profiler
 
 **10. Best Practices and Considerations**
-Data Privacy and Security Best Practices:
-Implement differential privacy
-Use secure aggregation techniques
-Encrypt model updates and communication channels
 
-Model Training and Optimization Tips:
-Use adaptive learning rates
-Experiment with different batch sizes and epochs
-Monitor for overfitting and underfitting
+   Data Privacy and Security Best Practices:
+   Implement differential privacy
+   Use secure aggregation techniques
+   Encrypt model updates and communication channels
 
-Troubleshooting Common Issues:
-Address communication bottlenecks
-Handle data heterogeneity
-Ensure model convergence
+   Model Training and Optimization Tips:
+   Use adaptive learning rates
+   Experiment with different batch sizes and epochs
+   Monitor for overfitting and underfitting
+
+   Troubleshooting Common Issues:
+   Address communication bottlenecks
+   Handle data heterogeneity
+   Ensure model convergence
 
 **11. Future Directions and Trends**
-Emerging Trends in Federated Learning:
-Personalized federated learning
-Cross-device federated learning
-Blockchain-based federated learning
 
-Research and Development Opportunities:
-Developing more efficient and secure aggregation algorithms
-Addressing data heterogeneity and non-IIDness
-Improving model robustness and generalization
+   Emerging Trends in Federated Learning:
+   Personalized federated learning
+   Cross-device federated learning
+   Blockchain-based federated learning
 
-Potential Applications:
-Drug discovery and development
-Smart cities and infrastructure
-Personalized education and training
+   Research and Development Opportunities:
+   Developing more efficient and secure aggregation algorithms
+   Addressing data heterogeneity and non-IIDness
+   Improving model robustness and generalization
+
+   Potential Applications:
+   Drug discovery and development
+   Smart cities and infrastructure
+   Personalized education and training
 
 **12. Conclusion**
+
 Summary of Key Concepts:
-Federated learning enables collaborative model training without data sharing, offering benefits in privacy, performance, and scalability.
+   Federated learning enables collaborative model training without data sharing, offering benefits in privacy, performance, and scalability.
 
 Next Steps and Further Exploration:
-Experiment with different federated learning architectures and algorithms
-Explore advanced topics like personalized federated learning and secure aggregation
-Contribute to the development of open-source federated learning tools and frameworks
+   Experiment with different federated learning architectures and algorithms
+   Explore advanced topics like personalized federated learning and secure aggregation
+   Contribute to the development of open-source federated learning tools and frameworks
