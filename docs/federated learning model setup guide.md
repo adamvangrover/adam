@@ -168,9 +168,9 @@ prometheus_client.start_http_server(8000)
 **9. Tools and Resources**
    
    Federated Learning Libraries and Frameworks:
-   TensorFlow Federated (TFF)
-   PySyft
-   OpenMined
+   *TensorFlow Federated (TFF)
+   *PySyft
+   *OpenMined
 
    Data Visualization Tools:
    TensorBoard
