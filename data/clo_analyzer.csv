@@ -1,0 +1,83 @@
+## CLO Analyzer
+
+| Input | Description | Example |
+|---|---|---|
+| **CLO Tranches** | Define the tranches within the CLO (e.g., Senior, Mezzanine, Equity) | Senior, Mezzanine 1, Mezzanine 2, Equity |
+| **Tranche Size** | Amount of principal for each tranche | $200 million, $100 million, $50 million, $50 million |
+| **Tranche Coupon** | Interest rate paid on each tranche | 4.5%, 6.0%, 8.0%, 12.0% |
+| **Underlying Assets** | Portfolio of leveraged loans backing the CLO | List of loans with details (see below) |
+| **Loan Details** | For each loan:  - Principal amount  - Interest rate  - Credit rating  - Maturity date | $10 million, 8.0%, B2, 5 years |
+| **Default Assumptions** | Probability of default for each loan | Based on credit ratings and historical data |
+| **Recovery Rate** | Percentage of principal recovered in case of default | Based on historical recovery rates for similar loans |
+| **Current Interest Rate** | Prevailing market interest rate | 3.5% |
+| **Loan Cash Flows** | Calculated based on loan details and default assumptions | See Loan Amortization Schedule |
+| **CLO Tranche Cash Flows** | Calculated based on loan cash flows and waterfall structure | See Tranche Cash Flow Waterfall |
+| **Tranche Pricing** | Present value of tranche cash flows | See Tranche Pricing Calculation |
+| **CLO Valuation** | Sum of present values of all tranches | $450 million |
+| **CDS Pricing** | CDS spread for the underlying assets or CLO tranches | See CDS Pricing Model |
+| **Mark-to-Market Valuation** | Current market value of the CLO | $475 million |
+| **Risk Metrics** | Probability of default, loss given default, expected loss, tranche attachment and detachment points | See Risk Metrics Dashboard |
+| **Developer Notes** | Formulas, future integrations, output formats | See Developer Notes Section |
+
+## Loan Amortization Schedule
+
+| Loan ID | Principal | Interest Rate | Maturity | Payment | Remaining Balance |
+|---|---|---|---|---|---|
+| Loan 1 | $10 million | 8.0% | 5 years | $200,000 | $9.8 million |
+| Loan 2 | $15 million | 7.5% | 7 years | $250,000 | $14.75 million |
+| ... | ... | ... | ... | ... | ... |
+
+## Tranche Cash Flow Waterfall
+
+| Period | Senior | Mezzanine 1 | Mezzanine 2 | Equity |
+|---|---|---|---|---|
+| 1 | $9 million | $1 million | $0 | $0 |
+| 2 | $10 million | $1.5 million | $0 | $0 |
+| ... | ... | ... | ... | ... |
+
+## Tranche Pricing Calculation
+
+| Tranche | Present Value of Cash Flows |
+|---|---|
+| Senior | $195 million |
+| Mezzanine 1 | $90 million |
+| Mezzanine 2 | $45 million |
+| Equity | $20 million |
+
+## CDS Pricing Model
+
+| Asset/Tranche | Probability of Default | Loss Given Default | CDS Spread |
+|---|---|---|---|
+| Loan 1 | 2.0% | 50% | 100 bps |
+| Senior Tranche | 0.5% | 20% | 10 bps |
+| ... | ... | ... | ... |
+
+## Risk Metrics Dashboard
+
+| Metric | Value |
+|---|---|
+| Weighted Average Default Probability | 1.5% |
+| Weighted Average Recovery Rate | 40% |
+| Expected Loss | $6 million |
+| Senior Tranche Attachment Point | 0% |
+| Senior Tranche Detachment Point | 10% |
+| ... | ... |
+
+## Developer Notes
+
+### Formulas
+
+* **Present Value:** `PV = CF / (1 + r)^t` (where CF = cash flow, r = discount rate, t = time period)
+* **Expected Loss:** `EL = PD * LGD * Notional`
+* **CDS Spread:** `Spread = EL / PV(Premium Leg)`
+
+### Future Integrations
+
+* Real-time data feeds
+* Advanced credit risk models
+* Scenario analysis
+
+### Output Formats
+
+* JSON
+* CSV
