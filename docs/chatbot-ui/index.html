@@ -423,7 +423,7 @@
     fetch('https://api.github.com/repos/adamvangrover/adam/contents/data')
       .then(response => response.json())
       .then(data => {
-        const reportSelection = document.getElementById('file-selection');
+        const fileSelection = document.getElementById('file-selection');
         data.forEach(item => {
           if (item.type === 'file') {
             const option = document.createElement('option');
@@ -435,14 +435,14 @@
       });
 
     function displaySelectedFile() {
-      const reportPath = document.getElementById('file-selection').value;
+      const filePath = document.getElementById('file-selection').value;
       // Fetch and display the selected report content
-      fetch(`https://raw.githubusercontent.com/adamvangrover/adam/main/${reportPath}`)
+      fetch(`https://raw.githubusercontent.com/adamvangrover/adam/main/${filePath}`)
         .then(response => response.text())
         .then(data => {
           const reportContent = document.getElementById('file-content');
           // Render the report content appropriately (e.g., using Marked for Markdown, or custom rendering for JSON)
-          reportContent.innerHTML = marked.parse(data); // Example using Marked for Markdown
+          fileContent.innerHTML = marked.parse(data); // Example using Marked for Markdown
         });
     }
 
