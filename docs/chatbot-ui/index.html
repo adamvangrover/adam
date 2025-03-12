@@ -69,6 +69,16 @@
         <button onclick="displaySelectedReport()">View Report</button>
         <div id="report-content"></div>
 
+        </div>
+        <div class="chatbot-message">
+          Select a file to view:
+        </div>
+        <select id="file-selection">
+        </select>
+        <button onclick="displaySelectedFile()">View File</button>
+        <div id="file-content"></div>
+
+        
         <div class="chatbot-options">
           <button onclick="showVideoOverview()">Watch Video Overview</button>
           <button onclick="startInteractiveTutorial()">Start Interactive Tutorial</button>
@@ -409,6 +419,36 @@
 
     // ... (Existing functions)
 
+    // Fetch the list of files from the repository
+    fetch('https://api.github.com/repos/adamvangrover/adam/contents/data')
+      .then(response => response.json())
+      .then(data => {
+        const reportSelection = document.getElementById('file-selection');
+        data.forEach(item => {
+          if (item.type === 'file') {
+            const option = document.createElement('option');
+            option.value = item.path;
+            option.text = item.name;
+            fileSelection.add(option);
+          }
+        });
+      });
+
+    function displaySelectedFile() {
+      const reportPath = document.getElementById('file-selection').value;
+      // Fetch and display the selected report content
+      fetch(`https://raw.githubusercontent.com/adamvangrover/adam/main/${reportPath}`)
+        .then(response => response.text())
+        .then(data => {
+          const reportContent = document.getElementById('file-content');
+          // Render the report content appropriately (e.g., using Marked for Markdown, or custom rendering for JSON)
+          reportContent.innerHTML = marked.parse(data); // Example using Marked for Markdown
+        });
+    }
+
+    // ... (Existing functions)
+
+    
 function showLearningModule() {
   const learningModulePopup = document.getElementById('learning-module-popup');
   learningModulePopup.style.display = 'block';
