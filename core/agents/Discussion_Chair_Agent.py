@@ -317,3 +317,197 @@ class DiscussionChairAgent:
         logging.info(f"Decision: {decision}")
         logging.info(f"Rationale: {rationale}")
 
+
+
+#WIP /////////////////////////////////////////////
+
+import json
+
+class DiscussionChairAgent:
+    def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):
+        """
+        Initializes the Discussion Chair Agent.
+
+        Args:
+            knowledge_base_path (str): Path to the knowledge base file.
+        """
+        self.knowledge_base_path = knowledge_base_path
+        self.knowledge_base = self._load_knowledge_base()
+
+    def _load_knowledge_base(self):
+        """
+        Loads the knowledge base from the JSON file.
+
+        Returns:
+            dict: The knowledge base data.
+        """
+        try:
+            with open(self.knowledge_base_path, 'r') as file:
+                return json.load(file)
+        except FileNotFoundError:
+            print(f"Knowledge base file not found: {self.knowledge_base_path}")
+            return {}
+        except json.JSONDecodeError:
+            print(f"Error decoding knowledge base JSON: {self.knowledge_base_path}")
+            return {}
+
+    def make_final_decision(self, simulation_type, **kwargs):
+        """
+        Makes the final decision for either the Credit Rating Assessment
+        Simulation or the Investment Committee Simulation, based on the
+        provided simulation type and relevant data.
+
+        Args:
+            simulation_type (str): The type of simulation ("credit_rating" or "investment_committee").
+            **kwargs: Keyword arguments containing the data and analysis results
+                      for the specific simulation.
+
+        Returns:
+            tuple: The final decision and a rationale for the decision,
+                   formatted appropriately for the simulation type.
+        """
+        if simulation_type == "credit_rating":
+            return self._make_credit_rating_decision(**kwargs)
+        elif simulation_type == "investment_committee":
+            return self._make_investment_decision(**kwargs)
+        else:
+            raise ValueError("Invalid simulation type.")
+
+    def _make_credit_rating_decision(self, shared_knowledge_graph):
+        """
+        Makes the final decision on the PD rating and regulatory rating
+        after considering all inputs and recommendations from the
+        Credit Rating Assessment Simulation.
+
+        Args:
+            shared_knowledge_graph (dict): The shared knowledge graph containing
+                                         all the data and analysis from the simulation.
+
+        Returns:
+            tuple: (str, str, str): The final PD rating, final regulatory rating,
+                                   and a justification for the decision.
+        """
+
+        # Review all data and analysis in the shared_knowledge_graph
+        company_name = shared_knowledge_graph["company_name"]
+        financial_data = shared_knowledge_graph["financial_data"]
+        pd_to_regulatory_rating_mapping = shared_knowledge_graph["pd_to_regulatory_rating_mapping"]
+        credit_metrics = shared_knowledge_graph["credit_metrics"]
+        dcf_forecast = shared_knowledge_graph["dcf_forecast"]
+        industry_analysis = shared_knowledge_graph["industry_analysis"]
+        company_narrative = shared_knowledge_graph["company_narrative"]
+        initial_pd_ratings = shared_knowledge_graph["initial_pd_ratings"]
+        
+        # Conflict detection (example: PD ratings vs. Financial data)
+        discrepancies = self._detect_conflicts(financial_data, initial_pd_ratings, industry_analysis)
+        
+        # Weigh quantitative vs qualitative factors
+        final_pd_rating = self._weigh_quantitative_and_qualitative(financial_data, credit_metrics, industry_analysis)
+        
+        # Determine regulatory rating based on mapped PD
+        final_regulatory_rating = pd_to_regulatory_rating_mapping.get(final_pd_rating, "Unknown")
+        
+        # Justification
+        justification = f"Final PD rating: {final_pd_rating}, Regulatory rating: {final_regulatory_rating}. " \
+                        f"Discrepancies identified: {discrepancies}. Analysis points to the company's strong financials, but " \
+                        "conflicting industry outlook slightly impacts the rating."
+
+        return final_pd_rating, final_regulatory_rating, justification
+
+    def _make_investment_decision(self, company_name, investment_amount, investment_horizon, fundamental_analysis, technical_analysis, risk_assessment, prediction_market_data, alternative_data, crypto_exposure):
+        """
+        Makes the final decision on the investment proposal after considering
+        all inputs and recommendations from the Investment Committee Simulation.
+
+        Args:
+            company_name (str): The name of the company.
+            investment_amount (float): The investment amount.
+            investment_horizon (str): The investment horizon.
+            fundamental_analysis (dict): Fundamental analysis results.
+            technical_analysis (dict): Technical analysis results.
+            risk_assessment (dict): Risk assessment results.
+            prediction_market_data (dict): Prediction market data.
+            alternative_data (dict): Alternative data.
+            crypto_exposure (dict): Cryptocurrency exposure analysis.
+
+        Returns:
+            tuple: (str, str): The investment decision ("Approve" or "Reject") and
+                               a rationale for the decision.
+        """
+
+        # Review all data and analysis
+        all_data = {
+            "fundamental_analysis": fundamental_analysis,
+            "technical_analysis": technical_analysis,
+            "risk_assessment": risk_assessment,
+            "prediction_market_data": prediction_market_data,
+            "alternative_data": alternative_data,
+            "crypto_exposure": crypto_exposure
+        }
+        
+        # Conflict detection (e.g., fundamental analysis vs. technical analysis)
+        conflicts = self._detect_conflicts(fundamental_analysis, technical_analysis, risk_assessment)
+        
+        # Weigh quantitative vs qualitative factors
+        decision = self._weigh_quantitative_and_qualitative_for_investment(fundamental_analysis, risk_assessment)
+        
+        # Justification
+        rationale = f"Investment Decision: {decision}. Conflicts detected: {conflicts}. Further analysis suggests that the investment " \
+                    "is suitable based on fundamental analysis, but technical analysis and risk assessment show some caution."
+
+        return decision, rationale
+
+    def _detect_conflicts(self, *data_sources):
+        """
+        Detects conflicts between various data sources.
+
+        Args:
+            data_sources (tuple): Multiple data sources to be checked for conflicts.
+
+        Returns:
+            list: A list of detected conflicts or empty if no conflicts found.
+        """
+        conflicts = []
+        # Simple example of conflict detection
+        if "valuation" in data_sources[0] and "valuation" in data_sources[1]:
+            if data_sources[0]["valuation"] != data_sources[1]["valuation"]:
+                conflicts.append("Valuation mismatch between analyses.")
+        
+        return conflicts
+
+    def _weigh_quantitative_and_qualitative(self, financial_data, credit_metrics, industry_analysis):
+        """
+        Weighs quantitative and qualitative factors in the credit rating decision.
+
+        Args:
+            financial_data (dict): The financial data.
+            credit_metrics (dict): The credit metrics.
+            industry_analysis (dict): The industry analysis.
+
+        Returns:
+            str: The final PD rating.
+        """
+        # Example: simplistic weighing logic
+        if credit_metrics["debt_to_equity"] < 1.5 and financial_data["revenue_growth"] > 5:
+            return "BBB"
+        elif industry_analysis["sector_outlook"] == "Positive":
+            return "A"
+        else:
+            return "BB"
+
+    def _weigh_quantitative_and_qualitative_for_investment(self, fundamental_analysis, risk_assessment):
+        """
+        Weighs quantitative and qualitative factors in the investment decision.
+
+        Args:
+            fundamental_analysis (dict): The fundamental analysis results.
+            risk_assessment (dict): The risk assessment results.
+
+        Returns:
+            str: The investment decision.
+        """
+        if fundamental_analysis["valuation"] == "Undervalued" and risk_assessment["overall_risk"] == "Low":
+            return "Approve"
+        else:
+            return "Reject"
+
