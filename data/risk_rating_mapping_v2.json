@@ -1,0 +1,709 @@
+{
+  "metadata": {
+    "version": "2.0.0",
+    "last_updated": "2025-04-01T20:45:00Z",
+    "_comment_last_updated": "Timestamp of the last manual update or verification of static data within this file.",
+    "description": "A comprehensive mapping file for corporate credit risk assessment, combining rating agency scales, regulatory classifications, market indicators, and economic context for LLM analysis.",
+    "data_sources": [
+      "Public Rating Agency Reports (S&P, Moody's, Fitch)",
+      "Regulatory Filings (e.g., SNC Reports)",
+      "Market Data Providers (for CDS, Indices, FX, Rates)",
+      "Internal Analysis",
+      "Economic Data Providers (e.g., BLS, Eurostat, BOJ)"
+    ],
+    "update_frequency_recommendation": {
+      "rating_agency_definitions": "Annually or as definitions change",
+      "regulatory_classifications": "Annually or as definitions change",
+      "market_indicators": "Daily/Intraday where possible",
+      "economic_context": "Daily (Rates, FX), Monthly/Quarterly (Macro Data, Sector Outlook)",
+      "default_probability_ranges": "Annually based on latest cohort studies (Note: values here are illustrative)"
+    },
+    "version_notes": {
+      "changes_from_v1": [
+        "Restructured entire file for better organization.",
+        "Added Fitch Ratings.",
+        "Replaced default probabilities with illustrative 1-year ranges.",
+        "Added rating categories, outlooks, and watch statuses.",
+        "Added inter-agency mapping.",
+        "Formalized SNC indicative criteria.",
+        "Added LGD ranges for SNC.",
+        "Included comprehensive market indicators (CDS, distressed, indices, volatility) with timestamps.",
+        "Replaced LIBOR with SOFR, added Treasury Curve with timestamps.",
+        "Standardized currency pairs with timestamps.",
+        "Added macroeconomic and sector context data with timestamps.",
+        "Refined risk score framework and qualitative mapping guidance.",
+        "Expanded metadata."
+      ],
+      "future_improvements": [
+        "Integrate real-time API calls for dynamic data.",
+        "Expand historical data capabilities.",
+        "Add more granular sector/industry risk factors.",
+        "Incorporate Probability of Default (PD) models directly.",
+        "Add Loss Given Default (LGD) estimates beyond SNC.",
+        "Include covenant analysis metrics."
+      ]
+    }
+  },
+  "rating_agencies": {
+    "_comment": "Data includes illustrative 1-year default probability ranges based on historical averages. Actual probabilities are dynamic.",
+    "S&P": {
+      "AAA": {
+        "description": "Highest rating. Extremely strong capacity to meet financial commitments.",
+        "category": "Investment Grade",
+        "typical_1yr_default_probability_range": [0.0000, 0.0001],
+        "equivalent_ratings": {"Moody's": "Aaa", "Fitch": "AAA"}
+      },
+      "AA+": {
+        "description": "Very strong capacity to meet financial commitments.",
+        "category": "Investment Grade",
+        "typical_1yr_default_probability_range": [0.0001, 0.0002],
+         "equivalent_ratings": {"Moody's": "Aa1", "Fitch": "AA+"}
+      },
+      "AA": {
+        "description": "Very strong capacity to meet financial commitments.",
+        "category": "Investment Grade",
+        "typical_1yr_default_probability_range": [0.0002, 0.0003],
+        "equivalent_ratings": {"Moody's": "Aa2", "Fitch": "AA"}
+      },
+      "AA-": {
+        "description": "Very strong capacity to meet financial commitments.",
+        "category": "Investment Grade",
+        "typical_1yr_default_probability_range": [0.0003, 0.0005],
+        "equivalent_ratings": {"Moody's": "Aa3", "Fitch": "AA-"}
+      },
+       "A+": {
+        "description": "Strong capacity to meet financial commitments, but somewhat more susceptible to adverse economic conditions.",
+        "category": "Investment Grade",
+        "typical_1yr_default_probability_range": [0.0005, 0.0008],
+        "equivalent_ratings": {"Moody's": "A1", "Fitch": "A+"}
+      },
+      "A": {
+        "description": "Strong capacity to meet financial commitments, but somewhat more susceptible to adverse economic conditions.",
+        "category": "Investment Grade",
+        "typical_1yr_default_probability_range": [0.0008, 0.0012],
+        "equivalent_ratings": {"Moody's": "A2", "Fitch": "A"}
+      },
+      "A-": {
+        "description": "Strong capacity to meet financial commitments, but somewhat more susceptible to adverse economic conditions.",
+        "category": "Investment Grade",
+        "typical_1yr_default_probability_range": [0.0012, 0.0018],
+        "equivalent_ratings": {"Moody's": "A3", "Fitch": "A-"}
+      },
+      "BBB+": {
+        "description": "Adequate capacity to meet financial commitments, but more subject to adverse economic conditions.",
+        "category": "Investment Grade",
+        "typical_1yr_default_probability_range": [0.0018, 0.0027],
+        "equivalent_ratings": {"Moody's": "Baa1", "Fitch": "BBB+"}
+      },
+      "BBB": {
+        "description": "Adequate capacity to meet financial commitments, but more subject to adverse economic conditions.",
+        "category": "Investment Grade",
+        "typical_1yr_default_probability_range": [0.0027, 0.0040],
+        "equivalent_ratings": {"Moody's": "Baa2", "Fitch": "BBB"}
+      },
+      "BBB-": {
+        "description": "Adequate capacity to meet financial commitments, but more subject to adverse economic conditions.",
+        "category": "Investment Grade",
+        "typical_1yr_default_probability_range": [0.0040, 0.0060],
+        "equivalent_ratings": {"Moody's": "Baa3", "Fitch": "BBB-"}
+      },
+      "BB+": {
+        "description": "Less vulnerable in the near term but faces major ongoing uncertainties to adverse business, financial, or economic conditions.",
+        "category": "Speculative Grade",
+        "typical_1yr_default_probability_range": [0.0060, 0.0090],
+        "equivalent_ratings": {"Moody's": "Ba1", "Fitch": "BB+"}
+      },
+      "BB": {
+        "description": "Less vulnerable in the near term but faces major ongoing uncertainties to adverse business, financial, or economic conditions.",
+        "category": "Speculative Grade",
+        "typical_1yr_default_probability_range": [0.0090, 0.0130],
+        "equivalent_ratings": {"Moody's": "Ba2", "Fitch": "BB"}
+      },
+      "BB-": {
+        "description": "Less vulnerable in the near term but faces major ongoing uncertainties to adverse business, financial, or economic conditions.",
+        "category": "Speculative Grade",
+        "typical_1yr_default_probability_range": [0.0130, 0.0190],
+        "equivalent_ratings": {"Moody's": "Ba3", "Fitch": "BB-"}
+      },
+      "B+": {
+        "description": "More vulnerable to adverse conditions but currently has the capacity to meet financial commitments.",
+        "category": "Speculative Grade",
+        "typical_1yr_default_probability_range": [0.0190, 0.0270],
+        "equivalent_ratings": {"Moody's": "B1", "Fitch": "B+"}
+      },
+       "B": {
+        "description": "More vulnerable to adverse conditions but currently has the capacity to meet financial commitments.",
+        "category": "Speculative Grade",
+        "typical_1yr_default_probability_range": [0.0270, 0.0380],
+        "equivalent_ratings": {"Moody's": "B2", "Fitch": "B"}
+      },
+       "B-": {
+        "description": "More vulnerable to adverse conditions but currently has the capacity to meet financial commitments.",
+        "category": "Speculative Grade",
+        "typical_1yr_default_probability_range": [0.0380, 0.0530],
+        "equivalent_ratings": {"Moody's": "B3", "Fitch": "B-"}
+      },
+      "CCC+": {
+        "description": "Currently vulnerable and depends on favorable conditions to meet financial commitments.",
+        "category": "Speculative Grade",
+        "typical_1yr_default_probability_range": [0.0530, 0.1500], # Wider range for CCC category
+         "equivalent_ratings": {"Moody's": "Caa1", "Fitch": "CCC+"}
+      },
+      "CCC": {
+        "description": "Currently vulnerable and depends on favorable conditions to meet financial commitments.",
+        "category": "Speculative Grade",
+        "typical_1yr_default_probability_range": [0.1000, 0.2500], # Wider range for CCC category
+        "equivalent_ratings": {"Moody's": "Caa2", "Fitch": "CCC"}
+      },
+      "CCC-": {
+        "description": "Currently vulnerable and depends on favorable conditions to meet financial commitments.",
+        "category": "Speculative Grade",
+        "typical_1yr_default_probability_range": [0.1500, 0.3500], # Wider range for CCC category
+        "equivalent_ratings": {"Moody's": "Caa3", "Fitch": "CCC-"}
+      },
+      "CC": {
+        "description": "Currently highly vulnerable.",
+        "category": "Speculative Grade",
+        "typical_1yr_default_probability_range": [0.2500, 0.5000],
+        "equivalent_ratings": {"Moody's": "Ca", "Fitch": "CC"}
+      },
+      "C": {
+        "description": "Currently highly vulnerable, potentially in bankruptcy or similar proceedings, but still meeting some financial commitments.",
+        "category": "Speculative Grade",
+        "typical_1yr_default_probability_range": [0.3000, 0.6000],
+        "equivalent_ratings": {"Moody's": "C", "Fitch": "C"}
+      },
+      "D": {
+        "description": "In default or breach of an imputed promise. Payment default on a financial commitment.",
+        "category": "Default",
+        "typical_1yr_default_probability_range": [0.99, 1.0], # Represents already defaulted or near certain default within year
+        "equivalent_ratings": {"Moody's": "/RD/SD", "Fitch": "RD/D"}
+      },
+      "NR": {
+        "description": "Not Rated. No rating has been requested, there is insufficient information, or the agency withdrew the rating.",
+        "category": "Not Rated",
+        "typical_1yr_default_probability_range": null,
+        "equivalent_ratings": {"Moody's": "NR", "Fitch": "NR"}
+      },
+      "outlook_modifiers": {
+        "Positive": "May be raised.",
+        "Negative": "May be lowered.",
+        "Stable": "Not likely to change.",
+        "Developing": "May be raised, lowered, or affirmed."
+      },
+       "watch_modifiers": {
+        "CreditWatch Positive": "Potential upgrade.",
+        "CreditWatch Negative": "Potential downgrade.",
+        "CreditWatch Developing": "Potential upgrade, downgrade, or affirmation."
+      }
+    },
+    "Moody's": {
+        "Aaa": {
+            "description": "Highest quality, minimal credit risk.",
+            "category": "Investment Grade",
+            "typical_1yr_default_probability_range": [0.0000, 0.0001],
+            "equivalent_ratings": {"S&P": "AAA", "Fitch": "AAA"}
+        },
+        "Aa1": {
+            "description": "High quality, very low credit risk.",
+            "category": "Investment Grade",
+            "typical_1yr_default_probability_range": [0.0001, 0.0002],
+            "equivalent_ratings": {"S&P": "AA+", "Fitch": "AA+"}
+        },
+        "Aa2": {
+            "description": "High quality, very low credit risk.",
+            "category": "Investment Grade",
+            "typical_1yr_default_probability_range": [0.0002, 0.0003],
+            "equivalent_ratings": {"S&P": "AA", "Fitch": "AA"}
+        },
+        "Aa3": {
+            "description": "High quality, very low credit risk.",
+            "category": "Investment Grade",
+            "typical_1yr_default_probability_range": [0.0003, 0.0005],
+            "equivalent_ratings": {"S&P": "AA-", "Fitch": "AA-"}
+        },
+        "A1": {
+            "description": "Upper-medium grade, low credit risk.",
+            "category": "Investment Grade",
+            "typical_1yr_default_probability_range": [0.0005, 0.0008],
+            "equivalent_ratings": {"S&P": "A+", "Fitch": "A+"}
+        },
+        "A2": {
+            "description": "Upper-medium grade, low credit risk.",
+            "category": "Investment Grade",
+            "typical_1yr_default_probability_range": [0.0008, 0.0012],
+            "equivalent_ratings": {"S&P": "A", "Fitch": "A"}
+        },
+        "A3": {
+            "description": "Upper-medium grade, low credit risk.",
+            "category": "Investment Grade",
+            "typical_1yr_default_probability_range": [0.0012, 0.0018],
+            "equivalent_ratings": {"S&P": "A-", "Fitch": "A-"}
+        },
+        "Baa1": {
+            "description": "Medium grade, moderate credit risk, possibly possessing speculative characteristics.",
+            "category": "Investment Grade",
+            "typical_1yr_default_probability_range": [0.0018, 0.0027],
+            "equivalent_ratings": {"S&P": "BBB+", "Fitch": "BBB+"}
+        },
+        "Baa2": {
+            "description": "Medium grade, moderate credit risk, possibly possessing speculative characteristics.",
+            "category": "Investment Grade",
+            "typical_1yr_default_probability_range": [0.0027, 0.0040],
+            "equivalent_ratings": {"S&P": "BBB", "Fitch": "BBB"}
+        },
+        "Baa3": {
+            "description": "Medium grade, moderate credit risk, possibly possessing speculative characteristics.",
+            "category": "Investment Grade",
+            "typical_1yr_default_probability_range": [0.0040, 0.0060],
+            "equivalent_ratings": {"S&P": "BBB-", "Fitch": "BBB-"}
+        },
+        "Ba1": {
+            "description": "Judged to have speculative elements and subject to substantial credit risk.",
+            "category": "Speculative Grade",
+            "typical_1yr_default_probability_range": [0.0060, 0.0090],
+            "equivalent_ratings": {"S&P": "BB+", "Fitch": "BB+"}
+        },
+        "Ba2": {
+            "description": "Judged to have speculative elements and subject to substantial credit risk.",
+            "category": "Speculative Grade",
+            "typical_1yr_default_probability_range": [0.0090, 0.0130],
+            "equivalent_ratings": {"S&P": "BB", "Fitch": "BB"}
+        },
+        "Ba3": {
+            "description": "Judged to have speculative elements and subject to substantial credit risk.",
+            "category": "Speculative Grade",
+            "typical_1yr_default_probability_range": [0.0130, 0.0190],
+            "equivalent_ratings": {"S&P": "BB-", "Fitch": "BB-"}
+        },
+        "B1": {
+            "description": "Considered speculative and subject to high credit risk.",
+            "category": "Speculative Grade",
+            "typical_1yr_default_probability_range": [0.0190, 0.0270],
+            "equivalent_ratings": {"S&P": "B+", "Fitch": "B+"}
+        },
+        "B2": {
+            "description": "Considered speculative and subject to high credit risk.",
+            "category": "Speculative Grade",
+            "typical_1yr_default_probability_range": [0.0270, 0.0380],
+            "equivalent_ratings": {"S&P": "B", "Fitch": "B"}
+        },
+        "B3": {
+            "description": "Considered speculative and subject to high credit risk.",
+            "category": "Speculative Grade",
+            "typical_1yr_default_probability_range": [0.0380, 0.0530],
+            "equivalent_ratings": {"S&P": "B-", "Fitch": "B-"}
+        },
+        "Caa1": {
+            "description": "Judged to be of poor standing and subject to very high credit risk.",
+            "category": "Speculative Grade",
+            "typical_1yr_default_probability_range": [0.0530, 0.1500],
+            "equivalent_ratings": {"S&P": "CCC+", "Fitch": "CCC+"}
+        },
+        "Caa2": {
+            "description": "Judged to be of poor standing and subject to very high credit risk.",
+            "category": "Speculative Grade",
+            "typical_1yr_default_probability_range": [0.1000, 0.2500],
+            "equivalent_ratings": {"S&P": "CCC", "Fitch": "CCC"}
+        },
+        "Caa3": {
+            "description": "Judged to be of poor standing and subject to very high credit risk.",
+            "category": "Speculative Grade",
+            "typical_1yr_default_probability_range": [0.1500, 0.3500],
+            "equivalent_ratings": {"S&P": "CCC-", "Fitch": "CCC-"}
+        },
+        "Ca": {
+            "description": "Highly speculative, likely in or very near default, with some prospect of recovery.",
+            "category": "Speculative Grade",
+            "typical_1yr_default_probability_range": [0.2500, 0.5000],
+            "equivalent_ratings": {"S&P": "CC", "Fitch": "CC"}
+        },
+        "C": {
+            "description": "Lowest rated class, typically in default, with little prospect for recovery.",
+            "category": "Speculative Grade",
+            "typical_1yr_default_probability_range": [0.3000, 0.6000],
+             "equivalent_ratings": {"S&P": "C", "Fitch": "C"}
+        },
+         "/RD/SD": {
+             "description": "Indicates Selective Default (SD) or Restricted Default (RD).",
+             "category": "Default",
+             "typical_1yr_default_probability_range": [0.99, 1.0],
+             "equivalent_ratings": {"S&P": "D", "Fitch": "RD/D"}
+         },
+        "NR": {
+             "description": "Not Rated.",
+             "category": "Not Rated",
+             "typical_1yr_default_probability_range": null,
+             "equivalent_ratings": {"S&P": "NR", "Fitch": "NR"}
+         },
+        "outlook_modifiers": {
+            "POS": "Positive outlook.",
+            "NEG": "Negative outlook.",
+            "STA": "Stable outlook.",
+            "DEV": "Developing outlook.",
+            "(P)": "Provisional rating."
+         },
+         "watch_modifiers": {
+            "RUR": "Rating Under Review for possible upgrade.",
+            "RDR": "Rating Under Review for possible downgrade.",
+            "RWR": "Rating Under Review with uncertain direction."
+         }
+    },
+    "Fitch": {
+        "AAA": {
+            "description": "Highest credit quality. Denotes the lowest expectation of default risk.",
+            "category": "Investment Grade",
+            "typical_1yr_default_probability_range": [0.0000, 0.0001],
+            "equivalent_ratings": {"S&P": "AAA", "Moody's": "Aaa"}
+        },
+        "AA+": {
+            "description": "Very high credit quality. Very low expectation of default risk.",
+            "category": "Investment Grade",
+            "typical_1yr_default_probability_range": [0.0001, 0.0002],
+            "equivalent_ratings": {"S&P": "AA+", "Moody's": "Aa1"}
+        },
+        "AA": {
+            "description": "Very high credit quality. Very low expectation of default risk.",
+            "category": "Investment Grade",
+            "typical_1yr_default_probability_range": [0.0002, 0.0003],
+            "equivalent_ratings": {"S&P": "AA", "Moody's": "Aa2"}
+        },
+        "AA-": {
+            "description": "Very high credit quality. Very low expectation of default risk.",
+            "category": "Investment Grade",
+            "typical_1yr_default_probability_range": [0.0003, 0.0005],
+            "equivalent_ratings": {"S&P": "AA-", "Moody's": "Aa3"}
+        },
+        "A+": {
+            "description": "High credit quality. Low expectation of default risk.",
+            "category": "Investment Grade",
+            "typical_1yr_default_probability_range": [0.0005, 0.0008],
+            "equivalent_ratings": {"S&P": "A+", "Moody's": "A1"}
+        },
+        "A": {
+            "description": "High credit quality. Low expectation of default risk.",
+            "category": "Investment Grade",
+            "typical_1yr_default_probability_range": [0.0008, 0.0012],
+            "equivalent_ratings": {"S&P": "A", "Moody's": "A2"}
+        },
+        "A-": {
+            "description": "High credit quality. Low expectation of default risk.",
+            "category": "Investment Grade",
+            "typical_1yr_default_probability_range": [0.0012, 0.0018],
+            "equivalent_ratings": {"S&P": "A-", "Moody's": "A3"}
+        },
+        "BBB+": {
+            "description": "Good credit quality. Low expectation of default risk currently.",
+            "category": "Investment Grade",
+            "typical_1yr_default_probability_range": [0.0018, 0.0027],
+            "equivalent_ratings": {"S&P": "BBB+", "Moody's": "Baa1"}
+        },
+        "BBB": {
+            "description": "Good credit quality. Low expectation of default risk currently.",
+            "category": "Investment Grade",
+            "typical_1yr_default_probability_range": [0.0027, 0.0040],
+            "equivalent_ratings": {"S&P": "BBB", "Moody's": "Baa2"}
+        },
+        "BBB-": {
+            "description": "Good credit quality. Low expectation of default risk currently.",
+            "category": "Investment Grade",
+            "typical_1yr_default_probability_range": [0.0040, 0.0060],
+            "equivalent_ratings": {"S&P": "BBB-", "Moody's": "Baa3"}
+        },
+        "BB+": {
+            "description": "Speculative. Elevated vulnerability to default risk.",
+            "category": "Speculative Grade",
+            "typical_1yr_default_probability_range": [0.0060, 0.0090],
+            "equivalent_ratings": {"S&P": "BB+", "Moody's": "Ba1"}
+        },
+        "BB": {
+            "description": "Speculative. Elevated vulnerability to default risk.",
+            "category": "Speculative Grade",
+            "typical_1yr_default_probability_range": [0.0090, 0.0130],
+            "equivalent_ratings": {"S&P": "BB", "Moody's": "Ba2"}
+        },
+        "BB-": {
+            "description": "Speculative. Elevated vulnerability to default risk.",
+            "category": "Speculative Grade",
+            "typical_1yr_default_probability_range": [0.0130, 0.0190],
+            "equivalent_ratings": {"S&P": "BB-", "Moody's": "Ba3"}
+        },
+        "B+": {
+            "description": "Highly speculative. Material default risk is present, but a limited margin of safety remains.",
+            "category": "Speculative Grade",
+            "typical_1yr_default_probability_range": [0.0190, 0.0270],
+            "equivalent_ratings": {"S&P": "B+", "Moody's": "B1"}
+        },
+        "B": {
+            "description": "Highly speculative. Material default risk is present, but a limited margin of safety remains.",
+            "category": "Speculative Grade",
+            "typical_1yr_default_probability_range": [0.0270, 0.0380],
+            "equivalent_ratings": {"S&P": "B", "Moody's": "B2"}
+        },
+        "B-": {
+            "description": "Highly speculative. Material default risk is present, but a limited margin of safety remains.",
+            "category": "Speculative Grade",
+            "typical_1yr_default_probability_range": [0.0380, 0.0530],
+            "equivalent_ratings": {"S&P": "B-", "Moody's": "B3"}
+        },
+        "CCC+": { # Fitch combines CCC+/CCC/CCC- into 'CCC' often for probability stats
+            "description": "Substantial credit risk. Default is a real possibility.",
+            "category": "Speculative Grade",
+            "typical_1yr_default_probability_range": [0.0530, 0.1500],
+            "equivalent_ratings": {"S&P": "CCC+", "Moody's": "Caa1"}
+        },
+        "CCC": {
+            "description": "Substantial credit risk. Default is a real possibility.",
+            "category": "Speculative Grade",
+            "typical_1yr_default_probability_range": [0.1000, 0.2500],
+             "equivalent_ratings": {"S&P": "CCC", "Moody's": "Caa2"}
+        },
+        "CCC-": {
+             "description": "Substantial credit risk. Default is a real possibility.",
+             "category": "Speculative Grade",
+             "typical_1yr_default_probability_range": [0.1500, 0.3500],
+            "equivalent_ratings": {"S&P": "CCC-", "Moody's": "Caa3"}
+        },
+        "CC": {
+            "description": "Very high levels of credit risk. Default of some kind appears probable.",
+            "category": "Speculative Grade",
+            "typical_1yr_default_probability_range": [0.2500, 0.5000],
+            "equivalent_ratings": {"S&P": "CC", "Moody's": "Ca"}
+        },
+        "C": {
+            "description": "Exceptionally high levels of credit risk. Default is imminent or inevitable.",
+            "category": "Speculative Grade",
+            "typical_1yr_default_probability_range": [0.3000, 0.6000],
+            "equivalent_ratings": {"S&P": "C", "Moody's": "C"}
+        },
+        "RD": {
+            "description": "Restricted Default. Indicates an uncured payment default on a material financial obligation.",
+            "category": "Default",
+            "typical_1yr_default_probability_range": [0.99, 1.0],
+            "equivalent_ratings": {"S&P": "D", "Moody's": "/RD/SD"}
+        },
+        "D": {
+            "description": "Default. Indicates a default has occurred.",
+            "category": "Default",
+            "typical_1yr_default_probability_range": [0.99, 1.0],
+            "equivalent_ratings": {"S&P": "D", "Moody's": "/RD/SD"}
+        },
+        "NR": {
+            "description": "Not Rated.",
+            "category": "Not Rated",
+            "typical_1yr_default_probability_range": null,
+            "equivalent_ratings": {"S&P": "NR", "Moody's": "NR"}
+        },
+        "outlook_modifiers": {
+            "Positive": "Rating may be raised.",
+            "Negative": "Rating may be lowered.",
+            "Stable": "Rating is not likely to change.",
+            "Evolving": "Rating may be raised, lowered or affirmed." # Fitch uses Evolving instead of Developing sometimes
+        },
+        "watch_modifiers": {
+            "Rating Watch Positive": "Indicates a potential upgrade.",
+            "Rating Watch Negative": "Indicates a potential downgrade.",
+            "Rating Watch Evolving": "Indicates potential upgrade, downgrade, or affirmation."
+         }
+    }
+  },
+  "regulatory_classifications": {
+    "SNC": {
+      "_comment": "Shared National Credit Program (US regulatory classification for large syndicated loans). Criteria are indicative.",
+      "Pass": {
+        "description": "Sound credit quality, performing as agreed, minimal risk identified.",
+        "implication": "Loan is considered performing and not subject to criticism.",
+        "indicative_criteria": {
+          "repayment_capacity": {"metric": "Cumulative FCF / Total Debt", "threshold": 0.50, "condition": "greater_than", "period": "Loan Term", "description": "Strong projected repayment capacity."},
+          "valuation": {"metric": "Loan to Value (LTV)", "threshold": 0.70, "condition": "less_than", "description": "Conservative LTV."},
+          "liquidity": {"score": "Strong", "description": "More than covers stress scenario + 30% cushion for next 2 years costs."},
+          "solvency": {"metric": "Debt Service Coverage Ratio (DSCR)", "threshold": 1.5, "condition": "greater_than", "description": "Healthy DSCR."}
+        },
+        "typical_loss_given_default_range": [0.0, 0.1] # Illustrative
+      },
+      "Special Mention (SM)": {
+        "description": "Potential weaknesses that deserve management's close attention. If left uncorrected, these may result in deterioration of repayment prospects.",
+        "implication": "Elevated monitoring required; not yet impaired but trending negatively.",
+         "indicative_criteria": {
+          "repayment_capacity": {"metric": "Cumulative FCF / Total Debt", "threshold": 0.40, "condition": "greater_than", "period": "Loan Term", "description": "Adequate projected repayment, potential concerns."},
+          "valuation": {"metric": "Loan to Value (LTV)", "range": [0.70, 0.80], "description": "Moderate LTV."},
+          "liquidity": {"score": "Adequate", "description": "Covers stress or 12-18 months costs + 20% cushion."},
+          "solvency": {"metric": "Debt Service Coverage Ratio (DSCR)", "range": [1.2, 1.5], "description": "Adequate DSCR, potential for deterioration."}
+        },
+        "typical_loss_given_default_range": [0.1, 0.25] # Illustrative
+      },
+      "Substandard": {
+        "description": "Inadequately protected by the current sound worth and paying capacity of the obligor or of the collateral pledged. Well-defined weakness(es) that jeopardize liquidation.",
+        "implication": "Credit risk is elevated; loss potential exists if deficiencies are not corrected.",
+         "indicative_criteria": {
+          "repayment_capacity": {"metric": "Cumulative FCF / Total Debt", "threshold": 0.30, "condition": "greater_than", "period": "Loan Term", "description": "Weak projected repayment, significant concerns."},
+          "valuation": {"metric": "Loan to Value (LTV)", "range": [0.80, 0.90], "description": "High LTV."},
+          "liquidity": {"score": "Less than Adequate", "description": "Limited cushion for stress or costs."},
+          "solvency": {"metric": "Debt Service Coverage Ratio (DSCR)", "range": [1.0, 1.2], "description": "Weak DSCR, potential for default."}
+        },
+        "typical_loss_given_default_range": [0.25, 0.50] # Illustrative
+      },
+      "Doubtful": {
+        "description": "Weaknesses make collection or liquidation in full highly questionable and improbable.",
+        "implication": "High probability of loss, but the exact amount is not yet determined.",
+        "indicative_criteria": {
+          "repayment_capacity": {"analysis_type": "Waterfall Analysis", "finding": "Significant shortfall", "description": "Highly doubtful repayment."},
+          "valuation": {"analysis_type": "Recovery Analysis", "finding": "Significant potential Loss Given Default", "description": "Collateral likely insufficient."},
+          "liquidity": {"score": "Less than Adequate", "description": "Limited cushion for stress or costs."},
+          "solvency": {"metric": "Debt Service Coverage Ratio (DSCR)", "threshold": 1.0, "condition": "less_than", "description": "Insufficient cash flow for debt service."}
+        },
+         "typical_loss_given_default_range": [0.50, 0.75] # Illustrative
+      },
+      "Loss": {
+        "description": "Considered uncollectible and of such little value that continuance as a bankable asset is not warranted.",
+        "implication": "Loan should be charged-off. Recovery is highly unlikely.",
+         "indicative_criteria": {
+          "repayment_capacity": {"analysis_type": "Waterfall Analysis", "finding": "Uncollectible", "description": "No reasonable expectation of repayment."},
+          "valuation": {"analysis_type": "Recovery Analysis", "finding": "Minimal or no recovery expected", "description": "Collateral value significantly below debt."},
+          "liquidity": {"score": "Less than Adequate", "description": "Limited cushion for stress or costs."},
+          "solvency": {"metric": "Debt Service Coverage Ratio (DSCR)", "threshold": 1.0, "condition": "less_than", "description": "Insufficient cash flow for debt service."}
+        },
+        "typical_loss_given_default_range": [0.75, 1.0] # Illustrative
+      }
+    }
+    // Potentially add other regulatory frameworks here (e.g., EBA NPL definitions)
+  },
+  "market_indicators": {
+    "_comment": "Market data needs frequent updates. Timestamps indicate last update time for this file.",
+    "cds_spreads_basis_points": {
+      "last_updated": "2025-04-01T18:00:00Z",
+      "source_example": "Market Data Provider X",
+      "Technology": {"1Y": 45, "3Y": 70, "5Y": 95, "10Y": 130},
+      "Healthcare": {"1Y": 55, "3Y": 80, "5Y": 110, "10Y": 140},
+      "Financials (Banks)": {"1Y": 65, "3Y": 100, "5Y": 135, "10Y": 170},
+      "Energy (Oil&Gas)": {"1Y": 90, "3Y": 130, "5Y": 170, "10Y": 210},
+      "Consumer Discretionary": {"1Y": 70, "3Y": 105, "5Y": 140, "10Y": 180},
+      "Industrials": {"1Y": 60, "3Y": 90, "5Y": 120, "10Y": 155}
+       // Add other relevant industries
+    },
+    "distressed_secondary_prices": {
+        "last_updated": "2025-04-01T18:00:00Z",
+        "source_example": "Market Data Provider Y",
+        "asset_type": "Broadly Syndicated Loans",
+        "price_type": "Percentage of Par",
+        "average_price_by_rating_category": {
+            "CCC": 65.5,
+            "B-": 80.0,
+            "B": 88.5,
+            "B+": 92.0
+            // ... other categories if available
+        },
+        "example_individual_loans": [
+            {"loan_id": "LXYZ", "issuer_sector": "Retail", "rating_approx": "CCC+", "price": 68.0, "date": "2025-04-01"},
+            {"loan_id": "LABC", "issuer_sector": "Airlines", "rating_approx": "B-", "price": 75.0, "date": "2025-04-01"}
+        ]
+    },
+     "global_equity_indices": {
+        "last_updated": "2025-04-01T18:00:00Z",
+        "source_example": "Market Data Provider Z",
+        "S&P500": {"value": 4950.75, "30d_historical_volatility": 0.16},
+        "DJIA": {"value": 38000.50, "30d_historical_volatility": 0.14},
+        "NASDAQ": {"value": 15500.25, "30d_historical_volatility": 0.20},
+        "FTSE100": {"value": 7600.00, "30d_historical_volatility": 0.15},
+        "N225": {"value": 39000.00, "30d_historical_volatility": 0.18}
+        // Add other relevant indices (DAX, HSI, etc.)
+    },
+    "volatility_indices": {
+        "last_updated": "2025-04-01T18:00:00Z",
+        "source_example": "Market Data Provider Z",
+        "VIX": {"value": 19.20, "description": "CBOE Volatility Index (S&P 500)"},
+        "VXN": {"value": 23.50, "description": "CBOE NASDAQ 100 Volatility Index"}
+         // Add other relevant volatility indices (e.g., V2X for Europe)
+    }
+  },
+  "economic_context": {
+    "_comment": "Economic data needs periodic updates. Timestamps indicate last update time for this file.",
+     "risk_free_rates": {
+        "last_updated": "2025-04-01T18:00:00Z",
+        "source_example": "Central Bank Data / Market Provider",
+        "SOFR": { // Secured Overnight Financing Rate (USD Benchmark)
+            "Overnight": 0.0525, "30D_Avg": 0.0528, "90D_Avg": 0.0530, "180D_Avg": 0.0535, "Term_1M": 0.0538, "Term_3M": 0.0540, "Term_6M": 0.0542, "Term_1Y": 0.0545
+        },
+        "Treasury_Curve_USD": {
+            "1M": 0.0510, "3M": 0.0515, "6M": 0.0520, "1Y": 0.0518, "2Y": 0.0505, "3Y": 0.0495, "5Y": 0.0480, "7Y": 0.0475, "10Y": 0.0470, "20Y": 0.0485, "30Y": 0.0490
+        },
+         "ESTR": { // Euro Short-Term Rate (EUR Benchmark)
+             "Overnight": 0.0390 // Add term structure if available
+         },
+         "SONIA": { // Sterling Overnight Index Average (GBP Benchmark)
+             "Overnight": 0.0515 // Add term structure if available
+         }
+        // Add other relevant benchmark rates (e.g., TONA for JPY)
+    },
+    "currency_exchange_rates": {
+        "last_updated": "2025-04-01T18:00:00Z",
+        "source_example": "FX Market Data Provider",
+        "base_currency": "USD",
+        "rates": {
+            "EURUSD": 1.0850, // 1 EUR = 1.0850 USD
+            "GBPUSD": 1.2550, // 1 GBP = 1.2550 USD
+            "USDJPY": 150.75, // 1 USD = 150.75 JPY
+            "USDCHF": 0.9010, // 1 USD = 0.9010 CHF
+            "USDCAD": 1.3600, // 1 USD = 1.3600 CAD
+            "AUDUSD": 0.6500, // 1 AUD = 0.6500 USD
+            "USDCNY": 7.2300  // 1 USD = 7.2300 CNY (Onshore rate)
+        }
+    },
+    "macroeconomic_data": {
+        "last_updated": "2025-03-15T12:00:00Z", // Example: Reflects last data release used
+        "data_period_example": "Q4 2024 / Feb 2025",
+        "source_example": "National Statistics Offices / Central Banks",
+        "USA": {"GDP_growth_qoq_ann": 0.018, "inflation_cpi_yoy": 0.031, "unemployment_rate": 0.039, "policy_rate": 0.0550},
+        "Eurozone": {"GDP_growth_qoq_ann": 0.005, "inflation_hcpi_yoy": 0.028, "unemployment_rate": 0.064, "policy_rate": 0.0400},
+        "China": {"GDP_growth_yoy": 0.050, "inflation_cpi_yoy": 0.015, "unemployment_rate_urban": 0.051, "policy_rate_1y_mlf": 0.0275},
+        "Japan": {"GDP_growth_qoq_ann": 0.002, "inflation_cpi_yoy": 0.022, "unemployment_rate": 0.024, "policy_rate": -0.001}
+        // Add other key economies (UK, Canada, etc.)
+    },
+    "sector_outlook": {
+        "last_updated": "2025-03-20T10:00:00Z",
+        "source_example": "Internal Research / Third-party Reports",
+        "Technology": {"outlook": "Stable", "growth_forecast_range_pct": [3, 6], "key_risks": ["Regulatory scrutiny", "Supply chain disruption", "Geopolitical tensions"]},
+        "Healthcare": {"outlook": "Positive", "growth_forecast_range_pct": [4, 7], "key_risks": ["Drug pricing pressure", "Patent cliffs", "Regulatory changes"]},
+        "Financials (Banks)": {"outlook": "Stable", "growth_forecast_range_pct": [2, 4], "key_risks": ["Net interest margin compression", "Credit losses", "Regulatory capital requirements"]},
+        "Energy (Oil&Gas)": {"outlook": "Volatile/Stable", "growth_forecast_range_pct": [1, 5], "key_risks": ["Commodity price volatility", "Energy transition policies", "Geopolitical supply risks"]},
+        "Consumer Discretionary": {"outlook": "Cautious/Stable", "growth_forecast_range_pct": [2, 5], "key_risks": ["Inflation impact on spending", "Consumer confidence shifts", "Inventory management"]},
+        "Industrials": {"outlook": "Stable", "growth_forecast_range_pct": [3, 5], "key_risks": ["Input cost inflation", "Labor shortages", "Infrastructure spending delays"]}
+        // Add other relevant sectors
+    }
+  },
+  "risk_score_framework": {
+    "_comment": "Defines internal risk scoring buckets and guidance for mapping qualitative data.",
+    "internal_risk_score_mapping": {
+      "_comment": "Mapping from a normalized internal risk score (e.g., 0.0 to 1.0) to qualitative buckets.",
+      "very_low": {"score_range": [0.0, 0.2], "description": "Minimal risk. Corresponds roughly to high Investment Grade.", "implied_action": "Standard monitoring."},
+      "low": {"score_range": [0.2, 0.4], "description": "Low risk. Corresponds roughly to mid/low Investment Grade.", "implied_action": "Standard monitoring, periodic review."},
+      "moderate": {"score_range": [0.4, 0.6], "description": "Moderate risk. Corresponds roughly to crossover/high Speculative Grade (BB area).", "implied_action": "Increased monitoring frequency."},
+      "high": {"score_range": [0.6, 0.8], "description": "High risk. Corresponds roughly to mid Speculative Grade (B area).", "implied_action": "Close monitoring, potential watchlist."},
+      "very_high": {"score_range": [0.8, 1.0], "description": "Very high risk. Corresponds roughly to low Speculative Grade (CCC area) or Default.", "implied_action": "Intensive monitoring, workout/recovery focus."}
+    },
+    "qualitative_to_numeric_guidance": {
+       "_comment": "Provides illustrative numerical weights (0=lowest risk, 1=highest risk) for qualitative inputs. Actual weights should be calibrated based on the specific model and context.",
+       "SNC_Classification_Weights": {
+            "source_type": "SNC Classification",
+            "mapping": {"Pass": 0.1, "Special Mention (SM)": 0.3, "Substandard": 0.6, "Doubtful": 0.8, "Loss": 1.0},
+            "notes": "Illustrative weights. Consider non-linear scaling based on portfolio."
+       },
+       "SNC_Liquidity_Score_Weights": {
+           "source_type": "SNC Liquidity Assessment",
+            "mapping": {"Strong": 0.1, "Adequate": 0.4, "Less than Adequate": 0.8},
+            "notes": "Illustrative weights for liquidity component."
+       },
+        "Agency_Outlook_Weights": {
+            "source_type": "Rating Agency Outlook",
+            "mapping": {"Positive": -0.05, "Stable": 0.0, "Negative": 0.1, "Developing": 0.05},
+            "notes": "Illustrative *adjustments* to a base score derived from the rating itself."
+       },
+       "Agency_Watch_Weights": {
+            "source_type": "Rating Agency Watch Status",
+            "mapping": {"Positive": -0.1, "Negative": 0.2, "Developing": 0.1},
+             "notes": "Illustrative *adjustments*, typically larger impact than outlook."
+       }
+       // Add guidance for other qualitative factors (e.g., Sector Outlook) if needed
+    }
+  }
+}
