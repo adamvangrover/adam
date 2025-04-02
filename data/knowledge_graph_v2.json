@@ -1,0 +1,713 @@
+{
+  "metadata": {
+    "version": "2.0.0",
+    "description": "A knowledge graph representing concepts and relationships in Valuation, Risk Management, Macroeconomics, Technical Analysis, Emerging Trends, and LLM Optimization.",
+    "last_updated": "2025-04-01T20:59:15Z"
+  },
+  "Valuation": {
+    "DCF": {
+      "machine_readable": {
+        "nodes": [
+          {"id": "dcf", "label": "Discounted Cash Flow (DCF)", "type": "Intrinsic Valuation Method"},
+          {"id": "ufcf", "label": "Unlevered Free Cash Flow (UFCF)", "type": "Financial Metric"},
+          {"id": "discount_rate", "label": "Discount Rate", "type": "Rate"},
+          {"id": "wacc", "label": "Weighted Average Cost of Capital (WACC)", "type": "Calculated Rate"},
+          {"id": "terminal_value", "label": "Terminal Value", "type": "Valuation Component"},
+          {"id": "present_value", "label": "Present Value", "type": "Calculated Value"},
+          {"id": "enterprise_value", "label": "Enterprise Value (EV)", "type": "Valuation Output"},
+          {"id": "equity_value", "label": "Equity Value", "type": "Valuation Output"},
+          {"id": "implied_share_price", "label": "Implied Share Price", "type": "Valuation Output"},
+          {"id": "net_debt", "label": "Net Debt", "type": "Balance Sheet Item"},
+          {"id": "shares_outstanding", "label": "Shares Outstanding", "type": "Equity Data"},
+          {"id": "ebit", "label": "Earnings Before Interest & Taxes (EBIT)", "type": "Income Statement Item"},
+          {"id": "tax_rate", "label": "Tax Rate", "type": "Parameter"},
+          {"id": "d_and_a", "label": "Depreciation & Amortization", "type": "Non-Cash Expense"},
+          {"id": "capex", "label": "Capital Expenditures", "type": "Cash Flow Item"},
+          {"id": "change_nwc", "label": "Change in Net Working Capital", "type": "Cash Flow Item"},
+          {"id": "terminal_growth_rate", "label": "Terminal Growth Rate", "type": "Assumption"},
+          {"id": "exit_multiple", "label": "Exit Multiple", "type": "Assumption"},
+          {"id": "cost_of_equity", "label": "Cost of Equity (Re)", "type": "Calculated Rate"},
+          {"id": "cost_of_debt", "label": "Cost of Debt (Rd)", "type": "Rate"},
+          {"id": "market_value_equity", "label": "Market Value of Equity (E)", "type": "Market Data"},
+          {"id": "market_value_debt", "label": "Market Value of Debt (D)", "type": "Market/Estimated Data"},
+          {"id": "total_capital", "label": "Total Capital (V = E+D)", "type": "Calculated Value"},
+          {"id": "capm", "label": "Capital Asset Pricing Model (CAPM)", "type": "Financial Model"},
+          {"id": "risk_free_rate", "label": "Risk-Free Rate (Rf)", "type": "Market Rate"},
+          {"id": "beta", "label": "Beta (β)", "type": "Risk Metric"},
+          {"id": "market_risk_premium", "label": "Market Risk Premium (MRP)", "type": "Market Expectation"}
+        ],
+        "edges": [
+          {"source": "dcf", "target": "ufcf", "relation": "uses"},
+          {"source": "dcf", "target": "discount_rate", "relation": "uses"},
+          {"source": "dcf", "target": "terminal_value", "relation": "calculates"},
+          {"source": "ufcf", "target": "ebit", "relation": "calculated_from"},
+          {"source": "ufcf", "target": "tax_rate", "relation": "calculated_from"},
+          {"source": "ufcf", "target": "d_and_a", "relation": "calculated_from"},
+          {"source": "ufcf", "target": "capex", "relation": "calculated_from"},
+          {"source": "ufcf", "target": "change_nwc", "relation": "calculated_from"},
+          {"source": "discount_rate", "target": "wacc", "relation": "is_typically"},
+          {"source": "wacc", "target": "cost_of_equity", "relation": "depends_on"},
+          {"source": "wacc", "target": "cost_of_debt", "relation": "depends_on"},
+          {"source": "wacc", "target": "market_value_equity", "relation": "uses_weight_of"},
+          {"source": "wacc", "target": "market_value_debt", "relation": "uses_weight_of"},
+          {"source": "wacc", "target": "tax_rate", "relation": "uses"},
+          {"source": "market_value_equity", "target": "total_capital", "relation": "component_of"},
+          {"source": "market_value_debt", "target": "total_capital", "relation": "component_of"},
+          {"source": "cost_of_equity", "target": "capm", "relation": "calculated_by"},
+          {"source": "capm", "target": "risk_free_rate", "relation": "uses"},
+          {"source": "capm", "target": "beta", "relation": "uses"},
+          {"source": "capm", "target": "market_risk_premium", "relation": "uses"},
+          {"source": "terminal_value", "target": "terminal_growth_rate", "relation": "can_use"},
+          {"source": "terminal_value", "target": "exit_multiple", "relation": "can_use"},
+          {"source": "dcf", "target": "present_value", "relation": "calculates"},
+          {"source": "present_value", "target": "ufcf", "relation": "calculated_for"},
+          {"source": "present_value", "target": "terminal_value", "relation": "calculated_for"},
+          {"source": "present_value", "target": "discount_rate", "relation": "uses"},
+          {"source": "dcf", "target": "enterprise_value", "relation": "calculates"},
+          {"source": "enterprise_value", "target": "present_value", "relation": "sum_of"},
+          {"source": "enterprise_value", "target": "equity_value", "relation": "leads_to"},
+          {"source": "equity_value", "target": "net_debt", "relation": "derived_by_subtracting"},
+          {"source": "equity_value", "target": "implied_share_price", "relation": "leads_to"},
+          {"source": "implied_share_price", "target": "shares_outstanding", "relation": "uses"}
+        ]
+      },
+      "human_readable": {
+        "developer_guidance": {
+          "nodes": "Expand graph with nodes for DCF sensitivity analysis parameters (e.g., +/- 1% WACC, +/- 0.5% growth rate). Add nodes for specific projection assumptions (e.g., revenue growth drivers, margin assumptions). Differentiate between Perpetuity Growth TV and Exit Multiple TV nodes.",
+          "edges": "Create edges showing sensitivity links (e.g., `Implied_Share_Price` `sensitive_to` `WACC`). Connect assumption nodes to the metrics they influence (e.g., `Revenue_Growth_Assumption` `drives` `EBIT`). Link WACC components explicitly to market data sources (e.g., `Risk_Free_Rate` `derived_from` `Treasury_Yield`).",
+          "connections": "Connect `Beta` node to `Market Risk` module. Link `Risk_Free_Rate` and `Market_Risk_Premium` nodes to `Macroeconomics` module. Connect `Exit_Multiple` to `Comparables` module.",
+          "refinement": "Ensure edge relations accurately reflect calculation dependencies (e.g., `calculated_from`, `uses`, `depends_on`, `is_typically`). Add node attributes for formulas where appropriate, if extending node structure."
+        }
+      }
+    },
+    "Comparables": {
+      "machine_readable": {
+        "nodes": [
+          {"id": "comparables", "label": "Comparable Company Analysis (CCA)", "type": "Relative Valuation Method"},
+          {"id": "precedent_transactions", "label": "Precedent Transaction Analysis", "type": "Relative Valuation Method"},
+          {"id": "pe_ratio", "label": "Price-to-Earnings Ratio (P/E)", "type": "Equity Multiple"},
+          {"id": "ev_ebitda", "label": "Enterprise Value to EBITDA", "type": "EV Multiple"},
+          {"id": "ev_sales", "label": "Enterprise Value to Sales", "type": "EV Multiple"},
+          {"id": "price_to_book", "label": "Price-to-Book Ratio (P/B)", "type": "Equity Multiple"},
+          {"id": "price_to_sales", "label": "Price-to-Sales Ratio (P/S)", "type": "Equity Multiple"},
+          {"id": "dividend_yield", "label": "Dividend Yield", "type": "Equity Metric"},
+          {"id": "peer_group", "label": "Peer Group", "type": "Company Set"},
+          {"id": "target_company", "label": "Target Company", "type": "Company"},
+          {"id": "industry_sector", "label": "Industry Sector", "type": "Classification"},
+          {"id": "market_sentiment", "label": "Market Sentiment", "type": "Market Factor"},
+          {"id": "control_premium", "label": "Control Premium", "type": "Valuation Adjustment"}
+        ],
+        "edges": [
+          {"source": "comparables", "target": "pe_ratio", "relation": "uses"},
+          {"source": "comparables", "target": "ev_ebitda", "relation": "uses"},
+          {"source": "comparables", "target": "ev_sales", "relation": "uses"},
+          {"source": "comparables", "target": "price_to_book", "relation": "uses"},
+          {"source": "comparables", "target": "price_to_sales", "relation": "uses"},
+          {"source": "comparables", "target": "dividend_yield", "relation": "uses"},
+          {"source": "comparables", "target": "peer_group", "relation": "requires"},
+          {"source": "peer_group", "target": "industry_sector", "relation": "selected_based_on"},
+          {"source": "peer_group", "target": "target_company", "relation": "compared_to"},
+          {"source": "comparables", "target": "target_company", "relation": "values"},
+          {"source": "comparables", "target": "market_sentiment", "relation": "influenced_by"},
+          {"source": "precedent_transactions", "target": "ev_ebitda", "relation": "uses"},
+          {"source": "precedent_transactions", "target": "ev_sales", "relation": "uses"},
+          {"source": "precedent_transactions", "target": "peer_group", "relation": "requires_data_from"},
+          {"source": "precedent_transactions", "target": "control_premium", "relation": "reflects"}
+        ]
+      },
+      "human_readable": {
+        "developer_guidance": {
+          "nodes": "Add nodes for LTM vs Forward Multiples. Include specific data source nodes (e.g., `Bloomberg Terminal`, `SEC Filings`). Add nodes for adjustments (e.g., `Non-Recurring Items`, `Calendarization`).",
+          "edges": "Connect multiple nodes (P/E, EV/EBITDA) explicitly to calculation components (e.g., `Market Cap`, `Net Debt`, `EBITDA`). Link `Peer Group` selection criteria nodes (Size, Growth, Geography). Connect `Precedent Transactions` to `M&A Database` source node.",
+          "connections": "Link `Market Sentiment` to `Macroeconomics` or `Market Risk`. Connect `Industry Sector` to broader economic sector nodes.",
+          "refinement": "Refine edge types (e.g., `derived_from`, `requires_selection_of`, `reflects_premium_for`). Ensure graph captures the 'relative' nature of the valuation."
+        }
+      }
+    },
+    "CreditMetrics": { // Renamed node slightly for clarity
+      "machine_readable": {
+         "nodes": [
+          {"id": "financial_ratios", "label": "Financial Ratios", "type": "Analysis Tool"},
+          {"id": "debt_to_equity", "label": "Debt-to-Equity Ratio", "type": "Leverage Ratio"},
+          {"id": "interest_coverage_ratio", "label": "Interest Coverage Ratio (ICR)", "type": "Coverage Ratio"},
+          {"id": "debt_to_ebitda", "label": "Debt-to-EBITDA Ratio", "type": "Leverage Ratio"},
+          {"id": "net_debt_to_ebitda", "label": "Net Debt-to-EBITDA Ratio", "type": "Leverage Ratio"},
+          {"id": "current_ratio", "label": "Current Ratio", "type": "Liquidity Ratio"},
+          {"id": "quick_ratio", "label": "Quick Ratio (Acid Test)", "type": "Liquidity Ratio"},
+          {"id": "cash_ratio", "label": "Cash Ratio", "type": "Liquidity Ratio"},
+          {"id": "debt_to_assets", "label": "Debt-to-Assets Ratio", "type": "Leverage Ratio"},
+          {"id": "total_debt", "label": "Total Debt", "type": "Balance Sheet Item"},
+          {"id": "total_equity", "label": "Total Equity", "type": "Balance Sheet Item"},
+          // {"id": "ebit", "label": "EBIT", "type": "Income Statement Item"}, // Already defined in DCF
+          {"id": "interest_expense", "label": "Interest Expense", "type": "Income Statement Item"},
+          {"id": "ebitda", "label": "EBITDA", "type": "Financial Metric"}, // Assuming EBITDA calculation is understood or linked elsewhere
+          {"id": "current_assets", "label": "Current Assets", "type": "Balance Sheet Item"},
+          {"id": "current_liabilities", "label": "Current Liabilities", "type": "Balance Sheet Item"},
+          {"id": "inventories", "label": "Inventories", "type": "Balance Sheet Item"},
+          {"id": "cash_equivalents", "label": "Cash & Cash Equivalents", "type": "Balance Sheet Item"},
+          {"id": "total_assets", "label": "Total Assets", "type": "Balance Sheet Item"}
+        ],
+         "edges": [
+          {"source": "financial_ratios", "target": "debt_to_equity", "relation": "includes"},
+          {"source": "financial_ratios", "target": "interest_coverage_ratio", "relation": "includes"},
+          {"source": "financial_ratios", "target": "debt_to_ebitda", "relation": "includes"},
+          {"source": "financial_ratios", "target": "net_debt_to_ebitda", "relation": "includes"},
+          {"source": "financial_ratios", "target": "current_ratio", "relation": "includes"},
+          {"source": "financial_ratios", "target": "quick_ratio", "relation": "includes"},
+          {"source": "financial_ratios", "target": "cash_ratio", "relation": "includes"},
+          {"source": "financial_ratios", "target": "debt_to_assets", "relation": "includes"},
+          // Calculation dependencies
+          {"source": "debt_to_equity", "target": "total_debt", "relation": "calculated_from"},
+          {"source": "debt_to_equity", "target": "total_equity", "relation": "calculated_from"},
+          {"source": "interest_coverage_ratio", "target": "ebit", "relation": "calculated_from"},
+          {"source": "interest_coverage_ratio", "target": "interest_expense", "relation": "calculated_from"},
+          {"source": "debt_to_ebitda", "target": "total_debt", "relation": "calculated_from"},
+          {"source": "debt_to_ebitda", "target": "ebitda", "relation": "calculated_from"},
+          {"source": "net_debt_to_ebitda", "target": "total_debt", "relation": "calculated_from"},
+          {"source": "net_debt_to_ebitda", "target": "cash_equivalents", "relation": "calculated_from"},
+          {"source": "net_debt_to_ebitda", "target": "ebitda", "relation": "calculated_from"},
+          {"source": "current_ratio", "target": "current_assets", "relation": "calculated_from"},
+          {"source": "current_ratio", "target": "current_liabilities", "relation": "calculated_from"},
+          {"source": "quick_ratio", "target": "current_assets", "relation": "calculated_from"},
+          {"source": "quick_ratio", "target": "inventories", "relation": "calculated_from"},
+          {"source": "quick_ratio", "target": "current_liabilities", "relation": "calculated_from"},
+          {"source": "cash_ratio", "target": "cash_equivalents", "relation": "calculated_from"},
+          {"source": "cash_ratio", "target": "current_liabilities", "relation": "calculated_from"},
+          {"source": "debt_to_assets", "target": "total_debt", "relation": "calculated_from"},
+          {"source": "debt_to_assets", "target": "total_assets", "relation": "calculated_from"}
+        ]
+      },
+      "human_readable": {
+         "developer_guidance": {
+            "nodes": "Add nodes for Profitability Ratios (Gross Margin, Operating Margin, Net Margin) and Efficiency Ratios (Asset Turnover, Inventory Turnover). Include nodes for industry benchmark data sources.",
+            "edges": "Clearly define calculation dependencies for all ratios using `calculated_from`. Link ratio nodes (e.g., `debt_to_ebitda`) to `Credit Risk` assessment node using `informs`. Link liquidity ratios (Current, Quick, Cash) to `Liquidity Risk` node using `informs`.",
+            "connections": "Connect financial statement item nodes (e.g., `Total Debt`, `EBIT`) to a potential `Financial Statements` module. Link ratio interpretation nodes (e.g., 'High Leverage') to the corresponding ratios.",
+            "refinement": "Ensure consistency in naming financial statement items across different modules (Valuation, Risk). Add node attributes for typical 'good'/'bad' ranges, acknowledging industry variance."
+         }
+      }
+    }
+  },
+  "RiskManagement": {
+    "VaR": {
+      "machine_readable": {
+        "nodes": [
+          {"id": "var", "label": "Value at Risk (VaR)", "type": "Risk Metric"},
+          {"id": "historical_simulation_var", "label": "Historical Simulation VaR", "type": "VaR Method"}, // Renamed ID slightly
+          {"id": "monte_carlo_var", "label": "Monte Carlo Simulation VaR", "type": "VaR Method"}, // Renamed ID slightly
+          {"id": "parametric_var", "label": "Parametric VaR", "type": "VaR Method"},
+          {"id": "confidence_level", "label": "Confidence Level", "type": "Parameter"},
+          {"id": "time_horizon", "label": "Time Horizon", "type": "Parameter"},
+          {"id": "lookback_period", "label": "Lookback Period", "type": "Parameter (Historical)"},
+          {"id": "num_simulations", "label": "Number of Simulations", "type": "Parameter (Monte Carlo)"},
+          {"id": "portfolio_return_dist", "label": "Portfolio Return Distribution", "type": "Statistical Concept"},
+          {"id": "normality_assumption", "label": "Normality Assumption", "type": "Assumption (Parametric)"},
+          {"id": "cvar", "label": "Conditional VaR (Expected Shortfall)", "type": "Risk Metric"},
+          {"id": "tail_risk", "label": "Tail Risk", "type": "Risk Concept"},
+          {"id": "backtesting", "label": "VaR Backtesting", "type": "Validation Method"}
+        ],
+        "edges": [
+          {"source": "var", "target": "historical_simulation_var", "relation": "calculated_by"},
+          {"source": "var", "target": "monte_carlo_var", "relation": "calculated_by"},
+          {"source": "var", "target": "parametric_var", "relation": "calculated_by"},
+          {"source": "var", "target": "confidence_level", "relation": "parameterized_by"},
+          {"source": "var", "target": "time_horizon", "relation": "parameterized_by"},
+          {"source": "historical_simulation_var", "target": "lookback_period", "relation": "uses"},
+          {"source": "historical_simulation_var", "target": "portfolio_return_dist", "relation": "derives_from_historical"},
+          {"source": "monte_carlo_var", "target": "num_simulations", "relation": "uses"},
+          {"source": "monte_carlo_var", "target": "portfolio_return_dist", "relation": "simulates"},
+          {"source": "parametric_var", "target": "portfolio_return_dist", "relation": "assumes_distribution_of"},
+          {"source": "parametric_var", "target": "normality_assumption", "relation": "often_makes"},
+          // {"source": "portfolio_return_dist", "target": "mean_return", "relation": "has_parameter"}, // Already in DCF context
+          // {"source": "portfolio_return_dist", "target": "standard_deviation", "relation": "has_parameter"}, // Already defined
+          {"source": "var", "target": "cvar", "relation": "related_to"},
+          {"source": "cvar", "target": "tail_risk", "relation": "measures"},
+          {"source": "var", "target": "tail_risk", "relation": "underestimates"},
+          {"source": "var", "target": "backtesting", "relation": "evaluated_by"}
+        ]
+      },
+      "human_readable": {
+        "developer_guidance": {
+          "nodes": "Add nodes for specific backtesting tests (e.g., Kupiec test, Christoffersen test). Include nodes for different portfolio types (e.g., Equity Portfolio, Fixed Income Portfolio) where VaR is applied.",
+          "edges": "Connect `VaR Method` nodes to their specific pros and cons nodes. Link `Normality Assumption` to nodes describing statistical distributions and 'fat tails'. Connect `Backtesting` node to nodes representing model validation concepts.",
+          "connections": "Link VaR parameters (`Confidence Level`, `Time Horizon`) to regulatory nodes (e.g., Basel Accords specify certain levels). Connect portfolio nodes to asset class nodes (`Equities`, `Bonds`).",
+          "refinement": "Ensure relationships accurately capture dependencies and assumptions (e.g., `assumes`, `parameterized_by`)."
+        }
+      }
+    },
+    "CreditRisk": {
+       "machine_readable": {
+        "nodes": [
+          {"id": "credit_risk", "label": "Credit Risk", "type": "Risk Category"},
+          {"id": "pd", "label": "Probability of Default (PD)", "type": "Credit Risk Metric"},
+          {"id": "lgd", "label": "Loss Given Default (LGD)", "type": "Credit Risk Metric"},
+          {"id": "ead", "label": "Exposure at Default (EAD)", "type": "Credit Risk Metric"},
+          {"id": "expected_loss", "label": "Expected Loss (EL)", "type": "Credit Risk Metric"},
+          {"id": "unexpected_loss", "label": "Unexpected Loss (UL)", "type": "Credit Risk Metric"},
+          {"id": "credit_var", "label": "Credit VaR", "type": "Risk Metric"},
+          {"id": "recovery_rate", "label": "Recovery Rate (RR)", "type": "Credit Risk Metric"},
+          {"id": "merton_model", "label": "Merton Model", "type": "Structural Credit Model"},
+          {"id": "kmv_model", "label": "KMV Model", "type": "Structural Credit Model"},
+          {"id": "altman_z_score", "label": "Altman Z-Score", "type": "Empirical Credit Model"},
+          {"id": "creditmetrics_model", "label": "CreditMetrics™ Model", "type": "Portfolio Credit Model"},
+          {"id": "logistic_regression_scoring", "label": "Logistic Regression Scoring", "type": "Empirical Credit Model"},
+          {"id": "reduced_form_model", "label": "Reduced Form Credit Model", "type": "Credit Model Category"},
+          {"id": "hazard_rate", "label": "Hazard Rate", "type": "Parameter (Reduced Form)"},
+          {"id": "credit_rating", "label": "Credit Rating", "type": "Assessment"},
+          {"id": "rating_agency", "label": "Rating Agency (S&P, Moody's, Fitch)", "type": "Entity"},
+          {"id": "collateral", "label": "Collateral", "type": "Credit Risk Mitigation"},
+          {"id": "covenants", "label": "Covenants", "type": "Credit Risk Mitigation"},
+          {"id": "credit_derivatives", "label": "Credit Derivatives", "type": "Financial Instrument"},
+          {"id": "cds", "label": "Credit Default Swap (CDS)", "type": "Credit Derivative"}
+        ],
+        "edges": [
+          {"source": "credit_risk", "target": "pd", "relation": "component_of"},
+          {"source": "credit_risk", "target": "lgd", "relation": "component_of"},
+          {"source": "credit_risk", "target": "ead", "relation": "component_of"},
+          {"source": "credit_risk", "target": "expected_loss", "relation": "measured_by"},
+          {"source": "credit_risk", "target": "unexpected_loss", "relation": "measured_by"},
+          {"source": "expected_loss", "target": "pd", "relation": "calculated_from"},
+          {"source": "expected_loss", "target": "lgd", "relation": "calculated_from"},
+          {"source": "expected_loss", "target": "ead", "relation": "calculated_from"},
+          {"source": "lgd", "target": "recovery_rate", "relation": "complement_of"}, // LGD = 1 - RR
+          {"source": "unexpected_loss", "target": "credit_var", "relation": "related_to"},
+          {"source": "pd", "target": "merton_model", "relation": "estimated_by"},
+          {"source": "pd", "target": "kmv_model", "relation": "estimated_by"},
+          {"source": "pd", "target": "altman_z_score", "relation": "indicated_by"}, // Z-Score predicts bankruptcy, related to PD
+          {"source": "pd", "target": "logistic_regression_scoring", "relation": "estimated_by"},
+          {"source": "pd", "target": "reduced_form_model", "relation": "estimated_by"},
+          {"source": "reduced_form_model", "target": "hazard_rate", "relation": "uses"},
+          {"source": "credit_risk", "target": "credit_rating", "relation": "assessed_by"},
+          {"source": "credit_rating", "target": "rating_agency", "relation": "assigned_by"},
+          {"source": "credit_rating", "target": "pd", "relation": "correlates_with"},
+          {"source": "credit_risk", "target": "collateral", "relation": "mitigated_by"},
+          {"source": "credit_risk", "target": "covenants", "relation": "mitigated_by"},
+          {"source": "credit_risk", "target": "credit_derivatives", "relation": "mitigated_by"},
+          {"source": "credit_derivatives", "target": "cds", "relation": "includes"}
+        ]
+      },
+       "human_readable": {
+         "developer_guidance": {
+            "nodes": "Add nodes for specific rating scales (AAA, Baa, etc.). Include nodes for different types of collateral and covenants. Add nodes for portfolio credit risk concepts (correlation, diversification).",
+            "edges": "Connect `Credit Rating` node to specific rating scale nodes. Link `Collateral` and `Covenants` nodes to `LGD` node (as they influence recovery). Connect `CDS` node to nodes representing reference entity, notional amount, spread.",
+            "connections": "Link `Credit Rating` node to `Financial Ratios` used by agencies. Connect `Hazard Rate` node to market data nodes (e.g., CDS Spreads). Link portfolio credit risk nodes to `Portfolio Management` module.",
+            "refinement": "Use specific relation types like `estimated_by`, `indicated_by`, `mitigated_by`, `correlates_with`. Ensure distinction between single-name and portfolio credit risk concepts."
+          }
+       }
+    },
+    // ... (LiquidityRisk, MarketRisk, OperationalRisk, StrategicRisk, ReputationalRisk, ESG_Risk, StressTesting nodes/edges following similar enhancement patterns) ...
+     "LiquidityRisk": {
+       "machine_readable": {
+         "nodes": [
+           {"id": "liquidity_risk", "label": "Liquidity Risk", "type": "Risk Category"},
+           {"id": "funding_liquidity_risk", "label": "Funding Liquidity Risk", "type": "Liquidity Risk Type"},
+           {"id": "market_liquidity_risk", "label": "Market Liquidity Risk", "type": "Liquidity Risk Type"},
+           {"id": "lcr", "label": "Liquidity Coverage Ratio (LCR)", "type": "Regulatory Liquidity Metric"},
+           {"id": "nsfr", "label": "Net Stable Funding Ratio (NSFR)", "type": "Regulatory Liquidity Metric"},
+           {"id": "hqla", "label": "High-Quality Liquid Assets (HQLA)", "type": "Asset Category"},
+           {"id": "net_cash_outflows_30d", "label": "Net Cash Outflows (30-day stress)", "type": "Calculated Flow"},
+           {"id": "available_stable_funding", "label": "Available Stable Funding (ASF)", "type": "Funding Category"},
+           {"id": "required_stable_funding", "label": "Required Stable Funding (RSF)", "type": "Funding Need"},
+           {"id": "cash_conversion_cycle", "label": "Cash Conversion Cycle", "type": "Operational Liquidity Metric"},
+           {"id": "bid_ask_spread", "label": "Bid-Ask Spread", "type": "Market Liquidity Indicator"},
+           {"id": "market_depth", "label": "Market Depth", "type": "Market Liquidity Indicator"},
+           {"id": "trading_volume", "label": "Trading Volume", "type": "Market Liquidity Indicator"},
+           {"id": "liquidity_stress_testing", "label": "Liquidity Stress Testing", "type": "Risk Assessment Method"}
+         ],
+         "edges": [
+           {"source": "liquidity_risk", "target": "funding_liquidity_risk", "relation": "includes_type"},
+           {"source": "liquidity_risk", "target": "market_liquidity_risk", "relation": "includes_type"},
+           {"source": "liquidity_risk", "target": "lcr", "relation": "measured_by"},
+           {"source": "liquidity_risk", "target": "nsfr", "relation": "measured_by"},
+           {"source": "liquidity_risk", "target": "cash_conversion_cycle", "relation": "measured_by"},
+           {"source": "market_liquidity_risk", "target": "bid_ask_spread", "relation": "indicated_by"},
+           {"source": "market_liquidity_risk", "target": "market_depth", "relation": "indicated_by"},
+           {"source": "market_liquidity_risk", "target": "trading_volume", "relation": "indicated_by"},
+           {"source": "lcr", "target": "hqla", "relation": "uses"},
+           {"source": "lcr", "target": "net_cash_outflows_30d", "relation": "uses"},
+           {"source": "nsfr", "target": "available_stable_funding", "relation": "uses"},
+           {"source": "nsfr", "target": "required_stable_funding", "relation": "uses"},
+           {"source": "liquidity_risk", "target": "liquidity_stress_testing", "relation": "assessed_by"}
+         ]
+       },
+        "human_readable": {
+            "developer_guidance": {
+                "nodes": "Add nodes for specific HQLA types (Cash, Central Bank Reserves, Gov Bonds). Include nodes for funding sources (Deposits, Wholesale Funding, Repo). Add nodes for stress scenarios used in testing.",
+                "edges": "Link `HQLA` node to specific asset type nodes. Connect `ASF` and `RSF` nodes to their components based on Basel III definitions. Link `Liquidity Stress Testing` to specific scenario nodes.",
+                "connections": "Connect `Bid-Ask Spread` and `Market Depth` to specific `Asset Class` nodes. Link regulatory metrics (`LCR`, `NSFR`) to `Basel Accords` node. Connect funding risk to `Monetary Policy` (central bank liquidity facilities).",
+                "refinement": "Refine relationship types (e.g., `calculated_as`, `component_of`, `applies_to`). Ensure distinction between funding and market liquidity concepts is clear."
+            }
+        }
+     },
+     // ... (Continue adding detailed nodes/edges for MarketRisk, OperationalRisk, StrategicRisk, ReputationalRisk, ESG_Risk, StressTesting) ...
+  },
+  "Macroeconomics": {
+    // ... (Nodes/edges for Key_Macro_Indicators, InterestRateModels, MonetaryPolicy, FiscalPolicy, StrategicReserves, ensuring connections) ...
+     "MonetaryPolicy": {
+       "machine_readable": {
+         "nodes": [
+           {"id": "monetary_policy", "label": "Monetary Policy", "type": "Macroeconomic Policy"},
+           {"id": "central_bank", "label": "Central Bank", "type": "Institution"},
+           {"id": "policy_interest_rate", "label": "Policy Interest Rate", "type": "Monetary Policy Tool"},
+           {"id": "reserve_requirements", "label": "Reserve Requirements", "type": "Monetary Policy Tool"},
+           {"id": "omo", "label": "Open Market Operations (OMO)", "type": "Monetary Policy Tool"},
+           {"id": "qe", "label": "Quantitative Easing (QE)", "type": "Unconventional Tool"},
+           {"id": "qt", "label": "Quantitative Tightening (QT)", "type": "Unconventional Tool"},
+           {"id": "forward_guidance", "label": "Forward Guidance", "type": "Unconventional Tool"},
+           {"id": "inflation_target", "label": "Inflation Target", "type": "Policy Objective"},
+           {"id": "employment_mandate", "label": "Employment Mandate", "type": "Policy Objective"},
+           {"id": "expansionary_stance", "label": "Expansionary Stance", "type": "Policy Stance"},
+           {"id": "contractionary_stance", "label": "Contractionary Stance", "type": "Policy Stance"}
+         ],
+         "edges": [
+           {"source": "monetary_policy", "target": "central_bank", "relation": "implemented_by"},
+           {"source": "monetary_policy", "target": "policy_interest_rate", "relation": "uses_tool"},
+           {"source": "monetary_policy", "target": "reserve_requirements", "relation": "uses_tool"},
+           {"source": "monetary_policy", "target": "omo", "relation": "uses_tool"},
+           {"source": "monetary_policy", "target": "qe", "relation": "uses_tool"},
+           {"source": "monetary_policy", "target": "qt", "relation": "uses_tool"},
+           {"source": "monetary_policy", "target": "forward_guidance", "relation": "uses_tool"},
+           {"source": "monetary_policy", "target": "inflation_target", "relation": "aims_for"},
+           {"source": "monetary_policy", "target": "employment_mandate", "relation": "aims_for"},
+           {"source": "expansionary_stance", "target": "policy_interest_rate", "relation": "involves_lowering"},
+           {"source": "expansionary_stance", "target": "qe", "relation": "may_involve"},
+           {"source": "contractionary_stance", "target": "policy_interest_rate", "relation": "involves_raising"},
+           {"source": "contractionary_stance", "target": "qt", "relation": "may_involve"},
+           {"source": "monetary_policy", "target": "inflation", "relation": "influences"}, // Link to Key Indicator node
+           {"source": "monetary_policy", "target": "interest_rates", "relation": "influences"}, // Link to Key Indicator node
+           {"source": "monetary_policy", "target": "economic_growth", "relation": "influences"}, // Link to GDP node
+           {"source": "monetary_policy", "target": "unemployment_rate", "relation": "influences"} // Link to Key Indicator node
+         ]
+       },
+        "human_readable": {
+            "developer_guidance": {
+                "nodes": "Add nodes for specific central banks (Fed, ECB, BoJ). Include nodes for transmission mechanisms (e.g., interest rate channel, credit channel). Add Taylor Rule node.",
+                "edges": "Connect specific central bank nodes to the currency/region they manage. Link transmission mechanism nodes between policy tools and macroeconomic outcomes. Connect `Taylor Rule` to `Inflation` and `Output Gap` nodes.",
+                "connections": "Link `Monetary Policy` node to `Fiscal Policy` node via `interacts_with`. Connect `Interest Rates` node to `Valuation` (discount rates) and `Risk Management` (Interest Rate Risk).",
+                "refinement": "Ensure relationships show influence direction (e.g., `influences`, `aims_for`). Add temporal aspect if needed (policy lags)."
+            }
+        }
+     }
+    // ... (FiscalPolicy, StrategicReserves etc.)
+  },
+  "TechnicalAnalysis": {
+    // ... (Nodes/edges for DowTheory, ChartingTechniques, TechnicalIndicators, ElliottWaveTheory, AlgorithmicTrading, ensuring connections) ...
+     "TechnicalIndicators": {
+       "machine_readable": {
+         "nodes": [
+           {"id": "technical_indicators", "label": "Technical Indicators", "type": "Technical Analysis Method"},
+           {"id": "ma", "label": "Moving Average (MA)", "type": "Trend Indicator"},
+           {"id": "sma", "label": "Simple Moving Average (SMA)", "type": "Moving Average Type"},
+           {"id": "ema", "label": "Exponential Moving Average (EMA)", "type": "Moving Average Type"},
+           {"id": "macd", "label": "MACD", "type": "Trend/Momentum Indicator"},
+           {"id": "rsi", "label": "Relative Strength Index (RSI)", "type": "Momentum Oscillator"},
+           {"id": "bollinger_bands", "label": "Bollinger Bands", "type": "Volatility Indicator"},
+           {"id": "stochastic_oscillator", "label": "Stochastic Oscillator", "type": "Momentum Oscillator"},
+           {"id": "adx", "label": "Average Directional Index (ADX)", "type": "Trend Strength Indicator"},
+           {"id": "obv", "label": "On-Balance Volume (OBV)", "type": "Volume Indicator"},
+           {"id": "fibonacci_retracements", "label": "Fibonacci Retracements", "type": "Support/Resistance Tool"},
+           {"id": "overbought", "label": "Overbought Condition", "type": "Indicator Signal"},
+           {"id": "oversold", "label": "Oversold Condition", "type": "Indicator Signal"},
+           {"id": "divergence", "label": "Divergence", "type": "Indicator Signal"}
+         ],
+         "edges": [
+           {"source": "technical_indicators", "target": "ma", "relation": "includes"},
+           {"source": "technical_indicators", "target": "macd", "relation": "includes"},
+           {"source": "technical_indicators", "target": "rsi", "relation": "includes"},
+           {"source": "technical_indicators", "target": "bollinger_bands", "relation": "includes"},
+           {"source": "technical_indicators", "target": "stochastic_oscillator", "relation": "includes"},
+           {"source": "technical_indicators", "target": "adx", "relation": "includes"},
+           {"source": "technical_indicators", "target": "obv", "relation": "includes"},
+           {"source": "technical_indicators", "target": "fibonacci_retracements", "relation": "includes"},
+           {"source": "ma", "target": "sma", "relation": "has_type"},
+           {"source": "ma", "target": "ema", "relation": "has_type"},
+           {"source": "rsi", "target": "overbought", "relation": "signals"},
+           {"source": "rsi", "target": "oversold", "relation": "signals"},
+           {"source": "rsi", "target": "divergence", "relation": "can_show"},
+           {"source": "stochastic_oscillator", "target": "overbought", "relation": "signals"},
+           {"source": "stochastic_oscillator", "target": "oversold", "relation": "signals"},
+           {"source": "stochastic_oscillator", "target": "divergence", "relation": "can_show"},
+           {"source": "macd", "target": "divergence", "relation": "can_show"},
+           {"source": "bollinger_bands", "target": "volatility", "relation": "measures"}, // Link to volatility concept/node
+           {"source": "adx", "target": "trend_strength", "relation": "measures"}, // Add trend_strength node
+           {"source": "obv", "target": "trading_volume", "relation": "uses"}, // Link to volume node
+           {"source": "fibonacci_retracements", "target": "support_level", "relation": "identifies_potential"}, // Add support/resistance nodes
+           {"source": "fibonacci_retracements", "target": "resistance_level", "relation": "identifies_potential"}
+         ]
+       },
+        "human_readable": {
+            "developer_guidance": {
+                "nodes": "Add nodes for calculation parameters (e.g., Period Length). Include nodes for specific signals (e.g., MA Crossover, MACD Signal Line Crossover). Add nodes for other indicators (ATR, Ichimoku Cloud).",
+                "edges": "Connect indicator nodes to `Parameter` nodes using `uses_parameter`. Link signal nodes (e.g., `MA Crossover`) to the indicators that generate them. Connect indicator nodes to `Charting Techniques` using `complements` relation.",
+                "connections": "Link volume indicators (`OBV`) to `Market Liquidity` concepts. Connect momentum oscillators (`RSI`) to `Market Sentiment` concepts.",
+                "refinement": "Ensure relationships distinguish between what an indicator *is* vs. what it *signals* or *measures*. Add edges showing combination strategies (e.g., MA crossover confirmed by RSI)."
+            }
+        }
+     }
+    // ... (Charting, AlgoTrading etc.)
+  },
+  "EmergingTrends": {
+    "DecentralizedFinance": {
+      "machine_readable": {
+        "nodes": [
+          {"id": "defi", "label": "Decentralized Finance (DeFi)", "type": "Financial Ecosystem"},
+          {"id": "blockchain", "label": "Blockchain", "type": "Core Technology"},
+          {"id": "smart_contract", "label": "Smart Contract", "type": "Core Technology"},
+          {"id": "dex", "label": "Decentralized Exchange (DEX)", "type": "DeFi Application"},
+          {"id": "uniswap", "label": "Uniswap", "type": "DEX Protocol Example"},
+          {"id": "lending_protocol", "label": "DeFi Lending Protocol", "type": "DeFi Application"},
+          {"id": "aave", "label": "Aave", "type": "Lending Protocol Example"},
+          {"id": "compound", "label": "Compound", "type": "Lending Protocol Example"},
+          {"id": "stablecoin", "label": "Stablecoin", "type": "Cryptocurrency Type"},
+          {"id": "usdc", "label": "USD Coin (USDC)", "type": "Stablecoin Example"},
+          {"id": "yield_farming", "label": "Yield Farming", "type": "DeFi Strategy"},
+          {"id": "liquidity_pool", "label": "Liquidity Pool", "type": "DeFi Mechanism"},
+          {"id": "impermanent_loss", "label": "Impermanent Loss", "type": "DeFi Risk"},
+          {"id": "defi_governance", "label": "DeFi Governance", "type": "Process"},
+          {"id": "governance_token", "label": "Governance Token", "type": "Token Type"}
+        ],
+        "edges": [
+          {"source": "defi", "target": "blockchain", "relation": "runs_on"},
+          {"source": "defi", "target": "smart_contract", "relation": "uses"},
+          {"source": "defi", "target": "dex", "relation": "includes_application"},
+          {"source": "defi", "target": "lending_protocol", "relation": "includes_application"},
+          {"source": "defi", "target": "stablecoin", "relation": "often_uses"},
+          {"source": "dex", "target": "uniswap", "relation": "example_is"},
+          {"source": "lending_protocol", "target": "aave", "relation": "example_is"},
+          {"source": "lending_protocol", "target": "compound", "relation": "example_is"},
+          {"source": "stablecoin", "target": "usdc", "relation": "example_is"},
+          {"source": "defi", "target": "yield_farming", "relation": "enables_strategy"},
+          {"source": "yield_farming", "target": "liquidity_pool", "relation": "often_involves"},
+          {"source": "liquidity_pool", "target": "impermanent_loss", "relation": "subject_to_risk_of"},
+          {"source": "defi_protocol", "target": "defi_governance", "relation": "managed_by"}, // Need DeFi protocol node
+          {"source": "defi_governance", "target": "governance_token", "relation": "uses"}
+        ]
+      },
+       "human_readable": {
+           "developer_guidance": {
+               "nodes": "Add nodes for specific blockchains used by DeFi (Ethereum, Solana, etc.). Include nodes for Oracles (Chainlink). Add nodes for risks (Smart Contract Risk, Regulatory Risk).",
+               "edges": "Connect specific protocols (`Uniswap`, `Aave`) to the blockchain node they run on. Link `Smart Contract` node to `Operational Risk` (Smart Contract Risk). Connect `DeFi` to `Regulatory Risk` node.",
+               "connections": "Link `Stablecoin` node to `CryptocurrencyMarkets`. Connect `Yield Farming` strategies to `Risk Management` concepts (high risk).",
+               "refinement": "Use specific relation types (`runs_on`, `enables_strategy`, `subject_to_risk_of`). Clearly map examples to categories."
+           }
+       }
+    },
+    "CryptocurrencyMarkets": {
+      "machine_readable": {
+        "nodes": [
+          {"id": "crypto_markets", "label": "Cryptocurrency Markets", "type": "Financial Market"},
+          {"id": "bitcoin", "label": "Bitcoin (BTC)", "type": "Cryptocurrency (Proof-of-Work)"},
+          {"id": "ethereum", "label": "Ethereum (ETH)", "type": "Cryptocurrency (Proof-of-Stake)"}, // Post-Merge
+          {"id": "altcoin", "label": "Altcoin", "type": "Cryptocurrency Category"},
+          {"id": "proof_of_work", "label": "Proof-of-Work (PoW)", "type": "Consensus Mechanism"},
+          {"id": "proof_of_stake", "label": "Proof-of-Stake (PoS)", "type": "Consensus Mechanism"},
+          {"id": "crypto_exchange", "label": "Cryptocurrency Exchange", "type": "Trading Venue"},
+          {"id": "coinbase", "label": "Coinbase", "type": "Crypto Exchange Example"},
+          {"id": "binance", "label": "Binance", "type": "Crypto Exchange Example"},
+          {"id": "crypto_wallet", "label": "Cryptocurrency Wallet", "type": "Storage Method"},
+          {"id": "hot_wallet", "label": "Hot Wallet", "type": "Wallet Type"},
+          {"id": "cold_wallet", "label": "Cold Wallet (Hardware Wallet)", "type": "Wallet Type"},
+          {"id": "mining", "label": "Cryptocurrency Mining", "type": "Process (PoW)"},
+          {"id": "staking", "label": "Cryptocurrency Staking", "type": "Process (PoS)"},
+          {"id": "halving", "label": "Bitcoin Halving", "type": "Supply Mechanism Event"}
+          // {"id": "blockchain", "label": "Blockchain", "type": "Core Technology"} // Already defined
+          // {"id": "cryptography", "label": "Cryptography", "type": "Core Technology"} // Add if needed, but broadly applicable
+        ],
+        "edges": [
+          {"source": "crypto_markets", "target": "bitcoin", "relation": "includes_asset"},
+          {"source": "crypto_markets", "target": "ethereum", "relation": "includes_asset"},
+          {"source": "crypto_markets", "target": "altcoin", "relation": "includes_category"},
+          {"source": "bitcoin", "target": "proof_of_work", "relation": "uses_consensus"},
+          {"source": "ethereum", "target": "proof_of_stake", "relation": "uses_consensus"}, // Post-Merge
+          {"source": "proof_of_work", "target": "mining", "relation": "involves"},
+          {"source": "proof_of_stake", "target": "staking", "relation": "involves"},
+          {"source": "crypto_markets", "target": "crypto_exchange", "relation": "traded_on"},
+          {"source": "crypto_exchange", "target": "coinbase", "relation": "example_is"},
+          {"source": "crypto_exchange", "target": "binance", "relation": "example_is"},
+          {"source": "bitcoin", "target": "crypto_wallet", "relation": "stored_in"}, // Apply to all cryptos
+          {"source": "crypto_wallet", "target": "hot_wallet", "relation": "has_type"},
+          {"source": "crypto_wallet", "target": "cold_wallet", "relation": "has_type"},
+          {"source": "bitcoin", "target": "halving", "relation": "subject_to"}
+        ]
+      },
+       "human_readable": {
+           "developer_guidance": {
+               "nodes": "Add specific Altcoin nodes (Solana, Cardano, etc.). Include nodes for NFTs, Metaverse concepts. Add nodes for regulatory bodies/actions impacting crypto.",
+               "edges": "Connect specific altcoin nodes to their respective blockchain/consensus mechanism. Link `NFT` node to `Blockchain` and potentially `Digital Art` or `Gaming` nodes. Connect `Crypto Markets` to `Regulatory Risk` node.",
+               "connections": "Link `Ethereum` node heavily to `DeFi` and `Smart Contract` nodes. Connect `Crypto Markets` volatility node to `Market Risk` concepts. Link `Mining` node to energy consumption / `Environmental Factors` node.",
+               "refinement": "Clearly define relationships between coins, tokens, and platforms. Ensure consensus mechanisms are accurately linked. Reflect the evolving regulatory landscape."
+           }
+       }
+    },
+    "SustainableInvesting": {
+      "machine_readable": {
+        "nodes": [
+          {"id": "sustainable_investing", "label": "Sustainable Investing", "type": "Investment Approach"},
+          {"id": "esg_criteria", "label": "ESG Criteria", "type": "Framework"},
+          {"id": "environmental_factors", "label": "Environmental Factors", "type": "ESG Pillar"},
+          {"id": "social_factors", "label": "Social Factors", "type": "ESG Pillar"},
+          {"id": "governance_factors", "label": "Governance Factors", "type": "ESG Pillar"},
+          {"id": "climate_change", "label": "Climate Change", "type": "Environmental Factor"},
+          {"id": "labor_practices", "label": "Labor Practices", "type": "Social Factor"},
+          {"id": "board_diversity", "label": "Board Diversity", "type": "Governance Factor"},
+          {"id": "esg_integration", "label": "ESG Integration", "type": "Sustainable Strategy"},
+          {"id": "sri_screening", "label": "Socially Responsible Investing (SRI) Screening", "type": "Sustainable Strategy"},
+          {"id": "negative_screening", "label": "Negative Screening", "type": "SRI Screening Type"},
+          {"id": "positive_screening", "label": "Positive Screening (Best-in-Class)", "type": "SRI Screening Type"},
+          {"id": "impact_investing", "label": "Impact Investing", "type": "Sustainable Strategy"},
+          {"id": "esg_rating_agency", "label": "ESG Rating Agency", "type": "Entity"},
+          {"id": "msci_esg", "label": "MSCI ESG", "type": "ESG Rating Agency Example"},
+          {"id": "sustainalytics", "label": "Sustainalytics", "type": "ESG Rating Agency Example"},
+          {"id": "sasb", "label": "SASB Standards", "type": "ESG Reporting Framework"},
+          {"id": "gri", "label": "GRI Standards", "type": "ESG Reporting Framework"},
+          {"id": "greenwashing", "label": "Greenwashing", "type": "Risk/Challenge"}
+        ],
+        "edges": [
+          {"source": "sustainable_investing", "target": "esg_criteria", "relation": "uses"},
+          {"source": "esg_criteria", "target": "environmental_factors", "relation": "includes"},
+          {"source": "esg_criteria", "target": "social_factors", "relation": "includes"},
+          {"source": "esg_criteria", "target": "governance_factors", "relation": "includes"},
+          {"source": "environmental_factors", "target": "climate_change", "relation": "includes"},
+          {"source": "social_factors", "target": "labor_practices", "relation": "includes"},
+          {"source": "governance_factors", "target": "board_diversity", "relation": "includes"},
+          {"source": "sustainable_investing", "target": "esg_integration", "relation": "implemented_via"},
+          {"source": "sustainable_investing", "target": "sri_screening", "relation": "implemented_via"},
+          {"source": "sustainable_investing", "target": "impact_investing", "relation": "implemented_via"},
+          {"source": "sri_screening", "target": "negative_screening", "relation": "includes_type"},
+          {"source": "sri_screening", "target": "positive_screening", "relation": "includes_type"},
+          {"source": "sustainable_investing", "target": "esg_rating_agency", "relation": "uses_data_from"},
+          {"source": "esg_rating_agency", "target": "msci_esg", "relation": "example_is"},
+          {"source": "esg_rating_agency", "target": "sustainalytics", "relation": "example_is"},
+          {"source": "sustainable_investing", "target": "sasb", "relation": "may_use_framework"},
+          {"source": "sustainable_investing", "target": "gri", "relation": "may_use_framework"},
+          {"source": "sustainable_investing", "target": "greenwashing", "relation": "challenged_by"}
+        ]
+      },
+       "human_readable": {
+           "developer_guidance": {
+               "nodes": "Add nodes for specific impact themes (Clean Energy, Affordable Housing). Include nodes for shareholder engagement/activism. Add nodes for regulations related to ESG disclosure (e.g., SFDR in EU).",
+               "edges": "Connect specific ESG factor nodes (e.g., `Climate Change`) to `ESG Risk` nodes in Risk Management module. Link `Impact Investing` node to specific impact measurement metrics/frameworks. Connect reporting framework nodes (`SASB`, `GRI`) to `Company Disclosure` nodes.",
+               "connections": "Link `Sustainable Investing` to `Portfolio Management` module (portfolio construction). Connect `ESG Rating Agency` node to potential data quality/bias nodes.",
+               "refinement": "Clearly differentiate between strategies (Integration, Screening, Impact). Ensure connection to financial materiality concepts where applicable."
+           }
+       }
+    }
+  },
+  "LLM_Optimization": {
+    "ContextWindows": {
+      "machine_readable": {
+        "nodes": [
+          {"id": "context_window", "label": "LLM Context Window", "type": "LLM Constraint"},
+          {"id": "token", "label": "Token", "type": "Text Unit"},
+          {"id": "tokenization", "label": "Tokenization", "type": "LLM Process"},
+          {"id": "attention_mechanism", "label": "Attention Mechanism", "type": "LLM Architecture Component"},
+          {"id": "transformer_model", "label": "Transformer Model", "type": "LLM Architecture"},
+          {"id": "context_length_limit", "label": "Context Length Limit", "type": "LLM Parameter"},
+          {"id": "sliding_window_attn", "label": "Sliding Window Attention", "type": "Context Extension Technique"},
+          {"id": "sparse_attention", "label": "Sparse Attention", "type": "Context Extension Technique"},
+          {"id": "context_retrieval", "label": "Context Retrieval", "type": "Information Management"} // Broader concept linked to RAG
+        ],
+        "edges": [
+          {"source": "context_window", "target": "token", "relation": "measured_in"},
+          {"source": "token", "target": "tokenization", "relation": "produced_by"},
+          {"source": "context_window", "target": "attention_mechanism", "relation": "processed_by"},
+          {"source": "attention_mechanism", "target": "transformer_model", "relation": "core_part_of"},
+          {"source": "context_window", "target": "context_length_limit", "relation": "limited_by"},
+          {"source": "context_length_limit", "target": "sliding_window_attn", "relation": "addressed_by"},
+          {"source": "context_length_limit", "target": "sparse_attention", "relation": "addressed_by"},
+          {"source": "context_length_limit", "target": "context_retrieval", "relation": "mitigated_by"} // Using retrieval to overcome limit
+        ]
+      },
+       "human_readable": {
+           "developer_guidance": {
+               "nodes": "Add nodes for specific tokenizers (BPE, WordPiece). Include nodes for attention variants (Multi-Head Attention). Add nodes for computational cost implications.",
+               "edges": "Connect `Tokenization` node to specific tokenizer nodes. Link `Attention Mechanism` node to `Computational Cost` node. Connect context extension technique nodes (`Sliding Window`) to their respective trade-offs (e.g., loss of global context).",
+               "connections": "Link `Context Window` node heavily to `Memory Management` module. Connect `Attention Mechanism` node to parallel processing concepts.",
+               "refinement": "Clearly define the constraint imposed by the context window. Use precise terms for techniques addressing the limitation."
+           }
+       }
+    },
+    "MemoryManagement": {
+      "machine_readable": {
+        "nodes": [
+          {"id": "llm_memory", "label": "LLM Memory", "type": "LLM Capability/Challenge"},
+          {"id": "short_term_memory", "label": "Short-Term Memory (Context Window)", "type": "Memory Type"},
+          {"id": "long_term_memory", "label": "Long-Term Memory (Parametric Knowledge)", "type": "Memory Type"},
+          {"id": "external_memory", "label": "External Memory", "type": "Memory Augmentation"},
+          {"id": "rag", "label": "Retrieval-Augmented Generation (RAG)", "type": "Memory Technique"},
+          {"id": "vector_database", "label": "Vector Database", "type": "Data Store (External Memory)"},
+          {"id": "knowledge_graph_kg", "label": "Knowledge Graph", "type": "Data Store (External Memory)"}, // Self-reference!
+          {"id": "embedding", "label": "Text Embedding", "type": "Representation Technique"},
+          {"id": "information_retrieval", "label": "Information Retrieval", "type": "Process"},
+          {"id": "memory_compression", "label": "Memory Compression", "type": "Optimization Technique"}
+        ],
+        "edges": [
+          {"source": "llm_memory", "target": "short_term_memory", "relation": "includes_type"},
+          {"source": "llm_memory", "target": "long_term_memory", "relation": "includes_type"},
+          {"source": "short_term_memory", "target": "context_window", "relation": "is_equivalent_to"},
+          {"source": "long_term_memory", "target": "model_parameters", "relation": "encoded_in"}, // Need model_parameters node
+          {"source": "llm_memory", "target": "external_memory", "relation": "augmented_by"},
+          {"source": "external_memory", "target": "rag", "relation": "enabled_by"},
+          {"source": "rag", "target": "information_retrieval", "relation": "performs"},
+          {"source": "rag", "target": "vector_database", "relation": "uses_storage"},
+          {"source": "rag", "target": "knowledge_graph_kg", "relation": "uses_storage"},
+          {"source": "information_retrieval", "target": "embedding", "relation": "uses"},
+          {"source": "vector_database", "target": "embedding", "relation": "stores"},
+          {"source": "llm_memory", "target": "memory_compression", "relation": "optimized_by"}
+        ]
+      },
+       "human_readable": {
+           "developer_guidance": {
+               "nodes": "Add nodes for specific embedding models (e.g., `Sentence-BERT`). Include nodes for different retrieval algorithms (e.g., `KNN`, `Approximate Nearest Neighbor`). Add nodes comparing parametric vs. non-parametric memory.",
+               "edges": "Connect `Embedding` node to specific model nodes. Link retrieval algorithm nodes to `Vector Database` node. Connect `RAG` node to `LLM Generation` process node.",
+               "connections": "Link `Knowledge Graph` node to structured data concepts. Connect memory limitations nodes to hallucination risk nodes.",
+               "refinement": "Clearly distinguish between implicit (parametric) and explicit (external) memory. Use accurate relationships for RAG components (`performs`, `uses_storage`)."
+           }
+       }
+    },
+    "ParameterTuning": {
+      "machine_readable": {
+        "nodes": [
+          {"id": "parameter_tuning", "label": "LLM Parameter Tuning", "type": "Optimization Process"},
+          {"id": "hyperparameter", "label": "Hyperparameter", "type": "Model Configuration"},
+          {"id": "learning_rate", "label": "Learning Rate", "type": "Hyperparameter"},
+          {"id": "batch_size", "label": "Batch Size", "type": "Hyperparameter"},
+          {"id": "num_epochs", "label": "Number of Epochs", "type": "Hyperparameter"},
+          {"id": "model_architecture_params", "label": "Model Architecture Parameters", "type": "Hyperparameter Category"}, // e.g., layers, heads
+          {"id": "regularization_params", "label": "Regularization Parameters", "type": "Hyperparameter Category"}, // e.g., dropout
+          {"id": "gradient_descent", "label": "Gradient Descent", "type": "Optimization Algorithm"},
+          {"id": "adam_optimizer", "label": "Adam Optimizer", "type": "Optimization Algorithm Variant"},
+          {"id": "grid_search", "label": "Grid Search", "type": "Hyperparameter Search Method"},
+          {"id": "random_search", "label": "Random Search", "type": "Hyperparameter Search Method"},
+          {"id": "bayesian_optimization", "label": "Bayesian Optimization", "type": "Hyperparameter Search Method"},
+          {"id": "fine_tuning", "label": "Fine-Tuning", "type": "Training Phase"},
+          {"id": "pre_training", "label": "Pre-Training", "type": "Training Phase"}
+        ],
+        "edges": [
+          {"source": "parameter_tuning", "target": "hyperparameter", "relation": "optimizes"},
+          {"source": "hyperparameter", "target": "learning_rate", "relation": "includes"},
+          {"source": "hyperparameter", "target": "batch_size", "relation": "includes"},
+          {"source": "hyperparameter", "target": "num_epochs", "relation": "includes"},
+          {"source": "hyperparameter", "target": "model_architecture_params", "relation": "includes_category"},
+          {"source": "hyperparameter", "target": "regularization_params", "relation": "includes_category"},
+          {"source": "parameter_tuning", "target": "grid_search", "relation": "uses_method"},
+          {"source": "parameter_tuning", "target": "random_search", "relation": "uses_method"},
+          {"source": "parameter_tuning", "target": "bayesian_optimization", "relation": "uses_method"},
+          {"source": "llm_training", "target": "gradient_descent", "relation": "uses_algorithm"}, // Need llm_training node
+          {"source": "gradient_descent", "target": "adam_optimizer", "relation": "variant_is"},
+          {"source": "gradient_descent", "target": "learning_rate", "relation": "uses_hyperparameter"},
+          {"source": "llm_training", "target": "pre_training", "relation": "includes_phase"},
+          {"source": "llm_training", "target": "fine_tuning", "relation": "includes_phase"},
+          {"source": "fine_tuning", "target": "parameter_tuning", "relation": "often_involves"}
+        ]
+      },
+       "human_readable": {
+           "developer_guidance": {
+               "nodes": "Add nodes for loss functions (Cross-Entropy). Include nodes for evaluation metrics (Perplexity, BLEU, Accuracy). Add nodes for concepts like Overfitting and Underfitting.",
+               "edges": "Connect `Gradient Descent` to `Loss Function` node using `minimizes`. Link `Parameter Tuning` methods (`Grid Search`, etc.) to `Evaluation Metric` nodes using `optimizes_for`. Connect tuning outcomes to `Overfitting`/`Underfitting` nodes.",
+               "connections": "Link `Parameter Tuning` to computational resource nodes (GPU, TPU). Connect `Fine-Tuning` node to specific downstream task nodes (e.g., `Sentiment Analysis`, `Summarization`).",
+               "refinement": "Clearly differentiate between model parameters (weights learned during training) and hyperparameters (set before training). Use precise relationships (`optimizes`, `uses_method`, `uses_hyperparameter`)."
+           }
+       }
+    }
+  }
+}
