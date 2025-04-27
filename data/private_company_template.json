@@ -1,0 +1,50 @@
+{
+"company_name": "[Company Name]",
+"lei": "[LEI or 'N/A']",
+"private_company_profile": {
+"incorporation_year": [Year],
+"ownership_type": "[public|private_equity_owned|family_owned|founder_led|partnership]",
+"revenue_band_usd": "[<10M|10M-50M|50M-100M|100M+]",
+"employee_count": [Integer],
+"reporting_quality": "[audited|unaudited|limited_review]",
+"key_financials_provided": ["[e.g., EBITDA]", "[Interest Coverage]", "[DSCR]"],
+"covenant_flags": {
+"maintenance": [true|false],
+"springing": [true|false],
+"disclosed_terms": [true|false]
+}
+},
+"calculated_metrics": {
+"debt_repayment_capacity": {
+"definition": "Projected FCF (Y1-3) / Total Debt",
+"value": [Float],
+"period_years": 3
+},
+"ev_total_debt": {
+"value": [Float],
+"date": "[YYYY-MM-DD]"
+}
+},
+"assessment": {
+"risk_band": "[AAA to C Equivalent or Not Rated]",
+"outlook": "[Stable|Positive|Negative]",
+"confidence_score": [0.0 to 1.0],
+"rationale": "[Text summary]",
+"probabilities": {
+"stable": [Float],
+"positive": [Float],
+"negative": [Float]
+},
+"decision_making_summary": "[Narrative summary for downstream use]"
+},
+"integration_points": {
+"action_hooks": ["[e.g., trigger_manual_financial_review]"],
+"semantic_kernel_notes": ["[e.g., Tag 'PrivateIssuerCreditMemory']"]
+},
+"module_origin": "[Module or Analyst System Name]",
+"version_info": {
+"iteration": "[e.g., beta_run_1]",
+"source_script": "[e.g., private_credit_pipeline.py]"
+},
+"timestamp": "[ISO8601 timestamp]"
+}
