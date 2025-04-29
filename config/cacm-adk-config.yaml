@@ -1,0 +1,68 @@
+# --- CACM Authoring & Development Kit (CACM-ADK) Configuration ---
+# Version: 1.0
+# Date: 2025-04-29
+
+# Core Agent/Interface Settings
+agent_settings:
+  agent_id: "CACM_Builder_Agent_v1"
+  interface_type: "Conversational_LLM" # Options: Conversational_LLM, IDE_Plugin, Web_UI
+  llm_provider: "VertexAI" # Options: VertexAI, Azure_OpenAI, OpenAI, Anthropic, etc.
+  llm_model: "gemini-1.5-pro-latest" # Specify model used for conversational interface & suggestions
+  api_key_env_var: "CACM_ADK_LLM_API_KEY" # Environment variable holding the API key
+  max_context_tokens: 8192
+  default_persona: "Expert Credit Analyst Assistant"
+
+# Ontology Configuration
+ontology_service:
+  type: "Remote" # Options: Remote, Local_File, Database
+  endpoint_uri: "https://ontology.yourcorp.com/credit_analysis/v2.1/" # URI for the ontology service/file
+  authentication: "API_Key" # Options: None, API_Key, OAuth
+  auth_key_env_var: "ONTOLOGY_SERVICE_API_KEY"
+  cache_duration_minutes: 60 # How long to cache ontology terms locally
+
+# Template Library Configuration
+template_library:
+  type: "Git_Repository" # Options: Git_Repository, Local_Directory, Database
+  repository_url: "https://git.yourcorp.com/cacm-templates.git"
+  branch: "main"
+  access_token_env_var: "GIT_ACCESS_TOKEN" # Optional, for private repos
+  local_sync_path: "/app/data/templates/"
+
+# Validation Service Configuration
+validation_service:
+  schema_endpoint: "https://validators.yourcorp.com/cacm/schema/v2.1/validate"
+  semantic_endpoint: "https://validators.yourcorp.com/cacm/semantic/v2.1/validate"
+  # Authentication might be needed here too
+
+# Compute Capability Catalog Access
+compute_catalog:
+  type: "API_Endpoint" # Options: API_Endpoint, Static_File
+  endpoint_uri: "https://infra.yourcorp.com/compute-capabilities/v1/catalog"
+  authentication: "Service_Account"
+  # Credentials loaded via environment or platform mechanism
+
+# Output & Storage Configuration
+default_output_format: "JSON-LD" # Options: JSON-LD, YAML
+cacm_registry:
+  type: "API_Endpoint" # Where new CACMs are registered/stored
+  endpoint_uri: "https://registry.yourcorp.com/cacm/v1/"
+  authentication: "OAuth"
+  # Credentials managed via agent identity
+
+# User Management (Conceptual)
+permissions_service:
+  endpoint_uri: "https://auth.yourcorp.com/permissions/check"
+  # Details on how user roles affect template access or validation workflows
+
+# Logging Configuration
+logging:
+  level: "INFO" # Options: DEBUG, INFO, WARN, ERROR
+  destination: "stdout" # Options: stdout, file, remote_syslog
+  log_file_path: "/app/logs/cacm-adk.log" # If destination is file
+  format: "json" # Options: json, text
+
+# Feature Flags (Conceptual)
+feature_flags:
+  enable_advanced_workflow_suggestions: true
+  enable_auto_documentation: false
+  use_beta_ontology_terms: false
