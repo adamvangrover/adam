@@ -1,0 +1,273 @@
+{
+  // ---------------------------------------------------------------------------
+  // JSON-LD Context Definition
+  // Defines vocabulary shortcuts and the base ontology URI.
+  // In a real scenario, this might be extensive or reference external contexts.
+  // ---------------------------------------------------------------------------
+  "@context": {
+    "cacm": "https://ontology.yourcorp.com/cacm/v1#", // Namespace for CACM specific terms
+    "credit": "https://ontology.yourcorp.com/credit_analysis/v2.1#", // Namespace for credit domain terms
+    "xsd": "http://www.w3.org/2001/XMLSchema#", // Standard XML Schema datatypes
+    "dcterms": "http://purl.org/dc/terms/", // Dublin Core terms for metadata
+
+    // --- Property Definitions (Shortcuts) ---
+    "version": "cacm:versionInfo",
+    "status": "cacm:status", // e.g., credit:Draft, credit:Active, credit:Deprecated
+    "label": "rdfs:label", // Human-readable name
+    "description": "dcterms:description",
+    "creator": "dcterms:creator",
+    "created": "dcterms:created",
+    "modified": "dcterms:modified",
+    "validFrom": "dcterms:valid",
+    "validUntil": "cacm:validUntil", // Custom term if needed
+    "ontologyUsed": "cacm:ontologyReference",
+
+    "semanticSignature": "cacm:semanticSignature",
+    "capabilityVerb": "credit:capabilityVerb", // e.g., credit:Assess, credit:Score
+    "primarySubject": "credit:primarySubject", // e.g., credit:CorporateCreditworthiness
+    "keyDimensions": "credit:keyDimension", // Reference to specific risk/performance dimensions
+
+    "inputSchema": "cacm:inputSchema",
+    "outputSchema": "cacm:outputSchema",
+    "requiredInput": "cacm:requiresInput",
+    "optionalInput": "cacm:optionalInput",
+    "producesOutput": "cacm:producesOutput",
+    "propertyName": "cacm:propertyName", // Semantic term for the input/output
+    "dataType": "cacm:dataType", // Link to xsd:string, xsd:decimal, or custom credit:FinancialStatement term
+    "constraints": "cacm:constraints",
+    "sourceHint": "cacm:sourceHint", // e.g., credit:SEC_EDGAR, credit:NewsAPI_VendorX
+
+    "parameters": "cacm:parameters",
+    "parameter": "cacm:parameter",
+    "parameterName": "cacm:parameterName", // Semantic term for the parameter
+    "parameterType": "cacm:parameterType", // xsd:string, xsd:decimal, xsd:boolean, credit:IndustryBenchmarkSet
+    "defaultValue": "cacm:defaultValue",
+    "allowedValues": "cacm:allowedValues", // For enums
+    "valueRange": "cacm:valueRange", // For numericals
+
+    "analysisWorkflow": "cacm:analysisWorkflow",
+    "steps": "cacm:steps",
+    "step": "cacm:step",
+    "stepId": "cacm:stepId",
+    "stepType": "cacm:stepType", // e.g., cacm:InvokeCompute, cacm:ConditionalBranch, cacm:MergeResults
+    "computeCapabilityRef": "cacm:computeCapabilityReference", // Reference to compute catalog capability
+    "inputMappings": "cacm:inputMappings", // Map CACM inputs/previous step outputs to capability inputs
+    "outputMappings": "cacm:outputMappings", // Map capability outputs to CACM outputs or next step inputs
+    "condition": "cacm:condition", // For conditional steps
+    "dependsOn": "cacm:dependsOn", // Prerequisite step IDs for graph execution
+
+    "validationRules": "cacm:validationRules",
+    "rule": "cacm:validationRule",
+    "ruleDescription": "dcterms:description",
+    "ruleLogic": "cacm:ruleLogic" // Could be formal expression or reference to a validation capability
+  },
+
+  // ---------------------------------------------------------------------------
+  // CACM Instance Definition
+  // ---------------------------------------------------------------------------
+  "@id": "cacm:instance:YourCompanyName_AnalysisType_v1.0.0", // Unique URI for this specific CACM definition/version
+  "@type": "cacm:CreditAnalysisCapabilityModule",
+
+  // --- Metadata ---
+  "label": "Preliminary Solvency Risk Assessment for Manufacturing Sector",
+  "version": "1.0.0",
+  "status": "credit:Draft", // Or credit:Active, credit:Deprecated
+  "description": "Calculates key solvency ratios and provides a preliminary risk flag for manufacturing companies based on annual filings.",
+  "creator": {
+    "@type": "credit:Analyst", // Or credit:Team, credit:Agent
+    "name": "Jane Doe",
+    "email": "jane.doe@yourcorp.com"
+  },
+  "created": { "@value": "2025-04-29T12:00:00Z", "@type": "xsd:dateTime" },
+  "modified": { "@value": "2025-04-29T14:30:00Z", "@type": "xsd:dateTime" },
+  "validFrom": { "@value": "2025-05-01", "@type": "xsd:date" },
+  // "validUntil": { "@value": "...", "@type": "xsd:date" }, // Optional expiration
+  "ontologyUsed": { "@id": "https://ontology.yourcorp.com/credit_analysis/v2.1/" },
+
+  // --- Semantic Signature ---
+  "semanticSignature": {
+    "@type": "cacm:SemanticSignature",
+    "capabilityVerb": { "@id": "credit:Assess" },
+    "primarySubject": { "@id": "credit:SolvencyRisk" },
+    "keyDimensions": [
+      { "@id": "credit:DebtToEquityRatio" },
+      { "@id": "credit:InterestCoverageRatio" },
+      { "@id": "credit:TotalDebtLoad" }
+      // ... other relevant semantic dimensions covered
+    ],
+    "targetSectorHint": { "@id": "credit:IndustrySectorManufacturing" } // Optional hint
+  },
+
+  // --- Input Schema ---
+  "inputSchema": {
+    "@type": "cacm:InputSchema",
+    "requiredInput": [
+      {
+        "@type": "cacm:InputSpecification",
+        "propertyName": { "@id": "credit:CompanyIdentifier" }, // e.g., Ticker, LEI
+        "dataType": { "@id": "xsd:string" },
+        "description": "Unique identifier for the target company."
+      },
+      {
+        "@type": "cacm:InputSpecification",
+        "propertyName": { "@id": "credit:FinancialStatementAnnual" }, // Could point to a complex type
+        "dataType": { "@id": "credit:StandardFinancialsObject" }, // Reference to a defined structure in ontology/schema
+        "description": "Most recent annual financial statements (Balance Sheet, Income Statement).",
+        "constraints": "Minimum 1 year required.",
+        "sourceHint": { "@id": "credit:SEC_EDGAR_10K" }
+      }
+      // ... other required inputs
+    ],
+    "optionalInput": [
+      {
+        "@type": "cacm:InputSpecification",
+        "propertyName": { "@id": "credit:PeerGroupIdentifier" },
+        "dataType": { "@id": "xsd:string" },
+        "description": "Identifier for a specific peer group to use for benchmarking (optional)."
+      }
+      // ... other optional inputs
+    ]
+  },
+
+  // --- Output Schema ---
+  "outputSchema": {
+    "@type": "cacm:OutputSchema",
+    "producesOutput": [
+      {
+        "@type": "cacm:OutputSpecification",
+        "propertyName": { "@id": "credit:CalculatedDebtToEquityRatio" },
+        "dataType": { "@id": "xsd:decimal" },
+        "description": "Calculated Debt-to-Equity ratio."
+      },
+      {
+        "@type": "cacm:OutputSpecification",
+        "propertyName": { "@id": "credit:CalculatedInterestCoverageRatio" },
+        "dataType": { "@id": "xsd:decimal" },
+        "description": "Calculated Interest Coverage Ratio (e.g., EBITDA/Interest)."
+      },
+      {
+        "@type": "cacm:OutputSpecification",
+        "propertyName": { "@id": "credit:SolvencyRiskFlag" },
+        "dataType": { "@id": "credit:RiskLevel" }, // e.g., credit:Low, credit:Medium, credit:High
+        "description": "Preliminary flag indicating solvency risk level based on calculated metrics and thresholds."
+      },
+      {
+        "@type": "cacm:OutputSpecification",
+        "propertyName": { "@id": "credit:AnalysisConfidence" },
+        "dataType": { "@id": "xsd:decimal" }, // e.g., 0.0 to 1.0
+        "description": "Confidence score based on data quality and model applicability."
+      },
+      {
+        "@type": "cacm:OutputSpecification",
+        "propertyName": { "@id": "credit:SupportingAnalysisNotes" },
+        "dataType": { "@id": "xsd:string" },
+        "description": "Generated notes explaining the rationale for the risk flag."
+      }
+      // ... other outputs
+    ]
+  },
+
+  // --- Parameters ---
+  "parameters": [
+    {
+      "@type": "cacm:ParameterSpecification",
+      "parameterName": { "@id": "credit:param:DebtToEquityThresholdHigh" },
+      "label": "High Debt-to-Equity Threshold",
+      "description": "The D/E ratio above which risk is considered high.",
+      "parameterType": { "@id": "xsd:decimal" },
+      "defaultValue": "2.5"
+    },
+    {
+      "@type": "cacm:ParameterSpecification",
+      "parameterName": { "@id": "credit:param:InterestCoverageThresholdLow" },
+      "label": "Low Interest Coverage Threshold",
+      "description": "The Interest Coverage ratio below which risk is considered high.",
+      "parameterType": { "@id": "xsd:decimal" },
+      "defaultValue": "3.0"
+    },
+    {
+      "@type": "cacm:ParameterSpecification",
+      "parameterName": { "@id": "credit:param:UsePeerBenchmarking" },
+      "label": "Use Peer Benchmarking",
+      "description": "Flag to enable comparison against optional peer group data.",
+      "parameterType": { "@id": "xsd:boolean" },
+      "defaultValue": "false"
+    }
+    // ... other parameters
+  ],
+
+  // --- Analysis Workflow (Example: Sequential) ---
+  "analysisWorkflow": {
+    "@type": "cacm:SequentialWorkflow", // Could also be cacm:GraphWorkflow
+    "steps": [
+      {
+        "@type": "cacm:WorkflowStep",
+        "stepId": "step1_calculate_ratios",
+        "label": "Calculate Solvency Ratios",
+        "stepType": { "@id": "cacm:InvokeCompute" },
+        "computeCapabilityRef": { "@id": "compute:CalculateStandardSolvencyRatios_v1" }, // Logical ref to infra capability
+        "inputMappings": [
+          { "source": "input:credit:FinancialStatementAnnual", "target": "capabilityInput:financials" },
+          { "source": "input:credit:CompanyIdentifier", "target": "capabilityInput:companyId" }
+        ],
+        "outputMappings": [
+          { "source": "capabilityOutput:debtEquityRatio", "target": "intermediate:debtEquityRatio_val" },
+          { "source": "capabilityOutput:interestCoverageRatio", "target": "intermediate:interestCoverageRatio_val" }
+        ]
+      },
+      {
+        "@type": "cacm:WorkflowStep",
+        "stepId": "step2_assess_risk",
+        "label": "Assess Risk Level",
+        "stepType": { "@id": "cacm:InvokeCompute" },
+        "computeCapabilityRef": { "@id": "compute:EvaluateThresholdBasedRisk_v2" },
+        "dependsOn": ["step1_calculate_ratios"], // Ensure step 1 completes first
+        "inputMappings": [
+          { "source": "intermediate:debtEquityRatio_val", "target": "capabilityInput:metricValue1" },
+          { "source": "intermediate:interestCoverageRatio_val", "target": "capabilityInput:metricValue2" },
+          { "source": "parameter:credit:param:DebtToEquityThresholdHigh", "target": "capabilityInput:threshold1_high" },
+          { "source": "parameter:credit:param:InterestCoverageThresholdLow", "target": "capabilityInput:threshold2_low" }
+          // ... potentially map peer group ID and benchmark flag if needed
+        ],
+        "outputMappings": [
+          { "source": "capabilityOutput:riskFlag", "target": "output:credit:SolvencyRiskFlag" },
+          { "source": "capabilityOutput:confidenceScore", "target": "output:credit:AnalysisConfidence" },
+          { "source": "capabilityOutput:explanationNotes", "target": "output:credit:SupportingAnalysisNotes" }
+        ]
+      },
+      // --- Example Conditional Step ---
+      {
+         "@type": "cacm:WorkflowStep",
+         "stepId": "step3_peer_compare_optional",
+         "label": "Perform Peer Comparison (Optional)",
+         "stepType": { "@id": "cacm:InvokeCompute" },
+         "condition": "parameter:credit:param:UsePeerBenchmarking == true && input:credit:PeerGroupIdentifier != null",
+         "computeCapabilityRef": { "@id": "compute:BenchmarkRatiosAgainstPeers_v1"},
+         "dependsOn": ["step1_calculate_ratios"],
+         "inputMappings": [
+            // map ratios and peer group ID...
+         ],
+         "outputMappings": [
+            // map benchmark results potentially into the notes or dedicated output fields...
+            { "source": "capabilityOutput:benchmarkNotes", "target": "output:credit:SupportingAnalysisNotes", "mode": "append"} // Append to existing notes
+         ]
+      }
+      // ... other steps (could be parallel if using cacm:GraphWorkflow)
+    ]
+  },
+
+  // --- Validation Rules (Optional) ---
+  "validationRules": [
+    {
+      "@type": "cacm:ValidationRule",
+      "ruleDescription": "Ensure financial statement date is within the last 18 months.",
+      "ruleLogic": "input:credit:FinancialStatementAnnual.statementDate >= (currentDate - P18M)" // Example logic expression
+    },
+    {
+      "@type": "cacm:ValidationRule",
+      "ruleDescription": "Confidence must be above 0.5 for High risk flag.",
+      "ruleLogic": "IF (output:credit:SolvencyRiskFlag == credit:High) THEN (output:credit:AnalysisConfidence >= 0.5)"
+    }
+    // ... other rules
+  ]
+}
