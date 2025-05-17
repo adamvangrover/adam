@@ -6,9 +6,9 @@ import os
 import importlib
 from pathlib import Path
 from collections import deque
-from typing import Dict, Optional
+from typing import Dict, Optional, List, Any
 
-import asyncio #expand asynchronous communication // example use asyncio.gather to run the process_query method for agents concurrently // example use asyncio.gather allow agents to work concurrently, potentially speeding up query processing
+import asyncio  # expand asynchronous communication
 import json
 
 from core.agents.agent_base import AgentBase
@@ -63,250 +63,231 @@ AGENT_CLASSES = {
 }
 
 
-
 class AgentOrchestrator:
     """
     Manages the creation, execution, and communication of agents.
+    This version incorporates MCP and A2A, and leverages Semantic Kernel.
     """
+
     def __init__(self):
         self.agents: Dict[str, AgentBase] = {}
         self.config = load_config("config/agents.yaml")
+        self.workflows = self.load_workflows()  # Load workflows
+        self.llm_plugin = LLMPlugin()
+        self.mcp_service_registry: Dict[
+            str, Dict[str, Any]
+        ] = {}  # MCP service registry
         if self.config is None:
-            logging.error("Failed to load agent configurations.")  # This will be caught by the init self-test
+            logging.error("Failed to load agent configurations.")
         else:
             self.load_agents()
+            self.establish_a2a_connections()
+            self.register_agent_skills()  # Register agent skills with MCP
 
 
     def load_agents(self):
         """Loads agents based on the configuration."""
+
         if not self.config:
             return
 
         for agent_name, agent_config in self.config.items():
-            if agent_name == "_defaults": #skip if defaults
+            if agent_name == "_defaults":  # skip if defaults
                 continue
             try:
                 agent_class = self._get_agent_class(agent_name)
-                self.agents[agent_name] = agent_class(agent_config)  # Pass config to agent
-                logging.info(f"Agent loaded: {agent_name}")
+                if agent_class:
+                    self.agents[agent_name] = agent_class(
+                        agent_config
+                    )  # Pass config to agent
+                    logging.info(f"Agent loaded: {agent_name}")
+                else:
+                    logging.warning(f"Agent class not found for: {agent_name}")
             except Exception as e:
                 logging.error(f"Failed to load agent {agent_name}: {e}")
 
     def _get_agent_class(self, agent_name: str):
         """Retrieves the agent class based on its name."""
-        agent_classes = {
-            "QueryUnderstandingAgent": QueryUnderstandingAgent,
-            "DataRetrievalAgent": DataRetrievalAgent,
-            "MarketSentimentAgent": MarketSentimentAgent,
-            "MacroeconomicAnalysisAgent": MacroeconomicAnalysisAgent,
-            "GeopoliticalRiskAgent": GeopoliticalRiskAgent,
-            "IndustrySpecialistAgent": IndustrySpecialistAgent,
-            "FundamentalAnalystAgent": FundamentalAnalystAgent,
-            "TechnicalAnalystAgent": TechnicalAnalystAgent,
-            "RiskAssessmentAgent": RiskAssessmentAgent,
-            "NewsletterLayoutSpecialistAgent": NewsletterLayoutSpecialistAgent,
-            "DataVerificationAgent": DataVerificationAgent,
-            "LexicaAgent": LexicaAgent,
-            "ArchiveManagerAgent": ArchiveManagerAgent,
-            "AgentForge": AgentForge,
-            "PromptTuner": PromptTuner,
-            "CodeAlchemist": CodeAlchemist,
-            "LinguaMaestro": LinguaMaestro,
-            "SenseWeaver": SenseWeaver,
-        }
-        return agent_classes.get(agent_name)
+
+        return AGENT_CLASSES.get(agent_name)
 
     def get_agent(self, agent_name: str) -> Optional[AgentBase]:
         """Retrieves an agent by name."""
+
         return self.agents.get(agent_name)
 
-    def execute_agent(self, agent_name: str, *args, **kwargs) -> Optional[str]:
-        """Executes an agent with the given arguments."""
+    def execute_agent(
+        self, agent_name: str, context: Dict[str, Any]
+    ) -> Optional[Any]:  # Changed return type to Any
+        """Executes an agent with the given context (MCP)."""
+
         agent = self.get_agent(agent_name)
         if agent:
             try:
-                return agent.execute(*args, **kwargs)
+                agent.set_context(context)  # Set the MCP context
+                return agent.execute(**context)  # Pass context as kwargs
             except Exception as e:
                 logging.exception(f"Error executing agent {agent_name}: {e}")
-                return None
+                return None  # Or raise, depending on error handling policy
         else:
             logging.error(f"Agent not found: {agent_name}")
             return None
 
-    def execute_workflow(self, workflow_name: str, **kwargs):
+    async def execute_workflow(
+        self, workflow_name: str, initial_context: Dict[str, Any]
+    ) -> Optional[Dict[str, Any]]:
         """
-        Executes a predefined workflow.  (Placeholder for now)
-        Workflows would be defined in config/workflows.yaml.
+        Executes a workflow defined in config/workflows.yaml, handling
+        agent dependencies, A2A communication, and MCP skill discovery.
         """
-        # TODO: Implement workflow execution logic.
-        logging.warning(f"Workflow execution not yet implemented for: {workflow_name}")
-        return None
 
-
-class BaseAgentOrchestrator:
-    """
-    Base class for managing agents and executing workflows.
-    """
-
-    def __init__(self, config_path="config/agents.yaml"):
-        self.agents = {}
-        self.config_path = Path(config_path)  # Use Path for file operations
-        self.llm_plugin = LLMPlugin()  # Initialize LLM Plugin
-        self.load_agents()
-
-    def load_agents(self):
-        """Loads agent configurations from a YAML file."""
-        try:
-            if not self.config_path.exists():
-                logging.error(f"Agents configuration file not found: {self.config_path}")
-                return
-
-            with self.config_path.open("r") as f:
-                agent_configs = yaml.safe_load(f)
-
-            for agent_name, config in agent_configs.items():
-                self.register_agent(agent_name, self.create_agent(agent_name, config))
-
-        except yaml.YAMLError as e:
-            logging.error(f"Error parsing agents.yaml: {e}")
-        except Exception as e:
-            logging.error(f"Unexpected error while loading agents: {e}")
-
-    def create_agent(self, agent_name, config):
-        """Creates an agent instance based on its name and configuration."""
-        try:
-            module_name = AGENT_CLASSES.get(agent_name)
-            if not module_name:
-                logging.warning(f"Agent '{agent_name}' not found in AGENT_CLASSES. Ensure it is registered.")
-                return None
-
-            module = importlib.import_module(module_name)
-            agent_class = getattr(module, agent_name, None)
-
-            if not agent_class:
-                logging.error(f"Agent class '{agent_name}' not found in module '{module_name}'.")
-                return None
-
-            return agent_class(config)  # Instantiate the agent with its config
-
-        except (ImportError, AttributeError) as e:
-            logging.error(f"Could not load agent '{agent_name}': {e}")
-            return None
-        except Exception as e:  # Catch any other initialization errors
-             logging.error(f"Error initializing agent '{agent_name}': {e}")
-             return None
-
-    def register_agent(self, agent_name, agent):
-        """Registers an agent."""
-        if agent:
-            self.agents[agent_name] = agent
-            logging.info(f"Agent '{agent_name}' registered successfully.")
-        else:
-            logging.warning(f"Failed to register agent '{agent_name}'.")
-
-    def get_agent(self, agent_name):
-        """Retrieves a registered agent by name."""
-        return self.agents.get(agent_name)
-
-    def execute_agent(self, agent_name, *args, **kwargs):
-        """Executes a registered agent."""
-        agent = self.get_agent(agent_name)
-        if agent:
-            try:
-                return agent.execute(*args, **kwargs)  # Assuming all agents have an execute method
-            except Exception as e:
-                logging.error(f"Error executing agent '{agent_name}': {e}")
-                return None  # Consistent error handling
-        else:
-            logging.error(f"Agent '{agent_name}' not found.")
+        workflow = self.workflows.get(workflow_name)
+        if not workflow:
+            logging.error(f"Unknown workflow: {workflow_name}")
             return None
 
+        results: Dict[str, Any] = {}
+        execution_queue: deque[str] = deque(workflow["agents"])
+        completed_agents: set[str] = set()
 
-class SimpleAgentOrchestrator(BaseAgentOrchestrator):
-    """
-    Lightweight orchestrator for constrained environments.
-    """
+        while execution_queue:
+            agent_name: str = execution_queue.popleft()
+            dependencies: List[str] = workflow["dependencies"].get(agent_name, [])
 
-    def __init__(self, config_path="config/agents.yaml"):
-        logging.info("Running in lightweight mode (SimpleAgentOrchestrator).")
-        super().__init__(config_path)
+            if all(dep in completed_agents for dep in dependencies):
+                try:
+                    agent: Optional[AgentBase] = self.get_agent(agent_name)
+                    if not agent:
+                        logging.error(
+                            f"Agent '{agent_name}' not found for workflow '{workflow_name}'"
+                        )
+                        return None
 
+                    # Prepare the context for the agent
+                    agent_context: Dict[str, Any] = self.prepare_agent_context(
+                        agent_name, initial_context, results
+                    )
 
-class AdvancedAgentOrchestrator(BaseAgentOrchestrator):
-    """
-    Full-featured orchestrator with workflows and dependencies.
-    """
+                    # Execute the agent and store the result
+                    result: Any = await agent.execute(**agent_context)  # Await agent execution
+                    results[agent_name] = result
 
-    def __init__(self, config_path="config/agents.yaml"):
-        logging.info("Running in full mode (AdvancedAgentOrchestrator).")
-        super().__init__(config_path)
-        self.workflows = self.load_workflows()
+                    # Handle A2A communication (if any)
+                    await self.handle_a2a_communication(
+                        agent, agent_name, workflow_name, results, initial_context
+                    )
 
-    def load_workflows(self):
-        """Loads workflows from a YAML file."""
-        workflows_path = Path("config/workflows.yaml")  # Use Path
+                except Exception as e:
+                    logging.error(
+                        f"Error executing '{agent_name}' in workflow '{workflow_name}': {e}"
+                    )
+                    return None
+
+            else:
+                execution_queue.append(agent_name)  # Re-queue if dependencies not met
+
+            # Prevent infinite loops
+            if agent_name == execution_queue[0] and len(execution_queue) > 1:
+                unmet_dependencies: List[str] = [
+                    dep for dep in dependencies if dep not in completed_agents
+                ]
+                logging.error(
+                    f"Workflow '{workflow_name}' stuck. Agent '{agent_name}' cannot execute due to unmet dependencies: {unmet_dependencies}"
+                )
+                return None
+
+        return results  # Return the collected results
+
+    def prepare_agent_context(
+        self, agent_name: str, initial_context: Dict[str, Any], results: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Prepares the context for an agent before execution.
+        This may involve selecting data from the initial context, results
+        from previous agents, or data from Semantic Kernel.
+        """
+
+        context: Dict[str, Any] = {}
+        context.update(initial_context)
+        context.update(results)
+
+        # Example: Integrate Semantic Kernel memory
+        # if agent_name == "DataRetrievalAgent":
+        #     context["semantic_memory"] = self.llm_plugin.get_relevant_memory(initial_context["user_query"])
+
+        return context
+
+    async def handle_a2a_communication(
+        self,
+        agent: AgentBase,
+        agent_name: str,
+        workflow_name: str,
+        results: Dict[str, Any],
+        initial_context: Dict[str, Any],
+    ) -> None:
+        """
+        Handles Agent-to-Agent (A2A) communication during workflow execution.
+        This version incorporates more sophisticated A2A logic, including skill-based
+        routing and asynchronous message handling.
+        """
+
+        # Example: QueryUnderstandingAgent delegates to DataRetrievalAgent
+        if agent_name == "QueryUnderstandingAgent" and "user_query" in initial_context:
+            user_query: str = initial_context["user_query"]
+            if "data" in user_query:
+                data_retrieval_agent: Optional[AgentBase] = self.get_agent(
+                    "DataRetrievalAgent"
+                )
+                if data_retrieval_agent:
+                    # Prepare A2A message
+                    a2a_message: Dict[str, Any] = {"query": user_query}
+                    # Send A2A message and await response
+                    data: Any = await agent.send_message(
+                        "DataRetrievalAgent", a2a_message
+                    )  # Use send_message
+                    results["DataRetrievalAgent"] = data
+                else:
+                    logging.warning(
+                        f"DataRetrievalAgent not available for A2A in workflow '{workflow_name}'"
+                    )
+
+        # Add more sophisticated A2A logic here based on your workflow needs
+        # For example, agents might need to exchange intermediate results,
+        # request specific information from each other, or negotiate parameters.
+
+        # Placeholder for asynchronous A2A communication
+        # Example: Using asyncio.gather to handle multiple A2A messages concurrently
+        # a2a_tasks: List[asyncio.Task[Any]] = []
+        # for target_agent, message in a2a_messages:
+        #    a2a_tasks.append(asyncio.create_task(agent.send_message(target_agent, message)))
+        # await asyncio.gather(*a2a_tasks)
+
+        pass
+
+    def load_workflows(self) -> Dict[str, Any]:
+        """Loads workflows from config/workflows.yaml."""
+
+        workflows_path: Path = Path("config/workflows.yaml")
         try:
             if workflows_path.exists():
                 with workflows_path.open("r") as f:
                     return yaml.safe_load(f)
             else:
-                logging.warning("Workflows configuration file (config/workflows.yaml) not found.  Workflows will not be available.")
-                return {}  # Return empty dict if not found
+                logging.warning(
+                    "Workflows configuration file (config/workflows.yaml) not found.  Workflows will not be available."
+                )
+                return {}
         except yaml.YAMLError as e:
             logging.error(f"Error parsing workflows.yaml: {e}")
-            return {} # Return empty dict on parsing error
+            return {}
         except Exception as e:
             logging.error(f"Unexpected error loading workflows: {e}")
             return {}
 
-    def execute_workflow(self, workflow_name, **kwargs):
-        """
-        Executes a predefined workflow, handling dependencies.
-        Uses a queue to manage agent execution order.
-        """
-        workflow = self.workflows.get(workflow_name)
-        if not workflow:
-            logging.error(f"Unknown workflow: {workflow_name}")
-            return None  # Consistent error return
-
-        results = {}  # Store results from each agent
-        execution_queue = deque(workflow["agents"])  # Use a deque for efficient queue operations
-        completed_agents = set()
-
-        while execution_queue:
-            agent_name = execution_queue.popleft()  # Get the next agent from the queue
-            dependencies = workflow["dependencies"].get(agent_name, [])
-
-            if all(dep in completed_agents for dep in dependencies):
-                # All dependencies are met, execute the agent
-                try:
-                    result = self.execute_agent(agent_name, **kwargs)
-                    results[agent_name] = result  # Store the result
-                    completed_agents.add(agent_name)
-                except Exception as e:
-                    logging.error(f"Error executing '{agent_name}' in workflow '{workflow_name}': {e}")
-                    # Consider whether to halt the entire workflow or continue
-                    return None  # Or raise, or continue with a partial result
-
-            else:
-                # Dependencies not met, re-add the agent to the end of the queue
-                execution_queue.append(agent_name)
-
-                # Prevent infinite loops due to unmet dependencies.  Check if we've
-                # gone through the entire queue without executing any agents.
-                if agent_name == execution_queue[0] and len(execution_queue) > 1 :
-                   unmet_dependencies = [dep for dep in dependencies if dep not in completed_agents]
-                   logging.error(f"Workflow '{workflow_name}' stuck. Agent '{agent_name}' cannot execute due to unmet dependencies: {unmet_dependencies}")
-                   return None # Exit the workflow
-
-        return results  # Return the collected results
-
-
-
-    def run_analysis(self, analysis_type, **kwargs):
+    def run_analysis(self, analysis_type: str, **kwargs: Any) -> Dict[str, Any]:
         """Runs specific analysis tasks using agents."""
-        # This could also be loaded from a config file for greater flexibility
-        analysis_agents = {
+
+        analysis_agents: Dict[str, str] = {
             "market_sentiment": "MarketSentimentAgent",
             "macroeconomic": "MacroeconomicAnalysisAgent",
             "geopolitical_risk": "GeopoliticalRiskAgent",
@@ -316,28 +297,31 @@ class AdvancedAgentOrchestrator(BaseAgentOrchestrator):
             "risk_assessment": "RiskAssessmentAgent",
         }
 
-        agent_name = analysis_agents.get(analysis_type)
+        agent_name: Optional[str] = analysis_agents.get(analysis_type)
         if not agent_name:
-            return {"error": "Invalid analysis type."}  # Consistent error structure
+            return {"error": "Invalid analysis type."}
 
-        return self.execute_agent(agent_name, **kwargs)
+        return self.execute_agent(agent_name, context=kwargs)  # Pass kwargs as context
 
-
-    def add_agent(self, agent_name, agent_type, **kwargs):
+    def add_agent(
+        self, agent_name: str, agent_type: str, agent_config: Dict[str, Any]
+    ) -> None:
         """Dynamically adds and configures a new agent."""
-        agent_config = kwargs # The kwargs *are* the config
-        agent = self.create_agent(agent_type, agent_config) # Use create_agent
+
+        agent: Optional[AgentBase] = self.create_agent(
+            agent_type, agent_config
+        )  # Use create_agent
         if agent:
             self.register_agent(agent_name, agent)
             logging.info(f"Added and configured new agent: {agent_name}")
+            self.register_agent_skills()  # Update MCP registry
         # else: logging.warning handled in register_agent
 
-
-    def update_agent_prompt(self, agent_name, new_prompt: str):
+    def update_agent_prompt(self, agent_name: str, new_prompt: str) -> None:
         """Updates the prompt template of an agent that supports it."""
-        agent = self.get_agent(agent_name)
+
+        agent: Optional[AgentBase] = self.get_agent(agent_name)
         if agent and hasattr(agent, "prompt_template"):
-            # Agents that support dynamic prompts should have a prompt_template attribute.
             agent.prompt_template = new_prompt
             logging.info(f"Updated prompt for agent: {agent_name}")
         else:
@@ -345,44 +329,113 @@ class AdvancedAgentOrchestrator(BaseAgentOrchestrator):
                 f"Agent '{agent_name}' either does not exist or does not support prompt updates."
             )
 
+    def establish_a2a_connections(self) -> None:
+        """Establishes Agent-to-Agent (A2A) connections based on config."""
 
-def get_orchestrator():
+        for agent_name, agent in self.agents.items():
+            if hasattr(agent, "peer_agents") and isinstance(
+                agent.peer_agents, list
+            ):  # Check if peer_agents is defined and is a list
+                for peer_agent_name in agent.peer_agents:
+                    peer_agent: Optional[AgentBase] = self.get_agent(
+                        peer_agent_name
+                    )
+                    if peer_agent:
+                        agent.add_peer_agent(peer_agent)
+                        logging.info(
+                            f"Established A2A connection: {agent_name} <-> {peer_agent_name}"
+                        )
+                    else:
+                        logging.warning(
+                            f"Peer agent '{peer_agent_name}' not found for A2A connection with '{agent_name}'"
+                        )
+
+    def register_agent_skills(self) -> None:
+        """Registers agent skills in the MCP service registry."""
+
+        self.mcp_service_registry.clear()  # Refresh the registry
+        for agent_name, agent in self.agents.items():
+            self.mcp_service_registry[agent_name] = agent.get_skill_schema()
+            logging.info(f"Registered skills for agent: {agent_name}")
+
+    def discover_agent_skills(self, skill_name: str) -> List[str]:
+        """Discovers agents that provide a specific skill (MCP)."""
+
+        providers: List[str] = [
+            agent_name
+            for agent_name, schema in self.mcp_service_registry.items()
+            if any(skill["name"] == skill_name for skill in schema["skills"])
+        ]
+        return providers
+
+    def route_a2a_message(
+        self, target_agent_name: str, message: Dict[str, Any]
+    ) -> Optional[Any]:
+        """Routes an A2A message to the appropriate agent."""
+
+        target_agent: Optional[AgentBase] = self.get_agent(target_agent_name)
+        if target_agent:
+            try:
+                return target_agent.receive_message(
+                    message["sender"], message
+                )  # Assuming message contains sender info
+            except Exception as e:
+                logging.error(
+                    f"Error routing A2A message to agent '{target_agent_name}': {e}"
+                )
+                return None
+        else:
+            logging.error(f"Target agent '{target_agent_name}' not found for A2A message.")
+            return None
+
+
+def get_orchestrator() -> AgentOrchestrator:
     """Auto-detects runtime and selects the appropriate orchestrator."""
-    limited_runtime = os.getenv("LIMITED_RUNTIME", "false").lower() == "true"
-    return SimpleAgentOrchestrator() if limited_runtime else AdvancedAgentOrchestrator()
+
+    limited_runtime: bool = os.getenv("LIMITED_RUNTIME", "false").lower() == "true"
+    # return SimpleAgentOrchestrator() if limited_runtime else AdvancedAgentOrchestrator()
+    return AgentOrchestrator()  # Always use the advanced orchestrator for now
 
 
 if __name__ == "__main__":
-    orchestrator = get_orchestrator()
+    orchestrator: AgentOrchestrator = get_orchestrator()
 
     # Create dummy config files for testing purposes
-    dummy_agent_config = {
+    dummy_agent_config: Dict[str, Any] = {
         "MarketSentimentAgent": {},
-        "QueryUnderstandingAgent":{}
+        "QueryUnderstandingAgent": {},
+        "DataRetrievalAgent": {},  # Add DataRetrievalAgent to the dummy config
     }
     with open("config/agents.yaml", "w") as f:
         yaml.dump(dummy_agent_config, f)
-    dummy_workflow_config = {
+    dummy_workflow_config: Dict[str, Any] = {
         "test_workflow": {
-            "agents": ["MarketSentimentAgent", "QueryUnderstandingAgent"],
-            "dependencies": {}
+            "agents": ["QueryUnderstandingAgent", "DataRetrievalAgent"],  # Define the workflow
+            "dependencies": {},
         }
     }
-    with open("config/workflows.yaml", 'w') as f:
+    with open("config/workflows.yaml", "w") as f:
         yaml.dump(dummy_workflow_config, f)
 
     # Test basic agent execution
-    orchestrator.execute_agent("MarketSentimentAgent")
+    orchestrator.execute_agent("MarketSentimentAgent", context={})
 
-    # Test workflow execution (if AdvancedAgentOrchestrator)
-    if isinstance(orchestrator, AdvancedAgentOrchestrator):
-        results = orchestrator.execute_workflow("test_workflow")
+    # Test workflow execution
+    results: Optional[Dict[str, Any]] = None
+    if isinstance(orchestrator, AgentOrchestrator):
+        results = asyncio.run(
+            orchestrator.execute_workflow(
+                "test_workflow", initial_context={"user_query": "get data"}
+            )
+        )
         print(results)
 
     # --- Example of adding a new agent dynamically ---
-    if isinstance(orchestrator, AdvancedAgentOrchestrator):
-        orchestrator.add_agent("MyNewAgent", "MarketSentimentAgent", some_param="value")
-        orchestrator.execute_agent("MyNewAgent")
+    if isinstance(orchestrator, AgentOrchestrator):
+        orchestrator.add_agent(
+            "MyNewAgent", "MarketSentimentAgent", agent_config={"some_param": "value"}
+        )
+        orchestrator.execute_agent("MyNewAgent", context={})
 
     # cleanup files
     os.remove("config/agents.yaml")
