@@ -1,221 +1,311 @@
-#core/agents/agent_forge.py
-
+# core/agents/agent_forge.py
+import logging
 import os
+from typing import Any, Dict, List, Optional
+from pathlib import Path
 import importlib
-import git
-from langchain.agents import AgentExecutor, Tool, ZeroShotAgent
-from langchain.prompts import PromptTemplate
-from core.utils.data_utils import send_message, receive_messages
+import yaml
 
-# ... (import other necessary libraries)
+from core.agents.agent_base import AgentBase
+from core.utils.config_utils import load_config, save_config
 
-class AgentForge:
-    def __init__(self, config, orchestrator):
-        self.agent_templates = config.get('agent_templates', {})
-        self.output_dir = config.get('output_dir', 'core/agents')
-        self.orchestrator = orchestrator  # Reference to the AgentOrchestrator
-        self.repo_path = config.get('repo_path', '.')  # Path to the Git repository
-        self.repo = git.Repo(self.repo_path)
 
-    def create_agent(self, agent_type, agent_name, **kwargs):
+class AgentForge(AgentBase):
+    """
+    The AgentForge is responsible for the dynamic creation of new agents.
+    It uses templates and configuration to generate agent code and add them
+    to the system at runtime. This version incorporates advanced features
+    like skill schema generation and A2A wiring.
+    """
+
+    def __init__(self, config: Dict[str, Any]):
+        super().__init__(config)
+        self.template_dir = Path(self.config.get("template_dir", "core/agents/templates"))
+        self.agent_config_path = Path("config/agents.yaml")
+        self.workflows_config_path = Path("config/workflows.yaml")
+        self.agent_classes = self.load_agent_classes()
+
+        logging.info(f"AgentForge initialized with template dir: {self.template_dir}")
+
+    def load_agent_classes(self) -> Dict[str, str]:
         """
-        Creates or modifies an agent based on the specified type and parameters.
+        Loads the available agent classes for extension.
+        This could be read from a config file or dynamically discovered.
+        For simplicity, it's hardcoded here.
         """
-        try:
-            if agent_type in self.agent_templates:
-                template = self.agent_templates[agent_type]
-                # Generate agent code based on template and parameters
-                agent_code = self.generate_agent_code(template, agent_name, **kwargs)
+        return {
+            "MarketSentimentAgent": "core.agents.market_sentiment_agent",
+            "MacroeconomicAnalysisAgent": "core.agents.macroeconomic_analysis_agent",
+            "GeopoliticalRiskAgent": "core.agents.geopolitical_risk_agent",
+            "IndustrySpecialistAgent": "core.agents.industry_specialist_agent",
+            "FundamentalAnalystAgent": "core.agents.fundamental_analyst_agent",
+            "TechnicalAnalystAgent": "core.agents.technical_analyst_agent",
+            "RiskAssessmentAgent": "core.agents.risk_assessment_agent",
+            "NewsletterLayoutSpecialistAgent": "core.agents.newsletter_layout_specialist_agent",
+            "DataVerificationAgent": "core.agents.data_verification_agent",
+            "LexicaAgent": "core.agents.lexica_agent",
+            "ArchiveManagerAgent": "core.agents.archive_manager_agent",
+            "AgentForge": "core.agents.agent_forge",
+            "PromptTuner": "core.agents.prompt_tuner",
+            "CodeAlchemist": "core.agents.code_alchemist",
+            "LinguaMaestro": "core.agents.lingua_maestro",
+            "SenseWeaver": "core.agents.sense_weaver",
+            "QueryUnderstandingAgent": "core.agents.query_understanding_agent",
+            "DataRetrievalAgent": "core.agents.data_retrieval_agent",
+            "ResultAggregationAgent": "core.agents.result_aggregation_agent",
+        }
 
-                # Check if agent already exists
-                agent_file_path = os.path.join(self.output_dir, f"{agent_name}.py")
-                if os.path.exists(agent_file_path):
-                    # Modify existing agent code (implement modification logic)
-                    modified_agent_code = self.modify_agent_code(agent_file_path, agent_code)
-                    if modified_agent_code:
-                        agent_code = modified_agent_code
-                    else:
-                        print(f"Agent modification failed for {agent_name}")
-                        return False
-
-                # Save agent code to file
-                self.save_agent_code(agent_name, agent_code)
-
-                # Import and initialize the new agent
-                new_agent = self.initialize_agent(agent_name, **kwargs)
-
-                # Test the new or modified agent
-                if not self.test_agent(new_agent):
-                    print(f"Agent testing failed for {agent_name}")
-                    # Rollback changes (implement rollback logic)
-                    self.rollback_changes(agent_file_path)
-                    return False
-
-                # Commit changes to Git repository
-                self.commit_changes(agent_file_path, f"Created or modified agent: {agent_name}")
-
-                # Inform orchestrator about the new agent
-                self.orchestrator.add_agent(agent_name, agent_type, **kwargs)
-                return True
-            else:
-                print(f"Agent template not found for type: {agent_type}")
-                return False
-        except Exception as e:
-            print(f"Error creating agent: {e}")
-            return False
-
-    def generate_agent_code(self, template, agent_name, **kwargs):
+    async def execute(self, action: str, **kwargs: Dict[str, Any]) -> Optional[str]:
         """
-        Generates Python code for the new agent based on the template and parameters.
+        Executes an agent creation action.
         """
-        # ... (Implementation for generating agent code)
-        # This could involve using string formatting or template engines like Jinja2
-        # to replace placeholders in the template with the provided parameters.
-        pass  # Placeholder for actual implementation
 
-    def save_agent_code(self, agent_name, agent_code):
-        """
-        Saves the generated agent code to a Python file.
-        """
-        try:
-            file_path = os.path.join(self.output_dir, f"{agent_name}.py")
-            with open(file_path, "w") as f:
-                f.write(agent_code)
-            print(f"Agent code saved to: {file_path}")
-        except Exception as e:
-            print(f"Error saving agent code: {e}")
-
-    def initialize_agent(self, agent_name, **kwargs):
-        """
-        Imports and initializes the newly created agent.
-        """
-        try:
-            # Import the agent module dynamically
-            module_name = f"core.agents.{agent_name}"
-            module = importlib.import_module(module_name)
-            # Get the agent class from the module
-            agent_class = getattr(module, agent_name.capitalize())  # Assuming class name is capitalized
-            # Instantiate the agent with provided parameters
-            agent_instance = agent_class(**kwargs)
-            return agent_instance
-        except Exception as e:
-            print(f"Error initializing agent: {e}")
+        if action == "create_agent":
+            return await self.create_agent(
+                kwargs.get("agent_name"),
+                kwargs.get("agent_type"),
+                kwargs.get("agent_description"),
+                kwargs.get("agent_skills"),
+                kwargs.get("agent_dependencies"),
+                kwargs.get("agent_a2a_peers"),
+            )
+        elif action == "list_templates":
+            return self.list_templates()
+        elif action == "get_template":
+            return self.get_template(kwargs.get("template_name"))
+        else:
+            logging.warning(f"AgentForge: Unknown action: {action}")
             return None
 
-    def modify_agent_code(self, agent_file_path, new_agent_code):
+    def list_templates(self) -> List[str]:
         """
-        Modifies the code of an existing agent.
+        Lists available agent templates.
         """
-        try:
-            with open(agent_file_path, "r") as f:
-                existing_code = f.read()
+        return [f.stem for f in self.template_dir.glob("*.py")]
 
-            # Implement logic to merge or replace existing code with new code
-            # This could involve using AST parsing, regular expressions, or other
-            # techniques to identify and modify specific sections of the code.
-            # ...
-
-            # Example: Simple replacement of the entire agent code
-            modified_code = new_agent_code
-
-            with open(agent_file_path, "w") as f:
-                f.write(modified_code)
-            print(f"Agent code modified at: {agent_file_path}")
-            return modified_code
-        except Exception as e:
-            print(f"Error modifying agent code: {e}")
+    def get_template(self, template_name: str) -> Optional[str]:
+        """
+        Retrieves the content of a specific agent template.
+        """
+        template_path = self.template_dir / f"{template_name}.py"
+        if template_path.exists():
+            return template_path.read_text()
+        else:
+            logging.warning(f"AgentForge: Template not found: {template_name}")
             return None
 
-    def test_agent(self, agent):
+    async def create_agent(
+        self,
+        agent_name: str,
+        agent_type: str,
+        agent_description: str,
+        agent_skills: List[Dict[str, Any]],
+        agent_dependencies: List[str],
+        agent_a2a_peers: List[str],
+    ) -> Optional[str]:
         """
-        Tests the functionality of the agent.
+        Creates a new agent.
         """
+
         try:
-            # Implement agent testing logic here
-            # This could involve running unit tests, integration tests, or other
-            # testing methods to validate the agent's behavior and performance.
-            # ...
+            # 1. Select Template
+            template_name = self.config.get("default_template", "basic_agent")  # Default template
+            template = self.get_template(template_name)
+            if not template:
+                raise ValueError(f"Agent template '{template_name}' not found.")
 
-            # Example: Simple test to check if the agent responds to a message
-            response = agent.respond("Test message")
-            if response:
-                print("Agent testing successful")
-                return True
-            else:
-                print("Agent testing failed")
-                return False
+            # 2. Customize Template
+            customized_code = self.customize_template(
+                template, agent_name, agent_description, agent_skills, agent_a2a_peers
+            )
+
+            # 3. Validate & Optimize (Placeholder - CodeAlchemist agent?)
+            validated_code = await self.validate_and_optimize_code(customized_code)
+            if not validated_code:
+                raise ValueError("Generated code is invalid.")
+
+            # 4. Save Agent Code
+            agent_filename = f"{agent_name.lower()}.py"
+            agent_path = Path("core/agents") / agent_filename
+            self.save_agent_code(validated_code, agent_path)
+
+            # 5. Update Configurations
+            self.update_agent_config(agent_name, agent_type, agent_description, agent_dependencies, agent_a2a_peers)
+            self.update_workflows_config(agent_name, agent_dependencies)
+
+            # 6. Agent Initialization (Orchestrator handles this)
+            # Orchestrator will reload agents or dynamically import the new agent
+
+            return f"Agent '{agent_name}' created successfully in '{agent_path}'."
+
         except Exception as e:
-            print(f"Error testing agent: {e}")
-            return False
+            logging.error(f"AgentForge: Error creating agent '{agent_name}': {e}")
+            return None
 
-    def commit_changes(self, file_path, commit_message):
+    def customize_template(
+        self,
+        template: str,
+        agent_name: str,
+        agent_description: str,
+        agent_skills: List[Dict[str, Any]],
+        agent_a2a_peers: List[str],
+    ) -> str:
         """
-        Commits changes to the Git repository.
+        Customizes the agent template with agent-specific details.
+        This includes generating the skill schema and A2A wiring.
         """
+
+        # Replace placeholders in the template
+        code = (
+            template.replace("CLASS_NAME", agent_name)
+            .replace("AGENT_DESCRIPTION", agent_description)
+        )
+
+        # Generate skill schema code
+        skill_schema_code = self.generate_skill_schema_code(agent_skills)
+        code = code.replace("SKILL_SCHEMA", skill_schema_code)
+
+        # Generate A2A wiring code
+        a2a_wiring_code = self.generate_a2a_wiring_code(agent_a2a_peers)
+        code = code.replace("A2A_WIRING", a2a_wiring_code)
+
+        return code
+
+    def generate_skill_schema_code(self, agent_skills: List[Dict[str, Any]]) -> str:
+        """
+        Generates the code for the get_skill_schema() method based on the
+        provided agent skills.
+        """
+
+        skills_code = ",\n            ".join([f"""
+                {{
+                    "name": "{skill['name']}",
+                    "description": "{skill['description']}",
+                    "inputs": {json.dumps(skill.get('inputs', []))},
+                    "outputs": {json.dumps(skill.get('outputs', []))}
+                }}"""
+                                            for skill in agent_skills])
+
+        return f"""
+        def get_skill_schema(self) -> Dict[str, Any]:
+            return {{
+                "name": type(self).__name__,
+                "description": self.config.get("description", "No description provided"),
+                "skills": [
+                    {skills_code}
+                ]
+            }}
+        """
+
+    def generate_a2a_wiring_code(self, agent_a2a_peers: List[str]) -> str:
+        """
+        Generates the code to add peer agents for A2A communication.
+        This assumes the AgentOrchestrator will call the add_peer_agent method.
+        """
+
+        wiring_code = "\n        ".join(
+            [f"self.add_peer_agent('{peer_agent}');" for peer_agent in agent_a2a_peers]
+        )
+        return f"""
+        def wire_a2a_peers(self):
+            {wiring_code}
+        """
+
+    async def validate_and_optimize_code(self, code: str) -> Optional[str]:
+        """
+        Placeholder for code validation and optimization using a CodeAlchemist agent.
+        In a real system, this would involve:
+            - Syntax checking
+            - Security scanning
+            - Performance analysis
+            - Code formatting
+        """
+
+        # For now, just return the code as is (for demonstration purposes)
+        return code
+        # Example of calling a CodeAlchemist agent (if available):
+        # code_alchemist = self.orchestrator.get_agent("CodeAlchemist")
+        # if code_alchemist:
+        #    return await code_alchemist.execute(action="validate_and_optimize", code=code)
+        # else:
+        #    logging.warning("CodeAlchemist agent not available. Skipping code validation and optimization.")
+        #    return code
+
+    def save_agent_code(self, code: str, agent_path: Path) -> None:
+        """
+        Saves the generated agent code to a file.
+        """
+
         try:
-            self.repo.index.add([file_path])
-            self.repo.index.commit(commit_message)
-            print(f"Changes committed to Git repository: {commit_message}")
+            with open(agent_path, "w") as f:
+                f.write(code)
+            logging.info(f"Agent code saved to: {agent_path}")
         except Exception as e:
-            print(f"Error committing changes to Git repository: {e}")
+            logging.error(f"AgentForge: Error saving agent code to '{agent_path}': {e}")
+            raise
 
-    def rollback_changes(self, file_path):
+    def update_agent_config(
+        self,
+        agent_name: str,
+        agent_type: str,
+        agent_description: str,
+        agent_dependencies: List[str],
+        agent_a2a_peers: List[str],
+    ) -> None:
         """
-        Rolls back changes to the Git repository.
-        """
-        try:
-            self.repo.git.checkout('--', file_path)
-            print(f"Changes rolled back for file: {file_path}")
-        except Exception as e:
-            print(f"Error rolling back changes: {e}")
-
-    def refine_agent_prompt(self, agent_name, **kwargs):
-        """
-        Refines the prompt of an existing agent based on the specified parameters.
+        Updates the agent configuration file (config/agents.yaml) to include the new agent.
         """
 
-        # ... (fetch agent prompt)
-        # ... (analyze and refine prompt based on parameters)
-        # ... (update agent prompt)
+        agent_config = load_config(self.agent_config_path)
+        if agent_config is None:
+            logging.error(f"AgentForge: Could not load agent config from {self.agent_config_path}")
+            return
 
-        # Notify orchestrator about the updated prompt
-        self.orchestrator.update_agent_prompt(agent_name, **kwargs)
-        return True
+        agent_config[agent_name] = {
+            "type": agent_type,
+            "description": agent_description,
+            "dependencies": agent_dependencies,
+            "a2a_peers": agent_a2a_peers,
+        }
+        save_config(self.agent_config_path, agent_config)
+        logging.info(f"Agent config updated with: {agent_name}")
 
-    def break_down_task(self, task, **kwargs):
+    def update_workflows_config(self, agent_name: str, agent_dependencies: List[str]) -> None:
         """
-        Breaks down a complex task into smaller sub-tasks and creates agents for each sub-task.
-        """
-
-        # ... (analyze task and break it down into sub-tasks)
-        # ... (create agents for each sub-task)
-
-        # Inform orchestrator about the new agents and their dependencies
-        # ... (add agents and dependencies to the orchestrator)
-        return
-
-    def optimize_agent_performance(self, agent_name, **kwargs):
-        """
-        Optimizes the performance of an existing agent based on the specified parameters.
+        Updates the workflows configuration file (config/workflows.yaml) to
+        incorporate the new agent into relevant workflows (if any).
+        This is a simplified example; a more robust implementation would
+        involve more intelligent workflow modification.
         """
 
-        # ... (fetch agent code and data)
-        # ... (analyze performance bottlenecks and areas for improvement)
-        # ... (apply optimization techniques, e.g., code refactoring, data optimization)
-        return True
+        workflows_config = load_config(self.workflows_config_path)
+        if workflows_config is None:
+            logging.error(f"AgentForge: Could not load workflows config from {self.workflows_config_path}")
+            return
 
-    def adapt_agent_to_environment(self, agent_name, environment):
+        for workflow in workflows_config.values():
+            if agent_dependencies:
+                # Naive: Add the new agent to any workflow that uses its dependencies
+                if any(dep in workflow["agents"] for dep in agent_dependencies):
+                    workflow["agents"].append(agent_name)
+                    workflow["dependencies"][agent_name] = agent_dependencies
+                    logging.info(f"Workflows config updated to include {agent_name}")
+                    break  # Only update the first matching workflow (for simplicity)
+
+        save_config(self.workflows_config_path, workflows_config)
+
+    async def run_semantic_kernel_skill(self, skill_name: str, input_vars: Dict[str, str]) -> str:
         """
-        Adapts an existing agent to a new environment or context.
+        Placeholder for running a Semantic Kernel skill.
+        This assumes the AgentForge might use SK for code generation or validation.
         """
 
-        # ... (analyze environment and identify required adaptations)
-        # ... (modify agent code and configuration to adapt to the environment)
-        return True
+        # For now, just return a dummy result
+        return f"Semantic Kernel skill '{skill_name}' executed (dummy result)."
 
-    def run(self):
-        # ... (fetch agent creation requests from message queue or API)
-        # ... (analyze user intent and determine the best approach)
-        # ... (create new agents, refine existing prompts, break down tasks,
-        # ... optimize agent performance, or adapt agents to new environments)
-        pass
+        # Example of calling a Semantic Kernel skill (if available):
+        # if hasattr(self, 'kernel') and self.kernel:
+        #    return await self.kernel.run(skill_name, input_vars=input_vars)
+        # else:
+        #    logging.warning("Semantic Kernel not available in AgentForge.")
+        #    return f"Semantic Kernel not available. Cannot execute skill '{skill_name}'."
