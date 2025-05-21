@@ -4,7 +4,7 @@ from core.system.agent_orchestrator import AgentOrchestrator
 from core.system.knowledge_base import KnowledgeBase
 from core.system.data_manager import DataManager
 from core.system.echo import Echo
-from core.utils.config_utils import load_config
+from core.utils.config_utils import load_app_config # Changed from load_config
 from core.utils.logging_utils import setup_logging
 from core.utils.api_utils import get_knowledge_graph_data, update_knowledge_graph_node
 from core.llm_plugin import LLMPlugin  # Import LLM plugin
@@ -15,7 +15,7 @@ def main():
     """
     try:
         # Load configuration
-        config = load_config()
+        config = load_app_config() # Changed from load_config()
 
         # Set up logging
         setup_logging(config)

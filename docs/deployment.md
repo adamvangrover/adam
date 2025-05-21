@@ -10,8 +10,8 @@ Before deploying Adam v15.4, ensure you have the following:
 * **Operating System:** Adam v15.4 can be deployed on various operating systems, including Linux, macOS, and Windows. Choose an OS that meets your needs and preferences.
 * **Python:** Adam v15.4 is written in Python, so you'll need to have a compatible version of Python installed on your system. Refer to the `requirements.txt` file for specific version requirements.
 * **Dependencies:** Install the required Python packages using `pip install -r requirements.txt`.
-* **Data Sources:** Ensure you have access to the necessary data sources (e.g., financial news APIs, market data providers) and have configured the API keys or credentials in the `config` directory.
-* **Configuration:** Review and modify the configuration files in the `config` directory to customize settings, data sources, and other parameters.
+* **Data Sources:** Ensure you have access to the necessary data sources (e.g., financial news APIs, market data providers) and have set the required API keys as environment variables (e.g., `BEA_API_KEY`, `TWITTER_CONSUMER_KEY`).
+* **Configuration:** Review and modify the modular configuration files in the `config/` directory, such as `agents.yaml`, `system.yaml`, `settings.yaml`, `data_sources.yaml`, to customize settings, data sources, and other parameters. The main `config/config.yaml` is deprecated for direct editing.
 
 ## Deployment Options
 
@@ -33,7 +33,7 @@ Adam v15.4 can be deployed in various ways:
 2. **Install Dependencies:**
     * Run `pip install -r requirements.txt` to install the required packages.
 3. **Configure Settings:**
-    * Modify the configuration files in the `config` directory to set parameters, data sources, and other preferences.
+    * Modify the relevant modular configuration files in the `config/` directory (e.g., `config/settings.yaml`, `config/data_sources.yaml`, `config/agents.yaml`) to set parameters, data sources, and other preferences. The main `config/config.yaml` file is no longer directly edited for these settings.
 4. **Run Adam v15.4:**
     * Execute the desired scripts from the `scripts` directory. For example, to generate a newsletter, run `python scripts/generate_newsletter.py`.
 
@@ -89,6 +89,6 @@ Adam v15.4 can be deployed in various ways:
 
 ## Security Considerations
 
-* **API Keys:** Securely store and manage your API keys for data sources.
+* **API Keys:** API keys are now managed via environment variables. This is a security best practice as it helps prevent keys from being accidentally committed to version control. Ensure your deployment environment securely provides these environment variables to the Adam application.
 * **Data Protection:** Implement appropriate security measures to protect sensitive data, such as encryption and access controls.
 * **Regular Updates:** Keep Adam v15.4 and its dependencies up-to-date to address security vulnerabilities.

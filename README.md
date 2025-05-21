@@ -77,13 +77,17 @@ Adam v19.1 is not just an AI; it's your partner in navigating the complexities o
 
 3.  **Configure the System:**
 
-    ```bash
-    cp config/example_config.yaml config/config.yaml
-    ```
+      * System configurations are now managed through a set of modular YAML files within the `config/` directory (e.g., `config/agents.yaml`, `config/api.yaml`, `config/data_sources.yaml`, `config/system.yaml`, `config/settings.yaml`, etc.). 
+      * The main `config/config.yaml` file is now deprecated for direct configuration and instead points to these modular files. Users should modify the specific files directly to customize settings.
+      * `config/example_config.yaml` can be consulted for examples of various structures but is no longer the primary template to copy for runtime configuration.
+      * Configure your preferred LLM engine (e.g., OpenAI, Hugging Face Transformers, Google Cloud Vertex AI) by modifying the relevant section in the appropriate modular configuration file (e.g., `config/llm_plugin.yaml` or `config/settings.yaml`).
+      * Customize agent configurations and workflows by editing files like `config/agents.yaml` and `config/workflow.yaml` to suit your specific needs.
 
-      * Update `config/config.yaml` with your API keys, database connections, and other settings.
-      * Configure your preferred LLM engine (e.g., OpenAI, Hugging Face Transformers, Google Cloud Vertex AI).
-      * Customize agent configurations and workflows to suit your specific needs.
+    **3.1. API Key Configuration**
+
+      * API keys for external services are no longer configured in YAML files. Instead, they must be provided as environment variables. The application will read these environment variables at runtime.
+      * For instance, you would set environment variables like: `BEA_API_KEY='your_bea_key'`, `BLS_API_KEY='your_bls_key'`, `IEX_CLOUD_API_KEY='your_iex_key'`, `TWITTER_CONSUMER_KEY='your_twitter_consumer_key'`, etc. 
+      * Refer to the specific data source integration or documentation for the exact environment variable names required.
 
 4.  **Run Adam:**
 

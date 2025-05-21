@@ -1,37 +1,34 @@
 # core/system/system_controller.py
 
-import yaml
 from plugin_manager import PluginManager
 from agents import * # Import all agents
+from core.utils.config_utils import load_app_config # Added import
 
 class SystemController:
-    def __init__(self, config_path="config/settings.yaml"):
+    def __init__(self, config: dict):
         """
-        Initializes the SystemController with the given configuration file.
+        Initializes the SystemController with a pre-loaded configuration dictionary.
 
         Args:
-            config_path (str): Path to the configuration file.
+            config (dict): The configuration dictionary.
         """
-        self.config_path = config_path
-        self.config = self._load_config()
+        self.config = config
         self.plugin_manager = PluginManager(self.config)
 
         # Initialize agents based on configuration
+        # Ensure 'agents' key exists, provide default if necessary
+        agents_config = self.config.get("agents", {})
         self.agents = {}
-        for agent_name, agent_config in self.config["agents"].items():
-            if agent_config["enabled"]:
-                agent_class = globals()[agent_name]  # Get agent class from name
-                self.agents[agent_name] = agent_class(agent_config)
+        for agent_name, agent_config in agents_config.items():
+            # Ensure agent_config is a dictionary and 'enabled' key exists
+            if isinstance(agent_config, dict) and agent_config.get("enabled"):
+                agent_class = globals().get(agent_name)  # Use .get for safety
+                if agent_class:
+                    self.agents[agent_name] = agent_class(agent_config)
+                else:
+                    # Optionally log a warning if an agent class is not found
+                    print(f"Warning: Agent class '{agent_name}' not found.")
 
-    def _load_config(self):
-        """
-        Loads the configuration from the YAML file.
-
-        Returns:
-            dict: The configuration data.
-        """
-        with open(self.config_path, "r") as f:
-            return yaml.safe_load(f)
 
     def run(self):
         """
@@ -85,5 +82,12 @@ class SystemController:
 
 # Example usage
 if __name__ == "__main__":
-    controller = SystemController()
+    app_config = load_app_config()
+    # Check if 'agents' key is present, as SystemController __init__ expects it.
+    # load_app_config should provide it if agents.yaml is loaded.
+    if "agents" not in app_config:
+        print("Warning: 'agents' key not found in loaded app_config. SystemController might not initialize agents correctly.")
+        app_config["agents"] = {} # Provide a default empty dict for agents
+
+    controller = SystemController(config=app_config)
     controller.run()
