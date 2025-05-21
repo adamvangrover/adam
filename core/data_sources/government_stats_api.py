@@ -2,31 +2,47 @@
 
 import requests
 import pandas as pd
+import logging # Added import
+from core.utils.secrets_utils import get_api_key # Added import
 
 class GovernmentStatsAPI:
     def __init__(self, config):
-        self.api_keys = config.get('api_keys', {})
+        # self.api_keys = config.get('api_keys', {}) # Removed API key loading from config
+        # The config parameter might still be used for other settings if any.
+        self.config = config 
 
     def get_gdp(self, country="US", period="annual"):
+        gdp_data = None # Initialize to None
+        bea_key = get_api_key('BEA_API_KEY')
+        if bea_key is None:
+            logging.error("BEA API key not found in environment variables. Cannot fetch GDP data.")
+            return None # Or appropriate empty/error response
+
         if country == "US":
             if period == "annual":
                 # Fetch annual GDP data for the US (example using BEA API)
-                url = f"https://apps.bea.gov/api/data/?&UserID={self.api_keys.get('bea_api_key')}&method=GetData&datasetname=NIPA&TableName=T10101&frequency=A&year=ALL"
+                url = f"https://apps.bea.gov/api/data/?&UserID={bea_key}&method=GetData&datasetname=NIPA&TableName=T10101&frequency=A&year=ALL"
                 response = requests.get(url)
                 #... (process the response and extract GDP data)
             elif period == "quarterly":
                 # Fetch quarterly GDP data for the US (example using BEA API)
-                url = f"https://apps.bea.gov/api/data/?&UserID={self.api_keys.get('bea_api_key')}&method=GetData&datasetname=NIPA&TableName=T10101&frequency=Q&year=ALL"
+                url = f"https://apps.bea.gov/api/data/?&UserID={bea_key}&method=GetData&datasetname=NIPA&TableName=T10101&frequency=Q&year=ALL"
                 response = requests.get(url)
                 #... (process the response and extract GDP data)
         #... (add handling for other countries and periods)
         return gdp_data
 
     def get_cpi(self, country="US", period="monthly"):
+        cpi_data = None # Initialize to None
+        bls_key = get_api_key('BLS_API_KEY')
+        if bls_key is None:
+            logging.error("BLS API key not found in environment variables. Cannot fetch CPI data.")
+            return None # Or appropriate empty/error response
+
         if country == "US":
             if period == "monthly":
                 # Fetch monthly CPI data for the US (example using BLS API)
-                url = f"https://api.bls.gov/publicAPI/v2/timeseries/data/?registrationkey={self.api_keys.get('bls_api_key')}&seriesid=CUUR0000SA0&startyear=2020&endyear=2025"
+                url = f"https://api.bls.gov/publicAPI/v2/timeseries/data/?registrationkey={bls_key}&seriesid=CUUR0000SA0&startyear=2020&endyear=2025"
                 response = requests.get(url)
                 #... (process the response and extract CPI data)
             elif period == "annual":
@@ -37,10 +53,16 @@ class GovernmentStatsAPI:
         return cpi_data
 
     def get_ppi(self, country="US", period="monthly"):
+        ppi_data = None # Initialize to None
+        bls_key = get_api_key('BLS_API_KEY')
+        if bls_key is None:
+            logging.error("BLS API key not found in environment variables. Cannot fetch PPI data.")
+            return None # Or appropriate empty/error response
+
         if country == "US":
             if period == "monthly":
                 # Fetch monthly PPI data for the US (example using BLS API)
-                url = f"https://api.bls.gov/publicAPI/v2/timeseries/data/?registrationkey={self.api_keys.get('bls_api_key')}&seriesid=PCU333---333---&startyear=2020&endyear=2025"
+                url = f"https://api.bls.gov/publicAPI/v2/timeseries/data/?registrationkey={bls_key}&seriesid=PCU333---333---&startyear=2020&endyear=2025"
                 response = requests.get(url)
                 #... (process the response and extract PPI data)
             elif period == "annual":
