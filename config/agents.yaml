@@ -358,6 +358,8 @@ agents:  # This top-level 'agents' key is REQUIRED
     alerting_thresholds:
       valuation_discrepancy: 0.2  # Alert when the difference between estimated and market value exceeds 20%
     communication_style: analytical and precise with detailed financial analysis
+    peers: 
+      - DataRetrievalAgent
 
   # Technical Analyst Agent
   technical_analyst_agent:
@@ -393,60 +395,56 @@ agents:  # This top-level 'agents' key is REQUIRED
       - Quantitative risk modeling (e.g., VaR, CVaR)
       - Portfolio stress testing and scenario analysis
     data_sources:
-      - market_data_api
-        market_data_api:
-      api_key: "YOUR_MARKET_DATA_API_KEY" # Placeholder
-  - company_data
+      - market_data_api 
+      - company_data
       - macroeconomic_data
-  risk_metrics:
-    - volatility
-    - beta
-    - VaR
-    - CVaR
-  risk_models:
-    - credit_scoring_models
-    - monte_carlo_simulation
-  alerting_thresholds:
-    portfolio_risk_level: 0.8  # Alert when the portfolio risk level exceeds 80%
-    market_risk_level: 0.6
-    credit_risk_level: 0.7
-    liquidity_risk_level: 0.5
-  communication_style: clear and informative with detailed risk reports
-  knowledge_base_path: "adam/data/risk_rating_mapping.json"
-  debug_mode: false
-  risk_weights:
-    market_risk: 0.2
-    credit_risk: 0.3
-    liquidity_risk: 0.1
-    operational_risk: 0.1
-    geopolitical_risk: 0.1
-    industry_risk: 0.1
-    economic_risk: 0.05
-    volatility_risk: 0.025
-    currency_risk: 0.025
-  data_validation:
-    enabled: true
-    rules:
-      - field: financial_data.revenue
-        type: float
-        min: 0
-      - field: market_data.trading_volume
-        type: integer
-        min: 0
-      - field: loan_details.loan_amount
-        type: float
-        min: 0
-  monitoring:
-    enabled: true
-    metrics:
-      - response_time
-      - accuracy
-      - resource_usage
-      - market_risk_calculation_time
-      - credit_risk_calculation_time
-      - overall_risk_score_drift
-
-
+    risk_metrics:
+      - volatility
+      - beta
+      - VaR
+      - CVaR
+    risk_models:
+      - credit_scoring_models
+      - monte_carlo_simulation
+    alerting_thresholds:
+      portfolio_risk_level: 0.8  # Alert when the portfolio risk level exceeds 80%
+      market_risk_level: 0.6
+      credit_risk_level: 0.7
+      liquidity_risk_level: 0.5
+    communication_style: clear and informative with detailed risk reports
+    knowledge_base_path: "adam/data/risk_rating_mapping.json"
+    debug_mode: false
+    risk_weights:
+      market_risk: 0.2
+      credit_risk: 0.3
+      liquidity_risk: 0.1
+      operational_risk: 0.1
+      geopolitical_risk: 0.1
+      industry_risk: 0.1
+      economic_risk: 0.05
+      volatility_risk: 0.025
+      currency_risk: 0.025
+    data_validation:
+      enabled: true
+      rules:
+        - field: financial_data.revenue
+          type: float
+          min: 0
+        - field: market_data.trading_volume
+          type: integer
+          min: 0
+        - field: loan_details.loan_amount
+          type: float
+          min: 0
+    monitoring:
+      enabled: true
+      metrics:
+        - response_time
+        - accuracy
+        - resource_usage
+        - market_risk_calculation_time
+        - credit_risk_calculation_time
+        - overall_risk_score_drift
 
   # Newsletter Layout Specialist Agent
   newsletter_layout_specialist_agent:
@@ -485,7 +483,6 @@ agents:  # This top-level 'agents' key is REQUIRED
     alerting_thresholds:
       data_discrepancy: 0.05  # Alert when the discrepancy between data sources exceeds 5%
     communication_style: precise and reliable with clear explanations of data discrepancies
-
 
   # Lexica Agent
   lexica_agent:
@@ -674,127 +671,55 @@ agents:  # This top-level 'agents' key is REQUIRED
       multimodal_coherence: 0.7  # Alert when the coherence between different modalities is below 70%
     communication_style: holistic and insightful with a focus on multi-sensory integration
 
-# Skill-based Configuration (Example)
-skills:
-  data_analysis:
-    agents:
-      - market_sentiment_agent
-      - macroeconomic_analysis_agent
-    #... skill-specific configurations...
+  # Data Visualization Agent
+  data_visualization_agent:
+    <<: *defaults
+    persona: Visual Storyteller
+    description: A master of data visualization, transforming complex data and insights into clear, concise, and engaging visuals.
+    expertise:
+      - Data visualization principles and best practices
+      - Charting and graphing techniques
+      - Interactive visualization tools and libraries
+    data_sources:
+      - all agents
+    visualization_types:
+      - charts (line, bar, pie, scatter)
+      - graphs (network, treemap)
+      - maps (choropleth, heatmap)
+    #... other visualization-related configurations...
+    communication_style: visual and informative with a focus on clarity and storytelling
 
-  risk_management:
-    agents:
-      - risk_assessment_agent
-      - geopolitical_risk_agent
-    #... skill-specific configurations...
+  # Natural Language Generation Agent
+  natural_language_generation_agent:
+    <<: *defaults
+    persona: Eloquent Narrator
+    description: A wordsmith, generating human-readable reports, summaries, and narratives from Adam's data and insights.
+    expertise:
+      - Natural language generation (NLG) techniques
+      - Financial writing and reporting
+      - Storytelling and narrative design
+    data_sources:
+      - all agents
+    #... other NLG-related configurations...
+    communication_style: clear, concise, and engaging with a focus on storytelling
 
-# Future-Proofing
-# This section can be used to define configurations for future
-# agents or functionalities that are not yet implemented.
-# For example:
-#
-# future_agents:
-#   ai_portfolio_manager:
-#     #... configuration for a future AI portfolio manager agent...
+  # Machine Learning Model Training Agent
+  machine_learning_model_training_agent:
+    <<: *defaults
+    persona: Model Master
+    description: An AI expert, training and optimizing machine learning models to enhance Adam's predictive capabilities and adaptability.
+    expertise:
+      - Machine learning algorithms and techniques
+      - Model training and evaluation
+      - Hyperparameter tuning and optimization
+    data_sources:
+      - historical_data
+      - real-time_data
+      - agent_feedback
+    #... other ML model training-related configurations...
+    communication_style: technical and informative with a focus on model performance
 
-# Alerting and Notification System
-alerting:
-  enabled: true  # Enable or disable the alerting system
-  channels:
-    - email
-    - sms
-    - push_notification
-  #... other alerting-related configurations...
-
-# Agent Communication and Collaboration
-communication:
-  message_queue:
-    enabled: true  # Enable or disable the message queue system
-    host: localhost  # Hostname or IP address of the message queue server
-    #... other message queue-related configurations...
-
-  api:
-    enabled: true  # Enable or disable the API for agent communication
-    #... other API-related configurations...
-
-# User Preferences and Customization
-user_preferences:
-  # Allow users to customize agent behavior and preferences
-  # through a user interface or configuration file.
-  # Example:
-  #
-  # risk_tolerance: conservative  # or moderate, aggressive
-  # investment_horizon: long_term  # or short_term, medium-term
-  # preferred_data_sources:
-  #   - news_api
-  #   - financial_statements_api
-
-# Agent Updating and Refinement
-updating:
-  # Configuration for automatic agent updates
-  # Example:
-  #
-  # frequency: daily  # or weekly, monthly
-  # source: remote_repository  # or local_file
-
-refinement:
-  # Configuration for agent refinement based on user feedback
-  # Example:
-  #
-  # method: user_feedback  # or expert_review, automated_tuning
-  # feedback_mechanism: web_form  # or email, api
-
-
-
-# Data Visualization Agent
-data_visualization_agent:
-  <<: *defaults
-  persona: Visual Storyteller
-  description: A master of data visualization, transforming complex data and insights into clear, concise, and engaging visuals.
-  expertise:
-    - Data visualization principles and best practices
-    - Charting and graphing techniques
-    - Interactive visualization tools and libraries
-  data_sources:
-    - all agents
-  visualization_types:
-    - charts (line, bar, pie, scatter)
-    - graphs (network, treemap)
-    - maps (choropleth, heatmap)
-  #... other visualization-related configurations...
-  communication_style: visual and informative with a focus on clarity and storytelling
-
-# Natural Language Generation Agent
-natural_language_generation_agent:
-  <<: *defaults
-  persona: Eloquent Narrator
-  description: A wordsmith, generating human-readable reports, summaries, and narratives from Adam's data and insights.
-  expertise:
-    - Natural language generation (NLG) techniques
-    - Financial writing and reporting
-    - Storytelling and narrative design
-  data_sources:
-    - all agents
-  #... other NLG-related configurations...
-  communication_style: clear, concise, and engaging with a focus on storytelling
-
-# Machine Learning Model Training Agent
-machine_learning_model_training_agent:
-  <<: *defaults
-  persona: Model Master
-  description: An AI expert, training and optimizing machine learning models to enhance Adam's predictive capabilities and adaptability.
-  expertise:
-    - Machine learning algorithms and techniques
-    - Model training and evaluation
-    - Hyperparameter tuning and optimization
-  data_sources:
-    - historical_data
-    - real-time_data
-    - agent_feedback
-  #... other ML model training-related configurations...
-  communication_style: technical and informative with a focus on model performance
-
-legal_agent:
+  legal_agent: 
     <<: *defaults
     persona: Legal Eagle
     description: An expert in legal and regulatory matters, ensuring compliance and mitigating legal risks.
@@ -827,7 +752,7 @@ legal_agent:
       model_accuracy: 0.9  # Alert when the model accuracy is below 90%
     communication_style: analytical and data-driven with clear model explanations
 
-  supply_chain_risk_agent:
+  supply_chain_risk_agent: 
     <<: *defaults
     persona: Supply Chain Guardian
     description: An expert in supply chain management, identifying and mitigating risks to ensure business continuity.
@@ -863,7 +788,7 @@ legal_agent:
       trading_performance: 0.05  # Alert when trading performance deviates from the benchmark by more than 5%
     communication_style: data-driven and concise with clear trading signals
 
-  discussion_chair_agent:
+  discussion_chair_agent: 
     <<: *defaults
     persona: Discussion Moderator
     description: A skilled facilitator, guiding discussions, summarizing key points, and ensuring effective decision-making.
@@ -875,45 +800,65 @@ legal_agent:
       - all_agents
     communication_style: neutral and objective with clear summaries and action items
 
-# Anomaly Detection Agent
-anomaly_detection_agent:
-  <<: *defaults
-  persona: Anomaly Hunter
-  description: A vigilant observer, constantly scanning data for unusual patterns and anomalies that could signal potential risks or opportunities.
-  expertise:
-    - Anomaly detection algorithms and techniques
-    - Statistical analysis and outlier detection
-    - Data mining and pattern recognition
-  data_sources:
-    - all data sources
-  anomaly_detection_methods:
-    - statistical_methods
-    - machine_learning_models
-  alerting_thresholds:
-    - anomaly_score: 0.8  # Alert when the anomaly score exceeds 80%
-  communication_style: concise and informative with clear explanations of detected anomalies
+  # Anomaly Detection Agent 
+  anomaly_detection_agent: 
+    <<: *defaults
+    persona: Anomaly Hunter
+    description: A vigilant observer, constantly scanning data for unusual patterns and anomalies that could signal potential risks or opportunities.
+    expertise: 
+      - Anomaly detection algorithms and techniques
+      - Statistical analysis and outlier detection
+      - Data mining and pattern recognition
+    data_sources:
+      - all data sources
+    anomaly_detection_methods:
+      - statistical_methods
+      - machine_learning_models
+    alerting_thresholds: 
+      anomaly_score: 0.8
+    communication_style: concise and informative with clear explanations of detected anomalies
 
-# Regulatory Compliance Agent
-regulatory_compliance_agent:
-  <<: *defaults
-  persona: Compliance Officer
-  description: A meticulous rule-follower, ensuring adherence to all applicable regulations and guidelines.
-  expertise:
-    - Regulatory compliance frameworks and standards
-    - Legal research and analysis
-    - Risk management and mitigation
-  data_sources:
-    - regulatory_databases
-    - legal_documents
-    - industry_standards
-  compliance_monitoring_methods:
-    - rule-based_checks
-    - data_analysis
-    - audit_trails
-  alerting_thresholds:
-    - compliance_violation: 0.9  # Alert when the probability of a compliance violation exceeds 90%
-  communication_style: formal and precise with clear explanations of compliance requirements
+  # Regulatory Compliance Agent 
+  regulatory_compliance_agent: 
+    <<: *defaults
+    persona: Compliance Officer
+    description: A meticulous rule-follower, ensuring adherence to all applicable regulations and guidelines.
+    expertise:
+      - Regulatory compliance frameworks and standards
+      - Legal research and analysis
+      - Risk management and mitigation
+    data_sources:
+      - regulatory_databases
+      - legal_documents
+      - industry_standards
+    compliance_monitoring_methods:
+      - rule-based_checks
+      - data_analysis
+      - audit_trails
+    alerting_thresholds: 
+      compliance_violation: 0.9
+    communication_style: formal and precise with clear explanations of compliance requirements
   
+  # SNC Analyst Agent - NEWLY ADDED
+  SNC_analyst_agent:
+    <<: *defaults
+    persona: "SNC Examiner"
+    description: "Analyzes Shared National Credits based on regulatory guidelines."
+    expertise:
+      - "SNC analysis"
+      - "regulatory interpretation"
+      - "credit risk"
+    comptrollers_handbook_SNC:
+      primary_repayment_source: "sustainable source of cash under the borrower's control"
+      substandard_definition: "inadequately protected by the current sound worth and paying capacity of the obligor or of the collateral pledged"
+      doubtful_definition: "all the weaknesses inherent in one classified substandard with the added characteristic that the weaknesses make collection or liquidation in full, highly questionable and improbable"
+      loss_definition: "uncollectible and of such little value that their continuance as bankable assets is not warranted"
+      repayment_capacity_period: 7
+      nonaccrual_status: "asset is maintained on a cash basis because of deterioration in the financial condition of the borrower"
+      capitalization_of_interest: "interest may be capitalized only when the borrower is creditworthy and has the ability to repay the debt in the normal course of business"
+    occ_guidelines_SNC:
+      nonaccrual_status: "asset is maintained on a cash basis because of deterioration in the financial condition of the borrower"
+      capitalization_of_interest: "interest may be capitalized only when the borrower is creditworthy and has the ability to repay the debt in the normal course of business"
 
 # Skill-based Configuration (Example)
 skills:

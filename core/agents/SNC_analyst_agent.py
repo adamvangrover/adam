@@ -1,6 +1,18 @@
 # core/agents/SNC_analyst_agent.py
-
+import logging
+import json 
+import asyncio
 from enum import Enum
+from typing import Dict, Any, Optional, Tuple
+from unittest.mock import patch # Added for example usage
+
+from core.agents.agent_base import AgentBase
+from semantic_kernel import Kernel # For AgentBase type hinting
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# For XAI debug logs, ensure the logger level is set to DEBUG if you want to see them.
+# Example: logging.getLogger().setLevel(logging.DEBUG) in the main application or test setup.
 
 class SNCRating(Enum):
     PASS = "Pass"
@@ -9,436 +21,430 @@ class SNCRating(Enum):
     DOUBTFUL = "Doubtful"
     LOSS = "Loss"
 
-class SNCAnalystAgent:
-    def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):
+class SNCAnalystAgent(AgentBase):
+    """
+    Agent for performing Shared National Credit (SNC) analysis.
+    This agent analyzes company data based on regulatory guidelines to assign an SNC rating.
+    It retrieves data via A2A communication with DataRetrievalAgent and can use SK skills.
+    """
+
+    def __init__(self, config: Dict[str, Any], kernel: Optional[Kernel] = None):
         """
-        Initializes the SNC Analyst Agent with knowledge of the
-        Comptroller's Handbook and OCC guidelines. It can operate
-        independently or integrate with the broader system.
+        Initializes the SNC Analyst Agent.
 
         Args:
-            knowledge_base_path (str): Path to the knowledge base file.
+            config: Agent-specific configuration dictionary. Expected keys:
+                    'persona', 'description', 'expertise', 
+                    'comptrollers_handbook_SNC' (dict), 'occ_guidelines_SNC' (dict),
+                    and 'peers' (list, for A2A communication).
+            kernel: Optional Semantic Kernel instance.
         """
-        # Load relevant sections from Comptroller's Handbook and OCC guidelines
-        # This could involve loading pre-processed data or using a document retrieval system
-        # For this example, we'll hardcode some key elements for demonstration purposes
-        self.comptrollers_handbook = {
-            "SNC": {
-                "primary_repayment_source": "sustainable source of cash under the borrower's control",
-                "substandard_definition": "inadequately protected by the current sound worth and paying capacity of the obligor or of the collateral pledged",
-                "doubtful_definition": "all the weaknesses inherent in one classified substandard with the added characteristic that the weaknesses make collection or liquidation in full, highly questionable and improbable",
-                "loss_definition": "uncollectible and of such little value that their continuance as bankable assets is not warranted",
-                # ... other relevant sections
-            }
-        }
-        self.occ_guidelines = {
-            "SNC": {
-                "nonaccrual_status": "asset is maintained on a cash basis because of deterioration in the financial condition of the borrower",
-                "capitalization_of_interest": "interest may be capitalized only when the borrower is creditworthy and has the ability to repay the debt in the normal course of business",
-                # ... other relevant guidelines
-            }
-        }
-        self.knowledge_base_path = knowledge_base_path
-        self.knowledge_base = self._load_knowledge_base()
+        super().__init__(config, kernel)
+        self.persona = self.config.get('persona', "SNC Analyst Examiner")
+        self.description = self.config.get('description', "Analyzes Shared National Credits based on regulatory guidelines by retrieving data via A2A and using Semantic Kernel skills.")
+        self.expertise = self.config.get('expertise', ["SNC analysis", "regulatory compliance", "credit risk assessment"])
 
-    def _load_knowledge_base(self):
-        """
-        Loads the knowledge base from the JSON file.
+        # Load regulatory guidelines from agent configuration
+        self.comptrollers_handbook_snc = self.config.get('comptrollers_handbook_SNC', {})
+        if not self.comptrollers_handbook_snc:
+            logging.warning("Comptroller's Handbook SNC guidelines not found in agent configuration.")
+        
+        self.occ_guidelines_snc = self.config.get('occ_guidelines_SNC', {})
+        if not self.occ_guidelines_snc:
+            logging.warning("OCC Guidelines SNC not found in agent configuration.")
 
-        Returns:
-            dict: The knowledge base data.
+    async def execute(self, **kwargs) -> Optional[Tuple[Optional[SNCRating], str]]:
         """
-        try:
-            with open(self.knowledge_base_path, 'r') as file:
-                return json.load(file)
-        except FileNotFoundError:
-            print(f"Knowledge base file not found: {self.knowledge_base_path}")
-            return {}
-        except json.JSONDecodeError:
-            print(f"Error decoding knowledge base JSON: {self.knowledge_base_path}")
-            return {}
-
-    def analyze_snc(self, company_name, financial_data=None, industry_data=None, economic_data=None):
-        """
-        Analyzes a Shared National Credit (SNC) and assigns a risk rating based on
-        the Comptroller's Handbook and OCC guidelines. Acts as an independent
-        examiner persona. Can receive data directly or pull from the knowledge
-        base if integrated with the system.
+        Main execution entry point for the SNC Analyst Agent.
+        Performs SNC analysis on a company identified by `company_id`.
+        Data is fetched via A2A communication with DataRetrievalAgent.
 
         Args:
-            company_name (str): The name of the company.
-            financial_data (dict, optional): Financial data of the company.
-            industry_data (dict, optional): Industry-specific data.
-            economic_data (dict, optional): Macroeconomic data.
+            **kwargs: Expected keyword arguments:
+                company_id (str): The ID of the company to analyze.
 
         Returns:
-            tuple: (SNCRating, str): The SNC rating and a detailed rationale for the rating.
+            A tuple containing:
+                - SNCRating (Optional[SNCRating]): The determined SNC rating, or None if an error occurs.
+                - str: A rationale for the rating or an error message.
         """
+        company_id = kwargs.get('company_id')
+        logging.info(f"Executing SNC analysis for company_id: {company_id}")
+        # XAI Log: Record initial input to the execute method
+        logging.debug(f"SNC_ANALYSIS_EXECUTE_INPUT: company_id='{company_id}', all_kwargs={kwargs}")
 
-        # If data is not provided directly, retrieve from the knowledge base
-        if not financial_data:
-            financial_data = self.get_company_financial_data(company_name)
-        if not industry_data:
-            industry_data = self.get_industry_data(company_name)
-        if not economic_data:
-            economic_data = self.get_economic_data()
 
-        # 1. Financial Statement Analysis
-        # Analyze financial data based on Comptroller's Handbook guidelines
-        # Assess cash flow, liquidity, leverage, profitability, and other relevant metrics
-        # Identify trends and potential weaknesses
-        # ... (Implementation of financial analysis logic)
+        if not company_id:
+            error_msg = "Company ID not provided for SNC analysis."
+            logging.error(error_msg)
+            return None, error_msg
 
-        # 2. Qualitative Analysis
-        # Evaluate management quality, industry outlook, and economic conditions
-        # Consider factors such as competitive landscape, regulatory environment, and
-        # technological advancements
-        # ... (Implementation of qualitative analysis logic)
+        # A2A Communication: Check for DataRetrievalAgent peer
+        if 'DataRetrievalAgent' not in self.peer_agents:
+            error_msg = "DataRetrievalAgent not found in peer agents for SNC_analyst_agent."
+            logging.error(error_msg)
+            return None, error_msg
+        
+        # Prepare and send request to DataRetrievalAgent
+        dra_request = {'data_type': 'get_company_financials', 'company_id': company_id}
+        logging.debug(f"SNC_ANALYSIS_A2A_REQUEST: Requesting data from DataRetrievalAgent: {dra_request}")
+        company_data_package = await self.send_message('DataRetrievalAgent', dra_request)
+        logging.debug(f"SNC_ANALYSIS_A2A_RESPONSE: Received data package: {company_data_package is not None}")
 
-        # 3. Credit Risk Mitigation
-        # Assess the presence and effectiveness of credit risk mitigants, such as:
-        # - Collateral: Evaluate collateral type, quality, and value
-        # - Guarantees: Analyze guarantor strength and willingness to perform
-        # - Other mitigants: Consider credit insurance, letters of credit, etc.
-        # ... (Implementation of credit risk mitigation assessment logic)
 
-        # 4. Rating Determination
-        # Assign SNC rating based on a combination of quantitative and qualitative factors
-        # Consider the probability of default and the severity of loss given default
-        rating, rationale = self._determine_rating(company_name, financial_data, industry_data, economic_data)
+        if not company_data_package:
+            error_msg = f"Failed to retrieve company data package for {company_id} from DataRetrievalAgent."
+            logging.error(error_msg)
+            return None, error_msg
 
+        # Extract structured data from the received package
+        company_info = company_data_package.get('company_info', {})
+        financial_data_detailed = company_data_package.get('financial_data_detailed', {})
+        qualitative_company_info = company_data_package.get('qualitative_company_info', {})
+        industry_data_context = company_data_package.get('industry_data_context', {})
+        economic_data_context = company_data_package.get('economic_data_context', {})
+        collateral_and_debt_details = company_data_package.get('collateral_and_debt_details', {})
+        
+        # XAI Log: Record the keys of extracted data sections to verify data presence
+        logging.debug(f"SNC_ANALYSIS_DATA_EXTRACTED: CompanyInfo: {company_info.keys()}, FinancialDetailed: {financial_data_detailed.keys()}, Qualitative: {qualitative_company_info.keys()}, Industry: {industry_data_context.keys()}, Economic: {economic_data_context.keys()}, Collateral: {collateral_and_debt_details.keys()}")
+
+        # Perform various analysis steps using helper methods
+        financial_analysis_result = self._perform_financial_analysis(financial_data_detailed)
+        qualitative_analysis_result = self._perform_qualitative_analysis(
+            company_info.get('name', company_id), 
+            qualitative_company_info, 
+            industry_data_context, 
+            economic_data_context
+        )
+        credit_risk_mitigation_info = self._evaluate_credit_risk_mitigation(collateral_and_debt_details)
+        
+        # Asynchronously determine the final rating and rationale
+        rating, rationale = await self._determine_rating( 
+            company_info.get('name', company_id), 
+            financial_analysis_result, 
+            qualitative_analysis_result, 
+            credit_risk_mitigation_info, 
+            economic_data_context
+        )
+        # XAI Log: Record the final output of the execute method
+        logging.debug(f"SNC_ANALYSIS_EXECUTE_OUTPUT: Rating='{rating.value if rating else 'N/A'}', Rationale='{rationale}'")
         return rating, rationale
 
-    def _determine_rating(self, company_name, financial_data, industry_data, economic_data):
+    def _perform_financial_analysis(self, financial_data_detailed: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Determines the SNC rating based on a comprehensive assessment of
-        credit risk, incorporating quantitative and qualitative factors.
+        Performs financial analysis based on detailed financial data.
 
         Args:
-            company_name (str): The name of the company.
-            financial_data (dict): Financial data of the company.
-            industry_data (dict): Industry-specific data.
-            economic_data (dict): Macroeconomic data.
-
+            financial_data_detailed (Dict[str, Any]): A dictionary containing detailed financial data,
+                                                     expected to have a 'key_ratios' sub-dictionary.
         Returns:
-            tuple: (SNCRating, str): The SNC rating and a detailed rationale for the rating.
+            Dict[str, Any]: A dictionary of key financial metrics relevant for SNC analysis.
         """
-
-        # Implement complex rating logic based on the Comptroller's Handbook
-        # and OCC guidelines.
-        # This logic should include:
-        # - Assessment of repayment capacity over a 7-year period
-        # - Probability-based assessment for each rating category
-        # - Non-accrual designation based on interest coverage and valuation/debt ratios
-        # - Consideration of qualitative factors and credit risk mitigants
-        # - Detailed rationale for the assigned rating
-
-        # Example logic (replace with actual implementation based on the guidelines):
-        if financial_data.get("debt_to_equity", 0) > 3.0 and financial_data.get("profitability", 0) < 0:
-            rating = SNCRating.LOSS
-            rationale = "High debt-to-equity ratio and negative profitability indicate significant risk of loss, aligning with the Comptroller's Handbook definition of 'Loss'."
-        elif financial_data.get("debt_to_equity", 0) > 2.0 and financial_data.get("profitability", 0) < 0.1:
-            rating = SNCRating.DOUBTFUL
-            rationale = "Elevated debt-to-equity ratio and low profitability raise concerns about repayment capacity, suggesting a 'Doubtful' rating as per the Comptroller's Handbook."
-        # ... other rating logic based on the guidelines ...
-        elif financial_data.get("debt_to_equity", 0) <= 1.0 and financial_data.get("profitability", 0) >= 0.3:
-            rating = SNCRating.PASS
-            rationale = "Strong financial condition with low debt-to-equity ratio and healthy profitability, meeting the criteria for a 'Pass' rating."
-        else:
-            rating = SNCRating.SPECIAL_MENTION
-            rationale = "Potential weaknesses require further monitoring, warranting a 'Special Mention' rating."
-
-        return rating, rationale
-
-    def get_company_financial_data(self, company_name):
-        """
-        Retrieves company financial data from the knowledge base.
-
-        Args:
-            company_name (str): Name of the company.
-
-        Returns:
-            dict: Financial data of the company.
-        """
-        # Placeholder for knowledge base interaction
-        # Replace with actual data retrieval logic
-        return self.knowledge_base.get("companies", {}).get(company_name, {})
-
-    def get_industry_data(self, company_name):
-        """
-        Retrieves industry data for the company's industry from the knowledge base.
-
-        Args:
-            company_name (str): Name of the company.
-
-        Returns:
-            dict: Industry-specific data.
-        """
-        # Placeholder for knowledge base interaction
-        # Replace with actual data retrieval logic
-        industry = self.knowledge_base.get("companies", {}).get(company_name, {}).get("industry", None)
-        if industry:
-            return self.knowledge_base.get("industries", {}).get(industry, {})
-        else:
-            return {}
-
-    def get_economic_data(self):
-        """
-        Retrieves macroeconomic data from the knowledge base.
-
-        Returns:
-            dict: Macroeconomic data.
-        """
-        # Placeholder for knowledge base interaction
-        # Replace with actual data retrieval logic
-        return self.knowledge_base.get("macroeconomic_data", {})
-
-
-
-#WIP ///////////////////////////////////////////////////////////////////////
-
-import json
-from enum import Enum
-
-
-class SNCRating(Enum):
-    PASS = "Pass"
-    SPECIAL_MENTION = "Special Mention"
-    SUBSTANDARD = "Substandard"
-    DOUBTFUL = "Doubtful"
-    LOSS = "Loss"
-
-
-class SNCAnalystAgent:
-    def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):
-        """
-        Initializes the SNC Analyst Agent with knowledge of the
-        Comptroller's Handbook and OCC guidelines. It can operate
-        independently or integrate with the broader system.
-
-        Args:
-            knowledge_base_path (str): Path to the knowledge base file.
-        """
-        # Load relevant sections from Comptroller's Handbook and OCC guidelines
-        self.comptrollers_handbook = {
-            "SNC": {
-                "primary_repayment_source": "sustainable source of cash under the borrower's control",
-                "substandard_definition": "inadequately protected by the current sound worth and paying capacity of the obligor or of the collateral pledged",
-                "doubtful_definition": "all the weaknesses inherent in one classified substandard with the added characteristic that the weaknesses make collection or liquidation in full, highly questionable and improbable",
-                "loss_definition": "uncollectible and of such little value that their continuance as bankable assets is not warranted",
-                # Additional sections as per Comptroller's Handbook
-                "repayment_capacity_period": 7,
-                "nonaccrual_status": "asset is maintained on a cash basis because of deterioration in the financial condition of the borrower",
-                "capitalization_of_interest": "interest may be capitalized only when the borrower is creditworthy and has the ability to repay the debt in the normal course of business",
-            }
-        }
-
-        self.occ_guidelines = {
-            "SNC": {
-                "nonaccrual_status": "asset is maintained on a cash basis because of deterioration in the financial condition of the borrower",
-                "capitalization_of_interest": "interest may be capitalized only when the borrower is creditworthy and has the ability to repay the debt in the normal course of business",
-                # Additional OCC guidelines could be added here
-            }
-        }
-        self.knowledge_base_path = knowledge_base_path
-        self.knowledge_base = self._load_knowledge_base()
-
-    def _load_knowledge_base(self):
-        """
-        Loads the knowledge base from the JSON file.
-
-        Returns:
-            dict: The knowledge base data.
-        """
-        try:
-            with open(self.knowledge_base_path, 'r') as file:
-                return json.load(file)
-        except FileNotFoundError:
-            print(f"Knowledge base file not found: {self.knowledge_base_path}")
-            return {}
-        except json.JSONDecodeError:
-            print(f"Error decoding knowledge base JSON: {self.knowledge_base_path}")
-            return {}
-
-    def analyze_snc(self, company_name, financial_data=None, industry_data=None, economic_data=None):
-        """
-        Analyzes a Shared National Credit (SNC) and assigns a risk rating based on
-        the Comptroller's Handbook and OCC guidelines. Acts as an independent
-        examiner persona. Can receive data directly or pull from the knowledge
-        base if integrated with the system.
-
-        Args:
-            company_name (str): The name of the company.
-            financial_data (dict, optional): Financial data of the company.
-            industry_data (dict, optional): Industry-specific data.
-            economic_data (dict, optional): Macroeconomic data.
-
-        Returns:
-            tuple: (SNCRating, str): The SNC rating and a detailed rationale for the rating.
-        """
-
-        # If data is not provided directly, retrieve from the knowledge base
-        if not financial_data:
-            financial_data = self.get_company_financial_data(company_name)
-        if not industry_data:
-            industry_data = self.get_industry_data(company_name)
-        if not economic_data:
-            economic_data = self.get_economic_data()
-
-        # 1. Financial Statement Analysis
-        # Analyze financial data based on Comptroller's Handbook guidelines
-        financial_analysis_result = self._perform_financial_analysis(financial_data)
-
-        # 2. Qualitative Analysis
-        qualitative_analysis_result = self._perform_qualitative_analysis(company_name, industry_data, economic_data)
-
-        # 3. Credit Risk Mitigation
-        credit_risk_mitigation_result = self._evaluate_credit_risk_mitigation(financial_data)
-
-        # 4. Rating Determination
-        # Assign SNC rating based on a combination of quantitative and qualitative factors
-        rating, rationale = self._determine_rating(financial_analysis_result, qualitative_analysis_result, credit_risk_mitigation_result)
-
-        return rating, rationale
-
-    def _perform_financial_analysis(self, financial_data):
-        """
-        Perform in-depth financial statement analysis based on Comptroller's Handbook criteria.
-
-        Args:
-            financial_data (dict): Financial data of the company.
-
-        Returns:
-            dict: Analysis results containing financial performance.
-        """
-        # Financial analysis metrics and thresholds based on the Comptroller's Handbook
+        # XAI Log: Record input for financial analysis
+        logging.debug(f"SNC_FIN_ANALYSIS_INPUT: financial_data_detailed keys: {financial_data_detailed.keys()}")
+        key_ratios = financial_data_detailed.get("key_ratios", {})
         analysis_result = {
-            "debt_to_equity": financial_data.get("debt_to_equity", 0),
-            "profitability": financial_data.get("profitability", 0),
-            "cash_flow": financial_data.get("cash_flow", 0),
-            "liquidity_ratio": financial_data.get("liquidity_ratio", 0),
-            "interest_coverage": financial_data.get("interest_coverage", 0)
+            "debt_to_equity": key_ratios.get("debt_to_equity_ratio"),
+            "profitability": key_ratios.get("net_profit_margin"),
+            "liquidity_ratio": key_ratios.get("current_ratio"),
+            "interest_coverage": key_ratios.get("interest_coverage_ratio")
         }
-
+        # XAI Log: Record output of financial analysis
+        logging.debug(f"SNC_FIN_ANALYSIS_OUTPUT: {analysis_result}")
         return analysis_result
 
-    def _perform_qualitative_analysis(self, company_name, industry_data, economic_data):
+    def _perform_qualitative_analysis(self, 
+                                      company_name: str, 
+                                      qualitative_company_info: Dict[str, Any], 
+                                      industry_data_context: Dict[str, Any], 
+                                      economic_data_context: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Evaluate qualitative factors including industry outlook, management quality, and economic context.
+        Performs qualitative analysis based on company, industry, and economic context.
 
         Args:
             company_name (str): Name of the company.
-            industry_data (dict): Industry-specific data.
-            economic_data (dict): Macroeconomic data.
+            qualitative_company_info (Dict[str, Any]): Dictionary with qualitative company details.
+            industry_data_context (Dict[str, Any]): Dictionary with industry context.
+            economic_data_context (Dict[str, Any]): Dictionary with economic context.
 
         Returns:
-            dict: Qualitative analysis results.
+            Dict[str, Any]: A dictionary of key qualitative assessment factors.
         """
+        # XAI Log: Record inputs for qualitative analysis
+        logging.debug(f"SNC_QUAL_ANALYSIS_INPUT: company_name='{company_name}', qualitative_info_keys={qualitative_company_info.keys()}, industry_keys={industry_data_context.keys()}, economic_keys={economic_data_context.keys()}")
         qualitative_result = {
-            "management_quality": "Strong" if industry_data.get("management_quality", "Strong") == "Strong" else "Weak",
-            "industry_outlook": industry_data.get("outlook", "Neutral"),
-            "economic_conditions": economic_data.get("economic_conditions", "Stable")
+            "management_quality": qualitative_company_info.get("management_assessment", "Not Assessed"),
+            "industry_outlook": industry_data_context.get("outlook", "Neutral"),
+            "economic_conditions": economic_data_context.get("overall_outlook", "Stable"),
+            "business_model_strength": qualitative_company_info.get("business_model_strength", "N/A"),
+            "competitive_advantages": qualitative_company_info.get("competitive_advantages", "N/A")
         }
-
+        # XAI Log: Record output of qualitative analysis
+        logging.debug(f"SNC_QUAL_ANALYSIS_OUTPUT: {qualitative_result}")
         return qualitative_result
 
-    def _evaluate_credit_risk_mitigation(self, financial_data):
+    def _evaluate_credit_risk_mitigation(self, collateral_and_debt_details: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Evaluate the effectiveness of credit risk mitigants such as collateral, guarantees, etc.
+        Evaluates credit risk mitigants based on collateral and debt details.
+        Prepares data for both SK skill and fallback logic.
 
         Args:
-            financial_data (dict): Financial data of the company.
+            collateral_and_debt_details (Dict[str, Any]): Dictionary with collateral and debt information.
 
         Returns:
-            dict: Credit risk mitigation factors.
+            Dict[str, Any]: A dictionary containing evaluated mitigation factors and data for SK skill.
         """
+        # XAI Log: Record input for credit risk mitigation evaluation
+        logging.debug(f"SNC_CREDIT_MITIGATION_INPUT: collateral_and_debt_details_keys={collateral_and_debt_details.keys()}")
+        
+        ltv = collateral_and_debt_details.get("loan_to_value_ratio")
+        collateral_quality_assessment = "Low" # Default for fallback logic
+        if ltv is not None:
+            try:
+                ltv_float = float(ltv)
+                if ltv_float < 0.5: collateral_quality_assessment = "High"
+                elif ltv_float < 0.75: collateral_quality_assessment = "Medium"
+            except ValueError:
+                logging.warning(f"Could not parse LTV ratio '{ltv}' as float.")
+        
+        # Prepare data for SK skill and for fallback logic
         mitigation_result = {
-            "collateral_quality": financial_data.get("collateral_quality", "Low"),
-            "guarantees": financial_data.get("guarantees", "None"),
-            "other_mitigants": financial_data.get("other_mitigants", "None")
+            "collateral_quality_fallback": collateral_quality_assessment, 
+            "collateral_summary_for_sk": collateral_and_debt_details.get("collateral_type", "Not specified."),
+            "loan_to_value_ratio": str(ltv) if ltv is not None else "Not specified.", # Ensure string for SK
+            "collateral_notes_for_sk": collateral_and_debt_details.get("other_credit_enhancements", "None."),
+            "collateral_valuation": collateral_and_debt_details.get("collateral_valuation"),
+            "guarantees_present": collateral_and_debt_details.get("guarantees_exist", False)
         }
-
+        # XAI Log: Record output of credit risk mitigation evaluation
+        logging.debug(f"SNC_CREDIT_MITIGATION_OUTPUT: {mitigation_result}")
         return mitigation_result
 
-    def _determine_rating(self, financial_analysis, qualitative_analysis, credit_risk_mitigation):
+    async def _determine_rating(self, company_name: str, 
+                               financial_analysis: Dict[str, Any], 
+                               qualitative_analysis: Dict[str, Any], 
+                               credit_risk_mitigation: Dict[str, Any], 
+                               economic_data_context: Dict[str, Any]
+                               ) -> Tuple[Optional[SNCRating], str]:
         """
-        Determines the SNC rating based on a comprehensive assessment of
-        credit risk, incorporating quantitative and qualitative factors.
-
-        Args:
-            financial_analysis (dict): Financial performance analysis results.
-            qualitative_analysis (dict): Qualitative analysis results.
-            credit_risk_mitigation (dict): Credit risk mitigation factors.
-
-        Returns:
-            tuple: (SNCRating, str): The SNC rating and a detailed rationale for the rating.
-        """
-        debt_to_equity = financial_analysis["debt_to_equity"]
-        profitability = financial_analysis["profitability"]
-        liquidity_ratio = financial_analysis["liquidity_ratio"]
-        cash_flow = financial_analysis["cash_flow"]
-        interest_coverage = financial_analysis["interest_coverage"]
-        collateral_quality = credit_risk_mitigation["collateral_quality"]
-        management_quality = qualitative_analysis["management_quality"]
-        economic_conditions = qualitative_analysis["economic_conditions"]
-
-        # Rating logic based on the Comptroller's Handbook and OCC guidelines
-        if debt_to_equity > 3.0 and profitability < 0:
-            rating = SNCRating.LOSS
-            rationale = f"High debt-to-equity ratio and negative profitability suggest a 'Loss' rating as per Comptroller's definition."
-        elif debt_to_equity > 2.0 and profitability < 0.1:
-            rating = SNCRating.DOUBTFUL
-            rationale = f"Elevated debt-to-equity ratio and low profitability imply a 'Doubtful' rating."
-        elif liquidity_ratio < 1.0 and interest_coverage < 1.0:
-            rating = SNCRating.SUBSTANDARD
-            rationale = f"Liquidity ratio and interest coverage are insufficient, aligning with 'Substandard' criteria."
-        elif collateral_quality == "Low" and management_quality == "Weak":
-            rating = SNCRating.SPECIAL_MENTION
-            rationale = "Weak management and poor collateral quality necessitate closer monitoring, 'Special Mention'."
-        elif debt_to_equity <= 1.0 and profitability >= 0.3 and economic_conditions == "Stable":
-            rating = SNCRating.PASS
-            rationale = "Strong financial performance and favorable economic conditions, warranting a 'Pass' rating."
-        else:
-            rating = SNCRating.SPECIAL_MENTION
-            rationale = "Potential weaknesses require monitoring, suggesting a 'Special Mention'."
-
-        return rating, rationale
-
-    def get_company_financial_data(self, company_name):
-        """
-        Retrieves company financial data from the knowledge base.
+        Determines the final SNC rating by integrating various analysis components.
+        Uses Semantic Kernel for collateral assessment if available, otherwise falls back
+        to Python-based logic.
 
         Args:
             company_name (str): Name of the company.
+            financial_analysis (Dict[str, Any]): Output from _perform_financial_analysis.
+            qualitative_analysis (Dict[str, Any]): Output from _perform_qualitative_analysis.
+            credit_risk_mitigation (Dict[str, Any]): Output from _evaluate_credit_risk_mitigation.
+            economic_data_context (Dict[str, Any]): Economic context data.
 
         Returns:
-            dict: Financial data of the company.
+            A tuple: (SNCRating, str) representing the SNC rating and a detailed rationale.
         """
-        return self.knowledge_base.get("companies", {}).get(company_name, {})
+        # XAI Log: Record all inputs to the rating determination logic
+        logging.debug(f"SNC_DETERMINE_RATING_INPUT: company='{company_name}', financial_analysis={financial_analysis}, qualitative_analysis={qualitative_analysis}, credit_mitigation={credit_risk_mitigation}, economic_context={economic_data_context}")
+        
+        rationale_parts = []
+        collateral_sk_assessment_str = None 
+        collateral_sk_justification = ""
 
-    def get_industry_data(self, company_name):
-        """
-        Retrieves industry data for the company's industry from the knowledge base.
+        # Semantic Kernel Integration for Collateral Assessment
+        if self.kernel and hasattr(self.kernel, 'skills'): # Check if kernel and skills collection exist
+            try:
+                # Prepare inputs for the SK skill "CollateralRiskAssessment"
+                sk_input_vars = {
+                    "guideline_substandard_collateral": self.comptrollers_handbook_snc.get('substandard_definition', "Collateral is inadequately protective."),
+                    "guideline_repayment_source": self.comptrollers_handbook_snc.get('primary_repayment_source', "Primary repayment should come from a sustainable source of cash under borrower control."),
+                    "collateral_description": credit_risk_mitigation.get('collateral_summary_for_sk', "Not specified."),
+                    "ltv_ratio": credit_risk_mitigation.get('loan_to_value_ratio', "Not specified."),
+                    "other_collateral_notes": credit_risk_mitigation.get('collateral_notes_for_sk', "None.")
+                }
+                # XAI Log: Inputs to the SK skill
+                logging.debug(f"SNC_DETERMINE_RATING_SK_INPUT: Calling CollateralRiskAssessment SK skill for {company_name} with inputs: {sk_input_vars}")
+                
+                sk_response_str = await self.run_semantic_kernel_skill(
+                    "SNCRatingAssistSkill", 
+                    "CollateralRiskAssessment", 
+                    sk_input_vars
+                )
+                
+                # Parse SK response (expected format: "Assessment: [Rating]\nJustification: [Text]")
+                lines = sk_response_str.strip().splitlines()
+                if lines:
+                    assessment_line = lines[0]
+                    if "Assessment:" in assessment_line: # Robust parsing
+                        collateral_sk_assessment_str = assessment_line.split("Assessment:", 1)[1].strip().replace('[','').replace(']','')
+                    if len(lines) > 1 and "Justification:" in lines[1]:
+                        collateral_sk_justification = lines[1].split("Justification:", 1)[1].strip()
+                
+                # XAI Log: Output from the SK skill
+                logging.debug(f"SNC_DETERMINE_RATING_SK_OUTPUT: SK CollateralRiskAssessment for {company_name}: Assessment='{collateral_sk_assessment_str}', Justification='{collateral_sk_justification}'")
+                if collateral_sk_justification: # Add SK justification to rationale
+                    rationale_parts.append(f"SK Collateral Assessment ({collateral_sk_assessment_str}): {collateral_sk_justification}")
 
-        Args:
-            company_name (str): Name of the company.
+            except Exception as e:
+                logging.error(f"Error calling CollateralRiskAssessment SK skill for {company_name}: {e}")
+                # Fallback: collateral_sk_assessment_str remains None, Python logic will use collateral_quality_fallback
+        
+        # Python-based rating logic, potentially augmented/influenced by SK assessment
+        debt_to_equity = financial_analysis.get("debt_to_equity")
+        profitability = financial_analysis.get("profitability")
+        rating = SNCRating.PASS # Default rating
 
-        Returns:
-            dict: Industry-specific data.
-        """
-        industry = self.knowledge_base.get("companies", {}).get(company_name, {}).get("industry", None)
-        if industry:
-            return self.knowledge_base.get("industries", {}).get(industry, {})
-        else:
-            return {}
+        # XAI Log: Initial values before rule-based logic
+        logging.debug(f"SNC_RATING_INITIAL_PARAMS: DtE={debt_to_equity}, Profitability={profitability}, SKCollateralAssessment='{collateral_sk_assessment_str}', FallbackCollateral='{credit_risk_mitigation.get('collateral_quality_fallback')}', ManagementQuality='{qualitative_analysis.get('management_quality')}'")
 
-    def get_economic_data(self):
-        """
-        Retrieves macroeconomic data from the knowledge base.
+        if debt_to_equity is not None and profitability is not None:
+            # Rule 1: High D/E and negative profitability
+            if debt_to_equity > 3.0 and profitability < 0:
+                logging.debug(f"SNC_RATING_RULE_TRIGGERED: LOSS - DtE ({debt_to_equity}) > 3.0 and Profitability ({profitability}) < 0")
+                rating = SNCRating.LOSS
+                rationale_parts.append("High D/E ratio and negative profitability.")
+            # Rule 2: Elevated D/E and low profitability
+            elif debt_to_equity > 2.0 and profitability < 0.1:
+                logging.debug(f"SNC_RATING_RULE_TRIGGERED: DOUBTFUL - DtE ({debt_to_equity}) > 2.0 and Profitability ({profitability}) < 0.1")
+                rating = SNCRating.DOUBTFUL
+                rationale_parts.append("Elevated D/E ratio and low profitability.")
+            # Rule 3: Insufficient liquidity and interest coverage
+            elif financial_analysis.get("liquidity_ratio", 0) < 1.0 and financial_analysis.get("interest_coverage", 0) < 1.0:
+                logging.debug(f"SNC_RATING_RULE_TRIGGERED: SUBSTANDARD - Liquidity ({financial_analysis.get('liquidity_ratio')}) < 1.0 and Interest Coverage ({financial_analysis.get('interest_coverage')}) < 1.0")
+                rating = SNCRating.SUBSTANDARD
+                rationale_parts.append("Insufficient liquidity and interest coverage.")
+            # Rule 4: Collateral concerns and weak management
+            elif (collateral_sk_assessment_str == "Substandard" or 
+                  (collateral_sk_assessment_str is None and credit_risk_mitigation.get("collateral_quality_fallback") == "Low")) and \
+                 qualitative_analysis.get("management_quality") == "Weak":
+                logging.debug(f"SNC_RATING_RULE_TRIGGERED: SPECIAL_MENTION - SK Collateral: {collateral_sk_assessment_str}, Fallback Collateral: {credit_risk_mitigation.get('collateral_quality_fallback')}, Management: {qualitative_analysis.get('management_quality')}")
+                rating = SNCRating.SPECIAL_MENTION
+                rationale_parts.append(f"Collateral concerns (SK: {collateral_sk_assessment_str}, Fallback: {credit_risk_mitigation.get('collateral_quality_fallback')}) and weak management warrant Special Mention.")
+            # Rule 5: Strong financials and stable economic conditions
+            elif debt_to_equity <= 1.0 and profitability >= 0.3 and qualitative_analysis.get("economic_conditions") == "Stable":
+                logging.debug(f"SNC_RATING_RULE_TRIGGERED: PASS - DtE ({debt_to_equity}) <= 1.0, Profitability ({profitability}) >= 0.3, Econ Conditions: {qualitative_analysis.get('economic_conditions')}")
+                rating = SNCRating.PASS 
+                rationale_parts.append("Strong financials and stable economic conditions.")
+            # Rule 6: Fallback to Special Mention if no other critical rule met but not clearly Pass
+            else: 
+                if rating == SNCRating.PASS: # Only if not already downgraded by a more severe rule
+                    logging.debug(f"SNC_RATING_RULE_TRIGGERED: SPECIAL_MENTION - Fallback/Mixed Indicators. Initial DtE: {debt_to_equity}, Profitability: {profitability}")
+                    rating = SNCRating.SPECIAL_MENTION
+                    rationale_parts.append("Mixed financial indicators or other unaddressed concerns warrant monitoring.")
+        else: # If key financial metrics are missing
+            logging.debug("SNC_RATING_RULE_TRIGGERED: UNDETERMINED - Missing key financial metrics (DtE or Profitability)")
+            rating = None
+            rationale_parts.append("Cannot determine rating due to missing key financial metrics (debt-to-equity or profitability).")
 
-        Returns:
-            dict: Macroeconomic data.
-        """
-        return self.knowledge_base.get("macroeconomic_data", {})
+        # Append regulatory guidance reference
+        rationale_parts.append(f"Regulatory guidance: Comptroller's Handbook SNC v{self.comptrollers_handbook_snc.get('version', 'N/A')}, OCC Guidelines v{self.occ_guidelines_snc.get('version', 'N/A')}.")
+        final_rationale = " ".join(filter(None, rationale_parts)) # Filter out potential None/empty strings
+        
+        # XAI Log: Final rating and combined rationale
+        logging.debug(f"SNC_DETERMINE_RATING_OUTPUT: Final Rating='{rating.value if rating else 'Undetermined'}', Rationale='{final_rationale}'")
+        logging.info(f"SNC rating for {company_name}: {rating.value if rating else 'Undetermined'}. Rationale: {final_rationale}")
+        return rating, final_rationale
 
+if __name__ == '__main__':
+    # To see XAI debug logs for the example, you might need to set the root logger level:
+    # logging.getLogger().setLevel(logging.DEBUG) 
+    
+    dummy_snc_agent_config = {
+        'persona': "Test SNC Analyst",
+        'comptrollers_handbook_SNC': {
+            "version": "2024.Q1_test",
+            "substandard_definition": "Collateral is inadequately protective if its value doesn't cover the loan or if perfection issues exist.",
+            "primary_repayment_source": "Repayment should primarily come from the borrower's sustainable cash flow."
+        },
+        'occ_guidelines_SNC': {"version": "2024-03_test"},
+        'peers': ['DataRetrievalAgent'] 
+    }
 
+    mock_data_package_template = {
+        "company_info": {"name": "TestCompany Corp", "industry_sector": "Tech", "country": "USA"},
+        "financial_data_detailed": {
+            "key_ratios": {"debt_to_equity_ratio": 1.5, "net_profit_margin": 0.15, "current_ratio": 1.8, "interest_coverage_ratio": 3.0}
+        },
+        "qualitative_company_info": {"management_assessment": "Average", "business_model_strength": "Moderate"},
+        "industry_data_context": {"outlook": "Stable"},
+        "economic_data_context": {"overall_outlook": "Stable"},
+        "collateral_and_debt_details": {
+            "collateral_type": "Accounts Receivable, Inventory", 
+            "collateral_valuation": 750000, 
+            "loan_to_value_ratio": 0.6, 
+            "guarantees_exist": False,
+            "other_credit_enhancements": "Standard covenants in place."
+        }
+    }
+
+    async def mock_send_message(target_agent_name, message):
+        # logging.info(f"MOCKED send_message to {target_agent_name} with {message}") # Already logged by AgentBase
+        if target_agent_name == 'DataRetrievalAgent' and message.get('data_type') == 'get_company_financials':
+            company_id = message.get('company_id')
+            if company_id == "TEST_COMPANY_SK_PASS":
+                data = json.loads(json.dumps(mock_data_package_template)) 
+                data["company_info"]["name"] = "SKPass Corp"
+                data["collateral_and_debt_details"]["loan_to_value_ratio"] = 0.4 
+                return data
+            elif company_id == "TEST_COMPANY_SK_SUB":
+                data = json.loads(json.dumps(mock_data_package_template)) 
+                data["company_info"]["name"] = "SKSub Corp"
+                data["collateral_and_debt_details"]["loan_to_value_ratio"] = 0.8 
+                data["collateral_and_debt_details"]["collateral_type"] = "Outdated machinery"
+                data["qualitative_company_info"]["management_assessment"] = "Weak" # To trigger specific rule
+                return data
+        return None
+
+    class MockSKFunction:
+        async def invoke(self, variables=None): 
+            class MockSKResult:
+                def __init__(self, value_str): self._value = value_str
+                def __str__(self): return self._value
+            
+            ltv_str = variables.get("ltv_ratio", "Not specified.")
+            assessment = "Pass"
+            justification = "Collateral appears adequate based on LTV."
+            try:
+                ltv = float(ltv_str)
+                if ltv > 0.7:
+                    assessment = "Substandard"
+                    justification = "Collateral LTV is high, indicating potential under-collateralization."
+                elif ltv > 0.5:
+                    assessment = "Special Mention"
+                    justification = "Collateral LTV warrants monitoring."
+            except ValueError: pass 
+            return MockSKResult(f"Assessment: {assessment}\nJustification: {justification}")
+
+    class MockSKSkillsCollection:
+        def get_function(self, skill_collection_name, skill_name):
+            if skill_collection_name == "SNCRatingAssistSkill" and skill_name == "CollateralRiskAssessment":
+                return MockSKFunction()
+            return None
+
+    class MockKernel:
+        def __init__(self): self.skills = MockSKSkillsCollection()
+        async def run_async(self, sk_function, input_vars=None, **kwargs):
+            if sk_function: return await sk_function.invoke(variables=input_vars)
+            return "Mock kernel run_async failed: No function"
+
+    async def run_tests():
+        # logging.getLogger().setLevel(logging.DEBUG) # Example: Uncomment to see XAI debug logs
+        
+        snc_agent_no_kernel = SNCAnalystAgent(config=dummy_snc_agent_config, kernel=None)
+        with patch.object(snc_agent_no_kernel, 'send_message', new=mock_send_message):
+            print("\n--- Test Case: GoodCorp (No SK Kernel - Fallback) ---")
+            rating_no_sk, rationale_no_sk = await snc_agent_no_kernel.execute(company_id="TEST_COMPANY_SK_PASS")
+            print(f"Rating: {rating_no_sk.value if rating_no_sk else 'N/A'}, Rationale: {rationale_no_sk}")
+
+        mock_kernel_instance = MockKernel()
+        snc_agent_with_kernel = SNCAnalystAgent(config=dummy_snc_agent_config, kernel=mock_kernel_instance)
+        with patch.object(snc_agent_with_kernel, 'send_message', new=mock_send_message):
+            print("\n--- Test Case: GoodCorp (With SK Kernel - Expects SK Collateral Assessment) ---")
+            rating_sk_pass, rationale_sk_pass = await snc_agent_with_kernel.execute(company_id="TEST_COMPANY_SK_PASS")
+            print(f"Rating: {rating_sk_pass.value if rating_sk_pass else 'N/A'}, Rationale: {rationale_sk_pass}")
+            assert "SK Collateral Assessment" in rationale_sk_pass
+
+            print("\n--- Test Case: RiskyCorp (With SK Kernel - Expects SK Collateral Assessment) ---")
+            rating_sk_sub, rationale_sk_sub = await snc_agent_with_kernel.execute(company_id="TEST_COMPANY_SK_SUB")
+            print(f"Rating: {rating_sk_sub.value if rating_sk_sub else 'N/A'}, Rationale: {rationale_sk_sub}")
+            assert "SK Collateral Assessment (Substandard)" in rationale_sk_sub
+
+    if __name__ == '__main__':
+        asyncio.run(run_tests())
