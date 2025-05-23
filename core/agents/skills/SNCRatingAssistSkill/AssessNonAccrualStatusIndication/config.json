@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "type": "completion",
+  "description": "Assesses if a loan should be on non-accrual status based on financial data, payment history, and regulatory guidelines.",
+  "completion": {
+    "max_tokens": 350,
+    "temperature": 0.3,
+    "top_p": 1.0,
+    "presence_penalty": 0.0,
+    "frequency_penalty": 0.0
+  },
+  "input": {
+    "parameters": [
+      { "name": "guideline_nonaccrual_status", "description": "Guideline defining non-accrual status.", "defaultValue": "Asset is maintained on a cash basis because of deterioration in the financial condition of the borrower." },
+      { "name": "guideline_interest_capitalization", "description": "Guideline on interest capitalization.", "defaultValue": "Interest may be capitalized only when the borrower is creditworthy and has the ability to repay the debt in the normal course of business." },
+      { "name": "payment_history_status", "description": "Status of loan payments, e.g., 'Current', '30 days past due', '90+ days past due'.", "defaultValue": "Current" },
+      { "name": "relevant_ratios", "description": "String representation of key financial ratios.", "defaultValue": "Not available" },
+      { "name": "repayment_capacity_assessment", "description": "Current assessment of repayment capacity (e.g., 'Strong', 'Weak').", "defaultValue": "Adequate" },
+      { "name": "notes_financial_deterioration", "description": "Qualitative notes on any observed financial deterioration.", "defaultValue": "None noted." },
+      { "name": "interest_capitalization_status", "description": "Is interest currently being capitalized? (e.g., 'Yes', 'No').", "defaultValue": "No" }
+    ]
+  }
+}

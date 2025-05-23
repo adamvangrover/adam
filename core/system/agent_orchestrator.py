@@ -32,11 +32,21 @@ from core.agents.prompt_tuner import PromptTuner
 from core.agents.code_alchemist import CodeAlchemist
 from core.agents.lingua_maestro import LinguaMaestro
 from core.agents.sense_weaver import SenseWeaver
+from core.agents.SNC_analyst_agent import SNCAnalystAgent # Added import
 
 from core.utils.config_utils import load_config
+from core.utils.secrets_utils import get_api_key # Added import
+
+# Semantic Kernel imports
+from semantic_kernel import Kernel
+from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion
+# from semantic_kernel.connectors.ai.azure_open_ai import AzureChatCompletion # Example for later
+# from semantic_kernel.connectors.ai.hugging_face import HuggingFaceTextCompletion # Example for later
 
 
 # Configure logging
+# Ensure logging is configured. If it's already configured at a higher level (e.g. main script),
+# this line might be redundant or could be adjusted. For now, keeping it.
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # Dictionary mapping agent names to their module paths for dynamic loading
@@ -60,6 +70,7 @@ AGENT_CLASSES = {
     "QueryUnderstandingAgent": "core.agents.query_understanding_agent",
     "DataRetrievalAgent": "core.agents.data_retrieval_agent",
     "ResultAggregationAgent": "core.agents.result_aggregation_agent",
+    "SNCAnalystAgent": "core.agents.SNC_analyst_agent", # Added SNC_analyst_agent
 }
 
 
@@ -77,12 +88,102 @@ class AgentOrchestrator:
         self.mcp_service_registry: Dict[
             str, Dict[str, Any]
         ] = {}  # MCP service registry
+        self.sk_kernel: Optional[Kernel] = None # Initialize Semantic Kernel instance to None
+
         if self.config is None:
-            logging.error("Failed to load agent configurations.")
+            logging.error("Failed to load agent configurations (config/agents.yaml).")
         else:
             self.load_agents()
             self.establish_a2a_connections()
             self.register_agent_skills()  # Register agent skills with MCP
+
+        # Initialize Semantic Kernel
+        try:
+            sk_settings_config = load_config('config/semantic_kernel_settings.yaml')
+            if not sk_settings_config or 'semantic_kernel_settings' not in sk_settings_config:
+                logging.error("Semantic Kernel settings not found or empty in config/semantic_kernel_settings.yaml. SK will not be available.")
+                # self.sk_kernel remains None
+            else:
+                sk_settings = sk_settings_config['semantic_kernel_settings']
+                default_service_id = sk_settings.get('default_completion_service_id')
+                completion_services = sk_settings.get('completion_services')
+
+                if not default_service_id or not completion_services:
+                    logging.error("Default service ID or completion_services not defined in Semantic Kernel settings. SK will not be available.")
+                    # self.sk_kernel remains None
+                else:
+                    service_config = completion_services.get(default_service_id)
+                    if not service_config:
+                        logging.error(f"Configuration for default service ID '{default_service_id}' not found in completion_services. SK will not be available.")
+                        # self.sk_kernel remains None
+                    else:
+                        kernel_instance = Kernel()
+                        service_type = service_config.get('service_type')
+                        model_id = service_config.get('model_id')
+
+                        if service_type == "OpenAI":
+                            api_key = get_api_key('OPENAI_API_KEY')
+                            # Optional: Fetch org_id if specified in sk_settings for this service
+                            # org_id_env_var = service_config.get('org_id_env_var')
+                            # org_id = get_api_key(org_id_env_var) if org_id_env_var else None
+                            org_id = get_api_key('OPENAI_ORG_ID') # Simpler: always try OPENAI_ORG_ID
+
+                            if api_key and model_id:
+                                try:
+                                    service_instance = OpenAIChatCompletion(
+                                        model_id=model_id,
+                                        api_key=api_key,
+                                        org_id=org_id if org_id else None
+                                    )
+                                    kernel_instance.add_chat_service("default_completion", service_instance)
+                                    self.sk_kernel = kernel_instance # Assign successfully configured kernel
+                                    logging.info(f"Semantic Kernel initialized with OpenAI service '{default_service_id}' (model: {model_id}).")
+                                except Exception as e:
+                                    logging.error(f"Failed to initialize and add OpenAI service to Semantic Kernel: {e}")
+                                    # self.sk_kernel remains None as it was before this block
+                            else:
+                                logging.error("OpenAI API key or model_id missing. Cannot configure OpenAI service for Semantic Kernel. SK will not be available.")
+                                # self.sk_kernel remains None
+                        # elif service_type == "AzureOpenAI":
+                            # Placeholder for Azure OpenAI configuration
+                            # logging.info("AzureOpenAI service type found, implementation pending.")
+                        # elif service_type == "HuggingFace":
+                            # Placeholder for HuggingFace configuration
+                            # logging.info("HuggingFace service type found, implementation pending.")
+                        else:
+                            logging.error(f"Unsupported Semantic Kernel service type: {service_type}. SK will not be available.")
+                            # self.sk_kernel remains None
+        except Exception as e:
+            logging.error(f"An unexpected error occurred during Semantic Kernel initialization: {e}")
+            self.sk_kernel = None # Ensure it's None on any exception during init
+
+        # Load Semantic Kernel skills if kernel was initialized
+        if self.sk_kernel:
+            skills_directory = "core/agents/skills/"
+            if os.path.isdir(skills_directory):
+                for skill_collection_name in os.listdir(skills_directory):
+                    skill_collection_path = os.path.join(skills_directory, skill_collection_name)
+                    if os.path.isdir(skill_collection_path):
+                        try:
+                            logging.info(f"Importing SK skill collection: {skill_collection_name} from {skill_collection_path}")
+                            # For SK v0.x Python: kernel.import_skill(skill_instance, skill_name) or for directory:
+                            # kernel.import_semantic_skill_from_directory(parent_directory, skill_directory_name)
+                            # or kernel.import_skill_from_directory (newer pre-v1)
+                            # The problem asks for import_skill(parent_directory=..., skill_collection_name=...)
+                            # which is slightly different from standard.
+                            # A common pattern for directory import is:
+                            # self.sk_kernel.import_skill(parent_directory=skills_directory, skill_directory=skill_collection_name)
+                            # or using plugins: self.sk_kernel.add_plugin(parent_directory=skills_directory, plugin_name=skill_collection_name)
+                            # Given the context of "skills" and "collections", and the AgentBase method using
+                            # kernel.skills.get_function, this implies a structure where skills are registered under a collection name.
+                            # The method import_skill_from_directory(parent_directory, skill_directory_name) is appropriate here.
+                            # skill_directory_name becomes the collection name.
+                            self.sk_kernel.import_skill_from_directory(skills_directory, skill_collection_name)
+                            logging.info(f"Successfully imported SK skill collection: {skill_collection_name}")
+                        except Exception as e:
+                            logging.error(f"Failed to import SK skill collection '{skill_collection_name}': {e}")
+            else:
+                logging.warning(f"Skills directory '{skills_directory}' not found. No SK skills loaded.")
 
 
     def load_agents(self):
@@ -97,10 +198,11 @@ class AgentOrchestrator:
             try:
                 agent_class = self._get_agent_class(agent_name)
                 if agent_class:
+                    # Pass both agent_config and the orchestrator's sk_kernel to the agent
                     self.agents[agent_name] = agent_class(
-                        agent_config
-                    )  # Pass config to agent
-                    logging.info(f"Agent loaded: {agent_name}")
+                        config=agent_config, kernel=self.sk_kernel
+                    )
+                    logging.info(f"Agent loaded: {agent_name} {'with' if self.sk_kernel else 'without'} SK Kernel instance.")
                 else:
                     logging.warning(f"Agent class not found for: {agent_name}")
             except Exception as e:
@@ -330,25 +432,35 @@ class AgentOrchestrator:
             )
 
     def establish_a2a_connections(self) -> None:
-        """Establishes Agent-to-Agent (A2A) connections based on config."""
+        """Establishes Agent-to-Agent (A2A) connections based on agent configurations."""
 
         for agent_name, agent in self.agents.items():
-            if hasattr(agent, "peer_agents") and isinstance(
-                agent.peer_agents, list
-            ):  # Check if peer_agents is defined and is a list
-                for peer_agent_name in agent.peer_agents:
-                    peer_agent: Optional[AgentBase] = self.get_agent(
-                        peer_agent_name
-                    )
-                    if peer_agent:
-                        agent.add_peer_agent(peer_agent)
-                        logging.info(
-                            f"Established A2A connection: {agent_name} <-> {peer_agent_name}"
-                        )
+            # Get peer agent names from the current agent's configuration
+            peer_agent_names = agent.config.get('peers', [])
+            
+            if isinstance(peer_agent_names, list):
+                for peer_name in peer_agent_names:
+                    peer_agent_instance = self.get_agent(peer_name)
+                    if peer_agent_instance:
+                        # The add_peer_agent method in AgentBase should handle the actual adding.
+                        # AgentBase.add_peer_agent already logs this connection.
+                        # We can rely on that, or add more specific logging here if needed.
+                        # For example, using agent.config.get('name', agent_name) for a more descriptive name if available.
+                        agent.add_peer_agent(peer_agent_instance)
+                        # Logging example (can be redundant if add_peer_agent logs sufficiently):
+                        # current_agent_display_name = agent.config.get('persona', agent_name) # Using persona as a display name
+                        # peer_agent_display_name = peer_agent_instance.config.get('persona', peer_name)
+                        # logging.info(f"A2A connection attempt: {current_agent_display_name} -> {peer_agent_display_name} successful via config.")
                     else:
                         logging.warning(
-                            f"Peer agent '{peer_agent_name}' not found for A2A connection with '{agent_name}'"
+                            f"Peer agent '{peer_name}' listed in config for '{agent.config.get('persona', agent_name)}' not found."
                         )
+            elif peer_agent_names: # If 'peers' exists but is not a list
+                 logging.warning(
+                    f"Invalid 'peers' configuration for agent '{agent.config.get('persona', agent_name)}': "
+                    f"'peers' should be a list, but found type {type(peer_agent_names)}."
+                )
+
 
     def register_agent_skills(self) -> None:
         """Registers agent skills in the MCP service registry."""

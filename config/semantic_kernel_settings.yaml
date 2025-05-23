@@ -1,0 +1,26 @@
+# config/semantic_kernel_settings.yaml
+# Settings for configuring Semantic Kernel, including LLM services.
+
+semantic_kernel_settings:
+  # Default service ID to use if an agent doesn't specify one.
+  # This ID must match one of the keys under 'completion_services'.
+  default_completion_service_id: "openai_gpt35_turbo"
+
+  # Configuration for different LLM completion services that Semantic Kernel can use.
+  # The keys (e.g., "openai_gpt35_turbo") are service_ids that can be used
+  # when adding completion services to the Kernel.
+  completion_services:
+    openai_gpt35_turbo:
+      service_type: "OpenAI"  # Indicates the type of service (OpenAI, AzureOpenAI, HuggingFace, etc.)
+      model_id: "gpt-3.5-turbo"    # The specific model ID for the OpenAI service.
+      # The API key will be fetched from an environment variable.
+      # The orchestrator, when setting up the kernel, will look for an environment
+      # variable typically named OPENAI_API_KEY.
+      # Optional: org_id_env_var: "OPENAI_ORG_ID" # For specifying an OpenAI organization ID from env.
+
+  # Placeholder for embedding service configurations (can be expanded later if needed for SK Memory)
+  # embedding_services:
+  #   openai_text_embedding_ada:
+  #     service_type: "OpenAI"
+  #     model_id: "text-embedding-ada-002"
+      # API key will also be fetched from an environment variable (e.g., OPENAI_API_KEY)
