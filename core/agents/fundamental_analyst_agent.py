@@ -299,47 +299,89 @@ class FundamentalAnalystAgent(AgentBase):
         pass
 
 
-    def calculate_dcf_valuation(self, company_data: Dict[str, Any]) -> Optional[float]:
+        Calculates the Discounted Cash Flow (DCF) valuation of the company using a two-stage FCF projection model.
+
+        Args:
+            company_data (Dict[str, Any]): The comprehensive data package for the company,
+                                         expected to contain 'financial_data_detailed'.
+        """
         company_name_for_log = company_data.get('company_info', {}).get('name', 'Unknown')
         logging.debug(f"FAA_XAI:DCF_INPUT: company_id='{company_name_for_log}', company_data keys: {list(company_data.keys())}")
         try:
             financial_details = company_data.get('financial_data_detailed', {})
             cash_flow_statement = financial_details.get('cash_flow_statement', {})
-            cash_flows = cash_flow_statement.get('free_cash_flow', [])
+            historical_fcf = cash_flow_statement.get('free_cash_flow', []) 
+
+            if not historical_fcf:
+                logging.warning(f"FAA_XAI:DCF_ABORT: No historical free cash flow data for {company_name_for_log}.")
+                return None
+            
+            last_historical_fcf = historical_fcf[-1]
+            if not isinstance(last_historical_fcf, (int, float)): # Ensure last FCF is usable
+                logging.warning(f"FAA_XAI:DCF_ABORT: Last historical FCF for {company_name_for_log} ('{last_historical_fcf}') is not numeric.")
+                return None
+
             dcf_assumptions = financial_details.get('dcf_assumptions', {})
             
-            growth_rate = dcf_assumptions.get('growth_rate') 
+            # Core rates from existing assumptions
             discount_rate = dcf_assumptions.get('discount_rate')
-            terminal_growth_rate = dcf_assumptions.get('terminal_growth_rate')
-
-            logging.debug(f"FAA_XAI:DCF_PARAMS: FCF_periods={len(cash_flows)}, GrowthRate={growth_rate}, DiscountRate={discount_rate}, TerminalGrowthRate={terminal_growth_rate}")
-
-            if not cash_flows:
-                logging.warning(f"FAA_XAI:DCF_ABORT: No free cash flow data for {company_name_for_log}.")
-                return None
-
-            if growth_rate is None or discount_rate is None or terminal_growth_rate is None:
-                logging.warning(f"FAA_XAI:DCF_ABORT: Missing DCF assumptions for {company_name_for_log}.")
-                return None
+            # Terminal growth rate for perpetuity calculation (after explicit projection period)
+            terminal_growth_rate_perpetuity = dcf_assumptions.get('terminal_growth_rate') 
             
-            if not all(isinstance(rate, (int, float)) for rate in [growth_rate, discount_rate, terminal_growth_rate]):
-                logging.warning(f"FAA_XAI:DCF_ABORT: Non-numeric DCF assumption for {company_name_for_log}.")
+            # New parameters for two-stage growth model
+            fcf_projection_years_total = int(dcf_assumptions.get('fcf_projection_years_total', 10)) # Default 10 years
+            initial_high_growth_period_years = int(dcf_assumptions.get('initial_high_growth_period_years', 5)) # Default 5 years
+            initial_high_growth_rate = dcf_assumptions.get('initial_high_growth_rate', 0.10) # Default 10%
+            stable_growth_rate = dcf_assumptions.get('stable_growth_rate', 0.05) # Default 5% for second stage
+            
+            # Ensure initial_high_growth_period_years is not more than fcf_projection_years_total
+            initial_high_growth_period_years = min(initial_high_growth_period_years, fcf_projection_years_total)
+
+            logging.debug(
+                f"FAA_XAI:DCF_PARAMS_TWO_STAGE: LastHistFCF={last_historical_fcf}, DiscountRate={discount_rate}, "
+                f"TerminalGrowthRatePerpetuity={terminal_growth_rate_perpetuity}, TotalProjectionYears={fcf_projection_years_total}, "
+                f"HighGrowthYears={initial_high_growth_period_years}, HighGrowthRate={initial_high_growth_rate}, StableGrowthRate={stable_growth_rate}"
+            )
+
+            # Validate core rates and growth rates
+            essential_rates = [discount_rate, terminal_growth_rate_perpetuity, initial_high_growth_rate, stable_growth_rate]
+            if not all(isinstance(rate, (int, float)) for rate in essential_rates if rate is not None): # Allow None for rates not used if logic handles it
+                logging.warning(f"FAA_XAI:DCF_ABORT: One or more DCF rates are non-numeric for {company_name_for_log}. Rates: DR={discount_rate}, TGR_P={terminal_growth_rate_perpetuity}, IHGR={initial_high_growth_rate}, SGR={stable_growth_rate}")
+                return None
+            if discount_rate is None or terminal_growth_rate_perpetuity is None: # These are always needed
+                 logging.warning(f"FAA_XAI:DCF_ABORT: Discount rate or terminal perpetuity growth rate is missing for {company_name_for_log}.")
+                 return None
+            if discount_rate <= terminal_growth_rate_perpetuity: # Check against perpetuity growth rate
+                logging.warning(f"FAA_XAI:DCF_ABORT: Discount rate ({discount_rate}) not > terminal perpetuity growth rate ({terminal_growth_rate_perpetuity}) for {company_name_for_log}.")
                 return None
 
-            if discount_rate <= terminal_growth_rate:
-                logging.warning(f"FAA_XAI:DCF_ABORT: Discount rate ({discount_rate}) not > terminal growth rate ({terminal_growth_rate}) for {company_name_for_log}.")
-                return None
-            
             projected_cash_flows = []
-            last_fcf = cash_flows[-1]
-            for _ in range(5): 
-                next_fcf = last_fcf * (1 + growth_rate)
-                projected_cash_flows.append(next_fcf)
-                last_fcf = next_fcf 
-            logging.debug(f"FAA_XAI:DCF_PROJECTED_FCF: {projected_cash_flows}")
+            current_fcf = last_historical_fcf
+
+            for year_num in range(1, fcf_projection_years_total + 1):
+                growth_rate_for_year = 0.0 
+                if year_num <= initial_high_growth_period_years:
+                    if initial_high_growth_rate is None: # Should be caught by all() check above if strictly required for all years
+                        logging.warning(f"FAA_XAI:DCF_WARN: Missing initial_high_growth_rate for year {year_num}, using 0 growth for this year.")
+                    else:
+                        growth_rate_for_year = initial_high_growth_rate
+                else: # Stable growth period (years > initial_high_growth_period_years up to fcf_projection_years_total)
+                    if stable_growth_rate is None: # Should be caught by all() check if strictly required
+                        logging.warning(f"FAA_XAI:DCF_WARN: Missing stable_growth_rate for year {year_num}, using 0 growth for this year.")
+                    else:
+                        growth_rate_for_year = stable_growth_rate
+                
+                current_fcf *= (1 + growth_rate_for_year)
+                projected_cash_flows.append(current_fcf)
+            
+            logging.debug(f"FAA_XAI:DCF_PROJECTED_FCF_TWO_STAGE ({fcf_projection_years_total} years): {projected_cash_flows}")
+
+            if not projected_cash_flows: 
+                logging.warning(f"FAA_XAI:DCF_ABORT: No projected cash flows generated for {company_name_for_log}.")
+                return None
 
             terminal_value_fcf_base = projected_cash_flows[-1]
-            terminal_value = (terminal_value_fcf_base * (1 + terminal_growth_rate)) / (discount_rate - terminal_growth_rate)
+            terminal_value = (terminal_value_fcf_base * (1 + terminal_growth_rate_perpetuity)) / (discount_rate - terminal_growth_rate_perpetuity)
             logging.debug(f"FAA_XAI:DCF_TERMINAL_VALUE: TV_FCF_Base={terminal_value_fcf_base}, TV={terminal_value}")
             
             present_values = []
@@ -347,18 +389,17 @@ class FundamentalAnalystAgent(AgentBase):
                 pv = fcf / ((1 + discount_rate) ** (i + 1))
                 present_values.append(pv)
 
-            terminal_pv = terminal_value / ((1 + discount_rate) ** len(projected_cash_flows))
+            terminal_pv = terminal_value / ((1 + discount_rate) ** fcf_projection_years_total) 
             logging.debug(f"FAA_XAI:DCF_PV_TERMINAL_VALUE: PV_TV={terminal_pv}")
             
             dcf_valuation = sum(present_values) + terminal_pv
             logging.debug(f"FAA_XAI:DCF_OUTPUT: DCF_Valuation={dcf_valuation}")
             return dcf_valuation
 
-        except (KeyError, TypeError, ZeroDivisionError) as e:
+        except Exception as e: 
             logging.exception(f"Error calculating DCF valuation for {company_name_for_log}: {e}")
             logging.debug(f"FAA_XAI:DCF_ERROR: Exception {e}")
             return None
-
 
     def calculate_enterprise_value(self, company_data: Dict[str, Any]) -> Optional[float]:
         company_name_for_log = company_data.get('company_info', {}).get('name', 'Unknown')
@@ -444,7 +485,14 @@ if __name__ == '__main__':
             "cash_flow_statement": {"operating_cash_flow": [180, 200, 230], "investing_cash_flow": [-50, -60, -70], 
                                     "financing_cash_flow": [-30, -40, -50], "free_cash_flow": [130, 140, 160]},
             "key_ratios": {"debt_to_equity_ratio": 0.58, "net_profit_margin": 0.20, "current_ratio": 2.95, "interest_coverage_ratio": 13.6},
-            "dcf_assumptions": {"growth_rate": 0.05, "discount_rate": 0.10, "terminal_growth_rate": 0.03},
+            "dcf_assumptions": {
+                "fcf_projection_years_total": 10,
+                "initial_high_growth_period_years": 5,
+                "initial_high_growth_rate": 0.10,
+                "stable_growth_rate": 0.05,
+                "discount_rate": 0.09,
+                "terminal_growth_rate_perpetuity": 0.025 # Matches DataRetrievalAgent
+            },
             "market_data": {"share_price": 65.00, "shares_outstanding": 10000000} 
         },
         "qualitative_company_info": {"management_assessment": "Experienced", "competitive_advantages": "Strong IP"},

@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "type": "completion",
+  "description": "Assesses a borrower's repayment capacity for SNC based on financial data, qualitative notes, and regulatory guidelines.",
+  "completion": {
+    "max_tokens": 400,
+    "temperature": 0.4,
+    "top_p": 1.0,
+    "presence_penalty": 0.0,
+    "frequency_penalty": 0.0
+  },
+  "input": {
+    "parameters": [
+      { "name": "guideline_repayment_source", "description": "Guideline on primary repayment source.", "defaultValue": "Must be sustainable and under borrower control." },
+      { "name": "guideline_substandard_paying_capacity", "description": "Guideline on paying capacity for substandard.", "defaultValue": "Paying capacity is inadequate." },
+      { "name": "repayment_capacity_period_years", "description": "Typical period to consider for repayment capacity.", "defaultValue": "7" },
+      { "name": "historical_fcf", "description": "String representation of historical FCF, e.g., '[100, 110, 120]'.", "defaultValue": "Not available" },
+      { "name": "historical_cfo", "description": "String representation of historical CFO.", "defaultValue": "Not available" },
+      { "name": "annual_debt_service", "description": "Annual debt service requirement.", "defaultValue": "Not available" },
+      { "name": "relevant_ratios", "description": "String representation of key financial ratios, e.g., 'Debt/EBITDA: 3.5, Interest Coverage: 2.1'.", "defaultValue": "Not available" },
+      { "name": "projected_fcf", "description": "String representation of projected FCF.", "defaultValue": "Not available" },
+      { "name": "qualitative_notes_stability", "description": "Qualitative notes on revenue and cash flow stability.", "defaultValue": "None provided." }
+    ]
+  }
+}

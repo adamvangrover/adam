@@ -138,8 +138,13 @@ class DataRetrievalAgent(AgentBase):
                         "debt_to_equity_ratio": 0.58, "net_profit_margin": 0.20,
                         "current_ratio": 2.95, "interest_coverage_ratio": 13.6 
                     },
-                    "dcf_assumptions": { # Renamed from direct keys for clarity
-                        "growth_rate": 0.05, "discount_rate": 0.10, "terminal_growth_rate": 0.03
+                    "dcf_assumptions": {
+                        "fcf_projection_years_total": 10,
+                        "initial_high_growth_period_years": 5,
+                        "initial_high_growth_rate": 0.10, 
+                        "stable_growth_rate": 0.05,       
+                        "discount_rate": 0.09,            
+                        "terminal_growth_rate_perpetuity": 0.025 
                     },
                     "market_data": { 
                         "share_price": 65.00, "shares_outstanding": 10000000 
