@@ -1,0 +1,1565 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix ex: <http://example.org/kg/entity/> .
+@prefix kgclass: <http://example.org/kg/class/> .
+@prefix kgprop: <http://example.org/kg/property/> .
+
+<http://example.org/knowledgegraph> rdf:type owl:Ontology ;
+    owl:versionInfo "2.0.0" ;
+    dcterms:description "A knowledge graph representing concepts and relationships in Valuation, Risk Management, Macroeconomics, Technical Analysis, Emerging Trends, and LLM Optimization." ;
+    dcterms:modified "2025-04-01T20:59:15Z"^^xsd:dateTime .
+
+# Class Definitions
+kgclass:Analysis_Tool rdf:type owl:Class ;
+    rdfs:label "Analysis Tool" .
+kgclass:Asset_Category rdf:type owl:Class ;
+    rdfs:label "Asset Category" .
+kgclass:Assessment rdf:type owl:Class ;
+    rdfs:label "Assessment" .
+kgclass:Assumption rdf:type owl:Class ;
+    rdfs:label "Assumption" .
+kgclass:Assumption_Parametric rdf:type owl:Class ;
+    rdfs:label "Assumption (Parametric)" .
+kgclass:Balance_Sheet_Item rdf:type owl:Class ;
+    rdfs:label "Balance Sheet Item" .
+kgclass:Calculated_Flow rdf:type owl:Class ;
+    rdfs:label "Calculated Flow" .
+kgclass:Calculated_Rate rdf:type owl:Class ;
+    rdfs:label "Calculated Rate" .
+kgclass:Calculated_Value rdf:type owl:Class ;
+    rdfs:label "Calculated Value" .
+kgclass:Cash_Flow_Item rdf:type owl:Class ;
+    rdfs:label "Cash Flow Item" .
+kgclass:Classification rdf:type owl:Class ;
+    rdfs:label "Classification" .
+kgclass:Company rdf:type owl:Class ;
+    rdfs:label "Company" .
+kgclass:Company_Set rdf:type owl:Class ;
+    rdfs:label "Company Set" .
+kgclass:Consensus_Mechanism rdf:type owl:Class ;
+    rdfs:label "Consensus Mechanism" .
+kgclass:Core_Technology rdf:type owl:Class ;
+    rdfs:label "Core Technology" .
+kgclass:Coverage_Ratio rdf:type owl:Class ;
+    rdfs:label "Coverage Ratio" .
+kgclass:Credit_Derivative rdf:type owl:Class ;
+    rdfs:label "Credit Derivative" .
+kgclass:Credit_Model_Category rdf:type owl:Class ;
+    rdfs:label "Credit Model Category" .
+kgclass:Credit_Risk_Metric rdf:type owl:Class ;
+    rdfs:label "Credit Risk Metric" .
+kgclass:Credit_Risk_Mitigation rdf:type owl:Class ;
+    rdfs:label "Credit Risk Mitigation" .
+kgclass:Cryptocurrency_Category rdf:type owl:Class ;
+    rdfs:label "Cryptocurrency Category" .
+kgclass:Cryptocurrency_Proof_or_Stake rdf:type owl:Class ;
+    rdfs:label "Cryptocurrency (Proof-of-Stake)" .
+kgclass:Cryptocurrency_Proof_or_Work rdf:type owl:Class ;
+    rdfs:label "Cryptocurrency (Proof-of-Work)" .
+kgclass:Cryptocurrency_Type rdf:type owl:Class ;
+    rdfs:label "Cryptocurrency Type" .
+kgclass:Crypto_Exchange_Example rdf:type owl:Class ;
+    rdfs:label "Crypto Exchange Example" .
+kgclass:Data_Store_External_Memory rdf:type owl:Class ;
+    rdfs:label "Data Store (External Memory)" .
+kgclass:DeFi_Application rdf:type owl:Class ;
+    rdfs:label "DeFi Application" .
+kgclass:DeFi_Ecosystem rdf:type owl:Class ;
+    rdfs:label "Financial Ecosystem" .
+kgclass:DeFi_Mechanism rdf:type owl:Class ;
+    rdfs:label "DeFi Mechanism" .
+kgclass:DeFi_Risk rdf:type owl:Class ;
+    rdfs:label "DeFi Risk" .
+kgclass:DeFi_Strategy rdf:type owl:Class ;
+    rdfs:label "DeFi Strategy" .
+kgclass:DEX_Protocol_Example rdf:type owl:Class ;
+    rdfs:label "DEX Protocol Example" .
+kgclass:Empirical_Credit_Model rdf:type owl:Class ;
+    rdfs:label "Empirical Credit Model" .
+kgclass:Entity rdf:type owl:Class ;
+    rdfs:label "Entity" .
+kgclass:Equity_Data rdf:type owl:Class ;
+    rdfs:label "Equity Data" .
+kgclass:Equity_Metric rdf:type owl:Class ;
+    rdfs:label "Equity Metric" .
+kgclass:Equity_Multiple rdf:type owl:Class ;
+    rdfs:label "Equity Multiple" .
+kgclass:ESG_Pillar rdf:type owl:Class ;
+    rdfs:label "ESG Pillar" .
+kgclass:ESG_Rating_Agency_Example rdf:type owl:Class ;
+    rdfs:label "ESG Rating Agency Example" .
+kgclass:ESG_Reporting_Framework rdf:type owl:Class ;
+    rdfs:label "ESG Reporting Framework" .
+kgclass:Environmental_Factor rdf:type owl:Class ;
+    rdfs:label "Environmental Factor" .
+kgclass:EV_Multiple rdf:type owl:Class ;
+    rdfs:label "EV Multiple" .
+kgclass:Financial_Ecosystem rdf:type owl:Class ;
+    rdfs:label "Financial Ecosystem" .
+kgclass:Financial_Instrument rdf:type owl:Class ;
+    rdfs:label "Financial Instrument" .
+kgclass:Financial_Market rdf:type owl:Class ;
+    rdfs:label "Financial Market" .
+kgclass:Financial_Metric rdf:type owl:Class ;
+    rdfs:label "Financial Metric" .
+kgclass:Financial_Model rdf:type owl:Class ;
+    rdfs:label "Financial Model" .
+kgclass:Framework rdf:type owl:Class ;
+    rdfs:label "Framework" .
+kgclass:Funding_Category rdf:type owl:Class ;
+    rdfs:label "Funding Category" .
+kgclass:Funding_Need rdf:type owl:Class ;
+    rdfs:label "Funding Need" .
+kgclass:Governance_Factor rdf:type owl:Class ;
+    rdfs:label "Governance Factor" .
+kgclass:Hyperparameter rdf:type owl:Class ;
+    rdfs:label "Hyperparameter" .
+kgclass:Hyperparameter_Category rdf:type owl:Class ;
+    rdfs:label "Hyperparameter Category" .
+kgclass:Hyperparameter_Search_Method rdf:type owl:Class ;
+    rdfs:label "Hyperparameter Search Method" .
+kgclass:Income_Statement_Item rdf:type owl:Class ;
+    rdfs:label "Income Statement Item" .
+kgclass:Indicator_Signal rdf:type owl:Class ;
+    rdfs:label "Indicator Signal" .
+kgclass:Information_Management rdf:type owl:Class ;
+    rdfs:label "Information Management" .
+kgclass:Institution rdf:type owl:Class ;
+    rdfs:label "Institution" .
+kgclass:Intrinsic_Valuation_Method rdf:type owl:Class ;
+    rdfs:label "Intrinsic Valuation Method" .
+kgclass:Investment_Approach rdf:type owl:Class ;
+    rdfs:label "Investment Approach" .
+kgclass:LLM_Architecture rdf:type owl:Class ;
+    rdfs:label "LLM Architecture" .
+kgclass:LLM_Architecture_Component rdf:type owl:Class ;
+    rdfs:label "LLM Architecture Component" .
+kgclass:LLM_Capability_or_Challenge rdf:type owl:Class ;
+    rdfs:label "LLM Capability/Challenge" .
+kgclass:LLM_Constraint rdf:type owl:Class ;
+    rdfs:label "LLM Constraint" .
+kgclass:LLM_Parameter rdf:type owl:Class ;
+    rdfs:label "LLM Parameter" .
+kgclass:LLM_Process rdf:type owl:Class ;
+    rdfs:label "LLM Process" .
+kgclass:Lending_Protocol_Example rdf:type owl:Class ;
+    rdfs:label "Lending Protocol Example" .
+kgclass:Leverage_Ratio rdf:type owl:Class ;
+    rdfs:label "Leverage Ratio" .
+kgclass:Liquidity_Ratio rdf:type owl:Class ;
+    rdfs:label "Liquidity Ratio" .
+kgclass:Liquidity_Risk_Type rdf:type owl:Class ;
+    rdfs:label "Liquidity Risk Type" .
+kgclass:Macroeconomic_Policy rdf:type owl:Class ;
+    rdfs:label "Macroeconomic Policy" .
+kgclass:Market_Data rdf:type owl:Class ;
+    rdfs:label "Market Data" .
+kgclass:Market_Expectation rdf:type owl:Class ;
+    rdfs:label "Market Expectation" .
+kgclass:Market_Factor rdf:type owl:Class ;
+    rdfs:label "Market Factor" .
+kgclass:Market_Liquidity_Indicator rdf:type owl:Class ;
+    rdfs:label "Market Liquidity Indicator" .
+kgclass:Market_or_Estimated_Data rdf:type owl:Class ;
+    rdfs:label "Market/Estimated Data" .
+kgclass:Market_Rate rdf:type owl:Class ;
+    rdfs:label "Market Rate" .
+kgclass:Memory_Augmentation rdf:type owl:Class ;
+    rdfs:label "External Memory" .
+kgclass:Memory_Technique rdf:type owl:Class ;
+    rdfs:label "Memory Technique" .
+kgclass:Memory_Type rdf:type owl:Class ;
+    rdfs:label "Memory Type" .
+kgclass:Model_Configuration rdf:type owl:Class ;
+    rdfs:label "Model Configuration" .
+kgclass:Monetary_Policy_Tool rdf:type owl:Class ;
+    rdfs:label "Monetary Policy Tool" .
+kgclass:Momentum_Oscillator rdf:type owl:Class ;
+    rdfs:label "Momentum Oscillator" .
+kgclass:Moving_Average_Type rdf:type owl:Class ;
+    rdfs:label "Moving Average Type" .
+kgclass:Non_Cash_Expense rdf:type owl:Class ;
+    rdfs:label "Non-Cash Expense" .
+kgclass:Operational_Liquidity_Metric rdf:type owl:Class ;
+    rdfs:label "Operational Liquidity Metric" .
+kgclass:Optimization_Algorithm rdf:type owl:Class ;
+    rdfs:label "Optimization Algorithm" .
+kgclass:Optimization_Algorithm_Variant rdf:type owl:Class ;
+    rdfs:label "Optimization Algorithm Variant" .
+kgclass:Optimization_Process rdf:type owl:Class ;
+    rdfs:label "Optimization Process" .
+kgclass:Optimization_Technique rdf:type owl:Class ;
+    rdfs:label "Optimization Technique" .
+kgclass:Parameter rdf:type owl:Class ;
+    rdfs:label "Parameter" .
+kgclass:Parameter_Historical rdf:type owl:Class ;
+    rdfs:label "Parameter (Historical)" .
+kgclass:Parameter_Monte_Carlo rdf:type owl:Class ;
+    rdfs:label "Parameter (Monte Carlo)" .
+kgclass:Parameter_Reduced_Form rdf:type owl:Class ;
+    rdfs:label "Parameter (Reduced Form)" .
+kgclass:Policy_Objective rdf:type owl:Class ;
+    rdfs:label "Policy Objective" .
+kgclass:Policy_Stance rdf:type owl:Class ;
+    rdfs:label "Policy Stance" .
+kgclass:Portfolio_Credit_Model rdf:type owl:Class ;
+    rdfs:label "Portfolio Credit Model" .
+kgclass:Process rdf:type owl:Class ;
+    rdfs:label "Process" .
+kgclass:Process_PoS rdf:type owl:Class ;
+    rdfs:label "Process (PoS)" .
+kgclass:Process_PoW rdf:type owl:Class ;
+    rdfs:label "Process (PoW)" .
+kgclass:Rate rdf:type owl:Class ;
+    rdfs:label "Rate" .
+kgclass:Regulatory_Liquidity_Metric rdf:type owl:Class ;
+    rdfs:label "Regulatory Liquidity Metric" .
+kgclass:Relative_Valuation_Method rdf:type owl:Class ;
+    rdfs:label "Relative Valuation Method" .
+kgclass:Representation_Technique rdf:type owl:Class ;
+    rdfs:label "Representation Technique" .
+kgclass:Risk_Assessment_Method rdf:type owl:Class ;
+    rdfs:label "Risk Assessment Method" .
+kgclass:Risk_Category rdf:type owl:Class ;
+    rdfs:label "Risk Category" .
+kgclass:Risk_Challenge rdf:type owl:Class ;
+    rdfs:label "Risk/Challenge" .
+kgclass:Risk_Concept rdf:type owl:Class ;
+    rdfs:label "Risk Concept" .
+kgclass:Risk_Metric rdf:type owl:Class ;
+    rdfs:label "Risk Metric" .
+kgclass:SRI_Screening_Type rdf:type owl:Class ;
+    rdfs:label "SRI Screening Type" .
+kgclass:Social_Factor rdf:type owl:Class ;
+    rdfs:label "Social Factor" .
+kgclass:Stablecoin_Example rdf:type owl:Class ;
+    rdfs:label "Stablecoin Example" .
+kgclass:Statistical_Concept rdf:type owl:Class ;
+    rdfs:label "Statistical Concept" .
+kgclass:Storage_Method rdf:type owl:Class ;
+    rdfs:label "Storage Method" .
+kgclass:Structural_Credit_Model rdf:type owl:Class ;
+    rdfs:label "Structural Credit Model" .
+kgclass:Supply_Mechanism_Event rdf:type owl:Class ;
+    rdfs:label "Supply Mechanism Event" .
+kgclass:Support_or_Resistance_Tool rdf:type owl:Class ;
+    rdfs:label "Support/Resistance Tool" .
+kgclass:Sustainable_Strategy rdf:type owl:Class ;
+    rdfs:label "Sustainable Strategy" .
+kgclass:Technical_Analysis_Method rdf:type owl:Class ;
+    rdfs:label "Technical Analysis Method" .
+kgclass:Text_Unit rdf:type owl:Class ;
+    rdfs:label "Token" .
+kgclass:Token_Type rdf:type owl:Class ;
+    rdfs:label "Token Type" .
+kgclass:Trading_Phase rdf:type owl:Class ;
+    rdfs:label "Training Phase" .
+kgclass:Trading_Venue rdf:type owl:Class ;
+    rdfs:label "Trading Venue" .
+kgclass:Trend_Indicator rdf:type owl:Class ;
+    rdfs:label "Trend Indicator" .
+kgclass:Trend_or_Momentum_Indicator rdf:type owl:Class ;
+    rdfs:label "Trend/Momentum Indicator" .
+kgclass:Trend_Strength_Indicator rdf:type owl:Class ;
+    rdfs:label "Trend Strength Indicator" .
+kgclass:Unconventional_Tool rdf:type owl:Class ;
+    rdfs:label "Unconventional Tool" .
+kgclass:Validation_Method rdf:type owl:Class ;
+    rdfs:label "Validation Method" .
+kgclass:Valuation_Adjustment rdf:type owl:Class ;
+    rdfs:label "Valuation Adjustment" .
+kgclass:Valuation_Component rdf:type owl:Class ;
+    rdfs:label "Valuation Component" .
+kgclass:Valuation_Output rdf:type owl:Class ;
+    rdfs:label "Valuation Output" .
+kgclass:VaR_Method rdf:type owl:Class ;
+    rdfs:label "VaR Method" .
+kgclass:Volatility_Indicator rdf:type owl:Class ;
+    rdfs:label "Volatility Indicator" .
+kgclass:Volume_Indicator rdf:type owl:Class ;
+    rdfs:label "Volume Indicator" .
+kgclass:Wallet_Type rdf:type owl:Class ;
+    rdfs:label "Wallet Type" .
+
+# Property Definitions
+kgprop:addressed_by rdf:type owl:ObjectProperty ;
+    rdfs:label "addressed_by" .
+kgprop:aims_for rdf:type owl:ObjectProperty ;
+    rdfs:label "aims_for" .
+kgprop:assessed_by rdf:type owl:ObjectProperty ;
+    rdfs:label "assessed_by" .
+kgprop:assigned_by rdf:type owl:ObjectProperty ;
+    rdfs:label "assigned_by" .
+kgprop:assumes rdf:type owl:ObjectProperty ;
+    rdfs:label "assumes" .
+kgprop:assumes_distribution_of rdf:type owl:ObjectProperty ;
+    rdfs:label "assumes_distribution_of" .
+kgprop:augmented_by rdf:type owl:ObjectProperty ;
+    rdfs:label "augmented_by" .
+kgprop:calculated_by rdf:type owl:ObjectProperty ;
+    rdfs:label "calculated_by" .
+kgprop:calculated_for rdf:type owl:ObjectProperty ;
+    rdfs:label "calculated_for" .
+kgprop:calculated_from rdf:type owl:ObjectProperty ;
+    rdfs:label "calculated_from" .
+kgprop:calculates rdf:type owl:ObjectProperty ;
+    rdfs:label "calculates" .
+kgprop:can_show rdf:type owl:ObjectProperty ;
+    rdfs:label "can_show" .
+kgprop:can_use rdf:type owl:ObjectProperty ;
+    rdfs:label "can_use" .
+kgprop:challenged_by rdf:type owl:ObjectProperty ;
+    rdfs:label "challenged_by" .
+kgprop:complement_of rdf:type owl:ObjectProperty ;
+    rdfs:label "complement_of" .
+kgprop:component_of rdf:type owl:ObjectProperty ;
+    rdfs:label "component_of" .
+kgprop:correlates_with rdf:type owl:ObjectProperty ;
+    rdfs:label "correlates_with" .
+kgprop:depends_on rdf:type owl:ObjectProperty ;
+    rdfs:label "depends_on" .
+kgprop:derives_from_historical rdf:type owl:ObjectProperty ;
+    rdfs:label "derives_from_historical" .
+kgprop:derived_by_subtracting rdf:type owl:ObjectProperty ;
+    rdfs:label "derived_by_subtracting" .
+kgprop:enabled_by rdf:type owl:ObjectProperty ;
+    rdfs:label "enabled_by" .
+kgprop:enables_strategy rdf:type owl:ObjectProperty ;
+    rdfs:label "enables_strategy" .
+kgprop:encoded_in rdf:type owl:ObjectProperty ;
+    rdfs:label "encoded_in" .
+kgprop:estimated_by rdf:type owl:ObjectProperty ;
+    rdfs:label "estimated_by" .
+kgprop:evaluated_by rdf:type owl:ObjectProperty ;
+    rdfs:label "evaluated_by" .
+kgprop:example_is rdf:type owl:ObjectProperty ;
+    rdfs:label "example_is" .
+kgprop:has_type rdf:type owl:ObjectProperty ;
+    rdfs:label "has_type" .
+kgprop:identifies_potential rdf:type owl:ObjectProperty ;
+    rdfs:label "identifies_potential" .
+kgprop:implemented_by rdf:type owl:ObjectProperty ;
+    rdfs:label "implemented_by" .
+kgprop:implemented_via rdf:type owl:ObjectProperty ;
+    rdfs:label "implemented_via" .
+kgprop:includes rdf:type owl:ObjectProperty ;
+    rdfs:label "includes" .
+kgprop:includes_application rdf:type owl:ObjectProperty ;
+    rdfs:label "includes_application" .
+kgprop:includes_asset rdf:type owl:ObjectProperty ;
+    rdfs:label "includes_asset" .
+kgprop:includes_category rdf:type owl:ObjectProperty ;
+    rdfs:label "includes_category" .
+kgprop:includes_phase rdf:type owl:ObjectProperty ;
+    rdfs:label "includes_phase" .
+kgprop:includes_type rdf:type owl:ObjectProperty ;
+    rdfs:label "includes_type" .
+kgprop:indicated_by rdf:type owl:ObjectProperty ;
+    rdfs:label "indicated_by" .
+kgprop:influenced_by rdf:type owl:ObjectProperty ;
+    rdfs:label "influenced_by" .
+kgprop:influences rdf:type owl:ObjectProperty ;
+    rdfs:label "influences" .
+kgprop:involves rdf:type owl:ObjectProperty ;
+    rdfs:label "involves" .
+kgprop:involves_lowering rdf:type owl:ObjectProperty ;
+    rdfs:label "involves_lowering" .
+kgprop:involves_raising rdf:type owl:ObjectProperty ;
+    rdfs:label "involves_raising" .
+kgprop:is_equivalent_to rdf:type owl:ObjectProperty ;
+    rdfs:label "is_equivalent_to" .
+kgprop:is_typically rdf:type owl:ObjectProperty ;
+    rdfs:label "is_typically" .
+kgprop:leads_to rdf:type owl:ObjectProperty ;
+    rdfs:label "leads_to" .
+kgprop:limited_by rdf:type owl:ObjectProperty ;
+    rdfs:label "limited_by" .
+kgprop:managed_by rdf:type owl:ObjectProperty ;
+    rdfs:label "managed_by" .
+kgprop:may_involve rdf:type owl:ObjectProperty ;
+    rdfs:label "may_involve" .
+kgprop:may_use_framework rdf:type owl:ObjectProperty ;
+    rdfs:label "may_use_framework" .
+kgprop:measured_by rdf:type owl:ObjectProperty ;
+    rdfs:label "measured_by" .
+kgprop:measured_in rdf:type owl:ObjectProperty ;
+    rdfs:label "measured_in" .
+kgprop:measures rdf:type owl:ObjectProperty ;
+    rdfs:label "measures" .
+kgprop:mitigated_by rdf:type owl:ObjectProperty ;
+    rdfs:label "mitigated_by" .
+kgprop:often_involves rdf:type owl:ObjectProperty ;
+    rdfs:label "often_involves" .
+kgprop:often_makes rdf:type owl:ObjectProperty ;
+    rdfs:label "often_makes" .
+kgprop:often_uses rdf:type owl:ObjectProperty ;
+    rdfs:label "often_uses" .
+kgprop:optimizes rdf:type owl:ObjectProperty ;
+    rdfs:label "optimizes" .
+kgprop:optimized_by rdf:type owl:ObjectProperty ;
+    rdfs:label "optimized_by" .
+kgprop:parameterized_by rdf:type owl:ObjectProperty ;
+    rdfs:label "parameterized_by" .
+kgprop:performs rdf:type owl:ObjectProperty ;
+    rdfs:label "performs" .
+kgprop:processed_by rdf:type owl:ObjectProperty ;
+    rdfs:label "processed_by" .
+kgprop:produced_by rdf:type owl:ObjectProperty ;
+    rdfs:label "produced_by" .
+kgprop:reflects rdf:type owl:ObjectProperty ;
+    rdfs:label "reflects" .
+kgprop:related_to rdf:type owl:ObjectProperty ;
+    rdfs:label "related_to" .
+kgprop:requires rdf:type owl:ObjectProperty ;
+    rdfs:label "requires" .
+kgprop:requires_data_from rdf:type owl:ObjectProperty ;
+    rdfs:label "requires_data_from" .
+kgprop:runs_on rdf:type owl:ObjectProperty ;
+    rdfs:label "runs_on" .
+kgprop:selected_based_on rdf:type owl:ObjectProperty ;
+    rdfs:label "selected_based_on" .
+kgprop:signals rdf:type owl:ObjectProperty ;
+    rdfs:label "signals" .
+kgprop:simulates rdf:type owl:ObjectProperty ;
+    rdfs:label "simulates" .
+kgprop:stored_in rdf:type owl:ObjectProperty ;
+    rdfs:label "stored_in" .
+kgprop:stores rdf:type owl:ObjectProperty ;
+    rdfs:label "stores" .
+kgprop:subject_to rdf:type owl:ObjectProperty ;
+    rdfs:label "subject_to" .
+kgprop:subject_to_risk_of rdf:type owl:ObjectProperty ;
+    rdfs:label "subject_to_risk_of" .
+kgprop:sum_of rdf:type owl:ObjectProperty ;
+    rdfs:label "sum_of" .
+kgprop:traded_on rdf:type owl:ObjectProperty ;
+    rdfs:label "traded_on" .
+kgprop:underestimates rdf:type owl:ObjectProperty ;
+    rdfs:label "underestimates" .
+kgprop:uses rdf:type owl:ObjectProperty ;
+    rdfs:label "uses" .
+kgprop:uses_consensus rdf:type owl:ObjectProperty ;
+    rdfs:label "uses_consensus" .
+kgprop:uses_data_from rdf:type owl:ObjectProperty ;
+    rdfs:label "uses_data_from" .
+kgprop:uses_hyperparameter rdf:type owl:ObjectProperty ;
+    rdfs:label "uses_hyperparameter" .
+kgprop:uses_method rdf:type owl:ObjectProperty ;
+    rdfs:label "uses_method" .
+kgprop:uses_storage rdf:type owl:ObjectProperty ;
+    rdfs:label "uses_storage" .
+kgprop:uses_tool rdf:type owl:ObjectProperty ;
+    rdfs:label "uses_tool" .
+kgprop:uses_weight_of rdf:type owl:ObjectProperty ;
+    rdfs:label "uses_weight_of" .
+kgprop:values rdf:type owl:ObjectProperty ;
+    rdfs:label "values" .
+kgprop:variant_is rdf:type owl:ObjectProperty ;
+    rdfs:label "variant_is" .
+
+# Individuals and their Properties
+ex:dcf
+    rdf:type kgclass:Intrinsic_Valuation_Method ;
+    rdfs:label "Discounted Cash Flow (DCF)" .
+
+ex:ufcf
+    rdf:type kgclass:Financial_Metric ;
+    rdfs:label "Unlevered Free Cash Flow (UFCF)" .
+
+ex:discount_rate
+    rdf:type kgclass:Rate ;
+    rdfs:label "Discount Rate" .
+
+ex:wacc
+    rdf:type kgclass:Calculated_Rate ;
+    rdfs:label "Weighted Average Cost of Capital (WACC)" .
+
+ex:terminal_value
+    rdf:type kgclass:Valuation_Component ;
+    rdfs:label "Terminal Value" .
+
+ex:present_value
+    rdf:type kgclass:Calculated_Value ;
+    rdfs:label "Present Value" .
+
+ex:enterprise_value
+    rdf:type kgclass:Valuation_Output ;
+    rdfs:label "Enterprise Value (EV)" .
+
+ex:equity_value
+    rdf:type kgclass:Valuation_Output ;
+    rdfs:label "Equity Value" .
+
+ex:implied_share_price
+    rdf:type kgclass:Valuation_Output ;
+    rdfs:label "Implied Share Price" .
+
+ex:net_debt
+    rdf:type kgclass:Balance_Sheet_Item ;
+    rdfs:label "Net Debt" .
+
+ex:shares_outstanding
+    rdf:type kgclass:Equity_Data ;
+    rdfs:label "Shares Outstanding" .
+
+ex:ebit
+    rdf:type kgclass:Income_Statement_Item ;
+    rdfs:label "Earnings Before Interest & Taxes (EBIT)" .
+
+ex:tax_rate
+    rdf:type kgclass:Parameter ;
+    rdfs:label "Tax Rate" .
+
+ex:d_And_a
+    rdf:type kgclass:Non_Cash_Expense ;
+    rdfs:label "Depreciation & Amortization" .
+
+ex:capex
+    rdf:type kgclass:Cash_Flow_Item ;
+    rdfs:label "Capital Expenditures" .
+
+ex:change_nwc
+    rdf:type kgclass:Cash_Flow_Item ;
+    rdfs:label "Change in Net Working Capital" .
+
+ex:terminal_growth_rate
+    rdf:type kgclass:Assumption ;
+    rdfs:label "Terminal Growth Rate" .
+
+ex:exit_multiple
+    rdf:type kgclass:Assumption ;
+    rdfs:label "Exit Multiple" .
+
+ex:cost_of_equity
+    rdf:type kgclass:Calculated_Rate ;
+    rdfs:label "Cost of Equity (Re)" .
+
+ex:cost_of_debt
+    rdf:type kgclass:Rate ;
+    rdfs:label "Cost of Debt (Rd)" .
+
+ex:market_value_equity
+    rdf:type kgclass:Market_Data ;
+    rdfs:label "Market Value of Equity (E)" .
+
+ex:market_value_debt
+    rdf:type kgclass:Market_or_Estimated_Data ;
+    rdfs:label "Market Value of Debt (D)" .
+
+ex:total_capital
+    rdf:type kgclass:Calculated_Value ;
+    rdfs:label "Total Capital (V = E+D)" .
+
+ex:capm
+    rdf:type kgclass:Financial_Model ;
+    rdfs:label "Capital Asset Pricing Model (CAPM)" .
+
+ex:risk_free_rate
+    rdf:type kgclass:Market_Rate ;
+    rdfs:label "Risk-Free Rate (Rf)" .
+
+ex:beta
+    rdf:type kgclass:Risk_Metric ;
+    rdfs:label "Beta (β)" .
+
+ex:market_risk_premium
+    rdf:type kgclass:Market_Expectation ;
+    rdfs:label "Market Risk Premium (MRP)" .
+
+ex:comparables
+    rdf:type kgclass:Relative_Valuation_Method ;
+    rdfs:label "Comparable Company Analysis (CCA)" .
+
+ex:precedent_transactions
+    rdf:type kgclass:Relative_Valuation_Method ;
+    rdfs:label "Precedent Transaction Analysis" .
+
+ex:pe_ratio
+    rdf:type kgclass:Equity_Multiple ;
+    rdfs:label "Price-to-Earnings Ratio (P/E)" .
+
+ex:ev_ebitda
+    rdf:type kgclass:EV_Multiple ;
+    rdfs:label "Enterprise Value to EBITDA" .
+
+ex:ev_sales
+    rdf:type kgclass:EV_Multiple ;
+    rdfs:label "Enterprise Value to Sales" .
+
+ex:price_to_book
+    rdf:type kgclass:Equity_Multiple ;
+    rdfs:label "Price-to-Book Ratio (P/B)" .
+
+ex:price_to_sales
+    rdf:type kgclass:Equity_Multiple ;
+    rdfs:label "Price-to-Sales Ratio (P/S)" .
+
+ex:dividend_yield
+    rdf:type kgclass:Equity_Metric ;
+    rdfs:label "Dividend Yield" .
+
+ex:peer_group
+    rdf:type kgclass:Company_Set ;
+    rdfs:label "Peer Group" .
+
+ex:target_company
+    rdf:type kgclass:Company ;
+    rdfs:label "Target Company" .
+
+ex:industry_sector
+    rdf:type kgclass:Classification ;
+    rdfs:label "Industry Sector" .
+
+ex:market_sentiment
+    rdf:type kgclass:Market_Factor ;
+    rdfs:label "Market Sentiment" .
+
+ex:control_premium
+    rdf:type kgclass:Valuation_Adjustment ;
+    rdfs:label "Control Premium" .
+
+ex:financial_ratios
+    rdf:type kgclass:Analysis_Tool ;
+    rdfs:label "Financial Ratios" .
+
+ex:debt_to_equity
+    rdf:type kgclass:Leverage_Ratio ;
+    rdfs:label "Debt-to-Equity Ratio" .
+
+ex:interest_coverage_ratio
+    rdf:type kgclass:Coverage_Ratio ;
+    rdfs:label "Interest Coverage Ratio (ICR)" .
+
+ex:debt_to_ebitda
+    rdf:type kgclass:Leverage_Ratio ;
+    rdfs:label "Debt-to-EBITDA Ratio" .
+
+ex:net_debt_to_ebitda
+    rdf:type kgclass:Leverage_Ratio ;
+    rdfs:label "Net Debt-to-EBITDA Ratio" .
+
+ex:current_ratio
+    rdf:type kgclass:Liquidity_Ratio ;
+    rdfs:label "Current Ratio" .
+
+ex:quick_ratio
+    rdf:type kgclass:Liquidity_Ratio ;
+    rdfs:label "Quick Ratio (Acid Test)" .
+
+ex:cash_ratio
+    rdf:type kgclass:Liquidity_Ratio ;
+    rdfs:label "Cash Ratio" .
+
+ex:debt_to_assets
+    rdf:type kgclass:Leverage_Ratio ;
+    rdfs:label "Debt-to-Assets Ratio" .
+
+ex:total_debt
+    rdf:type kgclass:Balance_Sheet_Item ;
+    rdfs:label "Total Debt" .
+
+ex:total_equity
+    rdf:type kgclass:Balance_Sheet_Item ;
+    rdfs:label "Total Equity" .
+
+ex:interest_expense
+    rdf:type kgclass:Income_Statement_Item ;
+    rdfs:label "Interest Expense" .
+
+ex:ebitda
+    rdf:type kgclass:Financial_Metric ;
+    rdfs:label "EBITDA" .
+
+ex:current_assets
+    rdf:type kgclass:Balance_Sheet_Item ;
+    rdfs:label "Current Assets" .
+
+ex:current_liabilities
+    rdf:type kgclass:Balance_Sheet_Item ;
+    rdfs:label "Current Liabilities" .
+
+ex:inventories
+    rdf:type kgclass:Balance_Sheet_Item ;
+    rdfs:label "Inventories" .
+
+ex:cash_equivalents
+    rdf:type kgclass:Balance_Sheet_Item ;
+    rdfs:label "Cash & Cash Equivalents" .
+
+ex:total_assets
+    rdf:type kgclass:Balance_Sheet_Item ;
+    rdfs:label "Total Assets" .
+
+ex:var
+    rdf:type kgclass:Risk_Metric ;
+    rdfs:label "Value at Risk (VaR)" .
+
+ex:historical_simulation_var
+    rdf:type kgclass:VaR_Method ;
+    rdfs:label "Historical Simulation VaR" .
+
+ex:monte_carlo_var
+    rdf:type kgclass:VaR_Method ;
+    rdfs:label "Monte Carlo Simulation VaR" .
+
+ex:parametric_var
+    rdf:type kgclass:VaR_Method ;
+    rdfs:label "Parametric VaR" .
+
+ex:confidence_level
+    rdf:type kgclass:Parameter ;
+    rdfs:label "Confidence Level" .
+
+ex:time_horizon
+    rdf:type kgclass:Parameter ;
+    rdfs:label "Time Horizon" .
+
+ex:lookback_period
+    rdf:type kgclass:Parameter_Historical ;
+    rdfs:label "Lookback Period" .
+
+ex:num_simulations
+    rdf:type kgclass:Parameter_Monte_Carlo ;
+    rdfs:label "Number of Simulations" .
+
+ex:portfolio_return_dist
+    rdf:type kgclass:Statistical_Concept ;
+    rdfs:label "Portfolio Return Distribution" .
+
+ex:normality_assumption
+    rdf:type kgclass:Assumption_Parametric ;
+    rdfs:label "Normality Assumption" .
+
+ex:cvar
+    rdf:type kgclass:Risk_Metric ;
+    rdfs:label "Conditional VaR (Expected Shortfall)" .
+
+ex:tail_risk
+    rdf:type kgclass:Risk_Concept ;
+    rdfs:label "Tail Risk" .
+
+ex:backtesting
+    rdf:type kgclass:Validation_Method ;
+    rdfs:label "VaR Backtesting" .
+
+ex:credit_risk
+    rdf:type kgclass:Risk_Category ;
+    rdfs:label "Credit Risk" .
+
+ex:pd
+    rdf:type kgclass:Credit_Risk_Metric ;
+    rdfs:label "Probability of Default (PD)" .
+
+ex:lgd
+    rdf:type kgclass:Credit_Risk_Metric ;
+    rdfs:label "Loss Given Default (LGD)" .
+
+ex:ead
+    rdf:type kgclass:Credit_Risk_Metric ;
+    rdfs:label "Exposure at Default (EAD)" .
+
+ex:expected_loss
+    rdf:type kgclass:Credit_Risk_Metric ;
+    rdfs:label "Expected Loss (EL)" .
+
+ex:unexpected_loss
+    rdf:type kgclass:Credit_Risk_Metric ;
+    rdfs:label "Unexpected Loss (UL)" .
+
+ex:credit_var
+    rdf:type kgclass:Risk_Metric ;
+    rdfs:label "Credit VaR" .
+
+ex:recovery_rate
+    rdf:type kgclass:Credit_Risk_Metric ;
+    rdfs:label "Recovery Rate (RR)" .
+
+ex:merton_model
+    rdf:type kgclass:Structural_Credit_Model ;
+    rdfs:label "Merton Model" .
+
+ex:kmv_model
+    rdf:type kgclass:Structural_Credit_Model ;
+    rdfs:label "KMV Model" .
+
+ex:altman_z_score
+    rdf:type kgclass:Empirical_Credit_Model ;
+    rdfs:label "Altman Z-Score" .
+
+ex:creditmetrics_model
+    rdf:type kgclass:Portfolio_Credit_Model ;
+    rdfs:label "CreditMetrics™ Model" .
+
+ex:logistic_regression_scoring
+    rdf:type kgclass:Empirical_Credit_Model ;
+    rdfs:label "Logistic Regression Scoring" .
+
+ex:reduced_form_model
+    rdf:type kgclass:Credit_Model_Category ;
+    rdfs:label "Reduced Form Credit Model" .
+
+ex:hazard_rate
+    rdf:type kgclass:Parameter_Reduced_Form ;
+    rdfs:label "Hazard Rate" .
+
+ex:credit_rating
+    rdf:type kgclass:Assessment ;
+    rdfs:label "Credit Rating" .
+
+ex:rating_agency
+    rdf:type kgclass:Entity ;
+    rdfs:label "Rating Agency (S&P, Moody's, Fitch)" .
+
+ex:collateral
+    rdf:type kgclass:Credit_Risk_Mitigation ;
+    rdfs:label "Collateral" .
+
+ex:covenants
+    rdf:type kgclass:Credit_Risk_Mitigation ;
+    rdfs:label "Covenants" .
+
+ex:credit_derivatives
+    rdf:type kgclass:Financial_Instrument ;
+    rdfs:label "Credit Derivatives" .
+
+ex:cds
+    rdf:type kgclass:Credit_Derivative ;
+    rdfs:label "Credit Default Swap (CDS)" .
+
+ex:liquidity_risk
+    rdf:type kgclass:Risk_Category ;
+    rdfs:label "Liquidity Risk" .
+
+ex:funding_liquidity_risk
+    rdf:type kgclass:Liquidity_Risk_Type ;
+    rdfs:label "Funding Liquidity Risk" .
+
+ex:market_liquidity_risk
+    rdf:type kgclass:Liquidity_Risk_Type ;
+    rdfs:label "Market Liquidity Risk" .
+
+ex:lcr
+    rdf:type kgclass:Regulatory_Liquidity_Metric ;
+    rdfs:label "Liquidity Coverage Ratio (LCR)" .
+
+ex:nsfr
+    rdf:type kgclass:Regulatory_Liquidity_Metric ;
+    rdfs:label "Net Stable Funding Ratio (NSFR)" .
+
+ex:hqla
+    rdf:type kgclass:Asset_Category ;
+    rdfs:label "High-Quality Liquid Assets (HQLA)" .
+
+ex:net_cash_outflows_30d
+    rdf:type kgclass:Calculated_Flow ;
+    rdfs:label "Net Cash Outflows (30-day stress)" .
+
+ex:available_stable_funding
+    rdf:type kgclass:Funding_Category ;
+    rdfs:label "Available Stable Funding (ASF)" .
+
+ex:required_stable_funding
+    rdf:type kgclass:Funding_Need ;
+    rdfs:label "Required Stable Funding (RSF)" .
+
+ex:cash_conversion_cycle
+    rdf:type kgclass:Operational_Liquidity_Metric ;
+    rdfs:label "Cash Conversion Cycle" .
+
+ex:bid_ask_spread
+    rdf:type kgclass:Market_Liquidity_Indicator ;
+    rdfs:label "Bid-Ask Spread" .
+
+ex:market_depth
+    rdf:type kgclass:Market_Liquidity_Indicator ;
+    rdfs:label "Market Depth" .
+
+ex:trading_volume
+    rdf:type kgclass:Market_Liquidity_Indicator ;
+    rdfs:label "Trading Volume" .
+
+ex:liquidity_stress_testing
+    rdf:type kgclass:Risk_Assessment_Method ;
+    rdfs:label "Liquidity Stress Testing" .
+
+ex:monetary_policy
+    rdf:type kgclass:Macroeconomic_Policy ;
+    rdfs:label "Monetary Policy" .
+
+ex:central_bank
+    rdf:type kgclass:Institution ;
+    rdfs:label "Central Bank" .
+
+ex:policy_interest_rate
+    rdf:type kgclass:Monetary_Policy_Tool ;
+    rdfs:label "Policy Interest Rate" .
+
+ex:reserve_requirements
+    rdf:type kgclass:Monetary_Policy_Tool ;
+    rdfs:label "Reserve Requirements" .
+
+ex:omo
+    rdf:type kgclass:Monetary_Policy_Tool ;
+    rdfs:label "Open Market Operations (OMO)" .
+
+ex:qe
+    rdf:type kgclass:Unconventional_Tool ;
+    rdfs:label "Quantitative Easing (QE)" .
+
+ex:qt
+    rdf:type kgclass:Unconventional_Tool ;
+    rdfs:label "Quantitative Tightening (QT)" .
+
+ex:forward_guidance
+    rdf:type kgclass:Unconventional_Tool ;
+    rdfs:label "Forward Guidance" .
+
+ex:inflation_target
+    rdf:type kgclass:Policy_Objective ;
+    rdfs:label "Inflation Target" .
+
+ex:employment_mandate
+    rdf:type kgclass:Policy_Objective ;
+    rdfs:label "Employment Mandate" .
+
+ex:expansionary_stance
+    rdf:type kgclass:Policy_Stance ;
+    rdfs:label "Expansionary Stance" .
+
+ex:contractionary_stance
+    rdf:type kgclass:Policy_Stance ;
+    rdfs:label "Contractionary Stance" .
+
+ex:technical_indicators
+    rdf:type kgclass:Technical_Analysis_Method ;
+    rdfs:label "Technical Indicators" .
+
+ex:ma
+    rdf:type kgclass:Trend_Indicator ;
+    rdfs:label "Moving Average (MA)" .
+
+ex:sma
+    rdf:type kgclass:Moving_Average_Type ;
+    rdfs:label "Simple Moving Average (SMA)" .
+
+ex:ema
+    rdf:type kgclass:Moving_Average_Type ;
+    rdfs:label "Exponential Moving Average (EMA)" .
+
+ex:macd
+    rdf:type kgclass:Trend_or_Momentum_Indicator ;
+    rdfs:label "MACD" .
+
+ex:rsi
+    rdf:type kgclass:Momentum_Oscillator ;
+    rdfs:label "Relative Strength Index (RSI)" .
+
+ex:bollinger_bands
+    rdf:type kgclass:Volatility_Indicator ;
+    rdfs:label "Bollinger Bands" .
+
+ex:stochastic_oscillator
+    rdf:type kgclass:Momentum_Oscillator ;
+    rdfs:label "Stochastic Oscillator" .
+
+ex:adx
+    rdf:type kgclass:Trend_Strength_Indicator ;
+    rdfs:label "Average Directional Index (ADX)" .
+
+ex:obv
+    rdf:type kgclass:Volume_Indicator ;
+    rdfs:label "On-Balance Volume (OBV)" .
+
+ex:fibonacci_retracements
+    rdf:type kgclass:Support_or_Resistance_Tool ;
+    rdfs:label "Fibonacci Retracements" .
+
+ex:overbought
+    rdf:type kgclass:Indicator_Signal ;
+    rdfs:label "Overbought Condition" .
+
+ex:oversold
+    rdf:type kgclass:Indicator_Signal ;
+    rdfs:label "Oversold Condition" .
+
+ex:divergence
+    rdf:type kgclass:Indicator_Signal ;
+    rdfs:label "Divergence" .
+
+ex:defi
+    rdf:type kgclass:Financial_Ecosystem ;
+    rdfs:label "Decentralized Finance (DeFi)" .
+
+ex:blockchain
+    rdf:type kgclass:Core_Technology ;
+    rdfs:label "Blockchain" .
+
+ex:smart_contract
+    rdf:type kgclass:Core_Technology ;
+    rdfs:label "Smart Contract" .
+
+ex:dex
+    rdf:type kgclass:DeFi_Application ;
+    rdfs:label "Decentralized Exchange (DEX)" .
+
+ex:uniswap
+    rdf:type kgclass:DEX_Protocol_Example ;
+    rdfs:label "Uniswap" .
+
+ex:lending_protocol
+    rdf:type kgclass:DeFi_Application ;
+    rdfs:label "DeFi Lending Protocol" .
+
+ex:aave
+    rdf:type kgclass:Lending_Protocol_Example ;
+    rdfs:label "Aave" .
+
+ex:compound
+    rdf:type kgclass:Lending_Protocol_Example ;
+    rdfs:label "Compound" .
+
+ex:stablecoin
+    rdf:type kgclass:Cryptocurrency_Type ;
+    rdfs:label "Stablecoin" .
+
+ex:usdc
+    rdf:type kgclass:Stablecoin_Example ;
+    rdfs:label "USD Coin (USDC)" .
+
+ex:yield_farming
+    rdf:type kgclass:DeFi_Strategy ;
+    rdfs:label "Yield Farming" .
+
+ex:liquidity_pool
+    rdf:type kgclass:DeFi_Mechanism ;
+    rdfs:label "Liquidity Pool" .
+
+ex:impermanent_loss
+    rdf:type kgclass:DeFi_Risk ;
+    rdfs:label "Impermanent Loss" .
+
+ex:defi_governance
+    rdf:type kgclass:Process ;
+    rdfs:label "DeFi Governance" .
+
+ex:governance_token
+    rdf:type kgclass:Token_Type ;
+    rdfs:label "Governance Token" .
+
+ex:crypto_markets
+    rdf:type kgclass:Financial_Market ;
+    rdfs:label "Cryptocurrency Markets" .
+
+ex:bitcoin
+    rdf:type kgclass:Cryptocurrency_Proof_or_Work ;
+    rdfs:label "Bitcoin (BTC)" .
+
+ex:ethereum
+    rdf:type kgclass:Cryptocurrency_Proof_or_Stake ;
+    rdfs:label "Ethereum (ETH)" .
+
+ex:altcoin
+    rdf:type kgclass:Cryptocurrency_Category ;
+    rdfs:label "Altcoin" .
+
+ex:proof_of_work
+    rdf:type kgclass:Consensus_Mechanism ;
+    rdfs:label "Proof-of-Work (PoW)" .
+
+ex:proof_of_stake
+    rdf:type kgclass:Consensus_Mechanism ;
+    rdfs:label "Proof-of-Stake (PoS)" .
+
+ex:crypto_exchange
+    rdf:type kgclass:Trading_Venue ;
+    rdfs:label "Cryptocurrency Exchange" .
+
+ex:coinbase
+    rdf:type kgclass:Crypto_Exchange_Example ;
+    rdfs:label "Coinbase" .
+
+ex:binance
+    rdf:type kgclass:Crypto_Exchange_Example ;
+    rdfs:label "Binance" .
+
+ex:crypto_wallet
+    rdf:type kgclass:Storage_Method ;
+    rdfs:label "Cryptocurrency Wallet" .
+
+ex:hot_wallet
+    rdf:type kgclass:Wallet_Type ;
+    rdfs:label "Hot Wallet" .
+
+ex:cold_wallet
+    rdf:type kgclass:Wallet_Type ;
+    rdfs:label "Cold Wallet (Hardware Wallet)" .
+
+ex:mining
+    rdf:type kgclass:Process_PoW ;
+    rdfs:label "Cryptocurrency Mining" .
+
+ex:staking
+    rdf:type kgclass:Process_PoS ;
+    rdfs:label "Cryptocurrency Staking" .
+
+ex:halving
+    rdf:type kgclass:Supply_Mechanism_Event ;
+    rdfs:label "Bitcoin Halving" .
+
+ex:sustainable_investing
+    rdf:type kgclass:Investment_Approach ;
+    rdfs:label "Sustainable Investing" .
+
+ex:esg_criteria
+    rdf:type kgclass:Framework ;
+    rdfs:label "ESG Criteria" .
+
+ex:environmental_factors
+    rdf:type kgclass:ESG_Pillar ;
+    rdfs:label "Environmental Factors" .
+
+ex:social_factors
+    rdf:type kgclass:ESG_Pillar ;
+    rdfs:label "Social Factors" .
+
+ex:governance_factors
+    rdf:type kgclass:ESG_Pillar ;
+    rdfs:label "Governance Factors" .
+
+ex:climate_change
+    rdf:type kgclass:Environmental_Factor ;
+    rdfs:label "Climate Change" .
+
+ex:labor_practices
+    rdf:type kgclass:Social_Factor ;
+    rdfs:label "Labor Practices" .
+
+ex:board_diversity
+    rdf:type kgclass:Governance_Factor ;
+    rdfs:label "Board Diversity" .
+
+ex:esg_integration
+    rdf:type kgclass:Sustainable_Strategy ;
+    rdfs:label "ESG Integration" .
+
+ex:sri_screening
+    rdf:type kgclass:Sustainable_Strategy ;
+    rdfs:label "Socially Responsible Investing (SRI) Screening" .
+
+ex:negative_screening
+    rdf:type kgclass:SRI_Screening_Type ;
+    rdfs:label "Negative Screening" .
+
+ex:positive_screening
+    rdf:type kgclass:SRI_Screening_Type ;
+    rdfs:label "Positive Screening (Best-in-Class)" .
+
+ex:impact_investing
+    rdf:type kgclass:Sustainable_Strategy ;
+    rdfs:label "Impact Investing" .
+
+ex:esg_rating_agency
+    rdf:type kgclass:Entity ;
+    rdfs:label "ESG Rating Agency" .
+
+ex:msci_esg
+    rdf:type kgclass:ESG_Rating_Agency_Example ;
+    rdfs:label "MSCI ESG" .
+
+ex:sustainalytics
+    rdf:type kgclass:ESG_Rating_Agency_Example ;
+    rdfs:label "Sustainalytics" .
+
+ex:sasb
+    rdf:type kgclass:ESG_Reporting_Framework ;
+    rdfs:label "SASB Standards" .
+
+ex:gri
+    rdf:type kgclass:ESG_Reporting_Framework ;
+    rdfs:label "GRI Standards" .
+
+ex:greenwashing
+    rdf:type kgclass:Risk_Challenge ;
+    rdfs:label "Greenwashing" .
+
+ex:context_window
+    rdf:type kgclass:LLM_Constraint ;
+    rdfs:label "LLM Context Window" .
+
+ex:token
+    rdf:type kgclass:Text_Unit ;
+    rdfs:label "Token" .
+
+ex:tokenization
+    rdf:type kgclass:LLM_Process ;
+    rdfs:label "Tokenization" .
+
+ex:attention_mechanism
+    rdf:type kgclass:LLM_Architecture_Component ;
+    rdfs:label "Attention Mechanism" .
+
+ex:transformer_model
+    rdf:type kgclass:LLM_Architecture ;
+    rdfs:label "Transformer Model" .
+
+ex:context_length_limit
+    rdf:type kgclass:LLM_Parameter ;
+    rdfs:label "Context Length Limit" .
+
+ex:sliding_window_attn
+    rdf:type kgclass:Context_Extension_Technique ;
+    rdfs:label "Sliding Window Attention" .
+
+ex:sparse_attention
+    rdf:type kgclass:Context_Extension_Technique ;
+    rdfs:label "Sparse Attention" .
+
+ex:context_retrieval
+    rdf:type kgclass:Information_Management ;
+    rdfs:label "Context Retrieval" .
+
+ex:llm_memory
+    rdf:type kgclass:LLM_Capability_or_Challenge ;
+    rdfs:label "LLM Memory" .
+
+ex:short_term_memory
+    rdf:type kgclass:Memory_Type ;
+    rdfs:label "Short-Term Memory (Context Window)" .
+
+ex:long_term_memory
+    rdf:type kgclass:Memory_Type ;
+    rdfs:label "Long-Term Memory (Parametric Knowledge)" .
+
+ex:external_memory
+    rdf:type kgclass:Memory_Augmentation ;
+    rdfs:label "External Memory" .
+
+ex:rag
+    rdf:type kgclass:Memory_Technique ;
+    rdfs:label "Retrieval-Augmented Generation (RAG)" .
+
+ex:vector_database
+    rdf:type kgclass:Data_Store_External_Memory ;
+    rdfs:label "Vector Database" .
+
+ex:knowledge_graph_kg
+    rdf:type kgclass:Data_Store_External_Memory ;
+    rdfs:label "Knowledge Graph" .
+
+ex:embedding
+    rdf:type kgclass:Representation_Technique ;
+    rdfs:label "Text Embedding" .
+
+ex:information_retrieval
+    rdf:type kgclass:Process ;
+    rdfs:label "Information Retrieval" .
+
+ex:memory_compression
+    rdf:type kgclass:Optimization_Technique ;
+    rdfs:label "Memory Compression" .
+
+ex:parameter_tuning
+    rdf:type kgclass:Optimization_Process ;
+    rdfs:label "LLM Parameter Tuning" .
+
+ex:hyperparameter
+    rdf:type kgclass:Model_Configuration ;
+    rdfs:label "Hyperparameter" .
+
+ex:learning_rate
+    rdf:type kgclass:Hyperparameter ;
+    rdfs:label "Learning Rate" .
+
+ex:batch_size
+    rdf:type kgclass:Hyperparameter ;
+    rdfs:label "Batch Size" .
+
+ex:num_epochs
+    rdf:type kgclass:Hyperparameter ;
+    rdfs:label "Number of Epochs" .
+
+ex:model_architecture_params
+    rdf:type kgclass:Hyperparameter_Category ;
+    rdfs:label "Model Architecture Parameters" .
+
+ex:regularization_params
+    rdf:type kgclass:Hyperparameter_Category ;
+    rdfs:label "Regularization Parameters" .
+
+ex:gradient_descent
+    rdf:type kgclass:Optimization_Algorithm ;
+    rdfs:label "Gradient Descent" .
+
+ex:adam_optimizer
+    rdf:type kgclass:Optimization_Algorithm_Variant ;
+    rdfs:label "Adam Optimizer" .
+
+ex:grid_search
+    rdf:type kgclass:Hyperparameter_Search_Method ;
+    rdfs:label "Grid Search" .
+
+ex:random_search
+    rdf:type kgclass:Hyperparameter_Search_Method ;
+    rdfs:label "Random Search" .
+
+ex:bayesian_optimization
+    rdf:type kgclass:Hyperparameter_Search_Method ;
+    rdfs:label "Bayesian Optimization" .
+
+ex:fine_tuning
+    rdf:type kgclass:Training_Phase ;
+    rdfs:label "Fine-Tuning" .
+
+ex:pre_training
+    rdf:type kgclass:Training_Phase ;
+    rdfs:label "Pre-Training" .
+
+
+# Relationships (Edges)
+ex:dcf kgprop:uses ex:ufcf .
+ex:dcf kgprop:uses ex:discount_rate .
+ex:dcf kgprop:calculates ex:terminal_value .
+ex:ufcf kgprop:calculated_from ex:ebit .
+ex:ufcf kgprop:calculated_from ex:tax_rate .
+ex:ufcf kgprop:calculated_from ex:d_And_a .
+ex:ufcf kgprop:calculated_from ex:capex .
+ex:ufcf kgprop:calculated_from ex:change_nwc .
+ex:discount_rate kgprop:is_typically ex:wacc .
+ex:wacc kgprop:depends_on ex:cost_of_equity .
+ex:wacc kgprop:depends_on ex:cost_of_debt .
+ex:wacc kgprop:uses_weight_of ex:market_value_equity .
+ex:wacc kgprop:uses_weight_of ex:market_value_debt .
+ex:wacc kgprop:uses ex:tax_rate .
+ex:market_value_equity kgprop:component_of ex:total_capital .
+ex:market_value_debt kgprop:component_of ex:total_capital .
+ex:cost_of_equity kgprop:calculated_by ex:capm .
+ex:capm kgprop:uses ex:risk_free_rate .
+ex:capm kgprop:uses ex:beta .
+ex:capm kgprop:uses ex:market_risk_premium .
+ex:terminal_value kgprop:can_use ex:terminal_growth_rate .
+ex:terminal_value kgprop:can_use ex:exit_multiple .
+ex:dcf kgprop:calculates ex:present_value .
+ex:present_value kgprop:calculated_for ex:ufcf .
+ex:present_value kgprop:calculated_for ex:terminal_value .
+ex:present_value kgprop:uses ex:discount_rate .
+ex:dcf kgprop:calculates ex:enterprise_value .
+ex:enterprise_value kgprop:sum_of ex:present_value .
+ex:enterprise_value kgprop:leads_to ex:equity_value .
+ex:equity_value kgprop:derived_by_subtracting ex:net_debt .
+ex:equity_value kgprop:leads_to ex:implied_share_price .
+ex:implied_share_price kgprop:uses ex:shares_outstanding .
+ex:comparables kgprop:uses ex:pe_ratio .
+ex:comparables kgprop:uses ex:ev_ebitda .
+ex:comparables kgprop:uses ex:ev_sales .
+ex:comparables kgprop:uses ex:price_to_book .
+ex:comparables kgprop:uses ex:price_to_sales .
+ex:comparables kgprop:uses ex:dividend_yield .
+ex:comparables kgprop:requires ex:peer_group .
+ex:peer_group kgprop:selected_based_on ex:industry_sector .
+ex:peer_group kgprop:compared_to ex:target_company .
+ex:comparables kgprop:values ex:target_company .
+ex:comparables kgprop:influenced_by ex:market_sentiment .
+ex:precedent_transactions kgprop:uses ex:ev_ebitda .
+ex:precedent_transactions kgprop:uses ex:ev_sales .
+ex:precedent_transactions kgprop:requires_data_from ex:peer_group .
+ex:precedent_transactions kgprop:reflects ex:control_premium .
+ex:financial_ratios kgprop:includes ex:debt_to_equity .
+ex:financial_ratios kgprop:includes ex:interest_coverage_ratio .
+ex:financial_ratios kgprop:includes ex:debt_to_ebitda .
+ex:financial_ratios kgprop:includes ex:net_debt_to_ebitda .
+ex:financial_ratios kgprop:includes ex:current_ratio .
+ex:financial_ratios kgprop:includes ex:quick_ratio .
+ex:financial_ratios kgprop:includes ex:cash_ratio .
+ex:financial_ratios kgprop:includes ex:debt_to_assets .
+ex:debt_to_equity kgprop:calculated_from ex:total_debt .
+ex:debt_to_equity kgprop:calculated_from ex:total_equity .
+ex:interest_coverage_ratio kgprop:calculated_from ex:ebit .
+ex:interest_coverage_ratio kgprop:calculated_from ex:interest_expense .
+ex:debt_to_ebitda kgprop:calculated_from ex:total_debt .
+ex:debt_to_ebitda kgprop:calculated_from ex:ebitda .
+ex:net_debt_to_ebitda kgprop:calculated_from ex:total_debt .
+ex:net_debt_to_ebitda kgprop:calculated_from ex:cash_equivalents .
+ex:net_debt_to_ebitda kgprop:calculated_from ex:ebitda .
+ex:current_ratio kgprop:calculated_from ex:current_assets .
+ex:current_ratio kgprop:calculated_from ex:current_liabilities .
+ex:quick_ratio kgprop:calculated_from ex:current_assets .
+ex:quick_ratio kgprop:calculated_from ex:inventories .
+ex:quick_ratio kgprop:calculated_from ex:current_liabilities .
+ex:cash_ratio kgprop:calculated_from ex:cash_equivalents .
+ex:cash_ratio kgprop:calculated_from ex:current_liabilities .
+ex:debt_to_assets kgprop:calculated_from ex:total_debt .
+ex:debt_to_assets kgprop:calculated_from ex:total_assets .
+ex:var kgprop:calculated_by ex:historical_simulation_var .
+ex:var kgprop:calculated_by ex:monte_carlo_var .
+ex:var kgprop:calculated_by ex:parametric_var .
+ex:var kgprop:parameterized_by ex:confidence_level .
+ex:var kgprop:parameterized_by ex:time_horizon .
+ex:historical_simulation_var kgprop:uses ex:lookback_period .
+ex:historical_simulation_var kgprop:derives_from_historical ex:portfolio_return_dist .
+ex:monte_carlo_var kgprop:uses ex:num_simulations .
+ex:monte_carlo_var kgprop:simulates ex:portfolio_return_dist .
+ex:parametric_var kgprop:assumes_distribution_of ex:portfolio_return_dist .
+ex:parametric_var kgprop:often_makes ex:normality_assumption .
+ex:var kgprop:related_to ex:cvar .
+ex:cvar kgprop:measures ex:tail_risk .
+ex:var kgprop:underestimates ex:tail_risk .
+ex:var kgprop:evaluated_by ex:backtesting .
+ex:credit_risk kgprop:component_of ex:pd .
+ex:credit_risk kgprop:component_of ex:lgd .
+ex:credit_risk kgprop:component_of ex:ead .
+ex:credit_risk kgprop:measured_by ex:expected_loss .
+ex:credit_risk kgprop:measured_by ex:unexpected_loss .
+ex:expected_loss kgprop:calculated_from ex:pd .
+ex:expected_loss kgprop:calculated_from ex:lgd .
+ex:expected_loss kgprop:calculated_from ex:ead .
+ex:lgd kgprop:complement_of ex:recovery_rate .
+ex:unexpected_loss kgprop:related_to ex:credit_var .
+ex:pd kgprop:estimated_by ex:merton_model .
+ex:pd kgprop:estimated_by ex:kmv_model .
+ex:pd kgprop:indicated_by ex:altman_z_score .
+ex:pd kgprop:estimated_by ex:logistic_regression_scoring .
+ex:pd kgprop:estimated_by ex:reduced_form_model .
+ex:reduced_form_model kgprop:uses ex:hazard_rate .
+ex:credit_risk kgprop:assessed_by ex:credit_rating .
+ex:credit_rating kgprop:assigned_by ex:rating_agency .
+ex:credit_rating kgprop:correlates_with ex:pd .
+ex:credit_risk kgprop:mitigated_by ex:collateral .
+ex:credit_risk kgprop:mitigated_by ex:covenants .
+ex:credit_risk kgprop:mitigated_by ex:credit_derivatives .
+ex:credit_derivatives kgprop:includes ex:cds .
+ex:liquidity_risk kgprop:includes_type ex:funding_liquidity_risk .
+ex:liquidity_risk kgprop:includes_type ex:market_liquidity_risk .
+ex:liquidity_risk kgprop:measured_by ex:lcr .
+ex:liquidity_risk kgprop:measured_by ex:nsfr .
+ex:liquidity_risk kgprop:measured_by ex:cash_conversion_cycle .
+ex:market_liquidity_risk kgprop:indicated_by ex:bid_ask_spread .
+ex:market_liquidity_risk kgprop:indicated_by ex:market_depth .
+ex:market_liquidity_risk kgprop:indicated_by ex:trading_volume .
+ex:lcr kgprop:uses ex:hqla .
+ex:lcr kgprop:uses ex:net_cash_outflows_30d .
+ex:nsfr kgprop:uses ex:available_stable_funding .
+ex:nsfr kgprop:uses ex:required_stable_funding .
+ex:liquidity_risk kgprop:assessed_by ex:liquidity_stress_testing .
+ex:monetary_policy kgprop:implemented_by ex:central_bank .
+ex:monetary_policy kgprop:uses_tool ex:policy_interest_rate .
+ex:monetary_policy kgprop:uses_tool ex:reserve_requirements .
+ex:monetary_policy kgprop:uses_tool ex:omo .
+ex:monetary_policy kgprop:uses_tool ex:qe .
+ex:monetary_policy kgprop:uses_tool ex:qt .
+ex:monetary_policy kgprop:uses_tool ex:forward_guidance .
+ex:monetary_policy kgprop:aims_for ex:inflation_target .
+ex:monetary_policy kgprop:aims_for ex:employment_mandate .
+ex:expansionary_stance kgprop:involves_lowering ex:policy_interest_rate .
+ex:expansionary_stance kgprop:may_involve ex:qe .
+ex:contractionary_stance kgprop:involves_raising ex:policy_interest_rate .
+ex:contractionary_stance kgprop:may_involve ex:qt .
+ex:monetary_policy kgprop:influences ex:inflation .
+ex:monetary_policy kgprop:influences ex:interest_rates .
+ex:monetary_policy kgprop:influences ex:economic_growth .
+ex:monetary_policy kgprop:influences ex:unemployment_rate .
+ex:technical_indicators kgprop:includes ex:ma .
+ex:technical_indicators kgprop:includes ex:macd .
+ex:technical_indicators kgprop:includes ex:rsi .
+ex:technical_indicators kgprop:includes ex:bollinger_bands .
+ex:technical_indicators kgprop:includes ex:stochastic_oscillator .
+ex:technical_indicators kgprop:includes ex:adx .
+ex:technical_indicators kgprop:includes ex:obv .
+ex:technical_indicators kgprop:includes ex:fibonacci_retracements .
+ex:ma kgprop:has_type ex:sma .
+ex:ma kgprop:has_type ex:ema .
+ex:rsi kgprop:signals ex:overbought .
+ex:rsi kgprop:signals ex:oversold .
+ex:rsi kgprop:can_show ex:divergence .
+ex:stochastic_oscillator kgprop:signals ex:overbought .
+ex:stochastic_oscillator kgprop:signals ex:oversold .
+ex:stochastic_oscillator kgprop:can_show ex:divergence .
+ex:macd kgprop:can_show ex:divergence .
+ex:bollinger_bands kgprop:measures ex:volatility .
+ex:adx kgprop:measures ex:trend_strength .
+ex:obv kgprop:uses ex:trading_volume .
+ex:fibonacci_retracements kgprop:identifies_potential ex:support_level .
+ex:fibonacci_retracements kgprop:identifies_potential ex:resistance_level .
+ex:defi kgprop:runs_on ex:blockchain .
+ex:defi kgprop:uses ex:smart_contract .
+ex:defi kgprop:includes_application ex:dex .
+ex:defi kgprop:includes_application ex:lending_protocol .
+ex:defi kgprop:often_uses ex:stablecoin .
+ex:dex kgprop:example_is ex:uniswap .
+ex:lending_protocol kgprop:example_is ex:aave .
+ex:lending_protocol kgprop:example_is ex:compound .
+ex:stablecoin kgprop:example_is ex:usdc .
+ex:defi kgprop:enables_strategy ex:yield_farming .
+ex:yield_farming kgprop:often_involves ex:liquidity_pool .
+ex:liquidity_pool kgprop:subject_to_risk_of ex:impermanent_loss .
+ex:defi_protocol kgprop:managed_by ex:defi_governance .
+ex:defi_governance kgprop:uses ex:governance_token .
+ex:crypto_markets kgprop:includes_asset ex:bitcoin .
+ex:crypto_markets kgprop:includes_asset ex:ethereum .
+ex:crypto_markets kgprop:includes_category ex:altcoin .
+ex:bitcoin kgprop:uses_consensus ex:proof_of_work .
+ex:ethereum kgprop:uses_consensus ex:proof_of_stake .
+ex:proof_of_work kgprop:involves ex:mining .
+ex:proof_of_stake kgprop:involves ex:staking .
+ex:crypto_markets kgprop:traded_on ex:crypto_exchange .
+ex:crypto_exchange kgprop:example_is ex:coinbase .
+ex:crypto_exchange kgprop:example_is ex:binance .
+ex:bitcoin kgprop:stored_in ex:crypto_wallet .
+ex:crypto_wallet kgprop:has_type ex:hot_wallet .
+ex:crypto_wallet kgprop:has_type ex:cold_wallet .
+ex:bitcoin kgprop:subject_to ex:halving .
+ex:sustainable_investing kgprop:uses ex:esg_criteria .
+ex:esg_criteria kgprop:includes ex:environmental_factors .
+ex:esg_criteria kgprop:includes ex:social_factors .
+ex:esg_criteria kgprop:includes ex:governance_factors .
+ex:environmental_factors kgprop:includes ex:climate_change .
+ex:social_factors kgprop:includes ex:labor_practices .
+ex:governance_factors kgprop:includes ex:board_diversity .
+ex:sustainable_investing kgprop:implemented_via ex:esg_integration .
+ex:sustainable_investing kgprop:implemented_via ex:sri_screening .
+ex:sustainable_investing kgprop:implemented_via ex:impact_investing .
+ex:sri_screening kgprop:includes_type ex:negative_screening .
+ex:sri_screening kgprop:includes_type ex:positive_screening .
+ex:sustainable_investing kgprop:uses_data_from ex:esg_rating_agency .
+ex:esg_rating_agency kgprop:example_is ex:msci_esg .
+ex:esg_rating_agency kgprop:example_is ex:sustainalytics .
+ex:sustainable_investing kgprop:may_use_framework ex:sasb .
+ex:sustainable_investing kgprop:may_use_framework ex:gri .
+ex:sustainable_investing kgprop:challenged_by ex:greenwashing .
+ex:context_window kgprop:measured_in ex:token .
+ex:token kgprop:produced_by ex:tokenization .
+ex:context_window kgprop:processed_by ex:attention_mechanism .
+ex:attention_mechanism kgprop:core_part_of ex:transformer_model .
+ex:context_window kgprop:limited_by ex:context_length_limit .
+ex:context_length_limit kgprop:addressed_by ex:sliding_window_attn .
+ex:context_length_limit kgprop:addressed_by ex:sparse_attention .
+ex:context_length_limit kgprop:mitigated_by ex:context_retrieval .
+ex:llm_memory kgprop:includes_type ex:short_term_memory .
+ex:llm_memory kgprop:includes_type ex:long_term_memory .
+ex:short_term_memory kgprop:is_equivalent_to ex:context_window .
+ex:long_term_memory kgprop:encoded_in ex:model_parameters .
+ex:llm_memory kgprop:augmented_by ex:external_memory .
+ex:external_memory kgprop:enabled_by ex:rag .
+ex:rag kgprop:performs ex:information_retrieval .
+ex:rag kgprop:uses_storage ex:vector_database .
+ex:rag kgprop:uses_storage ex:knowledge_graph_kg .
+ex:information_retrieval kgprop:uses ex:embedding .
+ex:vector_database kgprop:stores ex:embedding .
+ex:llm_memory kgprop:optimized_by ex:memory_compression .
+ex:parameter_tuning kgprop:optimizes ex:hyperparameter .
+ex:hyperparameter kgprop:includes ex:learning_rate .
+ex:hyperparameter kgprop:includes ex:batch_size .
+ex:hyperparameter kgprop:includes ex:num_epochs .
+ex:hyperparameter kgprop:includes_category ex:model_architecture_params .
+ex:hyperparameter kgprop:includes_category ex:regularization_params .
+ex:parameter_tuning kgprop:uses_method ex:grid_search .
+ex:parameter_tuning kgprop:uses_method ex:random_search .
+ex:parameter_tuning kgprop:uses_method ex:bayesian_optimization .
+ex:llm_training kgprop:uses_algorithm ex:gradient_descent .
+ex:gradient_descent kgprop:variant_is ex:adam_optimizer .
+ex:gradient_descent kgprop:uses_hyperparameter ex:learning_rate .
+ex:llm_training kgprop:includes_phase ex:pre_training .
+ex:llm_training kgprop:includes_phase ex:fine_tuning .
+ex:fine_tuning kgprop:often_involves ex:parameter_tuning .
