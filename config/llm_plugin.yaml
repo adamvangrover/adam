@@ -26,7 +26,7 @@ llm_plugin:
   enabled: true  # Set to 'false' to disable the LLM plugin.
   
   # Select the LLM engine to use. Currently supported: "openai", "huggingface", etc.
-  engine: "openai"  # Choose between different LLM providers like 'openai', 'huggingface', 'cohere', etc.
+  engine: "custom"  # Choose between different LLM providers like 'openai', 'huggingface', 'cohere', 'custom', etc.
 
   # API Settings for OpenAI (default engine)
   openai:
@@ -58,11 +58,11 @@ llm_plugin:
 
   # Configuration for using a custom LLM (self-hosted, fine-tuned models, etc.)
   custom:
-    enabled: false  # Set to 'true' if you are using a custom or self-hosted LLM model
-    url: "http://localhost:5000"  # URL to your self-hosted model API endpoint
-    headers:
-      "Authorization": "Bearer your-token"  # Optional headers for authentication
-    model: "custom_model_v1"  # Custom model name or identifier
+    enabled: true  # Set to 'true' if you are using a custom or self-hosted LLM model
+    url: "http://localhost:5001/mock_complete"  # URL to your self-hosted model API endpoint
+    # headers: # Mock service does not require specific headers
+    #   "Authorization": "Bearer your-token"  # Optional headers for authentication
+    model: "mock-model-v1"  # Custom model name or identifier
 
 # Optional advanced settings:
 advanced_settings:

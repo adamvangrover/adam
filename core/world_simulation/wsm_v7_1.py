@@ -76,25 +76,17 @@ class WorldSimulationModel(Model):
         self.schedule = RandomActivation(self)
 
         # --- Market Conditions ---
-        self.stock_prices = {
-            'AAPL':,
-            'MSFT':,
-            'GOOG':
-            # --- Development Node: Add more stocks ---
-        }
-        self.economic_indicators = {
-            'GDP_growth':,
-            'inflation':,
-            'interest_rates':
-            # --- Development Node: Add more economic indicators ---
-            # Examples: unemployment, consumer confidence, manufacturing output
-        }
-        self.geopolitical_risks = {
-            'political_stability':,
-            'trade_war_risk':
-            # --- Development Node: Add more geopolitical risks ---
-            # Examples: conflict risk, regulatory changes, natural disasters
-        }
+        # Initialize with config values if provided, otherwise use defaults.
+        # Ensures that these are dictionaries of lists.
+        self.stock_prices = config.get('stock_prices', {
+            'AAPL': [150.0], 'MSFT': [250.0], 'GOOG': [2000.0]
+        })
+        self.economic_indicators = config.get('economic_indicators', {
+            'GDP_growth': [2.5], 'inflation': [2.0], 'interest_rates': [1.5]
+        })
+        self.geopolitical_risks = config.get('geopolitical_risks', {
+            'political_stability': [0.7], 'trade_war_risk': [0.3]
+        })
 
         # --- Development Node: Add other market parameters ---
         # Examples:
@@ -143,7 +135,7 @@ class WorldSimulationModel(Model):
 
 # --- Standalone Execution ---
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
     # --- Development Node: Add configuration options for standalone execution ---
     # Examples:
     # * Number of simulation steps
@@ -151,9 +143,9 @@ if __name__ == "__main__":
     # * Visualization options
 
     # Example standalone simulation
-    model = WorldSimulationModel({})  # Replace with actual configuration
-    for i in range(100):  # Example: Run for 100 steps
-        model.step()
+    # model = WorldSimulationModel({})  # Replace with actual configuration
+    # for i in range(100):  # Example: Run for 100 steps
+    #     model.step()
 
     # --- Development Node: Add analysis and visualization of simulation results ---
     # Example:

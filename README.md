@@ -95,6 +95,38 @@ Adam v19.1 is not just an AI; it's your partner in navigating the complexities o
     python scripts/run_adam.py
     ```
 
+### Running the Command-Line Chatbot Simulator
+
+The Adam project includes a command-line chatbot (`scripts/run_chatbot.py`) that allows you to simulate interactions with the Adam agent system and a World Simulation Model (WSM). This simulation uses a mock LLM service to generate responses.
+
+**Prerequisites:**
+
+1.  Ensure you have followed the main "Getting Started" instructions to clone the repository and install all project dependencies from the root `requirements.txt` file.
+
+**Steps to Run:**
+
+1.  **Start the Mock LLM Service:**
+    *   The chatbot requires the Mock LLM Service to be running to simulate LLM interactions.
+    *   Open a new terminal window.
+    *   Navigate to the `tools/mock_llm_service/` directory.
+    *   Follow the setup and execution instructions in `tools/mock_llm_service/README.md` to start the service. (It typically involves activating a virtual environment and running `python app.py`).
+    *   Keep this service running in its terminal.
+
+2.  **Run the Chatbot CLI:**
+    *   Open another terminal window (or use your existing one where you have the main project's environment activated).
+    *   Navigate to the root directory of the Adam project.
+    *   Run the chatbot script:
+        ```bash
+        python scripts/run_chatbot.py
+        ```
+    *   You should see a welcome message: "Chatbot Initialized. Type 'quit' to exit."
+
+**Chatbot Commands:**
+
+*   `run_wsm_simulation`: Initializes and runs the World Simulation Model, then has the EchoAgent analyze the results using the (mock) LLM.
+*   `quit`: Exits the chatbot.
+*   (Other commands can be added as the chatbot is developed further).
+
 ## Accessing and Utilizing the Knowledge Graph and API
 
   * **Knowledge Graph:** Access and query the knowledge graph data directly or through the API. The data is stored in the `data/knowledge_graph.json` file and managed by the Neo4j graph database.
@@ -415,3 +447,4 @@ Contributions to Adam v19.1 are welcome\! Please check the [CONTRIBUTING.md](htt
 If you have any questions or feedback, please feel free to reach out to the Adam v19.1 development team. You can submit issues or pull requests on the GitHub repository or contact the developers directly.
 
 We hope this comprehensive README provides a solid foundation for understanding and utilizing the power of Adam v19.1. As you explore its features and capabilities, you'll discover new ways to enhance your financial analysis and decision-making processes.
+````

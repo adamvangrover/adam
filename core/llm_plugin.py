@@ -15,6 +15,8 @@ except ImportError:
     tiktoken = None  # Set to None if not installed
 
 
+import requests # Needed for CustomLLM
+
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -254,6 +256,62 @@ class CohereLLM(BaseLLM):
         }
         return context_lengths.get(self.model_name, 4096)
 
+
+class CustomLLM(BaseLLM):
+    """Implementation for custom LLM endpoints."""
+
+    def __init__(self, url: str, model_name: str = "custom-model", headers: Optional[Dict[str, str]] = None, timeout: int = 30):
+        self.url = url
+        self.model_name = model_name
+        self.headers = headers if headers else {}
+        self.timeout = timeout
+        # Ensure Content-Type is set for JSON payload if not provided
+        if "Content-Type" not in self.headers:
+            self.headers["Content-Type"] = "application/json"
+
+    def generate_text(self, prompt: str, **kwargs) -> str:
+        payload = {"prompt": prompt} # Mock service expects only "prompt"
+        # Add other kwargs to payload if your custom endpoint supports them
+        # payload.update(kwargs)
+
+        try:
+            response = requests.post(self.url, json=payload, headers=self.headers, timeout=self.timeout)
+            response.raise_for_status()  # Raise an exception for bad status codes
+
+            response_json = response.json()
+            if "choices" in response_json and response_json["choices"]:
+                message = response_json["choices"][0].get("message", {})
+                content = message.get("content")
+                if content:
+                    return content.strip()
+            elif "response" in response_json: # Fallback for simpler {"response": "text"}
+                return response_json["response"].strip()
+
+            logger.warning(f"CustomLLM received unexpected JSON structure: {response_json}")
+            return response.text.strip() # Fallback to raw text
+
+        except requests.exceptions.RequestException as e:
+            logger.exception(f"CustomLLM API request error: {e}")
+            raise LLMAPIError(f"CustomLLM API Request Error: {e}") from e
+        except json.JSONDecodeError as e:
+            logger.exception(f"CustomLLM JSON decode error: {e}. Response text: {response.text[:200]}")
+            raise LLMAPIError(f"CustomLLM JSON Decode Error: {e}") from e
+        except Exception as e:
+            logger.exception(f"CustomLLM error: {e}")
+            raise LLMAPIError(f"CustomLLM Error: {e}") from e
+
+    def get_token_count(self, text: str) -> int:
+        logger.warning("CustomLLM uses basic whitespace token counting.")
+        return len(text.split())
+
+    def get_model_name(self) -> str:
+        return self.model_name
+
+    def get_context_length(self) -> int:
+        logger.warning("CustomLLM context length is not defined, returning default 8192.")
+        return 8192
+
+
 class PromptTemplate:
     """Handles dynamic prompt generation."""
     templates = {
@@ -358,33 +416,68 @@ class LLMPlugin:
             "openai": OpenAILLM,
             "huggingface": HuggingFaceLLM,
             "cohere": CohereLLM,
+            "custom": CustomLLM, # Added CustomLLM
         }
-        provider = self.config.get("provider", "huggingface").lower() # Default to huggingface if no provider
+        
+        # self.config is the dictionary loaded from llm_plugin.yaml
+        # It should have a top-level "llm_plugin" key.
+        llm_plugin_settings = self.config.get("llm_plugin")
+        if not llm_plugin_settings:
+            raise LLMConfigurationError("LLM configuration missing 'llm_plugin' section.")
+
+        provider = llm_plugin_settings.get("engine", "huggingface").lower()
 
         if provider not in provider_map:
-             raise ValueError(f"Unsupported LLM provider: {provider}")
+             raise LLMConfigurationError(f"Unsupported LLM provider/engine: '{provider}' specified in llm_plugin.engine.")
 
-        api_key_env_var = f"{provider.upper()}_API_KEY"
-        api_key = os.getenv(api_key_env_var)
-        
-        # For HuggingFace, API key is optional (for inference API or gated models)
-        # For others, it's typically required.
-        if not api_key and provider not in ["huggingface"]: # allow HF to proceed without API key for local models
-            raise LLMConfigurationError(f"API key for {provider} ({api_key_env_var}) not found in environment variables.")
+        if provider == "custom":
+            custom_config = llm_plugin_settings.get("custom", {})
+            if not custom_config.get("enabled", False):
+                raise LLMConfigurationError("Custom LLM provider is selected ('custom' engine) but not enabled in llm_plugin.custom configuration.")
+            url = custom_config.get("url")
+            if not url:
+                raise LLMConfigurationError("Custom LLM 'url' not specified in llm_plugin.custom configuration.")
+            model_name = custom_config.get("model", "custom-model")
+            headers = custom_config.get("headers")
+            timeout = custom_config.get("timeout", 30)
+            logger.info(f"Initializing CustomLLM with URL: {url}, Model: {model_name}")
+            return CustomLLM(url=url, model_name=model_name, headers=headers, timeout=timeout)
 
-        # Get model name from config, or use default from the LLM class if not specified
-        default_model_name = provider_map[provider](api_key="dummy_key_if_needed_for_default_name_only").get_model_name() if provider != "huggingface" else "google/flan-t5-base" # HF needs specific default
-        model_name = self.config.get(f"{provider}_model_name", default_model_name)
+        # Logic for other standard providers
+        provider_specific_config = llm_plugin_settings.get(provider, {})
+        if not provider_specific_config:
+            logger.warning(f"No specific configuration block found for provider '{provider}' under 'llm_plugin'. Trying to use legacy keys or environment variables.")
+            # Attempt to fall back to legacy keys if necessary, or rely on environment variables.
+            # This part can be made more robust if various config styles need to be supported.
+            # For now, we prioritize the llm_plugin.<provider> structure.
+
+        api_key_env_var = f"{provider.upper()}_API_KEY" # e.g., OPENAI_API_KEY
+        api_key = os.getenv(api_key_env_var, provider_specific_config.get("api_key"))
+
+        if not api_key and provider not in ["huggingface"]: # HuggingFace can be local
+            raise LLMConfigurationError(f"API key for {provider} not found in environment variable {api_key_env_var} or in config file under llm_plugin.{provider}.api_key.")
+
+        model_name = provider_specific_config.get("model")
+        if not model_name: # Fallback to older style config or default.
+            model_name = self.config.get(f"{provider}_model_name") # e.g. openai_model_name from top level
+            if not model_name:
+                 # Default model names if nothing is specified
+                default_models = {"openai": "gpt-3.5-turbo", "huggingface": "google/flan-t5-base", "cohere": "command"}
+                model_name = default_models.get(provider)
+                logger.info(f"Using default model '{model_name}' for provider '{provider}'.")
 
 
         if provider == "huggingface":
-            use_pipeline = self.config.get("huggingface_use_pipeline", True)
-            # Pass api_key which might be None (handled by HuggingFaceLLM)
+            use_pipeline = provider_specific_config.get("use_pipeline", True)
+            # api_key for HF is for Hugging Face Hub, can be None for local models
             return HuggingFaceLLM(model_name=model_name, use_pipeline=use_pipeline, api_key=api_key) 
-        else:
-            if not api_key: # Should have been caught earlier, but as a safeguard
-                 raise LLMConfigurationError(f"API key for {provider} is required but not found.")
-            return provider_map[provider](api_key=api_key, model_name=model_name)
+        elif provider == "openai":
+            return OpenAILLM(api_key=api_key, model_name=model_name)
+        elif provider == "cohere":
+            return CohereLLM(api_key=api_key, model_name=model_name)
+
+        # Should not be reached if provider is in provider_map and handled above
+        raise LLMConfigurationError(f"Initialization failed for provider '{provider}'.")
 
     def generate_text(self, prompt: str, task: str = "default", **kwargs) -> str:
         """Generates text using the configured LLM with caching and task-specific prompting."""
@@ -441,6 +534,19 @@ class LLMPlugin:
     def get_context_length(self) -> int:
         """Returns the context length of the current LLM model."""
         return self.llm.get_context_length()
+
+    def generate_content(self, context: str, prompt_text: str, **kwargs) -> str:
+        """
+        Generates content using the LLM by combining context and a specific prompt text.
+        This method is intended for use by agents like EchoAgent.
+        """
+        # The 'input' for PromptTemplate.format will be the combination.
+        # CustomLLM and other LLM classes expect a single 'prompt' string.
+        combined_input_for_template = f"{context}\n\n{prompt_text}"
+
+        # 'generate_text' handles the PromptTemplate formatting (if any, for "default" task it's direct)
+        # and caching.
+        return self.generate_text(prompt=combined_input_for_template, task="default", **kwargs)
 
 # Example usage (for testing)
 if __name__ == "__main__":
