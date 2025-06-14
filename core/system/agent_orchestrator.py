@@ -71,6 +71,7 @@ AGENT_CLASSES = {
     "DataRetrievalAgent": "core.agents.data_retrieval_agent",
     "ResultAggregationAgent": "core.agents.result_aggregation_agent",
     "SNCAnalystAgent": "core.agents.SNC_analyst_agent", # Added SNC_analyst_agent
+    "NewsBotAgent": "core.agents.NewsBot",
 }
 
 
