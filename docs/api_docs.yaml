@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: Adam v17.0 API
+  title: Adam v19.1 API
   version: v1
 servers:
   - url: /api/v1
@@ -20,7 +20,7 @@ paths:
                 module:
                   type: string
                   description: The module to access (e.g., "valuation", "risk_management", "market_sentiment").
-                  enum: ["knowledge_graph", "agent_orchestrator", "echo_system", "valuation", "risk_management", "market_sentiment", "macroeconomic_analysis", "geopolitical_risk_analysis", "fundamental_analysis", "technical_analysis", "portfolio_optimization", "agent_forge", "prompt_tuner", "code_alchemist", "lingua_maestro", "sense_weaver", "data_visualization", "natural_language_generation", "machine_learning_model_training"]
+                  enum: ["knowledge_graph", "agent_orchestrator", "echo_system", "valuation", "risk_management", "market_sentiment", "macroeconomic_analysis", "geopolitical_risk_analysis", "fundamental_analysis", "technical_analysis", "portfolio_optimization", "agent_forge", "prompt_tuner", "code_alchemist", "lingua_maestro", "sense_weaver", "data_visualization", "natural_language_generation", "machine_learning_model_training", "SNC_analyst_agent"]
                 action:
                   type: string
                   description: The action to perform within the module (e.g., "get_dcf_valuation", "get_var", "get_sentiment").
@@ -37,7 +37,7 @@ paths:
                 properties:
                   results:
                     type: object
-                    description: The results of the API request.
+                    description: The results of the API request. Specific modules like SNC_analyst_agent may return a structured object defined in components.schemas.
         '400':
           description: Bad Request - Invalid request format or parameters.
         '500':
@@ -46,6 +46,21 @@ paths:
 components:
   schemas:
     # Define common response schemas or data models here, if any.
+    SNCAnalysisResponse:
+      type: object
+      description: Response structure for the SNC Analyst Agent.
+      properties:
+        rating:
+          type: string
+          nullable: true
+          description: The assigned SNC rating (e.g., Pass, Special Mention, Substandard).
+        rationale:
+          type: string
+          description: Textual justification for the rating.
+        xai_trace:
+          type: object
+          nullable: true
+          description: Optional detailed XAI execution trace if requested. Structure TBD.
     # Example:
     # DCFValuation:
     #   type: object

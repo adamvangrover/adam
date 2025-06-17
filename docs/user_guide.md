@@ -1,7 +1,7 @@
 ````markdown
-# Adam v17.0 User Guide
+# Adam v19.1 User Guide
 
-This guide provides comprehensive instructions on how to use Adam v17.0, the advanced financial analytics system. It covers various aspects, including:
+This guide provides comprehensive instructions on how to use Adam v19.1, the advanced financial analytics system. It covers various aspects, including:
 
 * Accessing and utilizing the knowledge graph
 * Interacting with the API
@@ -87,13 +87,33 @@ Here are a few examples of how to use the API:
 
 ## Analysis Modules
 
-Adam v17.0 provides various analysis modules that can be used to gain insights into financial markets and make informed investment decisions. These modules include:
+Adam v19.1 provides various analysis modules that can be used to gain insights into financial markets and make informed investment decisions. These modules include:
 
   * **Market Sentiment Analysis:** Analyzes news articles, social media, and financial forums to gauge investor sentiment towards different assets and markets.
   * **Macroeconomic Analysis:** Monitors and interprets key economic indicators (e.g., GDP, inflation, interest rates) to assess the macroeconomic environment and its potential impact on investments.
   * **Geopolitical Risk Analysis:** Identifies and analyzes geopolitical risks (e.g., political instability, trade wars) and their potential impact on financial markets.
   * **Fundamental Analysis:** Performs in-depth fundamental analysis of companies, including financial statement analysis, valuation modeling, and risk assessment.
   * **Technical Analysis:** Analyzes price charts, technical indicators, and patterns to identify trading opportunities and generate trading signals.
+
+### SNC Analyst Agent
+
+The Shared National Credit (SNC) Analyst Agent is designed to assess the credit risk of large, syndicated loans based on established regulatory guidelines. It provides a regulatory rating (e.g., Pass, Special Mention, Substandard) along with a detailed justification for its assessment.
+
+**Key XAI Features:**
+
+*   **Detailed Justifications:** The agent's primary output includes a human-readable rationale that explains the factors leading to the assigned rating. These justifications now incorporate references to specific sections or codes from relevant regulatory handbooks (e.g., Comptroller's Handbook, OCC Guidelines), making the reasoning more transparent and auditable.
+*   **XAI Execution Trace:** For an in-depth understanding of the agent's decision-making process, users can request a full XAI execution trace.
+    *   If interacting with the agent programmatically, this is typically done by passing an `include_xai_trace=True` parameter to its execution method.
+    *   This trace provides a step-by-step log of the agent's operations, including data inputs, skill invocations (internal reasoning steps), parameters passed, intermediate assessments, and how these contribute to the final rating and rationale.
+    *   The trace is provided in a structured format (JSON) and allows for a granular review of the entire analysis.
+*   **Accessing the Output:** The agent's output is a structured dictionary containing the `rating`, `rationale`, and optionally, the `xai_trace`. For example:
+    ```json
+    {
+      "rating": "Substandard",
+      "rationale": "Substandard rating influenced by SK assessments (Non-Accrual, Collateral, or Repayment indicating weaknesses, citing CHB Paying Capacity Sec 3.2, OCC Non-Accrual Reg 12.3(a)). Fallback: Insufficient liquidity and interest coverage.",
+      "xai_trace": { /* ... detailed trace data ... */ }
+    }
+    ```
 
 ### Running Analysis Modules
 
@@ -137,7 +157,7 @@ You can then use this data to generate a report or create a visualization of MSF
 
 ## Customizing Strategies and Settings
 
-Adam v17.0 allows you to customize various aspects of the system, including:
+Adam v19.1 allows you to customize various aspects of the system, including:
 
   * **Investment Strategies:** Define your own investment strategies based on Adam's insights and your risk tolerance and investment goals. You can use the API or configuration files to specify your investment preferences and constraints.
   * **Agent Behavior:** Configure the behavior and interactions of different agents within the system. You can adjust the parameters of each agent to fine-tune their analysis and decision-making processes.
@@ -146,15 +166,15 @@ Adam v17.0 allows you to customize various aspects of the system, including:
 
 ### Configuration File
 
-The `config/config.yaml` file allows you to customize various settings for Adam v17.0. Refer to the `config/example_config.yaml` file for detailed instructions and examples.
+The `config/` directory contains modular YAML files for customizing various settings for Adam v19.1 (e.g., `agents.yaml`, `system.yaml`). Refer to these files and any `example_*.yaml` files for detailed instructions and examples. The main `config/config.yaml` is deprecated for direct edits.
 
 ## Contributing
 
-Contributions to Adam v17.0 are welcome\! Please check the [CONTRIBUTING.md](https://www.google.com/url?sa=E&source=gmail&q=CONTRIBUTING.md) file for guidelines on how to contribute to the project.
+Contributions to Adam v19.1 are welcome\! Please check the [CONTRIBUTING.md](https://www.google.com/url?sa=E&source=gmail&q=CONTRIBUTING.md) file for guidelines on how to contribute to the project.
 
 ## Support and Feedback
 
-If you have any questions or feedback, please feel free to reach out to the Adam v17.0 development team. You can submit issues or pull requests on the GitHub repository or contact the developers directly via email or other communication channels.
+If you have any questions or feedback, please feel free to reach out to the Adam v19.1 development team. You can submit issues or pull requests on the GitHub repository or contact the developers directly via email or other communication channels.
 
 ```
 ```

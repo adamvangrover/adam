@@ -848,17 +848,24 @@ agents:  # This top-level 'agents' key is REQUIRED
       - "SNC analysis"
       - "regulatory interpretation"
       - "credit risk"
+    xai_log_file: "logs/snc_agent_xai.log"
     comptrollers_handbook_SNC:
       primary_repayment_source: "sustainable source of cash under the borrower's control"
+      primary_repayment_source_ref: "CHB Repayment Sec 1.3" # Suitable for both, can be overridden if specific needed
       substandard_definition: "inadequately protected by the current sound worth and paying capacity of the obligor or of the collateral pledged"
+      substandard_definition_ref: "CHB Collateral Eval Sec 2.1" # General ref
+      substandard_paying_capacity_ref: "CHB Paying Capacity Sec 3.2" # Specific for paying capacity
       doubtful_definition: "all the weaknesses inherent in one classified substandard with the added characteristic that the weaknesses make collection or liquidation in full, highly questionable and improbable"
       loss_definition: "uncollectible and of such little value that their continuance as bankable assets is not warranted"
       repayment_capacity_period: 7
-      nonaccrual_status: "asset is maintained on a cash basis because of deterioration in the financial condition of the borrower"
-      capitalization_of_interest: "interest may be capitalized only when the borrower is creditworthy and has the ability to repay the debt in the normal course of business"
+      repayment_capacity_period_years_ref: "CHB Guidance Appx A"
+      nonaccrual_status: "asset is maintained on a cash basis because of deterioration in the financial condition of the borrower" # This is also in occ_guidelines_SNC, agent uses OCC one for this skill
+      capitalization_of_interest: "interest may be capitalized only when the borrower is creditworthy and has the ability to repay the debt in the normal course of business" # Same as above
     occ_guidelines_SNC:
       nonaccrual_status: "asset is maintained on a cash basis because of deterioration in the financial condition of the borrower"
+      nonaccrual_status_ref: "OCC Non-Accrual Reg 12.3(a)"
       capitalization_of_interest: "interest may be capitalized only when the borrower is creditworthy and has the ability to repay the debt in the normal course of business"
+      capitalization_of_interest_ref: "OCC Interest Cap Policy 4.5"
 
   news_bot_agent:
     <<: *defaults

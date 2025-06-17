@@ -33,7 +33,7 @@ Adam v19.1 is not just an AI; it's your partner in navigating the complexities o
   * **Improved Knowledge Base:**
       * **Graph Database:** Leverages a powerful graph database (e.g., Neo4j) to store and access vast amounts of interconnected financial knowledge efficiently.
       * **Expanded Content:** Incorporates credit rating methodologies, regulatory guidelines, historical rating data, and crypto asset data, providing a holistic view of the financial landscape.
-  * **Explainable AI (XAI):** Offers clear and transparent explanations for every recommendation and insight, fostering trust and understanding.
+  * **Explainable AI (XAI):** Offers clear and transparent explanations for every recommendation and insight, fostering trust and understanding. The SNC Analyst Agent, for example, now provides detailed justification traces for its credit assessments, including references to specific SNC regulatory criteria.
   * **Automated Testing and Monitoring:** Continuously tests and monitors the system to ensure accuracy, reliability, and optimal performance.
 
 ## Key Features
@@ -45,6 +45,7 @@ Adam v19.1 is not just an AI; it's your partner in navigating the complexities o
   * **Personalized Recommendations:**
       * **Tailored to your risk tolerance and investment goals.**
       * **Provides actionable insights and clear explanations.**
+  * **Explainable AI (XAI):** This includes features like the SNC Analyst Agent's ability to output comprehensive execution traces that map to specific regulatory guidelines.
   * **Automated Workflows:**
       * **Automated data collection and processing from various sources.**
       * **Customizable strategy implementation with backtesting and optimization capabilities.**
@@ -264,7 +265,7 @@ Adam v19.1 comprises the following core components:
       * Data Visualization Agent: Generates interactive and informative visualizations.
       * Natural Language Generation Agent: Generates human-readable reports and narratives.
       * Machine Learning Model Training Agent: Trains and updates machine learning models.
-      * SNC Analyst Agent: Specializes in the analysis of Shared National Credits (SNCs).
+      * SNC Analyst Agent: Specializes in the analysis of Shared National Credits (SNCs), providing ratings with justifications that reference specific regulatory codes and offering detailed XAI traces for full transparency.
       * Crypto Agent: Specializes in the analysis of crypto assets.
       * Discussion Chair Agent: Leads discussions and makes final decisions in simulations.
       * Legal Agent: Provides legal advice and analysis.
