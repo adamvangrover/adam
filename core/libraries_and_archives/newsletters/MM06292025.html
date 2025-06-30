@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Mayhem - Interactive Weekly Briefing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: The SPA is structured into four logical, thematic sections accessible via a sticky nav bar: 1. Market Pulse (at-a-glance dashboard), 2. Strategic Themes (interactive tabbed deep-dive into AI, Cybersecurity, Supply Chain), 3. Market Movers (corporate deals and sentiment signals), and 4. Forward Outlook (upcoming events). This information architecture guides the user from a high-level overview to specific, actionable insights, making the dense report content more navigable and digestible than a linear document. The goal is to facilitate exploration and understanding by grouping related concepts logically. -->
+    <!-- Visualization & Content Choices: 1. Market Pulse: Uses stat cards (HTML/CSS) for key numbers and a Chart.js Bar Chart to compare indices. Goal: Inform/Compare. 2. Strategic Themes: Uses interactive tabs (JS) to organize content. A Chart.js Donut chart visualizes the AI energy bottleneck. Goal: Organize/Inform. 3. Market Movers: Features an interactive element with buttons (JS) to display details and a dynamic Chart.js Bar Chart for unusual options sentiment. Goal: Organize/Compare/Interact. 4. Forward Outlook: Uses a clean timeline layout (HTML/CSS). Goal: Inform. All choices prioritize clarity and interaction over static text. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f7f4;
+            color: #1a1a1a;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-link {
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #4f46e5;
+        }
+        .tab-button.active {
+            border-color: #4f46e5;
+            color: #4f46e5;
+            font-weight: 600;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 border-b border-gray-200">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-gray-800">Market Mayhem</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#pulse" class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium">Market Pulse</a>
+                        <a href="#themes" class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium">Strategic Themes</a>
+                        <a href="#movers" class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium">Market Movers</a>
+                        <a href="#outlook" class="nav-link text-gray-600 px-3 py-2 rounded-md text-sm font-medium">Forward Outlook</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div id="pulse" class="py-12 md:py-20 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Market Pulse</h2>
+                    <p class="mt-3 max-w-2xl mx-auto text-lg text-gray-500">An at-a-glance summary of key market indicators for the week ending June 27, 2025.</p>
+                </div>
+                <div class="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                    <div id="sp500-card" class="bg-gray-50 p-6 rounded-2xl shadow-sm"></div>
+                    <div id="dow-card" class="bg-gray-50 p-6 rounded-2xl shadow-sm"></div>
+                    <div id="nasdaq-card" class="bg-gray-50 p-6 rounded-2xl shadow-sm"></div>
+                    <div id="oil-card" class="bg-gray-50 p-6 rounded-2xl shadow-sm"></div>
+                    <div id="gold-card" class="bg-gray-50 p-6 rounded-2xl shadow-sm"></div>
+                </div>
+                <div class="mt-12">
+                    <div class="bg-white p-4 sm:p-6 rounded-2xl">
+                         <h3 class="text-lg font-medium leading-6 text-gray-900 text-center mb-4">U.S. Index Performance</h3>
+                         <div class="chart-container">
+                            <canvas id="indicesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="themes" class="py-12 md:py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Strategic Investment Themes</h2>
+                    <p class="mt-3 max-w-3xl mx-auto text-lg text-gray-500">Explore the powerful secular trends shaping the investment landscape. The current market is a balance between enthusiasm for tech advancements and significant geopolitical and supply chain risks.</p>
+                </div>
+                <div class="mt-10">
+                    <div class="border-b border-gray-200 mb-8">
+                        <nav class="-mb-px flex justify-center space-x-4 md:space-x-8" aria-label="Tabs">
+                            <button id="tab-ai" data-tab="ai" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-indigo-600 hover:border-indigo-500">
+                                &#x1F9E0; AI Infrastructure Supercycle
+                            </button>
+                            <button id="tab-cyber" data-tab="cyber" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-indigo-600 hover:border-indigo-500">
+                                &#x1F512; Cybersecurity Imperative
+                            </button>
+                            <button id="tab-supply" data-tab="supply" class="tab-button whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-indigo-600 hover:border-indigo-500">
+                                &#x1F69A; Supply Chain Resilience
+                            </button>
+                        </nav>
+                    </div>
+                    <div id="tab-content" class="fade-in"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="movers" class="py-12 md:py-20 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Market Movers</h2>
+                    <p class="mt-3 max-w-2xl mx-auto text-lg text-gray-500">A look at significant corporate deals, capital market events, and revealing signals from the derivatives market.</p>
+                </div>
+                <div id="ma-deals" class="mt-12"></div>
+                <div class="mt-12 grid gap-8 lg:grid-cols-2">
+                    <div id="ipo-section"></div>
+                    <div id="options-section" class="bg-gray-50 p-6 rounded-2xl"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="outlook" class="py-12 md:py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Forward Outlook</h2>
+                    <p class="mt-3 max-w-2xl mx-auto text-lg text-gray-500">Key economic data and corporate earnings to watch in the week ahead (June 30, 2025).</p>
+                </div>
+                <div class="mt-12 grid gap-12 lg:grid-cols-2">
+                    <div id="economic-calendar"></div>
+                    <div id="earnings-watch"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-white border-t border-gray-200">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div class="text-center text-xs text-gray-500">
+                <p>Disclaimer: The information and recommendations provided in this application are for informational purposes only and should not be construed as financial advice. Investing involves risk, and you could lose money. Consult with a qualified financial advisor before making any investment decisions.</p>
+                <p class="mt-2">Market Mayhem - June 29, 2025</p>
+            </div>
+        </div>
+    </footer>
+
+<script>
+const App = {
+    data: {
+        marketSnapshot: {
+            sp500: { name: 'S&P 500', value: '6,173.07' },
+            dow: { name: 'Dow Jones', value: '43,819.27' },
+            nasdaq: { name: 'Nasdaq Comp.', value: '20,167.91' },
+            oil: { name: 'Brent Crude Oil', value: '$67.31' },
+            gold: { name: 'Gold/oz', value: '$3,272.00' }
+        },
+        themes: {
+            ai: {
+                title: '&#x1F9E0; The AI Infrastructure Supercycle',
+                content: `<div class="grid md:grid-cols-2 gap-8 items-center">
+                              <div>
+                                  <h4 class="text-xl font-semibold text-gray-800">Rationale</h4>
+                                  <p class="mt-2 text-gray-600">The relentless pace of AI development, from OpenAI's GPT-5 to Microsoft's AI-native PCs, is creating massive, long-term demand for underlying infrastructure. This multi-trillion-dollar build-out includes semiconductors, cloud computing, data centers, and crucial energy solutions.</p>
+                                  <h4 class="text-xl font-semibold text-gray-800 mt-4">Considerations & Risks</h4>
+                                  <p class="mt-2 text-gray-600">Focus on market leaders with clear strategies. Be mindful of high valuations, intense competition, and the cyclical nature of the semiconductor industry.</p>
+                              </div>
+                              <div class="bg-white p-4 rounded-2xl">
+                                <h4 class="text-center font-medium text-gray-800">Projected U.S. Data Center Electricity Consumption</h4>
+                                <div class="chart-container h-64 md:h-72">
+                                    <canvas id="aiEnergyChart"></canvas>
+                                </div>
+                                <p class="text-xs text-center text-gray-500 mt-2">The growth of AI is inextricably linked to modernizing the power grid.</p>
+                              </div>
+                          </div>`
+            },
+            cyber: {
+                title: '&#x1F512; The Cybersecurity Imperative',
+                content: `<div class="prose max-w-none">
+                              <h4 class="text-xl font-semibold text-gray-800">Rationale</h4>
+                              <p class="mt-2 text-gray-600">As businesses digitize, their vulnerability to cyberattacks grows. The World Economic Forum projects global financial losses from cybercrime to reach <span class="font-bold text-indigo-600">$10.5 trillion in 2025</span>. This creates a critical, non-discretionary need for advanced cybersecurity solutions.</p>
+                              <h4 class="text-xl font-semibold text-gray-800 mt-4">Considerations & Risks</h4>
+                              <p class="mt-2 text-gray-600">Look for firms with strong enterprise adoption and innovative, AI-leveraged threat detection. The landscape is highly competitive and requires constant innovation to counter new threats.</p>
+                          </div>`
+            },
+            supply: {
+                title: '&#x1F69A; Supply Chain Resilience',
+                content: `<div class="prose max-w-none">
+                              <h4 class="text-xl font-semibold text-gray-800">Rationale</h4>
+                              <p class="mt-2 text-gray-600">Geopolitical tensions, trade tariffs, and climate events expose the fragility of global supply chains. This is driving huge investment in solutions that enhance resilience, such as dual-sourcing, near-shoring, and automation technologies like AI and robotics.</p>
+                              <h4 class="text-xl font-semibold text-gray-800 mt-4">Considerations & Risks</h4>
+                              <p class="mt-2 text-gray-600">Identify companies in industrial automation and logistics software. Be aware of high capital requirements and potential for economic slowdowns to defer investment.</p>
+                          </div>`
+            }
+        },
+        maDeals: [
+            { acquirer: 'Sanofi', target: 'Blueprint Medicines', value: '$9.5 billion', rationale: 'Bolster oncology and immunology portfolio.' },
+            { acquirer: 'Holcim', target: 'Amrize (Spin-off)', value: 'N/A', rationale: 'Create a pure-play North American building solutions company.' },
+            { acquirer: 'DNOW Inc.', target: 'MRC Global', value: '$1.5 billion', rationale: 'Consolidation in industrial distribution.' },
+            { acquirer: 'BioNTech', target: 'CureVac', value: '$1.25 billion', rationale: 'Strengthen mRNA technology and oncology pipeline.' }
+        ],
+        ipo: {
+            company: 'HDB Financial Services (India)',
+            details: 'One of the largest IPOs for a non-banking financial company (NBFC) in India\'s history, aiming to raise significant capital for expansion. The offering saw decent demand, particularly from non-institutional investors.'
+        },
+        optionsActivity: {
+            meli: {
+                title: 'MercadoLibre (MELI)',
+                content: 'Significant bullish bets detected. Traders are favoring call options, with notable volume in long-term contracts, suggesting a belief in substantial upside potential.',
+                data: {
+                    bullish: 1200000,
+                    bearish: 425091
+                }
+            },
+            snow: {
+                title: 'Snowflake (SNOW)',
+                content: 'Unusually high options volume with heavyweight investors divided on direction. Large positions are being established, indicating anticipation of a near-term catalyst.',
+                 data: {
+                    bullish: 50,
+                    bearish: 50
+                }
+            }
+        },
+        economicCalendar: [
+            { day: 'Monday', events: ['UK Final Q1 GDP', 'Germany Prelim. June Inflation', 'US Chicago PMI'] },
+            { day: 'Wednesday', events: ['Eurozone Unemployment Rate (May)'] },
+            { day: 'Thursday', events: ['US Non-Farm Payrolls (US Holiday)'] }
+        ],
+        earnings: {
+            reported: [
+                { ticker: 'MU', name: 'Micron Technology', result: 'Beat expectations with a 232.56% earnings increase, confirming AI demand.'},
+                { ticker: 'JEF', name: 'Jefferies Financial', result: 'Missed earnings consensus despite strong M&A activity.'},
+            ],
+            upcoming: [
+                { ticker: 'PRGS', name: 'Progress Software', date: 'June 30', consensus: '$0.43/share' }
+            ]
+        }
+    },
+    charts: {},
+    
+    init() {
+        this.renderMarketCards();
+        this.renderMaDeals();
+        this.renderIpoSection();
+        this.renderOptionsSection();
+        this.renderEconomicCalendar();
+        this.renderEarningsWatch();
+        this.setupEventListeners();
+        this.renderIndicesChart();
+        this.activateTab('ai');
+    },
+
+    renderMarketCards() {
+        const { sp500, dow, nasdaq, oil, gold } = this.data.marketSnapshot;
+        document.getElementById('sp500-card').innerHTML = `<h3 class="text-base font-medium text-gray-500">${sp500.name}</h3><p class="mt-2 text-3xl font-bold text-gray-900">${sp500.value}</p>`;
+        document.getElementById('dow-card').innerHTML = `<h3 class="text-base font-medium text-gray-500">${dow.name}</h3><p class="mt-2 text-3xl font-bold text-gray-900">${dow.value}</p>`;
+        document.getElementById('nasdaq-card').innerHTML = `<h3 class="text-base font-medium text-gray-500">${nasdaq.name}</h3><p class="mt-2 text-3xl font-bold text-gray-900">${nasdaq.value}</p>`;
+        document.getElementById('oil-card').innerHTML = `<h3 class="text-base font-medium text-gray-500">${oil.name}</h3><p class="mt-2 text-3xl font-bold text-gray-900">${oil.value}</p>`;
+        document.getElementById('gold-card').innerHTML = `<h3 class="text-base font-medium text-gray-500">${gold.name}</h3><p class="mt-2 text-3xl font-bold text-gray-900">${gold.value}</p>`;
+    },
+
+    renderMaDeals() {
+        let html = `<h3 class="text-2xl font-bold text-gray-900 text-center">Major Deals & Corporate Actions</h3>
+                    <div class="mt-6 flow-root">
+                        <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                            <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+                                <table class="min-w-full divide-y divide-gray-300">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">Acquirer/Parent</th>
+                                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Target</th>
+                                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Value (USD)</th>
+                                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Rationale</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-200">`;
+        this.data.maDeals.forEach(deal => {
+            html += `<tr>
+                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">${deal.acquirer}</td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${deal.target}</td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">${deal.value}</td>
+                        <td class="whitespace-normal px-3 py-4 text-sm text-gray-500">${deal.rationale}</td>
+                     </tr>`;
+        });
+        html += `</tbody></table></div></div></div>`;
+        document.getElementById('ma-deals').innerHTML = html;
+    },
+
+    renderIpoSection() {
+        document.getElementById('ipo-section').innerHTML = `
+            <div class="bg-gray-50 p-6 rounded-2xl h-full">
+                <h3 class="text-xl font-bold text-gray-900">Capital Markets: Major IPO</h3>
+                <p class="mt-2 font-semibold text-indigo-600">${this.data.ipo.company}</p>
+                <p class="mt-1 text-gray-600">${this.data.ipo.details}</p>
+            </div>`;
+    },
+    
+    renderOptionsSection() {
+        let html = `
+            <h3 class="text-xl font-bold text-gray-900">Unusual Options Activity</h3>
+            <p class="mt-1 text-sm text-gray-600">Click to see signals from the derivatives market.</p>
+            <div class="mt-4 flex space-x-2">
+                <button data-stock="meli" class="options-btn bg-white px-4 py-2 text-sm font-medium text-gray-700 rounded-lg shadow-sm hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">MELI</button>
+                <button data-stock="snow" class="options-btn bg-white px-4 py-2 text-sm font-medium text-gray-700 rounded-lg shadow-sm hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">SNOW</button>
+            </div>
+            <div id="options-content" class="mt-4"></div>
+            <div id="options-chart-container" class="mt-4" style="height: 150px; position: relative;">
+                <canvas id="optionsChart"></canvas>
+            </div>
+        `;
+        document.getElementById('options-section').innerHTML = html;
+        this.updateOptionsContent('meli');
+    },
+
+    updateOptionsContent(stock) {
+        const stockData = this.data.optionsActivity[stock];
+        document.getElementById('options-content').innerHTML = `
+            <div class="fade-in">
+                <p class="font-semibold text-gray-800">${stockData.title}</p>
+                <p class="text-gray-600 text-sm">${stockData.content}</p>
+            </div>
+        `;
+        document.querySelectorAll('.options-btn').forEach(btn => {
+            btn.classList.toggle('bg-indigo-100', btn.dataset.stock === stock);
+            btn.classList.toggle('text-indigo-700', btn.dataset.stock === stock);
+        });
+        
+        if (this.charts.optionsChart) {
+            this.charts.optionsChart.destroy();
+        }
+
+        const ctx = document.getElementById('optionsChart').getContext('2d');
+        const labels = stock === 'meli' ? ['Bullish Calls', 'Bearish Puts'] : ['Bullish Sentiment', 'Bearish Sentiment'];
+        const data = stock === 'meli' ? [stockData.data.bullish, stockData.data.bearish] : [stockData.data.bullish, stockData.data.bearish];
+        const chartTitle = stock === 'meli' ? 'Capital at Risk ($)' : 'Sentiment Split (%)';
+
+        this.charts.optionsChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Sentiment',
+                    data: data,
+                    backgroundColor: ['rgba(34, 197, 94, 0.6)', 'rgba(239, 68, 68, 0.6)'],
+                    borderColor: ['rgba(34, 197, 94, 1)', 'rgba(239, 68, 68, 1)'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: chartTitle }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                if (stock === 'meli') {
+                                    return '$' + (value / 1000000) + 'M';
+                                }
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    },
+
+    renderEconomicCalendar() {
+        let html = `<h3 class="text-xl font-bold text-gray-900">Economic Calendar</h3>
+                    <div class="mt-4 space-y-4">`;
+        this.data.economicCalendar.forEach(item => {
+            html += `<div class="flex">
+                        <div class="flex-shrink-0 w-24">
+                            <p class="font-semibold text-indigo-600">${item.day}</p>
+                        </div>
+                        <div class="flex-grow">
+                            <p class="text-gray-600">${item.events.join(', ')}</p>
+                        </div>
+                     </div>`;
+        });
+        html += `</div>`;
+        document.getElementById('economic-calendar').innerHTML = html;
+    },
+
+    renderEarningsWatch() {
+        let html = `<h3 class="text-xl font-bold text-gray-900">Earnings Watch</h3>
+                    <div class="mt-4 space-y-4">
+                        <div>
+                            <h4 class="font-semibold text-gray-800">Recently Reported</h4>`;
+        this.data.earnings.reported.forEach(item => {
+            html += `<div class="mt-2 p-3 bg-gray-50 rounded-lg">
+                        <p class="font-medium text-gray-900">${item.name} (${item.ticker})</p>
+                        <p class="text-sm text-gray-600">${item.result}</p>
+                     </div>`;
+        });
+        html += `</div><div>
+                    <h4 class="font-semibold text-gray-800 mt-4">Upcoming</h4>`;
+        this.data.earnings.upcoming.forEach(item => {
+            html += `<div class="mt-2 p-3 bg-gray-50 rounded-lg">
+                        <p class="font-medium text-gray-900">${item.name} (${item.ticker}) - Reports ${item.date}</p>
+                        <p class="text-sm text-gray-600">Consensus EPS: ${item.consensus}</p>
+                     </div>`;
+        });
+        html += `</div></div>`;
+        document.getElementById('earnings-watch').innerHTML = html;
+    },
+    
+    activateTab(tabId) {
+        document.getElementById('tab-content').innerHTML = this.data.themes[tabId].content;
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.classList.remove('active');
+            if (button.dataset.tab === tabId) {
+                button.classList.add('active');
+            }
+        });
+        
+        if (tabId === 'ai' && !this.charts.aiEnergyChart) {
+            this.renderAiEnergyChart();
+        } else if (tabId === 'ai' && this.charts.aiEnergyChart) {
+            this.charts.aiEnergyChart.update();
+        }
+    },
+
+    setupEventListeners() {
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                this.activateTab(e.currentTarget.dataset.tab);
+            });
+        });
+
+        document.getElementById('options-section').addEventListener('click', (e) => {
+            if (e.target.matches('.options-btn')) {
+                this.updateOptionsContent(e.target.dataset.stock);
+            }
+        });
+    },
+
+    renderIndicesChart() {
+        const ctx = document.getElementById('indicesChart').getContext('2d');
+        this.charts.indicesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['S&P 500', 'Dow Jones', 'Nasdaq'],
+                datasets: [{
+                    label: 'Closing Value',
+                    data: [6173.07, 43819.27, 20167.91],
+                    backgroundColor: [
+                        'rgba(79, 70, 229, 0.6)',
+                        'rgba(59, 130, 246, 0.6)',
+                        'rgba(16, 185, 129, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgba(79, 70, 229, 1)',
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(16, 185, 129, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) { return value.toLocaleString(); }
+                        }
+                    }
+                }
+            }
+        });
+    },
+
+    renderAiEnergyChart() {
+        const ctx = document.getElementById('aiEnergyChart').getContext('2d');
+        this.charts.aiEnergyChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Data Centers 2023', 'Projected Growth by 2028', 'Rest of U.S. Grid'],
+                datasets: [{
+                    data: [4.4, 7.6, 88],
+                    backgroundColor: [
+                        'rgba(251, 146, 60, 0.8)',
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(209, 213, 219, 0.8)'
+                    ],
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += context.parsed + '% of U.S. Electricity';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    App.init();
+});
+</script>
+
+</body>
+</html>
