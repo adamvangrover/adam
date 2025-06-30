@@ -1,0 +1,129 @@
+{
+  "prompt_metadata": {
+    "prompt_id": "Geopolitical_Risk_Impact_Assessment_v1",
+    "prompt_version": "1.0",
+    "creation_date": "YYYY-MM-DD",
+    "description": "A prompt to generate an assessment of the potential impact of a specific geopolitical event or trend on given asset classes or regions.",
+    "author": "Jules - AI Software Engineer"
+  },
+  "report_specifications": {
+    "report_title": "Geopolitical Risk Impact Assessment: [Event/Trend] on [Asset Classes/Regions]",
+    "geopolitical_event_trend": "[Specify the event, e.g., 'Kafkastan Elections', 'Sino-US Trade Tensions Escalation', 'Protracted War in Eastern Europe']",
+    "affected_asset_classes_regions": "[Specify, e.g., 'Global Equities and Oil Markets', 'Emerging Market Debt in LATAM', 'European Technology Sector']",
+    "time_horizon_analysis": "Short-term (0-3 months), Medium-term (3-12 months), Long-term (1-3 years) impacts.",
+    "target_audience": "Risk Managers, Portfolio Managers, International Business Strategists, Policy Analysts",
+    "output_format": "Markdown with structured sections",
+    "tone_and_style": "Analytical, objective, scenario-based, focused on probabilities and potential impacts."
+  },
+  "core_analysis_areas": [
+    {
+      "section_id": "executive_summary",
+      "section_title": "Executive Summary",
+      "instructions": "Provide a concise overview of the geopolitical event/trend, the assessed impacts on the specified asset classes/regions, and key risk mitigation considerations.",
+      "key_considerations": [
+        "Brief description of the geopolitical event/trend.",
+        "Summary of most likely impacts (positive/negative, magnitude).",
+        "Key transmission channels of risk.",
+        "Overall risk assessment level (e.g., Low, Medium, High)."
+      ]
+    },
+    {
+      "section_id": "geopolitical_event_overview",
+      "section_title": "Geopolitical Event/Trend Overview",
+      "instructions": "Detail the specified geopolitical event or trend.",
+      "key_considerations": [
+        "Background and context of the event/trend.",
+        "Key actors involved and their motivations/objectives.",
+        "Current status and potential evolution pathways (scenarios).",
+        "Likelihood assessment of different scenarios (if possible)."
+      ]
+    },
+    {
+      "section_id": "transmission_channels",
+      "section_title": "Transmission Channels to Markets/Regions",
+      "instructions": "Identify and analyze the mechanisms through which the geopolitical event impacts the specified asset classes or regions.",
+      "key_considerations": [
+        "Economic channels (e.g., trade disruptions, sanctions, commodity price shocks, investment flows, inflation).",
+        "Financial market channels (e.g., investor sentiment, risk premia, currency volatility, capital flight).",
+        "Political channels (e.g., policy changes, international relations shifts, domestic instability).",
+        "Supply chain disruptions."
+      ]
+    },
+    {
+      "section_id": "impact_assessment_asset_region",
+      "section_title": "Impact Assessment on [Asset Classes/Regions]",
+      "instructions": "Analyze the potential direct and indirect impacts on each specified asset class or region across different time horizons. Consider different scenarios if outlined.",
+      "dynamic_fields": {
+        "loop_through": "affected_asset_classes_regions", // This suggests the AI should create a sub-section for each item in this list
+        "sub_section_template": {
+          "sub_section_id": "impact_on_[item_name_sanitized]",
+          "title": "Impact on [Item Name]",
+          "key_considerations": [
+            "Short-term impact (0-3 months): e.g., price volatility, immediate sentiment shifts.",
+            "Medium-term impact (3-12 months): e.g., earnings revisions, capital flow adjustments, policy responses.",
+            "Long-term impact (1-3 years): e.g., structural economic changes, shifts in competitiveness, long-term investment trends.",
+            "Quantify potential impacts where possible (e.g., % change in price, bps change in yields, GDP impact).",
+            "Consider both direct impacts and second-order effects.",
+            "Identify potential winners and losers within the asset class/region."
+          ]
+        }
+      }
+    },
+    {
+      "section_id": "scenario_analysis",
+      "section_title": "Scenario Analysis (Optional)",
+      "instructions": "If multiple credible scenarios for the geopolitical event's evolution exist, detail the impact under each scenario.",
+      "key_considerations": [
+        "Define 2-3 plausible scenarios (e.g., Base Case, Best Case, Worst Case, or specific narrative scenarios like 'De-escalation', 'Protracted Conflict').",
+        "Assign qualitative probabilities to each scenario if possible.",
+        "For each scenario, briefly outline the differential impact on the target asset classes/regions compared to a baseline."
+      ]
+    },
+    {
+      "section_id": "risk_mitigation_strategies",
+      "section_title": "Potential Risk Mitigation Strategies",
+      "instructions": "Suggest potential strategies that investors or businesses could consider to mitigate the identified risks.",
+      "key_considerations": [
+        "Hedging strategies (e.g., currency hedges, commodity hedges, options).",
+        "Asset allocation adjustments (e.g., diversification, underweighting exposed assets).",
+        "Operational adjustments for businesses (e.g., supply chain diversification, market exit/entry).",
+        "Contingency planning considerations."
+      ]
+    },
+    {
+      "section_id": "monitoring_indicators",
+      "section_title": "Key Monitoring Indicators",
+      "instructions": "List key indicators or signposts that should be monitored to track the evolution of the geopolitical event and its impacts.",
+      "key_considerations": [
+        "Specific political developments.",
+        "Economic data releases from affected regions.",
+        "Market-based indicators (e.g., volatility indices, credit spreads, specific stock/commodity prices).",
+        "News flow and sentiment indicators."
+      ]
+    },
+    {
+      "section_id": "conclusion",
+      "section_title": "Conclusion",
+      "instructions": "Summarize the key findings, overall risk level, and most critical considerations.",
+      "key_considerations": [
+        "Reiterate the most significant potential impacts.",
+        "Restate the overall risk assessment.",
+        "Emphasize key uncertainties and areas for ongoing monitoring."
+      ]
+    }
+  ],
+  "data_requirements": [
+    "Reputable news sources and geopolitical analysis reports (e.g., think tanks, academic institutions, specialized risk consultancies).",
+    "Historical data on market reactions to similar past events (if available).",
+    "Economic data for relevant countries/regions.",
+    "Financial market data.",
+    "Company disclosures related to geopolitical risk exposure (for corporate strategists)."
+  ],
+  "expert_guidance_notes": [
+    "Clearly define the scope of the geopolitical event being analyzed.",
+    "Acknowledge the inherent uncertainty in geopolitical forecasting; use probabilistic language.",
+    "Distinguish between direct impacts and broader contagion/spillover effects.",
+    "Maintain neutrality and objectivity in the analysis.",
+    "The 'dynamic_fields' section suggests a programmatic approach where the AI would iterate through the list of assets/regions provided in the specifications."
+  ]
+}
