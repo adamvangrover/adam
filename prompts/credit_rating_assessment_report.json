@@ -1,0 +1,149 @@
+{
+  "prompt_metadata": {
+    "prompt_id": "Credit_Rating_Assessment_Report_v1",
+    "prompt_version": "1.0",
+    "creation_date": "YYYY-MM-DD",
+    "description": "A prompt to generate a comprehensive credit rating assessment report for a corporate entity.",
+    "author": "Jules - AI Software Engineer"
+  },
+  "report_specifications": {
+    "report_title": "Credit Rating Assessment Report: [Company Name]",
+    "company_name": "[Specify Company Name]",
+    "company_ticker_or_id": "[Specify Company Ticker or internal ID]",
+    "assessment_date": "[Specify Date of Assessment, e.g., YYYY-MM-DD]",
+    "rating_agency_methodology_simulated": "[Specify if simulating a specific agency's methodology, e.g., 'S&P Global Ratings', 'Moody's', or 'Internal Model']",
+    "target_audience": "Credit Analysts, Risk Managers, Investment Committees, Lenders",
+    "output_format": "Markdown with structured sections",
+    "tone_and_style": "Formal, analytical, objective, data-driven, clearly articulating rating rationale."
+  },
+  "core_analysis_areas": [
+    {
+      "section_id": "executive_summary",
+      "section_title": "Executive Summary",
+      "instructions": "Provide a concise overview of the assessment, including the assigned (or proposed) credit rating, key rating drivers, and outlook.",
+      "key_considerations": [
+        "Company identification.",
+        "Assigned/Proposed Credit Rating (e.g., AAA, BB+, etc.).",
+        "Rating Outlook (e.g., Stable, Positive, Negative, Developing).",
+        "Key positive and negative factors influencing the rating.",
+        "Summary of business and financial risk profiles."
+      ]
+    },
+    {
+      "section_id": "company_overview_and_industry_context",
+      "section_title": "Company Overview and Industry Context",
+      "instructions": "Describe the company's business, operational scale, and the industry it operates in.",
+      "key_considerations": [
+        "Detailed business description: products, services, markets, geographic diversification.",
+        "Competitive position within its industry: market share, competitive advantages, key competitors.",
+        "Industry analysis: cyclicality, growth prospects, regulatory environment, principal risk factors of the industry (drawing from e.g., `data/industry_reports` or similar if available)."
+      ]
+    },
+    {
+      "section_id": "business_risk_assessment",
+      "section_title": "Business Risk Assessment",
+      "instructions": "Analyze the company's qualitative business risk factors.",
+      "key_considerations": [
+        "Management quality and strategy: track record, corporate governance, strategic planning effectiveness.",
+        "Operating efficiency: cost structure, supply chain management, technological capabilities.",
+        "Market position and diversification: revenue sources, customer base, product lines, geographic reach.",
+        "Country risk and macroeconomic factors affecting the business."
+      ]
+    },
+    {
+      "section_id": "financial_risk_assessment",
+      "section_title": "Financial Risk Assessment",
+      "instructions": "Conduct a detailed analysis of the company's financial profile using historical and projected financial data. Reference relevant data structures like `dcf_model_template.csv` or `financial_statements.json` if such context is available.",
+      "sub_sections": [
+        {
+          "sub_section_id": "profitability_and_cash_flow",
+          "title": "Profitability and Cash Flow Analysis",
+          "key_considerations": [
+            "Historical and projected revenue growth, EBITDA margins, net income.",
+            "Cash flow generation: Operating Cash Flow (OCF), Free Cash Flow (FCF) before and after dividends.",
+            "Cash flow adequacy: OCF to debt, FCF to debt, capital expenditure coverage."
+          ]
+        },
+        {
+          "sub_section_id": "leverage_and_capital_structure",
+          "title": "Leverage and Capital Structure",
+          "key_considerations": [
+            "Debt levels: Total Debt, Net Debt.",
+            "Leverage ratios: Debt/EBITDA, Net Debt/EBITDA, Debt/Capital.",
+            "Capital structure: mix of debt and equity, debt maturity profile, off-balance sheet obligations.",
+            "Financial policy: attitude towards leverage, dividend policy, share buybacks."
+          ]
+        },
+        {
+          "sub_section_id": "liquidity_and_financial_flexibility",
+          "title": "Liquidity and Financial Flexibility",
+          "key_considerations": [
+            "Sources of liquidity: cash balances, undrawn credit facilities, expected OCF.",
+            "Uses of liquidity: working capital needs, capital expenditures, debt service, dividends.",
+            "Coverage ratios: Interest Coverage (EBITDA/Interest Expense), Fixed Charge Coverage.",
+            "Access to capital markets and bank financing."
+          ]
+        }
+      ]
+    },
+    {
+      "section_id": "peer_comparison",
+      "section_title": "Peer Comparison",
+      "instructions": "Compare the company's business and financial risk profiles against key industry peers.",
+      "key_considerations": [
+        "Selection of relevant peers.",
+        "Comparative analysis of key credit metrics (profitability, leverage, coverage).",
+        "Qualitative comparison of business risk factors.",
+        "How the company stacks up against peers in terms of creditworthiness."
+      ]
+    },
+    {
+      "section_id": "rating_rationale_and_outlook",
+      "section_title": "Rating Rationale and Outlook",
+      "instructions": "Clearly articulate the reasons for the assigned credit rating and the outlook.",
+      "key_considerations": [
+        "Synthesis of business risk and financial risk assessments.",
+        "Weighting of different factors in the rating decision (qualitative and quantitative).",
+        "Key strengths supporting the rating.",
+        "Key weaknesses or constraints on the rating.",
+        "Rationale for the rating outlook (Stable, Positive, Negative, Developing) based on expected trends and potential events over the next 12-24 months."
+      ]
+    },
+    {
+      "section_id": "downside_upside_scenarios_rating_triggers",
+      "section_title": "Downside/Upside Scenarios & Rating Triggers",
+      "instructions": "Describe specific factors or events that could lead to a rating upgrade or downgrade.",
+      "key_considerations": [
+        "Factors that could lead to a rating downgrade (e.g., deterioration in key financial metrics beyond certain thresholds, loss of major customers, adverse regulatory changes).",
+        "Factors that could lead to a rating upgrade (e.g., sustained improvement in financial performance, successful execution of strategic initiatives, favorable industry trends).",
+        "Quantifiable triggers where possible."
+      ]
+    },
+    {
+      "section_id": "appendices_optional",
+      "section_title": "Appendices (Optional)",
+      "instructions": "Include supplementary information if needed.",
+      "key_considerations": [
+        "Detailed historical financial statements.",
+        "Glossary of terms and ratios.",
+        "Description of rating methodology used (if not covered elsewhere)."
+      ]
+    }
+  ],
+  "data_requirements": [
+    "Audited historical financial statements (Income Statement, Balance Sheet, Cash Flow Statement) for the past 3-5 years.",
+    "Interim financial statements for the latest period.",
+    "Company investor presentations, annual reports, and public disclosures.",
+    "Industry reports and competitor data.",
+    "Details of existing debt instruments and their terms.",
+    "Economic forecasts relevant to the company's operations.",
+    "Internal credit risk models or decision trees (e.g., from `data/credit_rating_decision_tree_v3.json` if applicable and parsable)."
+  ],
+  "expert_guidance_notes": [
+    "Adhere to the principles of a chosen rating methodology (e.g., S&P, Moody's, Fitch, or a specified internal framework).",
+    "Clearly distinguish between historical facts and forward-looking projections/opinions.",
+    "Ensure all financial ratios are clearly defined and consistently calculated.",
+    "The rationale should transparently link the analysis to the final rating outcome.",
+    "Consider using a scorecard or decision tree output (like from `data/credit_rating_decision_tree_v3.json`) as a structured input or reference for the 'Rating Rationale' section."
+  ]
+}
