@@ -1,0 +1,175 @@
+{
+  "prompt_metadata": {
+    "prompt_id": "Portfolio_Optimization_Proposal_v1",
+    "prompt_version": "1.0",
+    "creation_date": "YYYY-MM-DD",
+    "description": "A prompt to generate a portfolio optimization proposal based on specified investor objectives, constraints, and a given asset universe.",
+    "author": "Jules - AI Software Engineer"
+  },
+  "report_specifications": {
+    "report_title": "Portfolio Optimization Proposal for [Client Name/ID]",
+    "client_name_id": "[Specify Client Name or ID, or 'Model Portfolio']",
+    "proposal_date": "[Specify Date of Proposal, e.g., YYYY-MM-DD]",
+    "target_audience": "Investment Advisors, Portfolio Managers, Retail Investors (with advisory context), Robo-advisors (as input)",
+    "output_format": "Markdown with structured sections, including tables for asset allocation.",
+    "tone_and_style": "Professional, analytical, client-focused, clearly explaining rationale and methodology."
+  },
+  "input_parameters": {
+    "section_id": "investor_profile_and_objectives",
+    "section_title": "Investor Profile and Objectives",
+    "instructions": "Define the investor's characteristics, goals, and constraints. This section would be filled with specific client data before running the prompt.",
+    "key_considerations": [
+      {
+        "parameter": "investment_objective",
+        "description": "Primary goal of the portfolio.",
+        "example_values": ["Capital Appreciation", "Wealth Preservation", "Income Generation", "Balanced Growth and Income", "Speculation"]
+      },
+      {
+        "parameter": "risk_tolerance",
+        "description": "Investor's willingness and ability to take risk.",
+        "example_values": ["Conservative", "Moderately Conservative", "Moderate", "Moderately Aggressive", "Aggressive"]
+      },
+      {
+        "parameter": "time_horizon",
+        "description": "Expected duration of the investment.",
+        "example_values": ["Short-term (0-2 years)", "Medium-term (3-7 years)", "Long-term (7+ years)"]
+      },
+      {
+        "parameter": "liquidity_needs",
+        "description": "Anticipated need for cash withdrawals.",
+        "example_values": ["Low", "Medium", "High", "Specific annual withdrawal %/amount"]
+      },
+      {
+        "parameter": "investment_constraints",
+        "description": "Any restrictions on investments.",
+        "example_values": ["ESG preferences", "Exclusion of specific sectors/assets (e.g., tobacco, weapons)", "Maximum allocation to a single asset/sector", "Tax considerations"]
+      },
+      {
+        "parameter": "current_portfolio_value",
+        "description": "Current market value of assets to be optimized (if applicable).",
+        "example_values": ["$USD Amount"]
+      },
+      {
+        "parameter": "asset_universe",
+        "description": "List of investable assets or asset classes to consider for the optimized portfolio. Could be a list of tickers, asset class names, or reference to a predefined model portfolio (e.g., from `data/example_user_portfolio.json`).",
+        "example_values": [
+          "['SPY', 'AGG', 'GLD', 'EFA', 'EEM']",
+          "['US Large Cap Equity', 'Global Fixed Income', 'Real Estate', 'Commodities']",
+          "Reference: `data/sp500_ai_overviews.jsonl` (for stock selection within S&P500)"
+        ]
+      },
+      {
+        "parameter": "optimization_model_preference",
+        "description": "Preferred optimization model or objective function.",
+        "example_values": ["Mean-Variance Optimization (Maximize Sharpe Ratio)", "Risk Parity", "Minimum Variance", "Maximize Expected Return for a Given Risk Level", "Black-Litterman"]
+      }
+    ]
+  },
+  "core_analysis_areas": [
+    {
+      "section_id": "executive_summary_proposal",
+      "section_title": "Executive Summary of Proposal",
+      "instructions": "Provide a concise overview of the proposed optimized portfolio, its alignment with investor objectives, and key expected characteristics.",
+      "key_considerations": [
+        "Restatement of key investor objectives and risk tolerance.",
+        "Summary of the proposed asset allocation.",
+        "Expected portfolio return and risk (e.g., standard deviation, Sharpe ratio) based on the optimization.",
+        "Key changes from current allocation (if applicable).",
+        "Brief rationale for the proposed strategy."
+      ]
+    },
+    {
+      "section_id": "methodology_and_assumptions",
+      "section_title": "Optimization Methodology and Assumptions",
+      "instructions": "Describe the portfolio optimization approach used and any key assumptions made.",
+      "key_considerations": [
+        "Description of the chosen optimization model (e.g., Mean-Variance, Black-Litterman).",
+        "Source of expected returns, risk (volatility), and correlation estimates for asset classes/assets. (This might involve referencing data from `data/adam_market_baseline.json` or models from `core/analysis/`).",
+        "Time period used for historical data if applicable.",
+        "Any constraints applied during the optimization process (e.g., max/min weights per asset).",
+        "Software or tools used for optimization (if relevant, e.g., Python libraries like PyPortfolioOpt, internal simulation tools)."
+      ]
+    },
+    {
+      "section_id": "proposed_optimized_portfolio",
+      "section_title": "Proposed Optimized Portfolio Allocation",
+      "instructions": "Detail the asset allocation of the optimized portfolio.",
+      "key_considerations": [
+        "Table showing: Asset Class/Asset, Proposed Weight (%), Ticker/Identifier (if applicable).",
+        "Visual representation (e.g., pie chart) of the allocation.",
+        "Breakdown by geography, sector, or other relevant dimensions if applicable."
+      ]
+    },
+    {
+      "section_id": "portfolio_characteristics_expected_performance",
+      "section_title": "Portfolio Characteristics and Expected Performance",
+      "instructions": "Analyze the expected risk and return characteristics of the optimized portfolio.",
+      "key_considerations": [
+        "Projected annualized return.",
+        "Projected annualized volatility (standard deviation).",
+        "Projected Sharpe Ratio (or other relevant risk-adjusted return metric).",
+        "Comparison of these metrics to a relevant benchmark or current portfolio (if applicable).",
+        "Potential downside risk (e.g., VaR, CVaR, max drawdown based on backtesting or simulation if performed).",
+        "Stress testing results against specific market scenarios (Optional, could reference `prompts/market_shock_scenario_analysis.json` logic)."
+      ]
+    },
+    {
+      "section_id": "alignment_with_investor_objectives",
+      "section_title": "Alignment with Investor Objectives",
+      "instructions": "Explain how the proposed portfolio meets the investor's stated goals and constraints.",
+      "key_considerations": [
+        "How the allocation addresses the primary investment objective (e.g., growth, income).",
+        "How the risk level of the portfolio aligns with the investor's risk tolerance.",
+        "Consideration of time horizon and liquidity needs.",
+        "Adherence to any specific investment constraints (ESG, exclusions)."
+      ]
+    },
+    {
+      "section_id": "implementation_recommendations",
+      "section_title": "Implementation Recommendations",
+      "instructions": "Suggest steps for implementing the proposed portfolio.",
+      "key_considerations": [
+        "Specific investment vehicles to use (e.g., ETFs, mutual funds, individual stocks/bonds).",
+        "Rebalancing strategy (frequency, thresholds).",
+        "Tax implications of reallocating (if applicable, high-level).",
+        "Phased implementation plan if significant changes from current portfolio."
+      ]
+    },
+    {
+      "section_id": "risks_and_limitations",
+      "section_title": "Risks and Limitations",
+      "instructions": "Clearly outline the risks associated with the proposed portfolio and the limitations of the optimization process.",
+      "key_considerations": [
+        "General market risks.",
+        "Specific risks related to the chosen asset classes or strategy.",
+        "Limitations of historical data in predicting future performance.",
+        "Sensitivity of the optimal portfolio to input assumptions (expected returns, correlations).",
+        "Statement that past performance is not indicative of future results."
+      ]
+    },
+    {
+      "section_id": "monitoring_and_review",
+      "section_title": "Monitoring and Review",
+      "instructions": "Outline how the portfolio's performance and alignment with objectives will be monitored.",
+      "key_considerations": [
+        "Recommended frequency of portfolio reviews.",
+        "Key metrics to track.",
+        "Conditions under which a portfolio review or re-optimization might be triggered (e.g., significant market changes, changes in investor circumstances)."
+      ]
+    }
+  ],
+  "data_requirements": [
+    "Investor-specific data (objectives, risk tolerance, constraints - as defined in `input_parameters`).",
+    "Historical market data for the asset universe (prices, returns, volatility, correlations).",
+    "Capital market assumptions (CMAs) for expected returns, risk, and correlations if using forward-looking inputs.",
+    "Details of existing portfolio holdings if re-optimizing an existing portfolio.",
+    "Information on available investment vehicles (ETFs, mutual funds) for implementation."
+  ],
+  "expert_guidance_notes": [
+    "The 'input_parameters' section is crucial and would need to be populated with actual client data before the prompt is executed by an AI.",
+    "Ensure that all projections (return, risk) are clearly labeled as estimates and are subject to uncertainty.",
+    "The level of detail in implementation recommendations may vary based on whether the AI is purely analytical or also has an advisory/execution role.",
+    "If using specific optimization algorithms, it can be helpful to briefly explain the rationale for choosing that algorithm in the methodology section.",
+    "Compliance and regulatory disclosures are critical in real-world client proposals and should be added as per jurisdictional requirements (outside the scope of this AI generation prompt but important context)."
+  ]
+}
