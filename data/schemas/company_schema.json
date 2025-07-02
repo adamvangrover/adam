@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Company",
+  "description": "Schema for a company entity",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string", "description": "Unique identifier (e.g., ticker symbol)" },
+    "name": { "type": "string", "description": "Name of the company" },
+    "industryId": { "type": "string", "description": "Identifier of the industry the company belongs to" },
+    "ownershipStructure": { "type": "string" },
+    "corporateStructure": { "type": "string" },
+    "financials": {
+      "type": "object",
+      "properties": {
+        "revenue_mn_usd": { "type": ["number", "null"] },
+        "pe_ratio": { "type": ["number", "null"] },
+        "debt_to_equity_ratio": { "type": ["number", "null"] }
+      }
+    },
+    "tradingLevels": {
+      "type": "object",
+      "properties": {
+        "price": { "type": ["number", "null"] },
+        "volume": { "type": ["integer", "null"] },
+        "volatility": { "type": ["number", "null"] },
+        "timestamp": { "type": ["string", "null"], "format": "date-time" }
+      }
+    }
+  },
+  "required": ["id", "name", "industryId"]
+}

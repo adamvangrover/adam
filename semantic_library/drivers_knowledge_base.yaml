@@ -1,0 +1,422 @@
+# semantic_library/drivers_knowledge_base.yaml
+# Version: 2.0
+# Description: Knowledge base of defined drivers, their characteristics, impact models, and narrative logic.
+
+drivers:
+  - id: DRV001
+    name: "Interest Rate Sensitivity"
+    description: "Measures how a company's financials, valuation, or stock price are affected by changes in interest rates."
+    type: "Macroeconomic"
+    tags: ["finance", "valuation", "macro", "risk"]
+    detection_patterns: # How an engine might determine this driver is active
+      # Conceptual examples:
+      # - "query: KG_RELATION(company, HAS_INDUSTRY, ?industry) AND ?industry.name IN ['Financials', 'Real Estate']"
+      # - "metric_threshold: company.financials.debt_to_equity_ratio > 0.7"
+      # - "event: central_bank.interest_rate.changed_recently == true"
+      # For now, detection might be simpler (e.g. presence of MACRO_IR as a linked factor)
+      - description: "Active if interest rates are volatile or company is in a sensitive sector/high debt."
+        # Simplified logic for now: always consider it if MACRO_IR is a known factor.
+        # Real system would have more complex evaluation here.
+        assumed_active_if_linked_to: "MACRO_IR"
+    impact_model:
+      target_variables: # Variables this driver can affect
+        - "company.financials.net_interest_margin"
+        - "company.valuation.pe_ratio"
+        - "company.debt.cost_of_new_debt"
+      first_order_impacts:
+        - target: "company.financials.net_interest_margin"
+          conditions: ["company.industryId == 'IND_FIN'"] # Example: More direct for financial institutions
+          effect_description: "Direct impact on spread for financial institutions."
+          effect_function: "percentage_change" # Registered function
+          # Parameters for 'percentage_change': current_value (from context via target), percentage
+          # Assume context provides 'macro.MACRO_IR.change_pct_for_nim_calc' which is the rate_change_pct * sensitivity
+          parameters: { percentage: "macro.MACRO_IR.change_pct_for_nim_calc" }
+          probability_of_occurrence: 0.80
+          time_horizon: "0-6 months"
+          expected_direction_on_rate_increase: "variable" # Depends on bank's asset/liability structure
+
+        - target: "company.valuation.pe_ratio"
+          conditions: ["company.financials.pe_ratio > 15"]
+          effect_description: "Higher rates typically compress P/E multiples, especially for growth stocks."
+          effect_function: "percentage_change" # Registered function
+          # Assume context provides "macro.MACRO_IR.pe_compression_factor" which is e.g. -(rate_increase_bps/100 * sensitivity_factor)
+          parameters: { percentage: "macro.MACRO_IR.pe_compression_factor" }
+          probability_of_occurrence: 0.65
+          time_horizon: "3-12 months"
+          expected_direction_on_rate_increase: "negative"
+
+        - target: "company.debt.cost_of_new_debt"
+          conditions: ["company.financials.debt_to_equity_ratio > 0.5"] # More impactful for companies needing to refinance/issue new debt
+          effect_description: "Cost of issuing new debt or refinancing existing floating-rate debt increases."
+          effect_function: "additive_change" # Registered function
+          # Assumes context provides "macro.MACRO_IR.rate_increase_abs" for the change_amount
+          parameters: { change_amount: "macro.MACRO_IR.rate_increase_abs" }
+          probability_of_occurrence: 0.90
+          time_horizon: "0-3 months (for new issuance)"
+          expected_direction_on_rate_increase: "positive" # Cost increases
+      second_order_effects: # Conceptual
+        - description: "Reduced corporate investment due to higher borrowing costs."
+          linked_drivers: ["DRV_CAPEX_SPENDING"] # Assumed DRV_CAPEX_SPENDING ID
+          probability: 0.40
+        - description: "Shift in investor preference from growth to value stocks."
+          probability: 0.50
+      third_order_effects: # Conceptual
+        - description: "Potential slowdown in overall economic growth if rate hikes are substantial and sustained."
+          probability: 0.30 # Highly dependent on magnitude and duration
+    narrative_logic:
+      key_insights_to_extract:
+        - "Assess company's vulnerability to interest rate changes based on its debt, industry, and valuation."
+        - "Quantify potential P/E compression or NIM changes if possible."
+      data_points_for_explanation: # Data to fetch/calculate to support the narrative
+        - "company.financials.debt_to_equity_ratio"
+        - "company.industry.name"
+        - "current_interest_rate_level_and_trend (from MACRO_IR)"
+        - "calculated_impacts (from first_order_impacts)"
+      explanation_patterns_llm: # Guidance for LLM
+        - "When discussing P/E impact, mention if the company is a 'growth' or 'value' stock if discernible."
+        - "If the company is in 'IND_FIN', emphasize the NIM impact."
+        - "Use probabilistic language according to calculated probabilities (e.g., 'a {probability_of_occurrence*100}% chance of P/E compression by X%')."
+        - "If specific impact functions were run, refer to their outputs: e.g., 'Our model suggests a potential {calculated_pe_change_pct}% change in P/E ratio given a {rate_change_scenario} bps rate change, with a {probability_of_occurrence*100}% likelihood.'"
+
+  - id: DRV002
+    name: "New Product Launch"
+    description: "Impact of a significant new product or service on company performance and market perception."
+    type: "CompanySpecific"
+    tags: ["innovation", "revenue_growth", "fundamental", "event_driven"]
+    detection_patterns:
+      # - "event: company.events.recent_product_launch.status == 'launched' AND company.events.recent_product_launch.significance == 'high'"
+      # - "news_analytics: company.news_volume_topic('new product') > threshold AND company.news_sentiment_topic('new product') > positive_threshold"
+      - description: "Active if a significant product was recently launched or is imminent."
+        # Simplified: Assume it's active if explicitly linked to a company.
+    impact_model:
+      target_variables:
+        - "company.financials.revenue_forecast_next_12m"
+        - "company.market_share.relevant_segment"
+        - "company.stock.sentiment_score"
+      first_order_impacts:
+        - target: "company.financials.revenue_forecast_next_12m"
+          effect_description: "Potential increase in revenue based on product adoption and pricing."
+          effect_function: "additive_change" # Registered function
+          parameters: { change_amount: "Normal(10000, 3000)" } # Parsed to its mean by ImpactCalculator
+          probability_of_occurrence: 0.70
+          time_horizon: "6-18 months"
+          conditions: ["company.product_launch_status == 'successful'"]
+
+        - target: "company.market_share.relevant_segment"
+          effect_description: "Potential gain in market share in the product's target segment."
+          effect_function: "additive_change" # Registered function
+          parameters: { change_amount: "Uniform(1, 5)" } # Parsed to its mean (3.0)
+          probability_of_occurrence: 0.60
+          time_horizon: "12-24 months"
+          conditions: ["company.product_competitive_advantage == 'high'"] # Context key needs to be specific
+
+        - target: "company.stock.sentiment_score"
+          effect_description: "Positive shift in market sentiment towards the stock."
+          effect_function: "additive_change" # Registered function
+          # Note: min(1, current_sentiment + boost) logic is not in the basic 'additive_change'.
+          # This would require a custom function or post-processing. For now, it's a simple add.
+          parameters: { change_amount: "Uniform(0.1, 0.3)" } # Parsed to its mean (0.2)
+          probability_of_occurrence: 0.75
+          time_horizon: "0-3 months"
+          conditions: ["company.product_media_coverage == 'positive'"] # Context key needs to be specific
+      second_order_effects:
+        - description: "Increased R&D spending for next generation if product is successful, or write-offs if not."
+          linked_drivers: ["DRV_RD_SPENDING_EFFICIENCY"] # Assumed ID
+          probability: 0.55
+        - description: "Competitive responses from other market players."
+          probability: 0.65
+      third_order_effects:
+        - description: "Potential to open up entirely new market segments or redefine existing ones if product is transformative."
+          probability: 0.20 # Lower probability for transformative impact
+    narrative_logic:
+      key_insights_to_extract:
+        - "Assess the materiality of the new product to overall company revenues and strategy."
+        - "Evaluate the likelihood of success based on available early indicators (reviews, pre-orders, competitive landscape)."
+      data_points_for_explanation:
+        - "product_name_and_category"
+        - "launch_date_and_status"
+        - "expected_revenue_contribution_or_market_share_gain (from impact_model parameters or external estimates)"
+        - "competitor_products_and_reactions"
+        - "calculated_impacts (from first_order_impacts with probabilities)"
+      explanation_patterns_llm:
+        - "Clearly state the product and its strategic importance."
+        - "If data on initial reception (sales, reviews) is available, incorporate it."
+        - "Discuss the probabilistic revenue/market share impact: e.g., 'The launch of {product_name} is projected to boost revenues by an estimated {avg_revenue_boost} (with a {probability}% chance of achieving this range), potentially capturing an additional {avg_market_share_gain}% market share.'"
+        - "Mention competitive landscape and how this product positions {company_name}."
+
+  # DRV003, DRV004, etc. would follow similar enhanced structure.
+  # ...
+  - id: DRV004 # Supply Chain Disruption - brief example of enhancement
+    name: "Supply Chain Disruption"
+    description: "Challenges in the supply chain affecting production, delivery, and input costs."
+    type: "Macroeconomic"
+    tags: ["operations", "cost_inflation", "geopolitics", "risk"]
+    detection_patterns:
+      - description: "Active if global supply chain indices show stress or company reports issues."
+    impact_model:
+      target_variables:
+        - "company.financials.cogs_pct_revenue"
+        - "company.operations.production_lead_time_days"
+      first_order_impacts:
+        - target: "company.financials.cogs_pct_revenue"
+          effect_description: "Increased Cost of Goods Sold due to higher input/logistics costs."
+          effect_function: "additive_change" # Registered function
+          # increase_basis_points: "Normal(50, 20)" -> mean 50bps = 0.0050
+          parameters: { change_amount: 0.0050 } # Directly providing the scaled change amount
+          probability_of_occurrence: 0.70
+          time_horizon: "3-9 months"
+          expected_direction_on_disruption: "positive"
+
+        - target: "company.operations.production_lead_time_days"
+          effect_description: "Increased production lead times due to component shortages or logistics delays."
+          effect_function: "additive_change"
+          parameters: { change_amount: "Uniform(5, 30)"} # Lead time increases by 5 to 30 days, mean 17.5
+          probability_of_occurrence: 0.60
+          time_horizon: "1-6 months"
+          expected_direction_on_disruption: "positive"
+    narrative_logic:
+      key_insights_to_extract: ["Impact on margins and production timelines."]
+      data_points_for_explanation: ["current_cogs_pct", "inventory_levels", "supplier_diversification_efforts"]
+      explanation_patterns_llm: ["Discuss potential margin compression and efforts to mitigate supply risks."]
+
+  - id: DRV008_SUPPLY_CHAIN_RESILIENCE # Elaborating on DRV004 or as a counter/mitigation
+    name: "Supply Chain Resilience Efforts"
+    description: "Company's proactive measures to strengthen its supply chain, diversify suppliers, or improve inventory management to mitigate disruptions."
+    type: "CompanySpecific" # Can also be an attribute of how a company handles DRV004
+    tags: ["operations", "risk_mitigation", "strategy", "ESG"]
+    detection_patterns:
+      - description: "Active if company reports specific supply chain strengthening initiatives or shows improved inventory turnover despite sector issues."
+        # Example: "query: company.reports.mentions_topic('supplier diversification') > 2"
+        # Example: "metric_trend: company.financials.inventory_turnover_ratio.trend == 'improving' AND industry.average_inventory_turnover_ratio.trend == 'worsening'"
+    impact_model:
+      target_variables:
+        - "company.risk_score.supply_chain" # Assuming a quantifiable risk score component
+        - "company.financials.cogs_pct_revenue_volatility"
+        - "company.operations.production_stability_index"
+      first_order_impacts:
+        - target: "company.risk_score.supply_chain"
+          effect_description: "Reduction in the company's specific supply chain risk score."
+          effect_function: "lambda current_risk_score, reduction_factor: current_risk_score * (1 - reduction_factor)"
+          parameters: { reduction_factor: "Uniform(0.05, 0.20)" } # 5-20% reduction in specific risk component
+          probability_of_occurrence: 0.75 # If initiatives are substantial
+          time_horizon: "6-12 months"
+          conditions: ["company.initiatives.supply_chain_diversification.status == 'implemented'"]
+          expected_direction_on_effort: "negative" # Risk score decreases
+
+        - target: "company.financials.cogs_pct_revenue_volatility"
+          effect_description: "Lower volatility in Cost of Goods Sold percentage, even if average COGS doesn't fall immediately."
+          effect_function: "lambda current_volatility, reduction_pct_of_vol: current_volatility * (1 - reduction_pct_of_vol)"
+          parameters: { reduction_pct_of_vol: "Normal(0.10, 0.05)" } # Reduces volatility by ~10%
+          probability_of_occurrence: 0.60
+          time_horizon: "12-24 months"
+          expected_direction_on_effort: "negative" # Volatility decreases
+      second_order_effects:
+        - description: "Improved investor confidence due to demonstrated operational robustness."
+          linked_drivers: ["DRV009_MARKET_SENTIMENT_SHIFT"]
+          probability: 0.40
+        - description: "Potential for slight increase in short-term costs due to diversification efforts, offset by long-term stability."
+          probability: 0.50
+    narrative_logic:
+      key_insights_to_extract:
+        - "Company's proactive stance on managing supply chain risks."
+        - "Quantifiable benefits if possible (e.g., reduced risk score, more stable margins over time)."
+        - "Contrast with industry peers if data is available."
+      data_points_for_explanation:
+        - "details_of_resilience_initiatives (e.g., dual sourcing, regional hubs)"
+        - "inventory_management_strategy_changes"
+        - "comparison_to_DRV004_Supply_Chain_Disruption_impacts"
+      explanation_patterns_llm:
+        - "Highlight that while broad disruptions (DRV004) exist, {company_name}'s efforts in supply chain resilience (DRV008) aim to mitigate these."
+        - "Specify the nature of resilience efforts (e.g., 'diversifying its supplier base for critical components...')."
+        - "If modeling results are available: 'These initiatives are estimated to reduce the supply chain risk component of its operational profile by approximately {risk_reduction_value} with a {probability}% likelihood over the next {time_horizon}.'"
+
+  - id: DRV009_MARKET_SENTIMENT_SHIFT
+    name: "Market Sentiment Shift"
+    description: "A discernible change in overall investor or analyst sentiment towards a company, sector, or the market, often driven by news, earnings, or new information."
+    type: "MarketDriven" # New type, could also be Fundamental if tied to earnings surprise
+    tags: ["sentiment", "valuation", "event_driven", "news_impact"]
+    detection_patterns:
+      # - "news_analytics: aggregate_sentiment_score_for_company_last_7d.change_pct > 20%"
+      # - "analyst_ratings: count_upgrades_last_30d > count_downgrades_last_30d * 2"
+      # - "social_media_analytics: volume_positive_mentions_company.spike == true"
+      - description: "Active when there's a significant, measurable change in aggregated sentiment indicators."
+    impact_model:
+      target_variables:
+        - "company.stock.price_momentum_短期" # Short-term price momentum
+        - "company.valuation.pe_ratio_relative_to_sector"
+        - "fund_flows.into_stock_or_sector"
+      first_order_impacts:
+        - target: "company.stock.price_momentum_短期"
+          effect_description: "Positive sentiment shift often leads to short-term upward price momentum."
+          # Effect could be a probability of outperforming an index by X%
+          effect_function: "lambda current_momentum_score, sentiment_change_strength: current_momentum_score + (sentiment_change_strength * 0.5)" # sentiment_change_strength from -1 to 1
+          parameters: {} # sentiment_change_strength comes from detection
+          probability_of_occurrence: 0.70 # For a strong, confirmed sentiment shift
+          time_horizon: "0-1 month"
+          conditions: ["sentiment_shift_direction == 'positive'"]
+          expected_direction_on_positive_shift: "positive"
+
+        - target: "company.valuation.pe_ratio_relative_to_sector"
+          effect_description: "Sustained positive sentiment can lead to multiple expansion relative to peers."
+          effect_function: "lambda current_relative_pe, sentiment_duration_months, expansion_factor_per_month: current_relative_pe * (1 + (sentiment_duration_months * expansion_factor_per_month))"
+          parameters: { expansion_factor_per_month: 0.01 } # e.g., 1% relative P/E expansion per month of sustained positive sentiment
+          probability_of_occurrence: 0.55
+          time_horizon: "3-6 months"
+          conditions: ["sentiment_shift_direction == 'positive'", "sentiment_duration_months >= 3"]
+          expected_direction_on_positive_shift: "positive"
+      second_order_effects:
+        - description: "Increased media coverage, potentially amplifying the sentiment."
+          probability: 0.60
+        - description: "If sentiment shift is very strong and company-specific, it might attract M&A interest (long shot)."
+          probability: 0.10
+    narrative_logic:
+      key_insights_to_extract:
+        - "Identify the direction and magnitude of the sentiment shift."
+        - "Pinpoint the likely causes (e.g., earnings beat, positive news, sector rotation)."
+        - "Assess potential for short-term price impact and longer-term valuation re-rating."
+      data_points_for_explanation:
+        - "source_of_sentiment_data (e.g., news analytics, analyst ratings changes)"
+        - "key_news_headlines_or_events_contributing_to_shift"
+        - "stock_price_performance_during_shift"
+        - "trading_volume_changes"
+      explanation_patterns_llm:
+        - "A notable {positive/negative} shift in market sentiment (DRV009) towards {company_name} has been observed recently, primarily driven by {mention key causes}."
+        - "This has a {probability}% likelihood of influencing short-term price momentum. We are seeing {evidence, e.g., stock up X% in Y days}."
+        - "If sustained, this altered sentiment could lead to a re-evaluation of its {valuation metric, e.g., P/E multiple} relative to its peers over the coming months."
+
+  - id: DRV010_GEOPOLITICAL_TENSION
+    name: "Geopolitical Tension Impact"
+    description: "Impact of international political instability, conflicts, or sanctions on a company's operations, market access, or input costs, often specific to regions where the company operates or sources materials."
+    type: "Geopolitical"
+    tags: ["risk", "macro", "international_trade", "supply_chain"]
+    detection_patterns:
+      - description: "Active if a company has significant operations/revenue from a region experiencing heightened geopolitical tension, or if global geopolitical risk indices (e.g., MACRO_GP_RISK) are elevated."
+        # Example: "query: company.operations.has_significant_exposure_to_region('XYZ') AND macro.XYZ_region.geopolitical_risk_status == 'High'"
+        # Example: "metric_threshold: macro.MACRO_GP_RISK.currentValue > 150"
+    impact_model:
+      target_variables:
+        - "company.financials.revenue_from_affected_region"
+        - "company.operations.disruption_cost_pct_revenue"
+        - "company.risk_score.geopolitical"
+      first_order_impacts:
+        - target: "company.financials.revenue_from_affected_region"
+          effect_description: "Potential decline in revenue from the specific region due to operational halt, sanctions, or demand collapse."
+          effect_function: "percentage_change"
+          # Parameter 'percentage' would be negative, e.g., -0.5 for a 50% decline.
+          # This percentage could be dynamically estimated based on severity.
+          parameters: { percentage: "Uniform(-0.75, -0.25)" } # Revenue decline between 25% to 75% from region
+          probability_of_occurrence: 0.60 # If tension directly impacts operations
+          time_horizon: "3-12 months"
+          conditions: ["company.exposure_to_conflict_zone_X == 'High'"]
+          expected_direction_on_tension_increase: "negative"
+        - target: "company.operations.disruption_cost_pct_revenue"
+          effect_description: "Increased operational costs (logistics, security, input sourcing) as a percentage of total revenue."
+          effect_function: "additive_change" # Adds a percentage point cost
+          parameters: { change_amount: "Uniform(0.005, 0.02)" } # Adds 0.5% to 2% of revenue as costs
+          probability_of_occurrence: 0.70
+          time_horizon: "1-6 months"
+          expected_direction_on_tension_increase: "positive" # Costs increase
+    narrative_logic:
+      key_insights_to_extract:
+        - "Identify specific regions of geopolitical tension relevant to the company."
+        - "Assess direct impact on revenue, operations, and costs."
+        - "Consider indirect impacts like currency volatility or broader market sentiment if applicable."
+      data_points_for_explanation:
+        - "company.revenue_breakdown_by_region"
+        - "company.key_suppliers_or_markets_in_affected_regions"
+        - "current_status_of_geopolitical_event (e.g., from MACRO_GP_RISK or news feeds)"
+        - "calculated_impacts_on_revenue_and_costs"
+      explanation_patterns_llm:
+        - "Heightened geopolitical tensions in {region_name} (DRV010), where {company_name} has {exposure_level} exposure, pose a notable risk."
+        - "This could lead to a {calculated_revenue_impact_range} decline in regional revenue (Prob: {probability_percentage}) and an estimated {calculated_cost_impact_value} increase in operational disruption costs over the next {time_horizon}."
+        - "Investors should monitor developments in {region_name} closely due to their potential to materially affect {company_name}'s performance."
+
+  - id: DRV011_REGULATORY_CHANGE_IMPACT
+    name: "Regulatory Change Impact"
+    description: "Impact of new or significantly altered government regulations on a company's business model, compliance costs, market access, or product viability."
+    type: "IndustrySpecific" # Often, but can be broader
+    tags: ["legal", "compliance", "risk", "policy"]
+    detection_patterns:
+      - description: "Active if a new significant regulation affecting the company's industry has been announced, implemented, or is under serious discussion."
+        # Example: "event: regulatory_body.announcement.industryId({company.industryId}).date > 'YYYY-MM-DD'"
+        # Example: "news_analytics: company.industryId.news_topic('new regulation {topic}').volume > threshold"
+    impact_model:
+      target_variables:
+        - "company.financials.compliance_cost_increase_abs"
+        - "company.strategy.market_access_affected_segments" # Qualitative or list of segments
+        - "company.product_lines.viability_score_change" # For specific products
+      first_order_impacts:
+        - target: "company.financials.compliance_cost_increase_abs"
+          effect_description: "Absolute increase in annual compliance costs due to new regulatory requirements."
+          effect_function: "direct_value" # The parameter *is* the estimated cost
+          parameters: { value: "Normal(5, 2)" } # e.g., $5M +/- $2M additional annual cost
+          probability_of_occurrence: 0.85 # If regulation is confirmed
+          time_horizon: "12-24 months (for full cost implementation)"
+          conditions: ["regulation.status == 'implemented' OR regulation.status == 'imminent_final'"]
+          expected_direction_on_new_regulation: "positive" # Costs increase
+        - target: "company.strategy.market_access_affected_segments"
+          effect_description: "Certain market segments might become restricted or require new operational models."
+          effect_function: "direct_value" # Value would be a list of segment names or a descriptive string
+          parameters: { value: "{regulation_details.affected_segments_list_or_description}" } # From context
+          probability_of_occurrence: 0.70
+          time_horizon: "6-12 months"
+          conditions: ["regulation.scope.restricts_market_access == true"]
+    narrative_logic:
+      key_insights_to_extract:
+        - "Clearly identify the specific regulation and its main implications."
+        - "Quantify compliance cost impact and describe market access changes."
+        - "Assess if the regulation creates new barriers to entry or competitive disadvantages/advantages."
+      data_points_for_explanation:
+        - "name_and_date_of_regulation"
+        - "summary_of_regulation_key_points"
+        - "company_statements_on_the_regulation"
+        - "estimated_compliance_costs (from impact_model or external analysis)"
+        - "list_of_affected_products_or_market_segments"
+      explanation_patterns_llm:
+        - "The recent {regulation_name} (DRV011) is expected to directly impact {company_name}'s operations in its {industry_name} segment."
+        - "A key consequence is an anticipated increase in annual compliance costs, estimated at around ${calculated_cost_impact} million (Prob: {probability_percentage})."
+        - "Furthermore, market access to {affected_segments} may be {description_of_impact, e.g., 'restricted' or 'require new certifications'}, potentially affecting growth in these areas."
+
+  - id: DRV012_CRYPTO_ADOPTION_RATE
+    name: "Cryptocurrency Adoption Rate Change"
+    description: "Impact of changes in the adoption rate of specific cryptocurrencies or blockchain technologies on companies involved in the crypto ecosystem (exchanges, miners, developers, institutional investors)."
+    type: "SectorSpecific_Crypto" # More specific type
+    tags: ["crypto", "blockchain", "innovation", "market_growth"]
+    detection_patterns:
+      - description: "Active if key adoption metrics (e.g., active wallets, transaction volumes, institutional inflows) for relevant crypto assets show significant change."
+        # Example: "metric_trend: crypto_asset({asset_id}).active_wallets.growth_qoq > 0.10"
+        # Example: "news_analytics: topic('institutional crypto adoption').sentiment == 'strong_positive'"
+    impact_model:
+      target_variables:
+        - "company.financials.transaction_volume_or_AUM_growth" # For exchanges or funds
+        - "company.valuation.growth_premium" # Crypto companies often have high growth premiums
+      first_order_impacts:
+        - target: "company.financials.transaction_volume_or_AUM_growth"
+          effect_description: "Direct correlation between crypto adoption rates and company's key operational metrics like transaction volume or Assets Under Management."
+          effect_function: "percentage_change"
+          # Parameter 'percentage' reflects how much company metric grows per 1% growth in overall adoption metric
+          parameters: { percentage: "Uniform(0.5, 1.5) * context.crypto_market.overall_adoption_rate_change_pct" } # Example of more complex parameter
+          probability_of_occurrence: 0.80
+          time_horizon: "3-6 months"
+          conditions: ["company.business_model_highly_tied_to_crypto_asset_X == true"]
+          expected_direction_on_adoption_increase: "positive"
+        - target: "company.valuation.growth_premium"
+          effect_description: "Changes in perceived future growth (and thus valuation premium) based on adoption trends."
+          effect_function: "additive_change" # e.g., adds/subtracts points from a growth score affecting valuation
+          parameters: { change_amount: "Normal(0.2, 0.1) * context.crypto_market.adoption_acceleration_factor" } # Factor from -1 to 1
+          probability_of_occurrence: 0.65
+          time_horizon: "6-12 months"
+    narrative_logic:
+      key_insights_to_extract:
+        - "Link company performance directly to broader crypto market adoption trends."
+        - "Identify which specific crypto assets or technologies are driving the relevant adoption changes."
+        - "Assess if the company is well-positioned to benefit from (or be harmed by) these trends."
+      data_points_for_explanation:
+        - "key_crypto_adoption_metrics (e.g., active addresses, institutional fund flows)"
+        - "company_specific_metrics_tied_to_adoption (e.g., exchange volume, new users)"
+        - "news_or_events_driving_adoption_changes"
+      explanation_patterns_llm:
+        - "Changes in the adoption rate of {specific_crypto_asset_or_technology} (DRV012) are a critical factor for {company_name}."
+        - "An observed {increase/decrease} in overall crypto adoption by {adoption_change_pct}% is likely to translate to a {calculated_impact_on_company_metric} for {company_name} (Prob: {probability_percentage})."
+        - "The company's valuation premium appears sensitive to these adoption trends, with a potential {calculated_growth_premium_change} shift."
+...

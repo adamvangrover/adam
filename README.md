@@ -1,24 +1,9 @@
-**File Name:** `README.md`
-
-**File Path:**
-
-```
-adam/
-└── README.md
-```
-
-**File Content:**
-
-````markdown
-
 # Adam v19.1: Your AI-Powered Financial Analyst
-````
 **(Welcome to Adam v19.1, the most advanced version yet\! We've supercharged our capabilities with an expanded agent network, enhanced simulation workflows, and a more sophisticated knowledge base to deliver unparalleled financial analysis and investment insights.)**
 
 **[Explore the interactive demo here\!](https://adamvangrover.github.io/adam/chatbot-ui/)**
 
 Adam v19.1 is not just an AI; it's your partner in navigating the complexities of the financial world. Whether you're an individual investor, a seasoned analyst, or a financial institution, Adam v19.1 empowers you with the knowledge and tools to make informed decisions and achieve your financial goals.
-````
 ## What's New in Adam v19.1?
 
   * **Expanded Agent Network:**
@@ -59,7 +44,6 @@ Adam v19.1 is not just an AI; it's your partner in navigating the complexities o
   * **Feedback and Prompt Refinement Loop:**
       * **Continuously learns and adapts based on user feedback and new information.**
 
-````
 ## Getting Started
 
 1.  **Clone the Repository:**
@@ -94,6 +78,39 @@ Adam v19.1 is not just an AI; it's your partner in navigating the complexities o
     ```bash
     python scripts/run_adam.py
     ```
+
+### Command-Line Interface (CLI)
+
+The CLI allows direct interaction with parts of the Adam system (specifically, the underlying narrative generation engine if this README is used for the current project).
+Ensure your Present Working Directory is the project root and `PYTHONPATH` is set.
+
+1.  **Set PYTHONPATH (if not already set for the session):**
+    ```bash
+    export PYTHONPATH=.  # For Linux/macOS
+    # set PYTHONPATH=.    # For Windows Command Prompt
+    # $env:PYTHONPATH="." # For Windows PowerShell
+    ```
+2.  **Run CLI commands (examples for the narrative library component):**
+    ```bash
+    # General help
+    python backend/src/main/python/cli.py --help
+
+    # Company specific commands
+    python backend/src/main/python/cli.py company explain AAPL
+    python backend/src/main/python/cli.py company explain MSFT --template-id STRAT_RISK_DEEP_DIVE # Note: template-id in CLI maps to strategy_id in Engine
+    python backend/src/main/python/cli.py company drivers AAPL
+
+    # Driver specific commands
+    python backend/src/main/python/cli.py driver details DRV001
+
+    # Data initialization
+    python backend/src/main/python/cli.py init-data --force
+
+    # Report generation (now based on calculated impacts for specified companies)
+    python backend/src/main/python/cli.py report driver-impacts --company-ids AAPL,MSFT --output-file reports/calculated_driver_impacts.jsonl --min-probability 0.65
+    ```
+    *(Note: The `reports/` directory might need to be created manually if it doesn't exist before running the report command that outputs to it).*
+
 
 ## Accessing and Utilizing the Knowledge Graph and API
 

@@ -1,0 +1,314 @@
+# semantic_library/domain_ontology.yaml
+# Version: 1.0
+# Description: Defines the core concepts, entities, properties, and relationships
+#              for the narrative library's domain. This acts as the foundational schema.
+
+# --- NOTES ON STRUCTURE ---
+# This file could adopt a more formal ontology language like OWL (via RDF/XML or Turtle)
+# or a structured JSON-LD format for greater interoperability and reasoning capabilities
+# by standard ontology tools. For simplicity with YAML, a custom schema is used here.
+
+# Key sections to define:
+# 1. Entity Types: Core objects in the domain.
+# 2. Property Definitions: Attributes of entities, including data types and constraints.
+# 3. Relationship Types: How entities can be connected, their cardinality, and properties of relationships.
+# 4. Taxonomies/Hierarchies: "is-a" or "part-of" relationships (e.g., for driver types).
+# 5. Controlled Vocabularies: Predefined sets of values for certain properties (enums).
+
+# Example Structure (Conceptual):
+
+controlled_vocabularies:
+  driver_type_enum:
+    - Macroeconomic
+    - Fundamental
+    - CompanySpecific
+    - IndustrySpecific
+    - Technical
+    - Geopolitical
+    - EventDriven
+  impact_direction_enum:
+    - Positive
+    - Negative
+    - Neutral
+    - Variable
+  time_horizon_enum:
+    - "0-3 months"
+    - "3-6 months"
+    - "6-12 months"
+    - "1-2 years"
+    - "2-5 years"
+    - "Long-term (>5 years)"
+  probability_qualifier_enum: # For qualitative probability expression
+    - VeryLow (<0.1)
+    - Low (0.1-0.3)
+    - Medium (0.3-0.6)
+    - High (0.6-0.85)
+    - VeryHigh (>0.85)
+
+entity_types:
+  - name: Company
+    description: "A business entity."
+    properties:
+      - name: id # Primary Key
+        type: string
+        is_required: true
+        description: "Unique ticker symbol or identifier."
+      - name: name
+        type: string
+        is_required: true
+      - name: industryId # Foreign Key to Industry
+        type: string
+      - name: financials # Nested object
+        type: object # Could reference a "FinancialStatement" entity type
+        properties:
+          - name: revenue_mn_usd
+            type: number
+          - name: pe_ratio
+            type: number
+          # ... other financial metrics
+      - name: tradingLevels # Nested object
+        type: object
+        properties:
+          - name: price
+            type: number
+          # ... other trading metrics
+      # ... other company properties
+
+  - name: Industry
+    description: "A category of economic activity."
+    properties:
+      - name: id
+        type: string
+        is_required: true
+      - name: name
+        type: string
+      # ...
+
+  - name: Driver # As defined in drivers_knowledge_base.yaml, but schema here
+    description: "A factor influencing entities."
+    properties:
+      - name: id
+        type: string
+        is_required: true
+      - name: name
+        type: string
+      - name: type
+        type: string # Could be restricted by driver_type_enum
+        # ... other properties as in drivers_knowledge_base.yaml
+        # The actual content/instances are in drivers_knowledge_base.yaml,
+        # this ontology would define the *structure* of a driver.
+
+  - name: MacroFactor
+    description: "A macroeconomic indicator or condition."
+    properties:
+      # ...
+      - name: trend
+        type: string # Could be an enum for Increasing, Decreasing, Stable
+
+  - name: Event
+    description: "A discrete occurrence that can impact entities or drivers."
+    properties:
+      - name: event_id
+        type: string
+      - name: event_type # e.g., ProductLaunch, EarningsAnnouncement, GeopoliticalCrisis
+        type: string
+      - name: date
+        type: date
+      - name: significance_score
+        type: number # 0-1
+      # ...
+
+  - name: TradingSignal # Example of a more abstract concept
+    description: "An indicator derived from market data suggesting a potential trading action or market state."
+    properties:
+      - name: signal_id
+        type: string
+      - name: signal_type # e.g., MomentumPositive, MeanReversionSetup
+        type: string
+      - name: confidence_level
+        type: number
+      - name: related_asset_id # e.g., company_id
+        type: string
+
+relationship_types:
+  - name: BELONGS_TO_INDUSTRY
+    description: "A company is part of an industry."
+    domain: Company # Source entity type
+    range: Industry # Target entity type
+    cardinality: "many-to-one"
+
+  - name: AFFECTED_BY_DRIVER
+    description: "An entity (Company, Industry) is influenced by a driver."
+    domain: [Company, Industry] # Can have multiple source types
+    range: Driver
+    cardinality: "many-to-many"
+    properties: # Relationships can also have properties
+      - name: relevance_score
+        type: number # How relevant this driver is to this specific entity
+      - name: activation_status # Inferred by Reasoning Engine
+        type: boolean
+
+  - name: TRIGGERS_DRIVER # An event might trigger a driver
+    domain: Event
+    range: Driver
+    cardinality: "many-to-many"
+
+  - name: IMPACTS_VARIABLE # A driver's effect impacts a specific variable
+    description: "Connects a DriverImpact (sub-object of Driver) to a target variable string."
+    # This is more conceptual for how the impact_model links to the ontology.
+    # domain: DriverImpact (conceptual)
+    # range: string (representing a path like 'company.financials.revenue')
+
+# Taxonomies (Example)
+# driver_taxonomy:
+#   Macroeconomic:
+#     children:
+#       - InterestRateRelated
+#       - InflationRelated
+#       - GDPGrowthRelated
+#   Fundamental:
+#     children:
+#       - CompanySpecificFundamental
+#       - IndustrySpecificFundamental
+# ...
+
+# This file would be loaded by the ReasoningEngine or a dedicated ontology manager
+# to validate data structures, understand relationships, and potentially perform
+# more advanced semantic reasoning if integrated with an ontology reasoner.
+
+  agent_type_enum: # From Adam v19.1 README
+    - MarketSentimentAgent
+    - MacroeconomicAnalysisAgent
+    - GeopoliticalRiskAgent
+    - IndustrySpecialistAgent
+    - FundamentalAnalysisAgent
+    - TechnicalAnalysisAgent
+    - RiskAssessmentAgent
+    - PredictionMarketAgent
+    - AlternativeDataAgent
+    - LegalAgent
+    - ModelBuilderAgent # Added from README
+    - SupplyChainGuardianAgent # Added
+    - AlgorithmicTraderAgent # Added
+    - DiscussionChairAgent # Added
+    - CryptoAgent
+    # ... other agent types from README
+  simulation_type_enum: # From Adam v19.1 README
+    - CreditRatingAssessment
+    - InvestmentCommittee
+    - PortfolioOptimization
+    - StressTesting
+    - MergerAcquisition
+    # ... other simulation types
+
+entity_types:
+  # ... (Company, Industry, Driver, MacroFactor, Event, TradingSignal from before) ...
+  - name: Agent
+    description: "A specialized AI component responsible for a specific domain or task."
+    properties:
+      - name: agent_id; type: string; is_required: true
+      - name: name; type: string; is_required: true # e.g., "Legal Eagle"
+      - name: agent_type
+        type: string # from agent_type_enum
+        description: "The specialized type of the agent."
+      - name: description; type: string
+      - name: capabilities; type: array; items: {type: string}
+      - name: data_sources_used; type: array; items: {type: string} # Refs to DataSource IDs
+      - name: status; type: string # e.g., Active, Inactive
+
+  - name: Simulation
+    description: "A defined scenario or model for testing hypotheses or exploring outcomes."
+    properties:
+      - name: simulation_id; type: string; is_required: true
+      - name: name; type: string # e.g., "Credit Rating Assessment Simulation"
+      - name: simulation_type
+        type: string # from simulation_type_enum
+      - name: description; type: string
+      - name: input_parameters; type: object
+      - name: environment_id; type: string # Links to simulation_environment_definitions.yaml
+      - name: involved_agent_ids; type: array; items: {type: string} # Agents participating
+
+  - name: DataSource
+    description: "An external or internal source of data used by Agents or the system."
+    properties:
+      - name: source_id; type: string; is_required: true
+      - name: name; type: string # e.g., "SEC Filings", "Twitter API"
+      - name: type; type: string # e.g., API, Database, NewsFeed
+      - name: description; type: string
+      - name: update_frequency; type: string
+      - name: access_details; type: object
+      - name: data_granularity; type: string # e.g., company-level, market-level, transaction-level
+
+  - name: FinancialInstrument
+    description: "A tradable asset of any kind, e.g., stock, bond, crypto."
+    properties:
+      - name: instrument_id; type: string; is_required: true # e.g., Ticker, ISIN, CUSIP
+      - name: name; type: string
+      - name: instrument_type; type: string # e.g., Equity, FixedIncome, Cryptocurrency, Derivative
+      - name: issuer_id; type: string # e.g., company_id if stock/bond
+      - name: exchange_id; type: string # Where it's traded
+      # ... other relevant financial instrument properties
+
+  - name: EconomicIndicator # More specific than MacroFactor
+    description: "A specific statistic about economic activity."
+    # inherits_from: MacroFactor (conceptually)
+    properties:
+      - name: indicator_id; type: string; is_required: true # e.g., GDP_ crescita_QOQ, CPI_YoY
+      - name: name; type: string
+      - name: description; type: string
+      - name: source_agency; type: string # e.g., BLS, BEA, Federal Reserve
+      - name: release_frequency; type: string
+      - name: unit_of_measure; type: string # e.g., %, $, Millions
+      - name: current_value; type: number # Could also be part of a TimeSeries entity
+      - name: trend; type: string
+
+  - name: RegulatoryBody
+    description: "An agency or organization responsible for financial regulation."
+    properties:
+      - name: body_id; type: string; is_required: true
+      - name: name; type: string # e.g., "Securities and Exchange Commission"
+      - name: acronym; type: string # e.g., "SEC"
+      - name: jurisdiction; type: string # e.g., "USA", "EU"
+      - name: areas_of_oversight; type: array; items: {type: string}
+
+  - name: InvestmentThesis
+    description: "A reasoned argument for a particular investment strategy or decision."
+    properties:
+      - name: thesis_id; type: string; is_required: true
+      - name: title; type: string
+      - name: summary; type: string
+      - name: supporting_driver_ids; type: array; items: {type: string}
+      - name: target_instrument_ids; type: array; items: {type: string}
+      - name: confidence_level; type: number
+      - name: time_horizon; type: string
+      - name: created_by_agent_id; type: string # Agent who formulated it
+
+relationship_types:
+  # ... (BELONGS_TO_INDUSTRY, AFFECTED_BY_DRIVER, TRIGGERS_DRIVER, IMPACTS_VARIABLE from before) ...
+  - name: USES_DATA_SOURCE
+    domain: Agent; range: DataSource; cardinality: "many-to-many"
+  - name: GENERATES_INSIGHT_FROM_DRIVER
+    domain: Agent; range: Driver; cardinality: "many-to-many"
+    properties:
+      - name: insight_summary; type: string
+      - name: confidence_score; type: number
+  - name: PARTICIPATES_IN_SIMULATION
+    domain: Agent; range: Simulation; cardinality: "many-to-many"
+  - name: ISSUED_BY # e.g., Stock issued by Company
+    domain: FinancialInstrument; range: Company; cardinality: "many-to-one"
+  - name: TRADED_ON_EXCHANGE # e.g., Stock traded on NYSE
+    domain: FinancialInstrument; range: string # Could be an Exchange entity
+    cardinality: "many-to-many"
+  - name: MONITORED_BY_REGULATOR
+    domain: [Company, Industry, FinancialInstrument]; range: RegulatoryBody; cardinality: "many-to-many"
+  - name: BASED_ON_THESIS
+    domain: string # e.g., InvestmentPortfolio, TradingStrategy
+    range: InvestmentThesis
+    cardinality: "many-to-one"
+  - name: TARGETS_INSTRUMENT
+    domain: InvestmentThesis; range: FinancialInstrument; cardinality: "many-to-many"
+  - name: SUPPORTS_THESIS
+    domain: Driver; range: InvestmentThesis; cardinality: "many-to-many"
+
+# ... (Taxonomies could be expanded here) ...
+...
