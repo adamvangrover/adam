@@ -1,178 +1,101 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive AI Prompt Library</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #f8f9fa;
-            --font-color: #212529;
-            --primary-color: #007bff;
-            --secondary-color: #6c757d;
-            --card-bg: #ffffff;
-            --card-border: #dee2e6;
-            --shadow: 0 4px 8px rgba(0,0,0,0.1);
-            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
+        /* Custom styles to complement Tailwind */
         body {
-            font-family: var(--font-family);
-            background-color: var(--bg-color);
-            color: var(--font-color);
-            margin: 0;
-            display: flex;
-            line-height: 1.6;
+            font-family: 'Inter', sans-serif;
         }
-        #sidebar {
-            width: 300px;
-            background-color: var(--card-bg);
-            border-right: 1px solid var(--card-border);
-            padding: 20px;
-            height: 100vh;
-            position: fixed;
-            overflow-y: auto;
-        }
-        #sidebar h2 {
-            margin-top: 0;
-            color: var(--primary-color);
-            font-size: 1.5em;
-        }
-        #sidebar ul {
-            list-style: none;
-            padding: 0;
-        }
-        #sidebar li a {
-            display: block;
-            padding: 8px 12px;
-            color: var(--secondary-color);
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.2s, color 0.2s;
-            font-weight: 500;
-        }
-        #sidebar li a:hover, #sidebar li a.active {
-            background-color: #e9ecef;
-            color: var(--primary-color);
-        }
-        #main-content {
-            margin-left: 340px;
-            padding: 20px 40px;
-            width: calc(100% - 380px);
-        }
-        #search-bar {
-            width: 100%;
-            padding: 12px;
-            font-size: 1em;
-            margin-bottom: 20px;
-            border: 1px solid var(--card-border);
-            border-radius: 5px;
-        }
-        .stage {
-            margin-bottom: 40px;
-        }
-        .stage-title {
-            font-size: 2.5em;
-            color: var(--primary-color);
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-            margin-bottom: 30px;
-        }
-        .section-title {
-            font-size: 1.8em;
-            color: #343a40;
-            cursor: pointer;
-            margin-top: 20px;
-            position: relative;
+        .font-mono {
+            font-family: 'Roboto Mono', monospace;
         }
         .section-title::before {
             content: '▶';
             margin-right: 10px;
             font-size: 0.8em;
-            transition: transform 0.2s;
+            transition: transform 0.2s ease-in-out;
+            display: inline-block;
         }
         .section-title.open::before {
             transform: rotate(90deg);
         }
-        .section-description {
-            font-style: italic;
-            color: var(--secondary-color);
-            margin-bottom: 20px;
-            border-left: 3px solid var(--card-border);
-            padding-left: 15px;
+        #sidebar::-webkit-scrollbar {
+            width: 8px;
         }
-        .section-content {
-            display: none;
-            padding-left: 20px;
+        #sidebar::-webkit-scrollbar-track {
+            background: #f1f5f9;
         }
-        .section-content.open {
-            display: block;
+        #sidebar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
         }
-        .prompt-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow);
-            transition: box-shadow 0.2s;
+        #sidebar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
-        .prompt-card:hover {
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        .loader {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
         }
-        .prompt-card h4 {
-            margin-top: 0;
-            background-color: #e9ecef;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-family: "SF Mono", "Fira Code", "Fira Mono", "Roboto Mono", monospace;
-            display: inline-block;
-            color: #c82333;
-        }
-        .prompt-text {
-            background-color: #e9f7ff;
-            border-left: 4px solid var(--primary-color);
-            padding: 15px;
-            margin: 15px 0;
-            position: relative;
-        }
-        .copy-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            opacity: 0.8;
-            transition: opacity 0.2s;
-        }
-        .copy-btn:hover {
-            opacity: 1;
-        }
-        .response-format {
-            font-family: "SF Mono", "Fira Code", "Fira Mono", "Roboto Mono", monospace;
-            background-color: #f8f9fa;
-            padding: 10px;
-            border-radius: 5px;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800">
 
-<div id="sidebar">
-    <h2>🤖 Prompt Library</h2>
-    <input type="text" id="search-bar" placeholder="Search prompts...">
-    <ul id="nav-links"></ul>
+<!-- API Key Modal -->
+<div id="api-key-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
+        <h2 class="text-2xl font-bold mb-4">Enter Gemini API Key</h2>
+        <p class="text-slate-600 mb-6">To generate examples, please provide your Google AI Studio API key. This key will only be stored for your current session.</p>
+        <input type="password" id="api-key-input" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition mb-4" placeholder="Enter your API key...">
+        <div class="flex justify-end space-x-4">
+            <button id="cancel-api-key" class="px-6 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition">Cancel</button>
+            <button id="save-api-key" class="px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition">Save Key</button>
+        </div>
+    </div>
 </div>
 
-<div id="main-content">
+<!-- Mobile Header -->
+<header class="md:hidden sticky top-0 bg-white/80 backdrop-blur-lg border-b border-slate-200 z-30">
+    <div class="flex items-center justify-between p-4">
+        <h1 class="text-xl font-bold text-slate-800">🤖 Prompt Library</h1>
+        <button id="mobile-menu-btn" class="p-2 rounded-md text-slate-600 hover:bg-slate-200 hover:text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+    </div>
+</header>
+
+<!-- Sidebar -->
+<div id="sidebar" class="w-80 bg-white border-r border-slate-200 h-screen p-5 fixed top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-40">
+    <div class="flex items-center mb-6">
+        <h2 class="text-2xl font-bold text-slate-800">🤖 Prompt Library</h2>
+    </div>
+    <input type="text" id="search-bar" placeholder="Search prompts..." class="w-full px-4 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition mb-4">
+    <nav>
+        <ul id="nav-links" class="space-y-1"></ul>
+    </nav>
+</div>
+
+<!-- Main Content -->
+<div id="main-content" class="md:ml-80 p-4 sm:p-6 md:p-10 w-full">
     <div id="library-container"></div>
 </div>
 
 <script>
-    // Embedded JSONL data
+    // --- DATA ---
     const jsonlData = `
 {"task_id":"EP01","stage_id":"foundational_scoping","stage_name":"I. Foundational & Scoping Prompts","section_id":"entity_profile","section_name":"Entity Profile","section_description":"This object gathers fundamental identification and contextual data. The purpose of the analysis is paramount, as it dictates the focus and depth required. An analysis for a new bond issuance will concentrate on the company's forward-looking capacity to service the proposed debt, whereas an annual surveillance review will focus on performance relative to previous expectations and covenants.","prompt_text":"Provide the full legal name of the entity being analyzed, its primary ticker symbol (if public), headquarters location, and the ultimate parent entity.","expected_response_format":"JSON object with keys: 'legal_name', 'ticker', 'hq_location', 'ultimate_parent'."}
 {"task_id":"EP02","stage_id":"foundational_scoping","stage_name":"I. Foundational & Scoping Prompts","section_id":"entity_profile","section_name":"Entity Profile","section_description":"This object gathers fundamental identification and contextual data. The purpose of the analysis is paramount, as it dictates the focus and depth required. An analysis for a new bond issuance will concentrate on the company's forward-looking capacity to service the proposed debt, whereas an annual surveillance review will focus on performance relative to previous expectations and covenants.","prompt_text":"Clearly state the purpose and scope of this credit analysis. Is it for a new debt issuance, an annual surveillance, a management assessment, or another purpose?","expected_response_format":"Narrative statement defining the specific goal and boundaries of the analysis."}
@@ -236,13 +159,13 @@
 {"task_id":"SYS03","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"system_behavior","section_name":"System Behavior","section_description":"Defines the LLM's core operational parameters, persona, and versioning for the task.","prompt_text":"Generate a configuration file in YAML format for a new data processing job. The configuration should include 'source_bucket', 'destination_table', 'job_name', and a list of 'data_quality_checks' such as 'not_null' and 'unique_values'.","expected_response_format":"A code block containing a valid YAML configuration file."}
 {"task_id":"RAG01","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"knowledge_integration","section_name":"Knowledge Integration (RAG)","section_description":"Controls how the model interacts with and synthesizes information from external knowledge sources.","prompt_text":"For the next prompt, exclusively use the following documents from the knowledge base as your context for Retrieval-Augmented Generation (RAG): [list of document IDs, e.g., 'doc_10K_2024.pdf', 'doc_credit_agreement_2023.pdf']. Do not use general knowledge.","expected_response_format":"Confirmation of RAG source configuration, e.g., 'RAG context locked to provided documents.'"}
 {"task_id":"KGRAPH01","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"knowledge_integration","section_name":"Knowledge Graph & Ontology","section_description":"Controls how the model interacts with and synthesizes information from external knowledge sources.","prompt_text":"Based on the 'entity_profile' and 'group_and_ownership_structure' sections, generate a formal ontology in OWL format defining the relationships between the company, its parent, its subsidiaries, and key executives.","expected_response_format":"A code block containing the ontology in OWL (Web Ontology Language) format."}
-{"task_id":"KGRAPH02","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"knowledge_integration","section_name":"Knowledge Graph & Ontology","section_description":"Controls how the model interacts with and synthesizes information from external knowledge sources.","prompt_text":"Populate a knowledge graph using the ontology from KGRAPH01 and the information from the credit report. Represent entities and relationships as Cypher statements for import into a Neo4j database.","expected_response_format":"A code block containing a series of Cypher `CREATE` or `MERGE` statements."}
+{"task_id":"KGRAPH02","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"knowledge_integration","section_name":"Knowledge Graph & Ontology","section_description":"Controls how the model interacts with and synthesizes information from external knowledge sources.","prompt_text":"Populate a knowledge graph using the ontology from KGRAPH01 and the information from the credit report. Represent entities and relationships as Cypher statements for import into a Neo4j database.","expected_response_format":"A code block containing a series of Cypher \\`CREATE\\` or \\`MERGE\\` statements."}
 {"task_id":"DT01","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"analytical_modeling","section_name":"Decision Tree Modeling","section_description":"Prompts for generating and executing structured analytical models like decision trees.","prompt_text":"Generate a decision tree in Python using scikit-learn that models the final rating recommendation. Use the following as features: CICRA score, competitive position assessment, profitability volatility, and projected Debt/EBITDA. The tree should output a rating category.","expected_response_format":"A Python code snippet defining and training a `DecisionTreeClassifier`."}
 {"task_id":"CODE01","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"coding_and_automation","section_name":"Coding & Automation","section_description":"Prompts for generating code, scripts, and instructions for development automation tools.","prompt_text":"Write a complete Python script named 'data_validator.py' that takes a CSV file path as a command-line argument. The script must use the pandas library to read the CSV and verify that the 'EBITDA' column contains no negative values. It should print a success or failure message.","expected_response_format":"A complete, executable Python script within a single code block."}
 {"task_id":"CODE02","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"coding_and_automation","section_name":"Coding & Automation","section_description":"Prompts for generating code, scripts, and instructions for development automation tools.","prompt_text":"Generate the high-level pseudocode and comments for a Python function that will be completed by a coding copilot. The function, named 'calculate_dscr', should take 'net_operating_income' and 'total_debt_service' as inputs and return the Debt Service Coverage Ratio. Include type hints and a docstring.","expected_response_format":"A Python function stub with detailed comments and pseudocode, ready for a copilot tool to complete."}
 {"task_id":"API01","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"external_tooling","section_name":"External Tooling (API & CLI)","section_description":"Prompts for generating commands to interact with external tools like APIs and Command-Line Interfaces.","prompt_text":"Generate a Python script to call an external API at 'https://api.marketdata.com/v1/quotes' to retrieve the latest stock price for the company's ticker. The API key is stored in the environment variable 'MARKET_DATA_API_KEY'.","expected_response_format":"A Python code snippet using the `requests` library to make the specified API call."}
-{"task_id":"CLI01","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"external_tooling","section_name":"External Tooling (API & CLI)","section_description":"Prompts for generating commands to interact with external tools like APIs and Command-Line Interfaces.","prompt_text":"Generate the gcloud CLI command to download the latest financial reports for the company from the Google Cloud Storage bucket 'gs://financial-reports-archive/' into the local directory './reports'.","expected_response_format":"A shell command snippet, e.g., `gcloud storage cp gs://financial-reports-archive/COMPANY_TICKER/* ./reports/`"}
-{"task_id":"CLI02","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"external_tooling","section_name":"External Tooling (API & CLI)","section_description":"Prompts for generating commands to interact with external tools like APIs and Command-Line Interfaces.","prompt_text":"Generate a single-line terminal command that finds all '.log' files in the '/var/log' directory, searches for lines containing the word 'ERROR', and saves the resulting lines to a file named 'error_summary.txt' in the home directory.","expected_response_format":"A single, complete shell command utilizing pipes, e.g., `grep -r 'ERROR' /var/log/*.log > ~/error_summary.txt`."}
+{"task_id":"CLI01","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"external_tooling","section_name":"External Tooling (API & CLI)","section_description":"Prompts for generating commands to interact with external tools like APIs and Command-Line Interfaces.","prompt_text":"Generate the gcloud CLI command to download the latest financial reports for the company from the Google Cloud Storage bucket 'gs://financial-reports-archive/' into the local directory './reports'.","expected_response_format":"A shell command snippet, e.g., \\`gcloud storage cp gs://financial-reports-archive/COMPANY_TICKER/* ./reports/\\`"}
+{"task_id":"CLI02","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"external_tooling","section_name":"External Tooling (API & CLI)","section_description":"Prompts for generating commands to interact with external tools like APIs and Command-Line Interfaces.","prompt_text":"Generate a single-line terminal command that finds all '.log' files in the '/var/log' directory, searches for lines containing the word 'ERROR', and saves the resulting lines to a file named 'error_summary.txt' in the home directory.","expected_response_format":"A single, complete shell command utilizing pipes, e.g., \\`grep -r 'ERROR' /var/log/*.log > ~/error_summary.txt\\`."}
 {"task_id":"AGENT01","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"agentic_workflow","section_name":"Agentic Workflow (SDK & MCP)","section_description":"Prompts for defining and executing multi-step, agentic tasks, including coordination between multiple agents.","prompt_text":"Initialize as a research agent. Your primary goal is to complete the 'Macro-Environment Risk Assessment' stage. You have access to the following tools: [web_search, knowledge_base_query]. Acknowledge when the goal is complete.","expected_response_format":"Confirmation of agent initialization and goal understanding."}
 {"task_id":"AGENT02","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"agentic_workflow","section_name":"Agentic Workflow (SDK & MCP)","section_description":"Prompts for defining and executing multi-step, agentic tasks, including coordination between multiple agents.","prompt_text":"Decompose the goal 'Complete the Financial Risk Profile Assessment' into a sequence of logical steps using the available prompts (FSA01, HFA01, etc.) and tools [code_interpreter, api_caller].","expected_response_format":"A numbered list of steps or a plan in JSON format."}
 {"task_id":"MCP01","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"agentic_workflow","section_name":"Agentic Workflow (SDK & MCP)","section_description":"Prompts for defining and executing multi-step, agentic tasks, including coordination between multiple agents.","prompt_text":"This is a multi-agent task. Define roles for 'AnalystAgent' (executes analysis prompts) and 'ReviewerAgent' (critiques outputs for quality and accuracy). The 'ReviewerAgent' must approve the output of each stage before the 'AnalystAgent' can proceed.","expected_response_format":"A JSON object defining the roles, responsibilities, and interaction protocol for the agents."}
@@ -255,15 +178,15 @@
 {"task_id":"XAI03","stage_id":"advanced_analytics_and_orchestration","stage_name":"VII. Advanced Analytics & Orchestration","section_id":"explainability_and_audit","section_name":"Explainability & Audit (XAI)","section_description":"Prompts for interpreting model behavior, ensuring transparency, and creating audit trails.","prompt_text":"Review the full log of prompts and responses in this session and generate a Markdown summary for an audit trail. The summary must list each major analytical step, the data or documents used, and the resulting conclusion, providing a traceable path from raw data to final rating.","expected_response_format":"A structured Markdown document detailing the analytical process flow for audit purposes."}
 {"task_id":"AKS01","stage_id":"advanced_analytics_and_orchestration","stage_name":"VII. Advanced Analytics & Orchestration","section_id":"advanced_knowledge_synthesis","section_name":"Advanced Knowledge Synthesis","section_description":"Prompts for advanced reasoning, hypothesis testing, and synthesis across multiple data types and sources.","prompt_text":"Form a hypothesis based on the initial financial data. Then, generate a multi-step plan to validate or refute this hypothesis. The plan must explicitly state which documents to search (using RAG), which API calls to make, and which calculations to perform. Hypothesis Example: 'The company's declining gross margins are primarily caused by rising input costs rather than pricing pressure.'","expected_response_format":"A JSON object with a 'hypothesis' string and a 'validation_plan' array of steps."}
 {"task_id":"AKS02","stage_id":"advanced_analytics_and_orchestration","stage_name":"VII. Advanced Analytics & Orchestration","section_id":"advanced_knowledge_synthesis","section_name":"Advanced Knowledge Synthesis","section_description":"Prompts for advanced reasoning, hypothesis testing, and synthesis across multiple data types and sources.","prompt_text":"Synthesize information from the following multimodal sources to assess the company's brand strength: [Text: MD&A section on market position, Image: Chart of market share from investor deck, Table: Customer satisfaction scores from attached CSV]. Conclude with a qualitative assessment.","expected_response_format":"A narrative synthesis that explicitly references how the text, image, and tabular data collectively support the final conclusion on brand strength."}
-{"task_id":"ORC01","stage_id":"advanced_analytics_and_orchestration","stage_name":"VII. Advanced Analytics & Orchestration","section_id":"workflow_orchestration","section_name":"Workflow Orchestration","section_description":"Prompts for automating and orchestrating complex workflows, including defining human-in-the-loop checkpoints.","prompt_text":"Generate a GitHub Actions workflow file (`.github/workflows/analysis.yml`) that triggers on a push to the 'main' branch. The workflow should execute the entire chain of analysis scripts (e.g., `data_validator.py`, `monte_carlo.py`) in sequence.","expected_response_format":"A complete, valid YAML file for a GitHub Actions workflow."}
+{"task_id":"ORC01","stage_id":"advanced_analytics_and_orchestration","stage_name":"VII. Advanced Analytics & Orchestration","section_id":"workflow_orchestration","section_name":"Workflow Orchestration","section_description":"Prompts for automating and orchestrating complex workflows, including defining human-in-the-loop checkpoints.","prompt_text":"Generate a GitHub Actions workflow file (\\`.github/workflows/analysis.yml\\`) that triggers on a push to the 'main' branch. The workflow should execute the entire chain of analysis scripts (e.g., `data_validator.py`, `monte_carlo.py`) in sequence.","expected_response_format":"A complete, valid YAML file for a GitHub Actions workflow."}
 {"task_id":"ORC02","stage_id":"advanced_analytics_and_orchestration","stage_name":"VII. Advanced Analytics & Orchestration","section_id":"workflow_orchestration","section_name":"Workflow Orchestration","section_description":"Prompts for automating and orchestrating complex workflows, including defining human-in-the-loop checkpoints.","prompt_text":"Define a human-in-the-loop (HITL) checkpoint. After the 'anchor' rating is determined in task RPS03, the workflow must pause. Generate a request for human review containing the anchor rating and the business/financial risk profiles. The agent may only proceed to MFN01 after receiving an explicit 'approved' signal.","expected_response_format":"A JSON object defining the HITL trigger condition, the data payload for the human reviewer, and the required approval signal."}
 {"task_id":"DYN01","stage_id":"advanced_analytics_and_orchestration","stage_name":"VII. Advanced Analytics & Orchestration","section_id":"dynamic_reporting_and_communication","section_name":"Dynamic Reporting & Communication","section_description":"Prompts for creating interactive, audience-specific reports and presentations.","prompt_text":"Generate a Python script for an interactive dashboard using Streamlit or Plotly Dash. The dashboard must allow a user to select different stress test scenarios (e.g., 'Recession', 'Input Cost Shock') from a dropdown menu and see the projected leverage and coverage ratios update dynamically in a chart.","expected_response_format":"A complete, executable Python script for an interactive dashboard."}
 {"task_id":"DYN02","stage_id":"advanced_analytics_and_orchestration","stage_name":"VII. Advanced Analytics & Orchestration","section_id":"dynamic_reporting_and_communication","section_name":"Dynamic Reporting & Communication","section_description":"Prompts for creating interactive, audience-specific reports and presentations.","prompt_text":"Generate three distinct summaries of the final rating recommendation (RR03): 1) An 'Executive Summary' for the CEO (max 100 words, focuses on strategic implications). 2) A 'Portfolio Manager Briefing' (focuses on risk factors, outlook, and covenant details). 3) A 'Methodology Note' for a junior analyst (explains key adjustments and model choices).","expected_response_format":"A JSON object with three keys ('executive_summary', 'pm_briefing', 'methodology_note'), each containing the tailored narrative."}
 {"task_id":"DYN03","stage_id":"advanced_analytics_and_orchestration","stage_name":"VII. Advanced Analytics & Orchestration","section_id":"dynamic_reporting_and_communication","section_name":"Dynamic Reporting & Communication","section_description":"Prompts for creating interactive, audience-specific reports and presentations.","prompt_text":"Generate a JSON structure representing a slide deck for the rating committee presentation. The structure should include keys for 'title', 'presenter', and an array of 'slides'. Each slide object should have a 'title', 'talking_points' (an array of strings), and an optional 'visualization_type' (e.g., 'bar_chart', 'line_chart'). Populate it with the key findings of this analysis.","expected_response_format":"A structured JSON object representing the entire presentation."}
 {"task_id":"GOV01","stage_id":"governance_deployment_and_lifecycle","stage_name":"VIII. Model Governance, Deployment & Lifecycle Management","section_id":"model_and_artifact_versioning","section_name":"Model & Artifact Versioning","section_description":"Prompts for managing versions of models, data, and code using integrated version control systems.","prompt_text":"Generate the git commands to create a new branch named 'feature/rating_model_v2', add the serialized decision tree model file ('rating_model.pkl') and the final credit report ('credit_report_v1.pdf') to the branch, commit them with the message 'feat: Add version 2 of rating model and initial report', and push the branch to the remote repository.","expected_response_format":"A sequence of shell commands for git."}
-{"task_id":"GOV02","stage_id":"governance_deployment_and_lifecycle","stage_name":"VIII. Model Governance, Deployment & Lifecycle Management","section_id":"model_and_artifact_versioning","section_name":"Model & Artifact Versioning","section_description":"Prompts for managing versions of models, data, and code using integrated version control systems.","prompt_text":"Generate a DVC (Data Version Control) command to start tracking the 'historical_financials.csv' file and associate it with the current git commit, ensuring data-to-code lineage.","expected_response_format":"A shell command snippet for DVC, e.g., `dvc add data/historical_financials.csv`."}
+{"task_id":"GOV02","stage_id":"governance_deployment_and_lifecycle","stage_name":"VIII. Model Governance, Deployment & Lifecycle Management","section_id":"model_and_artifact_versioning","section_name":"Model & Artifact Versioning","section_description":"Prompts for managing versions of models, data, and code using integrated version control systems.","prompt_text":"Generate a DVC (Data Version Control) command to start tracking the 'historical_financials.csv' file and associate it with the current git commit, ensuring data-to-code lineage.","expected_response_format":"A shell command snippet for DVC, e.g., \\`dvc add data/historical_financials.csv\\`."}
 {"task_id":"DEP01","stage_id":"governance_deployment_and_lifecycle","stage_name":"VIII. Model Governance, Deployment & Lifecycle Management","section_id":"deployment_and_cicd","section_name":"Deployment & CI/CD","section_description":"Prompts for automating the deployment of models and analysis pipelines into production or staging environments.","prompt_text":"Generate a Dockerfile to containerize the 'rating_model.pkl' and the API script created in task API01. The container should expose port 8080 and run the API server upon startup. Ensure all necessary Python dependencies from a 'requirements.txt' file are installed.","expected_response_format":"A complete, valid Dockerfile within a code block."}
-{"task_id":"DEP02","stage_id":"governance_deployment_and_lifecycle","stage_name":"VIII. Model Governance, Deployment & Lifecycle Management","section_id":"deployment_and_cicd","section_name":"Deployment & CI/CD","section_description":"Prompts for automating the deployment of models and analysis pipelines into production or staging environments.","prompt_text":"Generate a Kubernetes deployment manifest in YAML (`deployment.yaml`) to deploy the container image created from the Dockerfile in DEP01. The deployment should specify 2 replicas and include a liveness probe that checks the API's '/health' endpoint every 30 seconds.","expected_response_format":"A complete, valid Kubernetes deployment YAML file."}
+{"task_id":"DEP02","stage_id":"governance_deployment_and_lifecycle","stage_name":"VIII. Model Governance, Deployment & Lifecycle Management","section_id":"deployment_and_cicd","section_name":"Deployment & CI/CD","section_description":"Prompts for automating the deployment of models and analysis pipelines into production or staging environments.","prompt_text":"Generate a Kubernetes deployment manifest in YAML (\\`deployment.yaml\\`) to deploy the container image created from the Dockerfile in DEP01. The deployment should specify 2 replicas and include a liveness probe that checks the API's '/health' endpoint every 30 seconds.","expected_response_format":"A complete, valid Kubernetes deployment YAML file."}
 {"task_id":"MON01","stage_id":"governance_deployment_and_lifecycle","stage_name":"VIII. Model Governance, Deployment & Lifecycle Management","section_id":"performance_monitoring_and_alerting","section_name":"Performance Monitoring & Alerting","section_description":"Prompts for setting up real-time monitoring of model performance, data drift, and system health.","prompt_text":"Generate a JSON configuration for a monitoring alert. The alert should trigger if the 95th percentile latency of the rating prediction API exceeds 500ms over a 5-minute window. The alert should be sent to the '#credit-ops-alerts' Slack channel via a webhook URL stored in the 'SLACK_WEBHOOK' environment variable.","expected_response_format":"A JSON object defining the alert conditions and notification channel."}
 {"task_id":"MON02","stage_id":"governance_deployment_and_lifecycle","stage_name":"VIII. Model Governance, Deployment & Lifecycle Management","section_id":"performance_monitoring_and_alerting","section_name":"Performance Monitoring & Alerting","section_description":"Prompts for setting up real-time monitoring of model performance, data drift, and system health.","prompt_text":"Design a data drift detection job. Generate the pseudocode for a script that runs daily. The script should calculate the statistical distribution (e.g., mean, standard deviation) of key input features from the live prediction requests over the last 24 hours and compare it to the distribution of the training data using the Kolmogorov-Smirnov test. If the p-value for any feature is below 0.05, it should log a 'Drift Detected' warning.","expected_response_format":"Detailed pseudocode or a Python script outline for the data drift detection job."}
 {"task_id":"RET01","stage_id":"governance_deployment_and_lifecycle","stage_name":"VIII. Model Governance, Deployment & Lifecycle Management","section_id":"retraining_and_lifecycle_hooks","section_name":"Retraining & Lifecycle Hooks","section_description":"Prompts for defining automated triggers and policies for model retraining, testing, and promotion.","prompt_text":"Define a model retraining policy. Generate a JSON object that specifies the conditions under which the rating model should be automatically retrained. The policy should include two triggers: 1) A 'time-based' trigger to retrain every 90 days. 2) A 'performance-based' trigger if the model's prediction accuracy on a validation set drops below 85%.","expected_response_format":"A JSON object defining the retraining policy with its triggers."}
@@ -278,77 +201,96 @@
 {"task_id":"FBK01","stage_id":"human_computer_interaction_and_collaboration","stage_name":"IX. Human-Computer Interaction & Collaboration","section_id":"feedback_and_reinforcement_learning","section_name":"Feedback & Reinforcement Learning","section_description":"Prompts for capturing user feedback to improve the AI's future performance and fine-tune its models.","prompt_text":"The rationale provided in RR03 was not persuasive. The causal link between the company's competitive position and its financial forecast was unclear. Use this feedback to regenerate the rationale, placing greater emphasis on that specific connection. Register this feedback instance for model improvement.","expected_response_format":"A revised narrative for the rating rationale that explicitly incorporates the user's feedback."}
 {"task_id":"FBK02","stage_id":"human_computer_interaction_and_collaboration","stage_name":"IX. Human-Computer Interaction & Collaboration","section_id":"feedback_and_reinforcement_learning","section_name":"Feedback & Reinforcement Learning","section_description":"Prompts for capturing user feedback to improve the AI's future performance and fine-tune its models.","prompt_text":"The peer group selected in PA01 was excellent and highly relevant. Create a positive reinforcement signal for the selection logic used. Associate this successful outcome with the input features: industry='specialty chemicals', revenue_size='<$1B', geo_focus='North America'.","expected_response_format":"Confirmation that a positive feedback signal has been logged for reinforcement learning, associating the successful output with the specified input conditions."}
 {"task_id":"SEC01","stage_id":"security_privacy_and_access_control","stage_name":"X. Security, Privacy & Access Control","section_id":"permissions_and_role_based_access","section_name":"Permissions & Role-Based Access (RBAC)","section_description":"Prompts for defining and enforcing granular access controls over tasks, data, and system capabilities.","prompt_text":"Define a new user role named 'Junior Analyst'. Generate a JSON RBAC policy that grants this role 'read-only' access to all stages up to 'V. Synthesis, Rating, and Reporting', and explicit 'deny' access to all subsequent stages (VI-X). The role is also denied access to any task involving the 'delete' or 'deploy' verbs.","expected_response_format":"A JSON object representing the Role-Based Access Control policy."}
-{"task_id":"SEC02","stage_id":"security_privacy_and_access_control","stage_name":"X. Security, Privacy & Access Control","section_id":"permissions_and_role_based_access","section_name":"Permissions & Role-Based Access (RBAC)","section_description":"Prompts for defining and enforcing granular access controls over tasks, data, and system capabilities.","prompt_text":"The current user is requesting to execute task DEP02 (Kubernetes Deployment). Verify if the user's role has the necessary 'execute' permission for the 'deployment_and_cicd' section. Provide a confirmation or denial message based on the current RBAC policy.","expected_response_format":"A confirmation or denial string, e.g., 'ACCESS DENIED: User role 'Junior Analyst' lacks 'execute' permission for section 'deployment_and_cicd'.'"}
+{"task_id":"SEC02","stage_id":"security_privacy_and_access_control","stage_name":"X. Security, Privacy & Access Control","section_id":"permissions_and_role_based_access","section_name":"Permissions & Role-Based Access (RBAC)","section_description":"Prompts for defining and enforcing granular access controls over tasks, data, and system capabilities.","prompt_text":"The current user is requesting to execute task DEP02 (Kubernetes Deployment). Verify if the user's role has the necessary 'execute' permission for the 'deployment_and_cicd' section. Provide a confirmation or denial message based on the current RBAC policy.","expected_response_format":"A confirmation or denial string, e.g., 'ACCESS DENIED: User role \\'Junior Analyst\\' lacks \\'execute\\' permission for section \\'deployment_and_cicd\\'.'."}
 {"task_id":"PRIV01","stage_id":"security_privacy_and_access_control","stage_name":"X. Security, Privacy & Access Control","section_id":"data_privacy_and_anonymization","section_name":"Data Privacy & Anonymization","section_description":"Prompts for handling sensitive data, performing anonymization, and ensuring compliance with privacy regulations.","prompt_text":"Before processing the attached document 'employee_census.csv', run a PII scan and generate a data masking plan. The plan should identify columns containing names, addresses, and social security numbers, and specify a masking technique for each (e.g., 'hash', 'redact', 'substitute_with_placeholder').","expected_response_format":"A JSON object representing the data masking plan."}
 {"task_id":"PRIV02","stage_id":"security_privacy_and_access_control","stage_name":"X. Security, Privacy & Access Control","section_id":"data_privacy_and_anonymization","section_name":"Data Privacy & Anonymization","section_description":"Prompts for handling sensitive data, performing anonymization, and ensuring compliance with privacy regulations.","prompt_text":"Generate a differential privacy query. Apply a Laplace mechanism with a specified privacy budget (epsilon) of 1.0 to a query that calculates the average salary from the 'employee_census.csv' file. Generate the Python code to execute this differentially private query.","expected_response_format":"A Python script using a differential privacy library (e.g., Google's diff-privlib, OpenDP) to perform the noisy query."}
 {"task_id":"AUD01","stage_id":"security_privacy_and_access_control","stage_name":"X. Security, Privacy & Access Control","section_id":"security_auditing_and_logging","section_name":"Security Auditing & Logging","section_description":"Prompts for logging security-sensitive events and generating reports for compliance and forensic analysis.","prompt_text":"A request to access a sensitive document was denied. Create a high-priority security event log entry. The log must be in JSON format and include a timestamp, the requesting user's ID, the target resource ('doc_merger_prospectus.pdf'), the result ('ACCESS_DENIED'), and the ID of the RBAC policy that blocked the request.","expected_response_format":"A single JSON object representing the structured security event log."}
 {"task_id":"AUD02","stage_id":"security_privacy_and_access_control","stage_name":"X. Security, Privacy & Access Control","section_id":"security_auditing_and_logging","section_name":"Security Auditing & Logging","section_description":"Prompts for logging security-sensitive events and generating reports for compliance and forensic analysis.","prompt_text":"Generate a security report for the last 7 days. The report should summarize: 1) The number of failed login attempts by user. 2) A list of all access requests to resources tagged as 'highly_sensitive'. 3) All actions performed by users with the 'Administrator' role. The output should be a formatted Markdown file.","expected_response_format":"A structured Markdown report containing the requested security audit summary."}
 `;
 
-    document.addEventListener('DOMContentLoaded', () => {
-        const prompts = jsonlData.trim().split('\n').map(line => JSON.parse(line));
+    let geminiApiKey = "";
+    let promptsData = [];
 
-        const groupedData = prompts.reduce((acc, prompt) => {
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- INITIALIZATION ---
+        promptsData = jsonlData.trim().split('\n').map((line, index) => ({...JSON.parse(line), uniqueId: `prompt-${index}`}));
+        const groupedData = groupData(promptsData);
+        buildLibrary(groupedData);
+        addEventListeners();
+    });
+
+    /**
+     * Groups the flat list of prompts into a nested object by stage and section.
+     */
+    function groupData(prompts) {
+        return prompts.reduce((acc, prompt) => {
             const { stage_name, section_name } = prompt;
-            if (!acc[stage_name]) {
-                acc[stage_name] = {};
-            }
-            if (!acc[stage_name][section_name]) {
-                acc[stage_name][section_name] = [];
-            }
+            if (!acc[stage_name]) acc[stage_name] = {};
+            if (!acc[stage_name][section_name]) acc[stage_name][section_name] = [];
             acc[stage_name][section_name].push(prompt);
             return acc;
         }, {});
+    }
 
+    /**
+     * Builds the entire HTML structure for the library from the grouped data.
+     */
+    function buildLibrary(groupedData) {
         const libraryContainer = document.getElementById('library-container');
         const navLinks = document.getElementById('nav-links');
+        libraryContainer.innerHTML = '';
+        navLinks.innerHTML = '';
 
         for (const stageName in groupedData) {
             const stageId = stageName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
             
-            // Create nav link
             const li = document.createElement('li');
-            const a = document.createElement('a');
-            a.href = `#${stageId}`;
-            a.textContent = stageName;
-            li.appendChild(a);
+            li.innerHTML = `<a href="#${stageId}" class="nav-link block text-slate-600 font-medium hover:text-blue-600 hover:bg-slate-100 rounded-md p-2 transition-colors duration-200">${stageName}</a>`;
             navLinks.appendChild(li);
 
-            // Create stage container
             const stageDiv = document.createElement('div');
-            stageDiv.className = 'stage';
+            stageDiv.className = 'stage mb-12';
             stageDiv.id = stageId;
-            stageDiv.innerHTML = `<h2 class="stage-title">${stageName}</h2>`;
+            stageDiv.innerHTML = `<h2 class="stage-title text-3xl font-bold text-slate-800 border-b-2 border-blue-500 pb-3 mb-8">${stageName}</h2>`;
 
             for (const sectionName in groupedData[stageName]) {
                 const sectionDiv = document.createElement('div');
-                sectionDiv.className = 'section';
+                sectionDiv.className = 'section mb-8';
                 
                 const sectionTitle = document.createElement('h3');
-                sectionTitle.className = 'section-title';
+                sectionTitle.className = 'section-title text-2xl font-semibold text-slate-700 cursor-pointer mb-4 flex items-center';
                 sectionTitle.textContent = sectionName;
                 sectionDiv.appendChild(sectionTitle);
 
                 const sectionContent = document.createElement('div');
-                sectionContent.className = 'section-content';
+                sectionContent.className = 'section-content hidden pl-5';
                 
                 const sectionDescription = document.createElement('p');
-                sectionDescription.className = 'section-description';
+                sectionDescription.className = 'section-description text-slate-500 italic border-l-4 border-slate-200 pl-4 mb-6';
                 sectionDescription.textContent = groupedData[stageName][sectionName][0].section_description;
                 sectionContent.appendChild(sectionDescription);
                 
                 groupedData[stageName][sectionName].forEach(prompt => {
                     const card = document.createElement('div');
-                    card.className = 'prompt-card';
+                    card.className = 'prompt-card bg-white border border-slate-200 rounded-xl p-6 mb-5 shadow-sm hover:shadow-lg transition-shadow duration-300';
+                    card.dataset.promptId = prompt.uniqueId;
                     card.innerHTML = `
-                        <h4>Task: ${prompt.task_id}</h4>
-                        <div class="prompt-text">
-                            ${prompt.prompt_text}
-                            <button class="copy-btn" title="Copy to Clipboard">📋</button>
+                        <div class="flex justify-between items-start mb-4">
+                            <h4 class="font-mono text-sm font-medium text-red-600 bg-red-100 rounded px-2 py-1 inline-block">Task: ${prompt.task_id}</h4>
+                            <button class="generate-btn flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 transition-colors duration-200 text-sm font-semibold" title="Generate an example with Gemini">
+                                ✨ Generate Example
+                            </button>
                         </div>
-                        <div class="response-format">
-                            <strong>Expected Response:</strong> ${prompt.expected_response_format}
+                        <div class="relative mb-4">
+                            <p class="prompt-text-content text-slate-700 leading-relaxed pr-12">${prompt.prompt_text}</p>
+                            <button class="copy-btn absolute top-0 right-0 p-2 rounded-full bg-slate-100 text-slate-500 hover:bg-blue-100 hover:text-blue-600 transition-colors duration-200" title="Copy to Clipboard">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            </button>
                         </div>
+                        <div class="response-format font-mono text-sm bg-slate-100 text-slate-600 p-4 rounded-lg">
+                            <strong class="font-medium text-slate-700">Expected Response:</strong> ${prompt.expected_response_format}
+                        </div>
+                        <div class="generated-response-container mt-4 hidden"></div>
                     `;
                     sectionContent.appendChild(card);
                 });
@@ -357,58 +299,189 @@
             }
             libraryContainer.appendChild(stageDiv);
         }
+    }
 
-        // Add event listeners
-        addEventListeners();
-    });
-    
+    /**
+     * Adds all necessary event listeners.
+     */
     function addEventListeners() {
-        // Search bar
-        const searchBar = document.getElementById('search-bar');
-        searchBar.addEventListener('keyup', (e) => {
-            const searchTerm = e.target.value.toLowerCase();
-            document.querySelectorAll('.prompt-card').forEach(card => {
-                const cardText = card.textContent.toLowerCase();
-                if (cardText.includes(searchTerm)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
+        document.getElementById('search-bar').addEventListener('keyup', handleSearch);
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+        });
+        document.getElementById('save-api-key').addEventListener('click', saveApiKey);
+        document.getElementById('cancel-api-key').addEventListener('click', closeApiKeyModal);
+
+        // Use event delegation for dynamically created buttons
+        document.getElementById('library-container').addEventListener('click', function(e) {
+            if (e.target.closest('.copy-btn')) {
+                handleCopyClick(e);
+            }
+            if (e.target.closest('.generate-btn')) {
+                handleGenerateClick(e);
+            }
+            if (e.target.closest('.section-title')) {
+                const title = e.target.closest('.section-title');
+                title.classList.toggle('open');
+                title.nextElementSibling.classList.toggle('hidden');
+            }
         });
 
-        // Copy button
-        document.querySelectorAll('.copy-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const promptText = e.target.parentElement.innerText.trim();
-                navigator.clipboard.writeText(promptText).then(() => {
-                    e.target.textContent = '✅ Copied!';
-                    setTimeout(() => { e.target.textContent = '📋'; }, 2000);
-                });
-            });
-        });
-        
-        // Collapsible sections
-        document.querySelectorAll('.section-title').forEach(title => {
-            title.addEventListener('click', () => {
-                title.classList.toggle('open');
-                title.nextElementSibling.classList.toggle('open');
-            });
-        });
-        
-        // Sidebar navigation
-        document.querySelectorAll('#sidebar a').forEach(anchor => {
+        document.querySelectorAll('#sidebar .nav-link').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                document.querySelectorAll('#sidebar a').forEach(el => el.classList.remove('active'));
-                this.classList.add('active');
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
+                document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+                if (window.innerWidth < 768) {
+                    document.getElementById('sidebar').classList.add('-translate-x-full');
+                }
             });
         });
     }
 
+    // --- API KEY MODAL ---
+    function showApiKeyModal() { document.getElementById('api-key-modal').classList.remove('hidden'); }
+    function closeApiKeyModal() { document.getElementById('api-key-modal').classList.add('hidden'); }
+    function saveApiKey() {
+        const key = document.getElementById('api-key-input').value;
+        if (key) {
+            geminiApiKey = key;
+            closeApiKeyModal();
+        } else {
+            alert("Please enter a valid API key.");
+        }
+    }
+
+    // --- EVENT HANDLERS ---
+    function handleSearch(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        document.querySelectorAll('.stage').forEach(stage => {
+            let stageHasVisibleContent = false;
+            stage.querySelectorAll('.section').forEach(section => {
+                let sectionHasVisibleContent = false;
+                section.querySelectorAll('.prompt-card').forEach(card => {
+                    const cardText = card.textContent.toLowerCase();
+                    const isVisible = cardText.includes(searchTerm);
+                    card.style.display = isVisible ? 'block' : 'none';
+                    if (isVisible) {
+                        sectionHasVisibleContent = true;
+                        stageHasVisibleContent = true;
+                    }
+                });
+                const sectionTitle = section.querySelector('.section-title');
+                const sectionContent = section.querySelector('.section-content');
+                sectionTitle.style.display = sectionHasVisibleContent ? 'flex' : 'none';
+                if (searchTerm && sectionHasVisibleContent) {
+                    sectionContent.classList.remove('hidden');
+                    sectionTitle.classList.add('open');
+                } else if (!searchTerm) {
+                     sectionContent.classList.add('hidden');
+                     sectionTitle.classList.remove('open');
+                }
+            });
+            stage.style.display = stageHasVisibleContent ? 'block' : 'none';
+        });
+    }
+
+    function handleCopyClick(e) {
+        const btn = e.currentTarget;
+        const promptText = btn.parentElement.querySelector('.prompt-text-content').textContent.trim();
+        const textarea = document.createElement('textarea');
+        textarea.value = promptText;
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            btn.innerHTML = `<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+            setTimeout(() => {
+                btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>`;
+            }, 2000);
+        } catch (err) {
+            console.error('Copy failed', err);
+        }
+        document.body.removeChild(textarea);
+    }
+    
+    async function handleGenerateClick(e) {
+        if (!geminiApiKey) {
+            showApiKeyModal();
+            return;
+        }
+
+        const btn = e.currentTarget;
+        const card = btn.closest('.prompt-card');
+        const promptId = card.dataset.promptId;
+        const prompt = promptsData.find(p => p.uniqueId === promptId);
+        const responseContainer = card.querySelector('.generated-response-container');
+
+        responseContainer.classList.remove('hidden');
+        responseContainer.innerHTML = '<div class="flex items-center justify-center p-4"><div class="loader"></div></div>';
+
+        try {
+            const result = await callGemini(prompt.prompt_text, prompt.expected_response_format);
+            responseContainer.innerHTML = `
+                <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                    <h5 class="font-bold text-blue-800 mb-2">✨ Generated Example</h5>
+                    <pre class="font-mono text-sm text-blue-900 whitespace-pre-wrap">${result}</pre>
+                </div>
+            `;
+        } catch (error) {
+            console.error("Gemini API call failed:", error);
+            responseContainer.innerHTML = `
+                <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg">
+                    <h5 class="font-bold text-red-800 mb-2">Error</h5>
+                    <p class="text-sm text-red-900">${error.message}</p>
+                </div>
+            `;
+        }
+    }
+
+    // --- GEMINI API CALL ---
+    async function callGemini(promptText, responseFormat) {
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`;
+        
+        const fullPrompt = `You are a helpful assistant. Your task is to generate a realistic, high-quality example response for a given prompt.
+        
+        **The Prompt to Respond To:**
+        "${promptText}"
+        
+        **Instructions:**
+        - Generate a response that directly and accurately answers the prompt.
+        - The response MUST strictly adhere to the following format: "${responseFormat}".
+        - Do not add any extra commentary, explanations, or markdown formatting unless the format explicitly requires it. Just provide the raw response.
+        `;
+
+        const payload = {
+            contents: [{
+                role: "user",
+                parts: [{ text: fullPrompt }]
+            }]
+        };
+
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.json();
+            throw new Error(`API Error: ${response.status} - ${errorBody.error?.message || 'Unknown error'}`);
+        }
+
+        const result = await response.json();
+        
+        if (result.candidates && result.candidates.length > 0 &&
+            result.candidates[0].content && result.candidates[0].content.parts &&
+            result.candidates[0].content.parts.length > 0) {
+            return result.candidates[0].content.parts[0].text.trim();
+        } else {
+            // Handle cases where the response structure is unexpected or content is missing
+            console.warn("Unexpected API response structure:", result);
+            return "Could not generate a valid response from the API.";
+        }
+    }
 </script>
 </body>
 </html>
