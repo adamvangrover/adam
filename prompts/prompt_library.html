@@ -16,6 +16,7 @@
         .font-mono {
             font-family: 'Roboto Mono', monospace;
         }
+        /* Style for the arrow in collapsible sections */
         .section-title::before {
             content: '▶';
             margin-right: 10px;
@@ -26,6 +27,7 @@
         .section-title.open::before {
             transform: rotate(90deg);
         }
+        /* Custom scrollbar for aesthetics */
         #sidebar::-webkit-scrollbar {
             width: 8px;
         }
@@ -39,36 +41,17 @@
         #sidebar::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
-        .loader {
-            width: 24px;
-            height: 24px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #3498db;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        .use-case-btn {
+            transition: all 0.2s ease-in-out;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .use-case-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
 
-<!-- API Key Modal -->
-<div id="api-key-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-    <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
-        <h2 class="text-2xl font-bold mb-4">Enter Gemini API Key</h2>
-        <p class="text-slate-600 mb-6">To generate examples, please provide your Google AI Studio API key. This key will only be stored for your current session.</p>
-        <input type="password" id="api-key-input" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition mb-4" placeholder="Enter your API key...">
-        <div class="flex justify-end space-x-4">
-            <button id="cancel-api-key" class="px-6 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition">Cancel</button>
-            <button id="save-api-key" class="px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition">Save Key</button>
-        </div>
-    </div>
-</div>
-
-<!-- Mobile Header -->
 <header class="md:hidden sticky top-0 bg-white/80 backdrop-blur-lg border-b border-slate-200 z-30">
     <div class="flex items-center justify-between p-4">
         <h1 class="text-xl font-bold text-slate-800">🤖 Prompt Library</h1>
@@ -78,25 +61,26 @@
     </div>
 </header>
 
-<!-- Sidebar -->
-<div id="sidebar" class="w-80 bg-white border-r border-slate-200 h-screen p-5 fixed top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-40">
+<div id="sidebar" class="w-80 bg-white border-r border-slate-200 h-screen p-5 fixed top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-40 overflow-y-auto">
     <div class="flex items-center mb-6">
         <h2 class="text-2xl font-bold text-slate-800">🤖 Prompt Library</h2>
     </div>
-    <input type="text" id="search-bar" placeholder="Search prompts..." class="w-full px-4 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition mb-4">
+    <input type="text" id="search-bar" placeholder="Search prompts..." class="w-full px-4 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition mb-1">
+    <p class="text-xs text-slate-500 mt-1 mb-3 px-1">Search by ID (e.g., EP01), keyword, or use the navigator for suggestions.</p>
     <nav>
         <ul id="nav-links" class="space-y-1"></ul>
     </nav>
 </div>
 
-<!-- Main Content -->
 <div id="main-content" class="md:ml-80 p-4 sm:p-6 md:p-10 w-full">
+    <div id="use-case-navigator" class="mb-12"></div>
     <div id="library-container"></div>
 </div>
 
 <script>
     // --- DATA ---
-    const jsonlData = `
+    // Embedded JSONL data for the prompt library
+    let jsonlData = `
 {"task_id":"EP01","stage_id":"foundational_scoping","stage_name":"I. Foundational & Scoping Prompts","section_id":"entity_profile","section_name":"Entity Profile","section_description":"This object gathers fundamental identification and contextual data. The purpose of the analysis is paramount, as it dictates the focus and depth required. An analysis for a new bond issuance will concentrate on the company's forward-looking capacity to service the proposed debt, whereas an annual surveillance review will focus on performance relative to previous expectations and covenants.","prompt_text":"Provide the full legal name of the entity being analyzed, its primary ticker symbol (if public), headquarters location, and the ultimate parent entity.","expected_response_format":"JSON object with keys: 'legal_name', 'ticker', 'hq_location', 'ultimate_parent'."}
 {"task_id":"EP02","stage_id":"foundational_scoping","stage_name":"I. Foundational & Scoping Prompts","section_id":"entity_profile","section_name":"Entity Profile","section_description":"This object gathers fundamental identification and contextual data. The purpose of the analysis is paramount, as it dictates the focus and depth required. An analysis for a new bond issuance will concentrate on the company's forward-looking capacity to service the proposed debt, whereas an annual surveillance review will focus on performance relative to previous expectations and covenants.","prompt_text":"Clearly state the purpose and scope of this credit analysis. Is it for a new debt issuance, an annual surveillance, a management assessment, or another purpose?","expected_response_format":"Narrative statement defining the specific goal and boundaries of the analysis."}
 {"task_id":"AF01","stage_id":"foundational_scoping","stage_name":"I. Foundational & Scoping Prompts","section_id":"analytical_framework_setup","section_name":"Analytical Framework Setup","section_description":"This object establishes the methodological 'rules of engagement.' Credit analysis adheres to structured frameworks published by rating agencies like S&P, Moody's, and Fitch. This selection governs the entire analytical process, from financial adjustments to risk factor weighting.","prompt_text":"Select the primary credit rating agency methodology to be used for this analysis (e.g., S&P Global Ratings, Moody's, Fitch Ratings). Justify the selection.","expected_response_format":"String value (e.g., 'S&P Global Ratings') with a brief narrative justification."}
@@ -207,20 +191,65 @@
 {"task_id":"AUD01","stage_id":"security_privacy_and_access_control","stage_name":"X. Security, Privacy & Access Control","section_id":"security_auditing_and_logging","section_name":"Security Auditing & Logging","section_description":"Prompts for logging security-sensitive events and generating reports for compliance and forensic analysis.","prompt_text":"A request to access a sensitive document was denied. Create a high-priority security event log entry. The log must be in JSON format and include a timestamp, the requesting user's ID, the target resource ('doc_merger_prospectus.pdf'), the result ('ACCESS_DENIED'), and the ID of the RBAC policy that blocked the request.","expected_response_format":"A single JSON object representing the structured security event log."}
 {"task_id":"AUD02","stage_id":"security_privacy_and_access_control","stage_name":"X. Security, Privacy & Access Control","section_id":"security_auditing_and_logging","section_name":"Security Auditing & Logging","section_description":"Prompts for logging security-sensitive events and generating reports for compliance and forensic analysis.","prompt_text":"Generate a security report for the last 7 days. The report should summarize: 1) The number of failed login attempts by user. 2) A list of all access requests to resources tagged as 'highly_sensitive'. 3) All actions performed by users with the 'Administrator' role. The output should be a formatted Markdown file.","expected_response_format":"A structured Markdown report containing the requested security audit summary."}
 `;
+    // --- NEW PROMPTS ---
+    const newPrompts = `
+{"task_id":"CTX01","stage_id":"personalization_context","stage_name":"XI. Personalization & Context","section_id":"user_modeling","section_name":"User Profile & Modeling","section_description":"These prompts focus on building and adapting to a dynamic model of the user to provide a more tailored and effective interaction.","prompt_text":"Based on the conversation history, infer the user's expertise level (e.g., 'Novice', 'Expert', 'Developer') and primary goal. Store this as a 'user_profile' JSON object.","expected_response_format":"A JSON object with keys like 'expertise_level', 'inferred_goal', and 'confidence_score'."}
+{"task_id":"CTX02","stage_id":"personalization_context","stage_name":"XI. Personalization & Context","section_id":"user_modeling","section_name":"User Profile & Modeling","section_description":"These prompts focus on building and adapting to a dynamic model of the user to provide a more tailored and effective interaction.","prompt_text":"Update the 'user_profile' object. The user has just used a highly technical term ('stochastic modeling'). Increase the 'expertise_level' to 'Expert' and update the confidence score.","expected_response_format":"The updated 'user_profile' JSON object."}
+{"task_id":"MEM01","stage_id":"personalization_context","stage_name":"XI. Personalization & Context","section_id":"contextual_memory","section_name":"Contextual Memory","section_description":"Prompts that enable the AI to remember and reference specific information from earlier in the conversation or session.","prompt_text":"The user previously mentioned their target company is 'Global Auto Corp'. Reference this information in your response without being explicitly asked. For example: 'For a company like Global Auto Corp, the...'","expected_response_format":"A narrative response that naturally incorporates the previously mentioned entity."}
+{"task_id":"MEM02","stage_id":"personalization_context","stage_name":"XI. Personalization & Context","section_id":"contextual_memory","section_name":"Contextual Memory","section_description":"Prompts that enable the AI to remember and reference specific information from earlier in the conversation or session.","prompt_text":"Summarize the key decisions made in this session so far. List the chosen rating agency methodology (AF01) and the selected peer group (PA01).","expected_response_format":"A concise summary list of key data points established earlier in the session."}
+{"task_id":"ADP01","stage_id":"personalization_context","stage_name":"XI. Personalization & Context","section_id":"dynamic_adaptation","section_name":"Dynamic Adaptation","section_description":"Prompts that modify the AI's behavior, verbosity, or output format in real-time based on user interaction and inferred preferences.","prompt_text":"The user's last three queries were related to Python code generation. Infer a preference for 'coding_and_automation'. For the next ambiguous request, prioritize generating a code-based solution.","expected_response_format":"Confirmation of preference detection and adaptation strategy, e.g., 'User preference for code detected. Will prioritize script generation.'"}
+{"task_id":"ADP02","stage_id":"personalization_context","stage_name":"XI. Personalization & Context","section_id":"dynamic_adaptation","section_name":"Dynamic Adaptation","section_description":"Prompts that modify the AI's behavior, verbosity, or output format in real-time based on user interaction and inferred preferences.","prompt_text":"The user has corrected your last response for being too technical. Adapt your communication style to be less formal and use an analogy to explain the concept of 'data drift'.","expected_response_format":"A simplified, analogy-based explanation of the specified concept."}
+`;
+    jsonlData += newPrompts; // Append new prompts to the main data
 
-    let geminiApiKey = "";
-    let promptsData = [];
+    // --- USE CASE DATA ---
+    const useCaseMappings = {
+        "start_here": {
+            name: "🚀 Start a New Analysis",
+            description: "Begin a standard credit analysis from scratch.",
+            query: "EP01 OR EP02 OR AF01"
+        },
+        "build_agent": {
+            name: "🤖 Build an AI Agent",
+            description: "Prompts for creating and managing agentic workflows.",
+            query: "AGENT01 OR MCP01 OR A2A01"
+        },
+        "dev_automation": {
+            name: "DevOps & Automation ⚙️",
+            description: "Generate code, configurations, and CLI commands.",
+            query: "CODE01 OR CLI02 OR DEP01 OR ORC01"
+        },
+        "data_science": {
+            name: "📊 Data Science & Modeling",
+            description: "Prompts for advanced modeling and data analysis.",
+            query: "SIM01 OR DT01 OR XAI01 OR MON02"
+        },
+        "risk_assessment": {
+            name: "⚠️ Assess Financial Risk",
+            description: "Focus on financial health and stress testing.",
+            query: "HFA01 OR CFA03 OR FFS03 OR FFL01"
+        },
+        "reporting": {
+            name: "📄 Generate Reports",
+            description: "Create dynamic reports, summaries, and presentations.",
+            query: "CRG01 OR DYN02 OR DYN03 OR XAI03"
+        }
+    };
+
 
     document.addEventListener('DOMContentLoaded', () => {
         // --- INITIALIZATION ---
-        promptsData = jsonlData.trim().split('\n').map((line, index) => ({...JSON.parse(line), uniqueId: `prompt-${index}`}));
-        const groupedData = groupData(promptsData);
+        const prompts = jsonlData.trim().split('\n').map(line => JSON.parse(line));
+        const groupedData = groupData(prompts);
+        buildUseCaseNavigator();
         buildLibrary(groupedData);
         addEventListeners();
     });
 
     /**
      * Groups the flat list of prompts into a nested object by stage and section.
+     * @param {Array<Object>} prompts - The flat array of prompt objects.
+     * @returns {Object} A nested object representing the grouped data.
      */
     function groupData(prompts) {
         return prompts.reduce((acc, prompt) => {
@@ -233,36 +262,68 @@
     }
 
     /**
+     * Builds the interactive use case navigator.
+     */
+    function buildUseCaseNavigator() {
+        const navigatorContainer = document.getElementById('use-case-navigator');
+        let html = `<h2 class="text-2xl font-bold text-slate-700 mb-2">Find the Right Prompt</h2><p class="text-slate-500 mb-6">Not sure where to start? Select a common use case to see relevant prompts.</p><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`;
+
+        for (const key in useCaseMappings) {
+            const useCase = useCaseMappings[key];
+            html += `
+                <button class="use-case-btn text-left p-5 bg-white border border-slate-200 rounded-lg hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none" data-query="${useCase.query}">
+                    <h3 class="font-semibold text-slate-800">${useCase.name}</h3>
+                    <p class="text-sm text-slate-500 mt-1">${useCase.description}</p>
+                </button>
+            `;
+        }
+
+        html += `</div>`;
+        navigatorContainer.innerHTML = html;
+    }
+
+
+    /**
      * Builds the entire HTML structure for the library from the grouped data.
+     * @param {Object} groupedData - The grouped prompt data.
      */
     function buildLibrary(groupedData) {
         const libraryContainer = document.getElementById('library-container');
         const navLinks = document.getElementById('nav-links');
         libraryContainer.innerHTML = '';
         navLinks.innerHTML = '';
+        let isFirstSection = true; // Flag to keep the first section open by default
 
         for (const stageName in groupedData) {
             const stageId = stageName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
             
+            // Create sidebar navigation link
             const li = document.createElement('li');
             li.innerHTML = `<a href="#${stageId}" class="nav-link block text-slate-600 font-medium hover:text-blue-600 hover:bg-slate-100 rounded-md p-2 transition-colors duration-200">${stageName}</a>`;
             navLinks.appendChild(li);
 
+            // Create stage container in the main content
             const stageDiv = document.createElement('div');
             stageDiv.className = 'stage mb-12';
             stageDiv.id = stageId;
             stageDiv.innerHTML = `<h2 class="stage-title text-3xl font-bold text-slate-800 border-b-2 border-blue-500 pb-3 mb-8">${stageName}</h2>`;
 
             for (const sectionName in groupedData[stageName]) {
+                const sectionId = sectionName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                const contentId = `content-${stageId}-${sectionId}`;
+                
                 const sectionDiv = document.createElement('div');
                 sectionDiv.className = 'section mb-8';
                 
                 const sectionTitle = document.createElement('h3');
                 sectionTitle.className = 'section-title text-2xl font-semibold text-slate-700 cursor-pointer mb-4 flex items-center';
                 sectionTitle.textContent = sectionName;
+                sectionTitle.setAttribute('aria-expanded', 'false');
+                sectionTitle.setAttribute('aria-controls', contentId);
                 sectionDiv.appendChild(sectionTitle);
 
                 const sectionContent = document.createElement('div');
+                sectionContent.id = contentId;
                 sectionContent.className = 'section-content hidden pl-5';
                 
                 const sectionDescription = document.createElement('p');
@@ -273,27 +334,29 @@
                 groupedData[stageName][sectionName].forEach(prompt => {
                     const card = document.createElement('div');
                     card.className = 'prompt-card bg-white border border-slate-200 rounded-xl p-6 mb-5 shadow-sm hover:shadow-lg transition-shadow duration-300';
-                    card.dataset.promptId = prompt.uniqueId;
                     card.innerHTML = `
-                        <div class="flex justify-between items-start mb-4">
-                            <h4 class="font-mono text-sm font-medium text-red-600 bg-red-100 rounded px-2 py-1 inline-block">Task: ${prompt.task_id}</h4>
-                            <button class="generate-btn flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 transition-colors duration-200 text-sm font-semibold" title="Generate an example with Gemini">
-                                ✨ Generate Example
-                            </button>
-                        </div>
-                        <div class="relative mb-4">
+                        <h4 class="font-mono text-sm font-medium text-red-600 bg-red-100 rounded px-2 py-1 inline-block mb-4">Task: ${prompt.task_id}</h4>
+                        <div class="relative">
                             <p class="prompt-text-content text-slate-700 leading-relaxed pr-12">${prompt.prompt_text}</p>
                             <button class="copy-btn absolute top-0 right-0 p-2 rounded-full bg-slate-100 text-slate-500 hover:bg-blue-100 hover:text-blue-600 transition-colors duration-200" title="Copy to Clipboard">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                             </button>
                         </div>
-                        <div class="response-format font-mono text-sm bg-slate-100 text-slate-600 p-4 rounded-lg">
+                        <div class="response-format font-mono text-sm bg-slate-100 text-slate-600 p-4 rounded-lg mt-4">
                             <strong class="font-medium text-slate-700">Expected Response:</strong> ${prompt.expected_response_format}
                         </div>
-                        <div class="generated-response-container mt-4 hidden"></div>
                     `;
                     sectionContent.appendChild(card);
                 });
+
+                // Make the first section open by default
+                if (isFirstSection) {
+                    sectionTitle.classList.add('open');
+                    sectionTitle.setAttribute('aria-expanded', 'true');
+                    sectionContent.classList.remove('hidden');
+                    isFirstSection = false;
+                }
+
                 sectionDiv.appendChild(sectionContent);
                 stageDiv.appendChild(sectionDiv);
             }
@@ -302,91 +365,162 @@
     }
 
     /**
-     * Adds all necessary event listeners.
+     * Adds all necessary event listeners to the page elements.
      */
     function addEventListeners() {
-        document.getElementById('search-bar').addEventListener('keyup', handleSearch);
-        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
-            document.getElementById('sidebar').classList.toggle('-translate-x-full');
-        });
-        document.getElementById('save-api-key').addEventListener('click', saveApiKey);
-        document.getElementById('cancel-api-key').addEventListener('click', closeApiKeyModal);
+        const searchBar = document.getElementById('search-bar');
+        
+        // Search bar functionality
+        searchBar.addEventListener('keyup', handleSearch);
 
-        // Use event delegation for dynamically created buttons
-        document.getElementById('library-container').addEventListener('click', function(e) {
-            if (e.target.closest('.copy-btn')) {
-                handleCopyClick(e);
-            }
-            if (e.target.closest('.generate-btn')) {
-                handleGenerateClick(e);
-            }
-            if (e.target.closest('.section-title')) {
-                const title = e.target.closest('.section-title');
+        // Use Case Navigator buttons
+        document.querySelectorAll('.use-case-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const query = e.currentTarget.dataset.query;
+                searchBar.value = query;
+                // Trigger the search
+                searchBar.dispatchEvent(new Event('keyup'));
+                // Scroll to the library container
+                document.getElementById('library-container').scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // Copy button functionality
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', handleCopyClick);
+        });
+        
+        // Collapsible sections with ARIA
+        document.querySelectorAll('.section-title').forEach(title => {
+            title.addEventListener('click', () => {
                 title.classList.toggle('open');
-                title.nextElementSibling.classList.toggle('hidden');
-            }
+                const content = document.getElementById(title.getAttribute('aria-controls'));
+                content.classList.toggle('hidden');
+                
+                const isExpanded = title.getAttribute('aria-expanded') === 'true';
+                title.setAttribute('aria-expanded', !isExpanded);
+            });
         });
-
+        
+        // Sidebar navigation links
         document.querySelectorAll('#sidebar .nav-link').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+                // Close sidebar on mobile after clicking a link
                 if (window.innerWidth < 768) {
                     document.getElementById('sidebar').classList.add('-translate-x-full');
                 }
             });
         });
+
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+        });
     }
 
-    // --- API KEY MODAL ---
-    function showApiKeyModal() { document.getElementById('api-key-modal').classList.remove('hidden'); }
-    function closeApiKeyModal() { document.getElementById('api-key-modal').classList.add('hidden'); }
-    function saveApiKey() {
-        const key = document.getElementById('api-key-input').value;
-        if (key) {
-            geminiApiKey = key;
-            closeApiKeyModal();
-        } else {
-            alert("Please enter a valid API key.");
-        }
-    }
-
-    // --- EVENT HANDLERS ---
+    /**
+     * Handles the search input event to filter prompts, sections, and navigation.
+     * Supports OR logic for queries like "ID1 OR ID2".
+     * @param {Event} e - The keyup event object.
+     */
     function handleSearch(e) {
-        const searchTerm = e.target.value.toLowerCase();
+        const rawSearchTerm = e.target.value.toLowerCase().trim();
+        const navLinksList = document.getElementById('nav-links');
+
+        // If search is cleared, reset to the default view
+        if (rawSearchTerm === '') {
+            document.getElementById('use-case-navigator').style.display = 'block';
+            document.querySelectorAll('.stage').forEach(stage => stage.style.display = 'block');
+            document.querySelectorAll('.section').forEach((section, index) => {
+                section.style.display = 'block';
+                const title = section.querySelector('.section-title');
+                const content = section.querySelector('.section-content');
+                
+                // Reset to default collapsed state, except for the very first one
+                if (index === 0) {
+                    title.classList.add('open');
+                    content.classList.remove('hidden');
+                    title.setAttribute('aria-expanded', 'true');
+                } else {
+                    title.classList.remove('open');
+                    content.classList.add('hidden');
+                    title.setAttribute('aria-expanded', 'false');
+                }
+                section.querySelectorAll('.prompt-card').forEach(card => card.style.display = 'block');
+            });
+            navLinksList.querySelectorAll('li').forEach(li => li.style.display = 'block');
+            return;
+        }
+        
+        // Hide use-case navigator during active search
+        document.getElementById('use-case-navigator').style.display = 'none';
+
+        // Split search term by " or " to handle multiple queries
+        const searchTerms = rawSearchTerm.split(' or ').map(term => term.trim()).filter(term => term.length > 0);
+        const visibleStageIds = new Set();
+
+        // Filter main content
         document.querySelectorAll('.stage').forEach(stage => {
             let stageHasVisibleContent = false;
             stage.querySelectorAll('.section').forEach(section => {
                 let sectionHasVisibleContent = false;
                 section.querySelectorAll('.prompt-card').forEach(card => {
                     const cardText = card.textContent.toLowerCase();
-                    const isVisible = cardText.includes(searchTerm);
-                    card.style.display = isVisible ? 'block' : 'none';
-                    if (isVisible) {
+                    // Check if card text includes ANY of the search terms
+                    const isMatch = searchTerms.some(term => cardText.includes(term));
+                    
+                    if (isMatch) {
+                        card.style.display = 'block';
                         sectionHasVisibleContent = true;
-                        stageHasVisibleContent = true;
+                    } else {
+                        card.style.display = 'none';
                     }
                 });
-                const sectionTitle = section.querySelector('.section-title');
-                const sectionContent = section.querySelector('.section-content');
-                sectionTitle.style.display = sectionHasVisibleContent ? 'flex' : 'none';
-                if (searchTerm && sectionHasVisibleContent) {
-                    sectionContent.classList.remove('hidden');
-                    sectionTitle.classList.add('open');
-                } else if (!searchTerm) {
-                     sectionContent.classList.add('hidden');
-                     sectionTitle.classList.remove('open');
+
+                const title = section.querySelector('.section-title');
+                const content = section.querySelector('.section-content');
+                if (sectionHasVisibleContent) {
+                    section.style.display = 'block';
+                    title.classList.add('open');
+                    content.classList.remove('hidden');
+                    title.setAttribute('aria-expanded', 'true');
+                    stageHasVisibleContent = true;
+                } else {
+                    section.style.display = 'none';
                 }
             });
-            stage.style.display = stageHasVisibleContent ? 'block' : 'none';
+
+            if (stageHasVisibleContent) {
+                stage.style.display = 'block';
+                visibleStageIds.add(stage.id);
+            } else {
+                stage.style.display = 'none';
+            }
+        });
+
+        // Filter sidebar links
+        navLinksList.querySelectorAll('.nav-link').forEach(link => {
+            const hrefId = link.getAttribute('href').substring(1);
+            link.parentElement.style.display = visibleStageIds.has(hrefId) ? 'block' : 'none';
         });
     }
 
+    /**
+     * Handles the click event for the copy button.
+     * @param {Event} e - The click event object.
+     */
     function handleCopyClick(e) {
         const btn = e.currentTarget;
-        const promptText = btn.parentElement.querySelector('.prompt-text-content').textContent.trim();
+        const promptText = btn.closest('.relative').querySelector('.prompt-text-content').textContent.trim();
+        
         const textarea = document.createElement('textarea');
         textarea.value = promptText;
+        textarea.style.position = 'absolute';
+        textarea.style.left = '-9999px';
         document.body.appendChild(textarea);
         textarea.select();
         try {
@@ -396,91 +530,9 @@
                 btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>`;
             }, 2000);
         } catch (err) {
-            console.error('Copy failed', err);
+            console.error('Fallback: Oops, unable to copy', err);
         }
         document.body.removeChild(textarea);
-    }
-    
-    async function handleGenerateClick(e) {
-        if (!geminiApiKey) {
-            showApiKeyModal();
-            return;
-        }
-
-        const btn = e.currentTarget;
-        const card = btn.closest('.prompt-card');
-        const promptId = card.dataset.promptId;
-        const prompt = promptsData.find(p => p.uniqueId === promptId);
-        const responseContainer = card.querySelector('.generated-response-container');
-
-        responseContainer.classList.remove('hidden');
-        responseContainer.innerHTML = '<div class="flex items-center justify-center p-4"><div class="loader"></div></div>';
-
-        try {
-            const result = await callGemini(prompt.prompt_text, prompt.expected_response_format);
-            responseContainer.innerHTML = `
-                <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
-                    <h5 class="font-bold text-blue-800 mb-2">✨ Generated Example</h5>
-                    <pre class="font-mono text-sm text-blue-900 whitespace-pre-wrap">${result}</pre>
-                </div>
-            `;
-        } catch (error) {
-            console.error("Gemini API call failed:", error);
-            responseContainer.innerHTML = `
-                <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg">
-                    <h5 class="font-bold text-red-800 mb-2">Error</h5>
-                    <p class="text-sm text-red-900">${error.message}</p>
-                </div>
-            `;
-        }
-    }
-
-    // --- GEMINI API CALL ---
-    async function callGemini(promptText, responseFormat) {
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`;
-        
-        const fullPrompt = `You are a helpful assistant. Your task is to generate a realistic, high-quality example response for a given prompt.
-        
-        **The Prompt to Respond To:**
-        "${promptText}"
-        
-        **Instructions:**
-        - Generate a response that directly and accurately answers the prompt.
-        - The response MUST strictly adhere to the following format: "${responseFormat}".
-        - Do not add any extra commentary, explanations, or markdown formatting unless the format explicitly requires it. Just provide the raw response.
-        `;
-
-        const payload = {
-            contents: [{
-                role: "user",
-                parts: [{ text: fullPrompt }]
-            }]
-        };
-
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-            const errorBody = await response.json();
-            throw new Error(`API Error: ${response.status} - ${errorBody.error?.message || 'Unknown error'}`);
-        }
-
-        const result = await response.json();
-        
-        if (result.candidates && result.candidates.length > 0 &&
-            result.candidates[0].content && result.candidates[0].content.parts &&
-            result.candidates[0].content.parts.length > 0) {
-            return result.candidates[0].content.parts[0].text.trim();
-        } else {
-            // Handle cases where the response structure is unexpected or content is missing
-            console.warn("Unexpected API response structure:", result);
-            return "Could not generate a valid response from the API.";
-        }
     }
 </script>
 </body>
