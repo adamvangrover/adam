@@ -1,6 +1,6 @@
 ````
 ````markdown
-# A Comprehensive JSON Prompt Library for Corporate Credit Risk Analysis
+### A Comprehensive JSON Prompt Library for Corporate Credit Risk Analysis
 
 ---
 
