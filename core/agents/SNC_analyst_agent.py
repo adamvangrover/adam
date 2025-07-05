@@ -461,10 +461,30 @@ if __name__ == '__main__':
             return None
         
     class MockKernel:
-        def __init__(self): self.skills = MockSKSkillsCollection()
+        def __init__(self):
+            self.skills = MockSKSkillsCollection()
+
+        def create_new_context(self):
+            # Return a simple dictionary for the mock context variables
+            # This mirrors SKContext's variable dictionary behavior for the mock.
+            return {}
+
         async def run_async(self, sk_function, input_vars=None, **kwargs): 
-            if sk_function: return await sk_function.invoke(variables=input_vars)
+            # input_vars here is the context object (a dict in this mock setup)
+            if sk_function:
+                # The MockSKFunction's invoke method expects the context variables directly
+                return await sk_function.invoke(variables=input_vars)
             return "Mock kernel run_async failed: No function"
+
+        async def run(self, *args, **kwargs): # Diagnostic: Add run method
+            # Delegate to run_async or handle as appropriate for the mock
+            # This is to catch if something is unexpectedly calling 'run'
+            logging.warning("MockKernel.run() was called unexpectedly. Delegating to run_async if possible.")
+            if args and hasattr(args[0], 'invoke'): # Assuming first arg is sk_function
+                input_vars = kwargs.get('input_vars', args[1] if len(args) > 1 else None)
+                return await self.run_async(args[0], input_vars=input_vars)
+            return "Mock kernel run() called with unexpected arguments."
+
 
     async def run_tests():
         # Logging is now configured globally for the script run.
