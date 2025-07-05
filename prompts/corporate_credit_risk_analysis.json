@@ -1,0 +1,402 @@
+{
+  "prompt_metadata": {
+    "prompt_id": "Corporate_Credit_Risk_Analysis_Prompts_v1",
+    "prompt_version": "1.0",
+    "creation_date": "2024-03-15",
+    "description": "A comprehensive library of prompts for corporate credit risk analysis, underwriting, review, and monitoring.",
+    "author": "Jules - AI Software Engineer"
+  },
+  "report_specifications": {
+    "report_title_template": "Corporate Credit Risk Analysis: [Subject Area]",
+    "target_audience": "Credit Analysts, Risk Managers, Portfolio Managers, Underwriters, Investment Committees",
+    "output_format_general": "Markdown with structured sections, adaptable to JSON or specific reporting formats.",
+    "tone_and_style": "Formal, analytical, objective, data-driven, concise yet comprehensive."
+  },
+  "core_analysis_areas": [
+    {
+      "prompt_id": "company_overview_prompt",
+      "prompt_title": "Company Overview and Business Profile",
+      "description": "Generates a concise overview of the company, its business model, operational scale, products/services, and market position.",
+      "instructions": "Provide a comprehensive overview of [Company Name]. Focus on its core business activities, revenue model, key products/services, geographic footprint, and scale of operations. Identify its primary customers and suppliers. Briefly touch upon its history and organizational structure if relevant.",
+      "key_considerations": [
+        "Business description: What does the company do?",
+        "Main products and services offered.",
+        "Revenue generation model(s).",
+        "Scale of operations (e.g., revenue, assets, employees).",
+        "Geographic presence and diversification.",
+        "Key customers and suppliers.",
+        "Brief history and ownership structure (public, private, subsidiary of X)."
+      ],
+      "output_format_suggestion": "Narrative text with bullet points for key facts."
+    },
+    {
+      "prompt_id": "industry_analysis_competitive_landscape_prompt",
+      "prompt_title": "Industry Analysis and Competitive Landscape",
+      "description": "Analyzes the industry the company operates in, including its structure, trends, regulatory environment, and competitive dynamics.",
+      "instructions": "Analyze the industry for [Company Name]. Describe the industry structure, key economic drivers, growth prospects, cyclicality, and any significant regulatory or technological factors. Identify key competitors and [Company Name]'s competitive advantages and disadvantages.",
+      "key_considerations": [
+        "Industry definition and segmentation.",
+        "Market size, growth rates, and key trends (e.g., consolidation, technological disruption).",
+        "Porter's Five Forces analysis (or similar framework) for the industry.",
+        "Key success factors in the industry.",
+        "Regulatory landscape and potential impacts.",
+        "Principal risk factors inherent to the industry.",
+        "Major competitors and their market shares.",
+        "[Company Name]'s market position (leader, niche player, etc.).",
+        "Sources of competitive advantage (e.g., brand, cost, technology, network effects).",
+        "Barriers to entry."
+      ],
+      "output_format_suggestion": "Structured report with sub-sections for industry overview and competitive analysis."
+    },
+    {
+      "prompt_id": "financial_statement_analysis_prompt",
+      "prompt_title": "Financial Statement Analysis",
+      "description": "Conducts a detailed analysis of the company's financial statements, including key ratios, trends, and cash flow generation.",
+      "instructions": "Perform a comprehensive financial statement analysis for [Company Name] using its [Income Statement, Balance Sheet, Cash Flow Statement] for the past [Number] years and latest interim period. Calculate and analyze key financial ratios covering profitability, leverage, liquidity, coverage, and efficiency. Identify trends and compare to industry benchmarks if available. Focus on the quality of earnings and cash flow generation.",
+      "key_considerations": [
+        "**Profitability:** Gross Margin, EBITDA Margin, Net Margin, Return on Equity (ROE), Return on Assets (ROA), Return on Invested Capital (ROIC). Trends and drivers.",
+        "**Leverage:** Debt-to-Equity, Debt-to-Capital, Total Debt / Total Capitalization, Debt-to-EBITDA, Net Debt-to-EBITDA, Financial Leverage Ratio. Capital structure adequacy.",
+        "**Liquidity:** Current Ratio, Quick Ratio (Acid Test), Cash Ratio. Working capital management (DSO, DIO, DPO, Cash Conversion Cycle). Adequacy of liquidity sources.",
+        "**Coverage:** Interest Coverage (EBITDA/Interest), Fixed Charge Coverage Ratio, Debt Service Coverage Ratio. Ability to meet obligations.",
+        "**Efficiency:** Asset Turnover, Inventory Turnover, Receivables Turnover. Operational efficiency.",
+        "**Cash Flow Analysis:** Analysis of Operating Cash Flow (OCF), Investing Cash Flow (ICF), and Financing Cash Flow (FCF). Free Cash Flow (FCF) generation (pre- and post-dividend). OCF to Debt, FCF to Debt. Quality of cash flows.",
+        "Trend analysis for all key metrics over the specified period.",
+        "Peer group ratio comparison (if data provided or accessible).",
+        "Accounting policies and quality of earnings assessment (e.g., revenue recognition, expense capitalization)."
+      ],
+      "output_format_suggestion": "Tables for financial data and ratios, with narrative explanations for trends and analysis for each category."
+    },
+    {
+      "prompt_id": "performance_evaluation_prompt",
+      "prompt_title": "Historical and Projected Performance Evaluation",
+      "description": "Evaluates the company's past financial and operational performance and assesses the credibility of its future projections.",
+      "instructions": "Evaluate the historical performance of [Company Name] over the past [Number] years. Analyze revenue growth, profitability trends, and key operational metrics. If projections are available, assess their reasonableness based on historical performance, industry outlook, and strategic initiatives. Identify key drivers for future performance and potential risks to achieving targets.",
+      "key_considerations": [
+        "Historical revenue CAGR and drivers.",
+        "Trends in profitability margins (Gross, EBITDA, Net).",
+        "Key Performance Indicators (KPIs) relevant to the industry and company.",
+        "Comparison of actual performance against past guidance or internal budgets (if known).",
+        "Analysis of management's projections: assumptions, consistency with strategy, achievability.",
+        "Base case, upside, and downside scenarios for future performance (if developing projections).",
+        "Impact of capital expenditures on future growth and FCF.",
+        "Resilience and volatility of historical earnings and cash flows."
+      ],
+      "output_format_suggestion": "Combination of charts, tables, and narrative analysis."
+    },
+    {
+      "prompt_id": "probability_of_default_rating_prompt",
+      "prompt_title": "Probability of Default (PD) Assessment",
+      "description": "Assesses the likelihood of the company defaulting on its financial obligations, potentially referencing a PD model or scoring system.",
+      "instructions": "Assess the Probability of Default for [Company Name]. Consider key quantitative factors (e.g., leverage, profitability, liquidity from financial analysis) and qualitative factors (e.g., industry risk, competitive position, management quality). If using a specific PD model or scorecard (e.g., from `data/credit_rating_decision_tree_v3.json`), clearly state the model inputs and how they map to the company's profile. Conclude with an estimated PD range or category and the rationale.",
+      "key_considerations": [
+        "Key financial ratios influencing PD (e.g., Z-score components, leverage metrics).",
+        "Qualitative factors: industry risk, business cyclicality, competitive strength, management competence, corporate governance.",
+        "Impact of macroeconomic environment.",
+        "Company-specific factors (e.g., upcoming debt maturities, legal issues, M&A activity).",
+        "Reference to any internal or external PD models/scorecards used: inputs, weighting, output.",
+        "Sensitivity of PD to key assumptions or changes in financial performance.",
+        "Resulting PD estimate (e.g., as a percentage, or mapped to a rating category like 'Low,' 'Medium,' 'High').",
+        "Justification for the PD assessment."
+      ],
+      "output_format_suggestion": "Structured rationale leading to a PD conclusion, potentially with a scorecard summary if a model is used."
+    },
+    {
+      "prompt_id": "snc_regulatory_rating_prompt",
+      "prompt_title": "Shared National Credit (SNC) Regulatory Rating Analysis",
+      "description": "Analyzes factors relevant to assigning a Shared National Credit (SNC) regulatory rating, considering regulatory definitions and expectations.",
+      "instructions": "For [Company Name]'s credit facilities subject to SNC review, provide an analysis to support an indicative SNC regulatory rating (e.g., Pass, Special Mention, Substandard, Doubtful, Loss). Focus on factors typically emphasized by regulators, such as cash flow adequacy for debt service, financial condition and performance, leverage, quality of management, and industry trends. Reference specific regulatory guidance if applicable (e.g., OCC Handbook).",
+      "key_considerations": [
+        "Primary source of repayment and its reliability.",
+        "Secondary and tertiary sources of repayment (collateral, guarantees).",
+        "Borrower's financial condition: leverage, liquidity, profitability, cash flow.",
+        "Ability to service all debt obligations (interest and principal) on a timely basis from operational cash flow.",
+        "Realistic repayment prospects.",
+        "Quality of financial reporting and information.",
+        "Trends in financial performance and key credit metrics.",
+        "Industry conditions and outlook.",
+        "Management's ability to navigate challenges and execute its business plan.",
+        "Collateral coverage and quality (if a secured facility).",
+        "Any identified weaknesses that could jeopardize repayment as agreed.",
+        "Mapping of company's profile to SNC rating definitions (Pass, SM, Substandard, etc.)."
+      ],
+      "output_format_suggestion": "Report format aligning with typical regulatory review sections, focusing on repayment capacity and identified weaknesses."
+    },
+    {
+      "prompt_id": "credit_outlook_assessment_prompt",
+      "prompt_title": "Credit Outlook Assessment",
+      "description": "Determines the credit outlook (e.g., Stable, Positive, Negative, Developing) for the company based on expected trends over the next 12-24 months.",
+      "instructions": "Assess the credit outlook for [Company Name] over the next [12-24 months]. Consider expected trends in its financial performance, business profile, industry conditions, and macroeconomic environment. Justify whether the outlook is Stable, Positive, Negative, or Developing.",
+      "key_considerations": [
+        "Expected changes in financial metrics (e.g., improving/deteriorating leverage, profitability).",
+        "Anticipated business developments (e.g., new products, market expansion, M&A).",
+        "Industry trends and their likely impact on the company.",
+        "Macroeconomic forecasts and their relevance.",
+        "Potential for specific events (e.g., refinancing, major capital projects, regulatory changes).",
+        "Rationale for Stable: expectations of continuity in credit quality.",
+        "Rationale for Positive: factors that could lead to credit quality improvement.",
+        "Rationale for Negative: factors that could lead to credit quality deterioration.",
+        "Rationale for Developing: contingent events or uncertainties with mixed potential outcomes."
+      ],
+      "output_format_suggestion": "Clear statement of outlook with supporting arguments for the chosen outlook."
+    },
+    {
+      "prompt_id": "rating_triggers_prompt",
+      "prompt_title": "Rating Triggers (Upgrade/Downgrade Scenarios)",
+      "description": "Identifies specific factors, events, or metric thresholds that could lead to a credit rating upgrade or downgrade.",
+      "instructions": "Define potential rating triggers for [Company Name]. Specify quantitative and/or qualitative factors that, if they materialize, would likely lead to a rating upgrade. Similarly, specify factors that would likely lead to a rating downgrade. Be as specific as possible with thresholds for financial metrics.",
+      "key_considerations": [
+        "**Upgrade Triggers:**",
+        "  Sustained improvement in key credit metrics beyond specific thresholds (e.g., Debt/EBITDA below X.X times, FCF/Debt above Y%).",
+        "  Successful execution of key strategic initiatives improving business risk profile.",
+        "  Significant positive changes in industry or competitive landscape benefiting the company.",
+        "  Strengthened market position or diversification.",
+        "**Downgrade Triggers:**",
+        "  Deterioration in key credit metrics beyond specific thresholds (e.g., Debt/EBITDA above A.A times, sustained negative FCF).",
+        "  Loss of major customers or contracts.",
+        "  Adverse regulatory changes or legal outcomes.",
+        "  Weakening competitive position or market share erosion.",
+        "  Failed execution of strategy or operational missteps.",
+        "  Significant increase in debt without commensurate earnings growth.",
+        "  Sustained negative industry trends."
+      ],
+      "output_format_suggestion": "Bulleted lists for upgrade and downgrade triggers, with quantifiable metrics where possible."
+    },
+    {
+      "prompt_id": "strengths_weaknesses_summary_prompt",
+      "prompt_title": "Credit Strengths and Weaknesses Summary",
+      "description": "Provides a balanced summary of the company's key credit strengths and weaknesses.",
+      "instructions": "Summarize the key credit strengths and weaknesses for [Company Name]. This should be a balanced overview drawing from the business risk, financial risk, and industry analyses. Focus on factors most pertinent to its ability to service debt.",
+      "key_considerations": [
+        "**Strengths:**",
+        "  Strong market position / brand recognition.",
+        "  Diversified revenue streams / customer base.",
+        "  Conservative financial policy / low leverage.",
+        "  Strong profitability / cash flow generation.",
+        "  Experienced management team / good corporate governance.",
+        "  Favorable industry dynamics / high barriers to entry.",
+        "  Technological advantages / innovation.",
+        "**Weaknesses:**",
+        "  High leverage / aggressive financial policy.",
+        "  Weak profitability / volatile cash flows.",
+        "  Concentration risk (customer, product, geography).",
+        "  Challenging industry conditions / intense competition.",
+        "  Operational issues / execution risks.",
+        "  Corporate governance concerns.",
+        "  Exposure to specific macroeconomic or regulatory risks."
+      ],
+      "output_format_suggestion": "Two distinct lists: one for strengths and one for weaknesses, with brief explanations for each point."
+    },
+    {
+      "prompt_id": "covenant_analysis_prompt",
+      "prompt_title": "Covenant Analysis",
+      "description": "Analyzes the key financial and operational covenants in the company's debt agreements, assessing compliance and headroom.",
+      "instructions": "Analyze the key financial and operational covenants for [Company Name] based on its existing [Loan Agreements/Bond Indentures]. Identify the main covenants, calculate current compliance levels and headroom, and assess the likelihood of a breach under various scenarios. Discuss the implications of a potential breach.",
+      "key_considerations": [
+        "Identification of key financial covenants (e.g., minimum interest coverage, maximum leverage ratio, minimum net worth).",
+        "Identification of key affirmative and negative covenants (e.g., limitations on debt, asset sales, dividends).",
+        "Current calculation of each financial covenant and comparison to required levels.",
+        "Headroom/cushion available for each covenant.",
+        "Historical compliance with covenants.",
+        "Sensitivity of covenant compliance to changes in EBITDA, revenue, or other key metrics.",
+        "Potential for covenant breaches under stress scenarios.",
+        "Consequences of a covenant breach (e.g., default, repricing, waivers).",
+        "Any 'equity cure' provisions."
+      ],
+      "output_format_suggestion": "Table summarizing covenants, required levels, actual levels, and headroom, followed by narrative analysis."
+    },
+    {
+      "prompt_id": "management_assessment_prompt",
+      "prompt_title": "Management and Governance Assessment",
+      "description": "Evaluates the quality, experience, and track record of the company's management team and its corporate governance practices.",
+      "instructions": "Assess the management team and corporate governance of [Company Name]. Consider the experience and track record of key executives, the effectiveness of the company's strategy, its risk management practices, and the overall corporate governance framework. Identify any related strengths or weaknesses.",
+      "key_considerations": [
+        "Management team's experience, tenure, and past performance.",
+        "Clarity and credibility of corporate strategy.",
+        "Track record of strategy execution and achieving targets.",
+        "Financial policy and risk appetite.",
+        "Succession planning (if information available).",
+        "Corporate governance structure: board independence, committees, shareholder rights.",
+        "Transparency and quality of financial reporting.",
+        "History of any regulatory issues or ethical concerns.",
+        "Alignment of management incentives with long-term creditworthiness."
+      ],
+      "output_format_suggestion": "Narrative assessment covering management quality, strategic execution, and governance practices."
+    },
+    {
+      "prompt_id": "parent_subsidiary_linkage_prompt",
+      "prompt_title": "Parent/Subsidiary Linkage and Group Support Assessment",
+      "description": "Analyzes the relationship between the company and its parent/subsidiaries, including any guarantees, support mechanisms, or contagion risks.",
+      "instructions": "If [Company Name] is part of a larger group, analyze the linkages between it and its parent company and/or key subsidiaries. Assess the strategic importance of [Company Name] to the group. Identify any explicit support (e.g., guarantees) or implicit support. Also, consider potential contagion risks from weaker group entities.",
+      "key_considerations": [
+        "Ownership structure and percentage held by parent.",
+        "Strategic importance of the entity to the parent/group.",
+        "Nature of legal ties (guarantees, cross-defaults, keepwells).",
+        "Operational and financial integration with the group.",
+        "Track record of group support to its entities.",
+        "Potential for 'ring-fencing' or insulation from group issues.",
+        "Credit quality of the parent and other significant group entities.",
+        "Flow of funds (dividends, loans) between the entity and the group.",
+        "Contagion risk: likelihood that problems elsewhere in the group could negatively impact the entity."
+      ],
+      "output_format_suggestion": "Focused analysis on group structure, support mechanisms, and potential risks arising from linkages."
+    },
+    {
+      "prompt_id": "country_macroeconomic_risk_prompt",
+      "prompt_title": "Country and Macroeconomic Risk Assessment",
+      "description": "Evaluates the impact of country-specific and broader macroeconomic risks on the company's credit profile.",
+      "instructions": "Assess the country risks and macroeconomic risks relevant to [Company Name], considering its main countries of operation and sales. Analyze factors such as political stability, regulatory environment, currency risk, inflation, interest rates, and economic growth prospects in these key geographies. How do these factors impact the company's creditworthiness?",
+      "key_considerations": [
+        "Primary countries of operation, revenue generation, and asset location.",
+        "Sovereign rating and country risk score for key geographies.",
+        "Political stability and institutional strength.",
+        "Regulatory environment: predictability, transparency, risk of adverse changes.",
+        "Economic environment: GDP growth, inflation, interest rates, unemployment.",
+        "Currency risk: exposure to foreign exchange fluctuations and convertibility/transfer risks.",
+        "Legal framework and enforceability of contracts.",
+        "Specific macroeconomic factors that directly impact the company's industry and performance (e.g., commodity prices for a mining company).",
+        "Company's strategies to mitigate these risks."
+      ],
+      "output_format_suggestion": "Analysis segmented by key countries or risk factors, culminating in an overall assessment of their impact."
+    },
+    {
+      "prompt_id": "esg_credit_factors_prompt",
+      "prompt_title": "ESG (Environmental, Social, Governance) Credit Factors Analysis",
+      "description": "Identifies and analyzes key Environmental, Social, and Governance (ESG) factors that are material to the company's credit risk profile.",
+      "instructions": "Analyze the material Environmental, Social, and Governance (ESG) factors affecting the creditworthiness of [Company Name]. For each category (E, S, G), identify specific risks and opportunities relevant to the company and its industry. Assess how these factors are currently managed and their potential impact on financial performance and reputation.",
+      "key_considerations": [
+        "**Environmental:**",
+        "  Carbon footprint / GHG emissions.",
+        "  Exposure to climate change physical risks (e.g., extreme weather).",
+        "  Transition risks (e.g., policy changes, technological shifts towards low-carbon).",
+        "  Natural resource management (water, waste).",
+        "  Pollution and environmental liabilities.",
+        "**Social:**",
+        "  Labor practices and employee relations.",
+        "  Health and safety standards.",
+        "  Product safety and social impact of products/services.",
+        "  Community relations and social license to operate.",
+        "  Data privacy and security.",
+        "  Human capital development.",
+        "**Governance:** (Overlap with Management Assessment but with an ESG lens)",
+        "  Board oversight of ESG issues.",
+        "  Executive compensation linked to ESG targets.",
+        "  Shareholder rights and engagement on ESG.",
+        "  Ethical conduct and anti-corruption practices.",
+        "  Transparency and reporting on ESG performance.",
+        "Materiality of each factor to the specific company and industry.",
+        "Company's policies, targets, and performance regarding these ESG factors.",
+        "Potential financial impact (e.g., fines, litigation, reputational damage, access to capital, operational costs)."
+      ],
+      "output_format_suggestion": "Structured analysis with E, S, and G sections, highlighting material risks and mitigants."
+    },
+    {
+      "prompt_id": "underwriting_memo_structure_prompt",
+      "prompt_title": "Comprehensive Credit Underwriting Memo Structure",
+      "description": "Provides a template/outline for a comprehensive credit underwriting memo for a new transaction or facility.",
+      "instructions": "Generate a structured outline for a comprehensive credit underwriting memo for [Company Name] regarding a [Proposed Transaction/Facility - e.g., new term loan, revolving credit facility]. The memo should cover all critical aspects required for a credit decision. You can reference other prompts in this library for detailed content within sections.",
+      "key_considerations": [
+        "**1. Transaction Summary:** Borrower, Facility Type, Amount, Purpose, Tenor, Pricing, Key Terms.",
+        "**2. Recommendation:** Clear statement of approve/decline and proposed rating/risk assessment.",
+        "**3. Company Overview:** (Ref: `company_overview_prompt`)",
+        "**4. Industry Analysis & Competitive Landscape:** (Ref: `industry_analysis_competitive_landscape_prompt`)",
+        "**5. Management & Strategy Assessment:** (Ref: `management_assessment_prompt`)",
+        "**6. Financial Analysis:** (Ref: `financial_statement_analysis_prompt`)",
+        "   - Historical Performance & Key Ratios",
+        "   - Projected Performance & Assumptions (Ref: `performance_evaluation_prompt`)",
+        "   - Cash Flow Analysis & Debt Service Capacity",
+        "   - Sensitivity Analysis / Stress Testing",
+        "**7. Strengths & Weaknesses:** (Ref: `strengths_weaknesses_summary_prompt`)",
+        "**8. Risk Factors & Mitigants:** Specific to the company and transaction.",
+        "**9. Loan Structure & Security (if applicable):** Collateral, Guarantees, Covenants (Ref: `covenant_analysis_prompt`).",
+        "**10. Probability of Default / Risk Rating Rationale:** (Ref: `probability_of_default_rating_prompt`)",
+        "**11. Regulatory Considerations (e.g., SNC):** (Ref: `snc_regulatory_rating_prompt`)",
+        "**12. ESG Factors:** (Ref: `esg_credit_factors_prompt`)",
+        "**13. Parent/Subsidiary Linkages (if applicable):** (Ref: `parent_subsidiary_linkage_prompt`)",
+        "**14. Conclusion & Conditions Precedent/Subsequent.**",
+        "**Appendices:** Financials, Org Chart, etc."
+      ],
+      "output_format_suggestion": "A detailed, hierarchical outline (Markdown headers) representing a standard credit memo structure."
+    },
+    {
+      "prompt_id": "annual_review_monitoring_update_prompt",
+      "prompt_title": "Annual Review / Monitoring Update Structure",
+      "description": "Provides a template/outline for an annual credit review or periodic monitoring update.",
+      "instructions": "Generate a structured outline for an annual credit review (or periodic monitoring update) for [Company Name]. The update should focus on performance since the last review, compliance with terms, and any changes to the credit profile. You can reference other prompts in this library for detailed content within sections.",
+      "key_considerations": [
+        "**1. Executive Summary:** Current Rating/Outlook, Key Developments since last review, Recommendation (e.g., maintain rating, watchlist).",
+        "**2. Performance Update:**",
+        "   - Review of Financial Performance vs. Budget/Projections (Ref: `financial_statement_analysis_prompt`, `performance_evaluation_prompt`).",
+        "   - Discussion on variances and management actions.",
+        "   - Key Operational Developments.",
+        "**3. Covenant Compliance & Loan Terms:** (Ref: `covenant_analysis_prompt`)",
+        "**4. Updated Industry & Competitive Environment:** (Ref: `industry_analysis_competitive_landscape_prompt`) - focus on changes.",
+        "**5. Management & Strategy Updates:** (Ref: `management_assessment_prompt`) - any significant changes.",
+        "**6. Reassessment of Key Risks:** Have risks materialized, changed, or new ones emerged?",
+        "**7. Updated Financial Projections (if material change or part of annual process).**",
+        "**8. Reaffirmation or Revision of Risk Rating/PD:** (Ref: `probability_of_default_rating_prompt`)",
+        "**9. SNC Regulatory Rating Check (if applicable):** (Ref: `snc_regulatory_rating_prompt`)",
+        "**10. ESG Factor Update:** (Ref: `esg_credit_factors_prompt`) - any new developments.",
+        "**11. Outlook:** (Ref: `credit_outlook_assessment_prompt`)",
+        "**12. Action Plan / Next Steps.**"
+      ],
+      "output_format_suggestion": "A detailed, hierarchical outline for a review memo, emphasizing updates and changes."
+    },
+    {
+      "prompt_id": "due_diligence_checklist_credit_prompt",
+      "prompt_title": "Credit Due Diligence Checklist Items",
+      "description": "Generates a list of key items and questions for conducting credit due diligence on a company.",
+      "instructions": "Provide a comprehensive checklist of items and questions to consider when conducting credit-focused due diligence on [Company Name] for a [Potential Transaction type, e.g., loan, investment]. Categorize items for clarity (e.g., Business, Financial, Legal, Management).",
+      "key_considerations": [
+        "**Business Due Diligence:**",
+        "  - Understand business model, products, services, competitive advantages.",
+        "  - Market analysis, industry trends, customer concentration, supplier relationships.",
+        "  - Operational review: facilities, technology, supply chain.",
+        "  - ESG considerations specific to operations.",
+        "**Financial Due Diligence:**",
+        "  - Review historical audited and interim financials (quality of earnings, working capital, debt capacity).",
+        "  - Analyze financial projections and underlying assumptions.",
+        "  - Scrutinize debt structure, terms, covenants, and security.",
+        "  - Tax status and compliance.",
+        "  - Off-balance sheet items and contingent liabilities.",
+        "**Legal & Regulatory Due Diligence:**",
+        "  - Corporate structure, licenses, permits.",
+        "  - Material contracts (customer, supplier, debt).",
+        "  - Litigation, disputes, and regulatory compliance history.",
+        "  - Change of control provisions.",
+        "  - Intellectual property rights.",
+        "**Management & Governance Due Diligence:**",
+        "  - Background checks and track record of key management.",
+        "  - Management team's strategic vision and execution capabilities.",
+        "  - Organizational structure and internal controls.",
+        "  - Board composition and effectiveness.",
+        "  - Related party transactions.",
+        "**Collateral Due Diligence (if secured):**",
+        "  - Appraisals, valuations, perfection of liens."
+      ],
+      "output_format_suggestion": "Categorized checklist with specific questions or information requests for each item."
+    }
+  ],
+  "data_requirements_general": [
+    "Audited historical financial statements (Income Statement, Balance Sheet, Cash Flow Statement) for the past 3-5 years (or relevant period).",
+    "Interim financial statements for the latest period.",
+    "Company investor presentations, annual reports, sustainability reports, and public disclosures.",
+    "Industry reports, peer data, and market research.",
+    "Details of existing and proposed debt instruments, including terms, conditions, and covenants.",
+    "Economic forecasts, country risk reports, and macroeconomic data relevant to the company's operations and geographies.",
+    "Management discussions, biographies, and strategic plans.",
+    "Third-party credit reports or assessments, if available.",
+    "Details of any parent company, subsidiaries, or affiliated entities, including guarantees and support mechanisms.",
+    "Specific transaction details for underwriting requests (e.g., loan purpose, amount, tenor)."
+  ],
+  "expert_guidance_notes_general": [
+    "Clearly define the scope and purpose of the analysis for each specific prompt used.",
+    "Always specify the company or companies under review and the relevant time periods.",
+    "When comparing against peers or industry benchmarks, ensure the comparators are relevant and clearly identified.",
+    "Distinguish between historical facts, current assessments, and forward-looking projections or opinions.",
+    "Ensure all financial ratios and metrics are clearly defined and consistently calculated. State assumptions made.",
+    "Provide clear rationale linking analysis to conclusions or recommendations.",
+    "Consider the context of the request: e.g., new underwriting, annual review, event-driven update, portfolio monitoring.",
+    "For complex analyses, consider breaking down the request into multiple focused prompts from this library.",
+    "When simulating regulatory ratings or specific methodologies, clearly state the framework being applied."
+  ]
+}
