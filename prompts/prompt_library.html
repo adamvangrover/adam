@@ -12,6 +12,7 @@
         /* Custom styles to complement Tailwind */
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* A slightly lighter gray */
         }
         .font-mono {
             font-family: 'Roboto Mono', monospace;
@@ -41,12 +42,29 @@
         #sidebar::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
-        .use-case-btn {
+        .use-case-btn, #go-online-btn {
             transition: all 0.2s ease-in-out;
         }
-        .use-case-btn:hover {
+        .use-case-btn:hover, #go-online-btn:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .loader {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3b82f6; /* Blue-500 */
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .generate-btn:disabled {
+            background-color: #e2e8f0;
+            color: #64748b;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -73,14 +91,25 @@
 </div>
 
 <div id="main-content" class="md:ml-80 p-4 sm:p-6 md:p-10 w-full">
+    <div class="p-6 bg-white rounded-xl shadow-sm border border-slate-200 mb-8">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+                <h2 class="text-xl font-bold text-slate-800">AI-Powered Examples</h2>
+                <p class="text-slate-500 mt-1">Click the button and enter your API key to enable live example generation with Gemini.</p>
+            </div>
+            <button id="go-online-btn" class="w-full sm:w-auto flex-shrink-0 px-6 py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                ⚡ Connect to AI for Examples
+            </button>
+        </div>
+    </div>
     <div id="use-case-navigator" class="mb-12"></div>
     <div id="library-container"></div>
 </div>
 
 <script>
     // --- DATA ---
-    // Embedded JSONL data for the prompt library
-    let jsonlData = `
+    // All prompt data is embedded here to ensure the page works offline.
+    const jsonlData = `
 {"task_id":"EP01","stage_id":"foundational_scoping","stage_name":"I. Foundational & Scoping Prompts","section_id":"entity_profile","section_name":"Entity Profile","section_description":"This object gathers fundamental identification and contextual data. The purpose of the analysis is paramount, as it dictates the focus and depth required. An analysis for a new bond issuance will concentrate on the company's forward-looking capacity to service the proposed debt, whereas an annual surveillance review will focus on performance relative to previous expectations and covenants.","prompt_text":"Provide the full legal name of the entity being analyzed, its primary ticker symbol (if public), headquarters location, and the ultimate parent entity.","expected_response_format":"JSON object with keys: 'legal_name', 'ticker', 'hq_location', 'ultimate_parent'."}
 {"task_id":"EP02","stage_id":"foundational_scoping","stage_name":"I. Foundational & Scoping Prompts","section_id":"entity_profile","section_name":"Entity Profile","section_description":"This object gathers fundamental identification and contextual data. The purpose of the analysis is paramount, as it dictates the focus and depth required. An analysis for a new bond issuance will concentrate on the company's forward-looking capacity to service the proposed debt, whereas an annual surveillance review will focus on performance relative to previous expectations and covenants.","prompt_text":"Clearly state the purpose and scope of this credit analysis. Is it for a new debt issuance, an annual surveillance, a management assessment, or another purpose?","expected_response_format":"Narrative statement defining the specific goal and boundaries of the analysis."}
 {"task_id":"AF01","stage_id":"foundational_scoping","stage_name":"I. Foundational & Scoping Prompts","section_id":"analytical_framework_setup","section_name":"Analytical Framework Setup","section_description":"This object establishes the methodological 'rules of engagement.' Credit analysis adheres to structured frameworks published by rating agencies like S&P, Moody's, and Fitch. This selection governs the entire analytical process, from financial adjustments to risk factor weighting.","prompt_text":"Select the primary credit rating agency methodology to be used for this analysis (e.g., S&P Global Ratings, Moody's, Fitch Ratings). Justify the selection.","expected_response_format":"String value (e.g., 'S&P Global Ratings') with a brief narrative justification."}
@@ -123,7 +152,7 @@
 {"task_id":"FFS03","stage_id":"financial_risk_profile","stage_name":"IV. Financial Risk Profile Assessment","section_id":"financial_forecasting_and_stress_testing","section_name":"Financial Forecasting and Stress Testing","section_description":"Credit ratings are inherently forward-looking opinions. This section moves from historical analysis to projecting future performance. A critical concept here is the development of a 'rating case' forecast. This is distinct from a company's often-optimistic 'management case.' The rating case incorporates more conservative assumptions about growth and profitability to assess debt service capacity 'through the cycle'.","prompt_text":"Analyze the trajectory of key credit metrics (leverage, coverage) under both the rating case and the downside stress test. How resilient is the company's financial profile?","expected_response_format":"Table comparing projected credit metrics under both scenarios, with a narrative discussing financial resilience."}
 {"task_id":"FFL01","stage_id":"financial_risk_profile","stage_name":"IV. Financial Risk Profile Assessment","section_id":"financial_flexibility_and_liquidity","section_name":"Financial Flexibility and Liquidity","section_description":"This assesses the company's ability to meet near-term obligations and manage unexpected cash shortfalls. It involves analyzing the debt maturity profile, available liquidity sources, and covenant headroom under credit facilities. A potential covenant breach is a significant credit event that can trigger defaults.","prompt_text":"Analyze the company's near-term liquidity position. Calculate sources (cash, FFO, available credit lines) versus uses (short-term debt, working capital needs, capex, dividends) over the next 12-24 months.","expected_response_format":"A sources and uses of liquidity table with a concluding statement on the adequacy of the liquidity position (e.g., Strong, Adequate, Weak)."}
 {"task_id":"FFL02","stage_id":"financial_risk_profile","stage_name":"IV. Financial Risk Profile Assessment","section_id":"financial_flexibility_and_liquidity","section_name":"Financial Flexibility and Liquidity","section_description":"This assesses the company's ability to meet near-term obligations and manage unexpected cash shortfalls. It involves analyzing the debt maturity profile, available liquidity sources, and covenant headroom under credit facilities. A potential covenant breach is a significant credit event that can trigger defaults.","prompt_text":"Provide a schedule of the company's debt maturities for the next 5 years and beyond. Are there any large, upcoming maturity towers that pose a refinancing risk?","expected_response_format":"A table of debt maturities by year, with a narrative assessment of refinancing risk."}
-{"task_id":"FFL03","stage_id":"financial_risk_profile","stage_name":"IV. Financial Risk Profile Assessment","section_id":"financial_flexibility_and_liquidity","section_name":"Financial Flexibility and Liquidity","description":"This assesses the company's ability to meet near-term obligations and manage unexpected cash shortfalls. It involves analyzing the debt maturity profile, available liquidity sources, and covenant headroom under credit facilities. A potential covenant breach is a significant credit event that can trigger defaults.","prompt_text":"Identify the key financial covenants in the company's main credit facilities. Calculate the current and projected covenant headroom under the rating case and stress case forecasts.","expected_response_format":"Table listing key covenants, their required levels, and the calculated headroom (in %) under both forecast scenarios."}
+{"task_id":"FFL03","stage_id":"financial_risk_profile","stage_name":"IV. Financial Risk Profile Assessment","section_id":"financial_flexibility_and_liquidity","section_name":"Financial Flexibility and Liquidity","section_description":"This assesses the company's ability to meet near-term obligations and manage unexpected cash shortfalls. It involves analyzing the debt maturity profile, available liquidity sources, and covenant headroom under credit facilities. A potential covenant breach is a significant credit event that can trigger defaults.","prompt_text":"Identify the key financial covenants in the company's main credit facilities. Calculate the current and projected covenant headroom under the rating case and stress case forecasts.","expected_response_format":"Table listing key covenants, their required levels, and the calculated headroom (in %) under both forecast scenarios."}
 {"task_id":"PA01","stage_id":"synthesis_rating_reporting","stage_name":"V. Synthesis, Rating, and Reporting","section_id":"peer_analysis","section_name":"Peer Analysis","section_description":"A company's credit metrics are only meaningful when placed in the context of its peers. This systematic comparison helps to normalize for industry-specific characteristics and highlights areas of relative strength or weakness.","prompt_text":"Identify a group of 3-5 publicly rated peer companies. Justify their selection based on business mix, scale, and geography.","expected_response_format":"List of peer companies with their credit ratings and a brief justification for their inclusion."}
 {"task_id":"PA02","stage_id":"synthesis_rating_reporting","stage_name":"V. Synthesis, Rating, and Reporting","section_id":"peer_analysis","section_name":"Peer Analysis","section_description":"A company's credit metrics are only meaningful when placed in the context of its peers. This systematic comparison helps to normalize for industry-specific characteristics and highlights areas of relative strength or weakness.","prompt_text":"Create a table comparing the subject company's business risk profile (market position, diversification, profitability) against the selected peers.","expected_response_format":"Table with qualitative comparisons (e.g., 'Stronger', 'In-line', 'Weaker') for key business risk factors across the peer group."}
 {"task_id":"PA03","stage_id":"synthesis_rating_reporting","stage_name":"V. Synthesis, Rating, and Reporting","section_id":"peer_analysis","section_name":"Peer Analysis","section_description":"A company's credit metrics are only meaningful when placed in the context of its peers. This systematic comparison helps to normalize for industry-specific characteristics and highlights areas of relative strength or weakness.","prompt_text":"Create a table comparing the subject company's key historical and projected financial metrics (leverage, coverage) against the selected peers.","expected_response_format":"Table with quantitative credit metrics for the subject company and its peers."}
@@ -137,7 +166,7 @@
 {"task_id":"RR02","stage_id":"synthesis_rating_reporting","stage_name":"V. Synthesis, Rating, and Reporting","section_id":"rating_recommendation","section_name":"Rating Recommendation","section_description":"This is the final, actionable output. It includes the recommended rating, a forward-looking outlook, and a concise rationale. The outlook (Stable, Positive, Negative) is a critical component, communicating the likely direction of the rating over the next 12-24 months and is based on the potential for identified risks or opportunities to materialize.","prompt_text":"Assign a rating outlook (e.g., Stable, Positive, Negative, Developing). Justify the outlook based on the potential for specific risks or opportunities to materialize over the next 12-24 months.","expected_response_format":"A rating outlook with a brief justification."}
 {"task_id":"RR03","stage_id":"synthesis_rating_reporting","stage_name":"V. Synthesis, Rating, and Reporting","section_id":"rating_recommendation","section_name":"Rating Recommendation","section_description":"This is the final, actionable output. It includes the recommended rating, a forward-looking outlook, and a concise rationale. The outlook (Stable, Positive, Negative) is a critical component, communicating the likely direction of the rating over the next 12-24 months and is based on the potential for identified risks or opportunities to materialize.","prompt_text":"Write a concise rating rationale (2-3 paragraphs) summarizing the key credit strengths and weaknesses that support the final rating and outlook.","expected_response_format":"A well-structured narrative summarizing the core credit story."}
 {"task_id":"CRG01","stage_id":"synthesis_rating_reporting","stage_name":"V. Synthesis, Rating, and Reporting","section_id":"credit_report_generation","section_name":"Credit Report Generation","section_description":"This final object provides prompts to assemble the full narrative report from the preceding analytical components, ensuring a professional and comprehensive final deliverable consistent with industry standards.","prompt_text":"Assemble an executive summary that includes the final rating recommendation, outlook, and a high-level overview of the business and financial risk profiles and key credit considerations.","expected_response_format":"A 1-page executive summary narrative."}
-{"task_id":"CRG02","stage_id":"synthesis_rating_reporting","stage_name":"V. Synthesis, Rating, and Reporting","section_id":"credit_report_generation","section_name":"Credit Report Generation","section_description":"This final object provides prompts to assemble the full narrative report from the preceding analytical components, ensuring a professional and comprehensive final deliverable consistent with industry standards.","prompt_text":"Compile the full, detailed credit report by sequencing the narrative outputs from all preceding analytical sections in a logical, professional format.","expected_response_format":"A single, comprehensive document containing the full analysis."}
+{"task_id":"CRG02","stage_id":"synthesis_rating_reporting","stage_name":"V. Synthesis, Rating, and Reporting","section_id":"credit_report_generation","section_name":"Credit Report Generation","section_description":"This final object provides prompts to assemble the full narrative report from the preceding analytical components, a professional and comprehensive final deliverable consistent with industry standards.","prompt_text":"Compile the full, detailed credit report by sequencing the narrative outputs from all preceding analytical sections in a logical, professional format.","expected_response_format":"A single, comprehensive document containing the full analysis."}
 {"task_id":"SYS01","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"system_behavior","section_name":"System Behavior","section_description":"Defines the LLM's core operational parameters, persona, and versioning for the task.","prompt_text":"Adopt the persona of a senior credit analyst with 15 years of experience at a major rating agency. All subsequent responses should be formal, data-driven, and reference established credit methodologies.","expected_response_format":"Confirmation of persona adoption, e.g., 'Persona adopted. Ready to proceed with analysis.'"}
 {"task_id":"SYS02","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"system_behavior","section_name":"System Behavior","section_description":"Defines the LLM's core operational parameters, persona, and versioning for the task.","prompt_text":"Set the master version for this entire analysis session to v1.0. All generated artifacts, data, and reports should be tagged with this version.","expected_response_format":"Confirmation of version initialization, e.g., 'Analysis session v1.0 initialized.'"}
 {"task_id":"SYS03","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"system_behavior","section_name":"System Behavior","section_description":"Defines the LLM's core operational parameters, persona, and versioning for the task.","prompt_text":"Generate a configuration file in YAML format for a new data processing job. The configuration should include 'source_bucket', 'destination_table', 'job_name', and a list of 'data_quality_checks' such as 'not_null' and 'unique_values'.","expected_response_format":"A code block containing a valid YAML configuration file."}
@@ -200,7 +229,8 @@
 {"task_id":"ADP01","stage_id":"personalization_context","stage_name":"XI. Personalization & Context","section_id":"dynamic_adaptation","section_name":"Dynamic Adaptation","section_description":"Prompts that modify the AI's behavior, verbosity, or output format in real-time based on user interaction and inferred preferences.","prompt_text":"The user's last three queries were related to Python code generation. Infer a preference for 'coding_and_automation'. For the next ambiguous request, prioritize generating a code-based solution.","expected_response_format":"Confirmation of preference detection and adaptation strategy, e.g., 'User preference for code detected. Will prioritize script generation.'"}
 {"task_id":"ADP02","stage_id":"personalization_context","stage_name":"XI. Personalization & Context","section_id":"dynamic_adaptation","section_name":"Dynamic Adaptation","section_description":"Prompts that modify the AI's behavior, verbosity, or output format in real-time based on user interaction and inferred preferences.","prompt_text":"The user has corrected your last response for being too technical. Adapt your communication style to be less formal and use an analogy to explain the concept of 'data drift'.","expected_response_format":"A simplified, analogy-based explanation of the specified concept."}
 `;
-    jsonlData += newPrompts; // Append new prompts to the main data
+    let promptsData = [];
+    let sessionApiKey = null;
 
     // --- USE CASE DATA ---
     const useCaseMappings = {
@@ -233,17 +263,32 @@
             name: "📄 Generate Reports",
             description: "Create dynamic reports, summaries, and presentations.",
             query: "CRG01 OR DYN02 OR DYN03 OR XAI03"
+        },
+        "personalize": {
+            name: "🧠 Personalize Interaction",
+            description: "Use context and memory to tailor the AI's behavior.",
+            query: "CTX01 OR MEM01 OR ADP02"
         }
     };
 
 
     document.addEventListener('DOMContentLoaded', () => {
         // --- INITIALIZATION ---
-        const prompts = jsonlData.trim().split('\n').map(line => JSON.parse(line));
-        const groupedData = groupData(prompts);
-        buildUseCaseNavigator();
-        buildLibrary(groupedData);
-        addEventListeners();
+        try {
+            const combinedData = jsonlData.trim() + '\n' + newPrompts.trim();
+            promptsData = combinedData
+                .split('\n')
+                .filter(line => line.trim() !== '') // Filter out empty lines
+                .map((line, index) => ({...JSON.parse(line), uniqueId: `prompt-${index}`}));
+            
+            const groupedData = groupData(promptsData);
+            buildUseCaseNavigator();
+            buildLibrary(groupedData);
+            addEventListeners();
+        } catch (error) {
+            console.error("Failed to initialize the application:", error);
+            document.body.innerHTML = `<div class="p-8 text-red-600"><strong>Error:</strong> Could not load prompt data. Please check the console for details.</div>`;
+        }
     });
 
     /**
@@ -334,17 +379,24 @@
                 groupedData[stageName][sectionName].forEach(prompt => {
                     const card = document.createElement('div');
                     card.className = 'prompt-card bg-white border border-slate-200 rounded-xl p-6 mb-5 shadow-sm hover:shadow-lg transition-shadow duration-300';
+                    card.dataset.promptId = prompt.uniqueId;
                     card.innerHTML = `
-                        <h4 class="font-mono text-sm font-medium text-red-600 bg-red-100 rounded px-2 py-1 inline-block mb-4">Task: ${prompt.task_id}</h4>
-                        <div class="relative">
+                        <div class="flex justify-between items-start mb-4">
+                            <h4 class="font-mono text-sm font-medium text-red-600 bg-red-100 rounded px-2 py-1 inline-block">Task: ${prompt.task_id}</h4>
+                            <button class="generate-btn flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold" title="Enable online mode to generate examples" disabled>
+                                ✨ Generate Example
+                            </button>
+                        </div>
+                        <div class="relative mb-4">
                             <p class="prompt-text-content text-slate-700 leading-relaxed pr-12">${prompt.prompt_text}</p>
                             <button class="copy-btn absolute top-0 right-0 p-2 rounded-full bg-slate-100 text-slate-500 hover:bg-blue-100 hover:text-blue-600 transition-colors duration-200" title="Copy to Clipboard">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                             </button>
                         </div>
-                        <div class="response-format font-mono text-sm bg-slate-100 text-slate-600 p-4 rounded-lg mt-4">
+                        <div class="response-format font-mono text-sm bg-slate-100 text-slate-600 p-4 rounded-lg">
                             <strong class="font-medium text-slate-700">Expected Response:</strong> ${prompt.expected_response_format}
                         </div>
+                        <div class="generated-response-container mt-4 hidden"></div>
                     `;
                     sectionContent.appendChild(card);
                 });
@@ -373,53 +425,82 @@
         // Search bar functionality
         searchBar.addEventListener('keyup', handleSearch);
 
-        // Use Case Navigator buttons
-        document.querySelectorAll('.use-case-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const query = e.currentTarget.dataset.query;
+        // Event delegation for dynamic content
+        document.getElementById('main-content').addEventListener('click', (e) => {
+            const useCaseBtn = e.target.closest('.use-case-btn');
+            if (useCaseBtn) {
+                const query = useCaseBtn.dataset.query;
                 searchBar.value = query;
-                // Trigger the search
                 searchBar.dispatchEvent(new Event('keyup'));
-                // Scroll to the library container
                 document.getElementById('library-container').scrollIntoView({ behavior: 'smooth' });
-            });
-        });
+            }
 
-        // Copy button functionality
-        document.querySelectorAll('.copy-btn').forEach(btn => {
-            btn.addEventListener('click', handleCopyClick);
-        });
-        
-        // Collapsible sections with ARIA
-        document.querySelectorAll('.section-title').forEach(title => {
-            title.addEventListener('click', () => {
-                title.classList.toggle('open');
-                const content = document.getElementById(title.getAttribute('aria-controls'));
+            const copyBtn = e.target.closest('.copy-btn');
+            if (copyBtn) {
+                handleCopyClick(copyBtn);
+            }
+
+            const generateBtn = e.target.closest('.generate-btn');
+            if(generateBtn && !generateBtn.disabled) {
+                handleGenerateClick(generateBtn);
+            }
+
+            const sectionTitle = e.target.closest('.section-title');
+            if (sectionTitle) {
+                sectionTitle.classList.toggle('open');
+                const content = document.getElementById(sectionTitle.getAttribute('aria-controls'));
                 content.classList.toggle('hidden');
                 
-                const isExpanded = title.getAttribute('aria-expanded') === 'true';
-                title.setAttribute('aria-expanded', !isExpanded);
-            });
+                const isExpanded = sectionTitle.getAttribute('aria-expanded') === 'true';
+                sectionTitle.setAttribute('aria-expanded', !isExpanded);
+            }
         });
         
         // Sidebar navigation links
-        document.querySelectorAll('#sidebar .nav-link').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
+        document.getElementById('sidebar').addEventListener('click', function (e) {
+            const navLink = e.target.closest('.nav-link');
+            if (navLink) {
                 e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
+                const targetElement = document.querySelector(navLink.getAttribute('href'));
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                }
                 // Close sidebar on mobile after clicking a link
                 if (window.innerWidth < 768) {
                     document.getElementById('sidebar').classList.add('-translate-x-full');
                 }
-            });
+            }
         });
 
         // Mobile menu toggle
         document.getElementById('mobile-menu-btn').addEventListener('click', () => {
             document.getElementById('sidebar').classList.toggle('-translate-x-full');
         });
+
+        // Go Online button
+        document.getElementById('go-online-btn').addEventListener('click', goOnline);
+    }
+
+    /**
+     * ✅ [FIXED] Prompts user for API key and enables the "Generate Example" buttons.
+     */
+    function goOnline() {
+        const key = prompt("Please enter your Google AI Gemini API Key to enable this feature.");
+        if (key && key.trim() !== "") {
+            sessionApiKey = key.trim();
+            const goOnlineBtn = document.getElementById('go-online-btn');
+            document.querySelectorAll('.generate-btn').forEach(btn => {
+                btn.disabled = false;
+                btn.classList.add('bg-blue-50', 'text-blue-600', 'hover:bg-blue-100', 'hover:text-blue-700');
+                btn.title = "Generate an example with Gemini";
+            });
+            goOnlineBtn.textContent = '✅ AI Examples Enabled';
+            goOnlineBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+            goOnlineBtn.classList.add('bg-green-600', 'cursor-default');
+            goOnlineBtn.disabled = true;
+        } else {
+            alert("API Key not provided. The 'Generate Example' feature will remain disabled.");
+        }
     }
 
     /**
@@ -511,28 +592,137 @@
 
     /**
      * Handles the click event for the copy button.
-     * @param {Event} e - The click event object.
+     * @param {HTMLElement} btn - The button element that was clicked.
      */
-    function handleCopyClick(e) {
-        const btn = e.currentTarget;
+    function handleCopyClick(btn) {
         const promptText = btn.closest('.relative').querySelector('.prompt-text-content').textContent.trim();
-        
-        const textarea = document.createElement('textarea');
-        textarea.value = promptText;
-        textarea.style.position = 'absolute';
-        textarea.style.left = '-9999px';
-        document.body.appendChild(textarea);
-        textarea.select();
-        try {
-            document.execCommand('copy');
-            btn.innerHTML = `<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
-            setTimeout(() => {
-                btn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>`;
+        const originalIcon = btn.innerHTML;
+        const successIcon = `<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+
+        navigator.clipboard.writeText(promptText).then(() => {
+            btn.innerHTML = successIcon;
+            btn.title = "Copied!";
+            setTimeout(() => { 
+                btn.innerHTML = originalIcon;
+                btn.title = "Copy to Clipboard";
             }, 2000);
-        } catch (err) {
-            console.error('Fallback: Oops, unable to copy', err);
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+            // Fallback could be implemented here if needed
+        });
+    }
+
+
+    /**
+     * Handles the click event for the generate button.
+     * @param {HTMLElement} btn - The button element that was clicked.
+     */
+    async function handleGenerateClick(btn) {
+        const card = btn.closest('.prompt-card');
+        const promptId = card.dataset.promptId;
+        const prompt = promptsData.find(p => p.uniqueId === promptId);
+        const responseContainer = card.querySelector('.generated-response-container');
+
+        responseContainer.classList.remove('hidden');
+        responseContainer.innerHTML = '<div class="flex items-center justify-center p-4"><div class="loader"></div></div>';
+
+        try {
+            const result = await callGemini(prompt.prompt_text, prompt.expected_response_format);
+            renderGeneratedResponse(responseContainer, result, prompt.expected_response_format);
+        } catch (error) {
+            console.error("Gemini API call failed:", error);
+            responseContainer.innerHTML = `
+                <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg">
+                    <h5 class="font-bold text-red-800 mb-2">Error</h5>
+                    <p class="text-sm text-red-900">${error.message}</p>
+                </div>
+            `;
         }
-        document.body.removeChild(textarea);
+    }
+
+    /**
+     * Renders the generated response with appropriate formatting.
+     * @param {HTMLElement} container - The container to render the response in.
+     * @param {string} result - The text result from the Gemini API.
+     * @param {string} format - The expected response format string.
+     */
+    function renderGeneratedResponse(container, result, format) {
+        const lowerFormat = format.toLowerCase();
+        const isCode = /json|code|yaml|python|cypher|dot|dvc|git|shell|kubernetes|dockerfile|cli|script|commands|object|array/.test(lowerFormat);
+
+        // Basic sanitization to prevent direct HTML injection.
+        const sanitizedResult = result.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+        let contentHtml;
+        if (isCode) {
+            contentHtml = `<pre class="font-mono text-sm text-slate-800 whitespace-pre-wrap bg-slate-100 p-3 rounded">${sanitizedResult}</pre>`;
+        } else {
+            // For narrative text, make it more readable.
+            contentHtml = `<p class="text-slate-700 whitespace-pre-wrap">${sanitizedResult}</p>`;
+        }
+
+        container.innerHTML = `
+            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                <h5 class="font-bold text-blue-800 mb-2">✨ Generated Example</h5>
+                ${contentHtml}
+            </div>
+        `;
+    }
+
+    // --- GEMINI API CALL ---
+    async function callGemini(promptText, responseFormat) {
+        // ✅ [FIXED] Uses the API key provided by the user for the session.
+        if (!sessionApiKey) {
+            throw new Error("API Key not found. Please click 'Connect to AI' and provide your key.");
+        }
+        
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${sessionApiKey}`;
+        
+        const fullPrompt = `You are a helpful assistant. Your task is to generate a realistic, high-quality example response for a given prompt.
+        
+        **The Prompt to Respond To:**
+        "${promptText}"
+        
+        **Instructions:**
+        - Generate a response that directly and accurately answers the prompt.
+        - The response MUST strictly adhere to the following format: "${responseFormat}".
+        - Do not add any extra commentary, explanations, or markdown formatting unless the format explicitly requires it. Just provide the raw response.
+        `;
+
+        const payload = {
+            contents: [{
+                role: "user",
+                parts: [{ text: fullPrompt }]
+            }]
+        };
+
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.json();
+            throw new Error(`API Error: ${response.status} - ${errorBody.error?.message || 'Unknown error. Check if your API key is valid and has the Gemini API enabled.'}`);
+        }
+
+        const result = await response.json();
+        
+        if (result.candidates && result.candidates.length > 0 &&
+            result.candidates[0].content && result.candidates[0].content.parts &&
+            result.candidates[0].content.parts.length > 0) {
+            return result.candidates[0].content.parts[0].text.trim();
+        } else {
+            // Handle cases where the response structure is unexpected or content is missing
+            console.warn("Unexpected API response structure:", result);
+            if (result.promptFeedback && result.promptFeedback.blockReason) {
+                return `Could not generate a response. Reason: ${result.promptFeedback.blockReason}`;
+            }
+            return "Could not generate a valid response from the API.";
+        }
     }
 </script>
 </body>
