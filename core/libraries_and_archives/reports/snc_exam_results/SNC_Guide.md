@@ -257,9 +257,11 @@ If a loan is criticized (either internally or by examiners):
 
 This guide provides a framework for preparing for and navigating SNC exams. Effective preparation, robust documentation, a thorough understanding of guidelines, and clear communication are essential for a successful outcome.
 
+````
+once more with feeling
+````
 
-
-*   # SNC Exam Preparation Guide for Bank Analysts
+# SNC Exam Preparation Guide for Bank Analysts
 
 This guide provides a comprehensive overview of the SNC exam process and best practices for bank analysts to prepare effectively.
 
