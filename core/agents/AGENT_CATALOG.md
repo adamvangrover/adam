@@ -414,6 +414,21 @@ This document provides a comprehensive catalog of all the agents in the ADAM sys
 
 ---
 
+## `echo_agent`
+
+*   **File:** `core/agents/echo_agent.py`
+*   **Description:** This is a simple agent that echoes back any message it receives. It is primarily used for testing and debugging purposes.
+*   **Configuration:** None
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.Agent`.
+*   **Agent Forge and Lifecycle:** This agent is created by the Agent Forge on demand and runs until it is shut down.
+*   **Model Context Protocol (MCP):** This agent is stateless and does not maintain its own context.
+*   **Tools and Hooks:** None
+*   **Compute and Resource Requirements:** This agent is not resource-intensive.
+*   **Dependencies:** None
+*   **Developer Notes:** This is a good example of a simple agent that can be used as a starting point for creating new agents.
+
+---
+
 ## `event_driven_risk_agent`
 
 *   **File:** `core/agents/event_driven_risk_agent.py`
@@ -572,6 +587,25 @@ This document provides a comprehensive catalog of all the agents in the ADAM sys
 *   **Compute and Resource Requirements:** This agent is not very resource-intensive.
 *   **Dependencies:** `data_retrieval_agent`
 *   **Developer Notes:** This agent can be extended by adding new macroeconomic data sources and analysis modules.
+
+---
+
+## `market_sentiment_agent`
+
+*   **File:** `core/agents/market_sentiment_agent.py`
+*   **Description:** This agent is responsible for gauging market sentiment from a variety of sources, such as news articles and social media. It uses natural language processing to analyze the sentiment of the text and generates reports on market sentiment.
+*   **Configuration:** `config/agents.yaml`
+    *   `data_sources`: A list of data sources to use for sentiment analysis.
+    *   `sentiment_analysis_model`: The name of the sentiment analysis model to use.
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.Agent`.
+*   **Agent Forge and Lifecycle:** This agent is created by the Agent Forge at system startup and runs continuously until the system is shut down.
+*   **Model Context Protocol (MCP):** The agent maintains its own context, including the current sentiment scores and the sources of the sentiment.
+*   **Tools and Hooks:**
+    *   **Tools:** `nlu_tool`, `sentiment_analysis_tool`
+    *   **Hooks:** `pre_sentiment_analysis_hook`, `post_sentiment_analysis_hook`
+*   **Compute and Resource Requirements:** This agent is moderately resource-intensive, as it performs natural language processing on large volumes of text.
+*   **Dependencies:** `data_retrieval_agent`
+*   **Developer Notes:** The accuracy of this agent can be improved by fine-tuning the sentiment analysis model on a domain-specific dataset.
 
 ---
 
