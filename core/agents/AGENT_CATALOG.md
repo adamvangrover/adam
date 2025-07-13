@@ -4,6 +4,142 @@ This document provides a comprehensive catalog of all the agents in the ADAM sys
 
 ---
 
+## `agent_forge_agent`
+
+*   **File:** `core/agents/agent_forge.py`
+*   **Description:** This agent is responsible for creating, managing, and retiring other agents. It can be run as a standalone agent to perform these tasks based on user commands or system events. This agent is the cornerstone of the system's dynamic and adaptive nature.
+*   **Configuration:** `config/agents.yaml`
+    *   `agent_blueprints`: A list of agent blueprints that can be used to create new agents.
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.Agent`.
+*   **Agent Forge and Lifecycle:** This agent is created by the system at startup and runs continuously. It can be used to create, manage, and retire other agents.
+*   **Model Context Protocol (MCP):** The agent maintains a list of all the active agents in the system and their current state.
+*   **Tools and Hooks:**
+    *   **Tools:** `agent_creation_tool`, `agent_management_tool`, `agent_retirement_tool`
+    *   **Hooks:** `on_agent_created_hook`, `on_agent_retired_hook`
+*   **Compute and Resource Requirements:** This agent is not very resource-intensive, but it requires access to the agent blueprints and the system's configuration files.
+*   **Dependencies:** None
+*   **Developer Notes:** This agent is critical to the system's ability to adapt to new tasks and requirements. It can be extended by adding new agent blueprints.
+
+---
+
+## `orchestrator_agent`
+
+*   **File:** `core/system/agent_orchestrator.py`
+*   **Description:** This agent is responsible for orchestrating complex tasks that require the collaboration of multiple agents. It can break down complex tasks into smaller subtasks, allocate them to the most appropriate agents, and monitor their progress.
+*   **Configuration:** `config/workflow.yaml`
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.Agent`.
+*   **Agent Forge and Lifecycle:** This agent is created by the system at startup and runs continuously.
+*   **Model Context Protocol (MCP):** The agent maintains a list of the active workflows and the status of each subtask.
+*   **Tools and Hooks:**
+    *   **Tools:** `workflow_management_tool`, `task_allocation_tool`
+    *   **Hooks:** `on_workflow_completed_hook`
+*   **Compute and Resource Requirements:** This agent is not very resource-intensive.
+*   **Dependencies:** `task_allocation_agent`
+*   **Developer Notes:** This agent is critical to the system's ability to perform complex tasks. It can be extended by adding new workflow definitions.
+
+---
+
+## `resource_manager_agent`
+
+*   **File:** `core/system/resource_manager.py`
+*   **Description:** This agent is responsible for managing the system's resources, such as CPU, memory, and network bandwidth. It can monitor the resource usage of each agent and can allocate resources to agents based on their needs.
+*   **Configuration:** `config/system.yaml`
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.Agent`.
+*   **Agent Forge and Lifecycle:** This agent is created by the system at startup and runs continuously.
+*   **Model Context Protocol (MCP):** The agent maintains a list of the available resources and their current usage.
+*   **Tools and Hooks:**
+    *   **Tools:** `resource_monitoring_tool`, `resource_allocation_tool`
+    *   **Hooks:** `on_low_resource_hook`
+*   **Compute and Resource Requirements:** This agent is not very resource-intensive, but it requires access to the system's resource monitoring tools.
+*   **Dependencies:** None
+*   **Developer Notes:** This agent is critical to the system's stability and performance. It can be extended by adding new resource management policies.
+
+---
+
+## `task_allocation_agent`
+
+*   **File:** `core/system/task_scheduler.py`
+*   **Description:** This agent is responsible for allocating tasks to the most appropriate agents based on their capabilities and availability. It uses a variety of scheduling algorithms to ensure that tasks are allocated efficiently and that the system's resources are used effectively.
+*   **Configuration:** `config/system.yaml`
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.Agent`.
+*   **Agent Forge and Lifecycle:** This agent is created by the system at startup and runs continuously.
+*   **Model Context Protocol (MCP):** The agent maintains a list of the available agents and their current workload.
+*   **Tools and Hooks:**
+    *   **Tools:** `task_scheduling_tool`
+    *   **Hooks:** `on_task_allocated_hook`
+*   **Compute and Resource Requirements:** This agent is not very resource-intensive.
+*   **Dependencies:** `resource_manager_agent`
+*   **Developer Notes:** This agent is critical to the system's efficiency and scalability. It can be extended by adding new scheduling algorithms.
+
+---
+
+## `shared_context_manager_agent`
+
+*   **File:** `core/system/knowledge_base.py`
+*   **Description:** This agent is responsible for managing the shared context and state of the system. It provides a centralized repository for agents to store and retrieve shared information, such as the current state of the market or the user's preferences.
+*   **Configuration:** `config/knowledge_base.yaml`
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.Agent`.
+*   **Agent Forge and Lifecycle:** This agent is created by the system at startup and runs continuously.
+*   **Model Context Protocol (MCP):** The agent maintains the shared context and state of the system.
+*   **Tools and Hooks:**
+    *   **Tools:** `knowledge_base_tool`
+    *   **Hooks:** `on_context_updated_hook`
+*   **Compute and Resource Requirements:** This agent is not very resource-intensive, but it may require a significant amount of memory to store the shared context.
+*   **Dependencies:** None
+*   **Developer Notes:** This agent is critical to the system's ability to maintain a consistent view of the world. It can be extended by adding new data models to the knowledge base.
+
+---
+
+## `dependency_manager_agent`
+
+*   **File:** `core/system/plugin_manager.py`
+*   **Description:** This agent is responsible for managing the dependencies between agents and other system components. It can install, update, and remove dependencies as needed, and can ensure that all dependencies are compatible with each other.
+*   **Configuration:** `config/system.yaml`
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.Agent`.
+*   **Agent Forge and Lifecycle:** This agent is created by the system at startup and runs continuously.
+*   **Model Context Protocol (MCP):** The agent maintains a list of the installed dependencies and their versions.
+*   **Tools and Hooks:**
+    *   **Tools:** `dependency_management_tool`
+    *   **Hooks:** `on_dependency_installed_hook`
+*   **Compute and Resource Requirements:** This agent is not very resource-intensive.
+*   **Dependencies:** None
+*   **Developer Notes:** This agent is critical to the system's maintainability and extensibility. It can be extended by adding new dependency management backends.
+
+---
+
+## `integration_manager_agent`
+
+*   **File:** `core/api.py`
+*   **Description:** This agent is responsible for managing the integration of the agent-based system with other systems. It provides a set of APIs that allow other systems to interact with the agents and to access the data and services that they provide.
+*   **Configuration:** `config/api.yaml`
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.Agent`.
+*   **Agent Forge and Lifecycle:** This agent is created by the system at startup and runs continuously.
+*   **Model Context Protocol (MCP):** The agent is stateless and does not maintain its own context.
+*   **Tools and Hooks:**
+    *   **Tools:** `api_tool`
+    *   **Hooks:** `on_api_request_hook`
+*   **Compute and Resource Requirements:** This agent is not very resource-intensive.
+*   **Dependencies:** None
+*   **Developer Notes:** This agent is critical to the system's ability to interoperate with other systems. It can be extended by adding new API endpoints.
+
+---
+
+## `echo_agent`
+
+*   **File:** `core/agents/echo_agent.py`
+*   **Description:** This agent is a simulated LLM that mirrors the compute and resource requirements of the runtime engine. It is used as a backup when the primary LLM is unavailable, and it can also be used for testing and debugging purposes.
+*   **Configuration:** `config/llm_plugin.yaml`
+    *   `simulation_mode`: A boolean indicating whether the agent should run in simulation mode.
+*   **Architecture and Base Agent:** Inherits from `core.llm.base_llm_engine.BaseLLMEngine`.
+*   **Agent Forge and Lifecycle:** This agent is created by the system at startup and runs continuously.
+*   **Model Context Protocol (MCP):** The agent is stateless and does not maintain its own context.
+*   **Tools and Hooks:** None
+*   **Compute and Resource Requirements:** This agent is designed to have the same compute and resource requirements as the primary LLM engine.
+*   **Dependencies:** None
+*   **Developer Notes:** This agent is critical to the system's resilience and fault tolerance. It can be extended by adding more sophisticated simulation capabilities.
+
+---
+
 ## `fundamental_analyst_agent`
 
 *   **File:** `core/agents/fundamental_analyst_agent.py`
@@ -596,6 +732,60 @@ This document provides a comprehensive catalog of all the agents in the ADAM sys
 *   **Compute and Resource Requirements:** This agent can be resource-intensive, as it may need to process large volumes of text and use complex event detection models.
 *   **Dependencies:** `data_retrieval_agent`, `legal_agent`
 *   **Developer Notes:** The accuracy of this agent can be improved by fine-tuning the event detection model on a domain-specific dataset.
+
+---
+
+## `result_aggregation_agent`
+
+*   **File:** `core/agents/result_aggregation_agent.py`
+*   **Description:** This agent is responsible for aggregating and summarizing results from other agents. It can take a variety of results as input, such as reports, charts, and tables, and can generate a consolidated summary of the results.
+*   **Configuration:** `config/agents.yaml`
+    *   `aggregation_strategies`: A list of aggregation strategies to use.
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.Agent`.
+*   **Agent Forge and Lifecycle:** This agent is created by the Agent Forge on demand and runs until it has completed its result aggregation task.
+*   **Model Context Protocol (MCP):** The agent maintains a list of the results that it has aggregated.
+*   **Tools and Hooks:**
+    *   **Tools:** `result_aggregation_tool`
+    *   **Hooks:** `pre_aggregation_hook`, `post_aggregation_hook`
+*   **Compute and Resource Requirements:** This agent is not very resource-intensive.
+*   **Dependencies:** None
+*   **Developer Notes:** This agent can be extended by adding new aggregation strategies.
+
+---
+
+## `risk_assessment_agent`
+
+*   **File:** `core/agents/risk_assessment_agent.py`
+*   **Description:** This agent is responsible for assessing various types of investment risks, such as market risk, credit risk, and operational risk. It can use a variety of risk models to quantify the risks and can generate reports on the overall risk of a portfolio.
+*   **Configuration:** `config/agents.yaml`
+    *   `risk_models`: A list of risk models to use.
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.Agent`.
+*   **Agent Forge and Lifecycle:** This agent is created by the Agent Forge on demand and runs until it has completed its risk assessment task.
+*   **Model Context Protocol (MCP):** The agent maintains a list of the risks that it has assessed.
+*   **Tools and Hooks:**
+    *   **Tools:** `risk_assessment_tool`
+    *   **Hooks:** `pre_assessment_hook`, `post_assessment_hook`
+*   **Compute and Resource Requirements:** This agent can be resource-intensive, as it may need to perform complex risk calculations.
+*   **Dependencies:** `market_data_api`
+*   **Developer Notes:** The accuracy of this agent can be improved by using more sophisticated risk models.
+
+---
+
+## `sense_weaver`
+
+*   **File:** `core/agents/sense_weaver.py`
+*   **Description:** This agent is responsible for synthesizing information from multiple sources to create a coherent narrative. It can take a variety of information as input, such as news articles, research reports, and social media posts, and can generate a summary of the information that is easy to understand.
+*   **Configuration:** `config/agents.yaml`
+    *   `synthesis_strategies`: A list of synthesis strategies to use.
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.Agent`.
+*   **Agent Forge and Lifecycle:** This agent is created by the Agent Forge on demand and runs until it has completed its synthesis task.
+*   **Model Context Protocol (MCP):** The agent is stateless and does not maintain its own context.
+*   **Tools and Hooks:**
+    *   **Tools:** `synthesis_tool`
+    *   **Hooks:** `pre_synthesis_hook`, `post_synthesis_hook`
+*   **Compute and Resource Requirements:** This agent can be resource-intensive, as it may need to use large language models.
+*   **Dependencies:** `llm_engine`
+*   **Developer Notes:** This agent can be extended by adding new synthesis strategies.
 
 ---
 
