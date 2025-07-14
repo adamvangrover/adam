@@ -346,5 +346,28 @@ The final stage of the analysis involves integrating all prior findings, benchma
 }
 ```
 
+## VII. Advanced Analytics & Orchestration
+
+This stage moves beyond traditional analysis into the realm of advanced computational techniques. It encompasses simulation, explainability, and workflow automation, representing the frontier of AI-driven credit analysis.
+
+### world_model_simulation
+
+> This object defines a prompt for a world model simulation. The simulation takes the current state of the world as input and generates a probabilistic forecast of the next state. This is used to run Monte Carlo simulations to explore a wide range of possible futures.
+
+```json
+{
+  "world_model_simulation": {
+    "description": "Defines a prompt for a world model simulation, which takes the current state of the world and generates a probabilistic forecast of the next state.",
+    "prompts": [
+      {
+        "id": "WMSIM01",
+        "prompt_text": "You are a world model simulator. Your task is to generate the next state of the world based on the current state provided. The current state includes stock prices, economic indicators, and geopolitical risks. You must return a JSON object representing the next state of the world, which includes a condition matrix with probabilities for various outcomes. The sum of probabilities for each condition must equal 1.0.",
+        "expected_response_format": "JSON object with keys: 'next_state' (containing 'stock_prices', 'economic_indicators', 'geopolitical_risks') and 'condition_matrix' (a dictionary of conditions with their corresponding probability distributions)."
+      }
+    ]
+  }
+}
+```
+
 ```
 ```
