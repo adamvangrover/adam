@@ -370,4 +370,26 @@ This stage moves beyond traditional analysis into the realm of advanced computat
 ```
 
 ```
+
+## VIII. System Meta-Prompts
+
+This section contains meta-prompts that define the core behavior and governance of entire AI systems or copilots. These are not individual task prompts but rather foundational instructions for orchestrator agents.
+
+### intelligent_credit_monitoring_copilot
+
+> This prompt library contains a comprehensive meta-prompt for an agentic copilot focused on intelligent credit monitoring, based on the CreditSentry design document. It defines the copilot's persona, its team of specialized agents, delegation protocols, operational constraints, and output formatting requirements.
+
+```json
+{
+  "intelligent_credit_monitoring_copilot": {
+    "description": "A comprehensive meta-prompt for an agentic copilot focused on intelligent credit monitoring.",
+    "prompts": [
+        {
+            "id": "Intelligent_Credit_Monitoring_Copilot_Meta_Prompt_v1.0",
+            "description": "A comprehensive meta-prompt for an agentic copilot focused on intelligent credit monitoring, based on the CreditSentry design document.",
+            "file": "intelligent_credit_monitoring_copilot.json"
+        }
+    ]
+  }
+}
 ```
