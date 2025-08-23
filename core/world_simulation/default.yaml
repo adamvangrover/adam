@@ -1,0 +1,67 @@
+# Default configuration for the world model simulation
+
+simulation:
+  steps: 200 # Increased steps for more detailed simulation
+  runs: 50 # Increased runs for better statistical analysis
+
+llm:
+  engine: "openai"
+  model: "gpt-4-turbo" # Using a more powerful model
+  temperature: 0.5 # Slightly lower temperature for more realistic outputs
+  max_tokens: 2048
+
+market:
+  volatility: 0.08
+  risk_aversion: 0.6
+  stock_symbols:
+    - "AAPL"
+    - "MSFT"
+    - "GOOG"
+    - "AMZN"
+    - "TSLA"
+    - "NVDA"
+    - "JPM"
+    - "V"
+    - "JNJ"
+    - "WMT"
+  # New market parameters
+  market_sentiment: 0.5 # 0-1 scale, 0.5 is neutral
+  liquidity: 0.7 # 0-1 scale, 1 is high liquidity
+  news_impact: 0.3 # How much news affects the market
+
+economy:
+  gdp_growth: 0.025
+  inflation: 0.032
+  interest_rate: 0.055
+  unemployment: 0.045
+  # New economic indicators
+  consumer_confidence: 0.6 # 0-1 scale
+  business_confidence: 0.7 # 0-1 scale
+  housing_starts: 1.5 # in millions
+  retail_sales: 0.01 # month-over-month growth
+  cpi: 250.0 # Consumer Price Index
+
+geopolitics:
+  political_stability: 0.75
+  trade_war_risk: 0.15
+  regulatory_changes: 0.12
+  # New geopolitical factors
+  election_risk: 0.2 # Risk of a major election with uncertain outcome
+  geopolitical_hotspots:
+    - "East Asia"
+    - "Middle East"
+    - "Eastern Europe"
+  terrorism_risk: 0.1
+
+# New sections for more detailed simulation
+environment:
+  natural_disaster_risk: 0.05 # Probability of a major natural disaster
+  climate_change_impact: 0.02 # Long-term impact of climate change on the economy
+
+demographics:
+  population_growth: 0.008
+  aging_population_impact: 0.01 # Impact of an aging population on the economy
+
+technology:
+  technological_disruption_risk: 0.1 # Risk of a major technological disruption
+  ai_adoption_rate: 0.05 # Rate of AI adoption in the economy
