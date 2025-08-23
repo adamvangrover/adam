@@ -1,0 +1,85 @@
+version: 2.0 # Schema version for the Financial Digital Twin
+
+nodes: # Define the types of nodes in the graph
+  Company:
+    properties:
+      legalName: str
+      taxId: str
+      industryCode: str
+      address: str
+      timeSeriesId: str
+  Loan:
+    properties:
+      loanId: str
+      amount: float
+      maturityDate: date
+      status: str
+  Security:
+    properties:
+      cusip: str
+      isin: str
+      issueDate: date
+      faceValue: float
+      timeSeriesId: str
+  Collateral:
+    properties:
+      assetType: str
+      appraisedValue: float
+      location: str
+  Individual:
+    properties:
+      name: str
+      title: str
+  Covenant:
+    properties:
+      type: str
+      description: str
+  Financials:
+    properties:
+      statementType: str # e.g., 10-K, 10-Q
+      filingDate: date
+      url: str
+  Investor:
+    properties:
+      name: str
+      type: str # e.g., Hedge Fund, Mutual Fund
+
+edges: # Define the types of relationships between nodes
+  IS_BORROWER_OF:
+    source: Company
+    target: Loan
+  SECURED_BY:
+    source: Loan
+    target: Collateral
+  ISSUED:
+    source: Company
+    target: Security
+  HOLDS_POSITION_IN:
+    source: Investor
+    target: Security
+  HAS_PARENT:
+    source: Company
+    target: Company
+  IS_OFFICER_OF:
+    source: Individual
+    target: Company
+  SUBJECT_TO:
+    source: Loan
+    target: Covenant
+  HAS_FINANCIALS:
+    source: Company
+    target: Financials
+
+constraints: # Define constraints on the graph structure
+  - unique_company_tax_id:
+      node: Company
+      property: taxId
+  - unique_loan_id:
+      node: Loan
+      property: loanId
+  - unique_security_cusip:
+      node: Security
+      property: cusip
+  - unique_security_isin:
+      node: Security
+      property: isin
