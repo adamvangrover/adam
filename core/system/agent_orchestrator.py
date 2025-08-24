@@ -49,6 +49,7 @@ from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion
 # this line might be redundant or could be adjusted. For now, keeping it.
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
+from financial_digital_twin.nexus_agent import NexusAgent
 # Dictionary mapping agent names to their module paths for dynamic loading
 AGENT_CLASSES = {
     "MarketSentimentAgent": "core.agents.market_sentiment_agent",
@@ -72,6 +73,9 @@ AGENT_CLASSES = {
     "ResultAggregationAgent": "core.agents.result_aggregation_agent",
     "SNCAnalystAgent": "core.agents.SNC_analyst_agent", # Added SNC_analyst_agent
     "NewsBotAgent": "core.agents.NewsBot",
+    "NexusAgent": NexusAgent,
+    "IngestionAgent": AgentBase, # Using AgentBase as a placeholder
+    "AuditorAgent": AgentBase, # Using AgentBase as a placeholder
 }
 
 
@@ -83,7 +87,7 @@ class AgentOrchestrator:
 
     def __init__(self):
         self.agents: Dict[str, AgentBase] = {}
-        self.config = load_config("config/agents.yaml")
+        self.config = load_config("config/config.yaml")
         self.workflows = self.load_workflows()  # Load workflows
         self.llm_plugin = LLMPlugin()
         self.mcp_service_registry: Dict[
@@ -92,7 +96,7 @@ class AgentOrchestrator:
         self.sk_kernel: Optional[Kernel] = None # Initialize Semantic Kernel instance to None
 
         if self.config is None:
-            logging.error("Failed to load agent configurations (config/agents.yaml).")
+            logging.error("Failed to load agent configurations (config/config.yaml).")
         else:
             self.load_agents()
             self.establish_a2a_connections()
@@ -188,26 +192,42 @@ class AgentOrchestrator:
 
 
     def load_agents(self):
-        """Loads agents based on the configuration."""
-
-        if not self.config:
+        """Loads agents based on the new configuration structure."""
+        if not self.config or 'agents' not in self.config:
+            logging.error("Agent configuration 'agents' key not found in config.yaml.")
             return
 
-        for agent_name, agent_config in self.config.items():
-            if agent_name == "_defaults":  # skip if defaults
+        for agent_config in self.config.get('agents', []):
+            agent_name = agent_config.get('name')
+            if not agent_name:
+                logging.warning("Skipping agent configuration with no name.")
                 continue
+
             try:
                 agent_class = self._get_agent_class(agent_name)
                 if agent_class:
-                    # Pass both agent_config and the orchestrator's sk_kernel to the agent
+                    constitution = None
+                    constitution_path = agent_config.get('constitution_path')
+                    if constitution_path:
+                        try:
+                            with open(constitution_path, 'r') as f:
+                                constitution = json.load(f)
+                        except FileNotFoundError:
+                            logging.error(f"Constitution file not found for {agent_name} at {constitution_path}")
+                        except json.JSONDecodeError:
+                            logging.error(f"Failed to decode JSON from constitution file for {agent_name} at {constitution_path}")
+
+                    # Pass agent_config, constitution, and kernel to the agent
                     self.agents[agent_name] = agent_class(
-                        config=agent_config, kernel=self.sk_kernel
+                        config=agent_config,
+                        constitution=constitution,
+                        kernel=self.sk_kernel
                     )
-                    logging.info(f"Agent loaded: {agent_name} {'with' if self.sk_kernel else 'without'} SK Kernel instance.")
+                    logging.info(f"Agent loaded: {agent_name}")
                 else:
                     logging.warning(f"Agent class not found for: {agent_name}")
             except Exception as e:
-                logging.error(f"Failed to load agent {agent_name}: {e}")
+                logging.error(f"Failed to load agent {agent_name}: {e}", exc_info=True)
 
     def _get_agent_class(self, agent_name: str):
         """Retrieves the agent class based on its name."""
