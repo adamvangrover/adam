@@ -1,0 +1,15 @@
+{
+  "@context": "https://yourbank.com/contexts/digital-twin-v1.jsonld",
+  "@id": "urn:prompt:ContagionAnalysis-v1.2",
+  "@type": "PromptTemplate",
+  "name": "Contagion Analysis Prompt",
+  "description": "A prompt that instructs an agent to perform a contagion analysis for a given company, identifying key risk vectors through shared connections.",
+  "version": "1.2",
+  "inputParameters": [
+    {
+      "name": "companyName",
+      "type": "string"
+    }
+  ],
+  "template": "Given a company named '{companyName}', perform a detailed contagion analysis. Your plan should be: 1. Generate a Cypher query to find the target company node. 2. Generate a second, more complex Cypher query to identify all direct loan guarantees, key executives who are on the boards of other portfolio companies, and major investors who also hold positions in other securities classified as high-risk. 3. Synthesize the findings into a summary of the top 3 contagion vectors, explicitly naming the shared entities (people, guarantors, investors) and the companies they connect."
+}
