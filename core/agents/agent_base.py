@@ -20,18 +20,21 @@ class AgentBase(ABC):
     This version incorporates MCP, A2A, and Semantic Kernel.
     """
 
-    def __init__(self, config: Dict[str, Any], kernel: Optional[Kernel] = None):
+    def __init__(self, config: Dict[str, Any], constitution: Optional[Dict[str, Any]] = None, kernel: Optional[Kernel] = None):
         """
         Initializes the AgentBase. Subclasses should call super().__init__(config, kernel)
         to ensure proper initialization. The config dictionary provides agent-specific
         configuration parameters, and kernel is an optional Semantic Kernel instance.
         """
         self.config = config
+        self.constitution = constitution
         self.kernel = kernel # Store the Semantic Kernel instance
         self.context: Dict[str, Any] = {}
         self.peer_agents: Dict[str, AgentBase] = {}  # For A2A
         # Updated log message to reflect potential kernel presence
         log_message = f"Agent {type(self).__name__} initialized with config: {config}"
+        if constitution:
+            log_message += f" and constitution: {constitution.get('@id', 'N/A')}"
         if kernel:
             log_message += " and Semantic Kernel instance."
         else:
