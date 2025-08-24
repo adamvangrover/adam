@@ -1,0 +1,55 @@
+{
+  "prompt_name": "GenerateFiboCompanyInstance",
+  "version": "1.0",
+  "role": "You are an expert financial data analyst and semantic modeler specializing in the Financial Industry Business Ontology (FIBO).",
+  "task_description": "Your task is to research a specific public company and generate a detailed, FIBO-compliant data instance representing its corporate structure, key personnel, and financial footprint. The output must be in JSON-LD format, a standard for linked data.",
+  "input_parameters": [
+    {
+      "name": "company_identifier",
+      "type": "string",
+      "description": "A unique identifier for the company, such as its Ticker Symbol (e.g., 'AAPL'), CUSIP, or Legal Entity Identifier (LEI)."
+    }
+  ],
+  "instructions": [
+    "1. Ingest the provided `company_identifier`.",
+    "2. Use your data retrieval tools to gather comprehensive, publicly available information about the company. This must include its full legal name, its LEI, its headquarters address, its top two executives (CEO and CFO), and at least one security (stock or bond) it has issued.",
+    "3. Map the gathered information to the corresponding FIBO classes and properties as outlined in the `fibo_mapping` section below.",
+    "4. Construct a JSON-LD object that represents the company and its related entities as a graph of nodes.",
+    "5. Ensure the `@context` of the JSON-LD correctly references the official FIBO namespaces to provide semantic meaning.",
+    "6. The final output should contain a `@graph` array with separate JSON objects for the `LegalEntity`, at least two `NaturalPerson` (executives), and at least one `Security`."
+  ],
+  "fibo_mapping": {
+    "company": "fibo-be-le-lei:LegalEntity",
+    "legal_name": "fibo-fnd-utl-av:hasName",
+    "lei": "fibo-be-le-lei:hasLegalEntityIdentifier",
+    "executive": "fibo-be-oac-opty:NaturalPerson",
+    "stock": "fibo-sec-eq-eq:CommonStock",
+    "security_id": "fibo-sec-sec-id:hasCUSIP"
+  },
+  "output_format_example": {
+    "@context": {
+      "fibo-be-le-lei": "https://spec.edmcouncil.org/fibo/ontology/BE/LegalEntities/LegalEntity/",
+      "fibo-fnd-utl-av": "https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/",
+      "fibo-be-oac-opty": "https://spec.edmcouncil.org/fibo/ontology/BE/OwnershipAndControl/OwnershipParties/",
+      "xsd": "http://www.w3.org/2001/XMLSchema#"
+    },
+    "@graph": [
+      {
+        "@id": "urn:lei:HWUPKR0MPOU8FGXBT394",
+        "@type": "fibo-be-le-lei:LegalEntity",
+        "fibo-fnd-utl-av:hasName": {
+          "@value": "Apple Inc.",
+          "@type": "xsd:string"
+        }
+      },
+      {
+        "@id": "urn:person:tim_cook",
+        "@type": "fibo-be-oac-opty:NaturalPerson",
+        "fibo-fnd-utl-av:hasName": {
+          "@value": "Tim Cook",
+          "@type": "xsd:string"
+        }
+      }
+    ]
+  }
+}
