@@ -16,6 +16,14 @@ Agents in the ADAM system possess a range of core capabilities that enable them 
 
 The ADAM system provides a robust runtime environment for executing agents. The runtime is responsible for managing the lifecycle of the agents, providing them with the resources they need to operate, and ensuring the overall stability of the system.
 
+### Agent Lifecycle
+
+The lifecycle of an agent in the ADAM system is managed by the agent runtime. The lifecycle consists of the following stages:
+
+1.  **Initialization:** When an agent is first loaded, it is initialized with its configuration. This includes setting up any necessary resources, such as database connections or API clients.
+2.  **Execution:** Once an agent is initialized, it enters the execution stage. In this stage, the agent's `execute` method is called repeatedly by the main loop. The `execute` method contains the core logic of the agent and is responsible for performing the agent's tasks.
+3.  **Termination:** When an agent is no longer needed, it is terminated. This includes releasing any resources that were acquired during initialization.
+
 ### Main Loop
 
 The main loop is the heart of the agent runtime. It is responsible for iterating through the active agents and giving each agent an opportunity to execute. The main loop also handles a variety of other tasks, such as processing messages, managing the agent lifecycle, and monitoring the health of the system.
@@ -44,13 +52,38 @@ The ADAM system uses a variety of inheritance patterns to create specialized age
 
 The ADAM system uses a variety of design patterns to improve the modularity, extensibility, and maintainability of the code. These include the Singleton pattern for managing global resources, the Factory pattern for creating new agents, and the Observer pattern for handling events.
 
-## Standalone Operation
+## Creating and Using Agents
+
+This section provides a more comprehensive example of how to create and use an agent in the ADAM system.
+
+### Defining an Agent
+
+To define an agent, you need to create a new class that inherits from the `Agent` class in `agent_base.py`. The following code snippet shows how to define a simple `EchoAgent` that echoes back any message it receives:
+
+```python
+from core.agents.agent_base import Agent
+
+class EchoAgent(Agent):
+    def __init__(self, config):
+        super().__init__(config)
+
+    def execute(self, message):
+        return message
+```
+
+### Implementing the `execute` Method
+
+The `execute` method is the main entry point for the agent. It is called repeatedly by the main loop and is responsible for performing the agent's tasks. The `execute` method takes a message as input and should return a message as output.
+
+### Running an Agent in Standalone Mode
 
 Agents can be run in a standalone mode for testing and debugging purposes. To run an agent in standalone mode, you can use the `scripts/run_agent.py` script. This script takes the name of the agent as a command-line argument and starts the agent in its own process.
 
 ```bash
-python scripts/run_agent.py --agent-name market_sentiment_agent
+python scripts/run_agent.py --agent-name echo_agent
 ```
+
+When you run this command, the `EchoAgent` will be started and will wait for messages. You can then send messages to the agent and it will echo them back to you.
 
 ## Comprehensive Agent Profiles
 
@@ -107,7 +140,11 @@ There are several standard interaction patterns that are used for common interac
 
 ## Shared Context and State Management
 
-Agents in the ADAM system can share context and manage state through a variety of mechanisms.
+Effective state management is crucial for building robust and reliable agents. Agents in the ADAM system can share context and manage state through a variety of mechanisms.
+
+### In-Memory State
+
+For simple use cases, agents can store state in memory using instance variables. This is the simplest and fastest way to manage state, but it is not persistent and is not suitable for sharing state between multiple instances of the same agent.
 
 ### Shared Memory
 
@@ -115,7 +152,31 @@ Agents can use shared memory to share data with other agents on the same machine
 
 ### Distributed Caches
 
-Agents can use a distributed cache, such as Redis or Memcached, to share data with other agents in a distributed environment. This is a more scalable and resilient way to share data than shared memory.
+For more complex use cases, agents can use a distributed cache, such as Redis or Memcached, to store and share state. Distributed caches provide a scalable and resilient way to manage state, and they can be used to share state between multiple instances of the same agent or between different agents.
+
+### Database
+
+For long-term persistence, agents can use a database to store state. The ADAM system provides a database abstraction layer that makes it easy to use a variety of databases, such as PostgreSQL, MySQL, and SQLite.
+
+## Error Handling
+
+Robust error handling is essential for building a reliable and resilient agent-based system. Agents in the ADAM system should be designed to handle a variety of errors, such as network failures, API errors, and invalid data.
+
+### Timeouts
+
+When making requests to external services, agents should use timeouts to prevent them from blocking indefinitely. Timeouts can be configured in the `config/api.yaml` file.
+
+### Retries
+
+For transient errors, such as network failures, agents should use retries to automatically retry the request. The number of retries and the delay between retries can be configured in the `config/api.yaml` file.
+
+### Circuit Breakers
+
+For more serious errors, such as an API that is consistently failing, agents should use a circuit breaker to prevent them from repeatedly making requests to the failing service. The circuit breaker will automatically open after a certain number of failures and will remain open for a configurable period of time.
+
+### Fallbacks
+
+When a request fails, agents should have a fallback mechanism in place. This could be as simple as returning a default value or as complex as using a different data source.
 
 ## Semantic Kernel Integration
 
