@@ -15,6 +15,20 @@ When working on the ADAM project, please adhere to the following principles:
 *   **Robustness:** Implement comprehensive error handling and logging to ensure the system is resilient and debuggable.
 *   **Efficiency:** Optimize code for performance, especially in data-intensive and computationally expensive tasks.
 
+## Table of Contents
+
+*   [High-Level Goal](#high-level-goal)
+*   [Core Principles](#core-principles)
+*   [System Architecture](#system-architecture)
+    *   [Key Components](#key-components)
+    *   [Component Interaction](#component-interaction)
+*   [Agent Architecture](#agent-architecture)
+    *   [Sub-Agents](#sub-agents)
+    *   [Meta-Agents](#meta-agents)
+    *   [Orchestrator Agents](#orchestrator-agents)
+*   [Getting Started](#getting-started)
+*   [Contribution Guidelines](#contribution-guidelines)
+
 ## System Architecture
 
 The ADAM system is built on a modular architecture that consists of several key components. These components work together to provide a flexible and extensible platform for building and deploying autonomous agents.
@@ -37,6 +51,38 @@ The components of the ADAM system interact with each other in the following way:
 4.  **Agents** use the **LLM engine** to perform natural language processing tasks.
 5.  **Agents** communicate with each other through the **core's** message bus.
 6.  **Simulations** use the **core** to run experiments and evaluate the performance of the **agents**.
+
+## Agent Architecture
+
+The ADAM system employs a hierarchical agent architecture that consists of three types of agents: Sub-Agents, Meta-Agents, and Orchestrator Agents. This architecture is designed to separate concerns, improve modularity, and enable the development of sophisticated AI applications.
+
+### Sub-Agents
+
+*   **Role:** Sub-Agents are the "worker bees" of the system. They are responsible for performing specific, narrow, and well-defined tasks related to data acquisition and processing.
+*   **Responsibilities:**
+    *   Interacting directly with data sources and tools (e.g., APIs, databases, OCR engines).
+    *   Producing structured, verifiable data with metadata (e.g., source, confidence score).
+    *   Handling errors gracefully and providing structured error messages.
+*   **Example:** A Sub-Agent might be responsible for fetching financial data from a specific API or parsing a specific type of document.
+
+### Meta-Agents
+
+*   **Role:** Meta-Agents are the "analysts" and "strategists" of the system. They are responsible for performing higher-order tasks that require analysis, synthesis, and interpretation.
+*   **Responsibilities:**
+    *   Operating on the structured, verified data provided by Sub-Agents.
+    *   Encapsulating complex business logic, analytical models, and qualitative frameworks.
+    *   Transforming data into a more abstract or analytical form (e.g., a risk rating, a summary, a forecast).
+*   **Example:** A Meta-Agent might take financial data from a Sub-Agent and use it to generate a credit risk assessment.
+
+### Orchestrator Agents
+
+*   **Role:** The Orchestrator Agent is the "brain" and "central nervous system" of the entire agentic system. It is the highest level of control, responsible for interpreting user intent, formulating plans, delegating tasks, and synthesizing a final, coherent response.
+*   **Responsibilities:**
+    *   Understanding user goals and decomposing them into a sequence of tasks.
+    *   Delegating tasks to the appropriate Sub-Agents and Meta-Agents.
+    *   Managing the workflow, including handling dependencies and errors.
+    *   Synthesizing the results from multiple agents into a final response.
+*   **Example:** An Orchestrator Agent might take a user query like "What is the credit risk of Apple Inc.?", delegate the task of gathering financial data to a Sub-Agent, delegate the task of assessing credit risk to a Meta-Agent, and then synthesize the results into a comprehensive report.
 
 ## Getting Started
 
