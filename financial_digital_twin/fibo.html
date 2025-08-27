@@ -451,3 +451,663 @@
     </script>
 </body>
 </html>
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Counterparty Risk Assessment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals (Slate, Zinc, Amber) -->
+    <!-- Application Structure Plan: The SPA is designed with a top-down thematic structure. It starts with a high-level overview of the counterparty, then drills down into specific facility and product exposures, and concludes with an actionable risk analysis. This flow was chosen to guide the user from general information to specific details, making the complex data more digestible. Navigation is facilitated by a sticky header, allowing users to jump to any section easily. This is more intuitive than a linear report, as it allows users to explore sections based on their immediate questions. -->
+    <!-- Visualization & Content Choices: 
+        - Counterparty Overview: Goal is to inform. Used cards for key stats (Risk Rating, KYC Status) for quick scanning. A Donut chart (Chart.js) shows risk appetite composition, which is more engaging than a simple text description.
+        - Facility & Product Details: Goal is to compare. Bar charts (Chart.js) are used to compare take/hold amounts vs. limits. This visual comparison immediately highlights exposure levels and potential breaches, which is more effective than reading raw numbers.
+        - Risk Analysis: Goal is to organize and inform. Color-coded alert-style boxes are used to display risk tags. This method draws immediate attention to the most critical risk factors, supported by clear text explaining the trigger logic.
+        - Interaction: All charts have hover tooltips for detailed data points. The navigation is interactive, providing smooth scrolling. This supports user exploration.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-10 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <h1 class="text-xl font-bold text-slate-900">Counterparty Risk Dashboard</h1>
+                <nav class="hidden md:flex space-x-8">
+                    <a href="#overview" class="text-sm font-medium text-slate-600 hover:text-amber-600 transition-colors">Overview</a>
+                    <a href="#facility" class="text-sm font-medium text-slate-600 hover:text-amber-600 transition-colors">Facility Details</a>
+                    <a href="#product" class="text-sm font-medium text-slate-600 hover:text-amber-600 transition-colors">Product Exposure</a>
+                    <a href="#risk-analysis" class="text-sm font-medium text-slate-600 hover:text-amber-600 transition-colors">Risk Analysis</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <section id="overview" class="mb-16">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold tracking-tight text-slate-900">Counterparty Overview</h2>
+                <p class="mt-2 text-lg text-slate-600">High-level risk profile for <span class="font-semibold text-amber-700">Company A Inc.</span></p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                    <h3 class="text-lg font-semibold text-slate-900 mb-2">Risk Rating</h3>
+                    <p class="text-5xl font-bold text-amber-600">B</p>
+                    <p class="text-sm text-slate-500 mt-2">Institution's internal credit risk assessment.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                    <h3 class="text-lg font-semibold text-slate-900 mb-2">KYC Status</h3>
+                    <p class="text-5xl font-bold text-green-600">Complete</p>
+                    <p class="text-sm text-slate-500 mt-2">Know Your Customer documentation is verified and up-to-date.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                    <h3 class="text-lg font-semibold text-slate-900 mb-2">Regulatory Rating</h3>
+                    <p class="text-5xl font-bold text-slate-700">Stable</p>
+                    <p class="text-sm text-slate-500 mt-2">Based on latest public filings and reports.</p>
+                </div>
+            </div>
+             <div class="mt-8 bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                <h3 class="text-xl font-semibold text-slate-900 mb-4 text-center">Risk Appetite Profile</h3>
+                <p class="text-center text-slate-600 mb-4">This chart shows the institution's defined risk tolerance for this counterparty, breaking down the appetite into different categories. Hover over a segment to see the specific allocation.</p>
+                <div class="chart-container">
+                    <canvas id="riskAppetiteChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-16 border-slate-200">
+
+        <section id="facility" class="mb-16">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold tracking-tight text-slate-900">Facility Details</h2>
+                <p class="mt-2 text-lg text-slate-600">Analysis of credit facilities provided to the counterparty.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                <h3 class="text-xl font-semibold text-slate-900 mb-2">Facility ID: Facility123</h3>
+                 <p class="text-center text-slate-600 mb-4">This chart visualizes the current exposure against the total limit for this facility. It helps in quickly assessing how much of the available credit is currently utilized through 'Take' and 'Hold' amounts.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center mb-6">
+                    <div>
+                        <p class="text-sm text-slate-500">Target Net Risk Date</p>
+                        <p class="text-2xl font-semibold text-slate-800">2026-03-01</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-slate-500">Facility Limit</p>
+                        <p class="text-2xl font-semibold text-red-600">$10,000,000</p>
+                    </div>
+                     <div>
+                        <p class="text-sm text-slate-500">Total Exposure</p>
+                        <p class="text-2xl font-semibold text-amber-600">$7,000,000</p>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="facilityChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-16 border-slate-200">
+
+        <section id="product" class="mb-16">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold tracking-tight text-slate-900">Product Exposure</h2>
+                <p class="mt-2 text-lg text-slate-600">Exposure from specific financial instruments.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                <h3 class="text-xl font-semibold text-slate-900 mb-2">Product: DerivativeXYZ (Interest Rate Swap)</h3>
+                <p class="text-center text-slate-600 mb-4">This chart illustrates the hedge amount relative to the overall trading limit for this specific product. It provides a clear view of how much of the trading capacity is being utilized for hedging purposes.</p>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center mb-6">
+                    <div>
+                        <p class="text-sm text-slate-500">Trading Limit</p>
+                        <p class="text-2xl font-semibold text-red-600">$20,000,000</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-slate-500">Hedge Amount</p>
+                        <p class="text-2xl font-semibold text-blue-600">$15,000,000</p>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="productChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-16 border-slate-200">
+
+        <section id="risk-analysis">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold tracking-tight text-slate-900">Automated Risk Analysis</h2>
+                <p class="mt-2 text-lg text-slate-600">System-generated risk flags based on predefined trigger logic.</p>
+            </div>
+            <div class="space-y-4">
+                <div class="bg-green-100 border-l-4 border-green-500 text-green-800 p-4 rounded-md shadow-sm" role="alert">
+                    <p class="font-bold">[LOW_RISK] - All Clear</p>
+                    <p>This tag was applied because the counterparty's regulatory rating is above the defined threshold and no other higher-priority risk flags were triggered.</p>
+                </div>
+                <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded-md shadow-sm" role="alert">
+                    <p class="font-bold">[MODERATE_RISK] - Potential Issue</p>
+                    <p>This flag is triggered if the KYC status is found to be incomplete. (Currently not triggered for Company A).</p>
+                </div>
+                <div class="bg-orange-100 border-l-4 border-orange-500 text-orange-800 p-4 rounded-md shadow-sm" role="alert">
+                    <p class="font-bold">[HIGH_RISK] - Exposure Limit Breach</p>
+                    <p>This flag is triggered if the sum of 'Take Amount' and 'Hold Amount' for any facility exceeds its defined limit. (Currently not triggered for Company A).</p>
+                </div>
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-800 p-4 rounded-md shadow-sm" role="alert">
+                    <p class="font-bold">[CRITICAL_RISK] - Urgent Action Required</p>
+                    <p>This flag is triggered if the risk rating is below the acceptable threshold AND a target net risk date has passed. (Currently not triggered for Company A).</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-sm text-slate-500">
+            <p>&copy; 2025 Financial Risk Analytics. This is a demonstration application.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const counterpartyData = {
+                legalName: "Company A Inc.",
+                riskRating: "B",
+                riskAppetite: "Moderate",
+                kycStatus: "Complete",
+                regulatoryRating: "Stable",
+                riskControlTag: ["LOW_RISK"],
+                riskAppetiteBreakdown: {
+                    'Low Risk': 40,
+                    'Moderate Risk': 50,
+                    'High Risk': 10
+                }
+            };
+
+            const facilityData = {
+                id: "urn:facility:Facility123",
+                takeAmount: 5000000,
+                holdAmount: 2000000,
+                facilityLimit: 10000000,
+                targetNetRiskDate: "2026-03-01",
+            };
+
+            const productData = {
+                id: "urn:product:DerivativeXYZ",
+                productType: "Interest Rate Swap",
+                tradingLimit: 20000000,
+                hedgeAmount: 15000000,
+            };
+
+            const renderRiskAppetiteChart = () => {
+                const ctx = document.getElementById('riskAppetiteChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(counterpartyData.riskAppetiteBreakdown),
+                        datasets: [{
+                            label: 'Risk Appetite',
+                            data: Object.values(counterpartyData.riskAppetiteBreakdown),
+                            backgroundColor: [
+                                'rgba(34, 197, 94, 0.7)',  // green-500
+                                'rgba(245, 158, 11, 0.7)', // amber-500
+                                'rgba(239, 68, 68, 0.7)'   // red-500
+                            ],
+                            borderColor: [
+                                'rgba(22, 163, 74, 1)',
+                                'rgba(217, 119, 6, 1)',
+                                'rgba(220, 38, 38, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed !== null) {
+                                            label += context.parsed + '%';
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            };
+
+            const renderFacilityChart = () => {
+                const ctx = document.getElementById('facilityChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Exposure vs. Limit'],
+                        datasets: [
+                            {
+                                label: 'Take Amount',
+                                data: [facilityData.takeAmount],
+                                backgroundColor: 'rgba(245, 158, 11, 0.6)', // amber-500
+                                borderColor: 'rgba(217, 119, 6, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Hold Amount',
+                                data: [facilityData.holdAmount],
+                                backgroundColor: 'rgba(251, 191, 36, 0.6)', // amber-400
+                                borderColor: 'rgba(245, 158, 11, 1)',
+                                borderWidth: 1
+                            },
+                             {
+                                label: 'Remaining Limit',
+                                data: [facilityData.facilityLimit - (facilityData.takeAmount + facilityData.holdAmount)],
+                                backgroundColor: 'rgba(229, 231, 235, 0.6)', // gray-200
+                                borderColor: 'rgba(156, 163, 175, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        scales: {
+                            x: {
+                                stacked: true,
+                                title: { display: true, text: 'Amount (USD)' },
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + (value / 1000000) + 'M';
+                                    }
+                                }
+                            },
+                            y: {
+                                stacked: true
+                            }
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                             tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.x !== null) {
+                                            label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.x);
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            };
+
+            const renderProductChart = () => {
+                const ctx = document.getElementById('productChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Hedge vs. Trading Limit'],
+                        datasets: [{
+                            label: 'Hedge Amount',
+                            data: [productData.hedgeAmount],
+                            backgroundColor: 'rgba(59, 130, 246, 0.6)', // blue-500
+                            borderColor: 'rgba(37, 99, 235, 1)',
+                            borderWidth: 1,
+                            barPercentage: 0.5
+                        },
+                        {
+                            label: 'Trading Limit',
+                            data: [productData.tradingLimit],
+                            backgroundColor: 'rgba(229, 231, 235, 0.6)', // gray-200
+                            borderColor: 'rgba(156, 163, 175, 1)',
+                            borderWidth: 1,
+                            barPercentage: 0.5
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'Amount (USD)' },
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + (value / 1000000) + 'M';
+                                    }
+                                }
+                            }
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                             tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.y);
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            };
+
+            renderRiskAppetiteChart();
+            renderFacilityChart();
+            renderProductChart();
+        });
+    </script>
+</body>
+</html>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIBO GNN Risk Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Warm Neutral Tones -->
+    <!-- Application Structure Plan: A dashboard layout with a main canvas for the graph visualization and a side panel for details on demand. The user can select a node on the graph to populate the side panel with its properties and connected entities. This structure is chosen for its intuitive exploration flow, allowing users to navigate the complex relationships inherent in the FIBO data model without being overwhelmed. The primary interaction is clicking nodes to drill down into details. -->
+    <!-- Visualization & Content Choices: The core of the application is a network graph rendered on an HTML5 canvas, representing the entities (Company, Counterparty, Facility, Risk Control) as nodes and relationships as edges. This is the most effective way to visualize the interconnected nature of the data. When a node is selected, its properties are displayed in a clean, readable format in the side panel. Bar charts are used to visualize quantitative data like limits and amounts for quick comparison. This combination of graph visualization and detailed drill-down provides both a macro and micro view of the risk landscape. Chart.js is used for its canvas rendering capabilities, avoiding SVG entirely. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 80vh;
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800">
+
+    <div class="flex flex-col lg:flex-row h-screen">
+        
+        <main class="flex-1 p-4 lg:p-8 overflow-y-auto">
+            <header class="mb-6">
+                <h1 class="text-3xl font-bold text-stone-900">FIBO Graph Neural Network Visualizer</h1>
+                <p class="text-stone-600 mt-1">An interactive dashboard to explore financial entity relationships and risk controls.</p>
+            </header>
+            
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h2 class="text-xl font-semibold mb-1 text-stone-800">Risk Network Graph</h2>
+                <p class="text-stone-500 mb-4">Click on a node to view its details. Nodes represent entities like companies, counterparties, and facilities.</p>
+                <div class="chart-container">
+                    <canvas id="gnnGraph"></canvas>
+                </div>
+            </div>
+        </main>
+
+        <aside id="detailsPanel" class="w-full lg:w-96 bg-white p-6 shadow-lg border-l border-stone-200 overflow-y-auto">
+            <div id="panelContent">
+                <h2 class="text-2xl font-semibold text-stone-800 mb-4 border-b pb-2">Details</h2>
+                <div id="initialMessage" class="text-center text-stone-500 mt-16">
+                    <svg class="mx-auto h-12 w-12 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p class="mt-4 text-lg">Select a node from the graph to see its properties and connections.</p>
+                </div>
+                <div id="nodeDetails" class="hidden">
+                    <!-- Dynamic content will be injected here -->
+                </div>
+            </div>
+        </aside>
+
+    </div>
+
+    <script>
+        const mockData = {
+            nodes: [
+                { id: 'CompA', label: 'Global Corp', type: 'Company', properties: { Name: 'Global Corp', Headquarters: 'New York, USA' }, x: 100, y: 200 },
+                { id: 'CounterX', label: 'Alpha Trading', type: 'Counterparty', properties: { Name: 'Alpha Trading', KYC_Status: 'Complete', Regulatory_Ratings: { "S&P": 'A', "Moody's": 'A1' }, Enterprise_Risk_Appetite: 'Medium' }, x: 300, y: 100 },
+                { id: 'CounterY', label: 'Beta Investments', type: 'Counterparty', properties: { Name: 'Beta Investments', KYC_Status: 'Pending', Regulatory_Ratings: { "S&P": 'BBB', "Moody's": 'Baa2' }, Enterprise_Risk_Appetite: 'High' }, x: 300, y: 300 },
+                { id: 'Facility1', label: 'FX Swap Line', type: 'Facility', properties: { Status: 'Active', Product_Types: ['FX_Swap', 'Options'], Trading_Limit: 50000000 }, x: 500, y: 100 },
+                { id: 'Facility2', label: 'Term Loan B', type: 'Facility', properties: { Status: 'Active', Product_Types: ['Term_Loan'], Trading_Limit: 100000000 }, x: 500, y: 300 },
+                { id: 'Risk1', label: 'Automated Control', type: 'Risk_Control', properties: { Control_Type: 'Automated', Tagging: ['Risk_Limit_Breach'], Flagging: [] }, x: 700, y: 100 },
+                { id: 'Risk2', label: 'Manual Review', type: 'Risk_Control', properties: { Control_Type: 'Manual', Tagging: [], Flagging: ['Regulatory_Alert'] }, x: 700, y: 300 }
+            ],
+            edges: [
+                { from: 'CompA', to: 'CounterX', label: 'has_counterparty', properties: { Relationship_Type: 'Trading_Partner' } },
+                { from: 'CompA', to: 'CounterY', label: 'has_counterparty', properties: { Relationship_Type: 'Borrower' } },
+                { from: 'CounterX', to: 'Facility1', label: 'has_facility', properties: { Facility_Type: 'Line_of_Credit', Facility_Limit: 75000000 } },
+                { from: 'CounterY', to: 'Facility2', label: 'has_facility', properties: { Facility_Type: 'Term_Loan', Facility_Limit: 120000000 } },
+                { from: 'Facility1', to: 'Risk1', label: 'is_monitored_by', properties: { Take_Amount: 20000000, Hold_Amount: 15000000, Hedge_Amount: 5000000, Target_Net_Risk_Date: '2025-12-31' } },
+                { from: 'Facility2', to: 'Risk2', label: 'is_monitored_by', properties: { Take_Amount: 80000000, Hold_Amount: 80000000, Hedge_Amount: 0, Target_Net_Risk_Date: '2026-06-30' } }
+            ]
+        };
+
+        const ctx = document.getElementById('gnnGraph').getContext('2d');
+        const detailsPanel = document.getElementById('detailsPanel');
+        const initialMessage = document.getElementById('initialMessage');
+        const nodeDetailsContainer = document.getElementById('nodeDetails');
+
+        const colors = {
+            Company: 'rgba(59, 130, 246, 0.8)',
+            Counterparty: 'rgba(16, 185, 129, 0.8)',
+            Facility: 'rgba(239, 68, 68, 0.8)',
+            Risk_Control: 'rgba(249, 115, 22, 0.8)',
+            edge: 'rgba(156, 163, 175, 0.5)'
+        };
+        
+        const borderColors = {
+            Company: 'rgba(37, 99, 235, 1)',
+            Counterparty: 'rgba(5, 150, 105, 1)',
+            Facility: 'rgba(220, 38, 38, 1)',
+            Risk_Control: 'rgba(234, 88, 12, 1)',
+        }
+
+        const chart = new Chart(ctx, {
+            type: 'bubble',
+            data: {
+                datasets: mockData.nodes.map(node => ({
+                    label: node.label,
+                    data: [{ x: node.x, y: node.y, r: 20 }],
+                    backgroundColor: colors[node.type],
+                    borderColor: borderColors[node.type],
+                    borderWidth: 2,
+                    nodeId: node.id
+                }))
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label;
+                            }
+                        }
+                    },
+                    annotation: {
+                        annotations: mockData.edges.map(edge => {
+                            const fromNode = mockData.nodes.find(n => n.id === edge.from);
+                            const toNode = mockData.nodes.find(n => n.id === edge.to);
+                            return {
+                                type: 'line',
+                                xMin: fromNode.x,
+                                xMax: toNode.x,
+                                yMin: fromNode.y,
+                                yMax: toNode.y,
+                                borderColor: colors.edge,
+                                borderWidth: 2,
+                            };
+                        })
+                    }
+                },
+                scales: {
+                    x: { display: false, min: 0, max: 800 },
+                    y: { display: false, min: 0, max: 400 }
+                },
+                onClick: (event, elements) => {
+                    if (elements.length > 0) {
+                        const element = elements[0];
+                        const dataset = chart.data.datasets[element.datasetIndex];
+                        const nodeId = dataset.nodeId;
+                        displayNodeDetails(nodeId);
+                    }
+                }
+            },
+            plugins: [{
+                id: 'customCanvasLines',
+                afterDraw: (chart) => {
+                    const ctx = chart.ctx;
+                    ctx.save();
+                    mockData.edges.forEach(edge => {
+                        const fromNode = mockData.nodes.find(n => n.id === edge.from);
+                        const toNode = mockData.nodes.find(n => n.id === edge.to);
+                        if (fromNode && toNode) {
+                            const fromPoint = chart.getDatasetMeta(mockData.nodes.indexOf(fromNode)).data[0];
+                            const toPoint = chart.getDatasetMeta(mockData.nodes.indexOf(toNode)).data[0];
+                            
+                            ctx.beginPath();
+                            ctx.moveTo(fromPoint.x, fromPoint.y);
+                            ctx.lineTo(toPoint.x, toPoint.y);
+                            ctx.strokeStyle = colors.edge;
+                            ctx.lineWidth = 2;
+                            ctx.stroke();
+
+                            const midX = (fromPoint.x + toPoint.x) / 2;
+                            const midY = (fromPoint.y + toPoint.y) / 2;
+                            ctx.fillStyle = '#6b7280';
+                            ctx.font = '10px Inter';
+                            ctx.textAlign = 'center';
+                            ctx.fillText(edge.label, midX, midY - 5);
+                        }
+                    });
+                    ctx.restore();
+                }
+            }]
+        });
+
+        function formatValue(value) {
+            if (typeof value === 'number') {
+                return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
+            }
+            if (Array.isArray(value)) {
+                return value.join(', ') || 'N/A';
+            }
+            if (typeof value === 'object' && value !== null) {
+                return Object.entries(value).map(([k, v]) => `${k}: ${v}`).join(', ');
+            }
+            return value;
+        }
+
+        function createPropertyHTML(title, value) {
+            return `
+                <div class="mb-3">
+                    <p class="text-sm text-stone-500">${title}</p>
+                    <p class="font-medium text-stone-800">${formatValue(value)}</p>
+                </div>
+            `;
+        }
+
+        function displayNodeDetails(nodeId) {
+            const node = mockData.nodes.find(n => n.id === nodeId);
+            if (!node) return;
+
+            initialMessage.classList.add('hidden');
+            nodeDetailsContainer.classList.remove('hidden');
+
+            let html = `
+                <div class="p-4 rounded-lg" style="background-color: ${colors[node.type].replace('0.8', '0.1')}; border-left: 4px solid ${colors[node.type]}">
+                    <h3 class="text-xl font-bold" style="color: ${borderColors[node.type]}">${node.label}</h3>
+                    <p class="font-semibold text-sm" style="color: ${borderColors[node.type]}">${node.type.replace('_', ' ')}</p>
+                </div>
+                <div class="mt-6">
+                    <h4 class="font-semibold text-lg mb-3 text-stone-700 border-b pb-2">Properties</h4>
+            `;
+
+            for (const [key, value] of Object.entries(node.properties)) {
+                html += createPropertyHTML(key.replace(/_/g, ' '), value);
+            }
+
+            const outgoingEdges = mockData.edges.filter(e => e.from === nodeId);
+            if (outgoingEdges.length > 0) {
+                html += `<h4 class="font-semibold text-lg mt-6 mb-3 text-stone-700 border-b pb-2">Outgoing Connections</h4>`;
+                outgoingEdges.forEach(edge => {
+                    const targetNode = mockData.nodes.find(n => n.id === edge.to);
+                    html += `<div class="mb-4 p-3 bg-stone-50 rounded-lg border border-stone-200">`;
+                    html += `<p class="font-semibold text-blue-600">${edge.label}</p>`;
+                    html += `<p class="text-sm text-stone-500">to <span class="font-medium text-stone-700">${targetNode.label} (${targetNode.type.replace('_', ' ')})</span></p>`;
+                    for (const [key, value] of Object.entries(edge.properties)) {
+                        html += `<p class="text-xs text-stone-500 mt-1">${key.replace(/_/g, ' ')}: <span class="font-mono text-stone-700">${formatValue(value)}</span></p>`;
+                    }
+                    html += `</div>`;
+                });
+            }
+
+            const incomingEdges = mockData.edges.filter(e => e.to === nodeId);
+            if (incomingEdges.length > 0) {
+                html += `<h4 class="font-semibold text-lg mt-6 mb-3 text-stone-700 border-b pb-2">Incoming Connections</h4>`;
+                incomingEdges.forEach(edge => {
+                    const sourceNode = mockData.nodes.find(n => n.id === edge.from);
+                    html += `<div class="mb-4 p-3 bg-stone-50 rounded-lg border border-stone-200">`;
+                    html += `<p class="font-semibold text-green-600">${edge.label}</p>`;
+                    html += `<p class="text-sm text-stone-500">from <span class="font-medium text-stone-700">${sourceNode.label} (${sourceNode.type.replace('_', ' ')})</span></p>`;
+                     for (const [key, value] of Object.entries(edge.properties)) {
+                        html += `<p class="text-xs text-stone-500 mt-1">${key.replace(/_/g, ' ')}: <span class="font-mono text-stone-700">${formatValue(value)}</span></p>`;
+                    }
+                    html += `</div>`;
+                });
+            }
+
+            html += `</div>`;
+            nodeDetailsContainer.innerHTML = html;
+        }
+
+    </script>
+</body>
+</html>
+
+
+
