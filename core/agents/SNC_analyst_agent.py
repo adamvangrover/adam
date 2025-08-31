@@ -184,22 +184,99 @@ class SNCAnalystAgent(AgentBase):
         logging.debug(f"SNC_CREDIT_MITIGATION_OUTPUT: {mitigation_result}")
         return mitigation_result
 
+    def _rate_from_sk_assessments(self, repayment_assessment: Optional[str], collateral_assessment: Optional[str], nonaccrual_assessment: Optional[str]) -> Tuple[Optional[SNCRating], str]:
+        """Determines a rating based purely on the string outputs from SK skills."""
+        if repayment_assessment == "Unsustainable":
+            return SNCRating.LOSS, "Repayment capacity is assessed as unsustainable."
+        if nonaccrual_assessment == "Non-Accrual Warranted" and repayment_assessment == "Weak":
+            return SNCRating.LOSS, "Non-accrual status is warranted alongside weak repayment capacity."
+        
+        if repayment_assessment == "Weak":
+            return SNCRating.DOUBTFUL, "Repayment capacity is weak, casting doubt on the ability to service debt."
+        if collateral_assessment == "Substandard" and repayment_assessment == "Adequate":
+             return SNCRating.DOUBTFUL, "Collateral is substandard, and repayment capacity is only adequate, not strong."
+
+        if nonaccrual_assessment == "Non-Accrual Warranted":
+            return SNCRating.SUBSTANDARD, "Non-accrual status is warranted, indicating significant financial distress."
+        if collateral_assessment == "Substandard":
+            return SNCRating.SUBSTANDARD, "Collateral is substandard, providing inadequate support for the credit."
+        if repayment_assessment == "Adequate" and collateral_assessment == "Special Mention":
+            return SNCRating.SUBSTANDARD, "Repayment capacity is merely adequate and not supported by Pass-rated collateral."
+
+        if collateral_assessment == "Special Mention" or repayment_assessment == "Adequate":
+            return SNCRating.SPECIAL_MENTION, "Weaknesses are noted in collateral or repayment that require monitoring."
+
+        if repayment_assessment == "Strong" and collateral_assessment == "Pass" and nonaccrual_assessment == "Accrual Appropriate":
+            return SNCRating.PASS, "Strong repayment, Pass-rated collateral, and appropriate accrual status indicate a Pass rating."
+
+        return None, "SK assessments did not map to a definitive rating."
+
+    def _rate_from_fallback_logic(self, financial_analysis: Dict[str, Any], qualitative_analysis: Dict[str, Any], credit_risk_mitigation: Dict[str, Any]) -> Tuple[Optional[SNCRating], str]:
+        """Provides a rating based on hardcoded financial metrics if SK fails."""
+        debt_to_equity = financial_analysis.get("debt_to_equity")
+        profitability = financial_analysis.get("profitability")
+
+        if debt_to_equity is None or profitability is None:
+            return None, "Fallback rating failed: Missing key financial metrics (debt-to-equity or profitability)."
+
+        if debt_to_equity > 3.0 and profitability < 0:
+            return SNCRating.LOSS, "Fallback: High D/E ratio (> 3.0) and negative profitability."
+        if debt_to_equity > 2.0 and profitability < 0.1:
+            return SNCRating.DOUBTFUL, "Fallback: Elevated D/E ratio (> 2.0) and low profitability (< 10%)."
+        if financial_analysis.get("liquidity_ratio", 1.0) < 1.0 and financial_analysis.get("interest_coverage", 1.0) < 1.0:
+            return SNCRating.SUBSTANDARD, "Fallback: Insufficient liquidity (< 1.0) and interest coverage (< 1.0)."
+        if credit_risk_mitigation.get("collateral_quality_fallback") == "Low" and qualitative_analysis.get("management_quality") == "Weak":
+            return SNCRating.SPECIAL_MENTION, "Fallback: Combination of low-quality collateral and weak management."
+        
+        return SNCRating.PASS, "Fallback: Financial metrics do not meet any adverse classification triggers."
+
+    def _synthesize_rationale(self, company_name: str, rating: SNCRating, sk_rationale_summary: str, 
+                              financial_analysis: Dict[str, Any], qualitative_analysis: Dict[str, Any], credit_risk_mitigation: Dict[str, Any],
+                              repayment_assessment: Optional[str], collateral_assessment: Optional[str], nonaccrual_assessment: Optional[str]) -> str:
+        """Constructs a coherent, narrative rationale for the final rating."""
+        
+        header = f"Executive Summary for {company_name}: The credit has been assigned a rating of {rating.value}."
+        
+        sk_section_header = "Primary Justification (AI Skill-Based Analysis):"
+        sk_section_body = sk_rationale_summary
+        
+        sk_details = []
+        if repayment_assessment: sk_details.append(f"- Repayment Capacity Assessment: {repayment_assessment}")
+        if collateral_assessment: sk_details.append(f"- Collateral Risk Assessment: {collateral_assessment}")
+        if nonaccrual_assessment: sk_details.append(f"- Non-Accrual Status Assessment: {nonaccrual_assessment}")
+        sk_section_details = "\n".join(sk_details)
+
+        supporting_factors_header = "Supporting Quantitative and Qualitative Factors:"
+        
+        factors = []
+        d_to_e = financial_analysis.get('debt_to_equity')
+        profit = financial_analysis.get('profitability')
+        mgmt_quality = qualitative_analysis.get('management_quality')
+        econ_outlook = qualitative_analysis.get('economic_conditions')
+
+        if d_to_e is not None: factors.append(f"- Debt/Equity Ratio: {d_to_e:.2f}")
+        if profit is not None: factors.append(f"- Profit Margin: {profit:.2%}")
+        if mgmt_quality: factors.append(f"- Management Quality: {mgmt_quality}")
+        if econ_outlook: factors.append(f"- Economic Outlook: {econ_outlook}")
+        
+        supporting_factors_body = "\n".join(factors)
+
+        footer = f"Regulatory guidance considered: Comptroller's Handbook SNC v{self.comptrollers_handbook_snc.get('version', 'N/A')}, OCC Guidelines v{self.occ_guidelines_snc.get('version', 'N/A')}."
+
+        full_rationale = "\n\n".join([header, sk_section_header, sk_section_body, sk_section_details, supporting_factors_header, supporting_factors_body, footer])
+        return full_rationale
+
     async def _determine_rating(self, company_name: str, 
                                financial_analysis: Dict[str, Any], 
                                qualitative_analysis: Dict[str, Any], 
                                credit_risk_mitigation: Dict[str, Any],
                                economic_data_context: Dict[str, Any]
                                ) -> Tuple[Optional[SNCRating], str]:
-        logging.debug(f"SNC_DETERMINE_RATING_INPUT: company='{company_name}', financial_analysis_keys={list(financial_analysis.keys())}, qualitative_analysis_keys={list(qualitative_analysis.keys())}, credit_mitigation_keys={list(credit_risk_mitigation.keys())}, economic_context_keys={list(economic_data_context.keys())}")
+        logging.debug(f"SNC_DETERMINE_RATING_INPUT: company='{company_name}'")
         
-        rationale_parts = []
-        collateral_sk_assessment_str = None
-        collateral_sk_justification = ""
-        repayment_sk_assessment_str = None
-        repayment_sk_justification = ""
+        collateral_sk_assessment_str, repayment_sk_assessment_str, nonaccrual_sk_assessment_str = None, None, None
+        collateral_sk_justification, repayment_sk_justification, nonaccrual_sk_justification = "", "", ""
         repayment_sk_concerns = ""
-        nonaccrual_sk_assessment_str = None
-        nonaccrual_sk_justification = ""
 
         if self.kernel and hasattr(self.kernel, 'skills'):
             # 1. AssessCollateralRisk
@@ -218,7 +295,6 @@ class SNCAnalystAgent(AgentBase):
                     if "Assessment:" in lines[0]: collateral_sk_assessment_str = lines[0].split("Assessment:", 1)[1].strip().replace('[','').replace(']','')
                     if len(lines) > 1 and "Justification:" in lines[1]: collateral_sk_justification = lines[1].split("Justification:", 1)[1].strip()
                 logging.debug(f"SNC_XAI:SK_OUTPUT:AssessCollateralRisk: Assessment='{collateral_sk_assessment_str}', Justification='{collateral_sk_justification}'")
-                if collateral_sk_justification: rationale_parts.append(f"SK Collateral Assessment ({collateral_sk_assessment_str}): {collateral_sk_justification}")
             except Exception as e: logging.error(f"Error in CollateralRiskAssessment SK skill for {company_name}: {e}")
 
             # 2. AssessRepaymentCapacity
@@ -242,7 +318,6 @@ class SNCAnalystAgent(AgentBase):
                     if len(lines) > 1 and "Justification:" in lines[1]: repayment_sk_justification = lines[1].split("Justification:",1)[1].strip()
                     if len(lines) > 2 and "Concerns:" in lines[2]: repayment_sk_concerns = lines[2].split("Concerns:",1)[1].strip()
                 logging.debug(f"SNC_XAI:SK_OUTPUT:AssessRepaymentCapacity: Assessment='{repayment_sk_assessment_str}', Justification='{repayment_sk_justification}', Concerns='{repayment_sk_concerns}'")
-                if repayment_sk_justification: rationale_parts.append(f"SK Repayment Capacity ({repayment_sk_assessment_str}): {repayment_sk_justification}. Concerns: {repayment_sk_concerns}")
             except Exception as e: logging.error(f"Error in AssessRepaymentCapacity SK skill for {company_name}: {e}")
 
             # 3. AssessNonAccrualStatusIndication
@@ -263,76 +338,40 @@ class SNCAnalystAgent(AgentBase):
                     if "Assessment:" in lines[0]: nonaccrual_sk_assessment_str = lines[0].split("Assessment:",1)[1].strip().replace('[','').replace(']','')
                     if len(lines) > 1 and "Justification:" in lines[1]: nonaccrual_sk_justification = lines[1].split("Justification:",1)[1].strip()
                 logging.debug(f"SNC_XAI:SK_OUTPUT:AssessNonAccrualStatusIndication: Assessment='{nonaccrual_sk_assessment_str}', Justification='{nonaccrual_sk_justification}'")
-                if nonaccrual_sk_justification: rationale_parts.append(f"SK Non-Accrual Assessment ({nonaccrual_sk_assessment_str}): {nonaccrual_sk_justification}")
             except Exception as e: logging.error(f"Error in AssessNonAccrualStatusIndication SK skill for {company_name}: {e}")
-        
-        debt_to_equity = financial_analysis.get("debt_to_equity")
-        profitability = financial_analysis.get("profitability")
-        rating = SNCRating.PASS 
 
-        logging.debug(f"SNC_XAI:RATING_PARAMS_FOR_LOGIC: DtE={debt_to_equity}, Profitability={profitability}, SKCollateral='{collateral_sk_assessment_str}', SKRepayment='{repayment_sk_assessment_str}', SKNonAccrual='{nonaccrual_sk_assessment_str}', FallbackCollateral='{credit_risk_mitigation.get('collateral_quality_fallback')}', ManagementQuality='{qualitative_analysis.get('management_quality')}'")
+        # Primary rating path: Use SK skill outputs
+        rating, sk_rationale = self._rate_from_sk_assessments(
+            repayment_sk_assessment_str,
+            collateral_sk_assessment_str,
+            nonaccrual_sk_assessment_str
+        )
 
-        # Incorporate SK outputs into rating logic
-        if repayment_sk_assessment_str == "Unsustainable" or \
-           (nonaccrual_sk_assessment_str == "Non-Accrual Warranted" and repayment_sk_assessment_str == "Weak"):
-            logging.debug(f"SNC_XAI:RATING_RULE: LOSS - Based on SK Repayment ('{repayment_sk_assessment_str}') and/or SK Non-Accrual ('{nonaccrual_sk_assessment_str}').")
-            rating = SNCRating.LOSS
-            rationale_parts.append("Loss rating driven by SK assessment of unsustainable repayment or non-accrual with weak repayment.")
-        elif repayment_sk_assessment_str == "Weak" or \
-             (collateral_sk_assessment_str == "Substandard" and repayment_sk_assessment_str == "Adequate"):
-            logging.debug(f"SNC_XAI:RATING_RULE: DOUBTFUL - Based on SK Repayment ('{repayment_sk_assessment_str}') or SK Collateral ('{collateral_sk_assessment_str}') with Repayment ('{repayment_sk_assessment_str}').")
-            rating = SNCRating.DOUBTFUL
-            rationale_parts.append("Doubtful rating influenced by SK assessment of weak repayment or substandard collateral with adequate repayment.")
-        elif nonaccrual_sk_assessment_str == "Non-Accrual Warranted" or \
-             collateral_sk_assessment_str == "Substandard" or \
-             (repayment_sk_assessment_str == "Adequate" and collateral_sk_assessment_str != "Pass"): # If repayment is just adequate and collateral isn't perfect
-            logging.debug(f"SNC_XAI:RATING_RULE: SUBSTANDARD - Based on SK Non-Accrual ('{nonaccrual_sk_assessment_str}'), SK Collateral ('{collateral_sk_assessment_str}'), or SK Repayment ('{repayment_sk_assessment_str}').")
-            rating = SNCRating.SUBSTANDARD 
-            rationale_parts.append("Substandard rating influenced by SK assessments (Non-Accrual, Collateral, or Repayment indicating weaknesses).")
-        
-        if rating == SNCRating.PASS: 
-            if debt_to_equity is not None and profitability is not None:
-                if debt_to_equity > 3.0 and profitability < 0:
-                    if rating == SNCRating.PASS: 
-                        logging.debug(f"SNC_XAI:RATING_RULE_FALLBACK: LOSS - DtE ({debt_to_equity}) > 3.0 and Profitability ({profitability}) < 0")
-                        rating = SNCRating.LOSS
-                        rationale_parts.append("Fallback: High D/E ratio and negative profitability.")
-                elif debt_to_equity > 2.0 and profitability < 0.1:
-                     if rating == SNCRating.PASS:
-                        logging.debug(f"SNC_XAI:RATING_RULE_FALLBACK: DOUBTFUL - DtE ({debt_to_equity}) > 2.0 and Profitability ({profitability}) < 0.1")
-                        rating = SNCRating.DOUBTFUL
-                        rationale_parts.append("Fallback: Elevated D/E ratio and low profitability.")
-                elif financial_analysis.get("liquidity_ratio", 0) < 1.0 and financial_analysis.get("interest_coverage", 0) < 1.0:
-                     if rating == SNCRating.PASS:
-                        logging.debug(f"SNC_XAI:RATING_RULE_FALLBACK: SUBSTANDARD - Liquidity ({financial_analysis.get('liquidity_ratio')}) < 1.0 and Interest Coverage ({financial_analysis.get('interest_coverage')}) < 1.0")
-                        rating = SNCRating.SUBSTANDARD
-                        rationale_parts.append("Fallback: Insufficient liquidity and interest coverage.")
-                elif (collateral_sk_assessment_str is None and credit_risk_mitigation.get("collateral_quality_fallback") == "Low") and \
-                     qualitative_analysis.get("management_quality") == "Weak":
-                     if rating == SNCRating.PASS:
-                        logging.debug(f"SNC_XAI:RATING_RULE_FALLBACK: SPECIAL_MENTION - Fallback Collateral: {credit_risk_mitigation.get('collateral_quality_fallback')}, Management: {qualitative_analysis.get('management_quality')}")
-                        rating = SNCRating.SPECIAL_MENTION
-                        rationale_parts.append(f"Fallback: Collateral concerns (Fallback: {credit_risk_mitigation.get('collateral_quality_fallback')}) and weak management warrant Special Mention.")
-                elif debt_to_equity <= 1.0 and profitability >= 0.3 and qualitative_analysis.get("economic_conditions") == "Stable":
-                    # This is a definite PASS if not overridden by SK.
-                    logging.debug(f"SNC_XAI:RATING_RULE_FALLBACK: PASS - DtE ({debt_to_equity}) <= 1.0, Profitability ({profitability}) >= 0.3, Econ Conditions: {qualitative_analysis.get('economic_conditions')}")
-                    rating = SNCRating.PASS # Explicitly ensure it's Pass
-                    rationale_parts.append("Fallback: Strong financials and stable economic conditions.")
-                else: 
-                    if rating == SNCRating.PASS: 
-                        logging.debug(f"SNC_XAI:RATING_RULE_FALLBACK: SPECIAL_MENTION - Fallback/Mixed Indicators. Initial DtE: {debt_to_equity}, Profitability: {profitability}")
-                        rating = SNCRating.SPECIAL_MENTION
-                        rationale_parts.append("Fallback: Mixed financial indicators or other unaddressed concerns warrant monitoring.")
-            elif rating == SNCRating.PASS : 
-                logging.debug("SNC_XAI:RATING_RULE_FALLBACK: UNDETERMINED - Missing key financial metrics (DtE or Profitability)")
-                rating = None 
-                rationale_parts.append("Fallback: Cannot determine rating due to missing key financial metrics (debt-to-equity or profitability).")
+        final_rationale = ""
+        # Fallback path: If SK skills did not yield a rating, use hardcoded financial logic
+        if rating is None:
+            logging.warning(f"SK-based rating was inconclusive for {company_name}. Using fallback logic.")
+            rating, final_rationale = self._rate_from_fallback_logic(
+                financial_analysis,
+                qualitative_analysis,
+                credit_risk_mitigation
+            )
+        else:
+            # Synthesize a comprehensive rationale if the primary path was successful
+            final_rationale = self._synthesize_rationale(
+                company_name=company_name,
+                rating=rating,
+                sk_rationale_summary=sk_rationale,
+                financial_analysis=financial_analysis,
+                qualitative_analysis=qualitative_analysis,
+                credit_risk_mitigation=credit_risk_mitigation,
+                repayment_assessment=repayment_sk_assessment_str,
+                collateral_assessment=collateral_sk_assessment_str,
+                nonaccrual_assessment=nonaccrual_sk_assessment_str
+            )
 
-        rationale_parts.append(f"Regulatory guidance: Comptroller's Handbook SNC v{self.comptrollers_handbook_snc.get('version', 'N/A')}, OCC Guidelines v{self.occ_guidelines_snc.get('version', 'N/A')}.")
-        final_rationale = " ".join(filter(None, rationale_parts))
-        
         logging.debug(f"SNC_DETERMINE_RATING_OUTPUT: Final Rating='{rating.value if rating else 'Undetermined'}', Rationale='{final_rationale}'")
-        logging.info(f"SNC rating for {company_name}: {rating.value if rating else 'Undetermined'}. Rationale: {final_rationale}")
+        logging.info(f"SNC rating for {company_name}: {rating.value if rating else 'Undetermined'}.")
         return rating, final_rationale
 
 if __name__ == '__main__':
@@ -341,30 +380,23 @@ if __name__ == '__main__':
     if os.path.exists(log_file_name): 
         os.remove(log_file_name)
     
-    # Get the root logger
+    # Setup basic logging
     root_logger = logging.getLogger()
-    # Clear existing handlers
-    # This is important if the script is run multiple times or if other modules also call basicConfig.
-    for handler in root_logger.handlers[:]: # Iterate over a copy
-        root_logger.removeHandler(handler)
-        handler.close() 
+    if root_logger.hasHandlers():
+        for handler in root_logger.handlers[:]:
+            root_logger.removeHandler(handler)
+            handler.close()
     
-    root_logger.setLevel(logging.DEBUG) # Set root logger level to DEBUG
-
-    # Add new file handler for DEBUG messages
-    file_handler = logging.FileHandler(log_file_name, mode='w')
-    file_handler.setLevel(logging.DEBUG)
-    # Use a more detailed formatter for the file to include logger name for clarity
-    file_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    file_handler.setFormatter(file_formatter)
-    root_logger.addHandler(file_handler)
-
-    # Optional: Add a console handler back to see INFO/WARN/ERROR on console too
+    logging.basicConfig(level=logging.DEBUG, 
+                        filename=log_file_name, 
+                        filemode='w',
+                        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    
     console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.INFO) 
-    console_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s') 
+    console_handler.setLevel(logging.INFO)
+    console_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
     console_handler.setFormatter(console_formatter)
-    root_logger.addHandler(console_handler)
+    logging.getLogger().addHandler(console_handler)
 
     logging.debug("XAI DEBUG Logging to file is configured for this script run.")
 
@@ -373,158 +405,178 @@ if __name__ == '__main__':
         'persona': "Test SNC Analyst",
         'comptrollers_handbook_SNC': {
             "version": "2024.Q1_test",
-            "substandard_definition": "Collateral is inadequately protective if its value doesn't cover the loan or if perfection issues exist. Paying capacity is inadequate if primary repayment source is not sustainable.",
-            "primary_repayment_source": "Repayment should primarily come from the borrower's sustainable cash flow, under their control.",
+            "substandard_definition": "Collateral is inadequately protective...",
+            "primary_repayment_source": "Repayment should come from sustainable cash flow...",
             "repayment_capacity_period": 7
         },
         'occ_guidelines_SNC': {
             "version": "2024-03_test",
-            "nonaccrual_status": "Loan is maintained on a cash basis due to financial deterioration of borrower; payment of principal or interest is not expected.",
-            "capitalization_of_interest": "Permissible only if borrower is creditworthy and can repay in normal course of business."
-            },
+            "nonaccrual_status": "Loan is on cash basis due to financial deterioration...",
+            "capitalization_of_interest": "Permissible only if borrower is creditworthy..."
+        },
         'peers': ['DataRetrievalAgent'] 
     }
 
     mock_data_package_template = {
-        "company_info": {"name": "TestCompany Corp", "industry_sector": "Tech", "country": "USA"},
+        "company_info": {"name": "TestCompany Corp"},
         "financial_data_detailed": {
             "key_ratios": {"debt_to_equity_ratio": 1.5, "net_profit_margin": 0.15, "current_ratio": 1.8, "interest_coverage_ratio": 3.0},
             "cash_flow_statement": {"free_cash_flow": [100,110,120], "cash_flow_from_operations": [150,160,170]},
-            "market_data": {"annual_debt_service_placeholder": "60", "payment_history_placeholder": "30 days past due", "interest_capitalization_placeholder": "Yes"},
-            "dcf_assumptions": {"projected_fcf_placeholder": "[130, 140, 150]"}
+            "market_data": {"annual_debt_service_placeholder": "60", "payment_history_placeholder": "Current", "interest_capitalization_placeholder": "No"},
+            "dcf_assumptions": {}
         },
-        "qualitative_company_info": {
-            "management_assessment": "Average", 
-            "business_model_strength": "Moderate",
-            "revenue_cashflow_stability_notes_placeholder": "Revenue streams are moderately diverse.",
-            "financial_deterioration_notes_placeholder": "Recent downturn in quarterly earnings."
-            },
+        "qualitative_company_info": {"management_assessment": "Average"},
         "industry_data_context": {"outlook": "Stable"},
         "economic_data_context": {"overall_outlook": "Stable"},
-        "collateral_and_debt_details": {
-            "collateral_type": "Accounts Receivable, Inventory", 
-            "collateral_valuation": 750000, 
-            "loan_to_value_ratio": 0.6, 
-            "guarantees_exist": False,
-            "other_credit_enhancements": "Standard covenants in place."
-        }
+        "collateral_and_debt_details": {"loan_to_value_ratio": 0.6}
     }
 
     async def mock_send_message(target_agent_name, message):
-        if target_agent_name == 'DataRetrievalAgent' and message.get('data_type') == 'get_company_financials':
-            company_id = message.get('company_id')
-            data = json.loads(json.dumps(mock_data_package_template)) 
-            data["company_info"]["name"] = f"{company_id} Corp"
-            if company_id == "TEST_COMPANY_REPAY_WEAK":
-                data["financial_data_detailed"]["key_ratios"]["interest_coverage_ratio"] = 0.8
-                data["financial_data_detailed"]["cash_flow_statement"]["free_cash_flow"] = [10, 5, -20]
-                data["financial_data_detailed"]["market_data"]["payment_history_placeholder"] = "90 days past due" # To trigger non-accrual
-            return data
-        return None
+        company_id = message.get('company_id')
+        data = json.loads(json.dumps(mock_data_package_template)) 
+        data["company_info"]["name"] = f"{company_id} Corp"
+        if company_id == "TEST_COMPANY_REPAY_WEAK":
+            data["financial_data_detailed"]["key_ratios"]["interest_coverage_ratio"] = 0.8
+            data["financial_data_detailed"]["cash_flow_statement"]["free_cash_flow"] = [10, 5, -20]
+            data["financial_data_detailed"]["market_data"]["payment_history_placeholder"] = "90 days past due"
+        elif company_id == "TEST_COMPANY_FALLBACK":
+            # Data that will cause SK to return None, to test fallback
+            pass # Use default template
+        return data
 
     class MockSKFunction:
-        def __init__(self, skill_name):
+        def __init__(self, skill_name, test_case_id):
             self.skill_name = skill_name
+            self.test_case_id = test_case_id
 
         async def invoke(self, variables=None): 
             class MockSKResult:
                 def __init__(self, value_str): self._value = value_str
                 def __str__(self): return self._value
-            
+
+            if self.test_case_id == "TEST_COMPANY_FALLBACK":
+                return MockSKResult("Assessment: \nJustification: ") # Empty response
+
             if self.skill_name == "CollateralRiskAssessment":
-                ltv_str = variables.get("ltv_ratio", "Not specified.")
-                assessment = "Pass"; justification = "Collateral LTV is acceptable."
-                try:
-                    ltv = float(ltv_str)
-                    if ltv > 0.7: assessment = "Substandard"; justification = "High LTV."
-                    elif ltv > 0.5: assessment = "Special Mention"; justification = "LTV needs monitoring."
-                except ValueError: pass
+                assessment, justification = "Pass", "Collateral LTV is acceptable."
+                if self.test_case_id == "TEST_COMPANY_REPAY_WEAK":
+                    assessment, justification = "Special Mention", "LTV needs monitoring."
                 return MockSKResult(f"Assessment: {assessment}\nJustification: {justification}")
+
             elif self.skill_name == "AssessRepaymentCapacity":
-                assessment = "Adequate"; justification = "Repayment capacity seems adequate."; concerns="None."
-                # Simulate weak repayment based on some input data for testing
-                if "0.8" in variables.get("relevant_ratios","") or "-20" in variables.get("historical_fcf", "") : 
-                     assessment = "Weak"; justification = "Repayment capacity is weak based on ratios/FCF."; concerns="Debt service coverage low, negative FCF trend."
-                return MockSKResult(f"Assessment: {assessment}\nJustification: {justification}\nConcerns: {concerns}")
+                if self.test_case_id == "TEST_COMPANY_REPAY_WEAK":
+                    return MockSKResult(
+                        "Assessment: Weak\n"
+                        "DSCR_Calculation: 5,000 (Latest FCF) / 60,000 (Debt Service) = 0.08x\n"
+                        "Justification: Repayment capacity is weak due to negative FCF trend and very low DSCR.\n"
+                        "Concerns: Debt service coverage low, negative FCF trend."
+                    )
+                return MockSKResult(
+                    "Assessment: Strong\n"
+                    "DSCR_Calculation: 110,000 (Avg FCF) / 60,000 (Debt Service) = 1.83x\n"
+                    "Justification: Repayment capacity is strong with positive FCF and adequate DSCR.\n"
+                    "Concerns: None."
+                )
+
             elif self.skill_name == "AssessNonAccrualStatusIndication":
-                assessment = "Accrual Appropriate"; justification = "Currently performing."
-                if variables.get("payment_history_status") == "90 days past due" or variables.get("repayment_capacity_assessment") == "Weak":
-                    assessment = "Non-Accrual Warranted"; justification = "Deterioration noted and/or weak repayment."
-                return MockSKResult(f"Assessment: {assessment}\nJustification: {justification}")
+                if self.test_case_id == "TEST_COMPANY_REPAY_WEAK":
+                    return MockSKResult(
+                        "Assessment: Non-Accrual Warranted\n"
+                        "Triggers: 90 days past due, Repayment capacity assessed as Weak.\n"
+                        "Mitigants: None Identified.\n"
+                        "Justification: Delinquency and weak repayment capacity warrant non-accrual status."
+                    )
+                return MockSKResult(
+                    "Assessment: Accrual Appropriate\n"
+                    "Triggers: None Identified.\n"
+                    "Mitigants: N/A.\n"
+                    "Justification: The loan is performing and repayment capacity is strong."
+                )
             return MockSKResult("Unknown mock skill called.")
 
-
     class MockSKSkillsCollection:
+        def __init__(self, test_case_id):
+            self.test_case_id = test_case_id
         def get_function(self, skill_collection_name, skill_name):
             if skill_collection_name == "SNCRatingAssistSkill":
-                return MockSKFunction(skill_name) 
+                return MockSKFunction(skill_name, self.test_case_id) 
             return None
         
-    class MockKernel:
-        def __init__(self):
-            self.skills = MockSKSkillsCollection()
+    class MockKernel(Kernel):
+        def __init__(self, test_case_id="default"):
+            self.test_case_id = test_case_id
+            self._skills = MockSKSkillsCollection(test_case_id)
+        
+        @property
+        def skills(self):
+            return self._skills
 
-        def create_new_context(self):
-            # Return a simple dictionary for the mock context variables
-            # This mirrors SKContext's variable dictionary behavior for the mock.
-            return {}
-
-        async def run_async(self, sk_function, input_vars=None, **kwargs): 
-            # input_vars here is the context object (a dict in this mock setup)
-            if sk_function:
-                # The MockSKFunction's invoke method expects the context variables directly
-                return await sk_function.invoke(variables=input_vars)
-            return "Mock kernel run_async failed: No function"
-
-        async def run(self, *args, **kwargs): # Diagnostic: Add run method
-            # Delegate to run_async or handle as appropriate for the mock
-            # This is to catch if something is unexpectedly calling 'run'
-            logging.warning("MockKernel.run() was called unexpectedly. Delegating to run_async if possible.")
-            if args and hasattr(args[0], 'invoke'): # Assuming first arg is sk_function
-                input_vars = kwargs.get('input_vars', args[1] if len(args) > 1 else None)
-                return await self.run_async(args[0], input_vars=input_vars)
-            return "Mock kernel run() called with unexpected arguments."
-
+        async def run_semantic_kernel_skill(self, skill_collection_name, skill_name, sk_input_vars):
+            # This method now needs to be part of the mock to properly simulate behavior
+            # In the actual agent, `run_semantic_kernel_skill` is a helper that calls kernel.run_async
+            # Here, we simulate that by directly invoking our mock function
+            mock_function = self.skills.get_function(skill_collection_name, skill_name)
+            if mock_function:
+                result = await mock_function.invoke(variables=sk_input_vars)
+                return str(result)
+            return ""
 
     async def run_tests():
-        # Logging is now configured globally for the script run.
-        # dummy_snc_agent_config, mock_data_package_template, mock_send_message, 
-        # MockSKFunction, MockSKSkillsCollection, MockKernel are defined in the outer scope of __main__.
+        # --- Test Case 1: Good Financials ---
+        print("\n--- Test Case 1: Good Financials (Primary SK Path) ---")
+        mock_kernel_good = MockKernel(test_case_id="TEST_COMPANY_GOOD")
+        agent_good = SNCAnalystAgent(config=dummy_snc_agent_config, kernel=mock_kernel_good)
+        agent_good.peer_agents['DataRetrievalAgent'] = object()
+        # Patch the agent's own A2A and SK methods for this test
+        with patch.object(agent_good, 'send_message', new=mock_send_message), \
+             patch.object(agent_good, 'run_semantic_kernel_skill', new=mock_kernel_good.run_semantic_kernel_skill):
+            rating, rationale = await agent_good.execute(company_id="TEST_COMPANY_GOOD")
+            print(f"Rating: {rating.value if rating else 'N/A'}")
+            print(f"Rationale:\n{rationale}")
+            assert rating == SNCRating.PASS
+            assert "Executive Summary" in rationale and "DSCR_Calculation" in rationale
 
-        # Instantiate agents
-        snc_agent_no_kernel = SNCAnalystAgent(config=dummy_snc_agent_config, kernel=None)
-        mock_kernel_instance = MockKernel()
-        snc_agent_with_kernel = SNCAnalystAgent(config=dummy_snc_agent_config, kernel=mock_kernel_instance)
+        # --- Test Case 2: Weak Repayment ---
+        print("\n--- Test Case 2: Weak Repayment (Primary SK Path, Adverse Rating) ---")
+        mock_kernel_weak = MockKernel(test_case_id="TEST_COMPANY_REPAY_WEAK")
+        agent_weak = SNCAnalystAgent(config=dummy_snc_agent_config, kernel=mock_kernel_weak)
+        agent_weak.peer_agents['DataRetrievalAgent'] = object()
+        with patch.object(agent_weak, 'send_message', new=mock_send_message), \
+             patch.object(agent_weak, 'run_semantic_kernel_skill', new=mock_kernel_weak.run_semantic_kernel_skill):
+            rating, rationale = await agent_weak.execute(company_id="TEST_COMPANY_REPAY_WEAK")
+            print(f"Rating: {rating.value if rating else 'N/A'}")
+            print(f"Rationale:\n{rationale}")
+            assert rating == SNCRating.LOSS
+            assert "Triggers: 90 days past due" in rationale
 
-        # Simulate DataRetrievalAgent peer for testing execute() method directly
-        mock_dra_placeholder = object() 
-        snc_agent_no_kernel.peer_agents['DataRetrievalAgent'] = mock_dra_placeholder
-        snc_agent_with_kernel.peer_agents['DataRetrievalAgent'] = mock_dra_placeholder
-        
-        with patch.object(snc_agent_no_kernel, 'send_message', new=mock_send_message):
-            print("\n--- Test Case: Good Financials (No SK Kernel - TEST_COMPANY_SK_PASS) ---")
-            rating_no_sk_good, rationale_no_sk_good = await snc_agent_no_kernel.execute(company_id="TEST_COMPANY_SK_PASS")
-            print(f"Rating (No SK, Good): {rating_no_sk_good.value if rating_no_sk_good else 'N/A'}, Rationale: {rationale_no_sk_good}")
+        # --- Test Case 3: SK Failure Fallback ---
+        print("\n--- Test Case 3: SK Failure (Fallback Logic Path) ---")
+        mock_kernel_fallback = MockKernel(test_case_id="TEST_COMPANY_FALLBACK")
+        agent_fallback = SNCAnalystAgent(config=dummy_snc_agent_config, kernel=mock_kernel_fallback)
+        agent_fallback.peer_agents['DataRetrievalAgent'] = object()
+        with patch.object(agent_fallback, 'send_message', new=mock_send_message), \
+             patch.object(agent_fallback, 'run_semantic_kernel_skill', new=mock_kernel_fallback.run_semantic_kernel_skill):
+            # Modify data to trigger a specific fallback rule (e.g., Substandard)
+            global mock_data_package_template
+            original_data = json.loads(json.dumps(mock_data_package_template))
+            mock_data_package_template["financial_data_detailed"]["key_ratios"]["liquidity_ratio"] = 0.8
+            mock_data_package_template["financial_data_detailed"]["key_ratios"]["interest_coverage_ratio"] = 0.5
             
-            print("\n--- Test Case: Weak Repayment (No SK Kernel - TEST_COMPANY_REPAY_WEAK) ---")
-            rating_no_sk_repay_weak, rationale_no_sk_repay_weak = await snc_agent_no_kernel.execute(company_id="TEST_COMPANY_REPAY_WEAK")
-            print(f"Rating (No SK, Repay Weak): {rating_no_sk_repay_weak.value if rating_no_sk_repay_weak else 'N/A'}, Rationale: {rationale_no_sk_repay_weak}")
-
-        with patch.object(snc_agent_with_kernel, 'send_message', new=mock_send_message):
-            print("\n--- Test Case: Good Financials (With SK Kernel - TEST_COMPANY_SK_PASS) ---")
-            rating_sk_pass_good, rationale_sk_pass_good = await snc_agent_with_kernel.execute(company_id="TEST_COMPANY_SK_PASS") 
-            print(f"Rating (SK, Good): {rating_sk_pass_good.value if rating_sk_pass_good else 'N/A'}, Rationale: {rationale_sk_pass_good}")
-            assert "SK Collateral Assessment" in rationale_sk_pass_good
-
-            print("\n--- Test Case: Weak Repayment (With SK Kernel - TEST_COMPANY_REPAY_WEAK) ---")
-            rating_sk_repay_weak, rationale_sk_repay_weak = await snc_agent_with_kernel.execute(company_id="TEST_COMPANY_REPAY_WEAK") 
-            print(f"Rating (SK, Repay Weak): {rating_sk_repay_weak.value if rating_sk_repay_weak else 'N/A'}, Rationale: {rationale_sk_repay_weak}")
-            assert "SK Repayment Capacity (Weak)" in rationale_sk_repay_weak
+            rating, rationale = await agent_fallback.execute(company_id="TEST_COMPANY_FALLBACK")
+            print(f"Rating: {rating.value if rating else 'N/A'}")
+            print(f"Rationale:\n{rationale}")
+            assert rating == SNCRating.SUBSTANDARD
+            assert "Fallback: Insufficient liquidity" in rationale
             
-            print("\n--- Test Case: Missing Company ID (With Kernel for completeness) ---")
-            rating_missing_id, rationale_missing_id = await snc_agent_with_kernel.execute() # No company_id
-            print(f"Rating (Missing ID): {rating_missing_id.value if rating_missing_id else 'N/A'}, Rationale: {rationale_missing_id}")
-            assert rating_missing_id is None
+            # Restore original data for any subsequent tests
+            mock_data_package_template = original_data
+
+        # --- Test Case 4: Missing Company ID ---
+        print("\n--- Test Case 4: Missing Company ID ---")
+        agent_missing_id = SNCAnalystAgent(config=dummy_snc_agent_config, kernel=MockKernel())
+        rating, rationale = await agent_missing_id.execute() # No company_id
+        print(f"Rating: {'N/A'}, Rationale: {rationale}")
+        assert rating is None
 
     # The asyncio.run call should be the final line in the if __name__ == '__main__': block
     asyncio.run(run_tests())
