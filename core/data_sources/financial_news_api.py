@@ -68,3 +68,17 @@ class FinancialNewsAPI:
         
         #... (add more news sources)
         return historical_news
+
+class SimulatedFinancialNewsAPI(FinancialNewsAPI):
+    def get_headlines(self, source="bloomberg", keywords=None, sentiment=None):
+        logging.info(f"Fetching SIMULATED headlines from {source}. Keywords: {keywords}, Sentiment: {sentiment}")
+        return [
+            {"source": source, "title": f"Simulated positive news about {keywords or 'the market'}", "sentiment_score": 0.8},
+            {"source": source, "title": f"Simulated negative news about {keywords or 'the market'}", "sentiment_score": -0.8},
+        ]
+
+    def get_historical_news(self, source="bloomberg", keywords=None, start_date=None, end_date=None):
+        logging.info(f"Fetching SIMULATED historical news from {source}. Keywords: {keywords}, Start: {start_date}, End: {end_date}")
+        return [
+            {"source": source, "date": "2023-01-01", "title": f"Simulated historical news about {keywords or 'the market'}"}
+        ]
