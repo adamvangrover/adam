@@ -1,0 +1,559 @@
+from abc import ABC, abstractmethod
+from typing import Dict, Any, Optional
+import logging
+from typing import Dict, Any, Optional
+from core.data_access.base_data_source import BaseDataSource
+import json
+import logging
+from pathlib import Path
+from typing import Dict, Any, Optional
+from core.data_access.base_data_source import BaseDataSource
+from core.system.error_handler import FileReadError, InvalidInputError
+import requests
+import pandas as pd
+import logging # Added import
+from core.utils.secrets_utils import get_api_key # Added import
+import tweepy
+from textblob import TextBlob
+from facebook_scraper import get_posts
+import logging # Added import
+from core.utils.secrets_utils import get_api_key # Added import
+import requests
+import pandas as pd
+import logging # Added import
+from core.utils.secrets_utils import get_api_key # Added import
+import logging
+import requests
+from textblob import TextBlob
+import logging # Added import
+from core.utils.secrets_utils import get_api_key # Added import
+import requests
+from textblob import TextBlob
+import tweepy
+import logging # Added import
+from core.utils.secrets_utils import get_api_key # Added import
+from core.data_sources.financial_news_api import FinancialNewsAPI
+from core.data_sources.market_data_api import MarketDataAPI
+import logging
+from typing import List, Optional
+import os
+from core.embeddings.base_embedding_model import BaseEmbeddingModel
+import logging
+from typing import List
+from core.embeddings.base_embedding_model import BaseEmbeddingModel
+from abc import ABC, abstractmethod
+import numpy as np
+from scipy.stats import norm
+import pandas as pd  # For data manipulation
+from typing import Dict, Any, Tuple, List  # For type hinting
+from datetime import datetime
+import pandas as pd
+import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+from ta.trend import SMAIndicator, MACD, ADXIndicator
+from ta.momentum import RSIIndicator, StochasticOscillator
+from ta.volatility import BollingerBands
+from ta.volume import OnBalanceVolumeIndicator
+from typing import Dict, Any, Tuple
+import pandas as pd
+import numpy as np
+from langchain.agents import Tool
+from langchain.tools.python.tool import PythonAstREPLTool
+import logging
+import yaml
+import os
+import importlib
+from pathlib import Path
+from collections import deque
+from typing import Dict, Optional, List, Any
+import asyncio  # expand asynchronous communication
+import json
+from core.agents.agent_base import AgentBase
+from core.llm_plugin import LLMPlugin
+from core.agents.query_understanding_agent import QueryUnderstandingAgent
+from core.agents.data_retrieval_agent import DataRetrievalAgent
+from core.agents.market_sentiment_agent import MarketSentimentAgent
+from core.agents.macroeconomic_analysis_agent import MacroeconomicAnalysisAgent
+from core.agents.geopolitical_risk_agent import GeopoliticalRiskAgent
+from core.agents.industry_specialist_agent import IndustrySpecialistAgent
+from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
+from core.agents.technical_analyst_agent import TechnicalAnalystAgent
+from core.agents.risk_assessment_agent import RiskAssessmentAgent
+from core.agents.newsletter_layout_specialist_agent import NewsletterLayoutSpecialistAgent
+from core.agents.data_verification_agent import DataVerificationAgent
+from core.agents.lexica_agent import LexicaAgent
+from core.agents.archive_manager_agent import ArchiveManagerAgent
+from core.agents.agent_forge import AgentForge
+from core.agents.prompt_tuner import PromptTuner
+from core.agents.code_alchemist import CodeAlchemist
+from core.agents.lingua_maestro import LinguaMaestro
+from core.agents.sense_weaver import SenseWeaver
+from core.agents.SNC_analyst_agent import SNCAnalystAgent # Added import
+from core.agents.behavioral_economics_agent import BehavioralEconomicsAgent
+from core.agents.meta_cognitive_agent import MetaCognitiveAgent
+from core.utils.config_utils import load_config
+from core.utils.secrets_utils import get_api_key # Added import
+from semantic_kernel import Kernel
+from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion
+from financial_digital_twin.nexus_agent import NexusAgent
+import pandas as pd
+from core.utils.data_utils import validate_data
+import importlib
+import os
+from core.utils.config_utils import load_config
+import json
+import logging
+from typing import Optional
+from pathlib import Path
+import time
+from core.utils.data_utils import send_alert
+import psutil
+import time
+from core.utils.config_utils import load_error_codes # Import the function
+from core.system.agent_orchestrator import AgentOrchestrator
+from core.system.echo import Echo  # Assuming Echo is used for final output
+from core.utils.config_utils import load_config  # For loading configurations
+from core.utils.token_utils import check_token_limit, count_tokens  # Import token utilities
+import logging  # Import the logging module
+import schedule
+import time
+from plugin_manager import PluginManager
+from agents import * # Import all agents
+from core.utils.config_utils import load_app_config # Added import
+import json
+import pandas as pd
+from typing import List, Dict
+import random
+import numpy as np
+from mesa import Agent, Model
+from mesa.time import RandomActivation
+from mesa.datacollection import DataCollector
+import json
+from typing import Dict, Any
+from core.llm.base_llm_engine import BaseLLMEngine
+from core.world_simulation.config import WorldSimulationConfig
+import yaml
+from dataclasses import dataclass, field
+from typing import List, Dict
+import random
+import numpy as np
+from mesa import Agent, Model
+from mesa.time import RandomActivation
+from mesa.datacollection import DataCollector
+from abc import ABC, abstractmethod
+from typing import Any
+import logging
+from typing import Any
+from core.tools.base_tool import BaseTool
+from J鏟J_sandbox_tools import view_text_website
+from semantic_kernel.functions.kernel_function_decorator import kernel_function
+import os
+import logging
+from typing import Optional
+import pika
+import json
+from core.utils.data_utils import send_message, receive_messages
+import re
+import json
+import pandas as pd
+import numpy as np
+from datetime import datetime
+import pika
+import csv
+import logging
+import yaml #if needed
+from pathlib import Path
+from typing import Dict, Any, Optional, Union, List
+from core.system.error_handler import FileReadError, InvalidInputError, DataNotFoundError
+from flask import jsonify
+import yaml
+import os # Import the 'os' module
+import logging
+from typing import Dict, Any, Optional
+import tiktoken  # Use tiktoken for accurate token counting
+import logging
+import json
+from flask import Flask, request, jsonify
+from core.system.agent_orchestrator import AgentOrchestrator
+from core.system.echo import Echo
+from core.utils.api_utils import (
+import json
+from datetime import datetime
+from utils.api_communication import APICommunication
+from agents.Fundamental_Analysis_Agent import FundamentalAnalystAgent
+from agents.Technical_Analysis_Agent import TechnicalAnalystAgent
+from agents.Risk_Assessment_Agent import RiskAssessmentAgent
+from agents.Prediction_Market_Agent import PredictionMarketAgent
+from agents.Alternative_Data_Agent import AlternativeDataAgent
+from agents.Crypto_Agent import CryptoAgent
+from agents.Discussion_Chair_Agent import DiscussionChairAgent  # Import the Discussion Chair Agent
+import json
+from utils.api_communication import APICommunication
+from agents.Risk_Assessment_Agent import RiskAssessmentAgent
+from agents.Macroeconomic_Analysis_Agent import MacroeconomicAnalysisAgent
+from agents.Geopolitical_Risk_Agent import GeopoliticalRiskAgent
+from agents.Industry_Specialist_Agent import IndustrySpecialistAgent
+import json
+from utils.api_communication import APICommunication
+from agents.SNC_Analyst_Agent import SNCAnalystAgent
+from agents.Regulatory_Compliance_Agent import RegulatoryComplianceAgent
+from agents.Legal_Agent import LegalAgent
+import json
+from utils.api_communication import APICommunication
+from agents.Fundamental_Analysis_Agent import FundamentalAnalystAgent
+from agents.Industry_Specialist_Agent import IndustrySpecialistAgent
+from agents.Risk_Assessment_Agent import RiskAssessmentAgent
+from agents.Legal_Agent import LegalAgent
+import json
+from utils.api_communication import APICommunication
+from agents.Anomaly_Detection_Agent import AnomalyDetectionAgent
+from agents.Machine_Learning_Model_Training_Agent import MachineLearningModelTrainingAgent
+from agents.Alternative_Data_Agent import AlternativeDataAgent
+import json
+from agents.SNC_Analyst_Agent import SNCAnalystAgent
+from agents.Fundamental_Analysis_Agent import FundamentalAnalystAgent
+from agents.Industry_Specialist_Agent import IndustrySpecialistAgent
+from agents.Discussion_Chair_Agent import DiscussionChairAgent  # Import the Discussion Chair Agent
+import json
+from utils.api_communication import APICommunication
+from agents.Risk_Assessment_Agent import RiskAssessmentAgent
+from agents.Fundamental_Analysis_Agent import FundamentalAnalystAgent
+from agents.Technical_Analysis_Agent import TechnicalAnalystAgent
+from agents.Market_Sentiment_Agent import MarketSentimentAgent
+from agents.Prediction_Market_Agent import PredictionMarketAgent
+from agents.Alternative_Data_Agent import AlternativeDataAgent
+import logging
+from typing import List, Optional
+from abc import ABC, abstractmethod
+import logging
+from typing import List
+from core.llm.base_llm_engine import BaseLLMEngine
+import logging
+from typing import List, Optional
+import os # For API key handling
+from core.llm.base_llm_engine import BaseLLMEngine
+import json
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+from web3 import Web3
+import statsmodels.api as sm
+from core.agents.agent_base import AgentBase  # Assuming you have a base class for agents
+from core.utils.config_utils import load_config
+from core.utils.token_utils import count_tokens, check_token_limit
+import logging
+from core.agents.agent_base import AgentBase  # Assuming you have a base class for agents
+from core.utils.config_utils import load_config
+from core.utils.token_utils import count_tokens, check_token_limit
+import logging
+from typing import Any, Dict, List, Optional
+import asyncio
+from langchain.utilities import GoogleSearchAPIWrapper
+from transformers import pipeline
+from core.agents.agent_base import AgentBase
+from typing import Any, Dict, List, Optional
+import logging
+from transformers import pipeline
+import pandas as pd
+import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+import datetime
+import requests
+import json
+from typing import List, Dict
+from .base_agent import BaseAgent
+from utils.data_validation import validate_event_data
+from utils.visualization_tools import generate_event_impact_chart
+from core.utils.data_utils import send_message
+import json
+import datetime
+import requests
+import numpy as np
+from web3 import Web3
+from web3.middleware import geth_poa_middleware
+from sklearn.linear_model import LinearRegression
+import nltk
+from nltk.sentiment import SentimentIntensityAnalyzer
+import talib
+import ccxt
+from pycoingecko import CoinGeckoAPI
+import time
+import os
+from collections import deque
+import json
+import requests
+from datetime import datetime
+import logging
+import os
+import json
+import logging
+from core.utils.data_utils import send_message, receive_messages
+from core.utils.api_utils import get_knowledge_graph_data
+import sys
+import os
+import logging
+import json 
+import os # For os.path.exists and os.remove
+import asyncio
+from enum import Enum
+from typing import Dict, Any, Optional, Tuple
+from unittest.mock import patch 
+from core.agents.agent_base import AgentBase
+from semantic_kernel import Kernel 
+from transformers import pipeline
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import random
+import os
+import ast
+from langchain.utilities import GoogleSearchAPIWrapper
+from typing import Dict, List, Union
+import re
+from io import StringIO
+import sys
+import contextlib
+import logging
+import os
+import ast
+from typing import Any, Dict, List, Optional, Union
+import re
+from io import StringIO
+import sys
+import contextlib
+import logging
+import asyncio
+import aiohttp
+import json
+from core.agents.agent_base import AgentBase
+from core.utils.config_utils import load_config
+from core.llm_plugin import LLMPlugin
+import logging
+from typing import Any, Dict, Optional
+from core.agents.agent_base import AgentBase
+from typing import Any, Dict
+from core.agents.agent_base import AgentBase
+import requests
+from core.agents.agent_base import AgentBase
+from typing import Any, Dict
+from core.agents.agent_base import AgentBase
+from typing import Any, Dict
+from core.agents.agent_base import AgentBase
+import requests
+from core.agents.agent_base import AgentBase
+import csv
+import os
+import logging
+import pandas as pd
+import numpy as np
+from scipy import stats  # For statistical calculations (e.g., for DCF)
+from typing import Dict, Any, Optional, Union 
+from core.agents.agent_base import AgentBase
+from semantic_kernel import Kernel # Added for type hinting
+import asyncio # Added import
+import yaml # Added for example usage block
+from unittest.mock import patch # Added for example usage
+from typing import Any, Dict
+from core.agents.agent_base import AgentBase
+from typing import Any, Dict
+from core.agents.agent_base import AgentBase
+from typing import Any, Dict
+from core.agents.agent_base import AgentBase
+from typing import Any, Dict
+from core.agents.agent_base import AgentBase
+from typing import Any, Dict
+from core.agents.agent_base import AgentBase
+from core.agents.agent_base import AgentBase
+from textblob import TextBlob
+from core.agents.agent_base import AgentBase
+from textblob import TextBlob
+import requests
+from bs4 import BeautifulSoup
+from abc import ABC, abstractmethod
+from typing import Any, Dict, List, Optional # Optional was already here, ensure Dict and Any are used consistently
+import logging
+import json
+import asyncio
+from semantic_kernel import Kernel
+from core.llm.base_llm_engine import BaseLLMEngine
+from core.embeddings.base_embedding_model import BaseEmbeddingModel
+from core.vectorstore.base_vector_store import BaseVectorStore
+import logging
+import json
+import os
+import asyncio
+from typing import Optional, Union, List, Dict, Any
+from core.agents.agent_base import AgentBase
+from core.utils.data_utils import load_data # Assuming load_data is suitable
+from core.system.knowledge_base import KnowledgeBase
+from core.system.error_handler import DataNotFoundError, FileReadError 
+from semantic_kernel import Kernel # For AgentBase type hinting
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+import requests
+import logging
+from bs4 import BeautifulSoup
+import folium
+from geopy.geocoders import Nominatim
+import requests
+import nltk
+from nltk.sentiment import SentimentIntensityAnalyzer
+from collections import defaultdict
+import time
+from pycoingecko import CoinGeckoAPI
+import json
+import numpy as np
+from sklearn.cluster import KMeans
+from datetime import datetime
+import random
+from sklearn.metrics import pairwise_distances_argmin_min
+from typing import Dict, Any, Optional, List
+import feedparser # Added import
+import time # For parsing published_at if needed
+from datetime import timezone # For timezone aware datetime objects
+from semantic_kernel import Kernel
+from core.agents.agent_base import AgentBase
+import torch # Added import
+from transformers import AutoTokenizer, AutoModelForSequenceClassification # Added import
+import nltk # Added import for sentence tokenization in summarizer fallback
+from transformers import AutoModelForSeq2SeqLM # Added import for summarization model
+import json
+import nltk
+from nltk.sentiment import SentimentIntensityAnalyzer
+from textblob import TextBlob
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer as VaderSentiment
+import yfinance as yf
+import googlemaps
+import importlib
+from core.utils.data_utils import send_message
+import json
+import numpy as np
+from scipy.stats import norm
+import json
+import datetime
+from core.data_sources.financial_news_api import SimulatedFinancialNewsAPI
+from core.data_sources.prediction_market_api import SimulatedPredictionMarketAPI
+from core.data_sources.social_media_api import SimulatedSocialMediaAPI
+from core.data_sources.web_traffic_api import SimulatedWebTrafficAPI
+from core.utils.data_utils import send_message
+import numpy as np
+import pandas as pd
+from scipy import stats
+from sklearn.ensemble import IsolationForest
+from sklearn.neighbors import LocalOutlierFactor
+from sklearn.svm import OneClassSVM
+from sklearn.cluster import KMeans
+from statsmodels.tsa.seasonal import seasonal_decompose
+from statsmodels.tsa.arima.model import ARIMA
+from sklearn.preprocessing import StandardScaler
+from typing import Dict, List
+import os
+import json
+import datetime
+import pandas as pd
+from textblob import TextBlob
+import pandas as pd
+from textblob import TextBlob
+import pandas as pd
+from textblob import TextBlob
+import pandas as pd
+from textblob import TextBlob
+import pandas as pd
+from textblob import TextBlob
+import pandas as pd
+from textblob import TextBlob
+import pandas as pd
+from textblob import TextBlob
+import pandas as pd
+from textblob import TextBlob
+import pandas as pd
+from textblob import TextBlob
+import pandas as pd
+from textblob import TextBlob
+import pandas as pd
+from textblob import TextBlob
+import json
+import json
+import logging
+import json
+from core.utils.data_utils import send_message
+import logging
+import os
+from typing import Any, Dict, List, Optional
+from pathlib import Path
+import importlib
+import yaml
+from core.agents.agent_base import AgentBase
+from core.utils.config_utils import load_config, save_config
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from scipy import stats
+import logging
+from typing import Dict, Any, Tuple, List
+import openpyxl
+from langchain.prompts import PromptTemplate
+from core.utils.data_utils import send_message, receive_messages
+from typing import List, Dict
+import re
+from textblob import TextBlob  # Example NLP library
+import spacy  # Another example NLP library
+import json #knowledge base
+from typing import Any, Dict
+from core.agents.agent_base import AgentBase
+from core.agents.agent_base import AgentBase
+from core.agents.agent_base import AgentBase
+import re
+from typing import Dict, List, Tuple
+import nltk  # Natural Language Processing
+import requests  # API interaction
+from bs4 import BeautifulSoup  # Web scraping
+from neo4j import GraphDatabase  # Knowledge graph interaction
+import matplotlib.pyplot as plt
+import seaborn as sns
+import plotly.express as px
+import logging
+from core.agents.agent_base import AgentBase
+from core.utils.config_utils import load_config
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, LSTM, Dropout
+from typing import List, Dict
+from .base_agent import BaseAgent
+from utils.data_validation import validate_portfolio_data
+from utils.visualization_tools import generate_portfolio_visualization
+from langchain.utilities import GoogleSearchAPIWrapper
+from transformers import pipeline
+from nltk.sentiment import SentimentIntensityAnalyzer
+import pandas as pd
+import numpy as np
+from core.agents.agent_base import AgentBase
+from typing import Any, Dict, List, Optional
+import logging
+import re
+from core.agents.agent_base import Agent
+from core.agents.agent_base import Agent
+from core.llm.engines.dummy_llm_engine import DummyLLMEngine
+from core.embeddings.models.dummy_embedding_model import DummyEmbeddingModel
+from core.rag.document_handling import Document
+from semantic_kernel import Kernel
+import logging
+from typing import List, Tuple
+import numpy as np
+from core.vectorstore.base_vector_store import BaseVectorStore
+from abc import ABC, abstractmethod
+from typing import List, Tuple
+import os
+import logging
+from abc import ABC, abstractmethod
+from typing import Dict, Any, Optional, Tuple, List
+from dotenv import load_dotenv
+import yaml
+from pathlib import Path
+import json
+import time
+import hashlib
