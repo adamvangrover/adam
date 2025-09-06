@@ -33,6 +33,8 @@ from core.agents.code_alchemist import CodeAlchemist
 from core.agents.lingua_maestro import LinguaMaestro
 from core.agents.sense_weaver import SenseWeaver
 from core.agents.SNC_analyst_agent import SNCAnalystAgent # Added import
+from core.agents.behavioral_economics_agent import BehavioralEconomicsAgent
+from core.agents.meta_cognitive_agent import MetaCognitiveAgent
 
 from core.utils.config_utils import load_config
 from core.utils.secrets_utils import get_api_key # Added import
@@ -72,6 +74,8 @@ AGENT_CLASSES = {
     "DataRetrievalAgent": "core.agents.data_retrieval_agent",
     "ResultAggregationAgent": "core.agents.result_aggregation_agent",
     "SNCAnalystAgent": "core.agents.SNC_analyst_agent", # Added SNC_analyst_agent
+    "BehavioralEconomicsAgent": "core.agents.behavioral_economics_agent",
+    "MetaCognitiveAgent": "core.agents.meta_cognitive_agent",
     "NewsBotAgent": "core.agents.NewsBot",
     "NexusAgent": NexusAgent,
     "IngestionAgent": AgentBase, # Using AgentBase as a placeholder
@@ -418,6 +422,8 @@ class AgentOrchestrator:
             "fundamental": "FundamentalAnalystAgent",
             "technical": "TechnicalAnalystAgent",
             "risk_assessment": "RiskAssessmentAgent",
+            "behavioral_economics": "BehavioralEconomicsAgent",
+            "meta_cognitive": "MetaCognitiveAgent",
         }
 
         agent_name: Optional[str] = analysis_agents.get(analysis_type)
