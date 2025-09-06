@@ -923,6 +923,49 @@ agents:  # This top-level 'agents' key is REQUIRED
         description: "Serves as the secure and reliable conduit to the financial institution's own internal systems of record."
         expertise: ["internal data access", "API integration"]
 
+  behavioral_economics_agent:
+    <<: *defaults
+    persona: "Cognitive Bias Detector"
+    description: "Analyzes market data and user interactions for signs of cognitive biases and irrational behavior."
+    expertise:
+      - "cognitive bias detection"
+      - "behavioral analysis"
+      - "market psychology"
+    bias_patterns:
+      market:
+        herding:
+          - "everyone is buying"
+          - "fear of missing out"
+          - "FOMO"
+        recency_bias:
+          - "recent performance"
+          - "short-term trend"
+      user:
+        confirmation_bias:
+          - "confirm my belief"
+          - "evidence for my view"
+
+  meta_cognitive_agent:
+    <<: *defaults
+    persona: "Logical Consistency Guardian"
+    description: "Monitors the reasoning and outputs of other agents to ensure logical consistency, coherence, and alignment with core principles."
+    expertise:
+      - "logical fallacy detection"
+      - "consistency checking"
+      - "reasoning validation"
+    logical_fallacies:
+      appeal_to_authority:
+        - "\\b(expert|authority|source) says\\b"
+        - "\\b(studies|research) shows?\\b"
+      hasty_generalization:
+        - "\\b(always|never|everyone|no one) (is|are|does|do)\\b"
+      false_cause:
+        - "\\b(happened after|coincidence|caused by)\\b"
+    positive_keywords:
+      - "\\b(strong buy|outperform|bullish|upward trend|high confidence|positive outlook)\\b"
+    negative_keywords:
+      - "\\b(high risk|underperform|bearish|downward trend|low confidence|negative outlook|risky)\\b"
+
 # Skill-based Configuration (Example)
 skills:
   data_analysis:
