@@ -11,30 +11,27 @@ adam/
 
 ````markdown
 
-# Adam v19.1: Your AI-Powered Financial Analyst
+# Adam v21.0: Your AI-Powered Financial Analyst
 ````
-**(Welcome to Adam v19.1, the most advanced version yet\! We've supercharged our capabilities with an expanded agent network, enhanced simulation workflows, and a more sophisticated knowledge base to deliver unparalleled financial analysis and investment insights.)**
+**(Welcome to Adam v21.0, the most advanced version yet\! We've supercharged our capabilities with an expanded agent network, enhanced simulation workflows, and a more sophisticated knowledge base to deliver unparalleled financial analysis and investment insights.)**
 
 **[Explore the interactive demo here\!](https://adamvangrover.github.io/adam/chatbot-ui/)**
 
-Adam v19.1 is not just an AI; it's your partner in navigating the complexities of the financial world. Whether you're an individual investor, a seasoned analyst, or a financial institution, Adam v19.1 empowers you with the knowledge and tools to make informed decisions and achieve your financial goals.
+Adam v21.0 is not just an AI; it's your partner in navigating the complexities of the financial world. Whether you're an individual investor, a seasoned analyst, or a financial institution, Adam v21.0 empowers you with the knowledge and tools to make informed decisions and achieve your financial goals.
 ````
-## What's New in Adam v19.1?
+## What's New in Adam v21.0?
 
-  * **Expanded Agent Network:**
-      * **Legal Eagle:** Stays abreast of regulatory changes, analyzes legal documents, and assesses legal risks, ensuring your investments are compliant and protected.
-      * **Model Builder:** Creates and analyzes sophisticated financial models for valuation, forecasting, and scenario planning, providing deeper insights into investment opportunities.
-      * **Supply Chain Guardian:** Identifies and mitigates potential disruptions in supply chains, safeguarding your investments from unexpected risks.
-      * **Algorithmic Trader:** Develops and executes cutting-edge trading algorithms, optimizing your portfolio and maximizing returns.
-      * **Discussion Chair:** Facilitates and moderates investment committee discussions, ensuring efficient decision-making and capturing key insights.
-  * **Enhanced Simulation Capabilities:**
-      * **Credit Rating Assessment Simulation:** Simulates the credit rating process, providing a comprehensive and unbiased assessment of credit risk.
-      * **Investment Committee Simulation:** Replicates real-world investment committee discussions, allowing you to test different scenarios and refine your investment strategies.
-  * **Improved Knowledge Base:**
-      * **Graph Database:** Leverages a powerful graph database (e.g., Neo4j) to store and access vast amounts of interconnected financial knowledge efficiently.
-      * **Expanded Content:** Incorporates credit rating methodologies, regulatory guidelines, historical rating data, and crypto asset data, providing a holistic view of the financial landscape.
-  * **Explainable AI (XAI):** Offers clear and transparent explanations for every recommendation and insight, fostering trust and understanding.
-  * **Automated Testing and Monitoring:** Continuously tests and monitors the system to ensure accuracy, reliability, and optimal performance.
+  * **New Agents for Deeper Analysis:**
+      * **Behavioral Economics Agent:** Identifies market and user cognitive biases (e.g., herding, confirmation bias) to provide a more nuanced understanding of market behavior.
+      * **Meta-Cognitive Agent:** Acts as a quality control layer, reviewing the analysis of other agents for logical fallacies and inconsistencies, ensuring higher quality output.
+  * **Enhanced Reasoning and Self-Correction:**
+      * **Causal Inference Modeling:** Moves beyond correlation to understand the causal impact of events.
+      * **Formalized Self-Correction Loop:** A more robust system for identifying, diagnosing, and correcting errors, allowing the system to learn and improve over time.
+  * **Upgraded Core Principles:**
+      * **Intellectual Humility:** Proactively acknowledges uncertainty and the probabilistic nature of markets.
+      * **Ethical Guardrails:** Stricter operational and ethical boundaries to prevent misuse and ensure fairness.
+  * **Improved Agent Architecture:**
+      * Enhanced capabilities for monitoring agent performance, managing dependencies, and updating or retiring agents seamlessly.
 
 ## Key Features
 
@@ -55,7 +52,7 @@ Adam v19.1 is not just an AI; it's your partner in navigating the complexities o
   * **Dynamic Visualization Engine:**
       * **Generates interactive and informative visualizations to aid in understanding complex data.**
   * **Repository Management System:**
-      * **Organizes and manages all Adam v19.1 files, including market overviews, company recommendations, newsletters, and simulation results.**
+      * **Organizes and manages all Adam v21.0 files, including market overviews, company recommendations, newsletters, and simulation results.**
   * **Feedback and Prompt Refinement Loop:**
       * **Continuously learns and adapts based on user feedback and new information.**
 
@@ -98,7 +95,7 @@ Adam v19.1 is not just an AI; it's your partner in navigating the complexities o
 ## Accessing and Utilizing the Knowledge Graph and API
 
   * **Knowledge Graph:** Access and query the knowledge graph data directly or through the API. The data is stored in the `data/knowledge_graph.json` file and managed by the Neo4j graph database.
-  * **API:** The Adam v19.1 API provides a unified interface for interacting with the system. Refer to the `docs/api_docs.yaml` file for detailed API documentation.
+  * **API:** The Adam v21.0 API provides a unified interface for interacting with the system. Refer to the `docs/api_docs.yaml` file for detailed API documentation.
 
 ## Documentation
 
@@ -118,60 +115,60 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 
 ### General
 
-  * **What is Adam v19.1?**
-      * Adam v19.1 is a highly sophisticated AI-powered financial analytics system designed to provide comprehensive insights and strategic guidance for investors, analysts, and researchers.
-  * **Who is Adam v19.1 for?**
-      * Adam v19.1 is designed for a wide range of users, including individual investors, financial analysts, portfolio managers, risk managers, and researchers.
-  * **How does Adam v19.1 work?**
-      * Adam v19.1 utilizes a modular architecture with specialized agents for various tasks, including market sentiment analysis, macroeconomic analysis, geopolitical risk assessment, industry-specific analysis, fundamental and technical analysis, risk assessment, and more. These agents collaborate and interact to provide a holistic view of the financial landscape.
-  * **What are the benefits of using Adam v19.1?**
-      * Adam v19.1 can help users gain a deeper understanding of the financial markets, identify potential investment opportunities, manage risks, and optimize their portfolios. It also provides access to a wealth of financial knowledge and facilitates informed decision-making.
-  * **How can I access Adam v19.1?**
-      * Adam v19.1 is currently implemented as a GitHub repository. You can access the code and documentation here: [https://github.com/adamvangrover/adam](https://github.com/adamvangrover/adam)
-  * **Is Adam v19.1 free to use?**
-      * Yes, Adam v19.1 is open source and free to use.
-  * **What are the limitations of Adam v19.1?**
-      * As an AI system under development, Adam v19.1 may not always be perfect and its recommendations should not be taken as financial advice. It's essential to conduct your own research and consult with a financial advisor before making any investment decisions.
-  * **How can I contribute to Adam v19.1?**
+  * **What is Adam v21.0?**
+      * Adam v21.0 is a highly sophisticated AI-powered financial analytics system designed to provide comprehensive insights and strategic guidance for investors, analysts, and researchers.
+  * **Who is Adam v21.0 for?**
+      * Adam v21.0 is designed for a wide range of users, including individual investors, financial analysts, portfolio managers, risk managers, and researchers.
+  * **How does Adam v21.0 work?**
+      * Adam v21.0 utilizes a modular architecture with specialized agents for various tasks, including market sentiment analysis, macroeconomic analysis, geopolitical risk assessment, industry-specific analysis, fundamental and technical analysis, risk assessment, and more. These agents collaborate and interact to provide a holistic view of the financial landscape.
+  * **What are the benefits of using Adam v21.0?**
+      * Adam v21.0 can help users gain a deeper understanding of the financial markets, identify potential investment opportunities, manage risks, and optimize their portfolios. It also provides access to a wealth of financial knowledge and facilitates informed decision-making.
+  * **How can I access Adam v21.0?**
+      * Adam v21.0 is currently implemented as a GitHub repository. You can access the code and documentation here: [https://github.com/adamvangrover/adam](https://github.com/adamvangrover/adam)
+  * **Is Adam v21.0 free to use?**
+      * Yes, Adam v21.0 is open source and free to use.
+  * **What are the limitations of Adam v21.0?**
+      * As an AI system under development, Adam v21.0 may not always be perfect and its recommendations should not be taken as financial advice. It's essential to conduct your own research and consult with a financial advisor before making any investment decisions.
+  * **How can I contribute to Adam v21.0?**
       * Contributions are welcome\! You can contribute by reporting bugs, suggesting enhancements, or submitting code changes. See the `CONTRIBUTING.md` file for more details.
-  * **Where can I find more information about Adam v19.1?**
+  * **Where can I find more information about Adam v21.0?**
       * You can find more information in the `README.md` file and other documentation files in the repository. You can also explore the interactive tutorials and FAQ section for detailed guidance and examples.
 
 ### Features
 
   * **What is market sentiment analysis?**
-      * Market sentiment analysis gauges the overall mood and sentiment of investors in the financial markets. Adam v19.1 uses natural language processing (NLP) and machine learning (ML) techniques to analyze news articles, social media feeds, and other sources to determine the prevailing sentiment towards the market or specific assets.
-  * **How does Adam v19.1 perform macroeconomic analysis?**
-      * Adam v19.1 analyzes macroeconomic indicators, such as GDP growth, inflation, and interest rates, to assess the health of the economy and its potential impact on financial markets. It uses statistical models and forecasting techniques to provide insights into macroeconomic trends and their implications for investments.
-  * **What are geopolitical risks, and how does Adam v19.1 assess them?**
-      * Geopolitical risks are events or situations related to international relations, politics, or conflicts that can impact financial markets. Adam v19.1 assesses these risks by analyzing news, political developments, and other relevant data, using NLP and ML techniques to identify and evaluate potential geopolitical risks.
-  * **What industries does Adam v19.1 specialize in?**
-      * Adam v19.1 can analyze a wide range of industries, with specialized agents for key sectors such as technology, healthcare, energy, and finance. It can also adapt to new industries and sectors through its dynamic agent deployment capabilities.
-  * **How does Adam v19.1 conduct fundamental analysis?**
-      * Adam v19.1 performs fundamental analysis by analyzing financial statements, evaluating company management, and conducting valuation modeling. It uses a variety of techniques, including discounted cash flow (DCF) analysis, comparable company analysis, and precedent transactions analysis, to determine the intrinsic value of a company or asset.
-  * **What technical analysis tools does Adam v19.1 offer?**
-      * Adam v19.1 offers various technical analysis tools, including chart pattern recognition, technical indicator analysis, and trading signal generation. It can analyze historical price data and identify trends, support and resistance levels, and other technical patterns to provide insights into potential trading opportunities.
-  * **How does Adam v19.1 assess investment risks?**
-      * Adam v19.1 assesses investment risks by evaluating market risk, credit risk, liquidity risk, and other relevant factors. It uses quantitative models and simulations to assess the potential impact of different risk factors on investments and portfolios.
+      * Market sentiment analysis gauges the overall mood and sentiment of investors in the financial markets. Adam v21.0 uses natural language processing (NLP) and machine learning (ML) techniques to analyze news articles, social media feeds, and other sources to determine the prevailing sentiment towards the market or specific assets.
+  * **How does Adam v21.0 perform macroeconomic analysis?**
+      * Adam v21.0 analyzes macroeconomic indicators, such as GDP growth, inflation, and interest rates, to assess the health of the economy and its potential impact on financial markets. It uses statistical models and forecasting techniques to provide insights into macroeconomic trends and their implications for investments.
+  * **What are geopolitical risks, and how does Adam v21.0 assess them?**
+      * Geopolitical risks are events or situations related to international relations, politics, or conflicts that can impact financial markets. Adam v21.0 assesses these risks by analyzing news, political developments, and other relevant data, using NLP and ML techniques to identify and evaluate potential geopolitical risks.
+  * **What industries does Adam v21.0 specialize in?**
+      * Adam v21.0 can analyze a wide range of industries, with specialized agents for key sectors such as technology, healthcare, energy, and finance. It can also adapt to new industries and sectors through its dynamic agent deployment capabilities.
+  * **How does Adam v21.0 conduct fundamental analysis?**
+      * Adam v21.0 performs fundamental analysis by analyzing financial statements, evaluating company management, and conducting valuation modeling. It uses a variety of techniques, including discounted cash flow (DCF) analysis, comparable company analysis, and precedent transactions analysis, to determine the intrinsic value of a company or asset.
+  * **What technical analysis tools does Adam v21.0 offer?**
+      * Adam v21.0 offers various technical analysis tools, including chart pattern recognition, technical indicator analysis, and trading signal generation. It can analyze historical price data and identify trends, support and resistance levels, and other technical patterns to provide insights into potential trading opportunities.
+  * **How does Adam v21.0 assess investment risks?**
+      * Adam v21.0 assesses investment risks by evaluating market risk, credit risk, liquidity risk, and other relevant factors. It uses quantitative models and simulations to assess the potential impact of different risk factors on investments and portfolios.
   * **What is the World Simulation Model, and how does it work?**
       * The World Simulation Model (WSM) is a module that simulates market conditions and generates probabilistic forecasts to help assess potential investment outcomes. It uses historical data, economic models, and agent-based simulations to generate scenarios and assess their probabilities, providing insights into potential market movements and investment risks.
-  * **How does Adam v19.1 generate investment recommendations?**
-      * Adam v19.1 generates investment recommendations based on a combination of factors, including market analysis, fundamental analysis, technical analysis, risk assessment, and user preferences. It uses a multi-agent decision-making process, where different agents collaborate and share information to arrive at informed investment recommendations.
-  * **What is included in the Adam v19.1 newsletter?**
-      * The Adam v19.1 newsletter includes market commentary, investment ideas, risk assessments, and other relevant information for investors. It is generated automatically based on the latest analysis and insights from the system, and can be customized to suit individual preferences and interests.
+  * **How does Adam v21.0 generate investment recommendations?**
+      * Adam v21.0 generates investment recommendations based on a combination of factors, including market analysis, fundamental analysis, technical analysis, risk assessment, and user preferences. It uses a multi-agent decision-making process, where different agents collaborate and share information to arrive at informed investment recommendations.
+  * **What is included in the Adam v21.0 newsletter?**
+      * The Adam v21.0 newsletter includes market commentary, investment ideas, risk assessments, and other relevant information for investors. It is generated automatically based on the latest analysis and insights from the system, and can be customized to suit individual preferences and interests.
 
 ### Technical
 
-  * **What technologies are used to build Adam v19.1?**
-      * Adam v19.1 is built using Python and various libraries for data analysis, machine learning, natural language processing, and web development. It also utilizes a graph database (e.g., Neo4j) for efficient storage and retrieval of financial knowledge.
+  * **What technologies are used to build Adam v21.0?**
+      * Adam v21.0 is built using Python and various libraries for data analysis, machine learning, natural language processing, and web development. It also utilizes a graph database (e.g., Neo4j) for efficient storage and retrieval of financial knowledge.
   * **How is data security and privacy ensured?**
-      * Data security and privacy are ensured through encryption, access controls, and adherence to best practices for data management. Adam v19.1 also incorporates regular security audits and vulnerability assessments to identify and mitigate potential security risks.
-  * **What are the system requirements for running Adam v19.1?**
-      * The system requirements for running Adam v19.1 are detailed in the `README.md` file. They include a server or virtual machine with sufficient resources (CPU, memory, storage) to handle the workload, a compatible operating system (e.g., Linux, macOS, Windows), and the necessary Python packages and dependencies.
-  * **How can I deploy Adam v19.1 in different environments?**
-      * Adam v19.1 can be deployed in various ways, including direct deployment, virtual environment, Docker container, or cloud platforms. See the `deployment.md` file for more details.
-  * **What APIs and data sources does Adam v19.1 integrate with?**
-      * Adam v19.1 integrates with various APIs and data sources, including financial news APIs, social media APIs, government statistical agencies, and market data providers. It also incorporates alternative data sources, such as web traffic data, satellite imagery, and blockchain data, to provide a more comprehensive view of the financial landscape.
+      * Data security and privacy are ensured through encryption, access controls, and adherence to best practices for data management. Adam v21.0 also incorporates regular security audits and vulnerability assessments to identify and mitigate potential security risks.
+  * **What are the system requirements for running Adam v21.0?**
+      * The system requirements for running Adam v21.0 are detailed in the `README.md` file. They include a server or virtual machine with sufficient resources (CPU, memory, storage) to handle the workload, a compatible operating system (e.g., Linux, macOS, Windows), and the necessary Python packages and dependencies.
+  * **How can I deploy Adam v21.0 in different environments?**
+      * Adam v21.0 can be deployed in various ways, including direct deployment, virtual environment, Docker container, or cloud platforms. See the `deployment.md` file for more details.
+  * **What APIs and data sources does Adam v21.0 integrate with?**
+      * Adam v21.0 integrates with various APIs and data sources, including financial news APIs, social media APIs, government statistical agencies, and market data providers. It also incorporates alternative data sources, such as web traffic data, satellite imagery, and blockchain data, to provide a more comprehensive view of the financial landscape.
 
 ## Educational Resources
 
@@ -239,11 +236,11 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 
 ### Overview
 
-Adam v19.1 builds upon the modular, agent-based architecture of its predecessors, incorporating new agents, simulations, and enhanced capabilities to provide a more in-depth and nuanced understanding of financial markets. The system leverages a network of specialized agents, each responsible for a specific domain of expertise, such as market sentiment analysis, macroeconomic analysis, fundamental analysis, technical analysis, risk assessment, and more. These agents collaborate and interact to provide a holistic view of the financial landscape, enabling informed investment decisions and risk management.
+Adam v21.0 builds upon the modular, agent-based architecture of its predecessors, incorporating new agents, simulations, and enhanced capabilities to provide a more in-depth and nuanced understanding of financial markets. The system leverages a network of specialized agents, each responsible for a specific domain of expertise, such as market sentiment analysis, macroeconomic analysis, fundamental analysis, technical analysis, risk assessment, and more. These agents collaborate and interact to provide a holistic view of the financial landscape, enabling informed investment decisions and risk management.
 
 ### Core Components
 
-Adam v19.1 comprises the following core components:
+Adam v21.0 comprises the following core components:
 
   * **Agents:**
 
@@ -270,6 +267,8 @@ Adam v19.1 comprises the following core components:
       * Legal Agent: Provides legal advice and analysis.
       * Regulatory Compliance Agent: Ensures compliance with financial regulations (to be developed).
       * Anomaly Detection Agent: Detects anomalies and potential fraud (to be developed).
+      * Behavioral Economics Agent: Analyzes market data and user interactions for signs of cognitive biases and irrational behavior.
+      * Meta-Cognitive Agent: Monitors the reasoning and outputs of other agents to ensure logical consistency, coherence, and alignment with core principles.
 
   * **Simulations:**
 
@@ -320,7 +319,7 @@ Adam v19.1 comprises the following core components:
 
 ## Data Flow
 
-The data flow in Adam v19.1 involves the following steps:
+The data flow in Adam v21.0 involves the following steps:
 
 1.  **Data Acquisition:** Agents acquire data from various sources.
 2.  **Data Processing:** Agents process and analyze the data using appropriate techniques.
@@ -334,7 +333,7 @@ The data flow in Adam v19.1 involves the following steps:
 
 ```
 +-----------------------+
-|       Adam v19.1      |
+|       Adam v21.0      |
 |                       |
 |  +-----------------+  |
 |  |  Data Sources  |  |
@@ -370,7 +369,7 @@ The data flow in Adam v19.1 involves the following steps:
 
 ## Design Principles
 
-Adam v19.1's architecture adheres to the following design principles:
+Adam v21.0's architecture adheres to the following design principles:
 
   * **Modularity:** The system is composed of independent modules that can be developed, tested, and deployed separately.
   * **Scalability:** The architecture allows for easy scaling by adding new agents or data sources as needed.
@@ -392,9 +391,9 @@ Future enhancements to the architecture may include:
 
 ## Interactive Tutorials
 
-Adam v19.1 offers interactive tutorials to guide you through its features and capabilities. These tutorials cover various topics, including:
+Adam v21.0 offers interactive tutorials to guide you through its features and capabilities. These tutorials cover various topics, including:
 
-  * **Introduction to Adam v19.1:** Overview of the system, its components, and how to get started.
+  * **Introduction to Adam v21.0:** Overview of the system, its components, and how to get started.
   * **Market Sentiment Analysis:** Analyzing market sentiment using NLP and ML techniques.
   * **Fundamental Analysis:** Performing in-depth analysis of company financials and valuation.
   * **Technical Analysis:** Analyzing price trends, chart patterns, and technical indicators.
@@ -408,10 +407,10 @@ You can access the interactive tutorials here: https://github.com/adamvangrover/
 
 ## Contributing
 
-Contributions to Adam v19.1 are welcome\! Please check the [CONTRIBUTING.md](https://github.com/adamvangrover/adam/blob/main/CONTRIBUTING.md) file for guidelines on how to contribute to the project.
+Contributions to Adam v21.0 are welcome\! Please check the [CONTRIBUTING.md](https://github.com/adamvangrover/adam/blob/main/CONTRIBUTING.md) file for guidelines on how to contribute to the project.
 
 ## Support and Feedback
 
-If you have any questions or feedback, please feel free to reach out to the Adam v19.1 development team. You can submit issues or pull requests on the GitHub repository or contact the developers directly.
+If you have any questions or feedback, please feel free to reach out to the Adam v21.0 development team. You can submit issues or pull requests on the GitHub repository or contact the developers directly.
 
-We hope this comprehensive README provides a solid foundation for understanding and utilizing the power of Adam v19.1. As you explore its features and capabilities, you'll discover new ways to enhance your financial analysis and decision-making processes.
+We hope this comprehensive README provides a solid foundation for understanding and utilizing the power of Adam v21.0. As you explore its features and capabilities, you'll discover new ways to enhance your financial analysis and decision-making processes.
