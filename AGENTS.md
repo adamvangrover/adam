@@ -74,6 +74,11 @@ The ADAM system employs a hierarchical agent architecture that consists of three
     *   Transforming data into a more abstract or analytical form (e.g., a risk rating, a summary, a forecast).
 *   **Example:** A Meta-Agent might take financial data from a Sub-Agent and use it to generate a credit risk assessment.
 
+#### New Meta-Agents in v21.0
+
+*   **Behavioral Economics Agent:** Analyzes market data and user interactions for signs of cognitive biases and irrational behavior.
+*   **Meta-Cognitive Agent:** Monitors the reasoning and outputs of other agents to ensure logical consistency, coherence, and alignment with core principles.
+
 ### Orchestrator Agents
 
 *   **Role:** The Orchestrator Agent is the "brain" and "central nervous system" of the entire agentic system. It is the highest level of control, responsible for interpreting user intent, formulating plans, delegating tasks, and synthesizing a final, coherent response.
