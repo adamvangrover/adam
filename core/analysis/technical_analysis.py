@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from ta.trend import SMAIndicator, MACD, ADXIndicator
+from .trading_logic import sma_crossover_strategy
 from ta.momentum import RSIIndicator, StochasticOscillator
 from ta.volatility import BollingerBands
 from ta.volume import OnBalanceVolumeIndicator
@@ -121,6 +122,14 @@ class TechnicalAnalyst:
             # Technical Indicator Analysis
             signal = self._analyze_technical_indicators(df, signal)
 
+            # SMA Crossover Strategy
+            crossover_signals = sma_crossover_strategy(df)
+            if crossover_signals['position'][-1] == 1:
+                signal = 'buy'
+            elif crossover_signals['position'][-1] == -1:
+                signal = 'sell'
+
+
         # 2. CDS Spread Analysis (if available)
         if 'identifier' in asset_data and self.cds_spread_agent:
             identifier = asset_data['identifier']  # Assuming an identifier like CUSIP or ISIN
@@ -212,14 +221,6 @@ class TechnicalAnalyst:
         Returns:
             Trading signal ('buy', 'sell', or 'hold').
         """
-        # Example: Moving average crossover
-        if df['SMA_50'][-1] > df['SMA_200'][-1] and df['SMA_50'][-2] <= df['SMA_200'][-2]:
-            print("Bullish SMA crossover detected.")
-            return 'buy' if ml_signal != 'sell' else 'hold'  # Prioritize ML signal if it's a sell signal
-        elif df['SMA_50'][-1] < df['SMA_200'][-1] and df['SMA_50'][-2] >= df['SMA_200'][-2]:
-            print("Bearish SMA crossover detected.")
-            return 'sell' if ml_signal != 'buy' else 'hold'  # Prioritize ML signal if it's a buy signal
-
         # Example: RSI overbought/oversold
         if df['RSI'][-1] > 70:
             print("RSI overbought.")
