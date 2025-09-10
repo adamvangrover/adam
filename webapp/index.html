@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Catalog</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* A simple font and custom scrollbar for a better look */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        /* Custom scrollbar for webkit browsers */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+
+        /* Simple animations for modal */
+        @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
+
+        @keyframes slide-up {
+            from { transform: translateY(20px) scale(0.98); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        .animate-slide-up { animation: slide-up 0.3s ease-out forwards; }
+
+        /* Hide the modal by default */
+        .modal-hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 font-sans">
+
+    <div id="root" class="min-h-screen flex flex-col md:flex-row">
+        <aside class="w-full md:w-64 md:flex-shrink-0 bg-gray-900 border-b md:border-b-0 md:border-r border-gray-800">
+            <div class="flex items-center space-x-2 p-4 border-b border-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-indigo-400">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                    <polyline points="2 17 12 22 22 17"></polyline>
+                    <polyline points="2 12 12 17 22 12"></polyline>
+                </svg>
+                <h1 class="text-xl font-bold text-white">Prompt Catalog</h1>
+            </div>
+            <nav class="p-4">
+                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">Workflow Stages</h2>
+                <div id="sidebar-nav" class="flex flex-row md:flex-col overflow-x-auto md:overflow-x-visible pb-2 md:pb-0">
+                    </div>
+            </nav>
+        </aside>
+
+        <main class="flex-1 p-4 md:p-8">
+            <div class="mb-6">
+                <h2 class="text-3xl font-bold text-white">Credit Risk Agents</h2>
+                <p class="text-gray-400 mt-1">
+                    Browse and explore pre-defined prompts for various credit risk workflow stages.
+                    Currently showing <span id="current-stage" class="font-bold text-indigo-400">All</span> stage.
+                </p>
+            </div>
+            <div id="prompt-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
+        </main>
+
+        <div id="prompt-modal" class="fixed inset-0 bg-black/70 items-center justify-center p-4 z-50 modal-hidden">
+            <div id="modal-content" class="bg-gray-800 border border-gray-700 rounded-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA ---
+        const promptData = [
+          {
+            "prompt_id": "AGENT-ONBOARD-SCREEN-001",
+            "workflow_stage": "PRE_TRADE",
+            "agent_task": "Initial Counterparty Screening & Summarization",
+            "trigger_event": "NewCreditApplicationReceived",
+            "prompt_template": "You are a credit risk screening agent. A new credit application has been received and enriched with external data. Your task is to generate a structured initial assessment summary. Based on the provided context, which includes the application, financial ratios, and news sentiment analysis, you must:\n1. Provide a concise overview of the counterparty's business and financial profile.\n2. Identify and list up to 5 key credit risks, citing specific data points (e.g., high leverage, negative cash flow, industry volatility).\n3. Highlight any adverse media or sanctions-related red flags from the news sentiment and compliance checks.\n4. Conclude with a preliminary, automated risk classification (Low, Medium, High) to guide the credit officer's review.",
+            "example_context": { "legalEntityIdentifier": "5493001B317445727B61", "applicationData": { "requestedCredit": 50000000, "industry": "Manufacturing" }, "financials": { "totalDebt": 250000000, "ebitda": 45000000, "debtToEbitdaRatio": 5.55 }, "newsSentiment": { "score": -0.75, "keywords": ["supply chain disruption", "labor dispute", "earnings miss"] }, "complianceCheck": { "sanctionsHit": false, "pepScreening": "Clear" } },
+            "example_completion": "**Initial Assessment Summary: Global Manufacturing Inc.**\n\n**1. Business & Financial Profile:** The counterparty is an established firm in the manufacturing sector. Financials show moderate profitability but are characterized by significant leverage.\n\n**2. Key Credit Risks:**\n  - **High Leverage:** Debt-to-EBITDA ratio is 5.55x, indicating a high debt service burden.\n  - **Industry Headwinds:** The manufacturing sector is facing significant supply chain disruptions.\n  - **Profitability Concerns:** Recent earnings reports indicate a miss on revenue expectations.\n  - **Negative Cash Flow:** The latest quarterly report shows negative free cash flow, raising liquidity concerns.\n\n**3. Adverse Media & Red Flags:** News analysis reveals a consistently negative sentiment score (-0.75), driven by reports of ongoing labor disputes and supply chain challenges. Compliance checks are clear.\n\n**4. Preliminary Risk Classification:** High"
+          },
+          {
+            "prompt_id": "AGENT-TRADE-EXPLAIN-001",
+            "workflow_stage": "AT_TRADE",
+            "agent_task": "Explain New Trade Risk Drivers",
+            "trigger_event": "BilateralTradeExecuted",
+            "prompt_template": "You are a risk explanation agent. A new, non-cleared bilateral trade has been executed. Your task is to generate a plain-language explanation of its primary credit risk drivers for a non-quantitative audience (e.g., a relationship manager). Based on the provided trade context, your explanation must cover:\n1. The type of trade and its basic mechanics.\n2. The main market factors that will drive the bank's exposure to the counterparty (e.g., 'If interest rates fall, our exposure to the counterparty will grow').\n3. The significance of the trade's notional and maturity in the context of credit risk.",
+            "example_context": { "tradeId": "a1b2c3d4-e5f6-7890-1234-567890abcdef", "counterpartyName": "Global Corp Inc.", "instrumentType": "10-Year USD Interest Rate Swap", "direction": "Receive Fixed", "notional": 100000000, "keyRiskFactors": null },
+            "example_completion": "**New Trade Risk Explanation (Trade ID: a1b2c3d4)**\n\nWe have entered into a 10-year, $100 million Interest Rate Swap with Global Corp Inc., where we will receive a fixed interest rate and pay them a floating rate.\n\n**Primary Risk Driver:** Our main credit risk is tied to the movement of US interest rates. If interest rates fall significantly, the fixed payments we are scheduled to receive become more valuable. This would make the swap an asset on our books, and our exposure to Global Corp Inc. defaulting on their payments would increase substantially.\n\n**Significance:** The large notional ($100 million) and long maturity (10 years) make this a significant trade. Long-dated swaps are particularly sensitive to interest rate changes, meaning our potential future exposure can be large and can persist for a long time."
+          },
+          {
+            "prompt_id": "AGENT-PFE-NARRATE-001",
+            "workflow_stage": "POST_TRADE_MONITORING",
+            "agent_task": "Narrate PFE/CVA Calculation Results",
+            "trigger_event": "PortfolioExposureRecalculated",
+            "prompt_template": "You are a quantitative risk translation agent. The nightly PFE and CVA calculation for a key counterparty has completed. Your task is to translate the raw quantitative output into a concise business narrative for the daily risk summary report. Based on the provided data, you must:\n1. State the current Maximum PFE (MPFE) and CVA values.\n2. Explain the primary driver of any significant change from the previous period (e.g., 'The 15% increase in MPFE was primarily driven by heightened market volatility in FX rates, which impacts the cross-currency swap portfolio').\n3. Highlight the time horizon where the peak exposure occurs.",
+            "example_context": { "counterpartyName": "Hedge Fund Alpha", "metrics": { "currentMPFE": 125000000, "previousMPFE": 108000000, "peakPFEHorizon": "2 Years", "currentCVA": 2300000, "previousCVA": 2100000 }, "marketDataChange": { "driver": "FX Volatility", "change": "+12%" } },
+            "example_completion": "**Daily Exposure Update: Hedge Fund Alpha**\n\nMaximum Potential Future Exposure (MPFE) has increased to $125M, with a current CVA of $2.3M. The 15.7% increase in MPFE overnight was primarily driven by a 12% spike in FX volatility, which significantly widened the potential future value distribution of the outstanding derivatives portfolio. The peak credit exposure is projected to occur at the 2-year mark."
+          },
+          {
+            "prompt_id": "AGENT-BREACH-RCA-001",
+            "workflow_stage": "POST_TRADE_MONITORING",
+            "agent_task": "Limit Breach Root Cause Analysis",
+            "trigger_event": "LimitBreachDetected",
+            "prompt_template": "You are a risk investigation agent. A [severity] limit breach with ID [breachId] has occurred for counterparty [counterpartyId]. The limit of [limitValue] was exceeded by a calculated exposure of [breachValue]. Your task is to perform a root cause analysis. Analyze the provided context, including recent trade activity, market data movements, and collateral status, and provide a confidence score (0-1) for each potential cause: a) new trade activity, b) adverse market movement, c) collateral dispute or failure.",
+            "example_context": { "breachId": "BR-2024-456", "severity": "CRITICAL", "counterpartyId": "...", "limitType": "PFE", "limitValue": 100000000, "breachValue": 125000000, "recentTrades": [{ "notional": 50000000 }], "marketData": { "USD_IR_VOL": "+15%" }, "collateral": { "status": "Disputed" } },
+            "example_completion": "**Root Cause Analysis for Breach BR-2024-456:**\n- **New Large Trade:** Confidence: 0.7. A new trade with a $50M notional was executed shortly before the breach, which would have a significant marginal impact on PFE.\n- **Adverse Market Movement:** Confidence: 0.9. A 15% spike in USD interest rate volatility occurred, which dramatically increases the simulated future exposure of interest rate derivatives, the primary component of this portfolio.\n- **Collateral Dispute:** Confidence: 0.4. There is a collateral dispute, but the disputed amount is small and unlikely to be the primary driver of a $25M breach.\n**Conclusion:** The breach was most likely caused by a combination of the large new trade and the sharp increase in market volatility."
+          },
+          {
+            "prompt_id": "AGENT-BREACH-ESCALATE-001",
+            "workflow_stage": "POST_TRADE_MONITORING",
+            "agent_task": "Draft Breach Escalation Communication",
+            "trigger_event": "RootCauseAnalysisCompleted",
+            "prompt_template": "You are a risk communication agent. Following a root cause analysis for breach [breachId], your task is to draft a concise escalation email to the Head of Credit Risk. The email must be formal and leverage the structured output from the analysis. Include these sections: 1) Executive Summary (Counterparty, Limit Type, Breach Amount), 2) Confirmed Root Cause, 3) Immediate Actions Taken (system-logged), and 4) Recommended Next Steps.",
+            "example_context": { "breachId": "BR-2024-456", "counterpartyName": "Global Corp Inc.", "limitType": "PFE", "breachAmount": "25M USD", "rootCauseAnalysisOutput": "The breach was most likely caused by a combination of the large new trade and the sharp increase in market volatility.", "actionsTaken": "Trading desk has been notified; hard block automatically applied to prevent new exposure-increasing trades." },
+            "example_completion": "Subject: URGENT: Critical PFE Limit Breach for Global Corp Inc. (BR-2024-456)\n\n**1. Executive Summary:**\nThis is to notify you of a critical breach of the Potential Future Exposure (PFE) limit for counterparty Global Corp Inc. The approved limit of $100M has been exceeded by $25M, with a current exposure of $125M.\n\n**2. Confirmed Root Cause:**\nAnalysis confirms the breach was triggered by the combined effect of a sharp increase in market volatility and the execution of a new large-notional interest rate swap.\n\n**3. Immediate Actions Taken:**\nThe trading desk has been formally notified, and a hard block has been automatically applied, preventing any new exposure-increasing trades with this counterparty without explicit approval from Credit Risk Management.\n\n**4. Recommended Next Steps:**\nWe recommend an immediate call with the counterparty to discuss posting additional discretionary collateral to cure the breach. We will also conduct a full portfolio review to identify potential risk-reducing trades."
+          },
+          {
+            "prompt_id": "AGENT-STRESS-NARRATE-001",
+            "workflow_stage": "POST_TRADE_MONITORING",
+            "agent_task": "Summarize Stress Test Results",
+            "trigger_event": "StressTestRunCompleted",
+            "prompt_template": "You are a risk reporting agent. A firm-wide stress test has been completed. Your task is to generate a narrative summary of the results for a senior risk committee presentation. Based on the provided data for the '[scenarioName]' scenario, the summary must:\n1. State the overall P&L impact and the total increase in Potential Future Exposure (PFE).\n2. Identify the top 3 counterparties that contribute most to the increase in PFE.\n3. For the top counterparty, explain which specific trades or asset classes are the primary drivers of their increased exposure.\n4. Conclude with a statement on the portfolio's overall resilience to this specific shock.",
+            "example_context": { "scenarioName": "Global Interest Rate Shock +200bps", "overallPnlImpact": -1200000000, "overallPfeIncrease": 5400000000, "topContributors": null, "topCounterpartyDeepDive": { "name": "Hedge Fund Alpha", "drivers": "Their large portfolio of long-dated, uncollateralized interest rate swaps, where they pay a fixed rate, saw a massive increase in mark-to-market value." } },
+            "example_completion": "**Stress Test Summary: Global Interest Rate Shock +200bps**\n\n**Overall Impact:** The scenario resulted in a firm-wide P&L loss of $1.2 billion and a total increase in Potential Future Exposure of $5.4 billion.\n\n**Top Contributors:** The increase in credit exposure is highly concentrated. The top contributors are Hedge Fund Alpha ($850M increase) and Pension Plan Beta ($620M increase).\n\n**Deep Dive - Hedge Fund Alpha:** The exposure to Hedge Fund Alpha is driven almost exclusively by their large, uncollateralized portfolio of long-dated interest rate swaps. The sharp rise in interest rates caused the value of these positions to increase dramatically in our favor, thus increasing our credit risk to them.\n\n**Conclusion:** The portfolio shows significant vulnerability to a sharp, upward shift in global interest rates, particularly through uncollateralized derivatives with leveraged counterparties. A review of concentration limits for these specific clients is recommended."
+          }
+        ];
+
+        // --- GLOBAL STATE ---
+        let selectedStage = 'All';
+
+        // --- DOM ELEMENTS ---
+        const sidebarNav = document.getElementById('sidebar-nav');
+        const promptGrid = document.getElementById('prompt-grid');
+        const currentStageSpan = document.getElementById('current-stage');
+        const modal = document.getElementById('prompt-modal');
+        const modalContent = document.getElementById('modal-content');
+        
+        // --- STAGE COLORS MAPPING ---
+        const stageColors = {
+            'PRE_TRADE': 'bg-blue-900 text-blue-300',
+            'AT_TRADE': 'bg-purple-900 text-purple-300',
+            'POST_TRADE_MONITORING': 'bg-teal-900 text-teal-300',
+        };
+
+        // --- RENDER FUNCTIONS ---
+
+        function renderSidebar() {
+            const stages = ['All', ...new Set(promptData.map(p => p.workflow_stage))];
+            sidebarNav.innerHTML = ''; // Clear existing buttons
+            stages.forEach(stage => {
+                const isActive = selectedStage === stage;
+                const button = document.createElement('button');
+                button.textContent = stage.replace(/_/g, ' ');
+                button.className = `flex-shrink-0 md:w-full text-left px-4 py-2 text-sm rounded-lg transition-colors duration-200 ${
+                    isActive
+                        ? 'bg-indigo-600 text-white font-semibold'
+                        : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                }`;
+                button.onclick = () => {
+                    selectedStage = stage;
+                    renderSidebar();
+                    renderPromptCards();
+                    currentStageSpan.textContent = stage.replace(/_/g, ' ');
+                };
+                sidebarNav.appendChild(button);
+            });
+        }
+
+        function renderPromptCards() {
+            const filteredPrompts = selectedStage === 'All'
+                ? promptData
+                : promptData.filter(p => p.workflow_stage === selectedStage);
+            
+            promptGrid.innerHTML = ''; // Clear existing cards
+            filteredPrompts.forEach(prompt => {
+                const card = document.createElement('div');
+                card.className = "bg-gray-800 rounded-lg border border-gray-700 p-6 cursor-pointer hover:border-indigo-500 hover:bg-gray-700/50 transition-all duration-200 group flex flex-col justify-between";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs font-semibold px-2.5 py-1 rounded-full ${stageColors[prompt.workflow_stage] || 'bg-gray-700 text-gray-300'}">
+                                ${prompt.workflow_stage.replace(/_/g, ' ')}
+                            </span>
+                            <span class="text-xs text-gray-500 font-mono">${prompt.prompt_id}</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-100 mb-2 group-hover:text-indigo-400">${prompt.agent_task}</h3>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-400 mt-3 border-t border-gray-700 pt-3">
+                            <span class="font-semibold text-gray-300">Trigger:</span> ${prompt.trigger_event}
+                        </p>
+                    </div>
+                `;
+                card.onclick = () => openModal(prompt);
+                promptGrid.appendChild(card);
+            });
+        }
+
+        function openModal(prompt) {
+            modalContent.innerHTML = `
+                <header class="flex items-center justify-between p-4 border-b border-gray-700 flex-shrink-0">
+                    <div>
+                        <h2 class="text-xl font-bold text-white">${prompt.agent_task}</h2>
+                        <p class="text-sm text-gray-400 font-mono">${prompt.prompt_id}</p>
+                    </div>
+                    <button id="close-modal-btn" class="text-gray-400 hover:text-white transition-colors p-2 rounded-full hover:bg-gray-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </header>
+                <main class="p-6 overflow-y-auto space-y-6">
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Prompt Template</h3>
+                        <div class="relative bg-gray-900/50 p-4 rounded-lg border border-gray-700">
+                            <button id="copy-btn" class="absolute top-2 right-2 p-2 rounded-lg bg-gray-700 text-gray-300 hover:bg-indigo-600 hover:text-white transition-all text-xs">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                            </button>
+                            <pre class="text-gray-300 text-sm whitespace-pre-wrap font-sans">${prompt.prompt_template}</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Example Context</h3>
+                        <div class="bg-gray-900/50 p-4 rounded-lg border border-gray-700">
+                            <pre class="text-gray-300 text-sm whitespace-pre-wrap font-mono">${JSON.stringify(prompt.example_context, null, 2)}</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Example Completion</h3>
+                        <div class="bg-gray-900/50 p-4 rounded-lg border border-gray-700">
+                            <pre class="text-gray-300 text-sm whitespace-pre-wrap font-sans">${prompt.example_completion}</pre>
+                        </div>
+                    </div>
+                </main>
+            `;
+
+            // Add event listeners for the new modal content
+            document.getElementById('close-modal-btn').onclick = closeModal;
+            const copyBtn = document.getElementById('copy-btn');
+            copyBtn.onclick = () => handleCopy(prompt.prompt_template, copyBtn);
+            
+            modal.classList.remove('modal-hidden');
+            modal.classList.add('flex', 'animate-fade-in');
+            modalContent.classList.add('animate-slide-up');
+        }
+
+        function closeModal() {
+            modal.classList.add('modal-hidden');
+            modal.classList.remove('flex', 'animate-fade-in');
+            modalContent.classList.remove('animate-slide-up');
+            modalContent.innerHTML = '';
+        }
+
+        async function handleCopy(text, buttonElement) {
+            try {
+                await navigator.clipboard.writeText(text);
+                buttonElement.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                       <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                `;
+                setTimeout(() => {
+                   buttonElement.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                   `;
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                alert('Failed to copy text.');
+            }
+        }
+
+
+        // --- EVENT LISTENERS ---
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+        
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // --- INITIALIZATION ---
+        function init() {
+            renderSidebar();
+            renderPromptCards();
+        }
+
+        // Run the app
+        init();
+
+    </script>
+</body>
+</html>
