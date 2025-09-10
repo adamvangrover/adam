@@ -1,0 +1,230 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Credit Risk Automation Workflow",
+  "description": "A full front-to-back JSON schema for automating the credit risk assessment and decisioning process.",
+  "type": "object",
+  "properties": {
+    "workflowId": {
+      "description": "Unique identifier for this specific workflow instance.",
+      "type": "string",
+      "format": "uuid"
+    },
+    "applicationId": {
+      "description": "Unique identifier for the credit application.",
+      "type": "string"
+    },
+    "timestamp": {
+      "description": "Timestamp of when the workflow was initiated.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "stages": {
+      "type": "object",
+      "properties": {
+        "initiation": {
+          "title": "Stage 1: Application Initiation",
+          "description": "Initial data captured from the borrower's application.",
+          "type": "object",
+          "properties": {
+            "status": { "type": "string", "enum": ["pending", "in-progress", "completed", "error"] },
+            "applicantDetails": {
+              "type": "object",
+              "properties": {
+                "applicantType": { "type": "string", "enum": ["individual", "business"] },
+                "name": { "type": "string" },
+                "contact": {
+                  "type": "object",
+                  "properties": {
+                    "email": { "type": "string", "format": "email" },
+                    "phone": { "type": "string" }
+                  },
+                  "required": ["email", "phone"]
+                },
+                "address": {
+                  "type": "object",
+                  "properties": {
+                    "street": { "type": "string" },
+                    "city": { "type": "string" },
+                    "state": { "type": "string" },
+                    "zipCode": { "type": "string" },
+                    "country": { "type": "string" }
+                  }
+                },
+                "taxId": { "type": "string", "description": "e.g., SSN for individuals, EIN for businesses" }
+              },
+              "required": ["applicantType", "name", "contact", "taxId"]
+            },
+            "loanDetails": {
+              "type": "object",
+              "properties": {
+                "loanAmount": { "type": "number", "exclusiveMinimum": 0 },
+                "loanPurpose": { "type": "string" },
+                "loanTermMonths": { "type": "integer", "minimum": 1 }
+              },
+              "required": ["loanAmount", "loanPurpose", "loanTermMonths"]
+            }
+          },
+          "required": ["status", "applicantDetails", "loanDetails"]
+        },
+        "dataCollection": {
+          "title": "Stage 2: Automated Data Collection",
+          "description": "Gathering data from internal and external sources.",
+          "type": "object",
+          "properties": {
+            "status": { "type": "string", "enum": ["pending", "in-progress", "completed", "error"] },
+            "sources": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "sourceName": { "type": "string", "enum": ["creditBureau", "bankStatements", "incomeVerification", "fraudCheck", "internalHistory"] },
+                  "status": { "type": "string", "enum": ["retrieved", "failed", "pending"] },
+                  "data": { "type": "object", "description": "Raw data from the source." }
+                },
+                "required": ["sourceName", "status"]
+              }
+            }
+          }
+        },
+        "preprocessingAndVerification": {
+          "title": "Stage 3: Data Preprocessing & Verification",
+          "description": "Cleaning, validating, and structuring the collected data.",
+          "type": "object",
+          "properties": {
+            "status": { "type": "string", "enum": ["pending", "in-progress", "completed", "error"] },
+            "verificationChecks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "checkName": { "type": "string", "enum": ["identity", "income", "address", "employment"] },
+                  "isVerified": { "type": "boolean" },
+                  "details": { "type": "string", "description": "Notes or discrepancies found during verification." }
+                },
+                "required": ["checkName", "isVerified"]
+              }
+            },
+            "processedData": {
+              "type": "object",
+              "description": "Cleaned and structured data ready for analysis."
+            }
+          }
+        },
+        "riskAnalysisAndScoring": {
+          "title": "Stage 4: Risk Analysis & Scoring",
+          "description": "Executing risk models and calculating credit scores.",
+          "type": "object",
+          "properties": {
+            "status": { "type": "string", "enum": ["pending", "in-progress", "completed", "error"] },
+            "creditScore": {
+              "type": "object",
+              "properties": {
+                "score": { "type": "integer" },
+                "provider": { "type": "string", "description": "e.g., FICO, VantageScore, Internal Model" },
+                "riskTier": { "type": "string", "enum": ["A+", "A", "B", "C", "D", "F"] }
+              }
+            },
+            "riskFactors": {
+              "type": "array",
+              "description": "Key factors influencing the credit score.",
+              "items": { "type": "string" }
+            },
+            "debtToIncomeRatio": { "type": "number" },
+            "internalRiskRating": {
+              "type": "string",
+              "description": "Proprietary risk rating based on internal models."
+            }
+          }
+        },
+        "decisioning": {
+          "title": "Stage 5: Automated Decisioning",
+          "description": "Applying business rules to make a credit decision.",
+          "type": "object",
+          "properties": {
+            "status": { "type": "string", "enum": ["pending", "in-progress", "completed", "manual-review"] },
+            "outcome": { "type": "string", "enum": ["approved", "declined", "counter-offer"] },
+            "decisionEngine": {
+              "type": "object",
+              "properties": {
+                "rulesVersion": { "type": "string" },
+                "triggeredRules": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            },
+            "approvedTerms": {
+              "type": "object",
+              "description": "Final terms if the loan is approved or counter-offered.",
+              "properties": {
+                "approvedAmount": { "type": "number" },
+                "interestRate": { "type": "number" },
+                "termMonths": { "type": "integer" },
+                "monthlyPayment": { "type": "number" }
+              }
+            },
+            "declineReasons": {
+              "type": "array",
+              "description": "Reasons for declining the application.",
+              "items": { "type": "string" }
+            },
+            "escalationReason": {
+              "type": "string",
+              "description": "Reason for flagging for manual review."
+            }
+          },
+          "required": ["status", "outcome"]
+        },
+        "postDecision": {
+          "title": "Stage 6: Post-Decision Actions",
+          "description": "Finalizing the loan and notifying stakeholders.",
+          "type": "object",
+          "properties": {
+            "status": { "type": "string", "enum": ["pending", "in-progress", "completed"] },
+            "applicantNotification": {
+              "type": "object",
+              "properties": {
+                "sent": { "type": "boolean", "default": false },
+                "timestamp": { "type": "string", "format": "date-time" },
+                "method": { "type": "string", "enum": ["email", "sms", "portal"] }
+              }
+            },
+            "loanOrigination": {
+              "type": "object",
+              "description": "Actions for funding and booking the loan.",
+              "properties": {
+                "funded": { "type": "boolean", "default": false },
+                "fundingDate": { "type": "string", "format": "date" },
+                "loanAccountNumber": { "type": "string" }
+              }
+            }
+          }
+        },
+        "monitoring": {
+          "title": "Stage 7: Ongoing Monitoring",
+          "description": "Continuous monitoring of the credit after origination.",
+          "type": "object",
+          "properties": {
+            "status": { "type": "string", "enum": ["active", "paid-off", "default"] },
+            "lastReviewDate": { "type": "string", "format": "date" },
+            "nextReviewDate": { "type": "string", "format": "date" },
+            "currentRiskRating": { "type": "string" },
+            "paymentHistory": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "paymentDate": { "type": "string", "format": "date" },
+                  "amount": { "type": "number" },
+                  "status": { "type": "string", "enum": ["on-time", "late", "missed"] }
+                }
+              }
+            }
+          }
+        }
+      },
+      "required": ["initiation", "dataCollection", "preprocessingAndVerification", "riskAnalysisAndScoring", "decisioning"]
+    }
+  },
+  "required": ["workflowId", "applicationId", "timestamp", "stages"]
+}
