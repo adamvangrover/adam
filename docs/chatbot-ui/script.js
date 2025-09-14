@@ -47,9 +47,7 @@ import {
 // Import utility functions from utils.js
 import { displayMessage } from './utils.js';
 
-// 2. Event Handlers
-
-// 4. Initialization and Event Handling
+// 5. Event Handlers
 sendButton.addEventListener('click', () => {
     const userMessage = userInput.value;
     displayMessage(userMessage, 'user');
@@ -92,8 +90,7 @@ sendButton.addEventListener('click', () => {
 
 //... (Other event handlers)
 
-// 3. Helper Functions
-
+// 7. Helper Functions
 // Function to display README content
 function getREADMEContent() {
     // Initialize conversation state
@@ -115,9 +112,9 @@ function getREADMEContent() {
         switch (currentREADMEQuestion) {
             case 0:
                 if (response.includes('yes')) {
-                    message = `I'm Adam v17.0, an AI-powered system designed to provide sophisticated investors with actionable insights and personalized investment recommendations. My capabilities include market analysis, investment research, risk management, and personalized insights. I'm continuously learning and growing!`;
+                    message = `I'm Adam v21.0, an AI-powered system designed to provide sophisticated investors with actionable insights and personalized investment recommendations. My capabilities include market analysis, investment research, risk management, and personalized insights. I'm continuously learning and growing!`;
                 } else if (response.includes('no')) {
-                    message = "No problem. Feel free to ask me anything about the Adam v17.0 project or its features.";
+                    message = "No problem. Feel free to ask me anything about the Adam v21.0 project or its features.";
                 } else {
                     message = "I didn't understand your response. Please answer with 'yes' or 'no'.";
                     currentREADMEQuestion--;
@@ -176,7 +173,7 @@ function getREADMEContent() {
                     message = "Great! What else would you like to know about? (market analysis, investment research, risk management, personalized insights, architecture, agents, data sources, repository, deployment, contributing)";
                     currentREADMEQuestion = 1; // Go back to exploring features
                 } else if (response.includes('no')) {
-                    message = "Thanks for exploring the Adam v17.0 chatbot demo! Feel free to reach out if you have any further questions.";
+                    message = "Thanks for exploring the Adam v21.0 chatbot demo! Feel free to reach out if you have any further questions.";
                 } else {
                     message = "I didn't understand your response. Please answer with 'yes' or 'no'.";
                     currentREADMEQuestion--;
@@ -194,7 +191,7 @@ function getREADMEContent() {
     }
 
     // Start the README conversation
-    return `Welcome to the Adam v17.0 chatbot demo! This chatbot provides a glimpse into the capabilities of the full Adam v17.0 system, which is designed to be a comprehensive financial analysis tool for sophisticated investors.
+    return `Welcome to the Adam v21.0 chatbot demo! This chatbot provides a glimpse into the capabilities of the full Adam v21.0 system, which is designed to be a comprehensive financial analysis tool for sophisticated investors.
 
 ${readmeQuestions[currentREADMEQuestion]}
 `;
@@ -228,9 +225,11 @@ const sendButton = document.getElementById('send-button');
 const knowledgeGraphVisualization = document.getElementById('knowledge-graph-visualization');
 const markdownViewer = document.getElementById('markdown-viewer');
 const advancedModeButton = document.getElementById('advanced-mode-button');
+
+// 4. Global Variables
 let isAdvancedMode = false;  // Flag to track advanced mode
 let isFirstInteraction = true; // Flag to track the initial interaction
-let currentConversation =; // Initialize currentConversation as an empty array
+let currentConversation = []; // Initialize currentConversation as an empty array
 
 // Function to toggle advanced mode
 function toggleAdvancedMode() {
@@ -247,10 +246,10 @@ function toggleAdvancedMode() {
     }
 }
 
-// Function to display the main menu
+// 6. Menu Functions
 function showMainMenu() {
     const menuOptions = [
-        "Adam v17.0 Overview",
+        "Adam v21.0 Overview",
         "Market Analysis",
         "Investment Research",
         "Portfolio Management",
@@ -263,11 +262,10 @@ function showMainMenu() {
     displayMessage(menuMessage, 'bot');
 }
 
-// Function to handle menu selection
 function handleMenuSelection(userResponse) {
     const response = userResponse.toLowerCase();
     if (response.includes('1') || response.includes('overview')) {
-        displayMessage("Adam v17.0 is a sophisticated AI for financial market analysis and personalized insights. It's designed to help investors like you make informed decisions.", 'bot');
+        displayMessage("Adam v21.0 is a sophisticated AI for financial market analysis and personalized insights. It's designed to help investors like you make informed decisions.", 'bot');
     } else if (response.includes('2') || response.includes('market analysis')) {
         showMarketAnalysisMenu();
     } else if (response.includes('3') || response.includes('investment research')) {
@@ -322,7 +320,7 @@ function showPortfolioManagementMenu() {
 
 //... (Additional menu functions)
 
-// 4. Initialization and Event Handling
+// 5. Event Handlers
 sendButton.addEventListener('click', () => {
     const userMessage = userInput.value;
     displayMessage(userMessage, 'user');
@@ -363,7 +361,6 @@ sendButton.addEventListener('click', () => {
     }
 });
 
-// Helper function to display messages
 function displayMessage(message, sender) {
     const chatMessage = document.createElement('div');
     chatMessage.classList.add('chat-message', sender);
@@ -372,42 +369,20 @@ function displayMessage(message, sender) {
     chatWindow.scrollTop = chatWindow.scrollHeight; // Scroll to the bottom
 }
 
-// 5. Message Processing and Response Generation
-//... (Implementation for processing messages and generating responses)
-// This could involve calling the API, processing the response, and displaying it in the chat window.
-
-// 6. Dynamic Content Rendering and UI Updates
-//... (Implementation for rendering dynamic content and updating the UI)
-// This could involve updating the knowledge graph visualization, displaying markdown content,
-// or showing/hiding advanced features based on user interactions.
-
-// 7. Error Handling and Logging
-//... (Implement error handling and logging)
-// This could involve catching errors from the API or other modules and displaying appropriate messages to the user.
-
-
-
-
-// ... (Existing code)
-
-// Function to display the landing page chatbot
 function showLandingPageChatbot() {
   const landingPageChatbot = document.getElementById('landing-page-chatbot');
   landingPageChatbot.style.display = 'block';
 }
 
-// Function to hide the landing page chatbot
 function hideLandingPageChatbot() {
   const landingPageChatbot = document.getElementById('landing-page-chatbot');
   landingPageChatbot.style.display = 'none';
 }
 
-// Function to show the video overview (placeholder)
 function showVideoOverview() {
   alert("Video overview is not available in this demo. Please refer to the documentation for a detailed walkthrough of Adam's capabilities.");
 }
 
-// Function to start the interactive tutorial
 function startInteractiveTutorial() {
   introJs().setOptions({
     steps: [
@@ -416,23 +391,115 @@ function startInteractiveTutorial() {
   }).start();
 }
 
-// Function to start the guided tour (placeholder)
 function startGuidedTour() {
-  alert("Guided tour is not available in this demo. However, you can explore the User Guide and API Documentation for detailed information on how to use Adam v18.0.");
+  alert("Guided tour is not available in this demo. However, you can explore the User Guide and API Documentation for detailed information on how to use Adam v21.0.");
 }
 
-// Function to show the advanced (functional) chatbot
 function showAdvancedMode() {
   hideLandingPageChatbot();
   document.getElementById('functional-chatbot').style.display = 'block';
 }
 
-// ... (Other functions)
+function showSimulationResults() {
+  const simulationResults = document.getElementById('simulation-results');
+  simulationResults.style.display = 'block';
+  displaySimulationResults();
+}
 
-// Initialization
-// ...
+function displaySimulationResults() {
+    // --- MOCK DATA: START ---
+    // In a real application, this data would be fetched from the Adam v21.0 backend API.
+    // The API would provide real-time or historical simulation results based on user requests.
+    const simulationResultsData = [
+        {
+            name: "Credit Rating Assessment Simulation: Tesla (TSLA)",
+            date: "2025-09-12",
+            summary: "Simulated credit rating for TSLA indicates a 'AA-' rating with a stable outlook, based on strong sales growth and improved profitability margins.",
+            details: {
+                confidence_score: "92%",
+                key_findings: [
+                    "Increased market share in the EV sector.",
+                    "Volatility in stock price remains a key risk factor.",
+                    "Successful expansion into new international markets."
+                ],
+                recommendation: "Maintain current exposure. Monitor for any changes in competitive landscape."
+            },
+            link: "simulations/report_credit_tsla_20250912.html" // Placeholder link
+        },
+        {
+            name: "Investment Committee Simulation: AI Sector Allocation",
+            date: "2025-09-11",
+            summary: "The simulated investment committee approved a 5% increase in portfolio allocation to the AI and machine learning sector.",
+            details: {
+                confidence_score: "88%",
+                key_findings: [
+                    "Strong long-term growth prospects for the AI sector.",
+                    "Diversification benefits across multiple industries.",
+                    "High valuations present a short-term risk."
+                ],
+                recommendation: "Execute buy orders for a basket of AI-focused ETFs and stocks over the next quarter."
+            },
+            link: "simulations/report_invest_ai_20250911.html" // Placeholder link
+        },
+        {
+            name: "Portfolio Optimization Simulation: Q3 2025",
+            date: "2025-09-10",
+            summary: "Optimization simulation suggests rebalancing the portfolio to reduce exposure to high-risk assets and increase allocation to investment-grade bonds.",
+            details: {
+                confidence_score: "95%",
+                key_findings: [
+                    "Current portfolio is over-exposed to market volatility.",
+                    "Increasing bond allocation could improve risk-adjusted returns.",
+                    "Identified several underperforming assets for potential sale."
+                ],
+                recommendation: "Rebalance portfolio according to the optimized allocation model by the end of the month."
+            },
+            link: "simulations/report_portfolio_q3_2025.html" // Placeholder link
+        },
+        {
+            name: "Geopolitical Stress Test: US-China Trade Relations",
+            date: "2025-09-09",
+            summary: "Stress test simulating escalating trade tensions between the US and China shows a potential 15% downside risk to the portfolio.",
+            details: {
+                confidence_score: "85%",
+                key_findings: [
+                    "Tech and manufacturing sectors are most vulnerable.",
+                    "Commodities and healthcare sectors show resilience.",
+                    "Potential for significant currency fluctuations."
+                ],
+                recommendation: "Implement hedging strategies to mitigate downside risk. Consider reducing exposure to vulnerable sectors."
+            },
+            link: "simulations/report_stresstest_us_china_20250909.html" // Placeholder link
+        }
+    ];
+    // --- MOCK DATA: END ---
 
+    const simulationResultsContainer = document.getElementById('simulation-results');
+    // Add a comment explaining that this is a placeholder
+    let html = '<h3>Simulation Results (Mock Data)</h3>';
+    html += '<p><i>This is a demonstration of the simulation results feature. In a live environment, this data would be dynamically loaded from the ADAM backend.</i></p>';
+
+    simulationResultsData.forEach(result => {
+        html += `
+            <div class="simulation-result">
+                <h4>${result.name}</h4>
+                <p><strong>Date:</strong> ${result.date}</p>
+                <p><strong>Summary:</strong> ${result.summary}</p>
+                <div class="details">
+                    <p><strong>Confidence Score:</strong> ${result.details.confidence_score}</p>
+                    <p><strong>Key Findings:</strong></p>
+                    <ul>
+                        ${result.details.key_findings.map(finding => `<li>${finding}</li>`).join('')}
+                    </ul>
+                    <p><strong>Recommendation:</strong> ${result.details.recommendation}</p>
+                </div>
+                <a href="${result.link}" target="_blank">View Detailed Report</a>
+            </div>
+        `;
+    });
+    simulationResultsContainer.innerHTML = html;
+}
+
+// 8. Initialization
 // Show the landing page chatbot initially
 showLandingPageChatbot();
-
-// ... (Event listeners and other code)
