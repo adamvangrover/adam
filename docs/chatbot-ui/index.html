@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Adam v19.1 Chatbot</title>
+  <title>Adam v21.0 Chatbot</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
@@ -35,27 +35,27 @@
   <div id="landing-page-chatbot">
     <div class="chatbot-container">
       <div class="chatbot-header">
-        <h2>Welcome to Adam v19.1!</h2>
+        <h2>Welcome to Adam v21.0!</h2>
       </div>
       <div class="chatbot-body">
         <div class="chatbot-message">
-          Hello! I'm Adam v19.1, your AI-powered financial analyst. I can help you unlock market insights, analyze investment opportunities, and manage risks effectively.
+          Hello! I'm Adam v21.0, your AI-powered financial analyst. I can help you unlock market insights, analyze investment opportunities, and manage risks effectively.
         </div>
         <div class="chatbot-message">
           Here are some quick links to get you started:
         </div>
         <div class="chatbot-links">
-          <a href="https://github.com/adamvangrover/adam" target="_blank">Adam v19.1 GitHub Repository</a>
+          <a href="https://github.com/adamvangrover/adam" target="_blank">Adam v21.0 GitHub Repository</a>
           <a href="https://github.com/adamvangrover/adam/blob/main/README.md" target="_blank">README</a>
           <a href="https://github.com/adamvangrover/adam/blob/main/docs/user_guide.md" target="_blank">User Guide</a>
         </div>
         <div class="chatbot-message">
-          You can also ask me some basic questions about Adam v19.1 or the financial markets. For example:
+          You can also ask me some basic questions about Adam v21.0 or the financial markets. For example:
         </div>
         <div class="chatbot-message">
-          * What is Adam v19.1?
-          * How does Adam v19.1 work?
-          * What are the benefits of using Adam v19.1?
+          * What is Adam v21.0?
+          * How does Adam v21.0 work?
+          * What are the benefits of using Adam v21.0?
           * What are some common financial terms?
         </div>
         <div class="chatbot-message">
@@ -77,6 +77,11 @@
         </select>
         <button onclick="displaySelectedFile()">View File</button>
         <div id="file-content"></div>
+
+        <div id="simulation-results" style="display: none;">
+          <h3>Simulation Results</h3>
+          <p>No simulation results to display.</p>
+        </div>
 
         
         <div class="chatbot-options">
@@ -100,7 +105,7 @@
   <div id="functional-chatbot">
     <div id="chat-window">
       <div class="chat-message bot">
-        Hello! I'm Adam v19.1, your AI companion for navigating the financial markets. How can I assist you today?
+        Hello! I'm Adam v21.0, your AI companion for navigating the financial markets. How can I assist you today?
       </div>
     </div>
 
@@ -117,6 +122,7 @@
       <button onclick="showFundamentalAnalysis()">Fundamental Analysis</button>
       <button onclick="showTechnicalAnalysis()">Technical Analysis</button>
       <button onclick="showPortfolioOptimization()">Portfolio Optimization</button>
+      <button onclick="showSimulationResults()">Simulation Results</button>
 
       <button onclick="showKnowledgeGraph()">Knowledge Graph</button>
       <button onclick="showREADME()">README</button>
@@ -245,15 +251,15 @@
       introJs().setOptions({
         steps: [
           {
-            intro: "Welcome to the Adam v19.1 interactive tutorial! Let's explore its key features and functionalities."
+            intro: "Welcome to the Adam v21.0 interactive tutorial! Let's explore its key features and functionalities."
           },
           {
             element: '#landing-page-chatbot',
-            intro: "This is the landing page chatbot, your guide to Adam v19.1. It provides an overview of the system, setup instructions, user guide, and more."
+            intro: "This is the landing page chatbot, your guide to Adam v21.0. It provides an overview of the system, setup instructions, user guide, and more."
           },
           {
             element: '.chatbot-options button:first-child',
-            intro: "Click this button to watch a video overview of Adam v19.1's capabilities (not available in this demo)."
+            intro: "Click this button to watch a video overview of Adam v21.0's capabilities (not available in this demo)."
           },
           {
             element: '.chatbot-options button:nth-child(2)',
@@ -265,7 +271,7 @@
           },
           {
             element: '.chatbot-options button:last-child',
-            intro: "This button takes you to the advanced analysis mode, where you can interact with the full Adam v19.1 system."
+            intro: "This button takes you to the advanced analysis mode, where you can interact with the full Adam v21.0 system."
           },
           {
             element: '#functional-chatbot',
@@ -329,7 +335,7 @@
         const quizContainer = document.getElementById('quiz');
         quizContainer.innerHTML = `
           <p>Quick Quiz:</p>
-          <p>Which of these is NOT a core component of the Adam v19.1 system?</p>
+          <p>Which of these is NOT a core component of the Adam v21.0 system?</p>
           <button onclick="checkAnswer('agent_orchestrator')">Agent Orchestrator</button>
           <button onclick="checkAnswer('knowledge_graph')">Knowledge Graph</button>
           <button onclick="checkAnswer('landing_page_chatbot')">Landing Page Chatbot</button>
@@ -341,7 +347,7 @@
     function checkAnswer(answer) {
       const incorrectAnswer = 'landing_page_chatbot'; 
       if (answer === incorrectAnswer) {
-        alert("Correct! The Landing Page Chatbot is part of the UI demo, not the core Adam v19.1 system.");
+        alert("Correct! The Landing Page Chatbot is part of the UI demo, not the core Adam v21.0 system.");
       } else {
         alert("Not quite. Try reviewing the tutorial and the README again.");
       }
@@ -361,12 +367,12 @@
     function handleLandingPageInput(userInput) {
       const message = userInput.toLowerCase();
       let response = "";
-      if (message.includes("what is adam v19.1")) {
-        response = "Adam v19.1 is a highly sophisticated AI-powered financial analytics system designed to provide comprehensive insights and strategic guidance for investors, incorporating new agents, simulations, and enhanced capabilities.";
-      } else if (message.includes("how does adam v19.1 work")) {
-        response = "Adam v19.1 uses a network of specialized agents, a knowledge graph, and real-time data to analyze market trends, assess risks, and provide investment recommendations. It also includes new simulation workflows and XAI capabilities.";
-      } else if (message.includes("benefits of using adam v19.1")) {
-        response = "Adam v19.1 can help you make informed investment decisions, save time and effort, and potentially improve your returns. It also provides transparent explanations and facilitates deeper understanding of the financial markets.";
+      if (message.includes("what is adam v21.0")) {
+        response = "Adam v21.0 is a highly sophisticated AI-powered financial analytics system designed to provide comprehensive insights and strategic guidance for investors, incorporating new agents, simulations, and enhanced capabilities.";
+      } else if (message.includes("how does adam v21.0 work")) {
+        response = "Adam v21.0 uses a network of specialized agents, a knowledge graph, and real-time data to analyze market trends, assess risks, and provide investment recommendations. It also includes new simulation workflows and XAI capabilities.";
+      } else if (message.includes("benefits of using adam v21.0")) {
+        response = "Adam v21.0 can help you make informed investment decisions, save time and effort, and potentially improve your returns. It also provides transparent explanations and facilitates deeper understanding of the financial markets.";
       } else if (message.includes("financial terms")) {
         response = "Some common financial terms include: ROI (Return on Investment), P/E ratio (Price-to-Earnings ratio), and diversification. Do you have a specific term you'd like to know more about?";
       } else if (message.includes("joke")) {
