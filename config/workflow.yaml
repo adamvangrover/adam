@@ -84,3 +84,51 @@ workflows:
 
       - name: end  # Explicit end step
         type: end
+
+  - name: report_generation_workflow
+    description: Generate a report based on a user query.
+    trigger: user_query
+    steps:
+      - agent: QueryUnderstandingAgent
+        input: user_query
+        output: relevant_agents
+        next_steps:
+          - condition: "len(relevant_agents) > 0"
+            next_step: parallel_data_retrieval
+          - condition: "len(relevant_agents) == 0"
+            next_step: handle_no_relevant_agents
+
+      - name: parallel_data_retrieval
+        type: parallel
+        steps:
+          - agent: "{agent}"
+            input: user_query
+            output: "{agent}_data"
+            loop_variable: agent
+            loop_source: relevant_agents
+
+      - agent: ResultAggregationAgent
+        input: "{agent}_data"
+        input_mapping: >-
+          [{% for agent in relevant_agents %}
+            {{ agent }}_data
+          {%- if not loop.last -%},
+          {%- endif -%}
+          {%- endfor -%}]
+        output: aggregated_results
+        next_step: generate_report
+
+      - name: generate_report
+        agent: ReportGeneratorAgent
+        input: aggregated_results
+        output: final_report
+        next_step: end
+
+      - name: handle_no_relevant_agents
+        agent: QueryUnderstandingAgent
+        input: user_query
+        output: error_message
+        next_step: end
+
+      - name: end
+        type: end
