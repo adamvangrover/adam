@@ -73,6 +73,7 @@ AGENT_CLASSES = {
     "QueryUnderstandingAgent": "core.agents.query_understanding_agent",
     "DataRetrievalAgent": "core.agents.data_retrieval_agent",
     "ResultAggregationAgent": "core.agents.result_aggregation_agent",
+    "ReportGeneratorAgent": "core.agents.report_generator_agent",
     "SNCAnalystAgent": "core.agents.SNC_analyst_agent", # Added SNC_analyst_agent
     "BehavioralEconomicsAgent": "core.agents.behavioral_economics_agent",
     "MetaCognitiveAgent": "core.agents.meta_cognitive_agent",
