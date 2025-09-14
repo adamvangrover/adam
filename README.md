@@ -99,6 +99,7 @@ Adam v21.0 is not just an AI; it's your partner in navigating the complexities o
 
 ## Documentation
 
+  * **System Requirements:** [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md)
   * **User Guide:** [docs/user\_guide.md](docs/user_guide.md)
   * **API Documentation:** [docs/api\_docs.yaml](docs/api_docs.yaml)
   * **Contribution Guidelines:** [CONTRIBUTING.md](https://github.com/adamvangrover/adam/blob/main/CONTRIBUTING.md)
@@ -233,6 +234,8 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
   * **Portfolio Optimization:** Using mathematical models and algorithms to optimize the portfolio based on specific criteria, such as maximizing return or minimizing risk.
 
 ## Architecture
+
+> **Note:** This section provides a high-level overview of the system architecture. For a more detailed and up-to-date description of the system's requirements, including functional and non-functional requirements, please refer to the [System Requirements Document](docs/REQUIREMENTS.md).
 
 ### Overview
 
