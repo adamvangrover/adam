@@ -7,7 +7,7 @@ status: "Draft"
 author: "ADAM"
 last_updated: "2025-09-15"
 ---
-
+````
 # Adam Web Application: Product & Design Specification
 
 This document provides a comprehensive, implementable specification for building the Adam Web Application. It is intended for both human developers and automated software agents.
