@@ -75,6 +75,16 @@ agents:  # This top-level 'agents' key is REQUIRED
     alerting_thresholds:
       significant_shift: 0.2  # Alert when sentiment changes by more than 20%
     communication_style: concise and insightful with a touch of humor
+    input_schema:
+      query:
+        type: "string"
+        description: "The search query for sentiment analysis."
+        required: true
+      source:
+        type: "select"
+        options: ["news", "social_media", "all"]
+        default: "all"
+        description: "The source to analyze."
     #... other agent-specific configurations...
 
   macroeconomic_analysis_agent:
