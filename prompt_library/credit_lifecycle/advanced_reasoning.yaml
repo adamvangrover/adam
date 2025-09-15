@@ -1,0 +1,191 @@
+- title: "Chain-of-Thought Analysis"
+  prompt: |
+    **Objective:** Use Chain-of-Thought (CoT) reasoning to analyze a complex, multi-faceted credit scenario and arrive at a well-reasoned conclusion.
+
+    **Persona:** Act as a senior risk analyst, demonstrating a logical and methodical approach to problem-solving.
+
+    **Scenario:**
+    -   **Company:** `{company_name}`, a regional supplier of building materials.
+    -   **Event:** A major new competitor, `{competitor_name}`, has entered the market with an aggressive pricing strategy.
+    -   **Simultaneous Event:** A key supplier of `{company_name}` has just declared bankruptcy, potentially disrupting the supply chain.
+    -   **Financials:** `{company_name}` has high leverage (Debt-to-Equity of 3.5x) but strong historical profitability.
+    -   **Request:** The company is requesting a temporary increase in their line of credit to build up inventory from alternative suppliers.
+
+    **Chain-of-Thought Instructions:**
+    You must externalize your reasoning process. Follow these steps explicitly:
+
+    1.  **Deconstruct the Problem:** Break down the scenario into its primary components (e.g., competitive threat, supply chain risk, financial position, client request).
+    2.  **Analyze Each Component:** For each component, analyze its individual impact on the company's creditworthiness.
+        -   *Competitive Threat:* How will the new competitor's pricing affect `{company_name}`'s margins and market share?
+        -   *Supply Chain Risk:* What is the immediate impact of the supplier bankruptcy? How quickly can they find alternative suppliers? What will be the cost implications?
+        -   *Financial Position:* How does the high leverage affect their ability to absorb these shocks? Do they have the cash flow to withstand a period of lower profitability?
+        -   *Client Request:* Is the request for a credit line increase a prudent response to the situation, or is it a sign of distress?
+    3.  **Synthesize the Connections:** Connect the analyses of the individual components. How do these risks interact? For example, does the supply chain issue make them more vulnerable to the new competitor?
+    4.  **Formulate a Conclusion:** Based on the synthesized analysis, formulate a final conclusion and recommendation regarding the credit line increase request.
+
+    **Expected Output Format:**
+    Provide the analysis as a structured Markdown document.
+    ```markdown
+    # Chain-of-Thought Credit Analysis: {company_name}
+
+    ## 1. Deconstruction of the Problem
+    -   ...
+
+    ## 2. Analysis of Components
+    ### 2.1 Competitive Threat
+    -   ...
+    ### 2.2 Supply Chain Risk
+    -   ...
+    ### 2.3 Financial Position
+    -   ...
+    ### 2.4 Client Request Analysis
+    -   ...
+
+    ## 3. Synthesis of Interacting Risks
+    -   ...
+
+    ## 4. Conclusion and Recommendation
+    -   **Conclusion:** ...
+    -   **Recommendation:** ...
+    ```
+
+- title: "Tree-of-Thought Analysis"
+  prompt: |
+    **Objective:** Use Tree-of-Thought (ToT) reasoning to explore multiple possible outcomes of a complex credit scenario and evaluate their likelihood.
+
+    **Persona:** Act as a strategic risk advisor, thinking through multiple future states to identify the most probable outcome and the most significant risks.
+
+    **Scenario:**
+    -   **Company:** `{company_name}`, a tech startup that has developed a new AI-powered fraud detection system.
+    -   **Situation:** The company has two potential strategic paths:
+        1.  Accept a buyout offer from a large, established tech firm (`{acquirer_name}`).
+        2.  Decline the offer and pursue an independent growth strategy by raising a new round of venture capital.
+    -   **Loan:** The company has an existing venture debt facility with `{institution_name}`. The loan agreement has a "change of control" clause.
+
+    **Tree-of-Thought Instructions:**
+    You must explore the decision tree of this scenario.
+
+    1.  **Identify the Root Node:** The root decision is "Accept or Decline the Buyout Offer".
+    2.  **Branch 1: Accept Buyout Offer**
+        -   **Sub-branch 1.1 (Positive Outcome):** The acquisition is successful, the "change of control" clause is handled smoothly, and the debt is repaid in full. Evaluate the likelihood of this path.
+        -   **Sub-branch 1.2 (Negative Outcome):** The acquisition faces regulatory hurdles or integration issues, and the "change of control" clause triggers a technical default. Evaluate the likelihood of this path.
+    3.  **Branch 2: Decline Buyout Offer & Seek VC Funding**
+        -   **Sub-branch 2.1 (Positive Outcome):** The company successfully raises a new round of funding at a higher valuation and continues to grow. Evaluate the likelihood of this path.
+        -   **Sub-branch 2.2 (Negative Outcome):** The company fails to raise sufficient funding, faces a cash crunch, and struggles to compete independently. Evaluate the likelihood of this path.
+    4.  **Evaluate and Synthesize:**
+        -   For each leaf node (outcome), assess its probability (e.g., High, Medium, Low) and its impact on the credit facility.
+        -   Compare the branches and determine the most probable overall outcome.
+        -   Identify the key risks and decision points that have the most influence on the outcome.
+
+    **Expected Output Format:**
+    Provide the analysis as a structured Markdown document.
+    ```markdown
+    # Tree-of-Thought Credit Scenario Analysis: {company_name}
+
+    ## 1. Root Decision Node
+    -   The central decision is whether to accept the buyout offer from `{acquirer_name}` or to pursue independent growth.
+
+    ## 2. Branch 1: Accept Buyout Offer
+    ### 2.1 Outcome A (Successful Acquisition)
+    -   **Path:** ...
+    -   **Probability:** ...
+    -   **Impact on Credit:** ...
+    ### 2.2 Outcome B (Problematic Acquisition)
+    -   **Path:** ...
+    -   **Probability:** ...
+    -   **Impact on Credit:** ...
+
+    ## 3. Branch 2: Decline Offer & Seek Funding
+    ### 3.1 Outcome C (Successful Funding Round)
+    -   **Path:** ...
+    -   **Probability:** ...
+    -   **Impact on Credit:** ...
+    ### 3.2 Outcome D (Failed Funding Round)
+    -   **Path:** ...
+    -   **Probability:** ...
+    -   **Impact on Credit:** ...
+
+    ## 4. Synthesis and Final Assessment
+    -   **Most Probable Outcome:** ...
+    -   **Key Risk Factors:** ...
+    -   **Recommendation for Credit Monitoring:** ...
+    ```
+
+- title: "Critique-Refine Self-Correction"
+  prompt: |
+    **Objective:** Review a given credit analysis, identify potential flaws, and generate a revised, improved version.
+
+    **Persona:** Act as a Quality Assurance (QA) specialist or a senior member of the credit committee, responsible for ensuring the accuracy and rigor of all analysis.
+
+    **Input:**
+    -   **Original Analysis:** A credit analysis report for `{company_name}`. The report is provided below:
+        ```
+        {original_analysis}
+        ```
+
+    **Critique-Refine Instructions:**
+
+    1.  **Critique Phase:**
+        -   Read the original analysis carefully.
+        -   Identify any potential weaknesses, such as:
+            -   **Logical fallacies:** Are there any jumps in logic or unsupported conclusions?
+            -   **Cognitive biases:** Is there evidence of confirmation bias, anchoring, or other biases?
+            -   **Missing information:** Are there any key data points or risk factors that were not considered?
+            -   **Insufficient depth:** Is the analysis too superficial?
+        -   Provide a structured critique, listing each identified flaw and explaining why it is a problem.
+
+    2.  **Refine Phase:**
+        -   Based on your critique, generate a new, revised version of the analysis.
+        -   The revised version should address all the identified flaws.
+        -   It should be more robust, well-supported, and objective.
+
+    **Expected Output Format:**
+    A JSON object with two keys: `critique` and `refined_analysis`.
+    ```json
+    {{
+      "critique": [
+        {{
+          "flaw": "...",
+          "explanation": "..."
+        }}
+      ],
+      "refined_analysis": "..."
+    }}
+    ```
+
+- title: "Reflection and Meta-Learning"
+  prompt: |
+    **Objective:** Reflect on a completed credit analysis to extract key learnings and generate insights that can improve future analyses.
+
+    **Persona:** Act as a meta-cognitive agent focused on continuous improvement.
+
+    **Input:**
+    -   **Completed Analysis:** The final credit analysis report for `{company_name}`.
+    -   **Outcome (if available):** Information on the actual outcome of the credit decision (e.g., loan performance, default, early repayment). `{outcome}`
+
+    **Reflection Instructions:**
+
+    1.  **Analyze the Process:**
+        -   What were the key steps taken in the analysis?
+        -   What were the most important data points and assumptions?
+    2.  **Evaluate the Conclusion:**
+        -   Was the final recommendation correct, given the available information at the time?
+        -   If the actual outcome is known, how does it compare to the initial assessment? What was missed?
+    3.  **Extract Key Learnings:**
+        -   What are the most important lessons learned from this analysis?
+        -   Are there any new risk factors or patterns that should be considered in the future?
+        -   Can any part of the analysis process be improved?
+    4.  **Generate Actionable Insights:**
+        -   Formulate a set of actionable insights or updated rules that can be incorporated into future credit analyses.
+        -   For example, "For SaaS companies with high churn, place greater weight on the LTV:CAC ratio."
+
+    **Expected Output Format:**
+    A structured JSON object.
+    ```json
+    {{
+      "analysis_summary": "...",
+      "outcome_evaluation": "...",
+      "key_learnings": [],
+      "actionable_insights_for_future_analysis": []
+    }}
+    ```
