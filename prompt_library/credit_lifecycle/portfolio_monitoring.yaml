@@ -1,0 +1,202 @@
+- title: "Perform Annual Review"
+  prompt: |
+    **Objective:** Conduct a comprehensive annual review of a portfolio company and produce a structured monitoring report.
+
+    **Persona:** Act as a portfolio manager responsible for the ongoing health and performance of the credit portfolio.
+
+    **Company Information:**
+    -   **Company Name:** `{company_name}`
+    -   **Date of Last Review:** `{last_review_date}`
+    -   **Current Risk Rating:** `{current_risk_rating}`
+
+    **Annual Review Checklist:**
+
+    1.  **Financial Performance Analysis:**
+        -   Retrieve and analyze the latest annual financial statements.
+        -   Compare the actual performance against the projections from the previous year.
+        -   Calculate key financial ratios and analyze year-over-year trends.
+        -   Assess the company's current liquidity, profitability, and leverage.
+
+    2.  **Covenant Compliance Review:**
+        -   Retrieve the list of financial and non-financial covenants from the loan agreement.
+        -   Verify compliance with each covenant based on the latest financial data.
+        -   Document any breaches or near-breaches.
+
+    3.  **Management and Strategy Assessment:**
+        -   Review any changes in the management team or corporate strategy.
+        -   Assess the management's performance and their ability to execute the business plan.
+
+    4.  **Industry and Market Conditions:**
+        -   Analyze the current trends and outlook for the company's industry.
+        -   Assess the impact of any changes in the competitive landscape or regulatory environment.
+
+    5.  **Updated Risk Assessment:**
+        -   Re-evaluate the key risks associated with the loan.
+        -   Assign an updated risk rating (e.g., Upgrade, Downgrade, Maintain).
+        -   Provide a clear justification for the new risk rating.
+
+    **Recommendation:**
+    -   Provide a recommendation for the coming year (e.g., continue monitoring, schedule a deep-dive review, place on watchlist).
+    -   Identify any necessary actions, such as requesting additional information or engaging with the borrower.
+
+    **Expected Output Format:**
+    Provide the entire analysis as a single, structured JSON object.
+    ```json
+    {{
+      "company_name": "{company_name}",
+      "review_date": "{current_date}",
+      "executive_summary": {{
+        "updated_risk_rating": "...",
+        "recommendation": "...",
+        "key_developments": []
+      }},
+      "financial_performance": {{
+        "summary": "...",
+        "ratio_analysis": {{...}}
+      }},
+      "covenant_compliance": {{
+        "status": "In Compliance/Out of Compliance",
+        "details": [{{ "covenant": "...", "status": "...", "details": "..." }}]
+      }},
+      "management_and_strategy": {{
+        "summary": "..."
+      }},
+      "industry_and_market": {{
+        "summary": "..."
+      }},
+      "updated_risk_assessment": {{
+        "justification": "...",
+        "updated_risk_rating": "..."
+      }},
+      "action_plan": []
+    }}
+    ```
+
+- title: "Monitor Covenant Compliance"
+  prompt: |
+    **Objective:** Perform a detailed check of covenant compliance for a portfolio company based on the latest financial reporting.
+
+    **Persona:** Act as a credit monitoring officer specializing in covenant analysis.
+
+    **Company Information:**
+    -   **Company Name:** `{company_name}`
+    -   **Reporting Period:** `{reporting_period}` (e.g., Q3 2025)
+
+    **Input Data:**
+    -   **Covenant List:** A structured list of all financial and non-financial covenants from the loan agreement, including their definitions and required thresholds.
+      ```json
+      {{
+        "covenants": [
+          {{ "name": "DSCR", "type": "financial", "threshold": ">= 1.25x" }},
+          {{ "name": "Debt-to-Equity", "type": "financial", "threshold": "<= 2.0x" }},
+          {{ "name": "Submission of Financials", "type": "non-financial", "due_date": "90 days after year-end" }}
+        ]
+      }}
+      ```
+    -   **Financial Data:** The latest financial statements for the reporting period.
+
+    **Tasks to Perform:**
+
+    1.  **Calculate Covenant Values:** For each financial covenant, calculate the actual value based on the provided financial data.
+    2.  **Compare to Thresholds:** Compare the calculated value for each covenant against its required threshold.
+    3.  **Determine Compliance Status:** For each covenant, determine if it is "In Compliance" or "In Breach".
+    4.  **Generate Report:** Create a structured report detailing the compliance status of each covenant.
+
+    **Expected Output Format:**
+    Provide the output as a single JSON object.
+    ```json
+    {{
+      "company_name": "{company_name}",
+      "reporting_period": "{reporting_period}",
+      "overall_status": "In Compliance/Breach Detected",
+      "covenant_report": [
+        {{
+          "covenant_name": "...",
+          "required_threshold": "...",
+          "actual_value": "...",
+          "compliance_status": "In Compliance/In Breach",
+          "notes": "..."
+        }}
+      ],
+      "recommendation": "..."
+    }}
+    ```
+
+- title: "Peer and Industry Benchmarking"
+  prompt: |
+    **Objective:** Benchmark the financial performance of `{company_name}` against its key competitors and industry averages.
+
+    **Persona:** Act as a competitive intelligence analyst.
+
+    **Input Data:**
+    -   Financial statements for `{company_name}` for the last 3 years.
+    -   A list of key publicly traded competitors: `[{competitor_1}, {competitor_2}, ...]`
+    -   Industry average financial data from a source like `{data_source_name}` (e.g., RMA, S&P Capital IQ).
+
+    **Analysis Components:**
+    1.  **Key Ratio Benchmarking:**
+        -   Compare the following ratios for `{company_name}` against each competitor and the industry average:
+            -   Profitability (Gross Margin, EBITDA Margin, Net Margin)
+            -   Growth (Revenue Growth, EBITDA Growth)
+            -   Leverage (Debt/EBITDA, Debt/Equity)
+            -   Liquidity (Current Ratio)
+    2.  **Qualitative Assessment:**
+        -   How does `{company_name}`'s performance compare to its peers? Is it a market leader or a laggard?
+        -   What are the key drivers of any significant performance differences?
+        -   What are the strategic implications of the benchmarking analysis?
+
+    **Expected Output Format:**
+    A benchmarking report in Markdown format, including data tables and a narrative summary of the findings.
+
+- title: "Generate Watchlist Report"
+  prompt: |
+    **Objective:** Create a detailed "watchlist" report for an at-risk credit.
+
+    **Persona:** Act as a workout and recovery specialist.
+
+    **Company:** `{company_name}`
+    **Reason for Watchlist Status:** `{reason_for_watchlist}`
+
+    **Report Components:**
+    1.  **Executive Summary:** A brief overview of the situation and the recommended action plan.
+    2.  **Problem Statement:** A detailed description of the issues that led to the company being placed on the watchlist.
+    3.  **Current Status:** An update on the company's current financial performance, liquidity position, and any recent developments.
+    4.  **Action Plan:** A detailed, time-bound action plan to address the issues. This should include:
+        -   Specific steps to be taken by the company.
+        -   Specific steps to be taken by the lender.
+        -   Key milestones and deadlines.
+    5.  **Worst-Case Scenario Analysis:** An analysis of the potential outcome if the action plan is not successful, including an estimated recovery value.
+
+    **Expected Output Format:**
+    A formal watchlist report in Markdown format.
+
+- title: "Create Event-Driven Alert"
+  prompt: |
+    **Objective:** Analyze a specific event and generate an alert if it has a material impact on the creditworthiness of `{company_name}`.
+
+    **Persona:** Act as an automated monitoring agent.
+
+    **Event Information:**
+    -   **Event Type:** `{event_type}` (e.g., News Article, Press Release, SEC Filing, Market Data Update)
+    -   **Event Content:** `{event_content}`
+
+    **Analysis Steps:**
+    1.  **Summarize the Event:** Briefly summarize the key information from the event.
+    2.  **Assess Materiality:** Determine if the event is material to the creditworthiness of `{company_name}`. Consider its impact on the 5 Cs of Credit.
+    3.  **Determine Severity:** If the event is material, assess its severity (e.g., Low, Medium, High).
+    4.  **Generate Alert (if necessary):** If the event is material and has a medium or high severity, generate a structured alert.
+
+    **Expected Output Format:**
+    If the event is not material, output a JSON object with `{{ "alert_required": false }}`.
+    If the event is material, output a JSON object with the following schema:
+    ```json
+    {{
+      "alert_required": true,
+      "company_name": "{company_name}",
+      "event_type": "{event_type}",
+      "event_summary": "...",
+      "severity": "Medium/High",
+      "impact_analysis": "...",
+      "recommended_action": "..."
+    }}
+    ```
