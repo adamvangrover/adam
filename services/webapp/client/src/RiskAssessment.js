@@ -1,41 +1,48 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 
-function RiskAssessment() {
-  const [ticker, setTicker] = useState('');
-  const [output, setOutput] = useState('');
+const getRiskColor = (score) => {
+  if (score < 30) return 'green';
+  if (score < 70) return 'orange';
+  return 'red';
+};
 
-  const handleRunAnalysis = () => {
-    setOutput('Running analysis...');
-    fetch(`/api/agents/risk_assessment_agent/invoke`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ ticker }),
-    })
-      .then(res => res.json())
-      .then(data => {
-        setOutput(JSON.stringify(data, null, 2));
-      })
-      .catch(err => {
-        setOutput('Error running analysis.');
-      });
-  };
+const RiskAssessment = ({ data }) => {
+  const { t } = useTranslation();
+  if (!data || !data.risk_score) {
+    return <p>Incompatible data format for risk assessment.</p>;
+  }
+
+  const { risk_score, breakdown, summary } = data;
 
   return (
-    <div>
-      <h3>Risk Assessment Agent</h3>
-      <div>
-        <label>Company Ticker:</label>
-        <input type="text" value={ticker} onChange={(e) => setTicker(e.target.value)} />
+    <div className="Card">
+      <h3>{t('riskAssessment.title')}</h3>
+      <div style={{
+        backgroundColor: getRiskColor(risk_score),
+        color: 'white',
+        padding: '20px',
+        borderRadius: '10px',
+        textAlign: 'center'
+      }}>
+        <h4>{t('riskAssessment.riskScore')}</h4>
+        <h1>{risk_score}</h1>
+        <p>/ 100</p>
       </div>
-      <button onClick={handleRunAnalysis}>Run Analysis</button>
-      <div>
-        <h3>Output:</h3>
-        <pre>{output}</pre>
-      </div>
+
+      <h4>{t('riskAssessment.riskBreakdown')}</h4>
+      <ul>
+        {Object.entries(breakdown).map(([key, value]) => (
+          <li key={key}>
+            <strong>{key.replace(/_/g, ' ')}:</strong> {value}
+          </li>
+        ))}
+      </ul>
+
+      <h4>{t('riskAssessment.summary')}</h4>
+      <p>{summary}</p>
     </div>
   );
-}
+};
 
 export default RiskAssessment;
