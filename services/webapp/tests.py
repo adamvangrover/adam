@@ -62,6 +62,58 @@ class ApiTestCase(unittest.TestCase):
         self.assertEqual(data, {'result': 'success'})
         mock_agent_orchestrator.run_agent.assert_called_with('some_agent', {'some': 'data'})
 
+    def test_portfolio_endpoints(self):
+        # Create a test user and login
+        user = User(username='testuser', role='user')
+        user.set_password('password')
+        db.session.add(user)
+        db.session.commit()
+        response = self.client.post('/api/login',
+                                 data=json.dumps({'username': 'testuser', 'password': 'password'}),
+                                 content_type='application/json')
+        access_token = json.loads(response.data)['access_token']
+        headers = {'Authorization': f'Bearer {access_token}'}
+
+        # Create a portfolio
+        response = self.client.post('/api/portfolios',
+                                  headers=headers,
+                                  data=json.dumps({'name': 'My Test Portfolio'}),
+                                  content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        portfolio_id = json.loads(response.data)['id']
+
+        # Add an asset
+        response = self.client.post(f'/api/portfolios/{portfolio_id}/assets',
+                                  headers=headers,
+                                  data=json.dumps({'symbol': 'AAPL', 'quantity': 10, 'purchase_price': 150.0}),
+                                  content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        asset_id = json.loads(response.data)['id']
+
+        # Get the portfolio and check the asset
+        response = self.client.get(f'/api/portfolios/{portfolio_id}', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data['assets']), 1)
+        self.assertEqual(data['assets'][0]['symbol'], 'AAPL')
+
+        # Update the asset
+        response = self.client.put(f'/api/portfolios/{portfolio_id}/assets/{asset_id}',
+                                 headers=headers,
+                                 data=json.dumps({'symbol': 'AAPL', 'quantity': 15, 'purchase_price': 155.0}),
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(data['quantity'], 15)
+
+        # Delete the asset
+        response = self.client.delete(f'/api/portfolios/{portfolio_id}/assets/{asset_id}', headers=headers)
+        self.assertEqual(response.status_code, 200)
+
+        # Delete the portfolio
+        response = self.client.delete(f'/api/portfolios/{portfolio_id}', headers=headers)
+        self.assertEqual(response.status_code, 200)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
+import { Routes, Route, Link, Navigate, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './App.css';
 import Login from './Login';
 import Dashboard from './Dashboard';
@@ -8,80 +10,86 @@ import PortfolioManagement from './PortfolioManagement';
 import Simulations from './Simulations';
 import KnowledgeGraph from './KnowledgeGraph';
 import io from 'socket.io-client';
+import { getToken, logout } from './utils/auth';
 
 const socket = io('http://localhost:5001');
 
 function App() {
-  const [token, setToken] = useState(localStorage.getItem('token'));
-  const [activeSection, setActiveSection] = useState('Dashboard');
+  const { t, i18n } = useTranslation();
+  const [isLoggedIn, setIsLoggedIn] = useState(!!getToken());
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     socket.on('simulation_complete', (data) => {
       new Notification(`Simulation ${data.simulation_name} complete!`);
     });
 
+    // Check for token on initial load
+    if (getToken()) {
+      setIsLoggedIn(true);
+    }
+
     return () => {
       socket.off('simulation_complete');
     };
   }, []);
 
-  const handleLogin = (token) => {
-    setToken(token);
-    localStorage.setItem('token', token);
+  const handleLogin = () => {
+    setIsLoggedIn(true);
   };
 
-  const handleLogout = () => {
-    setToken(null);
-    localStorage.removeItem('token');
+  const handleLogout = async () => {
+    await logout();
+    setIsLoggedIn(false);
+    navigate('/login');
   }
 
-  const renderSection = () => {
-    switch (activeSection) {
-      case 'Dashboard':
-        return <Dashboard />;
-      case 'Market Data':
-        return <MarketData />;
-      case 'Analysis Tools':
-        return <AnalysisTools />;
-      case 'Portfolio Management':
-        return <PortfolioManagement />;
-      case 'Simulations':
-        return <Simulations />;
-      case 'Knowledge Graph':
-        return <KnowledgeGraph />;
-      default:
-        return <Dashboard />;
-    }
+  const PrivateRoute = ({ children }) => {
+    return isLoggedIn ? children : <Navigate to="/login" />;
   };
-
-  if (!token) {
-    return <Login onLogin={handleLogin} />;
-  }
 
   return (
     <div className="App">
-      <header className="App-header">
-        <button onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}>
-          {isSidebarCollapsed ? '>>' : '<<'}
-        </button>
-        <h1>Adam v19.2</h1>
-        <button onClick={handleLogout}>Logout</button>
-      </header>
+      {isLoggedIn && (
+        <header className="App-header">
+          <button onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}>
+            {isSidebarCollapsed ? '>>' : '<<'}
+          </button>
+            <h1>{t('app.title')}</h1>
+            <div>
+              <button onClick={() => i18n.changeLanguage('en')}>English</button>
+              <button onClick={() => i18n.changeLanguage('es')}>Español</button>
+            </div>
+            <button onClick={handleLogout}>{t('app.logout')}</button>
+        </header>
+      )}
       <div className="App-body">
-        <nav className={`App-sidebar ${isSidebarCollapsed ? 'collapsed' : ''}`}>
-          <h2>Menu</h2>
-          <ul>
-            <li onClick={() => setActiveSection('Dashboard')}>Dashboard</li>
-            <li onClick={() => setActiveSection('Market Data')}>Market Data</li>
-            <li onClick={() => setActiveSection('Analysis Tools')}>Analysis Tools</li>
-            <li onClick={() => setActiveSection('Portfolio Management')}>Portfolio Management</li>
-            <li onClick={() => setActiveSection('Simulations')}>Simulations</li>
-            <li onClick={() => setActiveSection('Knowledge Graph')}>Knowledge Graph</li>
-          </ul>
-        </nav>
+        {isLoggedIn && (
+          <nav className={`App-sidebar ${isSidebarCollapsed ? 'collapsed' : ''}`}>
+              <h2>{t('app.menu')}</h2>
+            <ul>
+                <li><Link to="/">{t('dashboard.title')}</Link></li>
+                <li><Link to="/market-data">{t('marketData.title')}</Link></li>
+                <li><Link to="/analysis">{t('analysisTools.title')}</Link></li>
+                <li><Link to="/portfolios">{t('portfolioManagement.title')}</Link></li>
+                <li><Link to="/simulations">{t('simulations.title')}</Link></li>
+                <li><Link to="/knowledge-graph">{t('knowledgeGraph.title')}</Link></li>
+            </ul>
+          </nav>
+        )}
         <main className="App-content">
-          {renderSection()}
+            <Suspense fallback="loading...">
+              <Routes>
+                <Route path="/login" element={<Login onLogin={handleLogin} />} />
+                <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+                <Route path="/market-data" element={<PrivateRoute><MarketData /></PrivateRoute>} />
+                <Route path="/analysis" element={<PrivateRoute><AnalysisTools /></PrivateRoute>} />
+                <Route path="/portfolios" element={<PrivateRoute><PortfolioManagement /></PrivateRoute>} />
+                <Route path="/simulations"element={<PrivateRoute><Simulations /></PrivateRoute>} />
+                <Route path="/knowledge-graph" element={<PrivateRoute><KnowledgeGraph /></PrivateRoute>} />
+              </Routes>
+            </Suspense>
         </main>
       </div>
     </div>
