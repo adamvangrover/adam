@@ -1,0 +1,64 @@
+{
+  "prompt_metadata": {
+    "prompt_id": "Regulatory_Rating_Prompts_v1.0",
+    "prompt_version": "1.0",
+    "creation_date": "2025-09-09",
+    "description": "A focused library of prompts for generating regulatory rating recommendations (e.g., for Shared National Credit - SNC) for corporate credit.",
+    "author": "Jules"
+  },
+  "report_specifications": {
+    "report_title_template": "Regulatory Rating Assessment: [Company Name]",
+    "target_audience": "Bank Examiners, Credit Risk Managers, Internal Auditors",
+    "output_format_general": "Markdown with structured sections.",
+    "tone_and_style": "Formal, regulatory-focused, objective, evidence-based."
+  },
+  "core_analysis_areas": [
+    {
+      "prompt_id": "regulatory_rating_analysis",
+      "prompt_title": "Regulatory Rating Analysis",
+      "description": "This section provides a structured approach to determining a regulatory credit rating, focusing on the core principles of repayment capacity and clearly defined weaknesses.",
+      "prompts": [
+        {
+          "task_id": "RR01",
+          "stage_id": "regulatory_rating",
+          "stage_name": "I. Regulatory Rating Analysis",
+          "section_id": "repayment_source_analysis",
+          "section_name": "Primary Source of Repayment Analysis",
+          "section_description": "Identify and assess the primary source of repayment for the credit facility. The analysis should determine the reliability and sustainability of this source.",
+          "prompt_text": "Identify the primary source of repayment for the credit facility (e.g., operating cash flow, asset conversion, refinancing). Analyze its reliability and sustainability over the next 12-24 months. Is this source of repayment considered sound and dependable?",
+          "expected_response_format": "Narrative analysis identifying the primary repayment source and assessing its reliability with a concluding statement on its soundness."
+        },
+        {
+          "task_id": "RR02",
+          "stage_id": "regulatory_rating",
+          "stage_name": "I. Regulatory Rating Analysis",
+          "section_id": "cash_flow_adequacy",
+          "section_name": "Cash Flow Adequacy Assessment",
+          "section_description": "Evaluate the company's capacity to generate sufficient cash flow to service all its debt obligations in a timely manner. This is a critical component of the 'Pass' rating criteria.",
+          "prompt_text": "Based on a conservative 'rating case' forecast, assess whether the company's cash flow is sufficient to service all debt obligations (principal and interest) in a timely manner. Provide key supporting ratios (e.g., Debt Service Coverage Ratio, Free Cash Flow to Debt).",
+          "expected_response_format": "Narrative assessment of cash flow adequacy, supported by key quantitative metrics, concluding on whether cash flow is sufficient."
+        },
+        {
+          "task_id": "RR03",
+          "stage_id": "regulatory_rating",
+          "stage_name": "I. Regulatory Rating Analysis",
+          "section_id": "weakness_identification",
+          "section_name": "Identification of Well-Defined Weaknesses",
+          "section_description": "Identify any 'well-defined weaknesses' that jeopardize the orderly repayment of the debt. The presence of such weaknesses is a key differentiator between 'Pass' and criticized ratings.",
+          "prompt_text": "Identify and describe any well-defined weaknesses that jeopardize the timely repayment of the debt under normal operating conditions. Consider factors such as deteriorating financial trends, covenant breaches, inadequate collateral, or poor management. For each weakness, explain how it directly threatens repayment.",
+          "expected_response_format": "Bulleted list of identified weaknesses, with a clear explanation of their impact on repayment capacity. If no such weaknesses exist, state this explicitly."
+        },
+        {
+          "task_id": "RR04",
+          "stage_id": "regulatory_rating",
+          "stage_name": "I. Regulatory Rating Analysis",
+          "section_id": "rating_recommendation_synthesis",
+          "section_name": "Rating Recommendation and Justification",
+          "section_description": "Synthesize the analysis of repayment sources, cash flow, and identified weaknesses to assign a final regulatory rating and provide a clear, concise justification.",
+          "prompt_text": "Based on the preceding analysis, recommend a regulatory rating from the following options: 'Pass', 'Special Mention', or 'Substandard'. Provide a concise justification for the recommended rating, directly referencing the findings on repayment sources, cash flow adequacy, and the presence or absence of well-defined weaknesses.",
+          "expected_response_format": "A single rating ('Pass', 'Special Mention', or 'Substandard') followed by a 2-3 paragraph justification narrative that synthesizes the analysis into a final recommendation."
+        }
+      ]
+    }
+  ]
+}
