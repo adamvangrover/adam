@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Prompt Schema",
+  "description": "Defines the canonical structure for a single prompt in the prompt library.",
+  "type": "object",
+  "properties": {
+    "prompt_id": {
+      "description": "Unique identifier for the prompt, e.g., 'ONBOARD-SUM-001'.",
+      "type": "string",
+      "pattern": "^[A-Z0-9_-]+-[0-9]+$"
+    },
+    "category": {
+      "description": "Hierarchical category for the prompt, e.g., 'Pre-Trade/Summarization'.",
+      "type": "string"
+    },
+    "version": {
+      "description": "An optional semantic version for the prompt, e.g., '1.0.0'.",
+      "type": "string"
+    },
+    "prompt_template": {
+      "description": "The template string for the LLM prompt.",
+      "type": "string"
+    },
+    "example_context": {
+      "description": "An example object containing the data to be injected into the prompt template.",
+      "type": "object"
+    },
+    "example_completion": {
+      "description": "An example of the desired output from the LLM for the given context.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "prompt_id",
+    "category",
+    "prompt_template",
+    "example_context",
+    "example_completion"
+  ]
+}
