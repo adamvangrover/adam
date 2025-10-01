@@ -1,12 +1,13 @@
 from flask import Flask, jsonify, request
 from flask_socketio import SocketIO, emit
 from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import create_access_token, jwt_required, JWTManager, get_jwt_identity
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, JWTManager, get_jwt_identity, get_jwt
 from werkzeug.exceptions import HTTPException
 from werkzeug.security import generate_password_hash, check_password_hash
 import sys
 import os
 import json
+from datetime import datetime, timezone
 from .config import config
 from .celery import celery
 
@@ -28,6 +29,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
+    role = db.Column(db.String(80), nullable=False, default='user')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -38,23 +40,42 @@ class User(db.Model):
     def __repr__(self):
         return f'<User {self.username}>'
 
-class SimulationResult(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    task_id = db.Column(db.String(36), unique=True, nullable=False)
-    simulation_name = db.Column(db.String(120), nullable=False)
-    result = db.Column(db.Text, nullable=True)
-
-    def __repr__(self):
-        return f'<SimulationResult {self.simulation_name}>'
-
 class Portfolio(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', backref=db.backref('portfolios', lazy=True))
+    assets = db.relationship('PortfolioAsset', backref='portfolio', lazy=True, cascade="all, delete-orphan")
 
     def __repr__(self):
         return f'<Portfolio {self.name}>'
+
+class PortfolioAsset(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    portfolio_id = db.Column(db.Integer, db.ForeignKey('portfolio.id'), nullable=False)
+    symbol = db.Column(db.String(20), nullable=False)
+    quantity = db.Column(db.Float, nullable=False)
+    purchase_price = db.Column(db.Float, nullable=False)
+
+    def __repr__(self):
+        return f'<PortfolioAsset {self.symbol}>'
+
+class SimulationResult(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    task_id = db.Column(db.String(36), unique=True, nullable=False)
+    simulation_name = db.Column(db.String(120), nullable=False)
+    result = db.Column(db.Text, nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = db.relationship('User', backref=db.backref('simulation_results', lazy=True))
+
+
+    def __repr__(self):
+        return f'<SimulationResult {self.simulation_name}>'
+
+class TokenBlocklist(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    jti = db.Column(db.String(36), nullable=False, index=True)
+    created_at = db.Column(db.DateTime, nullable=False)
 
 # ---------------------------------------------------------------------------- #
 # Application Factory
@@ -169,6 +190,12 @@ def create_app(config_name='default'):
         return jsonify({'message': 'User created successfully'}), 201
 
 
+    @jwt.token_in_blocklist_loader
+    def check_if_token_revoked(jwt_header, jwt_payload):
+        jti = jwt_payload["jti"]
+        token = db.session.query(TokenBlocklist.id).filter_by(jti=jti).scalar()
+        return token is not None
+
     @app.route('/api/login', methods=['POST'])
     def login():
         """
@@ -179,10 +206,27 @@ def create_app(config_name='default'):
         password = data.get('password')
         user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
-            access_token = create_access_token(identity=username)
-            return jsonify(access_token=access_token)
+            access_token = create_access_token(identity=str(user.id))
+            refresh_token = create_refresh_token(identity=str(user.id))
+            return jsonify(access_token=access_token, refresh_token=refresh_token)
         else:
             return jsonify({'error': 'Invalid credentials'}), 401
+
+    @app.route('/api/logout', methods=['POST'])
+    @jwt_required()
+    def logout():
+        jti = get_jwt()['jti']
+        now = datetime.now(timezone.utc)
+        db.session.add(TokenBlocklist(jti=jti, created_at=now))
+        db.session.commit()
+        return jsonify(msg="JWT revoked")
+
+    @app.route('/api/refresh', methods=['POST'])
+    @jwt_required(refresh=True)
+    def refresh():
+        identity = get_jwt_identity()
+        access_token = create_access_token(identity=identity)
+        return jsonify(access_token=access_token)
 
     # ---------------------------------------------------------------------------- #
     # Data Endpoints
@@ -226,7 +270,7 @@ def create_app(config_name='default'):
     # ---------------------------------------------------------------------------- #
 
     @celery.task(bind=True)
-    def run_simulation_task(self, simulation_name):
+    def run_simulation_task(self, simulation_name, user_id):
         """
         Celery task to run a simulation.
         """
@@ -241,7 +285,8 @@ def create_app(config_name='default'):
             sim_result = SimulationResult(
                 task_id=self.request.id,
                 simulation_name=simulation_name,
-                result=json.dumps(result)
+                result=json.dumps(result),
+                user_id=user_id
             )
             db.session.add(sim_result)
             db.session.commit()
@@ -255,12 +300,39 @@ def create_app(config_name='default'):
     # Simulation Endpoints
     # ---------------------------------------------------------------------------- #
 
+    @app.route('/api/simulations', methods=['GET'])
+    @jwt_required()
+    def get_simulations():
+        """
+        Returns a list of available simulations.
+        """
+        simulations_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'core', 'simulations')
+        simulations = [f.replace('.py', '') for f in os.listdir(simulations_dir) if f.endswith('.py') and not f.startswith('__')]
+        return jsonify(simulations)
+
+    @app.route('/api/simulations/history', methods=['GET'])
+    @jwt_required()
+    def get_simulation_history():
+        """
+        Returns the history of simulations for the current user.
+        """
+        current_user_id = get_jwt_identity()
+        results = SimulationResult.query.filter_by(user_id=current_user_id).order_by(SimulationResult.id.desc()).all()
+        return jsonify([{
+            'task_id': r.task_id,
+            'simulation_name': r.simulation_name,
+            'status': run_simulation_task.AsyncResult(r.task_id).state
+        } for r in results])
+
+
     @app.route('/api/simulations/<simulation_name>', methods=['POST'])
+    @jwt_required()
     def run_simulation(simulation_name):
         """
         Runs a specific simulation.
         """
-        task = run_simulation_task.delay(simulation_name)
+        current_user_id = get_jwt_identity()
+        task = run_simulation_task.delay(simulation_name, current_user_id)
         return jsonify({'task_id': task.id})
 
     # ---------------------------------------------------------------------------- #
@@ -271,28 +343,43 @@ def create_app(config_name='default'):
     def get_knowledge_graph():
         """
         Returns the knowledge graph data from Neo4j.
+        Accepts a 'query' parameter to search for a starting node.
         """
         from neo4j import GraphDatabase
+        query = request.args.get('query')
+        cypher_query = "MATCH (n)-[r]->(m) RETURN n, r, m LIMIT 25"
+        params = {}
+
+        if query:
+            cypher_query = "MATCH (n)-[r]->(m) WHERE n.name CONTAINS $query RETURN n, r, m LIMIT 100"
+            params = {'query': query}
+
+
         uri = os.environ.get('NEO4J_URI', 'bolt://neo4j:7687')
         user = os.environ.get('NEO4J_USER', 'neo4j')
         password = os.environ.get('NEO4J_PASSWORD', 'password')
         driver = GraphDatabase.driver(uri, auth=(user, password))
         with driver.session() as session:
-            result = session.run("MATCH (n)-[r]->(m) RETURN n, r, m LIMIT 25")
+            result = session.run(cypher_query, params)
             nodes = {}
             links = []
             for record in result:
-                source_name = record["n"]["name"]
-                target_name = record["m"]["name"]
-                if source_name not in nodes:
-                    nodes[source_name] = {"id": source_name, "labels": list(record["n"].labels)}
-                if target_name not in nodes:
-                    nodes[target_name] = {"id": target_name, "labels": list(record["m"].labels)}
+                source_node = record["n"]
+                target_node = record["m"]
+
+                source_id = source_node.id
+                target_id = target_node.id
+
+                if source_id not in nodes:
+                    nodes[source_id] = {"id": source_node.get('name'), "labels": list(source_node.labels), "properties": dict(source_node)}
+                if target_id not in nodes:
+                    nodes[target_id] = {"id": target_node.get('name'), "labels": list(target_node.labels), "properties": dict(target_node)}
 
                 links.append({
-                    "source": source_name,
-                    "target": target_name,
-                    "type": type(record["r"]).__name__
+                    "source": source_node.get('name'),
+                    "target": target_node.get('name'),
+                    "type": type(record["r"]).__name__,
+                    "properties": dict(record["r"])
                 })
 
             return jsonify({"nodes": list(nodes.values()), "links": links})
@@ -347,9 +434,10 @@ def create_app(config_name='default'):
     @jwt_required()
     def create_portfolio():
         data = request.get_json()
-        current_user = get_jwt_identity()
-        user = User.query.filter_by(username=current_user).first()
-        new_portfolio = Portfolio(name=data['name'], user_id=user.id)
+        if not data or 'name' not in data:
+            return jsonify({'error': 'Missing name in request body'}), 400
+        current_user_id = get_jwt_identity()
+        new_portfolio = Portfolio(name=data['name'], user_id=current_user_id)
         db.session.add(new_portfolio)
         db.session.commit()
         return jsonify({'id': new_portfolio.id, 'name': new_portfolio.name})
@@ -357,26 +445,24 @@ def create_app(config_name='default'):
     @app.route('/api/portfolios', methods=['GET'])
     @jwt_required()
     def get_portfolios():
-        current_user = get_jwt_identity()
-        user = User.query.filter_by(username=current_user).first()
-        portfolios = Portfolio.query.filter_by(user_id=user.id).all()
+        current_user_id = get_jwt_identity()
+        portfolios = Portfolio.query.filter_by(user_id=current_user_id).all()
         return jsonify([{'id': p.id, 'name': p.name} for p in portfolios])
 
     @app.route('/api/portfolios/<int:id>', methods=['GET'])
     @jwt_required()
     def get_portfolio(id):
-        current_user = get_jwt_identity()
-        user = User.query.filter_by(username=current_user).first()
-        portfolio = Portfolio.query.filter_by(id=id, user_id=user.id).first_or_404()
-        return jsonify({'id': portfolio.id, 'name': portfolio.name})
+        current_user_id = get_jwt_identity()
+        portfolio = Portfolio.query.filter_by(id=id, user_id=current_user_id).first_or_404()
+        assets = [{'id': asset.id, 'symbol': asset.symbol, 'quantity': asset.quantity, 'purchase_price': asset.purchase_price} for asset in portfolio.assets]
+        return jsonify({'id': portfolio.id, 'name': portfolio.name, 'assets': assets})
 
     @app.route('/api/portfolios/<int:id>', methods=['PUT'])
     @jwt_required()
     def update_portfolio(id):
         data = request.get_json()
-        current_user = get_jwt_identity()
-        user = User.query.filter_by(username=current_user).first()
-        portfolio = Portfolio.query.filter_by(id=id, user_id=user.id).first_or_404()
+        current_user_id = get_jwt_identity()
+        portfolio = Portfolio.query.filter_by(id=id, user_id=current_user_id).first_or_404()
         portfolio.name = data['name']
         db.session.commit()
         return jsonify({'id': portfolio.id, 'name': portfolio.name})
@@ -384,10 +470,48 @@ def create_app(config_name='default'):
     @app.route('/api/portfolios/<int:id>', methods=['DELETE'])
     @jwt_required()
     def delete_portfolio(id):
-        current_user = get_jwt_identity()
-        user = User.query.filter_by(username=current_user).first()
-        portfolio = Portfolio.query.filter_by(id=id, user_id=user.id).first_or_404()
+        current_user_id = get_jwt_identity()
+        portfolio = Portfolio.query.filter_by(id=id, user_id=current_user_id).first_or_404()
         db.session.delete(portfolio)
+        db.session.commit()
+        return jsonify({'result': True})
+
+    @app.route('/api/portfolios/<int:portfolio_id>/assets', methods=['POST'])
+    @jwt_required()
+    def add_portfolio_asset(portfolio_id):
+        data = request.get_json()
+        current_user_id = get_jwt_identity()
+        portfolio = Portfolio.query.filter_by(id=portfolio_id, user_id=current_user_id).first_or_404()
+        new_asset = PortfolioAsset(
+            portfolio_id=portfolio.id,
+            symbol=data['symbol'],
+            quantity=data['quantity'],
+            purchase_price=data['purchase_price']
+        )
+        db.session.add(new_asset)
+        db.session.commit()
+        return jsonify({'id': new_asset.id, 'symbol': new_asset.symbol, 'quantity': new_asset.quantity, 'purchase_price': new_asset.purchase_price})
+
+    @app.route('/api/portfolios/<int:portfolio_id>/assets/<int:asset_id>', methods=['PUT'])
+    @jwt_required()
+    def update_portfolio_asset(portfolio_id, asset_id):
+        data = request.get_json()
+        current_user_id = get_jwt_identity()
+        portfolio = Portfolio.query.filter_by(id=portfolio_id, user_id=current_user_id).first_or_404()
+        asset = PortfolioAsset.query.filter_by(id=asset_id, portfolio_id=portfolio.id).first_or_404()
+        asset.symbol = data['symbol']
+        asset.quantity = data['quantity']
+        asset.purchase_price = data['purchase_price']
+        db.session.commit()
+        return jsonify({'id': asset.id, 'symbol': asset.symbol, 'quantity': asset.quantity, 'purchase_price': asset.purchase_price})
+
+    @app.route('/api/portfolios/<int:portfolio_id>/assets/<int:asset_id>', methods=['DELETE'])
+    @jwt_required()
+    def delete_portfolio_asset(portfolio_id, asset_id):
+        current_user_id = get_jwt_identity()
+        portfolio = Portfolio.query.filter_by(id=portfolio_id, user_id=current_user_id).first_or_404()
+        asset = PortfolioAsset.query.filter_by(id=asset_id, portfolio_id=portfolio.id).first_or_404()
+        db.session.delete(asset)
         db.session.commit()
         return jsonify({'result': True})
 

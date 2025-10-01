@@ -1,41 +1,99 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
 
-function TechnicalAnalysis() {
-  const [ticker, setTicker] = useState('');
-  const [output, setOutput] = useState('');
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
-  const handleRunAnalysis = () => {
-    setOutput('Running analysis...');
-    fetch(`/api/agents/technical_analyst_agent/invoke`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+
+const TechnicalAnalysis = ({ data }) => {
+  const { t } = useTranslation();
+  if (!data || !data.price_history || !data.indicators) {
+    return <p>Incompatible data format for technical analysis chart.</p>;
+  }
+
+  const { price_history, indicators } = data;
+  const labels = price_history.map(item => item.date);
+
+  const chartData = {
+    labels,
+    datasets: [
+      {
+        label: t('technicalAnalysis.price'),
+        data: price_history.map(item => item.close),
+        borderColor: 'rgb(75, 192, 192)',
+        backgroundColor: 'rgba(75, 192, 192, 0.5)',
       },
-      body: JSON.stringify({ ticker }),
-    })
-      .then(res => res.json())
-      .then(data => {
-        setOutput(JSON.stringify(data, null, 2));
-      })
-      .catch(err => {
-        setOutput('Error running analysis.');
-      });
+      {
+        label: `SMA (${indicators.moving_average.period})`,
+        data: indicators.moving_average.values,
+        borderColor: 'rgb(255, 99, 132)',
+        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+        borderDash: [5, 5],
+      },
+       {
+        label: `RSI (${indicators.rsi.period})`,
+        data: indicators.rsi.values,
+        borderColor: 'rgb(54, 162, 235)',
+        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+        yAxisID: 'y1'
+      }
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: t('technicalAnalysis.title') + ` for ${data.ticker}`,
+      },
+    },
+    scales: {
+        y: {
+            type: 'linear',
+            display: true,
+            position: 'left',
+        },
+        y1: {
+            type: 'linear',
+            display: true,
+            position: 'right',
+            grid: {
+                drawOnChartArea: false, // only draw grid lines for the first Y axis
+            },
+        },
+    },
   };
 
   return (
-    <div>
-      <h3>Technical Analyst Agent</h3>
-      <div>
-        <label>Company Ticker:</label>
-        <input type="text" value={ticker} onChange={(e) => setTicker(e.target.value)} />
-      </div>
-      <button onClick={handleRunAnalysis}>Run Analysis</button>
-      <div>
-        <h3>Output:</h3>
-        <pre>{output}</pre>
-      </div>
+    <div className="Card">
+      <h3>{t('technicalAnalysis.title')}</h3>
+      <Line options={options} data={chartData} />
+      <h4>{t('technicalAnalysis.summary')}</h4>
+      <p>{indicators.summary}</p>
     </div>
   );
-}
+};
 
 export default TechnicalAnalysis;
