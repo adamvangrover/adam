@@ -39,6 +39,14 @@ Here's a breakdown of how to contribute to different parts of Adam v17.0:
 * **Testing:** Write unit tests for all new or modified code. Ensure that the tests cover various scenarios and edge cases.
 * **Documentation:** Update the relevant documentation files to reflect any code changes or new features. Ensure that the documentation is clear, comprehensive, and up-to-date.
 
+#### Using Documentation Templates
+
+To standardize our documentation, please use the provided templates when creating new components. When adding a new agent, data source, or workflow, please copy the relevant template to a new file in the `docs/` directory and fill it out as part of your contribution.
+
+*   **New Agent:** [`docs/templates/agent_documentation_template.md`](./docs/templates/agent_documentation_template.md)
+*   **New Data Source:** [`docs/templates/data_source_documentation_template.md`](./docs/templates/data_source_documentation_template.md)
+*   **New Workflow:** [`docs/templates/workflow_documentation_template.md`](./docs/templates/workflow_documentation_template.md)
+
 ### Submitting Contributions
 
 To submit your contributions, please follow these steps:
