@@ -1,0 +1,80 @@
+# Financial Digital Twin - FIBO-Aligned Schema
+# Version: 1.0
+
+# This YAML file defines the structure of the FIBO-aligned schema for the Financial Digital Twin.
+# It is based on the Financial Industry Business Ontology (FIBO) to ensure semantic interoperability.
+
+types:
+  - type: LegalEntity
+    properties:
+      - name: legalName
+        type: string
+        description: The full legal name of the entity.
+      - name: hasAddress
+        type: PostalAddress
+        description: The address of the legal entity.
+
+  - type: Organization
+    extends: LegalEntity
+    properties:
+      - name: hasOrganizationIdentification
+        type: OrganizationIdentification
+        description: The identification of the organization.
+
+  - type: Person
+    extends: LegalEntity
+    properties:
+      - name: firstName
+        type: string
+      - name: lastName
+        type: string
+
+  - type: FinancialInstrument
+    properties:
+      - name: hasIdentifier
+        type: string
+      - name: isIssuedBy
+        type: LegalEntity
+
+  - type: Stock
+    extends: FinancialInstrument
+    properties:
+      - name: hasTickerSymbol
+        type: string
+
+  - type: Loan
+    extends: FinancialInstrument
+    properties:
+      - name: hasPrincipalAmount
+        type: MonetaryAmount
+      - name: hasInterestRate
+        type: float
+
+  - type: PostalAddress
+    properties:
+      - name: street
+        type: string
+      - name: city
+        type: string
+      - name: state
+        type: string
+      - name: zipCode
+        type: string
+      - name: country
+        type: string
+
+  - type: OrganizationIdentification
+    properties:
+      - name: hasLEI
+        type: string
+        description: Legal Entity Identifier.
+      - name: hasCIK
+        type: string
+        description: Central Index Key.
+
+  - type: MonetaryAmount
+    properties:
+      - name: value
+        type: float
+      - name: currency
+        type: string
