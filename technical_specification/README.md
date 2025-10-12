@@ -1,3 +1,22 @@
+# ADAM Technical Specification Guides
+
+This document is the central hub for the technical specifications of the ADAM platform.
+
+---
+
+## ADAM v20.0 - Master Technical Design Specification
+
+The canonical technical specification for the Adam v20.0 system upgrade, focusing on Enhanced Autonomy, Causal Inference, and Generative Simulation.
+
+*   **[Master Technical Design Specification](./Adam_v20.0_TECHNICAL_SPECIFICATION.md)**
+
+### v20.0 Schemas and Ontologies
+*   **[Agent Proposal Standard (APS/1.0)](./schemas/agent_proposal.schema.json):** A JSON Schema for system-generated agent proposals.
+*   **["Black Swan" Scenario Definition Schema (BSSDS/1.0)](./schemas/black_swan_scenario.schema.yaml):** A YAML schema for defining simulation scenarios.
+*   **[Adam Causal Predicate Set (ACPS/1.0)](./ontologies/acps.ttl):** An RDF/OWL ontology for representing causal relationships.
+
+---
+
 # ADAM v21.0 - Technical Specification Guide
 
 ## Introduction
@@ -35,3 +54,4 @@ The following files are also part of this technical specification:
 ## Project README
 
 For the general project README, please see [../README_PROJECT.md](../README_PROJECT.md).
+
