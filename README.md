@@ -99,6 +99,7 @@ Adam v21.0 is not just an AI; it's your partner in navigating the complexities o
 
 ## Documentation
 
+  * **Adam v20.0 Implementation Plan:** [docs/v20.0](./docs/v20.0)
   * **System Requirements:** [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md)
   * **User Guide:** [docs/user\_guide.md](docs/user_guide.md)
   * **API Documentation:** [docs/api\_docs.yaml](docs/api_docs.yaml)

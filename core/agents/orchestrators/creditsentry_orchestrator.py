@@ -1,8 +1,13 @@
 # core/agents/orchestrators/creditsentry_orchestrator.py
 
+import asyncio
+import json
+import logging
 from typing import Any, Dict
 
 from core.agents.agent_base import AgentBase
+from core.llm.base_llm_engine import BaseLLMEngine
+
 
 class CreditSentryOrchestrator(AgentBase):
     """
@@ -83,22 +88,63 @@ FLAG_ESCALATION_IMMEDIATE: A severe combination of risks requires immediate huma
 END PROMPT COMPONENT 4
 """
 
-    def __init__(self, config: Dict[str, Any], **kwargs):
+    def __init__(self, config: Dict[str, Any], llm_engine: BaseLLMEngine, agents: Dict[str, AgentBase], **kwargs):
         super().__init__(config, **kwargs)
+        self.llm_engine = llm_engine
+        self.agents = agents
 
-    async def execute(self, *args: Any, **kwargs: Any) -> Any:
+    async def execute(self, user_query: str, **kwargs: Any) -> Any:
         """
         Main execution method for the CreditSentryOrchestrator.
         This agent will receive a user query, decompose it, delegate tasks to
         sub-agents and meta-agents, and synthesize the final response.
         """
-        # Placeholder implementation
-        print("Executing CreditSentryOrchestrator")
-        # In a real implementation, this would involve:
-        # 1. Receiving a user query.
-        # 2. Using an LLM with the META_PROMPT to decompose the query into a plan.
-        # 3. Delegating tasks to the appropriate agents.
-        # 4. Monitoring the execution of the plan.
-        # 5. Synthesizing the results from the agents.
-        # 6. Returning the final response.
-        return {"status": "success", "data": "orchestrated response"}
+        logging.info(f"Executing CreditSentryOrchestrator for query: {user_query}")
+
+        # 1. Decompose the query into a plan using the LLM.
+        prompt = f"{self.META_PROMPT}\n\n---\n\nUser Query: \"{user_query}\"\n\nBased on the user query and the protocols, generate a JSON object representing the execution plan. The plan should have a 'stages' key, containing an array of stages. Each stage should be an array of steps that can be executed in parallel."
+        
+        try:
+            plan_response = await self.llm_engine.generate_response(prompt)
+            logging.info(f"Generated execution plan: {plan_response}")
+            
+            plan = json.loads(plan_response)
+            
+            # 2. Execute the plan.
+            results = {}
+            for stage in plan['stages']:
+                tasks = []
+                for step in stage:
+                    agent_name = step['agent']
+                    inputs = step['inputs']
+                    
+                    # Resolve inputs from previous steps.
+                    resolved_inputs = {}
+                    for key, value in inputs.items():
+                        if isinstance(value, str) and value.startswith("$."):
+                            # This is a reference to a previous result.
+                            ref_step, ref_key = value[2:].split('.')
+                            resolved_inputs[key] = results[ref_step][ref_key]
+                        else:
+                            resolved_inputs[key] = value
+                    
+                    agent = self.agents.get(agent_name)
+                    if not agent:
+                        raise ValueError(f"Agent '{agent_name}' not found.")
+                    
+                    tasks.append(agent.execute(**resolved_inputs))
+                
+                stage_results = await asyncio.gather(*tasks)
+
+                for i, step in enumerate(stage):
+                    results[step['step_id']] = stage_results[i]
+
+            # 3. Synthesize the final response.
+            synthesis_prompt = f"The following tasks have been executed with their results:\n\n{json.dumps(results, indent=2)}\n\nBased on these results, generate a final, coherent response that adheres to the formatting and metadata tagging rules outlined in the 'OUTPUT FORMATTING & METADATA TAGGING' section of the system meta-prompt."
+            final_response = await self.llm_engine.generate_response(synthesis_prompt)
+
+            return {"status": "success", "response": final_response}
+
+        except Exception as e:
+            logging.error(f"Error executing plan: {e}")
+            return {"status": "error", "message": "Failed to execute plan."}

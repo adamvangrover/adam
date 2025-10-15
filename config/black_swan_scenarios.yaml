@@ -1,0 +1,87 @@
+# Black Swan Scenario Parameters
+# This file defines the parameters for plausible but historically unprecedented "black swan" events
+# to be used by the Generative Simulation engine.
+
+scenarios:
+  - name: "Simultaneous Sovereign Default"
+    description: "A scenario where three major economies default on their sovereign debt within the same week."
+    parameters:
+      - name: "affected_economies"
+        type: "list"
+        value: ["Italy", "Brazil", "South Africa"]
+      - name: "default_correlation_factor"
+        type: "float"
+        value: 0.85 # High correlation
+      - name: "global_equity_impact"
+        type: "percentage_change"
+        value: -35.0
+      - name: "flight_to_safety_asset"
+        type: "asset_class"
+        value: "USD"
+
+  - name: "Critical Infrastructure Cyberattack"
+    description: "A coordinated cyberattack takes down the primary stock exchange and a major cloud provider in a G7 nation for 72 hours."
+    parameters:
+      - name: "target_exchange"
+        type: "string"
+        value: "New York Stock Exchange"
+      - name: "target_cloud_provider"
+        type: "string"
+        value: "Amazon Web Services (AWS) US-EAST-1"
+      - name: "market_downtime_hours"
+        type: "integer"
+        value: 72
+      - name: "tech_sector_impact"
+        type: "percentage_change"
+        value: -25.0
+      - name: "vix_increase"
+        type: "percentage_change"
+        value: 150.0 # Volatility Index triples
+
+  - name: "Sudden Technological Obsolescence"
+    description: "A sudden breakthrough in quantum computing renders all current encryption standards immediately obsolete, causing a panic in the technology and financial sectors."
+    parameters:
+      - name: "breakthrough_announcement_source"
+        type: "string"
+        value: "Google Quantum AI"
+      - name: "affected_sector"
+        type: "string"
+        value: "Cybersecurity"
+      - name: "semiconductor_industry_impact"
+        type: "percentage_change"
+        value: -40.0
+      - name: "cryptocurrency_market_impact"
+        type: "percentage_change"
+        value: -90.0
+
+  - name: "Cascading Natural Catastrophe"
+    description: "A major volcanic eruption in Southeast Asia disrupts global supply chains for six months, coinciding with a severe drought affecting agricultural output in North and South America."
+    parameters:
+      - name: "volcano_location"
+        type: "string"
+        value: "Mount Pinatubo, Philippines"
+      - name: "supply_chain_disruption_duration_months"
+        type: "integer"
+        value: 6
+      - name: "agricultural_commodity_price_increase"
+        type: "percentage_change"
+        value: 200.0
+      - name: "shipping_and_logistics_sector_impact"
+        type: "percentage_change"
+        value: -50.0
+
+  - name: "Global Communications Blackout"
+    description: "An extreme solar flare destroys a significant portion of the world's satellite communication network, crippling GPS, international banking, and media for weeks."
+    parameters:
+      - name: "satellite_network_damage_percentage"
+        type: "integer"
+        value: 60
+      - name: "financial_transaction_failure_rate"
+        type: "percentage"
+        value: 75.0
+      - name: "aerospace_and_defense_sector_impact"
+        type: "percentage_change"
+        value: 20.0 # Positive impact due to rebuilding demand
+      - name: "telecom_sector_impact"
+        type: "percentage_change"
+        value: -60.0
