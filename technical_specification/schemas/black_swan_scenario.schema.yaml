@@ -1,0 +1,45 @@
+schemaVersion: bssds/1.0
+scenarioMetadata:
+  scenarioID: "a1b2c3d4-..."
+  name: "Black Swan: Critical Infrastructure Cyberattack"
+  description: "A coordinated cyberattack targeting major financial clearing houses, causing a sudden market freeze and liquidity crisis."
+  author: "RiskAssessmentAgent"
+  creationDate: "2025-11-10"
+
+globalParameters:
+  simulationStartDate: "2026-01-01"
+  simulationEndDate: "2026-12-31"
+  timestep: "1D"
+  monteCarloRuns: 1000
+
+eventPrimitives:
+  EquityMarket_FlashCrash: &FlashCrash
+    eventType: "MarketShock"
+    description: "A sudden, severe drop in major equity indices due to algorithmic trading halts and panic selling."
+    shockParameters:
+      - variable: "SP500_Index"
+        shockFunction: "percentage_change"
+        distribution: { type: "Normal", mean: -0.15, std_dev: 0.05 }
+      - variable: "VIX_Index"
+        shockFunction: "absolute_value"
+        distribution: { type: "Uniform", min: 70, max: 90 }
+
+timeline:
+  - eventID: "InitialAttack"
+    trigger: { onDate: "2026-02-01" }
+    duration: "2D"
+    eventDefinition:
+      eventType: "OperationalRiskEvent"
+      description: "Initial reports of cyberattack on payment systems. Interbank lending rates spike."
+      shockParameters:
+        - variable: "LIBOR_OIS_Spread"
+          shockFunction: "absolute_value"
+          distribution: { type: "Exponential", lambda: 0.5 }
+        - correlationMatrix:
+            -
+
+  - eventID: "MarketContagion"
+    trigger: { onCondition: "LIBOR_OIS_Spread > 1.0" }
+    duration: "5D"
+    eventDefinition:
+      <<: *FlashCrash # Use the primitive defined above
