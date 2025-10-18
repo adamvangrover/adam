@@ -299,6 +299,8 @@ class FundamentalAnalystAgent(AgentBase):
         pass
 
 
+    def calculate_dcf_valuation(self, company_data: Dict[str, Any]) -> Optional[float]:
+        """
         Calculates the Discounted Cash Flow (DCF) valuation of the company using a two-stage FCF projection model.
 
         Args:

@@ -4,6 +4,7 @@ import json
 import logging
 from typing import Optional
 from pathlib import Path
+from core.system.kg_cache import KGCache
 
 
 # Configure logging
@@ -23,6 +24,7 @@ class KnowledgeBase:
         """
         self.file_path = Path(file_path)
         self.data = self._load_data()
+        self.cache = KGCache()
 
     def _load_data(self) -> dict:
         """Loads data from the JSON file and converts keys to lowercase."""
@@ -50,8 +52,17 @@ class KnowledgeBase:
         Returns:
             The value associated with the key, or None if not found.
         """
+        # First, check the cache
+        cached_result = self.cache.get(query_key)
+        if cached_result:
+            return cached_result.decode('utf-8')
+
+        # If not in cache, query the knowledge base
         if self.data:
-            return self.data.get(query_key.lower())
+            result = self.data.get(query_key.lower())
+            if result:
+                self.cache.set(query_key, json.dumps(result))
+            return result
         else:
             logging.warning("Knowledge base data is empty.")
             return None
@@ -79,3 +90,20 @@ class KnowledgeBase:
             logging.info(f"Knowledge base saved to {self.file_path}")
         except IOError as e:
             logging.error(f"Error saving knowledge base to {self.file_path}: {e}")
+
+    def add_provenance(self, data_key: str, activity: str, agent: str, used_data_keys: list):
+        """
+        Adds provenance triples to the knowledge base.
+
+        Args:
+            data_key: The key of the data that was generated.
+            activity: The activity that generated the data.
+            agent: The agent that performed the activity.
+            used_data_keys: A list of keys of the data that was used in the activity.
+        """
+        provenance_info = {
+            "prov:wasGeneratedBy": activity,
+            "prov:wasAttributedTo": agent,
+            "prov:used": used_data_keys
+        }
+        self.update(f"{data_key}:provenance", provenance_info)

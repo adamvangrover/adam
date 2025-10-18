@@ -67,13 +67,12 @@ class AgentBase(ABC):
         """
         Sends an A2A message to another agent and waits for the response.
         """
-        if target_agent not in self.peer_agents:
-            raise ValueError(f"Agent '{target_agent}' is not a known peer.")
-
-        logging.info(f"Agent {self.name} sending message to {target_agent}: {message}")
-        response = await self.peer_agents[target_agent].receive_message(self.name, message)
-        logging.info(f"Agent {self.name} received response from {target_agent}: {response}")
-        return response
+        # This synchronous version is a placeholder.
+        # A true async implementation would involve a more complex mechanism for waiting for a response.
+        # For now, we'll just publish the message.
+        self.message_broker.publish(target_agent, json.dumps(message))
+        logging.info(f"Agent {type(self).__name__} sent message to {target_agent}")
+        return None
 
     @abstractmethod
     async def execute(self, *args: Any, **kwargs: Any) -> Any:
@@ -82,6 +81,29 @@ class AgentBase(ABC):
         This is the main entry point for agent execution.
         """
         raise NotImplementedError("Subclasses must implement the execute method.")
+
+    def start_listening(self, message_broker):
+        """
+        Subscribes the agent to its dedicated topic on the message broker
+        and processes incoming messages via a callback.
+        """
+        topic = type(self).__name__
+        message_broker.subscribe(topic, self.handle_message)
+
+    def handle_message(self, ch, method, properties, body):
+        """
+        Callback function to handle incoming messages.
+        """
+        message = json.loads(body)
+        context = message.get("context")
+        reply_to = message.get("reply_to")
+
+        # Execute the agent's logic
+        result = self.execute(**context)
+
+        # Publish the result to the reply_to topic
+        if reply_to:
+            self.message_broker.publish(reply_to, json.dumps(result))
 
     def get_skill_schema(self) -> Dict[str, Any]:
         """
