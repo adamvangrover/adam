@@ -9,7 +9,7 @@ from core.utils.secrets_utils import get_api_key # Added import
 
 class DataSources:
     def __init__(self, config):
-        # self.api_keys = config.get('api_keys', {}) # Removed API key loading from config
+        self.api_keys = config.get('api_keys', {})
         self.config = config # Retain config for other potential uses
 
         consumer_key = get_api_key('TWITTER_CONSUMER_KEY')

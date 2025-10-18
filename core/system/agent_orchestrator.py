@@ -38,6 +38,7 @@ from core.agents.meta_cognitive_agent import MetaCognitiveAgent
 
 from core.utils.config_utils import load_config
 from core.utils.secrets_utils import get_api_key # Added import
+from core.system.brokers.rabbitmq_client import RabbitMQClient
 
 # Semantic Kernel imports
 from semantic_kernel import Kernel
@@ -99,6 +100,8 @@ class AgentOrchestrator:
             str, Dict[str, Any]
         ] = {}  # MCP service registry
         self.sk_kernel: Optional[Kernel] = None # Initialize Semantic Kernel instance to None
+        self.message_broker = RabbitMQClient()
+        self.message_broker.connect()
 
         if self.config is None:
             logging.error("Failed to load agent configurations (config/config.yaml).")
@@ -252,11 +255,26 @@ class AgentOrchestrator:
         agent = self.get_agent(agent_name)
         if agent:
             try:
-                agent.set_context(context)  # Set the MCP context
-                return agent.execute(**context)  # Pass context as kwargs
+                # Instead of direct execution, publish a message
+                # The message should contain the context and a reply-to topic
+                reply_topic = f"{agent_name}_results"
+                message = {
+                    "context": context,
+                    "reply_to": reply_topic
+                }
+                self.message_broker.publish(agent_name, json.dumps(message))
+
+                # For this example, we'll assume a synchronous response
+                # In a real-world scenario, you would have a separate process
+                # listening for responses.
+                # This is a simplified simulation of the async process.
+                # We'll need a mechanism to wait for the response.
+                # For now, let's just log that the message was published.
+                logging.info(f"Published task for {agent_name} to message broker.")
+                return None
             except Exception as e:
                 logging.exception(f"Error executing agent {agent_name}: {e}")
-                return None  # Or raise, depending on error handling policy
+                return None
         else:
             logging.error(f"Agent not found: {agent_name}")
             return None
@@ -271,8 +289,30 @@ class AgentOrchestrator:
 
         workflow = self.workflows.get(workflow_name)
         if not workflow:
-            logging.error(f"Unknown workflow: {workflow_name}")
-            return None
+            logging.info(f"Workflow '{workflow_name}' not found. Attempting dynamic workflow generation.")
+            # Attempt to generate a dynamic workflow
+            try:
+                # Prepare the input for the WorkflowCompositionSkill
+                available_skills = json.dumps(self.mcp_service_registry, indent=2)
+                user_query = initial_context.get("user_query", "")
+
+                # Run the Semantic Kernel skill
+                generated_workflow_str = await self.sk_kernel.run_async(
+                    self.sk_kernel.skills.get_function("WorkflowCompositionSkill", "compose"),
+                    input_vars={"input": user_query, "skills": available_skills}
+                )
+
+                # Parse and validate the generated workflow
+                workflow = yaml.safe_load(generated_workflow_str)
+                if not workflow or "agents" not in workflow or "dependencies" not in workflow:
+                    logging.error("Dynamic workflow generation failed: Invalid workflow format.")
+                    return None
+
+                logging.info(f"Dynamically generated workflow: {workflow}")
+
+            except Exception as e:
+                logging.error(f"Error during dynamic workflow generation: {e}")
+                return None
 
         results: Dict[str, Any] = {}
         execution_queue: deque[str] = deque(workflow["agents"])
