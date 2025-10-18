@@ -1,13 +1,13 @@
-# core/agents/meta_cognitive_agent.py
+# core/agents/meta_19_agent.py
 from core.agents.agent_base import AgentBase
 from typing import Any, Dict, List, Optional
 import logging
 import re
 
-class MetaCognitiveAgent(AgentBase):
+class Meta19Agent(AgentBase):
     """
     Monitors the reasoning and outputs of other agents to ensure logical consistency,
-    coherence, and alignment with core principles.
+    coherence, and alignment with core principles. Deprecated as part of Adam v19 to v22.
     """
 
     def __init__(self, config: Dict[str, Any], **kwargs):
