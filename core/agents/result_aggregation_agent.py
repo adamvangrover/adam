@@ -14,10 +14,9 @@ class ResultAggregationAgent(AgentBase):
     but is designed for future LLM integration.
     """
 
-    def __init__(self, config_path="config/agents.yaml"):
-        super().__init__()
-        self.config = load_config(config_path)
-        agent_config = self.config.get('agents', {}).get('ResultAggregationAgent', {})
+    def __init__(self, config):
+        super().__init__(config)
+        agent_config = self.config
 
         if not agent_config:
             logging.error("ResultAggregationAgent configuration not found.")

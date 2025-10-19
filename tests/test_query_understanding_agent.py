@@ -7,8 +7,9 @@ from core.system.error_handler import InvalidInputError
 
 class TestQueryUnderstandingAgent(unittest.TestCase):
 
-    def setUp(self):
-        self.agent = QueryUnderstandingAgent()
+    @patch('core.agents.query_understanding_agent.LLMPlugin')
+    def setUp(self, mock_llm_plugin):
+        self.agent = QueryUnderstandingAgent(config={})
         self.config = {
              "agents": {
                 "QueryUnderstandingAgent": {
@@ -18,36 +19,36 @@ class TestQueryUnderstandingAgent(unittest.TestCase):
         }
 
     @patch('core.utils.config_utils.load_config')
-    def test_execute_risk_query(self, mock_load_config):
+    async def test_execute_risk_query(self, mock_load_config):
         mock_load_config.return_value = self.config
-        result = self.agent.execute("risk ABC")
+        result = await self.agent.execute("risk ABC")
         self.assertEqual(result, ["DataRetrievalAgent"])
 
     @patch('core.utils.config_utils.load_config')
-    def test_execute_kb_query(self, mock_load_config):
+    async def test_execute_kb_query(self, mock_load_config):
         mock_load_config.return_value = self.config
-        result = self.agent.execute("kb:market_sentiment")
+        result = await self.agent.execute("kb:market_sentiment")
         self.assertEqual(result, ["DataRetrievalAgent"])
 
     @patch('core.utils.config_utils.load_config')
-    def test_execute_updatekb_query(self, mock_load_config):
+    async def test_execute_updatekb_query(self, mock_load_config):
         mock_load_config.return_value = self.config
-        result = self.agent.execute("updatekb key:value")
+        result = await self.agent.execute("updatekb key:value")
         self.assertEqual(result, [])
 
     @patch('core.utils.config_utils.load_config')
-    def test_execute_unknown_query(self, mock_load_config):
+    async def test_execute_unknown_query(self, mock_load_config):
         mock_load_config.return_value = self.config
         with self.assertRaises(InvalidInputError) as context:
-            self.agent.execute("unknown command")
+            await self.agent.execute("unknown command")
         self.assertEqual(context.exception.code, 103)  # Check for correct error code
 
 
     @patch('core.utils.config_utils.load_config')
-    def test_execute_empty_query(self, mock_load_config):
+    async def test_execute_empty_query(self, mock_load_config):
         mock_load_config.return_value = self.config
         with self.assertRaises(InvalidInputError) as context:
-            self.agent.execute("")
+            await self.agent.execute("")
         self.assertEqual(context.exception.code, 103)
 
 if __name__ == '__main__':

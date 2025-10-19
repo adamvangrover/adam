@@ -3,9 +3,12 @@
 import unittest
 from core.system.knowledge_base import KnowledgeBase
 
+from unittest.mock import patch
+
 class TestKnowledgeBase(unittest.TestCase):
 
-    def setUp(self):
+    @patch('redis.Redis')
+    def setUp(self, mock_redis):
         self.kb = KnowledgeBase()
 
     def test_query_existing_key(self):

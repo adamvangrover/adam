@@ -7,7 +7,7 @@ from core.system.error_handler import AdamError
 class TestResultAggregationAgent(unittest.TestCase):
 
     def setUp(self):
-        self.agent = ResultAggregationAgent()
+        self.agent = ResultAggregationAgent(config={})
 
     def test_execute_empty_list(self):
         result = self.agent.execute([])

@@ -9,7 +9,7 @@ from core.utils.secrets_utils import get_api_key # Added import
 
 class DataSources:
     def __init__(self, config):
-        # self.api_keys = config.get('api_keys', {}) # Removed API key loading from config
+        self.api_keys = config.get('api_keys', {})
         self.config = config # Retain config for other potential uses
 
         consumer_key = get_api_key('TWITTER_CONSUMER_KEY')
@@ -41,6 +41,7 @@ class DataSources:
             return None
 
     def get_financial_news_headlines(self, source="bloomberg", keywords=None, sentiment=None):
+        headlines = []
         if source == "bloomberg":
             #... (fetch and process news headlines from Bloomberg API)
             pass  # Placeholder for actual implementation
@@ -49,11 +50,11 @@ class DataSources:
 
     def get_historical_news(self, source="bloomberg", keywords=None, start_date=None, end_date=None):
         #... (fetch historical news data from various sources)
-        pass  # Placeholder for actual implementation
+        return []
 
     def get_tweets(self, query, count=100, sentiment=None):
         #... (implementation for fetching tweets from Twitter)
-        pass  # Placeholder added
+        return []
 
     def get_trending_topics(self, location=None):
         #... (implementation for getting trending topics from Twitter)

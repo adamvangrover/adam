@@ -28,11 +28,11 @@ class TestDataRetrievalAgent(unittest.TestCase):
 
     @patch('core.utils.config_utils.load_config')
     @patch('core.utils.data_utils.load_data') # Mock load_data
-    def test_get_risk_rating_found(self, mock_load_data, mock_load_config):
+    async def test_get_risk_rating_found(self, mock_load_data, mock_load_config):
         mock_load_config.side_effect = [self.mock_config, self.mock_data_sources] #return config then data_source
         mock_load_data.return_value = {"ABC": "low", "DEF": "medium"}  # Mocked data
-        agent = DataRetrievalAgent()
-        rating = agent.get_risk_rating("ABC")
+        agent = DataRetrievalAgent(config=self.mock_config)
+        rating = await agent.get_risk_rating("ABC")
         self.assertEqual(rating, "low")
         mock_load_data.assert_called_once_with(self.mock_data_sources['risk_ratings'])
 
@@ -40,8 +40,8 @@ class TestDataRetrievalAgent(unittest.TestCase):
     @patch('core.utils.data_utils.load_data')
     def test_get_risk_rating_not_found(self, mock_load_data, mock_load_config):
         mock_load_config.side_effect = [self.mock_config, self.mock_data_sources] #return config then data_source
-        mock_load_data.return_value = {"ABC": "low"}  # Mocked data
-        agent = DataRetrievalAgent()
+        mock_load_data.side_effect = DataNotFoundError("XYZ")
+        agent = DataRetrievalAgent(config=self.mock_config)
         with self.assertRaises(DataNotFoundError) as context:
             agent.get_risk_rating("XYZ")
         self.assertEqual(context.exception.code, 101) #verify correct error
@@ -51,46 +51,46 @@ class TestDataRetrievalAgent(unittest.TestCase):
     @patch('core.utils.data_utils.load_data')
     def test_get_risk_rating_file_not_found(self, mock_load_data, mock_load_config):
         mock_load_config.side_effect = [self.mock_config, self.mock_data_sources] #return config then data_source
-        mock_load_data.return_value = None
-        agent = DataRetrievalAgent()
+        mock_load_data.side_effect = FileReadError("dummy_path.json")
+        agent = DataRetrievalAgent(config=self.mock_config)
         with self.assertRaises(FileReadError) as context:
             agent.get_risk_rating("ABC")
         self.assertEqual(context.exception.code, 105)
 
     @patch('core.utils.config_utils.load_config')
     @patch('core.utils.data_utils.load_data')
-    def test_get_market_data(self, mock_load_data, mock_load_config):
+    async def test_get_market_data(self, mock_load_data, mock_load_config):
         mock_load_config.side_effect = [self.mock_config, self.mock_data_sources]  # return config then data_source
         mock_load_data.return_value = {"market_trends":["test"]}
-        agent = DataRetrievalAgent()
-        result = agent.get_market_data()
+        agent = DataRetrievalAgent(config=self.mock_config)
+        result = await agent.get_market_data()
         self.assertEqual(result, {"market_trends":["test"]})
         mock_load_data.assert_called_once_with(self.mock_data_sources['market_baseline'])
 
 
     @patch('core.utils.config_utils.load_config')
     @patch('core.utils.data_utils.load_data')
-    def test_execute_risk_rating(self, mock_load_data, mock_load_config):
+    async def test_execute_risk_rating(self, mock_load_data, mock_load_config):
         mock_load_config.side_effect = [self.mock_config, self.mock_data_sources] #return config then data_source
         mock_load_data.return_value = {"ABC": "low"}
-        agent = DataRetrievalAgent()
-        result = agent.execute("risk_rating:ABC")
+        agent = DataRetrievalAgent(config=self.mock_config)
+        result = await agent.execute("risk_rating:ABC")
         self.assertEqual(result, "The risk rating for ABC is low.")
         mock_load_data.assert_called()
 
     @patch('core.utils.config_utils.load_config')
-    def test_execute_kb_query(self, mock_load_config):
+    async def test_execute_kb_query(self, mock_load_config):
         mock_load_config.side_effect = [self.mock_config, {}]
-        agent = DataRetrievalAgent(knowledge_base=self.mock_kb)
-        result = agent.execute("kb:test_key")
+        agent = DataRetrievalAgent(config={'knowledge_base': self.mock_kb})
+        result = await agent.execute("kb:test_key")
         self.assertEqual(result, "Test Value")
 
     @patch('core.utils.config_utils.load_config')
-    def test_execute_invalid_command(self, mock_load_config):
+    async def test_execute_invalid_command(self, mock_load_config):
         mock_load_config.side_effect = [self.mock_config, {}]
-        agent = DataRetrievalAgent()
+        agent = DataRetrievalAgent(config=self.mock_config)
         with self.assertRaises(InvalidInputError) as context:
-            agent.execute("invalid command")
+            await agent.execute("invalid command")
         self.assertEqual(context.exception.code, 103)
 
 
