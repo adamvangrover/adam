@@ -6,9 +6,9 @@
 * **Key Placeholders:**
 * `[Knowledge_Base_Handle]`: The name of your system (e.g., "Total Recall agent," "personal knowledge base").
 * `[Primary_Topic]`: The main subject to retrieve (e.g., "Project Adam v21.0").
-* `[Correlated_Topic_1]`: A cross-referenced person or topic (e.g., "my wife," "my manager," "my notes from Q3").
+* `[Correlated_Topic_1]`: A cross-referenced person or topic (e.g., "my colleague," "my manager," "my notes from Q3").
 * `[Correlated_Topic_2]`: A specific sub-topic (e.g., "UI design," "2025 budget," "discussions on 'Eclipse' game").
-* **Pro-Tips for 'Adam' AI:** This template is your *goal*. Designing this query prompt *first* helps you define the backend architecture for your "Total Recall System." Your system's query parser will need to be able to break a natural language question (e.g., "What did my wife and I say about the UI for Adam?") down into these structured placeholders.
+* **Pro-Tips for 'Adam' AI:** This template is your *goal*. Designing this query prompt *first* helps you define the backend architecture for your "Total Recall System." Your system's query parser will need to be able to break a natural language question (e.g., "What did my colleague and I say about the UI for Adam?") down into these structured placeholders.
 
 #### Full Template:
 
