@@ -89,6 +89,12 @@ The ADAM system employs a hierarchical agent architecture that consists of three
     *   Synthesizing the results from multiple agents into a final response.
 *   **Example:** An Orchestrator Agent might take a user query like "What is the credit risk of Apple Inc.?", delegate the task of gathering financial data to a Sub-Agent, delegate the task of assessing credit risk to a Meta-Agent, and then synthesize the results into a comprehensive report.
 
+### Hybrid Architecture (v22)
+
+The ADAM system has been updated to a hybrid architecture that combines the synchronous, centrally-orchestrated model of v21 with the new asynchronous, message-driven model of v22. This dual-architecture design allows the system to leverage the strengths of both approaches, providing flexibility and scalability while maintaining the robustness of the original system.
+
+The `HybridOrchestrator` is the central component of the new architecture. It acts as a bridge between the synchronous and asynchronous subsystems, providing a single entry point for all workflow execution. The `HybridOrchestrator` inspects each workflow to determine whether it is synchronous or asynchronous and then delegates it to the appropriate manager. For more details, see `docs/v22_architecture_integration.md`.
+
 ## Getting Started
 
 To get started, please familiarize yourself with the following:
