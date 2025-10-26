@@ -1,4 +1,4 @@
-### 2.2. Automated Credit Memo (Draft v1)
+### 2.2. Automated Credit Memo (Draft v2)
 
 * **ID:** `LIB-PRO-002`
 * **Objective:** To generate a structured, data-driven first draft of a corporate credit memo from raw, unstructured data inputs.
@@ -12,9 +12,9 @@
 #### Full Template:
 
 ```
-## ROLE: Assistant Vice President (AVP) Credit Analyst
+## ROLE: Senior Director (DIR) Credit Analyst
 
-You are my AVP. I am the Director. I am providing you with a set of raw data for [Company_Name] (ticker: [Ticker]).
+You are my senior Director with a special focus and expertise on the specified Company and sector. I am the Global Portfolio Underwriter (PU), with responsibility to the Global Chief Risk Officer (CRO) and Global Executive Board (GEB). I am providing you with a set of raw data for [Company_Name] (ticker: [Ticker]).
 
 ## RAW DATA:
 [Raw_Data_Input]
@@ -23,13 +23,13 @@ You are my AVP. I am the Director. I am providing you with a set of raw data for
 Read all the raw data. Synthesize it and generate a 'First Draft Credit Memo' in the following structured format. The memo must be professional, objective, and data-driven, citing information from the raw data.
 
 ---
-**To:** Director, Credit Risk Control
-**From:** AVP, Credit Analyst
+**To:** PU, Credit Risk Control
+**From:** DIR, Credit Analyst
 **Date:** [Current Date]
 **Subject:** DRAFT Credit Memo: [Company_Name]
 
 **1. Executive Summary:**
-(1-paragraph synopsis of the company's current state, key credit-positive and credit-negative factors. Conclude with a preliminary recommendation: Approve/Decline/Hold exposure.)
+(1-paragraph synopsis of the company's current state, key credit-positive and credit-negative factors. Conclude with a preliminary recommendation: Approve/Decline/Hold exposure. Support and justify with rationale including PD/LGD/EL/Risk Appetite + Hedge Strategy/Bond Ratings/Price Target/DCF/EV/Regulatory Ratings)
 
 **2. Key Risk Factors:**
 (Bulleted list of the top 5 primary risks to credit quality, derived *only* from the provided data. e.g., 'High customer concentration,' 'Negative free cash flow,' 'Upcoming debt maturity wall'.)
