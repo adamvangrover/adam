@@ -2,7 +2,7 @@
 
 *   **ID:** `LIB-LRN-002`
 *   **Version:** `1.1`
-*   **Author:** Jules
+*   **Author:** Adam v22
 *   **Objective:** To deconstruct a large, ambiguous system idea into its fundamental, verifiable components. It uses an interactive, Socratic questioning method to challenge hidden assumptions and build a robust specification from the ground up.
 *   **When to Use:** At the very beginning of a new project, especially for complex systems like your "Total Recall System" or a new 'Adam' AI module. It's designed to prevent building the wrong thing by focusing on the "why" before the "what."
 

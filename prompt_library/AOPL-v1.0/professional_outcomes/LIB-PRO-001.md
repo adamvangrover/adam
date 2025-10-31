@@ -2,7 +2,7 @@
 
 *   **ID:** `LIB-PRO-001`
 *   **Version:** `1.1`
-*   **Author:** Jules
+*   **Author:** Adam v22
 *   **Objective:** To systematically identify and challenge the weakest assumptions, hidden risks, and cognitive biases in a credit analysis or investment thesis. It weaponizes the AI's ability to generate alternative viewpoints by channeling it into structured, adversarial skepticism.
 *   **When to Use:** As a mandatory final step before submitting any credit memo, investment proposal, or risk assessment. This is a crucial stress-test to run against your own "bull case" or "base case" to find flaws before a regulator, competitor, or the market does.
 

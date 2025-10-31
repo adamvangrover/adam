@@ -58,3 +58,15 @@ Each prompt is stored in its own detailed Markdown file, named according to its 
     *   **Objective:** To generate clear, comprehensive, and user-friendly documentation for a complex AI system based on its architectural design.
 *   **`LIB-META-007: Agentic System Test Plan Generator`**
     *   **Objective:** To generate a comprehensive, structured test plan for a multi-agent AI system.
+
+## Structure
+
+The library is organized into three categories, each in its own subdirectory:
+
+*   `/learning`: Prompts designed to leverage AI to rapidly master new, complex domains by connecting them directly to existing expertise.
+*   `/professional_outcomes`: Prompts designed to automate and enhance core professional work in credit risk.
+*   `/system_architecture`: "Meta-prompts" designed to help build, refine, and manage AI systems.
+
+Each prompt is stored in its own Markdown file, named according to its unique ID (e.g., `LIB-LRN-001.md`).
+
+

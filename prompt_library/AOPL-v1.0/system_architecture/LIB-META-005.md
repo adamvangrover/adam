@@ -2,7 +2,7 @@
 
 *   **ID:** `LIB-META-005`
 *   **Version:** `1.1`
-*   **Author:** Jules
+*   **Author:** Adam v22
 *   **Objective:** To execute a complex, multi-faceted query against a personal or enterprise knowledge base, retrieve disparate information from multiple sources and modalities, synthesize the findings, and propose concrete actions.
 *   **When to Use:** This is the primary "power user" query prompt for your "Total Recall System." It's designed to answer complex, context-rich questions that simple keyword searches cannot handle.
 

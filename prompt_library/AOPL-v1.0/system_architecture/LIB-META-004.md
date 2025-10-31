@@ -2,7 +2,7 @@
 
 *   **ID:** `LIB-META-004`
 *   **Version:** `1.1`
-*   **Author:** Jules
+*   **Author:** Adam v22
 *   **Objective:** To translate a complex, technical, or abstract concept into a clear, concise, and value-focused "communications pack" tailored for a specific non-technical audience. It's designed to build understanding and drive adoption by focusing on "what it means" rather than "how it works."
 *   **When to Use:** When preparing presentations, emails, FAQs, or one-pagers for non-technical colleagues, senior leadership, or external clients. Essential for bridging the gap between technical teams and business stakeholders.
 

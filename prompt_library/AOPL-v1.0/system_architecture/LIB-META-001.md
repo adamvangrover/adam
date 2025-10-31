@@ -2,7 +2,7 @@
 
 *   **ID:** `LIB-META-001`
 *   **Version:** `1.1`
-*   **Author:** Jules
+*   **Author:** Adam v22
 *   **Objective:** To design a complete, robust, and production-ready multi-agent AI system to solve a complex, multi-step task. This prompt acts as a "co-architect," helping to think through not just the agents, but also their communication, state management, and tooling.
 *   **When to Use:** At the beginning of a new project that requires the coordination of multiple specialized AI agents. Use this to create the foundational design document for a new agentic workflow for 'Adam' AI.
 

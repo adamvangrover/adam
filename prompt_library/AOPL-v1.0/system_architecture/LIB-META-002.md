@@ -2,7 +2,7 @@
 
 *   **ID:** `LIB-META-002`
 *   **Version:** `1.1`
-*   **Author:** Jules
+*   **Author:** Adam v22
 *   **Objective:** To generate a complete, production-ready, and documented prompt template package for an enterprise library. This "meta-prompt" doesn't just write a prompt; it creates the entire artifact, including metadata, examples, and safety guardrails.
 *   **When to Use:** When you need to add a new, standardized capability for a non-technical audience. Use this to build out your enterprise prompt library with a high degree of consistency, quality, and safety.
 

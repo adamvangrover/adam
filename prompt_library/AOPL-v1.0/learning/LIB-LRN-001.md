@@ -2,7 +2,7 @@
 
 *   **ID:** `LIB-LRN-001`
 *   **Version:** `1.1`
-*   **Author:** Jules
+*   **Author:** Adam v22
 *   **Objective:** To rapidly understand a new, complex subject by analogizing it directly to a core domain of expertise. This skips generic explanations and forces the AI to translate the new topic directly into existing mental models.
 *   **When to Use:** When encountering a new technical or abstract field (e.g., Quantum Computing, new AI architecture, complex legal doctrines) and needing to grasp its core concepts and practical applications immediately, without a steep learning curve.
 

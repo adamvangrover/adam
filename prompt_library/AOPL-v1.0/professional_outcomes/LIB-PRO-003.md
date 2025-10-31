@@ -2,7 +2,7 @@
 
 *   **ID:** `LIB-PRO-003`
 *   **Version:** `1.1`
-*   **Author:** Jules
+*   **Author:** Adam v22
 *   **Objective:** To parse unstructured financial or legal text and extract entities, their properties, and their relationships as clean, machine-readable statements for a knowledge graph. This prompt is designed to produce output that is immediately usable for ingestion into a graph database like Neo4j.
 *   **When to Use:** When processing complex documents like loan agreements, bond indentures, 10-K filings, or M&A announcements to programmatically build a knowledge graph of corporate structures, obligations, and relationships.
 

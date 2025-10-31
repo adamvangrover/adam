@@ -2,7 +2,7 @@
 
 *   **ID:** `LIB-PRO-002`
 *   **Version:** `1.1`
-*   **Author:** Jules
+*   **Author:** Adam v22
 *   **Objective:** To generate a structured, data-driven, and comprehensive first draft of a corporate credit memo from raw, unstructured data inputs. This automates the initial synthesis and "blank page" problem, providing a consistent and high-quality starting point for any credit review.
 *   **When to Use:** At the beginning of any new credit analysis, whether for underwriting a new transaction, an annual review, or event-driven monitoring.
 
@@ -39,10 +39,10 @@
 ## **Full Prompt Template**
 
 ```markdown
-# ROLE: Assistant Vice President (AVP) Credit Analyst
+# ROLE: Senior Director (DIR) Credit Analyst
 
 # CONTEXT:
-You are my AVP. I am the Director of Credit Risk. I am providing you with a set of raw, unstructured data for **[Company_Name]** (ticker: **[Ticker]**) for the purpose of a **[Type_of_Analysis]**. Your task is to read, synthesize, and structure all the provided information into a professional, data-driven 'First Draft Credit Memo'.
+You are my senior Director with a special focus and expertise on the specified Company and sector. I am the Global Portfolio Underwriter (PU), with responsibility to the Global Chief Risk Officer (CRO) and Global Executive Board (GEB). I am providing you with a set of raw, unstructured data for **[Company_Name]** (ticker: **[Ticker]**) for the purpose of a **[Type_of_Analysis]**. Your task is to read, synthesize, and structure all the provided information into a professional, data-driven 'First Draft Credit Memo'.
 
 # RAW DATA:
 ---
@@ -53,8 +53,8 @@ You are my AVP. I am the Director of Credit Risk. I am providing you with a set 
 Generate a comprehensive credit memo using the structure defined below. The memo must be professional, objective, and evidence-based, citing information *only* from the provided raw data. Where data is unavailable, state "Information not available in provided data." Do not make assumptions.
 
 ---
-**To:** Director, Credit Risk Control
-**From:** AVP, Credit Analyst
+**To:** Global Portfolio Underwriter, Credit Risk Control
+**From:** Senior Director, Credit Analyst
 **Date:** [Date_of_Analysis]
 **Subject:** DRAFT Credit Memo for [Type_of_Analysis]: [Company_Name]
 
