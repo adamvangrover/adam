@@ -95,6 +95,12 @@ The ADAM system has been updated to a hybrid architecture that combines the sync
 
 The `HybridOrchestrator` is the central component of the new architecture. It acts as a bridge between the synchronous and asynchronous subsystems, providing a single entry point for all workflow execution. The `HybridOrchestrator` inspects each workflow to determine whether it is synchronous or asynchronous and then delegates it to the appropriate manager. For more details, see `docs/v22_architecture_integration.md`.
 
+### Adaptive Architecture (v23)
+
+The system is currently evolving towards the v23 "Adaptive System" architecture. This next-generation model introduces a stateful, cyclical graph-based execution engine (leveraging LangGraph) to enable true adaptive intelligence, including iterative self-correction, neuro-symbolic planning, and multimodal perception.
+
+The `MetaOrchestrator` is the unified entry point for all execution models, including v21 (synchronous), v22 (asynchronous), and v23 (graph-based). For the complete vision and technical specifications, please refer to the official `docs/v23_architecture_vision.md` mandate.
+
 ## Getting Started
 
 To get started, please familiarize yourself with the following:
