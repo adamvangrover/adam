@@ -5,7 +5,7 @@ This guide provides instructions for setting up your terminal and a "code wizard
 ## Terminal Setup
 
 1.  **Install Python:** Make sure you have Python 3.8 or higher installed.
-2.  **Clone the repository:** `git clone https://github.com/adam-agi/adam.git`
+2.  **Clone the repository:** `git clone https://github.com/adamvangrover/adam.git`
 3.  **Install dependencies:** `pip install -r requirements.txt`
 
 ## Code Wizard
