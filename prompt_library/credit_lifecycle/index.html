@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corporate Borrower Credit Risk Control Artifacts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Slate & Sky Blue -->
+    <!-- Application Structure Plan: The application is structured as a three-stage interactive workflow, guiding the user chronologically through the credit risk process: 1. Foundational Profile, 2. Quantitative Analysis, and 3. Final Decision & Monitoring. This process-oriented structure was chosen over a static dashboard because it directly mirrors the real-world workflow of a credit officer, making the complex relationships between artifacts intuitive. Users navigate via a top bar, and each section uses interactive cards and visual flows to explain how one stage's outputs become the next stage's inputs, enhancing understanding and usability. -->
+    <!-- Visualization & Content Choices: 
+        - Financial Ratios Trend: (Report Info: Trend Analysis) -> (Goal: Show change over time) -> (Viz: Line Chart) -> (Interaction: Tooltip on hover) -> (Justification: Best way to visualize time-series financial data) -> (Library: Chart.js).
+        - Stress Test Results: (Report Info: Scenario Analysis) -> (Goal: Compare outcomes) -> (Viz: Bar Chart) -> (Interaction: Buttons to switch scenarios, updating the chart) -> (Justification: Clearly shows impact of different discrete scenarios on key metrics) -> (Library: Chart.js).
+        - Data Flow Diagram: (Report Info: Foundational Artifacts relationship) -> (Goal: Organize & show process) -> (Viz: Styled HTML/CSS divs and arrows) -> (Interaction: None, purely visual) -> (Justification: A simple, clear way to depict process flow without complex libraries) -> (Method: HTML/Tailwind).
+        - EWI Dashboard: (Report Info: Early Warning Indicators) -> (Goal: Inform on status) -> (Viz: Status indicators) -> (Interaction: Button to simulate a trigger) -> (Justification: Makes the concept of real-time monitoring tangible and interactive) -> (Method: JS/HTML).
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .section-icon {
+            font-size: 2rem;
+            line-height: 1;
+        }
+        .arrow {
+            position: relative;
+            width: 1.5rem;
+            height: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+        }
+        .arrow::after {
+            content: '→';
+            font-size: 2rem;
+            line-height: 1;
+        }
+        .artifact-card {
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05), 0 1px 2px 0 rgba(0,0,0,0.03);
+            transition: all 0.2s ease-in-out;
+        }
+        .artifact-card:hover {
+             transform: translateY(-4px);
+             box-shadow: 0 10px 15px -3px rgba(0,0,0,0.07), 0 4px 6px -2px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl text-slate-800 font-bold">📂</span>
+                    <h1 class="ml-3 text-lg font-semibold text-slate-800">Credit Risk Artifacts Explorer</h1>
+                </div>
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#foundational" class="text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors">Foundational Profile</a>
+                    <a href="#quantitative" class="text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors">Quantitative Analysis</a>
+                    <a href="#decision" class="text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors">Decision & Monitoring</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">The Lifecycle of a Corporate Credit File</h2>
+            <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">This application provides an interactive overview of the essential artifacts generated and maintained for each corporate borrower. Follow the process from raw data to final decision and ongoing monitoring.</p>
+        </div>
+        
+        <section id="foundational" class="mb-20 scroll-mt-20">
+            <div class="text-center mb-12">
+                 <h3 class="text-2xl font-semibold text-slate-800"><span class="section-icon">🗂️</span> I. Foundational Financial Profile</h3>
+                <p class="mt-2 text-slate-500">This section covers the core, validated data components that serve as the "golden source" for all subsequent analysis.</p>
+            </div>
+
+            <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 mb-12">
+                <div class="p-4 text-center rounded-lg bg-slate-100 border border-slate-200">
+                    <h4 class="font-semibold">Source Financials</h4>
+                    <p class="text-xs text-slate-500">(e.g., 10-K PDF)</p>
+                </div>
+                <div class="arrow"></div>
+                <div class="p-4 text-center rounded-lg bg-slate-100 border border-slate-200">
+                    <h4 class="font-semibold">Spreading Template</h4>
+                    <p class="text-xs text-slate-500">(ELT/ETL Logic)</p>
+                </div>
+                <div class="arrow"></div>
+                <div class="p-4 text-center rounded-lg bg-sky-100 border border-sky-300 text-sky-800">
+                    <h4 class="font-semibold">Standardized & Normalized Data</h4>
+                    <p class="text-xs">(Trusted Input for Models)</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="artifact-card p-6">
+                    <h4 class="font-semibold text-slate-800">Source Financial Statements</h4>
+                    <p class="mt-2 text-sm text-slate-600">Unaltered, as-reported financial statements (e.g., original Form 10-K/10-Q PDFs). Stored in a raw data zone, this serves as the ultimate source for audit and verification.</p>
+                </div>
+                 <div class="artifact-card p-6">
+                    <h4 class="font-semibold text-slate-800">Financial Spreading Template</h4>
+                    <p class="mt-2 text-sm text-slate-600">The standardized template where source data is entered or ingested. This artifact shows all mapping and adjustment logic applied to raw numbers, creating an auditable transformation record.</p>
+                </div>
+                <div class="artifact-card p-6">
+                    <h4 class="font-semibold text-slate-800">Standardized & Normalized Financials</h4>
+                    <p class="mt-2 text-sm text-slate-600">A machine-readable file with 5+ years of historical and 3-5 years of projected financials, standardized to the bank's internal chart of accounts. This is the trusted input for the analytics engine.</p>
+                </div>
+                <div class="artifact-card p-6 md:col-span-2">
+                    <h4 class="font-semibold text-slate-800">Financial Ratios & Trend Analysis</h4>
+                    <p class="mt-2 text-sm text-slate-600 mb-4">A generated report showing historical trends for key credit metrics like Leverage and Coverage. Below is an example of a leverage ratio trend over five years.</p>
+                    <div class="chart-container">
+                        <canvas id="trendChart"></canvas>
+                    </div>
+                </div>
+                <div class="artifact-card p-6">
+                    <h4 class="font-semibold text-slate-800">Peer & Industry Data Set</h4>
+                    <p class="mt-2 text-sm text-slate-600">The specific dataset of comparable companies used for analysis, including their key financial metrics. This provides essential context for the borrower's performance against its industry peers and is queryable for dynamic analysis.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="quantitative" class="mb-20 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h3 class="text-2xl font-semibold text-slate-800"><span class="section-icon">⚖️</span> II. Quantitative Analysis & Rating</h3>
+                <p class="mt-2 text-slate-500">This stage provides a transparent view into the quantitative assessment of creditworthiness, critical for internal and regulatory review.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="artifact-card p-6 lg:col-span-2">
+                    <h4 class="font-semibold text-slate-800">Quantitative Model Output Scorecard</h4>
+                    <p class="mt-2 text-sm text-slate-600">A snapshot from the bank's approved Probability of Default (PD) model, showing inputs, factor scores, weightings, and the final calculated credit rating.</p>
+                    <div class="mt-4 overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th class="px-4 py-2 font-medium">Factor</th>
+                                    <th class="px-4 py-2 font-medium">Input Value</th>
+                                    <th class="px-4 py-2 font-medium">Score</th>
+                                    <th class="px-4 py-2 font-medium">Weight</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200">
+                                <tr><td class="px-4 py-2">Leverage</td><td class="px-4 py-2">3.5x</td><td class="px-4 py-2">4</td><td class="px-4 py-2">30%</td></tr>
+                                <tr><td class="px-4 py-2">Profitability</td><td class="px-4 py-2">15%</td><td class="px-4 py-2">6</td><td class="px-4 py-2">25%</td></tr>
+                                <tr><td class="px-4 py-2">Size</td><td class="px-4 py-2">$5B</td><td class="px-4 py-2">8</td><td class="px-4 py-2">20%</td></tr>
+                                <tr class="bg-sky-50 font-semibold"><td class="px-4 py-2">Final Rating</td><td class="px-4 py-2" colspan="3">IG-5</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="artifact-card p-6 flex flex-col justify-between">
+                    <div>
+                        <h4 class="font-semibold text-slate-800">Model Documentation</h4>
+                        <p class="mt-2 text-sm text-slate-600">Includes the <span class="font-semibold">Model Methodology Document</span> (theory, design, assumptions) and the latest independent <span class="font-semibold">Model Validation Report</span> (performance, back-testing).</p>
+                    </div>
+                    <div class="mt-4 text-xs text-slate-400">Linked by model version to the scorecard for full transparency.</div>
+                </div>
+                 <div class="artifact-card p-6 lg:col-span-3">
+                    <h4 class="font-semibold text-slate-800">Scenario & Stress Test Results</h4>
+                    <p class="mt-2 text-sm text-slate-600 mb-4">Shows projected performance and rating migration under various macroeconomic scenarios. Use the buttons below to see how the projected leverage ratio changes.</p>
+                     <div class="flex justify-center space-x-2 mb-4">
+                        <button id="btnBaseline" class="px-4 py-2 text-sm font-medium rounded-md bg-sky-600 text-white shadow-sm">Baseline</button>
+                        <button id="btnMild" class="px-4 py-2 text-sm font-medium rounded-md bg-slate-200 text-slate-700 hover:bg-slate-300">Mild Recession</button>
+                        <button id="btnSevere" class="px-4 py-2 text-sm font-medium rounded-md bg-slate-200 text-slate-700 hover:bg-slate-300">Severe Recession</button>
+                     </div>
+                    <div class="chart-container">
+                        <canvas id="stressTestChart"></canvas>
+                    </div>
+                </div>
+                <div class="artifact-card p-6 lg:col-span-3">
+                    <h4 class="font-semibold text-slate-800">Override Rationale Document</h4>
+                    <p class="mt-2 text-sm text-slate-600">If the final assigned rating differs from the model's output, a formal document is required. It details the specific qualitative factors (e.g., superior management, diversification, structural subordination) justifying the override, captured via a structured template.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="decision" class="scroll-mt-20">
+            <div class="text-center mb-12">
+                <h3 class="text-2xl font-semibold text-slate-800"><span class="section-icon">✅</span> III. Final Decision & Monitoring</h3>
+                <p class="mt-2 text-slate-500">The culminating documents that synthesize all analysis into a final recommendation, official decision, and ongoing monitoring framework.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="artifact-card p-6">
+                    <h4 class="font-semibold text-slate-800">Annual Credit Review / Proposal</h4>
+                    <p class="mt-2 text-sm text-slate-600">The primary narrative document serving as the official record. It synthesizes all quantitative and qualitative factors. An initial draft is auto-generated, then edited by the credit officer.</p>
+                </div>
+                <div class="artifact-card p-6">
+                    <h4 class="font-semibold text-slate-800">Credit Committee Minutes</h4>
+                    <p class="mt-2 text-sm text-slate-600">A timestamped, official record of the committee meeting where the proposal was discussed and the final decision was made, including challenges, questions, and the final vote.</p>
+                </div>
+                 <div class="artifact-card p-6">
+                    <h4 class="font-semibold text-slate-800">Covenant Compliance Checklist</h4>
+                    <p class="mt-2 text-sm text-slate-600">For each period, an internal checklist confirming compliance with financial covenants. Ratios are auto-calculated and presented for officer verification.</p>
+                    <ul class="mt-3 space-y-2 text-sm">
+                        <li class="flex items-center"><span class="text-green-500 mr-2">✓</span> Max Leverage &lt; 4.0x</li>
+                        <li class="flex items-center"><span class="text-green-500 mr-2">✓</span> Min Coverage &gt; 2.5x</li>
+                        <li class="flex items-center"><span class="text-green-500 mr-2">✓</span> Min Net Worth &gt; $1B</li>
+                    </ul>
+                </div>
+
+                <div class="artifact-card p-6 md:col-span-2">
+                    <h4 class="font-semibold text-slate-800">Early Warning Indicator (EWI) Dashboard</h4>
+                    <p class="mt-2 text-sm text-slate-600 mb-4">A real-time dashboard of automated triggers related to financial deterioration, market signals, and adverse news. Breaches create alerts and log entries.</p>
+                     <div id="ewi-dashboard" class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-md">
+                            <span class="font-medium text-sm">Financial Performance</span>
+                            <span id="ewi-financial" class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">OK</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-md">
+                            <span class="font-medium text-sm">Stock Price Volatility</span>
+                             <span id="ewi-stock" class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">OK</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-md">
+                            <span class="font-medium text-sm">CDS Spread Change</span>
+                             <span id="ewi-cds" class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">WARN</span>
+                        </div>
+                     </div>
+                     <button id="simulate-breach" class="mt-4 w-full text-sm font-medium py-2 rounded-md bg-slate-200 text-slate-700 hover:bg-slate-300">Simulate Financial Breach</button>
+                </div>
+                
+                <div class="artifact-card p-6">
+                    <h4 class="font-semibold text-slate-800">Material Event Log</h4>
+                    <p class="mt-2 text-sm text-slate-600 mb-3">A chronological, auditable log of material news, events, or correspondence related to the borrower, with a brief impact assessment by the credit officer.</p>
+                    <div class="space-y-3 text-sm">
+                        <div class="border-l-2 border-slate-300 pl-3">
+                            <p class="font-medium">Oct 10, 2025: Acquisition News</p>
+                            <p class="text-slate-500 text-xs">Officer: No immediate rating impact.</p>
+                        </div>
+                        <div class="border-l-2 border-slate-300 pl-3">
+                            <p class="font-medium">Sep 15, 2025: CEO Change</p>
+                            <p class="text-slate-500 text-xs">Officer: Monitoring for strategy shifts.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-slate-100 border-t border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-sm text-slate-500">
+            <p>Unified Financial Profile System | Corporate Borrower Credit Risk Control</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const trendChartCtx = document.getElementById('trendChart').getContext('2d');
+            const trendChart = new Chart(trendChartCtx, {
+                type: 'line',
+                data: {
+                    labels: ['2021', '2022', '2023', '2024', '2025 (P)'],
+                    datasets: [{
+                        label: 'Debt / EBITDA',
+                        data: [3.8, 3.6, 3.9, 3.5, 3.2],
+                        borderColor: '#0284c7',
+                        backgroundColor: 'rgba(2, 132, 199, 0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: { display: true, text: 'Leverage Ratio (x)' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.parsed.y.toFixed(1)}x`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const stressTestData = {
+                baseline: {
+                    label: 'Baseline Scenario',
+                    data: [3.5, 3.2, 3.0],
+                    color: '#0ea5e9'
+                },
+                mild: {
+                    label: 'Mild Recession Scenario',
+                    data: [3.8, 3.9, 3.6],
+                    color: '#f59e0b'
+                },
+                severe: {
+                    label: 'Severe Recession Scenario',
+                    data: [4.5, 5.1, 4.8],
+                    color: '#ef4444'
+                }
+            };
+
+            const stressTestCtx = document.getElementById('stressTestChart').getContext('2d');
+            const stressTestChart = new Chart(stressTestCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Year 1 (F)', 'Year 2 (F)', 'Year 3 (F)'],
+                    datasets: [{
+                        label: stressTestData.baseline.label,
+                        data: stressTestData.baseline.data,
+                        backgroundColor: stressTestData.baseline.color,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Projected Leverage (x)' }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top' },
+                    }
+                }
+            });
+
+            const stressButtons = [
+                { id: 'btnBaseline', scenario: 'baseline' },
+                { id: 'btnMild', scenario: 'mild' },
+                { id: 'btnSevere', scenario: 'severe' }
+            ];
+
+            stressButtons.forEach(btnInfo => {
+                document.getElementById(btnInfo.id).addEventListener('click', () => {
+                    const scenarioData = stressTestData[btnInfo.scenario];
+                    stressTestChart.data.datasets[0].label = scenarioData.label;
+                    stressTestChart.data.datasets[0].data = scenarioData.data;
+                    stressTestChart.data.datasets[0].backgroundColor = scenarioData.color;
+                    stressTestChart.update();
+                    
+                    stressButtons.forEach(b => {
+                        const el = document.getElementById(b.id);
+                        if (b.id === btnInfo.id) {
+                            el.classList.remove('bg-slate-200', 'text-slate-700', 'hover:bg-slate-300');
+                            el.classList.add('bg-sky-600', 'text-white');
+                        } else {
+                            el.classList.add('bg-slate-200', 'text-slate-700', 'hover:bg-slate-300');
+                            el.classList.remove('bg-sky-600', 'text-white');
+                        }
+                    });
+                });
+            });
+
+            document.getElementById('simulate-breach').addEventListener('click', function() {
+                const financialEwi = document.getElementById('ewi-financial');
+                const originalText = this.textContent;
+                
+                financialEwi.classList.remove('bg-green-100', 'text-green-800');
+                financialEwi.classList.add('bg-red-100', 'text-red-800');
+                financialEwi.textContent = 'BREACH';
+                this.textContent = 'Reset Simulation';
+                this.classList.add('bg-red-200');
+
+                const resetSimulation = () => {
+                    financialEwi.classList.remove('bg-red-100', 'text-red-800');
+                    financialEwi.classList.add('bg-green-100', 'text-green-800');
+                    financialEwi.textContent = 'OK';
+                    this.textContent = originalText;
+                    this.classList.remove('bg-red-200');
+                    this.removeEventListener('click', resetSimulation);
+                    this.addEventListener('click', breachSimulation);
+                };
+
+                const breachSimulation = () => {
+                    financialEwi.classList.remove('bg-green-100', 'text-green-800');
+                    financialEwi.classList.add('bg-red-100', 'text-red-800');
+                    financialEwi.textContent = 'BREACH';
+                    this.textContent = 'Reset Simulation';
+                    this.classList.add('bg-red-200');
+                    this.removeEventListener('click', breachSimulation);
+                    this.addEventListener('click', resetSimulation);
+                };
+
+                this.removeEventListener('click', breachSimulation);
+                this.addEventListener('click', resetSimulation);
+            });
+        });
+    </script>
+</body>
+</html>
