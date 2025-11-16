@@ -1,27 +1,27 @@
-# Outstanding Errors
+# Outstanding Errors and Technical Debt
 
-This document lists the outstanding errors that need to be corrected in future iterations.
+This document lists known errors and technical debt that should be addressed in future development cycles.
 
-## Test Failures
+## 1. Fragile Dependency Management
 
-### `test_data_retrieval_agent.py`
+**Issue:** The project's dependencies are not well-managed, leading to frequent installation failures and conflicts. The `requirements.txt` file is not always compatible with the latest versions of Python or other packages.
 
-*   `TypeError`: The `DataRetrievalAgent` is being instantiated without a `config` argument in some of the tests, and with an unexpected `knowledge_base` argument in another.
-*   `AssertionError`: The `execute` method is not being awaited in some of the tests.
+**Example:**
+- `statsmodels==0.13.2` fails to build with recent Python versions. It was temporarily upgraded to `0.14.2` to allow installation, but a full dependency review is needed.
+- Installing `facebook-scraper` causes version conflicts with `pyee` and `websockets`, breaking other packages like `playwright` and `semantic-kernel`.
+- The `lxml` library has moved its `html.clean` module to a separate project (`lxml_html_clean`), which is not reflected in the dependencies, causing `ImportError` when `facebook-scraper` is used.
 
-### `test_data_sources.py`
+**Recommendation:**
+- Perform a full audit of all dependencies.
+- Pin all top-level dependencies to known working versions.
+- Consider using a more robust dependency management tool like Poetry or Pipenv to manage transitive dependencies and resolve conflicts.
+- Create a `requirements-dev.txt` for testing and linting packages.
 
-*   `NameError`: The `headlines` variable is not initialized in the `get_financial_news_headlines` method.
-*   `AssertionError`: The `get_historical_news` and `get_tweets` methods are returning `None`.
+## 2. Incomplete Test Suite
 
-### `test_knowledge_base.py`
+**Issue:** Many tests fail to run due to `ModuleNotFoundError` or other import errors, indicating that the test environment is not properly configured or that the tests have not been maintained.
 
-*   `redis.exceptions.ConnectionError`: The tests are unable to connect to the Redis server.
-
-### `test_query_understanding_agent.py`
-
-*   `AssertionError`: The `execute` method is not being awaited in some of the tests.
-
-### `test_result_aggregation_agent.py`
-
-*   `TypeError`: The `ResultAggregationAgent` is being instantiated without a `config` argument in some of the tests.
+**Recommendation:**
+- Fix all dependency issues to allow the full test suite to be collected.
+- Run the full suite and triage all failures.
+- Implement a CI/CD pipeline that runs the tests on every commit to prevent future regressions.
