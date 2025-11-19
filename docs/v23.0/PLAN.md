@@ -1,3 +1,256 @@
+Adam System Evolution: Technical Architecture & Implementation StrategyVersion: 23.0 (Target)Status: Draft / Implementation PhaseContext: Transition from Monolith (v21.0) to Adaptive Hive (v23.0)1. Strategic Architectural Deconstruction: From Monolith to PlatformThe evolution of the Adam system from v21.0 to v23.0 represents a fundamental maturation in the deployment of artificial intelligence within financial analytics. This is not merely an exercise in scaling infrastructure; it is a paradigm shift from a localized, monolithic agentic tool to a decentralized, neuro-symbolic economy of agents.Current State (v21.0):Architecture: Rigid Monolith.Bottlenecks: Synchronous IPC between Agent Orchestrator, Data Manager, and Neo4j.limitations: Limits concurrent user scaling and enterprise integration.Target State (v23.0 - The Adaptive Hive):Architecture: Decentralized, Event-Driven, Neuro-Symbolic.Migration Strategy: Strangler Fig Pattern.1.1 The Strangler Fig Pattern: Implementation & Risk MitigationTo execute the migration to Adam v22.0 (The Platform), we utilize the Strangler Fig pattern. This involves seeding a new architecture alongside the old, gradually routing traffic to the new system via a "Facade" layer (Kubernetes Ingress & API Gateway).Migration Strategy:We begin by identifying "seams" in the monolith. The Data Ingestion component (currently an FTP polling script) is the "First Leaf"—a low-risk candidate for extraction into a dedicated microservice (svc-data-ingestion).PhaseTraffic DistributionTechnical MechanismStrategic Objective0. Facade Injection100% Legacy MonolithNGINX proxy to localhost:8080Establish control plane; baseline latency benchmarking.1. The Canary Pilot95% Legacy / 5% NewAnnotation: canary-weight: "5"Validate svc-project-phoenix read path with minimal blast radius.2. Functional StrangulationSplit by Path/api/ingest/* $\rightarrow$ New/api/reason/* $\rightarrow$ LegacyDecouple high-throughput data ingestion from reasoning bottlenecks.3. Decommissioning100% New PlatformDNS CutoverLegacy monolith is "strangled" and decommissioned.1.2 Infrastructure-as-Code: The Gateway FacadeThe following Kubernetes manifest illustrates the Ingress Facade configuration, leveraging canary weights to statistically split traffic.# k8s/ingress/adam-ingress-facade.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: adam-gateway-facade
+  namespace: production
+  annotations:
+    # The Strangler Facade Logic: Rewrite targets to normalize paths
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    # Canary Configuration: Directs 10% of traffic to the new 'Phoenix' service
+    nginx.ingress.kubernetes.io/canary: "true"
+    nginx.ingress.kubernetes.io/canary-weight: "10" 
+    # Optional: Force routing for internal QA using a specific header
+    nginx.ingress.kubernetes.io/canary-by-header: "X-Adam-Version"
+    nginx.ingress.kubernetes.io/canary-by-header-value: "v22"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: api.adam-platform.finance
+    http:
+      paths:
+      - path: /api/v1/analytics
+        pathType: Prefix
+        backend:
+          service:
+            name: svc-project-phoenix # The "New" System
+            port:
+              number: 80
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: adam-legacy-monolith # The "Old" System
+            port:
+              number: 8080
+1.3 Securing the Perimeter: Kong Gateway & OAuth 2.0As we transition to microservices, we move from application-level API keys to a centralized Kong Gateway enforcement point.Protocol: OAuth 2.0 (Client Credentials Flow).Benefit: Decouples auth logic from business logic. Enables granular scope management (e.g., market_read, trade_write) via an external IdP without code changes in services.2. The Event-Driven Backbone: Data Consistency & Polyglot PersistenceAdam v23.0 requires an asynchronous event bus to support "Always-On Digital Twins." Apache Kafka serves as this backbone, decoupling producers from consumers.2.1 Polyglot MicroservicesWe adopt a polyglot approach to optimize for specific task requirements:Go (Golang): Used for Ingestion & Infrastructure (svc-data-ingestion, svc-project-phoenix). Chosen for high concurrency, low memory overhead, and librdkafka performance.Python: Used for Reasoning & Logic (svc-reasoning-engine, svc-world-sim). Chosen for the rich AI ecosystem (PyTorch Geometric, DSPy, LangChain).2.2 Schema Enforcement: The Data ContractTo prevent "neuro" (LLM) hallucinations caused by malformed inputs, we enforce strict data contracts using Avro and the Confluent Schema Registry. This implements a "schema-on-write" strategy.2.2.1 Implementation: The Python Producer (Ingestion)# src/ingestion/kafka_producer.py
+from confluent_kafka import SerializingProducer
+from confluent_kafka.schema_registry import SchemaRegistryClient
+from confluent_kafka.schema_registry.avro import AvroSerializer
+from pydantic import BaseModel
+
+# 1. Define the Data Contract (Avro Schema)
+schema_str = """
+{
+  "namespace": "adam.finance",
+  "type": "record",
+  "name": "MarketTick",
+  "fields": [
+    {"name": "symbol", "type": "string"},
+    {"name": "price", "type": "double"},
+    {"name": "timestamp", "type": "long"},
+    {"name": "source", "type": "string"}
+  ]
+}
+"""
+
+class MarketData(BaseModel):
+    symbol: str
+    price: float
+    timestamp: int
+    source: str
+
+def delivery_report(err, msg):
+    if err is not None:
+        print(f"Delivery failed for record {msg.key()}: {err}")
+    else:
+        print(f"Record successfully produced to {msg.topic()} partition [{msg.partition()}]")
+
+def initialize_producer(config):
+    # Connect to the Schema Registry - The Authority on Data Structure
+    schema_registry_conf = {'url': config['schema_registry_url']}
+    schema_registry_client = SchemaRegistryClient(schema_registry_conf)
+
+    avro_serializer = AvroSerializer(schema_registry_client,
+                                     schema_str,
+                                     lambda obj, ctx: obj.dict())
+
+    producer_conf = {
+        'bootstrap.servers': config['bootstrap_servers'],
+        'key.serializer': avro_serializer,
+        'value.serializer': avro_serializer,
+        'enable.idempotence': True # Ensure exactly-once semantics
+    }
+    return SerializingProducer(producer_conf)
+2.2.2 Implementation: The Go Consumer (High-Performance)The Go consumer uses auto.offset.reset: earliest to ensure replayability and data integrity.// src/phoenix/consumer.go
+package main
+
+import (
+	"fmt"
+	"[github.com/confluentinc/confluent-kafka-go/v2/kafka](https://github.com/confluentinc/confluent-kafka-go/v2/kafka)"
+	"[github.com/confluentinc/confluent-kafka-go/v2/schemaregistry](https://github.com/confluentinc/confluent-kafka-go/v2/schemaregistry)"
+	"[github.com/confluentinc/confluent-kafka-go/v2/schemaregistry/serde](https://github.com/confluentinc/confluent-kafka-go/v2/schemaregistry/serde)"
+	"[github.com/confluentinc/confluent-kafka-go/v2/schemaregistry/serde/avro](https://github.com/confluentinc/confluent-kafka-go/v2/schemaregistry/serde/avro)"
+)
+
+// MarketTick struct maps directly to the Avro schema definition
+type MarketTick struct {
+	Symbol    string  `avro:"symbol"`
+	Price     float64 `avro:"price"`
+	Timestamp int64   `avro:"timestamp"`
+	Source    string  `avro:"source"`
+}
+
+func main() {
+    // 1. Initialize Schema Registry Client
+	client, err := schemaregistry.NewClient(schemaregistry.NewConfig("http://schema-registry:8081"))
+	if err!= nil { panic(err) }
+
+    // 2. Initialize Deserializer
+	deser, err := avro.NewGenericDeserializer(client, serde.ValueSerde, avro.NewDeserializerConfig())
+	if err!= nil { panic(err) }
+
+    // 3. Configure Consumer with librdkafka optimization
+	c, err := kafka.NewConsumer(&kafka.ConfigMap{
+		"bootstrap.servers": "kafka-broker:9092",
+		"group.id":          "phoenix_fast_path",
+		"auto.offset.reset": "earliest", // Replay mechanism for data integrity
+        "enable.auto.commit": false,     // Manual commit for exactly-once processing
+	})
+
+	c.SubscribeTopics([]string{"market_ticks"}, nil)
+
+	for {
+		msg, err := c.ReadMessage(-1)
+		if err == nil {
+			var value MarketTick
+			err = deser.DeserializeInto(*msg.TopicPartition.Topic, msg.Value, &value)
+			if err == nil {
+				fmt.Printf("Processed tick: %s at %f\n", value.Symbol, value.Price)
+                // Logic to update Redis Cache or trigger GNN inference
+			}
+		}
+	}
+}
+3. The Neuro-Symbolic Core: GNNs & Temporal ReasoningAdam v23.0 integrates Neuro-Symbolic AI, combining neural network learning with knowledge graph structures.3.1 Spatiotemporal Signal ProcessingWe use PyTorch Geometric Temporal to model dynamic financial relationships (e.g., spatiotemporal regression). We treat the graph topology (supply chains) as static over short windows, while node features (prices) are dynamic.3.1.1 Code Framework: Temporal Graph Loading# src/reasoning/temporal_graph_loader.py
+import torch
+from torch_geometric_temporal.signal import StaticGraphTemporalSignal
+import pandas as pd
+import numpy as np
+
+def load_financial_graph(node_features_df, edge_index_tuples, weights):
+    """
+    Converts financial time-series data into a PyTorch Geometric Temporal signal.
+    
+    Args:
+        node_features_df: Pandas DataFrame (Rows=Time, Cols=Nodes).
+                          Represents dynamic node attributes (e.g., Price).
+        edge_index_tuples: List of (source, target) tuples defining Graph Topology.
+        weights: List of float values representing Edge Weights (e.g., Correlation).
+    """
+    
+    # 1. Transform Data Topology
+    # Convert tuple list to the required LongTensor format for PyG [2, num_edges]
+    edge_index = torch.LongTensor(edge_index_tuples).t()
+    edge_weight = torch.FloatTensor(weights)
+    
+    # 2. Transform Node Features
+    # Unsqueeze to add the feature dimension (assuming 1 feature: Price)
+    X = torch.tensor(node_features_df.values, dtype=torch.float)
+    X = X.unsqueeze(2) 
+    
+    # 3. Create the Temporal Signal
+    # This object iterates over snapshots of the graph across time
+    dataset = StaticGraphTemporalSignal(
+        edge_index=edge_index,
+        edge_weight=edge_weight,
+        features=X,
+        targets=X # For self-supervised forecasting
+    )
+    
+    return dataset
+4. Agentic Governance: Prompt-as-Code & Verification4.1 Prompt-as-Code: The DSPy FrameworkWe replace manual prompt engineering with DSPy, abstracting prompts into compilable signatures (dspy.Signature). This allows the "Architect Agent" to optimize instructions based on performance metrics.# src/agents/signatures.py
+import dspy
+from pydantic import BaseModel, Field
+from typing import List, Literal
+
+# Structured Output Model ensuring type safety
+class FinancialInsight(BaseModel):
+    insight: str = Field(description="The core analytical finding summary")
+    confidence: float = Field(description="Probabilistic confidence score 0.0-1.0")
+    supporting_nodes: List[str] = Field(description="List of Neo4j Node IDs supporting this claim")
+    sentiment: Literal['bullish', 'bearish', 'neutral']
+
+class GraphReasoningSignature(dspy.Signature):
+    """
+    Analyzes a sub-graph structure to determine financial risk propagation.
+    The agent must trace the causal path in the graph and ignore irrelevant noise.
+    """
+    
+    graph_context: str = dspy.InputField(
+        desc="Serialized subgraph context (Cypher results) showing connections."
+    )
+    market_event: str = dspy.InputField(
+        desc="The specific news event or price shock being analyzed."
+    )
+    risk_assessment: FinancialInsight = dspy.OutputField(
+        desc="Structured assessment of the risk impact following the schema."
+    )
+
+# The Reasoning Module
+# 'ChainOfThought' enables the model to generate intermediate reasoning steps
+reasoning_agent = dspy.ChainOfThought(GraphReasoningSignature)
+4.2 The Quality Control Layer: CyVer ValidationTo mitigate Cypher Injection and hallucinations, we implement CyVer. The validation pipeline checks:Syntax Validity: Grammatical correctness.Schema Alignment: Existence of Node/Relationship labels.Property Existence: Validity of queried properties.# src/governance/query_validator.py
+from cyver import SchemaValidator, SyntaxValidator
+from neo4j import GraphDatabase
+
+class QueryGuardrails:
+    def __init__(self, uri, auth):
+        self.driver = GraphDatabase.driver(uri, auth=auth)
+        # Validators hooked to the live DB schema
+        self.schema_validator = SchemaValidator(self.driver)
+        self.syntax_validator = SyntaxValidator(self.driver)
+
+    def validate_agent_query(self, cypher_query: str) -> tuple[bool, str]:
+        """
+        Validates AI-generated Cypher against the live Neo4j schema.
+        Returns: (isValid, errorMessage)
+        """
+        # 1. Check Syntax
+        if not self.syntax_validator.validate(cypher_query):
+            return False, "Syntax Error: Query structure is invalid."
+
+        # 2. Check Schema Alignment (Properties/Relationships)
+        is_valid, error = self.schema_validator.validate(cypher_query)
+        if not is_valid:
+            # Error message feeds back to LLM self-correction loop
+            return False, f"Schema Error: {error}"
+            
+        return True, "Valid"
+5. Autonomous Evolution: GitOps & The Architect AgentThe "Architect Agent" acts as a virtual engineer, utilizing a GitOps workflow to effect change. It commits changes to the infrastructure-live repository, which ArgoCD then synchronizes to the cluster.5.1 The Architect Agent System PromptThe following defines the persona and constraints for the v23.0 Architect Agent.SYSTEM PROMPT: ARCHITECT AGENT (v23.0)
+
+You are the Architect Agent for the Adam v23.0 Financial Platform.
+Your mandate is to maintain, optimize, and evolve the system infrastructure and reasoning logic.
+
+CORE DIRECTIVES
+1. GitOps Sovereignty: You do not have shell access to production servers. You effect change SOLELY by generating Kubernetes manifests, Terraform configurations, or Code Patches and committing them to the infrastructure-live repository.
+2. Neuro-Symbolic Consistency: When generating reasoning logic, you must verify that all entity references (Nodes, Edges, Properties) exist in the Neo4j Schema. You must use the `validate_cypher_schema` tool before committing any query logic.
+3. Recursive Optimization: Monitor the `svc-monitoring` logs. If a specific Agent's confidence score drops below 0.7 or latency exceeds 200ms, you must analyze its DSPy signature and propose a prompt refinement (Prompt-as-Code).
+
+TOOLBOX & CAPABILITIES
+- k8s_manifest_generator(resource_type, spec): Generates syntactically valid YAML.
+- dsp_compiler(signature, training_data): Compiles new optimized prompt versions.
+- schema_lookup(entity_name): Retrieves node/edge definitions from Neo4j.
+- git_commit(file_path, content, message): Creates a PR/commit to the infra repo.
+
+RESPONSE PROTOCOL
+You must "think" before acting. Analyze the user request, check the schema, and then produce the artifact.
+All infrastructure changes must be wrapped in a code block labeled `git_patch`.
+6. Strategic Deployment Plan (v22.0 Execution)PhaseTimelineKey DeliverableTechnical MilestoneFoundationWeeks 1-4The Trellis (Infra)Provision K8s Cluster & Kafka (Kraft). Deploy Kong + OAuth2. Establish GitOps repo.PilotWeeks 5-8Project PhoenixDeploy svc-project-phoenix (Go). Configure NGINX Canary (10%). Redis Caching.StrangulationWeeks 9-12Data StrangulationDeploy svc-data-ingestion (Python/Avro). Enforce Schema Registry. Migrate Polling to Kafka.EvolutionWeeks 13-16The Adaptive HiveDeploy svc-reasoning-engine (PyTorch/Temporal). Grant Architect Agent GitOps write access. Decommission Monolith.
+
+
+````
+
 Adam System Evolution: Technical Architecture & Implementation Strategy for the Adaptive Hive1. Strategic Architectural Deconstruction: Transitioning from Monolith to PlatformThe evolution of the Adam system from version 21.0 to 23.0 represents a fundamental maturation in the deployment of artificial intelligence within financial analytics. The transition is not merely an exercise in scaling infrastructure; it is a paradigm shift from a localized, monolithic agentic tool to a decentralized, neuro-symbolic economy of agents. The analysis of the current v21.0 state reveals a highly capable but architecturally rigid system, heavily reliant on synchronous inter-process communication between the Agent Orchestrator, Data Manager, and the Neo4j Knowledge Graph.1 While the "meta-cognitive" quality control layer in v21.0 provides advanced behavioral economics capabilities, the monolithic structure inherently limits concurrent user scaling and integration with broader enterprise systems.2To execute the migration to Adam v22.0 (The Platform) and subsequently v23.0 (The Adaptive Hive), we must adopt a strategy that minimizes operational risk while progressively decoupling core functionalities. The Strangler Fig Pattern has been identified as the optimal mechanism for this transformation. This pattern, analogous to the biological behavior of the strangler fig tree, involves seeding a new architecture alongside the old, gradually routing traffic to the new system until the legacy monolith is stifled and can be safely decommissioned.11.1 The Strangler Fig Pattern: Implementation & Risk MitigationThe application of the Strangler Fig pattern requires the introduction of a sophisticated "Facade" or proxy layer between the client applications and the backend systems. In the context of Adam v22.0, this facade is implemented via a Kubernetes Ingress Controller and an API Gateway. This layer serves as the traffic marshal, intercepting all incoming requests and determining—based on specific routing rules—whether to direct the call to the legacy v21.0 Python monolith or the newly provisioned v22.0 microservices.1The migration is not a binary switch but a granular, phased process. We begin by identifying "seams" in the monolith—logical boundaries where functionality can be extracted. The Data Ingestion component, currently an FTP polling script, serves as the ideal "First Leaf" or pilot service. By extracting this into a dedicated microservice (svc-data-ingestion), we can validate the new infrastructure without jeopardizing the core reasoning engine.2Table 1: Phased Traffic Migration StrategyPhaseTraffic DistributionTechnical MechanismStrategic ObjectivePhase 0: Facade Injection100% Legacy MonolithIngress Proxy: NGINX configured to pass all traffic to localhost:8080.Establish the control plane. No functional change; baseline latency benchmarking.Phase 1: The Canary Pilot95% Legacy / 5% NewWeighted Routing: nginx.ingress.kubernetes.io/canary-weight: "5" annotation.Validate the svc-project-phoenix read path on production data with minimal blast radius.4Phase 2: Functional StrangulationSplit by PathPath-Based Routing: /api/ingest/* $\rightarrow$ New Service; /api/reason/* $\rightarrow$ Legacy.Decouple high-throughput data ingestion from the reasoning bottleneck.Phase 3: Decommissioning100% New PlatformDNS Cutover: Legacy endpoints removed; database writes blocked on old schema.Complete transition; the monolith is effectively "strangled" and removed.1The implementation of Phase 1 utilizes Kubernetes Ingress annotations to create a "Canary" deployment. This allows the system to route requests based on HTTP headers (e.g., X-Adam-Version: v22) or a percentage weight, providing a safety valve to instantly revert traffic if the new microservices exhibit instability.41.2 Infrastructure-as-Code: The Gateway FacadeTo formalize this pattern, the infrastructure definition must be declarative. The following Kubernetes manifest illustrates the configuration of the Ingress Facade. It leverages the canary-weight annotation to statistically split traffic, ensuring that the "Project Phoenix" pilot receives exactly 10% of the load for validation purposes.4YAML# adam-ingress-facade.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
