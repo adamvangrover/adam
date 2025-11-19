@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinMod_Agent: Credit Analysis</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Use Inter font */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom styles for tables */
+        th {
+            @apply px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+        }
+        td {
+            @apply px-4 py-3 whitespace-nowrap text-sm text-gray-700;
+        }
+        /* Sticky header for forecast table */
+        .table-sticky th {
+            @apply sticky top-0 bg-gray-100;
+        }
+        /* Right-align numbers in tables */
+        td.num, th.num {
+            @apply text-right;
+        }
+        /* Input field styling */
+        .form-input, .form-textarea {
+            @apply block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm;
+        }
+        .form-label {
+            @apply block text-sm font-medium text-gray-700 mb-1;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900 antialiased">
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8">
+        <header class="mb-8">
+            <h1 class="text-3xl font-bold text-blue-800">FinMod_Agent</h1>
+            <p class="mt-2 text-lg text-gray-600">Corporate Credit Analysis & Valuation Modeler</p>
+        </header>
+
+        <!-- Error Message Container -->
+        <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-6" role="alert">
+            <strong class="font-bold">Input Error:</strong>
+            <span class="block sm:inline" id="error-text"></span>
+        </div>
+
+        <!-- Input Form -->
+        <form id="model-form" class="space-y-6">
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Company Profile -->
+                <fieldset class="bg-white p-6 rounded-lg shadow-md">
+                    <legend class="text-lg font-semibold text-gray-800 mb-4">Company Profile</legend>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="companyName" class="form-label">Company Name</label>
+                            <input type="text" id="companyName" class="form-input" value="Apex Industrials">
+                        </div>
+                        <div>
+                            <label for="companySector" class="form-label">Sector</label>
+                            <input type="text" id="companySector" class="form-input" value="Industrials">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Base Financials -->
+                <fieldset class="bg-white p-6 rounded-lg shadow-md">
+                    <legend class="text-lg font-semibold text-gray-800 mb-4">Base Financials ($ in millions)</legend>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="baseRevenue" class="form-label">LTM Revenue</label>
+                            <input type="number" id="baseRevenue" class="form-input" value="1000">
+                        </div>
+                        <div>
+                            <label for="baseEBITDA" class="form-label">LTM EBITDA</label>
+                            <input type="number" id="baseEBITDA" class="form-input" value="200">
+                        </div>
+                        <div>
+                            <label for="baseDebt" class="form-label">Total Debt</label>
+                            <input type="number" id="baseDebt" class="form-input" value="800">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Valuation Inputs -->
+                <fieldset class="bg-white p-6 rounded-lg shadow-md">
+                    <legend class="text-lg font-semibold text-gray-800 mb-4">Valuation Inputs</legend>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="taxRate" class="form-label">Tax Rate (%)</label>
+                            <input type="number" step="0.1" id="taxRate" class="form-input" value="25.0">
+                        </div>
+                        <div>
+                            <label for="wacc" class="form-label">WACC (%)</label>
+                            <input type="number" step="0.1" id="wacc" class="form-input" value="10.0">
+                        </div>
+                        <div>
+                            <label for="terminalMultiple" class="form-label">Terminal EV/EBITDA Multiple</label>
+                            <input type="number" step="0.1" id="terminalMultiple" class="form-input" value="8.0">
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <!-- Forecast Assumptions -->
+            <fieldset class="bg-white p-6 rounded-lg shadow-md">
+                <legend class="text-lg font-semibold text-gray-800 mb-4">7-Year Forecast Assumptions</legend>
+                <p class="text-sm text-gray-500 mb-4">Enter 7 comma-separated values for each array (e.g., 8, 7, 6, 5, 4, 4, 3)</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
+                    <div>
+                        <label for="revGrowth" class="form-label">Revenue Growth %</label>
+                        <textarea id="revGrowth" class="form-textarea" rows="1" placeholder="e.g., 8, 7, 6, 5, 4, 4, 3">8.0, 7.0, 6.0, 5.0, 4.0, 4.0, 3.0</textarea>
+                    </div>
+                    <div>
+                        <label for="ebitdaMargin" class="form-label">EBITDA Margin %</label>
+                        <textarea id="ebitdaMargin" class="form-textarea" rows="1" placeholder="e.g., 20.5, 21, 21, 21.5, 21.5, 22, 22">20.5, 21.0, 21.0, 21.5, 21.5, 22.0, 22.0</textarea>
+                    </div>
+                    <div>
+                        <label for="capExPercent" class="form-label">CapEx as % of Revenue</label>
+                        <textarea id="capExPercent" class="form-textarea" rows="1" placeholder="e.g., 3, 3, 3, 3, 3, 3, 3">3.0, 3.0, 3.0, 3.0, 3.0, 3.0, 3.0</textarea>
+                    </div>
+                    <div>
+                        <label for="daPercent" class="form-label">D&A as % of Revenue</label>
+                        <textarea id="daPercent" class="form-textarea" rows="1" placeholder="e.g., 2, 2, 2, 2, 2, 2, 2">2.0, 2.0, 2.0, 2.0, 2.0, 2.0, 2.0</textarea>
+                    </div>
+                    <div>
+                        <label for="nwcPercent" class="form-label">Change in NWC as % of Revenue</label>
+                        <textarea id="nwcPercent" class="form-textarea" rows="1" placeholder="e.g., 1, 1, 1, 1, 1, 1, 1">1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0</textarea>
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- Submit Button -->
+            <div class="mt-8 text-center">
+                <button type="submit" class="w-full md:w-auto inline-flex justify-center items-center px-10 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
+                    Run FinMod_Agent
+                </button>
+            </div>
+        </form>
+
+        <!-- Output Section -->
+        <section id="output-container" class="hidden mt-12 space-y-10">
+            <h2 class="text-2xl font-bold text-gray-800">Modeling Results for: <span id="output-company-name" class="text-blue-700"></span></h2>
+
+            <!-- Module 1: 7-Year Forecast -->
+            <div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Module [7-Year_DCF_Engine] Output</h3>
+                <div class="overflow-hidden shadow rounded-lg">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 table-sticky">
+                            <thead class="bg-gray-100">
+                                <tr id="forecast-header">
+                                    <!-- JS will populate this -->
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" id="forecast-body">
+                                <!-- JS will populate this -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Module 2 & 3: Valuation & Credit -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Module 2: Valuation -->
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Module [Valuation_Module] Output</h3>
+                    <div class="overflow-hidden bg-white shadow rounded-lg">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr>
+                                    <th>Component</th>
+                                    <th>Calculation</th>
+                                    <th class="num">Value ($M)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200" id="valuation-body">
+                                <!-- JS will populate this -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Module 3: Credit Metrics -->
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Module [Credit_Metrics_Module] Output</h3>
+                    <div class="overflow-hidden bg-white shadow rounded-lg">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th>Calculation</th>
+                                    <th class="num">Result</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200" id="credit-body">
+                                <!-- JS will populate this -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Table -->
+            <div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">Summary of Key Outputs</h3>
+                <div class="overflow-hidden bg-white shadow rounded-lg max-w-lg">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <tbody class="divide-y divide-gray-200" id="summary-body">
+                            <!-- JS will populate this -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <script>
+        document.getElementById('model-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Clear previous errors
+            const errorDiv = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            errorDiv.classList.add('hidden');
+            errorText.textContent = '';
+
+            try {
+                // --- 1. PARSE & VALIDATE INPUTS ---
+
+                // Helper to parse comma-separated array inputs
+                function parseArrayInput(id, length = 7) {
+                    const str = document.getElementById(id).value;
+                    if (!str) throw new Error(`Input for ${id} is missing.`);
+
+                    const arr = str.split(',').map(s => parseFloat(s.trim()));
+
+                    if (arr.length !== length) {
+                        throw new Error(`Input for ${id} must have exactly ${length} comma-separated values. Found ${arr.length}.`);
+                    }
+                    if (arr.some(isNaN)) {
+                        throw new Error(`Input for ${id} contains invalid numbers.`);
+                    }
+                    return arr;
+                }
+
+                // Helper to parse single number inputs
+                function parseNumberInput(id) {
+                    const val = parseFloat(document.getElementById(id).value);
+                    if (isNaN(val)) {
+                        throw new Error(`Input for ${id} is invalid.`);
+                    }
+                    return val;
+                }
+
+                // Get Company Info
+                const companyName = document.getElementById('companyName').value || "N/A";
+
+                // Get Base Financials
+                const baseRevenue = parseNumberInput('baseRevenue');
+                const baseEBITDA = parseNumberInput('baseEBITDA');
+                const baseDebt = parseNumberInput('baseDebt');
+
+                if (baseRevenue <= 0 || baseEBITDA <= 0 || baseDebt <= 0) {
+                    throw new Error("Base Financials (Revenue, EBITDA, Debt) must be positive values.");
+                }
+
+                // Get Forecast Assumptions (Arrays)
+                const revGrowth = parseArrayInput('revGrowth');
+                const ebitdaMargin = parseArrayInput('ebitdaMargin');
+                const capExPercent = parseArrayInput('capExPercent');
+                const daPercent = parseArrayInput('daPercent');
+                const nwcPercent = parseArrayInput('nwcPercent');
+
+                // Get Valuation Inputs
+                const taxRate = parseNumberInput('taxRate') / 100;
+                const wacc = parseNumberInput('wacc') / 100;
+                const terminalMultiple = parseNumberInput('terminalMultiple');
+
+                if (taxRate < 0 || taxRate > 1 || wacc < 0 || wacc > 1) {
+                    throw new Error("Tax Rate and WACC must be valid percentages (e.g., 0-100).");
+                }
+
+                // --- 2. RUN MODULE [7-Year_DCF_Engine] ---
+                const f = {
+                    revGrowth: [],
+                    revenue: [],
+                    ebitdaMargin: [],
+                    ebitda: [],
+                    daPercent: [],
+                    da: [],
+                    ebit: [],
+                    nopat: [],
+                    capExPercent: [],
+                    capEx: [],
+                    nwcPercent: [],
+                    nwc: [],
+                    ufcf: [],
+                    pvUFCF: []
+                };
+
+                let cumulativeFCF = 0;
+                let sumPvUFCF = 0;
+
+                for (let i = 0; i < 7; i++) {
+                    // Get assumptions for the year
+                    f.revGrowth[i] = revGrowth[i] / 100;
+                    f.ebitdaMargin[i] = ebitdaMargin[i] / 100;
+                    f.daPercent[i] = daPercent[i] / 100;
+                    f.capExPercent[i] = capExPercent[i] / 100;
+                    f.nwcPercent[i] = nwcPercent[i] / 100;
+
+                    // Calculate forecast
+                    f.revenue[i] = (i === 0 ? baseRevenue : f.revenue[i-1]) * (1 + f.revGrowth[i]);
+                    f.ebitda[i] = f.revenue[i] * f.ebitdaMargin[i];
+                    f.da[i] = f.revenue[i] * f.daPercent[i];
+                    f.ebit[i] = f.ebitda[i] - f.da[i];
+                    f.nopat[i] = f.ebit[i] * (1 - taxRate);
+                    f.capEx[i] = f.revenue[i] * f.capExPercent[i];
+                    f.nwc[i] = f.revenue[i] * f.nwcPercent[i];
+                    f.ufcf[i] = f.nopat[i] + f.da[i] - f.capEx[i] - f.nwc[i];
+
+                    // Add to cumulative FCF
+                    cumulativeFCF += f.ufcf[i];
+
+                    // Calculate PV of UFCF
+                    const discountFactor = Math.pow(1 + wacc, i + 1);
+                    f.pvUFCF[i] = f.ufcf[i] / discountFactor;
+                    sumPvUFCF += f.pvUFCF[i];
+                }
+
+                // --- 3. RUN MODULE [Valuation_Module] ---
+                const finalEBITDA = f.ebitda[6];
+                const terminalValue = finalEBITDA * terminalMultiple;
+                const pvTerminalValue = terminalValue / Math.pow(1 + wacc, 7);
+                const enterpriseValue = sumPvUFCF + pvTerminalValue;
+
+                // --- 4. RUN MODULE [Credit_Metrics_Module] ---
+                const baseLeverage = baseDebt / baseEBITDA;
+                const finalLeverage = baseDebt / finalEBITDA;
+                const repaymentPercent = (cumulativeFCF / baseDebt) * 100; // As a percentage
+
+                // PD Rating Logic from prompt
+                function getPdRating(leverage, repayment) {
+                    if (leverage < 3.0 && repayment > 75) {
+                        return "'BB' Range";
+                    } else if ((leverage >= 3.0 && leverage <= 5.0) && (repayment >= 50 && repayment <= 75)) {
+                        return "'B+' Range";
+                    } else if ((leverage >= 5.0 && leverage <= 6.5) && (repayment >= 30 && repayment <= 50)) {
+                        return "'B' Range";
+                    } else if (leverage > 6.5 || repayment < 30) {
+                        return "'B-' / 'CCC' Range";
+                    } else {
+                        return "Unclassified"; // For cases that fall in the gaps
+                    }
+                }
+                const pdRating = getPdRating(finalLeverage, repaymentPercent);
+
+                // --- 5. POPULATE OUTPUT TABLES ---
+
+                // Helper functions for formatting
+                const formatNum = (num, digits = 0) => (num || 0).toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+                const formatPct = (num, digits = 1) => (num || 0).toFixed(digits) + '%';
+                const formatMult = (num, digits = 1) => (num || 0).toFixed(digits) + 'x';
+                const formatNeg = (num) => `(${formatNum(num)})`; // For negative numbers in financials
+
+                // Populate Company Name
+                document.getElementById('output-company-name').textContent = companyName;
+
+                // Populate Forecast Table Header
+                const forecastHeader = document.getElementById('forecast-header');
+                forecastHeader.innerHTML = `
+                    <th class="w-1/4">Metric</th>
+                    <th class="num">Base Yr</th>
+                    ${[1, 2, 3, 4, 5, 6, 7].map(yr => `<th class="num">Yr ${yr}</th>`).join('')}
+                `;
+
+                // Populate Forecast Table Body
+                const forecastBody = document.getElementById('forecast-body');
+                forecastBody.innerHTML = `
+                    <tr>
+                        <td>Revenue Growth %</td>
+                        <td class="num">-</td>
+                        ${f.revGrowth.map(val => `<td class="num">${formatPct(val * 100)}</td>`).join('')}
+                    </tr>
+                    <tr class="bg-gray-50 font-medium">
+                        <td>Revenue</td>
+                        <td class="num">${formatNum(baseRevenue)}</td>
+                        ${f.revenue.map(val => `<td class="num">${formatNum(val)}</td>`).join('')}
+                    </tr>
+                    <tr>
+                        <td>EBITDA Margin %</td>
+                        <td class="num">${formatPct(baseEBITDA / baseRevenue * 100)}</td>
+                        ${f.ebitdaMargin.map(val => `<td class="num">${formatPct(val * 100)}</td>`).join('')}
+                    </tr>
+                    <tr class="bg-gray-50 font-medium">
+                        <td>EBITDA</td>
+                        <td class="num">${formatNum(baseEBITDA)}</td>
+                        ${f.ebitda.map(val => `<td class="num">${formatNum(val)}</td>`).join('')}
+                    </tr>
+                    <tr>
+                        <td>D&A (% Rev)</td>
+                        <td class="num">-</td>
+                        ${f.daPercent.map(val => `<td class="num">${formatPct(val * 100)}</td>`).join('')}
+                    </tr>
+                    <tr>
+                        <td>D&A</td>
+                        <td class="num">-</td>
+                        ${f.da.map(val => `<td class="num">${formatNeg(val)}</td>`).join('')}
+                    </tr>
+                    <tr class="bg-gray-50 font-medium">
+                        <td>EBIT</td>
+                        <td class="num">${formatNum(baseEBITDA)}</td> <!-- Assuming Base D&A is 0 or not provided, using EBITDA as proxy for Base EBIT logic -->
+                        ${f.ebit.map(val => `<td class="num">${formatNum(val)}</td>`).join('')}
+                    </tr>
+                    <tr>
+                        <td>NOPAT (Tax @ ${formatPct(taxRate * 100, 0)})</td>
+                        <td class="num">-</td>
+                        ${f.nopat.map(val => `<td class="num">${formatNum(val)}</td>`).join('')}
+                    </tr>
+                    <tr>
+                        <td>Plus: D&A</td>
+                        <td class="num">-</td>
+                        ${f.da.map(val => `<td class="num">${formatNum(val)}</td>`).join('')}
+                    </tr>
+                    <tr>
+                        <td>Less: CapEx (% Rev)</td>
+                        <td class="num">-</td>
+                        ${f.capExPercent.map(val => `<td class="num">${formatPct(val * 100)}</td>`).join('')}
+                    </tr>
+                    <tr>
+                        <td>Less: CapEx</td>
+                        <td class="num">-</td>
+                        ${f.capEx.map(val => `<td class="num">${formatNeg(val)}</td>`).join('')}
+                    </tr>
+                    <tr>
+                        <td>Less: Chg. NWC (% Rev)</td>
+                        <td class="num">-</td>
+                        ${f.nwcPercent.map(val => `<td class="num">${formatPct(val * 100)}</td>`).join('')}
+                    </tr>
+                    <tr>
+                        <td>Less: Chg. NWC</td>
+                        <td class="num">-</td>
+                        ${f.nwc.map(val => `<td class="num">${formatNeg(val)}</td>`).join('')}
+                    </tr>
+                    <tr class="bg-blue-50 font-bold text-blue-800">
+                        <td>Unlevered FCF</td>
+                        <td class="num">-</td>
+                        ${f.ufcf.map(val => `<td class="num">${formatNum(val)}</td>`).join('')}
+                    </tr>
+                `;
+
+                // Populate Valuation Table
+                const valuationBody = document.getElementById('valuation-body');
+                valuationBody.innerHTML = `
+                    <tr>
+                        <td>1. Terminal Value</td>
+                        <td>Yr 7 EBITDA (${formatNum(finalEBITDA)}) * ${formatMult(terminalMultiple)}</td>
+                        <td class="num font-medium">${formatNum(terminalValue)}</td>
+                    </tr>
+                    <tr>
+                        <td>2. PV of UFCF (Yrs 1-7)</td>
+                        <td>Sum of (UFCF / (1 + ${formatPct(wacc * 100)})^n)</td>
+                        <td class="num font-medium">${formatNum(sumPvUFCF)}</td>
+                    </tr>
+                    <tr>
+                        <td>3. PV of Terminal Value</td>
+                        <td>${formatNum(terminalValue)} / (1 + ${formatPct(wacc * 100)})^7</td>
+                        <td class="num font-medium">${formatNum(pvTerminalValue)}</td>
+                    </tr>
+                    <tr class="bg-blue-50 font-bold text-blue-800">
+                        <td>Enterprise Value (EV)</td>
+                        <td>(2) + (3)</td>
+                        <td class="num">${formatNum(enterpriseValue)}</td>
+                    </tr>
+                `;
+
+                // Populate Credit Metrics Table
+                const creditBody = document.getElementById('credit-body');
+                creditBody.innerHTML = `
+                    <tr>
+                        <td>Base Year Leverage</td>
+                        <td>Base Total Debt (${formatNum(baseDebt)}) / Base EBITDA (${formatNum(baseEBITDA)})</td>
+                        <td class="num font-medium">${formatMult(baseLeverage)}</td>
+                    </tr>
+                    <tr>
+                        <td>Final Year Leverage</td>
+                        <td>Base Total Debt (${formatNum(baseDebt)}) / Yr 7 EBITDA (${formatNum(finalEBITDA)})</td>
+                        <td class="num font-medium">${formatMult(finalLeverage)}</td>
+                    </tr>
+                    <tr>
+                        <td>Cumulative 7-Yr FCF</td>
+                        <td>Sum of all UFCF (Yrs 1-7)</td>
+                        <td class="num font-medium">${formatNum(cumulativeFCF)} M</td>
+                    </tr>
+                    <tr>
+                        <td>Debt Repayment Capacity</td>
+                        <td>(Cumulative FCF ${formatNum(cumulativeFCF)}) / (Base Total Debt ${formatNum(baseDebt)})</td>
+                        <td class="num font-medium">${formatPct(repaymentPercent)}</td>
+                    </tr>
+                    <tr class="bg-blue-50 font-bold text-blue-800">
+                        <td>PD Rating (Proxy)</td>
+                        <td>Based on final leverage & repayment capacity</td>
+                        <td class="num">${pdRating}</td>
+                    </tr>
+                `;
+
+                // Populate Summary Table
+                const summaryBody = document.getElementById('summary-body');
+                const impliedEbitdaMultiple = enterpriseValue / baseEBITDA;
+                summaryBody.innerHTML = `
+                    <tr class="bg-blue-50">
+                        <td class="font-medium text-blue-800">Calculated Enterprise Value</td>
+                        <td class="num font-medium text-blue-800">${formatNum(enterpriseValue)} M</td>
+                    </tr>
+                    <tr>
+                        <td class="font-medium">Implied EV / LTM EBITDA</td>
+                        <td class="num font-medium">${formatMult(impliedEbitdaMultiple)}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-medium">Final Year (Yr 7) Leverage</td>
+                        <td class="num font-medium">${formatMult(finalLeverage)}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-medium">Debt Repayment Capacity</td>
+                        <td class="num font-medium">${formatPct(repaymentPercent)}</td>
+                    </tr>
+                    <tr>
+                        <td class="font-medium">Proxy PD Rating</td>
+                        <td class="num font-medium">${pdRating}</td>
+                    </tr>
+                `;
+
+
+                // --- 6. SHOW OUTPUT ---
+                document.getElementById('output-container').classList.remove('hidden');
+                // Scroll to results
+                document.getElementById('output-container').scrollIntoView({ behavior: 'smooth' });
+
+            } catch (err) {
+                // Display error message
+                errorText.textContent = err.message;
+                errorDiv.classList.remove('hidden');
+            }
+        });
+    </script>
+
+</body>
+</html>

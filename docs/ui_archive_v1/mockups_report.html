@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Corporate Credit Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony Neutrals -->
+    <!-- Application Structure Plan: The application is designed as a single-page dashboard with a fixed sidebar for navigation and a dynamic main content area. This structure was chosen because it provides a persistent, clear overview of the report's sections, allowing a credit analyst to easily navigate between different areas of analysis (e.g., Financials, Risks, ESG) without losing context. The user flow is task-oriented: select a section, view the key questions and data visualizations, and move to the next. This mirrors a logical workflow, transforming a static document prompt into an interactive analytical tool. -->
+    <!-- Visualization & Content Choices:
+        - Financial Performance: Goal is to compare and analyze trends. Bar charts are used for direct period-over-period comparisons (Revenue, EBITDA), a line chart shows margin trends over time, and a donut chart visualizes capital structure composition. Interactions include tooltips on hover for detail. Justification: Visual charts make performance trends instantly recognizable. Library: Chart.js.
+        - Covenants & Benchmarks: Goal is to assess compliance and performance against targets. A styled HTML table is used for covenant details, as it's the clearest way to present structured data (Requirement vs. Actual vs. Cushion). Bar charts are used for variance analysis (Actual vs. Budget). Justification: This combination provides both precise data (table) and quick visual assessment of performance gaps (charts). Library: Chart.js.
+        - Risk Assessment: Goal is to summarize strengths and weaknesses. A two-column layout visually separates these opposing factors for rapid analysis. A stylized HTML element is used for the PD rating to make it a focal point. Justification: This visual organization aids in the qualitative assessment process.
+        - Qualitative & ESG: Goal is to present detailed textual information without overwhelming the user. Clickable cards and an accordion-style layout are used to progressively disclose information. Justification: This improves readability and allows the user to focus on one topic at a time.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f7f4;
+            color: #3d3d3d;
+        }
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+            border-left: 3px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            background-color: #eaddd7;
+            border-left-color: #8c7a6b;
+            color: #3d3d3d;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .kpi-card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid #e5e7eb;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .section-intro {
+            background-color: #eaddd7;
+            border-left: 4px solid #8c7a6b;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+<body class="flex h-screen">
+
+    <aside class="w-64 bg-[#f0e9e4] text-gray-700 flex flex-col fixed h-full shadow-md">
+        <div class="h-20 flex items-center justify-center border-b border-gray-300">
+            <h1 class="text-xl font-bold text-[#5c5249]">Credit Report Tool</h1>
+        </div>
+        <nav class="flex-1 px-4 py-4 space-y-2">
+            <a href="#" class="nav-link active block py-2.5 px-4 rounded font-medium" data-section="overview">Company Overview</a>
+            <a href="#" class="nav-link block py-2.5 px-4 rounded font-medium" data-section="financials">Financial Performance</a>
+            <a href="#" class="nav-link block py-2.5 px-4 rounded font-medium" data-section="covenants">Covenants & Liquidity</a>
+            <a href="#" class="nav-link block py-2.5 px-4 rounded font-medium" data-section="performance">Performance Tracking</a>
+            <a href="#" class="nav-link block py-2.5 px-4 rounded font-medium" data-section="risk">Risk & Ratings</a>
+            <a href="#" class="nav-link block py-2.5 px-4 rounded font-medium" data-section="qualitative">Qualitative & ESG</a>
+            <a href="#" class="nav-link block py-2.5 px-4 rounded font-medium" data-section="qc">Quality Control</a>
+        </nav>
+    </aside>
+
+    <main class="flex-1 ml-64 p-6 md:p-10 overflow-y-auto">
+        <header class="mb-8">
+            <h1 id="company-name" class="text-3xl font-bold text-gray-800">[Enter Company Name Here]</h1>
+            <p id="report-date" class="text-md text-gray-500">Credit Report as of: [YYYY-MM-DD]</p>
+        </header>
+
+        <div id="overview" class="content-section active space-y-6">
+            <div class="section-intro">
+                <p class="text-gray-700">This section provides a high-level summary of the company's business, recent history, ownership, and the original investment rationale. It sets the context for the detailed financial and risk analysis that follows.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="kpi-card">
+                    <h3 class="font-bold text-lg mb-2 text-[#5c5249]">Business Description</h3>
+                    <p class="text-gray-600">Provide a brief overview of the company's business, including its primary products/services, key end-markets, and geographic footprint. What is its legal structure?</p>
+                </div>
+                <div class="kpi-card">
+                    <h3 class="font-bold text-lg mb-2 text-[#5c5249]">Corporate Developments</h3>
+                    <p class="text-gray-600">Summarize the company's history and any significant corporate developments over the last 12-24 months (e.g., M&A, divestitures, changes in strategy).</p>
+                </div>
+                <div class="kpi-card">
+                    <h3 class="font-bold text-lg mb-2 text-[#5c5249]">Ownership & Sponsor</h3>
+                    <p class="text-gray-600">Who are the primary owners or sponsors of the company? Describe their history and track record with this and other investments.</p>
+                </div>
+                <div class="kpi-card">
+                    <h3 class="font-bold text-lg mb-2 text-[#5c5249]">Investment Thesis</h3>
+                    <p class="text-gray-600">What is the core investment thesis from the original underwriting? Has it evolved?</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="financials" class="content-section space-y-8">
+            <div class="section-intro">
+                <p class="text-gray-700">Explore the company's financial health through interactive charts and key performance indicators. This section covers top-line revenue, profitability, cash flow generation, and the overall capital structure to provide a comprehensive quantitative picture.</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="kpi-card">
+                    <h3 class="font-bold text-lg mb-4 text-center text-[#5c5249]">Revenue Performance (LTM)</h3>
+                    <div class="chart-container"><canvas id="revenueChart"></canvas></div>
+                </div>
+                <div class="kpi-card">
+                    <h3 class="font-bold text-lg mb-4 text-center text-[#5c5249]">EBITDA Performance (LTM)</h3>
+                    <div class="chart-container"><canvas id="ebitdaChart"></canvas></div>
+                </div>
+                <div class="kpi-card">
+                    <h3 class="font-bold text-lg mb-4 text-center text-[#5c5249]">Margin & FCF Conversion</h3>
+                    <div class="chart-container"><canvas id="marginChart"></canvas></div>
+                </div>
+                <div class="kpi-card">
+                    <h3 class="font-bold text-lg mb-4 text-center text-[#5c5249]">Capital Structure</h3>
+                    <div class="chart-container"><canvas id="capitalStructureChart"></canvas></div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                 <h3 class="font-bold text-lg mb-2 text-[#5c5249]">Key Analytical Questions</h3>
+                 <ul class="list-disc list-inside space-y-2 text-gray-600">
+                    <li>What are the primary drivers of revenue change (volume, price, mix, M&A)?</li>
+                    <li>What are the key drivers for any changes in EBITDA margin?</li>
+                    <li>List and assess the quality of any adjustments made to EBITDA.</li>
+                    <li>What do cash flow trends indicate about capital intensity and working capital management?</li>
+                    <li>How has the leverage trended and what is the total/net debt?</li>
+                 </ul>
+            </div>
+        </div>
+
+        <div id="covenants" class="content-section space-y-6">
+            <div class="section-intro">
+                <p class="text-gray-700">This section details the company's adherence to its financial covenants as defined in the credit agreement and assesses its overall liquidity position. It is critical for understanding the company's financial flexibility and ability to meet short-term obligations.</p>
+            </div>
+            <div class="kpi-card">
+                <h3 class="font-bold text-lg mb-4 text-[#5c5249]">Covenant Compliance</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="p-3 font-medium">Covenant</th>
+                                <th class="p-3 font-medium">Requirement</th>
+                                <th class="p-3 font-medium">Actual</th>
+                                <th class="p-3 font-medium">Cushion (%)</th>
+                                <th class="p-3 font-medium">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b">
+                                <td class="p-3">Total Leverage Ratio</td>
+                                <td class="p-3">&lt; 4.50x</td>
+                                <td class="p-3">3.85x</td>
+                                <td class="p-3">14.4%</td>
+                                <td class="p-3"><span class="px-2 py-1 bg-green-200 text-green-800 rounded-full text-xs">Compliant</span></td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="p-3">Fixed Charge Coverage</td>
+                                <td class="p-3">&gt; 1.25x</td>
+                                <td class="p-3">1.65x</td>
+                                <td class="p-3">32.0%</td>
+                                <td class="p-3"><span class="px-2 py-1 bg-green-200 text-green-800 rounded-full text-xs">Compliant</span></td>
+                            </tr>
+                             <tr class="border-b">
+                                <td class="p-3">Minimum Liquidity</td>
+                                <td class="p-3">&gt; $20M</td>
+                                <td class="p-3">$55M</td>
+                                <td class="p-3">175.0%</td>
+                                <td class="p-3"><span class="px-2 py-1 bg-green-200 text-green-800 rounded-full text-xs">Compliant</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                 <p class="text-sm mt-4 text-gray-500">Have there been any covenant breaches or amendments in the reporting period? If so, describe them in detail.</p>
+            </div>
+            <div class="kpi-card">
+                 <h3 class="font-bold text-lg mb-2 text-[#5c5249]">Liquidity Analysis</h3>
+                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                    <div>
+                        <p class="text-2xl font-bold text-blue-600">$55M</p>
+                        <p class="text-sm text-gray-500">Cash Balance</p>
+                    </div>
+                     <div>
+                        <p class="text-2xl font-bold text-blue-600">$100M</p>
+                        <p class="text-sm text-gray-500">RCF Availability</p>
+                    </div>
+                     <div>
+                        <p class="text-2xl font-bold text-green-600">$155M</p>
+                        <p class="text-sm text-gray-500">Total Liquidity</p>
+                    </div>
+                     <div>
+                        <p class="text-2xl font-bold text-red-600">$80M</p>
+                        <p class="text-sm text-gray-500">Next 12M Uses</p>
+                    </div>
+                 </div>
+                 <p class="text-sm mt-4 text-gray-600">Analyze total liquidity sources against short-term obligations (debt maturities, capex, working capital needs) over the next 12 months. Is the liquidity position adequate?</p>
+            </div>
+        </div>
+
+        <div id="performance" class="content-section space-y-8">
+            <div class="section-intro">
+                <p class="text-gray-700">This section evaluates the company's performance relative to key benchmarks, including the original underwriting case, its internal budget, and the most recent forecast. Understanding variances is key to assessing management's forecasting accuracy and operational execution.</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="kpi-card">
+                    <h3 class="font-bold text-lg mb-4 text-center text-[#5c5249]">Revenue Performance vs. Benchmarks</h3>
+                    <div class="chart-container"><canvas id="revenueBenchmarkChart"></canvas></div>
+                </div>
+                <div class="kpi-card">
+                    <h3 class="font-bold text-lg mb-4 text-center text-[#5c5249]">EBITDA Performance vs. Benchmarks</h3>
+                    <div class="chart-container"><canvas id="ebitdaBenchmarkChart"></canvas></div>
+                </div>
+            </div>
+             <div class="kpi-card">
+                 <h3 class="font-bold text-lg mb-2 text-[#5c5249]">Key Analytical Questions</h3>
+                 <ul class="list-disc list-inside space-y-2 text-gray-600">
+                    <li>What are the reasons for any material deviations from the original underwriting case?</li>
+                    <li>Explain any significant variances compared to the company's own budget for the period.</li>
+                    <li>Is the company on track to meet its updated targets based on the 'current expected case' or latest forecast?</li>
+                 </ul>
+            </div>
+        </div>
+
+        <div id="risk" class="content-section space-y-6">
+            <div class="section-intro">
+                <p class="text-gray-700">Here, we synthesize the analysis into a formal risk assessment. This includes proposing internal and regulatory ratings, justifying the rating outlook, and clearly summarizing the core credit strengths and weaknesses that underpin the final recommendation.</p>
+            </div>
+             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="kpi-card text-center">
+                    <h3 class="font-bold text-lg mb-2 text-[#5c5249]">Proposed PD Rating</h3>
+                    <p class="text-4xl font-bold text-orange-500">PD-7</p>
+                    <p class="text-sm text-gray-500">(S&P: B+ / Moody's: B1)</p>
+                </div>
+                <div class="kpi-card text-center">
+                    <h3 class="font-bold text-lg mb-2 text-[#5c5249]">Rating Outlook</h3>
+                    <p class="text-4xl font-bold text-gray-700">Stable</p>
+                    <p class="text-sm text-gray-500">Expected trends over 12-18 months</p>
+                </div>
+                <div class="kpi-card text-center">
+                    <h3 class="font-bold text-lg mb-2 text-[#5c5249]">Regulatory Rating</h3>
+                    <p class="text-4xl font-bold text-green-600">Pass</p>
+                    <p class="text-sm text-gray-500">Current Assessment</p>
+                </div>
+            </div>
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="kpi-card">
+                    <h3 class="font-bold text-lg mb-2 text-green-700">Credit Strengths</h3>
+                    <ul class="list-disc list-inside space-y-1 text-gray-600">
+                        <li>Strong market leadership position.</li>
+                        <li>High, stable EBITDA margins.</li>
+                        <li>Long-term contracts with key customers.</li>
+                        <li>Experienced management team.</li>
+                        <li>Strong FCF conversion.</li>
+                    </ul>
+                </div>
+                <div class="kpi-card">
+                    <h3 class="font-bold text-lg mb-2 text-red-700">Credit Weaknesses & Mitigants</h3>
+                    <ul class="list-disc list-inside space-y-1 text-gray-600">
+                        <li><span class="font-semibold">Weakness:</span> High leverage (3.85x). <br><span class="text-xs text-blue-600">Mitigant: Amortizing debt, strong FCF for deleveraging.</span></li>
+                        <li><span class="font-semibold">Weakness:</span> Customer concentration (~25% of revenue). <br><span class="text-xs text-blue-600">Mitigant: Long-term contracts, high switching costs for customers.</span></li>
+                        <li><span class="font-semibold">Weakness:</span> Cyclical end-markets. <br><span class="text-xs text-blue-600">Mitigant: Geographic and product diversification.</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="qualitative" class="content-section space-y-6">
+            <div class="section-intro">
+                <p class="text-gray-700">This section moves beyond the numbers to assess qualitative factors and ESG considerations that can materially impact credit risk. We evaluate management, competitive positioning, and the company's approach to environmental, social, and governance issues.</p>
+            </div>
+            <div class="kpi-card">
+                 <h3 class="font-bold text-lg mb-4 text-[#5c5249]">PD Qualitative Factors</h3>
+                 <div class="space-y-4">
+                    <div>
+                        <h4 class="font-semibold">Management & Financial Policy</h4>
+                        <p class="text-gray-600 text-sm">Assess the strength, experience, and stability of the management team. Are their interests aligned with lenders? Assess the aggressiveness of the company's financial policy regarding M&A, dividends, and share repurchases.</p>
+                    </div>
+                     <div>
+                        <h4 class="font-semibold">Competitive Position & Scale</h4>
+                        <p class="text-gray-600 text-sm">Analyze the company's position within its industry. What are its key competitive advantages? Who are its main competitors? How does its size compare to peers?</p>
+                    </div>
+                     <div>
+                        <h4 class="font-semibold">Consistency of Cash Flows & Regulatory Environment</h4>
+                        <p class="text-gray-600 text-sm">Evaluate the predictability and volatility of the company's cash flows. Describe any material regulatory factors that could impact the company's operations or profitability.</p>
+                    </div>
+                 </div>
+            </div>
+             <div class="kpi-card">
+                <h3 class="font-bold text-lg mb-4 text-[#5c5249]">Environmental, Social, and Governance (ESG) Factors</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="border p-4 rounded-lg bg-green-50 border-green-200">
+                        <h4 class="font-semibold text-green-800">Environmental</h4>
+                        <p class="text-sm text-gray-600">Identify material risks or opportunities (e.g., carbon emissions, waste management).</p>
+                    </div>
+                     <div class="border p-4 rounded-lg bg-blue-50 border-blue-200">
+                        <h4 class="font-semibold text-blue-800">Social</h4>
+                        <p class="text-sm text-gray-600">Identify material risks or opportunities (e.g., labor relations, product safety, data privacy).</p>
+                    </div>
+                     <div class="border p-4 rounded-lg bg-yellow-50 border-yellow-200">
+                        <h4 class="font-semibold text-yellow-800">Governance</h4>
+                        <p class="text-sm text-gray-600">Identify material risks or opportunities (e.g., board structure, transparency, shareholder rights).</p>
+                    </div>
+                </div>
+                <p class="text-sm mt-4 text-gray-600">Overall, how do ESG factors impact the company's credit profile?</p>
+             </div>
+        </div>
+
+        <div id="qc" class="content-section space-y-6">
+            <div class="section-intro">
+                <p class="text-gray-700">The final step is a quality control check. This section ensures the completed analysis is accurate, internally consistent, and adheres to all relevant internal credit policies and external regulatory requirements before final submission.</p>
+            </div>
+             <div class="kpi-card">
+                 <h3 class="font-bold text-lg mb-4 text-[#5c5249]">Policy & Regulatory Adherence</h3>
+                 <ul class="list-disc list-inside space-y-2 text-gray-600">
+                    <li>Does the analysis and recommended rating adhere to all relevant internal credit policies?</li>
+                    <li>Does the report meet regulatory requirements for credit risk monitoring and reporting?</li>
+                 </ul>
+            </div>
+             <div class="kpi-card">
+                 <h3 class="font-bold text-lg mb-4 text-[#5c5249]">Consistency & Narrative Check</h3>
+                 <ul class="list-disc list-inside space-y-2 text-gray-600">
+                    <li>Is the narrative consistent throughout the report? Do weaknesses align with financial analysis?</li>
+                    <li>Have all calculations been checked for accuracy (covenants, ratios, growth %)?</li>
+                 </ul>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    contentSections.forEach(s => s.classList.remove('active'));
+
+                    link.classList.add('active');
+                    const sectionId = link.getAttribute('data-section');
+                    document.getElementById(sectionId).classList.add('active');
+                });
+            });
+
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    if (context.chart.id === 'marginChart' || context.chart.id === 'capitalStructureChart') {
+                                        label += context.parsed.y.toFixed(1) + '%';
+                                    } else {
+                                        label += '$' + context.parsed.y.toFixed(2) + 'M';
+                                    }
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value, index, values) {
+                                if (this.chart.id === 'marginChart' || this.chart.id === 'capitalStructureChart') {
+                                     return value + '%';
+                                }
+                                return '$' + value + 'M';
+                            }
+                        }
+                    }
+                }
+            };
+
+            new Chart(document.getElementById('revenueChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Prior Period', 'Current Period'],
+                    datasets: [{
+                        label: 'Total Revenue',
+                        data: [1050, 1200],
+                        backgroundColor: ['#bcaea3', '#8c7a6b'],
+                        borderColor: ['#bcaea3', '#8c7a6b'],
+                        borderWidth: 1
+                    }]
+                },
+                options: chartOptions
+            });
+
+            new Chart(document.getElementById('ebitdaChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Prior Period', 'Current Period'],
+                    datasets: [{
+                        label: 'LTM EBITDA',
+                        data: [280, 310],
+                        backgroundColor: ['#bcaea3', '#8c7a6b'],
+                        borderColor: ['#bcaea3', '#8c7a6b'],
+                        borderWidth: 1
+                    }]
+                },
+                options: chartOptions
+            });
+
+            new Chart(document.getElementById('marginChart'), {
+                type: 'line',
+                data: {
+                    labels: ['Q1', 'Q2', 'Q3', 'Q4', 'LTM'],
+                    datasets: [{
+                        label: 'EBITDA Margin (%)',
+                        data: [26.2, 26.8, 27.1, 25.9, 26.7],
+                        borderColor: '#8c7a6b',
+                        backgroundColor: 'rgba(140, 122, 107, 0.2)',
+                        fill: true,
+                        tension: 0.3
+                    }, {
+                        label: 'FCF Conversion (%)',
+                        data: [55, 62, 48, 58, 56],
+                        borderColor: '#a0a0a0',
+                        backgroundColor: 'rgba(160, 160, 160, 0.2)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: chartOptions
+            });
+
+            new Chart(document.getElementById('capitalStructureChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Revolving Credit Facility', 'Term Loan A', 'Term Loan B', 'Senior Notes'],
+                    datasets: [{
+                        label: 'Debt',
+                        data: [50, 300, 600, 250],
+                        backgroundColor: ['#dcd3cc', '#bcaea3', '#8c7a6b', '#5c5249'],
+                        hoverOffset: 4
+                    }]
+                },
+                options: { ...chartOptions, scales: {} }
+            });
+
+            const benchmarkChartOptions = {
+                ...chartOptions,
+                scales: {
+                    y: { ...chartOptions.scales.y },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            };
+
+            new Chart(document.getElementById('revenueBenchmarkChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Underwriting Case', 'Budget', 'Actual'],
+                    datasets: [{
+                        label: 'Revenue',
+                        data: [1150, 1220, 1200],
+                        backgroundColor: ['#bcaea3', '#8c7a6b', '#5c5249'],
+                    }]
+                },
+                options: benchmarkChartOptions
+            });
+
+            new Chart(document.getElementById('ebitdaBenchmarkChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Underwriting Case', 'Budget', 'Actual'],
+                    datasets: [{
+                        label: 'EBITDA',
+                        data: [320, 315, 310],
+                        backgroundColor: ['#bcaea3', '#8c7a6b', '#5c5249'],
+                    }]
+                },
+                options: benchmarkChartOptions
+            });
+        });
+    </script>
+</body>
+</html>

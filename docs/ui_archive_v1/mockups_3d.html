@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Credit Risk 3D Visualization</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js" charset="utf-8"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Executive Calm -->
+    <!-- Application Structure Plan: The SPA is re-architected around a central, interactive 3D visualization powered by Plotly.js (WebGL). This 3D map is the primary tool for data exploration. The structure remains "top-down," but the exploration is now spatial. Users can rotate, zoom, and pan the 3D model. Regional focus is achieved via control buttons that animate the camera to preset views. This design was chosen to handle the user's request for visualizing density, concentration, and loss simultaneously in a highly intuitive format. KPIs, formula breakdowns, and a detail table supplement the main 3D view, all updating in sync with the selected region. -->
+    <!-- Visualization & Content Choices: 1. Global 3D Risk Map: Report Info -> Product-level exposure, EL, and location. Goal -> Visualize complex relationships between geography, concentration (exposure), and risk (loss). Viz -> 3D Scatter Plot (Plotly.js). X/Y axes represent geographic location, Z-axis represents exposure concentration (peaks), and point color represents Expected Loss (heatmap). Interaction -> Pan/zoom/rotate globe. Buttons to snap view to regions. Hover for tooltips. Justification -> This is the most effective way to combine multiple data dimensions into a single, explorable visual narrative. Library -> Plotly.js (WebGL/Canvas). 2. KPIs & Supplementary Info: All other components (KPI cards, formula boxes, data table) are retained but now serve as contextual support for the 3D visualization, dynamically updating based on the region selected via the control buttons. This maintains data clarity while allowing the 3D map to be the focus. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .kpi-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            padding: 1.5rem;
+        }
+        #plot-container {
+            height: 65vh;
+            min-height: 500px;
+        }
+        .formula-box {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+        .region-button {
+            transition: all 0.2s ease-in-out;
+        }
+        .region-button.active {
+            background-color: #0284c7;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-screen-2xl">
+        <header class="mb-6">
+            <h1 class="text-4xl font-bold text-gray-900">Global Credit Risk 3D Visualization</h1>
+            <p id="as-of-date" class="text-lg text-gray-500 mt-1"></p>
+        </header>
+
+        <main class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="kpi-card">
+                    <h3 class="text-gray-500 font-medium">Selected Exposure</h3>
+                    <p id="kpi-exposure" class="text-4xl font-bold mt-2 text-sky-600"></p>
+                </div>
+                <div class="kpi-card">
+                    <h3 class="text-gray-500 font-medium">Avg. PD</h3>
+                    <p id="kpi-pd" class="text-4xl font-bold mt-2 text-amber-600"></p>
+                </div>
+                <div class="kpi-card">
+                    <h3 class="text-gray-500 font-medium">Selected EL</h3>
+                    <p id="kpi-el" class="text-4xl font-bold mt-2 text-red-600"></p>
+                </div>
+                <div class="kpi-card">
+                    <h3 class="text-gray-500 font-medium">Selected Provisions</h3>
+                    <p id="kpi-provisions" class="text-4xl font-bold mt-2 text-emerald-600"></p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-2 sm:p-4">
+                 <div class="flex flex-wrap justify-center gap-2 mb-4 p-2 bg-gray-100 rounded-lg">
+                    <button data-region="global" class="region-button text-sm sm:text-base bg-white shadow-sm hover:bg-gray-200 font-semibold py-2 px-4 rounded-lg">🌍 Global View</button>
+                    <button data-region="na" class="region-button text-sm sm:text-base bg-white shadow-sm hover:bg-gray-200 font-semibold py-2 px-4 rounded-lg">North America</button>
+                    <button data-region="emea" class="region-button text-sm sm:text-base bg-white shadow-sm hover:bg-gray-200 font-semibold py-2 px-4 rounded-lg">EMEA</button>
+                    <button data-region="apac" class="region-button text-sm sm:text-base bg-white shadow-sm hover:bg-gray-200 font-semibold py-2 px-4 rounded-lg">APAC</button>
+                    <button data-region="latam" class="region-button text-sm sm:text-base bg-white shadow-sm hover:bg-gray-200 font-semibold py-2 px-4 rounded-lg">LATAM</button>
+                </div>
+                <div id="plot-container">
+
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                 <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-900">Core Risk Formulas</h2>
+                    <div class="space-y-4">
+                        <div class="formula-box">
+                            <p class="font-semibold text-gray-700">Expected Loss (EL)</p>
+                            <p class="text-sm text-gray-500 mb-2">EL = PD x EAD x LGD</p>
+                            <div id="el-calc-details" class="mt-3 text-sm text-gray-600 space-y-1"></div>
+                        </div>
+                        <div class="formula-box">
+                            <p class="font-semibold text-gray-700">Provisions</p>
+                            <p class="text-sm text-gray-500 mb-2">Provisions = Σ(Product EL) + Overlays</p>
+                            <div id="prov-calc-details" class="mt-3 text-sm text-gray-600 space-y-1"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h2 id="table-title" class="text-2xl font-semibold mb-4 text-gray-900"></h2>
+                     <div class="overflow-x-auto h-80">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50 sticky top-0">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Exposure (M)</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">EL (M)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="risk-table-body" class="bg-white divide-y divide-gray-200">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const portfolioData = {
+        global: { name: "Global", summary: { exposure: 15500, pd: 2.15, el: 1489.6, provisions: 1550 }, products: [] },
+        na: { name: "North America", center: { lon: -100, lat: 40 }, summary: { exposure: 5800, pd: 1.85, el: 450.4, provisions: 475, overlays: 24.6 }, products: [
+            { name: 'Commercial Loans', exposure: 1800, el: 136.8 }, { name: 'Derivatives', exposure: 1500, el: 81.0 }, { name: 'Structured Finance', exposure: 800, el: 100.0 },
+            { name: 'Personal Banking', exposure: 700, el: 77.9 }, { name: 'Wealth Management', exposure: 600, el: 10.1 }, { name: 'Trading Book', exposure: 400, el: 16.7 },
+        ]},
+        emea: { name: "EMEA", center: { lon: 20, lat: 50 }, summary: { exposure: 4200, pd: 2.55, el: 513.8, provisions: 530, overlays: 16.2 }, products: [
+            { name: 'Commercial Loans', exposure: 1200, el: 151.2 }, { name: 'Derivatives', exposure: 900, el: 84.2 }, { name: 'Structured Finance', exposure: 700, el: 159.6 },
+            { name: 'Personal Banking', exposure: 600, el: 101.4 }, { name: 'Wealth Management', exposure: 500, el: 17.5 }, { name: 'Trading Book', exposure: 300, el: 27.0 },
+        ]},
+        apac: { name: "APAC", center: { lon: 120, lat: 25 }, summary: { exposure: 3500, pd: 2.30, el: 370.8, provisions: 385, overlays: 14.2 }, products: [
+            { name: 'Commercial Loans', exposure: 1000, el: 109.2 }, { name: 'Derivatives', exposure: 800, el: 70.4 }, { name: 'Structured Finance', exposure: 600, el: 111.4 },
+            { name: 'Personal Banking', exposure: 500, el: 74.4 }, { name: 'Wealth Management', exposure: 400, el: 11.5 }, { name: 'Trading Book', exposure: 200, el: 15.1 },
+        ]},
+        latam: { name: "LATAM", center: { lon: -60, lat: -15 }, summary: { exposure: 2000, pd: 3.10, el: 316.0, provisions: 330, overlays: 5.4 }, products: [
+            { name: 'Commercial Loans', exposure: 500, el: 84.0 }, { name: 'Derivatives', exposure: 300, el: 43.5 }, { name: 'Structured Finance', exposure: 400, el: 117.0 },
+            { name: 'Personal Banking', exposure: 200, el: 42.0 }, { name: 'Wealth Management', exposure: 300, el: 13.7 }, { name: 'Trading Book', exposure: 300, el: 32.4 },
+        ]}
+    };
+
+    portfolioData.global.products = Object.values(portfolioData).flatMap(r => r.products || []);
+
+    const elements = {
+        kpiExposure: document.getElementById('kpi-exposure'), kpiPd: document.getElementById('kpi-pd'), kpiEl: document.getElementById('kpi-el'),
+        kpiProvisions: document.getElementById('kpi-provisions'), tableBody: document.getElementById('risk-table-body'), tableTitle: document.getElementById('table-title'),
+        elCalcDetails: document.getElementById('el-calc-details'), provCalcDetails: document.getElementById('prov-calc-details'),
+        asOfDate: document.getElementById('as-of-date'), plotContainer: document.getElementById('plot-container'),
+    };
+
+    const formatCurrency = (value) => `$${(value / 1000).toFixed(1)}B`;
+    const formatCurrencyMillions = (value) => `$${value.toFixed(1)}M`;
+    const formatPercentage = (value) => `${value.toFixed(2)}%`;
+
+    function updateDashboard(regionId) {
+        const data = portfolioData[regionId];
+
+        elements.kpiExposure.textContent = formatCurrency(data.summary.exposure * 1000000);
+        elements.kpiPd.textContent = formatPercentage(data.summary.pd);
+        elements.kpiEl.textContent = formatCurrencyMillions(data.summary.el);
+        elements.kpiProvisions.textContent = formatCurrencyMillions(data.summary.provisions);
+
+        elements.tableTitle.textContent = `${data.name} Breakdown`;
+
+        const sortedProducts = [...data.products].sort((a,b) => b.exposure - a.exposure);
+        elements.tableBody.innerHTML = sortedProducts.map(p => `
+            <tr>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${p.name}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">${formatCurrencyMillions(p.exposure)}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-semibold text-right">${formatCurrencyMillions(p.el)}</td>
+            </tr>
+        `).join('');
+
+        elements.elCalcDetails.innerHTML = `<p><span class="font-semibold">Avg. PD:</span> ${formatPercentage(data.summary.pd)}</p><p><span class="font-semibold">EAD:</span> ${formatCurrency(data.summary.exposure * 1000000)}</p>`;
+        elements.provCalcDetails.innerHTML = `<p><span class="font-semibold">Total EL:</span> ${formatCurrencyMillions(data.summary.el)}</p>${data.summary.overlays ? `<p><span class="font-semibold">Overlays:</span> ${formatCurrencyMillions(data.summary.overlays)}</p>` : ''}`;
+
+        document.querySelectorAll('.region-button').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.region === regionId);
+        });
+    }
+
+    function create3DPlot() {
+        const traces = [];
+        let allELs = [];
+
+        Object.keys(portfolioData).forEach(regionId => {
+            if (regionId === 'global') return;
+            const region = portfolioData[regionId];
+            region.products.forEach(p => allELs.push(p.el));
+        });
+
+        const maxEL = Math.max(...allELs);
+
+        Object.keys(portfolioData).forEach(regionId => {
+            if (regionId === 'global') return;
+            const region = portfolioData[regionId];
+
+            traces.push({
+                x: region.products.map(() => region.center.lon + (Math.random() - 0.5) * 20),
+                y: region.products.map(() => region.center.lat + (Math.random() - 0.5) * 20),
+                z: region.products.map(p => p.exposure),
+                mode: 'markers',
+                type: 'scatter3d',
+                name: region.name,
+                text: region.products.map(p => `${p.name}<br>Exposure: ${formatCurrencyMillions(p.exposure)}<br>EL: ${formatCurrencyMillions(p.el)}`),
+                hoverinfo: 'text',
+                marker: {
+                    size: 8,
+                    color: region.products.map(p => p.el),
+                    colorscale: 'RdYlGn',
+                    reversescale: true,
+                    cmin: 0,
+                    cmax: maxEL,
+                    colorbar: {
+                        title: 'Expected Loss (M)',
+                        thickness: 15,
+                        len: 0.75,
+                    }
+                }
+            });
+        });
+
+        const layout = {
+            title: { text: 'Global Risk Exposure & Concentration', font: { size: 20 } },
+            showlegend: false,
+            margin: { l: 0, r: 0, b: 0, t: 40 },
+            scene: {
+                xaxis: { title: 'Longitude', showticklabels: false, showgrid: false, zeroline: false, autorange: true },
+                yaxis: { title: 'Latitude', showticklabels: false, showgrid: false, zeroline: false, autorange: true },
+                zaxis: { title: 'Exposure (M)' },
+                camera: { eye: { x: 1.8, y: 1.8, z: 0.8 } }
+            },
+            paper_bgcolor: 'rgba(255,255,255,0)',
+            plot_bgcolor: 'rgba(255,255,255,0)'
+        };
+
+        Plotly.newPlot(elements.plotContainer, traces, layout, {responsive: true});
+    }
+
+    function setupEventListeners() {
+        document.querySelectorAll('.region-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const regionId = e.currentTarget.dataset.region;
+                updateDashboard(regionId);
+
+                const cameraViews = {
+                    global: { eye: { x: 1.8, y: 1.8, z: 0.8 }, center: { x: 0, y: 0, z: 0 } },
+                    na: { eye: { x: -2, y: 2, z: 1.2 }, center: { x: -0.5, y: 0.2, z: 0 } },
+                    emea: { eye: { x: 1, y: 2.5, z: 1.2 }, center: { x: 0.1, y: 0.3, z: 0 } },
+                    apac: { eye: { x: 2.5, y: 1, z: 1.2 }, center: { x: 0.7, y: 0.1, z: 0 } },
+                    latam: { eye: { x: -1, y: -2, z: 1.2 }, center: { x: -0.3, y: -0.1, z: 0 } }
+                };
+
+                Plotly.animate(elements.plotContainer, {
+                    layout: { scene: { camera: cameraViews[regionId] } }
+                }, {
+                    transition: { duration: 500, easing: 'cubic-in-out' }
+                });
+            });
+        });
+    }
+
+    function initializeApp() {
+        elements.asOfDate.textContent = `As of: ${new Date().toLocaleString()}`;
+        create3DPlot();
+        updateDashboard('global');
+        setupEventListeners();
+    }
+
+    initializeApp();
+});
+</script>
+
+</body>
+</html>

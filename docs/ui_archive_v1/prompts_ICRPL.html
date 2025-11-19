@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Credit Risk Prompt Library</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Neutral Slate -->
+    <!-- Application Structure Plan: The application is designed as an interactive workflow explorer. A fixed sidebar navigation allows users to jump between the five core stages of credit analysis (Foundational, Macro, Business Risk, Financial Risk, Synthesis). The main content area dynamically displays the selected stage. This task-oriented structure helps users understand the process flow. Prompts within each section are organized into expandable accordions, allowing users to drill down into details without being overwhelmed. The key interactive feature is the Risk Scoring Matrix in the 'Synthesis' section, which turns a static table into a hands-on tool for understanding how Business and Financial risk profiles combine to determine a credit rating anchor. This design prioritizes usability and process comprehension over a linear document replication. -->
+    <!-- Visualization & Content Choices: Report Info -> Goal -> Viz/Presentation Method -> Interaction -> Justification -> Library/Method. 1) Rating Scales Table -> Inform -> Styled HTML Table -> None -> Clear, standard reference for analysts -> HTML/Tailwind. 2) Financial Ratios Table -> Inform/Organize -> Styled HTML Table -> Hover highlights -> Draws attention to complex ratio definitions -> HTML/Tailwind. 3) Risk Scoring Matrix -> Explain Relationships -> Interactive HTML Grid -> Hovering a cell highlights it and displays the resulting rating -> Makes the abstract concept of risk profile combination tangible and easy to grasp -> HTML/Tailwind/JS. 4) Overall Process -> Organize/Inform -> Accordion Components -> Click to expand/collapse -> Manages information density and allows for focused exploration of prompt groups -> HTML/Tailwind/JS. A simple decorative Chart.js donut chart is included in the overview to meet library requirements and provide a visual accent. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .sidebar-link.active { background-color: #334155; color: #f1f5f9; }
+        .matrix-table td:hover { background-color: #93c5fd; cursor: pointer; transition: background-color 0.2s; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="flex h-screen bg-slate-100">
+        <aside class="w-64 bg-slate-800 text-slate-200 flex flex-col fixed h-full">
+            <div class="h-20 flex items-center justify-center border-b border-slate-700">
+                <h1 class="text-xl font-bold text-center">Credit Risk Library</h1>
+            </div>
+            <nav class="flex-1 px-4 py-6 space-y-2">
+                <a href="#foundational" class="sidebar-link flex items-center px-4 py-2.5 rounded-lg transition-colors duration-200 hover:bg-slate-700">
+                    <span class="mr-3">I.</span> Foundational
+                </a>
+                <a href="#macro" class="sidebar-link flex items-center px-4 py-2.5 rounded-lg transition-colors duration-200 hover:bg-slate-700">
+                    <span class="mr-3">II.</span> Macro-Environment
+                </a>
+                <a href="#business" class="sidebar-link flex items-center px-4 py-2.5 rounded-lg transition-colors duration-200 hover:bg-slate-700">
+                     <span class="mr-3">III.</span> Business Risk
+                </a>
+                <a href="#financial" class="sidebar-link flex items-center px-4 py-2.5 rounded-lg transition-colors duration-200 hover:bg-slate-700">
+                    <span class="mr-3">IV.</span> Financial Risk
+                </a>
+                <a href="#synthesis" class="sidebar-link flex items-center px-4 py-2.5 rounded-lg transition-colors duration-200 hover:bg-slate-700">
+                    <span class="mr-3">V.</span> Synthesis & Rating
+                </a>
+            </nav>
+            <div class="p-4 border-t border-slate-700 text-xs text-slate-400">
+                <p>Interactive Explorer v1.0</p>
+            </div>
+        </aside>
+
+        <main class="flex-1 ml-64 p-6 sm:p-8 lg:p-12 overflow-y-auto">
+
+            <section id="foundational" class="content-section">
+                <h2 class="text-3xl font-bold text-slate-900 mb-2">I. Foundational & Scoping Prompts</h2>
+                <p class="mb-8 text-slate-600">This initial phase establishes a clear foundation for the analysis. It involves defining the entity, selecting the analytical framework, and confirming that all necessary information is available. This structured start ensures consistency and defensibility, acting as a critical go/no-go gate for the entire process.</p>
+
+                <div class="space-y-4">
+                    <div class="accordion-item bg-white p-5 rounded-lg shadow-sm">
+                        <button class="accordion-header w-full text-left text-lg font-semibold text-slate-800 flex justify-between items-center">
+                            Entity Profile
+                            <span class="transform transition-transform duration-300">&#9662;</span>
+                        </button>
+                        <div class="accordion-content">
+                            <p class="mt-4 text-slate-600">Captures fundamental identification data for the company and the specific purpose of the credit analysis. The purpose is paramount as it dictates the focus and depth required.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-white p-5 rounded-lg shadow-sm">
+                        <button class="accordion-header w-full text-left text-lg font-semibold text-slate-800 flex justify-between items-center">
+                            Analytical Framework Setup
+                            <span class="transform transition-transform duration-300">&#9662;</span>
+                        </button>
+                        <div class="accordion-content">
+                            <p class="mt-4 text-slate-600">Defines the methodological "rules of engagement." The choice of rating agency framework (e.g., S&P, Moody's, Fitch) governs the entire analytical process, from financial adjustments to risk factor weighting.</p>
+                        </div>
+                    </div>
+                     <div class="accordion-item bg-white p-5 rounded-lg shadow-sm">
+                        <button class="accordion-header w-full text-left text-lg font-semibold text-slate-800 flex justify-between items-center">
+                            Information Gathering
+                            <span class="transform transition-transform duration-300">&#9662;</span>
+                        </button>
+                        <div class="accordion-content">
+                            <p class="mt-4 text-slate-600">Serves as a structured checklist to ensure all necessary documentation (financials, debt indentures, etc.) is available before substantive analysis begins. An analysis with incomplete data is inherently flawed.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-12">
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4">Long-Term Rating Scale Equivalence</h3>
+                    <div class="overflow-x-auto bg-white rounded-lg shadow">
+                        <table class="min-w-full text-sm text-left text-slate-500">
+                            <thead class="bg-slate-100 text-xs text-slate-700 uppercase">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3">S&P</th>
+                                    <th scope="col" class="px-6 py-3">Moody's</th>
+                                    <th scope="col" class="px-6 py-3">Fitch</th>
+                                    <th scope="col" class="px-6 py-3">Rating Grade</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b"><td class="px-6 py-4 font-medium">AAA</td><td class="px-6 py-4">Aaa</td><td class="px-6 py-4">AAA</td><td class="px-6 py-4">Highest Quality</td></tr>
+                                <tr class="border-b bg-white"><td class="px-6 py-4 font-medium">AA+, AA, AA-</td><td class="px-6 py-4">Aa1, Aa2, Aa3</td><td class="px-6 py-4">AA+, AA, AA-</td><td class="px-6 py-4">High Quality</td></tr>
+                                <tr class="border-b"><td class="px-6 py-4 font-medium">A+, A, A-</td><td class="px-6 py-4">A1, A2, A3</td><td class="px-6 py-4">A+, A, A-</td><td class="px-6 py-4">Upper-Medium Grade</td></tr>
+                                <tr class="border-b bg-white"><td class="px-6 py-4 font-medium">BBB+, BBB, BBB-</td><td class="px-6 py-4">Baa1, Baa2, Baa3</td><td class="px-6 py-4">BBB+, BBB, BBB-</td><td class="px-6 py-4">Lower-Medium Grade (Investment Grade)</td></tr>
+                                <tr class="border-b"><td class="px-6 py-4 font-medium">BB+, BB, BB-</td><td class="px-6 py-4">Ba1, Ba2, Ba3</td><td class="px-6 py-4">BB+, BB, BB-</td><td class="px-6 py-4">Non-Investment Grade (Speculative)</td></tr>
+                                <tr class="border-b bg-white"><td class="px-6 py-4 font-medium">B+, B, B-</td><td class="px-6 py-4">B1, B2, B3</td><td class="px-6 py-4">B+, B, B-</td><td class="px-6 py-4">Highly Speculative</td></tr>
+                                <tr class="border-b"><td class="px-6 py-4 font-medium">CCC+, CCC, CCC-</td><td class="px-6 py-4">Caa1, Caa2, Caa3</td><td class="px-6 py-4">CCC</td><td class="px-6 py-4">Substantial Risks</td></tr>
+                                <tr class="border-b bg-white"><td class="px-6 py-4 font-medium">CC</td><td class="px-6 py-4">Ca</td><td class="px-6 py-4">CC</td><td class="px-6 py-4">Extremely Speculative</td></tr>
+                                <tr class="border-b"><td class="px-6 py-4 font-medium">C</td><td class="px-6 py-4">C</td><td class="px-6 py-4">C</td><td class="px-6 py-4">Near Default</td></tr>
+                                <tr class="bg-white"><td class="px-6 py-4 font-medium">D</td><td class="px-6 py-4"></td><td class="px-6 py-4">D</td><td class="px-6 py-4">In Default</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="macro" class="content-section">
+                <h2 class="text-3xl font-bold text-slate-900 mb-2">II. Macro-Environment Risk Assessment</h2>
+                <p class="mb-8 text-slate-600">A company's creditworthiness is fundamentally shaped by its operating environment. This top-down analysis assesses the external opportunities and threats from country, industry, and macroeconomic factors before delving into company specifics.</p>
+
+                <div class="space-y-4">
+                    <div class="accordion-item bg-white p-5 rounded-lg shadow-sm">
+                        <button class="accordion-header w-full text-left text-lg font-semibold text-slate-800 flex justify-between items-center">
+                            Sovereign & Country Risk
+                            <span class="transform transition-transform duration-300">&#9662;</span>
+                        </button>
+                        <div class="accordion-content">
+                            <p class="mt-4 text-slate-600">Assesses the economic, political, and institutional risks of the company's key operating countries. The sovereign rating can act as a "ceiling" on the corporate rating, especially for foreign currency debt.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-white p-5 rounded-lg shadow-sm">
+                        <button class="accordion-header w-full text-left text-lg font-semibold text-slate-800 flex justify-between items-center">
+                            Industry Risk Analysis
+                            <span class="transform transition-transform duration-300">&#9662;</span>
+                        </button>
+                        <div class="accordion-content">
+                             <p class="mt-4 text-slate-600">Evaluates the dynamics of the company's industry, including cyclicality, competitive intensity, growth prospects, and systemic risks like ESG factors. Key prompts include assessing competitive intensity using Porter's Five Forces, evaluating long-term growth drivers, and identifying systemic ESG risks for the sector.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-12 p-6 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h3 class="text-xl font-semibold text-blue-900">Key Concept: CICRA</h3>
+                    <p class="mt-2 text-blue-800">The Corporate Industry and Country Risk Assessment (CICRA) score combines these two risk categories. The interaction between country and industry factors can create multiplicative, rather than merely additive, risks. For example, a cyclical industry (e.g., automotive) in a country with weak legal institutions faces compounded risk during a downturn.</p>
+                </div>
+            </section>
+
+            <section id="business" class="content-section">
+                <h2 class="text-3xl font-bold text-slate-900 mb-2">III. Business Risk Profile Assessment</h2>
+                <p class="mb-8 text-slate-600">This section assesses the durability and strength of the company's franchise within its industry context. A company with a strong business profile—characterized by leading market positions, diversification, and stable profitability—can typically sustain higher financial leverage.</p>
+                 <div class="space-y-4">
+                    <div class="accordion-item bg-white p-5 rounded-lg shadow-sm">
+                        <button class="accordion-header w-full text-left text-lg font-semibold text-slate-800 flex justify-between items-center">
+                            Competitive Position
+                            <span class="transform transition-transform duration-300">&#9662;</span>
+                        </button>
+                        <div class="accordion-content">
+                            <p class="mt-4 text-slate-600">Evaluates the company's market standing and the sustainability of its competitive advantages. Key prompts focus on market share, diversification (product, geography, customer), and the durability of competitive advantages like brand or technology.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-white p-5 rounded-lg shadow-sm">
+                        <button class="accordion-header w-full text-left text-lg font-semibold text-slate-800 flex justify-between items-center">
+                            Operational Efficiency & Profitability
+                            <span class="transform transition-transform duration-300">&#9662;</span>
+                        </button>
+                        <div class="accordion-content">
+                             <p class="mt-4 text-slate-600">Examines the company's ability to generate profits and cash flow. A crucial distinction is made between the absolute level of profitability and its volatility; lower volatility implies more predictable cash flows for debt service.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-white p-5 rounded-lg shadow-sm">
+                        <button class="accordion-header w-full text-left text-lg font-semibold text-slate-800 flex justify-between items-center">
+                            Management & Governance
+                            <span class="transform transition-transform duration-300">&#9662;</span>
+                        </button>
+                        <div class="accordion-content">
+                            <p class="mt-4 text-slate-600">A qualitative assessment of management's competence, strategy, risk appetite, and the robustness of corporate governance. Management's financial policy is a critical indicator of future financial risk.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-white p-5 rounded-lg shadow-sm">
+                        <button class="accordion-header w-full text-left text-lg font-semibold text-slate-800 flex justify-between items-center">
+                            Group & Ownership Structure
+                            <span class="transform transition-transform duration-300">&#9662;</span>
+                        </button>
+                        <div class="accordion-content">
+                             <p class="mt-4 text-slate-600">Considers the influence of a parent company or controlling shareholders. A subsidiary's rating can be positively influenced by a strong parent or negatively impacted by a weak one that may extract resources.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="financial" class="content-section">
+                <h2 class="text-3xl font-bold text-slate-900 mb-2">IV. Financial Risk Profile Assessment</h2>
+                <p class="mb-8 text-slate-600">This section forms the quantitative core of the analysis, focusing on balance sheet strength and cash flow generation. It begins with critical adjustments to reported financials to reflect economic reality over accounting form, ensuring comparability and accuracy.</p>
+                 <div class="space-y-4">
+                    <div class="accordion-item bg-white p-5 rounded-lg shadow-sm">
+                        <button class="accordion-header w-full text-left text-lg font-semibold text-slate-800 flex justify-between items-center">
+                            Financial Statement Adjustments
+                            <span class="transform transition-transform duration-300">&#9662;</span>
+                        </button>
+                        <div class="accordion-content">
+                             <p class="mt-4 text-slate-600">This is the most critical step in quantitative analysis. Standard adjustments for items like operating leases and pension deficits create an analytically "clean" set of financials that provide a more accurate picture of a company's leverage and obligations.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-white p-5 rounded-lg shadow-sm">
+                        <button class="accordion-header w-full text-left text-lg font-semibold text-slate-800 flex justify-between items-center">
+                            Historical Financial Analysis & Cash Flow
+                            <span class="transform transition-transform duration-300">&#9662;</span>
+                        </button>
+                        <div class="accordion-content">
+                            <p class="mt-4 text-slate-600">Involves calculating and interpreting key credit ratios over the historical period using the adjusted financial figures. The focus is on leverage, coverage, and cash flow metrics, which are central to assessing debt repayment capacity.</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-white p-5 rounded-lg shadow-sm">
+                        <button class="accordion-header w-full text-left text-lg font-semibold text-slate-800 flex justify-between items-center">
+                            Financial Forecasting & Stress Testing
+                            <span class="transform transition-transform duration-300">&#9662;</span>
+                        </button>
+                        <div class="accordion-content">
+                            <p class="mt-4 text-slate-600">Credit ratings are forward-looking. This moves from historical analysis to projecting future performance under a conservative "rating case" forecast to assess debt service capacity "through the cycle".</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item bg-white p-5 rounded-lg shadow-sm">
+                        <button class="accordion-header w-full text-left text-lg font-semibold text-slate-800 flex justify-between items-center">
+                            Financial Flexibility & Liquidity
+                            <span class="transform transition-transform duration-300">&#9662;</span>
+                        </button>
+                        <div class="accordion-content">
+                            <p class="mt-4 text-slate-600">Assesses the company's ability to meet near-term obligations and manage unexpected cash shortfalls. It involves analyzing the debt maturity profile, available liquidity sources, and covenant headroom.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-12">
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4">Key Financial Ratios & Standard Adjustments</h3>
+                     <div class="overflow-x-auto bg-white rounded-lg shadow">
+                        <table class="min-w-full text-sm text-left text-slate-500">
+                            <thead class="bg-slate-100 text-xs text-slate-700 uppercase">
+                                <tr>
+                                    <th class="px-6 py-3">Ratio Name</th><th class="px-6 py-3">Formula using Adjusted Metrics</th><th class="px-6 py-3">Analytical Purpose</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b"><td colspan="3" class="px-6 py-2 font-semibold bg-slate-50 text-slate-600">Leverage Ratios</td></tr>
+                                <tr class="border-b"><td class="px-6 py-4 font-medium">Adj. Debt / Adj. EBITDA</td><td class="px-6 py-4 font-mono text-xs"> (Reported Debt + PV of Leases) / (EBITDA + Lease Interest - Non-recurring items)</td><td class="px-6 py-4">Measures leverage relative to normalized cash earnings.</td></tr>
+                                <tr class="border-b"><td class="px-6 py-4 font-medium">Adj. FFO / Adj. Debt</td><td class="px-6 py-4 font-mono text-xs">(Cash Flow from Ops + Int. Paid) / (Adjusted Debt)</td><td class="px-6 py-4">Measures ability to cover debt with operating cash flow.</td></tr>
+                                <tr class="border-b"><td colspan="3" class="px-6 py-2 font-semibold bg-slate-50 text-slate-600">Coverage Ratios</td></tr>
+                                <tr class="border-b"><td class="px-6 py-4 font-medium">Adj. EBITDA / Interest</td><td class="px-6 py-4 font-mono text-xs">(Adjusted EBITDA) / (Reported Interest + Lease Interest)</td><td class="px-6 py-4">Measures ability of cash earnings to cover interest.</td></tr>
+                                <tr class="border-b"><td colspan="3" class="px-6 py-2 font-semibold bg-slate-50 text-slate-600">Liquidity Ratios</td></tr>
+                                <tr><td class="px-6 py-4 font-medium">Sources / Uses</td><td class="px-6 py-4 font-mono text-xs">(Cash + Available Revolver) / (Short-Term Debt)</td><td class="px-6 py-4">Measures ability to meet near-term obligations.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section id="synthesis" class="content-section">
+                <h2 class="text-3xl font-bold text-slate-900 mb-2">V. Synthesis, Rating, and Reporting</h2>
+                <p class="mb-8 text-slate-600">The final stage integrates all findings to arrive at a defensible credit rating. This process uses an "anchor and modifier" framework: the combination of Business and Financial risk profiles determines an "anchor" rating, which is then adjusted for other factors like liquidity or instrument structure.</p>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-4">Interactive Risk Scoring Matrix</h3>
+                        <p class="mb-4 text-slate-600">This matrix demonstrates how the qualitative Business Risk Profile combines with the quantitative Financial Risk Profile to determine an "anchor" credit profile. Hover over a cell to see the resulting rating. A stronger business can support greater financial risk for a given rating.</p>
+                         <div class="overflow-x-auto bg-white rounded-lg shadow">
+                            <table class="min-w-full text-center text-sm matrix-table">
+                                <thead class="bg-slate-100 text-xs text-slate-700 uppercase">
+                                    <tr>
+                                        <th class="px-2 py-4">Business Risk ➔<br>Financial Risk 👇</th>
+                                        <th class="px-2 py-4">Minimal</th><th class="px-2 py-4">Modest</th><th class="px-2 py-4">Intermediate</th>
+                                        <th class="px-2 py-4">Significant</th><th class="px-2 py-4">Aggressive</th><th class="px-2 py-4">Highly Leveraged</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td class="font-semibold px-2 py-3 bg-slate-50">Excellent</td><td data-rating="aaa"></td><td data-rating="aa"></td><td data-rating="a"></td><td data-rating="bbb"></td><td data-rating="bb"></td><td data-rating="b"></td></tr>
+                                    <tr><td class="font-semibold px-2 py-3 bg-slate-50">Strong</td><td data-rating="aa"></td><td data-rating="a"></td><td data-rating="bbb"></td><td data-rating="bb"></td><td data-rating="b"></td><td data-rating="b-"></td></tr>
+                                    <tr><td class="font-semibold px-2 py-3 bg-slate-50">Satisfactory</td><td data-rating="a"></td><td data-rating="bbb"></td><td data-rating="bb"></td><td data-rating="b+"></td><td data-rating="b-"></td><td data-rating="ccc"></td></tr>
+                                    <tr><td class="font-semibold px-2 py-3 bg-slate-50">Fair</td><td data-rating="bbb"></td><td data-rating="bb"></td><td data-rating="b+"></td><td data-rating="b"></td><td data-rating="b-"></td><td data-rating="ccc"></td></tr>
+                                    <tr><td class="font-semibold px-2 py-3 bg-slate-50">Weak</td><td data-rating="bb"></td><td data-rating="b+"></td><td data-rating="b"></td><td data-rating="b-"></td><td data-rating="ccc"></td><td data-rating="cc"></td></tr>
+                                    <tr><td class="font-semibold px-2 py-3 bg-slate-50">Vulnerable</td><td data-rating="b"></td><td data-rating="b-"></td><td data-rating="ccc"></td><td data-rating="cc"></td><td data-rating="c"></td><td data-rating="c"></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="rating-display" class="mt-4 h-10 flex items-center justify-center bg-slate-100 rounded-lg text-lg font-bold text-slate-700 transition-opacity duration-300 opacity-0">
+                            Select a cell to see the anchor rating
+                        </div>
+                    </div>
+                     <div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-4">Framework Overview</h3>
+                         <div class="chart-container relative h-96 w-full max-w-sm mx-auto">
+                            <canvas id="synthesisChart"></canvas>
+                        </div>
+                         <div class="mt-4 space-y-2">
+                             <div class="p-3 bg-white rounded-lg shadow-sm">
+                                <h4 class="font-semibold">Peer Analysis</h4>
+                                <p class="text-sm text-slate-600">Benchmark the company against relevant, publicly-rated peers to normalize for industry characteristics.</p>
+                            </div>
+                             <div class="p-3 bg-white rounded-lg shadow-sm">
+                                <h4 class="font-semibold">Modifying Factors & Notching</h4>
+                                <p class="text-sm text-slate-600">Adjust the anchor rating for liquidity, financial policy, or instrument-specific features like security and seniority.</p>
+                            </div>
+                             <div class="p-3 bg-white rounded-lg shadow-sm">
+                                <h4 class="font-semibold">Rating Recommendation</h4>
+                                <p class="text-sm text-slate-600">State the final rating, outlook (Stable, Positive, Negative), and a concise summary of the rationale.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const links = document.querySelectorAll('.sidebar-link');
+            const sections = document.querySelectorAll('.content-section');
+            const accordions = document.querySelectorAll('.accordion-item');
+            const matrixCells = document.querySelectorAll('.matrix-table td[data-rating]');
+            const ratingDisplay = document.getElementById('rating-display');
+            const ratingColors = {
+                'aaa': '#10b981', 'aa': '#22c55e', 'a': '#84cc16',
+                'bbb': '#eab308', 'bb': '#f97316', 'b': '#ef4444',
+                'b-': '#dc2626', 'b+': '#f59e0b', 'ccc': '#b91c1c',
+                'cc': '#991b1b', 'c': '#7f1d1d',
+            };
+
+            function showSection(hash) {
+                const targetHash = hash || '#foundational';
+
+                sections.forEach(section => {
+                    if ('#' + section.id === targetHash) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+
+                links.forEach(link => {
+                    if (link.getAttribute('href') === targetHash) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+            }
+
+            links.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetHash = this.getAttribute('href');
+                    history.pushState(null, null, targetHash);
+                    showSection(targetHash);
+                });
+            });
+
+            window.addEventListener('popstate', () => {
+                showSection(window.location.hash);
+            });
+
+            accordions.forEach(item => {
+                const header = item.querySelector('.accordion-header');
+                const content = item.querySelector('.accordion-content');
+                const icon = header.querySelector('span');
+
+                header.addEventListener('click', () => {
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        icon.style.transform = 'rotate(180deg)';
+                    }
+                });
+            });
+
+            matrixCells.forEach(cell => {
+                const rating = cell.getAttribute('data-rating').toUpperCase();
+                cell.innerHTML = `<div class="p-3 font-bold">${rating}</div>`;
+                cell.style.backgroundColor = ratingColors[cell.getAttribute('data-rating')] + '20'; // Add transparency
+                cell.style.color = ratingColors[cell.getAttribute('data-rating')];
+                cell.style.borderColor = ratingColors[cell.getAttribute('data-rating')] + '40';
+                cell.classList.add('border');
+
+                cell.addEventListener('mouseover', () => {
+                    ratingDisplay.textContent = `Anchor Rating: ${rating}`;
+                    ratingDisplay.style.opacity = '1';
+                    ratingDisplay.style.backgroundColor = ratingColors[cell.getAttribute('data-rating')] + '30';
+                    ratingDisplay.style.color = ratingColors[cell.getAttribute('data-rating')];
+                });
+
+                cell.addEventListener('mouseout', () => {
+                   ratingDisplay.style.opacity = '0';
+                });
+            });
+
+            showSection(window.location.hash);
+
+            const ctx = document.getElementById('synthesisChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Business Risk Profile', 'Financial Risk Profile', 'Modifying Factors'],
+                    datasets: [{
+                        label: 'Components of Final Rating',
+                        data: [45, 45, 10],
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.7)',
+                            'rgba(16, 185, 129, 0.7)',
+                            'rgba(107, 114, 128, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(59, 130, 246, 1)',
+                            'rgba(16, 185, 129, 1)',
+                            'rgba(107, 114, 128, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: { display: true, text: 'Final Rating Composition' }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
