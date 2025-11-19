@@ -1,67 +1,231 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>ADAM System Documentation</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v22.0 Mission Control</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: #f0f0f0;
+            margin: 0;
+            display: flex;
+        }
+        #sidebar {
+            width: 250px;
+            background-color: #111;
+            padding: 20px;
+            height: 100vh;
+            position: fixed;
+            overflow-y: auto;
+        }
+        #main-content {
+            margin-left: 270px;
+            padding: 20px;
+            width: calc(100% - 270px);
+        }
+        h1, h2, h3 {
+            color: #00aaff;
+        }
+        a {
+            color: #00aaff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section-title {
+            border-bottom: 2px solid #00aaff;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        .file-list li {
+            margin-bottom: 5px;
+        }
+        #system-status {
+            background-color: #333;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .status-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .status-light {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        .status-active { background-color: #2ecc71; }
+        .status-inactive { background-color: #e74c3c; }
+        .status-standby { background-color: #f1c40f; }
+    </style>
 </head>
 <body>
 
-<h1>ADAM System Documentation</h1>
+    <div id="sidebar">
+        <h2>ADAM v22.0</h2>
+        <div class="section">
+            <h3 class="section-title">Core System</h3>
+            <ul class="file-list">
+                <li><a href="#chatbot">Chatbot</a></li>
+                <li><a href="#navigator">Navigator</a></li>
+                <li><a href="#agents">Agents</a></li>
+            </ul>
+        </div>
+        <div class="section">
+            <h3 class="section-title">Simulations</h3>
+            <ul class="file-list">
+                <li><a href="#simulations">Simulation Outputs</a></li>
+            </ul>
+        </div>
+        <div class="section">
+            <h3 class="section-title">Knowledge & Data</h3>
+            <ul class="file-list">
+                <li><a href="#knowledge-graph">The Graph</a></li>
+                <li><a href="#libraries">Libraries & Archives</a></li>
+                <li><a href="#training-data">Training Data & Cortex</a></li>
+            </ul>
+        </div>
+        <div class="section">
+            <h3 class="section-title">Prompt Engineering</h3>
+            <ul class="file-list">
+                <li><a href="#portable-configs">Portable Configs</a></li>
+                <li><a href="#prompt-library">Prompt Library</a></li>
+            </ul>
+        </div>
+        <div class="section">
+            <h3 class="section-title">Documentation</h3>
+            <ul class="file-list">
+                <li><a href="#guides">Guides</a></li>
+                <li><a href="#specs">Specifications</a></li>
+            </ul>
+        </div>
+        <div class="section">
+            <h3 class="section-title">Developer Tools</h3>
+            <ul class="file-list">
+                <li><a href="scripts/startup_helper.py">Startup Helper</a></li>
+                <li><a href="config/">Configuration Files</a></li>
+            </ul>
+        </div>
+    </div>
 
-<p>Welcome to the documentation for the ADAM system. This page provides a central starting point for navigating the project's documentation and resources.</p>
+    <div id="main-content">
+        <h1>Mission Control</h1>
 
-<h2>Getting Started</h2>
+        <div id="system-status">
+            <h3>System Status</h3>
+            <div class="status-item"><div class="status-light status-active"></div><span>Core Agent Framework</span></div>
+            <div class="status-item"><div class="status-light status-active"></div><span>Knowledge Graph</span></div>
+            <div class="status-item"><div class="status-light status-standby"></div><span>React WebApp</span></div>
+            <div class="status-item"><div class="status-light status-inactive"></div><span>Legacy Static Tools</span></div>
+        </div>
 
-<ul>
-    <li><a href="navigator.html">Repository Navigator</a>: An interactive file navigator for this repository.</li>
-    <li><a href="docs/getting_started.md">Getting Started Guide</a>: A guide to getting started with the ADAM system.</li>
-    <li><a href="docs/setup_guide.md">Setup Guide</a>: Instructions for setting up your terminal and a "code wizard" to help you get started with the project.</li>
-    <li><a href="scripts/startup_helper.py">Startup Helper</a>: A script that will guide you through the process of starting up the ADAM system.</li>
-</ul>
+        <div id="core-system" class="section">
+            <h2 class="section-title">Core System</h2>
+            <div id="chatbot">
+                <h3>Chatbot</h3>
+                <ul>
+                    <li><a href="chatbot/index.html">Legacy Chatbot UI</a></li>
+                    <li><a href="services/webapp/client/public/index.html">Modern React WebApp</a></li>
+                </ul>
+            </div>
+            <div id="navigator">
+                <h3>Navigator</h3>
+                <p>A tool for exploring the system's capabilities.</p>
+                <ul>
+                    <li><a href="navigator.html">Navigator UI</a></li>
+                </ul>
+            </div>
+            <div id="agents">
+                <h3>Agents</h3>
+                <p>Core agents responsible for analysis and insights.</p>
+                <ul class="file-list">
+                    <li><a href="core/agents/market_sentiment_agent.py">Market Sentiment Agent</a></li>
+                    <li><a href="core/agents/macro_economic_agent.py">Macro Economic Agent</a></li>
+                    <li><a href="core/agents/risk_assessment_agent.py">Risk Assessment Agent</a></li>
+                </ul>
+            </div>
+        </div>
 
-<h2>Documentation</h2>
+        <div id="knowledge-data" class="section">
+            <h2 class="section-title">Knowledge & Data</h2>
+            <div id="knowledge-graph">
+                <h3>The Graph</h3>
+                <p>The central knowledge repository.</p>
+                <ul>
+                    <li><a href="data/knowledgegraph.ttl">Knowledge Graph (Turtle)</a></li>
+                </ul>
+            </div>
+            <div id="libraries">
+                <h3>Libraries & Archives</h3>
+                <p>Collections of reports, newsletters, and other documents.</p>
+                <ul>
+                    <li><a href="core/libraries_and_archives/newsletters/">Newsletters</a></li>
+                    <li><a href="core/libraries_and_archives/sponsored_reports/">Sponsored Reports</a></li>
+                </ul>
+            </div>
+            <div id="training-data">
+                <h3>Training Data & Cortex</h3>
+                <p>The "brain" of the agents - artisanal training sets.</p>
+                <ul>
+                    <li><a href="data/artisanal_training_sets/">Artisanal Training Sets</a></li>
+                </ul>
+            </div>
+        </div>
 
-<ul>
-    <li><a href="core/agents/AGENT_CATALOG.md">Agent Catalog</a>: A comprehensive catalog of all the agents in the ADAM system.</li>
-    <li><a href="core/agents/AGENT_DEVELOPMENT.md">Agent Development Guide</a>: A guide for developers creating new agents for the ADAM system.</li>
-    <li><a href="data/DATA_NAVIGATION.md">Data Navigation Guide</a>: A high-level overview of the data in the `data` directory.</li>
-    <li><a href="VERSIONING.md">Versioning and Migration Guide</a>: Outlines the versioning scheme for data files and provides instructions for migrating data between versions.</li>
-</ul>
+        <div id="prompt-engineering" class="section">
+            <h2 class="section-title">Prompt Engineering</h2>
+            <div id="portable-configs">
+                <h3>Portable Configs</h3>
+                <p>Core prompts and configurations for the ADAM v22.0 system.</p>
+                <ul>
+                    <li><a href="prompts/Adam_v22.0_Portable_Config.json">Adam v22.0 Portable Config</a></li>
+                    <li><a href="prompts/AOPL-v1.0/">AOPL v1.0 Library</a></li>
+                </ul>
+            </div>
+            <div id="prompt-library">
+                <h3>Prompt Library</h3>
+                <p>A structured library of prompts for various tasks.</p>
+                <ul>
+                    <li><a href="prompts/index.html">Prompt Library UI (Legacy)</a></li>
+                    <li><a href="prompt_library/README.md">Prompt Library README</a></li>
+                </ul>
+            </div>
+        </div>
 
-<h2>Downloads</h2>
+        <div id="documentation" class="section">
+            <h2 class="section-title">Documentation</h2>
+            <div id="guides">
+                <h3>Guides</h3>
+                <ul>
+                    <li><a href="docs/getting_started.md">Getting Started</a></li>
+                    <li><a href="docs/setup_guide.md">Setup Guide</a></li>
+                </ul>
+            </div>
+            <div id="specs">
+                <h3>Specifications</h3>
+                <ul>
+                    <li><a href="technical_specification/README.md">Technical Specifications</a></li>
+                </ul>
+            </div>
+        </div>
 
-<ul>
-    <li><a href="downloads/download_agents.py">Download Pre-configured Agents</a>: A script to download pre-configured agents.</li>
-</ul>
-
-<h2>Chatbot</h2>
-
-<ul>
-    <li><a href="chatbot/index.html">Chatbot Interface</a>: A simple chatbot interface for interacting with the ADAM system.</li>
-</ul>
-
-<h2>Content</h2>
-
-<p>This section will be expanded to include more detailed documentation on the following topics:</p>
-
-<ul>
-    <li>System Architecture</li>
-    <li>Installation and Setup</li>
-    <li>Configuration</li>
-    <li>API Reference</li>
-    <li>Tutorials</li>
-    <li>Examples</li>
-</ul>
-
-<h2>Future Development</h2>
-
-<p>This section outlines potential future development for the ADAM system's documentation and data infrastructure.</p>
-
-<ul>
-    <li>**Interactive Documentation:** We plan to make the documentation more interactive by adding features such as embedded code examples, interactive diagrams, and a search function.</li>
-    <li>**Automated Documentation:** We are exploring ways to automate the generation of documentation from the source code and data files.</li>
-    <li>**Data Catalog:** We plan to create a more comprehensive data catalog that will provide more detailed information about the data in the `data` directory.</li>
-    <li>**Data Governance:** We also plan to implement a data governance framework to ensure the quality and consistency of the data.</li>
-</ul>
+        <div id="simulations" class="section">
+            <h2 class="section-title">Simulations</h2>
+            <p>Outputs from various system simulations.</p>
+            <ul>
+                <li><a href="data/simulation_outputs/">Simulation Outputs</a></li>
+            </ul>
+        </div>
+    </div>
 
 </body>
 </html>
