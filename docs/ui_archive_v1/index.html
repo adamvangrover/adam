@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Archive v1</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #00aaff;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        a {
+            color: #00aaff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>UI Archive v1</h1>
+    <ul id="file-list"></ul>
+
+    <script>
+        fetch('manifest.json')
+            .then(response => response.json())
+            .then(data => {
+                const fileList = document.getElementById('file-list');
+                for (const [newFilename, originalPath] of Object.entries(data)) {
+                    const listItem = document.createElement('li');
+                    const link = document.createElement('a');
+                    link.href = newFilename;
+                    link.textContent = `${newFilename} (from: ${originalPath})`;
+                    listItem.appendChild(link);
+                    fileList.appendChild(listItem);
+                }
+            });
+    </script>
+</body>
+</html>

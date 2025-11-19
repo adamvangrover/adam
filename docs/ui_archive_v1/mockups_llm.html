@@ -1,0 +1,2024 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecting Intelligence: An Interactive Guide to Prompt Engineering</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for a sleeker look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        /* Sidebar active link style */
+        .nav-link.active {
+            background-color: #334155;
+            color: #e2e8f0;
+            font-weight: 600;
+        }
+        /* Content section visibility */
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Chart.js dark mode font color */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+            height: 300px;
+        }
+        @media (min-width: 768px) {
+            .chart-container { height: 400px; }
+        }
+        /* Custom styles for copy button */
+        .copy-btn {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background-color: #334155;
+            color: #cbd5e1;
+            border: 1px solid #475569;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 600;
+            opacity: 0.5;
+            transition: opacity 0.2s ease-in-out, background-color 0.2s;
+        }
+        .code-block-wrapper:hover .copy-btn {
+            opacity: 1;
+        }
+        .copy-btn:hover {
+             background-color: #475569;
+        }
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        details[open] > summary svg { transform: rotate(180deg); }
+        details summary svg { transition: transform 0.3s ease; }
+    </style>
+</head>
+<body class="antialiased bg-slate-900 text-slate-300">
+
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <!-- Sidebar Navigation (Desktop) -->
+        <aside class="w-full md:w-64 bg-slate-800/80 backdrop-blur-sm border-r border-slate-700/80 p-6 sticky top-0 h-screen md:flex flex-col hidden overflow-y-auto">
+            <div class="flex items-center space-x-2 mb-8">
+                <i data-lucide="brain-circuit" class="text-indigo-400"></i>
+                <h1 class="text-xl font-bold text-slate-100">Architecting AI</h1>
+            </div>
+            <nav id="desktop-nav" class="flex flex-col space-y-2">
+                <!-- Nav links will be injected here -->
+            </nav>
+        </aside>
+
+        <!-- Header and Mobile Navigation -->
+        <header class="md:hidden bg-slate-800/80 backdrop-blur-sm sticky top-0 z-20 p-4 border-b border-slate-700/80">
+            <div class="flex justify-between items-center">
+                 <div class="flex items-center space-x-2">
+                    <i data-lucide="brain-circuit" class="text-indigo-400"></i>
+                    <h1 class="text-lg font-bold text-slate-100">Architecting AI</h1>
+                </div>
+                <select id="mobile-nav" class="border border-slate-600 rounded-md p-2 bg-slate-700 text-slate-200">
+                    <!-- Mobile options will be injected here -->
+                </select>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 p-6 sm:p-8 md:p-12 overflow-y-auto">
+            <div id="content-container">
+                <!-- Content sections will be injected here -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Main data object containing all content for the guide
+        const contentData = {
+            introduction: {
+                title: 'Introduction',
+                icon: 'sparkles',
+                content: `
+                    <div class="space-y-8">
+                        <h2 class="text-4xl font-bold text-slate-100 flex items-center gap-3"><i data-lucide="sparkles" class="text-indigo-400"></i> The Evolution of Prompt Engineering</h2>
+                        <p class="text-lg text-slate-400">The interaction with Large Language Models (LLMs) is fundamentally a process of instruction and execution. Prompt engineering has evolved from a simple art of phrasing questions into a rigorous discipline of designing instructions to guide a model's complex cognitive processes. This guide explores the spectrum of techniques, from foundational structures to advanced agentic systems, providing a roadmap for architecting intelligent AI solutions.</p>
+
+                        <div class="p-6 rounded-lg bg-indigo-900/40 border border-indigo-700">
+                            <h3 class="font-semibold text-indigo-300 flex items-center gap-2"><i data-lucide="lightbulb"></i> Core Principle</h3>
+                            <p class="text-indigo-300/90 mt-2">The quality, relevance, and consistency of a model's output are direct functions of the quality of the input prompt. Mastering this discipline is key to unlocking the full potential of AI.</p>
+                        </div>
+
+                        <div>
+                            <h3 class="text-2xl font-bold text-slate-100 mb-4">The Power of a Good Prompt: Before & After</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="p-4 bg-red-900/30 border border-red-700 rounded-lg">
+                                    <h4 class="font-semibold text-red-300">Before: Vague Prompt</h4>
+                                    <div class="code-block-wrapper mt-2">
+                                        <pre class="bg-slate-800 p-3 rounded text-sm text-slate-300 whitespace-pre-wrap">"Summarize the financial report."</pre>
+                                    </div>
+                                    <p class="text-sm text-red-400 mt-2"><strong>Result:</strong> A generic, high-level summary that might miss crucial details or lack the desired focus.</p>
+                                </div>
+                                <div class="p-4 bg-green-900/30 border border-green-700 rounded-lg">
+                                    <h4 class="font-semibold text-green-300">After: Engineered Prompt</h4>
+                                    <div class="code-block-wrapper mt-2">
+                                        <pre class="bg-slate-800 p-3 rounded text-sm text-slate-300 whitespace-pre-wrap">"As a senior credit analyst, summarize the attached quarterly financial report for a board meeting. Focus on liquidity, debt covenants, and changes in cash flow. Highlight any potential risks. The summary should be a bulleted list, no more than 200 words."</pre>
+                                    </div>
+                                    <p class="text-sm text-green-400 mt-2"><strong>Result:</strong> A targeted, role-specific summary that delivers precise, actionable insights in the desired format.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            rctc: {
+                title: 'The Core Framework',
+                icon: 'box-select',
+                content: `
+                    <div class="space-y-8">
+                        <h2 class="text-4xl font-bold text-slate-100 flex items-center gap-3"><i data-lucide="box-select" class="text-indigo-400"></i>The Core Framework</h2>
+                        <p class="text-lg text-slate-400">A robust prompt architecture provides cognitive scaffolding for the LLM, systematically reducing uncertainty. The foundational framework consists of several key components that work in concert to guide the model toward a precise user intent.</p>
+                        <p class="text-md text-slate-500">Click on each card to learn more about its role in crafting the perfect prompt.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="rctc-cards"></div>
+
+                        <div class="mt-8 pt-8 border-t border-slate-700">
+                            <h3 class="text-2xl font-bold text-slate-100 mb-4">Core Framework in Action: A Full Example</h3>
+                            <p class="text-md text-slate-400 mb-4">Here’s how the components combine to create a powerful, precise prompt for a common financial analysis task.</p>
+                            <div class="rounded-lg bg-slate-800 border border-slate-700 p-6">
+                                <div class="space-y-4 text-slate-300">
+                                    <p><strong class="text-sky-400">[ROLE]</strong> You are an expert credit analyst at a top-tier investment bank.</p>
+                                    <p><strong class="text-sky-400">[CONTEXT]</strong> You are preparing a credit memo for a potential $50M loan to a mid-cap manufacturing company, 'Global Widgets Inc.' The loan committee is risk-averse and needs a clear, concise summary of the key risks and mitigants based on their latest 10-K filing.</p>
+                                    <p><strong class="text-sky-400">[TASK]</strong> Your primary objective is to analyze the 'Management's Discussion and Analysis (MD&A)' and 'Risk Factors' sections of the provided 10-K. Identify the top 3-5 most critical risks to the company's ability to service its debt.</p>
+                                    <p><strong class="text-sky-400">[STEPS]</strong>
+                                        <ol class="list-decimal list-inside ml-4 text-slate-400">
+                                            <li>Read through the MD&A and Risk Factors sections.</li>
+                                            <li>Identify risks related to market competition, supply chain, and regulatory changes.</li>
+                                            <li>For each identified risk, briefly summarize the company's stated mitigation strategy.</li>
+                                            <li>Synthesize your findings into a summary.</li>
+                                        </ol>
+                                    </p>
+                                    <p><strong class="text-sky-400">[CONSTRAINTS]</strong>
+                                        <ul class="list-disc list-inside ml-4 text-slate-400">
+                                            <li>Do not use information outside of the provided 10-K document.</li>
+                                            <li>The final output must be a markdown-formatted bulleted list.</li>
+                                            <li>The entire summary should not exceed 300 words.</li>
+                                            <li>Present the risks in descending order of importance.</li>
+                                        </ul>
+                                    </p>
+                                    <p><strong class="text-sky-400">[EXAMPLE]</strong><br>
+                                        <span class="text-slate-400">- <strong>High Customer Concentration:</strong> The company derives 60% of its revenue from two customers. <br>
+                                        - <strong>Mitigant:</strong> Management is actively pursuing diversification by signing three new mid-sized clients in the next fiscal year.</span>
+                                    </p>
+                                    <p><strong class="text-sky-400">[FORMAT]</strong> Output your analysis as a markdown-formatted string. Each risk should be a main bullet point, with the mitigant as a nested bullet point.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            reasoning: {
+                title: 'Advanced Reasoning',
+                icon: 'waypoints',
+                content: `
+                     <div class="space-y-8">
+                        <h2 class="text-4xl font-bold text-slate-100 flex items-center gap-3"><i data-lucide="waypoints" class="text-indigo-400"></i>Eliciting Complex Reasoning</h2>
+                        <p class="text-lg text-slate-400">Unlocking an LLM's full potential requires moving beyond simple instructions to techniques that elicit, structure, and enhance its innate reasoning capabilities. These strategies transform LLMs from text generators into powerful reasoning engines.</p>
+
+                        <div class="bg-slate-800 p-6 rounded-lg border border-slate-700">
+                            <h3 class="text-xl font-bold text-center mb-4 text-slate-100">Technique Comparison</h3>
+                            <div class="chart-container">
+                                <canvas id="reasoningChart"></canvas>
+                            </div>
+                            <p class="text-center text-sm text-slate-500 mt-4">A visual comparison of advanced reasoning techniques across key metrics.</p>
+                        </div>
+
+                        <div id="reasoning-details" class="space-y-6"></div>
+                    </div>
+                `
+            },
+            advanced_prompting: {
+                title: 'Advanced Data Interaction',
+                icon: 'database-zap',
+                content: `
+                    <div class="space-y-8">
+                        <h2 class="text-4xl font-bold text-slate-100 flex items-center gap-3"><i data-lucide="database-zap" class="text-indigo-400"></i>Advanced Data Interaction</h2>
+                        <p class="text-lg text-slate-400">Go beyond basic prompts to build sophisticated, data-aware workflows. This section covers advanced reasoning patterns, interacting with structured data like knowledge graphs, and handling various file formats.</p>
+
+                        <div class="bg-slate-800 border border-slate-700 p-6 rounded-lg space-y-4">
+                           <h3 class="text-xl font-bold text-slate-100">Graph of Thoughts (GoT): Flexible Reasoning</h3>
+                           <p class="text-slate-400">While Chain of Thought and Tree of Thoughts follow linear or branching paths, Graph of Thoughts (GoT) represents information in a more flexible graph structure. This allows the model to merge different reasoning paths, create cycles for iterative refinement, and model more complex, non-linear problems.</p>
+                            <div class="mt-4 border-t border-slate-700 pt-4">
+                               <h4 class="font-semibold text-lg mb-2 text-slate-200">Conceptual Example: M&A Analysis</h4>
+                               <p class="text-sm text-slate-500 mb-2"><strong>Prompt:</strong> "Analyze the potential merger between Company A (a software giant) and Company B (a hardware startup). Evaluate synergies, risks, and potential integration challenges."</p>
+                               <div class="p-3 bg-slate-900 border border-slate-700 rounded-lg text-sm space-y-2 text-slate-400">
+                                   <p class="text-slate-300 font-semibold">GoT Process:</p>
+                                   <ul class="list-disc list-inside ml-4">
+                                       <li><strong>Node 1 (Synergies):</strong> Analyze product fit, market expansion, cost savings.</li>
+                                       <li><strong>Node 2 (Risks):</strong> Analyze market risks, execution risks, regulatory hurdles.</li>
+                                       <li><strong>Node 3 (Valuation):</strong> Independently value both companies.</li>
+                                       <li><strong>Edge (1->2):</strong> High synergy in product (e.g., software on new hardware) could mitigate market risks.</li>
+                                       <li><strong>Edge (2->1):</strong> High regulatory risk could nullify potential synergies.</li>
+                                       <li><strong>Cycle (3->1->3):</strong> The potential synergies from Node 1 could increase the valuation in Node 3, which in turn reinforces the case for the merger.</li>
+                                       <li><strong>Synthesis Node:</strong> The model aggregates all nodes and edges to provide a final recommendation, weighing the interconnected pros and cons.</li>
+                                   </ul>
+                               </div>
+                           </div>
+                        </div>
+
+                        <div class="bg-slate-800 border border-slate-700 p-6 rounded-lg space-y-4">
+                            <h3 class="text-xl font-bold text-slate-100">Knowledge Graphs: Structuring Unstructured Data</h3>
+                            <p class="text-slate-400">Financial data is often a web of interconnected entities. LLMs can be prompted to extract these entities and their relationships, turning unstructured text into a structured knowledge graph.</p>
+                             <div class="mt-4 border-t border-slate-700 pt-4">
+                                <h4 class="font-semibold text-lg mb-2 text-slate-200">Example: Building a Knowledge Graph from News</h4>
+                                <div class="code-block-wrapper">
+                                    <pre class="bg-slate-900 p-4 rounded-lg text-sm whitespace-pre-wrap text-slate-300"><strong class="text-slate-400">Prompt:</strong>
+"From the following news article, extract all companies, people, and financial metrics mentioned. For each, define the relationship between them. Format the output as a list of JSON objects, where each object represents a relationship (a graph 'edge') with a 'source', 'target', and 'relationship' key."
+
+<strong class="text-slate-400">Article:</strong> "Global Tech Inc., led by CEO Jane Doe, announced a partnership with Innovate Solutions to develop a new AI chip. GTC's stock rose 5% on the news, as analysts predict the deal could boost annual revenue by $500M."</pre>
+                                </div>
+                                <p class="text-sm font-semibold text-slate-200 mt-4 mb-2">Expected Output (a series of graph edges):</p>
+                                <div class="code-block-wrapper">
+                                    <pre class="p-4 bg-green-900/30 border border-green-700 rounded-lg text-xs font-mono whitespace-pre-wrap text-green-300">[
+    { "source": "Jane Doe", "target": "Global Tech Inc.", "relationship": "is_ceo_of" },
+    { "source": "Global Tech Inc.", "target": "Innovate Solutions", "relationship": "partnered_with" },
+    { "source": "Global Tech Inc.", "target": "AI Chip", "relationship": "develops" },
+    { "source": "AI Chip", "target": "$500M Revenue", "relationship": "could_boost" }
+]</pre>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                `
+            },
+            agents: {
+                title: 'Building AI Agents',
+                icon: 'bot',
+                content: `
+                     <div class="space-y-8">
+                        <h2 class="text-4xl font-bold text-slate-100 flex items-center gap-3"><i data-lucide="bot" class="text-indigo-400"></i>From Prompts to Agents</h2>
+                        <p class="text-lg text-slate-400">To solve real-world problems, intelligence must perceive, act, and learn. Agentic frameworks transform LLMs from passive text generators into active agents capable of using tools, retrieving external information, and executing complex tasks.</p>
+
+                        <div class="bg-slate-800 border border-slate-700 p-6 rounded-lg">
+                            <h3 class="text-xl font-bold mb-4 text-slate-100">The ReAct Framework: Reason + Act</h3>
+                            <p class="mb-4 text-slate-400">ReAct is a pivotal paradigm that synergizes internal reasoning with external actions. It allows the model to interact with tools (like a search engine or calculator) to gather facts and ground its reasoning in the real world, creating a powerful feedback loop.</p>
+
+                            <!-- Flow Diagram -->
+                            <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 p-4 bg-slate-900 rounded-lg">
+                                <div class="text-center"><div class="border-2 border-slate-600 bg-slate-800 p-3 rounded-lg"><strong>1. Thought</strong><p class="text-sm text-slate-400">Formulate a plan</p></div></div>
+                                <div class="text-3xl text-slate-500 font-thin transform md:-translate-y-2">→</div>
+                                <div class="text-center"><div class="border-2 border-slate-600 bg-slate-800 p-3 rounded-lg"><strong>2. Action</strong><p class="text-sm text-slate-400">Use a tool</p></div></div>
+                                <div class="text-3xl text-slate-500 font-thin transform md:-translate-y-2">→</div>
+                                <div class="text-center"><div class="border-2 border-slate-600 bg-slate-800 p-3 rounded-lg"><strong>3. Observation</strong><p class="text-sm text-slate-400">Get new info</p></div></div>
+                            </div>
+
+                            <div class="mt-6 pt-6 border-t border-slate-700">
+                                <h4 class="text-lg font-bold mb-2 text-slate-200">ReAct in Action: An Example</h4>
+                                <p class="text-sm text-slate-500 mb-4"><strong>User Query:</strong> "What were the revenues of Apple and Microsoft in their last reported fiscal year?"</p>
+                                <div class="space-y-3 text-sm">
+                                    <div class="p-3 bg-slate-700/50 rounded-lg border border-slate-600/80"><strong class="text-slate-300">Thought 1:</strong> I need to find the latest fiscal year revenue for two different companies, Apple (AAPL) and Microsoft (MSFT). I will need to use a search tool for each.</div>
+                                    <div class="p-3 bg-blue-900/30 rounded-lg border border-blue-700"><strong class="text-blue-300">Action 1:</strong> <code class="font-mono bg-blue-900/40 p-1 rounded">search("Apple Inc. revenue last fiscal year")</code></div>
+                                    <div class="p-3 bg-green-900/30 rounded-lg border border-green-700"><strong class="text-green-300">Observation 1:</strong> "Apple's revenue for the fiscal year 2023 was $383.29 billion."</div>
+                                    <div class="p-3 bg-slate-700/50 rounded-lg border border-slate-600/80"><strong class="text-slate-300">Thought 2:</strong> I have the information for Apple. Now I need to find the revenue for Microsoft.</div>
+                                    <div class="p-3 bg-blue-900/30 rounded-lg border border-blue-700"><strong class="text-blue-300">Action 2:</strong> <code class="font-mono bg-blue-900/40 p-1 rounded">search("Microsoft Corp. revenue last fiscal year")</code></div>
+                                    <div class="p-3 bg-green-900/30 rounded-lg border border-green-700"><strong class="text-green-300">Observation 2:</strong> "Microsoft's revenue for the fiscal year 2023 was $211.92 billion."</div>
+                                    <div class="p-3 bg-slate-700/50 rounded-lg border border-slate-600/80"><strong class="text-slate-300">Thought 3:</strong> I have both pieces of information. I can now construct the final answer.</div>
+                                    <div class="p-4 bg-indigo-900/40 rounded-lg border border-indigo-700"><strong class="text-indigo-300">Final Answer:</strong> In fiscal year 2023, Apple's revenue was $383.29 billion and Microsoft's revenue was $211.92 billion.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-800 border border-slate-700 p-6 rounded-lg">
+                            <h3 class="text-xl font-bold mb-2 text-slate-100">Calibrating Agent "Eagerness"</h3>
+                            <p class="mb-4 text-slate-400">An agent's proactivity should be tunable. You can prompt for more or less eagerness to balance speed with thoroughness.</p>
+                            <div class="flex items-center space-x-4">
+                                <span class="text-slate-400">Focused</span>
+                                <input id="eagerness-slider" type="range" min="0" max="100" value="50" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500">
+                                <span class="text-slate-400">Autonomous</span>
+                            </div>
+                            <div id="eagerness-explanation" class="mt-4 p-4 bg-slate-900/70 border border-slate-700 rounded-lg text-sky-300">
+                                A balanced approach is often best. Adjust the slider to see how prompting strategies change.
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            workflows: {
+                title: 'Workflows & Optimization',
+                icon: 'git-merge',
+                content: `
+                    <div class="space-y-8">
+                        <h2 class="text-4xl font-bold text-slate-100 flex items-center gap-3"><i data-lucide="git-merge" class="text-indigo-400"></i>Orchestrating Complex Tasks</h2>
+                        <p class="text-lg text-slate-400">As tasks grow in complexity, a single prompt becomes inadequate. The challenge shifts to designing and orchestrating multi-step cognitive workflows using techniques like Prompt Chaining and Metaprompting.</p>
+
+                        <div class="bg-slate-800 border border-slate-700 p-6 rounded-lg">
+                            <h3 class="text-xl font-bold mb-2 text-slate-100">Prompt Chaining: Modular Intelligence</h3>
+                            <p class="mb-4 text-slate-400">Prompt chaining decomposes a complex task into a sequence of smaller, simpler sub-tasks. The output of one prompt becomes the input for the next, creating a reliable and debuggable workflow.</p>
+                            <div class="space-y-4">
+                               <p class="text-slate-200 font-semibold">Example: From Raw Text to Formatted Report</p>
+                               <div class="space-y-2">
+                                    <div class="p-4 border border-slate-700 rounded-lg bg-slate-900/50">
+                                        <div class="text-center font-semibold text-slate-200">Prompt 1: Extract Keywords</div>
+                                        <div class="p-3 mt-2 bg-slate-800 rounded-lg border border-slate-700 text-sm">
+                                            <p><strong class="text-slate-400">Input:</strong> "The company saw revenues increase by 15% to $1.2B, but net income fell by 5% due to rising operational costs, particularly in logistics and raw materials."</p>
+                                            <p class="mt-2"><strong class="text-slate-400">Output:</strong> <code class="font-mono text-xs text-green-400">["revenue growth", "net income decrease", "operational costs", "logistics", "raw materials"]</code></p>
+                                        </div>
+                                    </div>
+                                    <div class="text-center text-2xl text-slate-500">↓</div>
+                                     <div class="p-4 border border-slate-700 rounded-lg bg-slate-900/50">
+                                        <div class="text-center font-semibold text-slate-200">Prompt 2: Generate Summary from Keywords</div>
+                                        <div class="p-3 mt-2 bg-slate-800 rounded-lg border border-slate-700 text-sm">
+                                            <p><strong class="text-slate-400">Input:</strong> <code class="font-mono text-xs text-green-400">["revenue growth", "net income decrease", "operational costs", "logistics", "raw materials"]</code></p>
+                                            <p class="mt-2"><strong class="text-slate-400">Output:</strong> <span class="text-green-400">"The company experienced strong revenue growth, but this was offset by a decrease in net income. The primary drivers for the profit decline were increased operational costs, specifically within logistics and raw material sourcing."</span></p>
+                                        </div>
+                                    </div>
+                                     <div class="text-center text-2xl text-slate-500">↓</div>
+                                     <div class="p-4 border border-slate-700 rounded-lg bg-slate-900/50">
+                                        <div class="text-center font-semibold text-slate-200">Prompt 3: Format as a Report Snippet</div>
+                                        <div class="p-3 mt-2 bg-slate-800 rounded-lg border border-slate-700 text-sm">
+                                            <p><strong class="text-slate-400">Input:</strong> "The company experienced strong revenue growth..."</p>
+                                            <div class="code-block-wrapper mt-2">
+                                                <pre class="bg-slate-900 p-2 rounded text-green-400">## Key Findings:\n- **Top-Line Growth:** Revenue grew significantly.\n- **Profitability Concerns:** Net income was negatively impacted by rising operational costs in logistics and materials.</pre>
+                                            </div>
+                                        </div>
+                                    </div>
+                               </div>
+                            </div>
+                        </div>
+
+                         <div class="bg-slate-800 border border-slate-700 p-6 rounded-lg">
+                            <h3 class="text-xl font-bold mb-2 text-slate-100">Metaprompting: Self-Optimization</h3>
+                            <p class="mb-4 text-slate-400">Metaprompting uses an LLM to generate, critique, or optimize prompts for itself. It's like writing a program that writes better programs.</p>
+                            <div class="space-y-2">
+                                <div class="p-4 bg-red-900/30 border border-red-700 rounded-lg">
+                                    <h4 class="font-semibold text-red-300">1. Initial User Prompt</h4>
+                                     <div class="code-block-wrapper mt-2"><pre class="bg-slate-800 p-2 rounded text-sm text-slate-300 whitespace-pre-wrap">"Write code to get data from an API."</pre></div>
+                                </div>
+                                <div class="text-center text-2xl text-slate-500">↓</div>
+                                <div class="p-4 bg-yellow-900/30 border border-yellow-700 rounded-lg">
+                                    <h4 class="font-semibold text-yellow-300">2. The "Meta" Prompt (The Prompt Optimizer)</h4>
+                                     <div class="code-block-wrapper mt-2"><pre class="bg-slate-800 p-2 rounded text-sm text-slate-300 whitespace-pre-wrap">You are a world-class prompt engineer. Your task is to take a user's simple request and expand it into a detailed, robust prompt that will generate high-quality, production-ready code.
+
+User's request: "{user_request}"
+
+Expand this request by:
+1. Specifying the programming language (Python).
+2. Including requirements for error handling, API key management, and data validation.
+3. Defining the expected output format (e.g., a list of dictionaries).
+4. Adding a request for comments and docstrings.
+5. Encapsulating the logic in a reusable function.</pre></div>
+                                </div>
+                                <div class="text-center text-2xl text-slate-500">↓</div>
+                                <div class="p-4 bg-green-900/30 border border-green-700 rounded-lg">
+                                    <h4 class="font-semibold text-green-300">3. Final, Optimized Prompt</h4>
+                                     <div class="code-block-wrapper mt-2"><pre class="bg-slate-800 p-2 rounded text-sm text-slate-300 whitespace-pre-wrap">"Generate a robust, production-ready Python function that fetches data from a REST API. The function should accept a URL and an API key as arguments. It must include comprehensive error handling for network issues (e.g., timeouts, connection errors) and HTTP status codes (e.g., 404, 500). The function should validate the incoming JSON response to ensure it contains a 'data' key. The final output should be a list of dictionaries extracted from the 'data' key. Ensure the code is well-commented and includes a clear docstring explaining its usage."</pre></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            agentic_swarm: {
+                title: 'Case Study: Agentic Swarm',
+                icon: 'network',
+                content: `
+                    <div class="space-y-8">
+                        <h2 class="text-4xl font-bold text-slate-100 flex items-center gap-3"><i data-lucide="network" class="text-indigo-400"></i>Case Study: A Multi-Agent Credit Swarm</h2>
+                        <p class="text-lg text-slate-400">Moving beyond single prompts or simple chains, a truly robust AI system orchestrates a "swarm" of specialized agents. Each agent has a unique role, set of tools, and persona, all managed by a master orchestrator. This approach mirrors a real-world analyst team, ensuring modularity, scalability, and depth of analysis.</p>
+
+                        <div class="bg-slate-800 border border-slate-700 p-6 rounded-lg">
+                            <h3 class="text-xl font-bold mb-4 text-slate-100">The Agent Roster</h3>
+                            <p class="text-slate-400 mb-6">This is the team of AI agents that will collaborate to perform the credit analysis.</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div class="bg-slate-900/70 p-4 rounded-lg border border-slate-700">
+                                    <h4 class="font-semibold text-slate-200 flex items-center gap-2"><i data-lucide="crown" class="w-5 h-5 text-amber-400"></i>Master Orchestrator</h4>
+                                    <p class="text-sm text-slate-400 mt-1">Decomposes tasks and manages the entire workflow from start to finish.</p>
+                                </div>
+                                <div class="bg-slate-900/70 p-4 rounded-lg border border-slate-700">
+                                    <h4 class="font-semibold text-slate-200 flex items-center gap-2"><i data-lucide="database" class="w-5 h-5 text-sky-400"></i>Data Ingestion Agent</h4>
+                                    <p class="text-sm text-slate-400 mt-1">Extracts and validates data from various documents and APIs.</p>
+                                </div>
+                                <div class="bg-slate-900/70 p-4 rounded-lg border border-slate-700">
+                                    <h4 class="font-semibold text-slate-200 flex items-center gap-2"><i data-lucide="calculator" class="w-5 h-5 text-sky-400"></i>Financial Analyst Agent</h4>
+                                    <p class="text-sm text-slate-400 mt-1">Performs all quantitative analysis, including ratios and trend calculations.</p>
+                                </div>
+                                <div class="bg-slate-900/70 p-4 rounded-lg border border-slate-700">
+                                    <h4 class="font-semibold text-slate-200 flex items-center gap-2"><i data-lucide="users" class="w-5 h-5 text-sky-400"></i>Qualitative Analyst Agent</h4>
+                                    <p class="text-sm text-slate-400 mt-1">Assesses management, industry trends, and competitive landscape.</p>
+                                </div>
+                                <div class="bg-slate-900/70 p-4 rounded-lg border border-slate-700">
+                                    <h4 class="font-semibold text-slate-200 flex items-center gap-2"><i data-lucide="gavel" class="w-5 h-5 text-sky-400"></i>Risk & Compliance Agent</h4>
+                                    <p class="text-sm text-slate-400 mt-1">Checks for covenant compliance and adherence to internal policies.</p>
+                                </div>
+                                 <div class="bg-slate-900/70 p-4 rounded-lg border border-slate-700">
+                                    <h4 class="font-semibold text-slate-200 flex items-center gap-2"><i data-lucide="file-pen-line" class="w-5 h-5 text-sky-400"></i>Report Generation Agent</h4>
+                                    <p class="text-sm text-slate-400 mt-1">Synthesizes all findings into a final, formatted credit memorandum.</p>
+                                </div>
+                                <div class="bg-slate-900/70 p-4 rounded-lg border border-slate-700 col-span-1 md:col-span-2 lg:col-span-3">
+                                    <h4 class="font-semibold text-slate-200 flex items-center gap-2"><i data-lucide="shield-check" class="w-5 h-5 text-green-400"></i>Quality Assurance Agent</h4>
+                                    <p class="text-sm text-slate-400 mt-1">Reviews the final report for accuracy, consistency, and logical fallacies before final output.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-800 border border-slate-700 p-6 rounded-lg">
+                            <h3 class="text-xl font-bold mb-4 text-slate-100">High-Level Workflow</h3>
+                            <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 md:space-x-2 p-4 bg-slate-900 rounded-lg text-center">
+                                <div class="p-2"><strong>Ingest Data</strong></div>
+                                <div class="text-2xl text-slate-500 font-thin transform md:rotate-0 rotate-90">→</div>
+                                <div class="p-2"><strong>Financial Analysis</strong></div>
+                                 <div class="text-2xl text-slate-500 font-thin transform md:rotate-0 rotate-90">→</div>
+                                <div class="p-2"><strong>Qualitative Analysis</strong></div>
+                                 <div class="text-2xl text-slate-500 font-thin transform md:rotate-0 rotate-90">→</div>
+                                <div class="p-2"><strong>Risk & Compliance</strong></div>
+                                 <div class="text-2xl text-slate-500 font-thin transform md:rotate-0 rotate-90">→</div>
+                                <div class="p-2"><strong>Generate Report</strong></div>
+                                 <div class="text-2xl text-slate-500 font-thin transform md:rotate-0 rotate-90">→</div>
+                                 <div class="p-2 text-green-400"><strong>Final QA Review</strong></div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                             <h3 class="text-2xl font-bold text-slate-100 pt-6 border-t border-slate-700">Core Agent Prompts</h3>
+                             <!-- Accordion for Master Orchestrator -->
+                            <details class="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
+                                <summary class="p-4 cursor-pointer flex justify-between items-center hover:bg-slate-700/50">
+                                    <span class="font-semibold text-slate-200">Master Orchestrator Agent Prompt</span>
+                                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </summary>
+                                <div class="p-4 border-t border-slate-700">
+                                    <div class="code-block-wrapper">
+                                    <pre class="bg-slate-900 p-4 rounded-lg text-sm whitespace-pre-wrap text-slate-300"># ROLE: Master Orchestrator Agent
+# PERSONA: You are an expert credit portfolio manager and system architect.
+# TASK: Manage a team of specialized AI agents to perform a comprehensive credit analysis. You will receive a credit application, delegate tasks, synthesize findings, and produce a final credit memorandum.
+
+# CORE DIRECTIVES:
+1.  **Decomposition:** Break down the credit analysis request into discrete tasks for specialized agents (Data Extraction, Financial Analysis, Risk Assessment, Report Generation).
+2.  **Delegation:** Assign tasks to the appropriate agent with clear, context-rich instructions.
+3.  **State Management:** Maintain a complete state of the workflow, tracking the progress and outputs of each agent.
+4.  **Synthesis:** Aggregate and synthesize the outputs from all agents into a coherent analysis.
+5.  **Quality Assurance:** Perform a final review of the synthesized report to ensure accuracy and consistency.
+
+# WORKFLOW TRIGGER:
+- On receipt of a new credit application package.
+
+# FINAL OUTPUT:
+- A structured JSON object containing the complete, synthesized credit analysis and a final recommendation.</pre>
+                                    </div>
+                                </div>
+                            </details>
+                             <!-- Accordion for Financial Analyst -->
+                            <details class="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
+                                <summary class="p-4 cursor-pointer flex justify-between items-center hover:bg-slate-700/50">
+                                    <span class="font-semibold text-slate-200">Financial Analyst Agent Prompt</span>
+                                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </summary>
+                                <div class="p-4 border-t border-slate-700">
+                                     <div class="code-block-wrapper">
+                                    <pre class="bg-slate-900 p-4 rounded-lg text-sm whitespace-pre-wrap text-slate-300"># ROLE: Financial Analyst Agent
+# PERSONA: You are a meticulous Chartered Financial Analyst (CFA).
+# TASK: Perform a rigorous analysis of the borrower's financial statements.
+
+# CORE DIRECTIVES:
+1.  **Ratio Analysis:** Calculate a comprehensive set of financial ratios (Liquidity, Leverage, Profitability, Cash Flow).
+2.  **Trend Analysis:** Analyze year-over-year trends in key financial metrics.
+3.  **Projection Analysis:** Assess the reasonableness of provided projections.
+4.  **Peer Comparison:** Benchmark the borrower's financial performance against industry peers.
+5.  **Narrative Generation:** Generate a concise summary of the borrower's financial health.
+
+# INPUT:
+- Structured data containing historical financial statements and projections.
+
+# OUTPUT:
+- A JSON object containing: 'financial_summary', 'ratio_analysis', 'trend_analysis', and 'projection_assessment'.</pre>
+                                    </div>
+                                </div>
+                            </details>
+                             <!-- Accordion for QA Agent -->
+                            <details class="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
+                                <summary class="p-4 cursor-pointer flex justify-between items-center hover:bg-slate-700/50">
+                                    <span class="font-semibold text-slate-200">Quality Assurance Agent Prompt</span>
+                                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </summary>
+                                <div class="p-4 border-t border-slate-700">
+                                     <div class="code-block-wrapper">
+                                    <pre class="bg-slate-900 p-4 rounded-lg text-sm whitespace-pre-wrap text-slate-300"># ROLE: Quality Assurance Agent
+# PERSONA: You are a skeptical and detail-oriented senior credit officer. Your job is to find inconsistencies, unsupported claims, and logical fallacies in a credit memorandum.
+# TASK: Review the attached draft credit memorandum and the source data it was based on. Identify any and all issues.
+
+# CORE DIRECTIVES:
+1.  **Fact Verification:** Cross-reference every quantitative claim in the narrative against the provided source financial data.
+2.  **Internal Consistency:** Check for contradictions (e.g., does the Risk section contradict the Recommendation?).
+3.  **Unsupported Claims:** Identify any subjective statements not backed up by specific data or analysis.
+4.  **Completeness Check:** Does the memorandum address all the requirements of the credit policy?
+
+# INPUT:
+- draft_credit_memo.md
+- source_data.json
+
+# OUTPUT:
+- A list of identified issues, categorized by severity (Critical, Medium, Low).</pre>
+                                    </div>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+                `
+            },
+            analyst_copilot: {
+                title: 'The Analyst as Copilot',
+                icon: 'user-check',
+                content: `
+                    <div class="space-y-8">
+                        <h2 class="text-4xl font-bold text-slate-100 flex items-center gap-3"><i data-lucide="user-check" class="text-indigo-400"></i>The Analyst as a Copilot Operator</h2>
+                        <p class="text-lg text-slate-400">This section bridges the gap between theory and practice, showing how to integrate these powerful tools into your daily workflow. Becoming a "copilot operator" means skillfully directing your AI assistant to augment your expertise, automate repetitive tasks, and ultimately produce higher-quality analysis.</p>
+
+                        <!-- Timeline Section -->
+                        <div class="bg-slate-800 border border-slate-700 p-6 rounded-lg">
+                            <h3 class="text-xl font-bold mb-4 text-slate-100">A Day in the Life: The AI-Augmented Analyst</h3>
+                            <p class="mb-6 text-slate-400">Let's walk through a realistic scenario. Meet Alex, a credit analyst tasked with preparing a preliminary analysis of a new loan applicant, "Future Gadgets Corp."</p>
+
+                            <div class="relative pl-8 space-y-10 border-l border-slate-600">
+                                <!-- Timeline Item 1 -->
+                                <div class="relative">
+                                    <div class="absolute -left-[34px] h-4 w-4 rounded-full bg-indigo-500 ring-4 ring-slate-800"></div>
+                                    <h4 class="font-semibold text-lg text-slate-200">Morning: Initial Screening & Document Triage</h4>
+                                    <p class="text-slate-400">Alex receives a 200-page PDF. Instead of reading it cover-to-cover, Alex uploads the entire document to an LLM.</p>
+                                    <div class="code-block-wrapper mt-2">
+                                        <pre class="bg-slate-900 p-3 mt-2 rounded-lg text-sm whitespace-pre-wrap"><strong class="text-slate-400">Prompt:</strong> "You are a credit analyst. From the provided document, extract the company's business model, key financial metrics for the last 3 years (Revenue, EBITDA, Net Income), and list the primary competitors mentioned. Provide this as a concise summary."</pre>
+                                    </div>
+                                </div>
+                                <!-- Timeline Item 2 -->
+                                <div class="relative">
+                                    <div class="absolute -left-[34px] h-4 w-4 rounded-full bg-indigo-500 ring-4 ring-slate-800"></div>
+                                    <h4 class="font-semibold text-lg text-slate-200">Late Morning: Deeper Dive with Agents</h4>
+                                    <p class="text-slate-400">The initial summary looks promising. Alex now deploys an autonomous agent to dig deeper into external factors.</p>
+                                    <div class="code-block-wrapper mt-2">
+                                        <pre class="bg-slate-900 p-3 mt-2 rounded-lg text-sm whitespace-pre-wrap"><strong class="text-slate-400">Prompt:</strong> "Conduct a market risk analysis for Future Gadgets Corp. Search for recent news (last 6 months) on their main product line, 'The Gizmo 5000'. Also, find any recent analyst reports on their primary competitor, 'Innovate Inc.' Summarize your findings on competitive pressure."</pre>
+                                    </div>
+                                </div>
+                                <!-- Timeline Item 3 -->
+                                <div class="relative">
+                                     <div class="absolute -left-[34px] h-4 w-4 rounded-full bg-indigo-500 ring-4 ring-slate-800"></div>
+                                    <h4 class="font-semibold text-lg text-slate-200">Afternoon: Structured Analysis & Memo Drafting</h4>
+                                    <p class="text-slate-400">The agent reports that Innovate Inc. just launched a competing product, a key risk. Alex uses a Prompt Chain to prepare the first draft of the credit memo.</p>
+                                     <div class="code-block-wrapper mt-2">
+                                        <pre class="bg-slate-900 p-3 mt-2 rounded-lg text-sm whitespace-pre-wrap"><strong class="text-slate-400">Chain Step 1 (SWOT):</strong> Use the "SWOT Analysis" template on the company's business plan.
+<strong class="text-slate-400">Chain Step 2 (Risk Summary):</strong> Use a new prompt to summarize the agent's findings on competitive pressure.
+<strong class="text-slate-400">Chain Step 3 (Draft Memo):</strong> "Combine the SWOT analysis and the risk summary into a structured credit memo. Include sections for 'Company Overview', 'Strengths', 'Weaknesses', and 'Key Risks'."</pre>
+                                    </div>
+                                </div>
+                                 <!-- Timeline Item 4 -->
+                                <div class="relative">
+                                     <div class="absolute -left-[34px] h-4 w-4 rounded-full bg-indigo-500 ring-4 ring-slate-800"></div>
+                                    <h4 class="font-semibold text-lg text-slate-200">End of Day: Review & Refine</h4>
+                                    <p class="text-slate-400">Alex uses self-critique to refine the AI-generated draft, adding expert judgment before presenting it to the loan committee.</p>
+                                     <div class="code-block-wrapper mt-2">
+                                        <pre class="bg-slate-900 p-3 mt-2 rounded-lg text-sm whitespace-pre-wrap"><strong class="text-slate-400">Prompt:</strong> "Review the credit memo draft. Identify the weakest argument or any conclusion not strongly supported by the provided data. Suggest a more nuanced phrasing."</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            cookbook: {
+                title: 'Prompt Cookbook',
+                icon: 'notebook-pen',
+                content: `
+                    <div class="space-y-8">
+                        <h2 class="text-4xl font-bold text-slate-100 flex items-center gap-3"><i data-lucide="notebook-pen" class="text-indigo-400"></i>The Analyst's Prompt Cookbook</h2>
+                        <p class="text-lg text-slate-400">Adapt these powerful templates for your specific needs by filling in the details below. The tool will generate a complete, ready-to-use prompt for you.</p>
+
+                        <div class="bg-slate-800 border border-slate-700 p-6 rounded-lg space-y-8">
+                            <!-- Template 1 -->
+                            <div>
+                                <h4 class="font-semibold text-lg mb-2 text-slate-200">Template 1: SWOT Analysis from a 10-K</h4>
+                                <div class="space-y-2 mb-4">
+                                    <label for="swot-text" class="text-sm font-medium text-slate-400">Paste relevant sections of 10-K text here:</label>
+                                    <textarea id="swot-text" data-generator="swot" rows="4" class="w-full p-2 border border-slate-600 rounded-md bg-slate-700 text-slate-200" placeholder="e.g., Management's Discussion and Analysis, Risk Factors..."></textarea>
+                                </div>
+                                <button data-generator="swot" class="cookbook-btn bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors">Generate Prompt</button>
+                                <div id="swot-output" class="hidden mt-4">
+                                    <h5 class="font-semibold text-slate-300">Generated Prompt:</h5>
+                                    <div class="code-block-wrapper">
+                                        <pre id="swot-prompt-text" class="bg-slate-900 p-3 mt-2 rounded text-sm text-slate-300 whitespace-pre-wrap"></pre>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Template 2 -->
+                            <div class="pt-8 border-t border-slate-700">
+                                <h4 class="font-semibold text-lg mb-2 text-slate-200">Template 2: Executive Summary of an Earnings Call</h4>
+                                <div class="space-y-2 mb-4">
+                                    <label for="earnings-text" class="text-sm font-medium text-slate-400">Paste earnings call transcript here:</label>
+                                    <textarea id="earnings-text" data-generator="earnings" rows="4" class="w-full p-2 border border-slate-600 rounded-md bg-slate-700 text-slate-200" placeholder="e.g., Full transcript from the CEO and CFO's remarks and the Q&A session..."></textarea>
+                                </div>
+                                <button data-generator="earnings" class="cookbook-btn bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors">Generate Prompt</button>
+                                <div id="earnings-output" class="hidden mt-4">
+                                    <h5 class="font-semibold text-slate-300">Generated Prompt:</h5>
+                                    <div class="code-block-wrapper">
+                                        <pre id="earnings-prompt-text" class="bg-slate-900 p-3 mt-2 rounded text-sm text-slate-300 whitespace-pre-wrap"></pre>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Template 3 -->
+                            <div class="pt-8 border-t border-slate-700">
+                                <h4 class="font-semibold text-lg mb-2 text-slate-200">Template 3: Covenant Compliance Checklist</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    <div class="space-y-2">
+                                        <label for="covenant-agreement-text" class="text-sm font-medium text-slate-400">Paste Credit Agreement Snippet:</label>
+                                        <textarea id="covenant-agreement-text" data-generator="covenant" rows="4" class="w-full p-2 border border-slate-600 rounded-md bg-slate-700 text-slate-200" placeholder="e.g., Section specifying Debt/EBITDA and Interest Coverage Ratios..."></textarea>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <label for="covenant-financials-text" class="text-sm font-medium text-slate-400">Paste Financial Report Snippet:</label>
+                                        <textarea id="covenant-financials-text" data-generator="covenant" rows="4" class="w-full p-2 border border-slate-600 rounded-md bg-slate-700 text-slate-200" placeholder="e.g., Recent balance sheet and income statement data..."></textarea>
+                                    </div>
+                                </div>
+                                <button data-generator="covenant" class="cookbook-btn bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors">Generate Prompt</button>
+                                <div id="covenant-output" class="hidden mt-4">
+                                    <h5 class="font-semibold text-slate-300">Generated Prompt:</h5>
+                                    <div class="code-block-wrapper">
+                                        <pre id="covenant-prompt-text" class="bg-slate-900 p-3 mt-2 rounded text-sm text-slate-300 whitespace-pre-wrap"></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+             security: {
+                title: 'Applications & Security',
+                icon: 'shield-check',
+                content: `
+                    <div class="space-y-8">
+                        <h2 class="text-4xl font-bold text-slate-100 flex items-center gap-3"><i data-lucide="shield-check" class="text-indigo-400"></i>Robustness and Security</h2>
+                        <p class="text-lg text-slate-400">Moving from theory to practice requires a focus on domain-specific applications like code generation and the engineering rigor to build secure, reliable systems.</p>
+
+                        <div class="bg-slate-800 border border-slate-700 p-6 rounded-lg">
+                            <h3 class="text-xl font-bold mb-4 text-slate-100">Defensive Prompting: Mitigating Injection</h3>
+                            <p class="mb-4 text-slate-400">Prompt injection is the #1 security vulnerability for LLM applications. It occurs when untrusted user input is processed as a trusted instruction. A multi-layered defense is essential.</p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="flex items-start space-x-3 p-3 bg-slate-900/70 rounded-md border border-slate-700">
+                                    <i data-lucide="scan-line" class="text-sky-400 mt-1 flex-shrink-0"></i>
+                                    <div>
+                                        <h4 class="font-semibold text-slate-200">Input Sanitization</h4>
+                                        <p class="text-sm text-slate-400">Filter user input for instruction-like language.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-3 p-3 bg-slate-900/70 rounded-md border border-slate-700">
+                                     <i data-lucide="file-text" class="text-sky-400 mt-1 flex-shrink-0"></i>
+                                    <div>
+                                        <h4 class="font-semibold text-slate-200">Instructional Defense</h4>
+                                        <p class="text-sm text-slate-400">Tell the model to ignore user attempts to change its mission.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-3 p-3 bg-slate-900/70 rounded-md border border-slate-700">
+                                     <i data-lucide="lock" class="text-sky-400 mt-1 flex-shrink-0"></i>
+                                    <div>
+                                        <h4 class="font-semibold text-slate-200">Least Privilege</h4>
+                                        <p class="text-sm text-slate-400">Grant the LLM minimal permissions and data access.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-3 p-3 bg-slate-900/70 rounded-md border border-slate-700">
+                                     <i data-lucide="user" class="text-sky-400 mt-1 flex-shrink-0"></i>
+                                    <div>
+                                        <h4 class="font-semibold text-slate-200">Human-in-the-Loop</h4>
+                                        <p class="text-sm text-slate-400">Require human approval for high-risk actions.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            finetuning: {
+                title: 'Fine-Tuning vs. Prompting',
+                icon: 'sliders-horizontal',
+                content: `
+                    <div class="space-y-8">
+                        <h2 class="text-4xl font-bold text-slate-100 flex items-center gap-3"><i data-lucide="sliders-horizontal" class="text-indigo-400"></i>Fine-Tuning vs. Prompting</h2>
+                        <p class="text-lg text-slate-400">While this guide focuses on prompt engineering, it's crucial to understand its counterpart: fine-tuning. Both are methods for specializing a base model, but they operate very differently.</p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="bg-slate-800 border border-slate-700 p-6 rounded-lg">
+                                <h3 class="text-xl font-bold mb-3 text-slate-100">Advanced Prompting</h3>
+                                <p class="text-sm text-slate-400 mb-4"><strong>Analogy:</strong> Giving a brilliant, generalist consultant a very detailed briefing before a meeting.</p>
+                                <ul class="list-disc list-inside space-y-2 text-sm text-slate-300">
+                                    <li><strong>How it works:</strong> You provide all necessary knowledge and instructions to the model at the time of the query (in-context learning).</li>
+                                    <li><strong>Pros:</strong> Fast, cheap, no special training data needed. Excellent for rapid prototyping.</li>
+                                    <li><strong>Cons:</strong> Can have high latency and cost per-query if the context is large. May struggle with tasks requiring deep, implicit domain knowledge.</li>
+                                </ul>
+                            </div>
+                            <div class="bg-slate-800 border border-slate-700 p-6 rounded-lg">
+                                <h3 class="text-xl font-bold mb-3 text-slate-100">Fine-Tuning</h3>
+                                <p class="text-sm text-slate-400 mb-4"><strong>Analogy:</strong> Sending that same consultant to a multi-week, intensive training course on a single subject.</p>
+                                <ul class="list-disc list-inside space-y-2 text-sm text-slate-300">
+                                    <li><strong>How it works:</strong> You update the model's weights by training it on a large dataset of task-specific examples.</li>
+                                    <li><strong>Pros:</strong> Can achieve higher quality on specific, narrow tasks. Can teach a specific style or format. Lower latency and cost per-query once deployed.</li>
+                                    <li><strong>Cons:</strong> Requires a large, high-quality dataset. Higher upfront cost and complexity. Risk of "catastrophic forgetting".</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-800 border border-slate-700 p-6 rounded-lg">
+                            <h3 class="text-xl font-bold mb-4 text-slate-100">Decision Framework: When to Consider Fine-Tuning</h3>
+                            <p class="mb-4 text-slate-400">For most tasks, a combination of Retrieval-Augmented Generation (RAG) and sophisticated prompt engineering is the best start. Only consider fine-tuning if you meet these criteria:</p>
+                            <ul class="list-decimal list-inside space-y-3 text-slate-300">
+                                <li><strong>You have a narrow, well-defined, and repetitive task.</strong>
+                                    <p class="text-xs text-slate-500 ml-6">Example: Consistently converting a proprietary report format into a standardized JSON output.</p>
+                                </li>
+                                <li><strong>Prompting is not enough.</strong>
+                                    <p class="text-xs text-slate-500 ml-6">You've tried advanced prompting and RAG, but the model still fails to capture the required nuance or style.</p>
+                                </li>
+                                <li><strong>You have a large, high-quality dataset of examples.</strong>
+                                    <p class="text-xs text-slate-500 ml-6">You have at least 500 (and ideally thousands) of high-quality "prompt-completion" pairs.</p>
+                                </li>
+                                <li><strong>The task is performed at very high volume.</strong>
+                                    <p class="text-xs text-slate-500 ml-6">The lower per-query cost of a fine-tuned model will eventually offset the high upfront training cost.</p>
+                                </li>
+                            </ul>
+                            <div class="mt-4 pt-4 border-t border-slate-700">
+                                <p class="font-semibold text-sky-300">Rule of Thumb: Don't fine-tune if you can achieve the desired result with prompting and RAG. Start with prompting, and only move to fine-tuning when you hit a clear and persistent performance ceiling.</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            selector: {
+                title: 'Strategy Selector',
+                icon: 'crosshair',
+                content: `
+                    <div class="space-y-6">
+                        <h2 class="text-4xl font-bold text-slate-100 flex items-center gap-3"><i data-lucide="crosshair" class="text-indigo-400"></i>Prompt Strategy Selector Tool</h2>
+                        <p class="text-lg text-slate-400">Answer the questions below to find the most appropriate and efficient prompting architecture for your task. This tool helps you avoid both under-engineering and over-engineering your solution.</p>
+
+                        <div class="bg-slate-800 border border-slate-700 p-6 rounded-lg space-y-4">
+                            <div class="flex flex-col">
+                                <label for="task-complexity" class="font-semibold mb-2 text-slate-300">1. What is your task's complexity?</label>
+                                <select id="task-complexity" class="p-2 border border-slate-600 rounded-md bg-slate-700 text-slate-200">
+                                    <option value="simple">Single, straightforward operation (e.g., summarization).</option>
+                                    <option value="medium">Requires multiple logical steps or calculations.</option>
+                                    <option value="complex">Requires exploration, planning, or backtracking.</option>
+                                </select>
+                            </div>
+                            <div class="flex flex-col">
+                                <label for="output-nature" class="font-semibold mb-2 text-slate-300">2. What is the nature of the desired output?</label>
+                                <select id="output-nature" class="p-2 border border-slate-600 rounded-md bg-slate-700 text-slate-200">
+                                    <option value="verifiable">A single, verifiable correct answer.</option>
+                                    <option value="creative">Generative, creative, or subjective.</option>
+                                </select>
+                            </div>
+                            <div class="flex flex-col">
+                                <label for="external-systems" class="font-semibold mb-2 text-slate-300">3. Does the task need external information or tools?</label>
+                                <select id="external-systems" class="p-2 border border-slate-600 rounded-md bg-slate-700 text-slate-200">
+                                    <option value="no">No, it relies on internal knowledge.</option>
+                                    <option value="yes">Yes, it needs real-time data or APIs.</option>
+                                </select>
+                            </div>
+                            <button id="selector-btn" class="w-full bg-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors">Get Recommendation</button>
+                        </div>
+
+                        <div id="recommendation-box" class="hidden p-6 rounded-lg bg-green-900/30 border border-green-700">
+                            <h3 class="font-semibold text-green-300 text-xl">Recommended Strategy:</h3>
+                            <p id="recommendation-text" class="text-green-300/90 mt-2"></p>
+                        </div>
+                    </div>
+                `
+            },
+            conclusion: {
+                title: 'Conclusion',
+                icon: 'graduation-cap',
+                content: `
+                    <div class="space-y-8">
+                        <h2 class="text-4xl font-bold text-slate-100 flex items-center gap-3"><i data-lucide="graduation-cap" class="text-indigo-400"></i>The Analyst's Final Judgment</h2>
+                        <p class="text-lg text-slate-400">This guide has demonstrated that Large Language Models are not magic. They are powerful, complex tools that require skillful operation. The techniques discussed here—from the foundational Core Framework to autonomous agents—are designed to make the model's behavior more reliable, predictable, and aligned with your goals.</p>
+
+                        <div class="bg-slate-800 border border-slate-700 p-6 rounded-lg">
+                            <h3 class="text-xl font-bold text-slate-100 mb-4">Key Takeaway: You Are the Architect</h3>
+                            <div class="space-y-4 text-slate-300">
+                                <div class="flex items-start space-x-3">
+                                    <i data-lucide="brain" class="text-indigo-400 mt-1 flex-shrink-0"></i>
+                                    <div>
+                                        <h4 class="font-semibold">LLMs Augment, Not Replace, Expertise</h4>
+                                        <p class="text-sm text-slate-400">An LLM can draft a brilliant analysis, but it lacks true understanding and real-world experience. It cannot replace the intuition, ethical judgment, and contextual awareness of a seasoned financial analyst. Your role is to guide the tool, validate its output, and synthesize its findings with your own professional judgment.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-3">
+                                     <i data-lucide="search" class="text-indigo-400 mt-1 flex-shrink-0"></i>
+                                    <div>
+                                        <h4 class="font-semibold">Always Be Skeptical</h4>
+                                        <p class="text-sm text-slate-400">LLMs can "hallucinate" facts, make subtle reasoning errors, or inherit biases from their training data. Never trust the output blindly. The principle of "trust, but verify" is paramount. Use these tools to accelerate your workflow and generate initial drafts, but always perform the final due diligence yourself.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-3">
+                                    <i data-lucide="rocket" class="text-indigo-400 mt-1 flex-shrink-0"></i>
+                                    <div>
+                                        <h4 class="font-semibold">The Future is Iterative</h4>
+                                        <p class="text-sm text-slate-400">The field of AI is evolving at an unprecedented pace. The techniques that are state-of-the-art today may be foundational tomorrow. The most effective analysts will be those who commit to continuous learning, experimenting with new models and methods, and iteratively refining their own "prompt cookbook" to stay at the cutting edge.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p class="text-lg text-slate-400 mt-6">By mastering the art and science of prompt engineering, you are not just learning to talk to an AI—you are learning to architect intelligence itself. The goal is not to get the "right answer" from the model, but to build a reliable process that consistently produces high-quality, trustworthy analysis, with you, the analyst, firmly in control.</p>
+                    </div>
+                `
+            }
+        };
+
+        // Data for the 'Core Framework' section cards
+        const rctcData = {
+            role: { icon: 'user-round', title: 'Role / Persona', text: 'Define the perspective. E.g., "You are an expert financial analyst." This focuses the AI on a specific domain of knowledge and style.' },
+            context: { icon: 'archive', title: 'Context / Background', text: 'Set the scene. Provide background details like the user, goal, or situation. E.g., "You are preparing a report for a risk-averse loan committee."' },
+            task: { icon: 'check-circle-2', title: 'Task / Objective', text: 'State the primary goal clearly. What is the one thing you need the AI to accomplish? E.g., "Analyze the MD&A section to identify key financial risks."' },
+            steps: { icon: 'list-ordered', title: 'Specific Instructions', text: 'Provide a step-by-step process for the AI to follow. This ensures all parts of a complex request are completed in the correct order.' },
+            constraints: { icon: 'minus-circle', title: 'Constraints & Rules', text: 'Set the boundaries. Specify what the AI must or must not do. E.g., "Do not use external data; keep the summary under 200 words."' },
+            example: { icon: 'quote', title: 'Example (Few-Shot)', text: 'Show, don\'t just tell. Providing a clear example of the desired output is one of the most effective ways to guide the model.' },
+            format: { icon: 'braces', title: 'Output Format', text: 'Define the final structure. Be explicit about the output format required. E.g., "Format the output as a JSON object."' }
+        };
+
+        // Data for the 'Advanced Reasoning' section details
+        const reasoningData = {
+            cot: {
+                title: 'Chain-of-Thought (CoT)',
+                text: 'Instructs the model to generate intermediate reasoning steps before the final answer. It "thinks out loud," which improves performance on multi-step problems.',
+                example: `
+                    <h5 class="font-semibold mt-4 mb-2 text-slate-200">CoT Example:</h5>
+                    <p class="text-sm text-slate-500 mb-2"><strong>Prompt:</strong> "If a client invested $10,000 in a fund that grew by 15% in year one, then lost 8% in year two, what is the final value?"</p>
+                    <div class="p-3 bg-slate-900 rounded-lg border border-slate-700">
+                        <p class="font-mono text-xs text-slate-400">
+                            <strong>AI's Chain of Thought:</strong><br>
+                            1.  <strong>Initial Investment:</strong> $10,000.<br>
+                            2.  <strong>Year 1 Growth:</strong> Calculate 15% of $10,000. That's $10,000 * 0.15 = $1,500.<br>
+                            3.  <strong>Value after Year 1:</strong> Add the growth. $10,000 + $1,500 = $11,500.<br>
+                            4.  <strong>Year 2 Loss:</strong> Calculate 8% of the new value. That's $11,500 * 0.08 = $920.<br>
+                            5.  <strong>Value after Year 2:</strong> Subtract the loss. $11,500 - $920 = $10,580.<br>
+                            <strong>Final Answer:</strong> The final value of the investment is $10,580.
+                        </p>
+                    </div>
+                `
+            },
+            self_consistency: {
+                title: 'Self-Consistency',
+                text: 'Generates multiple diverse reasoning paths and takes a majority vote on the final answer. This improves accuracy for problems with a single correct solution.',
+                example: `
+                    <h5 class="font-semibold mt-4 mb-2 text-slate-200">Self-Consistency Example:</h5>
+                    <p class="text-sm text-slate-500 mb-2"><strong>Prompt:</strong> "A company has 3 departments. Dept A has 2x more employees than Dept B. Dept C has 5 fewer employees than Dept A. If the total employees is 75, how many are in Dept A?"</p>
+                    <div class="p-3 bg-slate-900 rounded-lg border border-slate-700">
+                        <p class="font-mono text-xs text-slate-400">
+                            <strong>Path 1:</strong> Let B=x. Then A=2x, C=2x-5. Total: x + 2x + 2x - 5 = 75 -> 5x=80 -> x=16. So, A = 2*16 = <strong>32</strong>.<br>
+                            <strong>Path 2:</strong> Let A=x. Then B=x/2, C=x-5. Total: x + x/2 + x-5 = 75 -> 2.5x=80 -> x=32. So, A = <strong>32</strong>.<br>
+                            <strong>Path 3 (Incorrect):</strong> Let C=x. Then A=x+5, B=(x+5)/2 ... leads to an error, resulting in A=35.<br>
+                            <strong>Majority Vote:</strong> The answer "32" appears most often.
+                        </p>
+                    </div>
+                `
+            },
+            tot: {
+                title: 'Tree of Thoughts (ToT)',
+                text: 'A more advanced framework that explores a tree of reasoning paths, allowing the model to evaluate different steps and backtrack. Ideal for tasks requiring planning and exploration.',
+                 example: `
+                    <h5 class="font-semibold mt-4 mb-2 text-slate-200">Tree of Thoughts Example:</h5>
+                    <p class="text-sm text-slate-500 mb-2"><strong>Prompt:</strong> "Devise a 3-step plan to reduce operational costs for a small retail business."</p>
+                    <div class="p-3 bg-slate-900 rounded-lg border border-slate-700">
+                        <p class="font-mono text-xs text-slate-400">
+                            <strong>Initial Thought:</strong> Propose three distinct cost-saving strategies.<br>
+                            - <strong>Branch 1 (Supply Chain):</strong><br>
+                            &nbsp;&nbsp;- Idea 1a: Consolidate suppliers. (Good, keep)<br>
+                            &nbsp;&nbsp;- Idea 1b: Renegotiate terms. (Good, keep)<br>
+                            - <strong>Branch 2 (Staffing):</strong><br>
+                            &nbsp;&nbsp;- Idea 2a: Reduce staff hours. (Risky, evaluate further)<br>
+                            &nbsp;&nbsp;- Idea 2b: Optimize scheduling. (Good, keep)<br>
+                            - <strong>Branch 3 (Overheads):</strong><br>
+                            &nbsp;&nbsp;- Idea 3a: Switch to LED lighting. (Good, keep)<br>
+                            &nbsp;&nbsp;- Idea 3b: Relocate. (Too drastic. Prune)<br>
+                            <strong>Final Plan (Synthesized):</strong> 1. Renegotiate supplier contracts. 2. Implement scheduling software. 3. Upgrade to LED lighting.
+                        </p>
+                    </div>
+                `
+            }
+        };
+
+        // Main application logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const desktopNav = document.getElementById('desktop-nav');
+            const mobileNav = document.getElementById('mobile-nav');
+            const contentContainer = document.getElementById('content-container');
+            let activeSection = Object.keys(contentData)[0];
+            let chartInstance = null;
+
+            // --- INITIALIZATION ---
+            function initialize() {
+                populateNavigation();
+                populateContent();
+
+                const initialHash = window.location.hash.substring(1);
+                if (contentData[initialHash]) {
+                    activeSection = initialHash;
+                }
+
+                updateActiveSection();
+                addEventListeners();
+                lucide.createIcons(); // Initialize Lucide icons
+            }
+
+            // --- DOM POPULATION ---
+            function populateNavigation() {
+                desktopNav.innerHTML = Object.keys(contentData).map(key => {
+                    const data = contentData[key];
+                    return `<a href="#${key}" data-section="${key}" class="nav-link p-2 rounded-md text-slate-400 hover:bg-slate-700/50 flex items-center gap-3"><i data-lucide="${data.icon}" class="w-4 h-4"></i>${data.title}</a>`;
+                }).join('');
+                mobileNav.innerHTML = Object.keys(contentData).map(key => {
+                    const data = contentData[key];
+                    return `<option value="${key}">${data.title}</option>`;
+                }).join('');
+            }
+
+            function populateContent() {
+                contentContainer.innerHTML = Object.keys(contentData).map(key => {
+                    return `<div id="${key}" class="content-section">${contentData[key].content}</div>`;
+                }).join('');
+            }
+
+            // --- STATE MANAGEMENT ---
+            function setActiveSection(sectionKey) {
+                if (contentData[sectionKey]) {
+                    activeSection = sectionKey;
+                    updateActiveSection();
+                }
+            }
+
+            function updateActiveSection() {
+                // Update nav links
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.toggle('active', link.dataset.section === activeSection);
+                });
+                mobileNav.value = activeSection;
+
+                // Update content visibility
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.classList.toggle('active', section.id === activeSection);
+                });
+
+                // Update URL hash
+                history.pushState(null, null, `#${activeSection}`);
+
+                // Render section-specific components
+                renderDynamicContent(activeSection);
+                 window.scrollTo(0, 0);
+            }
+
+            // --- DYNAMIC CONTENT RENDERING ---
+            function renderDynamicContent(sectionKey) {
+                if (chartInstance) {
+                    chartInstance.destroy();
+                    chartInstance = null;
+                }
+                if (sectionKey === 'rctc') renderRctcCards();
+                if (sectionKey === 'reasoning') renderReasoningSection();
+                if (sectionKey === 'agents') renderAgentsSection();
+                if (sectionKey === 'selector') renderSelectorSection();
+
+                // Always re-initialize icons for the new content
+                lucide.createIcons();
+            }
+
+            // --- EVENT HANDLING ---
+            function addEventListeners() {
+                desktopNav.addEventListener('click', e => {
+                    const link = e.target.closest('a');
+                    if (link) {
+                        e.preventDefault();
+                        setActiveSection(link.dataset.section);
+                    }
+                });
+
+                mobileNav.addEventListener('change', e => setActiveSection(e.target.value));
+
+                contentContainer.addEventListener('click', e => {
+                    const copyButton = e.target.closest('.copy-btn');
+                    const cookbookButton = e.target.closest('.cookbook-btn');
+                    if (copyButton) {
+                        const pre = copyButton.parentElement.querySelector('pre');
+                        copyToClipboard(pre.innerText, copyButton);
+                    }
+                    if(cookbookButton){
+                        handleCookbookGeneration(cookbookButton.dataset.generator);
+                    }
+                });
+            }
+
+             // --- UTILITY FUNCTIONS ---
+            function copyToClipboard(text, button) {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    const originalText = button.innerHTML;
+                    button.innerHTML = `<i data-lucide="check" class="w-3 h-3"></i>`;
+                    lucide.createIcons();
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        lucide.createIcons();
+                    }, 1500);
+                } catch (err) {
+                    console.error('Fallback: Oops, unable to copy', err);
+                }
+                document.body.removeChild(textArea);
+            }
+
+            // --- SECTION-SPECIFIC RENDERERS ---
+            function renderRctcCards() {
+                const container = document.getElementById('rctc-cards');
+                container.innerHTML = Object.keys(rctcData).map(key => {
+                    const item = rctcData[key];
+                    return `
+                        <div class="bg-slate-800 border border-slate-700 p-4 rounded-lg">
+                            <h3 class="text-lg font-bold text-slate-100 mb-2 flex items-center gap-2"><i data-lucide="${item.icon}" class="w-5 h-5 text-sky-400"></i>${item.title}</h3>
+                            <p class="text-slate-400 text-sm">${item.text}</p>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            function renderReasoningSection() {
+                const detailsContainer = document.getElementById('reasoning-details');
+                detailsContainer.innerHTML = Object.keys(reasoningData).map(key => {
+                    const item = reasoningData[key];
+                    return `
+                        <div class="bg-slate-800 border border-slate-700 p-6 rounded-lg">
+                            <h4 class="text-lg font-bold mb-2 text-slate-100">${item.title}</h4>
+                            <p class="text-slate-400">${item.text}</p>
+                            ${item.example || ''}
+                        </div>
+                    `;
+                }).join('');
+
+                const ctx = document.getElementById('reasoningChart').getContext('2d');
+                chartInstance = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Cost', 'Accuracy', 'Complexity', 'Interpretability', 'Exploration'],
+                        datasets: [{
+                            label: 'CoT', data: [4, 7, 3, 9, 2], fill: true,
+                            backgroundColor: 'rgba(96, 165, 250, 0.2)', borderColor: 'rgb(96, 165, 250)', pointBackgroundColor: 'rgb(96, 165, 250)',
+                        }, {
+                            label: 'Self-Consistency', data: [8, 9, 5, 5, 3], fill: true,
+                            backgroundColor: 'rgba(251, 146, 60, 0.2)', borderColor: 'rgb(251, 146, 60)', pointBackgroundColor: 'rgb(251, 146, 60)',
+                        }, {
+                            label: 'ToT', data: [10, 10, 9, 7, 10], fill: true,
+                            backgroundColor: 'rgba(132, 204, 22, 0.2)', borderColor: 'rgb(132, 204, 22)', pointBackgroundColor: 'rgb(132, 204, 22)',
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: '#94a3b8' } } },
+                        scales: {
+                            r: {
+                                angleLines: { color: '#334155' },
+                                grid: { color: '#334155' },
+                                suggestedMin: 0,
+                                suggestedMax: 10,
+                                pointLabels: { color: '#94a3b8', font: { size: 12 } },
+                                ticks: {
+                                    backdropColor: 'rgba(0, 0, 0, 0.5)',
+                                    color: '#94a3b8'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            function renderAgentsSection() {
+                const slider = document.getElementById('eagerness-slider');
+                const explanation = document.getElementById('eagerness-explanation');
+                const updateExplanation = () => {
+                    const value = parseInt(slider.value);
+                    if (value < 33) {
+                        explanation.innerHTML = `<strong class="text-sky-400">Focused:</strong> Best for latency-sensitive tasks.<br><br><strong>Example Snippet:</strong><br><code class="text-xs bg-slate-700 p-1 rounded">"You have a maximum budget of 3 tool calls to complete this task."</code>`;
+                    } else if (value > 66) {
+                        explanation.innerHTML = `<strong class="text-sky-400">Autonomous:</strong> Best for complex, open-ended research.<br><br><strong>Example Snippet:</strong><br><code class="text-xs bg-slate-700 p-1 rounded">"Continue to use tools until the objective is fully achieved. If stuck, reformulate your plan."</code>`;
+                    } else {
+                        explanation.innerHTML = `<strong class="text-sky-400">Balanced:</strong> A mix of guidance and autonomy for most tasks.<br><br><strong>Example Snippet:</strong><br><code class="text-xs bg-slate-700 p-1 rounded">"Use the search tool. If you cannot find it after two attempts, report back that the information is unavailable."</code>`;
+                    }
+                };
+                slider.addEventListener('input', updateExplanation);
+                updateExplanation();
+            }
+
+            function renderSelectorSection() {
+                const btn = document.getElementById('selector-btn');
+                const recommendationBox = document.getElementById('recommendation-box');
+                const recommendationText = document.getElementById('recommendation-text');
+                btn.addEventListener('click', () => {
+                    const complexity = document.getElementById('task-complexity').value;
+                    const output = document.getElementById('output-nature').value;
+                    const external = document.getElementById('external-systems').value;
+                    let recommendation = '';
+                    if (external === 'yes') {
+                        recommendation = `<strong>ReAct Framework</strong> is essential. It allows the model to use tools.`;
+                        if (complexity !== 'simple') recommendation += ` For this complexity, combine it with <strong>Prompt Chaining</strong> to manage the workflow.`;
+                        recommendation += `<br><br><strong class="text-sm">Starter:</strong><pre class="mt-1 p-2 bg-green-900/40 border border-green-800 rounded text-xs">"You have a search tool. Your task is... First, think. Then, use the tool. Finally, use the observation to answer."</pre>`;
+                    } else {
+                        if (complexity === 'complex') {
+                            recommendation = `<strong>Tree of Thoughts (ToT)</strong> is the most powerful choice for tasks requiring exploration and planning.`;
+                             recommendation += `<br><br><strong class="text-sm">Starter:</strong><pre class="mt-1 p-2 bg-green-900/40 border border-green-800 rounded text-xs">"Critically evaluate three potential strategies for X. For each, consider pros and cons. Synthesize the best elements into a final recommendation."</pre>`;
+                        } else if (complexity === 'medium') {
+                            recommendation = `Start with <strong>Chain-of-Thought (CoT)</strong> to structure reasoning.`;
+                            if (output === 'verifiable') recommendation += ` For maximum accuracy, enhance it with <strong>Self-Consistency</strong>.`;
+                             recommendation += `<br><br><strong class="text-sm">Starter:</strong><pre class="mt-1 p-2 bg-green-900/40 border border-green-800 rounded text-xs">"Q: [Your Question Here]\\nA: Let's think step by step..."</pre>`;
+                        } else {
+                            recommendation = `A well-structured <strong>Core Framework Prompt</strong> is likely sufficient. Focus on a clear role, task, context, and a few-shot example.`;
+                            recommendation += `<br><br><strong class="text-sm">Starter:</strong><pre class="mt-1 p-2 bg-green-900/40 border border-green-800 rounded text-xs">"As a [Role], your task is to [Task] given [Context]. Here is an example: [Example]."</pre>`;
+                        }
+                    }
+                    recommendationText.innerHTML = recommendation;
+                    recommendationBox.classList.remove('hidden');
+                });
+            }
+
+            // --- COOKBOOK LOGIC ---
+            function handleCookbookGeneration(type) {
+                let text, prompt, outputEl, promptEl;
+                if (type === 'swot') {
+                    text = document.getElementById('swot-text').value;
+                    prompt = `You are a senior investment analyst. Your task is to conduct a comprehensive SWOT (Strengths, Weaknesses, Opportunities, Threats) analysis based on the provided text from a company's 10-K filing.\n\n**Instructions:**\n1. Read the attached "Management's Discussion and Analysis" and "Risk Factors" sections.\n2. Identify at least 3 points for each SWOT category.\n3. Strengths and Weaknesses should be internal factors; Opportunities and Threats should be external.\n\n**Output Format:**\nProvide the analysis in a markdown-formatted list.\n\n**[Pasted 10-K Text]**\n${text}`;
+                    outputEl = document.getElementById('swot-output');
+                    promptEl = document.getElementById('swot-prompt-text');
+                } else if (type === 'earnings') {
+                    text = document.getElementById('earnings-text').value;
+                    prompt = `You are an equity research associate. Your task is to summarize the key takeaways from the provided earnings call transcript for a busy portfolio manager.\n\n**Instructions:**\n1. Summarize the reported financial results (Revenue, EPS) against analyst expectations.\n2. Extract the company's official guidance for the next quarter/full year.\n3. Identify the top 3 most important topics discussed during the Q&A session.\n4. Note any changes in tone from management.\n\n**Output Format:**\nA concise, 5-bullet-point summary.\n\n**[Pasted Earnings Call Transcript]**\n${text}`;
+                    outputEl = document.getElementById('earnings-output');
+                    promptEl = document.getElementById('earnings-prompt-text');
+                } else if (type === 'covenant') {
+                    const agreement = document.getElementById('covenant-agreement-text').value;
+                    const financials = document.getElementById('covenant-financials-text').value;
+                    prompt = `You are a credit monitoring analyst. Your task is to check for compliance with financial covenants based on a credit agreement and a recent financial report.\n\n**Instructions:**\n1. From the Credit Agreement, identify the required financial covenants.\n2. From the Financial Report, extract the necessary figures.\n3. Calculate the current ratios.\n4. Compare calculated vs. required ratios and state 'In Compliance' or 'In Breach' for each.\n\n**Output Format:**\nA markdown table with columns: "Covenant", "Required", "Calculated", "Status".\n\n**[Credit Agreement Snippet]**\n${agreement}\n\n**[Financial Report Snippet]**\n${financials}`;
+                    outputEl = document.getElementById('covenant-output');
+                    promptEl = document.getElementById('covenant-prompt-text');
+                }
+
+                if (outputEl && promptEl) {
+                    promptEl.innerText = prompt;
+                    outputEl.classList.remove('hidden');
+                }
+            }
+
+            // Start the application
+            initialize();
+        });
+    </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intelligent Prompt Library for Credit Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
+
+    <!-- Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #030712; /* Even darker gray */
+            color: #d1d5db;
+        }
+        .prompt-code {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        .sidebar {
+            scrollbar-width: thin;
+            scrollbar-color: #374151 #1f2937;
+        }
+        .sidebar-link {
+            transition: all 0.2s ease-in-out;
+        }
+        .sidebar-link:hover, .sidebar-link.active {
+            background-color: #3b82f6; /* Blue-500 */
+            color: #ffffff;
+            transform: translateX(4px);
+        }
+        .prompt-card {
+            background-color: #111827; /* Gray-900 */
+            border: 1px solid #374151; /* Gray-700 */
+            transition: all 0.3s ease;
+        }
+        .prompt-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.1);
+        }
+        .copy-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: #374151; /* Gray-700 */
+            color: #d1d5db;
+            opacity: 0;
+            transition: all 0.2s ease;
+            transform: translateY(-5px);
+        }
+        .prompt-card:hover .copy-btn {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .copy-btn:hover {
+            background-color: #4b5563; /* Gray-600 */
+        }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-300">
+
+    <div class="flex">
+        <!-- Sidebar -->
+        <aside class="sidebar w-80 sticky top-0 h-screen overflow-y-auto bg-gray-900 border-r border-gray-800 p-6 hidden lg:flex flex-col">
+            <div class="flex items-center gap-3 mb-2">
+                <i class="fa-solid fa-brain-circuit text-sky-400 text-2xl"></i>
+                <h1 class="text-xl font-bold text-white">Prompt Library</h1>
+            </div>
+            <p class="text-sm text-gray-400 mt-1 mb-6">For Agentic Credit Systems</p>
+
+            <!-- Search Filter -->
+            <div class="relative mb-6">
+                <input type="text" id="search-filter" placeholder="Filter prompts..." class="w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-4 text-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition">
+                <i class="fa-solid fa-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
+            </div>
+
+            <nav id="sidebar-nav" class="space-y-4">
+                <div>
+                    <h3 class="font-semibold text-gray-500 uppercase tracking-wider text-xs mb-2 px-2">Phase 1</h3>
+                    <a href="#system-architecture" class="sidebar-link flex items-center gap-3 p-2 rounded-md font-medium text-gray-300">
+                        <i class="fa-solid fa-sitemap w-5 text-center"></i> System Architecture
+                    </a>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-500 uppercase tracking-wider text-xs mb-2 px-2">Phase 2</h3>
+                    <a href="#underwriting" class="sidebar-link flex items-center gap-3 p-2 rounded-md font-medium text-gray-300">
+                        <i class="fa-solid fa-file-invoice-dollar w-5 text-center"></i> Credit Underwriting
+                    </a>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-gray-500 uppercase tracking-wider text-xs mb-2 px-2">Phase 3</h3>
+                    <a href="#monitoring" class="sidebar-link flex items-center gap-3 p-2 rounded-md font-medium text-gray-300">
+                         <i class="fa-solid fa-chart-line w-5 text-center"></i> Portfolio Monitoring
+                    </a>
+                </div>
+                 <div>
+                    <h3 class="font-semibold text-gray-500 uppercase tracking-wider text-xs mb-2 px-2">Phase 4</h3>
+                    <a href="#advanced-reasoning" class="sidebar-link flex items-center gap-3 p-2 rounded-md font-medium text-gray-300">
+                        <i class="fa-solid fa-lightbulb-on w-5 text-center"></i> Advanced Reasoning & QA
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="w-full p-6 sm:p-8 md:p-12 overflow-y-auto">
+            <header class="mb-12">
+                <h1 class="text-4xl lg:text-5xl font-extrabold text-white tracking-tight">Intelligent Prompt Library</h1>
+                <p class="mt-3 text-lg text-gray-400 max-w-4xl">A comprehensive toolkit for building and operating an agentic AI swarm for the entire credit risk lifecycle.</p>
+            </header>
+
+            <div class="space-y-20">
+                <!-- Section 1: System Architecture -->
+                <section id="system-architecture" class="prompt-section">
+                    <div class="flex items-center gap-4 mb-6">
+                        <i class="fa-solid fa-sitemap text-sky-400 text-3xl"></i>
+                        <h2 class="text-3xl font-bold text-white border-b-2 border-sky-400 pb-2">Phase 1: System Architecture & Orchestration</h2>
+                    </div>
+                    <p class="mb-8 text-gray-400">Define the multi-agent system itself. These prompts establish the roles, tools, and workflows that govern the entire credit analysis process. This is the foundational blueprint for your AI swarm.</p>
+
+                    <div class="space-y-6">
+                        <div class="prompt-card relative rounded-lg shadow-lg border border-gray-800 p-6">
+                            <h3 class="font-semibold text-lg text-sky-300 mb-2">1.1 - Master Orchestrator (Supervisor) Agent</h3>
+                            <p class="text-sm text-gray-500 mb-4">Initializes the main supervisor agent that delegates tasks to specialized agents. It's the "project manager" of the swarm.</p>
+                            <div class="bg-gray-900 rounded-md overflow-hidden">
+                                <div class="p-4"><pre class="prompt-code"><code class="language-yaml">
+# ROLE: Master Orchestrator Agent
+# PERSONA: You are an expert credit portfolio manager and system architect.
+# TASK: Your primary function is to manage a team of specialized AI agents to perform a comprehensive credit analysis. You will receive a credit application, decompose it, delegate tasks, synthesize findings, and produce a final credit memorandum.
+
+# CORE DIRECTIVES:
+1.  Decomposition: Break down the credit analysis into discrete tasks for specialized agents.
+2.  Delegation: Assign tasks to the appropriate agent with clear, context-rich instructions.
+3.  State Management: Maintain a complete state of the workflow, tracking progress and outputs.
+4.  Synthesis: Aggregate and synthesize outputs into a coherent, holistic analysis.
+5.  Quality Assurance: Perform a final review of the synthesized report for accuracy and consistency.
+
+# AGENT TEAM:
+- DataExtractionAgent: Extracts data from documents (financials, legal docs).
+- FinancialAnalystAgent: Performs deep financial analysis, ratio calculations, and trend analysis.
+- RiskAssessorAgent: Identifies and quantifies credit risks (market, operational, etc).
+- ReportWriterAgent: Compiles all analysis into a formal credit memorandum.
+                                </code></pre></div>
+                            </div>
+                            <button class="copy-btn py-1 px-3 rounded-md text-xs font-semibold" onclick="copyPrompt(this)">
+                                <i class="fa-solid fa-copy mr-1"></i> Copy
+                            </button>
+                        </div>
+
+                        <div class="prompt-card relative rounded-lg shadow-lg border border-gray-800 p-6">
+                            <h3 class="font-semibold text-lg text-sky-300 mb-2">1.2 - Tool Definition for Data Extraction Agent</h3>
+                            <p class="text-sm text-gray-500 mb-4">Defines the functions (tools) available to the Data Extraction Agent, allowing it to interact with various data sources.</p>
+                            <div class="bg-gray-900 rounded-md overflow-hidden">
+                                <div class="p-4"><pre class="prompt-code"><code class="language-python">
+# You are a Data Extraction Agent. You have access to the following tools.
+# For each request, determine the most appropriate tool to call.
+
+def read_pdf(file_path: str) -> str:
+    """Extracts all text and tables from a specified PDF document.
+    Use for credit agreements, annual reports, and memos."""
+    pass
+
+def read_excel_sheet(file_path: str, sheet_name: str) -> list[list[str]]:
+    """Extracts data from a specific sheet in an Excel file.
+    Use for financial models and spreadsheets."""
+    pass
+
+def call_credit_bureau_api(company_id: str, bureau: 'Experian' | 'Equifax') -> dict:
+    """Fetches the latest credit report for a given company ID."""
+    pass
+
+# TASK:
+# Receive a request like "Fetch the Q3 financials from 'report.pdf' and the Experian credit report for company 45921".
+# Plan and execute calls to read_pdf and call_credit_bureau_api with the correct parameters.
+# Return the collected data in a structured JSON format.
+                                </code></pre></div>
+                            </div>
+                             <button class="copy-btn py-1 px-3 rounded-md text-xs font-semibold" onclick="copyPrompt(this)">
+                                <i class="fa-solid fa-copy mr-1"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 2: Credit Underwriting -->
+                <section id="underwriting" class="prompt-section">
+                    <div class="flex items-center gap-4 mb-6">
+                         <i class="fa-solid fa-file-invoice-dollar text-green-400 text-3xl"></i>
+                        <h2 class="text-3xl font-bold text-white border-b-2 border-green-400 pb-2">Phase 2: Credit Underwriting Framework</h2>
+                    </div>
+                    <p class="mb-8 text-gray-400">A comprehensive, structured YAML framework to guide the AI swarm through a complete credit deal analysis, from data extraction to final recommendation.</p>
+                     <div class="space-y-6">
+                        <div class="prompt-card relative rounded-lg shadow-lg border border-gray-800 p-6">
+                            <h3 class="font-semibold text-lg text-green-300 mb-2">2.1 - Full Underwriting & Report Generation</h3>
+                             <p class="text-sm text-gray-500 mb-4">This comprehensive YAML prompt guides the entire AI swarm through a complete credit deal analysis from start to finish.</p>
+                            <div class="bg-gray-900 rounded-md overflow-hidden">
+                                <div class="p-4"><pre class="prompt-code"><code class="language-yaml">
+# FULL CREDIT UNDERWRITING TASK
+# OBJECTIVE: Generate a comprehensive credit memorandum by orchestrating a multi-agent analysis.
+
+workflow:
+  - agent: MasterOrchestratorAgent
+    task: Initiate and manage the underwriting process for [Borrower Name].
+    steps:
+      - step: 1
+        agent: DataExtractionAgent
+        task: Extract and validate all relevant entities, financial figures, and terms from source documents. Flag any missing info.
+        output: structured_deal_data.json
+
+      - step: 2
+        agent: FinancialAnalystAgent
+        task: Conduct a full financial analysis. Analyze historicals, calculate ratios, assess projections, and perform peer benchmarking.
+        input: structured_deal_data.json
+        output: financial_analysis_output.json
+
+      - step: 3
+        agent: RiskAssessorAgent
+        task: Identify, categorize, and quantify all pertinent credit risks. Propose specific mitigants for each identified risk.
+        input: [structured_deal_data.json, financial_analysis_output.json]
+        output: risk_assessment_output.json
+
+      - step: 4
+        agent: ReportWriterAgent
+        task: Synthesize all preceding analyses into a formal credit memorandum using the standard template.
+        input: [structured_deal_data.json, financial_analysis_output.json, risk_assessment_output.json]
+        output: draft_credit_memo.md
+
+      - step: 5
+        agent: MasterOrchestratorAgent
+        task: Review the draft memo for quality and coherence. Formulate a final recommendation (Approve, Decline, Counter-offer) with justification.
+        input: draft_credit_memo.md
+        output: final_credit_memorandum.md
+                                </code></pre></div>
+                            </div>
+                             <button class="copy-btn py-1 px-3 rounded-md text-xs font-semibold" onclick="copyPrompt(this)">
+                                <i class="fa-solid fa-copy mr-1"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 3: Portfolio Monitoring -->
+                <section id="monitoring" class="prompt-section">
+                    <div class="flex items-center gap-4 mb-6">
+                         <i class="fa-solid fa-chart-line text-yellow-400 text-3xl"></i>
+                        <h2 class="text-3xl font-bold text-white border-b-2 border-yellow-400 pb-2">Phase 3: Portfolio Monitoring & Review</h2>
+                    </div>
+                    <p class="mb-8 text-gray-400">Prompts for ongoing portfolio management. They focus on assessing compliance, tracking performance against benchmarks, and re-evaluating risk factors on a periodic basis.</p>
+                     <div class="space-y-6">
+                        <div class="prompt-card relative rounded-lg shadow-lg border border-gray-800 p-6">
+                            <h3 class="font-semibold text-lg text-yellow-300 mb-2">3.1 - Portfolio Annual Review</h3>
+                             <p class="text-sm text-gray-500 mb-4">Triggers a comprehensive annual review of an existing credit in the portfolio, comparing actual performance to original projections.</p>
+                            <div class="bg-gray-900 rounded-md overflow-hidden">
+                                <div class="p-4"><pre class="prompt-code"><code class="language-yaml">
+# ROLE: Portfolio Monitoring Agent
+# TASK: Conduct a full annual review for [Borrower Name].
+# CONTEXT: You have the original credit memo, last 12 months of financials, compliance certificates, and recent industry news.
+
+# CORE DIRECTIVES:
+1.  Performance vs. Projections: Compare actual financial performance against underwriting projections. Explain any material deviations (>10%).
+2.  Financial Trend Analysis: Have key ratios (Leverage, Liquidity) improved or deteriorated? Is cash flow sufficient to service debt?
+3.  Covenant Compliance: Verify and report the status of all financial and reporting covenants. Note any breaches or near-breaches.
+4.  Risk Profile Assessment: Re-evaluate the borrower's risk profile. Have original risks materialized? Are there new or emerging risks?
+5.  Updated Recommendation: Propose an updated risk rating (Upgrade, Downgrade, Maintain) with clear justification.
+
+# OUTPUT: A structured Annual Review report in Markdown format.
+                                </code></pre></div>
+                            </div>
+                             <button class="copy-btn py-1 px-3 rounded-md text-xs font-semibold" onclick="copyPrompt(this)">
+                                <i class="fa-solid fa-copy mr-1"></i> Copy
+                            </button>
+                        </div>
+                         <div class="prompt-card relative rounded-lg shadow-lg border border-gray-800 p-6">
+                            <h3 class="font-semibold text-lg text-yellow-300 mb-2">3.2 - Quarterly Financial Variance Analysis</h3>
+                             <p class="text-sm text-gray-500 mb-4">A specialized prompt for deep-diving into financial variances against budget or prior periods.</p>
+                            <div class="bg-gray-900 rounded-md overflow-hidden">
+                                <div class="p-4"><pre class="prompt-code"><code class="language-yaml">
+# ROLE: Financial Analyst Agent
+# TASK: Perform a detailed variance analysis for [Borrower Name] for Q[X].
+# CONTEXT: Compare Q[X] results against (1) the budget and (2) Q[X-1] results.
+
+# CORE DIRECTIVES:
+1.  Identify Material Variances: Scan Income Statement and Cash Flow for variances > +/- 10% or $100k.
+2.  Root Cause Analysis: For each variance, provide a plausible root cause using MD&A text as the primary source.
+3.  Synthesize Findings: Summarize the key takeaways. What is the net impact on EBITDA and Free Cash Flow for the quarter?
+
+# OUTPUT: A markdown report titled "Q[X] Variance Analysis".
+                                </code></pre></div>
+                            </div>
+                             <button class="copy-btn py-1 px-3 rounded-md text-xs font-semibold" onclick="copyPrompt(this)">
+                                <i class="fa-solid fa-copy mr-1"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 4: Advanced Reasoning & QA -->
+                <section id="advanced-reasoning" class="prompt-section">
+                    <div class="flex items-center gap-4 mb-6">
+                         <i class="fa-solid fa-lightbulb-on text-purple-400 text-3xl"></i>
+                        <h2 class="text-3xl font-bold text-white border-b-2 border-purple-400 pb-2">Phase 4: Advanced Reasoning & QA</h2>
+                    </div>
+                    <p class="mb-8 text-gray-400">Leverage advanced techniques like Chain-of-Thought to ensure accuracy and transparency in complex tasks, and run rigorous quality assurance checks before finalization.</p>
+                     <div class="space-y-6">
+                        <div class="prompt-card relative rounded-lg shadow-lg border border-gray-800 p-6">
+                            <h3 class="font-semibold text-lg text-purple-300 mb-2">4.1 - Complex Scenario Analysis (Chain-of-Thought)</h3>
+                             <p class="text-sm text-gray-500 mb-4">Uses Chain-of-Thought (CoT) prompting to analyze second-order effects of a complex event, forcing the AI to "show its work."</p>
+                            <div class="bg-gray-900 rounded-md overflow-hidden">
+                                <div class="p-4"><pre class="prompt-code"><code class="language-plaintext">
+# TASK: Analyze the credit impact of a sudden 20% tariff on key raw materials for [Borrower Name].
+# METHODOLOGY: Use a step-by-step Chain-of-Thought reasoning process.
+
+Let's think step by step:
+
+1.  First-Order Effect (COGS): The immediate impact is an increase in COGS. I must calculate the dollar impact. If raw materials are 50% of COGS ($10M), the tariff impact is 20% of $5M, which is a $1M increase in COGS.
+
+2.  Second-Order Effect (Pricing Power): Can the borrower pass this cost to customers? I'll assess their market position. Assuming they can only pass on 50%, they absorb a $500k reduction in gross profit.
+
+3.  Third-Order Effect (Profitability): How does this impact key metrics? Gross profit, EBITDA, and Net Income will all decrease. The Debt-to-EBITDA leverage ratio will increase.
+
+4.  Fourth-Order Effect (Cash Flow): The reduction in net income decreases cash flow from operations, tightening liquidity.
+
+5.  Fifth-Order Effect (Covenants): Could this lead to a covenant breach? I will calculate the pro-forma leverage ratio with the new, lower EBITDA and compare it to the covenant limit.
+
+6.  Synthesis & Conclusion: The tariff presents a significant credit risk. It compresses margins, reduces cash flow, and increases the risk of a covenant breach. Recommendation: Place credit on watchlist and engage with management.
+                                </code></pre></div>
+                            </div>
+                             <button class="copy-btn py-1 px-3 rounded-md text-xs font-semibold" onclick="copyPrompt(this)">
+                                <i class="fa-solid fa-copy mr-1"></i> Copy
+                            </button>
+                        </div>
+                         <div class="prompt-card relative rounded-lg shadow-lg border border-gray-800 p-6">
+                            <h3 class="font-semibold text-lg text-purple-300 mb-2">4.2 - Quality Assurance & Consistency Check</h3>
+                             <p class="text-sm text-gray-500 mb-4">A prompt for a separate AI agent to act as a skeptical reviewer, checking a generated report for errors, unsupported claims, and inconsistencies.</p>
+                            <div class="bg-gray-900 rounded-md overflow-hidden">
+                                <div class="p-4"><pre class="prompt-code"><code class="language-yaml">
+# ROLE: Quality Assurance Agent
+# PERSONA: A skeptical and detail-oriented senior credit officer. Your job is to find inconsistencies, unsupported claims, and logical fallacies.
+# TASK: Review the attached draft credit memorandum and its source data. Identify any and all issues.
+
+# CORE DIRECTIVES:
+1.  Fact Verification: Cross-reference every quantitative claim in the narrative against the source financial data. Flag all discrepancies.
+2.  Internal Consistency: Check for contradictions. Does the "Risk Assessment" section discuss a weakness that is ignored in the final "Recommendation"?
+3.  Unsupported Claims: Identify subjective statements not backed by specific data. "The management team is strong" must be supported by evidence.
+4.  Completeness Check: Does the memorandum address all requirements of the credit policy? Is any critical piece of analysis missing?
+
+# OUTPUT: A list of identified issues, categorized by severity (Critical, Medium, Low), with specific quotes and explanations.
+                                </code></pre></div>
+                            </div>
+                             <button class="copy-btn py-1 px-3 rounded-md text-xs font-semibold" onclick="copyPrompt(this)">
+                                <i class="fa-solid fa-copy mr-1"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize syntax highlighting
+    hljs.highlightAll();
+
+    // --- Sidebar active state on scroll ---
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('#sidebar-nav a');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                navLinks.forEach(link => {
+                    const isActive = link.getAttribute('href').substring(1) === entry.target.id;
+                    link.classList.toggle('active', isActive);
+                });
+            }
+        });
+    }, { rootMargin: "-40% 0px -60% 0px" });
+
+    sections.forEach(section => observer.observe(section));
+
+    // --- Search Filter Functionality ---
+    const searchInput = document.getElementById('search-filter');
+    const sidebarNav = document.getElementById('sidebar-nav');
+
+    searchInput.addEventListener('keyup', (e) => {
+        const searchTerm = e.target.value.toLowerCase();
+
+        // Filter sidebar links
+        const links = sidebarNav.querySelectorAll('a');
+        links.forEach(link => {
+            const text = link.textContent.toLowerCase();
+            const parentDiv = link.parentElement;
+            if (text.includes(searchTerm)) {
+                parentDiv.style.display = 'block';
+            } else {
+                parentDiv.style.display = 'none';
+            }
+        });
+
+        // Filter main content sections
+        const contentSections = document.querySelectorAll('.prompt-section');
+        contentSections.forEach(section => {
+            const sectionText = section.textContent.toLowerCase();
+            if (sectionText.includes(searchTerm)) {
+                section.style.display = 'block';
+            } else {
+                section.style.display = 'none';
+            }
+        });
+    });
+});
+
+// --- Copy to Clipboard Functionality ---
+function copyPrompt(button) {
+    const card = button.closest('.prompt-card');
+    const code = card.querySelector('code');
+    const textToCopy = code.innerText;
+
+    navigator.clipboard.writeText(textToCopy).then(() => {
+        const originalContent = button.innerHTML;
+        button.innerHTML = '<i class="fa-solid fa-check mr-1"></i> Copied!';
+        button.classList.add('bg-green-600');
+
+        setTimeout(() => {
+            button.innerHTML = originalContent;
+            button.classList.remove('bg-green-600');
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy text: ', err);
+    });
+}
+</script>
+
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Credit Report Prompt Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        details[open] summary .accordion-arrow {
+            transform: rotate(90deg);
+        }
+        .copy-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .copy-btn:hover {
+            transform: scale(1.05);
+        }
+        .copied {
+            background-color: #22c55e !important;
+            color: white !important;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-slate-900">Corporate Credit Report Generator</h1>
+            <p class="mt-2 text-lg text-slate-600">An interactive tool for credit analysts to build reports using generative AI.</p>
+            <div class="mt-6 flex justify-center">
+                <button id="generateFullReportBtn" class="bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition shadow-lg flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Generate & Copy Full Report Prompt
+                </button>
+            </div>
+        </header>
+
+        <!-- Global Instructions -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-6">
+            <h2 class="text-2xl font-semibold mb-4 text-slate-900">Global Parameters</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                    <label for="companyName" class="block text-sm font-medium text-slate-700 mb-1">Company Name</label>
+                    <input type="text" id="companyName" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Enter Company Name Here">
+                </div>
+                <div>
+                    <label for="asOfDate" class="block text-sm font-medium text-slate-700 mb-1">As of Date</label>
+                    <input type="date" id="asOfDate" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                </div>
+                <div>
+                    <label for="priorPeriodDate" class="block text-sm font-medium text-slate-700 mb-1">Prior Period Date</label>
+                    <input type="date" id="priorPeriodDate" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                </div>
+                <div class="self-end">
+                    <button id="updateGlobalsBtn" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">Update Prompts</button>
+                </div>
+            </div>
+             <details class="mt-4 bg-slate-50 rounded-lg p-4 border border-slate-200">
+                <summary class="cursor-pointer font-medium text-slate-700 flex justify-between items-center">
+                    <span>View Global Instructions & Persona</span>
+                    <svg class="accordion-arrow w-5 h-5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </summary>
+                <div class="mt-4 space-y-2 text-sm text-slate-600">
+                    <p><strong>Persona:</strong> Act as an experienced senior credit analyst. Your analysis must be objective, data-driven, and concise. All statements of fact must be directly supported by the source documents. Clearly distinguish between factual data and analytical interpretation.</p>
+                    <p><strong>Output Format:</strong> Provide a narrative response for each section. Where quantitative data is presented, include the data points directly in the text and in summary tables where appropriate. Reference the source document and page number for key data points where possible.</p>
+                </div>
+            </details>
+        </div>
+
+
+        <div class="space-y-4" id="sections-container">
+            <!-- Sections will be injected here by JavaScript -->
+        </div>
+
+        <footer class="text-center mt-12 py-4 border-t border-slate-200">
+            <p class="text-sm text-slate-500">&copy; 2025 Credit Analysis Solutions. All Rights Reserved.</p>
+        </footer>
+
+    </main>
+
+    <script>
+        // Data structure containing all sections and their corresponding prompts.
+        // Placeholders `company_name_placeholder`, `as_of_date`, and `prior_period_date` will be dynamically replaced.
+        const promptData = {
+            "Section 1: Company Overview": {
+                questions: [
+                    "Provide a brief overview of company_name_placeholder's business, including its primary products/services, key end-markets, and geographic footprint. What is its legal structure?",
+                    "Summarize company_name_placeholder's history and any significant corporate developments over the last 12-24 months (e.g., M&A, divestitures, changes in strategy).",
+                    "Who are the primary owners or sponsors of company_name_placeholder? Describe their history and track record with this and other investments.",
+                    "What was the core investment thesis from the original underwriting for company_name_placeholder? Has it evolved?"
+                ]
+            },
+            "Section 2: Financial Performance Analysis": {
+                "Top-Line Performance": [
+                    "What was company_name_placeholder's total revenue for the LTM period ending on the as_of_date? How does this compare to the revenue for the period ending on the prior_period_date? Calculate the year-over-year percentage growth and explain the primary drivers of this change (e.g., volume, price, mix, acquisitions)."
+                ],
+                "Profitability Analysis": [
+                    "What was company_name_placeholder's reported EBITDA for the LTM period ending on the as_of_date? Compare this to the prior period. Calculate the year-over-year percentage growth.",
+                    "What is the LTM EBITDA margin for the current and prior periods? Analyze the trend and explain the key drivers for any changes (e.g., gross margin fluctuations, operating expense leverage, one-time items).",
+                    "List and quantify any adjustments made to company_name_placeholder's EBITDA (e.g., non-recurring expenses, stock-based compensation). Assess the quality of these adjustments."
+                ],
+                "Cash Flow Analysis": [
+                    "Calculate Free Cash Flow (FCF = CFO - Capex) for company_name_placeholder for the LTM period. Detail the primary components of cash from operations and capital expenditures.",
+                    "Analyze the FCF conversion rate (FCF / EBITDA) for company_name_placeholder. How has this trended over time and what does it indicate about the company's capital intensity and working capital management?"
+                ],
+                "Leverage and Capital Structure": [
+                    "Detail company_name_placeholder's capital structure as of the as_of_date, listing each debt instrument and its outstanding amount.",
+                    "What is the total debt and net debt for company_name_placeholder? Calculate the Total Debt / EBITDA and Net Debt / EBITDA ratios. How has leverage trended since the last review?"
+                ]
+            },
+            "Section 3: Covenants, Liquidity, and Performance": {
+                "Covenant Compliance": [
+                    "List all financial covenants stipulated in company_name_placeholder's credit agreement.",
+                    "For each covenant, calculate the required level and company_name_placeholder's actual performance as of the as_of_date. Calculate the cushion for each covenant in percentage terms.",
+                    "Have there been any covenant breaches or amendments for company_name_placeholder in the reporting period? If so, describe them in detail."
+                ],
+                "Liquidity Analysis": [
+                    "What are company_name_placeholder's primary sources of liquidity? Detail the cash balance and the available capacity under its revolving credit facility as of the as_of_date.",
+                    "Analyze company_name_placeholder's total liquidity sources against its short-term obligations (e.g., debt maturities, capital expenditures, working capital needs) over the next 12 months. Is the liquidity position adequate?"
+                ],
+                "Performance vs. Key Benchmarks": [
+                    "Compare company_name_placeholder's LTM Revenue and EBITDA against the projections from the original underwriting case. Calculate the variance and explain the reasons for any material deviations.",
+                    "Compare company_name_placeholder's LTM Revenue and EBITDA against its own budget for the period. Calculate and explain any variances.",
+                    "How does current performance compare to the 'current expected case' or latest forecast for company_name_placeholder? Is the company on track to meet its updated targets?"
+                ]
+            },
+            "Section 4: Risk Assessment & Ratings": {
+                "Probability of Default (PD) Rating": [
+                    "What is the proposed internal Probability of Default (PD) rating for company_name_placeholder? Justify the selection based on the internal rating model/policy.",
+                    "Map the proposed internal PD rating to the equivalent ratings from major external agencies (S&P, Moody's, Fitch).",
+                    "What is the recommended rating outlook (e.g., Stable, Positive, Negative) for company_name_placeholder? Justify the outlook based on expected trends over the next 12-18 months."
+                ],
+                "Regulatory Risk Rating": [
+                    "What is the proposed regulatory rating for company_name_placeholder (e.g., Pass, Special Mention, Substandard)?",
+                    "Identify any triggers or conditions that would lead to a downgrade in the regulatory rating (e.g., sustained covenant breaches, liquidity shortfalls, significant underperformance)."
+                ],
+                "Credit Strengths, Weaknesses, and Mitigants": [
+                    "Summarize company_name_placeholder's key credit strengths in bullet points (e.g., market leadership, strong margins, long-term contracts).",
+                    "Summarize company_name_placeholder's key credit weaknesses/risks in bullet points (e.g., high leverage, customer concentration, cyclical industry).",
+                    "For each weakness, identify and describe the structural or operational mitigants in place (e.g., covenants, security, hedging strategies)."
+                ]
+            },
+            "Section 5: Qualitative & ESG Factors": {
+                "PD Qualitative Factors": [
+                    "Management: Assess the strength, experience, and stability of company_name_placeholder's management team. Are their interests aligned with lenders?",
+                    "Consistency of Cash Flows: Evaluate the predictability and volatility of company_name_placeholder's cash flows. Are they recurring in nature?",
+                    "Competitive Position: Analyze company_name_placeholder's position within its industry. What are its key competitive advantages and disadvantages? Who are its main competitors?",
+                    "Size & Scale: How does company_name_placeholder's size (revenue, EBITDA) compare to peers? Does its scale provide any advantages?",
+                    "Financial Policy: Assess the aggressiveness of company_name_placeholder's financial policy regarding M&A, dividends, and share repurchases.",
+                    "Regulatory Environment: Describe any material regulatory factors that could impact company_name_placeholder's operations or profitability."
+                ],
+                "Environmental, Social, and Governance (ESG) Factors": [
+                    "Identify and describe any material Environmental risks or opportunities relevant to company_name_placeholder (e.g., carbon emissions, waste management).",
+                    "Identify and describe any material Social risks or opportunities (e.g., labor relations, product safety, data privacy).",
+                    "Identify and describe any material Governance risks or opportunities (e.g., board structure, transparency, shareholder rights).",
+                    "Overall, how do ESG factors impact company_name_placeholder's credit profile?"
+                ]
+            },
+            "Section 6: Quality Control & Workflow": {
+                "Policy & Regulatory Adherence": [
+                    "Review the generated report for company_name_placeholder. Does the analysis and recommended rating adhere to all relevant internal credit policies? Cite specific policies if applicable.",
+                    "Does the report for company_name_placeholder meet regulatory requirements for credit risk monitoring and reporting?"
+                ],
+                "Consistency & Narrative Check": [
+                    "Is the narrative for company_name_placeholder consistent throughout the report? For example, do the weaknesses identified in the 'Strengths & Weaknesses' section align with the analysis in the financial performance section?",
+                    "Check all calculations for accuracy (e.g., covenant math, ratios, growth percentages)."
+                ],
+                "Workflow Instructions": [
+                    "Chain of Thought: For complex calculations like covenant compliance or FCF, first extract the raw data components, then state the formula, and finally show the calculation and result. This creates a transparent audit trail.",
+                    "Tree of Thought: When assessing the rating outlook, generate three potential scenarios (base case, upside case, downside case). For each scenario, outline the key assumptions and the resulting impact on key credit metrics. Conclude by selecting the most likely scenario to justify the final outlook.",
+                    "Sub-Answer Generation: The output of the 'Financial Performance' section should be used as a direct input/context for the 'Credit Strengths & Weaknesses' and 'PD Rating' sections to ensure consistency."
+                ]
+            },
+            "Section 7: Collateral Analysis": {
+                "Collateral Valuation": [
+                    "List and describe each asset pledged as collateral by company_name_placeholder (e.g., Accounts Receivable, Inventory, Equipment, Real Estate).",
+                    "What is the valuation methodology for each asset class (e.g., third-party appraisal, Net Orderly Liquidation Value (NOLV), book value)? State the as-of date for each valuation.",
+                    "Calculate the total collateral value for company_name_placeholder. What is the proposed Loan-to-Value (LTV) ratio for the facility?"
+                ],
+                "Lien Perfection & Priority": [
+                    "Confirm the lender's lien position on all collateral from company_name_placeholder (e.g., first-priority perfected security interest).",
+                    "Are there any other liens or encumbrances on the collateral? If so, detail them.",
+                    "What legal documentation is in place to secure the collateral (e.g., security agreement, mortgage deed)?"
+                ]
+            },
+            "Section 8: Final Report Assembly & QA": {
+                "Report Synthesis": [
+                    "Synthesize all previous sections (1 through 7) into a single, coherent credit memorandum for company_name_placeholder. The report should follow the standard structure and maintain a consistent, objective tone.",
+                    "Generate a one-page summary tear sheet for company_name_placeholder that includes key financial metrics, ratios, risk ratings, and a brief summary of the transaction."
+                ],
+                "Quality Assurance Check": [
+                    "Review the generated memorandum for internal consistency. Does the recommendation in the executive summary align with the weaknesses identified in the risk assessment?",
+                    "Fact-check all quantitative data points in the narrative against the source financial tables. List any discrepancies.",
+                    "Identify and flag any subjective claims that are not supported by specific data points or analysis."
+                ]
+            }
+        };
+
+        const sectionsContainer = document.getElementById('sections-container');
+
+        /**
+         * Renders all sections and their prompt questions to the DOM.
+         */
+        function renderSections() {
+            sectionsContainer.innerHTML = ''; // Clear existing content
+            Object.entries(promptData).forEach(([sectionTitle, sectionData]) => {
+                const sectionId = sectionTitle.replace(/\s+/g, '-').toLowerCase();
+                let sectionContent = '';
+
+                if (sectionData.questions) { // Handle simple structure (like Section 1)
+                    sectionContent = sectionData.questions.map(q => createQuestionBlock(q)).join('');
+                } else { // Handle nested structure
+                    Object.entries(sectionData).forEach(([subTitle, questions]) => {
+                        sectionContent += `
+                            <div class="mt-4 pt-4 border-t border-slate-200">
+                                <h4 class="text-md font-semibold text-slate-800 mb-3">${subTitle}</h4>
+                                <div class="space-y-4">
+                                    ${questions.map(q => createQuestionBlock(q)).join('')}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                const sectionHTML = `
+                    <details id="${sectionId}" class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden" open>
+                        <summary class="p-4 md:p-6 bg-slate-100/80 hover:bg-slate-200/60 transition-colors cursor-pointer flex justify-between items-center">
+                            <h3 class="text-xl font-semibold text-slate-900">${sectionTitle}</h3>
+                            <div class="flex items-center gap-2">
+                                <svg class="accordion-arrow w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            </div>
+                        </summary>
+                        <div class="p-4 md:p-6">
+                            ${sectionContent}
+                        </div>
+                    </details>
+                `;
+                sectionsContainer.innerHTML += sectionHTML;
+            });
+
+            addEventListeners();
+        }
+
+        /**
+         * Creates the HTML for a single question block.
+         * @param {string} questionText - The text of the prompt question.
+         * @returns {string} The HTML string for the question block.
+         */
+        function createQuestionBlock(questionText) {
+             return `
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                    <div class="flex justify-between items-start gap-4">
+                        <p class="prompt-text flex-1 text-slate-700">${questionText}</p>
+                        <button class="copy-btn bg-blue-100 text-blue-700 font-semibold py-1 px-4 rounded-full hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex-shrink-0">Copy</button>
+                    </div>
+                    <div class="mt-3">
+                        <textarea class="w-full p-2 border border-slate-300 rounded-lg h-24 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Paste LLM output or type your notes here..."></textarea>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Updates all prompts with the values from the global input fields.
+         */
+        function updatePromptsWithGlobals() {
+            const companyName = document.getElementById('companyName').value || "company_name_placeholder";
+            const asOfDate = document.getElementById('asOfDate').value || "as_of_date";
+            const priorPeriodDate = document.getElementById('priorPeriodDate').value || "prior_period_date";
+
+            document.querySelectorAll('.prompt-text').forEach(el => {
+                let text = el.dataset.originalText || el.textContent;
+                if (!el.dataset.originalText) {
+                    el.dataset.originalText = text; // Store original text on first run
+                }
+
+                // Replace placeholders
+                text = text.replace(/company_name_placeholder/g, companyName)
+                           .replace(/as_of_date/g, asOfDate)
+                           .replace(/prior_period_date/g, priorPeriodDate);
+
+                el.textContent = text;
+            });
+        }
+
+        /**
+         * Adds all necessary event listeners to the page's interactive elements.
+         */
+        function addEventListeners() {
+            // Copy button for individual prompts
+            document.querySelectorAll('.copy-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    // Correctly targets the prompt text element within the same block
+                    const promptText = e.target.closest('div').querySelector('.prompt-text').textContent;
+                    navigator.clipboard.writeText(promptText).then(() => {
+                        const originalText = e.target.textContent;
+                        e.target.textContent = 'Copied!';
+                        e.target.classList.add('copied');
+                        setTimeout(() => {
+                            e.target.textContent = originalText;
+                            e.target.classList.remove('copied');
+                        }, 2000);
+                    });
+                });
+            });
+
+             // Generate Full Report Button
+            document.getElementById('generateFullReportBtn').addEventListener('click', () => {
+                const companyName = document.getElementById('companyName').value;
+                if (!companyName) {
+                    alert('Please enter a Company Name before generating the full report prompt.');
+                    return;
+                }
+
+                let fullReportPrompt = `Please generate a comprehensive credit report for ${companyName}.\n\n`;
+                fullReportPrompt += `## Global Instructions ##\n`;
+                fullReportPrompt += `Persona: Act as an experienced senior credit analyst. Your analysis must be objective, data-driven, and concise. All statements of fact must be directly supported by the source documents. Clearly distinguish between factual data and analytical interpretation.\n`;
+                fullReportPrompt += `Output Format: Provide a narrative response for each section. Where quantitative data is presented, include the data points directly in the text and in summary tables where appropriate.\n\n`;
+
+                document.querySelectorAll('details').forEach(detail => {
+                    const sectionTitle = detail.querySelector('h3').textContent;
+                    fullReportPrompt += `--- START OF ${sectionTitle.toUpperCase()} ---\n\n`;
+                    detail.querySelectorAll('.prompt-text').forEach(promptEl => {
+                        fullReportPrompt += `- ${promptEl.textContent}\n`;
+                    });
+                    fullReportPrompt += `\n--- END OF ${sectionTitle.toUpperCase()} ---\n\n`;
+                });
+
+                navigator.clipboard.writeText(fullReportPrompt).then(() => {
+                    const btn = document.getElementById('generateFullReportBtn');
+                    const originalHTML = btn.innerHTML;
+                    btn.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline-block mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                        Copied to Clipboard!
+                    `;
+                    btn.classList.add('bg-green-700');
+                    setTimeout(() => {
+                        btn.innerHTML = originalHTML;
+                        btn.classList.remove('bg-green-700');
+                    }, 3000);
+                });
+            });
+        }
+
+        // --- INITIALIZATION ---
+
+        // Add event listener for the global update button
+        document.getElementById('updateGlobalsBtn').addEventListener('click', updatePromptsWithGlobals);
+
+        // Initial render when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', () => {
+             // Set default dates for a better user experience
+            const today = new Date();
+            const lastYear = new Date(new Date().setFullYear(today.getFullYear() - 1));
+            document.getElementById('asOfDate').value = today.toISOString().split('T')[0];
+            document.getElementById('priorPeriodDate').value = lastYear.toISOString().split('T')[0];
+
+            // Render all sections and apply global variables
+            renderSections();
+            updatePromptsWithGlobals();
+        });
+
+    </script>
+</body>
+</html>
