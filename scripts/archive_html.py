@@ -22,7 +22,7 @@ def archive_html_files():
                     "/", "_"
                 ).replace("\\", "_")
                 new_filepath = os.path.join(archive_dir, new_filename)
-
+                
                 # Copy the file
                 with open(original_path, "r", encoding="utf-8") as f_in, open(
                     new_filepath, "w", encoding="utf-8"
@@ -30,7 +30,7 @@ def archive_html_files():
                     f_out.write(f_in.read())
 
                 manifest[new_filename] = original_path
-
+    
     with open(
         os.path.join(archive_dir, "manifest.json"), "w", encoding="utf-8"
     ) as f:
