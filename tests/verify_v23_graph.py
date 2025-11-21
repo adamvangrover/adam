@@ -20,27 +20,27 @@ def setup_dummy_data():
 def main():
     print("Starting v23 Graph Verification...")
     setup_dummy_data()
-
+    
     # Use ABC_TEST to get valid mock data from DataRetrievalAgent
     initial_state = init_risk_state("ABC_TEST", "Assess credit risk")
     config = {"configurable": {"thread_id": "verification_run_2"}}
-
+    
     print(f"Initial State: {initial_state['human_readable_status']}")
-
+    
     # Run the graph
     print("\n--- Execution Trace ---")
     try:
         result = cyclical_reasoning_app.invoke(initial_state, config=config)
-
+        
         print("\n--- Final Result ---")
         print(f"Final Status: {result.get('human_readable_status')}")
         print(f"Iteration Count: {result.get('iteration_count')}")
         print(f"Quality Score: {result.get('quality_score')}")
-
+        
         if "draft_analysis" in result:
             print("Draft Analysis Preview:\n")
             print(result["draft_analysis"])
-
+        
     except Exception as e:
         print(f"Execution failed: {e}")
         import traceback
