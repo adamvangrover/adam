@@ -12,6 +12,8 @@ adam/
 ````markdown
 
 # Adam v21.0: Your AI-Powered Financial Analyst
+
+> **Note:** This document describes the current stable version of the Adam system (v21.0). For details on the next-generation architecture, please see the [Adam v23.0 "Adaptive Hive" Vision](./docs/v23_architecture_vision.md).
 ````
 **(Welcome to Adam v21.0, the most advanced version yet\! We've supercharged our capabilities with an expanded agent network, enhanced simulation workflows, and a more sophisticated knowledge base to deliver unparalleled financial analysis and investment insights.)**
 
