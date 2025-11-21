@@ -6,20 +6,20 @@ class ExplainableStateTranslator:
         """
         Converts raw system state into a reassuring, transparent message for the UI.
         """
-        if state['iteration_count'] == 0:
-            return f"🔎 Starting analysis on {state['ticker']}. Checking primary data sources..."
+        status = state.get('human_readable_status', "Processing...")
+        iteration = state.get('iteration_count', 0)
+        quality = state.get('quality_score', 0.0)
         
-        if state['needs_correction']:
+        if iteration == 0:
+            return f"🔎 Starting analysis on {state['ticker']}. {status}"
+        
+        if state.get('needs_correction'):
             return (
-                f"🤔 I detected an inconsistency in the draft regarding {state['ticker']}'s debt figures. "
-                f"Self-correcting (Attempt {state['iteration_count']})..."
+                f"🤔 I detected inconsistencies in the analysis (Quality: {quality:.2f}). "
+                f"Self-correcting (Attempt {iteration}). Status: {status}"
             )
         
-        if state['quality_score'] > 0.8:
-            return f"✅ Analysis complete. High confidence ({state['quality_score']:.2f}). Generatng final report."
+        if quality >= 0.85:
+            return f"✅ Analysis complete. High confidence ({quality:.2f}). Generating final report."
             
-        return f"⚙️ Processing... Current Phase: {state['human_readable_status']}"
-
-# Example Usage for UI Polling
-# update_msg = ExplainableStateTranslator.generate_user_update(current_state)
-# print(update_msg)
+        return f"⚙️ Processing... Phase: {status} (Iter: {iteration})"
