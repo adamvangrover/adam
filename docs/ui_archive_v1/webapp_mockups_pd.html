@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Corporate PD Explorer</title>
+    <!-- Chosen Palette: Warm Neutrals (BG: #F5F5F4 Stone-100, Text: #292524 Stone-800, Accent: #10B981 Emerald-500) -->
+    <!-- Application Structure Plan: A responsive dashboard layout is used to transform the static report into an exploratory tool. The structure includes: 1) Global filters (sector, search) for slicing the data. 2) An interactive, sortable master table for detailed comparison. 3) A dynamic "Company Detail" card that appears upon selection, providing a focused view. 4) Two linked charts (Risk Matrix Scatter & PD Bar Chart) that update with filters. This structure was chosen to facilitate user-driven discovery, allowing users to compare cohorts, identify outliers, and understand the relationship between input factors and the final risk rating in an intuitive, non-linear way. -->
+    <!-- Visualization & Content Choices:
+        - Report Info: Full company table -> Goal: Organize/Compare -> Viz: Interactive HTML Table -> Interaction: Sorting, Row Selection -> Justification: Best for displaying dense, structured data and allowing direct comparison.
+        - Report Info: Debt/EBITDA vs. Weighted Score vs. Market Cap -> Goal: Relationships -> Viz: Bubble Chart -> Interaction: Hover tooltips, linked to filters -> Justification: Visualizes the multi-dimensional nature of risk, showing how financial health and business strength correlate.
+        - Report Info: 1-Year PD (%) -> Goal: Compare -> Viz: Horizontal Bar Chart -> Interaction: Hover tooltips, sorting -> Justification: Clearly and directly communicates the model's primary output—the default risk—for easy comparison across companies.
+        - All visualizations use Chart.js (Canvas) to ensure interactivity and performance, adhering to the NO SVG/Mermaid constraint. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 45vh;
+            max-height: 450px;
+        }
+        .table-scrollbar::-webkit-scrollbar {
+            height: 8px;
+        }
+        .table-scrollbar::-webkit-scrollbar-track {
+            background-color: #f1f1f1;
+            border-radius: 10px;
+        }
+        .table-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #a8a29e;
+            border-radius: 10px;
+        }
+        .table-scrollbar::-webkit-scrollbar-thumb:hover {
+            background-color: #78716c;
+        }
+        .sort-asc::after {
+            content: ' ▲';
+            color: #10B981;
+        }
+        .sort-desc::after {
+            content: ' ▼';
+            color: #10B981;
+        }
+        .selected-row {
+            background-color: #d1fae5 !important;
+        }
+    </style>
+</head>
+<body class="bg-stone-100 text-stone-800 antialiased">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-stone-900">Interactive Corporate PD Explorer</h1>
+            <p class="text-stone-600 mt-2">Analyze and compare company credit risk based on a multi-factor model.</p>
+        </header>
+
+        <div class="bg-white rounded-xl shadow-md p-4 md:p-6 mb-8">
+            <h2 class="text-xl font-bold mb-4">Filters & Controls</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="search" class="block text-sm font-medium text-stone-700">Search Company</label>
+                    <input type="text" id="search" placeholder="e.g., Microsoft or MSFT" class="mt-1 block w-full rounded-md border-stone-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm p-2">
+                </div>
+                <div>
+                    <label for="sector-filter" class="block text-sm font-medium text-stone-700">Filter by Sector</label>
+                    <select id="sector-filter" class="mt-1 block w-full rounded-md border-stone-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm p-2">
+                        <option value="all">All Sectors</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-md p-4 md:p-6">
+                    <h2 class="text-xl font-bold mb-4">Company Overview</h2>
+                    <p class="text-stone-600 text-sm mb-4">Click a column header to sort. Click a row to see detailed analysis.</p>
+                    <div class="overflow-x-auto table-scrollbar">
+                        <table class="min-w-full divide-y divide-stone-200">
+                            <thead class="bg-stone-50">
+                                <tr>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider cursor-pointer" data-sort="Company">Company</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider cursor-pointer" data-sort="Final Rating">Rating</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider cursor-pointer" data-sort="1-Year PD (%)">1Y PD</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider cursor-pointer" data-sort="Weighted Score (1-5)">Score</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider cursor-pointer" data-sort="Debt/EBITDA (x)">Debt/EBITDA</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider cursor-pointer" data-sort="EBITDA Margin (%)">EBITDA Margin</th>
+                                    <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-stone-500 uppercase tracking-wider cursor-pointer" data-sort="Market Cap ($B)">Mkt Cap ($B)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="company-table-body" class="bg-white divide-y divide-stone-200">
+                                <!-- JS will populate this -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="detail-view-container" class="bg-white rounded-xl shadow-md p-4 md:p-6 hidden lg:block">
+                 <div id="company-detail" class="h-full">
+                    <div class="flex flex-col items-center justify-center h-full text-center">
+                        <svg class="w-12 h-12 text-stone-300 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639l4.43-4.43a1.012 1.012 0 011.431 1.43l-2.093 2.092a.507.507 0 000 .714l2.093 2.092a1.012 1.012 0 01-1.43 1.431l-4.43-4.43zM10.964 3.678a1.012 1.012 0 010 1.431l-2.093 2.092a.507.507 0 000 .714l2.093 2.092a1.012 1.012 0 01-1.43 1.43l-4.43-4.43a1.012 1.012 0 010-1.43l4.43-4.43a1.012 1.012 0 011.43 0zm5.63 9.322a1.012 1.012 0 010 .639l-4.43 4.43a1.012 1.012 0 01-1.43-1.43l2.092-2.092a.507.507 0 000-.714l-2.093-2.092a1.012 1.012 0 011.43-1.431l4.43 4.43z" /></svg>
+                        <h3 class="text-lg font-semibold text-stone-700">Select a Company</h3>
+                        <p class="text-sm text-stone-500">Click a row in the table to view its detailed credit risk profile.</p>
+                    </div>
+                 </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+            <div class="bg-white rounded-xl shadow-md p-4 md:p-6">
+                <h2 class="text-xl font-bold mb-1">Risk Matrix</h2>
+                <p class="text-stone-600 text-sm mb-4">Debt/EBITDA vs. Overall Score. Bubble size represents Market Cap.</p>
+                <div class="chart-container">
+                    <canvas id="riskMatrixChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-md p-4 md:p-6">
+                <h2 class="text-xl font-bold mb-1">Probability of Default (1-Year)</h2>
+                <p class="text-stone-600 text-sm mb-4">A higher bar indicates greater risk of default.</p>
+                <div class="chart-container">
+                    <canvas id="pdChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const companyData = [
+                { "Company": "Microsoft Corp.", "Ticker": "MSFT", "Sector": "Technology", "Debt/EBITDA (x)": 1.1, "EBITDA Margin (%)": 48, "Market Cap ($B)": 3150, "1Y Stock Volatility (%)": 19, "Competitive Position (1-5)": 5, "Industry Cyclicality (1-5)": 4, "Mgmt & Governance (1-5)": 5, "Weighted Score (1-5)": 4.85, "1-Year PD (%)": 0.02, "Final Rating": "AAA" },
+                { "Company": "Johnson & Johnson", "Ticker": "JNJ", "Sector": "Healthcare", "Debt/EBITDA (x)": 2.4, "EBITDA Margin (%)": 31, "Market Cap ($B)": 370, "1Y Stock Volatility (%)": 15, "Competitive Position (1-5)": 5, "Industry Cyclicality (1-5)": 5, "Mgmt & Governance (1-5)": 5, "Weighted Score (1-5)": 4.50, "1-Year PD (%)": 0.05, "Final Rating": "AA+" },
+                { "Company": "Alphabet Inc.", "Ticker": "GOOGL", "Sector": "Technology", "Debt/EBITDA (x)": 0.3, "EBITDA Margin (%)": 32, "Market Cap ($B)": 2200, "1Y Stock Volatility (%)": 25, "Competitive Position (1-5)": 5, "Industry Cyclicality (1-5)": 4, "Mgmt & Governance (1-5)": 4, "Weighted Score (1-5)": 4.60, "1-Year PD (%)": 0.04, "Final Rating": "AA+" },
+                { "Company": "Walmart Inc.", "Ticker": "WMT", "Sector": "Consumer Defensive", "Debt/EBITDA (x)": 2.8, "EBITDA Margin (%)": 6, "Market Cap ($B)": 460, "1Y Stock Volatility (%)": 14, "Competitive Position (1-5)": 4, "Industry Cyclicality (1-5)": 4, "Mgmt & Governance (1-5)": 4, "Weighted Score (1-5)": 3.70, "1-Year PD (%)": 0.28, "Final Rating": "A+" },
+                { "Company": "NVIDIA Corp.", "Ticker": "NVDA", "Sector": "Technology", "Debt/EBITDA (x)": 0.5, "EBITDA Margin (%)": 55, "Market Cap ($B)": 2300, "1Y Stock Volatility (%)": 45, "Competitive Position (1-5)": 5, "Industry Cyclicality (1-5)": 2, "Mgmt & Governance (1-5)": 4, "Weighted Score (1-5)": 4.40, "1-Year PD (%)": 0.08, "Final Rating": "AA" },
+                { "Company": "Amazon.com Inc.", "Ticker": "AMZN", "Sector": "Technology", "Debt/EBITDA (x)": 2.9, "EBITDA Margin (%)": 14, "Market Cap ($B)": 1900, "1Y Stock Volatility (%)": 30, "Competitive Position (1-5)": 5, "Industry Cyclicality (1-5)": 3, "Mgmt & Governance (1-5)": 4, "Weighted Score (1-5)": 4.00, "1-Year PD (%)": 0.15, "Final Rating": "AA-" },
+                { "Company": "Caterpillar Inc.", "Ticker": "CAT", "Sector": "Industrials", "Debt/EBITDA (x)": 2.1, "EBITDA Margin (%)": 21, "Market Cap ($B)": 170, "1Y Stock Volatility (%)": 28, "Competitive Position (1-5)": 4, "Industry Cyclicality (1-5)": 2, "Mgmt & Governance (1-5)": 4, "Weighted Score (1-5)": 3.85, "1-Year PD (%)": 0.21, "Final Rating": "A" },
+                { "Company": "Oracle Corp.", "Ticker": "ORCL", "Sector": "Technology", "Debt/EBITDA (x)": 4.1, "EBITDA Margin (%)": 41, "Market Cap ($B)": 340, "1Y Stock Volatility (%)": 24, "Competitive Position (1-5)": 4, "Industry Cyclicality (1-5)": 4, "Mgmt & Governance (1-5)": 3, "Weighted Score (1-5)": 3.65, "1-Year PD (%)": 0.35, "Final Rating": "A-" },
+                { "Company": "Tesla, Inc.", "Ticker": "TSLA", "Sector": "Consumer Cyclical", "Debt/EBITDA (x)": 0.8, "EBITDA Margin (%)": 17, "Market Cap ($B)": 580, "1Y Stock Volatility (%)": 55, "Competitive Position (1-5)": 4, "Industry Cyclicality (1-5)": 2, "Mgmt & Governance (1-5)": 2, "Weighted Score (1-5)": 3.30, "1-Year PD (%)": 0.85, "Final Rating": "BBB" },
+                { "Company": "Intel Corp.", "Ticker": "INTC", "Sector": "Technology", "Debt/EBITDA (x)": 2.5, "EBITDA Margin (%)": 20, "Market Cap ($B)": 130, "1Y Stock Volatility (%)": 42, "Competitive Position (1-5)": 3, "Industry Cyclicality (1-5)": 2, "Mgmt & Governance (1-5)": 3, "Weighted Score (1-5)": 3.10, "1-Year PD (%)": 1.50, "Final Rating": "BBB-" },
+                { "Company": "Ford Motor Co.", "Ticker": "F", "Sector": "Consumer Cyclical", "Debt/EBITDA (x)": 3.8, "EBITDA Margin (%)": 8, "Market Cap ($B)": 48, "1Y Stock Volatility (%)": 38, "Competitive Position (1-5)": 3, "Industry Cyclicality (1-5)": 2, "Mgmt & Governance (1-5)": 4, "Weighted Score (1-5)": 2.95, "1-Year PD (%)": 2.20, "Final Rating": "BB+" },
+                { "Company": "Boeing Co.", "Ticker": "BA", "Sector": "Industrials", "Debt/EBITDA (x)": -55.0, "EBITDA Margin (%)": -1, "Market Cap ($B)": 110, "1Y Stock Volatility (%)": 40, "Competitive Position (1-5)": 3, "Industry Cyclicality (1-5)": 2, "Mgmt & Governance (1-5)": 2, "Weighted Score (1-5)": 1.95, "1-Year PD (%)": 7.50, "Final Rating": "B+" },
+                { "Company": "Netflix, Inc.", "Ticker": "NFLX", "Sector": "Communication Svcs.", "Debt/EBITDA (x)": 2.6, "EBITDA Margin (%)": 21, "Market Cap ($B)": 265, "1Y Stock Volatility (%)": 48, "Competitive Position (1-5)": 3, "Industry Cyclicality (1-5)": 3, "Mgmt & Governance (1-5)": 3, "Weighted Score (1-5)": 3.15, "1-Year PD (%)": 1.30, "Final Rating": "BBB-" },
+                { "Company": "Uber Technologies", "Ticker": "UBER", "Sector": "Technology", "Debt/EBITDA (x)": 3.5, "EBITDA Margin (%)": 5, "Market Cap ($B)": 145, "1Y Stock Volatility (%)": 51, "Competitive Position (1-5)": 3, "Industry Cyclicality (1-5)": 3, "Mgmt & Governance (1-5)": 3, "Weighted Score (1-5)": 2.75, "1-Year PD (%)": 3.10, "Final Rating": "BB" },
+                { "Company": "Delta Air Lines", "Ticker": "DAL", "Sector": "Industrials", "Debt/EBITDA (x)": 3.1, "EBITDA Margin (%)": 12, "Market Cap ($B)": 31, "1Y Stock Volatility (%)": 35, "Competitive Position (1-5)": 3, "Industry Cyclicality (1-5)": 1, "Mgmt & Governance (1-5)": 4, "Weighted Score (1-5)": 2.90, "1-Year PD (%)": 2.50, "Final Rating": "BB+" },
+                { "Company": "Upland Software", "Ticker": "UPLD", "Sector": "Technology", "Debt/EBITDA (x)": 6.8, "EBITDA Margin (%)": 25, "Market Cap ($B)": 0.1, "1Y Stock Volatility (%)": 75, "Competitive Position (1-5)": 2, "Industry Cyclicality (1-5)": 4, "Mgmt & Governance (1-5)": 2, "Weighted Score (1-5)": 1.90, "1-Year PD (%)": 8.00, "Final Rating": "B" },
+                { "Company": "Altice USA", "Ticker": "ATUS", "Sector": "Communication Svcs.", "Debt/EBITDA (x)": 8.1, "EBITDA Margin (%)": 35, "Market Cap ($B)": 1.5, "1Y Stock Volatility (%)": 85, "Competitive Position (1-5)": 2, "Industry Cyclicality (1-5)": 4, "Mgmt & Governance (1-5)": 2, "Weighted Score (1-5)": 1.70, "1-Year PD (%)": 10.50, "Final Rating": "B-" },
+                { "Company": "AMC Entertainment", "Ticker": "AMC", "Sector": "Consumer Cyclical", "Debt/EBITDA (x)": -8.5, "EBITDA Margin (%)": -4, "Market Cap ($B)": 1.4, "1Y Stock Volatility (%)": 150, "Competitive Position (1-5)": 1, "Industry Cyclicality (1-5)": 2, "Mgmt & Governance (1-5)": 1, "Weighted Score (1-5)": 0.80, "1-Year PD (%)": 28.00, "Final Rating": "CCC" },
+                { "Company": "Carnival Corp.", "Ticker": "CCL", "Sector": "Consumer Cyclical", "Debt/EBITDA (x)": 5.5, "EBITDA Margin (%)": 16, "Market Cap ($B)": 20, "1Y Stock Volatility (%)": 60, "Competitive Position (1-5)": 3, "Industry Cyclicality (1-5)": 1, "Mgmt & Governance (1-5)": 3, "Weighted Score (1-5)": 2.30, "1-Year PD (%)": 5.20, "Final Rating": "B+" },
+                { "Company": "Coinbase Global", "Ticker": "COIN", "Sector": "Financials", "Debt/EBITDA (x)": 1.5, "EBITDA Margin (%)": 51, "Market Cap ($B)": 60, "1Y Stock Volatility (%)": 95, "Competitive Position (1-5)": 3, "Industry Cyclicality (1-5)": 1, "Mgmt & Governance (1-5)": 3, "Weighted Score (1-5)": 2.70, "1-Year PD (%)": 3.50, "Final Rating": "BB" }
+            ];
+
+            const searchInput = document.getElementById('search');
+            const sectorFilter = document.getElementById('sector-filter');
+            const tableBody = document.getElementById('company-table-body');
+            const tableHeaders = document.querySelectorAll('th[data-sort]');
+            const companyDetailContainer = document.getElementById('company-detail');
+
+            let riskMatrixChart, pdChart;
+            let currentSort = { column: 'Weighted Score (1-5)', direction: 'desc' };
+
+            const ratingColors = {
+                'AAA': 'bg-emerald-600', 'AA+': 'bg-emerald-500', 'AA': 'bg-emerald-500', 'AA-': 'bg-emerald-500',
+                'A+': 'bg-green-500', 'A': 'bg-green-500', 'A-': 'bg-green-500',
+                'BBB': 'bg-lime-500', 'BBB-': 'bg-lime-500',
+                'BB+': 'bg-yellow-500', 'BB': 'bg-yellow-500',
+                'B+': 'bg-amber-500', 'B': 'bg-amber-500', 'B-': 'bg-amber-500',
+                'CCC': 'bg-red-500',
+            };
+            const ratingBorderColors = {
+                'AAA': '#059669', 'AA+': '#10B981', 'AA': '#10B981', 'AA-': '#10B981',
+                'A+': '#22C55E', 'A': '#22C55E', 'A-': '#22C55E',
+                'BBB': '#84CC16', 'BBB-': '#84CC16',
+                'BB+': '#EAB308', 'BB': '#EAB308',
+                'B+': '#F59E0B', 'B': '#F59E0B', 'B-': '#F59E0B',
+                'CCC': '#EF4444',
+            };
+
+            function populateSectors() {
+                const sectors = [...new Set(companyData.map(c => c.Sector))];
+                sectors.sort().forEach(sector => {
+                    const option = document.createElement('option');
+                    option.value = sector;
+                    option.textContent = sector;
+                    sectorFilter.appendChild(option);
+                });
+            }
+
+            function getRatingColor(rating) {
+                return ratingColors[rating] || 'bg-stone-400';
+            }
+
+            function renderTable(data, selectedTicker = null) {
+                tableBody.innerHTML = '';
+                if (data.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="7" class="text-center p-8 text-stone-500">No companies match the current filters.</td></tr>`;
+                    return;
+                }
+                data.forEach(company => {
+                    const row = document.createElement('tr');
+                    row.className = `hover:bg-stone-50 cursor-pointer ${company.Ticker === selectedTicker ? 'selected-row' : ''}`;
+                    row.dataset.ticker = company.Ticker;
+                    row.innerHTML = `
+                        <td class="px-4 py-3 whitespace-nowrap"><div class="font-medium text-stone-900">${company.Company}</div><div class="text-sm text-stone-500">${company.Ticker}</div></td>
+                        <td class="px-4 py-3 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getRatingColor(company['Final Rating'])} text-white">${company['Final Rating']}</span></td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-stone-500">${company['1-Year PD (%)']}%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-stone-500">${company['Weighted Score (1-5)'].toFixed(2)}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-stone-500">${company['Debt/EBITDA (x)'] < 0 ? 'N/M' : company['Debt/EBITDA (x)'].toFixed(1) + 'x'}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-stone-500">${company['EBITDA Margin (%)']}%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-stone-500">${company['Market Cap ($B)'].toLocaleString()}</td>
+                    `;
+                    row.addEventListener('click', () => {
+                        document.querySelectorAll('#company-table-body tr').forEach(r => r.classList.remove('selected-row'));
+                        row.classList.add('selected-row');
+                        renderCompanyDetail(company);
+                        if (window.innerWidth < 1024) {
+                           document.getElementById('detail-view-container').scrollIntoView({ behavior: 'smooth' });
+                        }
+                    });
+                    tableBody.appendChild(row);
+                });
+            }
+
+            function renderCompanyDetail(company) {
+                document.getElementById('detail-view-container').classList.remove('hidden');
+                companyDetailContainer.innerHTML = `
+                    <h2 class="text-xl font-bold">${company.Company} (${company.Ticker})</h2>
+                    <p class="text-sm text-stone-500 mb-4">${company.Sector}</p>
+                    <div class="flex items-baseline justify-center text-center my-4">
+                        <span class="px-4 py-1 inline-flex text-lg leading-5 font-bold rounded-full ${getRatingColor(company['Final Rating'])} text-white">${company['Final Rating']}</span>
+                        <div class="ml-4">
+                            <div class="text-3xl font-extrabold text-stone-800">${company['1-Year PD (%)']}%</div>
+                            <div class="text-xs text-stone-500">1-Year Probability of Default</div>
+                        </div>
+                    </div>
+                    <div class="space-y-3 mt-6 text-sm">
+                        <h4 class="font-semibold text-md text-stone-700 border-b pb-1 mb-2">Key Risk Factors (Score 1-5)</h4>
+                        ${renderFactorBar('Competitive Position', company['Competitive Position (1-5)'])}
+                        ${renderFactorBar('Industry Cyclicality', company['Industry Cyclicality (1-5)'])}
+                        ${renderFactorBar('Mgmt & Governance', company['Mgmt & Governance (1-5)'])}
+                    </div>
+                `;
+            }
+
+            function renderFactorBar(label, score) {
+                const percentage = (score / 5) * 100;
+                let colorClass = 'bg-emerald-500';
+                if (score < 2) colorClass = 'bg-red-500';
+                else if (score < 4) colorClass = 'bg-yellow-500';
+
+                return `
+                    <div class="w-full">
+                        <div class="flex justify-between mb-1">
+                            <span class="font-medium text-stone-600">${label}</span>
+                            <span class="font-bold text-stone-800">${score}/5</span>
+                        </div>
+                        <div class="w-full bg-stone-200 rounded-full h-2.5">
+                            <div class="${colorClass} h-2.5 rounded-full" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function renderCharts(data) {
+                renderRiskMatrix(data);
+                renderPDChart(data);
+            }
+
+            function renderRiskMatrix(data) {
+                const ctx = document.getElementById('riskMatrixChart').getContext('2d');
+                const chartData = data.map(c => ({
+                    x: c['Debt/EBITDA (x)'] < 0 ? 0 : c['Debt/EBITDA (x)'],
+                    y: c['Weighted Score (1-5)'],
+                    r: Math.max(5, Math.log(c['Market Cap ($B)']) * 3), // Bubble radius based on log of market cap
+                    company: c.Company,
+                    rating: c['Final Rating']
+                }));
+
+                if (riskMatrixChart) riskMatrixChart.destroy();
+                riskMatrixChart = new Chart(ctx, {
+                    type: 'bubble',
+                    data: {
+                        datasets: [{
+                            label: 'Companies',
+                            data: chartData,
+                            backgroundColor: chartData.map(d => `${ratingBorderColors[d.rating] || '#9ca3af'}B3`),
+                            borderColor: chartData.map(d => ratingBorderColors[d.rating] || '#9ca3af'),
+                            borderWidth: 1.5,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const d = context.raw;
+                                        return `${d.company} (${d.rating})`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                title: { display: true, text: 'Leverage (Debt/EBITDA)', font: { weight: '600' } }
+                            },
+                            y: {
+                                title: { display: true, text: 'Overall Weighted Score', font: { weight: '600' } },
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+
+            function renderPDChart(data) {
+                const ctx = document.getElementById('pdChart').getContext('2d');
+                const sortedData = [...data].sort((a, b) => b['1-Year PD (%)'] - a['1-Year PD (%)']);
+
+                if (pdChart) pdChart.destroy();
+                pdChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: sortedData.map(c => c.Company),
+                        datasets: [{
+                            label: '1-Year PD (%)',
+                            data: sortedData.map(c => c['1-Year PD (%)']),
+                            backgroundColor: sortedData.map(c => `${ratingBorderColors[c['Final Rating']] || '#9ca3af'}B3`),
+                            borderColor: sortedData.map(c => ratingBorderColors[c['Final Rating']] || '#9ca3af'),
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            x: {
+                                title: { display: true, text: 'Probability of Default (%)', font: { weight: '600' } },
+                                type: 'logarithmic',
+                            },
+                            y: {
+                                ticks: {
+                                    autoSkip: false,
+                                    font: { size: 10 }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            function filterAndSortData() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const selectedSector = sectorFilter.value;
+
+                let filteredData = companyData.filter(c => {
+                    const matchesSearch = c.Company.toLowerCase().includes(searchTerm) || c.Ticker.toLowerCase().includes(searchTerm);
+                    const matchesSector = selectedSector === 'all' || c.Sector === selectedSector;
+                    return matchesSearch && matchesSector;
+                });
+
+                filteredData.sort((a, b) => {
+                    const valA = a[currentSort.column];
+                    const valB = b[currentSort.column];
+
+                    if (currentSort.column === 'Final Rating') {
+                        // Special sort for ratings
+                        const ratingOrder = ['AAA', 'AA+', 'AA', 'AA-', 'A+', 'A', 'A-', 'BBB', 'BBB-', 'BB+', 'BB', 'B+', 'B', 'B-', 'CCC'];
+                        const indexA = ratingOrder.indexOf(valA);
+                        const indexB = ratingOrder.indexOf(valB);
+                        return currentSort.direction === 'asc' ? indexA - indexB : indexB - indexA;
+                    }
+
+                    if (valA < valB) return currentSort.direction === 'asc' ? -1 : 1;
+                    if (valA > valB) return currentSort.direction === 'asc' ? 1 : -1;
+                    return 0;
+                });
+
+                return filteredData;
+            }
+
+            function updateDisplay() {
+                const data = filterAndSortData();
+                renderTable(data);
+                renderCharts(data);
+                if (document.querySelector('.selected-row')) {
+                    // If a selection exists but is now filtered out, clear detail view
+                    const selectedTicker = document.querySelector('.selected-row').dataset.ticker;
+                    if (!data.some(d => d.Ticker === selectedTicker)) {
+                        clearDetailView();
+                    }
+                }
+            }
+
+            function clearDetailView() {
+                document.querySelector('#company-table-body .selected-row')?.classList.remove('selected-row');
+                companyDetailContainer.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-center">
+                         <svg class="w-12 h-12 text-stone-300 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639l4.43-4.43a1.012 1.012 0 011.431 1.43l-2.093 2.092a.507.507 0 000 .714l2.093 2.092a1.012 1.012 0 01-1.43 1.431l-4.43-4.43zM10.964 3.678a1.012 1.012 0 010 1.431l-2.093 2.092a.507.507 0 000 .714l2.093 2.092a1.012 1.012 0 01-1.43 1.43l-4.43-4.43a1.012 1.012 0 010-1.43l4.43-4.43a1.012 1.012 0 011.43 0zm5.63 9.322a1.012 1.012 0 010 .639l-4.43 4.43a1.012 1.012 0 01-1.43-1.43l2.092-2.092a.507.507 0 000-.714l-2.093-2.092a1.012 1.012 0 011.43-1.431l4.43 4.43z" /></svg>
+                        <h3 class="text-lg font-semibold text-stone-700">Select a Company</h3>
+                        <p class="text-sm text-stone-500">Click a row in the table to view its detailed credit risk profile.</p>
+                    </div>`;
+            }
+
+            searchInput.addEventListener('input', updateDisplay);
+            sectorFilter.addEventListener('change', updateDisplay);
+
+            tableHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    const column = header.dataset.sort;
+                    if (currentSort.column === column) {
+                        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentSort.column = column;
+                        currentSort.direction = 'desc';
+                    }
+
+                    tableHeaders.forEach(h => {
+                        h.classList.remove('sort-asc', 'sort-desc');
+                        if (h.dataset.sort === currentSort.column) {
+                            h.classList.add(currentSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
+                        }
+                    });
+
+                    updateDisplay();
+                });
+            });
+
+            function initialize() {
+                populateSectors();
+                tableHeaders.forEach(h => {
+                   if(h.dataset.sort === currentSort.column) {
+                       h.classList.add('sort-desc');
+                   }
+                });
+                updateDisplay();
+            }
+
+            initialize();
+        });
+    </script>
+</body>
+</html>

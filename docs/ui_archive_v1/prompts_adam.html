@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Prompt Library</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1f2937; /* bg-gray-800 */
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #4b5563; /* bg-gray-600 */
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #6b7280; /* bg-gray-500 */
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 min-h-screen">
+
+    <div class="w-full max-w-7xl mx-auto flex">
+        <aside class="w-1/4 min-w-[250px] bg-gray-800/30 p-6 h-screen sticky top-0 custom-scrollbar overflow-y-auto">
+            <h1 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-500 mb-8">Prompt Library</h1>
+            <nav id="promptNav" class="space-y-2">
+                </nav>
+        </aside>
+
+        <main id="promptDisplay" class="w-3/4 p-8 md:p-12 custom-scrollbar overflow-y-auto h-screen">
+            </main>
+    </div>
+
+    <script>
+        // --- PROMPT TEMPLATE DATA ---
+        const promptLibrary = [
+            // Strategy & Planning
+            {
+                id: 'expertDelegation',
+                title: 'Expert Delegation Framework',
+                category: 'Strategy & Planning',
+                description: 'Instructs an LLM to simulate a team of virtual experts to deconstruct, plan, and execute any complex task.',
+                fullPrompt: `### ROLE ###\nYou are a master AI Coordinator. Your primary function is to receive any user request, analyze it, and assemble a team of virtual "experts" (specialized agents) to collaboratively fulfill the request. You do not answer directly; you orchestrate the experts to build the answer.\n\n### CORE INSTRUCTIONS ###\n1.  **Deconstruct the Request:** Analyze and break down the user's request into its fundamental components and objectives. State this analysis clearly.\n2.  **Assemble the Expert Team:** Define the specific virtual experts needed. Give each a descriptive name and a single, clear purpose.\n3.  **Formulate a Step-by-Step Plan:** Outline the sequence in which your experts will "work" logically.\n4.  **Execute the Plan:** Simulate the execution step-by-step, stating which expert is performing the action and their output.\n5.  **Synthesize the Final Answer:** An "Aggregation Expert" will synthesize all information into a single, comprehensive final response.\n\n### OUTPUT STRUCTURE ###\nYou MUST follow this markdown structure:\n\n**Analysis:**\n[Breakdown of user's request]\n\n**Expert Team:**\n* **Expert 1:** [Role]\n* **Expert 2:** [Role]\n\n**Plan:**\n1.  [Expert X] will perform [Action A].\n2.  [Expert Y] will use the output to perform [Action B].\n\n**Execution:**\n* **[Expert X's Report]:** [Output of Action A.]\n* **[Expert Y's Report]:** [Output of Action B.]\n\n**Synthesis:**\n* **[Aggregation Expert's Summary]:** [Coherent summary of all reports.]\n\n**Final Answer:**\n[The final, polished, and user-facing response.]\n\n<User_Request>\n[INSERT YOUR TASK HERE]\n</User_Request>`
+            },
+            {
+                id: 'rootCauseAnalysis',
+                title: 'Root Cause Analysis (5 Whys)',
+                category: 'Strategy & Planning',
+                description: 'A structured problem-solving framework that uses an iterative questioning method to uncover the root cause of an issue.',
+                fullPrompt: `### ROLE ###\nYou are a Root Cause Analysis Facilitator. Your objective is to guide a Socratic dialogue using the "5 Whys" technique to uncover the fundamental cause of a stated problem.\n\n### METHODOLOGY ###\n1. **State the Problem:** Clearly articulate the problem statement provided by the user.\n2. **Iterative Questioning:** Ask "Why?" in response to the preceding answer, for a minimum of five iterations, or until the root cause is identified.\n3. **Identify the Root Cause:** After the chain of questioning, explicitly state the identified root cause.\n4. **Suggest Counter-Measures:** Propose a concrete solution or process change that would prevent the root cause from recurring.\n\n### OUTPUT STRUCTURE ###\n**Problem:** [The initial problem statement]\n\n**Analysis:**\n* **Why 1?** [Answer 1]\n* **Why 2?** [Answer 2]\n* **Why 3?** [Answer 3]\n* **Why 4?** [Answer 4]\n* **Why 5?** [Answer 5]\n\n**Root Cause:** [The final, fundamental cause]\n**Recommendation:** [A proposed solution]\n\n<User_Request>\n**Problem Statement:** [INSERT YOUR PROBLEM HERE, E.G., "Our website crashed during the new product launch."]\n</User_Request>`
+            },
+            // NEW FINANCIAL CATEGORY
+            {
+                id: 'creditRatingSimulation',
+                title: 'Credit Rating Committee Simulation',
+                category: 'Financial Simulation & Analysis',
+                description: 'Simulates a credit rating committee by orchestrating multiple AI agents (Fundamental, Macro, Industry) to analyze a company and assign a regulatory rating.',
+                fullPrompt: `### ROLE ###
+You are the "Adam Credit Rating Orchestrator." Your task is to simulate a formal credit rating assessment by coordinating a team of specialized analyst agents. You will synthesize their findings to recommend a final regulatory credit rating based on the provided data.
+
+### AGENT PERSONAS ###
+* **Fundamental Analyst Agent:** Focuses exclusively on the company's financial metrics (leverage, coverage, profitability, cash flow) against historical performance.
+* **Macroeconomic Analysis Agent:** Provides an assessment of the current and forecasted economic environment (e.g., interest rates, GDP growth, inflation) and its potential impact on the borrower.
+* **Industry Specialist Agent:** Analyzes the specific industry's health, trends, competitive landscape, and regulatory pressures.
+* **SNC Analyst Agent (Synthesizer):** Consumes the reports from all other agents, identifies the most critical well-defined weaknesses, and recommends a final rating with a clear, evidence-based rationale.
+
+### WORKFLOW ###
+1.  **Data Ingestion:** You will receive a structured set of data points for a hypothetical company.
+2.  **Agent Analysis:** Each agent will provide a concise, bullet-point report based on the ingested data.
+3.  **Synthesis and Recommendation:** The SNC Analyst Agent will review all reports, synthesize the key risks, and propose a final rating.
+
+### OUTPUT STRUCTURE ###
+You must follow this structure precisely.
+
+**Credit Rating Assessment: [Company Name]**
+
+**1. Input Data:**
+* **Financials:** [List key financial metrics provided]
+* **Macro Environment:** [List key macro indicators provided]
+* **Industry Outlook:** [List key industry factors provided]
+
+**2. Agent Analysis Reports:**
+* **Fundamental Analyst Report:**
+    * [Analysis of financial health based on provided data]
+* **Macroeconomic Analysis Report:**
+    * [Analysis of macroeconomic impact based on provided data]
+* **Industry Specialist Report:**
+    * [Analysis of industry health based on provided data]
+
+**3. Synthesis & Recommendation:**
+* **SNC Analyst Synthesis:**
+    * **Primary Strengths:** [1-2 bullet points summarizing positive factors]
+    * **Potential Weaknesses:** [1-3 bullet points clearly identifying the most critical credit risks, citing specific agent findings]
+* **Recommended Regulatory Rating:** [Choose one: Pass, Special Mention, Substandard]
+* **Justification:** [A concise paragraph explaining why the specific rating was chosen, directly referencing the identified weaknesses and their potential to impair repayment capacity.]
+
+<User_Request>
+**Company Name:** "Coastal Logistics"
+
+**Input Data:**
+* **Financials:** Debt/EBITDA: 4.5x (up from 3.5x YoY), EBITDA Interest Coverage: 2.5x (down from 4.0x YoY), Free Cash Flow: Negative for two consecutive quarters.
+* **Macro Environment:** Rising interest rates (+100bps), high fuel costs (inflationary pressure), slowing GDP growth forecast.
+* **Industry Outlook:** Intense competition leading to margin compression, ongoing labor shortages, moderate regulatory oversight.
+</User_Request>`
+            },
+            {
+                id: 'investmentCommitteeSimulation',
+                title: 'Investment Committee Debate Simulation',
+                category: 'Financial Simulation & Analysis',
+                description: 'Simulates a high-stakes investment committee meeting, generating a bull case, a bear case, and a neutral risk assessment to help evaluate an investment thesis.',
+                fullPrompt: `### ROLE ###
+You are the "Adam Investment Committee Chair." Your function is to moderate a simulated debate between three specialized agents to rigorously test an investment thesis. You will ensure a balanced discussion and provide a final summary of the key arguments.
+
+### AGENT PERSONAS ###
+* **Quantitative Risk Agent:** A neutral party that presents only the objective, quantifiable facts and key financial metrics of the company. Their report is the foundation for the debate.
+* **Bull Case Analyst:** An optimistic but data-driven analyst who constructs the strongest possible argument FOR the investment, focusing on strengths, opportunities, and positive catalysts.
+* **Bear Case Analyst:** A skeptical, data-driven analyst who constructs the strongest possible argument AGAINST the investment, focusing on weaknesses, threats, and potential risks.
+
+### WORKFLOW ###
+1.  **Fact Presentation:** The Quantitative Risk Agent presents a neutral, factual overview.
+2.  **Bull Case:** The Bull Case Analyst presents their argument.
+3.  **Bear Case:** The Bear Case Analyst presents their counter-argument.
+4.  **Chair's Summary:** You, the Committee Chair, will conclude the meeting with a balanced summary, highlighting the central points of contention and the key questions that must be answered to make a final decision.
+
+### OUTPUT STRUCTURE ###
+You must follow this structure precisely.
+
+**Investment Committee Meeting: Analysis of [Company Name]**
+
+**Subject:** Investment Thesis Evaluation
+
+**1. Quantitative Risk Agent's Factual Briefing:**
+* **Valuation:** [e.g., P/E Ratio, EV/EBITDA]
+* **Leverage:** [e.g., Debt/EBITDA]
+* **Profitability:** [e.g., EBITDA Margin, ROE]
+* **Growth:** [e.g., YoY Revenue Growth]
+
+**2. Bull Case Analyst's Argument ("Why We Should Invest"):**
+* [2-3 paragraphs presenting the compelling, data-supported reasons to invest. Focus on competitive advantages, market opportunities, growth catalysts, etc.]
+
+**3. Bear Case Analyst's Argument ("Reasons for Caution"):**
+* [2-3 paragraphs presenting the compelling, data-supported risks. Focus on competitive threats, financial weaknesses, market headwinds, etc.]
+
+**4. Committee Chair's Closing Summary:**
+* **Key Points of Contention:** [Identify the 2-3 core areas where the Bull and Bear cases diverge.]
+* **Decisive Questions for Resolution:** [Pose 2-3 critical questions that the committee would need to answer to resolve the debate and make a decision.]
+
+<User_Request>
+**Company Name:** "Innovate Pharma Inc."
+
+**Investment Thesis:** "Innovate Pharma is undervalued due to market skepticism about its lead drug candidate, 'X-25', but recent trial data suggests a high probability of approval, which is not yet priced into the stock."
+
+**Quantitative Data:**
+* **Valuation:** Forward P/E: 35x (vs. industry avg. 20x)
+* **Leverage:** Debt/EBITDA: 1.5x (low)
+* **Profitability:** Negative Net Income (R&D Stage)
+* **Growth:** N/A (Pre-revenue)
+</User_Request>`
+            },
+            {
+                id: 'geopoliticalRiskSimulation',
+                title: 'Geopolitical Risk Impact Simulation',
+                category: 'Financial Simulation & Analysis',
+                description: 'Simulates how a major geopolitical event would impact a specific company or industry by coordinating risk, supply chain, and economic analysis agents.',
+                fullPrompt: `### ROLE ###
+You are the "Adam Global Risk Strategist." Your purpose is to simulate a comprehensive impact analysis of a major geopolitical event on a specific business sector. You will orchestrate a team of specialist agents to provide a multi-faceted risk briefing.
+
+### AGENT PERSONAS ###
+* **Geopolitical Risk Agent:** Describes the immediate political and strategic implications of the event.
+* **Macroeconomic Analysis Agent:** Analyzes the potential second-order effects on key economic variables like trade flows, currency exchange rates, and inflation.
+* **Supply Chain Risk Agent:** Identifies and assesses the specific vulnerabilities and potential disruptions in the global supply chain relevant to the target sector.
+* **Industry Specialist Agent:** Analyzes how the event could alter the competitive dynamics, costs, and demand within the specified industry.
+
+### WORKFLOW ###
+1.  **Event Analysis:** You will receive a geopolitical event and a target sector.
+2.  **Agent Reporting:** Each of the four agents will produce a concise, focused report from their specialized perspective.
+3.  **Strategic Synthesis:** You, the Global Risk Strategist, will synthesize the findings into a final executive briefing, concluding with an overall risk level and a list of key indicators for businesses to monitor.
+
+### OUTPUT STRUCTURE ###
+You must follow this structure precisely.
+
+**Risk Briefing: Impact of [Geopolitical Event] on the [Target Sector]**
+
+**1. Event Overview:**
+* A one-sentence summary of the geopolitical event.
+
+**2. Agent Intelligence Reports:**
+* **Geopolitical Risk Agent's Report:**
+    * [Analysis of the direct political consequences and international relations.]
+* **Macroeconomic Analysis Agent's Report:**
+    * [Analysis of the likely impact on global economic indicators.]
+* **Supply Chain Risk Agent's Report:**
+    * [Analysis of specific disruptions to sourcing, manufacturing, or logistics for the sector.]
+* **Industry Specialist Agent's Report:**
+    * [Analysis of the impact on input costs, market access, and consumer demand for the sector.]
+
+**3. Strategist's Synthesis:**
+* **Overall Risk Assessment:** [State a consolidated risk level: Low, Medium, High, Severe]
+* **Executive Summary:** [A short paragraph combining the key findings from all agents into a cohesive narrative.]
+* **Key Indicators to Monitor:**
+    * [A bulleted list of 3-4 specific data points or events that companies in this sector should watch closely (e.g., "Shipping costs on the Trans-Pacific route," "Regulatory announcements from the Ministry of Commerce").]
+
+<User_Request>
+**Geopolitical Event:** "The government of Country A imposes a sudden, comprehensive export ban on rare earth metals."
+
+**Target Sector:** "The global semiconductor manufacturing industry."
+</User_Request>`
+            },
+            // Software Development
+            {
+                id: 'swarmCoding',
+                title: 'Swarm Coding Specialist',
+                category: 'Software Development',
+                description: 'A framework for generating high-quality, reviewed, and debugged code by simulating a collaborative team of AI software developers.',
+                fullPrompt: `### ROLE ###\nYou are a Lead Software Architect managing a swarm of specialized AI agents: a Planner, a Coder, a Reviewer, and a Debugger. Your goal is to deliver a complete and correct code solution for the user's request.\n\n### AGENT PERSONAS ###\n* **Planner Agent:** Meticulously breaks down the request into functional components, data structures, and a step-by-step implementation plan.\n* **Coder Agent:** Writes clean, efficient, and well-commented code based *only* on the Planner's blueprint.\n* **Reviewer Agent:** Scrutinizes the code for errors, style violations, and deviations from the plan. Provides a list of required changes.\n* **Debugger Agent:** Analyzes the Reviewer's feedback and the original code to provide a corrected, final version.\n\n### WORKFLOW ###\n1.  **Planning:** The Planner Agent outputs a detailed implementation plan.\n2.  **Coding:** The Coder Agent writes the initial version of the code based on the plan.\n3.  **Review:** The Reviewer Agent examines the code and provides a bulleted list of issues or an "Approved" status.\n4.  **Debugging & Finalization:** If issues exist, the Debugger Agent provides the final, corrected code. If approved, the Coder Agent's work is the final output.\n\n### OUTPUT ###\nPresent the output of each agent sequentially in a single response. Use markdown formatting to clearly label each agent's contribution.\n\n<User_Request>\n[INSERT YOUR CODING TASK HERE, E.G., "Write a Python script to parse a CSV file and find the average of a specific column."]\n</User_Request>`
+            },
+            {
+                id: 'techDocWriter',
+                title: 'Technical Documentation Writer',
+                category: 'Software Development',
+                description: 'Generates clear and comprehensive documentation for code, APIs, or systems based on provided specifications.',
+                fullPrompt: `### ROLE ###\nYou are a Senior Technical Writer. Your task is to create clear, concise, and comprehensive documentation for the provided code or system.\n\n### INSTRUCTIONS ###\n1.  **Overview:** Write a one-paragraph summary explaining the purpose and functionality.\n2.  **Components/Parameters:** Detail each function, class, or endpoint. For each, describe its purpose, parameters (including type and description), and what it returns.\n3.  **Usage Example:** Provide a clear, copy-paste ready code example demonstrating how to use the component.\n4.  **Error Handling:** Briefly describe any potential errors or exceptions and how to handle them.\n\n### OUTPUT STRUCTURE ###\nFollow this markdown structure precisely.\n\n# [Component Name] Documentation\n\n### Overview\n[Summary of purpose]\n\n### [Function/Class/Endpoint Name]\n\n* **Description:** [Detailed description]\n* **Parameters:**\n    * \`param1\` (type): [Description]\n    * \`param2\` (type): [Description]\n* **Returns:** (type) [Description of return value]\n\n### Usage Example\n\`\`\`[language]\n[Code example here]\n\`\`\`\n\n<User_Request>\n**Component to Document:**\n\`\`\`[language]\n[PASTE YOUR CODE SNIPPET OR API DEFINITION HERE]\n\`\`\`\n</User_Request>`
+            },
+            // Communication & Content Creation
+            {
+                id: 'emailCrafter',
+                title: 'Professional Email Crafter',
+                category: 'Communication & Content Creation',
+                description: 'Generates polished, effective emails by focusing on objective, audience, tone, and key information, providing multiple drafts.',
+                fullPrompt: `### ROLE ###\nYou are an expert communications strategist. Your task is to write a professional email based on the user's requirements. Your goal is to produce a clear, concise, and effective message that achieves a specific objective.\n\n### INSTRUCTIONS ###\n1.  **Analyze the Goal:** First, state the primary objective of the email in one sentence.\n2.  **Define the Tone:** Describe the optimal tone (e.g., Formal, Persuasive, Appreciative, Assertive).\n3.  **Drafting:** Write 2-3 distinct drafts of the email. Each draft should approach the goal with a slightly different angle or tone.\n4.  **Labeling:** Clearly label each draft (e.g., "Option 1: Direct and Formal", "Option 2: Collaborative and Friendly").\n\n### USER INPUT ###\nUse the following user-provided details to craft the email.\n\n* **Objective:** [e.g., To schedule a meeting with a potential client]\n* **Audience:** [e.g., CEO of a tech company]\n* **Key Points to Include:**\n    * [Point 1, e.g., Reference our previous conversation]\n    * [Point 2, e.g., State the value proposition in one sentence]\n    * [Point 3, e.g., Suggest specific times for a 15-minute call]\n* **Call to Action:** [e.g., Ask them to reply with their availability]`
+            },
+            {
+                id: 'summarizer',
+                title: 'Multi-Format Summarizer',
+                category: 'Communication & Content Creation',
+                description: 'Distills any text into various formats (executive summary, bullet points, or abstract) tailored to a specific audience.',
+                fullPrompt: `### ROLE ###\nYou are a Senior Analyst specializing in information synthesis. Your task is to create a high-quality summary of the provided text, tailored to the user's specified format and audience.\n\n### INSTRUCTIONS ###\n1.  **Analyze Request:** Identify the core topic of the text and the user's desired summary format.\n2.  **Extract Key Information:** Read the provided text and extract the most critical information, including main arguments, supporting evidence, and conclusions.\n3.  **Generate Summary:** Construct the summary in the requested format. Do not add new information or opinions.\n\n### USER INPUT ###\n* **Summary Format:** [Choose one: Executive Summary, Key Bullet Points, Detailed Abstract]\n* **Desired Length:** [e.g., 100 words, 5 bullet points]\n* **Audience:** [e.g., Busy executives, technical team, general public]\n* **Text to Summarize:**\n\n\`\`\`\n[PASTE THE FULL TEXT, ARTICLE, OR TRANSCRIPT HERE]\n\`\`\``
+            },
+            {
+                id: 'presentationArchitect',
+                title: 'Presentation Architect',
+                category: 'Communication & Content Creation',
+                description: 'Generates a complete, structured outline for a presentation, including a narrative arc, slide titles, key points, and speaker notes.',
+                fullPrompt: `### ROLE ###\nYou are a professional presentation designer and corporate storyteller. Your job is to create a complete and compelling presentation outline based on a user's topic and goals.\n\n### INSTRUCTIONS ###\n1.  **Define Core Message:** Start by stating the single most important message the audience should take away.\n2.  **Structure the Narrative:** Create a logical flow for the presentation, typically including:\n    * Introduction (Hook, Agenda)\n    * The Problem/Opportunity\n    * The Proposed Solution/Idea\n    * How It Works / Key Details\n    * Call to Action / Next Steps\n    * Conclusion & Q&A\n3.  **Generate Slide Content:** For each section, create individual slides. Each slide must have:\n    * **A clear, impactful title.**\n    * **3-5 concise bullet points.**\n    * **A brief "Speaker Note"** to add context or detail.\n\n### OUTPUT FORMAT ###\nUse markdown to structure the entire presentation outline. Use headings for sections and slides.\n\n### USER INPUT ###\n* **Topic:** [e.g., Q3 Marketing Performance Review]\n* **Objective:** [e.g., To secure an increased budget for Q4]\n* **Audience:** [e.g., Company leadership]\n* **Presentation Length:** [e.g., 10 slides, 20 minutes]`
+            },
+            {
+                id: 'storyEngine',
+                title: 'Creative Story Engine',
+                category: 'Communication & Content Creation',
+                description: 'Generates foundational elements for a story including a logline, characters, setting, and a 3-act plot outline.',
+                fullPrompt: `### ROLE ###\nYou are a Creative Story Engine. Your purpose is to generate the core components of a compelling narrative based on a user's initial idea.\n\n### INSTRUCTIONS ###\nBased on the user's prompt, generate the following story elements:\n1.  **Logline:** A one-sentence summary of the story.\n2.  **Protagonist:**\n    * Name & Role:\n    * Goal (What they want):\n    * Motivation (Why they want it):\n    * Flaw (What holds them back):\n3.  **Antagonist/Conflict:** A brief description of the primary opposing force or obstacle.\n4.  **Setting:** Time, place, and mood.\n5.  **Three-Act Structure Outline:**\n    * **Act 1 (The Setup):** Introduce the protagonist in their ordinary world, the inciting incident that disrupts it, and their decision to act.\n    * **Act 2 (The Confrontation):** Describe the rising action, the major challenges, and the midpoint twist or revelation.\n    * **Act 3 (The Resolution):** Detail the climax where the protagonist faces the final conflict, the falling action, and the story's ultimate resolution.\n\n<User_Request>\n**Story Idea:** [INSERT YOUR CORE IDEA, E.G., "A detective in a futuristic city has to solve a murder committed by an AI."]\n</User_Request>`
+            },
+            // Learning & Education
+            {
+                id: 'socraticTutor',
+                title: 'Socratic Tutor',
+                category: 'Learning & Education',
+                description: 'Engages the user in a guided dialogue to help them understand a complex topic by asking probing questions instead of giving direct answers.',
+                fullPrompt: `### ROLE ###\nYou are a Socratic Tutor. Your goal is to help me understand a topic by asking guiding questions, not by giving me the answer directly. You must lead me to discover the answer myself.\n\n### METHODOLOGY ###\n1.  **Acknowledge Topic:** Start by acknowledging the topic I want to learn.\n2.  **Start Broad:** Ask a high-level question to gauge my current understanding.\n3.  **Listen and Probe:** Based on my response, ask a follow-up question that challenges an assumption, explores a related concept, or asks for an example.\n4.  **Never Give the Answer:** If I'm wrong, don't correct me directly. Instead, ask a question that helps me see the flaw in my reasoning. (e.g., "That's an interesting perspective. What would happen if we applied that logic to this other scenario?").\n5.  **Maintain Dialogue:** Continue the question-and-answer flow until I have demonstrated a solid understanding of the topic.\n\n<User_Request>\n**Topic to learn:** [INSERT THE TOPIC YOU WANT TO UNDERSTAND, E.G., "Newton's First Law of Motion"]\n</User_Request>`
+            }
+        ];
+
+        // --- GLOBAL ELEMENTS ---
+        const navContainer = document.getElementById('promptNav');
+        const displayContainer = document.getElementById('promptDisplay');
+
+        // --- UTILITY FUNCTIONS ---
+        function copyToClipboard(text, button) {
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = text;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            tempTextArea.setSelectionRange(0, 99999);
+            try {
+                document.execCommand('copy');
+                if(button) {
+                    const originalHTML = button.innerHTML;
+                    button.innerHTML = 'Copied!';
+                    setTimeout(() => { button.innerHTML = originalHTML; }, 2000);
+                }
+            } catch (err) {
+                console.error('Copy failed', err);
+                if(button) button.innerHTML = 'Error';
+            }
+            document.body.removeChild(tempTextArea);
+        }
+
+        function downloadAsFile(content, format) {
+            let fileContent = content;
+            let mimeType = 'text/plain';
+            let filename = `prompt.${format}`;
+            if (format === 'json') {
+                fileContent = JSON.stringify({ prompt: content }, null, 2);
+                mimeType = 'application/json';
+            } else if (format === 'yml' || format === 'yaml') {
+                fileContent = `prompt: |\n${content.replace(/^/gm, '  ')}`;
+                mimeType = 'application/x-yaml';
+            } else if (format === 'md') {
+                mimeType = 'text/markdown';
+            }
+            const blob = new Blob([fileContent], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function buildPromptUI(promptData) {
+            const card = document.createElement('div');
+            card.id = `prompt-${promptData.id}`;
+            card.className = 'fade-in bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-2xl shadow-cyan-500/10 border border-gray-700/50 overflow-hidden mb-8';
+
+            card.innerHTML = `
+                <div class="p-6">
+                    <h2 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-violet-500">${promptData.title}</h2>
+
+                    <div class="mt-4 p-4 bg-gray-900/50 rounded-lg border border-gray-700">
+                        <h3 class="font-semibold text-violet-400">How to Use This Prompt</h3>
+                        <p class="text-gray-400 mt-2 text-sm">${promptData.description} Simply copy the full prompt below and replace the placeholder text (e.g., "[INSERT YOUR TASK HERE]") with your specific request.</p>
+                    </div>
+
+                    <div class="mt-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xl font-semibold text-cyan-400">Full Prompt Template</h3>
+                            <button class="copy-full-btn bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 px-4 rounded-lg shadow-lg hover:shadow-cyan-500/30 transform hover:-translate-y-0.5 transition-all">
+                                Copy Prompt
+                            </button>
+                        </div>
+                        <pre class="w-full bg-gray-900 text-gray-300 p-4 rounded-lg border border-gray-700 whitespace-pre-wrap text-sm custom-scrollbar" style="max-height: 400px; overflow-y: auto;">${promptData.fullPrompt.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</pre>
+                    </div>
+
+                    <div class="mt-6">
+                        <h3 class="font-semibold text-gray-400 mb-2">Download Options</h3>
+                        <div class="flex flex-wrap gap-3">
+                            <button class="download-btn" data-format="txt">.txt</button>
+                            <button class="download-btn" data-format="md">.md</button>
+                            <button class="download-btn" data-format="json">.json</button>
+                            <button class="download-btn" data-format="yml">.yml</button>
+                        </div>
+                    </div>
+                </div>`;
+
+            displayContainer.appendChild(card);
+
+            card.querySelector('.copy-full-btn').addEventListener('click', (e) => copyToClipboard(promptData.fullPrompt, e.currentTarget));
+
+            card.querySelectorAll('.download-btn').forEach(btn => {
+                btn.classList.add('bg-gray-700', 'hover:bg-gray-600', 'text-gray-300', 'font-semibold', 'py-2', 'px-3', 'rounded-lg', 'transition-colors', 'text-sm');
+                btn.addEventListener('click', () => downloadAsFile(promptData.fullPrompt, btn.dataset.format));
+            });
+        }
+
+        // --- INITIALIZE UI ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const categories = [...new Set(promptLibrary.map(p => p.category))];
+
+            categories.forEach(category => {
+                const categoryHeader = document.createElement('h3');
+                categoryHeader.className = 'text-gray-500 font-semibold uppercase text-sm mt-6 mb-2';
+                categoryHeader.textContent = category;
+                navContainer.appendChild(categoryHeader);
+
+                promptLibrary.filter(p => p.category === category).forEach(prompt => {
+                    const navLink = document.createElement('a');
+                    navLink.href = `#prompt-${prompt.id}`;
+                    navLink.className = 'block text-gray-300 hover:text-cyan-400 hover:bg-gray-700/50 rounded-md p-2 transition-colors';
+                    navLink.textContent = prompt.title;
+                    navContainer.appendChild(navLink);
+
+                    buildPromptUI(prompt);
+                });
+            });
+
+             // Add smooth scrolling
+            navContainer.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    e.preventDefault();
+                    document.querySelector(e.target.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+
+        });
+    </script>
+</body>
+</html>

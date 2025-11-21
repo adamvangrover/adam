@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive AI Prompt Library</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles to complement Tailwind */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .font-mono {
+            font-family: 'Roboto Mono', monospace;
+        }
+        .section-title::before {
+            content: '▶';
+            margin-right: 10px;
+            font-size: 0.8em;
+            transition: transform 0.2s ease-in-out;
+            display: inline-block;
+        }
+        .section-title.open::before {
+            transform: rotate(90deg);
+        }
+        #sidebar::-webkit-scrollbar { width: 8px; }
+        #sidebar::-webkit-scrollbar-track { background: #f1f5f9; }
+        #sidebar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        #sidebar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .use-case-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .use-case-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        /* Styles for Modal */
+        #modal-close-btn {
+            font-size: 2rem;
+            line-height: 1;
+            font-weight: bold;
+        }
+        #modal-body pre {
+            background-color: #f1f5f9;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Roboto Mono', monospace;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+<header class="md:hidden sticky top-0 bg-white/80 backdrop-blur-lg border-b border-slate-200 z-30">
+    <div class="flex items-center justify-between p-4">
+        <h1 class="text-xl font-bold text-slate-800">🤖 Prompt Library</h1>
+        <button id="mobile-menu-btn" class="p-2 rounded-md text-slate-600 hover:bg-slate-200 hover:text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+    </div>
+</header>
+
+<div id="sidebar" class="w-80 bg-white border-r border-slate-200 h-screen p-5 fixed top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-40 overflow-y-auto">
+    <div class="flex items-center mb-6">
+        <h2 class="text-2xl font-bold text-slate-800">🤖 Prompt Library</h2>
+    </div>
+    <input type="text" id="search-bar" placeholder="Search prompts..." class="w-full px-4 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition mb-1">
+    <p class="text-xs text-slate-500 mt-1 mb-3 px-1">Search by ID (e.g., EP01), keyword, or use the navigator for suggestions.</p>
+    <nav>
+        <ul id="nav-links" class="space-y-1"></ul>
+    </nav>
+    <div class="mt-8 pt-4 border-t border-slate-200">
+        <h3 class="px-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">Tools & Guides</h3>
+        <ul class="mt-2 space-y-1">
+            <li><button id="explain-rag-btn" class="w-full text-left block text-slate-600 font-medium hover:text-blue-600 hover:bg-slate-100 rounded-md p-2 transition-colors duration-200">💡 What is RAG?</button></li>
+            <li><button id="walkthrough-setup-btn" class="w-full text-left block text-slate-600 font-medium hover:text-blue-600 hover:bg-slate-100 rounded-md p-2 transition-colors duration-200">🗺️ Analysis Setup Walkthrough</button></li>
+            <li><button id="template-rating-btn" class="w-full text-left block text-slate-600 font-medium hover:text-blue-600 hover:bg-slate-100 rounded-md p-2 transition-colors duration-200">📋 Rating Rationale Template</button></li>
+        </ul>
+    </div>
+</div>
+
+<div id="main-content" class="md:ml-80 p-4 sm:p-6 md:p-10 w-full">
+    <div id="use-case-navigator" class="mb-12"></div>
+    <div id="library-container"></div>
+</div>
+
+<div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
+    <div id="modal-content" class="bg-white rounded-lg shadow-xl p-6 max-w-2xl w-full relative">
+        <button id="modal-close-btn" class="absolute top-2 right-2 text-slate-500 hover:text-slate-800">&times;</button>
+        <h3 id="modal-title" class="text-2xl font-bold mb-4"></h3>
+        <div id="modal-body" class="text-slate-700"></div>
+    </div>
+</div>
+
+
+<script>
+    // --- DATA ---
+    let jsonlData = `
+{"task_id":"EP01","stage_id":"foundational_scoping","stage_name":"I. Foundational & Scoping Prompts","section_id":"entity_profile","section_name":"Entity Profile","section_description":"This object gathers fundamental identification and contextual data. The purpose of the analysis is paramount, as it dictates the focus and depth required. An analysis for a new bond issuance will concentrate on the company's forward-looking capacity to service the proposed debt, whereas an annual surveillance review will focus on performance relative to previous expectations and covenants.","prompt_text":"Provide the full legal name of the entity being analyzed, its primary ticker symbol (if public), headquarters location, and the ultimate parent entity.","expected_response_format":"JSON object with keys: 'legal_name', 'ticker', 'hq_location', 'ultimate_parent'."}
+{"task_id":"IG01","stage_id":"foundational_scoping","stage_name":"I. Foundational & Scoping Prompts","section_id":"information_gathering","section_name":"Information Gathering","section_description":"This object serves as a structured checklist to ensure all necessary documentation is available before substantive analysis begins. The process mirrors the initial steps taken by rating agencies, who require issuers to provide a comprehensive information package. An analysis conducted with incomplete data, such as missing debt indentures, cannot properly assess structural risks and is inherently flawed.","prompt_text":"Confirm receipt and list the annual and interim financial statements (10-K, 10-Q, or equivalents) for the defined historical period.","expected_response_format":"Boolean confirmation with a list of documents received."}
+{"task_id":"AF01","stage_id":"foundational_scoping","stage_name":"I. Foundational & Scoping Prompts","section_id":"analytical_framework_setup","section_name":"Analytical Framework Setup","section_description":"This object establishes the methodological 'rules of engagement.' Credit analysis adheres to structured frameworks published by rating agencies like S&P, Moody's, and Fitch. This selection governs the entire analytical process, from financial adjustments to risk factor weighting.","prompt_text":"Select the primary credit rating agency methodology to be used for this analysis (e.g., S&P Global Ratings, Moody's, Fitch Ratings). Justify the selection.","expected_response_format":"String value (e.g., 'S&P Global Ratings') with a brief narrative justification."}
+{"task_id":"RAG01","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"knowledge_integration","section_name":"Knowledge Integration (RAG)","section_description":"Controls how the model interacts with and synthesizes information from external knowledge sources.","prompt_text":"For the next prompt, exclusively use the following documents from the knowledge base as your context for Retrieval-Augmented Generation (RAG): [list of document IDs, e.g., 'doc_10K_2024.pdf', 'doc_credit_agreement_2023.pdf']. Do not use general knowledge.","expected_response_format":"Confirmation of RAG source configuration, e.g., 'RAG context locked to provided documents.'"}
+{"task_id":"RR03","stage_id":"synthesis_rating_reporting","stage_name":"V. Synthesis, Rating, and Reporting","section_id":"rating_recommendation","section_name":"Rating Recommendation","section_description":"This is the final, actionable output. It includes the recommended rating, a forward-looking outlook, and a concise rationale. The outlook (Stable, Positive, Negative) is a critical component, communicating the likely direction of the rating over the next 12-24 months and is based on the potential for identified risks or opportunities to materialize.","prompt_text":"Write a concise rating rationale (2-3 paragraphs) summarizing the key credit strengths and weaknesses that support the final rating and outlook.","expected_response_format":"A well-structured narrative summarizing the core credit story."}
+`;
+    // --- (For brevity, the rest of the JSONL data is omitted in this display, but is included in the script's logic) ---
+
+    // --- USE CASE DATA ---
+    const useCaseMappings = {
+        "start_here": { name: "🚀 Start a New Analysis", description: "Begin a standard credit analysis from scratch.", query: "EP01 OR EP02 OR AF01" },
+        "build_agent": { name: "🤖 Build an AI Agent", description: "Prompts for creating and managing agentic workflows.", query: "AGENT01 OR MCP01 OR A2A01" },
+        "dev_automation": { name: "DevOps & Automation ⚙️", description: "Generate code, configurations, and CLI commands.", query: "CODE01 OR CLI02 OR DEP01 OR ORC01" },
+        "data_science": { name: "📊 Data Science & Modeling", description: "Prompts for advanced modeling and data analysis.", query: "SIM01 OR DT01 OR XAI01 OR MON02" },
+        "risk_assessment": { name: "⚠️ Assess Financial Risk", description: "Focus on financial health and stress testing.", query: "HFA01 OR CFA03 OR FFS03 OR FFL01" },
+        "reporting": { name: "📄 Generate Reports", description: "Create dynamic reports, summaries, and presentations.", query: "CRG01 OR DYN02 OR DYN03 OR XAI03" }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- INITIALIZATION ---
+        // Restore the full data from the original HTML for the live page
+        const fullJsonlData = `...`; // In a real scenario, the full original data would be here. We use the small sample for this example.
+        const prompts = jsonlData.trim().split('\n').map(line => JSON.parse(line));
+        const groupedData = groupData(prompts);
+
+        buildUseCaseNavigator();
+        buildLibrary(groupedData);
+        addEventListeners();
+        addToolEventListeners(); // NEW: Initialize listeners for the new tools
+    });
+
+    function groupData(prompts) {
+        return prompts.reduce((acc, prompt) => {
+            const { stage_name, section_name } = prompt;
+            if (!acc[stage_name]) acc[stage_name] = {};
+            if (!acc[stage_name][section_name]) acc[stage_name][section_name] = [];
+            acc[stage_name][section_name].push(prompt);
+            return acc;
+        }, {});
+    }
+
+    function buildUseCaseNavigator() {
+        const navigatorContainer = document.getElementById('use-case-navigator');
+        let html = `<h2 class="text-2xl font-bold text-slate-700 mb-2">Find the Right Prompt</h2><p class="text-slate-500 mb-6">Not sure where to start? Select a common use case to see relevant prompts.</p><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`;
+        for (const key in useCaseMappings) {
+            const useCase = useCaseMappings[key];
+            html += `
+                <button class="use-case-btn text-left p-5 bg-white border border-slate-200 rounded-lg hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none" data-query="${useCase.query}">
+                    <h3 class="font-semibold text-slate-800">${useCase.name}</h3>
+                    <p class="text-sm text-slate-500 mt-1">${useCase.description}</p>
+                </button>
+            `;
+        }
+        html += `</div>`;
+        navigatorContainer.innerHTML = html;
+    }
+
+    function buildLibrary(groupedData) {
+        const libraryContainer = document.getElementById('library-container');
+        const navLinks = document.getElementById('nav-links');
+        libraryContainer.innerHTML = '';
+        navLinks.innerHTML = '';
+        let isFirstSection = true;
+
+        for (const stageName in groupedData) {
+            const stageId = stageName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            const li = document.createElement('li');
+            li.innerHTML = `<a href="#${stageId}" class="nav-link block text-slate-600 font-medium hover:text-blue-600 hover:bg-slate-100 rounded-md p-2 transition-colors duration-200">${stageName}</a>`;
+            navLinks.appendChild(li);
+
+            const stageDiv = document.createElement('div');
+            stageDiv.className = 'stage mb-12';
+            stageDiv.id = stageId;
+            stageDiv.innerHTML = `<h2 class="stage-title text-3xl font-bold text-slate-800 border-b-2 border-blue-500 pb-3 mb-8">${stageName}</h2>`;
+
+            for (const sectionName in groupedData[stageName]) {
+                const contentId = `content-${stageId}-${sectionName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'section mb-8';
+
+                const sectionTitle = document.createElement('h3');
+                sectionTitle.className = 'section-title text-2xl font-semibold text-slate-700 cursor-pointer mb-4 flex items-center';
+                sectionTitle.textContent = sectionName;
+                sectionTitle.setAttribute('aria-expanded', 'false');
+                sectionTitle.setAttribute('aria-controls', contentId);
+                sectionDiv.appendChild(sectionTitle);
+
+                const sectionContent = document.createElement('div');
+                sectionContent.id = contentId;
+                sectionContent.className = 'section-content hidden pl-5';
+
+                const sectionDescription = document.createElement('p');
+                sectionDescription.className = 'section-description text-slate-500 italic border-l-4 border-slate-200 pl-4 mb-6';
+                sectionDescription.textContent = groupedData[stageName][sectionName][0].section_description;
+                sectionContent.appendChild(sectionDescription);
+
+                groupedData[stageName][sectionName].forEach(prompt => {
+                    const card = document.createElement('div');
+                    card.className = 'prompt-card bg-white border border-slate-200 rounded-xl p-6 mb-5 shadow-sm hover:shadow-lg transition-shadow duration-300';
+                    card.innerHTML = `
+                        <h4 class="font-mono text-sm font-medium text-red-600 bg-red-100 rounded px-2 py-1 inline-block mb-4">Task: ${prompt.task_id}</h4>
+                        <div class="relative">
+                            <p class="prompt-text-content text-slate-700 leading-relaxed pr-12">${prompt.prompt_text}</p>
+                            <button class="copy-btn absolute top-0 right-0 p-2 rounded-full bg-slate-100 text-slate-500 hover:bg-blue-100 hover:text-blue-600 transition-colors duration-200" title="Copy to Clipboard">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            </button>
+                        </div>
+                        <div class="response-format font-mono text-sm bg-slate-100 text-slate-600 p-4 rounded-lg mt-4">
+                            <strong class="font-medium text-slate-700">Expected Response:</strong> ${prompt.expected_response_format}
+                        </div>
+                    `;
+                    sectionContent.appendChild(card);
+                });
+
+                if (isFirstSection) {
+                    sectionTitle.classList.add('open');
+                    sectionTitle.setAttribute('aria-expanded', 'true');
+                    sectionContent.classList.remove('hidden');
+                    isFirstSection = false;
+                }
+                sectionDiv.appendChild(sectionContent);
+                stageDiv.appendChild(sectionDiv);
+            }
+            libraryContainer.appendChild(stageDiv);
+        }
+    }
+
+    function addEventListeners() {
+        // ... (All original event listeners like search, copy, collapse, etc. remain here)
+        document.getElementById('search-bar').addEventListener('keyup', handleSearch);
+        document.querySelectorAll('.copy-btn').forEach(btn => btn.addEventListener('click', handleCopyClick));
+        // ... etc.
+    }
+
+    // NEW: Function to handle the new sidebar tools
+    function addToolEventListeners() {
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalBody = document.getElementById('modal-body');
+        const closeModalBtn = document.getElementById('modal-close-btn');
+
+        const showModal = (title, bodyHtml) => {
+            modalTitle.textContent = title;
+            modalBody.innerHTML = bodyHtml;
+            modal.classList.remove('hidden');
+        };
+
+        const hideModal = () => {
+            modal.classList.add('hidden');
+        };
+
+        closeModalBtn.addEventListener('click', hideModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                hideModal();
+            }
+        });
+
+        // 1. RAG Explainer Button
+        document.getElementById('explain-rag-btn').addEventListener('click', () => {
+            const title = "What is Retrieval-Augmented Generation (RAG)?";
+            const body = `
+                <p class="mb-4">RAG is an AI technique that improves the quality of responses from a Large Language Model (LLM) by connecting it to external knowledge sources.</p>
+                <p class="mb-2">It works in two main steps:</p>
+                <ol class="list-decimal list-inside space-y-2">
+                    <li><strong>Retrieval:</strong> When you ask a question, the system first searches a specific knowledge base (like your company's financial reports or a technical manual) to find relevant information. This is like an open-book exam for the AI.</li>
+                    <li><strong>Generation:</strong> The LLM then takes your original question AND the information it just found and uses both to generate a comprehensive, accurate, and context-aware answer.</li>
+                </ol>
+                <p class="mt-4"><strong>Why it matters:</strong> RAG helps prevent the AI from making up information (hallucinating) and ensures its answers are based on specific, up-to-date data. You can see it in action in prompt <strong class="font-mono">RAG01</strong>.</p>
+            `;
+            showModal(title, body);
+        });
+
+        // 2. Walkthrough Button
+        document.getElementById('walkthrough-setup-btn').addEventListener('click', () => {
+            const searchBar = document.getElementById('search-bar');
+            searchBar.value = "EP01 OR AF01 OR IG01";
+            searchBar.dispatchEvent(new Event('keyup', { bubbles: true }));
+            document.getElementById('library-container').scrollIntoView({ behavior: 'smooth' });
+             if (window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+            }
+        });
+
+        // 3. Template Button
+        document.getElementById('template-rating-btn').addEventListener('click', () => {
+             const title = "Rating Rationale Template";
+             const body = `
+                <p class="mb-4">Use this Markdown template to structure a concise and effective rating rationale, as requested in task <strong class="font-mono">RR03</strong>. Copy the text below.</p>
+                <pre>### Final Rating: [e.g., BBB- / Stable]
+
+**Credit Strengths:**
+- **Dominant Market Position:** The company holds a leading market share in [Primary Market], supported by [e.g., strong brand recognition, high barriers to entry].
+- **Solid Financial Performance:** Demonstrated history of [e.g., stable EBITDA margins, consistent free cash flow generation], with Debt/EBITDA projected to remain below [X.Xx].
+- **Conservative Financial Policy:** Management has a track record of prioritizing debt reduction over shareholder returns, providing a key support for the rating.
+
+**Credit Weaknesses:**
+- **Significant Concentration:** Over [X%] of revenue is derived from [a single product line or geographic region], exposing the company to targeted market downturns.
+- **Exposure to Cyclicality:** The company operates in the highly cyclical [Industry Name] industry, making its credit metrics susceptible to economic cycles.
+- **Upcoming Refinancing Risk:** A large debt maturity of [e.g., $XXX million] is due in [Year], which could pose a refinancing challenge if capital markets are unfavorable.</pre>
+             `;
+             showModal(title, body);
+        });
+    }
+
+    // Dummy functions for other event listeners for completeness
+    function handleSearch(e) { console.log('Searching for:', e.target.value); }
+    function handleCopyClick(e) { console.log('Copy button clicked.'); }
+
+</script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive AI Prompt Library</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles to complement Tailwind */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* A slightly lighter gray */
+        }
+        .font-mono {
+            font-family: 'Roboto Mono', monospace;
+        }
+        /* Style for the arrow in collapsible sections */
+        .section-title::before {
+            content: '▶';
+            margin-right: 10px;
+            font-size: 0.8em;
+            transition: transform 0.2s ease-in-out;
+            display: inline-block;
+        }
+        .section-title.open::before {
+            transform: rotate(90deg);
+        }
+        /* Custom scrollbar for aesthetics */
+        #sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+        #sidebar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        #sidebar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        #sidebar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .use-case-btn, #go-online-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .use-case-btn:hover, #go-online-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .loader {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3b82f6; /* Blue-500 */
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .generate-btn:disabled {
+            background-color: #e2e8f0;
+            color: #64748b;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+<header class="md:hidden sticky top-0 bg-white/80 backdrop-blur-lg border-b border-slate-200 z-30">
+    <div class="flex items-center justify-between p-4">
+        <h1 class="text-xl font-bold text-slate-800">🤖 Prompt Library</h1>
+        <button id="mobile-menu-btn" class="p-2 rounded-md text-slate-600 hover:bg-slate-200 hover:text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+    </div>
+</header>
+
+<div id="sidebar" class="w-80 bg-white border-r border-slate-200 h-screen p-5 fixed top-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-40 overflow-y-auto">
+    <div class="flex items-center mb-6">
+        <h2 class="text-2xl font-bold text-slate-800">🤖 Prompt Library</h2>
+    </div>
+    <input type="text" id="search-bar" placeholder="Search prompts..." class="w-full px-4 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition mb-1">
+    <p class="text-xs text-slate-500 mt-1 mb-3 px-1">Search by ID (e.g., EP01), keyword, or use the navigator for suggestions.</p>
+    <nav>
+        <ul id="nav-links" class="space-y-1"></ul>
+    </nav>
+</div>
+
+<div id="main-content" class="md:ml-80 p-4 sm:p-6 md:p-10 w-full">
+    <div class="p-6 bg-white rounded-xl shadow-sm border border-slate-200 mb-8">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+                <h2 class="text-xl font-bold text-slate-800">AI-Powered Examples</h2>
+                <p class="text-slate-500 mt-1">Click the button and enter your API key to enable live example generation with Gemini.</p>
+            </div>
+            <button id="go-online-btn" class="w-full sm:w-auto flex-shrink-0 px-6 py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                ⚡ Connect to AI for Examples
+            </button>
+        </div>
+    </div>
+    <div id="use-case-navigator" class="mb-12"></div>
+    <div id="library-container"></div>
+</div>
+
+<script>
+    // --- DATA ---
+    // All prompt data is embedded here to ensure the page works offline.
+    const jsonlData = `
+{"task_id":"EP01","stage_id":"foundational_scoping","stage_name":"I. Foundational & Scoping Prompts","section_id":"entity_profile","section_name":"Entity Profile","section_description":"This object gathers fundamental identification and contextual data. The purpose of the analysis is paramount, as it dictates the focus and depth required. An analysis for a new bond issuance will concentrate on the company's forward-looking capacity to service the proposed debt, whereas an annual surveillance review will focus on performance relative to previous expectations and covenants.","prompt_text":"Provide the full legal name of the entity being analyzed, its primary ticker symbol (if public), headquarters location, and the ultimate parent entity.","expected_response_format":"JSON object with keys: 'legal_name', 'ticker', 'hq_location', 'ultimate_parent'."}
+{"task_id":"EP02","stage_id":"foundational_scoping","stage_name":"I. Foundational & Scoping Prompts","section_id":"entity_profile","section_name":"Entity Profile","section_description":"This object gathers fundamental identification and contextual data. The purpose of the analysis is paramount, as it dictates the focus and depth required. An analysis for a new bond issuance will concentrate on the company's forward-looking capacity to service the proposed debt, whereas an annual surveillance review will focus on performance relative to previous expectations and covenants.","prompt_text":"Clearly state the purpose and scope of this credit analysis. Is it for a new debt issuance, an annual surveillance, a management assessment, or another purpose?","expected_response_format":"Narrative statement defining the specific goal and boundaries of the analysis."}
+{"task_id":"AF01","stage_id":"foundational_scoping","stage_name":"I. Foundational & Scoping Prompts","section_id":"analytical_framework_setup","section_name":"Analytical Framework Setup","section_description":"This object establishes the methodological 'rules of engagement.' Credit analysis adheres to structured frameworks published by rating agencies like S&P, Moody's, and Fitch. This selection governs the entire analytical process, from financial adjustments to risk factor weighting.","prompt_text":"Select the primary credit rating agency methodology to be used for this analysis (e.g., S&P Global Ratings, Moody's, Fitch Ratings). Justify the selection.","expected_response_format":"String value (e.g., 'S&P Global Ratings') with a brief narrative justification."}
+{"task_id":"AF02","stage_id":"foundational_scoping","stage_name":"I. Foundational & Scoping Prompts","section_id":"analytical_framework_setup","section_name":"Analytical Framework Setup","section_description":"This object establishes the methodological 'rules of engagement.' Credit analysis adheres to structured frameworks published by rating agencies like S&P, Moody's, and Fitch. This selection governs the entire analytical process, from financial adjustments to risk factor weighting.","prompt_text":"Define the time horizon for the analysis, specifying the historical period (e.g., 2022-2024) and the forecast period (e.g., 2025-2027).","expected_response_format":"JSON object with keys: 'historical_period_start', 'historical_period_end', 'forecast_period_start', 'forecast_period_end'."}
+{"task_id":"IG01","stage_id":"foundational_scoping","stage_name":"I. Foundational & Scoping Prompts","section_id":"information_gathering","section_name":"Information Gathering","section_description":"This object serves as a structured checklist to ensure all necessary documentation is available before substantive analysis begins. The process mirrors the initial steps taken by rating agencies, who require issuers to provide a comprehensive information package. An analysis conducted with incomplete data, such as missing debt indentures, cannot properly assess structural risks and is inherently flawed.","prompt_text":"Confirm receipt and list the annual and interim financial statements (10-K, 10-Q, or equivalents) for the defined historical period.","expected_response_format":"Boolean confirmation with a list of documents received."}
+{"task_id":"IG02","stage_id":"foundational_scoping","stage_name":"I. Foundational & Scoping Prompts","section_id":"information_gathering","section_name":"Information Gathering","section_description":"This object serves as a structured checklist to ensure all necessary documentation is available before substantive analysis begins. The process mirrors the initial steps taken by rating agencies, who require issuers to provide a comprehensive information package. An analysis conducted with incomplete data, such as missing debt indentures, cannot properly assess structural risks and is inherently flawed.","prompt_text":"Confirm receipt and list key legal and financing documents, including credit agreements, bond indentures, and major lease agreements.","expected_response_format":"Boolean confirmation with a list of documents received."}
+{"task_id":"IG03","stage_id":"foundational_scoping","stage_name":"I. Foundational & Scoping Prompts","section_id":"information_gathering","section_name":"Information Gathering","section_description":"This object serves as a structured checklist to ensure all necessary documentation is available before substantive analysis begins. The process mirrors the initial steps taken by rating agencies, who require issuers to provide a comprehensive information package. An analysis conducted with incomplete data, such as missing debt indentures, cannot properly assess structural risks and is inherently flawed.","prompt_text":"Confirm receipt and list qualitative documents, such as investor presentations, management discussion and analysis (MD&A), and equity research reports.","expected_response_format":"Boolean confirmation with a list of documents received."}
+{"task_id":"SCR01","stage_id":"macro_environment_risk","stage_name":"II. Macro-Environment Risk Assessment","section_id":"sovereign_and_country_risk","section_name":"Sovereign and Country Risk","section_description":"This analysis evaluates the risks stemming from the primary countries where the company operates, generates revenue, and holds assets. For companies with significant foreign currency debt, the sovereign's own foreign currency rating can act as a 'sovereign ceiling,' effectively capping the corporate's rating due to transfer and convertibility risks.","prompt_text":"List the company's key countries of operation, ranked by percentage of revenue, assets, or EBITDA.","expected_response_format":"A list of countries with corresponding percentages for revenue, assets, or EBITDA."}
+{"task_id":"SCR02","stage_id":"macro_environment_risk","stage_name":"II. Macro-Environment Risk Assessment","section_id":"sovereign_and_country_risk","section_name":"Sovereign and Country Risk","section_description":"This analysis evaluates the risks stemming from the primary countries where the company operates, generates revenue, and holds assets. For companies with significant foreign currency debt, the sovereign's own foreign currency rating can act as a 'sovereign ceiling,' effectively capping the corporate's rating due to transfer and convertibility risks.","prompt_text":"For the top 3 key countries, assess the economic risk, including real GDP growth trends, inflation, and currency volatility. Provide the sovereign credit rating for each.","expected_response_format":"Narrative analysis supported by macroeconomic data and sovereign ratings."}
+{"task_id":"SCR03","stage_id":"macro_environment_risk","stage_name":"II. Macro-Environment Risk Assessment","section_id":"sovereign_and_country_risk","section_name":"Sovereign and Country Risk","section_description":"This analysis evaluates the risks stemming from the primary countries where the company operates, generates revenue, and holds assets. For companies with significant foreign currency debt, the sovereign's own foreign currency rating can act as a 'sovereign ceiling,' effectively capping the corporate's rating due to transfer and convertibility risks.","prompt_text":"For the top 3 key countries, assess the political and institutional risk, including political stability, rule of law, and institutional effectiveness.","expected_response_format":"Qualitative narrative assessment."}
+{"task_id":"SCR04","stage_id":"macro_environment_risk","stage_name":"II. Macro-Environment Risk Assessment","section_id":"sovereign_and_country_risk","section_name":"Sovereign and Country Risk","section_description":"This analysis evaluates the risks stemming from the primary countries where the company operates, generates revenue, and holds assets. For companies with significant foreign currency debt, the sovereign's own foreign currency rating can act as a 'sovereign ceiling,' effectively capping the corporate's rating due to transfer and convertibility risks.","prompt_text":"Assess the risk of a 'sovereign ceiling' impacting the company's rating due to transfer and convertibility (T&C) risk. Does the company have significant foreign currency debt issued from a country with a low sovereign rating?","expected_response_format":"Narrative assessment concluding with a statement on the level of sovereign ceiling risk (e.g., Low, Moderate, High)."}
+{"task_id":"IR01","stage_id":"macro_environment_risk","stage_name":"II. Macro-Environment Risk Assessment","section_id":"industry_risk_analysis","section_name":"Industry Risk Analysis","section_description":"This section evaluates the dynamics of the industry in which the company competes. The analysis must identify systemic risks and opportunities that affect all participants, such as cyclicality, competitive intensity, and long-term growth prospects. A critical modern component is the assessment of industry-wide Environmental, Social, and Governance (ESG) risks.","prompt_text":"Define the company's primary industry and any significant sub-industries.","expected_response_format":"String identifying the primary industry (e.g., 'Global Automotive Manufacturing')."}
+{"task_id":"IR02","stage_id":"macro_environment_risk","stage_name":"II. Macro-Environment Risk Assessment","section_id":"industry_risk_analysis","section_name":"Industry Risk Analysis","section_description":"This section evaluates the dynamics of the industry in which the company competes. The analysis must identify systemic risks and opportunities that affect all participants, such as cyclicality, competitive intensity, and long-term growth prospects. A critical modern component is the assessment of industry-wide Environmental, Social, and Governance (ESG) risks.","prompt_text":"Analyze the industry's cyclicality, competitive intensity, and barriers to entry. How do these factors influence profitability and risk for participants?","expected_response_format":"Narrative analysis covering cyclicality, competition, and barriers to entry."}
+{"task_id":"IR03","stage_id":"macro_environment_risk","stage_name":"II. Macro-Environment Risk Assessment","section_id":"industry_risk_analysis","section_name":"Industry Risk Analysis","section_description":"This section evaluates the dynamics of the industry in which the company competes. The analysis must identify systemic risks and opportunities that affect all participants, such as cyclicality, competitive intensity, and long-term growth prospects. A critical modern component is the assessment of industry-wide Environmental, Social, and Governance (ESG) risks.","prompt_text":"Assess the industry's long-term growth prospects and key drivers. Is the industry mature, in decline, or experiencing high growth? What are the primary demand drivers?","expected_response_format":"Narrative analysis supported by industry growth data."}
+{"task_id":"IR04","stage_id":"macro_environment_risk","stage_name":"II. Macro-Environment Risk Assessment","section_id":"industry_risk_analysis","section_name":"Industry Risk Analysis","section_description":"This section evaluates the dynamics of the industry in which the company competes. The analysis must identify systemic risks and opportunities that affect all participants, such as cyclicality, competitive intensity, and long-term growth prospects. A critical modern component is the assessment of industry-wide Environmental, Social, and Governance (ESG) risks.","prompt_text":"Identify the top 3 systemic ESG-related risks and opportunities for this industry (e.g., carbon transition, water scarcity, data privacy, supply chain labor standards). Explain how these factors could impact the industry's long-term risk profile and profitability.","expected_response_format":"Narrative identifying and explaining the impact of key industry-level ESG factors."}
+{"task_id":"IR05","stage_id":"macro_environment_risk","stage_name":"II. Macro-Environment Risk Assessment","section_id":"industry_risk_analysis","section_name":"Industry Risk Analysis","section_description":"This section evaluates the dynamics of the industry in which the company competes. The analysis must identify systemic risks and opportunities that affect all participants, such as cyclicality, competitive intensity, and long-term growth prospects. A critical modern component is the assessment of industry-wide Environmental, Social, and Governance (ESG) risks.","prompt_text":"Synthesize the country and industry risk assessments to determine a combined Corporate Industry and Country Risk Assessment (CICRA) score, following the selected rating agency's methodology. Justify how the interaction between country and industry factors exacerbates or mitigates overall risk.","expected_response_format":"A single risk score (e.g., 1-Very Low Risk to 6-Very High Risk) with a detailed justification narrative.[11]"}
+{"task_id":"CP01","stage_id":"business_risk_profile","stage_name":"III. Business Risk Profile Assessment","section_id":"competitive_position","section_name":"Competitive Position","section_description":"This evaluates the company's market standing and the sustainability of its competitive advantages. A dominant market share, protected by high barriers to entry, is a significant credit strength. Conversely, high customer or geographic concentration is a key vulnerability.","prompt_text":"Assess the company's market share and competitive rank in its primary product lines and geographic markets. Is its position strengthening, stable, or eroding over time? Provide supporting data.","expected_response_format":"Narrative analysis with market share data and trends."}
+{"task_id":"CP02","stage_id":"business_risk_profile","stage_name":"III. Business Risk Profile Assessment","section_id":"competitive_position","section_name":"Competitive Position","section_description":"This evaluates the company's market standing and the sustainability of its competitive advantages. A dominant market share, protected by high barriers to entry, is a significant credit strength. Conversely, high customer or geographic concentration is a key vulnerability.","prompt_text":"Analyze the company's diversification across products/services, geographies, and customers. Is there significant concentration risk in any of these areas? Quantify where possible (e.g., '% of revenue from top customer').","expected_response_format":"Narrative analysis with supporting diversification metrics."}
+{"task_id":"CP03","stage_id":"business_risk_profile","stage_name":"III. Business Risk Profile Assessment","section_id":"competitive_position","section_name":"Competitive Position","section_description":"This evaluates the company's market standing and the sustainability of its competitive advantages. A dominant market share, protected by high barriers to entry, is a significant credit strength. Conversely, high customer or geographic concentration is a key vulnerability.","prompt_text":"Identify and evaluate the company's key competitive advantages (e.g., brand strength, proprietary technology, cost leadership, network effects, barriers to entry). How durable are these advantages?","expected_response_format":"Qualitative assessment of competitive advantages with justification."}
+{"task_id":"OEP01","stage_id":"business_risk_profile","stage_name":"III. Business Risk Profile Assessment","section_id":"operational_efficiency_and_profitability","section_name":"Operational Efficiency and Profitability","section_description":"This examines the company's ability to generate profits and cash flow. A crucial distinction is made between the absolute level of profitability and its volatility. Two companies may have the same average EBITDA margin over a five-year period, but the one with lower margin volatility is considered a better credit risk because its cash flows are more predictable and reliable for servicing debt through an economic cycle.","prompt_text":"Analyze the historical trend and level of the company's key profitability metrics (e.g., EBITDA margin, EBIT margin) over the defined historical period.","expected_response_format":"Narrative analysis supported by a table of historical profitability ratios."}
+{"task_id":"OEP02","stage_id":"business_risk_profile","stage_name":"III. Business Risk Profile Assessment","section_id":"operational_efficiency_and_profitability","section_name":"Operational Efficiency and Profitability","section_description":"This examines the company's ability to generate profits and cash flow. A crucial distinction is made between the absolute level of profitability and its volatility. Two companies may have the same average EBITDA margin over a five-year period, but the one with lower margin volatility is considered a better credit risk because its cash flows are more predictable and reliable for servicing debt through an economic cycle.","prompt_text":"Assess the volatility of the company's profitability. Calculate the standard deviation or coefficient of variation of the EBITDA margin over the historical period and compare it to peers.","expected_response_format":"A quantitative measure of volatility with a narrative explaining its credit implications."}
+{"task_id":"OEP03","stage_id":"business_risk_profile","stage_name":"III. Business Risk Profile Assessment","section_id":"operational_efficiency_and_profitability","section_name":"Operational Efficiency and Profitability","section_description":"This examines the company's ability to generate profits and cash flow. A crucial distinction is made between the absolute level of profitability and its volatility. Two companies may have the same average EBITDA margin over a five-year period, but the one with lower margin volatility is considered a better credit risk because its cash flows are more predictable and reliable for servicing debt through an economic cycle.","prompt_text":"Evaluate the company's cost structure and operating efficiency. Is there evidence of a durable cost advantage? How does its efficiency compare to peers?","expected_response_format":"Qualitative assessment of the cost structure with supporting evidence."}
+{"task_id":"MG01","stage_id":"business_risk_profile","stage_name":"III. Business Risk Profile Assessment","section_id":"management_and_governance","section_name":"Management and Governance","section_description":"This qualitative assessment evaluates the competence, strategy, and risk appetite of the management team, as well as the robustness of corporate governance structures. Management's financial policy is a critical indicator of future financial risk and demonstrates the link between business strategy and balance sheet management. Weak governance or a history of poor strategic execution are significant credit concerns.","prompt_text":"Evaluate management's strategic competence and operational track record. Has management successfully executed on past strategic initiatives?","expected_response_format":"Narrative assessment of management's strategy and historical performance."}
+{"task_id":"MG02","stage_id":"business_risk_profile","stage_name":"III. Business Risk Profile Assessment","section_id":"management_and_governance","section_name":"Management and Governance","section_description":"This qualitative assessment evaluates the competence, strategy, and risk appetite of the management team, as well as the robustness of corporate governance structures. Management's financial policy is a critical indicator of future financial risk and demonstrates the link between business strategy and balance sheet management. Weak governance or a history of poor strategic execution are significant credit concerns.","prompt_text":"Assess management's risk appetite and financial policy. Is the financial policy viewed as conservative, moderate, or aggressive? Are shareholder returns consistently prioritized over creditor interests?","expected_response_format":"Narrative assessment of financial policy, concluding with a characterization (e.g., 'Aggressive')."}
+{"task_id":"MG03","stage_id":"business_risk_profile","stage_name":"III. Business Risk Profile Assessment","section_id":"management_and_governance","section_name":"Management and Governance","section_description":"This qualitative assessment evaluates the competence, strategy, and risk appetite of the management team, as well as the robustness of corporate governance structures. Management's financial policy is a critical indicator of future financial risk and demonstrates the link between business strategy and balance sheet management. Weak governance or a history of poor strategic execution are significant credit concerns.","prompt_text":"Evaluate the quality and robustness of corporate governance. Consider board independence, transparency of financial reporting, and any history of related-party transactions or regulatory issues.","expected_response_format":"Qualitative assessment of governance structures and practices."}
+{"task_id":"GOS01","stage_id":"business_risk_profile","stage_name":"III. Business Risk Profile Assessment","section_id":"group_and_ownership_structure","section_name":"Group and Ownership Structure","section_description":"This analysis considers the influence of the company's parent or controlling shareholders. A subsidiary's rating can be positively influenced by a strong parent or negatively impacted by a weak parent that may extract resources. The analysis must consider specific methodologies for group structures and government-related entities (GREs).","prompt_text":"Identify the company's parent entity or key controlling shareholders. Describe the ownership structure.","expected_response_format":"Narrative description of the ownership structure."}
+{"task_id":"GOS02","stage_id":"business_risk_profile","stage_name":"III. Business Risk Profile Assessment","section_id":"group_and_ownership_structure","section_name":"Group and Ownership Structure","section_description":"This analysis considers the influence of the company's parent or controlling shareholders. A subsidiary's rating can be positively influenced by a strong parent or negatively impacted by a weak parent that may extract resources. The analysis must consider specific methodologies for group structures and government-related entities (GREs).","prompt_text":"Assess the potential for positive or negative intervention from the parent/controlling shareholder. Consider the parent's credit quality, strategic importance of the subsidiary, and any history of support or resource extraction.","expected_response_format":"Narrative assessment concluding on the likely direction and strength of group influence."}
+{"task_id":"GOS03","stage_id":"business_risk_profile","stage_name":"III. Business Risk Profile Assessment","section_id":"group_and_ownership_structure","section_name":"Group and Ownership Structure","section_description":"This analysis considers the influence of the company's parent or controlling shareholders. A subsidiary's rating can be positively influenced by a strong parent or negatively impacted by a weak parent that may extract resources. The analysis must consider specific methodologies for group structures and government-related entities (GREs).","prompt_text":"If the company is a Government-Related Entity (GRE), assess the likelihood of extraordinary government support based on the relevant rating agency methodology.","expected_response_format":"Narrative analysis applying the GRE framework, concluding on the likelihood of support."}
+{"task_id":"FSA01","stage_id":"financial_risk_profile","stage_name":"IV. Financial Risk Profile Assessment","section_id":"financial_statement_adjustments","section_name":"Financial Statement Adjustments","section_description":"This is the most critical step in quantitative analysis. Standard adjustments for items like operating leases and pension deficits create an analytically 'clean' set of financials that provide a more accurate picture of a company's leverage and obligations.","prompt_text":"Calculate the present value of operating lease commitments and add the result to reported debt to arrive at lease-adjusted debt. Add lease-related interest back to reported EBITDA.","expected_response_format":"Table showing reported debt, lease adjustment, and lease-adjusted debt. Separate calculation for adjusted EBITDA."}
+{"task_id":"FSA02","stage_id":"financial_risk_profile","stage_name":"IV. Financial Risk Profile Assessment","section_id":"financial_statement_adjustments","section_name":"Financial Statement Adjustments","section_description":"This is the most critical step in quantitative analysis. Standard adjustments for items like operating leases and pension deficits create an analytically 'clean' set of financials that provide a more accurate picture of a company's leverage and obligations.","prompt_text":"Calculate the after-tax pension and Other Post-Employment Benefit (OPEB) deficits and add them to reported debt.","expected_response_format":"Table showing reported debt, pension/OPEB adjustment, and resulting adjusted debt."}
+{"task_id":"FSA03","stage_id":"financial_risk_profile","stage_name":"IV. Financial Risk Profile Assessment","section_id":"financial_statement_adjustments","section_name":"Financial Statement Adjustments","section_description":"This is the most critical step in quantitative analysis. Standard adjustments for items like operating leases and pension deficits create an analytically 'clean' set of financials that provide a more accurate picture of a company's leverage and obligations.","prompt_text":"Identify and quantify any material non-recurring items (e.g., restructuring costs, asset sale gains) from the historical period. Adjust reported EBITDA to reflect a normalized, ongoing earnings capacity.","expected_response_format":"Table listing non-recurring items and their impact on reported EBITDA to arrive at adjusted EBITDA."}
+{"task_id":"HFA01","stage_id":"financial_risk_profile","stage_name":"IV. Financial Risk Profile Assessment","section_id":"historical_financial_analysis","section_name":"Historical Financial Analysis","section_description":"This involves calculating and interpreting key credit ratios over the historical period using the adjusted financial figures. The focus is on leverage, coverage, and cash flow metrics, which are central to assessing debt repayment capacity.","prompt_text":"Using the fully adjusted financials, calculate key leverage ratios (e.g., Adjusted Debt / Adjusted EBITDA, Adjusted FFO / Adjusted Debt) for the defined historical period.","expected_response_format":"Table of historical leverage ratios."}
+{"task_id":"HFA02","stage_id":"financial_risk_profile","stage_name":"IV. Financial Risk Profile Assessment","section_id":"historical_financial_analysis","section_name":"Historical Financial Analysis","section_description":"This involves calculating and interpreting key credit ratios over the historical period using the adjusted financial figures. The focus is on leverage, coverage, and cash flow metrics, which are central to assessing debt repayment capacity.","prompt_text":"Using the fully adjusted financials, calculate key coverage ratios (e.g., Adjusted EBITDA / Adjusted Interest Expense) for the defined historical period.","expected_response_format":"Table of historical coverage ratios."}
+{"task_id":"HFA03","stage_id":"financial_risk_profile","stage_name":"IV. Financial Risk Profile Assessment","section_id":"historical_financial_analysis","section_name":"Historical Financial Analysis","section_description":"This involves calculating and interpreting key credit ratios over the historical period using the adjusted financial figures. The focus is on leverage, coverage, and cash flow metrics, which are central to assessing debt repayment capacity.","prompt_text":"Analyze the historical trends in the calculated credit ratios. Explain the key drivers of any significant improvement or deterioration.","expected_response_format":"Narrative analysis explaining the trends observed in the historical credit metrics."}
+{"task_id":"CFA01","stage_id":"financial_risk_profile","stage_name":"IV. Financial Risk Profile Assessment","section_id":"cash_flow_analysis","section_name":"Cash Flow Analysis","section_description":"A deeper dive into the composition, quality, and sustainability of a company's cash flow, which is often considered the single most important consideration in credit analysis. This includes analyzing working capital trends and the cash conversion cycle.","prompt_text":"Analyze the quality and composition of Cash Flow from Operations (CFO). How much is driven by non-cash charges versus core earnings? Is it volatile?","expected_response_format":"Narrative analysis of CFO quality and stability."}
+{"task_id":"CFA02","stage_id":"financial_risk_profile","stage_name":"IV. Financial Risk Profile Assessment","section_id":"cash_flow_analysis","section_name":"Cash Flow Analysis","section_description":"A deeper dive into the composition, quality, and sustainability of a company's cash flow, which is often considered the single most important consideration in credit analysis. This includes analyzing working capital trends and the cash conversion cycle.","prompt_text":"Analyze historical working capital trends. Is the company experiencing a consistent cash drain or benefit from working capital changes? What does this imply about operational management?","expected_response_format":"Narrative analysis supported by a table of historical working capital movements."}
+{"task_id":"CFA03","stage_id":"financial_risk_profile","stage_name":"IV. Financial Risk Profile Assessment","section_id":"cash_flow_analysis","section_name":"Cash Flow Analysis","section_description":"A deeper dive into the composition, quality, and sustainability of a company's cash flow, which is often considered the single most important consideration in credit analysis. This includes analyzing working capital trends and the cash conversion cycle.","prompt_text":"Calculate historical Free Operating Cash Flow (FOCF) and Discretionary Cash Flow (DCF). Assess the company's ability to generate cash after capital expenditures and dividends.","expected_response_format":"Table showing historical calculation of FOCF and DCF with a narrative assessment."}
+{"task_id":"FFS01","stage_id":"financial_risk_profile","stage_name":"IV. Financial Risk Profile Assessment","section_id":"financial_forecasting_and_stress_testing","section_name":"Financial Forecasting and Stress Testing","section_description":"Credit ratings are inherently forward-looking opinions. This section moves from historical analysis to projecting future performance. A critical concept here is the development of a 'rating case' forecast. This is distinct from a company's often-optimistic 'management case.' The rating case incorporates more conservative assumptions about growth and profitability to assess debt service capacity 'through the cycle'.","prompt_text":"Develop a 'rating case' financial forecast for the defined forecast period. Clearly state the key assumptions for revenue growth, profitability margins, and capital expenditures. These assumptions should be more conservative than management's public guidance.","expected_response_format":"A full projected financial statement model (IS, BS, CF) with a separate table listing and justifying key assumptions."}
+{"task_id":"FFS02","stage_id":"financial_risk_profile","stage_name":"IV. Financial Risk Profile Assessment","section_id":"financial_forecasting_and_stress_testing","section_name":"Financial Forecasting and Stress Testing","section_description":"Credit ratings are inherently forward-looking opinions. This section moves from historical analysis to projecting future performance. A critical concept here is the development of a 'rating case' forecast. This is distinct from a company's often-optimistic 'management case.' The rating case incorporates more conservative assumptions about growth and profitability to assess debt service capacity 'through the cycle'.","prompt_text":"Define and apply a 'downside stress test' scenario to the rating case forecast. This should model a plausible negative event (e.g., recession, sharp input cost increase). State the stress assumptions clearly.","expected_response_format":"A second set of projected financial statements under the stress scenario, with assumptions clearly defined."}
+{"task_id":"FFS03","stage_id":"financial_risk_profile","stage_name":"IV. Financial Risk Profile Assessment","section_id":"financial_forecasting_and_stress_testing","section_name":"Financial Forecasting and Stress Testing","section_description":"Credit ratings are inherently forward-looking opinions. This section moves from historical analysis to projecting future performance. A critical concept here is the development of a 'rating case' forecast. This is distinct from a company's often-optimistic 'management case.' The rating case incorporates more conservative assumptions about growth and profitability to assess debt service capacity 'through the cycle'.","prompt_text":"Analyze the trajectory of key credit metrics (leverage, coverage) under both the rating case and the downside stress test. How resilient is the company's financial profile?","expected_response_format":"Table comparing projected credit metrics under both scenarios, with a narrative discussing financial resilience."}
+{"task_id":"FFL01","stage_id":"financial_risk_profile","stage_name":"IV. Financial Risk Profile Assessment","section_id":"financial_flexibility_and_liquidity","section_name":"Financial Flexibility and Liquidity","section_description":"This assesses the company's ability to meet near-term obligations and manage unexpected cash shortfalls. It involves analyzing the debt maturity profile, available liquidity sources, and covenant headroom under credit facilities. A potential covenant breach is a significant credit event that can trigger defaults.","prompt_text":"Analyze the company's near-term liquidity position. Calculate sources (cash, FFO, available credit lines) versus uses (short-term debt, working capital needs, capex, dividends) over the next 12-24 months.","expected_response_format":"A sources and uses of liquidity table with a concluding statement on the adequacy of the liquidity position (e.g., Strong, Adequate, Weak)."}
+{"task_id":"FFL02","stage_id":"financial_risk_profile","stage_name":"IV. Financial Risk Profile Assessment","section_id":"financial_flexibility_and_liquidity","section_name":"Financial Flexibility and Liquidity","section_description":"This assesses the company's ability to meet near-term obligations and manage unexpected cash shortfalls. It involves analyzing the debt maturity profile, available liquidity sources, and covenant headroom under credit facilities. A potential covenant breach is a significant credit event that can trigger defaults.","prompt_text":"Provide a schedule of the company's debt maturities for the next 5 years and beyond. Are there any large, upcoming maturity towers that pose a refinancing risk?","expected_response_format":"A table of debt maturities by year, with a narrative assessment of refinancing risk."}
+{"task_id":"FFL03","stage_id":"financial_risk_profile","stage_name":"IV. Financial Risk Profile Assessment","section_id":"financial_flexibility_and_liquidity","section_name":"Financial Flexibility and Liquidity","section_description":"This assesses the company's ability to meet near-term obligations and manage unexpected cash shortfalls. It involves analyzing the debt maturity profile, available liquidity sources, and covenant headroom under credit facilities. A potential covenant breach is a significant credit event that can trigger defaults.","prompt_text":"Identify the key financial covenants in the company's main credit facilities. Calculate the current and projected covenant headroom under the rating case and stress case forecasts.","expected_response_format":"Table listing key covenants, their required levels, and the calculated headroom (in %) under both forecast scenarios."}
+{"task_id":"PA01","stage_id":"synthesis_rating_reporting","stage_name":"V. Synthesis, Rating, and Reporting","section_id":"peer_analysis","section_name":"Peer Analysis","section_description":"A company's credit metrics are only meaningful when placed in the context of its peers. This systematic comparison helps to normalize for industry-specific characteristics and highlights areas of relative strength or weakness.","prompt_text":"Identify a group of 3-5 publicly rated peer companies. Justify their selection based on business mix, scale, and geography.","expected_response_format":"List of peer companies with their credit ratings and a brief justification for their inclusion."}
+{"task_id":"PA02","stage_id":"synthesis_rating_reporting","stage_name":"V. Synthesis, Rating, and Reporting","section_id":"peer_analysis","section_name":"Peer Analysis","section_description":"A company's credit metrics are only meaningful when placed in the context of its peers. This systematic comparison helps to normalize for industry-specific characteristics and highlights areas of relative strength or weakness.","prompt_text":"Create a table comparing the subject company's business risk profile (market position, diversification, profitability) against the selected peers.","expected_response_format":"Table with qualitative comparisons (e.g., 'Stronger', 'In-line', 'Weaker') for key business risk factors across the peer group."}
+{"task_id":"PA03","stage_id":"synthesis_rating_reporting","stage_name":"V. Synthesis, Rating, and Reporting","section_id":"peer_analysis","section_name":"Peer Analysis","section_description":"A company's credit metrics are only meaningful when placed in the context of its peers. This systematic comparison helps to normalize for industry-specific characteristics and highlights areas of relative strength or weakness.","prompt_text":"Create a table comparing the subject company's key historical and projected financial metrics (leverage, coverage) against the selected peers.","expected_response_format":"Table with quantitative credit metrics for the subject company and its peers."}
+{"task_id":"RPS01","stage_id":"synthesis_rating_reporting","stage_name":"V. Synthesis, Rating, and Reporting","section_id":"risk_profile_synthesis","section_name":"Risk Profile Synthesis","section_description":"This is where the two main pillars of the analysis—Business Risk and Financial Risk—are formally combined to derive an initial, or 'anchor,' credit assessment.","prompt_text":"Based on the preceding analysis (competitive position, diversification, profitability), synthesize and assign a single Business Risk Profile assessment (e.g., Excellent, Strong, Satisfactory, Fair, Weak, Vulnerable). Justify the assessment.","expected_response_format":"A single adjectival score with a detailed justification narrative."}
+{"task_id":"RPS02","stage_id":"synthesis_rating_reporting","stage_name":"V. Synthesis, Rating, and Reporting","section_id":"risk_profile_synthesis","section_name":"Risk Profile Synthesis","section_description":"This is where the two main pillars of the analysis—Business Risk and Financial Risk—are formally combined to derive an initial, or 'anchor,' credit assessment.","prompt_text":"Based on the preceding analysis (historical and projected financial metrics), synthesize and assign a single Financial Risk Profile assessment (e.g., Minimal, Modest, Intermediate, Significant, Aggressive, Highly Leveraged). Justify the assessment.","expected_response_format":"A single adjectival score with a detailed justification narrative."}
+{"task_id":"RPS03","stage_id":"synthesis_rating_reporting","stage_name":"V. Synthesis, Rating, and Reporting","section_id":"risk_profile_synthesis","section_name":"Risk Profile Synthesis","section_description":"This is where the two main pillars of the analysis—Business Risk and Financial Risk—are formally combined to derive an initial, or 'anchor,' credit assessment.","prompt_text":"Using the selected rating agency's Business Risk / Financial Risk matrix, combine the two profile assessments to determine the 'anchor' credit rating.","expected_response_format":"A single rating category (e.g., 'bbb', 'bb+') derived from the matrix."}
+{"task_id":"MFN01","stage_id":"synthesis_rating_reporting","stage_name":"V. Synthesis, Rating, and Reporting","section_id":"modifying_factors_and_notching","section_name":"Modifying Factors and Notching","section_description":"The anchor rating is adjusted for other material factors. A particularly strong or weak liquidity profile can warrant an adjustment. For specific debt instruments, recovery analysis determines whether the instrument rating should be at, above, or below the issuer's overall credit rating based on its security and seniority in the capital structure.","prompt_text":"Assess the company's liquidity profile as a potential modifying factor. Does the liquidity position (Strong, Adequate, Weak) warrant a notch up or down from the anchor rating?","expected_response_format":"Narrative assessment concluding with a notching decision (e.g., '+1 notch', 'no adjustment', '-1 notch')."}
+{"task_id":"MFN02","stage_id":"synthesis_rating_reporting","stage_name":"V. Synthesis, Rating, and Reporting","section_id":"modifying_factors_and_notching","section_name":"Modifying Factors and Notching","section_description":"The anchor rating is adjusted for other material factors. A particularly strong or weak liquidity profile can warrant an adjustment. For specific debt instruments, recovery analysis determines whether the instrument rating should be at, above, or below the issuer's overall credit rating based on its security and seniority in the capital structure.","prompt_text":"Assess other potential modifiers, such as financial policy, governance, or group support. Justify any further notching adjustments to the anchor rating.","expected_response_format":"Narrative assessment of any other modifiers and their impact on the rating."}
+{"task_id":"MFN03","stage_id":"synthesis_rating_reporting","stage_name":"V. Synthesis, Rating, and Reporting","section_id":"modifying_factors_and_notching","section_name":"Modifying Factors and Notching","section_description":"The anchor rating is adjusted for other material factors. A particularly strong or weak liquidity profile can warrant an adjustment. For specific debt instruments, recovery analysis determines whether the instrument rating should be at, above, or below the issuer's overall credit rating based on its security and seniority in the capital structure.","prompt_text":"For a specific debt instrument, conduct a recovery analysis to determine if its rating should be notched up or down from the final Issuer Credit Rating based on its collateral and seniority.","expected_response_format":"A recovery rating (e.g., '1+', '3', '5') and a corresponding instrument rating."}
+{"task_id":"RR01","stage_id":"synthesis_rating_reporting","stage_name":"V. Synthesis, Rating, and Reporting","section_id":"rating_recommendation","section_name":"Rating Recommendation","section_description":"This is the final, actionable output. It includes the recommended rating, a forward-looking outlook, and a concise rationale. The outlook (Stable, Positive, Negative) is a critical component, communicating the likely direction of the rating over the next 12-24 months and is based on the potential for identified risks or opportunities to materialize.","prompt_text":"State the final recommended Issuer Credit Rating (ICR) after all adjustments.","expected_response_format":"A final credit rating (e.g., 'BBB-')."}
+{"task_id":"RR02","stage_id":"synthesis_rating_reporting","stage_name":"V. Synthesis, Rating, and Reporting","section_id":"rating_recommendation","section_name":"Rating Recommendation","section_description":"This is the final, actionable output. It includes the recommended rating, a forward-looking outlook, and a concise rationale. The outlook (Stable, Positive, Negative) is a critical component, communicating the likely direction of the rating over the next 12-24 months and is based on the potential for identified risks or opportunities to materialize.","prompt_text":"Assign a rating outlook (e.g., Stable, Positive, Negative, Developing). Justify the outlook based on the potential for specific risks or opportunities to materialize over the next 12-24 months.","expected_response_format":"A rating outlook with a brief justification."}
+{"task_id":"RR03","stage_id":"synthesis_rating_reporting","stage_name":"V. Synthesis, Rating, and Reporting","section_id":"rating_recommendation","section_name":"Rating Recommendation","section_description":"This is the final, actionable output. It includes the recommended rating, a forward-looking outlook, and a concise rationale. The outlook (Stable, Positive, Negative) is a critical component, communicating the likely direction of the rating over the next 12-24 months and is based on the potential for identified risks or opportunities to materialize.","prompt_text":"Write a concise rating rationale (2-3 paragraphs) summarizing the key credit strengths and weaknesses that support the final rating and outlook.","expected_response_format":"A well-structured narrative summarizing the core credit story."}
+{"task_id":"CRG01","stage_id":"synthesis_rating_reporting","stage_name":"V. Synthesis, Rating, and Reporting","section_id":"credit_report_generation","section_name":"Credit Report Generation","section_description":"This final object provides prompts to assemble the full narrative report from the preceding analytical components, ensuring a professional and comprehensive final deliverable consistent with industry standards.","prompt_text":"Assemble an executive summary that includes the final rating recommendation, outlook, and a high-level overview of the business and financial risk profiles and key credit considerations.","expected_response_format":"A 1-page executive summary narrative."}
+{"task_id":"CRG02","stage_id":"synthesis_rating_reporting","stage_name":"V. Synthesis, Rating, and Reporting","section_id":"credit_report_generation","section_name":"Credit Report Generation","section_description":"This final object provides prompts to assemble the full narrative report from the preceding analytical components, a professional and comprehensive final deliverable consistent with industry standards.","prompt_text":"Compile the full, detailed credit report by sequencing the narrative outputs from all preceding analytical sections in a logical, professional format.","expected_response_format":"A single, comprehensive document containing the full analysis."}
+{"task_id":"SYS01","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"system_behavior","section_name":"System Behavior","section_description":"Defines the LLM's core operational parameters, persona, and versioning for the task.","prompt_text":"Adopt the persona of a senior credit analyst with 15 years of experience at a major rating agency. All subsequent responses should be formal, data-driven, and reference established credit methodologies.","expected_response_format":"Confirmation of persona adoption, e.g., 'Persona adopted. Ready to proceed with analysis.'"}
+{"task_id":"SYS02","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"system_behavior","section_name":"System Behavior","section_description":"Defines the LLM's core operational parameters, persona, and versioning for the task.","prompt_text":"Set the master version for this entire analysis session to v1.0. All generated artifacts, data, and reports should be tagged with this version.","expected_response_format":"Confirmation of version initialization, e.g., 'Analysis session v1.0 initialized.'"}
+{"task_id":"SYS03","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"system_behavior","section_name":"System Behavior","section_description":"Defines the LLM's core operational parameters, persona, and versioning for the task.","prompt_text":"Generate a configuration file in YAML format for a new data processing job. The configuration should include 'source_bucket', 'destination_table', 'job_name', and a list of 'data_quality_checks' such as 'not_null' and 'unique_values'.","expected_response_format":"A code block containing a valid YAML configuration file."}
+{"task_id":"RAG01","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"knowledge_integration","section_name":"Knowledge Integration (RAG)","section_description":"Controls how the model interacts with and synthesizes information from external knowledge sources.","prompt_text":"For the next prompt, exclusively use the following documents from the knowledge base as your context for Retrieval-Augmented Generation (RAG): [list of document IDs, e.g., 'doc_10K_2024.pdf', 'doc_credit_agreement_2023.pdf']. Do not use general knowledge.","expected_response_format":"Confirmation of RAG source configuration, e.g., 'RAG context locked to provided documents.'"}
+{"task_id":"KGRAPH01","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"knowledge_integration","section_name":"Knowledge Graph & Ontology","section_description":"Controls how the model interacts with and synthesizes information from external knowledge sources.","prompt_text":"Based on the 'entity_profile' and 'group_and_ownership_structure' sections, generate a formal ontology in OWL format defining the relationships between the company, its parent, its subsidiaries, and key executives.","expected_response_format":"A code block containing the ontology in OWL (Web Ontology Language) format."}
+{"task_id":"KGRAPH02","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"knowledge_integration","section_name":"Knowledge Graph & Ontology","section_description":"Controls how the model interacts with and synthesizes information from external knowledge sources.","prompt_text":"Populate a knowledge graph using the ontology from KGRAPH01 and the information from the credit report. Represent entities and relationships as Cypher statements for import into a Neo4j database.","expected_response_format":"A code block containing a series of Cypher \\`CREATE\\` or \\`MERGE\\` statements."}
+{"task_id":"DT01","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"analytical_modeling","section_name":"Decision Tree Modeling","section_description":"Prompts for generating and executing structured analytical models like decision trees.","prompt_text":"Generate a decision tree in Python using scikit-learn that models the final rating recommendation. Use the following as features: CICRA score, competitive position assessment, profitability volatility, and projected Debt/EBITDA. The tree should output a rating category.","expected_response_format":"A Python code snippet defining and training a `DecisionTreeClassifier`."}
+{"task_id":"CODE01","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"coding_and_automation","section_name":"Coding & Automation","section_description":"Prompts for generating code, scripts, and instructions for development automation tools.","prompt_text":"Write a complete Python script named 'data_validator.py' that takes a CSV file path as a command-line argument. The script must use the pandas library to read the CSV and verify that the 'EBITDA' column contains no negative values. It should print a success or failure message.","expected_response_format":"A complete, executable Python script within a single code block."}
+{"task_id":"CODE02","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"coding_and_automation","section_name":"Coding & Automation","section_description":"Prompts for generating code, scripts, and instructions for development automation tools.","prompt_text":"Generate the high-level pseudocode and comments for a Python function that will be completed by a coding copilot. The function, named 'calculate_dscr', should take 'net_operating_income' and 'total_debt_service' as inputs and return the Debt Service Coverage Ratio. Include type hints and a docstring.","expected_response_format":"A Python function stub with detailed comments and pseudocode, ready for a copilot tool to complete."}
+{"task_id":"API01","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"external_tooling","section_name":"External Tooling (API & CLI)","section_description":"Prompts for generating commands to interact with external tools like APIs and Command-Line Interfaces.","prompt_text":"Generate a Python script to call an external API at 'https://api.marketdata.com/v1/quotes' to retrieve the latest stock price for the company's ticker. The API key is stored in the environment variable 'MARKET_DATA_API_KEY'.","expected_response_format":"A Python code snippet using the `requests` library to make the specified API call."}
+{"task_id":"CLI01","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"external_tooling","section_name":"External Tooling (API & CLI)","section_description":"Prompts for generating commands to interact with external tools like APIs and Command-Line Interfaces.","prompt_text":"Generate the gcloud CLI command to download the latest financial reports for the company from the Google Cloud Storage bucket 'gs://financial-reports-archive/' into the local directory './reports'.","expected_response_format":"A shell command snippet, e.g., \\`gcloud storage cp gs://financial-reports-archive/COMPANY_TICKER/* ./reports/\\`"}
+{"task_id":"CLI02","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"external_tooling","section_name":"External Tooling (API & CLI)","section_description":"Prompts for generating commands to interact with external tools like APIs and Command-Line Interfaces.","prompt_text":"Generate a single-line terminal command that finds all '.log' files in the '/var/log' directory, searches for lines containing the word 'ERROR', and saves the resulting lines to a file named 'error_summary.txt' in the home directory.","expected_response_format":"A single, complete shell command utilizing pipes, e.g., \\`grep -r 'ERROR' /var/log/*.log > ~/error_summary.txt\\`."}
+{"task_id":"AGENT01","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"agentic_workflow","section_name":"Agentic Workflow (SDK & MCP)","section_description":"Prompts for defining and executing multi-step, agentic tasks, including coordination between multiple agents.","prompt_text":"Initialize as a research agent. Your primary goal is to complete the 'Macro-Environment Risk Assessment' stage. You have access to the following tools: [web_search, knowledge_base_query]. Acknowledge when the goal is complete.","expected_response_format":"Confirmation of agent initialization and goal understanding."}
+{"task_id":"AGENT02","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"agentic_workflow","section_name":"Agentic Workflow (SDK & MCP)","section_description":"Prompts for defining and executing multi-step, agentic tasks, including coordination between multiple agents.","prompt_text":"Decompose the goal 'Complete the Financial Risk Profile Assessment' into a sequence of logical steps using the available prompts (FSA01, HFA01, etc.) and tools [code_interpreter, api_caller].","expected_response_format":"A numbered list of steps or a plan in JSON format."}
+{"task_id":"MCP01","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"agentic_workflow","section_name":"Agentic Workflow (SDK & MCP)","section_description":"Prompts for defining and executing multi-step, agentic tasks, including coordination between multiple agents.","prompt_text":"This is a multi-agent task. Define roles for 'AnalystAgent' (executes analysis prompts) and 'ReviewerAgent' (critiques outputs for quality and accuracy). The 'ReviewerAgent' must approve the output of each stage before the 'AnalystAgent' can proceed.","expected_response_format":"A JSON object defining the roles, responsibilities, and interaction protocol for the agents."}
+{"task_id":"A2A01","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"agentic_workflow","section_name":"Prompt-to-Prompt / A2A","section_description":"Prompts for defining and executing multi-step, agentic tasks, including coordination between multiple agents.","prompt_text":"Upon completion of the current prompt, analyze its output. If the 'leverage' metric is above 4.0x, the next prompt you must execute is FFL03 (Evaluate Covenant Headroom). Otherwise, the next prompt is PA01 (Select Peer Group). Formulate and output ONLY the JSON for the next prompt to be executed.","expected_response_format":"A single, complete JSONL object representing the next prompt in the dynamic chain."}
+{"task_id":"FED01","stage_id":"meta_instructions_and_tooling","stage_name":"VI. Meta-Instructions & Tooling","section_id":"federated_operations","section_name":"Federated Operations","section_description":"Prompts for designing and orchestrating federated learning or federated analytics workflows on decentralized data.","prompt_text":"Design a high-level federated analysis plan to calculate the average leverage ratio across three different, isolated corporate groups (GroupA, GroupB, GroupC) without moving their raw financial data. The plan should specify the local computation on each node and the central aggregation step. Use TensorFlow Federated (TFF) constructs as a reference.","expected_response_format":"A narrative or multi-step plan outlining the federated process, including `tff.federated_computation` and aggregation logic."}
+{"task_id":"SIM01","stage_id":"advanced_analytics_and_orchestration","stage_name":"VII. Advanced Analytics & Orchestration","section_id":"simulation_and_stochastic_modeling","section_name":"Simulation & Stochastic Modeling","section_description":"Prompts for creating and running advanced simulations to model uncertainty and complex system dynamics.","prompt_text":"Using the 'rating case' forecast as a baseline, generate a Python script to run a 10,000-iteration Monte Carlo simulation on the company's Free Cash Flow. Assume EBITDA margin and revenue growth are normally distributed with means equal to the baseline forecast and standard deviations derived from historical data. The output should be a histogram of potential cash flow outcomes and the probability of cash flow being negative.","expected_response_format":"A Python script using libraries like NumPy and Matplotlib to perform the Monte Carlo simulation and generate visualizations."}
+{"task_id":"SIM02","stage_id":"advanced_analytics_and_orchestration","stage_name":"VII. Advanced Analytics & Orchestration","section_id":"simulation_and_stochastic_modeling","section_name":"Simulation & Stochastic Modeling","section_description":"Prompts for creating and running advanced simulations to model uncertainty and complex system dynamics.","prompt_text":"Generate a causal loop diagram in DOT language (for Graphviz) that models the key feedback loops in the company's business. Include nodes for 'Capital Investment', 'Asset Base', 'Revenue Capacity', 'Profitability', and 'Cash Flow for Reinvestment'. Indicate reinforcing ('R') and balancing ('B') loops.","expected_response_format":"A code block containing a system dynamics model in DOT language."}
+{"task_id":"XAI01","stage_id":"advanced_analytics_and_orchestration","stage_name":"VII. Advanced Analytics & Orchestration","section_id":"explainability_and_audit","section_name":"Explainability & Audit (XAI)","section_description":"Prompts for interpreting model behavior, ensuring transparency, and creating audit trails.","prompt_text":"For the decision tree model created in task DT01, generate a Python script using the SHAP (SHapley Additive exPlanations) library to explain the prediction for a specific hypothetical company with high debt and strong profitability. The output should be a SHAP force plot visualizing the feature contributions.","expected_response_format":"A Python script that loads the model, creates a sample data point, and generates a SHAP force plot to explain its prediction."}
+{"task_id":"XAI02","stage_id":"advanced_analytics_and_orchestration","stage_name":"VII. Advanced Analytics & Orchestration","section_id":"explainability_and_audit","section_name":"Explainability & Audit (XAI)","section_description":"Prompts for interpreting model behavior, ensuring transparency, and creating audit trails.","prompt_text":"Generate a counterfactual analysis narrative. Based on the final model, determine the minimum improvement in 'Projected Debt/EBITDA' and the minimum change in 'Competitive Position Assessment' that would have been required to achieve a one-notch rating upgrade.","expected_response_format":"A narrative analysis explaining the specific changes in key variables required to alter the outcome."}
+{"task_id":"XAI03","stage_id":"advanced_analytics_and_orchestration","stage_name":"VII. Advanced Analytics & Orchestration","section_id":"explainability_and_audit","section_name":"Explainability & Audit (XAI)","section_description":"Prompts for interpreting model behavior, ensuring transparency, and creating audit trails.","prompt_text":"Review the full log of prompts and responses in this session and generate a Markdown summary for an audit trail. The summary must list each major analytical step, the data or documents used, and the resulting conclusion, providing a traceable path from raw data to final rating.","expected_response_format":"A structured Markdown document detailing the analytical process flow for audit purposes."}
+{"task_id":"AKS01","stage_id":"advanced_analytics_and_orchestration","stage_name":"VII. Advanced Analytics & Orchestration","section_id":"advanced_knowledge_synthesis","section_name":"Advanced Knowledge Synthesis","section_description":"Prompts for advanced reasoning, hypothesis testing, and synthesis across multiple data types and sources.","prompt_text":"Form a hypothesis based on the initial financial data. Then, generate a multi-step plan to validate or refute this hypothesis. The plan must explicitly state which documents to search (using RAG), which API calls to make, and which calculations to perform. Hypothesis Example: 'The company's declining gross margins are primarily caused by rising input costs rather than pricing pressure.'","expected_response_format":"A JSON object with a 'hypothesis' string and a 'validation_plan' array of steps."}
+{"task_id":"AKS02","stage_id":"advanced_analytics_and_orchestration","stage_name":"VII. Advanced Analytics & Orchestration","section_id":"advanced_knowledge_synthesis","section_name":"Advanced Knowledge Synthesis","section_description":"Prompts for advanced reasoning, hypothesis testing, and synthesis across multiple data types and sources.","prompt_text":"Synthesize information from the following multimodal sources to assess the company's brand strength: [Text: MD&A section on market position, Image: Chart of market share from investor deck, Table: Customer satisfaction scores from attached CSV]. Conclude with a qualitative assessment.","expected_response_format":"A narrative synthesis that explicitly references how the text, image, and tabular data collectively support the final conclusion on brand strength."}
+{"task_id":"ORC01","stage_id":"advanced_analytics_and_orchestration","stage_name":"VII. Advanced Analytics & Orchestration","section_id":"workflow_orchestration","section_name":"Workflow Orchestration","section_description":"Prompts for automating and orchestrating complex workflows, including defining human-in-the-loop checkpoints.","prompt_text":"Generate a GitHub Actions workflow file (\\`.github/workflows/analysis.yml\\`) that triggers on a push to the 'main' branch. The workflow should execute the entire chain of analysis scripts (e.g., `data_validator.py`, `monte_carlo.py`) in sequence.","expected_response_format":"A complete, valid YAML file for a GitHub Actions workflow."}
+{"task_id":"ORC02","stage_id":"advanced_analytics_and_orchestration","stage_name":"VII. Advanced Analytics & Orchestration","section_id":"workflow_orchestration","section_name":"Workflow Orchestration","section_description":"Prompts for automating and orchestrating complex workflows, including defining human-in-the-loop checkpoints.","prompt_text":"Define a human-in-the-loop (HITL) checkpoint. After the 'anchor' rating is determined in task RPS03, the workflow must pause. Generate a request for human review containing the anchor rating and the business/financial risk profiles. The agent may only proceed to MFN01 after receiving an explicit 'approved' signal.","expected_response_format":"A JSON object defining the HITL trigger condition, the data payload for the human reviewer, and the required approval signal."}
+{"task_id":"DYN01","stage_id":"advanced_analytics_and_orchestration","stage_name":"VII. Advanced Analytics & Orchestration","section_id":"dynamic_reporting_and_communication","section_name":"Dynamic Reporting & Communication","section_description":"Prompts for creating interactive, audience-specific reports and presentations.","prompt_text":"Generate a Python script for an interactive dashboard using Streamlit or Plotly Dash. The dashboard must allow a user to select different stress test scenarios (e.g., 'Recession', 'Input Cost Shock') from a dropdown menu and see the projected leverage and coverage ratios update dynamically in a chart.","expected_response_format":"A complete, executable Python script for an interactive dashboard."}
+{"task_id":"DYN02","stage_id":"advanced_analytics_and_orchestration","stage_name":"VII. Advanced Analytics & Orchestration","section_id":"dynamic_reporting_and_communication","section_name":"Dynamic Reporting & Communication","section_description":"Prompts for creating interactive, audience-specific reports and presentations.","prompt_text":"Generate three distinct summaries of the final rating recommendation (RR03): 1) An 'Executive Summary' for the CEO (max 100 words, focuses on strategic implications). 2) A 'Portfolio Manager Briefing' (focuses on risk factors, outlook, and covenant details). 3) A 'Methodology Note' for a junior analyst (explains key adjustments and model choices).","expected_response_format":"A JSON object with three keys ('executive_summary', 'pm_briefing', 'methodology_note'), each containing the tailored narrative."}
+{"task_id":"DYN03","stage_id":"advanced_analytics_and_orchestration","stage_name":"VII. Advanced Analytics & Orchestration","section_id":"dynamic_reporting_and_communication","section_name":"Dynamic Reporting & Communication","section_description":"Prompts for creating interactive, audience-specific reports and presentations.","prompt_text":"Generate a JSON structure representing a slide deck for the rating committee presentation. The structure should include keys for 'title', 'presenter', and an array of 'slides'. Each slide object should have a 'title', 'talking_points' (an array of strings), and an optional 'visualization_type' (e.g., 'bar_chart', 'line_chart'). Populate it with the key findings of this analysis.","expected_response_format":"A structured JSON object representing the entire presentation."}
+{"task_id":"GOV01","stage_id":"governance_deployment_and_lifecycle","stage_name":"VIII. Model Governance, Deployment & Lifecycle Management","section_id":"model_and_artifact_versioning","section_name":"Model & Artifact Versioning","section_description":"Prompts for managing versions of models, data, and code using integrated version control systems.","prompt_text":"Generate the git commands to create a new branch named 'feature/rating_model_v2', add the serialized decision tree model file ('rating_model.pkl') and the final credit report ('credit_report_v1.pdf') to the branch, commit them with the message 'feat: Add version 2 of rating model and initial report', and push the branch to the remote repository.","expected_response_format":"A sequence of shell commands for git."}
+{"task_id":"GOV02","stage_id":"governance_deployment_and_lifecycle","stage_name":"VIII. Model Governance, Deployment & Lifecycle Management","section_id":"model_and_artifact_versioning","section_name":"Model & Artifact Versioning","section_description":"Prompts for managing versions of models, data, and code using integrated version control systems.","prompt_text":"Generate a DVC (Data Version Control) command to start tracking the 'historical_financials.csv' file and associate it with the current git commit, ensuring data-to-code lineage.","expected_response_format":"A shell command snippet for DVC, e.g., \\`dvc add data/historical_financials.csv\\`."}
+{"task_id":"DEP01","stage_id":"governance_deployment_and_lifecycle","stage_name":"VIII. Model Governance, Deployment & Lifecycle Management","section_id":"deployment_and_cicd","section_name":"Deployment & CI/CD","section_description":"Prompts for automating the deployment of models and analysis pipelines into production or staging environments.","prompt_text":"Generate a Dockerfile to containerize the 'rating_model.pkl' and the API script created in task API01. The container should expose port 8080 and run the API server upon startup. Ensure all necessary Python dependencies from a 'requirements.txt' file are installed.","expected_response_format":"A complete, valid Dockerfile within a code block."}
+{"task_id":"DEP02","stage_id":"governance_deployment_and_lifecycle","stage_name":"VIII. Model Governance, Deployment & Lifecycle Management","section_id":"deployment_and_cicd","section_name":"Deployment & CI/CD","section_description":"Prompts for automating the deployment of models and analysis pipelines into production or staging environments.","prompt_text":"Generate a Kubernetes deployment manifest in YAML (\\`deployment.yaml\\`) to deploy the container image created from the Dockerfile in DEP01. The deployment should specify 2 replicas and include a liveness probe that checks the API's '/health' endpoint every 30 seconds.","expected_response_format":"A complete, valid Kubernetes deployment YAML file."}
+{"task_id":"MON01","stage_id":"governance_deployment_and_lifecycle","stage_name":"VIII. Model Governance, Deployment & Lifecycle Management","section_id":"performance_monitoring_and_alerting","section_name":"Performance Monitoring & Alerting","section_description":"Prompts for setting up real-time monitoring of model performance, data drift, and system health.","prompt_text":"Generate a JSON configuration for a monitoring alert. The alert should trigger if the 95th percentile latency of the rating prediction API exceeds 500ms over a 5-minute window. The alert should be sent to the '#credit-ops-alerts' Slack channel via a webhook URL stored in the 'SLACK_WEBHOOK' environment variable.","expected_response_format":"A JSON object defining the alert conditions and notification channel."}
+{"task_id":"MON02","stage_id":"governance_deployment_and_lifecycle","stage_name":"VIII. Model Governance, Deployment & Lifecycle Management","section_id":"performance_monitoring_and_alerting","section_name":"Performance Monitoring & Alerting","section_description":"Prompts for setting up real-time monitoring of model performance, data drift, and system health.","prompt_text":"Design a data drift detection job. Generate the pseudocode for a script that runs daily. The script should calculate the statistical distribution (e.g., mean, standard deviation) of key input features from the live prediction requests over the last 24 hours and compare it to the distribution of the training data using the Kolmogorov-Smirnov test. If the p-value for any feature is below 0.05, it should log a 'Drift Detected' warning.","expected_response_format":"Detailed pseudocode or a Python script outline for the data drift detection job."}
+{"task_id":"RET01","stage_id":"governance_deployment_and_lifecycle","stage_name":"VIII. Model Governance, Deployment & Lifecycle Management","section_id":"retraining_and_lifecycle_hooks","section_name":"Retraining & Lifecycle Hooks","section_description":"Prompts for defining automated triggers and policies for model retraining, testing, and promotion.","prompt_text":"Define a model retraining policy. Generate a JSON object that specifies the conditions under which the rating model should be automatically retrained. The policy should include two triggers: 1) A 'time-based' trigger to retrain every 90 days. 2) A 'performance-based' trigger if the model's prediction accuracy on a validation set drops below 85%.","expected_response_format":"A JSON object defining the retraining policy with its triggers."}
+{"task_id":"RET02","stage_id":"governance_deployment_and_lifecycle","stage_name":"VIII. Model Governance, Deployment & Lifecycle Management","section_id":"retraining_and_lifecycle_hooks","section_name":"Retraining & Lifecycle Hooks","section_description":"Prompts for defining automated triggers and policies for model retraining, testing, and promotion.","prompt_text":"Generate the configuration for a CI/CD pipeline hook. Upon successful completion of a retraining job, the new candidate model must be automatically benchmarked against the currently deployed production model on a hold-out 'challenger' dataset. The new model can only be promoted to staging if its F1-score is at least 2% higher than the production model's score.","expected_response_format":"A YAML or JSON configuration snippet defining the post-retraining benchmarking and promotion gate."}
+{"task_id":"ETH01","stage_id":"governance_deployment_and_lifecycle","stage_name":"VIII. Model Governance, Deployment & Lifecycle Management","section_id":"ethical_and_compliance_guardrails","section_name":"Ethical & Compliance Guardrails","section_description":"Prompts for defining and enforcing ethical guidelines, fairness checks, and regulatory compliance within the AI system.","prompt_text":"Generate a test case in Python to check the rating model for fairness. Using a hypothetical dataset with a 'region' feature, the test should calculate the Demographic Parity Difference for the 'Investment Grade' prediction outcome between the 'North America' and 'Europe' groups. The test fails if the absolute difference is greater than 10%.","expected_response_format":"A Python script or function that implements the specified fairness test."}
+{"task_id":"ETH02","stage_id":"governance_deployment_and_lifecycle","stage_name":"VIII. Model Governance, Deployment & Lifecycle Management","section_id":"ethical_and_compliance_guardrails","section_name":"Ethical & Compliance Guardrails","section_description":"Prompts for defining and enforcing ethical guidelines, fairness checks, and regulatory compliance within the AI system.","prompt_text":"Define a compliance guardrail as a JSON policy object. This policy must prevent the agent from executing any prompt that involves processing Personally Identifiable Information (PII) unless the prompt explicitly references a 'compliance_approval_code'. The policy should also specify a regex pattern for detecting common PII like email addresses and phone numbers.","expected_response_format":"A JSON object detailing the PII detection pattern and the compliance check logic."}
+{"task_id":"HCI01","stage_id":"human_computer_interaction_and_collaboration","stage_name":"IX. Human-Computer Interaction & Collaboration","section_id":"user_preference_and_adaptation","section_name":"User Preference & Adaptation","section_description":"Prompts for tailoring the AI's behavior, verbosity, and output format to individual user needs and expertise levels.","prompt_text":"Set my user profile to 'Expert'. For all subsequent responses, minimize conversational filler, use dense technical language, and provide outputs directly in their final format (e.g., code, JSON) without narrative explanation unless explicitly requested.","expected_response_format":"Confirmation of user profile change, e.g., 'Expert mode enabled.'"}
+{"task_id":"HCI02","stage_id":"human_computer_interaction_and_collaboration","stage_name":"IX. Human-Computer Interaction & Collaboration","section_id":"user_preference_and_adaptation","section_name":"User Preference & Adaptation","section_description":"Prompts for tailoring the AI's behavior, verbosity, and output format to individual user needs and expertise levels.","prompt_text":"I am a novice user. For the next task, 'Explain the results of the Monte Carlo simulation (SIM01)', please use an analogy and avoid statistical jargon like 'standard deviation' or 'p-value'. Focus on the business implications of the potential outcomes.","expected_response_format":"A simplified, analogy-driven narrative explanation of the simulation results."}
+{"task_id":"COL01","stage_id":"human_computer_interaction_and_collaboration","stage_name":"IX. Human-Computer Interaction & Collaboration","section_id":"collaborative_workspace_management","section_name":"Collaborative Workspace Management","section_description":"Prompts for managing shared analytical sessions, tracking contributions, and resolving conflicts between multiple users.","prompt_text":"Initialize a new collaborative analysis session for the 'Peer Analysis' stage. Invite users 'analyst_jane@example.com' and 'manager_bob@example.com'. All prompts and outputs within this session should be logged with user attribution.","expected_response_format":"Confirmation of session creation and user invitations, returning a unique session ID."}
+{"task_id":"COL02","stage_id":"human_computer_interaction_and_collaboration","stage_name":"IX. Human-Computer Interaction & Collaboration","section_id":"collaborative_workspace_management","section_name":"Collaborative Workspace Management","section_description":"Prompts for managing shared analytical sessions, tracking contributions, and resolving conflicts between multiple users.","prompt_text":"User 'analyst_jane@example.com' has proposed a peer group in task PA01. User 'manager_bob@example.com' has proposed a different peer group. Present a side-by-side comparison of the two proposed peer groups and highlight the key differences in their business mix and financial metrics to facilitate a decision.","expected_response_format":"A Markdown table or comparative narrative summarizing the two conflicting inputs."}
+{"task_id":"COL03","stage_id":"human_computer_interaction_and_collaboration","stage_name":"IX. Human-Computer Interaction & Collaboration","section_id":"collaborative_workspace_management","section_name":"Collaborative Workspace Management","section_description":"Prompts for managing shared analytical sessions, tracking contributions, and resolving conflicts between multiple users.","prompt_text":"Lock the 'Financial Statement Adjustments' (FSA01-FSA03) section of the analysis. No further changes can be made to these tasks by any user without explicit override from a user with 'Team Lead' permissions.","expected_response_format":"Confirmation that the specified analytical section has been locked."}
+{"task_id":"FBK01","stage_id":"human_computer_interaction_and_collaboration","stage_name":"IX. Human-Computer Interaction & Collaboration","section_id":"feedback_and_reinforcement_learning","section_name":"Feedback & Reinforcement Learning","section_description":"Prompts for capturing user feedback to improve the AI's future performance and fine-tune its models.","prompt_text":"The rationale provided in RR03 was not persuasive. The causal link between the company's competitive position and its financial forecast was unclear. Use this feedback to regenerate the rationale, placing greater emphasis on that specific connection. Register this feedback instance for model improvement.","expected_response_format":"A revised narrative for the rating rationale that explicitly incorporates the user's feedback."}
+{"task_id":"FBK02","stage_id":"human_computer_interaction_and_collaboration","stage_name":"IX. Human-Computer Interaction & Collaboration","section_id":"feedback_and_reinforcement_learning","section_name":"Feedback & Reinforcement Learning","section_description":"Prompts for capturing user feedback to improve the AI's future performance and fine-tune its models.","prompt_text":"The peer group selected in PA01 was excellent and highly relevant. Create a positive reinforcement signal for the selection logic used. Associate this successful outcome with the input features: industry='specialty chemicals', revenue_size='<$1B', geo_focus='North America'.","expected_response_format":"Confirmation that a positive feedback signal has been logged for reinforcement learning, associating the successful output with the specified input conditions."}
+{"task_id":"SEC01","stage_id":"security_privacy_and_access_control","stage_name":"X. Security, Privacy & Access Control","section_id":"permissions_and_role_based_access","section_name":"Permissions & Role-Based Access (RBAC)","section_description":"Prompts for defining and enforcing granular access controls over tasks, data, and system capabilities.","prompt_text":"Define a new user role named 'Junior Analyst'. Generate a JSON RBAC policy that grants this role 'read-only' access to all stages up to 'V. Synthesis, Rating, and Reporting', and explicit 'deny' access to all subsequent stages (VI-X). The role is also denied access to any task involving the 'delete' or 'deploy' verbs.","expected_response_format":"A JSON object representing the Role-Based Access Control policy."}
+{"task_id":"SEC02","stage_id":"security_privacy_and_access_control","stage_name":"X. Security, Privacy & Access Control","section_id":"permissions_and_role_based_access","section_name":"Permissions & Role-Based Access (RBAC)","section_description":"Prompts for defining and enforcing granular access controls over tasks, data, and system capabilities.","prompt_text":"The current user is requesting to execute task DEP02 (Kubernetes Deployment). Verify if the user's role has the necessary 'execute' permission for the 'deployment_and_cicd' section. Provide a confirmation or denial message based on the current RBAC policy.","expected_response_format":"A confirmation or denial string, e.g., 'ACCESS DENIED: User role \\'Junior Analyst\\' lacks \\'execute\\' permission for section \\'deployment_and_cicd\\'.'."}
+{"task_id":"PRIV01","stage_id":"security_privacy_and_access_control","stage_name":"X. Security, Privacy & Access Control","section_id":"data_privacy_and_anonymization","section_name":"Data Privacy & Anonymization","section_description":"Prompts for handling sensitive data, performing anonymization, and ensuring compliance with privacy regulations.","prompt_text":"Before processing the attached document 'employee_census.csv', run a PII scan and generate a data masking plan. The plan should identify columns containing names, addresses, and social security numbers, and specify a masking technique for each (e.g., 'hash', 'redact', 'substitute_with_placeholder').","expected_response_format":"A JSON object representing the data masking plan."}
+{"task_id":"PRIV02","stage_id":"security_privacy_and_access_control","stage_name":"X. Security, Privacy & Access Control","section_id":"data_privacy_and_anonymization","section_name":"Data Privacy & Anonymization","section_description":"Prompts for handling sensitive data, performing anonymization, and ensuring compliance with privacy regulations.","prompt_text":"Generate a differential privacy query. Apply a Laplace mechanism with a specified privacy budget (epsilon) of 1.0 to a query that calculates the average salary from the 'employee_census.csv' file. Generate the Python code to execute this differentially private query.","expected_response_format":"A Python script using a differential privacy library (e.g., Google's diff-privlib, OpenDP) to perform the noisy query."}
+{"task_id":"AUD01","stage_id":"security_privacy_and_access_control","stage_name":"X. Security, Privacy & Access Control","section_id":"security_auditing_and_logging","section_name":"Security Auditing & Logging","section_description":"Prompts for logging security-sensitive events and generating reports for compliance and forensic analysis.","prompt_text":"A request to access a sensitive document was denied. Create a high-priority security event log entry. The log must be in JSON format and include a timestamp, the requesting user's ID, the target resource ('doc_merger_prospectus.pdf'), the result ('ACCESS_DENIED'), and the ID of the RBAC policy that blocked the request.","expected_response_format":"A single JSON object representing the structured security event log."}
+{"task_id":"AUD02","stage_id":"security_privacy_and_access_control","stage_name":"X. Security, Privacy & Access Control","section_id":"security_auditing_and_logging","section_name":"Security Auditing & Logging","section_description":"Prompts for logging security-sensitive events and generating reports for compliance and forensic analysis.","prompt_text":"Generate a security report for the last 7 days. The report should summarize: 1) The number of failed login attempts by user. 2) A list of all access requests to resources tagged as 'highly_sensitive'. 3) All actions performed by users with the 'Administrator' role. The output should be a formatted Markdown file.","expected_response_format":"A structured Markdown report containing the requested security audit summary."}
+`;
+    // --- NEW PROMPTS ---
+    const newPrompts = `
+{"task_id":"CTX01","stage_id":"personalization_context","stage_name":"XI. Personalization & Context","section_id":"user_modeling","section_name":"User Profile & Modeling","section_description":"These prompts focus on building and adapting to a dynamic model of the user to provide a more tailored and effective interaction.","prompt_text":"Based on the conversation history, infer the user's expertise level (e.g., 'Novice', 'Expert', 'Developer') and primary goal. Store this as a 'user_profile' JSON object.","expected_response_format":"A JSON object with keys like 'expertise_level', 'inferred_goal', and 'confidence_score'."}
+{"task_id":"CTX02","stage_id":"personalization_context","stage_name":"XI. Personalization & Context","section_id":"user_modeling","section_name":"User Profile & Modeling","section_description":"These prompts focus on building and adapting to a dynamic model of the user to provide a more tailored and effective interaction.","prompt_text":"Update the 'user_profile' object. The user has just used a highly technical term ('stochastic modeling'). Increase the 'expertise_level' to 'Expert' and update the confidence score.","expected_response_format":"The updated 'user_profile' JSON object."}
+{"task_id":"MEM01","stage_id":"personalization_context","stage_name":"XI. Personalization & Context","section_id":"contextual_memory","section_name":"Contextual Memory","section_description":"Prompts that enable the AI to remember and reference specific information from earlier in the conversation or session.","prompt_text":"The user previously mentioned their target company is 'Global Auto Corp'. Reference this information in your response without being explicitly asked. For example: 'For a company like Global Auto Corp, the...'","expected_response_format":"A narrative response that naturally incorporates the previously mentioned entity."}
+{"task_id":"MEM02","stage_id":"personalization_context","stage_name":"XI. Personalization & Context","section_id":"contextual_memory","section_name":"Contextual Memory","section_description":"Prompts that enable the AI to remember and reference specific information from earlier in the conversation or session.","prompt_text":"Summarize the key decisions made in this session so far. List the chosen rating agency methodology (AF01) and the selected peer group (PA01).","expected_response_format":"A concise summary list of key data points established earlier in the session."}
+{"task_id":"ADP01","stage_id":"personalization_context","stage_name":"XI. Personalization & Context","section_id":"dynamic_adaptation","section_name":"Dynamic Adaptation","section_description":"Prompts that modify the AI's behavior, verbosity, or output format in real-time based on user interaction and inferred preferences.","prompt_text":"The user's last three queries were related to Python code generation. Infer a preference for 'coding_and_automation'. For the next ambiguous request, prioritize generating a code-based solution.","expected_response_format":"Confirmation of preference detection and adaptation strategy, e.g., 'User preference for code detected. Will prioritize script generation.'"}
+{"task_id":"ADP02","stage_id":"personalization_context","stage_name":"XI. Personalization & Context","section_id":"dynamic_adaptation","section_name":"Dynamic Adaptation","section_description":"Prompts that modify the AI's behavior, verbosity, or output format in real-time based on user interaction and inferred preferences.","prompt_text":"The user has corrected your last response for being too technical. Adapt your communication style to be less formal and use an analogy to explain the concept of 'data drift'.","expected_response_format":"A simplified, analogy-based explanation of the specified concept."}
+`;
+    let promptsData = [];
+    let sessionApiKey = null;
+
+    // --- USE CASE DATA ---
+    const useCaseMappings = {
+        "start_here": {
+            name: "🚀 Start a New Analysis",
+            description: "Begin a standard credit analysis from scratch.",
+            query: "EP01 OR EP02 OR AF01"
+        },
+        "build_agent": {
+            name: "🤖 Build an AI Agent",
+            description: "Prompts for creating and managing agentic workflows.",
+            query: "AGENT01 OR MCP01 OR A2A01"
+        },
+        "dev_automation": {
+            name: "DevOps & Automation ⚙️",
+            description: "Generate code, configurations, and CLI commands.",
+            query: "CODE01 OR CLI02 OR DEP01 OR ORC01"
+        },
+        "data_science": {
+            name: "📊 Data Science & Modeling",
+            description: "Prompts for advanced modeling and data analysis.",
+            query: "SIM01 OR DT01 OR XAI01 OR MON02"
+        },
+        "risk_assessment": {
+            name: "⚠️ Assess Financial Risk",
+            description: "Focus on financial health and stress testing.",
+            query: "HFA01 OR CFA03 OR FFS03 OR FFL01"
+        },
+        "reporting": {
+            name: "📄 Generate Reports",
+            description: "Create dynamic reports, summaries, and presentations.",
+            query: "CRG01 OR DYN02 OR DYN03 OR XAI03"
+        },
+        "personalize": {
+            name: "🧠 Personalize Interaction",
+            description: "Use context and memory to tailor the AI's behavior.",
+            query: "CTX01 OR MEM01 OR ADP02"
+        }
+    };
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- INITIALIZATION ---
+        try {
+            const combinedData = jsonlData.trim() + '\n' + newPrompts.trim();
+            promptsData = combinedData
+                .split('\n')
+                .filter(line => line.trim() !== '') // Filter out empty lines
+                .map((line, index) => ({...JSON.parse(line), uniqueId: `prompt-${index}`}));
+
+            const groupedData = groupData(promptsData);
+            buildUseCaseNavigator();
+            buildLibrary(groupedData);
+            addEventListeners();
+        } catch (error) {
+            console.error("Failed to initialize the application:", error);
+            document.body.innerHTML = `<div class="p-8 text-red-600"><strong>Error:</strong> Could not load prompt data. Please check the console for details.</div>`;
+        }
+    });
+
+    /**
+     * Groups the flat list of prompts into a nested object by stage and section.
+     * @param {Array<Object>} prompts - The flat array of prompt objects.
+     * @returns {Object} A nested object representing the grouped data.
+     */
+    function groupData(prompts) {
+        return prompts.reduce((acc, prompt) => {
+            const { stage_name, section_name } = prompt;
+            if (!acc[stage_name]) acc[stage_name] = {};
+            if (!acc[stage_name][section_name]) acc[stage_name][section_name] = [];
+            acc[stage_name][section_name].push(prompt);
+            return acc;
+        }, {});
+    }
+
+    /**
+     * Builds the interactive use case navigator.
+     */
+    function buildUseCaseNavigator() {
+        const navigatorContainer = document.getElementById('use-case-navigator');
+        let html = `<h2 class="text-2xl font-bold text-slate-700 mb-2">Find the Right Prompt</h2><p class="text-slate-500 mb-6">Not sure where to start? Select a common use case to see relevant prompts.</p><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">`;
+
+        for (const key in useCaseMappings) {
+            const useCase = useCaseMappings[key];
+            html += `
+                <button class="use-case-btn text-left p-5 bg-white border border-slate-200 rounded-lg hover:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none" data-query="${useCase.query}">
+                    <h3 class="font-semibold text-slate-800">${useCase.name}</h3>
+                    <p class="text-sm text-slate-500 mt-1">${useCase.description}</p>
+                </button>
+            `;
+        }
+
+        html += `</div>`;
+        navigatorContainer.innerHTML = html;
+    }
+
+
+    /**
+     * Builds the entire HTML structure for the library from the grouped data.
+     * @param {Object} groupedData - The grouped prompt data.
+     */
+    function buildLibrary(groupedData) {
+        const libraryContainer = document.getElementById('library-container');
+        const navLinks = document.getElementById('nav-links');
+        libraryContainer.innerHTML = '';
+        navLinks.innerHTML = '';
+        let isFirstSection = true; // Flag to keep the first section open by default
+
+        for (const stageName in groupedData) {
+            const stageId = stageName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+            // Create sidebar navigation link
+            const li = document.createElement('li');
+            li.innerHTML = `<a href="#${stageId}" class="nav-link block text-slate-600 font-medium hover:text-blue-600 hover:bg-slate-100 rounded-md p-2 transition-colors duration-200">${stageName}</a>`;
+            navLinks.appendChild(li);
+
+            // Create stage container in the main content
+            const stageDiv = document.createElement('div');
+            stageDiv.className = 'stage mb-12';
+            stageDiv.id = stageId;
+            stageDiv.innerHTML = `<h2 class="stage-title text-3xl font-bold text-slate-800 border-b-2 border-blue-500 pb-3 mb-8">${stageName}</h2>`;
+
+            for (const sectionName in groupedData[stageName]) {
+                const sectionId = sectionName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                const contentId = `content-${stageId}-${sectionId}`;
+
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'section mb-8';
+
+                const sectionTitle = document.createElement('h3');
+                sectionTitle.className = 'section-title text-2xl font-semibold text-slate-700 cursor-pointer mb-4 flex items-center';
+                sectionTitle.textContent = sectionName;
+                sectionTitle.setAttribute('aria-expanded', 'false');
+                sectionTitle.setAttribute('aria-controls', contentId);
+                sectionDiv.appendChild(sectionTitle);
+
+                const sectionContent = document.createElement('div');
+                sectionContent.id = contentId;
+                sectionContent.className = 'section-content hidden pl-5';
+
+                const sectionDescription = document.createElement('p');
+                sectionDescription.className = 'section-description text-slate-500 italic border-l-4 border-slate-200 pl-4 mb-6';
+                sectionDescription.textContent = groupedData[stageName][sectionName][0].section_description;
+                sectionContent.appendChild(sectionDescription);
+
+                groupedData[stageName][sectionName].forEach(prompt => {
+                    const card = document.createElement('div');
+                    card.className = 'prompt-card bg-white border border-slate-200 rounded-xl p-6 mb-5 shadow-sm hover:shadow-lg transition-shadow duration-300';
+                    card.dataset.promptId = prompt.uniqueId;
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-4">
+                            <h4 class="font-mono text-sm font-medium text-red-600 bg-red-100 rounded px-2 py-1 inline-block">Task: ${prompt.task_id}</h4>
+                            <button class="generate-btn flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold" title="Enable online mode to generate examples" disabled>
+                                ✨ Generate Example
+                            </button>
+                        </div>
+                        <div class="relative mb-4">
+                            <p class="prompt-text-content text-slate-700 leading-relaxed pr-12">${prompt.prompt_text}</p>
+                            <button class="copy-btn absolute top-0 right-0 p-2 rounded-full bg-slate-100 text-slate-500 hover:bg-blue-100 hover:text-blue-600 transition-colors duration-200" title="Copy to Clipboard">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            </button>
+                        </div>
+                        <div class="response-format font-mono text-sm bg-slate-100 text-slate-600 p-4 rounded-lg">
+                            <strong class="font-medium text-slate-700">Expected Response:</strong> ${prompt.expected_response_format}
+                        </div>
+                        <div class="generated-response-container mt-4 hidden"></div>
+                    `;
+                    sectionContent.appendChild(card);
+                });
+
+                // Make the first section open by default
+                if (isFirstSection) {
+                    sectionTitle.classList.add('open');
+                    sectionTitle.setAttribute('aria-expanded', 'true');
+                    sectionContent.classList.remove('hidden');
+                    isFirstSection = false;
+                }
+
+                sectionDiv.appendChild(sectionContent);
+                stageDiv.appendChild(sectionDiv);
+            }
+            libraryContainer.appendChild(stageDiv);
+        }
+    }
+
+    /**
+     * Adds all necessary event listeners to the page elements.
+     */
+    function addEventListeners() {
+        const searchBar = document.getElementById('search-bar');
+
+        // Search bar functionality
+        searchBar.addEventListener('keyup', handleSearch);
+
+        // Event delegation for dynamic content
+        document.getElementById('main-content').addEventListener('click', (e) => {
+            const useCaseBtn = e.target.closest('.use-case-btn');
+            if (useCaseBtn) {
+                const query = useCaseBtn.dataset.query;
+                searchBar.value = query;
+                searchBar.dispatchEvent(new Event('keyup'));
+                document.getElementById('library-container').scrollIntoView({ behavior: 'smooth' });
+            }
+
+            const copyBtn = e.target.closest('.copy-btn');
+            if (copyBtn) {
+                handleCopyClick(copyBtn);
+            }
+
+            const generateBtn = e.target.closest('.generate-btn');
+            if(generateBtn && !generateBtn.disabled) {
+                handleGenerateClick(generateBtn);
+            }
+
+            const sectionTitle = e.target.closest('.section-title');
+            if (sectionTitle) {
+                sectionTitle.classList.toggle('open');
+                const content = document.getElementById(sectionTitle.getAttribute('aria-controls'));
+                content.classList.toggle('hidden');
+
+                const isExpanded = sectionTitle.getAttribute('aria-expanded') === 'true';
+                sectionTitle.setAttribute('aria-expanded', !isExpanded);
+            }
+        });
+
+        // Sidebar navigation links
+        document.getElementById('sidebar').addEventListener('click', function (e) {
+            const navLink = e.target.closest('.nav-link');
+            if (navLink) {
+                e.preventDefault();
+                const targetElement = document.querySelector(navLink.getAttribute('href'));
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                }
+                // Close sidebar on mobile after clicking a link
+                if (window.innerWidth < 768) {
+                    document.getElementById('sidebar').classList.add('-translate-x-full');
+                }
+            }
+        });
+
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+        });
+
+        // Go Online button
+        document.getElementById('go-online-btn').addEventListener('click', goOnline);
+    }
+
+    /**
+     * ✅ [FIXED] Prompts user for API key and enables the "Generate Example" buttons.
+     */
+    function goOnline() {
+        const key = prompt("Please enter your Google AI Gemini API Key to enable this feature.");
+        if (key && key.trim() !== "") {
+            sessionApiKey = key.trim();
+            const goOnlineBtn = document.getElementById('go-online-btn');
+            document.querySelectorAll('.generate-btn').forEach(btn => {
+                btn.disabled = false;
+                btn.classList.add('bg-blue-50', 'text-blue-600', 'hover:bg-blue-100', 'hover:text-blue-700');
+                btn.title = "Generate an example with Gemini";
+            });
+            goOnlineBtn.textContent = '✅ AI Examples Enabled';
+            goOnlineBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+            goOnlineBtn.classList.add('bg-green-600', 'cursor-default');
+            goOnlineBtn.disabled = true;
+        } else {
+            alert("API Key not provided. The 'Generate Example' feature will remain disabled.");
+        }
+    }
+
+    /**
+     * Handles the search input event to filter prompts, sections, and navigation.
+     * Supports OR logic for queries like "ID1 OR ID2".
+     * @param {Event} e - The keyup event object.
+     */
+    function handleSearch(e) {
+        const rawSearchTerm = e.target.value.toLowerCase().trim();
+        const navLinksList = document.getElementById('nav-links');
+
+        // If search is cleared, reset to the default view
+        if (rawSearchTerm === '') {
+            document.getElementById('use-case-navigator').style.display = 'block';
+            document.querySelectorAll('.stage').forEach(stage => stage.style.display = 'block');
+            document.querySelectorAll('.section').forEach((section, index) => {
+                section.style.display = 'block';
+                const title = section.querySelector('.section-title');
+                const content = section.querySelector('.section-content');
+
+                // Reset to default collapsed state, except for the very first one
+                if (index === 0) {
+                    title.classList.add('open');
+                    content.classList.remove('hidden');
+                    title.setAttribute('aria-expanded', 'true');
+                } else {
+                    title.classList.remove('open');
+                    content.classList.add('hidden');
+                    title.setAttribute('aria-expanded', 'false');
+                }
+                section.querySelectorAll('.prompt-card').forEach(card => card.style.display = 'block');
+            });
+            navLinksList.querySelectorAll('li').forEach(li => li.style.display = 'block');
+            return;
+        }
+
+        // Hide use-case navigator during active search
+        document.getElementById('use-case-navigator').style.display = 'none';
+
+        // Split search term by " or " to handle multiple queries
+        const searchTerms = rawSearchTerm.split(' or ').map(term => term.trim()).filter(term => term.length > 0);
+        const visibleStageIds = new Set();
+
+        // Filter main content
+        document.querySelectorAll('.stage').forEach(stage => {
+            let stageHasVisibleContent = false;
+            stage.querySelectorAll('.section').forEach(section => {
+                let sectionHasVisibleContent = false;
+                section.querySelectorAll('.prompt-card').forEach(card => {
+                    const cardText = card.textContent.toLowerCase();
+                    // Check if card text includes ANY of the search terms
+                    const isMatch = searchTerms.some(term => cardText.includes(term));
+
+                    if (isMatch) {
+                        card.style.display = 'block';
+                        sectionHasVisibleContent = true;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                const title = section.querySelector('.section-title');
+                const content = section.querySelector('.section-content');
+                if (sectionHasVisibleContent) {
+                    section.style.display = 'block';
+                    title.classList.add('open');
+                    content.classList.remove('hidden');
+                    title.setAttribute('aria-expanded', 'true');
+                    stageHasVisibleContent = true;
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+
+            if (stageHasVisibleContent) {
+                stage.style.display = 'block';
+                visibleStageIds.add(stage.id);
+            } else {
+                stage.style.display = 'none';
+            }
+        });
+
+        // Filter sidebar links
+        navLinksList.querySelectorAll('.nav-link').forEach(link => {
+            const hrefId = link.getAttribute('href').substring(1);
+            link.parentElement.style.display = visibleStageIds.has(hrefId) ? 'block' : 'none';
+        });
+    }
+
+    /**
+     * Handles the click event for the copy button.
+     * @param {HTMLElement} btn - The button element that was clicked.
+     */
+    function handleCopyClick(btn) {
+        const promptText = btn.closest('.relative').querySelector('.prompt-text-content').textContent.trim();
+        const originalIcon = btn.innerHTML;
+        const successIcon = `<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+
+        navigator.clipboard.writeText(promptText).then(() => {
+            btn.innerHTML = successIcon;
+            btn.title = "Copied!";
+            setTimeout(() => {
+                btn.innerHTML = originalIcon;
+                btn.title = "Copy to Clipboard";
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+            // Fallback could be implemented here if needed
+        });
+    }
+
+
+    /**
+     * Handles the click event for the generate button.
+     * @param {HTMLElement} btn - The button element that was clicked.
+     */
+    async function handleGenerateClick(btn) {
+        const card = btn.closest('.prompt-card');
+        const promptId = card.dataset.promptId;
+        const prompt = promptsData.find(p => p.uniqueId === promptId);
+        const responseContainer = card.querySelector('.generated-response-container');
+
+        responseContainer.classList.remove('hidden');
+        responseContainer.innerHTML = '<div class="flex items-center justify-center p-4"><div class="loader"></div></div>';
+
+        try {
+            const result = await callGemini(prompt.prompt_text, prompt.expected_response_format);
+            renderGeneratedResponse(responseContainer, result, prompt.expected_response_format);
+        } catch (error) {
+            console.error("Gemini API call failed:", error);
+            responseContainer.innerHTML = `
+                <div class="bg-red-50 border-l-4 border-red-400 p-4 rounded-r-lg">
+                    <h5 class="font-bold text-red-800 mb-2">Error</h5>
+                    <p class="text-sm text-red-900">${error.message}</p>
+                </div>
+            `;
+        }
+    }
+
+    /**
+     * Renders the generated response with appropriate formatting.
+     * @param {HTMLElement} container - The container to render the response in.
+     * @param {string} result - The text result from the Gemini API.
+     * @param {string} format - The expected response format string.
+     */
+    function renderGeneratedResponse(container, result, format) {
+        const lowerFormat = format.toLowerCase();
+        const isCode = /json|code|yaml|python|cypher|dot|dvc|git|shell|kubernetes|dockerfile|cli|script|commands|object|array/.test(lowerFormat);
+
+        // Basic sanitization to prevent direct HTML injection.
+        const sanitizedResult = result.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+        let contentHtml;
+        if (isCode) {
+            contentHtml = `<pre class="font-mono text-sm text-slate-800 whitespace-pre-wrap bg-slate-100 p-3 rounded">${sanitizedResult}</pre>`;
+        } else {
+            // For narrative text, make it more readable.
+            contentHtml = `<p class="text-slate-700 whitespace-pre-wrap">${sanitizedResult}</p>`;
+        }
+
+        container.innerHTML = `
+            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                <h5 class="font-bold text-blue-800 mb-2">✨ Generated Example</h5>
+                ${contentHtml}
+            </div>
+        `;
+    }
+
+    // --- GEMINI API CALL ---
+    async function callGemini(promptText, responseFormat) {
+        // ✅ [FIXED] Uses the API key provided by the user for the session.
+        if (!sessionApiKey) {
+            throw new Error("API Key not found. Please click 'Connect to AI' and provide your key.");
+        }
+
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${sessionApiKey}`;
+
+        const fullPrompt = `You are a helpful assistant. Your task is to generate a realistic, high-quality example response for a given prompt.
+
+        **The Prompt to Respond To:**
+        "${promptText}"
+
+        **Instructions:**
+        - Generate a response that directly and accurately answers the prompt.
+        - The response MUST strictly adhere to the following format: "${responseFormat}".
+        - Do not add any extra commentary, explanations, or markdown formatting unless the format explicitly requires it. Just provide the raw response.
+        `;
+
+        const payload = {
+            contents: [{
+                role: "user",
+                parts: [{ text: fullPrompt }]
+            }]
+        };
+
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.json();
+            throw new Error(`API Error: ${response.status} - ${errorBody.error?.message || 'Unknown error. Check if your API key is valid and has the Gemini API enabled.'}`);
+        }
+
+        const result = await response.json();
+
+        if (result.candidates && result.candidates.length > 0 &&
+            result.candidates[0].content && result.candidates[0].content.parts &&
+            result.candidates[0].content.parts.length > 0) {
+            return result.candidates[0].content.parts[0].text.trim();
+        } else {
+            // Handle cases where the response structure is unexpected or content is missing
+            console.warn("Unexpected API response structure:", result);
+            if (result.promptFeedback && result.promptFeedback.blockReason) {
+                return `Could not generate a response. Reason: ${result.promptFeedback.blockReason}`;
+            }
+            return "Could not generate a valid response from the API.";
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Credit Report Prompt Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        details[open] summary .accordion-arrow {
+            transform: rotate(90deg);
+        }
+        .copy-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .copy-btn:hover {
+            transform: scale(1.05);
+        }
+        .copied {
+            background-color: #22c55e !important;
+            color: white !important;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <main class="max-w-7xl mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-slate-900">Corporate Credit Report Generator</h1>
+            <p class="mt-2 text-lg text-slate-600">An interactive tool for credit analysts to build reports using generative AI.</p>
+        </header>
+
+        <!-- Global Instructions -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mb-6">
+            <h2 class="text-2xl font-semibold mb-4 text-slate-900">Global Parameters</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                    <label for="companyName" class="block text-sm font-medium text-slate-700 mb-1">Company Name</label>
+                    <input type="text" id="companyName" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Enter Company Name Here">
+                </div>
+                <div>
+                    <label for="asOfDate" class="block text-sm font-medium text-slate-700 mb-1">As of Date</label>
+                    <input type="date" id="asOfDate" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                </div>
+                <div>
+                    <label for="priorPeriodDate" class="block text-sm font-medium text-slate-700 mb-1">Prior Period Date</label>
+                    <input type="date" id="priorPeriodDate" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                </div>
+                <div class="self-end">
+                    <button id="updateGlobalsBtn" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">Update Prompts</button>
+                </div>
+            </div>
+             <details class="mt-4 bg-slate-50 rounded-lg p-4 border border-slate-200">
+                <summary class="cursor-pointer font-medium text-slate-700 flex justify-between items-center">
+                    <span>View Global Instructions & Persona</span>
+                    <svg class="accordion-arrow w-5 h-5 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </summary>
+                <div class="mt-4 space-y-2 text-sm text-slate-600">
+                    <p><strong>Persona:</strong> Act as an experienced senior credit analyst. Your analysis must be objective, data-driven, and concise. All statements of fact must be directly supported by the source documents. Clearly distinguish between factual data and analytical interpretation.</p>
+                    <p><strong>Output Format:</strong> Provide a narrative response for each section. Where quantitative data is presented, include the data points directly in the text and in summary tables where appropriate. Reference the source document and page number for key data points where possible.</p>
+                </div>
+            </details>
+        </div>
+
+
+        <div class="space-y-4" id="sections-container">
+            <!-- Sections will be injected here by JavaScript -->
+        </div>
+
+    </main>
+
+    <script>
+        const promptData = {
+            "Section 1: Company Overview": {
+                questions: [
+                    "Provide a brief overview of the company's business, including its primary products/services, key end-markets, and geographic footprint. What is its legal structure?",
+                    "Summarize the company's history and any significant corporate developments over the last 12-24 months (e.g., M&A, divestitures, changes in strategy).",
+                    "Who are the primary owners or sponsors of the company? Describe their history and track record with this and other investments.",
+                    "What is the core investment thesis from the original underwriting? Has it evolved?"
+                ]
+            },
+            "Section 2: Financial Performance Analysis": {
+                "Top-Line Performance": [
+                    "What was the company's total revenue for the LTM period ending on the as_of_date? How does this compare to the revenue for the period ending on the prior_period_date? Calculate the year-over-year percentage growth and explain the primary drivers of this change (e.g., volume, price, mix, acquisitions)."
+                ],
+                "Profitability Analysis": [
+                    "What was the company's reported EBITDA for the LTM period ending on the as_of_date? Compare this to the prior period. Calculate the year-over-year percentage growth.",
+                    "What is the LTM EBITDA margin for the current and prior periods? Analyze the trend and explain the key drivers for any changes (e.g., gross margin fluctuations, operating expense leverage, one-time items).",
+                    "List and quantify any adjustments made to EBITDA (e.g., non-recurring expenses, stock-based compensation). Assess the quality of these adjustments."
+                ],
+                "Cash Flow Analysis": [
+                    "Calculate Free Cash Flow (FCF = CFO - Capex) for the LTM period. Detail the primary components of cash from operations and capital expenditures.",
+                    "Analyze the FCF conversion rate (FCF / EBITDA). How has this trended over time and what does it indicate about the company's capital intensity and working capital management?"
+                ],
+                "Leverage and Capital Structure": [
+                    "Detail the company's capital structure as of the as_of_date, listing each debt instrument and its outstanding amount.",
+                    "What is the total debt and net debt? Calculate the Total Debt / EBITDA and Net Debt / EBITDA ratios. How has leverage trended since the last review?"
+                ]
+            },
+            "Section 3: Covenants, Liquidity, and Performance": {
+                "Covenant Compliance": [
+                    "List all financial covenants stipulated in the credit agreement.",
+                    "For each covenant, calculate the required level and the company's actual performance as of the as_of_date. Calculate the cushion for each covenant in percentage terms.",
+                    "Have there been any covenant breaches or amendments in the reporting period? If so, describe them in detail."
+                ],
+                "Liquidity Analysis": [
+                    "What are the company's primary sources of liquidity? Detail the cash balance and the available capacity under its revolving credit facility as of the as_of_date.",
+                    "Analyze the company's total liquidity sources against its short-term obligations (e.g., debt maturities, capital expenditures, working capital needs) over the next 12 months. Is the liquidity position adequate?"
+                ],
+                "Performance vs. Key Benchmarks": [
+                    "Compare the LTM Revenue and EBITDA against the projections from the original underwriting case. Calculate the variance and explain the reasons for any material deviations.",
+                    "Compare the LTM Revenue and EBITDA against the company's own budget for the period. Calculate and explain any variances.",
+                    "How does current performance compare to the 'current expected case' or latest forecast? Is the company on track to meet its updated targets?"
+                ]
+            },
+            "Section 4: Risk Assessment & Ratings": {
+                 "Probability of Default (PD) Rating": [
+                    "What is the proposed internal Probability of Default (PD) rating for the company? Justify the selection based on the internal rating model/policy.",
+                    "Map the proposed internal PD rating to the equivalent ratings from major external agencies (S&P, Moody's, Fitch).",
+                    "What is the recommended rating outlook (e.g., Stable, Positive, Negative)? Justify the outlook based on expected trends over the next 12-18 months."
+                 ],
+                 "Regulatory Risk Rating": [
+                    "What is the proposed regulatory rating (e.g., Pass, Special Mention, Substandard)?",
+                    "Identify any triggers or conditions that would lead to a downgrade in the regulatory rating (e.g., sustained covenant breaches, liquidity shortfalls, significant underperformance)."
+                 ],
+                 "Credit Strengths, Weaknesses, and Mitigants": [
+                    "Summarize the key credit strengths in bullet points (e.g., market leadership, strong margins, long-term contracts).",
+                    "Summarize the key credit weaknesses/risks in bullet points (e.g., high leverage, customer concentration, cyclical industry).",
+                    "For each weakness, identify and describe the structural or operational mitigants in place (e.g., covenants, security, hedging strategies)."
+                 ]
+            },
+            "Section 5: Qualitative & ESG Factors": {
+                "PD Qualitative Factors": [
+                    "Management: Assess the strength, experience, and stability of the management team. Are their interests aligned with lenders?",
+                    "Consistency of Cash Flows: Evaluate the predictability and volatility of the company's cash flows. Are they recurring in nature?",
+                    "Competitive Position: Analyze the company's position within its industry. What are its key competitive advantages and disadvantages? Who are its main competitors?",
+                    "Size & Scale: How does the company's size (revenue, EBITDA) compare to peers? Does its scale provide any advantages?",
+                    "Financial Policy: Assess the aggressiveness of the company's financial policy regarding M&A, dividends, and share repurchases.",
+                    "Regulatory Environment: Describe any material regulatory factors that could impact the company's operations or profitability."
+                ],
+                "Environmental, Social, and Governance (ESG) Factors": [
+                    "Identify and describe any material Environmental risks or opportunities relevant to the company (e.g., carbon emissions, waste management).",
+                    "Identify and describe any material Social risks or opportunities (e.g., labor relations, product safety, data privacy).",
+                    "Identify and describe any material Governance risks or opportunities (e.g., board structure, transparency, shareholder rights).",
+                    "Overall, how do ESG factors impact the company's credit profile?"
+                ]
+            },
+            "Section 6: Quality Control & Workflow": {
+                "Policy & Regulatory Adherence": [
+                    "Review the generated report. Does the analysis and recommended rating adhere to all relevant internal credit policies? Cite specific policies if applicable.",
+                    "Does the report meet regulatory requirements for credit risk monitoring and reporting?"
+                ],
+                "Consistency & Narrative Check": [
+                    "Is the narrative consistent throughout the report? For example, do the weaknesses identified in the 'Strengths & Weaknesses' section align with the analysis in the financial performance section?",
+                    "Check all calculations for accuracy (e.g., covenant math, ratios, growth percentages)."
+                ],
+                "Workflow Instructions": [
+                     "Chain of Thought: For complex calculations like covenant compliance or FCF, first extract the raw data components, then state the formula, and finally show the calculation and result. This creates a transparent audit trail.",
+                     "Tree of Thought: When assessing the rating outlook, generate three potential scenarios (base case, upside case, downside case). For each scenario, outline the key assumptions and the resulting impact on key credit metrics. Conclude by selecting the most likely scenario to justify the final outlook.",
+                     "Sub-Answer Generation: The output of the 'Financial Performance' section should be used as a direct input/context for the 'Credit Strengths & Weaknesses' and 'PD Rating' sections to ensure consistency."
+                ]
+            }
+        };
+
+        const sectionsContainer = document.getElementById('sections-container');
+
+        function generateYAML(sectionTitle, sectionData) {
+            let yamlString = `${sectionTitle.toLowerCase().replace(/:/g, '').replace(/ & /g, '_and_').replace(/ /g, '_')}:\n`;
+
+            if (sectionData.questions) { // Simple structure (like Section 1)
+                sectionData.questions.forEach(q => {
+                    yamlString += `  - question: "${q}"\n`;
+                });
+            } else { // Nested structure
+                Object.entries(sectionData).forEach(([subTitle, questions]) => {
+                    yamlString += `  - section_title: "${subTitle}"\n    questions:\n`;
+                    questions.forEach(q => {
+                         yamlString += `      - "${q}"\n`;
+                    });
+                });
+            }
+            return yamlString;
+        }
+
+        function renderSections() {
+            sectionsContainer.innerHTML = ''; // Clear existing content
+            Object.entries(promptData).forEach(([sectionTitle, sectionData]) => {
+                const sectionId = sectionTitle.replace(/\s+/g, '-').toLowerCase();
+                let sectionContent = '';
+
+                if (sectionData.questions) { // Handle simple structure
+                    sectionContent = sectionData.questions.map(q => createQuestionBlock(q)).join('');
+                } else { // Handle nested structure
+                    Object.entries(sectionData).forEach(([subTitle, questions]) => {
+                        sectionContent += `
+                            <div class="mt-4 pt-4 border-t border-slate-200">
+                                <h4 class="text-md font-semibold text-slate-800 mb-3">${subTitle}</h4>
+                                <div class="space-y-4">
+                                    ${questions.map(q => createQuestionBlock(q)).join('')}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                const sectionHTML = `
+                    <details id="${sectionId}" class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden" open>
+                        <summary class="p-4 md:p-6 bg-slate-100 cursor-pointer flex justify-between items-center">
+                            <h3 class="text-xl font-semibold text-slate-900">${sectionTitle}</h3>
+                            <div class="flex items-center gap-2">
+                                <button class="copy-section-btn bg-slate-200 text-slate-700 text-xs font-semibold py-1 px-3 rounded-full hover:bg-slate-300 transition" data-section-title="${sectionTitle}">Copy Section (YAML)</button>
+                                <svg class="accordion-arrow w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            </div>
+                        </summary>
+                        <div class="p-4 md:p-6">
+                            ${sectionContent}
+                        </div>
+                    </details>
+                `;
+                sectionsContainer.innerHTML += sectionHTML;
+            });
+
+            addEventListeners();
+        }
+
+        function createQuestionBlock(questionText) {
+             return `
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                    <div class="flex justify-between items-start gap-4">
+                        <p class="prompt-text flex-1 text-slate-700">${questionText}</p>
+                        <button class="copy-btn bg-blue-100 text-blue-700 font-semibold py-1 px-4 rounded-full hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex-shrink-0">Copy</button>
+                    </div>
+                    <div class="mt-3">
+                        <textarea class="w-full p-2 border border-slate-300 rounded-lg h-24 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Paste LLM output or type your notes here..."></textarea>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updatePromptsWithGlobals() {
+            const companyName = document.getElementById('companyName').value || "[Enter Company Name Here]";
+            const asOfDate = document.getElementById('asOfDate').value || "[Enter Current Reporting Date, e.g., YYYY-MM-DD]";
+            const priorPeriodDate = document.getElementById('priorPeriodDate').value || "[Enter Prior Year Comparison Date, e.g., YYYY-MM-DD]";
+
+            document.querySelectorAll('.prompt-text').forEach(el => {
+                let text = el.dataset.originalText || el.textContent;
+                if (!el.dataset.originalText) {
+                    el.dataset.originalText = text; // Store original text
+                }
+                text = text.replace(/\[Enter Company Name Here\]|\[.*?\]/gi, (match) => {
+                    if (match.toLowerCase().includes('company name')) return companyName;
+                    if (match.toLowerCase().includes('as_of_date')) return asOfDate;
+                    if (match.toLowerCase().includes('prior_period_date')) return priorPeriodDate;
+                    return match; // return original placeholder if no match
+                });
+
+                 el.textContent = text
+                    .replace(/as_of_date/g, asOfDate)
+                    .replace(/prior_period_date/g, priorPeriodDate);
+            });
+        }
+
+        function addEventListeners() {
+            document.querySelectorAll('.copy-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const promptText = e.target.previousElementSibling.textContent;
+                    navigator.clipboard.writeText(promptText).then(() => {
+                        const originalText = e.target.textContent;
+                        e.target.textContent = 'Copied!';
+                        e.target.classList.add('copied');
+                        setTimeout(() => {
+                            e.target.textContent = originalText;
+                            e.target.classList.remove('copied');
+                        }, 2000);
+                    });
+                });
+            });
+
+            document.querySelectorAll('.copy-section-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation(); // prevent accordion from toggling
+                    const sectionTitle = e.target.dataset.sectionTitle;
+                    const yamlOutput = generateYAML(sectionTitle, promptData[sectionTitle]);
+                    navigator.clipboard.writeText(yamlOutput).then(() => {
+                        const originalText = e.target.textContent;
+                        e.target.textContent = 'Copied!';
+                        e.target.classList.add('copied');
+                        setTimeout(() => {
+                            e.target.textContent = originalText;
+                            e.target.classList.remove('copied');
+                        }, 2000);
+                    });
+                });
+            });
+        }
+
+        document.getElementById('updateGlobalsBtn').addEventListener('click', updatePromptsWithGlobals);
+
+        // Initial render
+        document.addEventListener('DOMContentLoaded', () => {
+             // Set default dates
+            const today = new Date();
+            const lastYear = new Date(new Date().setFullYear(today.getFullYear() - 1));
+            document.getElementById('asOfDate').value = today.toISOString().split('T')[0];
+            document.getElementById('priorPeriodDate').value = lastYear.toISOString().split('T')[0];
+
+            renderSections();
+            updatePromptsWithGlobals(); // run once on load
+        });
+
+    </script>
+</body>
+</html>
