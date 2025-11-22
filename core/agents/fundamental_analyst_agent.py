@@ -8,7 +8,7 @@ import logging
 import pandas as pd
 import numpy as np
 from scipy import stats  # For statistical calculations (e.g., for DCF)
-from typing import Dict, Any, Optional, Union 
+from typing import Dict, Any, Optional, Union, List
 from core.agents.agent_base import AgentBase
 from semantic_kernel import Kernel # Added for type hinting
 import asyncio # Added import
