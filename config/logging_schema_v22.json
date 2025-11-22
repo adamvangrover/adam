@@ -1,0 +1,94 @@
+{
+  "type": "object",
+  "title": "Structured Logging Schema (Provenance & Reasoning)",
+  "description": "This JSON structure is designed to be appended to every interaction log. It fulfills the Groundedness pillar by using W3C PROV-O concepts and ensures the Meta-Cognitive Agent can review performance.",
+  "properties": {
+    "interaction_id": {
+      "type": "string",
+      "description": "uuid-v4"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp"
+    },
+    "version": {
+      "type": "string",
+      "const": "Adam_v22.0"
+    },
+    "provenance_graph": {
+      "type": "object",
+      "properties": {
+        "entities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "type": { "type": "string" },
+              "source": { "type": "string" },
+              "timestamp": { "type": "string", "format": "date-time" },
+              "uri": { "type": "string" }
+            },
+            "required": ["id", "type"]
+          }
+        },
+        "activities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "agent": { "type": "string" },
+              "input": { "type": "array", "items": { "type": "string" } }
+            },
+            "required": ["id", "agent"]
+          }
+        }
+      },
+      "required": ["entities", "activities"]
+    },
+    "meta_cognition": {
+      "type": "object",
+      "properties": {
+        "guardrails_triggered": { "type": "array", "items": { "type": "string" } },
+        "confidence_score": { "type": "number" },
+        "self_correction_log": { "type": "string" }
+      }
+    },
+    "output_state": {
+      "type": "object",
+      "properties": {
+        "recommendation_type": { "type": "string" },
+        "policy_violation": { "type": "boolean" }
+      }
+    }
+  },
+  "required": ["interaction_id", "timestamp", "provenance_graph", "output_state"],
+  "example": {
+    "interaction_id": "uuid-v4",
+    "timestamp": "2025-11-21T17:45:00Z",
+    "version": "Adam_v22.0",
+    "provenance_graph": {
+      "entities": [
+        {"id": "user_query", "type": "input", "source": "user"},
+        {"id": "market_data_vix", "type": "data", "source": "Bloomberg_API_v2", "timestamp": "2025-11-21T17:44:00Z"},
+        {"id": "credit_sentry_logic", "type": "knowledge_node", "uri": "kb://frameworks/credit_sentry"}
+      ],
+      "activities": [
+        {"id": "sentiment_analysis", "agent": "Market Sentiment Agent", "input": ["user_query", "market_data_vix"]},
+        {"id": "risk_calc", "agent": "Risk Assessment Agent", "input": ["sentiment_analysis", "credit_sentry_logic"]},
+        {"id": "red_team_challenge", "agent": "Red Team Agent", "input": ["risk_calc"]}
+      ]
+    },
+    "meta_cognition": {
+      "guardrails_triggered": ["Adversarial_Analysis_Complete"],
+      "confidence_score": 0.89,
+      "self_correction_log": "Initial draft ignored 'Refinancing Risk'. Meta-Cognitive agent forced re-evaluation based on FCF conversion < 50%."
+    },
+    "output_state": {
+      "recommendation_type": "ACTIONABLE",
+      "policy_violation": false
+    }
+  }
+}
