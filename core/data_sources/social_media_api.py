@@ -2,7 +2,10 @@
 
 import tweepy
 from textblob import TextBlob
-from facebook_scraper import get_posts
+try:
+    from facebook_scraper import get_posts
+except ImportError:
+    get_posts = None
 import logging # Added import
 from core.utils.secrets_utils import get_api_key # Added import
 #... (import other necessary libraries for Instagram, TikTok, etc.)
@@ -54,6 +57,9 @@ class SocialMediaAPI:
 
     def get_facebook_posts(self, query, count=100, sentiment=None):
         posts = []
+        if get_posts is None:
+            logging.warning("facebook_scraper is not installed. Cannot fetch Facebook posts.")
+            return posts
         try:
             for post in get_posts(query, pages=int(count/10)):  # Assuming 10 posts per page
                 post_text = post['text']
