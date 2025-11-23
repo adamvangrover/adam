@@ -17,39 +17,6 @@ Key Components:
   FIBO and PROV-O simultaneously, creating a fully verifiable reasoning chain.
 """
 
-# Placeholder for Unified Knowledge Graph interface
-# Example structure:
-#
-# from neo4j import GraphDatabase
-#
-# class UnifiedKnowledgeGraph:
-#     def __init__(self, uri, user, password):
-#         self._driver = GraphDatabase.driver(uri, auth=(user, password))
-#
-#     def close(self):
-#         self._driver.close()
-#
-#     def find_symbolic_path(self, start_node, end_node):
-#         """
-#         Example of a unified query that finds a path and retrieves provenance for each step.
-#         """
-#         query = """
-#         MATCH path = (a)-[r:fibo*]->(b)
-#         WHERE a.name = $start_node AND b.name = $end_node
-#         CALL {
-#           WITH r
-#           UNWIND r as rel
-#           MATCH (rel)-[p:prov*]->(source)
-#           RETURN source.uri as provenance
-#         }
-#         RETURN path, provenance
-#         """
-#         with self._driver.session() as session:
-#             result = session.run(query, start_node=start_node, end_node=end_node)
-#             return # process result into a verifiable path object
-
-# core/v23_graph_engine/unified_knowledge_graph.py
-
 """
 Agent Notes (Meta-Commentary):
 This module manages the integration of FIBO and PROV-O ontologies.
@@ -81,6 +48,7 @@ class UnifiedKnowledgeGraph:
         logger.info("Ingesting FIBO Ontology...")
         # Define some core financial concepts and relationships
         triples = [
+            # Core Financials
             ("Company", "has_risk_profile", "RiskProfile"),
             ("Company", "issues", "FinancialReport"),
             ("FinancialReport", "contains", "FinancialData"),
@@ -89,10 +57,41 @@ class UnifiedKnowledgeGraph:
             ("MarketData", "affects", "Volatility"),
             ("Volatility", "affects", "RiskScore"),
             ("RiskScore", "determines", "CreditRating"),
+
+            # ESG & Compliance
+            ("Company", "has_esg_score", "ESGScore"),
+            ("ESGScore", "influenced_by", "CarbonFootprint"),
+            ("ESGScore", "influenced_by", "GovernanceStructure"),
+            ("Company", "subject_to", "Regulation"),
+            ("Regulation", "enforced_by", "RegulatoryBody"),
+            ("RegulatoryBody", "issues", "RegulatoryFine"),
+            ("RegulatoryFine", "impacts", "FinancialData"),
+
+            # Macroeconomics
+            ("MacroEvent", "impacts", "MarketSector"),
+            ("MarketSector", "contains", "Company"),
+            ("InterestRate", "affects", "CostOfCapital"),
+            ("InterestRate", "affects", "ConsumerSpend"),
+            ("CostOfCapital", "affects", "Valuation"),
+            ("Inflation", "affects", "ConsumerSpend"),
+            ("ConsumerSpend", "affects", "Revenue"),
+            ("Revenue", "is_part_of", "FinancialData"),
+
+            # Red Teaming / Adversarial
+            ("CyberAttack", "targets", "Company"),
+            ("CyberAttack", "impacts", "OperationalStability"),
+            ("OperationalStability", "affects", "RiskScore"),
+            ("ShortSellerReport", "challenges", "Valuation"),
+
             # Domain specific instances (for the planner to find)
             ("Apple Inc.", "is_a", "Company"),
+            ("Apple Inc.", "belongs_to", "TechnologySector"),
+            ("TechnologySector", "is_a", "MarketSector"),
             ("Apple 10-K", "is_a", "FinancialReport"),
-            ("AAPL Stock", "is_a", "MarketData")
+            ("AAPL Stock", "is_a", "MarketData"),
+            ("SEC", "is_a", "RegulatoryBody"),
+            ("GDPR", "is_a", "Regulation"),
+            ("Fed Rate Hike", "is_a", "InterestRate")
         ]
         for u, r, v in triples:
             self.graph.add_edge(u, v, relation=r, type="fibo")
@@ -105,6 +104,8 @@ class UnifiedKnowledgeGraph:
         # Link data sources to agents/processes
         self.graph.add_node("Apple 10-K", prov_source="SEC EDGAR", prov_time="2023-09-30")
         self.graph.add_node("AAPL Stock", prov_source="Bloomberg", prov_time="2023-10-27")
+        self.graph.add_node("Fed Rate Hike", prov_source="Federal Reserve API", prov_time="2023-11-01")
+        self.graph.add_node("GDPR", prov_source="EU Law Database", prov_time="2018-05-25")
 
     def find_symbolic_path(self, start_concept: str, end_concept: str) -> Optional[List[Dict[str, str]]]:
         """
