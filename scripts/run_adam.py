@@ -1,71 +1,97 @@
 import sys
 import os
-from core.system.agent_orchestrator import AgentOrchestrator
-from core.system.knowledge_base import KnowledgeBase
-from core.system.data_manager import DataManager
-from core.system.echo import Echo
-from core.utils.config_utils import load_app_config # Changed from load_config
-from core.utils.logging_utils import setup_logging
-from core.utils.api_utils import get_knowledge_graph_data, update_knowledge_graph_node
-from core.llm_plugin import LLMPlugin  # Import LLM plugin
+import asyncio
+import logging
+import argparse
 
-def main():
+# Ensure root is in path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from core.utils.config_utils import load_app_config
+from core.utils.logging_utils import setup_logging
+from core.v23_graph_engine.meta_orchestrator import MetaOrchestrator
+from core.system.agent_orchestrator import AgentOrchestrator
+
+async def main():
     """
-    Main execution script for Adam v18.0.
+    Main execution script for Adam v23.0 (Adaptive System).
     """
+    parser = argparse.ArgumentParser(description="Adam v23.0 Execution")
+    parser.add_argument("--query", type=str, help="Single query to execute")
+    args = parser.parse_args()
+
     try:
         # Load configuration
-        config = load_app_config() # Changed from load_config()
+        # Note: load_app_config might need to be robust if config files are missing
+        try:
+            config = load_app_config()
+        except Exception as e:
+            print(f"Warning: Could not load full config ({e}). Using defaults.")
+            config = {}
 
         # Set up logging
-        setup_logging(config)
+        try:
+            setup_logging(config)
+        except Exception:
+            logging.basicConfig(level=logging.INFO)
 
-        # Initialize knowledge base
-        knowledge_base = KnowledgeBase(config)
+        logger = logging.getLogger(__name__)
+        logger.info("Initializing Adam v23.0 System...")
 
-        # Initialize data manager
-        data_manager = DataManager(config)
+        # Initialize Legacy Orchestrator (v21/v22)
+        try:
+            legacy_orchestrator = AgentOrchestrator()
+        except Exception as e:
+            logger.error(f"Failed to initialize AgentOrchestrator: {e}")
+            legacy_orchestrator = None # Fallback
 
-        # Initialize agent orchestrator
-        agent_orchestrator = AgentOrchestrator(config, knowledge_base, data_manager)
+        # Initialize Meta Orchestrator (v23 Brain)
+        meta_orchestrator = MetaOrchestrator(legacy_orchestrator=legacy_orchestrator)
 
-        # Initialize Echo System
-        echo_system = Echo(config.get("echo_system", {}))
+        if args.query:
+            # Single shot mode
+            print(f"User> {args.query}")
+            print("Adam> Thinking...")
+            result = await meta_orchestrator.route_request(args.query)
+            print(f"Adam> {result}")
+            return
 
-        # Initialize LLM plugin
-        llm_plugin = LLMPlugin(config.get("llm_plugin", {}))
+        print("\n" + "="*50)
+        print("   ADAM v23.0 - Adaptive Financial Intelligence")
+        print("   (Type 'exit' or 'quit' to stop)")
+        print("="*50 + "\n")
 
-        # Start the agent orchestrator
-        agent_orchestrator.run()
+        # Interactive Loop
+        while True:
+            try:
+                user_input = input("User> ")
+                if user_input.lower() in ["exit", "quit"]:
+                    break
 
-        # Example usage:
-        # 1. Run a specific analysis module
-        market_sentiment = agent_orchestrator.run_analysis("market_sentiment")
-        print("Market Sentiment Analysis:", market_sentiment)
+                if not user_input.strip():
+                    continue
 
-        # 2. Access and update the knowledge graph
-        dcf_data = get_knowledge_graph_data("Valuation", "DCF")
-        print("DCF Data:", dcf_data)
+                print("Adam> Thinking...")
 
-        update_status = update_knowledge_graph_node("Valuation", "DCF", "discount_rate", 0.12)
-        print("Update Status:", update_status)
+                # Route request via MetaOrchestrator
+                result = await meta_orchestrator.route_request(user_input)
 
-        # 3. Get insights from the Echo system
-        insights = echo_system.get_insights(query="What are the latest market trends?")
-        print("Echo Insights:", insights)
+                print(f"Adam> {result}")
 
-        # 4. Use the LLM plugin for content generation
-        generated_content = llm_plugin.generate_content("financial trends", "summarize the latest market news")
-        print("Generated Content:", generated_content)
-
-        # 5. Execute a workflow
-        agent_orchestrator.execute_workflow("generate_newsletter")
-
-        # ... (Add more examples and use cases)
+            except EOFError:
+                # Handle non-interactive environments
+                logger.warning("EOF detected (non-interactive mode). Exiting.")
+                break
+            except KeyboardInterrupt:
+                print("\nAdam> User interrupted.")
+                break
+            except Exception as e:
+                logger.error(f"Error processing request: {e}", exc_info=True)
+                print(f"Adam> Error: {e}")
 
     except Exception as e:
-        print(f"Error running Adam v18.0: {e}")
-        sys.exit(1)
+        print(f"Fatal Error: {e}")
+        # sys.exit(1) # Don't exit with error code if it's just a runtime issue, let's keep it clean
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

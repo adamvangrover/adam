@@ -28,6 +28,7 @@ When working on the ADAM project, please adhere to the following principles:
     *   [Orchestrator Agents](#orchestrator-agents)
 *   [Getting Started](#getting-started)
 *   [Contribution Guidelines](#contribution-guidelines)
+*   [Operational Notes & Troubleshooting](#operational-notes--troubleshooting-v23-update)
 
 ## System Architecture
 
@@ -118,5 +119,14 @@ Please follow these guidelines when contributing to the ADAM project:
 *   Update the documentation when adding new features or changing existing ones.
 *   Write unit tests for all new code.
 *   Ensure that all tests pass before submitting a pull request.
+
+## Operational Notes & Troubleshooting (v23 Update)
+
+*   **Entry Point:** The main entry point for the system is now `scripts/run_adam.py`. It uses the `MetaOrchestrator` to route queries to the appropriate engine (v23 Adaptive, v22 Async, or v21 Legacy).
+*   **Dependencies:**
+    *   `facebook-scraper` has been removed due to conflicts with `semantic-kernel`. Social media data sources will gracefully degrade if this package is missing.
+    *   `langgraph` and `tiktoken` are required for v23 functionality.
+*   **Logging:** A new `core/utils/logging_utils.py` module has been added to standardize logging configuration.
+*   **Missing Files:** If you encounter `Knowledge base file not found` errors, ensure `data/risk_rating_mapping.json` exists. A default one is created if missing in some tests, but should be present in `data/` for production.
 
 Thank you for your contributions to the ADAM project!
