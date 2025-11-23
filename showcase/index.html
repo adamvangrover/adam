@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v23.0 - Mission Control</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white font-sans antialiased">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="w-64 bg-gray-800 border-r border-gray-700 flex flex-col">
+            <div class="p-6">
+                <h1 class="text-2xl font-bold tracking-wider text-blue-400">ADAM <span class="text-xs text-gray-500">v23.0</span></h1>
+                <p class="text-xs text-gray-400 mt-1">Adaptive Hive Mind</p>
+            </div>
+            <nav class="flex-1 px-4 space-y-2">
+                <a href="#" class="flex items-center space-x-3 px-4 py-3 bg-gray-700 rounded-lg text-white">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="dashboard.html" class="flex items-center space-x-3 px-4 py-3 hover:bg-gray-700 rounded-lg text-gray-300 transition">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Financial Terminal</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 px-4 py-3 hover:bg-gray-700 rounded-lg text-gray-300 transition">
+                    <i class="fas fa-network-wired"></i>
+                    <span>Knowledge Graph</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 px-4 py-3 hover:bg-gray-700 rounded-lg text-gray-300 transition">
+                    <i class="fas fa-bug"></i>
+                    <span>Red Team Ops</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 px-4 py-3 hover:bg-gray-700 rounded-lg text-gray-300 transition">
+                    <i class="fas fa-robot"></i>
+                    <span>Agents</span>
+                </a>
+            </nav>
+            <div class="p-4 border-t border-gray-700">
+                <div class="flex items-center space-x-3">
+                    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                    <span class="text-xs text-gray-400">System Online</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Topbar -->
+            <header class="bg-gray-800 border-b border-gray-700 p-4 flex justify-between items-center">
+                <div class="flex items-center bg-gray-900 rounded-lg px-4 py-2 w-96 border border-gray-600">
+                    <i class="fas fa-search text-gray-500 mr-3"></i>
+                    <input type="text" placeholder="Ask Adam (e.g., 'Analyze Apple's Credit Risk')" class="bg-transparent border-none focus:outline-none text-white w-full">
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="p-2 text-gray-400 hover:text-white"><i class="fas fa-bell"></i></button>
+                    <button class="p-2 text-gray-400 hover:text-white"><i class="fas fa-cog"></i></button>
+                    <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center font-bold">A</div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-900 p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- Stat Card 1 -->
+                    <div class="bg-gray-800 rounded-lg p-6 border border-gray-700 shadow-lg">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-400 text-sm">Active Agents</p>
+                                <h3 class="text-3xl font-bold mt-1">12</h3>
+                            </div>
+                            <div class="p-2 bg-blue-500 bg-opacity-20 rounded-lg text-blue-400">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                        <p class="text-green-400 text-sm mt-4"><i class="fas fa-arrow-up"></i> +2 since yesterday</p>
+                    </div>
+
+                    <!-- Stat Card 2 -->
+                    <div class="bg-gray-800 rounded-lg p-6 border border-gray-700 shadow-lg">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-400 text-sm">Reasoning Loops</p>
+                                <h3 class="text-3xl font-bold mt-1">847</h3>
+                            </div>
+                            <div class="p-2 bg-purple-500 bg-opacity-20 rounded-lg text-purple-400">
+                                <i class="fas fa-sync-alt"></i>
+                            </div>
+                        </div>
+                        <p class="text-green-400 text-sm mt-4"><i class="fas fa-arrow-up"></i> 12% efficiency gain</p>
+                    </div>
+
+                    <!-- Stat Card 3 -->
+                    <div class="bg-gray-800 rounded-lg p-6 border border-gray-700 shadow-lg">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-400 text-sm">KG Nodes</p>
+                                <h3 class="text-3xl font-bold mt-1">1.2M</h3>
+                            </div>
+                            <div class="p-2 bg-green-500 bg-opacity-20 rounded-lg text-green-400">
+                                <i class="fas fa-project-diagram"></i>
+                            </div>
+                        </div>
+                        <p class="text-gray-400 text-sm mt-4">FIBO + PROV-O Integrated</p>
+                    </div>
+
+                     <!-- Stat Card 4 -->
+                     <div class="bg-gray-800 rounded-lg p-6 border border-gray-700 shadow-lg">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-gray-400 text-sm">System Health</p>
+                                <h3 class="text-3xl font-bold mt-1 text-green-400">98%</h3>
+                            </div>
+                            <div class="p-2 bg-red-500 bg-opacity-20 rounded-lg text-red-400">
+                                <i class="fas fa-heartbeat"></i>
+                            </div>
+                        </div>
+                        <p class="text-gray-400 text-sm mt-4">All systems nominal</p>
+                    </div>
+                </div>
+
+                <!-- Main Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Recent Activity -->
+                    <div class="lg:col-span-2 bg-gray-800 rounded-lg border border-gray-700 p-6">
+                        <h2 class="text-xl font-bold mb-4">Live System Activity</h2>
+                        <div class="space-y-4" id="activity-log">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- System Status -->
+                    <div class="bg-gray-800 rounded-lg border border-gray-700 p-6">
+                        <h2 class="text-xl font-bold mb-4">Component Status</h2>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center p-3 bg-gray-900 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-green-500 mr-3"></div>
+                                    <span>Meta Orchestrator</span>
+                                </div>
+                                <span class="text-xs text-green-400 font-mono">ACTIVE</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-gray-900 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-green-500 mr-3"></div>
+                                    <span>Neuro-Symbolic Planner</span>
+                                </div>
+                                <span class="text-xs text-green-400 font-mono">READY</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-gray-900 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-yellow-500 mr-3"></div>
+                                    <span>Red Team Agent</span>
+                                </div>
+                                <span class="text-xs text-yellow-400 font-mono">IDLE</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-gray-900 rounded-lg">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 rounded-full bg-blue-500 mr-3"></div>
+                                    <span>Unified KG</span>
+                                </div>
+                                <span class="text-xs text-blue-400 font-mono">SYNCING</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="js/mock_data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

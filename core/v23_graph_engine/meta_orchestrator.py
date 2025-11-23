@@ -14,6 +14,7 @@ import logging
 from typing import Dict, Any, Optional
 from core.v23_graph_engine.neuro_symbolic_planner import NeuroSymbolicPlanner
 from core.v23_graph_engine.states import init_risk_state
+from core.v23_graph_engine.red_team_graph import red_team_app
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +31,9 @@ class MetaOrchestrator:
         complexity = self._assess_complexity(query)
         logger.info(f"MetaOrchestrator: Query complexity is {complexity}")
         
-        if complexity == "HIGH":
+        if complexity == "RED_TEAM":
+            return self._run_red_team_flow(query)
+        elif complexity == "HIGH":
             return self._run_adaptive_flow(query)
         elif complexity == "MEDIUM":
             # return self.legacy_orchestrator.run_async(query)
@@ -45,6 +48,11 @@ class MetaOrchestrator:
         In production, this would be a BERT classifier or Router LLM.
         """
         query_lower = query.lower()
+
+        # Red Team / Adversarial
+        if any(x in query_lower for x in ["attack", "stress test", "scenario", "adversarial", "simulate"]):
+            return "RED_TEAM"
+
         # v23 is best for analysis, planning, and risk
         if any(x in query_lower for x in ["analyze", "risk", "plan", "strategy", "report"]):
             return "HIGH"
@@ -84,4 +92,37 @@ class MetaOrchestrator:
             }
         except Exception as e:
             logger.error(f"v23 Execution Failed: {e}")
+            return {"error": str(e)}
+
+    def _run_red_team_flow(self, query: str):
+        logger.info("Engaging Red Team Graph...")
+
+        # Extract params (Mock)
+        target = "Apple Inc."
+        scenario = "Cyber"
+        if "rate" in query.lower() or "fed" in query.lower():
+            scenario = "Macro"
+        elif "law" in query.lower() or "compliance" in query.lower():
+            scenario = "Regulatory"
+
+        initial_state = {
+            "target_entity": target,
+            "scenario_type": scenario,
+            "current_scenario_description": "",
+            "simulated_impact_score": 0.0,
+            "severity_threshold": 8.0, # High threshold to force loops
+            "critique_notes": [],
+            "iteration_count": 0,
+            "is_sufficiently_severe": False,
+            "human_readable_status": "Initiating Red Team Protocol..."
+        }
+
+        try:
+            result = red_team_app.invoke(initial_state)
+            return {
+                "status": "Red Team Simulation Complete",
+                "final_state": result
+            }
+        except Exception as e:
+            logger.error(f"Red Team Execution Failed: {e}")
             return {"error": str(e)}

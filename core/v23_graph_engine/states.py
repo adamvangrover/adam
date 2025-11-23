@@ -52,6 +52,24 @@ class SNCAnalysisState(TypedDict):
     # Explainability
     human_readable_status: str
 
+class RedTeamState(TypedDict):
+    """
+    State for the Adversarial Red Team Loop.
+    """
+    target_entity: str
+    scenario_type: str # e.g. "Cyber", "Macro", "Regulatory"
+    current_scenario_description: str
+    simulated_impact_score: float # 0.0 to 10.0
+    severity_threshold: float
+
+    # Internal
+    critique_notes: List[str]
+    iteration_count: int
+    is_sufficiently_severe: bool
+
+    # Explainability
+    human_readable_status: str
+
 def init_risk_state(ticker: str, intent: str) -> RiskAssessmentState:
     return {
         "ticker": ticker,

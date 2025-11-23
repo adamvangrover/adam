@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v23.0 - Financial Terminal</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-900 text-white font-sans antialiased">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar (Simplified) -->
+        <div class="w-16 bg-gray-800 border-r border-gray-700 flex flex-col items-center py-4 space-y-4">
+            <a href="index.html" class="p-3 text-gray-400 hover:text-white rounded-lg hover:bg-gray-700"><i class="fas fa-home"></i></a>
+            <a href="#" class="p-3 text-blue-400 bg-gray-700 rounded-lg"><i class="fas fa-chart-line"></i></a>
+            <a href="#" class="p-3 text-gray-400 hover:text-white rounded-lg hover:bg-gray-700"><i class="fas fa-search"></i></a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+             <header class="bg-gray-800 border-b border-gray-700 p-4 flex justify-between items-center">
+                <h1 class="text-xl font-bold">Financial Analysis Terminal</h1>
+                <div class="flex items-center space-x-2">
+                    <span class="px-2 py-1 bg-green-900 text-green-400 text-xs rounded border border-green-700">MARKET OPEN</span>
+                    <span class="text-sm text-gray-400">S&P 500: <span class="text-green-400">4,567.89 (+0.4%)</span></span>
+                </div>
+            </header>
+
+            <main class="flex-1 p-6 grid grid-cols-12 gap-6 overflow-y-auto">
+                <!-- Chart Area -->
+                <div class="col-span-8 bg-gray-800 rounded-lg border border-gray-700 p-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="font-bold">Portfolio Performance</h2>
+                        <div class="space-x-2">
+                            <button class="px-3 py-1 text-xs bg-gray-700 rounded hover:bg-gray-600">1D</button>
+                            <button class="px-3 py-1 text-xs bg-gray-700 rounded hover:bg-gray-600">1W</button>
+                            <button class="px-3 py-1 text-xs bg-blue-600 rounded">1M</button>
+                        </div>
+                    </div>
+                    <div class="h-64 bg-gray-900 rounded flex items-center justify-center relative">
+                        <!-- Chart.js Canvas -->
+                        <canvas id="mainChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Order/Action Panel -->
+                <div class="col-span-4 bg-gray-800 rounded-lg border border-gray-700 p-4 flex flex-col">
+                    <h2 class="font-bold mb-4">Agent Actions</h2>
+                    <div class="space-y-3 flex-1 overflow-y-auto">
+                        <div class="bg-gray-900 p-3 rounded border-l-4 border-yellow-500">
+                            <p class="text-xs text-gray-400">Recommendation</p>
+                            <p class="text-sm font-semibold">Hedge against inflation</p>
+                            <p class="text-xs text-gray-500 mt-1">Confidence: 87%</p>
+                        </div>
+                        <div class="bg-gray-900 p-3 rounded border-l-4 border-red-500">
+                            <p class="text-xs text-gray-400">Alert</p>
+                            <p class="text-sm font-semibold">Unusual options volume (AAPL)</p>
+                            <p class="text-xs text-gray-500 mt-1">Source: MarketData Agent</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-gray-700">
+                        <button class="w-full bg-blue-600 hover:bg-blue-500 text-white py-2 rounded font-bold transition">
+                            Generate Report
+                        </button>
+                    </div>
+                </div>
+
+                <!-- News Feed -->
+                <div class="col-span-12 bg-gray-800 rounded-lg border border-gray-700 p-4">
+                     <h2 class="font-bold mb-4">Live Intelligence Feed</h2>
+                     <div class="grid grid-cols-3 gap-4">
+                         <div class="bg-gray-900 p-3 rounded hover:bg-gray-700 cursor-pointer transition">
+                             <span class="text-xs text-blue-400">Bloomberg</span>
+                             <h4 class="text-sm font-bold mt-1">Fed Signals Pause in Rate Hikes</h4>
+                         </div>
+                         <div class="bg-gray-900 p-3 rounded hover:bg-gray-700 cursor-pointer transition">
+                             <span class="text-xs text-blue-400">Reuters</span>
+                             <h4 class="text-sm font-bold mt-1">Oil Prices Surge on Supply Concerns</h4>
+                         </div>
+                         <div class="bg-gray-900 p-3 rounded hover:bg-gray-700 cursor-pointer transition">
+                             <span class="text-xs text-blue-400">Internal Analysis</span>
+                             <h4 class="text-sm font-bold mt-1">Tech Sector Valuation Model Updated</h4>
+                         </div>
+                     </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script>
+        // Simple Chart.js initialization
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['9:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30'],
+                datasets: [{
+                    label: 'Portfolio Value',
+                    data: [100, 102, 101, 105, 104, 108, 110],
+                    borderColor: 'rgb(59, 130, 246)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { grid: { color: '#374151' } },
+                    x: { grid: { color: '#374151' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
