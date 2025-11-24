@@ -83,6 +83,16 @@ class UnifiedKnowledgeGraph:
             ("OperationalStability", "affects", "RiskScore"),
             ("ShortSellerReport", "challenges", "Valuation"),
 
+            # Market Sentiment & News
+            ("NewsArticle", "mentions", "Company"),
+            ("NewsArticle", "expresses", "Sentiment"),
+            ("Sentiment", "influences", "StockPrice"),
+            ("SocialMediaPost", "amplifies", "NewsArticle"),
+            ("SocialMediaPost", "indicates", "RetailSentiment"),
+            ("RetailSentiment", "drives", "Volatility"),
+            ("AnalystUpgrade", "boosts", "Sentiment"),
+            ("AnalystDowngrade", "dampens", "Sentiment"),
+
             # Domain specific instances (for the planner to find)
             ("Apple Inc.", "is_a", "Company"),
             ("Apple Inc.", "belongs_to", "TechnologySector"),
