@@ -52,6 +52,33 @@ class SNCAnalysisState(TypedDict):
     # Explainability
     human_readable_status: str
 
+class MarketSentimentState(TypedDict):
+    """
+    State for the Market Sentiment & News Monitoring Graph.
+    """
+    # Input
+    ticker: str
+    target_sector: str
+
+    # Internal Reasoning State
+    news_feed: List[Dict[str, Any]]  # List of articles/tweets
+    sentiment_score: float           # -1.0 to 1.0
+    sentiment_trend: Literal["bullish", "bearish", "neutral"]
+    key_drivers: List[str]           # "Inflation", "Earnings", etc.
+
+    # KG Integration
+    related_entities: List[str]      # Entities found in KG related to the news
+
+    # Output
+    alert_level: Literal["LOW", "MEDIUM", "HIGH", "CRITICAL"]
+    final_report: Optional[str]
+
+    # Control Flow
+    iteration_count: int
+
+    # Explainability
+    human_readable_status: str
+
 class RedTeamState(TypedDict):
     """
     State for the Adversarial Red Team Loop.
@@ -96,4 +123,19 @@ def init_snc_state(obligor_id: str, syndicate_data: Dict, financials: Dict) -> S
         "is_compliant": True,
         "needs_revision": False,
         "human_readable_status": "Initializing SNC analysis..."
+    }
+
+def init_sentiment_state(ticker: str, sector: str) -> MarketSentimentState:
+    return {
+        "ticker": ticker,
+        "target_sector": sector,
+        "news_feed": [],
+        "sentiment_score": 0.0,
+        "sentiment_trend": "neutral",
+        "key_drivers": [],
+        "related_entities": [],
+        "alert_level": "LOW",
+        "final_report": None,
+        "iteration_count": 0,
+        "human_readable_status": "Initializing Sentiment Monitor..."
     }

@@ -27,3 +27,12 @@ This document lists known errors and technical debt that should be addressed in 
 **Recommendation:**
 - Run the full suite and triage all failures.
 - Implement a CI/CD pipeline.
+
+## 3. Environment Limitations (v23)
+
+**Issue:** The current runtime environment lacks `langgraph` and `numpy`, preventing the execution of `scripts/test_sentiment_graph.py`.
+
+**Detail:**
+- `core/v23_graph_engine/market_sentiment_graph.py` relies on `langgraph`.
+- The `test_sentiment_graph.py` script was run with mocks to verify syntax and logical structure, which passed.
+- **Action Required:** Install `langgraph`, `numpy`, and `pandas` in the target environment to fully enable v23 features.
