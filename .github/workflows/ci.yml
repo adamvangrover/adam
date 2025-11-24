@@ -53,7 +53,7 @@ jobs:
 
     - name: Install Node.js dependencies
       working-directory: ./services/webapp/client
-      run: npm install
+      run: npm install --legacy-peer-deps
 
     - name: Run backend tests
       env:
@@ -70,11 +70,15 @@ jobs:
 
     - name: Run frontend tests
       working-directory: ./services/webapp/client
+      env:
+        CI: true
       run: npm test
 
-    - name: Lint frontend
+    - name: Build frontend
       working-directory: ./services/webapp/client
-      run: npm run eject -- --force && npm install eslint --save-dev && npx eslint src
+      env:
+        CI: true
+      run: npm run build
 
   build:
     runs-on: ubuntu-latest
