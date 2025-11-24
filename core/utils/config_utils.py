@@ -99,6 +99,25 @@ def load_error_codes() -> Dict[str, Any]:
     logging.warning("Could not load error codes from config/errors.yaml.")
     return {}
 
+def save_config(config: Dict[str, Any], file_path: str) -> bool:
+    """
+    Saves a configuration dictionary to a YAML file.
+
+    Args:
+        config: The configuration dictionary to save.
+        file_path: The path to the YAML file.
+
+    Returns:
+        True if successful, False otherwise.
+    """
+    try:
+        with open(file_path, 'w') as f:
+            yaml.dump(config, f, default_flow_style=False)
+        return True
+    except Exception as e:
+        logging.error(f"Error saving config to {file_path}: {e}")
+        return False
+
 # Example Usage (you can remove this when you integrate it into your project)
 if __name__ == '__main__':
     # Create a dummy config file for testing

@@ -23,7 +23,7 @@ from core.agents.industry_specialist_agent import IndustrySpecialistAgent
 from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
 from core.agents.technical_analyst_agent import TechnicalAnalystAgent
 from core.agents.risk_assessment_agent import RiskAssessmentAgent
-from core.agents.newsletter_layout_specialist_agent import NewsletterLayoutSpecialistAgent
+from core.agents.newsletter_layout_specialist_agent import NewsletterLayoutSpecialist as NewsletterLayoutSpecialistAgent
 from core.agents.data_verification_agent import DataVerificationAgent
 from core.agents.lexica_agent import LexicaAgent
 from core.agents.archive_manager_agent import ArchiveManagerAgent

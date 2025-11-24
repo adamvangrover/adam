@@ -1,6 +1,9 @@
 # core/agents/prompt_tuner.py
 
-from langchain.prompts import PromptTemplate
+try:
+    from langchain.prompts import PromptTemplate
+except ImportError:
+    from langchain_core.prompts import PromptTemplate
 from core.utils.data_utils import send_message, receive_messages
 from typing import List, Dict
 import re

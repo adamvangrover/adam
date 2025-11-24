@@ -1,6 +1,9 @@
 # core/agents/sense_weaver.py
 
-from langchain.utilities import GoogleSearchAPIWrapper
+try:
+    from langchain.utilities import GoogleSearchAPIWrapper
+except ImportError:
+    from langchain_community.utilities import GoogleSearchAPIWrapper
 from transformers import pipeline
 #... (import other necessary libraries for multi-modal processing)
 
