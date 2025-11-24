@@ -1,4 +1,4 @@
-from typing import TypedDict, List, Optional, Annotated, Dict, Any
+from typing import TypedDict, List, Optional, Annotated, Dict, Any, Literal
 import operator
 
 class ResearchArtifact(TypedDict):
@@ -97,6 +97,54 @@ class RedTeamState(TypedDict):
     # Explainability
     human_readable_status: str
 
+class ESGAnalysisState(TypedDict):
+    """
+    State for the ESG (Environmental, Social, Governance) Analysis Graph.
+    """
+    # Input
+    company_name: str
+    sector: str
+
+    # Internal Reasoning State
+    env_score: float
+    social_score: float
+    gov_score: float
+    total_esg_score: float
+    controversies: List[str]
+
+    critique_notes: List[str]
+    iteration_count: int
+
+    # Control Flow
+    needs_revision: bool
+
+    # Explainability
+    human_readable_status: str
+    final_report: Optional[str]
+
+class ComplianceState(TypedDict):
+    """
+    State for the Regulatory Compliance Graph.
+    """
+    # Input
+    entity_id: str
+    jurisdiction: str
+
+    # Internal Reasoning
+    applicable_regulations: List[str]
+    potential_violations: List[str]
+    risk_level: Literal["LOW", "MEDIUM", "HIGH", "CRITICAL"]
+
+    critique_notes: List[str]
+    iteration_count: int
+
+    # Control Flow
+    needs_revision: bool
+
+    # Explainability
+    human_readable_status: str
+    final_report: Optional[str]
+
 def init_risk_state(ticker: str, intent: str) -> RiskAssessmentState:
     return {
         "ticker": ticker,
@@ -138,4 +186,34 @@ def init_sentiment_state(ticker: str, sector: str) -> MarketSentimentState:
         "final_report": None,
         "iteration_count": 0,
         "human_readable_status": "Initializing Sentiment Monitor..."
+    }
+
+def init_esg_state(company: str, sector: str) -> ESGAnalysisState:
+    return {
+        "company_name": company,
+        "sector": sector,
+        "env_score": 0.0,
+        "social_score": 0.0,
+        "gov_score": 0.0,
+        "total_esg_score": 0.0,
+        "controversies": [],
+        "critique_notes": [],
+        "iteration_count": 0,
+        "needs_revision": False,
+        "human_readable_status": "Initializing ESG Analysis...",
+        "final_report": None
+    }
+
+def init_compliance_state(entity: str, jurisdiction: str) -> ComplianceState:
+    return {
+        "entity_id": entity,
+        "jurisdiction": jurisdiction,
+        "applicable_regulations": [],
+        "potential_violations": [],
+        "risk_level": "LOW",
+        "critique_notes": [],
+        "iteration_count": 0,
+        "needs_revision": False,
+        "human_readable_status": "Initializing Compliance Check...",
+        "final_report": None
     }

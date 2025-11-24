@@ -1,6 +1,9 @@
 # core/agents/lingua_maestro.py
 
-from langchain.utilities import GoogleSearchAPIWrapper
+try:
+    from langchain.utilities import GoogleSearchAPIWrapper
+except ImportError:
+    from langchain_community.utilities import GoogleSearchAPIWrapper
 from transformers import pipeline
 from nltk.sentiment import SentimentIntensityAnalyzer
 #... (import other necessary libraries)

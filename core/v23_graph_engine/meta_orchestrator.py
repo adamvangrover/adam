@@ -8,14 +8,17 @@ a user query should take:
 1. Fast Path (v21): Direct tool execution (e.g. "Get stock price").
 2. Async Path (v22): Message-driven workflow (e.g. "Monitor news").
 3. Adaptive Path (v23): Neuro-Symbolic Planner (e.g. "Analyze complex credit risk").
+4. Specialized Paths: ESG, Compliance, Red Team.
 """
 
 import logging
 import asyncio
 from typing import Dict, Any, Optional
 from core.v23_graph_engine.neuro_symbolic_planner import NeuroSymbolicPlanner
-from core.v23_graph_engine.states import init_risk_state
+from core.v23_graph_engine.states import init_risk_state, init_esg_state, init_compliance_state
 from core.v23_graph_engine.red_team_graph import red_team_app
+from core.v23_graph_engine.esg_graph import esg_graph_app
+from core.v23_graph_engine.regulatory_compliance_graph import compliance_graph_app
 from core.system.agent_orchestrator import AgentOrchestrator
 
 logger = logging.getLogger(__name__)
@@ -35,20 +38,19 @@ class MetaOrchestrator:
         
         if complexity == "RED_TEAM":
             return await self._run_red_team_flow(query)
+        elif complexity == "ESG":
+            return await self._run_esg_flow(query)
+        elif complexity == "COMPLIANCE":
+            return await self._run_compliance_flow(query)
         elif complexity == "HIGH":
             return await self._run_adaptive_flow(query)
         elif complexity == "MEDIUM":
             # Route to legacy workflow (Async v22 style via AgentOrchestrator)
-            # For now we use a generic workflow or analysis
             logger.info("Routing to Legacy/Async Workflow...")
-            # Assuming 'general_analysis' or similar workflow exists, or just use QueryUnderstanding
-            # Since execute_workflow expects a workflow name defined in workflows.yaml
-            # We'll try to find a matching workflow or default to a simple one.
             return await self.legacy_orchestrator.execute_workflow("test_workflow", initial_context={"user_query": query})
         else:
             # Low complexity -> Legacy Single Agent Execution
             logger.info("Routing to Legacy Single Agent...")
-            # Using execute_agent which is Fire-and-Forget (Message Broker)
             self.legacy_orchestrator.execute_agent("QueryUnderstandingAgent", context={"user_query": query})
             return {"status": "Dispatched to Message Broker", "query": query}
 
@@ -62,6 +64,14 @@ class MetaOrchestrator:
         # Red Team / Adversarial
         if any(x in query_lower for x in ["attack", "stress test", "scenario", "adversarial", "simulate"]):
             return "RED_TEAM"
+
+        # ESG
+        if any(x in query_lower for x in ["esg", "environmental", "sustainability", "carbon", "green", "social impact"]):
+            return "ESG"
+
+        # Compliance
+        if any(x in query_lower for x in ["compliance", "kyc", "aml", "regulation", "violation", "dodd-frank", "basel"]):
+            return "COMPLIANCE"
 
         # v23 is best for analysis, planning, and risk
         if any(x in query_lower for x in ["analyze", "risk", "plan", "strategy", "report"]):
@@ -96,13 +106,11 @@ class MetaOrchestrator:
         initial_state = init_risk_state(ticker, query)
         
         try:
-            # invoke is synchronous in LangGraph unless using ainvoke?
-            # LangGraph apps are runnables. invoke is sync. ainvoke is async.
-            # We should use ainvoke if possible to keep it async friendly.
+            config = {"configurable": {"thread_id": "1"}}
             if hasattr(app, 'ainvoke'):
-                result = await app.ainvoke(initial_state)
+                result = await app.ainvoke(initial_state, config=config)
             else:
-                result = app.invoke(initial_state)
+                result = app.invoke(initial_state, config=config)
 
             return {
                 "status": "v23 Execution Complete",
@@ -136,15 +144,66 @@ class MetaOrchestrator:
         }
 
         try:
-             # Using ainvoke if available
+            config = {"configurable": {"thread_id": "1"}}
             if hasattr(red_team_app, 'ainvoke'):
-                result = await red_team_app.ainvoke(initial_state)
+                result = await red_team_app.ainvoke(initial_state, config=config)
             else:
-                result = red_team_app.invoke(initial_state)
+                result = red_team_app.invoke(initial_state, config=config)
             return {
                 "status": "Red Team Simulation Complete",
                 "final_state": result
             }
         except Exception as e:
             logger.error(f"Red Team Execution Failed: {e}")
+            return {"error": str(e)}
+
+    async def _run_esg_flow(self, query: str):
+        logger.info("Engaging ESG Graph...")
+
+        # Mock Extraction
+        company = "Acme Corp"
+        if "apple" in query.lower(): company = "Apple Inc."
+        elif "exxon" in query.lower(): company = "Exxon Mobil"
+
+        sector = "Technology"
+        if "oil" in query.lower() or "exxon" in query.lower(): sector = "Energy"
+
+        initial_state = init_esg_state(company, sector)
+
+        try:
+            config = {"configurable": {"thread_id": "1"}}
+            if hasattr(esg_graph_app, 'ainvoke'):
+                result = await esg_graph_app.ainvoke(initial_state, config=config)
+            else:
+                result = esg_graph_app.invoke(initial_state, config=config)
+            return {
+                "status": "ESG Analysis Complete",
+                "final_state": result
+            }
+        except Exception as e:
+             logger.error(f"ESG Execution Failed: {e}")
+             return {"error": str(e)}
+
+    async def _run_compliance_flow(self, query: str):
+        logger.info("Engaging Compliance Graph...")
+
+        # Mock Extraction
+        entity = "Generic Bank"
+        jurisdiction = "US"
+        if "eu" in query.lower() or "gdpr" in query.lower(): jurisdiction = "EU"
+
+        initial_state = init_compliance_state(entity, jurisdiction)
+
+        try:
+            config = {"configurable": {"thread_id": "1"}}
+            if hasattr(compliance_graph_app, 'ainvoke'):
+                result = await compliance_graph_app.ainvoke(initial_state, config=config)
+            else:
+                result = compliance_graph_app.invoke(initial_state, config=config)
+            return {
+                "status": "Compliance Check Complete",
+                "final_state": result
+            }
+        except Exception as e:
+            logger.error(f"Compliance Execution Failed: {e}")
             return {"error": str(e)}
