@@ -1,12 +1,14 @@
 # tests/test_agent_base.py
 import unittest
+import asyncio
 from core.agents.agent_base import AgentBase
 
 class MockAgent(AgentBase):  # Concrete subclass for testing
     def __init__(self, config):
         super().__init__(config)
         self.name = config.get("name")
-    def execute(self, *args, **kwargs):
+
+    async def execute(self, *args, **kwargs):
         return "Mock Agent Executed"
 
 class TestAgentBase(unittest.TestCase):

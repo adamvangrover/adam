@@ -1,12 +1,15 @@
-# core/agents/agent_base.py
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional # Optional was already here, ensure Dict and Any are used consistently
+from typing import Any, Dict, List, Optional
 import logging
 import json
 import asyncio
+import uuid
 
 # Import Kernel for type hinting
-from semantic_kernel import Kernel
+try:
+    from semantic_kernel import Kernel
+except ImportError:
+    Kernel = Any  # Fallback for type hinting if package is missing
 
 
 # Configure logging (you could also have a central logging config)
@@ -31,6 +34,8 @@ class AgentBase(ABC):
         self.kernel = kernel # Store the Semantic Kernel instance
         self.context: Dict[str, Any] = {}
         self.peer_agents: Dict[str, AgentBase] = {}  # For A2A
+        self.pending_requests: Dict[str, asyncio.Future] = {} # For Async A2A responses
+
         # Updated log message to reflect potential kernel presence
         log_message = f"Agent {type(self).__name__} initialized with config: {config}"
         if constitution:
@@ -63,16 +68,40 @@ class AgentBase(ABC):
         self.peer_agents[agent.name] = agent
         logging.info(f"Agent {self.name} added peer agent: {agent.name}")
 
-    async def send_message(self, target_agent: str, message: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    async def send_message(self, target_agent: str, message: Dict[str, Any], timeout: float = 30.0) -> Optional[Dict[str, Any]]:
         """
-        Sends an A2A message to another agent and waits for the response.
+        Sends an A2A message to another agent and waits for the response asynchronously.
         """
-        # This synchronous version is a placeholder.
-        # A true async implementation would involve a more complex mechanism for waiting for a response.
-        # For now, we'll just publish the message.
-        self.message_broker.publish(target_agent, json.dumps(message))
-        logging.info(f"Agent {type(self).__name__} sent message to {target_agent}")
-        return None
+        correlation_id = str(uuid.uuid4())
+        message['correlation_id'] = correlation_id
+        # Ensure we have a return address. Ideally this is the queue name the agent listens on.
+        message['reply_to'] = type(self).__name__
+
+        future = asyncio.get_running_loop().create_future()
+        self.pending_requests[correlation_id] = future
+
+        try:
+            if not hasattr(self, 'message_broker') or not self.message_broker:
+                 logging.warning(f"Agent {type(self).__name__} has no message broker attached. Cannot send message.")
+                 # Cleanup
+                 del self.pending_requests[correlation_id]
+                 return None
+
+            self.message_broker.publish(target_agent, json.dumps(message))
+            logging.info(f"Agent {type(self).__name__} sent message to {target_agent} (ID: {correlation_id})")
+
+            return await asyncio.wait_for(future, timeout)
+
+        except asyncio.TimeoutError:
+            logging.error(f"Timeout waiting for response from {target_agent} (ID: {correlation_id})")
+            if correlation_id in self.pending_requests:
+                del self.pending_requests[correlation_id]
+            return None
+        except Exception as e:
+            logging.error(f"Error sending message: {e}")
+            if correlation_id in self.pending_requests:
+                del self.pending_requests[correlation_id]
+            return None
 
     @abstractmethod
     async def execute(self, *args: Any, **kwargs: Any) -> Any:
@@ -87,23 +116,81 @@ class AgentBase(ABC):
         Subscribes the agent to its dedicated topic on the message broker
         and processes incoming messages via a callback.
         """
+        self.message_broker = message_broker # Store broker reference
         topic = type(self).__name__
         message_broker.subscribe(topic, self.handle_message)
 
     def handle_message(self, ch, method, properties, body):
         """
         Callback function to handle incoming messages.
+        Dispatches to internal handler to manage async execution.
         """
-        message = json.loads(body)
-        context = message.get("context")
+        try:
+            message = json.loads(body)
+            correlation_id = message.get("correlation_id")
+
+            # 1. Handle Response to a previous request
+            if correlation_id and correlation_id in self.pending_requests:
+                future = self.pending_requests.pop(correlation_id)
+                if not future.done():
+                    # pika callbacks might run in a different thread or context.
+                    # We need to set the result in the loop where the future was created.
+                    try:
+                        loop = future.get_loop()
+                        if not loop.is_closed():
+                            loop.call_soon_threadsafe(future.set_result, message)
+                        else:
+                            logging.error("Event loop is closed, cannot set result for message.")
+                    except Exception as loop_err:
+                        logging.error(f"Error setting future result: {loop_err}")
+                return
+
+            # 2. Handle New Request (fire and forget / async)
+            # Since 'execute' is async, we need to schedule it on an event loop.
+            try:
+                # Try to get the running loop if this callback is in the main thread
+                loop = asyncio.get_running_loop()
+            except RuntimeError:
+                # If we are in a separate thread (e.g. pika thread), we might not have a running loop accessible directly
+                # In a real app, we should have a reference to the main loop.
+                # For now, we attempt to get a loop or create a task if possible.
+                # WARNING: Creating a new loop here is risky if one exists elsewhere.
+                # Assuming standard asyncio usage where main loop handles this.
+                logging.warning("No running loop found in handle_message. Request might be ignored if not properly scheduled.")
+                return
+
+            asyncio.run_coroutine_threadsafe(self._process_incoming_request(message), loop)
+
+        except Exception as e:
+            logging.error(f"Error in handle_message: {e}")
+
+    async def _process_incoming_request(self, message: Dict[str, Any]):
+        """
+        Internal helper to process an incoming request asynchronously.
+        """
+        context = message.get("context", {})
         reply_to = message.get("reply_to")
+        correlation_id = message.get("correlation_id")
 
-        # Execute the agent's logic
-        result = self.execute(**context)
+        try:
+            # Execute the agent's logic
+            result = await self.execute(**context)
 
-        # Publish the result to the reply_to topic
-        if reply_to:
-            self.message_broker.publish(reply_to, json.dumps(result))
+            # Publish the result to the reply_to topic if requested
+            if reply_to and hasattr(self, 'message_broker'):
+                response_message = result if isinstance(result, dict) else {"result": result}
+                if correlation_id:
+                    response_message["correlation_id"] = correlation_id
+
+                self.message_broker.publish(reply_to, json.dumps(response_message))
+
+        except Exception as e:
+            logging.error(f"Error processing incoming request in agent {type(self).__name__}: {e}")
+            # Optionally send error back
+            if reply_to and hasattr(self, 'message_broker') and correlation_id:
+                 error_msg = {"error": str(e), "correlation_id": correlation_id}
+                 self.message_broker.publish(reply_to, json.dumps(error_msg))
+
 
     def get_skill_schema(self) -> Dict[str, Any]:
         """
@@ -118,322 +205,41 @@ class AgentBase(ABC):
 
     async def receive_message(self, sender_agent: str, message: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """
-        Handles incoming A2A messages. Subclasses should override
-        this to define how they respond to messages.
+        Handles incoming A2A messages directly (alternative to broker).
+        Subclasses should override this to define how they respond to messages.
         """
-        logging.info(f"Agent {self.name} received message from {sender_agent}: {message}")
+        logging.info(f"Agent {self.config.get('agent_id')} received message from {sender_agent}: {message}")
         return None  # Default: No response
 
 
     async def run_semantic_kernel_skill(self, skill_collection_name: str, skill_name: str, input_vars: Dict[str, str]) -> str:
         """
-        Executes a Semantic Kernel skill from a specific collection.
-        This assumes the agent has access to a Semantic Kernel instance (self.kernel)
-        and that skills have been imported into collections.
+        Executes a Semantic Kernel skill. Standardized for clearer error handling.
         """
         if not hasattr(self, 'kernel') or not self.kernel:
-            raise AttributeError("Agent does not have access to a Semantic Kernel instance (self.kernel).")
-        if not hasattr(self.kernel, 'skills') or not hasattr(self.kernel.skills, 'get_function'):
-             raise AttributeError("Semantic Kernel instance does not have 'skills.get_function' method. SK version might be different than expected.")
-
-
-        # Get the Semantic Kernel function from the specified collection and skill name.
-        # For SK v1.x Python, this is typically kernel.plugins[plugin_name][function_name]
-        # or kernel.skills.get_function(skill_collection_name, skill_name) if skills are registered that way.
-        # The problem description suggests kernel.skills.get_function(skill_collection_name, skill_name).
-        try:
-            sk_function = self.kernel.skills.get_function(skill_collection_name, skill_name)
-        except Exception as e: # Broad exception to catch issues if .skills or .get_function doesn't exist as expected
-            logging.error(f"Error accessing SK function '{skill_name}' in collection '{skill_collection_name}': {e}. This might be due to an unexpected SK version or structure.")
-            raise ValueError(f"Could not retrieve Semantic Kernel skill '{skill_name}' from collection '{skill_collection_name}'. Error: {e}")
-
-
-        if not sk_function:
-            raise ValueError(f"Semantic Kernel skill '{skill_name}' not found in collection '{skill_collection_name}'.")
-
-        # Create the Semantic Kernel context.
-        # For SK v1.x, context is often handled via KernelArguments or directly passed to invoke.
-        # The method `kernel.create_new_context()` is from older versions (e.g., v0.9.x)
-        # If using SK v1.x, `kernel.run_async(sk_function, input_vars=input_vars)` might not be the right way.
-        # It would be more like: `await self.kernel.invoke(sk_function, **input_vars)`
-        # or `await sk_function.invoke(variables=input_vars)`
-        # Given the existing `self.kernel.run`, I will assume it's for an older SK version compatible with create_new_context.
-        # However, the instruction for SK v1.x style get_function is a bit conflicting.
-        # Let's stick to the existing run pattern but log a warning if create_new_context is missing.
-        
-        sk_context = None
-        if hasattr(self.kernel, 'create_new_context') and callable(self.kernel.create_new_context):
-            sk_context = self.kernel.create_new_context()
-            # Set input variables for the Semantic Kernel function.
-            for var_name, var_value in input_vars.items():
-                sk_context[var_name] = var_value
-        else:
-            # If create_new_context is not available (e.g. SK v1.x), input_vars are usually passed directly to run/invoke.
-            # The existing self.kernel.run call takes input_vars, so this might be fine.
-            logging.debug("kernel.create_new_context() not found, assuming input_vars passed directly to kernel.run().")
-
-
-        # Execute the Semantic Kernel function.
-        # The existing code is: result = await self.kernel.run(sk_function, input_vars=input_vars)
-        # For SK v1.x, it would be more like: result = await self.kernel.invoke(sk_function, **input_vars)
-        # or await sk_function.invoke(input_vars)
-        # Given the instruction to keep `kernel.run`, I'll use it.
-        # If sk_context was created, some SK versions expect it in run: await self.kernel.run(sk_function, context=sk_context)
-        # If not, input_vars directly: await self.kernel.run(sk_function, input_vars=input_vars)
-        # The original code did not pass sk_context to run.
-        
-        # Using input_vars directly as per the original structure of kernel.run call
-        result = await self.kernel.run_async(sk_function, input_vars=input_vars) # kernel.run is often run_async
-
-        # Return the result as a string.
-
-        # Set input variables for the Semantic Kernel function.
-        for var_name, var_value in input_vars.items():
-            sk_context[var_name] = var_value
-
-        # Execute the Semantic Kernel function.
-        result = await self.kernel.run(sk_function, input_vars=input_vars)
-
-        # Return the result as a string.
-        return str(result)
-
-
-# New Agent class for RAG pipeline
-from core.llm.base_llm_engine import BaseLLMEngine
-from core.embeddings.base_embedding_model import BaseEmbeddingModel
-from core.vectorstore.base_vector_store import BaseVectorStore
-
-class Agent:
-    def __init__(
-        self,
-        llm_engine: BaseLLMEngine,
-        embedding_model: BaseEmbeddingModel,
-        vector_store: BaseVectorStore,
-        agent_id: str = "rag_agent",
-        kernel: Optional[Kernel] = None, # Added kernel parameter
-    ):
-        self.agent_id = agent_id
-        self.llm_engine = llm_engine
-        self.embedding_model = embedding_model
-        self.vector_store = vector_store
-        self.kernel = kernel # Store the kernel instance
-        self.tools = {} # To store instantiated tools
-        self.state = "idle"
-        log_message = f"RAG Agent {self.agent_id} initialized"
-        if self.kernel:
-            log_message += " with Semantic Kernel instance."
-        else:
-            log_message += "."
-        logging.info(log_message)
-
-    async def process_query(self, query: str) -> str:
-        """
-        Processes a user query using the RAG pipeline.
-        """
-        self.state = "active"
-        logging.info(f"RAG Agent {self.agent_id} received query: {query}")
-
-        # 1. Generate query embedding
-        query_embedding = await self.embedding_model.generate_embedding(query)
-        logging.debug(f"RAG Agent {self.agent_id} generated query embedding.")
-
-        # 2. Search for relevant documents in the vector store
-        retrieved_docs = await self.vector_store.search(query_embedding, top_k=3)
-        logging.debug(f"RAG Agent {self.agent_id} retrieved {len(retrieved_docs)} documents.")
-
-        # 3. Format context from retrieved documents
-        context = "\n".join([doc[0] for doc in retrieved_docs])
-        if not context:
-            logging.warning(f"RAG Agent {self.agent_id} found no relevant context for query: {query}")
-            # Fallback or specific handling for no context can be added here
-            # For now, proceed with an empty context string.
-
-        logging.info(f"RAG Agent {self.agent_id} prepared context (length: {len(context)}).")
-
-
-        # 4. Generate response using LLM with query and context
-        response = await self.llm_engine.generate_response(prompt=query, context=context)
-        logging.info(f"RAG Agent {self.agent_id} generated response.")
-
-        self.state = "idle"
-        return response
-
-    async def ingest_document(self, doc_input: Any, chunk_size: int = 500, chunk_overlap: int = 50):
-        """
-        Ingests a document or text into the RAG system.
-        - If doc_input is a string, it's treated as raw content.
-        - If doc_input is a Document object, its content is used.
-        - Chunks the document content.
-        - Generates embeddings for each chunk.
-        - Adds each chunk and its embedding to the vector store.
-        """
-        from core.rag.document_handling import Document, chunk_text # Local import
-
-        if isinstance(doc_input, str):
-            doc = Document(content=doc_input)
-        elif isinstance(doc_input, Document):
-            doc = doc_input
-        else:
-            logging.error(f"RAG Agent {self.agent_id}: Invalid document input type: {type(doc_input)}")
-            return
-
-        self.state = "ingesting"
-        logging.info(f"RAG Agent {self.agent_id} ingesting document (ID: {doc.id}, Source: {doc.metadata.get('source', 'N/A')})...")
+            raise AttributeError("Agent does not have access to a Semantic Kernel instance.")
 
         try:
-            text_chunks = chunk_text(doc.content, chunk_size=chunk_size, chunk_overlap=chunk_overlap)
-            if not text_chunks:
-                logging.warning(f"RAG Agent {self.agent_id}: No chunks generated for document {doc.id}. Content might be empty or too short.")
-                self.state = "idle"
-                return
+            # Support SK v1.x (Plugins)
+            if hasattr(self.kernel, 'plugins') and skill_collection_name in self.kernel.plugins:
+                plugin = self.kernel.plugins[skill_collection_name]
+                if skill_name in plugin:
+                    function = plugin[skill_name]
+                    result = await self.kernel.invoke(function, **input_vars)
+                    return str(result)
 
-            logging.info(f"RAG Agent {self.agent_id}: Document {doc.id} split into {len(text_chunks)} chunks.")
+            # Support Older SK (Skills)
+            if hasattr(self.kernel, 'skills') and hasattr(self.kernel.skills, 'get_function'):
+                 function = self.kernel.skills.get_function(skill_collection_name, skill_name)
+                 result = await self.kernel.run_async(function, input_vars=input_vars)
+                 return str(result)
 
-            documents_to_add = []
-            for i, chunk_text_content in enumerate(text_chunks):
-                # We could add chunk-specific metadata here, e.g., chunk_index, document_id
-                # For now, the vector store interface takes (text, embedding).
-                # If BaseVectorStore.add_documents can handle metadata, this would be the place to pass it.
-                chunk_embedding = await self.embedding_model.generate_embedding(chunk_text_content)
-                # Storing the chunk text along with its embedding.
-                # The vector store would ideally also store/link metadata like doc.id, doc.metadata, chunk_id.
-                # Current BaseVectorStore.add_documents takes List[Tuple[str, List[float]]]
-                documents_to_add.append((chunk_text_content, chunk_embedding))
-
-            if documents_to_add:
-                await self.vector_store.add_documents(documents_to_add)
-                logging.info(f"RAG Agent {self.agent_id}: Finished embedding and adding {len(documents_to_add)} chunks for document {doc.id}.")
-            else:
-                logging.info(f"RAG Agent {self.agent_id}: No document chunks were added to vector store for doc {doc.id}.")
+            # If we reach here, we couldn't find the skill
+            raise ValueError(f"Skill '{skill_name}' in collection '{skill_collection_name}' not found in Kernel.")
 
         except Exception as e:
-            logging.error(f"RAG Agent {self.agent_id}: Failed to ingest document (ID: {doc.id}): {e}")
-            # Optionally re-raise or handle more gracefully
-            # raise # Uncomment if the caller should handle this exception
-        finally:
-            self.state = "idle"
+            logging.error(f"Error executing Semantic Kernel skill: {e}")
+            raise
 
-    def get_status(self) -> Dict[str, str]:
-        return {"agent_id": self.agent_id, "state": self.state}
-
-    async def enhance_query_with_sk(self, query: str) -> str:
-        """
-        Enhances a query using a Semantic Kernel skill.
-        This is a demonstration of how the agent can use SK.
-        """
-        if not self.kernel:
-            logging.warning(f"RAG Agent {self.agent_id}: Semantic Kernel not available. Returning original query.")
-            return query
-
-        # Import KernelArguments if using SK v1.x style
-        try:
-            from semantic_kernel.functions import KernelArguments
-        except ImportError:
-            # Fallback or error if SK version is not as expected
-            logging.error("Failed to import KernelArguments from semantic_kernel.functions. Ensure Semantic Kernel v1.x is installed.")
-            return query
-
-        skill_name = "QueryEnhancerSkill"
-        function_name = "enhance" # Assuming the prompt file name (skprompt.txt) translates to 'enhance' function
-
-        if skill_name not in self.kernel.plugins:
-            try:
-                # Path to the directory containing the 'QueryEnhancerSkill' directory
-                skills_directory_path = "core/agents/skills/rag_skills"
-                # The import_plugin_from_prompt_directory expects the path to the skill group, then the specific skill dir name
-                self.kernel.import_plugin_from_prompt_directory(skills_directory_path, skill_name)
-                logging.info(f"RAG Agent {self.agent_id}: Loaded {skill_name} into Semantic Kernel from {skills_directory_path}/{skill_name}.")
-            except Exception as e:
-                logging.error(f"RAG Agent {self.agent_id}: Failed to load {skill_name}: {e}")
-                return query
-
-        try:
-            if skill_name not in self.kernel.plugins or function_name not in self.kernel.plugins[skill_name]:
-                logging.error(f"RAG Agent {self.agent_id}: {skill_name} or function {function_name} not found in kernel plugins after attempting load.")
-                return query
-
-            enhancer_function = self.kernel.plugins[skill_name][function_name]
-
-            kernel_args = KernelArguments(query=query)
-            result = await self.kernel.invoke(enhancer_function, kernel_args)
-
-            enhanced_query = str(result)
-            logging.info(f"RAG Agent {self.agent_id}: Enhanced query from '{query}' to '{enhanced_query}' using SK.")
-            return enhanced_query
-        except Exception as e:
-            logging.error(f"RAG Agent {self.agent_id}: Error running QueryEnhancerSkill: {e}")
-            return query
-
-    def register_tool(self, tool_instance: Any, plugin_name: Optional[str] = None):
-        """
-        Registers a tool with the agent's Semantic Kernel instance.
-        The tool_instance should have methods decorated with @kernel_function.
-        """
-        if not self.kernel:
-            logging.warning(f"RAG Agent {self.agent_id}: Cannot register tool, Semantic Kernel not available.")
-            return
-
-        if not hasattr(tool_instance, "name"):
-            logging.error(f"RAG Agent {self.agent_id}: Tool instance does not have a 'name' attribute.")
-            return
-
-        tool_name = plugin_name or tool_instance.name
-
-        try:
-            # SK v1.x: plugins are typically Python objects whose methods are decorated.
-            # kernel.add_plugin(plugin_instance=tool_instance, plugin_name=tool_name)
-            self.kernel.add_plugin(plugin_instance=tool_instance, plugin_name=tool_name)
-            self.tools[tool_name] = tool_instance # Keep a reference if needed
-            logging.info(f"RAG Agent {self.agent_id}: Registered tool '{tool_name}' with Semantic Kernel.")
-        except Exception as e:
-            logging.error(f"RAG Agent {self.agent_id}: Failed to register tool '{tool_name}': {e}")
-
-    async def invoke_tool(self, plugin_name: str, function_name: str, **kwargs) -> Optional[str]:
-        """
-        Invokes a registered tool's function via Semantic Kernel.
-        """
-        if not self.kernel:
-            logging.warning(f"RAG Agent {self.agent_id}: Cannot invoke tool, Semantic Kernel not available.")
-            return None
-
-        if plugin_name not in self.kernel.plugins or function_name not in self.kernel.plugins[plugin_name]:
-            logging.error(f"RAG Agent {self.agent_id}: Tool/function '{plugin_name}.{function_name}' not found in Semantic Kernel.")
-            return None
-
-        try:
-            from semantic_kernel.functions import KernelArguments
-            kernel_args = KernelArguments(**kwargs)
-            target_function = self.kernel.plugins[plugin_name][function_name]
-
-            result = await self.kernel.invoke(target_function, kernel_args)
-            return str(result)
-        except Exception as e:
-            logging.error(f"RAG Agent {self.agent_id}: Error invoking tool '{plugin_name}.{function_name}': {e}")
-            return None
-
-    async def search_web_if_needed(self, query: str, direct_url: Optional[str] = None) -> Optional[str]:
-        """
-        Example of how an agent might decide to use the web search tool.
-        """
-        # Simple logic: if the query asks to "search" or "find on the web", use the tool.
-        # A more sophisticated agent would use an LLM prompt or a planner to decide this.
-        if "search for" in query.lower() or "find on the web" in query.lower() or "what is" in query.lower() or direct_url:
-            logging.info(f"RAG Agent {self.agent_id}: Web search triggered for query: '{query}' or URL: '{direct_url}'")
-
-            # Name of the plugin and function should match how WebSearchTool was registered
-            # and its @kernel_function decorated method.
-            plugin_name = "web_search" # Default name from WebSearchTool.name
-            function_name = "fetch_web_content" # From @kernel_function name in WebSearchTool
-
-            tool_args = {}
-            if direct_url:
-                tool_args["url"] = direct_url
-            if query and not direct_url: # Only pass query if no direct URL, or pass both if desired by tool
-                tool_args["query"] = query
-
-            if not tool_args:
-                logging.warning(f"RAG Agent {self.agent_id}: Web search tool invoked without query or URL.")
-                return "No query or URL provided for web search."
-
-            return await self.invoke_tool(plugin_name, function_name, **tool_args)
-        return None
+# Note: The 'Agent' class previously located here has been moved to 'core/agents/rag_agent.py'
+# to improve architectural clarity and separation of concerns.
