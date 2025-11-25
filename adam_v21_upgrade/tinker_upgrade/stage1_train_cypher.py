@@ -14,7 +14,7 @@ def train_cypher_agent():
     # Create the LoRA training client
     training_client = service_client.create_lora_training_client(
         base_model=BASE_MODEL,
-        lora_rank=16
+        rank=16
     )
 
     data_path = "../data/neo4j_tool_use.jsonl" # This will use the expanded dataset

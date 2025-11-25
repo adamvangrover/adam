@@ -32,7 +32,7 @@ service_client = tinker.ServiceClient()
 try:
     training_client = service_client.create_lora_training_client(
         base_model=BASE_MODEL,
-        lora_rank=16,
+        rank=16,
         # Load the weights from our Stage 2 "Mind" adapter
         base_adapter_path=BASE_ADAPTER_PATH
     )
