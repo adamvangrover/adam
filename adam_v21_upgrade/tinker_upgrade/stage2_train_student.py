@@ -19,7 +19,7 @@ service_client = tinker.ServiceClient()
 # 2. Create LoRA Training Client for the Student
 training_client = service_client.create_lora_training_client(
     base_model=STUDENT_MODEL,
-    lora_rank=16
+    rank=16
 )
 
 # 3. Load Distilled Data
