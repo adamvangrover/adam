@@ -378,6 +378,23 @@ This document provides a comprehensive catalog of all the agents in the ADAM sys
 
 ---
 
+## `crisis_simulation_agent`
+
+*   **File:** `core/agents/meta_agents/crisis_simulation_agent.py`
+*   **Description:** A meta-agent that conducts dynamic, enterprise-grade crisis simulations. It uses a sophisticated prompt structure to simulate the cascading effects of risks based on a user-defined scenario.
+*   **Configuration:** `config/agents.yaml`
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.AgentBase`.
+*   **Agent Forge and Lifecycle:** This agent is created by the Agent Forge on demand and runs until it has completed its crisis simulation task.
+*   **Model Context Protocol (MCP):** The agent is stateless and does not maintain its own context. The context is provided in the input.
+*   **Tools and Hooks:**
+    *   **Tools:** `CrisisSimulationPlugin`
+    *   **Hooks:** None
+*   **Compute and Resource Requirements:** This agent can be resource-intensive as it relies on a large language model to perform the simulation.
+*   **Dependencies:** `core.prompting.plugins.crisis_simulation_plugin.CrisisSimulationPlugin`
+*   **Developer Notes:** The quality of the simulation is highly dependent on the quality of the risk portfolio data and the sophistication of the LLM.
+
+---
+
 ## `data_verification_agent`
 
 *   **File:** `core/agents/data_verification_agent.py`
