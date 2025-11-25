@@ -240,7 +240,31 @@ class AgentOrchestrator:
     def _get_agent_class(self, agent_name: str):
         """Retrieves the agent class based on its name."""
 
-        return AGENT_CLASSES.get(agent_name)
+        agent_entry = AGENT_CLASSES.get(agent_name)
+
+        # If the entry is already a class type, return it
+        if isinstance(agent_entry, type):
+            return agent_entry
+
+        # If it's a string, try to resolve it
+        if isinstance(agent_entry, str):
+            # Check if it's already imported and available in globals
+            if agent_name in globals():
+                return globals()[agent_name]
+
+            # Fallback to dynamic import
+            try:
+                module_path = agent_entry
+                module = importlib.import_module(module_path)
+
+                # Assume class name matches agent name
+                if hasattr(module, agent_name):
+                    return getattr(module, agent_name)
+
+            except Exception as e:
+                logging.error(f"Failed to dynamically load agent {agent_name}: {e}")
+
+        return None
 
     def get_agent(self, agent_name: str) -> Optional[AgentBase]:
         """Retrieves an agent by name."""

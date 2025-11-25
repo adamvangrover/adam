@@ -36,3 +36,15 @@ This document lists known errors and technical debt that should be addressed in 
 - `core/v23_graph_engine/market_sentiment_graph.py` relies on `langgraph`.
 - The `test_sentiment_graph.py` script was run with mocks to verify syntax and logical structure, which passed.
 - **Action Required:** Install `langgraph`, `numpy`, and `pandas` in the target environment to fully enable v23 features.
+
+## 4. Broken Unit Tests (Agent Orchestrator)
+
+**Issue:** Existing unit tests for `AgentOrchestrator` are broken and possibly outdated.
+
+**Detail:**
+- `tests/test_agent_orchestrator.py`: Fails with `TypeError: AgentOrchestrator.__init__() got an unexpected keyword argument 'config'`. The `AgentOrchestrator` constructor does not accept arguments.
+- `tests/test_v21_orchestrator_loading.py`: Fails due to missing API keys (`COHERE_API_KEY`) in the environment when `LLMPlugin` initializes.
+
+**Recommendation:**
+- Refactor `tests/test_agent_orchestrator.py` to match the current `AgentOrchestrator` signature.
+- Mock `LLMPlugin` or provide dummy API keys in `tests/test_v21_orchestrator_loading.py` to allow tests to pass without external credentials.
