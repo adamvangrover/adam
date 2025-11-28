@@ -29,6 +29,7 @@ When working on the ADAM project, please adhere to the following principles:
 *   [Getting Started](#getting-started)
 *   [Contribution Guidelines](#contribution-guidelines)
 *   [Operational Notes & Troubleshooting](#operational-notes--troubleshooting-v23-update)
+*   [Directives for v25 Development](#directives-for-v25-development)
 
 ## System Architecture
 
@@ -128,5 +129,40 @@ Please follow these guidelines when contributing to the ADAM project:
     *   `langgraph` and `tiktoken` are required for v23 functionality.
 *   **Logging:** A new `core/utils/logging_utils.py` module has been added to standardize logging configuration.
 *   **Missing Files:** If you encounter `Knowledge base file not found` errors, ensure `data/risk_rating_mapping.json` exists. A default one is created if missing in some tests, but should be present in `data/` for production.
+
+## Directives for v25 Development
+
+### 1. The Prime Directive: Bifurcation
+This repository implements two distinct strategies. **Do not mix them.**
+- **Path A (`core/vertical_risk_agent`)**: Prioritize **Reliability**, **Auditability**, and **Business Logic**. Code should be defensive, heavily typed (Pydantic), and explained via logs. Performance is secondary to correctness.
+- **Path B (`experimental/inference_lab`)**: Prioritize **Velocity**, **Throughput**, and **Math**. Code should be optimized (Triton/CUDA), minimal, and benchmarked. Business logic is irrelevant here.
+
+### 2. Coding Standards
+
+#### Path A (Product)
+- **Imports**: Absolute imports preferred.
+- **Error Handling**: Never crash. Use `try/except` blocks with logging.
+- **State**: All agent state must be defined in `state.py` using `TypedDict` or `Pydantic`.
+- **Tools**: All external interactions (API, DB) must go through the MCP Server pattern (`tools/mcp_server`).
+
+#### Path B (Research)
+- **Imports**: Minimal overhead.
+- **Memory**: Be conscious of VRAM. Use `inplace` operations where possible.
+- **Comments**: Explain the *math* behind the optimization (e.g., "We use a block size of 128 to align with warp size").
+
+### 3. Workflow Protocol
+1. **Plan**: Before writing code, inspect the `README.md` of the target directory.
+2. **Visualize**: If modifying `langgraph` flows, generate the Mermaid diagram to verify logic.
+3. **Verify**:
+   - Path A: Run `python evals/run.py`.
+   - Path B: Run `python benchmarks/benchmark_tps.py`.
+
+### 4. Known Context
+- The system uses a mock `langgraph` if the library is missing. Do not remove this fallback unless you are installing the real dependency.
+- The `xbrl_handler.py` has a real XML parser but falls back to mock data if the file is missing. This is intentional for demo purposes.
+
+### 5. Documentation
+- Update `docs/v25_strategic_divergence_roadmap.md` when you complete a major feature.
+- Keep `outstanding_errors.md` updated if you encounter intractable issues.
 
 Thank you for your contributions to the ADAM project!

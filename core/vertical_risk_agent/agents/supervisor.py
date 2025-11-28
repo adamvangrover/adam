@@ -1,23 +1,48 @@
-from typing import Literal
+from typing import Literal, Dict, Any
+
 try:
     from langgraph.graph import StateGraph, END
     from langgraph.checkpoint.memory import MemorySaver
 except ImportError:
-    # Mock for blueprint purposes
+    # Mock for blueprint purposes if langgraph not installed
     class StateGraph:
         def __init__(self, state_schema): pass
         def add_node(self, name, func): pass
         def add_edge(self, start, end): pass
         def add_conditional_edges(self, source, router, map): pass
         def compile(self, checkpointer=None, interrupt_before=None): return self
+        def set_entry_point(self, name): pass
+
+    # Mock CompiledGraph for UI to use invoke
+    class CompiledGraphMock:
+        def invoke(self, state, config=None):
+            # Return a mock output state for the UI
+            return {
+                "balance_sheet": {
+                    "cash": 50000000,
+                    "total_debt": 120000000,
+                    "consolidated_ebitda": 40000000
+                },
+                "covenants": [
+                    {"name": "Net Leverage Ratio", "threshold": 4.5, "current": 3.0}
+                ],
+                "draft_memo": {"memo": "Based on the analysis, the company is in good standing..."},
+                "messages": ["Analysis Complete"]
+            }
+
     END = "END"
     class MemorySaver: pass
 
+    # If mocking, modify StateGraph to return the CompiledGraphMock on compile
+    StateGraph.compile = lambda self, checkpointer=None, interrupt_before=None: CompiledGraphMock()
+
+
 from ..state import VerticalRiskGraphState
-from .workers import QuantAgent, LegalAgent, MarketAgent
+from .analyst import QuantAgent
+from .legal import LegalAgent
+from .market import MarketAgent
 
 # Initialize Agents
-# In a real app, these would be initialized with an LLM instance (e.g. ChatOpenAI)
 quant_agent = QuantAgent(model=None)
 legal_agent = LegalAgent(model=None)
 market_agent = MarketAgent(model=None)
@@ -28,22 +53,20 @@ def supervisor_node(state: VerticalRiskGraphState):
     """
     print("--- Supervisor: Routing ---")
     messages = state.get("messages", [])
-    last_message = messages[-1] if messages else ""
 
-    # Simple logic for blueprint:
-    # If no analysis, start with Quant.
-    # If Quant done, do Legal.
-    # If Legal done, do Market.
-    # If all done, go to Critiquer.
+    # Logic:
+    # 1. If no financials, call Quant.
+    # 2. If no legal analysis, call Legal.
+    # 3. If no market research, call Market.
+    # 4. If all done, Critique.
+    # 5. If Critique passed (or count > 0 for demo), Approval.
 
-    # In a real implementation, an LLM would make this decision dynamically.
-    return {"next_step": "deciding"} # State update
+    return {"next_step": "deciding"}
 
 def route_supervisor(state: VerticalRiskGraphState) -> Literal["quant", "legal", "market", "critique", "human_approval"]:
     """
     Conditional logic to determine the next node.
     """
-    # Check what data is missing
     if not state.get("quant_analysis"):
         return "quant"
     if not state.get("legal_analysis"):
@@ -107,7 +130,6 @@ workflow.add_edge("quant", "supervisor")
 workflow.add_edge("legal", "supervisor")
 workflow.add_edge("market", "supervisor")
 workflow.add_edge("critique", "supervisor")
-# Human approval is a terminal state or loops back if rejected
 workflow.add_edge("human_approval", END)
 
 # Compile with Checkpointer for Time Travel
