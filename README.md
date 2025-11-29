@@ -11,11 +11,27 @@ adam/
 
 ````markdown
 
-# Adam v21.0: Your AI-Powered Financial Analyst
+# Adam v23.0: Your AI-Powered Partner
 
 > **Note:** This document describes the current stable version of the Adam system (v21.0). For details on the next-generation architecture, please see the [Adam v23.0 "Adaptive Hive" Vision](./docs/v23_architecture_vision.md).
 ````
-**(Welcome to Adam v21.0, the most advanced version yet\! We've supercharged our capabilities with an expanded agent network, enhanced simulation workflows, and a more sophisticated knowledge base to deliver unparalleled financial analysis and investment insights.)**
+# Adam v23.0: The Adaptive Hive Mind
+
+> **System Status:** v23.0 (Active) | v21.0 (Stable)
+> **Mission:** Autonomous Financial Analysis & Adaptive Reasoning
+
+**Adam has evolved.** v23.0 introduces the "Adaptive System" architecture, featuring:
+*   **Cyclical Reasoning Graph**: A self-correcting neuro-symbolic engine.
+*   **Neural Dashboard**: Real-time visualization of agent thought processes.
+*   **Hybrid Architecture**: Combining v21's reliability with v22's speed and v23's intelligence.
+
+**[Launch Neural Dashboard](./showcase/index.html)**
+
+> **Note:** For details on the original v21.0 architecture, please see the [v21.0 Documentation](./docs/v20.0).
+
+---
+
+**(Welcome to Adam, the most advanced financial AI system yet\! We've supercharged our capabilities with an expanded agent network, enhanced simulation workflows, and a more sophisticated knowledge base to deliver unparalleled financial analysis and investment insights.)**
 
 **[Explore the interactive demo here\!](https://adamvangrover.github.io/adam/chatbot-ui/)**
 
@@ -419,4 +435,5 @@ Contributions to Adam v21.0 are welcome\! Please check the [CONTRIBUTING.md](htt
 
 If you have any questions or feedback, please feel free to reach out to the Adam v21.0 development team. You can submit issues or pull requests on the GitHub repository or contact the developers directly.
 
+We hope this comprehensive README provides a solid foundation for understanding and utilizing the power of Adam v21.0. As you explore its features and capabilities, you'll discover new ways to enhance your financial analysis and decision-making processes.
 We hope this comprehensive README provides a solid foundation for understanding and utilizing the power of Adam v21.0. As you explore its features and capabilities, you'll discover new ways to enhance your financial analysis and decision-making processes.
