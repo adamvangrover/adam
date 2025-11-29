@@ -1,4 +1,4 @@
-# core/v23_graph_engine/cyclical_reasoning_graph.py
+# core/v23_graph_engine/cyclical_reasoning_graph2.py
 
 """
 Agent Notes (Meta-Commentary):
