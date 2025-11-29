@@ -10,7 +10,20 @@ except ImportError:
 
 import sqlite3
 import pandas as pd
+import sys
+import os
 from typing import List
+
+# Ensure core is importable
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../..")))
+
+try:
+    from core.vertical_risk_agent.generative_risk import GenerativeRiskEngine
+    from core.v22_quantum_pipeline.qmc_engine import QuantumMonteCarloEngine
+except ImportError:
+    print("Warning: Could not import Quantum/GenAI engines. Tools will be unavailable.")
+    GenerativeRiskEngine = None
+    QuantumMonteCarloEngine = None
 
 # Initialize the MCP Server
 mcp = FastMCP("Financial Data Room")
@@ -63,6 +76,32 @@ def get_covenant_definitions(doc_id: str) -> str:
     (a) Consolidated Leverage Ratio. The Borrower shall not permit the Consolidated Leverage Ratio
         as of the end of any Fiscal Quarter to be greater than 4.50 to 1.00.
     """
+
+@mcp.tool()
+def simulate_quantum_merton_model(asset_value: float, debt: float, volatility: float, horizon: float) -> str:
+    """
+    Runs an End-to-End Quantum Monte Carlo simulation for credit risk (Merton Model).
+    Returns the Probability of Default (PD) and Asset Value stats.
+    """
+    if not QuantumMonteCarloEngine:
+        return "Error: QMC Engine not available."
+
+    qmc = QuantumMonteCarloEngine()
+    result = qmc.simulate_merton_model(asset_value, debt, volatility, 0.05, horizon)
+    return str(result)
+
+@mcp.tool()
+def generate_stress_scenarios(regime: str = "stress", n_samples: int = 5) -> str:
+    """
+    Generates synthetic market scenarios using a Generative Risk Engine (GAN-based).
+    Useful for tail risk analysis. Regime can be 'normal', 'stress', or 'crash'.
+    """
+    if not GenerativeRiskEngine:
+        return "Error: Generative Risk Engine not available."
+
+    engine = GenerativeRiskEngine()
+    scenarios = engine.generate_scenarios(n_samples=n_samples, regime=regime)
+    return "\n".join([str(s) for s in scenarios])
 
 if __name__ == "__main__":
     mcp.run()
