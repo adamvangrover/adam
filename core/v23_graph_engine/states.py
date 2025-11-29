@@ -146,6 +146,29 @@ class ComplianceState(TypedDict):
     human_readable_status: str
     final_report: Optional[str]
 
+class QuantumRiskState(TypedDict):
+    """
+    State for the Quantum-Enhanced Risk Graph.
+    Tracks the execution of QMC simulations and Hybrid QNN inference.
+    """
+    # Input
+    portfolio_id: str
+    risk_factors: Dict[str, Any]
+
+    # Internal Reasoning
+    simulation_type: Literal["QMC_MERTON", "HYBRID_QNN", "GENERATIVE_STRESS"]
+    simulation_results: Dict[str, Any] # e.g. PD, VaR, Asset Value
+    quantum_execution_time: float
+    classical_fallback_triggered: bool
+
+    # Explainability
+    icaa_score: float # Inter-Class Attribution Alignment
+    human_readable_status: str
+    final_report: Optional[str]
+
+    # Control Flow
+    iteration_count: int
+
 def init_risk_state(ticker: str, intent: str) -> RiskAssessmentState:
     return {
         "ticker": ticker,
@@ -218,4 +241,18 @@ def init_compliance_state(entity: str, jurisdiction: str) -> ComplianceState:
         "needs_revision": False,
         "human_readable_status": "Initializing Compliance Check...",
         "final_report": None
+    }
+
+def init_quantum_state(portfolio_id: str, risk_factors: Dict) -> QuantumRiskState:
+    return {
+        "portfolio_id": portfolio_id,
+        "risk_factors": risk_factors,
+        "simulation_type": "QMC_MERTON",
+        "simulation_results": {},
+        "quantum_execution_time": 0.0,
+        "classical_fallback_triggered": False,
+        "icaa_score": 0.0,
+        "human_readable_status": "Initializing Quantum Risk Engine...",
+        "final_report": None,
+        "iteration_count": 0
     }
