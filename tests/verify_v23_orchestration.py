@@ -1,6 +1,7 @@
 import sys
 import os
 import logging
+import asyncio
 
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -24,7 +25,7 @@ def verify_orchestration():
     
     for q in queries:
         print(f"\nQuery: {q}")
-        result = orchestrator.route_request(q)
+        result = asyncio.run(orchestrator.route_request(q))
         print(f"Result: {result}")
         
         # If v23, we can inspect the result
