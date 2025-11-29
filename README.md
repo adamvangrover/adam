@@ -1,6 +1,70 @@
-**File Name:** `README.md`
+# Adam v23.0 "Adaptive Hive" (Architecture Upgrade)
 
-**File Path:**
+> **Current Status:** Transitioning from v22.0 "Monolithic Simulation" to v23.0 "Adaptive Hive".
+> **Focus:** Vertical Risk Intelligence & Systems Engineering Rigor.
+
+
+## Strategic Divergence 2025: The "Adaptive Hive"
+
+Adam v23.0 represents a paradigm shift in financial AI, moving from fragile prompt chains to a **deterministic, stateful, and self-correcting system**.
+
+### Key Differentiators
+
+#### 1. Cyclical Reasoning Graph (The Engine)
+*   **Path A (Vertical AI):**  Instead of a linear "chain-of-thought", Adam v23.0 uses a `LangGraph` state machine.
+*   **Process:** Analyst Node -> Reviewer Node (Critique) -> Refinement Node (Edit) -> Loop.
+*   **Outcome:** Self-correcting analysis that doesn't hallucinate definitions.
+*   **Location:** `core/v23_graph_engine/cyclical_reasoning_graph.py`
+
+#### 2. Enterprise-Grade Data Room (MCP Integration)
+*   **Connectivity:** Implements the **Model Context Protocol (MCP)** to securely connect LLMs to local data.
+*   **Smart Routing:**
+    *   **XBRL Path:** Precision extraction for SEC 10-Ks.
+    *   **Vision Path:** VLM-based extraction for PDFs and charts.
+*   **Location:** `core/vertical_risk_agent/tools/mcp_server/server.py`
+
+#### 3. Neuro-Symbolic Planner (The Brain)
+*   **Path B (Systems Engineering):** Decomposes high-level questions ("Is this company solvent?") into atomic, verifiable sub-goals.
+*   **Logic:** Uses knowledge graph traversal (FIBO/PROV-O) to "discover" a reasoning path before executing it.
+*   **Location:** `core/v23_graph_engine/neuro_symbolic_planner.py`
+
+---
+
+## Getting Started (v23.0)
+
+### Prerequisites
+*   Python 3.10+
+*   `langgraph`, `mcp-python-sdk` (mocked if missing), `pydantic`
+
+### Running the Evaluation Benchmark
+Verify the agent's performance against the "Golden Set":
+
+```bash
+python evals/run_benchmarks.py
+```
+
+### Running the MCP Server
+Start the financial data room server:
+
+```bash
+python core/vertical_risk_agent/tools/mcp_server/server.py
+```
+
+---
+
+## Legacy Documentation (v21.0 - v22.0)
+
+For historical context on the monolithic architecture, refer to:
+*   [Adam v21.0 README](./docs/ui_archive_v1/README_v21.md) (Archived)
+*   [v22.0 Implementation Plan](./docs/adam_v22_technical_migration_plan.md)
+
+## Contributing
+
+We are strictly following **Path A** (Vertical Risk) and **Path B** (Systems Engineering).
+*   **Rule 1:** All agents must be typed (`Pydantic`).
+*   **Rule 2:** All network calls must be `async`.
+*   **Rule 3:** No linear prompt chains; use Graphs.
+
 
 ```
 adam/
@@ -179,261 +243,7 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 
 ### Technical
 
-  * **What technologies are used to build Adam v21.0?**
-      * Adam v21.0 is built using Python and various libraries for data analysis, machine learning, natural language processing, and web development. It also utilizes a graph database (e.g., Neo4j) for efficient storage and retrieval of financial knowledge.
-  * **How is data security and privacy ensured?**
-      * Data security and privacy are ensured through encryption, access controls, and adherence to best practices for data management. Adam v21.0 also incorporates regular security audits and vulnerability assessments to identify and mitigate potential security risks.
-  * **What are the system requirements for running Adam v21.0?**
-      * The system requirements for running Adam v21.0 are detailed in the `README.md` file. They include a server or virtual machine with sufficient resources (CPU, memory, storage) to handle the workload, a compatible operating system (e.g., Linux, macOS, Windows), and the necessary Python packages and dependencies.
-  * **How can I deploy Adam v21.0 in different environments?**
-      * Adam v21.0 can be deployed in various ways, including direct deployment, virtual environment, Docker container, or cloud platforms. See the `deployment.md` file for more details.
-  * **What APIs and data sources does Adam v21.0 integrate with?**
-      * Adam v21.0 integrates with various APIs and data sources, including financial news APIs, social media APIs, government statistical agencies, and market data providers. It also incorporates alternative data sources, such as web traffic data, satellite imagery, and blockchain data, to provide a more comprehensive view of the financial landscape.
-
-## Educational Resources
-
-### Financial Concepts
-
-  * **Investment Fundamentals:**
-      * **Stocks:** Shares of ownership in a company.
-      * **Bonds:** Debt securities issued by companies or governments.
-      * **ETFs:** Exchange-traded funds that track a specific index, sector, or asset class.
-      * **Mutual Funds:** Investment funds that pool money from multiple investors to invest in a diversified portfolio of securities.
-  * **Risk and Return:**
-      * The potential for higher returns typically comes with higher risk.
-      * Investors need to balance their risk tolerance with their investment goals.
-  * **Diversification:**
-      * Spreading investments across different asset classes, sectors, and geographies to reduce risk.
-  * **Asset Allocation:**
-      * The process of deciding how to distribute investments across different asset classes.
-  * **Valuation Methods:**
-      * Techniques used to determine the intrinsic value of an asset, such as discounted cash flow (DCF) analysis or comparable company analysis.
-
-### Investment Strategies
-
-  * **Value Investing:**
-      * Investing in undervalued companies with strong fundamentals.
-  * **Growth Investing:**
-      * Investing in companies with high growth potential.
-  * **Momentum Investing:**
-      * Investing in assets that are experiencing upward price trends.
-  * **Dividend Investing:**
-      * Investing in companies that pay dividends to shareholders.
-  * **Index Investing:**
-      * Investing in a diversified portfolio of securities that tracks a specific market index.
-
-### Risk Management
-
-  * **Risk Identification and Assessment:**
-      * Identifying and evaluating potential investment risks, such as market risk, credit risk, and liquidity risk.
-  * **Risk Mitigation Strategies:**
-      * Techniques to reduce or manage investment risks, such as diversification, hedging, and position sizing.
-  * **Portfolio Diversification:**
-      * Spreading investments across different assets to reduce overall portfolio risk.
-  * **Hedging:**
-      * Using financial instruments to offset potential losses in an investment.
-  * **Position Sizing:**
-      * Determining the appropriate size of an investment position based on risk tolerance and potential loss.
-
-## Portfolio Theory and Design
-
-### Optimal Portfolio
-
-  * The optimal portfolio is a theoretical concept that aims to maximize return for a given level of risk, or minimize risk for a given level of return.
-  * It is based on the efficient frontier, which represents a set of portfolios that offer the highest expected return for each level of risk.
-
-### Risk Tolerance and Asset Allocation
-
-  * **Risk Tolerance:** An investor's ability and willingness to withstand potential investment losses.
-  * **Asset Allocation:** The process of distributing investments across different asset classes based on risk tolerance, investment goals, and time horizon.
-
-### Rebalancing and Portfolio Optimization
-
-  * **Rebalancing:** Periodically adjusting the portfolio to maintain the desired asset allocation and risk profile.
-  * **Portfolio Optimization:** Using mathematical models and algorithms to optimize the portfolio based on specific criteria, such as maximizing return or minimizing risk.
-
-## Architecture
-
-> **Note:** This section provides a high-level overview of the system architecture. For a more detailed and up-to-date description of the system's requirements, including functional and non-functional requirements, please refer to the [System Requirements Document](docs/REQUIREMENTS.md).
-
-### Overview
-
-Adam v21.0 builds upon the modular, agent-based architecture of its predecessors, incorporating new agents, simulations, and enhanced capabilities to provide a more in-depth and nuanced understanding of financial markets. The system leverages a network of specialized agents, each responsible for a specific domain of expertise, such as market sentiment analysis, macroeconomic analysis, fundamental analysis, technical analysis, risk assessment, and more. These agents collaborate and interact to provide a holistic view of the financial landscape, enabling informed investment decisions and risk management.
-
-### Core Components
-
-Adam v21.0 comprises the following core components:
-
-  * **Agents:**
-
-      * Market Sentiment Agent: Analyzes market sentiment from news, social media, and other sources.
-      * Macroeconomic Analysis Agent: Analyzes macroeconomic data and trends.
-      * Geopolitical Risk Agent: Assesses geopolitical risks and their potential impact on markets.
-      * Industry Specialist Agent: Provides in-depth analysis of specific industry sectors.
-      * Fundamental Analysis Agent: Conducts fundamental analysis of companies.
-      * Technical Analysis Agent: Performs technical analysis of financial instruments.
-      * Risk Assessment Agent: Assesses and manages investment risks.
-      * Prediction Market Agent: Gathers and analyzes data from prediction markets.
-      * Alternative Data Agent: Explores and integrates alternative data sources.
-      * Agent Forge: Automates the creation of specialized agents.
-      * Prompt Tuner: Refines and optimizes prompts for communication and analysis.
-      * Code Alchemist: Enhances code generation, validation, and deployment.
-      * Lingua Maestro: Handles multi-language translation and communication.
-      * Sense Weaver: Handles multi-modal inputs and outputs.
-      * Data Visualization Agent: Generates interactive and informative visualizations.
-      * Natural Language Generation Agent: Generates human-readable reports and narratives.
-      * Machine Learning Model Training Agent: Trains and updates machine learning models.
-      * SNC Analyst Agent: Specializes in the analysis of Shared National Credits (SNCs).
-      * Crypto Agent: Specializes in the analysis of crypto assets.
-      * Discussion Chair Agent: Leads discussions and makes final decisions in simulations.
-      * Legal Agent: Provides legal advice and analysis.
-      * Regulatory Compliance Agent: Ensures compliance with financial regulations (to be developed).
-      * Anomaly Detection Agent: Detects anomalies and potential fraud (to be developed).
-      * Behavioral Economics Agent: Analyzes market data and user interactions for signs of cognitive biases and irrational behavior.
-      * Meta-Cognitive Agent: Monitors the reasoning and outputs of other agents to ensure logical consistency, coherence, and alignment with core principles.
-
-  * **Simulations:**
-
-      * Credit Rating Assessment Simulation: Simulates the credit rating process for a company.
-      * Investment Committee Simulation: Simulates the investment decision-making process.
-      * Portfolio Optimization Simulation: Simulates the optimization of an investment portfolio.
-      * Stress Testing Simulation: Simulates the impact of stress scenarios on a portfolio or institution.
-      * Merger & Acquisition (M\&A) Simulation: Simulates the evaluation and execution of an M\&A transaction.
-      * Regulatory Compliance Simulation: Simulates the process of ensuring compliance with regulations.
-      * Fraud Detection Simulation: Simulates the detection of fraudulent activities.
-
-  * **Data Sources:**
-
-      * Financial news APIs (e.g., Bloomberg, Reuters)
-      * Social media APIs (e.g., Twitter, Reddit)
-      * Government statistical agencies (e.g., Bureau of Labor Statistics, Federal Reserve)
-      * Company filings (e.g., SEC filings, 10-K reports)
-      * Market data providers (e.g., Refinitiv, S\&P Global)
-      * Prediction market platforms (e.g., PredictIt, Kalshi)
-      * Alternative data providers (e.g., web traffic data, satellite imagery)
-      * Blockchain explorers (e.g., Etherscan, Blockchain.com)
-      * Legal databases (e.g., Westlaw, LexisNexis)
-      * Regulatory databases (e.g., SEC Edgar, Federal Register)
-
-  * **Analysis Modules:**
-
-      * Fundamental analysis (e.g., DCF valuation, ratio analysis)
-      * Technical analysis (e.g., indicator calculation, pattern recognition)
-      * Risk assessment (e.g., volatility calculation, risk modeling)
-      * Sentiment analysis (e.g., NLP, emotion analysis)
-      * Prediction market analysis (e.g., probability estimation, trend analysis)
-      * Alternative data analysis (e.g., machine learning, data visualization)
-      * Legal analysis (e.g., compliance checks, risk assessment)
-
-  * **World Simulation Model (WSM):** A probabilistic forecasting and scenario analysis module that simulates market conditions and provides insights into potential outcomes. It uses historical data, economic models, and agent-based simulations to generate scenarios and assess their probabilities.
-
-  * **Knowledge Base:** A comprehensive knowledge graph storing financial concepts, market data, company information, industry data, and more. It is powered by a graph database (e.g., Neo4j) to enable efficient storage and retrieval of interconnected data.
-
-  * **Libraries and Archives:** Storage for market overviews, company recommendations, newsletters, simulation results, and other historical data. These archives are used for backtesting, performance analysis, and knowledge discovery.
-
-  * **System Operations:**
-
-      * Agent orchestration and collaboration: Manages the interaction and communication between agents.
-      * Resource management and task prioritization: Allocates resources and prioritizes tasks based on their importance and urgency.
-      * Data acquisition and processing: Collects, cleans, and processes data from various sources.
-      * Knowledge base management: Updates and maintains the knowledge graph.
-      * Output generation and reporting: Generates reports, visualizations, and other outputs based on the analysis.
-
-## Data Flow
-
-The data flow in Adam v21.0 involves the following steps:
-
-1.  **Data Acquisition:** Agents acquire data from various sources.
-2.  **Data Processing:** Agents process and analyze the data using appropriate techniques.
-3.  **Information Sharing:** Agents share information and insights through the knowledge base and direct communication.
-4.  **Simulation Execution:** Simulations orchestrate agent interactions to analyze specific scenarios.
-5.  **Decision Making:** Agents and simulations make decisions and recommendations based on their analysis.
-6.  **Output Generation:** The system generates reports, visualizations, and other outputs.
-7.  **Archiving:** Outputs and relevant data are archived for future reference and analysis.
-
-## Architecture Diagram
-
-```
-+-----------------------+
-|       Adam v21.0      |
-|                       |
-|  +-----------------+  |
-|  |  Data Sources  |  |
-|  +-----------------+  |
-|        ^ ^ ^        |
-|        | | |        |
-|  +------+ +------+  |
-|  | Agents |-------|  |
-|  +------+ |  Simulations  |
-|          | +------+  |
-|          v v v        |
-|  +-----------------+  |
-|  | Analysis Modules |  |
-|  +-----------------+  |
-|        ^ ^ ^        |
-|        | | |        |
-|  +------+ +------+  |
-|  |Knowledge|-------|  |
-|  |  Base   |  World Simulation Model  |
-|  +------+ +------+  |
-|        | | |        |
-|        v v v        |
-|  +-----------------+  |
-|  |  System Operations |  |
-|  +-----------------+  |
-|        |               |
-|        v               |
-|  +-----------------+  |
-|  |      Outputs     |  |
-|  +-----------------+  |
-+-----------------------+
-```
-
-## Design Principles
-
-Adam v21.0's architecture adheres to the following design principles:
-
-  * **Modularity:** The system is composed of independent modules that can be developed, tested, and deployed separately.
-  * **Scalability:** The architecture allows for easy scaling by adding new agents or data sources as needed.
-  * **Adaptability:** The system can adapt to changing market conditions and user preferences through dynamic agent deployment and machine learning.
-  * **Transparency:** The reasoning processes and data sources used by the system are transparent and explainable.
-  * **Collaboration:** The agents collaborate effectively to provide a holistic view of the financial markets.
-  * **Security:** The system incorporates robust security measures to protect sensitive data and ensure system integrity.
-
-## Future Enhancements
-
-Future enhancements to the architecture may include:
-
-  * **Enhanced Machine Learning:** Integrate more sophisticated machine learning and deep learning techniques for predictive modeling and pattern recognition.
-  * **Real-Time Data Integration:** Incorporate real-time data feeds for more dynamic analysis and decision-making.
-  * **Distributed Architecture:** Deploy the system across a distributed network for improved performance and scalability.
-  * **User Interface Enhancements:** Develop a more interactive and user-friendly interface for accessing and visualizing data.
-  * **Explainable AI (XAI) Enhancements:** Expand XAI capabilities to provide more detailed and comprehensive explanations for the system's decisions and recommendations.
-  * **Integration with External Systems:** Integrate with external systems, such as portfolio management platforms and trading platforms, to enable seamless execution of investment strategies.
-
-## Interactive Tutorials
-
-Adam v21.0 offers interactive tutorials to guide you through its features and capabilities. These tutorials cover various topics, including:
-
-  * **Introduction to Adam v21.0:** Overview of the system, its components, and how to get started.
-  * **Market Sentiment Analysis:** Analyzing market sentiment using NLP and ML techniques.
-  * **Fundamental Analysis:** Performing in-depth analysis of company financials and valuation.
-  * **Technical Analysis:** Analyzing price trends, chart patterns, and technical indicators.
-  * **Risk Assessment:** Evaluating investment risks and developing mitigation strategies.
-  * **Prediction Market Analysis:** Gathering and analyzing data from prediction markets.
-  * **Alternative Data Analysis:** Exploring and integrating alternative data sources.
-  * **Simulations:** Running various simulations to analyze complex scenarios.
-  * **Advanced Topics:** Customizing and extending the system, integrating with external systems, and contributing to the project.
-
-You can access the interactive tutorials here: https://github.com/adamvangrover/adam/blob/main/docs/tutorials.md
-
-## Contributing
-
-Contributions to Adam v21.0 are welcome\! Please check the [CONTRIBUTING.md](https://github.com/adamvangrover/adam/blob/main/CONTRIBUTING.md) file for guidelines on how to contribute to the project.
-
-## Support and Feedback
-
-If you have any questions or feedback, please feel free to reach out to the Adam v21.0 development team. You can submit issues or pull requests on the GitHub repository or contact the developers directly.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 
 We hope this comprehensive README provides a solid foundation for understanding and utilizing the power of Adam v21.0. As you explore its features and capabilities, you'll discover new ways to enhance your financial analysis and decision-making processes.
-We hope this comprehensive README provides a solid foundation for understanding and utilizing the power of Adam v21.0. As you explore its features and capabilities, you'll discover new ways to enhance your financial analysis and decision-making processes.
+
