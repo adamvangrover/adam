@@ -38,7 +38,8 @@ from core.agents.meta_cognitive_agent import MetaCognitiveAgent
 
 from core.utils.config_utils import load_config
 from core.utils.secrets_utils import get_api_key # Added import
-from core.system.brokers.rabbitmq_client import RabbitMQClient
+from core.system.message_broker import MessageBroker
+# from core.system.brokers.rabbitmq_client import RabbitMQClient
 
 # Semantic Kernel imports
 from semantic_kernel import Kernel
@@ -93,14 +94,22 @@ class AgentOrchestrator:
 
     def __init__(self):
         self.agents: Dict[str, AgentBase] = {}
-        self.config = load_config("config/config.yaml")
+        self.config = load_config("config/config.yaml") or {}
+        
+        # Load agents.yaml if config.yaml is empty or missing agents
+        if 'agents' not in self.config:
+            agents_cfg = load_config("config/agents.yaml")
+            if agents_cfg and 'agents' in agents_cfg:
+                self.config['agents'] = agents_cfg['agents']
+
         self.workflows = self.load_workflows()  # Load workflows
         self.llm_plugin = LLMPlugin()
         self.mcp_service_registry: Dict[
             str, Dict[str, Any]
         ] = {}  # MCP service registry
         self.sk_kernel: Optional[Kernel] = None # Initialize Semantic Kernel instance to None
-        self.message_broker = RabbitMQClient()
+        # Use In-Memory Broker for default/showcase (RabbitMQ requires external service)
+        self.message_broker = MessageBroker.get_instance()
         self.message_broker.connect()
 
         if self.config is None:
@@ -205,7 +214,19 @@ class AgentOrchestrator:
             logging.error("Agent configuration 'agents' key not found in config.yaml.")
             return
 
-        for agent_config in self.config.get('agents', []):
+        agents_data = self.config.get('agents', [])
+        
+        # Normalize dict to list-like iteration
+        iterator = []
+        if isinstance(agents_data, dict):
+            for name, cfg in agents_data.items():
+                if cfg is None: cfg = {}
+                cfg['name'] = name # Inject name from key
+                iterator.append(cfg)
+        elif isinstance(agents_data, list):
+            iterator = agents_data
+            
+        for agent_config in iterator:
             agent_name = agent_config.get('name')
             if not agent_name:
                 logging.warning("Skipping agent configuration with no name.")
