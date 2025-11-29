@@ -15,14 +15,15 @@ class RiskAssessmentState(TypedDict):
     # Input
     ticker: str
     user_intent: str
+    data_context: Dict[str, Any] # Raw data from MCP
     
     # Internal Reasoning State
-    research_data: Annotated[List[ResearchArtifact], operator.add] # Append-only log
-    draft_analysis: Optional[str]
-    critique_notes: List[str]
-    iteration_count: int
+    analysis_draft: Optional[str] # Current version of the output
+    critique_feedback: List[str] # List of strings from the Reviewer node
+    revision_count: int # Integer
     
-    # Control Flow
+    # Legacy/Helper fields
+    research_data: Annotated[List[ResearchArtifact], operator.add] # Append-only log
     quality_score: float
     needs_correction: bool
     
@@ -149,10 +150,11 @@ def init_risk_state(ticker: str, intent: str) -> RiskAssessmentState:
     return {
         "ticker": ticker,
         "user_intent": intent,
+        "data_context": {},
+        "analysis_draft": None,
+        "critique_feedback": [],
+        "revision_count": 0,
         "research_data": [],
-        "draft_analysis": None,
-        "critique_notes": [],
-        "iteration_count": 0,
         "quality_score": 0.0,
         "needs_correction": False,
         "human_readable_status": "Initializing analysis..."
