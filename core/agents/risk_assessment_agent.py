@@ -6,7 +6,7 @@ import json
 import datetime
 
 class RiskAssessmentAgent:
-    def __init__(self, knowledge_base_path="risk_rating_mapping.json"):
+    def __init__(self, knowledge_base_path="data/risk_rating_mapping.json"):
         """
         Initializes the Risk Assessment Agent.
 
