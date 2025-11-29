@@ -7,6 +7,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from core.v23_graph_engine.neuro_symbolic_planner import NeuroSymbolicPlanner
 from core.v23_graph_engine.autonomous_self_improvement import AutonomousSelfImprovementController
+from core.v23_graph_engine.cyclical_reasoning_graph import cyclical_reasoning_app
 from core.v23_graph_engine.states import init_risk_state
 
 # Configure logging to see the flow
@@ -61,7 +62,33 @@ def verify_self_improvement():
     # The controller should trigger the loop on the 3rd failure
     print("Check logs above for 'ADAPTATION LOOP' messages.")
 
+def verify_cyclical_graph():
+    print("\n=== Phase 1: Cyclical Reasoning Graph Verification ===")
+    state = init_risk_state("TSLA", "Full Risk Analysis")
+
+    # Needs a config for memory (thread_id)
+    config = {"configurable": {"thread_id": "verify_v23"}}
+
+    print(f"Invoking Cyclical Graph for {state['ticker']}...")
+    try:
+        final_state = cyclical_reasoning_app.invoke(state, config=config)
+
+        print("\nFinal State Summary:")
+        print(f"Status: {final_state['human_readable_status']}")
+        print(f"Iterations: {final_state['iteration_count']}")
+        print(f"Quality Score: {final_state['quality_score']}")
+        print(f"Needs Correction: {final_state['needs_correction']}")
+
+        if final_state['quality_score'] > 0.8:
+            print("SUCCESS: Graph converged to high quality.")
+        else:
+            print("WARNING: Graph did not converge.")
+
+    except Exception as e:
+        print(f"Graph Execution Failed: {e}")
+
 def main():
+    verify_cyclical_graph()
     verify_planner()
     verify_self_improvement()
 
