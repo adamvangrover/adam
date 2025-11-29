@@ -130,6 +130,14 @@ Please follow these guidelines when contributing to the ADAM project:
 *   **Logging:** A new `core/utils/logging_utils.py` module has been added to standardize logging configuration.
 *   **Missing Files:** If you encounter `Knowledge base file not found` errors, ensure `data/risk_rating_mapping.json` exists. A default one is created if missing in some tests, but should be present in `data/` for production.
 
+## Quantum-AI Convergence (New Capabilities)
+
+Following the strategic analysis in `docs/whitepapers/quantum_ai_convergence.md`, the following modules have been added to the system:
+
+*   **End-to-End Quantum Monte Carlo:** `core/v22_quantum_pipeline/qmc_engine.py` implements the Matsakos-Nield framework for simulating stochastic processes on quantum circuits.
+*   **Generative Risk Engine:** `core/vertical_risk_agent/generative_risk.py` provides GAN-based market scenario generation for tail risk stress testing.
+*   **Explainable Quantum AI:** `core/xai/iqnn_cs.py` implements the Interpretable Quantum Neural Network (IQNN-CS) framework with Inter-Class Attribution Alignment (ICAA) metrics.
+
 ## Directives for v25 Development
 
 ### 1. The Prime Directive: Bifurcation
