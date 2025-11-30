@@ -45,11 +45,11 @@ Return ONLY a valid JSON object.
 
 ```json
 {
-  "v23_omniscient_knowledge_graph": {
+  "v23_knowledge_graph": {
     "meta": {
       "target": "[TARGET_SUBJECT]",
       "generated_at": "[ISO_DATE]",
-      "model_version": "Adam-v23.5-Omni"
+      "model_version": "Adam-v23.5"
     },
     "nodes": {
       "entity_ecosystem": {
@@ -135,7 +135,9 @@ Return ONLY a valid JSON object.
 }
 ```
 
-### Usage Guide for the "Omniscient" Template
+***
+
+### Usage Guide for the "AI Partner" Template
 
 1.  **For a Distressed Debt Analyst:**
     * **Input:** Target="AMC Entertainment", Simulation Depth="Deep"
@@ -147,4 +149,4 @@ Return ONLY a valid JSON object.
 
 3.  **For a Macro Strategist:**
     * **Input:** Target="Regional Banking Sector (KRE)", Simulation Depth="Deep"
-    * **Outcome:** The prompt treats the *Sector* as the entity, aggregating SNC ratings (`Phase 3`) across the ecosystem and running a "Commercial Real Estate Collapse" scenario in `Phase 4`.
+    * **Outcome:** The prompt treats the *Sector* as the entity, aggregating data across the sector.
