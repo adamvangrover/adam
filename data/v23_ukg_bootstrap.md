@@ -194,7 +194,7 @@ Construct the response as a single, valid JSON object. **Do not** include markdo
     }
   }
 }
-}
+````
 ---
 
 ## 4. Sample Output  (JSON)
