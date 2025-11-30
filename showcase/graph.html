@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM System | Knowledge Graph</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Courier New', Courier, monospace; }
+        #network { width: 100%; height: 100%; background: #0f172a; }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+    <!-- Top Bar -->
+    <header class="bg-slate-900 border-b border-slate-700 p-4 flex justify-between items-center shrink-0 z-10">
+        <div class="flex items-center space-x-4">
+            <h1 class="text-xl font-bold text-blue-400">NEURAL TOPOLOGY</h1>
+        </div>
+        <nav class="space-x-6 text-sm">
+            <a href="index.html" class="hover:text-blue-300 transition">MISSION CONTROL</a>
+            <a href="navigator.html" class="hover:text-blue-300 transition">NAVIGATOR</a>
+            <a href="agents.html" class="hover:text-blue-300 transition">AGENTS</a>
+            <a href="graph.html" class="text-blue-400 font-bold border-b-2 border-blue-400">KNOWLEDGE GRAPH</a>
+        </nav>
+    </header>
+
+    <main class="flex-1 relative">
+        <div id="network"></div>
+        <div class="absolute bottom-4 left-4 bg-slate-900/80 p-4 rounded border border-slate-700 pointer-events-none">
+            <h3 class="text-xs font-bold text-gray-400 mb-2">LEGEND</h3>
+            <div class="flex items-center space-x-2 text-xs"><span class="w-3 h-3 rounded-full bg-yellow-500"></span><span>Orchestrator</span></div>
+            <div class="flex items-center space-x-2 text-xs"><span class="w-3 h-3 rounded-full bg-purple-500"></span><span>Meta-Agent</span></div>
+            <div class="flex items-center space-x-2 text-xs"><span class="w-3 h-3 rounded-full bg-green-500"></span><span>Sub-Agent</span></div>
+        </div>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await window.dataManager.init();
+            const agents = window.dataManager.getAgents();
+
+            const nodes = [];
+            const edges = [];
+
+            // Central Node
+            nodes.push({ id: 'CORE', label: 'ADAM CORE', color: '#3b82f6', size: 40, shape: 'hexagon' });
+
+            agents.forEach((agent, index) => {
+                let color = '#22c55e'; // Green (Sub)
+                let shape = 'dot';
+                if (agent.type.includes('Meta')) { color = '#a855f7'; shape = 'diamond'; } // Purple
+                if (agent.type.includes('Orchestrator')) { color = '#eab308'; shape = 'star'; } // Yellow
+
+                nodes.push({ id: index, label: agent.name, color: color, shape: shape });
+
+                // Connect to Core
+                edges.push({ from: 'CORE', to: index, length: 200, color: { color: '#334155', opacity: 0.5 } });
+
+                // Random connections for "neural" look
+                if (Math.random() > 0.7) {
+                    const target = Math.floor(Math.random() * agents.length);
+                    edges.push({ from: index, to: target, color: { color: '#1e293b', opacity: 0.3 } });
+                }
+            });
+
+            const container = document.getElementById('network');
+            const data = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) };
+            const options = {
+                nodes: {
+                    font: { color: '#e2e8f0', face: 'Courier New' },
+                    borderWidth: 2,
+                    borderWidthSelected: 4,
+                },
+                physics: {
+                    stabilization: false,
+                    barnesHut: {
+                        gravitationalConstant: -8000,
+                        springConstant: 0.04,
+                        springLength: 95
+                    }
+                }
+            };
+            const network = new vis.Network(container, data, options);
+        });
+    </script>
+</body>
+</html>
