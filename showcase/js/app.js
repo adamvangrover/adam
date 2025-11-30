@@ -51,7 +51,18 @@ class DataManager {
             if (!res.ok) return "Error loading file.";
             return await res.text();
         } else {
-            return "File content viewing is only available when running the UI Backend server.\n\nRun 'python services/ui_backend.py' to enable this feature.";
+            // Attempt to fetch relatively if running statically
+            try {
+                // Assuming index.html is in showcase/ and path is relative to repo root (e.g. README.md)
+                // We need to go up one level.
+                const res = await fetch(`../${path}`);
+                if (res.ok) {
+                    return await res.text();
+                }
+            } catch (e) {
+                console.warn("Failed to fetch static file:", path, e);
+            }
+            return "File content viewing is only available when running the UI Backend server or if files are hosted statically.\n\nRun 'python services/ui_backend.py' to enable full features.";
         }
     }
 }
