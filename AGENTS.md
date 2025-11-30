@@ -154,6 +154,14 @@ Following the strategic analysis in `docs/whitepapers/quantum_ai_convergence.md`
 *   **Generative Risk Engine:** `core/vertical_risk_agent/generative_risk.py` provides GAN-based market scenario generation for tail risk stress testing.
 *   **Explainable Quantum AI:** `core/xai/iqnn_cs.py` implements the Interpretable Quantum Neural Network (IQNN-CS) framework with Inter-Class Attribution Alignment (ICAA) metrics.
 
+## AI Partner v23.5 Upgrade ("The Omniscient Analyst")
+
+The v23.5 upgrade massively expands the scope of the system from a simple graph extractor to a full-spectrum **Autonomous Financial Analyst**.
+
+*   **New "Deep Dive" Pipeline:** A 5-phase execution protocol covering Entity Resolution, Deep Fundamental/Valuation, Credit/SNC Ratings, Risk/Quantum Simulation, and Strategic Synthesis.
+*   **Omniscient State:** A new `OmniscientState` in `core/v23_graph_engine/states.py` supports the hyper-dimensional knowledge graph output.
+*   **Portable Prompt:** A comprehensive system prompt is available in `prompt_library/AOPL-v1.0/system_architecture/autonomous_financial_analyst_v23_5.md`.
+
 ## Directives for v25 Development
 
 ### 1. The Prime Directive: Bifurcation

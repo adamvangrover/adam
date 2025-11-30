@@ -193,6 +193,71 @@ class CrisisSimulationState(TypedDict):
     human_readable_status: str
     final_report: Optional[str]
 
+class ReflectorState(TypedDict):
+    """
+    State for the Reflector (Meta-Cognition) Graph.
+    """
+    input_content: str
+    context: Dict[str, Any]
+
+    critique_notes: List[str]
+    score: float
+    is_valid: bool
+
+    refined_content: Optional[str]
+    iteration_count: int
+    human_readable_status: str
+
+# --- Omniscient State (v23.5) ---
+
+class EntityEcosystem(TypedDict):
+    legal_entity: Dict[str, str]
+    management_assessment: Dict[str, Any]
+    competitive_positioning: Dict[str, str]
+
+class EquityAnalysis(TypedDict):
+    fundamentals: Dict[str, str]
+    valuation_engine: Dict[str, Any]
+
+class CreditAnalysis(TypedDict):
+    snc_rating_model: Dict[str, Any]
+    cds_market_implied_rating: str
+    covenant_risk_analysis: Dict[str, Any]
+
+class SimulationEngine(TypedDict):
+    monte_carlo_default_prob: float
+    quantum_scenarios: List[Dict[str, Any]]
+    trading_dynamics: Dict[str, str]
+
+class StrategicSynthesis(TypedDict):
+    m_and_a_posture: str
+    final_verdict: Dict[str, Any]
+
+class OmniscientNodes(TypedDict):
+    entity_ecosystem: EntityEcosystem
+    equity_analysis: EquityAnalysis
+    credit_analysis: CreditAnalysis
+    simulation_engine: SimulationEngine
+    strategic_synthesis: StrategicSynthesis
+
+class OmniscientMeta(TypedDict):
+    target: str
+    generated_at: str
+    model_version: str
+
+class OmniscientKnowledgeGraph(TypedDict):
+    meta: OmniscientMeta
+    nodes: OmniscientNodes
+
+class OmniscientState(TypedDict):
+    """
+    State for the v23.5 'AI Partner' Omniscient Workflow.
+    """
+    v23_omniscient_knowledge_graph: OmniscientKnowledgeGraph
+    human_readable_status: str
+
+# --- Initializers ---
+
 def init_risk_state(ticker: str, intent: str) -> RiskAssessmentState:
     return {
         "ticker": ticker,
@@ -295,21 +360,6 @@ def init_crisis_state(scenario: str, portfolio: Dict) -> CrisisSimulationState:
         "human_readable_status": "Initializing Crisis Simulation...",
         "final_report": None
     }
-
-class ReflectorState(TypedDict):
-    """
-    State for the Reflector (Meta-Cognition) Graph.
-    """
-    input_content: str
-    context: Dict[str, Any]
-
-    critique_notes: List[str]
-    score: float
-    is_valid: bool
-
-    refined_content: Optional[str]
-    iteration_count: int
-    human_readable_status: str
 
 def init_reflector_state(content: str, context: Dict = None) -> ReflectorState:
     return {

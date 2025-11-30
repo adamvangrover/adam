@@ -84,6 +84,13 @@ Combines the creativity of LLMs with the logical rigor of Knowledge Graphs.
 *   **v22 (Async):** Message-driven microservices for high-throughput data ingestion.
 *   **v23 (Adaptive):** The "Brain" that orchestrates it all.
 
+### 4. AI Partner v23.5 ("The Omniscient Analyst")
+A full-spectrum autonomous analyst capable of deep credit analysis, valuation, and quantum risk modeling.
+
+*   **Deep Dive Pipeline:** 5-phase execution from Entity Resolution to Strategic Synthesis.
+*   **Portable Prompt:** `prompt_library/AOPL-v1.0/system_architecture/autonomous_financial_analyst_v23_5.md`
+*   **Config:** `config/Adam_v23.5_Portable_Config.json`
+
 ## 🛠️ Getting Started
 
 ### Prerequisites
