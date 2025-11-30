@@ -1,0 +1,65 @@
+#
+# KNOWLEDGE GRAPH INSTANCE DATA
+# Example for "Global Consolidated Manufacturing Inc."
+# Version: 1.0
+#
+
+#
+# Prefixes
+#
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# Ontologies
+@prefix fibo-be-le-lei: <https://spec.edmcouncil.org/fibo/ontology/BE/LegalEntities/LegalEntity/> .
+@prefix fibo-fbc-fi-fi: <https://spec.edmcouncil.org/fibo/ontology/FBC/FinancialInstruments/FinancialInstruments/> .
+@prefix fibo-fnd-rel-rel: <https://spec.edmcouncil.org/fibo/ontology/FND/Relations/Relations/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix fibo-fnd-acc-cur: <https://spec.edmcouncil.org/fibo/ontology/FND/Accounting/CurrencyAmount/> .
+@prefix lending: <https://ourbank.com/ontology/lending/> .
+
+# Instance Namespace
+@prefix inst: <https://ourbank.com/instance/> .
+
+#
+# Instance Data
+#
+
+# 1. The Company (Borrower)
+inst:company-gcm
+    a fibo-be-le-lei:LegalEntity ;
+    fibo-fnd-utl-av:hasName "Global Consolidated Manufacturing Inc."^^xsd:string ;
+    fibo-be-le-lei:hasLegalEntityIdentifier "5493001B3242622W2R82"^^xsd:string .
+
+# 2. A Loan issued to the Company
+inst:loan-12345
+    a fibo-fbc-fi-fi:Loan ;
+    fibo-fnd-rel-rel:isProvidedBy inst:ourbank ; # Assuming our bank is an entity
+    fibo-fnd-rel-rel:isMadeTo inst:company-gcm ;
+    fibo-fnd-acc-cur:hasPrincipalAmount "5000000.00"^^xsd:decimal ;
+    fibo-fnd-acc-cur:hasCurrency "USD"^^xsd:string .
+
+# 3. A Financial Covenant associated with the Loan
+inst:covenant-dscr-01
+    a lending:FinancialCovenant ;
+    fibo-fnd-rel-rel:isPartOrConstituentOf inst:loan-12345 ;
+    lending:hasMetricThreshold "1.25"^^xsd:decimal ;
+    rdfs:comment "Requires a Debt Service Coverage Ratio of at least 1.25." .
+
+# 4. A specific violation of that covenant
+inst:violation-789
+    a lending:CovenantViolation ;
+    lending:isViolationOf inst:covenant-dscr-01 ;
+    lending:appliesToLoan inst:loan-12345 ;
+    lending:hasViolationDate "2024-08-20"^^xsd:date ;
+    lending:hasViolationStatus "Active"^^xsd:string .
+
+# 5. An internal risk rating assigned to the Company
+inst:riskrating-gcm-q3-2024
+    a lending:InternalRiskRating ;
+    lending:isAssignedTo inst:company-gcm ;
+    lending:hasRatingValue "RR-05"^^xsd:string ;
+    lending:hasRatingEffectiveDate "2024-08-21"^^xsd:date ;
+    rdfs:comment "Rating downgraded following covenant violation." .

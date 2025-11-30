@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v23 | Neural Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f1115;
+            color: #e0e0e0;
+        }
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .glass-panel {
+            background: rgba(20, 24, 30, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
+        }
+        .node {
+            transition: all 0.3s ease;
+            fill: #2d3340;
+            stroke: #4a5568;
+            stroke-width: 2;
+        }
+        .node.active {
+            fill: #3b82f6; /* Blue-500 */
+            stroke: #60a5fa;
+            filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.6));
+        }
+        .node.critique {
+            fill: #ef4444; /* Red-500 */
+            stroke: #f87171;
+            filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.6));
+        }
+        .edge {
+            stroke: #4a5568;
+            stroke-width: 1;
+            transition: all 0.3s;
+        }
+        .edge.active {
+            stroke: #60a5fa;
+            stroke-width: 2;
+        }
+        /* Grid background */
+        .bg-grid {
+            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body class="bg-grid h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header class="h-16 border-b border-gray-800 flex items-center justify-between px-6 bg-[#0f1115]">
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="text-gray-500 hover:text-white transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+                </svg>
+            </a>
+            <div class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+            <h1 class="text-xl font-bold tracking-tight">ADAM <span class="text-blue-500">v23</span> <span class="text-gray-500 font-normal">| Adaptive Reasoning Engine</span></h1>
+        </div>
+        <div class="flex gap-4 mono text-xs text-gray-400">
+            <div>MEM_USAGE: <span class="text-green-400">14.2 GB</span></div>
+            <div>GRAPH_OPS: <span class="text-blue-400">2,340 /s</span></div>
+            <div>STATUS: <span class="text-green-400">ONLINE</span></div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex gap-4 p-4">
+
+        <!-- Sidebar: Active Agents -->
+        <aside class="w-64 glass-panel p-4 flex flex-col gap-4">
+            <h2 class="text-xs uppercase tracking-widest text-gray-500 font-bold">Active Circuits</h2>
+
+            <div class="p-3 bg-blue-900/20 border border-blue-500/30 rounded cursor-pointer hover:bg-blue-900/30 transition" onclick="visualizeGraph('SNC')">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="font-bold text-sm text-blue-400">SNC Analyzer</span>
+                    <span class="w-2 h-2 rounded-full bg-green-400"></span>
+                </div>
+                <div class="text-xs text-gray-400">Cyclical Logic: Credit Risk</div>
+            </div>
+
+            <div class="p-3 bg-purple-900/20 border border-purple-500/30 rounded cursor-pointer hover:bg-purple-900/30 transition" onclick="visualizeGraph('Sentiment')">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="font-bold text-sm text-purple-400">Market Sentiment</span>
+                    <span class="w-2 h-2 rounded-full bg-green-400"></span>
+                </div>
+                <div class="text-xs text-gray-400">State: Ingesting News</div>
+            </div>
+
+            <div class="p-3 bg-red-900/20 border border-red-500/30 rounded cursor-pointer hover:bg-red-900/30 transition" onclick="visualizeGraph('RedTeam')">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="font-bold text-sm text-red-400">Red Team</span>
+                    <span class="w-2 h-2 rounded-full bg-yellow-400"></span>
+                </div>
+                <div class="text-xs text-gray-400">Adversarial Simulator</div>
+            </div>
+        </aside>
+
+        <!-- Main Visualization Area -->
+        <section class="flex-1 glass-panel relative flex flex-col">
+            <div class="absolute top-4 left-4 z-10">
+                <h2 id="graph-title" class="text-lg font-bold">Waiting for Selection...</h2>
+                <p id="graph-status" class="text-sm text-gray-400 mono mt-1">Select a circuit to visualize real-time reasoning.</p>
+            </div>
+
+            <svg id="viz-canvas" class="w-full h-full" viewBox="0 0 800 600">
+                <!-- Nodes and Edges will be injected here via JS -->
+            </svg>
+        </section>
+
+        <!-- Right Panel: Stream Log -->
+        <aside class="w-80 glass-panel flex flex-col">
+            <div class="p-3 border-b border-gray-700 bg-gray-800/50 rounded-t-lg">
+                <h2 class="text-xs uppercase tracking-widest text-gray-400 font-bold">Thought Stream</h2>
+            </div>
+            <div id="log-container" class="flex-1 overflow-y-auto p-3 mono text-xs space-y-2">
+                <div class="text-gray-500">[SYSTEM] Neural Dashboard initialized.</div>
+            </div>
+        </aside>
+
+    </main>
+
+    <script>
+        // Mock Data for Graphs
+        const GRAPHS = {
+            'SNC': {
+                title: "Shared National Credit (SNC) Analysis",
+                nodes: [
+                    { id: 'start', x: 50, y: 300, label: 'START' },
+                    { id: 'analyze', x: 200, y: 300, label: 'Analyze Structure' },
+                    { id: 'assess', x: 350, y: 300, label: 'Assess Credit' },
+                    { id: 'critique', x: 500, y: 300, label: 'Critique' },
+                    { id: 'revise', x: 500, y: 150, label: 'Revise' },
+                    { id: 'approval', x: 650, y: 300, label: 'Human Approval' },
+                    { id: 'end', x: 750, y: 300, label: 'END' }
+                ],
+                edges: [
+                    { from: 'start', to: 'analyze' },
+                    { from: 'analyze', to: 'assess' },
+                    { from: 'assess', to: 'critique' },
+                    { from: 'critique', to: 'revise', type: 'conditional' },
+                    { from: 'revise', to: 'critique' },
+                    { from: 'critique', to: 'approval' },
+                    { from: 'approval', to: 'end' }
+                ],
+                flow: ['start', 'analyze', 'assess', 'critique', 'revise', 'critique', 'approval', 'end']
+            },
+            'Sentiment': {
+                title: "Market Sentiment & Contagion Graph",
+                nodes: [
+                    { id: 'start', x: 50, y: 300, label: 'START' },
+                    { id: 'ingest', x: 200, y: 300, label: 'Ingest News' },
+                    { id: 'analyze', x: 350, y: 300, label: 'Analyze Sentiment' },
+                    { id: 'kg', x: 500, y: 300, label: 'KG Cross-Ref' },
+                    { id: 'alert', x: 650, y: 300, label: 'Draft Alert' },
+                    { id: 'end', x: 750, y: 300, label: 'END' }
+                ],
+                edges: [
+                    { from: 'start', to: 'ingest' },
+                    { from: 'ingest', to: 'analyze' },
+                    { from: 'analyze', to: 'kg' },
+                    { from: 'kg', to: 'alert' },
+                    { from: 'alert', to: 'end' },
+                    { from: 'alert', to: 'ingest', type: 'loop' }
+                ],
+                flow: ['start', 'ingest', 'analyze', 'kg', 'alert', 'end']
+            }
+        };
+
+        const svg = document.getElementById('viz-canvas');
+        const logContainer = document.getElementById('log-container');
+        let currentAnimation = null;
+
+        function log(msg, type='info') {
+            const div = document.createElement('div');
+            const time = new Date().toISOString().split('T')[1].split('.')[0];
+            let color = 'text-gray-400';
+            if (type === 'active') color = 'text-blue-400';
+            if (type === 'critique') color = 'text-red-400';
+
+            div.className = `${color} border-l-2 border-transparent pl-2`;
+            if (type === 'active') div.classList.add('border-blue-500');
+
+            div.innerText = `[${time}] ${msg}`;
+            logContainer.appendChild(div);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function visualizeGraph(graphKey) {
+            // Reset
+            svg.innerHTML = '';
+            const graph = GRAPHS[graphKey];
+            if (!graph) return;
+
+            document.getElementById('graph-title').innerText = graph.title;
+            document.getElementById('graph-status').innerText = "Graph structure loaded. Starting simulation...";
+            log(`Loaded schema for ${graphKey}`, 'info');
+
+            // Draw Edges
+            graph.edges.forEach(edge => {
+                const start = graph.nodes.find(n => n.id === edge.from);
+                const end = graph.nodes.find(n => n.id === edge.to);
+
+                const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+
+                // Curve for feedback loops
+                let d = `M ${start.x} ${start.y} L ${end.x} ${end.y}`;
+                if (edge.type === 'conditional' || edge.type === 'loop') {
+                    // Simple quadratic curve
+                    const cx = (start.x + end.x) / 2;
+                    const cy = Math.min(start.y, end.y) - 50;
+                    d = `M ${start.x} ${start.y} Q ${cx} ${cy} ${end.x} ${end.y}`;
+                }
+
+                path.setAttribute("d", d);
+                path.setAttribute("class", "edge");
+                path.setAttribute("fill", "none");
+                path.setAttribute("id", `edge-${edge.from}-${edge.to}`);
+                svg.appendChild(path);
+            });
+
+            // Draw Nodes
+            graph.nodes.forEach(node => {
+                const group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                group.setAttribute("id", `node-${node.id}`);
+                group.setAttribute("class", "node-group cursor-pointer");
+
+                const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                rect.setAttribute("x", node.x - 60);
+                rect.setAttribute("y", node.y - 20);
+                rect.setAttribute("width", 120);
+                rect.setAttribute("height", 40);
+                rect.setAttribute("rx", 6);
+                rect.setAttribute("class", "node");
+
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", node.x);
+                text.setAttribute("y", node.y + 5);
+                text.setAttribute("text-anchor", "middle");
+                text.setAttribute("fill", "#e0e0e0");
+                text.setAttribute("font-size", "12");
+                text.setAttribute("class", "mono pointer-events-none");
+                text.textContent = node.label;
+
+                group.appendChild(rect);
+                group.appendChild(text);
+                svg.appendChild(group);
+            });
+
+            // Start Animation Loop
+            runSimulation(graph);
+        }
+
+        async function runSimulation(graph) {
+            if (currentAnimation) clearInterval(currentAnimation);
+
+            let stepIndex = 0;
+
+            currentAnimation = setInterval(() => {
+                // Clear previous active states
+                document.querySelectorAll('.node').forEach(n => n.classList.remove('active', 'critique'));
+                document.querySelectorAll('.edge').forEach(e => e.classList.remove('active'));
+
+                if (stepIndex >= graph.flow.length) {
+                    stepIndex = 0; // Loop forever for demo
+                    log("--- Cycle Complete. Restarting ---", 'info');
+                    return;
+                }
+
+                const nodeId = graph.flow[stepIndex];
+                const nodeEl = document.querySelector(`#node-${nodeId} .node`);
+
+                if (nodeEl) {
+                    const isCritique = nodeId === 'critique' || nodeId === 'revise';
+                    nodeEl.classList.add(isCritique ? 'critique' : 'active');
+
+                    const label = graph.nodes.find(n => n.id === nodeId).label;
+                    log(`Executing Node: ${label}`, isCritique ? 'critique' : 'active');
+
+                    // Highlight edge from previous
+                    if (stepIndex > 0) {
+                        const prevId = graph.flow[stepIndex - 1];
+                        const edgeEl = document.getElementById(`edge-${prevId}-${nodeId}`);
+                        if (edgeEl) edgeEl.classList.add('active');
+                    }
+                }
+
+                stepIndex++;
+
+            }, 1200); // 1.2s per step
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Credit Risk Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony Neutrals -->
+    <!-- Application Structure Plan: The application is designed as a single-page dashboard with a fixed sidebar for navigation and a dynamic main content area. This structure provides persistent, clear access to different risk views (e.g., Concentration, Scenarios), allowing an analyst to seamlessly move between macro and micro analysis. The user flow is designed for exploration, starting with a high-level overview and enabling deep dives into specific risk dimensions. This is the most effective structure for managing complex portfolio data. -->
+    <!-- Visualization & Content Choices: 
+        - Overview: Goal is a "mission control" summary. KPI Cards for instant metrics, a Donut chart for rating mix, and a Line chart for trends provide a comprehensive snapshot. Lib: Chart.js.
+        - Concentration: Goal is to identify overexposure. Bar charts for industry/region and a Bubble chart for rating/exposure visualization are chosen for their clarity in comparing segments and showing multi-dimensional data. Lib: Chart.js.
+        - Limits: Goal is to monitor risk appetite. Donut charts styled as gauges offer immediate visual feedback on utilization. A table provides granular details. Lib: Chart.js.
+        - Scenario Analysis: Goal is to quantify potential stress impact. A bar chart is the most direct way to compare losses across different economic scenarios. Interaction: JS toggles to switch views. Lib: Chart.js.
+        - Heatmap & Knowledge Graph: Goal is to visualize complex relationships. An HTML table with conditional background colors creates an effective heatmap. The knowledge graph is conceptually represented with styled HTML/CSS to demonstrate the UI for showing interconnected risk, as complex graphing libraries are not used.
+        - Contagion & Outlier: Goal is to spot anomalies and systemic risk. A Scatter plot is the standard for identifying outliers. A conceptual HTML diagram illustrates contagion paths. Lib: Chart.js.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f7f4;
+            color: #3d3d3d;
+        }
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+            border-left: 3px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            background-color: #eaddd7;
+            border-left-color: #8c7a6b;
+            color: #3d3d3d;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .kpi-card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid #e5e7eb;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .section-intro {
+            background-color: #eaddd7;
+            border-left: 4px solid #8c7a6b;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 0.25rem;
+        }
+        .heatmap td {
+            padding: 0.75rem;
+            text-align: center;
+            color: white;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="flex h-screen">
+
+    <aside class="w-64 bg-[#f0e9e4] text-gray-700 flex flex-col fixed h-full shadow-md">
+        <div class="h-20 flex items-center justify-center border-b border-gray-300">
+            <h1 class="text-xl font-bold text-[#5c5249]">Portfolio Risk Hub</h1>
+        </div>
+        <nav class="flex-1 px-4 py-4 space-y-2">
+            <a href="#" class="nav-link active block py-2.5 px-4 rounded font-medium" data-section="overview">Dashboard Overview</a>
+            <a href="#" class="nav-link block py-2.5 px-4 rounded font-medium" data-section="concentration">Concentration</a>
+            <a href="#" class="nav-link block py-2.5 px-4 rounded font-medium" data-section="limits">Limits</a>
+            <a href="#" class="nav-link block py-2.5 px-4 rounded font-medium" data-section="scenario">Scenario Analysis</a>
+            <a href="#" class="nav-link block py-2.5 px-4 rounded font-medium" data-section="heatmap">Risk Heatmap</a>
+            <a href="#" class="nav-link block py-2.5 px-4 rounded font-medium" data-section="knowledge">Knowledge Graph</a>
+            <a href="#" class="nav-link block py-2.5 px-4 rounded font-medium" data-section="contagion">Contagion & Outlier</a>
+        </nav>
+    </aside>
+
+    <main class="flex-1 ml-64 p-6 md:p-10 overflow-y-auto">
+        <header class="mb-8">
+            <h1 id="section-title" class="text-3xl font-bold text-gray-800">Dashboard Overview</h1>
+            <p class="text-md text-gray-500">Portfolio health summary as of: <span id="report-date">2025-09-13</span></p>
+        </header>
+
+        <div id="overview" class="content-section active">
+            <div class="section-intro">
+                <p class="text-gray-700">This overview provides a high-level summary of the entire credit portfolio's health, highlighting key risk indicators, rating distribution, and performance trends to enable quick assessment and identification of emerging risks.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <div class="kpi-card">
+                    <h3 class="text-sm font-medium text-gray-500">Total Exposure</h3>
+                    <p class="text-3xl font-bold text-[#5c5249]">$12.4B</p>
+                </div>
+                <div class="kpi-card">
+                    <h3 class="text-sm font-medium text-gray-500">No. of Obligors</h3>
+                    <p class="text-3xl font-bold text-[#5c5249]">152</p>
+                </div>
+                <div class="kpi-card">
+                    <h3 class="text-sm font-medium text-gray-500">Avg. PD Rating</h3>
+                    <p class="text-3xl font-bold text-[#5c5249]">PD-8</p>
+                </div>
+                <div class="kpi-card">
+                    <h3 class="text-sm font-medium text-gray-500">Watchlist Items</h3>
+                    <p class="text-3xl font-bold text-orange-600">9</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                <div class="lg:col-span-3 kpi-card">
+                    <h3 class="font-bold text-lg mb-4 text-center text-[#5c5249]">Portfolio Risk Trend</h3>
+                    <div class="chart-container"><canvas id="riskTrendChart"></canvas></div>
+                </div>
+                <div class="lg:col-span-2 kpi-card">
+                    <h3 class="font-bold text-lg mb-4 text-center text-[#5c5249]">Exposure by PD Rating</h3>
+                    <div class="chart-container"><canvas id="ratingDistributionChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="concentration" class="content-section">
+            <div class="section-intro">
+                <p class="text-gray-700">Analyze portfolio concentration to identify potential overexposure to specific industries, geographic regions, or credit rating bands. Understanding these concentrations is crucial for managing correlated risks.</p>
+            </div>
+             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="kpi-card">
+                    <h3 class="font-bold text-lg mb-4 text-center text-[#5c5249]">Top 10 Industry Exposures</h3>
+                    <div class="chart-container"><canvas id="industryConcentrationChart"></canvas></div>
+                </div>
+                <div class="kpi-card">
+                    <h3 class="font-bold text-lg mb-4 text-center text-[#5c5249]">Exposure by Region</h3>
+                    <div class="chart-container"><canvas id="regionConcentrationChart"></canvas></div>
+                </div>
+                <div class="col-span-1 lg:col-span-2 kpi-card">
+                     <h3 class="font-bold text-lg mb-4 text-center text-[#5c5249]">Obligor Concentration by Rating & Exposure</h3>
+                     <div class="chart-container"><canvas id="obligorBubbleChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="limits" class="content-section">
+             <div class="section-intro">
+                <p class="text-gray-700">Monitor adherence to the established risk appetite framework by tracking utilization of key portfolio limits. This ensures that the portfolio remains within predefined risk tolerances for concentration and quality.</p>
+            </div>
+             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="kpi-card text-center">
+                    <h3 class="font-bold text-lg mb-4 text-[#5c5249]">Single Obligor Limit</h3>
+                    <div class="chart-container h-48 max-h-48"><canvas id="singleObligorGauge"></canvas></div>
+                </div>
+                 <div class="kpi-card text-center">
+                    <h3 class="font-bold text-lg mb-4 text-[#5c5249]">Top Industry Limit</h3>
+                    <div class="chart-container h-48 max-h-48"><canvas id="industryLimitGauge"></canvas></div>
+                </div>
+                 <div class="kpi-card text-center">
+                    <h3 class="font-bold text-lg mb-4 text-[#5c5249]">Non-Investment Grade Limit</h3>
+                    <div class="chart-container h-48 max-h-48"><canvas id="nigLimitGauge"></canvas></div>
+                </div>
+            </div>
+             <div class="kpi-card">
+                <h3 class="font-bold text-lg mb-4 text-[#5c5249]">Detailed Limit Monitoring</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="p-3 font-medium">Limit Category</th>
+                                <th class="p-3 font-medium">Limit</th>
+                                <th class="p-3 font-medium">Current Exposure</th>
+                                <th class="p-3 font-medium">Utilization</th>
+                                <th class="p-3 font-medium">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b">
+                                <td class="p-3">Single Obligor Exposure</td>
+                                <td class="p-3">$500M</td>
+                                <td class="p-3">$380M</td>
+                                <td class="p-3">76%</td>
+                                <td class="p-3"><span class="px-2 py-1 bg-green-200 text-green-800 rounded-full text-xs">OK</span></td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="p-3">Top Industry (Software)</td>
+                                <td class="p-3">20% of Portfolio</td>
+                                <td class="p-3">18.5%</td>
+                                <td class="p-3">92.5%</td>
+                                <td class="p-3"><span class="px-2 py-1 bg-yellow-200 text-yellow-800 rounded-full text-xs">Amber</span></td>
+                            </tr>
+                             <tr class="border-b">
+                                <td class="p-3">Non-Investment Grade (PD 9+)</td>
+                                <td class="p-3">40% of Portfolio</td>
+                                <td class="p-3">31%</td>
+                                <td class="p-3">77.5%</td>
+                                <td class="p-3"><span class="px-2 py-1 bg-green-200 text-green-800 rounded-full text-xs">OK</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="scenario" class="content-section">
+             <div class="section-intro">
+                <p class="text-gray-700">Stress test the portfolio's resilience by simulating its performance under various macroeconomic scenarios. This analysis helps quantify potential losses and understand vulnerabilities to adverse economic conditions.</p>
+            </div>
+            <div class="kpi-card">
+                <h3 class="font-bold text-lg mb-4 text-center text-[#5c5249]">Portfolio Stress Test: Expected Losses</h3>
+                <div class="chart-container"><canvas id="scenarioAnalysisChart"></canvas></div>
+            </div>
+        </div>
+
+        <div id="heatmap" class="content-section">
+            <div class="section-intro">
+                <p class="text-gray-700">Visualize risk concentration across industries and credit ratings using a heatmap. This matrix provides an at-a-glance view of where the most significant exposure is located, combining two key risk dimensions.</p>
+            </div>
+            <div class="kpi-card">
+                 <h3 class="font-bold text-lg mb-4 text-[#5c5249]">Industry vs. PD Rating Exposure Heatmap ($M)</h3>
+                 <div class="overflow-x-auto">
+                    <table class="w-full border-collapse heatmap">
+                        <thead>
+                             <tr class="bg-gray-100">
+                                <th class="p-2 font-medium text-gray-700">Industry</th>
+                                <th class="p-2 font-medium text-gray-700">PD 1-4</th>
+                                <th class="p-2 font-medium text-gray-700">PD 5-7</th>
+                                <th class="p-2 font-medium text-gray-700">PD 8-10</th>
+                                <th class="p-2 font-medium text-gray-700">PD 11+</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Software & Services</td><td style="background-color: #8c7a6b;">1,100</td><td style="background-color: #5c5249;">2,300</td><td style="background-color: #a8998d;">850</td><td style="background-color: #dcd3cc;">150</td></tr>
+                            <tr><td>Healthcare</td><td style="background-color: #a8998d;">750</td><td style="background-color: #8c7a6b;">1,300</td><td style="background-color: #8c7a6b;">1,200</td><td style="background-color: #bcaea3;">300</td></tr>
+                            <tr><td>Industrials</td><td style="background-color: #bcaea3;">400</td><td style="background-color: #a8998d;">900</td><td style="background-color: #8c7a6b;">1,150</td><td style="background-color: #8c7a6b;">1,000</td></tr>
+                            <tr><td>Consumer Discretionary</td><td style="background-color: #dcd3cc;">100</td><td style="background-color: #bcaea3;">600</td><td style="background-color: #a8998d;">950</td><td style="background-color: #5c5249;">2,100</td></tr>
+                        </tbody>
+                    </table>
+                 </div>
+            </div>
+        </div>
+        
+        <div id="knowledge" class="content-section">
+            <div class="section-intro">
+                <p class="text-gray-700">Explore the complex web of relationships between obligors, their suppliers, customers, and sectors. This conceptual graph helps identify hidden dependencies and potential contagion paths that are not visible in standard analysis.</p>
+            </div>
+            <div class="kpi-card text-center">
+                 <h3 class="font-bold text-lg mb-4 text-[#5c5249]">Conceptual Knowledge Graph</h3>
+                 <p class="text-gray-500 mb-4">Illustrating relationships between entities. (Conceptual Mockup)</p>
+                 <div class="p-4 border rounded-lg bg-gray-50">
+                    
+                 </div>
+            </div>
+        </div>
+
+        <div id="contagion" class="content-section">
+            <div class="section-intro">
+                <p class="text-gray-700">Identify obligors with anomalous performance characteristics and analyze potential contagion effects. This view helps pinpoint idiosyncratic risks and understand how the failure of one entity could impact others within the portfolio.</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="kpi-card">
+                    <h3 class="font-bold text-lg mb-4 text-center text-[#5c5249]">Outlier Analysis (PD vs. Market Value)</h3>
+                    <div class="chart-container"><canvas id="outlierChart"></canvas></div>
+                </div>
+                <div class="kpi-card">
+                    <h3 class="font-bold text-lg mb-4 text-center text-[#5c5249]">Contagion Path Analysis</h3>
+                    <p class="text-gray-500 mb-4">Visualizing shock propagation. (Conceptual Mockup)</p>
+                    <div class="p-4 border rounded-lg bg-gray-50 h-full flex items-center justify-center">
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const navLinks = document.querySelectorAll('.nav-link');
+        const contentSections = document.querySelectorAll('.content-section');
+        const sectionTitle = document.getElementById('section-title');
+
+        const chartInstances = {};
+
+        function destroyAllCharts() {
+            Object.values(chartInstances).forEach(chart => chart.destroy());
+        }
+        
+        function renderCharts(sectionId) {
+             const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+            };
+
+            if (sectionId === 'overview') {
+                 chartInstances.riskTrendChart = new Chart(document.getElementById('riskTrendChart'), {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Mar', 'May', 'Jul', 'Sep'],
+                        datasets: [{
+                            label: 'Weighted Avg. PD',
+                            data: [7.8, 7.9, 8.1, 8.0, 8.2],
+                            borderColor: '#8c7a6b',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {...chartOptions, plugins: {legend:{display:true}}}
+                });
+                chartInstances.ratingDistributionChart = new Chart(document.getElementById('ratingDistributionChart'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['PD 1-4', 'PD 5-7', 'PD 8-10', 'PD 11+'],
+                        datasets: [{
+                            data: [2250, 5000, 3100, 2050],
+                            backgroundColor: ['#dcd3cc', '#bcaea3', '#8c7a6b', '#5c5249'],
+                        }]
+                    },
+                     options: {...chartOptions, plugins: {legend:{display:true, position:'bottom'}}}
+                });
+            } else if(sectionId === 'concentration') {
+                 chartInstances.industryConcentrationChart = new Chart(document.getElementById('industryConcentrationChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Software', 'Healthcare', 'Industrials', 'Consumer', 'Finance', 'Energy', 'Utilities', 'Materials', 'Real Estate', 'Telecom'],
+                        datasets: [{
+                             label: 'Exposure ($B)',
+                             data: [2.3, 1.8, 1.5, 1.2, 1.1, 0.9, 0.8, 0.7, 0.6, 0.5],
+                             backgroundColor: '#8c7a6b'
+                        }]
+                    },
+                    options: {...chartOptions, indexAxis: 'y' }
+                });
+                 chartInstances.regionConcentrationChart = new Chart(document.getElementById('regionConcentrationChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['North America', 'Europe', 'Asia-Pacific', 'LatAm', 'Other'],
+                        datasets: [{
+                            label: 'Exposure ($B)',
+                            data: [7.5, 3.2, 1.1, 0.4, 0.2],
+                            backgroundColor: ['#5c5249', '#8c7a6b', '#bcaea3', '#dcd3cc', '#f0e9e4'],
+                        }]
+                    },
+                    options: chartOptions
+                });
+                 chartInstances.obligorBubbleChart = new Chart(document.getElementById('obligorBubbleChart'), {
+                    type: 'bubble',
+                    data: {
+                        datasets: [
+                            { label: 'PD 5-7', data: [{x: 6, y: 350, r: 25}], backgroundColor: '#bcaea3'},
+                            { label: 'PD 8-10', data: [{x: 9, y: 150, r: 45}, {x: 8, y: 250, r: 15}], backgroundColor: '#8c7a6b'},
+                            { label: 'PD 11+', data: [{x: 12, y: 80, r: 30}], backgroundColor: '#5c5249'}
+                        ]
+                    },
+                    options: {...chartOptions, plugins: {legend:{display:true}}, scales: { x: { title: { display: true, text: 'PD Rating'}}, y: { title: {display: true, text: 'Exposure ($M)'}}}}
+                });
+            } else if (sectionId === 'limits') {
+                const gaugeOptions = (utilization) => ({
+                    circumference: 180, rotation: 270, cutout: '70%',
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } }
+                });
+                chartInstances.singleObligorGauge = new Chart(document.getElementById('singleObligorGauge'), {
+                    type: 'doughnut', data: { datasets: [{ data: [76, 24], backgroundColor: ['#8c7a6b', '#e0e0e0']}]}, options: gaugeOptions(76)
+                });
+                chartInstances.industryLimitGauge = new Chart(document.getElementById('industryLimitGauge'), {
+                    type: 'doughnut', data: { datasets: [{ data: [92.5, 7.5], backgroundColor: ['#f59e0b', '#e0e0e0']}]}, options: gaugeOptions(92.5)
+                });
+                chartInstances.nigLimitGauge = new Chart(document.getElementById('nigLimitGauge'), {
+                    type: 'doughnut', data: { datasets: [{ data: [77.5, 22.5], backgroundColor: ['#8c7a6b', '#e0e0e0']}]}, options: gaugeOptions(77.5)
+                });
+            } else if (sectionId === 'scenario') {
+                 chartInstances.scenarioAnalysisChart = new Chart(document.getElementById('scenarioAnalysisChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Baseline', 'Mild Recession', 'Severe Recession'],
+                        datasets: [{
+                            label: 'Expected Loss ($M)',
+                            data: [150, 420, 980],
+                            backgroundColor: ['#bcaea3', '#f59e0b', '#dc2626']
+                        }]
+                    },
+                    options: chartOptions
+                });
+            } else if (sectionId === 'contagion') {
+                chartInstances.outlierChart = new Chart(document.getElementById('outlierChart'), {
+                    type: 'scatter',
+                    data: {
+                        datasets: [{
+                            label: 'Obligors',
+                            data: [{x: 5, y: 1.2}, {x: 8, y: 0.9}, {x: 12, y: -0.5}, {x: 10, y: 2.5}, {x: 7, y: 1.1}],
+                            backgroundColor: '#8c7a6b'
+                        }]
+                    },
+                    options: {...chartOptions, scales: { x: { title: { display: true, text: 'PD Rating'}}, y: { title: {display: true, text: 'Equity Performance (YoY %)'}}}}
+                });
+            }
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                const currentActive = document.querySelector('.nav-link.active');
+                if (currentActive) currentActive.classList.remove('active');
+                link.classList.add('active');
+
+                contentSections.forEach(s => s.classList.remove('active'));
+                
+                const sectionId = link.getAttribute('data-section');
+                document.getElementById(sectionId).classList.add('active');
+                sectionTitle.textContent = link.textContent;
+                
+                destroyAllCharts();
+                renderCharts(sectionId);
+            });
+        });
+        
+        renderCharts('overview');
+    });
+    </script>
+</body>
+</html>

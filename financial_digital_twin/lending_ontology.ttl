@@ -1,0 +1,132 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix lending: <https://ourbank.com/ontology/lending/> .
+
+# Import necessary FIBO modules
+@prefix fibo-fbc-fi-fi: <https://spec.edmcouncil.org/fibo/ontology/FBC/FinancialInstruments/FinancialInstruments/> .
+@prefix fibo-fnd-utl-av: <https://spec.edmcouncil.org/fibo/ontology/FND/Utilities/AnnotationVocabulary/> .
+@prefix fibo-fnd-rel-rel: <https://spec.edmcouncil.org/fibo/ontology/FND/Relations/Relations/> .
+@prefix fibo-be-le-lei: <https://spec.edmcouncil.org/fibo/ontology/BE/LegalEntities/LegalEntity/> .
+@prefix fibo-fnd-acc-cur: <https://spec.edmcouncil.org/fibo/ontology/FND/Accounting/CurrencyAmount/> .
+
+#
+# PROPRIETARY LENDING ONTOLOGY
+# Version: 1.1.0
+#
+# This ontology extends the Financial Industry Business Ontology (FIBO)
+# to include concepts, classes, and properties specific to this
+# institution's lending operations.
+#
+
+lending: a owl:Ontology ;
+    rdfs:label "Proprietary Lending Ontology" ;
+    owl:versionInfo "1.1.0" ;
+    fibo-fnd-utl-av:hasMaturityLevel fibo-fnd-utl-av:Release .
+
+#################################################################
+#    Covenant Model
+#################################################################
+
+lending:LoanCovenant a owl:Class ;
+    rdfs:subClassOf fibo-fbc-fi-fi:FinancialInstrumentTerm ;
+    rdfs:label "Loan Covenant" ;
+    rdfs:comment "A specific condition or restriction in a loan agreement that the borrower must comply with. This is the superclass for all proprietary covenant types." .
+
+#
+# Covenant Subclasses
+#
+
+lending:FinancialCovenant a owl:Class ;
+    rdfs:subClassOf lending:LoanCovenant ;
+    rdfs:label "Financial Covenant" ;
+    rdfs:comment "A covenant based on a measurable financial metric, such as a debt-to-equity ratio or Debt Service Coverage Ratio (DSCR)." .
+
+lending:ReportingCovenant a owl:Class ;
+    rdfs:subClassOf lending:LoanCovenant ;
+    rdfs:label "Reporting Covenant" ;
+    rdfs:comment "A covenant that requires the borrower to report financial information at a specified frequency." .
+
+lending:NegativeCovenant a owl:Class ;
+    rdfs:subClassOf lending:LoanCovenant ;
+    rdfs:label "Negative Covenant" ;
+    rdfs:comment "A covenant that restricts the borrower from taking certain actions without lender approval, such as incurring more debt." .
+
+#
+# Covenant Data Properties
+#
+
+lending:hasMetricThreshold a owl:DatatypeProperty ;
+    rdfs:label "has metric threshold" ;
+    rdfs:domain lending:FinancialCovenant ;
+    rdfs:range xsd:decimal ;
+    rdfs:comment "The specific numerical threshold for a financial covenant (e.g., 1.25 for a DSCR covenant)." .
+
+lending:hasReportingFrequency a owl:DatatypeProperty ;
+    rdfs:label "has reporting frequency" ;
+    rdfs:domain lending:ReportingCovenant ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The frequency at which a report is due (e.g., 'Quarterly', 'Annually')." .
+
+#################################################################
+#    Covenant Violation Model
+#
+# A more robust model for tracking violations as specific events.
+#################################################################
+
+lending:CovenantViolation a owl:Class ;
+    rdfs:label "Covenant Violation" ;
+    rdfs:comment "An event representing the breach of a specific loan covenant by a borrower. Modeling this as a class allows for detailed tracking of the violation's lifecycle." .
+
+lending:hasViolationDate a owl:DatatypeProperty ;
+    rdfs:label "has violation date" ;
+    rdfs:domain lending:CovenantViolation ;
+    rdfs:range xsd:date .
+
+lending:hasViolationStatus a owl:DatatypeProperty ;
+    rdfs:label "has violation status" ;
+    rdfs:domain lending:CovenantViolation ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The current status of the violation, e.g., 'Active', 'Cured', 'Waived'." .
+
+lending:isViolationOf a owl:ObjectProperty ;
+    rdfs:label "is violation of" ;
+    rdfs:domain lending:CovenantViolation ;
+    rdfs:range lending:LoanCovenant .
+
+lending:appliesToLoan a owl:ObjectProperty ;
+    rdfs:label "applies to loan" ;
+    rdfs:domain lending:CovenantViolation ;
+    rdfs:range fibo-fbc-fi-fi:Loan .
+
+# Deprecating the old property in favor of the new event-based model
+lending:violatesCovenant a owl:ObjectProperty ;
+    owl:deprecated true ;
+    rdfs:label "violates covenant (deprecated)" ;
+    rdfs:comment "This property is deprecated in favor of the more robust CovenantViolation class model." .
+
+
+#################################################################
+#    Internal Risk Rating Model
+#################################################################
+
+lending:InternalRiskRating a owl:Class ;
+    rdfs:label "Internal Risk Rating" ;
+    rdfs:comment "A proprietary risk rating assigned to a legal entity based on internal assessment models. This is distinct from ratings from external agencies like Moody's or S&P." .
+
+lending:hasRatingValue a owl:DatatypeProperty ;
+    rdfs:label "has rating value" ;
+    rdfs:domain lending:InternalRiskRating ;
+    rdfs:range xsd:string ;
+    rdfs:comment "The internal risk grade, e.g., 'RR-01', 'RR-02', etc." .
+
+lending:hasRatingEffectiveDate a owl:DatatypeProperty ;
+    rdfs:label "has rating effective date" ;
+    rdfs:domain lending:InternalRiskRating ;
+    rdfs:range xsd:date .
+
+lending:isAssignedTo a owl:ObjectProperty ;
+    rdfs:label "is assigned to" ;
+    rdfs:domain lending:InternalRiskRating ;
+    rdfs:range fibo-be-le-lei:LegalEntity .

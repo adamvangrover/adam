@@ -2,6 +2,7 @@
 
 from core.system.agent_orchestrator import AgentOrchestrator
 from core.system.echo import Echo  # Assuming Echo is used for final output
+from core.system.knowledge_base import KnowledgeBase
 from core.utils.config_utils import load_config  # For loading configurations
 from core.utils.token_utils import check_token_limit, count_tokens  # Import token utilities
 import logging  # Import the logging module
@@ -18,15 +19,15 @@ class InteractionLoop:
     data retrieval, result aggregation, and output presentation.
     """
 
-    def __init__(self):
+    def __init__(self, config=None, knowledge_base=None):
         """
         Initializes the InteractionLoop.
         """
-        self.config = load_config("config/system.yaml")  # Load system configuration
+        self.config = config if config is not None else load_config("config/system.yaml")
         self.agent_orchestrator = AgentOrchestrator()
         self.echo = Echo()  # Initialize the Echo system (placeholder functionality)
         self.token_limit = self.config.get("token_limit", 4096)  # Default to 4096 if not specified
-        self.knowledge_base = KnowledgeBase() #instantiate knowledgebase        
+        self.knowledge_base = knowledge_base if knowledge_base is not None else KnowledgeBase()
         logging.info(f"InteractionLoop initialized with token limit: {self.token_limit}")
 
 
@@ -138,7 +139,11 @@ class InteractionLoop:
         """
         print("Adam system interaction loop started.  Type 'exit' to quit.")
         while True:
-            user_input = input("Enter your query: ")
+            try:
+                user_input = input("Enter your query: ")
+            except EOFError:
+                print("\nEOF detected, exiting loop.")
+                break
             if user_input.lower() == 'exit':
                 break
             response = self.process_input(user_input)

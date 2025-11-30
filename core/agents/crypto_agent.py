@@ -9,7 +9,11 @@ from web3.middleware import geth_poa_middleware
 from sklearn.linear_model import LinearRegression
 import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
-import talib
+try:
+    import talib
+    TALIB_AVAILABLE = True
+except ImportError:
+    TALIB_AVAILABLE = False
 import ccxt
 from pycoingecko import CoinGeckoAPI
 import time
@@ -300,6 +304,9 @@ class CryptoAgent:
             str: 'buy', 'sell', or 'hold' based on the MACD strategy.
         """
         historical_prices = self.get_historical_data(symbol)
+        if not TALIB_AVAILABLE:
+            logging.warning("TA-Lib is not installed. Skipping MACD strategy.")
+            return 'hold'
         if not historical_prices:
             return 'hold'
 

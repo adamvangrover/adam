@@ -3,7 +3,7 @@
 // Function to display the main menu
 function showMainMenu() {
     const menuOptions = [
-        "Adam v17.0 Overview",
+        "Adam v21.0 Overview",
         "Market Analysis",
         "Investment Research",
         "Portfolio Management",

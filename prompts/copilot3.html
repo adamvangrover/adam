@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Prompt Engineering Assistant for Credit Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://mozilla.github.io/pdf.js/build/pdf.mjs" type="module"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .prose {
+            max-width: none;
+        }
+        .prose h1, .prose h2, .prose h3, .prose h4 {
+            color: #111827;
+        }
+        .prose p, .prose li {
+            color: #374151;
+        }
+        .prose strong {
+            color: #111827;
+        }
+        .prose code {
+            background-color: #f3f4f6;
+            color: #1f2937;
+            padding: 0.2em 0.4em;
+            margin: 0;
+            font-size: 85%;
+            border-radius: 6px;
+        }
+        .prose pre {
+            background-color: #f3f4f6;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        .prose pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+        .prose blockquote {
+            border-left-color: #4f46e5;
+        }
+        .prose table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .prose th, .prose td {
+            border: 1px solid #d1d5db;
+            padding: 0.75rem;
+        }
+        .prose th {
+            background-color: #f9fafb;
+        }
+        details > summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: #4f46e5;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4f46e5;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-gray-900">Interactive Prompt Engineering Assistant</h1>
+            <p class="text-lg text-gray-600 mt-2">A multi-purpose tool for credit analysis report generation.</p>
+        </header>
+
+        <main class="space-y-12">
+            <!-- README Section -->
+            <section id="readme" class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-4 border-b pb-2">1. README: Understanding This Tool</h2>
+                <div class="prose">
+                    <p>This web application is a multi-purpose tool designed to assist in the prompt engineering process for credit analysis. It serves several functions:</p>
+                    <ol>
+                        <li><strong>A README:</strong> Explaining its purpose, functionality, and limitations.</li>
+                        <li><strong>A Prompt Engineering Guide:</strong> Showing how a detailed prompt for a Large Language Model (LLM) is constructed.</li>
+                        <li><strong>An Interactive Report Generation Tool:</strong> Allowing you to input company data and generate a <em>simulated</em> credit report.</li>
+                        <li><strong>An LLM-powered report generator:</strong> Allowing you to generate a report using a Generative AI model.</li>
+                        <li><strong>A Feedback and Evaluation Tool:</strong> Allowing you to score and provide feedback on the AI-generated report.</li>
+                    </ol>
+                    <h3 class="text-xl font-semibold mt-4">1.1. How it Works</h3>
+                    <p>The process is straightforward:</p>
+                    <ol>
+                        <li><strong>User Input:</strong> You provide company-specific data through the interactive form below. You can also upload a PDF or TXT file for additional context.</li>
+                        <li><strong>Prompt Construction:</strong> The tool takes your inputs and dynamically builds a detailed, structured prompt.</li>
+                        <li><strong>Report Generation:</strong> Clicking the generate button triggers two processes:
+                            <ul>
+                                <li>A <strong>simulated report</strong> is created instantly using internal, rule-based logic.</li>
+                                <li>An <strong>AI-generated report</strong> is created by sending the constructed prompt to a large language model.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Output Review & Evaluation:</strong> You can review both reports, compare them, and provide feedback on the AI's performance to create a data record for future training.</li>
+                    </ol>
+                    <h3 class="text-xl font-semibold mt-4">1.2. Limitations</h3>
+                    <ul>
+                        <li><strong>API Key Required:</strong> To generate a report using an AI model, you must provide your own API key. The application does not store or transmit this key anywhere except to make the direct call to the model provider's API.</li>
+                        <li><strong>Simulation Quality:</strong> The simulated report uses a simple, rule-based approach. Its output is a structured first draft and lacks the nuanced reasoning of a state-of-the-art LLM.</li>
+                        <li><strong>Input Dependency:</strong> The quality of both reports heavily depends on the detail and accuracy of the information you provide.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Interactive Generator Section -->
+            <section id="generator" class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-4 border-b pb-2">2. Interactive Report Generator</h2>
+                
+                <!-- LLM Configuration -->
+                <div class="mb-8 p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
+                    <h3 class="text-xl font-semibold mb-3 text-gray-800">A. AI Model Configuration</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="apiKey" class="block text-sm font-medium text-gray-700">API Key:</label>
+                            <input type="password" id="apiKey" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Enter your API key here">
+                        </div>
+                        <div>
+                            <label for="llmModel" class="block text-sm font-medium text-gray-700">AI Model:</label>
+                            <select id="llmModel" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+                                <option>gemini-2.5-flash-preview-05-20</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Inputs -->
+                <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                    <h3 class="text-xl font-semibold mb-3 text-gray-800">B. Data Inputs</h3>
+                    <div class="space-y-6">
+                        <!-- File Upload -->
+                        <div>
+                            <h4 class="font-semibold text-gray-700 mb-2">1. Upload Supporting Document (Optional PDF/TXT)</h4>
+                            <input type="file" id="fileUpload" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" accept=".pdf,.txt">
+                            <p id="fileUploadStatus" class="text-sm text-gray-500 mt-2">No file uploaded.</p>
+                        </div>
+                        
+                        <!-- Form Inputs -->
+                        <div>
+                            <h4 class="font-semibold text-gray-700 mb-2">2. Enter Company & Analysis Data</h4>
+                            <div id="input-form" class="space-y-8"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Generate Button -->
+                <div class="mt-8 text-center">
+                    <button id="generateBtn" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-transform transform hover:scale-105">
+                        Generate Prompt & Reports
+                    </button>
+                </div>
+                
+                <!-- Output Area -->
+                <div id="outputArea" class="mt-8 space-y-8"></div>
+
+                <!-- Scenario Analysis Section -->
+                <div id="scenarioSection" class="hidden mt-12">
+                    <h2 class="text-2xl font-bold mb-4 border-b pb-2">✨ 3. Run Scenario Analysis</h2>
+                    <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                        <p class="text-gray-600 mb-4">Ask a "what-if" question based on the generated company profile to analyze potential impacts on its creditworthiness.</p>
+                        <div>
+                            <label for="scenarioInput" class="block text-sm font-medium text-gray-700">Scenario Query:</label>
+                            <textarea id="scenarioInput" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="e.g., What is the likely impact on credit rating if revenue declines by 10% due to market headwinds?"></textarea>
+                        </div>
+                        <div class="mt-4">
+                            <button id="runScenarioBtn" class="bg-teal-600 text-white font-bold py-2 px-6 rounded-lg shadow-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
+                                Run Analysis
+                            </button>
+                        </div>
+                        <div id="scenarioOutput" class="mt-4"></div>
+                    </div>
+                </div>
+
+            </section>
+            
+            <!-- Feedback Section -->
+            <section id="feedbackSection" class="hidden bg-white p-6 rounded-lg shadow-md">
+                 <h2 class="text-2xl font-bold mb-4 border-b pb-2">4. Evaluation & Feedback Loop</h2>
+                 <p class="text-gray-600 mb-6">After reviewing the AI report, you can optionally provide a human-written report, score the AI's output, and give feedback to generate a data record for fine-tuning.</p>
+                 
+                 <div class="space-y-6">
+                    <div>
+                        <label for="humanReportInput" class="block text-sm font-medium text-gray-700 mb-1">1. Paste Human-Written Report (Optional)</label>
+                        <textarea id="humanReportInput" rows="8" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Paste human-written report here for comparison..."></textarea>
+                    </div>
+
+                    <div>
+                        <h4 class="text-lg font-semibold text-gray-800 mb-2">2. Score AI Report Sections (1-10)</h4>
+                        <div id="scoreWidgets" class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4"></div>
+                    </div>
+                    
+                    <div>
+                        <label for="feedbackInput" class="block text-sm font-medium text-gray-700 mb-1">3. Provide Qualitative Feedback on AI Report</label>
+                        <textarea id="feedbackInput" rows="4" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" placeholder="Provide overall feedback on the AI report quality, gaps, strengths..."></textarea>
+                    </div>
+                    
+                    <div class="text-center pt-4">
+                        <button id="compareBtn" class="bg-green-600 text-white font-bold py-3 px-8 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-transform transform hover:scale-105">
+                            Generate Comparison & Store Feedback
+                        </button>
+                    </div>
+                 </div>
+                 <div id="evaluationOutputArea" class="mt-8"></div>
+            </section>
+        </main>
+    </div>
+
+    <script type="module">
+        // --- TEMPLATES AND CONFIGURATION ---
+        const PROMPT_TEMPLATE_CORE = `You are an expert senior credit analyst AI, tasked with generating a comprehensive, balanced, and insightful corporate credit report. Your analysis should be objective and data-driven, drawing upon the information provided below.
+
+**Objective:** Produce a corporate credit report for the specified company, adhering to the structure outlined in the "REPORT_STRUCTURE_GUIDE".
+
+**Key Instructions:**
+1.  **Company Focus:** The report is for: {company_name} ({company_ticker}), operating in the {company_sector} sector.
+2.  **Information Provided by User:** You will receive structured inputs including:
+    * Key Financial Data
+    * Calculated Credit Metrics
+    * Qualitative Assessments (Management, Competitive Landscape, Industry Outlook, ESG Factors)
+    * Recent News Snippets / Press Releases
+    * Analyst's Key Assumptions
+    * Additional context from uploaded documents (if provided by user): {uploaded_document_context}
+3.  **Analysis Approach:**
+    * Synthesize all provided quantitative and qualitative information, including any text from uploaded documents.
+    * Identify key credit strengths and weaknesses.
+    * Discuss financial performance and creditworthiness based on the data.
+    * Incorporate recent developments and their potential impact.
+    * Clearly state the rating rationale and outlook based *only* on the information provided.
+    * If specific data for a standard report section is NOT provided, explicitly state "Information not provided for this section." or "Analysis for this section is limited due to lack of specific input." Do NOT invent data.
+4.  **Tone:** Professional, analytical, objective, and cautious. Use clear and concise language.
+5.  **Output Format:** Generate the report in Markdown format, strictly following the section headers and structure provided in the "REPORT_STRUCTURE_GUIDE".
+6.  **Disclaimer:** Conclude the report with the mandatory disclaimer: "This report is an AI-generated analysis based on user-provided inputs and should not be used for actual investment or credit decisions without independent verification by a qualified human professional. Verify all information independently."
+
+**USER-PROVIDED INFORMATION WILL BE INSERTED BELOW THIS LINE WHEN THE FULL PROMPT IS CONSTRUCTED.**
+---INPUT_DATA_MARKER---
+**REPORT_STRUCTURE_GUIDE:**
+{report_structure_guide}
+---END_REPORT_STRUCTURE_GUIDE---
+**FINAL INSTRUCTION: Now, generate the comprehensive corporate credit report based on all the above instructions and the provided user inputs, adhering strictly to the REPORT_STRUCTURE_GUIDE.**
+`;
+
+        const REPORT_STRUCTURE_GUIDE = `# Corporate Credit Report: {company_name} ({company_ticker})
+
+## 1. Executive Summary
+    * Overall Assessment: [Brief summary of creditworthiness based on inputs]
+    * Suggested Credit Rating: [e.g., BBB+, A-, etc. - LLM should infer a plausible rating based on inputs OR state if inputs are insufficient to determine]
+    * Rating Outlook: [e.g., Stable, Positive, Negative - LLM should infer a plausible outlook OR state if inputs are insufficient]
+    * Key Positive Factors: [List 2-3 key strengths from inputs]
+    * Key Credit Concerns: [List 2-3 key risks/weaknesses from inputs]
+
+## 2. Company Overview
+    * Company Name: {company_name}
+    * Ticker Symbol: {company_ticker}
+    * Primary Sector: {company_sector}
+    * Brief Business Description (if provided by user): {qualitative_business_description}
+    * Additional Context from Uploaded Documents: [Summarize relevant points from uploaded_document_context IF PROVIDED, otherwise state "No documents uploaded for additional context."]
+
+## 3. Key Analyst Assumptions
+    * [List of key assumptions provided by the user: {key_assumptions}]
+
+## 4. Financial Performance Analysis
+    * Summary of Provided Financials:
+        * {financial_data_summary}
+    * Key Credit Metrics Analysis:
+        * {credit_metrics_summary}
+    * Trend Analysis (based on provided data interpretation):
+        * [Comment on trends if discernible from inputs]
+
+## 5. Qualitative Factors Assessment
+    * Management & Strategy:
+        * {qualitative_management_strategy}
+    * Competitive Landscape & Market Position:
+        * {qualitative_competitive_landscape}
+    * Industry Outlook:
+        * {qualitative_industry_outlook}
+    * Environmental, Social, and Governance (ESG) Considerations (if provided):
+        * {qualitative_esg_factors}
+
+## 6. Recent Developments & News
+    * Summary of Recent Press Releases/News:
+        * {recent_news_summary}
+    * Potential Impact Analysis (based on analyst input or LLM inference if obvious from news):
+        * [Briefly discuss potential credit implications of the news]
+
+## 7. Credit Strengths
+    * [Synthesized from all inputs - financial, qualitative, news, uploaded documents etc.]
+
+## 8. Credit Risks & Concerns
+    * [Synthesized from all inputs - financial, qualitative, news, uploaded documents etc.]
+
+## 9. Rating Rationale
+    * [Explain the reasoning behind the suggested rating, tying back to specific strengths, weaknesses, financial metrics, and qualitative factors provided.]
+
+## 10. Outlook Rationale
+    * [Explain the reasoning behind the suggested outlook, considering potential trends and future impacts of current factors.]
+
+## 11. Disclaimer
+This report is an AI-generated analysis based on user-provided inputs and should not be used for actual investment or credit decisions without independent verification by a qualified human professional. Verify all information independently.
+`;
+
+        const INPUT_UI_CONFIG = {
+          "sections": [
+            {"title": "Company Information", "fields": [
+              {"name": "company_name", "label": "Company Name:", "type": "text", "default": "Microsoft Corp."},
+              {"name": "company_ticker", "label": "Ticker Symbol:", "type": "text", "default": "MSFT"},
+              {"name": "company_sector", "label": "Primary Sector:", "type": "text", "default": "Technology - Software"}]},
+            {"title": "Key Analyst Assumptions", "fields": [
+              {"name": "key_assumptions", "label": "Analyst's Key Assumptions:", "type": "textarea", "default": "1. Continued double-digit growth in Azure and cloud services.\n2. Successful integration of recent acquisitions.\n3. Stable demand in the enterprise software segment."}]},
+            {"title": "Financial Data (Illustrative)", "fields": [
+              {"name": "financial_revenue_y1", "label": "Recent Full Year Revenue ($M):", "type": "float", "default": 211915.0},
+              {"name": "financial_ebitda_y1", "label": "Recent Full Year EBITDA ($M):", "type": "float", "default": 104975.0},
+              {"name": "financial_total_debt_y1", "label": "Total Debt ($M):", "type": "float", "default": 47034.0},
+              {"name": "financial_total_equity_y1", "label": "Total Equity ($M):", "type": "float", "default": 206223.0},
+              {"name": "financial_fcf_y1", "label": "Free Cash Flow ($M):", "type": "float", "default": 65304.0}]},
+            {"title": "Credit Metrics (Illustrative)", "fields": [
+              {"name": "metric_debt_ebitda", "label": "Debt / EBITDA (x):", "type": "float", "default": 0.45},
+              {"name": "metric_ebitda_interest", "label": "EBITDA / Interest Expense (x):", "type": "float", "default": 55.0}]},
+            {"title": "Qualitative Factors", "fields": [
+              {"name": "qualitative_business_description", "label": "Brief Business Description:", "type": "textarea", "default": "A global technology leader in software, services, devices, and solutions. Dominant positions in operating systems, productivity software (Office 365), and a rapidly growing cloud computing platform (Azure)."},
+              {"name": "qualitative_management_strategy", "label": "Management Assessment & Strategy:", "type": "textarea", "default": "Strong, experienced management team with a proven track record of successful execution and strategic pivots (e.g., 'cloud-first' strategy). Focus on AI integration across product lines is a key forward-looking strategy."},
+              {"name": "qualitative_competitive_landscape", "label": "Competitive Landscape & Market Position:", "type": "textarea", "default": "Faces intense competition from other tech giants like Amazon (AWS) in cloud, Google in search and productivity, and Apple in hardware/OS. However, holds a strong moat in its enterprise ecosystem and diverse revenue streams."},
+              {"name": "qualitative_industry_outlook", "label": "Industry Outlook:", "type": "textarea", "default": "Positive outlook for cloud computing, AI, and digital transformation services. Potential headwinds from macroeconomic slowdowns affecting IT spending and regulatory scrutiny."},
+              {"name": "qualitative_esg_factors", "label": "ESG Considerations:", "type": "textarea", "default": "Strong commitment to sustainability with goals to be carbon negative by 2030. Faces ongoing scrutiny regarding data privacy, antitrust issues, and supply chain ethics, which are common for large tech firms."}]},
+            {"title": "Recent News / Press Releases", "fields": [
+              {"name": "recent_news_summary", "label": "Paste recent news snippets/summaries here:", "type": "textarea", "default": "Reports strong quarterly earnings, beating analyst expectations, driven by significant growth in Azure and AI services. Announced new AI-powered features for its Copilot assistant across the Microsoft 365 suite."}]}]};
+        
+        const SCORE_CONFIG = [
+            { id: "executive_summary_score", label: "Exec Summary Score:" },
+            { id: "financial_analysis_score", label: "Financial Analysis Score:" },
+            { id: "qualitative_factors_score", label: "Qualitative Score:" },
+            { id: "rating_rationale_score", label: "Rating Rationale Score:" },
+            { id: "overall_llm_score", label: "Overall AI Report Score:" },
+        ];
+
+        // --- GLOBAL STATE ---
+        let currentLLMPrompt = "";
+        let currentLLMReportMd = "";
+        let currentSimulatedReportMd = "";
+        let currentUserInputs = {};
+        let currentUploadedText = "";
+
+        // --- UI INITIALIZATION ---
+        function initializeUI() {
+            const formContainer = document.getElementById('input-form');
+            INPUT_UI_CONFIG.sections.forEach(section => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'p-4 border border-gray-200 rounded-lg bg-white';
+                
+                const title = document.createElement('h5');
+                title.className = 'font-semibold text-gray-800 mb-4';
+                title.textContent = section.title;
+                sectionDiv.appendChild(title);
+                
+                const fieldsContainer = document.createElement('div');
+                fieldsContainer.className = 'space-y-4';
+                
+                section.fields.forEach(field => {
+                    const fieldDiv = document.createElement('div');
+                    
+                    let input;
+                    if (field.type === 'textarea') {
+                        input = document.createElement('textarea');
+                        input.rows = 3;
+                    } else {
+                        input = document.createElement('input');
+                        input.type = field.type === 'float' ? 'number' : 'text';
+                        if (field.type === 'float') input.step = 'any';
+                    }
+                    
+                    input.id = field.name;
+                    input.name = field.name;
+                    input.className = 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm';
+                    input.value = field.default;
+
+                    const label = document.createElement('label');
+                    label.htmlFor = field.name;
+                    label.className = 'block text-sm font-medium text-gray-700';
+                    
+                    if (field.name === 'key_assumptions') {
+                        const button = document.createElement('button');
+                        button.id = 'suggestAssumptionsBtn';
+                        button.innerHTML = '✨ Suggest Assumptions';
+                        button.className = 'float-right text-xs bg-yellow-400 text-yellow-900 font-semibold py-1 px-2 rounded-md hover:bg-yellow-500';
+                        button.type = 'button';
+                        label.textContent = field.label;
+                        fieldDiv.appendChild(label);
+                        fieldDiv.appendChild(button);
+                        fieldDiv.appendChild(input);
+                    } else {
+                         label.textContent = field.label;
+                         fieldDiv.appendChild(label);
+                         fieldDiv.appendChild(input);
+                    }
+
+                    fieldsContainer.appendChild(fieldDiv);
+                });
+                sectionDiv.appendChild(fieldsContainer);
+                formContainer.appendChild(sectionDiv);
+            });
+
+            const scoreContainer = document.getElementById('scoreWidgets');
+            SCORE_CONFIG.forEach(scoreItem => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center space-x-4';
+                const label = document.createElement('label');
+                label.htmlFor = scoreItem.id;
+                label.className = 'text-sm font-medium text-gray-700 w-48';
+                label.textContent = scoreItem.label;
+                
+                const slider = document.createElement('input');
+                slider.type = 'range';
+                slider.id = scoreItem.id;
+                slider.min = 1;
+                slider.max = 10;
+                slider.value = 5;
+                slider.className = 'w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700';
+                
+                const valueSpan = document.createElement('span');
+                valueSpan.id = `${scoreItem.id}-value`;
+                valueSpan.className = 'text-sm font-semibold text-indigo-600 w-8 text-center';
+                valueSpan.textContent = slider.value;
+                
+                slider.oninput = () => { valueSpan.textContent = slider.value; };
+                
+                div.appendChild(label);
+                div.appendChild(slider);
+                div.appendChild(valueSpan);
+                scoreContainer.appendChild(div);
+            });
+        }
+
+        // --- CORE LOGIC ---
+        
+        // Simulated Report Generator (Ported from Python)
+        class DynamicReportSimulator {
+            constructor(reportStructureTemplateMd) {
+                this.reportStructureTemplateMd = reportStructureTemplateMd;
+            }
+
+            _formatFinancials(inputs) {
+                const summary = Object.entries(inputs)
+                    .filter(([key]) => key.startsWith('financial_'))
+                    .map(([key, value]) => {
+                        const label = key.replace('financial_', '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                        return `- ${label}: $${parseFloat(value).toLocaleString()}M`;
+                    });
+                return summary.length > 0 ? summary.join('\n        * ') : "No specific financial figures provided.";
+            }
+
+            _formatMetrics(inputs) {
+                let summary = [];
+                let commentary = [];
+                Object.entries(inputs).forEach(([key, value]) => {
+                    if (key.startsWith('metric_')) {
+                        const label = key.replace('metric_', '').replace(/_/g, ' ').toUpperCase();
+                        summary.push(`- ${label}: ${value}x`);
+                        
+                        const val = parseFloat(value);
+                        if (key === 'metric_debt_ebitda') {
+                            if (val <= 2.0) commentary.push("Leverage (Debt/EBITDA) appears low to moderate.");
+                            else if (val <= 4.0) commentary.push("Leverage (Debt/EBITDA) appears moderate.");
+                            else commentary.push("Leverage (Debt/EBITDA) appears high.");
+                        } else if (key === 'metric_ebitda_interest') {
+                            if (val >= 5.0) commentary.push("Interest coverage appears strong.");
+                            else if (val >= 2.0) commentary.push("Interest coverage appears adequate.");
+                            else commentary.push("Interest coverage appears weak.");
+                        }
+                    }
+                });
+                
+                let metricsText = summary.length > 0 ? summary.join('\n        * ') : "No specific credit metrics provided.";
+                if (commentary.length > 0) {
+                    metricsText += "\n    * **Brief Commentary:**\n        * " + commentary.join('\n        * ');
+                }
+                return metricsText;
+            }
+
+            _inferRatingOutlook(inputs) {
+                let score = 0;
+                try {
+                    if (parseFloat(inputs['financial_fcf_y1']) > 0) score++; else score--;
+                    if (parseFloat(inputs['financial_revenue_y1']) > 500) score++;
+                    
+                    const debtEbitda = parseFloat(inputs['metric_debt_ebitda']);
+                    if (debtEbitda < 1.5) score += 2;
+                    else if (debtEbitda < 3.0) score++;
+                    else if (debtEbitda > 4.5) score -= 2;
+                    else score--;
+
+                    const ebitdaInterest = parseFloat(inputs['metric_ebitda_interest']);
+                    if (ebitdaInterest > 8.0) score += 2;
+                    else if (ebitdaInterest > 4.0) score++;
+                    else if (ebitdaInterest < 2.0) score -= 2;
+                    else score--;
+
+                } catch (e) { /* ignore parsing errors */ }
+                
+                if (score >= 4) return ["A-", "Positive"];
+                if (score >= 2) return ["BBB+", "Stable"];
+                if (score >= 0) return ["BBB", "Stable"];
+                if (score >= -2) return ["BBB-", "Negative"];
+                if (score >= -4) return ["BB+", "Negative"];
+                return ["BB", "Negative"];
+            }
+
+            generate(inputs) {
+                const [simRating, simOutlook] = this._inferRatingOutlook(inputs);
+                let positiveFactors = [];
+                let creditConcerns = [];
+
+                if (parseFloat(inputs['financial_fcf_y1']) > 0) positiveFactors.push(`Positive Free Cash Flow ($${inputs['financial_fcf_y1']}M).`);
+                else creditConcerns.push(`Negative or low Free Cash Flow ($${inputs['financial_fcf_y1']}M).`);
+
+                const debtEbitda = parseFloat(inputs['metric_debt_ebitda']);
+                if (debtEbitda < 2.0) positiveFactors.push(`Low leverage (Debt/EBITDA: ${debtEbitda}x).`);
+                else if (debtEbitda > 4.0) creditConcerns.push(`High leverage (Debt/EBITDA: ${debtEbitda}x).`);
+
+                if (!positiveFactors.length) positiveFactors.push("No specific positive factors highlighted from inputs.");
+                if (!creditConcerns.length) creditConcerns.push("No specific credit concerns highlighted from inputs.");
+                
+                let reportMd = this.reportStructureTemplateMd;
+                const replacements = {
+                    ...inputs,
+                    key_assumptions: (inputs.key_assumptions || 'N/A').replace(/\n/g, '\n    * '),
+                    financial_data_summary: this._formatFinancials(inputs),
+                    credit_metrics_summary: this._formatMetrics(inputs),
+                    recent_news_summary: (inputs.recent_news_summary || 'N/A').replace(/\n/g, '\n        * '),
+                    uploaded_document_context: inputs.uploaded_document_text || "No documents uploaded for additional context."
+                };
+
+                for (const [key, value] of Object.entries(replacements)) {
+                    reportMd = reportMd.replace(new RegExp(`{${key}}`, 'g'), String(value));
+                }
+
+                const overallAssessment = `Based on the provided inputs, the company exhibits characteristics consistent with a ${simRating} credit profile. Financial metrics show leverage at ${inputs.metric_debt_ebitda}x and interest coverage at ${inputs.metric_ebitda_interest}x. Qualitative factors and recent news contribute to this view. The outlook is ${simOutlook}.`;
+                reportMd = reportMd.replace("[Brief summary of creditworthiness based on inputs]", overallAssessment);
+                reportMd = reportMd.replace("[e.g., BBB+, A-, etc. - LLM should infer a plausible rating based on inputs OR state if inputs are insufficient to determine]", `${simRating} (Simulated)`);
+                reportMd = reportMd.replace("[e.g., Stable, Positive, Negative - LLM should infer a plausible outlook OR state if inputs are insufficient]", `${simOutlook} (Simulated)`);
+                reportMd = reportMd.replace("[List 2-3 key strengths from inputs]", `\n    * ${positiveFactors.join('\n    * ')}`);
+                reportMd = reportMd.replace("[List 2-3 key risks/weaknesses from inputs]", `\n    * ${creditConcerns.join('\n    * ')}`);
+
+                // Fill in remaining placeholders with generic text
+                reportMd = reportMd.replace("[Explain the reasoning behind the suggested rating, tying back to specific strengths, weaknesses, financial metrics, and qualitative factors provided.]", `The simulated rating of ${simRating} is primarily driven by the interplay of its financial metrics and qualitative assessments.`);
+                reportMd = reportMd.replace("[Explain the reasoning behind the suggested outlook, considering potential trends and future impacts of current factors.]", `The ${simOutlook} outlook is based on the current trajectory implied by the financial data and stated key assumptions.`);
+                reportMd = reportMd.replace("[Comment on trends if discernible from inputs]", "[Detailed trend analysis requires time-series data. Based on single-period input, this section focuses on current state.]");
+                reportMd = reportMd.replace("[Briefly discuss potential credit implications of the news]", "[The provided news snippets could impact credit quality. Further analysis needed.]");
+                reportMd = reportMd.replace("[Synthesized from all inputs - financial, qualitative, news, uploaded documents etc.]", `[Key strengths identified include: ${positiveFactors.join(', ')}. Further synthesis pending.]`);
+                reportMd = reportMd.replace("[Synthesized from all inputs - financial, qualitative, news, uploaded documents etc.]", `[Key risks identified include: ${creditConcerns.join(', ')}. Further synthesis pending.]`);
+
+                return reportMd;
+            }
+        }
+        
+        const reportSimulator = new DynamicReportSimulator(REPORT_STRUCTURE_GUIDE);
+
+        async function onGenerate() {
+            const outputArea = document.getElementById('outputArea');
+            outputArea.innerHTML = `<div class="flex items-center justify-center p-4"><div class="loader"></div><p class="ml-4 text-indigo-600 font-semibold">Generating reports, please wait...</p></div>`;
+
+            // 1. Gather all inputs
+            currentUserInputs = {};
+            INPUT_UI_CONFIG.sections.forEach(section => {
+                section.fields.forEach(field => {
+                    currentUserInputs[field.name] = document.getElementById(field.name).value;
+                });
+            });
+            currentUserInputs.uploaded_document_text = currentUploadedText;
+
+            // 2. Construct the full prompt
+            let inputDataPromptSection = "**USER-PROVIDED INFORMATION:**\n\n";
+            for (const section of INPUT_UI_CONFIG.sections) {
+                inputDataPromptSection += `**${section.title}:**\n`;
+                for (const field of section.fields) {
+                    inputDataPromptSection += `- ${field.label} ${currentUserInputs[field.name]}\n`;
+                }
+                inputDataPromptSection += `\n`;
+            }
+            if (currentUploadedText) {
+                inputDataPromptSection += `**Additional Context from Uploaded Document:**\n${currentUploadedText.substring(0, 4000)}...\n`;
+            } else {
+                inputDataPromptSection += `**Additional Context from Uploaded Document:**\nNot provided.\n`;
+            }
+            
+            currentLLMPrompt = PROMPT_TEMPLATE_CORE
+                .replace('{company_name}', currentUserInputs.company_name)
+                .replace('{company_ticker}', currentUserInputs.company_ticker)
+                .replace('{company_sector}', currentUserInputs.company_sector)
+                .replace('{uploaded_document_context}', currentUploadedText ? currentUploadedText.substring(0, 4000) + '...' : "Not provided.")
+                .replace('---INPUT_DATA_MARKER---', inputDataPromptSection)
+                .replace('{report_structure_guide}', REPORT_STRUCTURE_GUIDE);
+
+            // 3. Generate simulated report
+            currentSimulatedReportMd = reportSimulator.generate(currentUserInputs);
+
+            // 4. Call LLM for AI report
+            const apiKey = document.getElementById('apiKey').value;
+            const model = document.getElementById('llmModel').value;
+            
+            if (!apiKey) {
+                currentLLMReportMd = "API Key not provided. AI report not generated.";
+            } else {
+                try {
+                    currentLLMReportMd = await callGoogleGenerativeAI(currentLLMPrompt, apiKey, model);
+                } catch (error) {
+                    console.error("Error calling AI model:", error);
+                    currentLLMReportMd = `**Error calling AI API:**\n\n\`\`\`\n${error.message}\n\`\`\`\n\nPlease check your API key, model configuration, and network connection.`;
+                }
+            }
+
+            // 5. Display outputs
+            displayOutputs();
+            document.getElementById('feedbackSection').classList.remove('hidden');
+            document.getElementById('scenarioSection').classList.remove('hidden');
+        }
+
+        async function onSuggestAssumptions() {
+            const assumptionsInput = document.getElementById('key_assumptions');
+            const button = document.getElementById('suggestAssumptionsBtn');
+            const originalText = button.innerHTML;
+            button.innerHTML = 'Thinking...';
+            button.disabled = true;
+
+            const sector = document.getElementById('company_sector').value;
+            const revenue = document.getElementById('financial_revenue_y1').value;
+            const debt = document.getElementById('financial_total_debt_y1').value;
+            const industryOutlook = document.getElementById('qualitative_industry_outlook').value;
+
+            const prompt = `You are an expert credit analyst. For a company in the "${sector}" sector with recent annual revenue of $${revenue}M and total debt of $${debt}M, and an industry outlook described as "${industryOutlook}", please suggest 3-4 concise, key assumptions an analyst should consider for a forward-looking credit analysis. Present them as a numbered list.`;
+            
+            const apiKey = document.getElementById('apiKey').value;
+            const model = document.getElementById('llmModel').value;
+
+            if (!apiKey) {
+                assumptionsInput.value = "Error: API Key not provided.";
+                button.innerHTML = originalText;
+                button.disabled = false;
+                return;
+            }
+
+            try {
+                const result = await callGoogleGenerativeAI(prompt, apiKey, model);
+                assumptionsInput.value = result;
+            } catch (error) {
+                assumptionsInput.value = `Error generating assumptions: ${error.message}`;
+            } finally {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }
+
+        async function onRunScenario() {
+            const scenarioOutput = document.getElementById('scenarioOutput');
+            const scenarioInput = document.getElementById('scenarioInput').value;
+            const button = document.getElementById('runScenarioBtn');
+            
+            if (!scenarioInput.trim()) {
+                scenarioOutput.innerHTML = `<p class="text-red-600">Please enter a scenario query.</p>`;
+                return;
+            }
+
+            const originalText = button.innerHTML;
+            button.innerHTML = '<div class="loader mx-auto" style="width:20px; height:20px; border-width: 2px;"></div>';
+            button.disabled = true;
+            scenarioOutput.innerHTML = '';
+
+            const companyContext = `
+                Company: ${currentUserInputs.company_name} (${currentUserInputs.company_ticker})
+                Sector: ${currentUserInputs.company_sector}
+                Key Financials: Revenue $${currentUserInputs.financial_revenue_y1}M, EBITDA $${currentUserInputs.financial_ebitda_y1}M, Total Debt $${currentUserInputs.financial_total_debt_y1}M.
+                Key Metrics: Debt/EBITDA ${currentUserInputs.metric_debt_ebitda}x, EBITDA/Interest ${currentUserInputs.metric_ebitda_interest}x.
+                Summary: The AI-generated report summarized the company's credit profile as follows: [Provide a brief 1-2 sentence summary of the 'Overall Assessment' from the main report if available].
+            `;
+
+            const prompt = `You are an expert credit analyst. Given the following baseline credit profile for a company:\n\n${companyContext}\n\nNow, please analyze the following "what-if" scenario: "${scenarioInput}".\n\nProvide a concise analysis covering the potential impact on key credit metrics (like leverage and coverage), overall creditworthiness, and the likely direction of the credit rating/outlook. Structure your response in clear, easy-to-understand markdown.`;
+
+            const apiKey = document.getElementById('apiKey').value;
+            const model = document.getElementById('llmModel').value;
+
+            if (!apiKey) {
+                scenarioOutput.innerHTML = `<p class="text-red-600">Error: API Key not provided.</p>`;
+                button.innerHTML = originalText;
+                button.disabled = false;
+                return;
+            }
+
+            try {
+                const result = await callGoogleGenerativeAI(prompt, apiKey, model);
+                scenarioOutput.innerHTML = `<div class="prose">${marked.parse(result)}</div>`;
+            } catch (error) {
+                scenarioOutput.innerHTML = `<p class="text-red-600">Error running scenario analysis: ${error.message}</p>`;
+            } finally {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }
+        }
+
+        async function callGoogleGenerativeAI(prompt, apiKey, model) {
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{
+                    parts: [{ text: prompt }]
+                }]
+            };
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorBody = await response.json();
+                throw new Error(`API request failed with status ${response.status}: ${errorBody.error.message}`);
+            }
+
+            const result = await response.json();
+            if (result.candidates && result.candidates.length > 0 && result.candidates[0].content.parts.length > 0) {
+                 return result.candidates[0].content.parts[0].text;
+            }
+            return "No content generated or unexpected response format.";
+        }
+
+        function displayOutputs() {
+            const outputArea = document.getElementById('outputArea');
+            outputArea.innerHTML = `
+                <div class="space-y-8">
+                    <!-- Generated Prompt -->
+                    <div class="bg-gray-100 p-4 rounded-lg">
+                        <details>
+                            <summary class="text-lg font-semibold text-indigo-700">View Full AI Prompt</summary>
+                            <pre class="mt-2 p-3 bg-white rounded text-sm overflow-x-auto"><code>${escapeHtml(currentLLMPrompt)}</code></pre>
+                            ${createDownloadLink(currentLLMPrompt, `${currentUserInputs.company_ticker}_prompt.txt`, 'Download Prompt')}
+                        </details>
+                    </div>
+
+                    <!-- Reports Comparison -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Simulated Report -->
+                        <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                            <h3 class="text-xl font-bold text-blue-800 mb-2">Simulated Report (Rule-based)</h3>
+                            <div class="prose">${marked.parse(currentSimulatedReportMd)}</div>
+                            ${createDownloadLink(currentSimulatedReportMd, `${currentUserInputs.company_ticker}_simulated_report.md`, 'Download Simulated Report (MD)')}
+                        </div>
+                        <!-- AI Report -->
+                        <div class="bg-purple-50 border border-purple-200 p-4 rounded-lg">
+                            <h3 class="text-xl font-bold text-purple-800 mb-2">AI-Generated Report</h3>
+                            <div class="prose">${marked.parse(currentLLMReportMd)}</div>
+                            ${createDownloadLink(currentLLMReportMd, `${currentUserInputs.company_ticker}_ai_report.md`, 'Download AI Report (MD)')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function onFileUpload(event) {
+            const file = event.target.files[0];
+            const statusEl = document.getElementById('fileUploadStatus');
+            if (!file) {
+                currentUploadedText = "";
+                statusEl.textContent = "No file uploaded.";
+                return;
+            }
+
+            statusEl.textContent = `Processing ${file.name}...`;
+            try {
+                if (file.type === 'application/pdf') {
+                    currentUploadedText = await extractTextFromPdf(file);
+                } else if (file.type === 'text/plain') {
+                    currentUploadedText = await file.text();
+                } else {
+                    throw new Error("Unsupported file type. Please upload a PDF or TXT file.");
+                }
+                statusEl.textContent = `Successfully extracted text from ${file.name}.`;
+            } catch (error) {
+                console.error("File processing error:", error);
+                currentUploadedText = "";
+                statusEl.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        async function extractTextFromPdf(file) {
+            const { pdfjsLib } = globalThis;
+            pdfjsLib.GlobalWorkerOptions.workerSrc = `https://mozilla.github.io/pdf.js/build/pdf.worker.mjs`;
+
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+            let textContent = '';
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const text = await page.getTextContent();
+                textContent += text.items.map(item => item.str).join(' ') + '\n';
+            }
+            return textContent;
+        }
+
+        function onCompare() {
+            const evaluationOutputArea = document.getElementById('evaluationOutputArea');
+            evaluationOutputArea.innerHTML = ''; // Clear previous output
+
+            if (!currentLLMReportMd || currentLLMReportMd.startsWith("API Key not provided") || currentLLMReportMd.startsWith("**Error")) {
+                evaluationOutputArea.innerHTML = `<p class="text-red-600 font-semibold">AI report not available for comparison. Please generate it first.</p>`;
+                return;
+            }
+
+            const humanReportText = document.getElementById('humanReportInput').value;
+            const analystFeedbackText = document.getElementById('feedbackInput').value;
+            const scores = {};
+            SCORE_CONFIG.forEach(item => {
+                scores[item.id] = document.getElementById(item.id).value;
+            });
+
+            const mlTrainingDataEntry = {
+                record_id: `feedback-${currentUserInputs.company_ticker.toLowerCase()}-${new Date().toISOString().replace(/[-:.]/g, '')}`,
+                timestamp: new Date().toISOString(),
+                user_inputs: currentUserInputs,
+                uploaded_document_text_snippet: currentUploadedText ? currentUploadedText.substring(0, 1000) : null,
+                llm_prompt: currentLLMPrompt,
+                llm_model_used: document.getElementById('llmModel').value,
+                llm_generated_report_markdown: currentLLMReportMd,
+                human_written_report_markdown: humanReportText || null,
+                comparison_scores: scores,
+                analyst_qualitative_feedback: analystFeedbackText || null
+            };
+            
+            const jsonlString = JSON.stringify(mlTrainingDataEntry);
+            
+            evaluationOutputArea.innerHTML = `
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Feedback Data Record (JSONL Format)</h3>
+                <p class="text-sm text-gray-600 mb-2">This data has been prepared for download. In a real application, this would be saved to a database for model fine-tuning.</p>
+                <pre class="p-3 bg-gray-100 rounded text-sm overflow-x-auto"><code>${escapeHtml(JSON.stringify(mlTrainingDataEntry, null, 2))}</code></pre>
+                ${createDownloadLink(jsonlString, 'credit_analysis_feedback.jsonl', 'Download Feedback Data (JSONL)')}
+            `;
+        }
+
+        // --- UTILITY FUNCTIONS ---
+        function createDownloadLink(data, filename, buttonText) {
+            const blob = new Blob([data], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            return `<div class="mt-4"><a href="${url}" download="${filename}" class="inline-block bg-gray-200 text-gray-800 text-sm font-semibold py-2 px-4 rounded-lg hover:bg-gray-300">${buttonText}</a></div>`;
+        }
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                 .replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#039;");
+        }
+
+        // --- SCRIPT START ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // First, create all the dynamic UI elements
+            initializeUI();
+
+            // Now that the UI is built, attach all event listeners
+            document.getElementById('generateBtn').addEventListener('click', onGenerate);
+            document.getElementById('compareBtn').addEventListener('click', onCompare);
+            document.getElementById('fileUpload').addEventListener('change', onFileUpload);
+            document.getElementById('suggestAssumptionsBtn').addEventListener('click', onSuggestAssumptions);
+            document.getElementById('runScenarioBtn').addEventListener('click', onRunScenario);
+        });
+
+    </script>
+</body>
+</html>

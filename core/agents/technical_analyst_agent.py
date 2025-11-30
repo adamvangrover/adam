@@ -4,8 +4,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 #... (import other necessary libraries)
 
-class TechnicalAnalyst:
-    def __init__(self, config):
+class TechnicalAnalystAgent:
+    def __init__(self, config, constitution=None, kernel=None):
         self.data_sources = config.get('data_sources', {})
         self.model_path = config.get('model_path', 'models/technical_model.pkl')  # Path to save/load model
 

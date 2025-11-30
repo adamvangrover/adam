@@ -74,6 +74,40 @@ When creating new prompts, please follow these guidelines:
 *   **Use placeholders.** Use placeholders to make your prompts more reusable.
 *   **Test your prompts.** Test your prompts with a variety of inputs to ensure that they are working as expected.
 
+## Advanced Prompt Engineering
+
+This section describes some advanced prompt engineering techniques that can be used to improve the performance and quality of the LLM's responses.
+
+### Prompt Chaining
+
+Prompt chaining is a technique in which the output of one prompt is used as the input for another prompt. This can be used to create more complex and sophisticated text generation pipelines. For example, you could use one prompt to generate a summary of a news article, and then use another prompt to generate a list of key takeaways from the summary.
+
+**Example:**
+
+1.  **Prompt 1: Summarize News Article**
+    *   **Input:** A news article.
+    *   **Output:** A summary of the news article.
+
+2.  **Prompt 2: Generate Key Takeaways**
+    *   **Input:** The summary of the news article from Prompt 1.
+    *   **Output:** A list of key takeaways from the summary.
+
+### Few-Shot Learning
+
+Few-shot learning is a technique in which you provide the LLM with a few examples of the desired output format. This can help the LLM to understand the format and style of the desired output, and it can improve the quality of the generated text.
+
+**Example:**
+
+> **User:**
+> Translate the following English phrases to French:
+>
+> 1. "Hello, how are you?" -> "Bonjour, comment ça va?"
+> 2. "I am doing well, thank you." -> "Je vais bien, merci."
+> 3. "What is your name?" ->
+
+> **LLM:**
+> "Quel est votre nom?"
+
 ## Best Practices
 
 For more information on best practices for writing prompts, please refer to the `PROMPT_BEST_PRACTICES.md` file in this directory.

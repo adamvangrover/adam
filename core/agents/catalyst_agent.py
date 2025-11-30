@@ -183,20 +183,23 @@ if __name__ == "__main__":
     result = agent.run("client123", "company456", "tech")
 print(json.dumps(result, indent=4))
 
-#json
+# """
+# #json
+# 
+# {
+#     "client_data_url": "http://client-data-service/clients",
+#     "market_data_url": "http://market-data-service/market",
+#     "company_financials_url": "http://company-financials-service/companies",
+#     "industry_reports_url": "http://industry-reports-service/reports",
+#     "bank_product_data_url": "http://bank-product-service/products",
+#     "knowledge_graph_url": "http://knowledge-graph-service/graph",
+#     "financial_modeling_url": "http://financial-modeling-service/model",
+#     "reporting_url": "http://reporting-service/reports",
+#     "nlp_url": "http://nlp-service"
+# }
+# """
 
-{
-    "client_data_url": "http://client-data-service/clients",
-    "market_data_url": "http://market-data-service/market",
-    "company_financials_url": "http://company-financials-service/companies",
-    "industry_reports_url": "http://industry-reports-service/reports",
-    "bank_product_data_url": "http://bank-product-service/products",
-    "knowledge_graph_url": "http://knowledge-graph-service/graph",
-    "financial_modeling_url": "http://financial-modeling-service/model",
-    "reporting_url": "http://reporting-service/reports",
-    "nlp_url": "http://nlp-service"
-}
-
+"""
 #yaml
 
 agent:
@@ -249,3 +252,4 @@ agent:
     - "Implement real-time tracking of deal performance metrics."
     - "Prioritize client relationship management for long-term growth."
     - "Future models should focus on adaptive strategies for maximizing financial outcomes."
+"""

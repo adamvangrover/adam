@@ -155,13 +155,13 @@ class AnomalyDetectionAgent:
         Returns:
             A list of indices of the outliers.
         """
-        model = KMeans(n_clusters=n_clusters)
+        model = KMeans(n_clusters=n_clusters, n_init=10)
         model.fit(data)
         distances = model.transform(data)
-        # TODO: Define a threshold for outlier detection based on distances to cluster centers
-        # outliers = ...
-        # return outliers
-        pass  # Placeholder for future implementation
+        min_distances = np.min(distances, axis=1)
+        threshold = np.percentile(min_distances, 95)
+        outliers = np.where(min_distances > threshold)[0]
+        return outliers.tolist()
 
     def _detect_anomalies_time_series(self, data: pd.Series) -> List[int]:
         """
@@ -173,15 +173,43 @@ class AnomalyDetectionAgent:
         Returns:
             A list of indices of the outliers.
         """
-        # TODO: Implement time series anomaly detection using seasonal_decompose and ARIMA
-        # decomposition = seasonal_decompose(data, model='additive')
-        # model = ARIMA(data, order=(5,1,0))
-        # model_fit = model.fit()
-        # predictions = model_fit.predict()
-        # # TODO: Define a threshold for outlier detection based on the difference between actual and predicted values
-        # # outliers = ...
-        # # return outliers
-        pass  # Placeholder for future implementation
+        # Assuming a period of 12, common for monthly financial data.
+        # This might need to be adjusted based on the data's frequency.
+        period = 12
+        if len(data) < 2 * period:
+            # Not enough data to perform seasonal decomposition
+            return []
+        
+        try:
+            # Time series decomposition
+            decomposition = seasonal_decompose(data, model='additive', period=period)
+            residual = decomposition.resid.dropna()
+
+            if len(residual) < 10: # Not enough residuals to fit a model
+                return []
+
+            # Fit ARIMA model on the residuals
+            # Using order=(5,0,0) as residuals should be stationary
+            model = ARIMA(residual, order=(5, 0, 0))
+            model_fit = model.fit()
+
+            # Get model residuals
+            model_residuals = model_fit.resid
+            
+            # Define a threshold for outlier detection (3 standard deviations)
+            threshold = 3 * np.std(model_residuals)
+            
+            # Identify outliers
+            outlier_indices = np.where(np.abs(model_residuals) > threshold)[0]
+
+            # Map back to original data indices
+            original_indices = residual.index[outlier_indices].tolist()
+
+            return original_indices
+        except Exception:
+            # Handle cases where the model fails to converge or other errors.
+            # In a real application, this should be logged.
+            return []
 
     def _get_financial_ratios(self, company_data: pd.DataFrame) -> pd.DataFrame:
         """
@@ -221,16 +249,16 @@ class AnomalyDetectionAgent:
         Returns:
             A list of dictionaries, where each dictionary represents a detected anomaly.
         """
-        anomalies =
+        anomalies = []
 
         # Z-score outlier detection for stock prices
         outliers_zscore_price = self._detect_outliers_zscore(self.market_data['stock_price'])
         for outlier_index in outliers_zscore_price:
             anomaly = {
                 'type': 'stock_price_outlier',
-                'value': self.market_data['stock_price'][outlier_index],
+                'value': self.market_data['stock_price'].iloc[outlier_index],
                 'method': 'z-score',
-                'message': f"Unusual stock price movement detected: {self.market_data['stock_price'][outlier_index]}"
+                'message': f"Unusual stock price movement detected: {self.market_data['stock_price'].iloc[outlier_index]}"
             }
             anomalies.append(anomaly)
 
@@ -239,14 +267,62 @@ class AnomalyDetectionAgent:
         for outlier_index in outliers_isolation_forest_volume:
             anomaly = {
                 'type': 'trading_volume_anomaly',
-                'value': self.market_data['trading_volume'][outlier_index],
+                'value': self.market_data['trading_volume'].iloc[outlier_index],
                 'method': 'isolation_forest',
-                'message': f"Unusual trading volume detected: {self.market_data['trading_volume'][outlier_index]}"
+                'message': f"Unusual trading volume detected: {self.market_data['trading_volume'].iloc[outlier_index]}"
             }
             anomalies.append(anomaly)
 
-        # TODO: Implement other anomaly detection techniques (LOF, One-Class SVM, clustering, time series)
-        # ...
+        # Scale data for multivariate outlier detection
+        scaled_market_data = self.scaler.fit_transform(self.market_data)
+
+        # LOF anomaly detection
+        outliers_lof = self._detect_outliers_lof(scaled_market_data)
+        for outlier_index in outliers_lof:
+            anomaly = {
+                'type': 'market_data_anomaly',
+                'stock_price': self.market_data['stock_price'].iloc[outlier_index],
+                'trading_volume': self.market_data['trading_volume'].iloc[outlier_index],
+                'method': 'LOF',
+                'message': f"Unusual market activity detected (LOF): price={self.market_data['stock_price'].iloc[outlier_index]}, volume={self.market_data['trading_volume'].iloc[outlier_index]}"
+            }
+            anomalies.append(anomaly)
+
+        # One-Class SVM anomaly detection
+        outliers_svm = self._detect_outliers_one_class_svm(scaled_market_data)
+        for outlier_index in outliers_svm:
+            anomaly = {
+                'type': 'market_data_anomaly',
+                'stock_price': self.market_data['stock_price'].iloc[outlier_index],
+                'trading_volume': self.market_data['trading_volume'].iloc[outlier_index],
+                'method': 'One-Class SVM',
+                'message': f"Unusual market activity detected (SVM): price={self.market_data['stock_price'].iloc[outlier_index]}, volume={self.market_data['trading_volume'].iloc[outlier_index]}"
+            }
+            anomalies.append(anomaly)
+
+        # Clustering-based anomaly detection
+        outliers_clustering = self._detect_anomalies_clustering(scaled_market_data)
+        for outlier_index in outliers_clustering:
+            anomaly = {
+                'type': 'market_data_anomaly',
+                'stock_price': self.market_data['stock_price'].iloc[outlier_index],
+                'trading_volume': self.market_data['trading_volume'].iloc[outlier_index],
+                'method': 'Clustering (KMeans)',
+                'message': f"Unusual market activity detected (Clustering): price={self.market_data['stock_price'].iloc[outlier_index]}, volume={self.market_data['trading_volume'].iloc[outlier_index]}"
+            }
+            anomalies.append(anomaly)
+
+        # Time series anomaly detection for stock price
+        outliers_time_series = self._detect_anomalies_time_series(self.market_data['stock_price'])
+        for outlier_index in outliers_time_series:
+            anomaly = {
+                'type': 'stock_price_anomaly',
+                'value': self.market_data['stock_price'].iloc[outlier_index],
+                'method': 'Time Series (ARIMA)',
+                'message': f"Unusual stock price trend detected (Time Series): {self.market_data['stock_price'].iloc[outlier_index]}"
+            }
+            anomalies.append(anomaly)
+
 
         return anomalies
 
@@ -257,7 +333,7 @@ class AnomalyDetectionAgent:
         Returns:
             A list of dictionaries, where each dictionary represents a detected anomaly.
         """
-        anomalies =
+        anomalies = []
 
         # Z-score outlier detection for revenue
         outliers_zscore_revenue = self._detect_outliers_zscore(self.company_data['revenue'], threshold=2)

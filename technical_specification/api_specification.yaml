@@ -1,0 +1,200 @@
+openapi: 3.0.0
+info:
+  title: ADAM v21.0 Central API
+  version: 1.1.0
+  description: The central API for the ADAM v21.0 platform. It provides a unified interface for interacting with the system, including submitting queries, retrieving results, and managing data.
+
+servers:
+  - url: https://api.adam-platform.com/v1
+    description: Production Server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Query:
+      type: object
+      properties:
+        query:
+          type: string
+          description: The natural language query to be processed by the system.
+          example: "What is the credit risk of Apple Inc.?"
+        mode:
+          type: string
+          enum: [prompted, autonomous]
+          description: The mode of operation for the agentic process.
+          example: "autonomous"
+    QueryResult:
+      type: object
+      properties:
+        queryId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [processing, complete, failed]
+        result:
+          type: object
+          example: {"recommendation": "Buy", "confidence": 0.85}
+    Label:
+      type: object
+      properties:
+        dataId:
+          type: string
+          description: The ID of the data to be labeled.
+        label:
+          type: string
+          description: The label to be applied to the data.
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 400
+        message:
+          type: string
+          example: "Bad Request"
+
+security:
+  - bearerAuth: []
+
+paths:
+  /query:
+    post:
+      summary: Submit a query
+      description: Submits a natural language query to the agent orchestrator for processing.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Query'
+      responses:
+        '202':
+          description: The query has been accepted for processing.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  queryId:
+                    type: string
+                    format: uuid
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /query/{queryId}:
+    get:
+      summary: Get query result
+      description: Retrieves the result of a previously submitted query.
+      parameters:
+        - name: queryId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: The result of the query.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryResult'
+        '404':
+          description: Query not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /history:
+    get:
+      summary: Get query history
+      description: Retrieves a list of past queries and their results.
+      responses:
+        '200':
+          description: A list of past queries.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QueryResult'
+
+  /status:
+    get:
+      summary: Get system status
+      description: Retrieves the current status of the system.
+      responses:
+        '200':
+          description: The current status of the system.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok, degraded, unavailable]
+                  version:
+                    type: string
+                    example: "1.1.0"
+
+  /data/ingest:
+    post:
+      summary: Ingest data
+      description: Triggers the ingestion of data from a specified source.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                source:
+                  type: string
+                  enum: [sharepoint, datastore, prompt_library]
+      responses:
+        '202':
+          description: Data ingestion has been initiated.
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /data/label:
+    post:
+      summary: Label data
+      description: Applies a label to a piece of data in the system.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Label'
+      responses:
+        '200':
+          description: The label has been applied successfully.
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Data not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'

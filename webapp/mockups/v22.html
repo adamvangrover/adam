@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v22.0 | Mission Control</title>
+    <!-- Tailwind CSS for rapid styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter for UI, JetBrains Mono for Code -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --panel-bg: #1e293b;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+        }
+        
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark); 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569; 
+        }
+
+        .card {
+            background-color: var(--panel-bg);
+            border: 1px solid #334155;
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .status-active { background-color: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
+        .status-warning { background-color: #f59e0b; }
+        .status-offline { background-color: var(--accent-red); }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: var(--text-secondary);
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+        .sidebar-link:hover, .sidebar-link.active {
+            background-color: #334155;
+            color: var(--text-primary);
+        }
+        .sidebar-link i {
+            margin-right: 0.75rem;
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- Sidebar Navigation -->
+    <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col">
+        <div class="p-6 border-b border-slate-800">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <span class="font-bold text-white">A</span>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg tracking-tight">ADAM System</h1>
+                    <p class="text-xs text-slate-400 mono">v22.0.4-beta</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-4 px-2">Core Modules</div>
+            <a href="#mission-control" class="sidebar-link active">
+                <i data-lucide="layout-dashboard"></i> Mission Control
+            </a>
+            <a href="services/webapp/client/public/index.html" class="sidebar-link text-blue-400">
+                <i data-lucide="zap"></i> WebApp (React)
+            </a>
+            <a href="chatbot/index.html" class="sidebar-link">
+                <i data-lucide="message-square"></i> Chatbot (Legacy)
+            </a>
+            
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-6 px-2">Intelligence</div>
+            <a href="#agents" class="sidebar-link">
+                <i data-lucide="bot"></i> Agent Registry
+            </a>
+            <a href="data/knowledgegraph.ttl" class="sidebar-link">
+                <i data-lucide="network"></i> Knowledge Graph
+            </a>
+            <a href="#training" class="sidebar-link">
+                <i data-lucide="brain-circuit"></i> Training Cortex
+            </a>
+
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-6 px-2">Resources</div>
+            <a href="prompt_library/AOPL-v1.0/README.md" class="sidebar-link">
+                <i data-lucide="library"></i> Prompt Library
+            </a>
+            <a href="docs/getting_started.md" class="sidebar-link">
+                <i data-lucide="book"></i> Documentation
+            </a>
+             <a href="docs/ui_archive_v1/index.html" class="sidebar-link">
+                <i data-lucide="archive"></i> UI Archive (v1)
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-slate-800">
+            <div class="flex items-center gap-3">
+                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span class="text-xs text-slate-400">System Operational</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto bg-slate-950">
+        
+        <!-- Header -->
+        <header class="bg-slate-900 border-b border-slate-800 p-6 flex justify-between items-center sticky top-0 z-10">
+            <div>
+                <h2 class="text-2xl font-bold">Mission Control</h2>
+                <p class="text-slate-400 text-sm">Overview of the Adam Financial Intelligence Platform</p>
+            </div>
+            <div class="flex gap-4">
+                <div class="flex flex-col items-end">
+                    <span class="text-xs text-slate-500">Current Deployment</span>
+                    <span class="text-sm font-mono text-blue-400">k8s-cluster-prod-01</span>
+                </div>
+                <div class="flex flex-col items-end">
+                    <span class="text-xs text-slate-500">GitOps Sync</span>
+                    <span class="text-sm font-mono text-green-400">Synced (3m ago)</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-8 max-w-7xl mx-auto space-y-8">
+
+            <!-- Architecture Overview (Split Brain Visualization) -->
+            <section>
+                <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                    <i data-lucide="layers" class="w-5 h-5 text-blue-500"></i> System Architecture
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- The Future: v22 WebApp -->
+                    <a href="services/webapp/client/public/index.html" class="card p-6 rounded-xl block group relative overflow-hidden">
+                        <div class="absolute top-0 right-0 bg-blue-600 text-white text-xs px-3 py-1 rounded-bl-xl font-bold">v22.0 STABLE</div>
+                        <div class="flex items-start gap-4">
+                            <div class="p-3 bg-blue-500/10 rounded-lg text-blue-500">
+                                <i data-lucide="cpu" class="w-8 h-8"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold group-hover:text-blue-400 transition-colors">Adam WebApp Platform</h4>
+                                <p class="text-slate-400 text-sm mt-1">The modern React-based interface. Microservices architecture, real-time market data, and agent orchestration.</p>
+                                <div class="mt-4 flex gap-2 text-xs mono text-slate-500">
+                                    <span class="px-2 py-1 bg-slate-800 rounded border border-slate-700">React</span>
+                                    <span class="px-2 py-1 bg-slate-800 rounded border border-slate-700">Vite</span>
+                                    <span class="px-2 py-1 bg-slate-800 rounded border border-slate-700">Tailwind</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- The Legacy: Static Tools -->
+                    <a href="chatbot/index.html" class="card p-6 rounded-xl block group opacity-90 hover:opacity-100">
+                        <div class="flex items-start gap-4">
+                            <div class="p-3 bg-slate-700/20 rounded-lg text-slate-400">
+                                <i data-lucide="terminal" class="w-8 h-8"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold group-hover:text-slate-300 transition-colors">Legacy Tools (v21)</h4>
+                                <p class="text-slate-400 text-sm mt-1">Access static HTML tools including the classic Chatbot Interface and the Navigator.</p>
+                                <div class="mt-4 flex gap-2">
+                                    <span class="text-xs text-yellow-500 border border-yellow-500/30 px-2 py-1 rounded">Maintenance Mode</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Agent Registry & Status -->
+            <section id="agents">
+                <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                    <i data-lucide="users" class="w-5 h-5 text-purple-500"></i> Active Agents
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <!-- Agent Card Template -->
+                    <div class="card p-4 rounded-lg">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="font-semibold">Market Sentiment</div>
+                            <span class="status-dot status-active"></span>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-3">Analyzes news feeds and social signals for bullish/bearish trends.</p>
+                        <a href="core/agents/market_sentiment_agent.py" class="text-xs text-blue-400 hover:underline mono">View Source</a>
+                    </div>
+
+                    <div class="card p-4 rounded-lg">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="font-semibold">Risk Assessment</div>
+                            <span class="status-dot status-active"></span>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-3">Calculates VaR and counterparty risk exposure.</p>
+                        <a href="core/agents/risk_assessment_agent.py" class="text-xs text-blue-400 hover:underline mono">View Source</a>
+                    </div>
+
+                    <div class="card p-4 rounded-lg">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="font-semibold">Macro Analyst</div>
+                            <span class="status-dot status-warning" title="High Latency"></span>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-3">Processes government stats and central bank policy data.</p>
+                        <a href="core/agents/macroeconomic_analysis_agent.py" class="text-xs text-blue-400 hover:underline mono">View Source</a>
+                    </div>
+
+                    <div class="card p-4 rounded-lg">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="font-semibold">Architect Agent</div>
+                            <span class="status-dot status-active"></span>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-3">Self-improvement loop and GitOps configuration manager.</p>
+                        <a href="core/system/agent_improvement_pipeline.py" class="text-xs text-blue-400 hover:underline mono">View Pipeline</a>
+                    </div>
+                </div>
+            </section>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Training Cortex (Data) -->
+                <section id="training">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                        <i data-lucide="brain" class="w-5 h-5 text-pink-500"></i> Artisanal Cortex Memory
+                    </h3>
+                    <div class="card rounded-xl overflow-hidden">
+                        <table class="w-full text-sm text-left text-slate-400">
+                            <thead class="text-xs text-slate-200 uppercase bg-slate-800">
+                                <tr>
+                                    <th class="px-6 py-3">Dataset Name</th>
+                                    <th class="px-6 py-3">Type</th>
+                                    <th class="px-6 py-3">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                                    <td class="px-6 py-4 font-medium text-white">artisanal_data_houseview_v1.jsonl</td>
+                                    <td class="px-6 py-4">Strategic Alignment</td>
+                                    <td class="px-6 py-4"><a href="data/artisanal_training_sets/artisanal_data_houseview_v1.jsonl" class="text-blue-400 hover:underline">Inspect</a></td>
+                                </tr>
+                                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                                    <td class="px-6 py-4 font-medium text-white">artisanal_data_risk_assessment_v2.jsonl</td>
+                                    <td class="px-6 py-4">Risk Logic</td>
+                                    <td class="px-6 py-4"><a href="data/artisanal_training_sets/artisanal_data_risk_assessment_v2.jsonl" class="text-blue-400 hover:underline">Inspect</a></td>
+                                </tr>
+                                <tr class="border-b border-slate-800 hover:bg-slate-800/50">
+                                    <td class="px-6 py-4 font-medium text-white">neo4j_tool_use.jsonl</td>
+                                    <td class="px-6 py-4">Tool Calling</td>
+                                    <td class="px-6 py-4"><a href="data/artisanal_training_sets/neo4j_tool_use.jsonl" class="text-blue-400 hover:underline">Inspect</a></td>
+                                </tr>
+                                <tr class="hover:bg-slate-800/50">
+                                    <td class="px-6 py-4 font-medium text-white">Adam_v22_TrainingData.jsonl</td>
+                                    <td class="px-6 py-4">Core Knowledge</td>
+                                    <td class="px-6 py-4"><a href="core/libraries_and_archives/Adam_v22_TrainingData.jsonl" class="text-blue-400 hover:underline">Inspect</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Prompt Engineering -->
+                <section id="prompts">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center gap-2">
+                        <i data-lucide="terminal-square" class="w-5 h-5 text-orange-500"></i> Prompt Engineering (AOPL)
+                    </h3>
+                    <div class="card p-6 rounded-xl space-y-4">
+                        <div>
+                            <h4 class="font-semibold text-white">Adam Open Prompt Library (v1.0)</h4>
+                            <p class="text-sm text-slate-400 mt-1">Standardized prompt signatures for agent skills.</p>
+                            <div class="mt-2 flex gap-2 flex-wrap">
+                                <a href="prompt_library/AOPL-v1.0/system_architecture/LIB-META-001.md" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded text-xs transition">System Arch</a>
+                                <a href="prompt_library/AOPL-v1.0/professional_outcomes/LIB-PRO-001.md" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded text-xs transition">Prof. Outcomes</a>
+                                <a href="prompt_library/AOPL-v1.0/learning/LIB-LRN-001.md" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded text-xs transition">Learning</a>
+                            </div>
+                        </div>
+                        <hr class="border-slate-800">
+                        <div>
+                            <h4 class="font-semibold text-white">Portable Configurations</h4>
+                            <p class="text-sm text-slate-400 mt-1">JSON configs for runtime agent behavior.</p>
+                            <a href="prompts/Adam_v22.0_Portable_Config.json" class="block mt-2 p-3 bg-slate-900 rounded border border-slate-800 mono text-xs text-green-400 hover:border-green-500 transition">
+                                prompts/Adam_v22.0_Portable_Config.json
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Quick Links / Footer -->
+            <footer class="mt-8 border-t border-slate-800 pt-8 pb-20">
+                <div class="flex flex-col md:flex-row justify-between items-start gap-8">
+                    <div>
+                        <h4 class="font-semibold text-white mb-4">Documentation</h4>
+                        <ul class="space-y-2 text-sm text-slate-400">
+                            <li><a href="docs/getting_started.md" class="hover:text-white">Getting Started Guide</a></li>
+                            <li><a href="docs/setup_guide.md" class="hover:text-white">Environment Setup</a></li>
+                            <li><a href="technical_specification/README.md" class="hover:text-white">Technical Specs (v22.0)</a></li>
+                            <li><a href="docs/v23.0/PLAN.md" class="hover:text-white">v23.0 Evolution Plan</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-white mb-4">Developer Tools</h4>
+                        <ul class="space-y-2 text-sm text-slate-400">
+                            <li><a href="scripts/startup_helper.py" class="hover:text-white mono">scripts/startup_helper.py</a></li>
+                            <li><a href="config/config.yaml" class="hover:text-white mono">config/config.yaml</a></li>
+                            <li><a href="data/knowledgegraph.ttl" class="hover:text-white mono">data/knowledgegraph.ttl</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </footer>
+
+        </div>
+    </main>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Simple active link handling
+        const links = document.querySelectorAll('.sidebar-link');
+        links.forEach(link => {
+            link.addEventListener('click', function() {
+                links.forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

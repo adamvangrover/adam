@@ -41,6 +41,12 @@ agents:  # This top-level 'agents' key is REQUIRED
 
       Relevant Agents:
 
+  ReportGeneratorAgent:
+    <<: *defaults
+    persona: "Report Generator Agent"
+    description: "Generates reports based on the analysis of other agents."
+    expertise: ["report generation", "data synthesis"]
+
   DataRetrievalAgent:
     <<: *defaults
     persona: "Data Retrieval Agent"
@@ -69,6 +75,16 @@ agents:  # This top-level 'agents' key is REQUIRED
     alerting_thresholds:
       significant_shift: 0.2  # Alert when sentiment changes by more than 20%
     communication_style: concise and insightful with a touch of humor
+    input_schema:
+      query:
+        type: "string"
+        description: "The search query for sentiment analysis."
+        required: true
+      source:
+        type: "select"
+        options: ["news", "social_media", "all"]
+        default: "all"
+        description: "The source to analyze."
     #... other agent-specific configurations...
 
   macroeconomic_analysis_agent:
@@ -867,6 +883,104 @@ agents:  # This top-level 'agents' key is REQUIRED
     expertise: ["news aggregation", "event detection", "information filtering"]
     data_sources: [] # To be updated later
     alerting_thresholds: {} # To be updated later
+
+  credit_sentry_agents:
+    orchestrator:
+      CreditSentryOrchestrator:
+        <<: *defaults
+        persona: "CreditSentry"
+        description: "The Orchestrator/Supervisor Agent. This is the central nervous system of the copilot."
+        expertise: ["orchestration", "delegation", "synthesis"]
+    meta_agents:
+      CreditRiskAssessmentAgent:
+        <<: *defaults
+        persona: "Credit Risk Assessor"
+        description: "Conducts a comprehensive commercial credit analysis."
+        expertise: ["credit analysis", "financial modeling", "risk assessment"]
+      PortfolioMonitoringEWSAgent:
+        <<: *defaults
+        persona: "Portfolio Sentinel"
+        description: "Provides continuous, real-time surveillance of the entire credit portfolio."
+        expertise: ["portfolio monitoring", "early warning systems", "covenant tracking"]
+      NarrativeSummarizationAgent:
+        <<: *defaults
+        persona: "Narrative Weaver"
+        description: "Bridges the gap between complex, quantitative machine output and clear, concise human understanding."
+        expertise: ["narrative generation", "summarization", "data visualization"]
+      PersonaCommunicationAgent:
+        <<: *defaults
+        persona: "Communications Specialist"
+        description: "Tailors the presentation of the final output to the specific needs, role, and authority level of the human user."
+        expertise: ["persona-based communication", "output formatting"]
+      CounterpartyRiskAgent:
+        <<: *defaults
+        persona: "Counterparty Risk Analyst"
+        description: "Quantifies the complex, contingent risks associated with derivative transactions."
+        expertise: ["counterparty credit risk", "PFE calculation", "wrong-way risk"]
+    sub_agents:
+      FinancialDocumentAgent:
+        <<: *defaults
+        persona: "Financial Document Extractor"
+        description: "Automates the ingestion and structuring of financial information from documents."
+        expertise: ["OCR", "document parsing", "data extraction"]
+      ComplianceKYCAgent:
+        <<: *defaults
+        persona: "Compliance & KYC Officer"
+        description: "Automates the essential checks required for client onboarding and ongoing monitoring."
+        expertise: ["KYC", "AML", "regulatory checks"]
+      MarketAlternativeDataAgent:
+        <<: *defaults
+        persona: "Market & Alt-Data Analyst"
+        description: "Scans and ingests a wide spectrum of both structured and unstructured information from the public domain."
+        expertise: ["market data", "alternative data", "web scraping"]
+      InternalSystemsAgent:
+        <<: *defaults
+        persona: "Internal Systems Connector"
+        description: "Serves as the secure and reliable conduit to the financial institution's own internal systems of record."
+        expertise: ["internal data access", "API integration"]
+
+  behavioral_economics_agent:
+    <<: *defaults
+    persona: "Cognitive Bias Detector"
+    description: "Analyzes market data and user interactions for signs of cognitive biases and irrational behavior."
+    expertise:
+      - "cognitive bias detection"
+      - "behavioral analysis"
+      - "market psychology"
+    bias_patterns:
+      market:
+        herding:
+          - "everyone is buying"
+          - "fear of missing out"
+          - "FOMO"
+        recency_bias:
+          - "recent performance"
+          - "short-term trend"
+      user:
+        confirmation_bias:
+          - "confirm my belief"
+          - "evidence for my view"
+
+  meta_cognitive_agent:
+    <<: *defaults
+    persona: "Logical Consistency Guardian"
+    description: "Monitors the reasoning and outputs of other agents to ensure logical consistency, coherence, and alignment with core principles."
+    expertise:
+      - "logical fallacy detection"
+      - "consistency checking"
+      - "reasoning validation"
+    logical_fallacies:
+      appeal_to_authority:
+        - "\\b(expert|authority|source) says\\b"
+        - "\\b(studies|research) shows?\\b"
+      hasty_generalization:
+        - "\\b(always|never|everyone|no one) (is|are|does|do)\\b"
+      false_cause:
+        - "\\b(happened after|coincidence|caused by)\\b"
+    positive_keywords:
+      - "\\b(strong buy|outperform|bullish|upward trend|high confidence|positive outlook)\\b"
+    negative_keywords:
+      - "\\b(high risk|underperform|bearish|downward trend|low confidence|negative outlook|risky)\\b"
 
 # Skill-based Configuration (Example)
 skills:

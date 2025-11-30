@@ -1,0 +1,69 @@
+@prefix : <https://adam.system/data/> .
+@prefix acps: <https://adam.system/ontologies/v20.0/causal#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+acps: a owl:Ontology ;
+  rdfs:label "Adam Causal Predicate Set (ACPS)" ;
+  rdfs:comment "An ontology for representing causal relationships in the Adam system." .
+
+# Classes
+acps:CausalModel a owl:Class ;
+  rdfs:label "Causal Model" ;
+  rdfs:comment "A self-contained representation of a data-generating process, typically structured as a Directed Acyclic Graph (DAG)." .
+
+acps:Variable a owl:Class ;
+  rdfs:label "Variable" ;
+  rdfs:comment "A node in a Causal Model, representing a factor that can be a cause or an effect." .
+
+acps:CausalRelationship a owl:Class ;
+  rdfs:label "Causal Relationship" ;
+  rdfs:comment "An abstract superclass for all causal predicates." .
+
+# Object Properties
+acps:includesVariable a owl:ObjectProperty ;
+  rdfs:domain acps:CausalModel ;
+  rdfs:range acps:Variable ;
+  rdfs:label "includes variable" .
+
+acps:hasDirectCause a owl:ObjectProperty ;
+  rdfs:domain acps:Variable ;
+  rdfs:range acps:Variable ;
+  rdfs:label "has direct cause" ;
+  rdfs:subPropertyOf acps:CausalRelationship ;
+  rdfs:comment "This property must be acyclic. This constraint is not enforced by the ontology and must be validated by the application." .
+  owl:propertyChainAxiom ( acps:hasDirectCause acps:hasDirectCause ) .
+
+acps:isDirectCauseOf a owl:ObjectProperty ;
+  owl:inverseOf acps:hasDirectCause .
+
+acps:promotes a owl:ObjectProperty ;
+  rdfs:subPropertyOf acps:hasDirectCause ;
+  rdfs:label "promotes" .
+
+acps:inhibits a owl:ObjectProperty ;
+  rdfs:subPropertyOf acps:hasDirectCause ;
+  rdfs:label "inhibits" .
+
+acps:enables a owl:ObjectProperty ;
+  rdfs:subPropertyOf acps:hasDirectCause ;
+  rdfs:label "enables" .
+
+acps:prevents a owl:ObjectProperty ;
+  rdfs:subPropertyOf acps:hasDirectCause ;
+  rdfs:label "prevents" .
+
+# Annotation Properties
+acps:hasConfidenceScore a owl:AnnotationProperty ;
+  rdfs:label "has confidence score" ;
+  rdfs:comment "Attaches a numerical value (e.g., xsd:float between 0.0 and 1.0) representing the statistical confidence or expert belief in a causal link." .
+
+acps:hasDataSource a owl:AnnotationProperty ;
+  rdfs:label "has data source" ;
+  rdfs:comment "A URI or literal linking to the source of the causal claim (e.g., a research paper, an econometric model run ID, or an expert's name)." .
+
+acps:temporalLag a owl:AnnotationProperty ;
+  rdfs:label "temporal lag" ;
+  rdfs:comment "An xsd:duration value specifying the typical time delay between the cause and the manifestation of the effect." .

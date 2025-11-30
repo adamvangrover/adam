@@ -15,6 +15,22 @@ When working on the ADAM project, please adhere to the following principles:
 *   **Robustness:** Implement comprehensive error handling and logging to ensure the system is resilient and debuggable.
 *   **Efficiency:** Optimize code for performance, especially in data-intensive and computationally expensive tasks.
 
+## Table of Contents
+
+*   [High-Level Goal](#high-level-goal)
+*   [Core Principles](#core-principles)
+*   [System Architecture](#system-architecture)
+    *   [Key Components](#key-components)
+    *   [Component Interaction](#component-interaction)
+*   [Agent Architecture](#agent-architecture)
+    *   [Sub-Agents](#sub-agents)
+    *   [Meta-Agents](#meta-agents)
+    *   [Orchestrator Agents](#orchestrator-agents)
+*   [Getting Started](#getting-started)
+*   [Contribution Guidelines](#contribution-guidelines)
+*   [Operational Notes & Troubleshooting](#operational-notes--troubleshooting-v23-update)
+*   [Directives for v25 Development](#directives-for-v25-development)
+
 ## System Architecture
 
 The ADAM system is built on a modular architecture that consists of several key components. These components work together to provide a flexible and extensible platform for building and deploying autonomous agents.
@@ -38,6 +54,55 @@ The components of the ADAM system interact with each other in the following way:
 5.  **Agents** communicate with each other through the **core's** message bus.
 6.  **Simulations** use the **core** to run experiments and evaluate the performance of the **agents**.
 
+## Agent Architecture
+
+The ADAM system employs a hierarchical agent architecture that consists of three types of agents: Sub-Agents, Meta-Agents, and Orchestrator Agents. This architecture is designed to separate concerns, improve modularity, and enable the development of sophisticated AI applications.
+
+### Sub-Agents
+
+*   **Role:** Sub-Agents are the "worker bees" of the system. They are responsible for performing specific, narrow, and well-defined tasks related to data acquisition and processing.
+*   **Responsibilities:**
+    *   Interacting directly with data sources and tools (e.g., APIs, databases, OCR engines).
+    *   Producing structured, verifiable data with metadata (e.g., source, confidence score).
+    *   Handling errors gracefully and providing structured error messages.
+*   **Example:** A Sub-Agent might be responsible for fetching financial data from a specific API or parsing a specific type of document.
+
+### Meta-Agents
+
+*   **Role:** Meta-Agents are the "analysts" and "strategists" of the system. They are responsible for performing higher-order tasks that require analysis, synthesis, and interpretation.
+*   **Responsibilities:**
+    *   Operating on the structured, verified data provided by Sub-Agents.
+    *   Encapsulating complex business logic, analytical models, and qualitative frameworks.
+    *   Transforming data into a more abstract or analytical form (e.g., a risk rating, a summary, a forecast).
+*   **Example:** A Meta-Agent might take financial data from a Sub-Agent and use it to generate a credit risk assessment.
+
+#### New Meta-Agents in v21.0
+
+*   **Behavioral Economics Agent:** Analyzes market data and user interactions for signs of cognitive biases and irrational behavior.
+*   **Meta-Cognitive Agent:** Monitors the reasoning and outputs of other agents to ensure logical consistency, coherence, and alignment with core principles.
+
+### Orchestrator Agents
+
+*   **Role:** The Orchestrator Agent is the "brain" and "central nervous system" of the entire agentic system. It is the highest level of control, responsible for interpreting user intent, formulating plans, delegating tasks, and synthesizing a final, coherent response.
+*   **Responsibilities:**
+    *   Understanding user goals and decomposing them into a sequence of tasks.
+    *   Delegating tasks to the appropriate Sub-Agents and Meta-Agents.
+    *   Managing the workflow, including handling dependencies and errors.
+    *   Synthesizing the results from multiple agents into a final response.
+*   **Example:** An Orchestrator Agent might take a user query like "What is the credit risk of Apple Inc.?", delegate the task of gathering financial data to a Sub-Agent, delegate the task of assessing credit risk to a Meta-Agent, and then synthesize the results into a comprehensive report.
+
+### Hybrid Architecture (v22)
+
+The ADAM system has been updated to a hybrid architecture that combines the synchronous, centrally-orchestrated model of v21 with the new asynchronous, message-driven model of v22. This dual-architecture design allows the system to leverage the strengths of both approaches, providing flexibility and scalability while maintaining the robustness of the original system.
+
+The `HybridOrchestrator` is the central component of the new architecture. It acts as a bridge between the synchronous and asynchronous subsystems, providing a single entry point for all workflow execution. The `HybridOrchestrator` inspects each workflow to determine whether it is synchronous or asynchronous and then delegates it to the appropriate manager. For more details, see `docs/v22_architecture_integration.md`.
+
+### Adaptive Architecture (v23)
+
+The system is currently evolving towards the v23 "Adaptive System" architecture. This next-generation model introduces a stateful, cyclical graph-based execution engine (leveraging LangGraph) to enable true adaptive intelligence, including iterative self-correction, neuro-symbolic planning, and multimodal perception.
+
+The `MetaOrchestrator` is the unified entry point for all execution models, including v21 (synchronous), v22 (asynchronous), and v23 (graph-based). For the complete vision and technical specifications, please refer to the official `docs/v23_architecture_vision.md` mandate.
+
 ## Getting Started
 
 To get started, please familiarize yourself with the following:
@@ -55,5 +120,57 @@ Please follow these guidelines when contributing to the ADAM project:
 *   Update the documentation when adding new features or changing existing ones.
 *   Write unit tests for all new code.
 *   Ensure that all tests pass before submitting a pull request.
+
+## Operational Notes & Troubleshooting (v23 Update)
+
+*   **Entry Point:** The main entry point for the system is now `scripts/run_adam.py`. It uses the `MetaOrchestrator` to route queries to the appropriate engine (v23 Adaptive, v22 Async, or v21 Legacy).
+*   **Dependencies:**
+    *   `facebook-scraper` has been removed due to conflicts with `semantic-kernel`. Social media data sources will gracefully degrade if this package is missing.
+    *   `langgraph` and `tiktoken` are required for v23 functionality.
+*   **Logging:** A new `core/utils/logging_utils.py` module has been added to standardize logging configuration.
+*   **Missing Files:** If you encounter `Knowledge base file not found` errors, ensure `data/risk_rating_mapping.json` exists. A default one is created if missing in some tests, but should be present in `data/` for production.
+
+## Quantum-AI Convergence (New Capabilities)
+
+Following the strategic analysis in `docs/whitepapers/quantum_ai_convergence.md`, the following modules have been added to the system:
+
+*   **End-to-End Quantum Monte Carlo:** `core/v22_quantum_pipeline/qmc_engine.py` implements the Matsakos-Nield framework for simulating stochastic processes on quantum circuits.
+*   **Generative Risk Engine:** `core/vertical_risk_agent/generative_risk.py` provides GAN-based market scenario generation for tail risk stress testing.
+*   **Explainable Quantum AI:** `core/xai/iqnn_cs.py` implements the Interpretable Quantum Neural Network (IQNN-CS) framework with Inter-Class Attribution Alignment (ICAA) metrics.
+
+## Directives for v25 Development
+
+### 1. The Prime Directive: Bifurcation
+This repository implements two distinct strategies. **Do not mix them.**
+- **Path A (`core/vertical_risk_agent`)**: Prioritize **Reliability**, **Auditability**, and **Business Logic**. Code should be defensive, heavily typed (Pydantic), and explained via logs. Performance is secondary to correctness.
+- **Path B (`experimental/inference_lab`)**: Prioritize **Velocity**, **Throughput**, and **Math**. Code should be optimized (Triton/CUDA), minimal, and benchmarked. Business logic is irrelevant here.
+
+### 2. Coding Standards
+
+#### Path A (Product)
+- **Imports**: Absolute imports preferred.
+- **Error Handling**: Never crash. Use `try/except` blocks with logging.
+- **State**: All agent state must be defined in `state.py` using `TypedDict` or `Pydantic`.
+- **Tools**: All external interactions (API, DB) must go through the MCP Server pattern (`tools/mcp_server`).
+
+#### Path B (Research)
+- **Imports**: Minimal overhead.
+- **Memory**: Be conscious of VRAM. Use `inplace` operations where possible.
+- **Comments**: Explain the *math* behind the optimization (e.g., "We use a block size of 128 to align with warp size").
+
+### 3. Workflow Protocol
+1. **Plan**: Before writing code, inspect the `README.md` of the target directory.
+2. **Visualize**: If modifying `langgraph` flows, generate the Mermaid diagram to verify logic.
+3. **Verify**:
+   - Path A: Run `python evals/run.py`.
+   - Path B: Run `python benchmarks/benchmark_tps.py`.
+
+### 4. Known Context
+- The system uses a mock `langgraph` if the library is missing. Do not remove this fallback unless you are installing the real dependency.
+- The `xbrl_handler.py` has a real XML parser but falls back to mock data if the file is missing. This is intentional for demo purposes.
+
+### 5. Documentation
+- Update `docs/v25_strategic_divergence_roadmap.md` when you complete a major feature.
+- Keep `outstanding_errors.md` updated if you encounter intractable issues.
 
 Thank you for your contributions to the ADAM project!

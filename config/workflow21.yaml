@@ -1,0 +1,79 @@
+# config/workflow21.yaml
+workflows:
+  - name: adam_v21_master_workflow
+    description: "The master workflow for Adam v21.0, following the multi-stage reasoning framework."
+    trigger: user_query
+    steps:
+      # Stage 1: Query Deconstruction and Knowledge Graph Grounding
+      - agent: Query Understanding Agent
+        input: user_query
+        output: task_plan
+        next_step: data_ingestion
+
+      - agent: Data Ingestion Agent
+        input: task_plan
+        output: ingested_data
+        next_step: knowledge_graph_update
+
+      - agent: Knowledge Agent
+        input: ingested_data
+        output: contextual_dataset
+        next_step: strategic_analysis
+
+      # Stage 2: Strategic Analysis - Causal and Behavioral Framework
+      - name: strategic_analysis
+        type: parallel
+        steps:
+          - agent: Macroeconomic Analysis Agent
+            input: contextual_dataset
+            output: macro_analysis
+          - agent: Behavioral Economics Agent
+            input: contextual_dataset
+            output: behavioral_analysis
+          - agent: Geopolitical Risk Agent
+            input: contextual_dataset
+            output: geopolitical_analysis
+        next_step: tactical_analysis
+
+      # Stage 3: Tactical Analysis - Quantitative and Deep Learning Framework
+      - name: tactical_analysis
+        type: parallel
+        steps:
+          - agent: Fundamental Analyst Agent
+            input: contextual_dataset
+            output: fundamental_analysis
+          - agent: Technical Analyst Agent
+            input: contextual_dataset
+            output: technical_analysis
+          - agent: Algorithmic Trading Strategy Agent
+            input: contextual_dataset
+            output: algo_strategy_analysis
+        next_step: preliminary_synthesis
+
+      # Stage 4: Recommendation, Explanation, and Refinement
+      - agent: Orchestrator Agent # Synthesis role
+        name: preliminary_synthesis
+        input:
+          - macro_analysis
+          - behavioral_analysis
+          - geopolitical_analysis
+          - fundamental_analysis
+          - technical_analysis
+          - algo_strategy_analysis
+        output: preliminary_recommendation
+        next_step: meta_cognitive_review
+
+      - agent: Meta-Cognitive Agent
+        name: meta_cognitive_review
+        input: preliminary_recommendation
+        output: refined_recommendation
+        next_step: report_generation
+
+      - agent: Report Generation Agent
+        name: report_generation
+        input: refined_recommendation
+        output: final_report
+        next_step: end
+
+      - name: end
+        type: end

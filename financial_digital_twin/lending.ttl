@@ -1,0 +1,39 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+@prefix fibo-fbc-fi-fi: <https://spec.edmcouncil.org/fibo/ontology/FBC/FinancialInstruments/FinancialInstruments/>.
+@prefix lending: <https://ourbank.com/ontology/lending/>.
+
+#
+# PROPRIETARY LENDING ONTOLOGY
+# Version: 1.0.0
+#
+# This ontology extends the Financial Industry Business Ontology (FIBO)
+# to include concepts, classes, and properties specific to this
+# institution's lending operations.
+#
+
+#
+# Class Definition for a proprietary Loan Covenant
+#
+# This defines a specific condition or restriction in a loan agreement
+# that the borrower must comply with, such as maintaining a certain
+# debt-to-equity ratio. It inherits its foundational properties from
+# FIBO's FinancialInstrumentTerm.
+#
+lending:LoanCovenant a owl:Class ;
+    rdfs:subClassOf fibo-fbc-fi-fi:FinancialInstrumentTerm ;
+    rdfs:label "Loan Covenant" ;
+    rdfs:comment "A specific condition or restriction in a loan agreement that the borrower must comply with, such as maintaining a certain debt-to-equity ratio.".
+
+#
+# Object Property to link a Loan to a Covenant Violation
+#
+# This defines the relationship that indicates a loan is currently
+# in violation of a specific covenant.
+#
+lending:violatesCovenant a owl:ObjectProperty ;
+    rdfs:label "violates covenant" ;
+    rdfs:domain fibo-fbc-fi-fi:Loan ;
+    rdfs:range lending:LoanCovenant ;
+    rdfs:comment "A relationship indicating that a loan is currently in violation of a specific covenant.".

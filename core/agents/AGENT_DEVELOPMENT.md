@@ -58,7 +58,158 @@ The `Agent` class in `agent_base.py` provides the following methods and properti
 *   **`get_knowledge(self, query)`:** Retrieves information from the knowledge base.
 *   **`log(self, message)`:** Logs a message to the system's log file.
 
-## 5. Future Development
+
+    *   **Code Example:**
+        ```python
+        from core.agents.agent_base import Agent
+
+        class MyAgent(Agent):
+            def __init__(self):
+                super().__init__("MyAgent", "A friendly agent that helps with tasks.")
+        ```
+
+*   **`run(self)`:** The main entry point for the agent. This method is called by the system to start the agent's execution.
+
+    *   **Code Example:**
+        ```python
+        from core.agents.agent_base import Agent
+
+        class MyAgent(Agent):
+            def __init__(self):
+                super().__init__("MyAgent", "A friendly agent that helps with tasks.")
+
+            def run(self):
+                self.log("MyAgent is running.")
+                # Agent's main logic goes here
+        ```
+
+*   **`send_message(self, recipient, message)`:** Sends a message to another agent.
+
+    *   **Code Example:**
+        ```python
+        self.send_message("OtherAgent", "Hello from MyAgent!")
+        ```
+
+*   **`receive_message(self, sender, message)`:** Receives a message from another agent.
+
+    *   **Code Example:**
+        ```python
+        def receive_message(self, sender, message):
+            self.log(f"Received message from {sender}: {message}")
+        ```
+
+*   **`get_knowledge(self, query)`:** Retrieves information from the knowledge base. For more information on the knowledge base, see the [Data Navigation Guide](../../data/DATA_NAVIGATION.md).
+
+    *   **Code Example:**
+        ```python
+        company_info = self.get_knowledge("What is the stock price of GOOGL?")
+        ```
+
+*   **`log(self, message)`:** Logs a message to the system's log file.
+
+    *   **Code Example:**
+        ```python
+        self.log("This is a log message.")
+        ```
+
+## 5. Tutorials
+
+### 5.1. "Hello, World" Agent
+
+This tutorial shows how to create a simple "Hello, World" agent.
+
+1.  Create a new file in the `core/agents` directory called `hello_world_agent.py`.
+2.  Add the following code to the file:
+
+    ```python
+    from core.agents.agent_base import Agent
+
+    class HelloWorldAgent(Agent):
+        def __init__(self):
+            super().__init__("HelloWorldAgent", "An agent that prints 'Hello, World!'")
+
+        def run(self):
+            self.log("Hello, World!")
+    ```
+
+3.  Run the agent using the `scripts/run_agent.py` script:
+
+    ```bash
+    python scripts/run_agent.py HelloWorldAgent
+    ```
+
+### 5.2. Agent that Uses the Knowledge Base
+
+This tutorial shows how to create an agent that uses the knowledge base.
+
+1.  Create a new file in the `core/agents` directory called `knowledge_agent.py`.
+2.  Add the following code to the file:
+
+    ```python
+    from core.agents.agent_base import Agent
+
+    class KnowledgeAgent(Agent):
+        def __init__(self):
+            super().__init__("KnowledgeAgent", "An agent that uses the knowledge base.")
+
+        def run(self):
+            knowledge = self.get_knowledge("What is the capital of France?")
+            self.log(f"The capital of France is: {knowledge}")
+    ```
+
+### 5.3. Agent that Communicates with Another Agent
+
+This tutorial shows how to create two agents that communicate with each other.
+
+1.  Create a new file in the `core/agents` directory called `sender_agent.py`.
+2.  Add the following code to the file:
+
+    ```python
+    from core.agents.agent_base import Agent
+
+    class SenderAgent(Agent):
+        def __init__(self):
+            super().__init__("SenderAgent", "An agent that sends a message.")
+
+        def run(self):
+            self.send_message("ReceiverAgent", "Hello from SenderAgent!")
+    ```
+
+3.  Create a new file in the `core/agents` directory called `receiver_agent.py`.
+4.  Add the following code to the file:
+
+    ```python
+    from core.agents.agent_base import Agent
+
+    class ReceiverAgent(Agent):
+        def __init__(self):
+            super().__init__("ReceiverAgent", "An agent that receives a message.")
+
+        def receive_message(self, sender, message):
+            self.log(f"Received message from {sender}: {message}")
+    ```
+
+## 6. Advanced Topics
+
+### 6.1. Agent Lifecycle Management
+
+The agent lifecycle is managed by the `AgentOrchestrator`. The orchestrator is responsible for creating, starting, stopping, and deleting agents.
+
+### 6.2. Error Handling
+
+Agents should use try-except blocks to handle errors gracefully. The `ErrorHandler` class can be used to log and report errors.
+
+### 6.3. Performance Tuning
+
+The performance of an agent can be tuned by optimizing its code and by using caching. The `CacheManager` can be used to cache frequently accessed data.
+
+## 7. Developer Notes
+
+*   The `agent_base.py` file contains the base class for all agents.
+*   The `agent_orchestrator.py` file contains the code for managing the agent lifecycle.
+*   The `knowledge_base.py` file contains the code for accessing the knowledge base.
+
+## 8. Future Development
 
 *   **Agent Sandboxing:** In the future, we plan to implement agent sandboxing to provide a more secure environment for running agents.
 *   **Agent Marketplace:** We also plan to create an agent marketplace where developers can share and sell their agents.

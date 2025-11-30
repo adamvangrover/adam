@@ -1,0 +1,210 @@
+- title: "Analyze New Credit Deal"
+  prompt: |
+    **Objective:** Conduct a comprehensive credit analysis for a new loan application and generate a structured credit report in JSON format.
+
+    **Persona:** Act as a senior credit analyst with 15 years of experience in middle-market lending. Your analysis must be thorough, data-driven, and risk-aware.
+
+    **Deal Information:**
+    -   **Company Name:** `{company_name}`
+    -   **Industry:** `{industry}`
+    -   **Loan Amount:** `{loan_amount}`
+    -   **Loan Purpose:** `{loan_purpose}`
+    -   **Supporting Documents:** `{list_of_documents}` (e.g., 3 years of financial statements, tax returns, business plan)
+
+    **Analysis Framework (5 Cs of Credit):**
+    Your analysis must be structured around the 5 Cs of Credit. For each section, provide a narrative summary and a quantitative score (1-5, where 1 is Excellent and 5 is Poor).
+
+    1.  **Character:**
+        -   Assess the management team's experience, reputation, and track record.
+        -   Review the company's credit history and payment record.
+        -   Identify any legal or regulatory issues.
+        -   **Narrative & Score Required.**
+
+    2.  **Capacity:**
+        -   Analyze historical cash flow statements to determine the company's ability to service its debt.
+        -   Calculate key financial ratios (see Financial Ratio Analysis section below).
+        -   Develop a projection model to forecast future cash flows and debt service coverage.
+        -   **Narrative & Score Required.**
+
+    3.  **Capital:**
+        -   Evaluate the company's capital structure and leverage.
+        -   Assess the owner's equity contribution to the business.
+        -   Analyze the company's balance sheet strength and net worth.
+        -   **Narrative & Score Required.**
+
+    4.  **Collateral:**
+        -   Identify and value the assets being pledged as collateral.
+        -   Determine the loan-to-value (LTV) ratio.
+        -   Assess the quality and liquidity of the collateral.
+        -   **Narrative & Score Required.**
+
+    5.  **Conditions:**
+        -   Analyze the current economic climate and industry trends.
+        -   Assess the competitive landscape and the company's market position.
+        -   Evaluate the purpose of the loan and its potential impact on the business.
+        -   **Narrative & Score Required.**
+
+    **Financial Ratio Analysis:**
+    Calculate and analyze the following key financial ratios for the past 3 years:
+    -   **Liquidity Ratios:** Current Ratio, Quick Ratio
+    -   **Profitability Ratios:** Gross Profit Margin, Net Profit Margin, Return on Equity (ROE)
+    -   **Leverage Ratios:** Debt-to-Equity Ratio, Debt-to-Assets Ratio
+    -   **Coverage Ratios:** Debt Service Coverage Ratio (DSCR), Interest Coverage Ratio
+
+    **Risk Assessment:**
+    -   Identify the key risks associated with the loan (e.g., market risk, operational risk, credit risk).
+    -   Propose mitigation strategies for each identified risk.
+    -   Assign an overall risk rating to the loan (e.g., Low, Medium, High).
+
+    **Recommendation:**
+    -   Provide a final recommendation on whether to approve or decline the loan application.
+    -   If recommending approval, specify the recommended loan structure, terms, and covenants.
+    -   If recommending decline, provide a clear and well-supported justification.
+
+    **Expected Output Format:**
+    Provide the entire analysis as a single, structured JSON object. Do not include any introductory text or pleasantries. The JSON object must conform to the following schema:
+    ```json
+    {{
+      "company_name": "{company_name}",
+      "analysis_date": "{current_date}",
+      "executive_summary": {{
+        "overall_risk_rating": "...",
+        "recommendation": "...",
+        "key_strengths": [],
+        "key_weaknesses": []
+      }},
+      "credit_analysis": {{
+        "character": {{ "score": 0, "narrative": "..." }},
+        "capacity": {{ "score": 0, "narrative": "..." }},
+        "capital": {{ "score": 0, "narrative": "..." }},
+        "collateral": {{ "score": 0, "narrative": "..." }},
+        "conditions": {{ "score": 0, "narrative": "..." }}
+      }},
+      "financial_ratio_analysis": {{
+        "liquidity_ratios": {{ "current_ratio": [], "quick_ratio": [] }},
+        "profitability_ratios": {{ "gross_profit_margin": [], "net_profit_margin": [], "return_on_equity": [] }},
+        "leverage_ratios": {{ "debt_to_equity": [], "debt_to_assets": [] }},
+        "coverage_ratios": {{ "dscr": [], "interest_coverage": [] }}
+      }},
+      "risk_assessment": {{
+        "identified_risks": [{{ "risk": "...", "mitigation": "..." }}],
+        "overall_risk_rating": "..."
+      }},
+      "final_recommendation": {{
+        "decision": "Approve/Decline",
+        "justification": "...",
+        "recommended_terms": {{
+          "loan_amount": "...",
+          "interest_rate": "...",
+          "term": "...",
+          "covenants": []
+        }}
+      }}
+    }}
+    ```
+
+- title: "Generate Credit Report"
+  prompt: |
+    **Objective:** Generate a human-readable credit report from a structured JSON analysis object.
+
+    **Persona:** Act as a junior analyst responsible for formatting and presenting credit reports.
+
+    **Input:** A JSON object containing the full credit analysis for `{company_name}`.
+
+    **Task:**
+    Convert the provided JSON object into a well-formatted, professional credit report. The report can be in one of the following formats: `{output_format}` (e.g., Markdown, HTML, PDF).
+
+    **Report Structure:**
+    1.  **Executive Summary:** A high-level overview of the analysis and recommendation.
+    2.  **Company Overview:** Basic information about the company.
+    3.  **Credit Analysis (The 5 Cs):** A detailed section for each of the 5 Cs, including the narrative and score.
+    4.  **Financial Analysis:** A table of the key financial ratios over the past 3 years, with a brief analysis of the trends.
+    5.  **Risk Assessment:** A summary of the key risks and mitigation strategies.
+    6.  **Final Recommendation:** A clear statement of the final recommendation and any proposed terms.
+
+    **Instructions:**
+    -   Use clear headings and formatting to make the report easy to read.
+    -   Present numerical data in tables where appropriate.
+    -   Ensure that all information from the JSON object is accurately represented in the final report.
+    -   The tone should be formal and professional.
+
+- title: "Deep-Dive Working Capital Analysis"
+  prompt: |
+    **Objective:** Conduct a detailed analysis of the working capital cycle for `{company_name}`.
+
+    **Persona:** Act as a cash flow and treasury management specialist.
+
+    **Input Data:** 3 years of monthly or quarterly balance sheets and income statements for `{company_name}`.
+
+    **Analysis Components:**
+    1.  **Cash Conversion Cycle (CCC):**
+        -   Calculate the CCC for each period.
+        -   Analyze the trend in the CCC and its components:
+            -   Days Inventory Outstanding (DIO)
+            -   Days Sales Outstanding (DSO)
+            -   Days Payable Outstanding (DPO)
+    2.  **Working Capital Components Analysis:**
+        -   Analyze the trends in Accounts Receivable (A/R), including an A/R aging analysis.
+        -   Analyze the trends in Inventory, including inventory turnover.
+        -   Analyze the trends in Accounts Payable (A/P).
+    3.  **Recommendations:**
+        -   Identify any potential issues or areas for improvement in the company's working capital management.
+        -   Provide specific recommendations to optimize the cash conversion cycle.
+
+    **Expected Output Format:**
+    A structured report in Markdown format with sections for each analysis component.
+
+- title: "SaaS Company Credit Analysis"
+  prompt: |
+    **Objective:** Conduct a credit analysis specifically tailored for a SaaS (Software-as-a-Service) company.
+
+    **Persona:** Act as a technology and venture debt analyst.
+
+    **Company:** `{company_name}`
+
+    **Key SaaS Metrics to Analyze:**
+    In addition to standard financial ratios, you must calculate and analyze the following SaaS-specific metrics:
+    1.  **Annual Recurring Revenue (ARR) / Monthly Recurring Revenue (MRR):** Analyze the growth and stability of recurring revenue.
+    2.  **Customer Acquisition Cost (CAC):** Calculate the cost to acquire a new customer.
+    3.  **Lifetime Value (LTV):** Calculate the total revenue expected from a single customer account.
+    4.  **LTV:CAC Ratio:** Assess the profitability and efficiency of the sales and marketing efforts. A ratio above 3:1 is generally considered healthy.
+    5.  **Customer Churn Rate:** Calculate the percentage of customers who cancel their subscriptions in a given period.
+    6.  **Net Revenue Retention (NRR):** Measure the percentage of recurring revenue retained from existing customers, including upsells and downgrades. An NRR above 100% indicates a healthy, growing customer base.
+
+    **Analysis Focus:**
+    -   How do these SaaS metrics supplement the traditional 5 Cs of credit analysis?
+    -   What are the key risks specific to this SaaS business model (e.g., customer concentration, technology risk, churn)?
+    -   Provide a final credit recommendation based on both traditional and SaaS-specific analysis.
+
+    **Expected Output Format:**
+    A structured credit memo in Markdown format that integrates the SaaS metric analysis into the standard credit report structure.
+
+- title: "Generate Credit Memo Section"
+  prompt: |
+    **Objective:** Generate a specific section of the credit memo based on provided data.
+
+    **Persona:** Act as a specialized credit analyst.
+
+    **Task:**
+    Generate the `{section_name}` section of the credit memo for `{company_name}`.
+
+    **Available Sections:**
+    -   `Executive Summary`
+    -   `Company Overview`
+    -   `Management Assessment`
+    -   `Industry Analysis`
+    -   `Financial Analysis`
+    -   `Risk Assessment`
+    -   `Collateral Analysis`
+    -   `Final Recommendation`
+
+    **Input Data:**
+    -   A structured JSON object containing all the necessary data for the specified section.
+
+    **Instructions:**
+    -   Write a clear, concise, and well-structured narrative for the specified section.
+    -   Ensure the narrative is consistent with the provided data.
+    -   The tone should be formal and professional.
+
+    **Expected Output Format:**
+    A string containing the formatted Markdown text for the specified section.

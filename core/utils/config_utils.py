@@ -4,7 +4,6 @@ import yaml
 import os # Import the 'os' module
 import logging
 from typing import Dict, Any, Optional
-#from core.system.error_handler import ConfigurationError # Removed as per instructions to simplify error handling
 
 
 # Configure logging (consider moving to a central location)
@@ -86,6 +85,38 @@ def load_app_config() -> Dict[str, Any]:
             logging.warning(f"Configuration file {file_path} could not be loaded. Skipping.")
     
     return combined_config
+
+def load_error_codes() -> Dict[str, Any]:
+    """
+    Loads error codes from the errors.yaml configuration file.
+
+    Returns:
+        A dictionary containing error codes and messages.
+    """
+    error_config = load_config('config/errors.yaml')
+    if error_config and 'errors' in error_config:
+        return error_config['errors']
+    logging.warning("Could not load error codes from config/errors.yaml.")
+    return {}
+
+def save_config(config: Dict[str, Any], file_path: str) -> bool:
+    """
+    Saves a configuration dictionary to a YAML file.
+
+    Args:
+        config: The configuration dictionary to save.
+        file_path: The path to the YAML file.
+
+    Returns:
+        True if successful, False otherwise.
+    """
+    try:
+        with open(file_path, 'w') as f:
+            yaml.dump(config, f, default_flow_style=False)
+        return True
+    except Exception as e:
+        logging.error(f"Error saving config to {file_path}: {e}")
+        return False
 
 # Example Usage (you can remove this when you integrate it into your project)
 if __name__ == '__main__':

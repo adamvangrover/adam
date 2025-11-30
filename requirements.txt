@@ -1,193 +1,106 @@
-# adam-v19.1 requirements
-
-# Data Analysis
-pandas==1.5.3
-numpy==1.24.3
-scipy==1.10.1
-
-# Machine Learning
-scikit-learn==1.2.2
-tensorflow==2.12.0       # For deep learning models
-pytorch==2.0.1           # Another popular deep learning framework
-xgboost==1.7.5           # Gradient boosting library
-
-# API Interaction
-requests==2.31.0
-
-# Data Serialization
-pyyaml==6.0
-
-# Other Utilities
-python-dateutil==2.8.2
-
-# Web Scraping
-beautifulsoup4==4.12.2   # General-purpose web scraping library
-scrapy==2.8.0           # Web scraping framework
-facebook-scraper==1.17.1
-feedparser # For RSS feed parsing
-#... add other scraping libraries as needed
-
-# Technical Analysis
-ta==0.10.0
-
-# Agent-Based Modeling
-mesa==1.3.0
-
-# PDF Generation
-fpdf==1.7.2
-reportlab==3.6.12       # Another PDF generation library
-
-# Natural Language Processing (NLP)
-nltk==3.8.1             # For text processing and analysis
-transformers==4.30.2     # For advanced NLP models (e.g., BERT, GPT)
-torch # For PyTorch, a dependency for transformers models like FinBERT
-
-# Visualization
-matplotlib==3.7.1
-seaborn==0.12.2
-
-# Database Interaction
-psycopg2-binary==2.9.6   # For PostgreSQL database
-neo4j==5.11.0            # For Neo4j graph database
-#... add other database drivers as needed
-
-# Cloud Services (if applicable)
-boto3==1.26.134         # For AWS integration
-google-cloud-storage==2.8.0  # For Google Cloud Storage
-#... add other cloud service libraries as needed
-
-# Explainable AI (XAI)
-shap==0.42.1           # For SHAP (SHapley Additive exPlanations)
-lime==0.2.0.1           # For LIME (Local Interpretable Model-agnostic Explanations)
-
-# Monitoring
-prometheus_client==0.16.0  # For Prometheus monitoring and metrics
-
-# Message Queue (for agent communication)
-pika==1.3.2              # For RabbitMQ message queue
-# ... or other message queue libraries as needed
-
-# Graph Visualization (for knowledge graph)
-networkx==3.1            # For network analysis and visualization
-# ... or other graph visualization libraries as needed
-
-# LLM Engines
-transformers==4.30.2     # For Hugging Face Transformers (supports various LLMs)
-langchain==0.0.123       # For LangChain (framework for building LLM-powered applications)
-openai==0.27.8           # For OpenAI's GPT models
-google-cloud-aiplatform==1.25.0  # For Google Cloud's Vertex AI (includes LLMs)
-
-# LLM Libraries
-openai==0.27.8 # Or later, but check compatibility
-anthropic  # No specific version needed, latest is usually fine
-tiktoken
-pyyaml #If it is not already there
-
-
-
-
-
-# Adam v19.2 Requirements (Enhanced)
-
-# --- Core Infrastructure ---
-
-# Agent Framework
-langchain==0.0.123  # For agent orchestration and LLM integration [cite: 267, 142]
-
-# Asynchronous Operations
-asyncio  # Built-in, but ensure compatibility
-
-# Logging
-logging #Built-in
+# Consolidated and Cleaned Requirements
 
 # --- Core Data Analysis and Manipulation ---
-
-# Data Handling
 pandas==1.5.3
-numpy==1.24.3
-scipy==1.10.1
+numpy==1.26.4
+scipy==1.11.4
 
 # --- Core Machine Learning ---
-
-# Classical ML
 scikit-learn==1.2.2
-xgboost==1.7.5  # Gradient boosting [cite: 142, 267]
-
-# Deep Learning (Optional, for advanced models)
-tensorflow==2.12.0
-pytorch==2.0.1
+statsmodels==0.14.2
+torch==2.3.0 --index-url https://download.pytorch.org/whl/cpu
+torchvision==0.18.0 --index-url https://download.pytorch.org/whl/cpu
+torchaudio==2.3.0 --index-url https://download.pytorch.org/whl/cpu
+xgboost==1.7.5
 
 # --- API and Data Interaction ---
-
-# API Communication
 requests==2.31.0
-aiohttp  # For asynchronous HTTP requests (A2A)
+aiohttp==3.8.4
 
-# Data Serialization
-pyyaml==6.0
+# --- Data Serialization ---
+pyyaml==6.0.1
 
-# Date/Time
+# --- Date/Time ---
 python-dateutil==2.8.2
 
 # --- Web Data Acquisition ---
-
-# Web Scraping
 beautifulsoup4==4.12.2
 scrapy==2.8.0
-facebook-scraper==1.17.1
-feedparser # For RSS feed parsing
+feedparser==6.0.10
 
 # --- Financial Analysis ---
-ta==0.10.0
+ta==0.11.0
+TA-Lib==0.4.24
 
 # --- Agent-Based Modeling ---
-mesa==1.3.0 #If used
+mesa==3.2.0
 
 # --- Report Generation ---
 fpdf==1.7.2
-reportlab==3.6.12
+reportlab==4.0.9
 
 # --- Natural Language Processing (NLP) ---
-
-# Core NLP
 nltk==3.8.1
-
-# Advanced NLP/LLM Integration
 transformers==4.30.2
-torch # For PyTorch
-tiktoken #If needed
+tiktoken
+
+# --- Visualization ---
+matplotlib==3.7.1
+seaborn==0.12.2
 
 # --- Data Storage ---
+psycopg2-binary==2.9.10
+neo4j==5.28.2
 
-# Relational DB (If needed)
-psycopg2-binary==2.9.6
-
-# Graph DB
-neo4j==5.11.0 [cite: 142, 244]
-
-# --- Cloud Integration (If needed) ---
-boto3==1.26.134  # AWS
-google-cloud-storage==2.8.0  # Google Cloud
-google-cloud-aiplatform==1.25.0 # If using Vertex AI
+# --- Cloud Integration ---
+boto3==1.26.134
+google-cloud-storage==2.8.0
+google-cloud-aiplatform==1.111.0
+shapely==2.1.1
 
 # --- Explainable AI (XAI) ---
 shap==0.42.1
 lime==0.2.0.1
+dowhy==0.8
 
 # --- System Monitoring ---
 prometheus_client==0.16.0
 
 # --- Agent Communication ---
-pika==1.3.2  # RabbitMQ (A2A)
+pika==1.3.2
+redis==4.5.1
 
 # --- Knowledge Graph ---
 networkx==3.1
+rdflib==6.3.2
 
 # --- LLM Support ---
-openai # OpenAI Python library (version as needed)
-anthropic # Anthropic Python library (version as needed)
+langchain
+openai==1.106.1
+anthropic
+semantic-kernel
+langgraph
 
-# --- Semantic Kernel ---
-semantic_kernel # Version to be determined upon release
+# --- Web Application ---
+Flask==3.0.0
+Flask-SocketIO==5.3.6
+Flask-SQLAlchemy==3.1.1
+Flask-JWT-Extended==4.6.0
+Celery==5.3.6
 
-# ... add other packages as needed
+# --- Prompt-as-Code ---
+pydantic>=2.5.0
+jinja2>=3.1.0
+typing-extensions>=4.5.0
+pyyaml>=6.0
+
+# --- Vertical Risk Agent Dependencies ---
+# mcp-python-sdk
+# python-xbrl
+llama-parse
+trl
+peft
+Flask-Cors
+textblob
+tweepy
+transformers

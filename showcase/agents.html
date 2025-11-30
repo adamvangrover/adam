@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM System | Agents</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Courier New', Courier, monospace; }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+    <!-- Top Bar -->
+    <header class="bg-slate-900 border-b border-slate-700 p-4 flex justify-between items-center shrink-0">
+        <div class="flex items-center space-x-4">
+            <h1 class="text-xl font-bold text-blue-400">AGENT MATRIX</h1>
+        </div>
+        <nav class="space-x-6 text-sm">
+            <a href="index.html" class="hover:text-blue-300 transition">MISSION CONTROL</a>
+            <a href="navigator.html" class="hover:text-blue-300 transition">NAVIGATOR</a>
+            <a href="agents.html" class="text-blue-400 font-bold border-b-2 border-blue-400">AGENTS</a>
+            <a href="graph.html" class="hover:text-blue-300 transition">KNOWLEDGE GRAPH</a>
+        </nav>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="agent-grid">
+            <!-- Populated by JS -->
+        </div>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await window.dataManager.init();
+            const agents = window.dataManager.getAgents();
+            const grid = document.getElementById('agent-grid');
+
+            agents.forEach(agent => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-800 border border-slate-700 p-4 rounded hover:border-blue-500 transition";
+
+                let typeColor = 'text-gray-400';
+                if(agent.type.includes('Meta')) typeColor = 'text-purple-400';
+                if(agent.type.includes('Orchestrator')) typeColor = 'text-yellow-400';
+                if(agent.type.includes('Sub')) typeColor = 'text-green-400';
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-bold text-white">${agent.name}</h3>
+                        <span class="text-xs px-2 py-1 rounded bg-slate-700 ${typeColor}">${agent.type}</span>
+                    </div>
+                    <p class="text-sm text-gray-400 mb-4 h-16 overflow-hidden">${agent.description}</p>
+                    <div class="flex items-center justify-between text-xs border-t border-slate-700 pt-3">
+                        <span class="flex items-center text-green-400">
+                            <span class="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span>
+                            ACTIVE
+                        </span>
+                        <button class="text-blue-400 hover:text-white transition">INSPECT LOGS ></button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        });
+    </script>
+</body>
+</html>

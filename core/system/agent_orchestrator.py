@@ -23,7 +23,7 @@ from core.agents.industry_specialist_agent import IndustrySpecialistAgent
 from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
 from core.agents.technical_analyst_agent import TechnicalAnalystAgent
 from core.agents.risk_assessment_agent import RiskAssessmentAgent
-from core.agents.newsletter_layout_specialist_agent import NewsletterLayoutSpecialistAgent
+from core.agents.newsletter_layout_specialist_agent import NewsletterLayoutSpecialist as NewsletterLayoutSpecialistAgent
 from core.agents.data_verification_agent import DataVerificationAgent
 from core.agents.lexica_agent import LexicaAgent
 from core.agents.archive_manager_agent import ArchiveManagerAgent
@@ -33,9 +33,13 @@ from core.agents.code_alchemist import CodeAlchemist
 from core.agents.lingua_maestro import LinguaMaestro
 from core.agents.sense_weaver import SenseWeaver
 from core.agents.SNC_analyst_agent import SNCAnalystAgent # Added import
+from core.agents.behavioral_economics_agent import BehavioralEconomicsAgent
+from core.agents.meta_cognitive_agent import MetaCognitiveAgent
 
 from core.utils.config_utils import load_config
 from core.utils.secrets_utils import get_api_key # Added import
+from core.system.message_broker import MessageBroker
+# from core.system.brokers.rabbitmq_client import RabbitMQClient
 
 # Semantic Kernel imports
 from semantic_kernel import Kernel
@@ -49,6 +53,7 @@ from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion
 # this line might be redundant or could be adjusted. For now, keeping it.
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
+from financial_digital_twin.nexus_agent import NexusAgent
 # Dictionary mapping agent names to their module paths for dynamic loading
 AGENT_CLASSES = {
     "MarketSentimentAgent": "core.agents.market_sentiment_agent",
@@ -70,8 +75,14 @@ AGENT_CLASSES = {
     "QueryUnderstandingAgent": "core.agents.query_understanding_agent",
     "DataRetrievalAgent": "core.agents.data_retrieval_agent",
     "ResultAggregationAgent": "core.agents.result_aggregation_agent",
+    "ReportGeneratorAgent": "core.agents.report_generator_agent",
     "SNCAnalystAgent": "core.agents.SNC_analyst_agent", # Added SNC_analyst_agent
+    "BehavioralEconomicsAgent": "core.agents.behavioral_economics_agent",
+    "MetaCognitiveAgent": "core.agents.meta_cognitive_agent",
     "NewsBotAgent": "core.agents.NewsBot",
+    "NexusAgent": NexusAgent,
+    "IngestionAgent": AgentBase, # Using AgentBase as a placeholder
+    "AuditorAgent": AgentBase, # Using AgentBase as a placeholder
 }
 
 
@@ -83,16 +94,26 @@ class AgentOrchestrator:
 
     def __init__(self):
         self.agents: Dict[str, AgentBase] = {}
-        self.config = load_config("config/agents.yaml")
+        self.config = load_config("config/config.yaml") or {}
+        
+        # Load agents.yaml if config.yaml is empty or missing agents
+        if 'agents' not in self.config:
+            agents_cfg = load_config("config/agents.yaml")
+            if agents_cfg and 'agents' in agents_cfg:
+                self.config['agents'] = agents_cfg['agents']
+
         self.workflows = self.load_workflows()  # Load workflows
         self.llm_plugin = LLMPlugin()
         self.mcp_service_registry: Dict[
             str, Dict[str, Any]
         ] = {}  # MCP service registry
         self.sk_kernel: Optional[Kernel] = None # Initialize Semantic Kernel instance to None
+        # Use In-Memory Broker for default/showcase (RabbitMQ requires external service)
+        self.message_broker = MessageBroker.get_instance()
+        self.message_broker.connect()
 
         if self.config is None:
-            logging.error("Failed to load agent configurations (config/agents.yaml).")
+            logging.error("Failed to load agent configurations (config/config.yaml).")
         else:
             self.load_agents()
             self.establish_a2a_connections()
@@ -188,31 +209,83 @@ class AgentOrchestrator:
 
 
     def load_agents(self):
-        """Loads agents based on the configuration."""
-
-        if not self.config:
+        """Loads agents based on the new configuration structure."""
+        if not self.config or 'agents' not in self.config:
+            logging.error("Agent configuration 'agents' key not found in config.yaml.")
             return
 
-        for agent_name, agent_config in self.config.items():
-            if agent_name == "_defaults":  # skip if defaults
+        agents_data = self.config.get('agents', [])
+        
+        # Normalize dict to list-like iteration
+        iterator = []
+        if isinstance(agents_data, dict):
+            for name, cfg in agents_data.items():
+                if cfg is None: cfg = {}
+                cfg['name'] = name # Inject name from key
+                iterator.append(cfg)
+        elif isinstance(agents_data, list):
+            iterator = agents_data
+            
+        for agent_config in iterator:
+            agent_name = agent_config.get('name')
+            if not agent_name:
+                logging.warning("Skipping agent configuration with no name.")
                 continue
+
             try:
                 agent_class = self._get_agent_class(agent_name)
                 if agent_class:
-                    # Pass both agent_config and the orchestrator's sk_kernel to the agent
+                    constitution = None
+                    constitution_path = agent_config.get('constitution_path')
+                    if constitution_path:
+                        try:
+                            with open(constitution_path, 'r') as f:
+                                constitution = json.load(f)
+                        except FileNotFoundError:
+                            logging.error(f"Constitution file not found for {agent_name} at {constitution_path}")
+                        except json.JSONDecodeError:
+                            logging.error(f"Failed to decode JSON from constitution file for {agent_name} at {constitution_path}")
+
+                    # Pass agent_config, constitution, and kernel to the agent
                     self.agents[agent_name] = agent_class(
-                        config=agent_config, kernel=self.sk_kernel
+                        config=agent_config,
+                        constitution=constitution,
+                        kernel=self.sk_kernel
                     )
-                    logging.info(f"Agent loaded: {agent_name} {'with' if self.sk_kernel else 'without'} SK Kernel instance.")
+                    logging.info(f"Agent loaded: {agent_name}")
                 else:
                     logging.warning(f"Agent class not found for: {agent_name}")
             except Exception as e:
-                logging.error(f"Failed to load agent {agent_name}: {e}")
+                logging.error(f"Failed to load agent {agent_name}: {e}", exc_info=True)
 
     def _get_agent_class(self, agent_name: str):
         """Retrieves the agent class based on its name."""
 
-        return AGENT_CLASSES.get(agent_name)
+        agent_entry = AGENT_CLASSES.get(agent_name)
+
+        # If the entry is already a class type, return it
+        if isinstance(agent_entry, type):
+            return agent_entry
+
+        # If it's a string, try to resolve it
+        if isinstance(agent_entry, str):
+            # Check if it's already imported and available in globals
+            if agent_name in globals():
+                return globals()[agent_name]
+
+            # Fallback to dynamic import
+            try:
+                module_path = agent_entry
+                module = importlib.import_module(module_path)
+
+                # Assume class name matches agent name
+                if hasattr(module, agent_name):
+                    return getattr(module, agent_name)
+
+            except Exception as e:
+                logging.error(f"Failed to dynamically load agent {agent_name}: {e}")
+
+        return None
 
     def get_agent(self, agent_name: str) -> Optional[AgentBase]:
         """Retrieves an agent by name."""
@@ -227,11 +300,26 @@ class AgentOrchestrator:
         agent = self.get_agent(agent_name)
         if agent:
             try:
-                agent.set_context(context)  # Set the MCP context
-                return agent.execute(**context)  # Pass context as kwargs
+                # Instead of direct execution, publish a message
+                # The message should contain the context and a reply-to topic
+                reply_topic = f"{agent_name}_results"
+                message = {
+                    "context": context,
+                    "reply_to": reply_topic
+                }
+                self.message_broker.publish(agent_name, json.dumps(message))
+
+                # For this example, we'll assume a synchronous response
+                # In a real-world scenario, you would have a separate process
+                # listening for responses.
+                # This is a simplified simulation of the async process.
+                # We'll need a mechanism to wait for the response.
+                # For now, let's just log that the message was published.
+                logging.info(f"Published task for {agent_name} to message broker.")
+                return None
             except Exception as e:
                 logging.exception(f"Error executing agent {agent_name}: {e}")
-                return None  # Or raise, depending on error handling policy
+                return None
         else:
             logging.error(f"Agent not found: {agent_name}")
             return None
@@ -246,8 +334,30 @@ class AgentOrchestrator:
 
         workflow = self.workflows.get(workflow_name)
         if not workflow:
-            logging.error(f"Unknown workflow: {workflow_name}")
-            return None
+            logging.info(f"Workflow '{workflow_name}' not found. Attempting dynamic workflow generation.")
+            # Attempt to generate a dynamic workflow
+            try:
+                # Prepare the input for the WorkflowCompositionSkill
+                available_skills = json.dumps(self.mcp_service_registry, indent=2)
+                user_query = initial_context.get("user_query", "")
+
+                # Run the Semantic Kernel skill
+                generated_workflow_str = await self.sk_kernel.run_async(
+                    self.sk_kernel.skills.get_function("WorkflowCompositionSkill", "compose"),
+                    input_vars={"input": user_query, "skills": available_skills}
+                )
+
+                # Parse and validate the generated workflow
+                workflow = yaml.safe_load(generated_workflow_str)
+                if not workflow or "agents" not in workflow or "dependencies" not in workflow:
+                    logging.error("Dynamic workflow generation failed: Invalid workflow format.")
+                    return None
+
+                logging.info(f"Dynamically generated workflow: {workflow}")
+
+            except Exception as e:
+                logging.error(f"Error during dynamic workflow generation: {e}")
+                return None
 
         results: Dict[str, Any] = {}
         execution_queue: deque[str] = deque(workflow["agents"])
@@ -398,6 +508,8 @@ class AgentOrchestrator:
             "fundamental": "FundamentalAnalystAgent",
             "technical": "TechnicalAnalystAgent",
             "risk_assessment": "RiskAssessmentAgent",
+            "behavioral_economics": "BehavioralEconomicsAgent",
+            "meta_cognitive": "MetaCognitiveAgent",
         }
 
         agent_name: Optional[str] = analysis_agents.get(analysis_type)

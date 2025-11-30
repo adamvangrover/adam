@@ -1,0 +1,120 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Agent Proposal Schema",
+  "description": "A standardized template for proposing the creation of a new agent within the Adam system.",
+  "type": "object",
+  "properties": {
+    "proposal_id": {
+      "description": "A unique identifier for the proposal, likely a UUID.",
+      "type": "string",
+      "format": "uuid"
+    },
+    "proposal_version": {
+      "description": "The version of the agent proposal schema being used.",
+      "type": "string",
+      "enum": ["1.0.0"]
+    },
+    "generated_by": {
+      "description": "The name of the system component or agent that generated this proposal.",
+      "type": "string",
+      "default": "Agent Forge"
+    },
+    "timestamp": {
+      "description": "The ISO 8601 timestamp of when the proposal was generated.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "gap_report_id": {
+      "description": "The unique identifier of the Capability Gap Report that triggered this proposal.",
+      "type": "string"
+    },
+    "agent_details": {
+      "description": "Core details of the proposed new agent.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The proposed name for the new agent.",
+          "type": "string",
+          "examples": ["Geospatial Data Analyst Agent"]
+        },
+        "role": {
+          "description": "A high-level, concise description of the agent's primary function and purpose.",
+          "type": "string"
+        },
+        "responsibilities": {
+          "description": "A list of specific tasks, functions, and duties the agent will be expected to perform.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "required_data_sources": {
+          "description": "A list of data sources the new agent will require access to in order to perform its role.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "description": "A human-readable name for the data source.",
+                "type": "string"
+              },
+              "type": {
+                "description": "The type of data source.",
+                "type": "string",
+                "enum": ["API", "Database", "File Stream", "Internal Knowledge Graph", "Other"]
+              },
+              "description": {
+                "description": "A brief description of the data source and why it is needed.",
+                "type": "string"
+              }
+            },
+            "required": ["name", "type", "description"]
+          }
+        },
+        "collaboration_protocols": {
+          "description": "A list defining how this new agent is expected to interact with existing agents.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "agent_name": {
+                "description": "The name of the existing agent to collaborate with.",
+                "type": "string"
+              },
+              "interaction_type": {
+                "description": "The nature of the interaction.",
+                "type": "string",
+                "enum": ["requests_data_from", "sends_data_to", "requests_analysis_from", "sends_analysis_to", "triggers_task_in"]
+              },
+              "description": {
+                "description": "A description of the data or analysis being exchanged.",
+                "type": "string"
+              }
+            },
+            "required": ["agent_name", "interaction_type", "description"]
+          }
+        }
+      },
+      "required": ["name", "role", "responsibilities"]
+    },
+    "estimated_impact": {
+      "description": "A qualitative or quantitative assessment of the expected benefits of creating this agent, such as improved accuracy, increased automation, or new analytical capabilities.",
+      "type": "string"
+    },
+    "status": {
+      "description": "The current status of the proposal in the review and deployment lifecycle.",
+      "type": "string",
+      "enum": ["pending_review", "approved", "rejected", "in_development", "deployed"],
+      "default": "pending_review"
+    }
+  },
+  "required": [
+    "proposal_id",
+    "proposal_version",
+    "generated_by",
+    "timestamp",
+    "gap_report_id",
+    "agent_details",
+    "status"
+  ]
+}

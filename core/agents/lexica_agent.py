@@ -41,7 +41,7 @@ class LexicaAgent:
         #... (implementation for web search using a search engine API)
         # This is a placeholder. The actual implementation would depend on the chosen search engine API.
         # Consider using the Google Search API or other search engines with API access.
-        results =
+        results = []
         # Example using requests library:
         url = f"https://www.googleapis.com/customsearch/v1?key=YOUR_API_KEY&cx=YOUR_SEARCH_ENGINE_ID&q={query}"
         response = requests.get(url)
@@ -59,7 +59,7 @@ class LexicaAgent:
         #... (implementation for fetching news articles using a news aggregator API)
         # This is a placeholder. The actual implementation would depend on the chosen news aggregator API.
         # Consider using the News API or other news aggregators with API access.
-        articles =
+        articles = []
         # Example using requests library:
         url = f"https://newsapi.org/v2/everything?q={query}&apiKey=YOUR_API_KEY"
         response = requests.get(url)

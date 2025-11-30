@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Underwriter's Digital Co-Pilot: An Interactive Framework</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: The SPA is designed with a top-down, thematic navigation structure (Overview, Transaction Anatomy, Decision Framework, Portfolio Context) to transform the linear report into an explorable dashboard. This allows users to either follow the logical flow or jump directly to their area of interest. The "Transaction Anatomy" section is the most interactive, using a chart and tabbed content to deconstruct the report's densest data. A new "Deal Simulator" powered by the Gemini API is added to the Decision Framework to make the concepts tangible. This non-linear, interactive approach was chosen to enhance user engagement and comprehension of complex financial concepts by breaking them into digestible, user-controlled modules. -->
+    <!-- Visualization & Content Choices:
+        - Report Info: Internal Risk Rating (IRR) Table -> Goal: Compare & Inform -> Viz: Interactive Bar Chart (Chart.js) -> Interaction: Clicking a bar reveals detailed data in a side panel. Justification: Visually represents the escalating risk scale more effectively than a static table, encouraging user exploration.
+        - Report Info: Product Types Table -> Goal: Compare -> Viz: Tabbed Content Panels (HTML/JS) -> Interaction: Clicking a product tab displays its unique risk profile. Justification: Simplifies comparison by focusing user attention on one product at a time, reducing cognitive load.
+        - Report Info: Decision Output Structure -> Goal: Organize & Inform -> Viz: Structured HTML/CSS Diagram -> Interaction: Hovering over elements reveals explanatory tooltips. Justification: Provides a clear visual map of the AI's output logic with on-demand detail.
+        - New Feature: Deal Simulator -> Goal: Demonstrate & Engage -> Viz: Interactive Form + Dynamic Output -> Interaction: User inputs deal parameters, clicks a button to call the Gemini API, and receives a fully-formed underwriting recommendation. Justification: Provides a live, practical demonstration of the AI assistant's capabilities.
+        - Library/Method: Chart.js for canvas-based charting, Vanilla JS for all interactions and content updates, Gemini API for AI-powered analysis. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+            color: #1e293b; /* slate-800 */
+        }
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active, .nav-link:hover {
+            color: #0f766e; /* teal-700 */
+            border-bottom-color: #0f766e; /* teal-700 */
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 450px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 450px;
+            }
+        }
+        .tab.active {
+            background-color: #0f766e; /* teal-700 */
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 250px;
+            background-color: #334155; /* slate-700 */
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -125px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            vertical-align: text-bottom;
+            border: 2px solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spin .75s linear infinite;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-sm sticky top-0 z-10 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl md:text-2xl font-bold text-slate-900">The Underwriter's Digital Co-Pilot</h1>
+                    <p class="text-sm text-slate-500 hidden sm:block">An Interactive Framework for AI-Augmented Decision-Making</p>
+                </div>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#overview" class="nav-link text-sm font-medium text-slate-600 pb-1 active">Overview</a>
+                    <a href="#anatomy" class="nav-link text-sm font-medium text-slate-600 pb-1">Transaction Anatomy</a>
+                    <a href="#decision" class="nav-link text-sm font-medium text-slate-600 pb-1">Decision Framework</a>
+                    <a href="#portfolio" class="nav-link text-sm font-medium text-slate-600 pb-1">Portfolio Context</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <nav class="md:hidden bg-white shadow-md sticky top-[73px] z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-around py-2">
+                <a href="#overview" class="nav-link text-xs font-medium text-slate-600 pb-1 active">Overview</a>
+                <a href="#anatomy" class="nav-link text-xs font-medium text-slate-600 pb-1">Anatomy</a>
+                <a href="#decision" class="nav-link text-xs font-medium text-slate-600 pb-1">Decision</a>
+                <a href="#portfolio" class="nav-link text-xs font-medium text-slate-600 pb-1">Portfolio</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+
+        <section id="overview" class="content-section active space-y-8">
+            <div class="bg-white p-6 md:p-8 rounded-lg shadow-sm">
+                <h2 class="text-2xl font-bold text-teal-800 mb-4">Introduction: The New Underwriting Paradigm</h2>
+                <div class="space-y-4 text-slate-700 leading-relaxed">
+                    <p>The discipline of underwriting in capital markets is undergoing a profound transformation. Historically perceived as a transaction-focused, often administrative, function centered on risk avoidance, its modern incarnation is evolving into a dynamic, portfolio-aware, and strategically vital component of a financial institution's value chain. This evolution is driven by the confluence of increasing market complexity, immense data volumes, and the advent of sophisticated analytical technologies. At the heart of this change is the potential for a new symbiosis between human expertise and artificial intelligence, a partnership designed not to replace the underwriter but to augment their capabilities.</p>
+                    <p>This interactive application deconstructs the analytical framework of a Global Portfolio Underwriter AI Assistant to provide a comprehensive examination of the underwriter's function in contemporary capital markets. Navigate through the sections to explore the core inputs of a transaction, the logic of an AI-assisted recommendation, and the critical context of portfolio management.</p>
+                </div>
+            </div>
+             <div class="bg-white p-6 md:p-8 rounded-lg shadow-sm">
+                <h2 class="text-2xl font-bold text-teal-800 mb-4">Conclusion: A Symbiosis of Human Expertise and AI Precision</h2>
+                <div class="space-y-4 text-slate-700 leading-relaxed">
+                    <p>This analytical framework does not herald the obsolescence of the human underwriter; rather, it redefines and elevates their role. The new division of labor leverages the distinct strengths of both human and machine. The AI assistant excels at structured, data-intensive tasks, freeing the human expert to focus on elements that remain uniquely human: assessing unquantifiable aspects of a deal, negotiating bespoke terms, exercising senior judgment, and managing client relationships.</p>
+                    <p>Frameworks of this nature represent the clear future of the underwriting profession. They offer a mature model for a symbiotic partnership that harnesses the AI's speed and consistency while amplifying the human expert's experience and strategic wisdom. This powerful combination will lead to underwriting decisions that are not only faster and more consistent but also smarter, more risk-aware, and more precisely aligned with an institution's long-term strategic goals.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="anatomy" class="content-section space-y-12">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-slate-900">The Anatomy of a Capital Markets Transaction</h2>
+                <p class="mt-2 max-w-2xl mx-auto text-lg text-slate-600">A robust underwriting decision is the culmination of a granular analysis across multiple, distinct pillars of risk. This section allows you to interactively explore these core inputs, from the nuances of financial products to the universal language of risk ratings.</p>
+            </div>
+
+            <div class="bg-white p-6 md:p-8 rounded-lg shadow-sm">
+                <h3 class="text-2xl font-bold text-teal-800 mb-2">Internal Risk Rating (IRR) Explorer</h3>
+                <p class="text-slate-600 mb-6">The IRR is the linchpin of credit risk management, distilling complex analysis into a single grade. Click on a bar in the chart below to explore the characteristics and institutional actions associated with each risk rating.</p>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                    <div class="lg:col-span-2">
+                        <div class="chart-container">
+                            <canvas id="irrChart"></canvas>
+                        </div>
+                    </div>
+                    <div id="irrDetails" class="bg-slate-50 p-4 rounded-lg border border-slate-200 h-full min-h-[450px]">
+                        <h4 class="font-bold text-lg text-slate-800 mb-2">Select a Rating</h4>
+                        <p class="text-slate-500">Click on a bar to see details.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 md:p-8 rounded-lg shadow-sm">
+                <h3 class="text-2xl font-bold text-teal-800 mb-2">Product & Counterparty Nuances</h3>
+                <p class="text-slate-600 mb-6">The nature, magnitude, and velocity of potential losses are dictated by the financial product itself. Select a product below to understand its unique risk profile and the key factors an underwriter must consider.</p>
+                <div class="flex flex-wrap gap-2 border-b border-slate-200 mb-4">
+                    <button class="tab py-2 px-4 rounded-t-lg text-sm font-medium text-slate-600 bg-slate-100 border border-b-0 border-slate-200 active" data-tab="swaps">Derivative Swaps</button>
+                    <button class="tab py-2 px-4 rounded-t-lg text-sm font-medium text-slate-600 bg-slate-100 border border-b-0 border-slate-200" data-tab="pb">Prime Brokerage</button>
+                    <button class="tab py-2 px-4 rounded-t-lg text-sm font-medium text-slate-600 bg-slate-100 border border-b-0 border-slate-200" data-tab="loans">Syndicated Loans</button>
+                </div>
+                <div id="product-content">
+                    <div id="swaps" class="tab-content active animate-fade-in">
+                        <h4 class="font-bold text-lg text-slate-800 mb-2">Derivative Swaps (Rates & Currencies)</h4>
+                        <p class="mb-4 text-slate-600">These are bilateral contracts to exchange future cash flows. Unlike exchange-traded instruments, the core risk is the failure of the other party to pay.</p>
+                        <ul class="space-y-3">
+                            <li class="flex items-start"><span class="font-semibold text-teal-700 w-40 flex-shrink-0">Primary Risk:</span><span class="text-slate-700"><strong>Counterparty Credit Risk</strong> - The risk that one party will default on its payment obligations.</span></li>
+                            <li class="flex items-start"><span class="font-semibold text-teal-700 w-40 flex-shrink-0">Key Metric:</span><span class="text-slate-700"><strong>Potential Future Exposure (PFE)</strong> - A statistical estimate of the maximum expected loss over the life of the trade.</span></li>
+                            <li class="flex items-start"><span class="font-semibold text-teal-700 w-40 flex-shrink-0">Key Mitigant:</span><span class="text-slate-700"><strong>Executed ISDA/CSA</strong> - Legal agreements that govern collateral posting and allow for close-out netting in a default.</span></li>
+                        </ul>
+                    </div>
+                    <div id="pb" class="tab-content animate-fade-in">
+                        <h4 class="font-bold text-lg text-slate-800 mb-2">Prime Brokerage (PB) Mandates</h4>
+                        <p class="mb-4 text-slate-600">This is a bundled suite of services (lending, clearing, custody) offered to sophisticated clients like hedge funds. The risk is holistic to the client's entire operation.</p>
+                        <ul class="space-y-3">
+                            <li class="flex items-start"><span class="font-semibold text-teal-700 w-40 flex-shrink-0">Primary Risk:</span><span class="text-slate-700"><strong>Leverage & Wrong-Way Risk</strong> - Risk amplified by client borrowing and the potential for collateral value to fall as default risk rises.</span></li>
+                            <li class="flex items-start"><span class="font-semibold text-teal-700 w-40 flex-shrink-0">Key Metric:</span><span class="text-slate-700"><strong>AUM & Gross Leverage</strong> - Assessing the size of the fund and the magnitude of its borrowing.</span></li>
+                             <li class="flex items-start"><span class="font-semibold text-teal-700 w-40 flex-shrink-0">Key Mitigant:</span><span class="text-slate-700"><strong>Prime Brokerage Agreement</strong> - A comprehensive legal contract governing the entire relationship, including margin requirements.</span></li>
+                        </ul>
+                    </div>
+                    <div id="loans" class="tab-content animate-fade-in">
+                        <h4 class="font-bold text-lg text-slate-800 mb-2">Syndicated & Commercial Loans</h4>
+                        <p class="mb-4 text-slate-600">This represents the traditional function of assessing a borrower's capacity to repay debt from its operational cash flows, often funded by a group (syndicate) of lenders.</p>
+                        <ul class="space-y-3">
+                            <li class="flex items-start"><span class="font-semibold text-teal-700 w-40 flex-shrink-0">Primary Risk:</span><span class="text-slate-700"><strong>Borrower Default Risk</strong> - The risk that the borrower cannot meet its debt obligations.</span></li>
+                            <li class="flex items-start"><span class="font-semibold text-teal-700 w-40 flex-shrink-0">Key Metric:</span><span class="text-slate-700"><strong>Debt Service Coverage Ratio (DSCR)</strong> - A measure of the cash flow available to pay current debt obligations.</span></li>
+                            <li class="flex items-start"><span class="font-semibold text-teal-700 w-40 flex-shrink-0">Key Mitigant:</span><span class="text-slate-700"><strong>Credit Agreement with Covenants</strong> - A legal contract that includes rules and restrictions (covenants) the borrower must adhere to.</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                 <div class="bg-white p-6 md:p-8 rounded-lg shadow-sm">
+                    <h3 class="text-2xl font-bold text-teal-800 mb-2">Collateral as the Backstop</h3>
+                     <p class="text-slate-600 mb-4">Collateral mitigates Loss Given Default (LGD) by providing a secondary source of repayment. Its effectiveness depends on its quality and liquidity.</p>
+                    <ul class="space-y-2">
+                        <li class="p-3 bg-green-50 border-l-4 border-green-500 rounded-r-md"><strong class="text-green-800">High Quality:</strong> Cash, Government Bonds. Stable value, instantly liquid.</li>
+                        <li class="p-3 bg-yellow-50 border-l-4 border-yellow-500 rounded-r-md"><strong class="text-yellow-800">Medium Quality:</strong> Listed Equities, Corporate Bonds. Liquid but with market risk.</li>
+                        <li class="p-3 bg-red-50 border-l-4 border-red-500 rounded-r-md"><strong class="text-red-800">Low Quality:</strong> Real Estate, Private Equity. Illiquid and hard to value.</li>
+                    </ul>
+                </div>
+                 <div class="bg-white p-6 md:p-8 rounded-lg shadow-sm">
+                    <h3 class="text-2xl font-bold text-teal-800 mb-2">Documentation as a Fortress</h3>
+                    <p class="text-slate-600 mb-4">Legal agreements determine an institution's rights in a default. The status of documentation is a critical signal of legal certainty.</p>
+                    <ul class="space-y-2">
+                        <li class="p-3 bg-green-50 border-l-4 border-green-500 rounded-r-md"><strong class="text-green-800">Strongest:</strong> Executed ISDA/CSA, enabling close-out netting.</li>
+                        <li class="p-3 bg-yellow-50 border-l-4 border-yellow-500 rounded-r-md"><strong class="text-yellow-800">Developing:</strong> Draft Term Sheet, indicating progress but no binding terms.</li>
+                        <li class="p-3 bg-red-50 border-l-4 border-red-500 rounded-r-md"><strong class="text-red-800">Weakest:</strong> Unsecured, relying solely on the counterparty's creditworthiness.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="decision" class="content-section space-y-12">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-slate-900">The Logic of the Recommendation</h2>
+                <p class="mt-2 max-w-2xl mx-auto text-lg text-slate-600">The AI assistant's output is not an opaque prediction but a transparent, logical, and defensible argument. This structure allows a human underwriter to rapidly assimilate the core logic, critically evaluate the evidence, and own the final decision.</p>
+            </div>
+
+            <div class="bg-white p-6 md:p-8 rounded-lg shadow-sm">
+                <h3 class="text-2xl font-bold text-teal-800 mb-6 text-center">AI Output Framework</h3>
+                <div class="space-y-6">
+                    <div class="text-center">
+                        <div class="inline-block bg-teal-600 text-white font-bold py-2 px-6 rounded-full shadow">
+                            1. Recommendation
+                        </div>
+                        <p class="mt-2 text-slate-600">The verdict: <span class="font-semibold">Approve</span>, <span class="font-semibold">Decline</span>, or <span class="font-semibold">Refer to Committee</span> for exceptions requiring senior oversight.</p>
+                    </div>
+
+                    <div class="text-center">
+                        <div class="inline-block bg-teal-600 text-white font-bold py-2 px-6 rounded-full shadow">
+                            2. Confidence Level [0-100]
+                        </div>
+                        <p class="mt-2 text-slate-600">A score reflecting how cleanly the data aligns with underwriting criteria, not a probability of success. A low score is a "yellow flag" for human review.</p>
+                    </div>
+
+                    <div>
+                        <div class="text-center mb-4">
+                             <div class="inline-block bg-teal-600 text-white font-bold py-2 px-6 rounded-full shadow">
+                                3. Justification & Rationale
+                            </div>
+                        </div>
+                        <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                            <div class="bg-slate-50 p-4 rounded-lg border">
+                                <h4 class="font-bold text-slate-800">Summary Statement</h4>
+                                <p class="text-sm text-slate-600">A single sentence declaring the primary reason for the recommendation.</p>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-lg border">
+                                <h4 class="font-bold text-slate-800">Supporting Factors</h4>
+                                <p class="text-sm text-slate-600">Bullet points directly referencing specific inputs (e.g., IRR, LTV) to support the decision.</p>
+                            </div>
+                             <div class="bg-slate-50 p-4 rounded-lg border">
+                                <h4 class="font-bold text-slate-800">Link to Risk Pillars</h4>
+                                <p class="text-sm text-slate-600">Explicitly connects the decision to the quality of the IRR, Collateral, and Documentation.</p>
+                            </div>
+                            <div class="bg-slate-50 p-4 rounded-lg border border-amber-400">
+                                <h4 class="font-bold text-slate-800">Contradictory Factors & Mitigants</h4>
+                                <p class="text-sm text-slate-600">The most sophisticated step: acknowledging factors that argue *against* the recommendation and assessing how they are mitigated.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gemini API Deal Simulator -->
+            <div id="deal-simulator" class="bg-white p-6 md:p-8 rounded-lg shadow-sm border-t-4 border-teal-600">
+                <h3 class="text-2xl font-bold text-teal-800 mb-2">✨ AI Deal Simulator</h3>
+                <p class="text-slate-600 mb-6">Experience the AI underwriter in action. Input the parameters for a hypothetical transaction below and click "Generate Analysis" to receive a real-time recommendation and rationale from the Gemini API.</p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div id="simulator-form" class="space-y-4">
+                        <div>
+                            <label for="clientName" class="block text-sm font-medium text-slate-700">Client / Counterparty</label>
+                            <input type="text" id="clientName" value="Apex Holdings Inc." class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="productType" class="block text-sm font-medium text-slate-700">Product Type</label>
+                            <select id="productType" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm">
+                                <option>Interest Rate Swap</option>
+                                <option>Prime Brokerage Mandate</option>
+                                <option selected>Syndicated Loan</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="notionalAmount" class="block text-sm font-medium text-slate-700">Notional / Loan Amount (USD)</label>
+                            <input type="number" id="notionalAmount" value="50000000" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="riskRating" class="block text-sm font-medium text-slate-700">Internal Risk Rating (IRR)</label>
+                            <select id="riskRating" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm">
+                                <option value="RR-1">RR-1 (Exceptional)</option>
+                                <option value="RR-2">RR-2 (Excellent)</option>
+                                <option value="RR-3">RR-3 (Good)</option>
+                                <option value="RR-4" selected>RR-4 (Satisfactory)</option>
+                                <option value="RR-5">RR-5 (Acceptable)</option>
+                                <option value="RR-6">RR-6 (Acceptable w/ Monitoring)</option>
+                                <option value="RR-7">RR-7 (Watchlist)</option>
+                                <option value="RR-8">RR-8 (Special Mention)</option>
+                                <option value="RR-9">RR-9 (Substandard)</option>
+                                <option value="RR-10">RR-10 (Loss)</option>
+                            </select>
+                        </div>
+                        <button id="generate-analysis-btn" class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition">
+                            Generate Analysis
+                        </button>
+                    </div>
+                    <div id="analysis-output" class="bg-slate-50 p-4 rounded-lg border border-slate-200 min-h-[300px] overflow-y-auto">
+                         <p class="text-slate-500 text-center mt-8">AI analysis will appear here.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="portfolio" class="content-section space-y-12">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-slate-900">The Portfolio Imperative</h2>
+                <p class="mt-2 max-w-2xl mx-auto text-lg text-slate-600">A financial transaction does not exist in a vacuum. This section explores how each deal is evaluated against the broader context of portfolio risk and institutional strategy, elevating the underwriter from a gatekeeper to a strategic driver of value.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 md:p-8 rounded-lg shadow-sm">
+                    <h3 class="text-2xl font-bold text-teal-800 mb-4">Concentration Risk Management</h3>
+                    <div class="space-y-4 text-slate-700 leading-relaxed">
+                        <p>This is the potential for a single event to cause catastrophic losses due to over-exposure to one area. Effective management of concentration is a fundamental tenet of prudent banking.</p>
+                        <p>The underwriting process must assess a deal's marginal impact on established limits, which are set for:</p>
+                        <ul class="list-disc list-inside space-y-1 pl-2">
+                            <li>Single Counterparties</li>
+                            <li>Specific Industries (e.g., Commercial Real Estate)</li>
+                            <li>Geographic Regions</li>
+                            <li>Collateral Types</li>
+                        </ul>
+                        <p>A deal may be declined not because of its own poor quality, but because it would push the portfolio's exposure over a prudential limit.</p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 md:p-8 rounded-lg shadow-sm">
+                    <h3 class="text-2xl font-bold text-teal-800 mb-4">The Strategic Mandate</h3>
+                    <div class="space-y-4 text-slate-700 leading-relaxed">
+                        <p>Underwriting decisions are a powerful tool for executing long-term business strategy. The "Strategic Mandate" is a qualitative overlay that guides decisions beyond a pure analysis of risk and return.</p>
+                        <p>This mandate reflects senior management's high-level objectives:</p>
+                        <ul class="list-disc list-inside space-y-1 pl-2">
+                            <li class="text-green-700"><strong>Growth Example:</strong> "Grow market share in APAC FX derivatives." A deal supporting this may be approved on slightly more favorable terms.</li>
+                            <li class="text-red-700"><strong>Reduction Example:</strong> "Reduce exposure to cyclical industries." A loan in such an industry might be declined even if its metrics are acceptable.</li>
+                        </ul>
+                        <p>This ensures the bank's most precious resource—its risk-bearing capacity—is deployed in the most strategically advantageous way.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+
+            function updateActiveNav(targetId) {
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.getAttribute('href') === `#${targetId}`);
+                });
+            }
+
+            function updateActiveSection(targetId) {
+                contentSections.forEach(section => {
+                    section.classList.toggle('active', section.id === targetId);
+                });
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href').substring(1);
+                    updateActiveNav(targetId);
+                    updateActiveSection(targetId);
+                    // Do not change window.location.hash to avoid jumping
+                });
+            });
+
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                updateActiveNav(hash);
+                updateActiveSection(hash);
+            }
+
+            const irrData = [
+                { grade: 'RR-1', desc: 'Exceptional / Near Risk-Free', pd: '<0.02%', action: 'Actively seek; core appetite; premium pricing', color: '#10b981' },
+                { grade: 'RR-2', desc: 'Excellent Quality', pd: '0.02% - 0.10%', action: 'Actively seek; core appetite', color: '#34d399' },
+                { grade: 'RR-3', desc: 'Good Quality', pd: '0.10% - 0.25%', action: 'Standard business; core appetite', color: '#6ee7b7' },
+                { grade: 'RR-4', desc: 'Satisfactory Quality', pd: '0.25% - 0.75%', action: 'Standard business; acceptable risk', color: '#a7f3d0' },
+                { grade: 'RR-5', desc: 'Acceptable / Standard Risk', pd: '0.75% - 1.50%', action: 'Standard underwriting; monitor closely', color: '#fcd34d' },
+                { grade: 'RR-6', desc: 'Acceptable with Monitoring', pd: '1.50% - 3.00%', action: 'Requires enhanced monitoring/covenants', color: '#fbbf24' },
+                { grade: 'RR-7', desc: 'Watchlist / Potential Weakness', pd: '3.00% - 7.50%', action: 'Limit new exposure; increase monitoring', color: '#f59e0b' },
+                { grade: 'RR-8', desc: 'Special Mention', pd: '7.50% - 15.00%', action: 'No new exposure; develop exit/remediation plan', color: '#f97316' },
+                { grade: 'RR-9', desc: 'Substandard / Default Imminent', pd: '15.00% - 50.00%', action: 'Workout/restructuring; provision required', color: '#ef4444' },
+                { grade: 'RR-10', desc: 'Loss / Default', pd: '100%', action: 'Charge-off; recovery efforts', color: '#dc2626' },
+            ];
+
+            const irrDetailsContainer = document.getElementById('irrDetails');
+            const ctx = document.getElementById('irrChart').getContext('2d');
+            let irrChart;
+
+            function renderIrrChart() {
+                if (irrChart) {
+                    irrChart.destroy();
+                }
+                irrChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: irrData.map(d => d.grade),
+                        datasets: [{
+                            label: 'Risk Level',
+                            data: irrData.map((_, i) => (i + 1) * 10),
+                            backgroundColor: irrData.map(d => d.color),
+                            borderColor: irrData.map(d => d.color),
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                enabled: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                display: false
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        onClick: (event, elements) => {
+                            if (elements.length > 0) {
+                                const index = elements[0].index;
+                                const data = irrData[index];
+                                irrDetailsContainer.innerHTML = `
+                                    <h4 class="font-bold text-lg text-slate-800 mb-2">${data.grade}: ${data.desc}</h4>
+                                    <div class="space-y-3 text-sm">
+                                        <p><strong class="text-slate-600 block">Illustrative 1-Year PD:</strong> <span class="text-slate-800 font-mono">${data.pd}</span></p>
+                                        <p><strong class="text-slate-600 block">Institutional Action:</strong> <span class="text-slate-800">${data.action}</span></p>
+                                    </div>
+                                `;
+                            }
+                        }
+                    }
+                });
+            }
+
+            renderIrrChart();
+
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const targetId = this.dataset.tab;
+
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+
+                    tabContents.forEach(content => {
+                        content.classList.toggle('active', content.id === targetId);
+                    });
+                });
+            });
+
+            // Gemini API Integration
+            const generateBtn = document.getElementById('generate-analysis-btn');
+            const analysisOutput = document.getElementById('analysis-output');
+
+            generateBtn.addEventListener('click', async () => {
+                const clientName = document.getElementById('clientName').value;
+                const productType = document.getElementById('productType').value;
+                const notionalAmount = document.getElementById('notionalAmount').value;
+                const riskRating = document.getElementById('riskRating').value;
+
+                const prompt = `
+                    Persona: You are a Global Portfolio Underwriter AI Assistant. Your function is to analyze complex financial transactions and provide a data-driven recommendation to a human decision-maker. You are an expert in derivative swaps, trading, prime brokerage, and capital markets lending.
+
+                    Core Directive: Your analysis must be direct, precise, and concise. Deliver a clear decision, a quantifiable confidence level, and a justification that fully supports your conclusion.
+
+                    Inputs:
+                    Transaction Details:
+                    Client/Counterparty: ${clientName}
+                    Product Type: ${productType}
+                    Notional/Loan Amount: USD ${parseInt(notionalAmount).toLocaleString()}
+                    Tenor/Maturity: 5Y (Assumed)
+                    Key Terms: Standard market terms for this product type.
+
+                    Risk Assessment:
+                    Internal Risk Rating (IRR): ${riskRating}
+
+                    Collateral / Security:
+                    Type: Assume standard collateral for this product and risk rating.
+                    Value (LTV/Loan-to-Value): Assume standard LTV.
+                    Quality: Assume standard quality.
+
+                    Documentation Status: Assume fully executed and appropriate for the transaction.
+
+                    Portfolio & Appetite Context:
+                    Sector/Industry Concentration: Within Limits
+                    Country/Region Exposure: Within Limits
+                    Strategic Mandate: Neutral
+
+                    Required Output:
+                    Your response must follow this structure exactly, with each item on a new line.
+                    1. Recommendation: [Approve / Decline / Refer to Committee]
+                    2. Confidence Level: [0-100]
+                    3. Justification & Rationale:
+                    (Summary Statement): A single sentence declaring the primary reason for the recommendation.
+                    (Supporting Factors):
+                    - Bullet point 1
+                    - Bullet point 2
+                    Link to Risk Rating: How does the IRR align with our appetite for this product?
+                    Link to Collateral: Is the collateral sufficient, high-quality, and liquid enough to mitigate the risk?
+                    Link to Documentation: Does the documentation status provide adequate legal protection?
+                    (Contradictory Factors & Mitigants):
+                    - Bullet point 1
+                    (Portfolio Impact): A brief statement on how this transaction aligns with our strategic mandate and concentration limits.
+                `;
+
+                generateBtn.disabled = true;
+                generateBtn.innerHTML = `<span class="spinner mr-2"></span> Analyzing...`;
+                analysisOutput.innerHTML = `<p class="text-slate-500 text-center mt-8">Contacting AI assistant... Please wait.</p>`;
+
+                try {
+                    let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+                    const payload = { contents: chatHistory };
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API request failed with status ${response.status}`);
+                    }
+
+                    const result = await response.json();
+
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        renderAnalysis(text, analysisOutput);
+                    } else {
+                        throw new Error("Invalid response structure from API.");
+                    }
+
+                } catch (error) {
+                    analysisOutput.innerHTML = `<p class="text-red-500 text-center mt-8">An error occurred while generating the analysis. Please try again. <br><small>${error.message}</small></p>`;
+                } finally {
+                    generateBtn.disabled = false;
+                    generateBtn.innerHTML = `Generate Analysis`;
+                }
+            });
+
+            function getRecommendationClass(rec) {
+                if (!rec) return 'text-slate-800';
+                const lowerRec = rec.toLowerCase();
+                if (lowerRec.includes('approve')) return 'text-green-600';
+                if (lowerRec.includes('decline')) return 'text-red-600';
+                if (lowerRec.includes('refer')) return 'text-amber-600';
+                return 'text-slate-800';
+            }
+
+            function renderAnalysis(text, container) {
+                container.innerHTML = '';
+                const lines = text.split('\n').filter(line => line.trim() !== '');
+                let currentList = null;
+
+                lines.forEach(line => {
+                    const trimmedLine = line.trim();
+                    if (trimmedLine.startsWith('1. Recommendation:')) {
+                        const content = trimmedLine.replace('1. Recommendation:', '').trim();
+                        const p = document.createElement('p');
+                        p.className = 'mb-2';
+                        p.innerHTML = `<strong class="text-lg text-slate-800">Recommendation:</strong> <span class="text-lg font-semibold ${getRecommendationClass(content)}">${content}</span>`;
+                        container.appendChild(p);
+                        currentList = null;
+                    } else if (trimmedLine.startsWith('2. Confidence Level:')) {
+                        const content = trimmedLine.replace('2. Confidence Level:', '').trim();
+                        const p = document.createElement('p');
+                        p.className = 'mb-4';
+                        p.innerHTML = `<strong class="text-lg text-slate-800">Confidence Level:</strong> <span class="text-lg font-semibold text-teal-700">${content}</span>`;
+                        container.appendChild(p);
+                        currentList = null;
+                    } else if (trimmedLine.startsWith('3. Justification & Rationale:')) {
+                        const h3 = document.createElement('h3');
+                        h3.className = 'text-xl font-bold text-teal-800 mt-4 mb-2 border-t pt-4';
+                        h3.textContent = 'Justification & Rationale';
+                        container.appendChild(h3);
+                        currentList = null;
+                    } else if (trimmedLine.startsWith('(Summary Statement):')) {
+                        const content = trimmedLine.replace('(Summary Statement):', '').trim();
+                        const p = document.createElement('p');
+                        p.innerHTML = `<strong class="text-slate-700">Summary:</strong> ${content}`;
+                        p.className = 'italic text-slate-600 mb-4';
+                        container.appendChild(p);
+                        currentList = null;
+                    } else if (trimmedLine.match(/^\(.*\):$/) || trimmedLine.startsWith('Link to')) {
+                        const h4 = document.createElement('h4');
+                        h4.className = 'font-semibold text-slate-800 mt-3 mb-1';
+                        h4.textContent = trimmedLine.replace(':', '').replace(/\(.*\)/, '').trim();
+                        container.appendChild(h4);
+                        currentList = document.createElement('ul');
+                        container.appendChild(currentList);
+                    } else if (trimmedLine.startsWith('-') || trimmedLine.startsWith('*')) {
+                        if (!currentList) {
+                            currentList = document.createElement('ul');
+                            container.appendChild(currentList);
+                        }
+                        const content = trimmedLine.substring(1).trim();
+                        const li = document.createElement('li');
+                        li.className = 'text-slate-700 ml-5 list-disc text-sm';
+                        li.innerHTML = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                        currentList.appendChild(li);
+                    } else {
+                        const p = document.createElement('p');
+                        p.className = 'text-slate-700 text-sm';
+                        p.textContent = trimmedLine;
+                        container.appendChild(p);
+                        currentList = null;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
