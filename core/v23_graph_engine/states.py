@@ -1,5 +1,6 @@
 from typing import TypedDict, List, Optional, Annotated, Dict, Any, Literal
 import operator
+from datetime import datetime
 
 class ResearchArtifact(TypedDict):
     title: str
@@ -253,7 +254,8 @@ class OmniscientState(TypedDict):
     """
     State for the v23.5 'AI Partner' Omniscient Workflow.
     """
-    v23_omniscient_knowledge_graph: OmniscientKnowledgeGraph
+    ticker: str # Input
+    v23_knowledge_graph: OmniscientKnowledgeGraph # Output
     human_readable_status: str
 
 # --- Initializers ---
@@ -371,4 +373,28 @@ def init_reflector_state(content: str, context: Dict = None) -> ReflectorState:
         "refined_content": None,
         "iteration_count": 0,
         "human_readable_status": "Initializing Reflection..."
+    }
+
+def init_omniscient_state(ticker: str) -> OmniscientState:
+    empty_nodes: OmniscientNodes = {
+        "entity_ecosystem": {},
+        "equity_analysis": {},
+        "credit_analysis": {},
+        "simulation_engine": {},
+        "strategic_synthesis": {}
+    }
+
+    empty_meta: OmniscientMeta = {
+        "target": ticker,
+        "generated_at": datetime.now().isoformat(),
+        "model_version": "Adam-v23.5"
+    }
+
+    return {
+        "ticker": ticker,
+        "v23_knowledge_graph": {
+            "meta": empty_meta,
+            "nodes": empty_nodes
+        },
+        "human_readable_status": "Initializing AI Partner Deep Dive..."
     }

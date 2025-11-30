@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v23.5 | Deep Dive Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/mock_data.js"></script>
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; }
+        .phase-card { background: #1e293b; border: 1px solid #334155; padding: 1.5rem; border-radius: 0.5rem; }
+        .phase-title { font-size: 1.25rem; font-weight: 700; color: #60a5fa; margin-bottom: 1rem; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; }
+        .data-label { color: #94a3b8; font-size: 0.875rem; }
+        .data-value { color: #f8fafc; font-weight: 600; }
+        .rating-badge { padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; }
+        .rating-pass { background: #064e3b; color: #34d399; }
+        .rating-fail { background: #7f1d1d; color: #fca5a5; }
+    </style>
+</head>
+<body class="p-8">
+    <header class="mb-8 flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-blue-500">ADAM v23.5 AI Partner</h1>
+            <p class="text-gray-400">Deep Dive Analysis Protocol</p>
+        </div>
+        <div id="target-header" class="text-right">
+            <!-- Injected -->
+        </div>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <!-- Phase 1 -->
+        <div class="phase-card">
+            <h2 class="phase-title">Phase 1: Entity & Ecosystem</h2>
+            <div id="phase1-content" class="space-y-3"></div>
+        </div>
+
+        <!-- Phase 2 -->
+        <div class="phase-card">
+            <h2 class="phase-title">Phase 2: Valuation</h2>
+            <div id="phase2-content" class="space-y-3"></div>
+        </div>
+
+        <!-- Phase 3 -->
+        <div class="phase-card">
+            <h2 class="phase-title">Phase 3: Credit & SNC</h2>
+            <div id="phase3-content" class="space-y-3"></div>
+        </div>
+
+        <!-- Phase 4 -->
+        <div class="phase-card">
+            <h2 class="phase-title">Phase 4: Risk Simulation</h2>
+            <div id="phase4-content" class="space-y-3"></div>
+        </div>
+
+        <!-- Phase 5 -->
+        <div class="phase-card col-span-1 md:col-span-2 lg:col-span-2 border-l-4 border-l-green-500">
+            <h2 class="phase-title text-green-400">Phase 5: Strategic Synthesis</h2>
+            <div id="phase5-content" class="grid grid-cols-2 gap-4"></div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const data = window.MOCK_DATA.deep_dive_sample.v23_knowledge_graph;
+            const nodes = data.nodes;
+            const meta = data.meta;
+
+            // Header
+            document.getElementById('target-header').innerHTML = `
+                <h2 class="text-2xl font-bold">${meta.target}</h2>
+                <p class="text-sm text-gray-500">${new Date(meta.generated_at).toLocaleString()}</p>
+            `;
+
+            // Phase 1
+            const p1 = nodes.entity_ecosystem;
+            document.getElementById('phase1-content').innerHTML = `
+                <div><span class="data-label">Legal Name:</span> <div class="data-value">${p1.legal_entity.name}</div></div>
+                <div><span class="data-label">Moat Status:</span> <div class="data-value text-yellow-400">${p1.competitive_positioning.moat_status}</div></div>
+                <div><span class="data-label">Capital Allocation:</span> <div class="data-value">${p1.management_assessment.capital_allocation_score}/10</div></div>
+                <div class="text-xs text-gray-500 mt-2">${p1.management_assessment.alignment_analysis}</div>
+            `;
+
+            // Phase 2
+            const p2 = nodes.equity_analysis.valuation_engine;
+            document.getElementById('phase2-content').innerHTML = `
+                <div class="flex justify-between">
+                    <div><span class="data-label">Intrinsic Value:</span> <div class="data-value text-xl">$${p2.dcf_model.intrinsic_share_price}</div></div>
+                    <div><span class="data-label">Upside:</span> <div class="data-value text-green-400">+15%</div></div>
+                </div>
+                <div class="mt-2"><span class="data-label">Method:</span> <span class="text-xs bg-blue-900 px-2 py-1 rounded">DCF</span> <span class="text-xs bg-blue-900 px-2 py-1 rounded">Multiples</span></div>
+                <div class="mt-2 text-sm">
+                    <span class="data-label">Bear:</span> $${p2.price_targets.bear_case} |
+                    <span class="data-label">Base:</span> $${p2.price_targets.base_case} |
+                    <span class="data-label">Bull:</span> $${p2.price_targets.bull_case}
+                </div>
+            `;
+
+            // Phase 3
+            const p3 = nodes.credit_analysis.snc_rating_model;
+            document.getElementById('phase3-content').innerHTML = `
+                <div><span class="data-label">SNC Rating:</span> <span class="rating-badge rating-pass">${p3.overall_borrower_rating}</span></div>
+                <div class="mt-2 text-sm">
+                    ${p3.facilities.map(f => `<div>• ${f.id} (${f.amount}): ${f.regulatory_rating}</div>`).join('')}
+                </div>
+                <div class="mt-2"><span class="data-label">CDS Implied:</span> <div class="data-value">${nodes.credit_analysis.cds_market_implied_rating}</div></div>
+            `;
+
+            // Phase 4
+            const p4 = nodes.simulation_engine;
+            document.getElementById('phase4-content').innerHTML = `
+                <div><span class="data-label">Monte Carlo PD:</span> <div class="data-value">${(p4.monte_carlo_default_prob * 100).toFixed(2)}%</div></div>
+                <div class="mt-2"><span class="data-label">Quantum Tail Scenarios:</span></div>
+                <ul class="list-disc list-inside text-xs text-gray-400">
+                    ${p4.quantum_scenarios.map(s => `<li>${s.name} (EV: ${s.estimated_impact_ev})</li>`).join('')}
+                </ul>
+            `;
+
+            // Phase 5
+            const p5 = nodes.strategic_synthesis;
+            document.getElementById('phase5-content').innerHTML = `
+                <div>
+                    <span class="data-label">Final Verdict:</span>
+                    <div class="text-3xl font-bold text-green-500 my-1">${p5.final_verdict.recommendation}</div>
+                    <div class="text-sm">Conviction: ${p5.final_verdict.conviction_level}/10</div>
+                </div>
+                <div>
+                    <span class="data-label">M&A Posture:</span>
+                    <div class="data-value text-purple-400">${p5.m_and_a_posture}</div>
+                </div>
+                <div class="col-span-2 mt-2">
+                    <div class="p-2 bg-slate-800 rounded italic text-gray-300 text-sm">
+                        "${p5.final_verdict.rationale_summary}"
+                    </div>
+                </div>
+            `;
+        });
+    </script>
+</body>
+</html>
