@@ -17,15 +17,10 @@ Key Components:
   FIBO and PROV-O simultaneously, creating a fully verifiable reasoning chain.
 """
 
-"""
-Agent Notes (Meta-Commentary):
-This module manages the integration of FIBO and PROV-O ontologies.
-It currently uses an in-memory NetworkX graph to simulate the Neo4j database
-for the v23.0 scaffolding phase, enabling valid path discovery without external infra.
-"""
-
 import networkx as nx
 import logging
+import json
+import os
 from typing import List, Dict, Any, Optional
 
 # Configure logging
@@ -40,6 +35,7 @@ class UnifiedKnowledgeGraph:
         self.graph = nx.DiGraph()
         self._ingest_fibo_ontology()
         self._ingest_provenance_data()
+        self._ingest_seed_data()
         
     def _ingest_fibo_ontology(self):
         """
@@ -93,7 +89,7 @@ class UnifiedKnowledgeGraph:
             ("AnalystUpgrade", "boosts", "Sentiment"),
             ("AnalystDowngrade", "dampens", "Sentiment"),
 
-            # Domain specific instances (for the planner to find)
+            # Domain specific instances (legacy fallback)
             ("Apple Inc.", "is_a", "Company"),
             ("Apple Inc.", "belongs_to", "TechnologySector"),
             ("TechnologySector", "is_a", "MarketSector"),
@@ -116,6 +112,110 @@ class UnifiedKnowledgeGraph:
         self.graph.add_node("AAPL Stock", prov_source="Bloomberg", prov_time="2023-10-27")
         self.graph.add_node("Fed Rate Hike", prov_source="Federal Reserve API", prov_time="2023-11-01")
         self.graph.add_node("GDPR", prov_source="EU Law Database", prov_time="2018-05-25")
+
+    def _ingest_seed_data(self):
+        """
+        Ingests data from data/v23_ukg_seed.json to populate the graph dynamically.
+        """
+        filepath = "data/v23_ukg_seed.json"
+        if not os.path.exists(filepath):
+            logger.warning(f"Seed data not found at {filepath}")
+            return
+
+        try:
+            logger.info(f"Ingesting seed data from {filepath}...")
+            with open(filepath, 'r') as f:
+                data = json.load(f)
+
+            ukg_root = data.get("v23_unified_knowledge_graph", {})
+            nodes_data = ukg_root.get("nodes", {})
+
+            lei_to_name = {}
+            node_id_to_name = {}
+
+            # 1. Legal Entities
+            for entity in nodes_data.get("legal_entities", []):
+                name = entity.get("legal_name")
+                lei = entity.get("lei_code")
+                nid = entity.get("node_id")
+
+                if name:
+                    if lei:
+                        lei_to_name[lei] = name
+                    if nid:
+                        node_id_to_name[nid] = name
+
+                    # Add Node with all metadata
+                    self.graph.add_node(name, **entity, type="LegalEntity")
+                    self.graph.add_edge(name, "Company", relation="is_a", type="fibo")
+
+                    # Link to Sector
+                    sector = entity.get("sector")
+                    if sector:
+                        self.graph.add_edge(name, sector, relation="belongs_to", type="fibo")
+                        if sector not in self.graph:
+                            self.graph.add_edge(sector, "MarketSector", relation="is_a", type="fibo")
+
+            # 2. Supply Chain Relations
+            for rel in nodes_data.get("supply_chain_relations", []):
+                src = lei_to_name.get(rel.get("source_lei"))
+                tgt = lei_to_name.get(rel.get("target_lei"))
+                if src and tgt:
+                    self.graph.add_edge(src, tgt,
+                                      relation=rel.get("relationship_type", "connected_to"),
+                                      type="supply_chain",
+                                      criticality=rel.get("criticality_score"),
+                                      desc=rel.get("dependency_description"))
+
+            # 3. Macro Indicators
+            for macro in nodes_data.get("macro_indicators", []):
+                name = macro.get("name")
+                if name:
+                    self.graph.add_node(name, **macro, type="MacroIndicator")
+                    impacts = macro.get("impact_map", {})
+                    for sector, impact_type in impacts.items():
+                        if sector not in self.graph:
+                             self.graph.add_edge(sector, "MarketSector", relation="is_a", type="fibo")
+
+                        self.graph.add_edge(name, sector,
+                                          relation="impacts",
+                                          impact_type=impact_type,
+                                          type="macro_impact")
+
+            # 4. Crisis Scenarios
+            sim_params = ukg_root.get("simulation_parameters", {})
+            for scenario in sim_params.get("crisis_scenarios", []):
+                name = scenario.get("name")
+                if name:
+                    # Avoid conflict with 'type' kwarg
+                    scenario_attrs = scenario.copy()
+                    if 'type' in scenario_attrs:
+                        scenario_attrs['scenario_type'] = scenario_attrs.pop('type')
+
+                    self.graph.add_node(name, **scenario_attrs, type="CrisisScenario")
+                    # Link to affected nodes if explicitly listed
+                    for affected_id in scenario.get("affected_nodes", []):
+                        target_name = node_id_to_name.get(affected_id)
+                        if target_name:
+                             self.graph.add_edge(name, target_name, relation="affects", type="scenario_impact")
+
+            # 5. Regulatory Rules
+            reg_rules = ukg_root.get("regulatory_rules", {})
+            for framework, rules in reg_rules.items():
+                framework_node = f"Framework: {framework.upper()}"
+                self.graph.add_node(framework_node, type="RegulatoryFramework")
+
+                for rule in rules:
+                    rule_name = rule.get("name")
+                    if rule_name:
+                        self.graph.add_node(rule_name, **rule, type="Regulation")
+                        self.graph.add_edge(framework_node, rule_name, relation="contains", type="regulatory_structure")
+                        self.graph.add_edge(rule_name, "Company", relation="applies_to", type="regulatory_scope")
+
+            logger.info("Seed data ingestion complete.")
+
+        except Exception as e:
+            logger.error(f"Failed to ingest seed data: {e}", exc_info=True)
 
     def find_symbolic_path(self, start_concept: str, end_concept: str) -> Optional[List[Dict[str, str]]]:
         """

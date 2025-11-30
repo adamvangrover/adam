@@ -108,6 +108,16 @@ Key Graph Engines:
 
 The `MetaOrchestrator` is the unified entry point for all execution models, including v21 (synchronous), v22 (asynchronous), and v23 (graph-based). For the complete vision and technical specifications, please refer to the official `docs/v23_architecture_vision.md` mandate.
 
+### Adam v23.5 "AI Partner" Upgrade
+
+The v23.5 upgrade expands the system scope to a full-spectrum "Autonomous Financial Analyst", incorporating:
+*   **Deep Credit:** SNC ratings and covenant analysis.
+*   **Valuation:** DCF and multiples analysis.
+*   **Risk:** Monte Carlo and Quantum scenarios.
+*   **Strategic Synthesis:** M&A and conviction levels.
+
+This upgrade is defined by the "Hyper-Dimensional Knowledge Graph" (HDKG) output schema and a new "Deep Dive" execution protocol. The system prompt is available in `config/Adam_v23.5_Portable_Config.json` and `prompt_library/Adam_v23.5_System_Prompt.md`.
+
 ## Getting Started
 
 To get started, please familiarize yourself with the following:
