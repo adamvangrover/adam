@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM System | Prompt as Code</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="h-screen flex flex-col grid-bg text-slate-200">
+    <div class="scan-line"></div>
+    <!-- Nav via nav.js -->
+
+    <main class="flex-1 p-8 overflow-y-auto grid grid-cols-12 gap-6">
+
+        <!-- Header -->
+        <div class="col-span-12 glass-panel p-6 rounded-lg border-l-4 border-amber-500 flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2 font-mono">PROMPT AS CODE (PaC)</h1>
+                <p class="text-slate-400">Structured, version-controlled prompt templates with Jinja2 rendering and Pydantic validation.</p>
+            </div>
+            <div class="text-right hidden md:block">
+                 <div class="text-2xl font-mono text-amber-500 font-bold">AOPL v1.0</div>
+                 <div class="text-xs text-slate-500">ADAM OPEN PROMPT LIBRARY</div>
+            </div>
+        </div>
+
+        <!-- Sidebar List -->
+        <div class="col-span-12 lg:col-span-3 glass-panel rounded-lg overflow-hidden flex flex-col h-[70vh]">
+            <div class="bg-slate-900/50 p-4 border-b border-slate-700 font-bold text-slate-300 text-sm">TEMPLATE LIBRARY</div>
+            <div class="overflow-y-auto flex-1 p-2 space-y-1" id="prompt-list">
+                <!-- Populated via JS -->
+            </div>
+        </div>
+
+        <!-- Editor/Viewer -->
+        <div class="col-span-12 lg:col-span-9 glass-panel rounded-lg flex flex-col h-[70vh] border border-slate-700">
+            <!-- Toolbar -->
+            <div class="bg-slate-900/80 p-3 border-b border-slate-700 flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <span id="current-file" class="font-mono text-amber-400 font-bold text-sm">select_template.md</span>
+                    <span class="text-xs text-slate-500 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">READ ONLY</span>
+                </div>
+                <div class="flex space-x-3 text-xs font-mono">
+                    <button class="text-slate-400 hover:text-white" onclick="alert('Copy function mock')">COPY</button>
+                    <button class="text-slate-400 hover:text-white" onclick="alert('History function mock')">HISTORY</button>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1 bg-slate-900/50 p-6 overflow-auto font-mono text-sm leading-relaxed text-slate-300" id="prompt-content">
+                <p class="text-slate-500 italic">// Select a prompt template from the library to view source.</p>
+                <br>
+                <p class="text-slate-500">
+                    The Adam System uses a "Prompt-as-Code" architecture. Prompts are not magic strings; they are structured assets managed like software code.<br><br>
+                    Features:<br>
+                    - <span class="text-cyan-400">Jinja2 Templating</span>: Dynamic variable injection.<br>
+                    - <span class="text-purple-400">Pydantic Validation</span>: Type-safe inputs and outputs.<br>
+                    - <span class="text-emerald-400">Version Control</span>: Git-backed history and rollbacks.
+                </p>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="js/app.js"></script>
+    <script src="js/nav.js"></script>
+    <script>
+        const PROMPTS = [
+            { id: "credit_analysis", name: "Credit Analysis (Legacy)", type: "json", category: "Core" },
+            { id: "market_analysis", name: "Market Analysis", type: "md", category: "Core" },
+            { id: "esg_analysis", name: "ESG Analysis", type: "md", category: "Specialist" },
+            { id: "crisis_simulation", name: "Crisis Simulation", type: "xml", category: "Simulation" },
+            { id: "LIB-PRO-001", name: "Professional Outcomes 001", type: "md", category: "AOPL" },
+            { id: "LIB-META-001", name: "Meta Architecture 001", type: "md", category: "AOPL" },
+            { id: "regulatory_rating", name: "Regulatory Rating", type: "json", category: "Compliance" },
+            { id: "due_diligence", name: "Due Diligence", type: "md", category: "Core" }
+        ];
+
+        const SAMPLE_CONTENT = {
+            "credit_analysis": `---
+version: 1.2.0
+model_config:
+  temperature: 0.2
+  max_tokens: 2000
+---
+
+You are a Senior Credit Analyst at a top-tier investment bank.
+
+Task: Analyze the creditworthiness of {{ company_name }}.
+
+Context:
+{{ context_data }}
+
+Instructions:
+1. Review the provided Balance Sheet and Income Statement.
+2. Calculate key ratios (Debt/EBITDA, Interest Coverage).
+3. Assess qualitative risks (Management, Industry Headwinds).
+4. Assign a credit rating (AAA to D).
+
+Output Format (JSON):
+{
+  "rating": "string",
+  "rationale": "string",
+  "ratios": { ... }
+}`,
+            "crisis_simulation": `<system>
+    <role>Chief Risk Officer</role>
+    <objective>Simulate impact of Black Swan event: {{ event_type }}</objective>
+</system>
+
+<scenario>
+    <event>{{ event_description }}</event>
+    <magnitude>{{ magnitude }}</magnitude>
+    <affected_sectors>
+        {% for sector in sectors %}
+        <sector>{{ sector }}</sector>
+        {% endfor %}
+    </affected_sectors>
+</scenario>
+
+<instruction>
+    Generate a 5-step cascade effect analysis. Focus on liquidity crunches and counterparty failures.
+</instruction>`
+        };
+
+        function renderList() {
+            const list = document.getElementById('prompt-list');
+
+            // Group by category
+            const categories = {};
+            PROMPTS.forEach(p => {
+                if(!categories[p.category]) categories[p.category] = [];
+                categories[p.category].push(p);
+            });
+
+            for (const [cat, items] of Object.entries(categories)) {
+                const group = document.createElement('div');
+                group.className = 'mb-4';
+                group.innerHTML = `<h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-2">${cat}</h4>`;
+
+                items.forEach(item => {
+                    const btn = document.createElement('button');
+                    btn.className = 'w-full text-left px-3 py-2 text-sm text-slate-300 hover:bg-slate-700/50 hover:text-white rounded transition mb-1 flex justify-between items-center group';
+                    btn.innerHTML = `
+                        <span>${item.name}</span>
+                        <span class="text-[0.6rem] text-slate-600 bg-slate-900 px-1 rounded border border-slate-800 group-hover:border-slate-600 font-mono">${item.type.toUpperCase()}</span>
+                    `;
+                    btn.onclick = () => loadPrompt(item);
+                    group.appendChild(btn);
+                });
+
+                list.appendChild(group);
+            }
+        }
+
+        function loadPrompt(item) {
+            document.getElementById('current-file').textContent = `${item.id}.${item.type}`;
+            const content = SAMPLE_CONTENT[item.id] || `// Mock content for ${item.name}\n\n{{ content_placeholder }}`;
+
+            // Simple syntax highlighting mock
+            let html = content
+                .replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/{{/g, '<span class="text-amber-500">{{').replace(/}}/g, '}}</span>')
+                .replace(/{% /g, '<span class="text-purple-500">{% ').replace(/ %}/g, ' %}</span>')
+                .replace(/---/g, '<span class="text-slate-500">---</span>');
+
+            document.getElementById('prompt-content').innerHTML = `<pre>${html}</pre>`;
+        }
+
+        document.addEventListener('DOMContentLoaded', renderList);
+    </script>
+</body>
+</html>

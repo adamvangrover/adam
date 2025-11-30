@@ -1,21 +1,84 @@
-/* Simple CSS overrides or custom styles if needed beyond Tailwind */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap');
+
+/* Base Overrides */
 body {
-    background-color: #111827; /* Gray 900 */
+    background-color: #0f172a; /* Slate 900 */
+    color: #e2e8f0; /* Slate 200 */
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
 }
 
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.font-mono {
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* Scrollbar */
 ::-webkit-scrollbar {
     width: 8px;
+    height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #1f2937;
+    background: #0f172a;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #4b5563;
+    background: #334155;
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #6b7280;
+    background: #475569;
+}
+
+/* Utility Classes */
+.scan-line {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, transparent, rgba(6, 182, 212, 0.5), transparent); /* Cyan-500 equivalent */
+    position: fixed;
+    top: 0;
+    left: 0;
+    animation: scan 4s linear infinite;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.3;
+}
+
+@keyframes scan {
+    0% { top: -10%; }
+    100% { top: 110%; }
+}
+
+.glass-panel {
+    background: rgba(30, 41, 59, 0.7); /* Slate 800 with opacity */
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(148, 163, 184, 0.1); /* Slate 400 with low opacity */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.terminal-text {
+    color: #22d3ee; /* Cyan 400 */
+    text-shadow: 0 0 5px rgba(34, 211, 238, 0.5);
+}
+
+.grid-bg {
+    background-image: linear-gradient(rgba(51, 65, 85, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(51, 65, 85, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+/* Card Hover Effects */
+.hover-card {
+    transition: all 0.2s ease-in-out;
+}
+.hover-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+    border-color: rgba(56, 189, 248, 0.4); /* Sky 400 */
 }

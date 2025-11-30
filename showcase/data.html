@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM System | Data & Libraries</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="h-screen flex flex-col grid-bg text-slate-200">
+    <div class="scan-line"></div>
+    <!-- Nav via nav.js -->
+
+    <main class="flex-1 p-8 overflow-y-auto grid grid-cols-12 gap-6">
+
+        <!-- Header -->
+        <div class="col-span-12 glass-panel p-6 rounded-lg border-l-4 border-purple-500 flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2 font-mono">DATA & LIBRARIES</h1>
+                <p class="text-slate-400">Central repository for training sets, financial ontologies, and artisanal data.</p>
+            </div>
+            <div class="text-right font-mono text-xs text-slate-400">
+                 <div class="mb-1"><span class="text-white font-bold">Total Storage:</span> 4.2 GB</div>
+                 <div><span class="text-white font-bold">Last Index:</span> 2025-07-01 14:00</div>
+            </div>
+        </div>
+
+        <!-- Directory View -->
+        <div class="col-span-12 lg:col-span-8 glass-panel rounded-lg overflow-hidden">
+            <div class="bg-slate-900/80 p-3 border-b border-slate-700 flex space-x-2 text-xs font-mono">
+                <span class="text-slate-500">ROOT /</span>
+                <span class="text-slate-300 hover:text-white cursor-pointer">data</span>
+                <span class="text-slate-500">/</span>
+                <span class="text-cyan-400 font-bold" id="current-dir">artisanal_training_sets</span>
+            </div>
+
+            <table class="w-full text-left text-sm">
+                <thead>
+                    <tr class="bg-slate-800 text-slate-400 font-mono text-xs uppercase">
+                        <th class="p-3">Name</th>
+                        <th class="p-3">Type</th>
+                        <th class="p-3">Size</th>
+                        <th class="p-3">Modified</th>
+                        <th class="p-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="file-list" class="divide-y divide-slate-700">
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Data Preview / Stats -->
+        <div class="col-span-12 lg:col-span-4 flex flex-col space-y-6">
+
+            <!-- Quick Stats -->
+            <div class="glass-panel p-4 rounded-lg">
+                <h3 class="text-purple-400 font-bold font-mono text-sm mb-3 uppercase">Dataset Quality</h3>
+                <div class="space-y-3">
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span>SNC Training Data</span>
+                            <span class="text-white">98.5% Clean</span>
+                        </div>
+                        <div class="w-full bg-slate-700 h-1 rounded">
+                            <div class="bg-emerald-500 h-1 rounded" style="width: 98%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span>Risk Taxonomy Alignment</span>
+                            <span class="text-white">92.0%</span>
+                        </div>
+                        <div class="w-full bg-slate-700 h-1 rounded">
+                            <div class="bg-blue-500 h-1 rounded" style="width: 92%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Card -->
+            <div class="glass-panel p-4 rounded-lg flex-1 flex flex-col">
+                <h3 class="text-slate-400 font-bold font-mono text-sm mb-3 uppercase">File Preview</h3>
+                <div class="flex-1 bg-slate-900 rounded p-3 font-mono text-xs text-slate-300 overflow-auto whitespace-pre-wrap" id="file-preview">
+Select a file to view snippet...
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script src="js/app.js"></script>
+    <script src="js/nav.js"></script>
+    <script>
+        const MOCK_FILES = [
+            { name: "artisanal_data_snc_v2.jsonl", type: "JSONL", size: "22 KB", date: "2025-06-28", content: '{"prompt": "Analyze shared credit risk for...", "completion": "Based on the syndicate structure..."}\n{"prompt": "Calculate DSCR for...", "completion": "DSCR = 1.45x..."}' },
+            { name: "knowledge_graph_schema.json", type: "JSON", size: "3.8 KB", date: "2025-05-12", content: '{\n  "entities": ["Company", "Person", "Risk"],\n  "relationships": ["CEO_OF", "EXPOSED_TO"]\n}' },
+            { name: "finance_bench.json", type: "JSON", size: "406 B", date: "2025-02-15", content: '[{"question": "What is the net income?", "answer": "1.2B"}]' },
+            { name: "adam_market_baseline.json", type: "JSON", size: "15 KB", date: "2025-06-01", content: '{\n  "sp500_pe": 21.5,\n  "treasury_10y": 4.2\n}' },
+            { name: "risk_rating_mapping.json", type: "JSON", size: "12 KB", date: "2025-04-20", content: '{\n  "AAA": 1,\n  "AA+": 2\n}' },
+            { name: "artisanal_data_esg_v1.jsonl", type: "JSONL", size: "6.7 KB", date: "2025-06-10", content: '...' },
+        ];
+
+        function renderFiles() {
+            const tbody = document.getElementById('file-list');
+            tbody.innerHTML = '';
+
+            MOCK_FILES.forEach((file, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-800 transition cursor-pointer group';
+                tr.onclick = () => showPreview(idx);
+
+                tr.innerHTML = `
+                    <td class="p-3 font-mono text-slate-300 group-hover:text-white flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        ${file.name}
+                    </td>
+                    <td class="p-3 text-slate-400">${file.type}</td>
+                    <td class="p-3 text-slate-400 font-mono">${file.size}</td>
+                    <td class="p-3 text-slate-500">${file.date}</td>
+                    <td class="p-3">
+                        <button class="text-cyan-600 hover:text-cyan-400 font-bold text-xs uppercase">Download</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function showPreview(idx) {
+            const file = MOCK_FILES[idx];
+            const el = document.getElementById('file-preview');
+            el.textContent = file.content || "// No preview available";
+            el.classList.add('animate-pulse');
+            setTimeout(() => el.classList.remove('animate-pulse'), 300);
+        }
+
+        document.addEventListener('DOMContentLoaded', renderFiles);
+    </script>
+</body>
+</html>
