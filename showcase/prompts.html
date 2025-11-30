@@ -30,6 +30,7 @@
             <div class="bg-slate-900/50 p-4 border-b border-slate-700 font-bold text-slate-300 text-sm">TEMPLATE LIBRARY</div>
             <div class="overflow-y-auto flex-1 p-2 space-y-1" id="prompt-list">
                 <!-- Populated via JS -->
+                 <div class="text-slate-500 text-xs text-center mt-4">Loading templates...</div>
             </div>
         </div>
 
@@ -63,88 +64,49 @@
 
     </main>
 
+    <script src="js/mock_data.js"></script>
     <script src="js/app.js"></script>
     <script src="js/nav.js"></script>
     <script>
-        const PROMPTS = [
-            { id: "credit_analysis", name: "Credit Analysis (Legacy)", type: "json", category: "Core" },
-            { id: "market_analysis", name: "Market Analysis", type: "md", category: "Core" },
-            { id: "esg_analysis", name: "ESG Analysis", type: "md", category: "Specialist" },
-            { id: "crisis_simulation", name: "Crisis Simulation", type: "xml", category: "Simulation" },
-            { id: "LIB-PRO-001", name: "Professional Outcomes 001", type: "md", category: "AOPL" },
-            { id: "LIB-META-001", name: "Meta Architecture 001", type: "md", category: "AOPL" },
-            { id: "regulatory_rating", name: "Regulatory Rating", type: "json", category: "Compliance" },
-            { id: "due_diligence", name: "Due Diligence", type: "md", category: "Core" }
-        ];
+        document.addEventListener('DOMContentLoaded', () => {
+             const data = window.MOCK_DATA || {};
+             const prompts = data.prompts || [];
+             renderList(prompts);
+        });
 
-        const SAMPLE_CONTENT = {
-            "credit_analysis": `---
-version: 1.2.0
-model_config:
-  temperature: 0.2
-  max_tokens: 2000
----
-
-You are a Senior Credit Analyst at a top-tier investment bank.
-
-Task: Analyze the creditworthiness of {{ company_name }}.
-
-Context:
-{{ context_data }}
-
-Instructions:
-1. Review the provided Balance Sheet and Income Statement.
-2. Calculate key ratios (Debt/EBITDA, Interest Coverage).
-3. Assess qualitative risks (Management, Industry Headwinds).
-4. Assign a credit rating (AAA to D).
-
-Output Format (JSON):
-{
-  "rating": "string",
-  "rationale": "string",
-  "ratios": { ... }
-}`,
-            "crisis_simulation": `<system>
-    <role>Chief Risk Officer</role>
-    <objective>Simulate impact of Black Swan event: {{ event_type }}</objective>
-</system>
-
-<scenario>
-    <event>{{ event_description }}</event>
-    <magnitude>{{ magnitude }}</magnitude>
-    <affected_sectors>
-        {% for sector in sectors %}
-        <sector>{{ sector }}</sector>
-        {% endfor %}
-    </affected_sectors>
-</scenario>
-
-<instruction>
-    Generate a 5-step cascade effect analysis. Focus on liquidity crunches and counterparty failures.
-</instruction>`
-        };
-
-        function renderList() {
+        function renderList(prompts) {
             const list = document.getElementById('prompt-list');
+            list.innerHTML = '';
+
+            if (prompts.length === 0) {
+                list.innerHTML = '<div class="text-slate-500 text-xs text-center mt-4">No templates found in data.</div>';
+                return;
+            }
 
             // Group by category
             const categories = {};
-            PROMPTS.forEach(p => {
-                if(!categories[p.category]) categories[p.category] = [];
-                categories[p.category].push(p);
+            prompts.forEach(p => {
+                const cat = p.category || "General";
+                if(!categories[cat]) categories[cat] = [];
+                categories[cat].push(p);
             });
 
-            for (const [cat, items] of Object.entries(categories)) {
+            // Sort categories
+            const sortedCats = Object.keys(categories).sort();
+
+            for (const cat of sortedCats) {
+                const items = categories[cat];
                 const group = document.createElement('div');
                 group.className = 'mb-4';
-                group.innerHTML = `<h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-2">${cat}</h4>`;
+                group.innerHTML = `<h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-2 border-b border-slate-800 pb-1">${cat}</h4>`;
 
                 items.forEach(item => {
                     const btn = document.createElement('button');
+                    const ext = item.name.split('.').pop();
                     btn.className = 'w-full text-left px-3 py-2 text-sm text-slate-300 hover:bg-slate-700/50 hover:text-white rounded transition mb-1 flex justify-between items-center group';
                     btn.innerHTML = `
-                        <span>${item.name}</span>
-                        <span class="text-[0.6rem] text-slate-600 bg-slate-900 px-1 rounded border border-slate-800 group-hover:border-slate-600 font-mono">${item.type.toUpperCase()}</span>
+                        <span class="truncate pr-2" title="${item.name}">${item.name}</span>
+                        <span class="text-[0.6rem] text-slate-600 bg-slate-900 px-1 rounded border border-slate-800 group-hover:border-slate-600 font-mono">${ext.toUpperCase()}</span>
                     `;
                     btn.onclick = () => loadPrompt(item);
                     group.appendChild(btn);
@@ -154,9 +116,12 @@ Output Format (JSON):
             }
         }
 
-        function loadPrompt(item) {
-            document.getElementById('current-file').textContent = `${item.id}.${item.type}`;
-            const content = SAMPLE_CONTENT[item.id] || `// Mock content for ${item.name}\n\n{{ content_placeholder }}`;
+        async function loadPrompt(item) {
+            document.getElementById('current-file').textContent = item.path;
+            const container = document.getElementById('prompt-content');
+            container.innerHTML = '<span class="text-slate-500">Loading content...</span>';
+
+            const content = await window.dataManager.getFileContent(item.path);
 
             // Simple syntax highlighting mock
             let html = content
@@ -165,10 +130,8 @@ Output Format (JSON):
                 .replace(/{% /g, '<span class="text-purple-500">{% ').replace(/ %}/g, ' %}</span>')
                 .replace(/---/g, '<span class="text-slate-500">---</span>');
 
-            document.getElementById('prompt-content').innerHTML = `<pre>${html}</pre>`;
+            container.innerHTML = `<pre>${html}</pre>`;
         }
-
-        document.addEventListener('DOMContentLoaded', renderList);
     </script>
 </body>
 </html>

@@ -27,8 +27,29 @@ class DataManager {
                 return this.fetchData();
             }
         } else {
-            const response = await fetch(this.staticBase);
-            this.data = await response.json();
+            // Check global mock data first (safe for file://)
+            if (window.MOCK_DATA) {
+                this.data = window.MOCK_DATA;
+                console.log("Loaded data from window.MOCK_DATA");
+                return this.data;
+            }
+
+            try {
+                const response = await fetch(this.staticBase);
+                if(response.ok) {
+                    this.data = await response.json();
+                } else {
+                    throw new Error("Static fetch failed");
+                }
+            } catch (e) {
+                console.warn("Failed to fetch static JSON:", e);
+                // Last resort fallback
+                this.data = {
+                    system_stats: { cpu_usage: 0, memory_usage: 0, active_tasks: 0 },
+                    files: [],
+                    agents: []
+                };
+            }
         }
         return this.data;
     }
@@ -47,22 +68,26 @@ class DataManager {
 
     async getFileContent(path) {
         if (this.useApi) {
-            const res = await fetch(`/${path}`); // Serve static file from root
-            if (!res.ok) return "Error loading file.";
-            return await res.text();
+            try {
+                const res = await fetch(`/${path}`); // Serve static file from root
+                if (!res.ok) throw new Error("File not found");
+                return await res.text();
+            } catch(e) {
+                return `Error loading file via API: ${e.message}`;
+            }
         } else {
             // Attempt to fetch relatively if running statically
             try {
-                // Assuming index.html is in showcase/ and path is relative to repo root (e.g. README.md)
-                // We need to go up one level.
-                const res = await fetch(`../${path}`);
+                // If path is absolute from repo root like 'README.md', and we are in 'showcase/', we need '../README.md'
+                const relPath = `../${path}`;
+                const res = await fetch(relPath);
                 if (res.ok) {
                     return await res.text();
                 }
             } catch (e) {
                 console.warn("Failed to fetch static file:", path, e);
             }
-            return "File content viewing is only available when running the UI Backend server or if files are hosted statically.\n\nRun 'python services/ui_backend.py' to enable full features.";
+            return "File content viewing is only available when running a local server (e.g. 'python -m http.server').\n\nRun 'python services/ui_backend.py' to enable full API features.";
         }
     }
 }
