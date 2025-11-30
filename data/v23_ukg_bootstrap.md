@@ -195,6 +195,10 @@ Construct the response as a single, valid JSON object. **Do not** include markdo
   }
 }
 
+---
+
+## 4. Sample Output  (JSON)
+Construct the response as a single, valid JSON object. **Do not** include markdown formatting (like ```json). Ensure every data point derived from a real-world source includes a `provenance` field with the source URL.
 
 **Sample Output:**
 
