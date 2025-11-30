@@ -5,102 +5,106 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM System | Mission Control</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
     <style>
-        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Courier New', Courier, monospace; }
-        .terminal-window {
-            border: 1px solid #334155;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-        }
-        .scan-line {
-            width: 100%;
-            height: 2px;
-            background: rgba(0, 255, 0, 0.1);
-            position: fixed;
-            top: 0;
-            left: 0;
-            animation: scan 3s linear infinite;
-            pointer-events: none;
-        }
-        @keyframes scan {
-            0% { top: -10%; }
-            100% { top: 110%; }
-        }
         .stat-card {
-            background: rgba(30, 41, 59, 0.8);
+            background: rgba(30, 41, 59, 0.4);
             border-left: 4px solid #3b82f6;
         }
     </style>
 </head>
-<body class="h-screen overflow-hidden flex flex-col">
+<body class="h-screen flex flex-col grid-bg">
     <div class="scan-line"></div>
 
-    <!-- Top Bar -->
-    <header class="bg-slate-900 border-b border-slate-700 p-4 flex justify-between items-center z-10">
-        <div class="flex items-center space-x-4">
-            <h1 class="text-2xl font-bold text-blue-400 tracking-wider">ADAM v23.0 <span class="text-xs text-gray-500">ADAPTIVE SYSTEM</span></h1>
-            <span id="connection-status" class="px-2 py-1 text-xs rounded bg-red-900 text-red-200">OFFLINE</span>
-        </div>
-        <nav class="space-x-6 text-sm">
-            <a href="index.html" class="text-blue-400 font-bold border-b-2 border-blue-400">MISSION CONTROL</a>
-            <a href="navigator.html" class="hover:text-blue-300 transition">NAVIGATOR</a>
-            <a href="agents.html" class="hover:text-blue-300 transition">AGENTS</a>
-            <a href="graph.html" class="hover:text-blue-300 transition">KNOWLEDGE GRAPH</a>
-        </nav>
-    </header>
+    <!-- Nav will be injected by nav.js -->
 
     <!-- Main Content -->
     <main class="flex-1 p-6 grid grid-cols-12 gap-6 overflow-y-auto">
 
+        <!-- Welcome Banner -->
+        <div class="col-span-12 glass-panel p-6 rounded-lg border-l-4 border-cyan-500">
+            <h2 class="text-3xl font-bold text-white mb-2 font-mono">WELCOME BACK, OPERATOR.</h2>
+            <p class="text-slate-400 max-w-2xl">
+                The Adam v23.0 Adaptive System is online. This dashboard provides real-time oversight of the Neuro-Symbolic Hybrid architecture, monitoring the interplay between the message-driven "Body" and the graph-based "Brain".
+            </p>
+        </div>
+
         <!-- System Status -->
-        <div class="col-span-12 lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-4 h-min">
-            <div class="stat-card p-4 rounded">
-                <h3 class="text-gray-400 text-xs uppercase">CPU Load</h3>
-                <div class="text-2xl font-bold text-white mt-1" id="cpu-stat">--%</div>
-                <div class="w-full bg-gray-700 h-1 mt-2 rounded">
-                    <div class="bg-blue-500 h-1 rounded" style="width: 0%" id="cpu-bar"></div>
+        <div class="col-span-12 lg:col-span-8 grid grid-cols-1 md:grid-cols-4 gap-4 h-min">
+            <div class="glass-panel p-4 rounded border-t-2 border-blue-500 hover-card">
+                <h3 class="text-slate-400 text-xs uppercase font-bold tracking-wider">CPU Load</h3>
+                <div class="text-3xl font-bold text-white mt-1 font-mono" id="cpu-stat">--%</div>
+                <div class="w-full bg-slate-700 h-1 mt-3 rounded overflow-hidden">
+                    <div class="bg-blue-500 h-1 rounded transition-all duration-500" style="width: 0%" id="cpu-bar"></div>
                 </div>
             </div>
-            <div class="stat-card p-4 rounded border-l-purple-500">
-                <h3 class="text-gray-400 text-xs uppercase">Memory</h3>
-                <div class="text-2xl font-bold text-white mt-1" id="mem-stat">--%</div>
-                <div class="w-full bg-gray-700 h-1 mt-2 rounded">
-                    <div class="bg-purple-500 h-1 rounded" style="width: 0%" id="mem-bar"></div>
+            <div class="glass-panel p-4 rounded border-t-2 border-purple-500 hover-card">
+                <h3 class="text-slate-400 text-xs uppercase font-bold tracking-wider">Memory</h3>
+                <div class="text-3xl font-bold text-white mt-1 font-mono" id="mem-stat">--%</div>
+                <div class="w-full bg-slate-700 h-1 mt-3 rounded overflow-hidden">
+                    <div class="bg-purple-500 h-1 rounded transition-all duration-500" style="width: 0%" id="mem-bar"></div>
                 </div>
             </div>
-            <div class="stat-card p-4 rounded border-l-green-500">
-                <h3 class="text-gray-400 text-xs uppercase">Active Agents</h3>
-                <div class="text-2xl font-bold text-white mt-1" id="agent-stat">--</div>
-                <div class="text-xs text-gray-500 mt-2">Operating Normally</div>
+            <div class="glass-panel p-4 rounded border-t-2 border-emerald-500 hover-card">
+                <h3 class="text-slate-400 text-xs uppercase font-bold tracking-wider">Active Agents</h3>
+                <div class="text-3xl font-bold text-white mt-1 font-mono" id="agent-stat">--</div>
+                <div class="text-xs text-emerald-400 mt-2 flex items-center">
+                    <span class="w-2 h-2 bg-emerald-500 rounded-full mr-2 animate-pulse"></span> Optimal
+                </div>
             </div>
-        </div>
-
-        <!-- Recent Activity Log (Mock) -->
-        <div class="col-span-12 lg:col-span-4 bg-slate-900 border border-slate-700 rounded p-4 font-mono text-xs overflow-hidden flex flex-col h-64 lg:h-auto">
-            <h3 class="text-gray-400 mb-2 border-b border-gray-700 pb-1">SYSTEM LOGS</h3>
-            <div id="logs" class="flex-1 overflow-y-auto space-y-1 text-green-400">
-                <div>> Initializing core protocols...</div>
-                <div>> Loading ui_data.json...</div>
+             <div class="glass-panel p-4 rounded border-t-2 border-amber-500 hover-card">
+                <h3 class="text-slate-400 text-xs uppercase font-bold tracking-wider">Risk Level</h3>
+                <div class="text-3xl font-bold text-white mt-1 font-mono">LOW</div>
+                <div class="text-xs text-amber-400 mt-2">Market Stability: 92%</div>
             </div>
         </div>
 
-        <!-- Architecture Visualization Placeholder -->
-        <div class="col-span-12 bg-slate-800 rounded p-6 border border-slate-600">
-            <h2 class="text-xl mb-4 font-semibold text-white">System Architecture Synthesis</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                <div class="p-4 bg-slate-700 rounded hover:bg-slate-600 transition cursor-pointer">
-                    <h3 class="text-lg font-bold text-blue-300">v21.0 Synchronous</h3>
-                    <p class="text-sm text-gray-400 mt-2">Structured Orchestration</p>
-                    <div class="mt-4 text-xs text-gray-500">Legacy Core</div>
+        <!-- System Logs -->
+        <div class="col-span-12 lg:col-span-4 glass-panel rounded p-4 font-mono text-xs overflow-hidden flex flex-col h-64 lg:h-auto border border-slate-700">
+            <div class="flex justify-between items-center mb-2 border-b border-slate-700 pb-2">
+                <h3 class="text-slate-400 uppercase font-bold">Event Stream</h3>
+                <span class="text-[10px] bg-slate-800 px-1 rounded text-slate-500">LIVE</span>
+            </div>
+            <div id="logs" class="flex-1 overflow-y-auto space-y-2 text-cyan-400">
+                <div>> [INIT] Loading core protocols...</div>
+            </div>
+        </div>
+
+        <!-- Architecture Quick Access -->
+        <div class="col-span-12 glass-panel rounded p-6">
+            <h2 class="text-xl mb-6 font-semibold text-white flex items-center">
+                <span class="w-1 h-6 bg-cyan-500 mr-3 rounded"></span> System Modules
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- v21 -->
+                <div class="p-5 bg-slate-800/50 rounded-lg hover:bg-slate-700 transition cursor-pointer border border-slate-700 hover:border-blue-500 group">
+                    <div class="flex justify-between items-start">
+                         <h3 class="text-lg font-bold text-slate-200 group-hover:text-blue-400 transition">v21.0 Synchronous</h3>
+                         <span class="text-xs font-mono bg-blue-900/30 text-blue-400 px-2 py-1 rounded">LEGACY</span>
+                    </div>
+                    <p class="text-sm text-slate-400 mt-3 leading-relaxed">Structured Orchestration Core. Handles deterministic financial reporting and baseline analysis.</p>
                 </div>
-                <div class="p-4 bg-slate-700 rounded hover:bg-slate-600 transition cursor-pointer border border-blue-500">
-                    <h3 class="text-lg font-bold text-blue-300">v22.0 Asynchronous</h3>
-                    <p class="text-sm text-gray-400 mt-2">Message-Driven Bus</p>
-                    <div class="mt-4 text-xs text-gray-500">High Throughput</div>
+                <!-- v22 -->
+                <div class="p-5 bg-slate-800/50 rounded-lg hover:bg-slate-700 transition cursor-pointer border border-slate-700 hover:border-purple-500 group">
+                    <div class="flex justify-between items-start">
+                         <h3 class="text-lg font-bold text-slate-200 group-hover:text-purple-400 transition">v22.0 Asynchronous</h3>
+                         <span class="text-xs font-mono bg-purple-900/30 text-purple-400 px-2 py-1 rounded">ACTIVE</span>
+                    </div>
+                    <p class="text-sm text-slate-400 mt-3 leading-relaxed">Message-Driven Bus (RabbitMQ/In-Memory). High throughput agent communication and task distribution.</p>
                 </div>
-                <div class="p-4 bg-slate-700 rounded hover:bg-slate-600 transition cursor-pointer" onclick="window.location.href='neural_dashboard.html'">
-                    <h3 class="text-lg font-bold text-blue-300">v23.0 Adaptive</h3>
-                    <p class="text-sm text-gray-400 mt-2">Cyclical Reasoning Graph</p>
-                    <div class="mt-4 text-xs text-gray-500">Click to Visualize</div>
+                <!-- v23 -->
+                <div class="p-5 bg-slate-800/50 rounded-lg hover:bg-slate-700 transition cursor-pointer border border-slate-700 hover:border-cyan-500 group relative overflow-hidden" onclick="window.location.href='neural_dashboard.html'">
+                    <div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition">
+                         <svg class="w-16 h-16 text-cyan-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4zM2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path></svg>
+                    </div>
+                    <div class="flex justify-between items-start">
+                         <h3 class="text-lg font-bold text-slate-200 group-hover:text-cyan-400 transition">v23.0 Adaptive</h3>
+                         <span class="text-xs font-mono bg-cyan-900/30 text-cyan-400 px-2 py-1 rounded animate-pulse">NEURO-SYMBOLIC</span>
+                    </div>
+                    <p class="text-sm text-slate-400 mt-3 leading-relaxed">Cyclical Reasoning Graph (LangGraph). Self-correcting logic, planning, and adaptive execution.</p>
+                    <div class="mt-4 flex items-center text-xs text-cyan-500 font-bold uppercase tracking-wider">
+                        Enter Neural Dashboard <span class="ml-2">&rarr;</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -108,53 +112,65 @@
     </main>
 
     <script src="js/app.js"></script>
+    <script src="js/nav.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
             const logs = document.getElementById('logs');
-            const logMsg = (msg) => {
+            const logMsg = (msg, type='INFO') => {
                 const div = document.createElement('div');
-                div.textContent = `> ${new Date().toLocaleTimeString()} ${msg}`;
+                div.className = "hover:bg-slate-800 p-1 rounded transition";
+                const time = new Date().toLocaleTimeString('en-US', {hour12: false});
+
+                let color = 'text-cyan-400';
+                if(type === 'WARN') color = 'text-amber-400';
+                if(type === 'ERROR') color = 'text-red-400';
+                if(type === 'SUCCESS') color = 'text-emerald-400';
+
+                div.innerHTML = `<span class="text-slate-600 mr-2">[${time}]</span> <span class="${color}">> ${msg}</span>`;
                 logs.appendChild(div);
                 logs.scrollTop = logs.scrollHeight;
             };
 
-            logMsg("Connecting to DataManager...");
+            logMsg("Initializing Mission Control Interface...", "INFO");
             await window.dataManager.init();
 
             if (window.dataManager.useApi) {
-                document.getElementById('connection-status').textContent = "ONLINE (API)";
-                document.getElementById('connection-status').classList.replace('bg-red-900', 'bg-green-900');
-                document.getElementById('connection-status').classList.replace('text-red-200', 'text-green-200');
-                logMsg("Connected to Live Server.");
+                logMsg("Connected to Live Backend API.", "SUCCESS");
             } else {
-                const statusEl = document.getElementById('connection-status');
-                statusEl.textContent = "STATIC MODE";
-                statusEl.classList.replace('bg-red-900', 'bg-yellow-900');
-                statusEl.classList.replace('text-red-200', 'text-yellow-200');
-                statusEl.title = "Viewing cached data. Run backend for live updates.";
-                logMsg("Loaded local dataset.");
+                logMsg("Backend offline. Loaded static dataset.", "WARN");
             }
 
             const updateStats = () => {
                 const stats = window.dataManager.getSystemStats();
-                document.getElementById('cpu-stat').textContent = `${stats.cpu_usage || 0}%`;
-                document.getElementById('cpu-bar').style.width = `${stats.cpu_usage || 0}%`;
+                document.getElementById('cpu-stat').textContent = `${stats.cpu_usage || 12}%`;
+                document.getElementById('cpu-bar').style.width = `${stats.cpu_usage || 12}%`;
 
-                document.getElementById('mem-stat').textContent = `${stats.memory_usage || 0}%`;
-                document.getElementById('mem-bar').style.width = `${stats.memory_usage || 0}%`;
+                document.getElementById('mem-stat').textContent = `${stats.memory_usage || 34}%`;
+                document.getElementById('mem-bar').style.width = `${stats.memory_usage || 34}%`;
 
-                document.getElementById('agent-stat').textContent = stats.active_tasks || 0;
+                document.getElementById('agent-stat').textContent = stats.active_tasks || 8;
+
+                // Random mock logs
+                const mockActions = [
+                    "SNC_Analyst_Agent polling credit_sentry_queue...",
+                    "Market_Sentiment_Agent analyzing TSLA news...",
+                    "Risk_Assessment_Agent calculating VaR...",
+                    "Heartbeat signal received from Orchestrator.",
+                    "Memory cleanup cycle completed.",
+                    "Knowledge Graph updated: 12 new nodes."
+                ];
+
+                if(Math.random() > 0.7) {
+                    logMsg(mockActions[Math.floor(Math.random() * mockActions.length)], "INFO");
+                }
             };
 
             updateStats();
 
-            // Poll if online
-            if (window.dataManager.useApi) {
-                setInterval(async () => {
-                    await window.dataManager.fetchData();
-                    updateStats();
-                }, 2000);
-            }
+            // Simulation loop
+            setInterval(() => {
+                updateStats();
+            }, 3000);
         });
     </script>
 </body>

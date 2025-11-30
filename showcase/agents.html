@@ -3,64 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM System | Agents</title>
+    <title>ADAM System | Agent Registry</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Courier New', Courier, monospace; }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="h-screen flex flex-col">
-    <!-- Top Bar -->
-    <header class="bg-slate-900 border-b border-slate-700 p-4 flex justify-between items-center shrink-0">
-        <div class="flex items-center space-x-4">
-            <h1 class="text-xl font-bold text-blue-400">AGENT MATRIX</h1>
-        </div>
-        <nav class="space-x-6 text-sm">
-            <a href="index.html" class="hover:text-blue-300 transition">MISSION CONTROL</a>
-            <a href="navigator.html" class="hover:text-blue-300 transition">NAVIGATOR</a>
-            <a href="agents.html" class="text-blue-400 font-bold border-b-2 border-blue-400">AGENTS</a>
-            <a href="graph.html" class="hover:text-blue-300 transition">KNOWLEDGE GRAPH</a>
-        </nav>
-    </header>
+<body class="h-screen flex flex-col grid-bg text-slate-200">
+    <div class="scan-line"></div>
+    <!-- Nav via nav.js -->
 
-    <main class="flex-1 overflow-y-auto p-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="agent-grid">
-            <!-- Populated by JS -->
+    <main class="flex-1 p-8 overflow-y-auto">
+
+        <header class="mb-8 flex justify-between items-center glass-panel p-6 rounded-lg border-l-4 border-emerald-500">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2 font-mono">AGENT REGISTRY</h1>
+                <p class="text-slate-400">Manage and monitor autonomous agents, swarms, and meta-agents.</p>
+            </div>
+            <div class="flex space-x-4">
+                 <button class="px-4 py-2 bg-emerald-900/50 hover:bg-emerald-800 text-emerald-400 border border-emerald-700 rounded text-sm font-mono transition">
+                    + DEPLOY NEW
+                 </button>
+                 <button class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-600 rounded text-sm font-mono transition">
+                    REFRESH STATUS
+                 </button>
+            </div>
+        </header>
+
+        <!-- Filters -->
+        <div class="flex space-x-2 mb-6 text-sm font-mono">
+            <button class="px-3 py-1 bg-blue-900/40 text-blue-300 border border-blue-800 rounded hover:bg-blue-800/50 active">ALL</button>
+            <button class="px-3 py-1 bg-slate-800 text-slate-400 border border-slate-700 rounded hover:bg-slate-700">FINANCIAL</button>
+            <button class="px-3 py-1 bg-slate-800 text-slate-400 border border-slate-700 rounded hover:bg-slate-700">RISK</button>
+            <button class="px-3 py-1 bg-slate-800 text-slate-400 border border-slate-700 rounded hover:bg-slate-700">META</button>
+            <button class="px-3 py-1 bg-slate-800 text-slate-400 border border-slate-700 rounded hover:bg-slate-700">SYSTEM</button>
         </div>
+
+        <!-- Agents Grid -->
+        <div id="agents-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Populated by JS -->
+            <div class="col-span-full text-center text-slate-500 py-20 font-mono animate-pulse">
+                Accessing Agent Registry...
+            </div>
+        </div>
+
     </main>
 
     <script src="js/app.js"></script>
+    <script src="js/nav.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            await window.dataManager.init();
-            const agents = window.dataManager.getAgents();
-            const grid = document.getElementById('agent-grid');
+        const AGENT_DATA = [
+            { id: "RISK-001", name: "Risk Assessment Agent", type: "RISK", status: "ACTIVE", load: 45, desc: "Evaluates credit risk and market exposure.", version: "v2.4" },
+            { id: "SENT-002", name: "Market Sentiment Agent", type: "FINANCIAL", status: "PROCESSING", load: 88, desc: "Analyzes news sentiment and social signals.", version: "v3.1" },
+            { id: "FUND-003", name: "Fundamental Analyst", type: "FINANCIAL", status: "IDLE", load: 12, desc: "Processes 10-K/10-Q filings and financial ratios.", version: "v2.0" },
+            { id: "SNC-004", name: "SNC Analyst", type: "RISK", status: "ACTIVE", load: 67, desc: "Specialized Shared National Credit analysis.", version: "v1.5" },
+            { id: "LEGAL-005", name: "Legal Compliance Bot", type: "SYSTEM", status: "MAINTENANCE", load: 0, desc: "Checks regulatory alignment (KYC/AML).", version: "v1.2" },
+            { id: "META-001", name: "Meta Orchestrator", type: "META", status: "ACTIVE", load: 30, desc: "Routes tasks between v22 and v23 graphs.", version: "v5.0" },
+            { id: "ESG-007", name: "ESG Scorer", type: "FINANCIAL", status: "IDLE", load: 5, desc: "Calculates Environmental, Social, Governance scores.", version: "v1.1" },
+            { id: "RED-008", name: "Red Team Simulator", type: "RISK", status: "SLEEP", load: 0, desc: "Adversarial stress testing generator.", version: "v2.2" },
+            { id: "ARCH-009", name: "Architect Agent", type: "SYSTEM", status: "ACTIVE", load: 55, desc: "System design and self-improvement planning.", version: "v0.9" },
+            { id: "NEWS-010", name: "NewsBot", type: "FINANCIAL", status: "PROCESSING", load: 92, desc: "Real-time news ingestion and vectorization.", version: "v4.1" },
+        ];
 
-            agents.forEach(agent => {
+        function renderAgents() {
+            const grid = document.getElementById('agents-grid');
+            grid.innerHTML = '';
+
+            AGENT_DATA.forEach(agent => {
+                const isProcessing = agent.status === 'PROCESSING';
+                const isIdle = agent.status === 'IDLE' || agent.status === 'SLEEP';
+                const isMaint = agent.status === 'MAINTENANCE';
+
+                let statusColor = 'bg-emerald-500';
+                if(isProcessing) statusColor = 'bg-blue-500';
+                if(isIdle) statusColor = 'bg-slate-500';
+                if(isMaint) statusColor = 'bg-amber-500';
+
                 const card = document.createElement('div');
-                card.className = "bg-slate-800 border border-slate-700 p-4 rounded hover:border-blue-500 transition";
-
-                let typeColor = 'text-gray-400';
-                if(agent.type.includes('Meta')) typeColor = 'text-purple-400';
-                if(agent.type.includes('Orchestrator')) typeColor = 'text-yellow-400';
-                if(agent.type.includes('Sub')) typeColor = 'text-green-400';
+                card.className = 'glass-panel p-5 rounded-lg border border-slate-700 hover:border-slate-500 hover-card group flex flex-col justify-between h-48';
 
                 card.innerHTML = `
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="text-lg font-bold text-white">${agent.name}</h3>
-                        <span class="text-xs px-2 py-1 rounded bg-slate-700 ${typeColor}">${agent.type}</span>
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[0.65rem] font-bold font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-600">${agent.type}</span>
+                            <span class="flex items-center space-x-2 text-xs font-mono text-slate-300">
+                                <span class="w-2 h-2 rounded-full ${statusColor} ${isProcessing ? 'animate-pulse' : ''}"></span>
+                                <span>${agent.status}</span>
+                            </span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white group-hover:text-cyan-400 transition mb-1">${agent.name}</h3>
+                        <p class="text-xs text-slate-400 line-clamp-2 mb-3">${agent.desc}</p>
                     </div>
-                    <p class="text-sm text-gray-400 mb-4 h-16 overflow-hidden">${agent.description}</p>
-                    <div class="flex items-center justify-between text-xs border-t border-slate-700 pt-3">
-                        <span class="flex items-center text-green-400">
-                            <span class="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span>
-                            ACTIVE
-                        </span>
-                        <button class="text-blue-400 hover:text-white transition">INSPECT LOGS ></button>
+
+                    <div>
+                        <div class="flex justify-between text-[0.6rem] text-slate-500 font-mono mb-1">
+                            <span>ID: ${agent.id}</span>
+                            <span>VER: ${agent.version}</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                            <div class="h-full ${statusColor} opacity-80" style="width: ${agent.load}%"></div>
+                        </div>
+                         <div class="text-[0.6rem] text-right text-slate-500 mt-1">LOAD: ${agent.load}%</div>
                     </div>
                 `;
                 grid.appendChild(card);
             });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+             // Simulate loading delay for effect
+             setTimeout(renderAgents, 500);
         });
     </script>
 </body>
