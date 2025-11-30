@@ -194,3 +194,164 @@ Construct the response as a single, valid JSON object. **Do not** include markdo
     }
   }
 }
+
+
+**Sample Output:**
+
+```json
+
+{
+"v23\_unified\_knowledge\_graph": {
+"version": "23.0-alpha",
+"ontology\_standard": "FIBO-v2",
+"generated\_at": "2025-11-29T23:25:00Z",
+"nodes": {
+"legal\_entities": [
+{
+"legal\_name": "JPMORGAN CHASE & CO.",
+"lei\_code": "8I5DZWZKVSZI1NUHU748",
+"ticker": "JPM",
+"headquarters\_address": "383 Madison Avenue, New York, NY 10179, United States",
+"jurisdiction": "US-DE",
+"provenance": "[https://www.legalentityidentifier.in/leicert/8I5DZWZKVSZI1NUHU748/](https://www.legalentityidentifier.in/leicert/8I5DZWZKVSZI1NUHU748/)"
+},
+{
+"legal\_name": "EXXON MOBIL CORPORATION",
+"lei\_code": "J3WHBG0MTS7O8ZVMDC91",
+"ticker": "XOM",
+"headquarters\_address": "22777 Springwoods Village Parkway, Spring, TX 77389, United States",
+"jurisdiction": "US-NJ",
+"provenance": "[https://lei.bloomberg.com/leis/view/J3WHBG0MTS7O8ZVMDC91](https://www.google.com/search?q=https://lei.bloomberg.com/leis/view/J3WHBG0MTS7O8ZVMDC91)"
+},
+{
+"legal\_name": "MICROSOFT CORPORATION",
+"lei\_code": "INR2EJN1ERAN0W5ZP974",
+"ticker": "MSFT",
+"headquarters\_address": "One Microsoft Way, Redmond, WA 98052, United States",
+"jurisdiction": "US-WA",
+"provenance": "[https://www.lei-identifier.com/leicert/INR2EJN1ERAN0W5ZP974/](https://www.lei-identifier.com/leicert/INR2EJN1ERAN0W5ZP974/)"
+}
+],
+"financial\_instruments": {
+"loans": [
+{
+"loan\_id": "LN-XOM-2025-SNC",
+"borrower\_lei": "J3WHBG0MTS7O8ZVMDC91",
+"principal\_amount": 5000000000,
+"currency": "USD",
+"interest\_rate\_model": "SOFR+150bps",
+"covenants": [
+{
+"covenant\_id": "COV-XOM-LEV-01",
+"type": "Financial",
+"description": "Net Leverage Ratio must not exceed 3.5x",
+"is\_legally\_binding": true
+}
+],
+"status": "Performing"
+}
+],
+"securities": [
+{
+"cusip": "594918CS1",
+"issuer\_lei": "INR2EJN1ERAN0W5ZP974",
+"type": "Corporate Bond",
+"description": "MSFT 1.35% 09/15/2030",
+"maturity\_date": "2030-09-15",
+"face\_value": 1000,
+"coupon\_rate": 0.0135,
+"provenance": "[https://public.com/bonds/corporate/microsoft-corp/msft-1.35-09-15-2030-594918cs1](https://public.com/bonds/corporate/microsoft-corp/msft-1.35-09-15-2030-594918cs1)"
+}
+]
+},
+"esg\_profiles": [
+{
+"lei\_code": "J3WHBG0MTS7O8ZVMDC91",
+"entity\_name": "Exxon Mobil Corporation",
+"controversies": [
+{
+"event": "Lawsuit against California climate disclosure laws (SB 253/261)",
+"date": "2025-11-04",
+"category": "Environmental",
+"source": "[https://jacobin.com/2025/11/pollution-supreme-court-emissions-data](https://jacobin.com/2025/11/pollution-supreme-court-emissions-data)"
+},
+{
+"event": "2025 Climate Report fails scientific review; misrepresents IPCC findings",
+"date": "2025-05-27",
+"category": "Environmental",
+"source": "[https://blog.ucs.org/carly-phillips/exxonmobils-2025-climate-report-fails-scientific-review-again/](https://blog.ucs.org/carly-phillips/exxonmobils-2025-climate-report-fails-scientific-review-again/)"
+}
+],
+"greenwashing\_risk\_score": 0.85
+},
+{
+"lei\_code": "INR2EJN1ERAN0W5ZP974",
+"entity\_name": "Microsoft Corporation",
+"controversies": [
+{
+"event": "Antitrust Class Action over OpenAI partnership and cloud exclusivity",
+"date": "2025-10-22",
+"category": "Governance",
+"source": "[https://grellas.com/microsoft-faces-antitrust-class-action-over-openai-partnership/](https://grellas.com/microsoft-faces-antitrust-class-action-over-openai-partnership/)"
+}
+],
+"greenwashing\_risk\_score": 0.25
+}
+]
+},
+"simulation\_parameters": {
+"crisis\_scenarios": [
+{
+"scenario\_id": "CRISIS-BW-001",
+"name": "The 8% World",
+"description": "Fed Funds rate hits 8%, triggering widespread default.",
+"shocks": {
+"interest\_rates\_us": 0.08,
+"corporate\_default\_rate": 0.05,
+"credit\_spread\_widening\_bps": 400
+}
+},
+{
+"scenario\_id": "CRISIS-BW-002",
+"name": "Strait Closure",
+"description": "Oil supply shock pushes price to $200/bbl, followed by demand destruction.",
+"shocks": {
+"oil\_price\_peak": 200.0,
+"global\_gdp\_impact": -0.025,
+"energy\_sector\_volatility": 0.60
+}
+},
+{
+"scenario\_id": "CRISIS-BW-003",
+"name": "AI Winter",
+"description": "Regulatory crackdown cuts Tech Capex by 40%.",
+"shocks": {
+"tech\_sector\_capex": -0.40,
+"nasdaq\_drawdown": -0.25,
+"ai\_valuation\_multiple\_contraction": -0.50
+}
+}
+]
+},
+"regulatory\_rules": {
+"basel\_iii": [
+{
+"rule\_id": "B3-CAP-TIER1",
+"description": "Tier 1 Capital Ratio must exceed 6%",
+"metric": "tier\_1\_ratio",
+"threshold": 0.06,
+"operator": "gt"
+}
+],
+"gdpr": [
+{
+"rule\_id": "GDPR-DATA-RES",
+"description": "EU Customer data must reside in EU-West-1",
+"constraint": "data\_residency",
+"required\_value": "eu-west-1",
+"target\_region": "EU"
+}
+]
+}
+}
+}
