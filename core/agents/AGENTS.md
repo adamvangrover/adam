@@ -16,6 +16,42 @@ Agents in the ADAM system possess a range of core capabilities that enable them 
 
 The ADAM system provides a robust runtime environment for executing agents. The runtime is responsible for managing the lifecycle of the agents, providing them with the resources they need to operate, and ensuring the overall stability of the system.
 
+### Main Loop
+
+The main loop is the heart of the agent runtime. It is responsible for iterating through the active agents and giving each agent an opportunity to execute. The main loop also handles a variety of other tasks, such as processing messages, managing the agent lifecycle, and monitoring the health of the system.
+
+### Threading Model
+
+The agent runtime uses a multi-threaded architecture to allow multiple agents to execute concurrently. Each agent runs in its own thread, which allows it to perform long-running tasks without blocking the main loop.
+
+### Resource Management
+
+The agent runtime is responsible for managing the resources that are used by the agents, such as CPU, memory, and network bandwidth. The runtime uses a variety of techniques to ensure that resources are allocated fairly and efficiently, and to prevent any single agent from consuming too many resources.
+
+## Implementation Details
+
+The agents in the ADAM system are implemented using a combination of object-oriented programming and design patterns.
+
+### Base Agent Class
+
+All agents inherit from the `Agent` class in `agent_base.py`. This class provides the basic structure for all agents, including methods for sending and receiving messages, accessing the knowledge base, and logging events.
+
+### Inheritance Patterns
+
+The ADAM system uses a variety of inheritance patterns to create specialized agents. For example, the `FinancialAnalystAgent` class inherits from the `Agent` class and adds a variety of methods for performing financial analysis.
+
+### Design Patterns
+
+The ADAM system uses a variety of design patterns to improve the modularity, extensibility, and maintainability of the code. These include the Singleton pattern for managing global resources, the Factory pattern for creating new agents, and the Observer pattern for handling events.
+
+## Standalone Operation
+
+Agents can be run in a standalone mode for testing and debugging purposes. To run an agent in standalone mode, you can use the `scripts/run_agent.py` script. This script takes the name of the agent as a command-line argument and starts the agent in its own process.
+
+```bash
+python scripts/run_agent.py --agent-name market_sentiment_agent
+```
+
 ### Agent Lifecycle
 
 The lifecycle of an agent in the ADAM system is managed by the agent runtime. The lifecycle consists of the following stages:
@@ -140,6 +176,7 @@ There are several standard interaction patterns that are used for common interac
 
 ## Shared Context and State Management
 
+Agents in the ADAM system can share context and manage state through a variety of mechanisms.
 Effective state management is crucial for building robust and reliable agents. Agents in the ADAM system can share context and manage state through a variety of mechanisms.
 
 ### In-Memory State
@@ -152,6 +189,7 @@ Agents can use shared memory to share data with other agents on the same machine
 
 ### Distributed Caches
 
+Agents can use a distributed cache, such as Redis or Memcached, to share data with other agents in a distributed environment. This is a more scalable and resilient way to share data than shared memory.
 For more complex use cases, agents can use a distributed cache, such as Redis or Memcached, to store and share state. Distributed caches provide a scalable and resilient way to manage state, and they can be used to share state between multiple instances of the same agent or between different agents.
 
 ### Database

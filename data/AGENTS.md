@@ -116,7 +116,6 @@ with open("data/simulated_JSONL_output.jsonl", "r") as f:
         data = json.loads(line)
         print(data)
 ```
-=======
 # Data Files
 
 This directory contains the data files used by the ADAM system. These files include datasets for training and testing, as well as knowledge bases and other resources.
@@ -365,7 +364,6 @@ These files contain simulated data and teacher outputs for training and testing 
 *   **Developer Notes:** This data can be used to train a machine learning model to predict credit ratings and to generate justifications for the ratings.
 
 By providing a comprehensive and well-documented data directory, we can empower developers to build more intelligent and capable agents, and to accelerate the development of the ADAM system as a whole.
-=======
 # Data Files
 
 This directory contains the data files used by the ADAM system. These files include datasets for training and testing, as well as knowledge bases and other resources.

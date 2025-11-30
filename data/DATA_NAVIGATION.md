@@ -1,8 +1,13 @@
 # Data Navigation Guide
 
+This document provides a high-level overview of the data in the `data` directory and how it is organized. It is intended to help developers navigate the data and to understand how the different data files are related to each other.
+
+## 1. Data Map
+
+The following data map provides a visual representation of the data in the `data` directory and how the different data files are related to each other.
 This document provides a high-level overview of the data in the `data` directory and how it is organized. It is intended to help developers navigate the data and to understand how the different data files are related to each other. For information on data versioning, see the [Versioning and Migration Guide](../VERSIONING.md).
 
-## 1. Interactive Data Map
+## 1.1. Interactive Data Map
 
 The following data map provides a visual representation of the data in the `data` directory and how the different data files are related to each other. To make this map interactive, we can embed it in an HTML file and use JavaScript to add click listeners to the nodes. When a node is clicked, it could link to the relevant section in this document.
 
@@ -64,6 +69,17 @@ graph TD
 ## 2. Data Dictionary
 
 The following data dictionary provides definitions for all the data fields in the system.
+
+| File | Field | Data Type | Description |
+|---|---|---|---|
+| `knowledge_base.json` | `Valuation` | object | Contains information about valuation methods, such as DCF and comparables. |
+| `knowledge_base.json` | `RiskManagement` | object | Contains information about risk management techniques, such as VaR and credit risk analysis. |
+| `knowledge_graph.json` | `nodes` | array | An array of nodes in the knowledge graph. |
+| `knowledge_graph.json` | `edges` | array | An array of edges in the knowledge graph. |
+| `credit_rating_decision_tree_v3.json` | `tree` | object | The root of the decision tree. |
+| `context_definition.jsonld` | `@context` | object | The JSON-LD context for the system. |
+| `adam_core_data.json` | `contextual_data` | object | Contains contextual data for the system, such as user profiles and world events. |
+| `company_data.json` | `[TICKER]` | object | Contains data for a specific company. |
 
 | File | Field | Data Type | Description | Constraints | Example |
 |---|---|---|---|---|---|

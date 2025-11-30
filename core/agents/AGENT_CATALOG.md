@@ -1,6 +1,6 @@
 # Agent Catalog
 
-This document provides a comprehensive catalog of all the agents in the ADAM system. It is intended to be a central registry for developers to quickly understand the capabilities, configuration, and implementation details of each agent. For more information on how to develop agents, see the [Agent Development Guide](AGENT_DEVELOPMENT.md).
+This document provides a comprehensive catalog of all the agents in the ADAM system. It is intended to be a central registry for developers to quickly understand the capabilities, configuration, and implementation details of each agent.
 
 ---
 
@@ -86,7 +86,7 @@ This document provides a comprehensive catalog of all the agents in the ADAM sys
     *   **Hooks:** `on_context_updated_hook`
 *   **Compute and Resource Requirements:** This agent is not very resource-intensive, but it may require a significant amount of memory to store the shared context.
 *   **Dependencies:** None
-*   **Developer Notes:** This agent is critical to the system's ability to maintain a consistent view of the world. It can be extended by adding new data models to the knowledge base. For more information on the data, see the [Data Navigation Guide](../../data/DATA_NAVIGATION.md).
+*   **Developer Notes:** This agent is critical to the system's ability to maintain a consistent view of the world. It can be extended by adding new data models to the knowledge base.
 
 ---
 

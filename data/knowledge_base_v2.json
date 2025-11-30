@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "version": "2.0.0",
-    "description": "A knowledge base defining core concepts in Valuation, Risk Management, Macroeconomics, and Technical Analysis for LLM understanding and potential application.",
-    "last_updated": "2025-04-01T20:54:00Z",
+    "version": "2.1.0",
+    "description": "A knowledge base defining core concepts in Valuation, Risk Management, Macroeconomics, and Technical Analysis for LLM understanding and potential application. This version adds new sections for Portfolio Management, Derivatives, and Behavioral Finance.",
+    "last_updated": "2025-05-30T10:00:00Z",
     "_comment": "Timestamp of the last significant update to this knowledge base structure or content."
   },
   "formula_notation_and_acronyms": {
@@ -883,6 +883,139 @@
         ]
       }
     }
+  },
+  "PortfolioManagement": {
+    "ModernPortfolioTheory": {
+      "machine_readable": {
+        "type": "Investment Framework",
+        "key_concepts": {
+          "Diversification": {
+            "description": "Combining assets with non-perfect correlations to reduce portfolio risk without sacrificing potential return."
+          },
+          "Efficient_Frontier": {
+            "description": "A curve representing the set of optimal portfolios that offer the highest expected return for a defined level of risk or the lowest risk for a given level of expected return."
+          },
+          "Capital_Allocation_Line_CAL": {
+            "description": "Represents the risk-return combinations available by combining a risk-free asset with an optimal risky portfolio."
+          },
+          "Optimal_Risky_Portfolio": {
+            "description": "The specific portfolio on the efficient frontier that, when combined with the risk-free asset, results in the steepest CAL (highest Sharpe Ratio)."
+          }
+        },
+        "inputs": {
+          "Expected_Returns": { "type": "array", "description": "Expected return for each asset in the portfolio." },
+          "Standard_Deviations": { "type": "array", "description": "Volatility (standard deviation) of each asset." },
+          "Correlation_Matrix": { "type": "matrix", "description": "Correlation coefficients between each pair of assets." },
+          "Risk_Free_Rate": { "type": "number", "description": "The return on a risk-free asset." }
+        },
+        "formulas": {
+          "Portfolio_Expected_Return": "Sum(weight[i] * expected_return[i])",
+          "Portfolio_Variance": "Sum(Sum(weight[i] * weight[j] * correlation[i,j] * std_dev[i] * std_dev[j]))"
+        },
+        "_future_enhancements": ["Add Black-Litterman model as an extension", "Detail optimization algorithms for finding the efficient frontier"]
+      },
+      "human_readable": {
+        "definition": "Modern Portfolio Theory (MPT) is a framework for assembling a portfolio of assets such that the expected return is maximized for a given level of risk.",
+        "explanation": "Developed by Harry Markowitz, MPT's core idea is that an asset's risk and return should not be viewed in isolation, but by how it contributes to the overall portfolio's risk and return. It emphasizes that diversification can reduce portfolio risk.",
+        "example": "Instead of holding only a high-growth tech stock, an MPT investor might combine it with government bonds and international stocks. Even if the bonds have lower returns, their low correlation with the tech stock can significantly reduce the total portfolio's volatility.",
+        "criticism": ["Relies heavily on historical data and assumptions about future returns and correlations, which may not hold true, especially in crises.", "Assumes investors are rational and that returns are normally distributed."],
+        "sources": [
+          { "title": "Investopedia - Modern Portfolio Theory (MPT)", "url": "https://www.investopedia.com/terms/m/modernportfoliotheory.asp" }
+        ]
+      }
+    },
+    "PerformanceMeasurement": {
+      "machine_readable": {
+        "metrics": {
+          "Sharpe_Ratio": {
+            "formula": "(Portfolio_Return - Risk_Free_Rate) / Portfolio_Standard_Deviation",
+            "description": "Measures risk-adjusted return. Higher is better."
+          },
+          "Sortino_Ratio": {
+            "formula": "(Portfolio_Return - Risk_Free_Rate) / Downside_Deviation",
+            "description": "Similar to Sharpe, but only penalizes for downside volatility. Higher is better."
+          },
+          "Treynor_Ratio": {
+            "formula": "(Portfolio_Return - Risk_Free_Rate) / Portfolio_Beta",
+            "description": "Measures excess return per unit of systematic risk (beta)."
+          },
+          "Jensens_Alpha": {
+            "formula": "Portfolio_Return - (Risk_Free_Rate + Portfolio_Beta * (Market_Return - Risk_Free_Rate))",
+            "description": "Measures the portfolio's return above or below what would be predicted by the CAPM. Positive alpha indicates outperformance."
+          },
+          "Information_Ratio": {
+            "formula": "(Portfolio_Return - Benchmark_Return) / Tracking_Error",
+            "description": "Measures portfolio returns above the returns of a benchmark, adjusted for the volatility of those returns (tracking error)."
+          }
+        },
+        "_future_enhancements": ["Add details on calculating downside deviation and tracking error"]
+      },
+      "human_readable": {
+        "definition": "Portfolio performance measurement involves evaluating a portfolio's return and risk characteristics, often relative to a benchmark.",
+        "explanation": "These metrics help investors understand if the returns generated were appropriate for the level of risk taken. They provide a standardized way to compare different investments and managers.",
+        "example": "A portfolio with a 15% return and high volatility might have a lower Sharpe Ratio than a portfolio with a 12% return and very low volatility, indicating the second portfolio had better risk-adjusted performance.",
+        "sources": [
+          { "title": "Investopedia - Sharpe Ratio", "url": "https://www.investopedia.com/terms/s/sharperatio.asp" }
+        ]
+      }
+    }
+  },
+  "Derivatives": {
+    "Options": {
+      "machine_readable": {
+        "type": "Derivative Security",
+        "definition": "A contract giving the buyer the right, but not the obligation, to buy or sell an underlying asset at a specified strike price on or before a certain expiration date.",
+        "option_types": {
+          "Call_Option": { "right": "To buy the underlying asset." },
+          "Put_Option": { "right": "To sell the underlying asset." }
+        },
+        "key_terms": ["Underlying Asset", "Strike Price (Exercise Price)", "Expiration Date", "Premium (Option Price)"],
+        "styles": ["American (exercisable at any time)", "European (exercisable only at expiration)"],
+        "pricing_models": {
+          "Black_Scholes_Merton": {
+            "description": "A mathematical model for pricing European-style options.",
+            "inputs": ["Underlying_Price", "Strike_Price", "Time_to_Expiration", "Volatility", "Risk_Free_Rate", "Dividend_Yield"]
+          }
+        },
+        "the_greeks": {
+          "Delta": { "measures": "Rate of change of option price with respect to the underlying asset's price." },
+          "Gamma": { "measures": "Rate of change of Delta." },
+          "Theta": { "measures": "Rate of change of option price with respect to time (time decay)." },
+          "Vega": { "measures": "Rate of change of option price with respect to volatility." },
+          "Rho": { "measures": "Rate of change of option price with respect to the risk-free interest rate." }
+        },
+        "_future_enhancements": ["Add binomial option pricing model", "Detail common option strategies (covered calls, protective puts, spreads)"]
+      },
+      "human_readable": {
+        "definition": "Options are contracts that derive their value from an underlying asset, like a stock. They offer the right, not an obligation, to buy (a call) or sell (a put) the asset at a set price within a specific timeframe.",
+        "example": "Buying a call option on Apple stock with a $180 strike price gives you the right to buy Apple shares at $180 anytime before the option expires. If the stock price goes to $200, your right is valuable. If it stays at $170, you can let the option expire worthless, losing only the premium you paid.",
+        "sources": [
+          { "title": "Investopedia - Option", "url": "https://www.investopedia.com/terms/o/option.asp" }
+        ]
+      }
+    }
+  },
+  "BehavioralFinance": {
+    "Cognitive_Biases": {
+      "machine_readable": {
+        "type": "Psychological Bias",
+        "biases": {
+          "Confirmation_Bias": { "description": "The tendency to search for, interpret, favor, and recall information that confirms or supports one's preexisting beliefs." },
+          "Anchoring_Bias": { "description": "Relying too heavily on the first piece of information offered (the 'anchor') when making decisions." },
+          "Loss_Aversion": { "description": "The tendency to prefer avoiding losses to acquiring equivalent gains. The pain of losing is psychologically more powerful than the pleasure of winning." },
+          "Herding": { "description": "The tendency for individuals to follow the actions of a larger group, whether those actions are rational or not." },
+          "Overconfidence_Bias": { "description": "A person's subjective confidence in their judgments is reliably greater than their objective accuracy." }
+        },
+        "_future_enhancements": ["Add more biases like Recency Bias, Hindsight Bias, Endowment Effect"]
+      },
+      "human_readable": {
+        "definition": "Behavioral finance studies the effects of psychology on financial decision-makers and the subsequent effects on markets. It posits that investors are not always rational.",
+        "explanation": "Cognitive biases are systematic patterns of deviation from norm or rationality in judgment. They can lead investors to make suboptimal decisions.",
+        "example": "An investor might hold onto a losing stock for too long because of Loss Aversion, hoping it will 'come back,' even when fundamentals suggest it won't. This is in contrast to a rational decision to cut losses and reinvest elsewhere.",
+        "sources": [
+          { "title": "Investopedia - Behavioral Finance", "url": "https://www.investopedia.com/terms/b/behavioralfinance.asp" }
+        ]
+      }
+    }
   }
-  // "_future_enhancements_global": ["Add 'PortfolioManagement' module (Asset Allocation, Performance Measurement)", "Add 'Derivatives' module (Options, Futures, Swaps)", "Add 'BehavioralFinance' module"]
 }

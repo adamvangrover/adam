@@ -1,8 +1,8 @@
 {
   "metadata": {
-    "version": "3.0",
-    "description": "Enhanced creditworthiness assessment and rating assignment decision tree with structured condition logic, explicit aggregation methods, qualitative mappings, and a refined rating scale.",
-    "last_updated": "2025-04-01T21:02:00Z",
+    "version": "3.1.0",
+    "description": "Enhanced creditworthiness assessment and rating assignment decision tree with structured condition logic, explicit aggregation methods, qualitative mappings, a refined rating scale, and integration with the knowledge graph.",
+    "last_updated": "2025-05-30T10:00:00Z",
     "qualitative_score_mapping": {
       "_comment": "Standard mapping for qualitative assessments to a 0-10 leaf score. Higher is better.",
       "Very Strong": 10,
@@ -20,17 +20,16 @@
       "Stable": 5,
       "Neutral": 5,
       "Weak": 4,
-      "Low": 4, // Assumes Low risk/inequality etc. is good, adjust if Low growth etc.
+      "Low": 4,
       "Limited": 4,
       "Unfavorable": 3,
       "Below Average": 3,
       "Very Weak": 2,
       "Poor": 1,
       "Ineffective": 1,
-      "None": 10, // E.g., 'None' for External Conflicts is good
-      "Yes": 2, // E.g., 'Yes' for high risk presence might be bad
-      "No": 8 // E.g., 'No' for high risk presence might be good
-      // Add other relevant qualitative terms as needed
+      "None": 10,
+      "Yes": 2,
+      "No": 8
     },
     "scoring_methodology_notes": "Leaf nodes are scored 0-10 based on conditions (using qualitative map if needed). Scores are aggregated up using 'simple_average' at metric level and 'weighted_average' at factor level. Final score (0-100 range expected) maps to rating scale."
   },
@@ -48,16 +47,16 @@
         ]
       },
       {
-        "node_id": "company_analysis_v3", // Unique ID for this version
-        "type": "factor_group", // Renamed type for clarity
+        "node_id": "company_analysis_v3",
+        "type": "factor_group",
         "name": "Company Creditworthiness Analysis",
-        "aggregation_method": "weighted_average", // How factors combine
+        "aggregation_method": "weighted_average",
         "children": [
           {
             "name": "Financial Risk Profile",
             "type": "factor",
-            "weight": 0.45, // Increased weight slightly
-            "aggregation_method": "simple_average", // How metrics combine within factor
+            "weight": 0.45,
+            "aggregation_method": "simple_average",
             "children": [
               {
                 "name": "Profitability Assessment",
@@ -65,8 +64,8 @@
                 "aggregation_method": "simple_average",
                 "children": [
                   {"name": "Return on Equity (ROE)", "type": "leaf", "metric_id": "roe", "condition_logic": {"operator": "ge", "value": 0.15}, "score": 10, "default_score_if_unmet": 4},
-                  {"name": "Operating Margin", "type": "leaf", "metric_id": "op_margin", "condition_logic": {"operator": "ge", "value": 0.12}, "score": 9, "default_score_if_unmet": 3}, // Slightly adjusted
-                  {"name": "Net Income Trend", "type": "leaf", "metric_id": "ni_trend", "condition_logic": {"operator": "qual_eq", "qual_value": "Consistently Growing"}, "score": 8, "default_score_if_unmet": 2} // Uses qualitative map
+                  {"name": "Operating Margin", "type": "leaf", "metric_id": "op_margin", "condition_logic": {"operator": "ge", "value": 0.12}, "score": 9, "default_score_if_unmet": 3},
+                  {"name": "Net Income Trend", "type": "leaf", "metric_id": "ni_trend", "condition_logic": {"operator": "qual_eq", "qual_value": "Consistently Growing"}, "score": 8, "default_score_if_unmet": 2}
                 ]
               },
               {
@@ -74,36 +73,9 @@
                 "type": "metric",
                 "aggregation_method": "simple_average",
                 "children": [
-                  {"name": "Net Debt / EBITDA", "type": "leaf", "metric_id": "net_debt_ebitda", "condition_logic": {"operator": "le", "value": 3.0}, "score": 9, "default_score_if_unmet": 2}, // More specific metric
-                  {"name": "Total Debt / Capital", "type": "leaf", "metric_id": "debt_capital", "condition_logic": {"operator": "le", "value": 0.50}, "score": 8, "default_score_if_unmet": 3} // Adjusted metric
+                  {"name": "Net Debt / EBITDA", "type": "leaf", "metric_id": "net_debt_ebitda", "condition_logic": {"operator": "le", "value": 3.0}, "score": 9, "default_score_if_unmet": 2},
+                  {"name": "Total Debt / Capital", "type": "leaf", "metric_id": "debt_capital", "condition_logic": {"operator": "le", "value": 0.50}, "score": 8, "default_score_if_unmet": 3}
                 ]
-              },
-              {
-                "name": "Cash Flow Adequacy",
-                "type": "metric",
-                "aggregation_method": "simple_average",
-                "children": [
-                  {"name": "Operating Cash Flow / Total Debt", "type": "leaf", "metric_id": "ocfl_debt", "condition_logic": {"operator": "ge", "value": 0.25}, "score": 9, "default_score_if_unmet": 3},
-                  {"name": "Free Cash Flow (FCF) Generation", "type": "leaf", "metric_id": "fcf_gen", "condition_logic": {"operator": "qual_eq", "qual_value": "Consistently Positive"}, "score": 8, "default_score_if_unmet": 2}
-                ]
-              },
-              {
-                "name": "Liquidity Position",
-                "type": "metric",
-                "aggregation_method": "simple_average",
-                "children": [
-                  {"name": "Current Ratio", "type": "leaf", "metric_id": "current_ratio", "condition_logic": {"operator": "ge", "value": 1.8}, "score": 9, "default_score_if_unmet": 4}, // Adjusted threshold
-                  {"name": "Quick Ratio", "type": "leaf", "metric_id": "quick_ratio", "condition_logic": {"operator": "ge", "value": 1.0}, "score": 8, "default_score_if_unmet": 3}
-                ]
-              },
-              {
-                "name": "Debt Structure Assessment", // Added metric group
-                "type": "metric",
-                "aggregation_method": "simple_average",
-                "children": [
-                   {"name": "Short-Term Debt % of Total Debt", "type": "leaf", "metric_id": "st_debt_pct", "condition_logic": {"operator": "le", "value": 0.30}, "score": 8, "default_score_if_unmet": 4},
-                   {"name": "Debt Maturity Profile", "type": "leaf", "metric_id": "maturity_profile", "condition_logic": {"operator": "qual_eq", "qual_value": "Well-Laddered"}, "score": 7, "default_score_if_unmet": 3}
-                 ]
               }
             ]
           },
@@ -114,235 +86,47 @@
             "aggregation_method": "simple_average",
             "children": [
               {
-                "name": "Industry Risk Evaluation", // More explicit name
+                "name": "Industry Risk Evaluation",
                 "type": "metric",
                 "aggregation_method": "simple_average",
                 "children": [
-                  {"name": "Industry Growth Rate", "type": "leaf", "metric_id": "ind_growth", "condition_logic": {"operator": "ge", "value": 0.03}, "score": 8, "default_score_if_unmet": 4 }, // Quantified
-                  {"name": "Industry Cyclicality", "type": "leaf", "metric_id": "ind_cyclicality", "condition_logic": {"operator": "qual_eq", "qual_value": "Low"}, "score": 7, "default_score_if_unmet": 3}, // Use map: Low is good
-                  {"name": "Competitive Intensity", "type": "leaf", "metric_id": "ind_competition", "condition_logic": {"operator": "qual_eq", "qual_value": "Moderate"}, "score": 6, "default_score_if_unmet": 3} // Use map: Moderate is okay
+                  {
+                    "name": "Industry Growth Rate",
+                    "type": "leaf",
+                    "metric_id": "ind_growth",
+                    "condition_logic": {
+                      "operator": "ge",
+                      "value": {
+                        "type": "knowledge_graph_lookup",
+                        "query": "MATCH (c:Company {id: $company_id})-[:IN_INDUSTRY]->(i:Industry) RETURN i.average_growth_rate"
+                      }
+                    },
+                    "score": 8,
+                    "default_score_if_unmet": 4
+                  },
+                  {
+                    "name": "Industry Cyclicality",
+                    "type": "leaf",
+                    "metric_id": "ind_cyclicality",
+                    "condition_logic": {"operator": "qual_eq", "qual_value": "Low"},
+                    "score": 7,
+                    "default_score_if_unmet": 3
+                  },
+                  {
+                    "name": "Competitive Intensity",
+                    "type": "leaf",
+                    "metric_id": "ind_competition",
+                    "condition_logic": {"operator": "qual_eq", "qual_value": "Moderate"},
+                    "score": 6,
+                    "default_score_if_unmet": 3
+                  }
                 ]
-              },
-              {
-                "name": "Market Position Strength",
-                "type": "metric",
-                "aggregation_method": "simple_average",
-                "children": [
-                  {"name": "Market Share Rank", "type": "leaf", "metric_id": "mkt_share_rank", "condition_logic": {"operator": "in_range", "value": [1, 3]}, "score": 9, "default_score_if_unmet": 4}, // Rank 1, 2 or 3
-                  {"name": "Product/Service Diversification", "type": "leaf", "metric_id": "diversification", "condition_logic": {"operator": "qual_eq", "qual_value": "High"}, "score": 8, "default_score_if_unmet": 4}
-                ]
-              },
-              {
-                 "name": "Operational Effectiveness", // Moved from M&G
-                 "type": "metric",
-                 "aggregation_method": "simple_average",
-                 "children": [
-                   {"name": "Cost Position vs Peers", "type": "leaf", "metric_id": "cost_position", "condition_logic": {"operator": "qual_eq", "qual_value": "Advantaged"}, "score": 9, "default_score_if_unmet": 4},
-                   {"name": "Supply Chain Resilience", "type": "leaf", "metric_id": "supply_chain", "condition_logic": {"operator": "qual_eq", "qual_value": "Strong"}, "score": 7, "default_score_if_unmet": 3}
-                  ]
-               }
+              }
             ]
-          },
-          {
-             "name": "Management & Governance Profile", // Added factor
-             "type": "factor",
-             "weight": 0.15, // Added weight
-             "aggregation_method": "simple_average",
-             "children": [
-                {
-                  "name": "Management Quality Assessment",
-                  "type": "metric",
-                  "aggregation_method": "simple_average",
-                  "children": [
-                     {"name": "Track Record & Experience", "type": "leaf", "metric_id": "mgmt_track_record", "condition_logic": {"operator": "qual_eq", "qual_value": "Strong"}, "score": 9, "default_score_if_unmet": 4},
-                     {"name": "Strategy Clarity & Execution", "type": "leaf", "metric_id": "mgmt_strategy", "condition_logic": {"operator": "qual_eq", "qual_value": "Strong"}, "score": 8, "default_score_if_unmet": 4}
-                   ]
-                },
-                {
-                  "name": "Governance Structure Assessment",
-                  "type": "metric",
-                  "aggregation_method": "simple_average",
-                  "children": [
-                     {"name": "Board Independence & Effectiveness", "type": "leaf", "metric_id": "gov_board", "condition_logic": {"operator": "qual_eq", "qual_value": "High"}, "score": 8, "default_score_if_unmet": 4},
-                     {"name": "Shareholder Rights & Transparency", "type": "leaf", "metric_id": "gov_sh_rights", "condition_logic": {"operator": "qual_eq", "qual_value": "Strong"}, "score": 7, "default_score_if_unmet": 3}
-                  ]
-                }
-              ]
-          },
-          {
-            "name": "Other Considerations", // Renamed from Other Factors
-            "type": "factor",
-            "weight": 0.10, // Adjusted weight
-            "aggregation_method": "simple_average",
-            "children": [
-               {
-                 "name": "Macroeconomic Sensitivity", // Adjusted from conditions
-                 "type": "metric",
-                 "aggregation_method": "simple_average",
-                 "children": [
-                   {"name": "Sensitivity to GDP Cycles", "type": "leaf", "metric_id": "macro_gdp_sens", "condition_logic": {"operator": "qual_eq", "qual_value": "Low"}, "score": 8, "default_score_if_unmet": 4},
-                   {"name": "Sensitivity to Interest Rates", "type": "leaf", "metric_id": "macro_ir_sens", "condition_logic": {"operator": "qual_eq", "qual_value": "Low"}, "score": 7, "default_score_if_unmet": 4}
-                  ]
-               },
-               {
-                 "name": "Regulatory & Legal Environment", // Adjusted
-                 "type": "metric",
-                 "aggregation_method": "simple_average",
-                 "children": [
-                    {"name": "Regulatory Burden/Risk", "type": "leaf", "metric_id": "reg_risk", "condition_logic": {"operator": "qual_eq", "qual_value": "Low"}, "score": 8, "default_score_if_unmet": 3},
-                    {"name": "Litigation Risk", "type": "leaf", "metric_id": "legal_risk", "condition_logic": {"operator": "qual_eq", "qual_value": "Low"}, "score": 7, "default_score_if_unmet": 3}
-                  ]
-                },
-                {
-                  "name": "ESG Profile Assessment", // More specific name
-                  "type": "metric",
-                  "aggregation_method": "simple_average", // Could be weighted E/S/G
-                   "_comment": "Assesses overall ESG standing. Individual E, S, G scores assumed to be mapped via qualitative map.",
-                  "children": [
-                    {"name": "Environmental Performance", "type": "leaf", "metric_id": "esg_e", "condition_logic": {"operator": "qual_eq", "qual_value": "Strong"}, "score": 8, "default_score_if_unmet": 4},
-                    {"name": "Social Performance", "type": "leaf", "metric_id": "esg_s", "condition_logic": {"operator": "qual_eq", "qual_value": "Strong"}, "score": 8, "default_score_if_unmet": 4},
-                    {"name": "Governance Performance", "type": "leaf", "metric_id": "esg_g", "condition_logic": {"operator": "qual_eq", "qual_value": "Strong"}, "score": 9, "default_score_if_unmet": 5} // Higher weight/importance often given to G
-                  ]
-                }
-             ]
           }
         ]
-      },
-      {
-        "node_id": "sovereign_analysis_v3", // Unique ID for this version
-        "type": "factor_group",
-        "name": "Sovereign Creditworthiness Analysis",
-        "aggregation_method": "weighted_average",
-        "children": [
-          {
-            "name": "Institutional & Governance Strength", // Renamed & reordered
-            "type": "factor",
-            "weight": 0.25,
-            "aggregation_method": "simple_average",
-             "children": [
-                {
-                  "name": "Political Stability & Effectiveness", // Combined
-                  "type": "metric",
-                  "aggregation_method": "simple_average",
-                  "children": [
-                    {"name": "Government Stability Index", "type": "leaf", "metric_id": "sov_gov_stability", "condition_logic": {"operator": "qual_eq", "qual_value": "High"}, "score": 9, "default_score_if_unmet": 3},
-                    {"name": "Rule of Law Index", "type": "leaf", "metric_id": "sov_rule_of_law", "condition_logic": {"operator": "qual_eq", "qual_value": "Strong"}, "score": 8, "default_score_if_unmet": 3},
-                    {"name": "Control of Corruption Index", "type": "leaf", "metric_id": "sov_corruption", "condition_logic": {"operator": "qual_eq", "qual_value": "Strong"}, "score": 8, "default_score_if_unmet": 2}
-                  ]
-                },
-                 {
-                  "name": "Policy Effectiveness",
-                  "type": "metric",
-                  "aggregation_method": "simple_average",
-                  "children": [
-                    {"name": "Monetary Policy Credibility", "type": "leaf", "metric_id": "sov_mon_policy", "condition_logic": {"operator": "qual_eq", "qual_value": "High"}, "score": 9, "default_score_if_unmet": 4},
-                    {"name": "Fiscal Policy Track Record", "type": "leaf", "metric_id": "sov_fisc_policy", "condition_logic": {"operator": "qual_eq", "qual_value": "Prudent"}, "score": 8, "default_score_if_unmet": 3} // Prudent maps to Strong/High
-                  ]
-                }
-              ]
-           },
-           {
-            "name": "Economic Strength", // Renamed from Economic Risk
-            "type": "factor",
-            "weight": 0.30, // Adjusted weight
-            "aggregation_method": "simple_average",
-            "children": [
-               {
-                 "name": "Growth & Income Levels",
-                 "type": "metric",
-                 "aggregation_method": "simple_average",
-                 "children": [
-                   {"name": "Real GDP Growth Rate (Avg 5yr)", "type": "leaf", "metric_id": "sov_gdp_growth", "condition_logic": {"operator": "ge", "value": 0.025}, "score": 9, "default_score_if_unmet": 3},
-                   {"name": "GDP per Capita (PPP)", "type": "leaf", "metric_id": "sov_gdp_capita", "condition_logic": {"operator": "ge", "value": 25000}, "score": 8, "default_score_if_unmet": 3}, // Example threshold in USD
-                   {"name": "Economic Diversification Index", "type": "leaf", "metric_id": "sov_econ_div", "condition_logic": {"operator": "qual_eq", "qual_value": "High"}, "score": 7, "default_score_if_unmet": 3}
-                  ]
-                },
-                {
-                  "name": "Economic Resilience",
-                   "type": "metric",
-                   "aggregation_method": "simple_average",
-                   "children": [
-                      {"name": "Inflation Volatility", "type": "leaf", "metric_id": "sov_inf_vol", "condition_logic": {"operator": "qual_eq", "qual_value": "Low"}, "score": 8, "default_score_if_unmet": 4},
-                      {"name": "Unemployment Rate Level", "type": "leaf", "metric_id": "sov_unemp_lvl", "condition_logic": {"operator": "le", "value": 0.06}, "score": 8, "default_score_if_unmet": 4}
-                   ]
-                }
-              ]
-           },
-           {
-            "name": "External Liquidity & International Position", // Renamed from External Stability
-            "type": "factor",
-            "weight": 0.20, // Adjusted weight
-            "aggregation_method": "simple_average",
-             "children": [
-                {
-                  "name": "Current Account & External Debt",
-                  "type": "metric",
-                  "aggregation_method": "simple_average",
-                  "children": [
-                     {"name": "Current Account Balance (% GDP)", "type": "leaf", "metric_id": "sov_ca_balance", "condition_logic": {"operator": "ge", "value": -0.03}, "score": 9, "default_score_if_unmet": 3}, // Small deficit or surplus
-                     {"name": "External Debt (% Exports)", "type": "leaf", "metric_id": "sov_ext_debt_exp", "condition_logic": {"operator": "le", "value": 1.5}, "score": 8, "default_score_if_unmet": 3}, // 150%
-                     {"name": "Net International Investment Position (% GDP)", "type": "leaf", "metric_id": "sov_niip", "condition_logic": {"operator": "ge", "value": -0.50}, "score": 7, "default_score_if_unmet": 3} // NIIP not excessively negative
-                   ]
-                 },
-                 {
-                  "name": "Reserve Adequacy",
-                  "type": "metric",
-                  "aggregation_method": "simple_average",
-                  "children": [
-                     {"name": "FX Reserves (Months of Imports)", "type": "leaf", "metric_id": "sov_fx_reserves_imp", "condition_logic": {"operator": "ge", "value": 4}, "score": 9, "default_score_if_unmet": 4},
-                     {"name": "FX Reserves (% Short-Term External Debt)", "type": "leaf", "metric_id": "sov_fx_reserves_std", "condition_logic": {"operator": "ge", "value": 1.0}, "score": 8, "default_score_if_unmet": 4} // Guidotti-Greenspan rule
-                   ]
-                  }
-               ]
-            },
-            {
-             "name": "Fiscal Strength",
-             "type": "factor",
-             "weight": 0.20, // Adjusted weight
-             "aggregation_method": "simple_average",
-              "children": [
-                 {
-                   "name": "Government Debt Burden",
-                   "type": "metric",
-                   "aggregation_method": "simple_average",
-                   "children": [
-                      {"name": "General Government Debt (% GDP)", "type": "leaf", "metric_id": "sov_gov_debt_gdp", "condition_logic": {"operator": "le", "value": 0.60}, "score": 9, "default_score_if_unmet": 3},
-                      {"name": "Interest Payments (% Revenue)", "type": "leaf", "metric_id": "sov_int_rev", "condition_logic": {"operator": "le", "value": 0.10}, "score": 8, "default_score_if_unmet": 3}
-                    ]
-                 },
-                 {
-                   "name": "Fiscal Flexibility & Performance",
-                   "type": "metric",
-                   "aggregation_method": "simple_average",
-                   "children": [
-                     {"name": "Fiscal Balance (% GDP)", "type": "leaf", "metric_id": "sov_fisc_balance", "condition_logic": {"operator": "ge", "value": -0.03}, "score": 8, "default_score_if_unmet": 3}, // Deficit not too large
-                     {"name": "Revenue Base (% GDP)", "type": "leaf", "metric_id": "sov_rev_base", "condition_logic": {"operator": "qual_eq", "qual_value": "Broad & Stable"}, "score": 7, "default_score_if_unmet": 4}
-                   ]
-                  }
-                ]
-            },
-            {
-              "name": "Monetary Flexibility", // Renamed from Monetary Stability
-              "type": "factor",
-              "weight": 0.05, // Reduced weight, partially covered in Policy Effectiveness
-              "aggregation_method": "simple_average",
-              "children": [
-                 {
-                   "name": "Price Stability & Exchange Rate",
-                   "type": "metric",
-                   "aggregation_method": "simple_average",
-                   "children": [
-                      {"name": "Inflation Rate (Avg 3yr)", "type": "leaf", "metric_id": "sov_inf_rate", "condition_logic": {"operator": "in_range", "value": [0.01, 0.04]}, "score": 9, "default_score_if_unmet": 3}, // Low and stable
-                      {"name": "Exchange Rate Regime Flexibility", "type": "leaf", "metric_id": "sov_fx_regime", "condition_logic": {"operator": "qual_eq", "qual_value": "Flexible"}, "score": 8, "default_score_if_unmet": 4} // Flexible usually better for absorbing shocks
-                     ]
-                 }
-               ]
-            }
-            // Note: Removed Political Risk as separate factor, integrated into Institutional Strength
-            // Note: Removed Other Factors, integrated elements (Debt Sustainability, External Liquidity) into core factors
-         ]
-       }
-     ]
+      }
+    ]
   },
   "rating_scale": {
     "_comment": "Mapping of final aggregated score (0-100) to letter rating.",
@@ -362,7 +146,7 @@
     "30-34": "B+",
     "25-29": "B",
     "20-24": "B-",
-    "15-19": "CCC", // Combined CCC range for simplicity, could be split further
+    "15-19": "CCC",
     "10-14": "CC",
     "5-9": "C",
     "0-4": "D"

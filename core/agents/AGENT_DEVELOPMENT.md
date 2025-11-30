@@ -1,6 +1,6 @@
 # Agent Development Guide
 
-This document provides a comprehensive guide for developers creating new agents for the ADAM system. It covers the agent development workflow, best practices, debugging and testing, and the agent API. For a catalog of existing agents, see the [Agent Catalog](AGENT_CATALOG.md).
+This document provides a comprehensive guide for developers creating new agents for the ADAM system. It covers the agent development workflow, best practices, debugging and testing, and the agent API.
 
 ## 1. Agent Development Workflow
 
@@ -52,6 +52,12 @@ End-to-end tests are used to test the entire system from start to finish. End-to
 The `Agent` class in `agent_base.py` provides the following methods and properties:
 
 *   **`__init__(self, name, persona)`:** Initializes the agent with a name and persona.
+*   **`run(self)`:** The main entry point for the agent. This method is called by the system to start the agent's execution.
+*   **`send_message(self, recipient, message)`:** Sends a message to another agent.
+*   **`receive_message(self, sender, message)`:** Receives a message from another agent.
+*   **`get_knowledge(self, query)`:** Retrieves information from the knowledge base.
+*   **`log(self, message)`:** Logs a message to the system's log file.
+
 
     *   **Code Example:**
         ```python
