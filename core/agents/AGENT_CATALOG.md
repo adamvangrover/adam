@@ -839,3 +839,89 @@ This document provides a comprehensive catalog of all the agents in the ADAM sys
 *   **Compute and Resource Requirements:** This agent is not very resource-intensive.
 *   **Dependencies:** `market_data_api`
 *   **Developer Notes:** This agent can be extended by adding new technical analysis indicators.
+
+---
+
+## `red_team_agent`
+
+*   **File:** `core/agents/red_team_agent.py`
+*   **Description:** The Red Team Agent acts as an adversary to the system. It generates novel and challenging scenarios (stress tests) to validate risk models and system resilience.
+*   **Configuration:** `config/agents.yaml`
+    *   `num_scenarios`: Number of scenarios to generate.
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.AgentBase`.
+*   **Agent Forge and Lifecycle:** Created on demand or during stress test cycles.
+*   **Model Context Protocol (MCP):** Maintains context of generated scenarios and their severity.
+*   **Tools and Hooks:** None currently.
+*   **Compute and Resource Requirements:** Low to Medium.
+*   **Dependencies:** None.
+
+---
+
+## `meta_cognitive_agent`
+
+*   **File:** `core/agents/meta_cognitive_agent.py`
+*   **Description:** Responsible for monitoring the reasoning and outputs of other agents to ensure logical consistency, coherence, and alignment with core principles.
+*   **Configuration:** `config/agents.yaml`
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.AgentBase`.
+*   **Agent Forge and Lifecycle:** Continuous monitoring or per-task review.
+*   **Model Context Protocol (MCP):** Stateless reviews.
+*   **Tools and Hooks:** None currently.
+*   **Compute and Resource Requirements:** Low.
+*   **Dependencies:** None.
+
+---
+
+## `reflector_agent`
+
+*   **File:** `core/agents/reflector_agent.py`
+*   **Description:** A simple agent that reflects its input back to the sender. Useful for testing agent routing and cyclical reasoning.
+*   **Configuration:** None.
+*   **Architecture and Base Agent:** Inherits from `core.system.v22_async.async_agent_base.AsyncAgentBase`.
+*   **Agent Forge and Lifecycle:** On demand for testing.
+*   **Model Context Protocol (MCP):** Stateless.
+*   **Tools and Hooks:** None.
+*   **Compute and Resource Requirements:** Negligible.
+*   **Dependencies:** None.
+
+---
+
+## `behavioral_economics_agent`
+
+*   **File:** `core/agents/behavioral_economics_agent.py`
+*   **Description:** Analyzes market data and user interactions for signs of cognitive biases and irrational behavior.
+*   **Configuration:** `config/agents.yaml`
+    *   `bias_patterns`: Dictionary of bias patterns to look for.
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.AgentBase`.
+*   **Agent Forge and Lifecycle:** Continuous or on demand.
+*   **Model Context Protocol (MCP):** Stateless.
+*   **Tools and Hooks:** Uses `transformers` pipeline for sentiment analysis.
+*   **Compute and Resource Requirements:** Medium (uses ML model).
+*   **Dependencies:** `transformers`, `torch`.
+
+---
+
+## `cyclical_reasoning_agent`
+
+*   **File:** `core/agents/cyclical_reasoning_agent.py`
+*   **Description:** An agent capable of cyclical reasoning, routing its output back to itself or other agents for iterative improvement.
+*   **Configuration:** None.
+*   **Architecture and Base Agent:** Inherits from `core.system.v22_async.async_agent_base.AsyncAgentBase`.
+*   **Agent Forge and Lifecycle:** Task-based.
+*   **Model Context Protocol (MCP):** Tracks iteration count.
+*   **Tools and Hooks:** None.
+*   **Compute and Resource Requirements:** Low.
+*   **Dependencies:** None.
+
+---
+
+## `prompt_generation_agent`
+
+*   **File:** `core/agents/prompt_generation_agent.py`
+*   **Description:** An agent that generates a high-quality prompt from a user query.
+*   **Configuration:** None.
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.AgentBase`.
+*   **Agent Forge and Lifecycle:** On demand.
+*   **Model Context Protocol (MCP):** Stateless.
+*   **Tools and Hooks:** Uses Semantic Kernel or LLM.
+*   **Compute and Resource Requirements:** Low.
+*   **Dependencies:** `semantic_kernel` (optional).
