@@ -381,17 +381,17 @@ This document provides a comprehensive catalog of all the agents in the ADAM sys
 ## `crisis_simulation_agent`
 
 *   **File:** `core/agents/meta_agents/crisis_simulation_agent.py`
-*   **Description:** A meta-agent that conducts dynamic, enterprise-grade crisis simulations. It uses a sophisticated prompt structure to simulate the cascading effects of risks based on a user-defined scenario.
+*   **Description:** A meta-agent that conducts dynamic, enterprise-grade crisis simulations. **Updated for v23:** Wraps the `CrisisSimulationGraph` for cyclical, multi-step macroeconomic stress testing. Falls back to v21 prompt structure if graph dependencies are missing.
 *   **Configuration:** `config/agents.yaml`
-*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.AgentBase`.
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.AgentBase`. Wraps `LangGraph`.
 *   **Agent Forge and Lifecycle:** This agent is created by the Agent Forge on demand and runs until it has completed its crisis simulation task.
-*   **Model Context Protocol (MCP):** The agent is stateless and does not maintain its own context. The context is provided in the input.
+*   **Model Context Protocol (MCP):** The agent maps input context to `CrisisSimulationState`.
 *   **Tools and Hooks:**
-    *   **Tools:** `CrisisSimulationPlugin`
+    *   **Tools:** `CrisisSimulationPlugin` (Fallback), `CrisisSimulationGraph` (Primary)
     *   **Hooks:** None
-*   **Compute and Resource Requirements:** This agent can be resource-intensive as it relies on a large language model to perform the simulation.
-*   **Dependencies:** `core.prompting.plugins.crisis_simulation_plugin.CrisisSimulationPlugin`
-*   **Developer Notes:** The quality of the simulation is highly dependent on the quality of the risk portfolio data and the sophistication of the LLM.
+*   **Compute and Resource Requirements:** High (Cyclical LLM calls).
+*   **Dependencies:** `langgraph`, `core.v23_graph_engine.crisis_simulation_graph`.
+*   **Developer Notes:** The v23 graph provides better reasoning traces than the v21 prompt-only approach.
 
 ---
 
@@ -773,17 +773,18 @@ This document provides a comprehensive catalog of all the agents in the ADAM sys
 ## `risk_assessment_agent`
 
 *   **File:** `core/agents/risk_assessment_agent.py`
-*   **Description:** This agent is responsible for assessing various types of investment risks, such as market risk, credit risk, and operational risk. It can use a variety of risk models to quantify the risks and can generate reports on the overall risk of a portfolio.
+*   **Description:** This agent is responsible for assessing various types of investment risks. **Updated for v23:** Can delegate complex investment risk analysis to the `CyclicalReasoningGraph` for iterative drafting and critique.
 *   **Configuration:** `config/agents.yaml`
     *   `risk_models`: A list of risk models to use.
+    *   `use_v23_graph`: Boolean to enable graph delegation.
 *   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.Agent`.
 *   **Agent Forge and Lifecycle:** This agent is created by the Agent Forge on demand and runs until it has completed its risk assessment task.
 *   **Model Context Protocol (MCP):** The agent maintains a list of the risks that it has assessed.
 *   **Tools and Hooks:**
-    *   **Tools:** `risk_assessment_tool`
+    *   **Tools:** `risk_assessment_tool`, `CyclicalReasoningGraph`
     *   **Hooks:** `pre_assessment_hook`, `post_assessment_hook`
-*   **Compute and Resource Requirements:** This agent can be resource-intensive, as it may need to perform complex risk calculations.
-*   **Dependencies:** `market_data_api`
+*   **Compute and Resource Requirements:** High (if using Graph).
+*   **Dependencies:** `market_data_api`, `langgraph`.
 *   **Developer Notes:** The accuracy of this agent can be improved by using more sophisticated risk models.
 
 ---
@@ -874,14 +875,14 @@ This document provides a comprehensive catalog of all the agents in the ADAM sys
 ## `reflector_agent`
 
 *   **File:** `core/agents/reflector_agent.py`
-*   **Description:** The Reflector Agent performs meta-cognition. It analyzes the output of other agents or the system's own reasoning traces to identify logical fallacies, hallucination risks, or missing context. It implements the "Self-Correction" loop of the v23 architecture.
+*   **Description:** The Reflector Agent performs meta-cognition. **Updated for v23:** Wraps the `ReflectorGraph` to perform iterative critique and refinement of reasoning traces ("System 2" thinking).
 *   **Configuration:** None.
 *   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.AgentBase`.
 *   **Agent Forge and Lifecycle:** Continuous or on demand.
 *   **Model Context Protocol (MCP):** Stateless.
-*   **Tools and Hooks:** None.
-*   **Compute and Resource Requirements:** Low (Heuristic) to High (LLM-based).
-*   **Dependencies:** None.
+*   **Tools and Hooks:** `ReflectorGraph`.
+*   **Compute and Resource Requirements:** Low (Heuristic) to High (Graph/LLM-based).
+*   **Dependencies:** `langgraph`.
 
 ---
 

@@ -295,3 +295,30 @@ def init_crisis_state(scenario: str, portfolio: Dict) -> CrisisSimulationState:
         "human_readable_status": "Initializing Crisis Simulation...",
         "final_report": None
     }
+
+class ReflectorState(TypedDict):
+    """
+    State for the Reflector (Meta-Cognition) Graph.
+    """
+    input_content: str
+    context: Dict[str, Any]
+
+    critique_notes: List[str]
+    score: float
+    is_valid: bool
+
+    refined_content: Optional[str]
+    iteration_count: int
+    human_readable_status: str
+
+def init_reflector_state(content: str, context: Dict = None) -> ReflectorState:
+    return {
+        "input_content": content,
+        "context": context or {},
+        "critique_notes": [],
+        "score": 0.0,
+        "is_valid": False,
+        "refined_content": None,
+        "iteration_count": 0,
+        "human_readable_status": "Initializing Reflection..."
+    }

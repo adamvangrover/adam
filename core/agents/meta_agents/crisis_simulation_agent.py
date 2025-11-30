@@ -2,8 +2,17 @@ from __future__ import annotations
 from typing import Any, Dict
 from core.agents.agent_base import AgentBase
 from core.prompting.plugins.crisis_simulation_plugin import CrisisSimulationPlugin
-from core.schemas.crisis_simulation import CrisisSimulationInput, CrisisSimulationOutput
+from core.schemas.crisis_simulation import CrisisSimulationInput, CrisisSimulationOutput, CrisisLogEntry
+from core.v23_graph_engine.states import init_crisis_state
 import logging
+
+# Try to import v23 Graph logic
+try:
+    from core.v23_graph_engine.crisis_simulation_graph import crisis_simulation_app
+    GRAPH_AVAILABLE = True
+except ImportError:
+    GRAPH_AVAILABLE = False
+    crisis_simulation_app = None
 
 class CrisisSimulationMetaAgent(AgentBase):
     """
@@ -41,6 +50,9 @@ class CrisisSimulationMetaAgent(AgentBase):
         """
         Executes the crisis simulation.
 
+        If v23 Graph is available, delegates to `CrisisSimulationGraph`.
+        Otherwise, falls back to v21 Prompt-as-Code logic.
+
         Args:
             simulation_input: A Pydantic model containing the risk portfolio,
                               current date, and the user's crisis scenario.
@@ -48,10 +60,54 @@ class CrisisSimulationMetaAgent(AgentBase):
         Returns:
             A Pydantic model containing the structured simulation output.
         """
+        logging.info("Starting crisis simulation...")
+
+        # --- v23 Path: Cyclical Graph ---
+        if GRAPH_AVAILABLE and crisis_simulation_app:
+            logging.info("CrisisSimulationMetaAgent: Delegating to v23 CrisisSimulationGraph.")
+
+            input_dict = simulation_input.model_dump()
+            scenario = input_dict.get("user_scenario", "General Crisis Scenario")
+            portfolio = input_dict.get("risk_portfolio", {})
+
+            initial_state = init_crisis_state(scenario, portfolio)
+
+            try:
+                config = {"configurable": {"thread_id": "1"}}
+                result_state = await crisis_simulation_app.ainvoke(initial_state, config=config)
+
+                # Transform Graph Output to CrisisSimulationOutput
+                # The graph returns 'final_report' (str)
+                final_report = result_state.get("final_report", "Graph Execution Complete")
+
+                # Create a synthetic log entry since the graph doesn't produce it yet
+                synthetic_log = [
+                    CrisisLogEntry(
+                        timestamp="T+0",
+                        event_description=f"Simulation initialized for scenario: {scenario}",
+                        risk_id_cited="SYS-INIT",
+                        status="Active"
+                    ),
+                    CrisisLogEntry(
+                        timestamp="T+End",
+                        event_description="Simulation completed by v23 Graph Engine.",
+                        risk_id_cited="SYS-END",
+                        status="Resolved"
+                    )
+                ]
+
+                return CrisisSimulationOutput(
+                    executive_summary=final_report,
+                    crisis_simulation_log=synthetic_log,
+                    recommendations="Review the detailed graph trace in 'final_report' for mitigation strategies."
+                )
+            except Exception as e:
+                logging.error(f"CrisisSimulationGraph execution failed: {e}. Falling back to v21 logic.")
+                # Fallthrough to legacy logic
+
+        # --- v21 Path: Prompt-as-Code ---
         if not self.simulation_plugin:
             raise RuntimeError("CrisisSimulationPlugin is not initialized.")
-
-        logging.info("Starting crisis simulation...")
 
         # Render the prompt using the plugin
         messages = self.simulation_plugin.render_messages(simulation_input.model_dump())
@@ -59,15 +115,11 @@ class CrisisSimulationMetaAgent(AgentBase):
         # In a real scenario, this would be an API call to an LLM.
         if self.kernel:
             # This is where the actual LLM call would be made.
-            # For now, we will log that we would be making the call.
             logging.info("Semantic Kernel is available, would make a real LLM call here.")
-            # result = await self.kernel.invoke_prompt(prompt=messages[0]['content'], arguments={})
-            # llm_response_str = str(result)
             llm_response_str = self._mock_llm_call(messages) # Keep mock for now to not break tests
         else:
             logging.warning("Semantic Kernel not available. Using mocked LLM call for crisis simulation.")
             llm_response_str = self._mock_llm_call(messages)
-
 
         # Parse the response using the plugin
         parsed_output = self.simulation_plugin.parse_response(llm_response_str)
