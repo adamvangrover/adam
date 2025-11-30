@@ -1,83 +1,193 @@
 {
   "v23_unified_knowledge_graph": {
-    "version": "23.0-alpha",
-    "ontology_standard": "FIBO-v2",
-    "generated_at": "2025-05-23T12:00:00Z",
+    "meta": {
+      "version": "23.1-beta",
+      "ontology_standard": "FIBO-v2",
+      "generated_at": "2025-05-23T14:30:00Z",
+      "graph_integrity_hash": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
     "nodes": {
       "legal_entities": [
         {
-          "legal_name": "JPMorgan Chase & Co.",
+          "node_id": "LE-JPM-001",
+          "legal_name": "JPMORGAN CHASE & CO.",
           "lei_code": "8I5DZWZKVSZI1NUHU748",
-          "headquarters_address": "383 Madison Avenue, New York, NY 10179, USA",
+          "ticker": "JPM",
+          "sector": "Financials",
+          "sub_sector": "Diversified Banks",
+          "headquarters_address": "383 MADISON AVENUE, NEW YORK, NY, 10179, UNITED STATES",
           "jurisdiction": "US-DE",
+          "risk_weight": "G-SIB (Bucket 4)",
           "provenance": "https://lei.bloomberg.com/leis/view/8I5DZWZKVSZI1NUHU748"
         },
         {
-          "legal_name": "Exxon Mobil Corporation",
+          "node_id": "LE-XOM-002",
+          "legal_name": "EXXON MOBIL CORPORATION",
           "lei_code": "J3WHBG0MTS7O8ZVMDC91",
-          "headquarters_address": "22777 Springwoods Village Parkway, Spring, TX 77389, USA",
+          "ticker": "XOM",
+          "sector": "Energy",
+          "sub_sector": "Integrated Oil & Gas",
+          "headquarters_address": "22777 SPRINGWOODS VILLAGE PARKWAY, SPRING, TX, 77389, UNITED STATES",
           "jurisdiction": "US-NJ",
-          "provenance": "https://www.legalentityidentifier.in/leicert/J3WHBG0MTS7O8ZVMDC91/"
+          "provenance": "https://www.lei-lookup.com/record/J3WHBG0MTS7O8ZVMDC91/"
         },
         {
-          "legal_name": "Microsoft Corporation",
+          "node_id": "LE-MSFT-003",
+          "legal_name": "MICROSOFT CORPORATION",
           "lei_code": "INR2EJN1ERAN0W5ZP974",
-          "headquarters_address": "One Microsoft Way, Redmond, WA 98052, USA",
+          "ticker": "MSFT",
+          "sector": "Technology",
+          "sub_sector": "Systems Software",
+          "headquarters_address": "ONE MICROSOFT WAY, REDMOND, WA, 98052-8300, UNITED STATES",
           "jurisdiction": "US-WA",
           "provenance": "https://www.legalentityidentifier.in/leicert/INR2EJN1ERAN0W5ZP974/"
+        },
+        {
+          "node_id": "LE-TSMC-004",
+          "legal_name": "TAIWAN SEMICONDUCTOR MANUFACTURING COMPANY LTD.",
+          "lei_code": "5493001R2JKJ5K51L616",
+          "ticker": "TSM",
+          "sector": "Technology",
+          "sub_sector": "Semiconductors",
+          "headquarters_address": "HSINCHU SCIENCE PARK, TAIWAN",
+          "jurisdiction": "TW",
+          "role": "Critical_Supplier",
+          "provenance": "https://search.gleif.org/"
+        }
+      ],
+      "supply_chain_relations": [
+        {
+          "source_lei": "5493001R2JKJ5K51L616",
+          "target_lei": "INR2EJN1ERAN0W5ZP974",
+          "relationship_type": "Supplier",
+          "criticality_score": 0.95,
+          "dependency_description": "Exclusive supplier for Azure AI Accelerator Chips"
         }
       ],
       "financial_instruments": {
         "loans": [
           {
-            "loan_id": "LN-XOM-2025-A",
+            "instrument_id": "LN-XOM-2025-A",
+            "type": "Syndicated Revolving Credit Facility",
             "borrower_lei": "J3WHBG0MTS7O8ZVMDC91",
+            "lead_arranger_lei": "8I5DZWZKVSZI1NUHU748",
             "principal_amount": 5000000000,
             "currency": "USD",
-            "interest_rate": "SOFR + 150bps",
+            "interest_rate_model": {
+              "benchmark": "SOFR",
+              "spread_bps": 150,
+              "floor": 0.00
+            },
+            "maturity_date": "2028-05-21",
+            "status": "Performing",
             "covenants": [
               {
                 "covenant_id": "COV-001",
-                "type": "Financial",
+                "type": "Financial Maintenance",
                 "description": "Net Leverage Ratio <= 3.5x",
+                "metric": "net_debt_to_ebitda",
+                "threshold": 3.5,
+                "testing_frequency": "Quarterly",
+                "is_legally_binding": true
+              },
+              {
+                "covenant_id": "COV-002",
+                "type": "Affirmative",
+                "description": "Must maintain insurance coverage > $10B",
                 "is_legally_binding": true
               }
-            ],
-            "status": "Performing",
-            "provenance": "Synthetic Construction for SNC Graph Testing"
+            ]
           }
         ],
         "securities": [
           {
+            "instrument_id": "SEC-MSFT-2030",
+            "isin": "US594918CS19",
             "cusip": "594918CS1",
             "issuer_lei": "INR2EJN1ERAN0W5ZP974",
             "type": "Corporate Bond",
+            "seniority": "Senior Unsecured",
             "maturity_date": "2030-09-15",
             "face_value": 1000,
-            "coupon": "1.35%",
-            "provenance": "https://public.com/bonds/corporate/microsoft-corp/msft-1.35-09-15-2030-594918cs1"
+            "currency": "USD",
+            "coupon_structure": {
+              "rate": 0.0135,
+              "frequency": "Semi-Annual",
+              "type": "Fixed"
+            },
+            "market_data": {
+              "price": 89.45,
+              "yield_to_maturity": 0.0385,
+              "duration": 4.8
+            }
           }
         ]
       },
       "esg_profiles": [
         {
           "lei_code": "J3WHBG0MTS7O8ZVMDC91",
-          "environmental_score": 4.5,
+          "company_name": "Exxon Mobil Corporation",
+          "overall_score": 4.2,
+          "environmental_score": 3.1,
+          "governance_score": 6.5,
+          "social_score": 4.0,
+          "greenwashing_risk_score": 0.92,
           "controversies": [
-            "California AG Lawsuit (2023): Alleged deception regarding plastic recycling recyclability.",
-            "Climate Risk Disclosure Lawsuit (2024): Legal challenge to block California's emissions reporting laws."
+            {
+              "id": "CON-XOM-2024-001",
+              "event": "California AG Lawsuit: Deception on Plastic Recycling",
+              "date": "2024-09-23",
+              "severity": "High",
+              "status": "Active Litigation",
+              "source": "https://oag.ca.gov/news/press-releases/attorney-general-bonta-sues-exxonmobil-deceiving-public-recyclability-plastic"
+            },
+            {
+              "id": "CON-XOM-2025-001",
+              "event": "2025 Climate Report Failed Scientific Review",
+              "date": "2025-01-15",
+              "severity": "Medium",
+              "status": "Reputational Damage",
+              "source": "https://blog.ucs.org/carly-phillips/exxonmobils-2025-climate-report-fails-scientific-review-again/"
+            }
           ],
-          "greenwashing_risk_score": 0.85,
-          "provenance": "https://oag.ca.gov/news/press-releases/attorney-general-bonta-sues-exxonmobil-deceiving-public-recyclability-plastic"
+          "commitments": {
+            "net_zero_target": 2050,
+            "scope_3_included": false,
+            "sbti_verified": false
+          }
         },
         {
           "lei_code": "INR2EJN1ERAN0W5ZP974",
-          "environmental_score": 8.2,
+          "company_name": "Microsoft Corporation",
+          "overall_score": 8.8,
+          "environmental_score": 9.2,
+          "governance_score": 7.5,
+          "social_score": 8.5,
+          "greenwashing_risk_score": 0.18,
           "controversies": [
-            "CSRB Report (2024): Cyber Safety Review Board cited 'cascade of avoidable errors' allowing Chinese intrusion into US government emails, highlighting governance failure in security culture."
+            {
+              "id": "CON-MSFT-2024-001",
+              "event": "CSRB Report: Cascade of Avoidable Security Errors",
+              "date": "2024-04-02",
+              "severity": "High",
+              "status": "Remediation Phase",
+              "category": "Governance/Cybersecurity",
+              "source": "https://www.cisa.gov/news-events/news/csrb-releases-report-microsoft-online-exchange-incident"
+            },
+            {
+              "id": "CON-MSFT-2024-002",
+              "event": "EU Antitrust Preliminary View (Teams Bundling)",
+              "date": "2024-06-25",
+              "severity": "Medium",
+              "status": "Regulatory Probe",
+              "source": "https://ec.europa.eu/commission/presscorner/detail/en/ip_24_3462"
+            }
           ],
-          "greenwashing_risk_score": 0.15,
-          "provenance": "https://www.cisa.gov/news-events/news/csrb-releases-report-microsoft-online-exchange-incident"
+          "commitments": {
+            "net_zero_target": 2030,
+            "water_positive_target": 2030,
+            "sbti_verified": true
+          }
         }
       ]
     },
@@ -85,32 +195,44 @@
       "crisis_scenarios": [
         {
           "scenario_id": "CRISIS-001",
-          "name": "The 8% World",
-          "description": "Fed Funds rate hits 8%, triggering widespread default.",
+          "name": "The 8% World (Stagflation Shock)",
+          "type": "Macroeconomic",
+          "probability": 0.15,
           "shocks": {
-            "interest_rates_us": 0.08,
+            "fed_funds_rate": 0.08,
+            "us_10y_yield": 0.075,
             "sp500_drawdown": -0.35,
-            "corporate_default_rate": 0.05
-          }
+            "corporate_default_rate_hy": 0.12,
+            "unemployment_rate": 0.065
+          },
+          "cascading_effects": [
+            "Trigger COV-001 breach for high-leverage energy companies",
+            "JPM Loan Loss Provision increase by 40%"
+          ]
         },
         {
           "scenario_id": "CRISIS-002",
-          "name": "Strait Closure",
-          "description": "Oil hits $200/bbl due to geopolitical conflict, then collapses due to demand destruction.",
+          "name": "Strait of Hormuz Closure",
+          "type": "Geopolitical",
+          "probability": 0.05,
           "shocks": {
             "oil_price_peak": 200.0,
-            "oil_price_settle": 40.0,
-            "energy_sector_capex": -0.50
+            "oil_price_settle": 45.0,
+            "energy_sector_revenue_lag": -0.20,
+            "global_gdp_impact": -0.025,
+            "shipping_cost_index_multiplier": 4.5
           }
         },
         {
           "scenario_id": "CRISIS-003",
-          "name": "AI Winter",
-          "description": "Regulatory crackdown on LLMs slashes Tech sector capex by 40%.",
+          "name": "AI Winter (Regulatory Freeze)",
+          "type": "Sector_Specific",
+          "probability": 0.10,
           "shocks": {
             "tech_sector_capex": -0.40,
-            "nasdaq_drawdown": -0.45,
-            "ai_regulation_index": 0.9
+            "nasdaq_drawdown": -0.25,
+            "ai_regulation_compliance_cost_increase": 3.0,
+            "semiconductor_demand_drop": -0.30
           }
         }
       ]
@@ -119,20 +241,39 @@
       "basel_iii": [
         {
           "rule_id": "B3-CAP-01",
-          "description": "Tier 1 Capital > 6%",
-          "metric": "tier_1_ratio",
-          "threshold": 0.06
+          "name": "Tier 1 Capital Ratio",
+          "description": "Core equity capital must exceed 6% of risk-weighted assets.",
+          "metric": "tier_1_capital_ratio",
+          "threshold": 0.06,
+          "operator": "gt",
+          "impact_on_breach": "Dividend Suspension"
+        },
+        {
+          "rule_id": "B3-LIQ-01",
+          "name": "Liquidity Coverage Ratio (LCR)",
+          "description": "High Quality Liquid Assets / Total Net Cash Outflows > 100%",
+          "metric": "lcr_ratio",
+          "threshold": 1.0,
+          "operator": "gt"
         }
       ],
       "gdpr": [
         {
-          "rule_id": "GDPR-sov-01",
-          "description": "Data Sovereignty: EU Customer data must reside in EU-West-1",
-          "metric": "data_region",
-          "allowed_values": [
-            "EU-West-1",
-            "EU-Central-1"
-          ]
+          "rule_id": "GDPR-SOV-01",
+          "name": "Data Sovereignty (Schrems II)",
+          "description": "EU Customer data must reside in EEA or equivalent adequacy zones.",
+          "metric": "data_residency_region",
+          "allowed_values": ["EU-West-1", "EU-Central-1", "Europe-North1"],
+          "remediation_period_days": 30
+        }
+      ],
+      "dora": [
+        {
+          "rule_id": "DORA-ICT-01",
+          "name": "ICT Third Party Risk",
+          "description": "Critical ICT providers (e.g., Cloud) must have penetration testing results on file.",
+          "metric": "supplier_audit_status",
+          "required_value": "Current"
         }
       ]
     }
