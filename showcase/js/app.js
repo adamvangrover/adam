@@ -1,35 +1,60 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const activityLog = document.getElementById('activity-log');
-
-    if (activityLog && typeof recentActivities !== 'undefined') {
-        recentActivities.forEach(activity => {
-            const item = document.createElement('div');
-            item.className = 'bg-gray-900 p-4 rounded-lg border-l-4 border-blue-500 hover:bg-gray-700 transition cursor-pointer';
-
-            let icon = 'fa-tasks';
-            let color = 'blue';
-
-            if (activity.type === 'red_team') { icon = 'fa-user-secret'; color = 'red'; }
-            if (activity.type === 'monitor') { icon = 'fa-eye'; color = 'green'; }
-            if (activity.type === 'system') { icon = 'fa-server'; color = 'gray'; }
-
-            item.style.borderColor = `var(--${color}-500)`; // Note: Tailwind classes handle colors, this is illustrative
-
-            item.innerHTML = `
-                <div class="flex justify-between items-start">
-                    <div class="flex items-center">
-                        <div class="p-2 bg-gray-800 rounded-lg mr-3">
-                            <i class="fas ${icon} text-${color}-400"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-gray-200">${activity.title}</h4>
-                            <p class="text-sm text-gray-400">${activity.details}</p>
-                        </div>
-                    </div>
-                    <span class="text-xs text-gray-500 whitespace-nowrap">${activity.time}</span>
-                </div>
-            `;
-            activityLog.appendChild(item);
-        });
+class DataManager {
+    constructor() {
+        this.useApi = true;
+        this.apiBase = '/api';
+        this.staticBase = 'data/ui_data.json';
+        this.data = null;
     }
-});
+
+    async init() {
+        try {
+            await this.fetchData();
+        } catch (e) {
+            console.warn("API failed, falling back to static data", e);
+            this.useApi = false;
+            await this.fetchData();
+        }
+    }
+
+    async fetchData() {
+        if (this.useApi) {
+            try {
+                const response = await fetch(`${this.apiBase}/state`);
+                if (!response.ok) throw new Error("API Error");
+                this.data = await response.json();
+            } catch (e) {
+                this.useApi = false;
+                return this.fetchData();
+            }
+        } else {
+            const response = await fetch(this.staticBase);
+            this.data = await response.json();
+        }
+        return this.data;
+    }
+
+    getSystemStats() {
+        return this.data?.system_stats || {};
+    }
+
+    getFiles() {
+        return this.data?.files || [];
+    }
+
+    getAgents() {
+        return this.data?.agents || [];
+    }
+
+    async getFileContent(path) {
+        if (this.useApi) {
+            const res = await fetch(`/${path}`); // Serve static file from root
+            if (!res.ok) return "Error loading file.";
+            return await res.text();
+        } else {
+            return "File content viewing is only available when running the UI Backend server.\n\nRun 'python services/ui_backend.py' to enable this feature.";
+        }
+    }
+}
+
+// Global instance
+window.dataManager = new DataManager();
