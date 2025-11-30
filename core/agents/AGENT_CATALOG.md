@@ -845,15 +845,15 @@ This document provides a comprehensive catalog of all the agents in the ADAM sys
 ## `red_team_agent`
 
 *   **File:** `core/agents/red_team_agent.py`
-*   **Description:** The Red Team Agent acts as an adversary to the system. It generates novel and challenging scenarios (stress tests) to validate risk models and system resilience.
+*   **Description:** The Red Team Agent acts as an adversary to the system. It generates novel and challenging scenarios (stress tests) to validate risk models and system resilience. **Updated for v23:** Now wraps the `RedTeamGraph` (`core/v23_graph_engine/red_team_graph.py`) for cyclical adversarial reasoning (Attack -> Simulate -> Critique).
 *   **Configuration:** `config/agents.yaml`
     *   `num_scenarios`: Number of scenarios to generate.
-*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.AgentBase`.
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.AgentBase`. Wraps `LangGraph` app.
 *   **Agent Forge and Lifecycle:** Created on demand or during stress test cycles.
 *   **Model Context Protocol (MCP):** Maintains context of generated scenarios and their severity.
-*   **Tools and Hooks:** None currently.
-*   **Compute and Resource Requirements:** Low to Medium.
-*   **Dependencies:** None.
+*   **Tools and Hooks:** Uses `RedTeamGraph`.
+*   **Compute and Resource Requirements:** Medium.
+*   **Dependencies:** `langgraph`.
 
 ---
 
@@ -874,13 +874,13 @@ This document provides a comprehensive catalog of all the agents in the ADAM sys
 ## `reflector_agent`
 
 *   **File:** `core/agents/reflector_agent.py`
-*   **Description:** A simple agent that reflects its input back to the sender. Useful for testing agent routing and cyclical reasoning.
+*   **Description:** The Reflector Agent performs meta-cognition. It analyzes the output of other agents or the system's own reasoning traces to identify logical fallacies, hallucination risks, or missing context. It implements the "Self-Correction" loop of the v23 architecture.
 *   **Configuration:** None.
-*   **Architecture and Base Agent:** Inherits from `core.system.v22_async.async_agent_base.AsyncAgentBase`.
-*   **Agent Forge and Lifecycle:** On demand for testing.
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.AgentBase`.
+*   **Agent Forge and Lifecycle:** Continuous or on demand.
 *   **Model Context Protocol (MCP):** Stateless.
 *   **Tools and Hooks:** None.
-*   **Compute and Resource Requirements:** Negligible.
+*   **Compute and Resource Requirements:** Low (Heuristic) to High (LLM-based).
 *   **Dependencies:** None.
 
 ---

@@ -15,10 +15,11 @@ import logging
 import asyncio
 from typing import Dict, Any, Optional
 from core.v23_graph_engine.neuro_symbolic_planner import NeuroSymbolicPlanner
-from core.v23_graph_engine.states import init_risk_state, init_esg_state, init_compliance_state
+from core.v23_graph_engine.states import init_risk_state, init_esg_state, init_compliance_state, init_crisis_state
 from core.v23_graph_engine.red_team_graph import red_team_app
 from core.v23_graph_engine.esg_graph import esg_graph_app
 from core.v23_graph_engine.regulatory_compliance_graph import compliance_graph_app
+from core.v23_graph_engine.crisis_simulation_graph import crisis_simulation_app
 from core.system.agent_orchestrator import AgentOrchestrator
 
 logger = logging.getLogger(__name__)
@@ -38,6 +39,8 @@ class MetaOrchestrator:
         
         if complexity == "RED_TEAM":
             return await self._run_red_team_flow(query)
+        elif complexity == "CRISIS":
+            return await self._run_crisis_flow(query)
         elif complexity == "ESG":
             return await self._run_esg_flow(query)
         elif complexity == "COMPLIANCE":
@@ -62,8 +65,12 @@ class MetaOrchestrator:
         query_lower = query.lower()
 
         # Red Team / Adversarial
-        if any(x in query_lower for x in ["attack", "stress test", "scenario", "adversarial", "simulate"]):
+        if any(x in query_lower for x in ["attack", "adversarial"]):
             return "RED_TEAM"
+
+        # Crisis / Simulation
+        if any(x in query_lower for x in ["simulation", "simulate", "crisis", "shock", "stress test", "scenario"]):
+            return "CRISIS"
 
         # ESG
         if any(x in query_lower for x in ["esg", "environmental", "sustainability", "carbon", "green", "social impact"]):
@@ -206,4 +213,26 @@ class MetaOrchestrator:
             }
         except Exception as e:
             logger.error(f"Compliance Execution Failed: {e}")
+            return {"error": str(e)}
+
+    async def _run_crisis_flow(self, query: str):
+        logger.info("Engaging Crisis Simulation Graph...")
+
+        # Mock Portfolio
+        portfolio = {"id": "Main Fund", "aum": 100_000_000}
+
+        initial_state = init_crisis_state(query, portfolio)
+
+        try:
+            config = {"configurable": {"thread_id": "1"}}
+            if hasattr(crisis_simulation_app, 'ainvoke'):
+                result = await crisis_simulation_app.ainvoke(initial_state, config=config)
+            else:
+                result = crisis_simulation_app.invoke(initial_state, config=config)
+            return {
+                "status": "Crisis Simulation Complete",
+                "final_state": result
+            }
+        except Exception as e:
+            logger.error(f"Crisis Simulation Failed: {e}")
             return {"error": str(e)}

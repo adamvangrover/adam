@@ -168,6 +168,31 @@ class QuantumRiskState(TypedDict):
     # Control Flow
     iteration_count: int
 
+class CrisisSimulationState(TypedDict):
+    """
+    State for the Macro-Economic Crisis Simulation Graph.
+    """
+    # Input
+    scenario_description: str # "Interest rates +5%"
+    portfolio_data: Dict[str, Any]
+
+    # Internal Reasoning
+    macro_variables: Dict[str, float] # { "rates": 0.08, "gdp": -0.02 }
+    first_order_impacts: List[str]
+    second_order_impacts: List[str]
+    estimated_loss: float
+
+    critique_notes: List[str]
+    iteration_count: int
+
+    # Control Flow
+    is_realistic: bool
+    needs_refinement: bool
+
+    # Explainability
+    human_readable_status: str
+    final_report: Optional[str]
+
 def init_risk_state(ticker: str, intent: str) -> RiskAssessmentState:
     return {
         "ticker": ticker,
@@ -253,4 +278,20 @@ def init_quantum_state(portfolio_id: str, risk_factors: Dict) -> QuantumRiskStat
         "human_readable_status": "Initializing Quantum Risk Engine...",
         "final_report": None,
         "iteration_count": 0
+    }
+
+def init_crisis_state(scenario: str, portfolio: Dict) -> CrisisSimulationState:
+    return {
+        "scenario_description": scenario,
+        "portfolio_data": portfolio,
+        "macro_variables": {},
+        "first_order_impacts": [],
+        "second_order_impacts": [],
+        "estimated_loss": 0.0,
+        "critique_notes": [],
+        "iteration_count": 0,
+        "is_realistic": False,
+        "needs_refinement": True,
+        "human_readable_status": "Initializing Crisis Simulation...",
+        "final_report": None
     }

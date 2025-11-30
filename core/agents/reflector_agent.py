@@ -1,27 +1,47 @@
-# core/agents/reflector_agent.py
+from __future__ import annotations
+from typing import Dict, Any, List
 import logging
-from typing import Any, Dict
+from core.agents.agent_base import AgentBase
 
-from core.system.v22_async.async_agent_base import AsyncAgentBase
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-class ReflectorAgent(AsyncAgentBase):
+class ReflectorAgent(AgentBase):
     """
-    A simple agent that reflects its input back to the sender.
-    Useful for testing agent routing and cyclical reasoning.
+    The Reflector Agent performs meta-cognition.
+    It analyzes the output of other agents or the system's own reasoning traces
+    to identify logical fallacies, hallucination risks, or missing context.
     """
 
-    async def execute(self, task: Dict[str, Any]) -> Dict[str, Any]:
+    async def execute(self, content_to_analyze: str, context: Dict[str, Any] = None) -> Dict[str, Any]:
         """
-        Receives a task and returns its payload.
-
-        Args:
-            task (Dict[str, Any]): The input task.
-
-        Returns:
-            Dict[str, Any]: The payload of the input task.
+        Analyzes the provided content (reasoning trace, report, etc.) and provides a critique.
         """
-        logger.info(f"Reflecting task: {task}")
-        return task
+        logger.info("ReflectorAgent: Analyzing content for self-correction...")
+
+        # In a real v23 system, this would call a "Critique LLM" or the "Self-Correction" node of a graph.
+        # Here we implement heuristic checks as a fallback/mock.
+
+        critique = []
+        score = 10.0
+
+        # Heuristic 1: Absolutism Check
+        if "always" in content_to_analyze.lower() or "never" in content_to_analyze.lower():
+            critique.append("Detected potential absolutism (always/never). Verify if exceptions exist.")
+            score -= 1.5
+
+        # Heuristic 2: Depth Check
+        if len(content_to_analyze) < 100:
+            critique.append("Content seems too brief for a detailed analysis.")
+            score -= 2.0
+
+        # Heuristic 3: Source Citation (Mock)
+        if "source" not in content_to_analyze.lower() and "according to" not in content_to_analyze.lower():
+            critique.append("No explicit sources cited. Risk of hallucination.")
+            score -= 1.5
+
+        return {
+            "original_content_snippet": content_to_analyze[:100] + "...",
+            "critique_notes": critique,
+            "quality_score": score,
+            "verification_status": "PASS" if score > 7.0 else "NEEDS_REVISION"
+        }
