@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Comprehensive Counterparty Profile",
+  "type": "object",
+  "properties": {
+    "entity": {
+      "type": "object",
+      "properties": {
+        "legalName": { "type": "string" },
+        "ticker": { "type": "string" },
+        "naicsCode": { "type": "string", "description": "e.g., 6211 for Healthcare Rollups" },
+        "riskRating": { "type": "string", "enum": ["Pass", "Special Mention", "Substandard", "Doubtful", "Loss"] }
+      },
+      "required": ["legalName", "ticker"]
+    },
+    "capitalStructure": {
+      "type": "object",
+      "properties": {
+        "debtInstruments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "instrumentName": { "type": "string", "examples": ["Term Loan B"] },
+              "seniority": { "type": "string", "enum": ["Senior Secured", "Unsecured", "Subordinated"] },
+              "outstandingAmount": { "type": "number" },
+              "interestRate": { "type": "string", "examples": ["S+350"] },
+              "maturityDate": { "type": "string", "format": "date" },
+              "covenantLite": { "type": "boolean" },
+              "hasJCrewBlocker": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    },
+    "financials": {
+      "type": "object",
+      "properties": {
+        "ebitdaReconciliation": {
+          "type": "object",
+          "properties": {
+            "reportedNetIncome": { "type": "number" },
+            "adjustments": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "description": { "type": "string", "examples": ["Synergies"] },
+                  "amount": { "type": "number" },
+                  "type": { "type": "string", "enum": ["Synergy", "Restructuring", "ManagementFee", "NonCash"] }
+                }
+              }
+            },
+            "adjustedEBITDA": { "type": "number" }
+          }
+        }
+      }
+    }
+  },
+  "required": ["entity", "capitalStructure", "financials"]
+}

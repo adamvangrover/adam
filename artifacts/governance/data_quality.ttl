@@ -1,0 +1,18 @@
+@prefix sh: <http://www.w3.org/ns/shacl#>.
+@prefix : <https://ontology.yourbank.com/lending#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+:LeveragedLoanShape a sh:NodeShape ;
+    sh:targetClass :LeveragedLoan ;
+    sh:property [
+        sh:path :calculatedDSCR ;
+        sh:minCount 1 ;
+        sh:datatype xsd:decimal ;
+        sh:message "Every Leveraged Loan must have a calculated DSCR." ;
+    ] ;
+    sh:property [
+        sh:path :hasJCrewBlocker ;
+        sh:minCount 1 ;
+        sh:datatype xsd:boolean ;
+        sh:message "Every Leveraged Loan must have a J.Crew Blocker analysis." ;
+    ] .
