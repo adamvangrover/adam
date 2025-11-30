@@ -24,6 +24,32 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 # For XAI debug logs, ensure the logger level is set to DEBUG if you want to see them.
 # Example: logging.getLogger().setLevel(logging.DEBUG) in the main application or test setup.
 
+class DCFCalculator:
+    """
+    Helper class for DCF calculations.
+    """
+    @staticmethod
+    def calculate_intrinsic_value(wacc: float, terminal_growth: float, last_fcf: float, projection_years: int = 5, growth_rate: float = 0.05) -> float:
+        """
+        Calculates intrinsic value using a simplified DCF model.
+        """
+        if wacc <= terminal_growth:
+            return 0.0
+
+        present_value = 0.0
+        current_fcf = last_fcf
+
+        # Projection Period
+        for i in range(1, projection_years + 1):
+            current_fcf *= (1 + growth_rate)
+            present_value += current_fcf / ((1 + wacc) ** i)
+
+        # Terminal Value
+        terminal_value = current_fcf * (1 + terminal_growth) / (wacc - terminal_growth)
+        pv_terminal_value = terminal_value / ((1 + wacc) ** projection_years)
+
+        return present_value + pv_terminal_value
+
 class FundamentalAnalystAgent(AgentBase):
     """
     Agent for performing fundamental analysis of companies.
@@ -397,6 +423,13 @@ class FundamentalAnalystAgent(AgentBase):
             
             dcf_valuation = sum(present_values) + terminal_pv
             logging.debug(f"FAA_XAI:DCF_OUTPUT: DCF_Valuation={dcf_valuation}")
+
+            # Use Helper Class as well for comparison or verification (as per v23.5 requirements)
+            simple_val = DCFCalculator.calculate_intrinsic_value(
+                discount_rate, terminal_growth_rate_perpetuity, last_historical_fcf
+            )
+            logging.debug(f"FAA_XAI:DCF_SIMPLE_CALC: {simple_val}")
+
             return dcf_valuation
 
         except Exception as e: 
