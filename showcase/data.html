@@ -20,8 +20,8 @@
                 <p class="text-slate-400">Central repository for training sets, financial ontologies, and artisanal data.</p>
             </div>
             <div class="text-right font-mono text-xs text-slate-400">
-                 <div class="mb-1"><span class="text-white font-bold">Total Storage:</span> 4.2 GB</div>
-                 <div><span class="text-white font-bold">Last Index:</span> 2025-07-01 14:00</div>
+                 <div class="mb-1"><span class="text-white font-bold">Total Storage:</span> <span id="total-storage">--</span></div>
+                 <div><span class="text-white font-bold">Last Index:</span> <span id="last-index">--</span></div>
             </div>
         </div>
 
@@ -31,7 +31,7 @@
                 <span class="text-slate-500">ROOT /</span>
                 <span class="text-slate-300 hover:text-white cursor-pointer">data</span>
                 <span class="text-slate-500">/</span>
-                <span class="text-cyan-400 font-bold" id="current-dir">artisanal_training_sets</span>
+                <span class="text-cyan-400 font-bold" id="current-dir">ALL</span>
             </div>
 
             <table class="w-full text-left text-sm">
@@ -46,6 +46,7 @@
                 </thead>
                 <tbody id="file-list" class="divide-y divide-slate-700">
                     <!-- Populated by JS -->
+                    <tr><td colspan="5" class="p-3 text-center text-slate-500">Loading data files...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -79,7 +80,7 @@
             </div>
 
             <!-- Preview Card -->
-            <div class="glass-panel p-4 rounded-lg flex-1 flex flex-col">
+            <div class="glass-panel p-4 rounded-lg flex-1 flex flex-col h-64 lg:h-auto">
                 <h3 class="text-slate-400 font-bold font-mono text-sm mb-3 uppercase">File Preview</h3>
                 <div class="flex-1 bg-slate-900 rounded p-3 font-mono text-xs text-slate-300 overflow-auto whitespace-pre-wrap" id="file-preview">
 Select a file to view snippet...
@@ -90,52 +91,87 @@ Select a file to view snippet...
 
     </main>
 
+    <script src="js/mock_data.js"></script>
     <script src="js/app.js"></script>
     <script src="js/nav.js"></script>
     <script>
-        const MOCK_FILES = [
-            { name: "artisanal_data_snc_v2.jsonl", type: "JSONL", size: "22 KB", date: "2025-06-28", content: '{"prompt": "Analyze shared credit risk for...", "completion": "Based on the syndicate structure..."}\n{"prompt": "Calculate DSCR for...", "completion": "DSCR = 1.45x..."}' },
-            { name: "knowledge_graph_schema.json", type: "JSON", size: "3.8 KB", date: "2025-05-12", content: '{\n  "entities": ["Company", "Person", "Risk"],\n  "relationships": ["CEO_OF", "EXPOSED_TO"]\n}' },
-            { name: "finance_bench.json", type: "JSON", size: "406 B", date: "2025-02-15", content: '[{"question": "What is the net income?", "answer": "1.2B"}]' },
-            { name: "adam_market_baseline.json", type: "JSON", size: "15 KB", date: "2025-06-01", content: '{\n  "sp500_pe": 21.5,\n  "treasury_10y": 4.2\n}' },
-            { name: "risk_rating_mapping.json", type: "JSON", size: "12 KB", date: "2025-04-20", content: '{\n  "AAA": 1,\n  "AA+": 2\n}' },
-            { name: "artisanal_data_esg_v1.jsonl", type: "JSONL", size: "6.7 KB", date: "2025-06-10", content: '...' },
-        ];
+        let dataFiles = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+             const data = window.MOCK_DATA || {};
+             const allFiles = data.files || [];
+
+             // Filter for data directory
+             dataFiles = allFiles.filter(f => f.path.startsWith('data/'));
+
+             renderFiles();
+             updateStats();
+        });
 
         function renderFiles() {
             const tbody = document.getElementById('file-list');
             tbody.innerHTML = '';
 
-            MOCK_FILES.forEach((file, idx) => {
+            if (dataFiles.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-slate-500">No data files found.</td></tr>';
+                return;
+            }
+
+            dataFiles.forEach((file, idx) => {
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-800 transition cursor-pointer group';
-                tr.onclick = () => showPreview(idx);
+                tr.onclick = () => showPreview(file);
+
+                const name = file.path.replace('data/', '');
+                const type = name.split('.').pop().toUpperCase();
+                const size = formatSize(file.size);
+                const date = new Date(file.last_modified * 1000).toISOString().split('T')[0];
 
                 tr.innerHTML = `
                     <td class="p-3 font-mono text-slate-300 group-hover:text-white flex items-center">
                         <svg class="w-4 h-4 mr-2 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        ${file.name}
+                        ${name}
                     </td>
-                    <td class="p-3 text-slate-400">${file.type}</td>
-                    <td class="p-3 text-slate-400 font-mono">${file.size}</td>
-                    <td class="p-3 text-slate-500">${file.date}</td>
+                    <td class="p-3 text-slate-400">${type}</td>
+                    <td class="p-3 text-slate-400 font-mono">${size}</td>
+                    <td class="p-3 text-slate-500">${date}</td>
                     <td class="p-3">
-                        <button class="text-cyan-600 hover:text-cyan-400 font-bold text-xs uppercase">Download</button>
+                        <button class="text-cyan-600 hover:text-cyan-400 font-bold text-xs uppercase" onclick="alert('Download mock')">Download</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        function showPreview(idx) {
-            const file = MOCK_FILES[idx];
+        async function showPreview(file) {
             const el = document.getElementById('file-preview');
-            el.textContent = file.content || "// No preview available";
+            el.innerHTML = '<span class="text-slate-500">Loading...</span>';
             el.classList.add('animate-pulse');
-            setTimeout(() => el.classList.remove('animate-pulse'), 300);
+
+            // Try to fetch content
+            const content = await window.dataManager.getFileContent(file.path);
+
+            // Truncate if too long
+            const displayContent = content.length > 2000 ? content.substring(0, 2000) + "\n... [Truncated]" : content;
+
+            el.textContent = displayContent;
+            el.classList.remove('animate-pulse');
         }
 
-        document.addEventListener('DOMContentLoaded', renderFiles);
+        function formatSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        }
+
+        function updateStats() {
+            let totalSize = 0;
+            dataFiles.forEach(f => totalSize += f.size);
+            document.getElementById('total-storage').textContent = formatSize(totalSize);
+            document.getElementById('last-index').textContent = new Date().toISOString().replace('T', ' ').substring(0, 16);
+        }
     </script>
 </body>
 </html>

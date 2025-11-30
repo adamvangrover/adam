@@ -30,11 +30,11 @@
             <div class="space-y-3">
                 <div class="flex justify-between text-xs text-slate-400">
                     <span>Nodes:</span>
-                    <span class="text-white font-mono">1,245</span>
+                    <span class="text-white font-mono" id="node-count">--</span>
                 </div>
                 <div class="flex justify-between text-xs text-slate-400">
                     <span>Edges:</span>
-                    <span class="text-white font-mono">3,892</span>
+                    <span class="text-white font-mono" id="edge-count">--</span>
                 </div>
 
                 <hr class="border-slate-700">
@@ -58,7 +58,7 @@
             <div class="mt-6 p-2 bg-slate-900/80 rounded border border-slate-700 text-[10px] font-mono text-cyan-500 leading-tight">
                 > Graph DB connected.<br>
                 > Reasoning engine online.<br>
-                > 14 inferred links found.
+                > Inferred links found.
             </div>
         </div>
 
@@ -79,81 +79,120 @@
         </div>
     </div>
 
+    <script src="js/mock_data.js"></script>
     <script src="js/app.js"></script>
     <script src="js/nav.js"></script>
     <script>
-        // Mock Data for Graph
-        const nodes = new vis.DataSet([
-            { id: 1, label: 'Tesla, Inc.', group: 'Company', value: 20, title: "Automotive & Energy Company" },
-            { id: 2, label: 'Elon Musk', group: 'Person', value: 10, title: "CEO" },
-            { id: 3, label: 'SpaceX', group: 'Company', value: 15, title: "Aerospace Manufacturer" },
-            { id: 4, label: 'Supply Chain Disruption', group: 'Risk', value: 15, title: "Global Risk Factor" },
-            { id: 5, label: 'Semiconductor Shortage', group: 'Risk', value: 10, title: "Component Risk" },
-            { id: 6, label: 'NVIDIA', group: 'Company', value: 18, title: "Chip Manufacturer" },
-            { id: 7, label: 'AI Boom', group: 'MarketTrend', value: 25, title: "Macro Trend" },
-            { id: 8, label: 'Regulatory Scrutiny', group: 'Risk', value: 12, title: "Legal Risk" },
-        ]);
+        let network;
+        let nodes;
+        let edges;
 
-        const edges = new vis.DataSet([
-            { from: 1, to: 2, label: 'CEO_OF' },
-            { from: 2, to: 3, label: 'CEO_OF' },
-            { from: 1, to: 4, label: 'EXPOSED_TO', dashes: true, color: { color: 'red' } },
-            { from: 4, to: 5, label: 'CAUSED_BY' },
-            { from: 1, to: 6, label: 'PARTNER_WITH' },
-            { from: 6, to: 5, label: 'AFFECTED_BY' },
-            { from: 6, to: 7, label: 'DRIVES' },
-            { from: 1, to: 8, label: 'UNDER_INVESTIGATION', color: { color: 'orange' } },
-        ]);
+        document.addEventListener('DOMContentLoaded', () => {
+            const data = window.MOCK_DATA || {};
+            const companies = data.company_data || {};
 
-        const container = document.getElementById('mynetwork');
-        const data = { nodes: nodes, edges: edges };
-        const options = {
-            nodes: {
-                shape: 'dot',
-                font: { size: 14, color: '#ffffff', face: 'monospace' },
-                borderWidth: 2,
-            },
-            edges: {
-                width: 1,
-                color: { color: '#4b5563', highlight: '#22d3ee' },
-                smooth: { type: 'continuous' },
-                font: { size: 10, align: 'middle', color: '#94a3b8', background: 'none' }
-            },
-            groups: {
-                Company: { color: { background: '#1e3a8a', border: '#3b82f6' } }, // Blue
-                Person: { color: { background: '#581c87', border: '#a855f7' } }, // Purple
-                Risk: { color: { background: '#7f1d1d', border: '#ef4444' } }, // Red
-                MarketTrend: { color: { background: '#064e3b', border: '#10b981' } } // Green
-            },
-            physics: {
-                stabilization: false,
-                barnesHut: {
-                    gravitationalConstant: -2000,
-                    springConstant: 0.04,
-                    springLength: 95
-                }
-            },
-            interaction: { hover: true }
-        };
+            const nodesArray = [];
+            const edgesArray = [];
+            let idCounter = 1;
+            const idMap = {};
 
-        const network = new vis.Network(container, data, options);
-
-        // Events
-        network.on("click", function (params) {
-            if (params.nodes.length > 0) {
-                const nodeId = params.nodes[0];
-                const node = nodes.get(nodeId);
-                showDetails(node);
+            // Default mock nodes if empty
+            if (Object.keys(companies).length === 0) {
+                // ... use hardcoded fallback ...
+                nodesArray.push({ id: 1, label: 'Tesla, Inc.', group: 'Company', value: 20 });
+                nodesArray.push({ id: 2, label: 'Market Risk', group: 'Risk', value: 15 });
+                edgesArray.push({ from: 1, to: 2, label: 'EXPOSED_TO' });
             } else {
-                closeDetails();
+                // Build graph from company data
+                Object.keys(companies).forEach(ticker => {
+                    const comp = companies[ticker];
+                    const id = idCounter++;
+                    idMap[ticker] = id;
+                    nodesArray.push({
+                        id: id,
+                        label: ticker,
+                        group: 'Company',
+                        value: 20,
+                        title: comp.name + "\n" + comp.industry
+                    });
+                });
+
+                // Edges for competitors
+                Object.keys(companies).forEach(ticker => {
+                    const comp = companies[ticker];
+                    const fromId = idMap[ticker];
+                    if(comp.competitors) {
+                        comp.competitors.forEach(rival => {
+                            if(idMap[rival]) {
+                                edgesArray.push({ from: fromId, to: idMap[rival], label: 'COMPETES_WITH' });
+                            } else {
+                                // Add missing node
+                                const rivalId = idCounter++;
+                                idMap[rival] = rivalId;
+                                nodesArray.push({ id: rivalId, label: rival, group: 'Company', value: 15, title: "Competitor" });
+                                edgesArray.push({ from: fromId, to: rivalId, label: 'COMPETES_WITH' });
+                            }
+                        });
+                    }
+                });
             }
+
+            document.getElementById('node-count').textContent = nodesArray.length;
+            document.getElementById('edge-count').textContent = edgesArray.length;
+
+            nodes = new vis.DataSet(nodesArray);
+            edges = new vis.DataSet(edgesArray);
+
+            const container = document.getElementById('mynetwork');
+            const graphData = { nodes: nodes, edges: edges };
+            const options = {
+                nodes: {
+                    shape: 'dot',
+                    font: { size: 14, color: '#ffffff', face: 'monospace' },
+                    borderWidth: 2,
+                },
+                edges: {
+                    width: 1,
+                    color: { color: '#4b5563', highlight: '#22d3ee' },
+                    smooth: { type: 'continuous' },
+                    font: { size: 10, align: 'middle', color: '#94a3b8', background: 'none' }
+                },
+                groups: {
+                    Company: { color: { background: '#1e3a8a', border: '#3b82f6' } }, // Blue
+                    Person: { color: { background: '#581c87', border: '#a855f7' } }, // Purple
+                    Risk: { color: { background: '#7f1d1d', border: '#ef4444' } }, // Red
+                    MarketTrend: { color: { background: '#064e3b', border: '#10b981' } } // Green
+                },
+                physics: {
+                    stabilization: false,
+                    barnesHut: {
+                        gravitationalConstant: -2000,
+                        springConstant: 0.04,
+                        springLength: 95
+                    }
+                },
+                interaction: { hover: true }
+            };
+
+            network = new vis.Network(container, graphData, options);
+
+            // Events
+            network.on("click", function (params) {
+                if (params.nodes.length > 0) {
+                    const nodeId = params.nodes[0];
+                    const node = nodes.get(nodeId);
+                    showDetails(node);
+                } else {
+                    closeDetails();
+                }
+            });
         });
 
         function showDetails(node) {
             const panel = document.getElementById('details-panel');
             document.getElementById('node-label').textContent = node.label;
             document.getElementById('node-type').textContent = node.group.toUpperCase();
-            document.getElementById('node-desc').textContent = node.title || "No description available.";
+            document.getElementById('node-desc').innerText = node.title || "No description available.";
 
             panel.classList.remove('hidden');
         }
@@ -164,7 +203,6 @@
 
         function filterGraph(group) {
             // Very simple filter: mock implementation
-            // In a real app, this would use DataView
             alert(`Filtering for ${group} (Mock functionality)`);
         }
 

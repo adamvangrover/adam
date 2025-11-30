@@ -11,14 +11,20 @@
             background: white;
             color: black;
             font-family: 'Times New Roman', Times, serif;
-            transform-origin: top left;
-            transform: scale(0.6);
-            width: 210mm; /* A4 width */
-            height: 297mm; /* A4 height */
+            /* transform: scale(0.9); */
+            width: 100%;
+            min-height: 297mm; /* A4 height */
             padding: 20mm;
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
             overflow: hidden;
         }
+        .report-title { font-size: 24pt; font-weight: bold; border-bottom: 2px solid #000; margin-bottom: 10px; }
+        .report-meta { font-style: italic; color: #666; margin-bottom: 20px; }
+        .section-title { font-size: 14pt; font-weight: bold; margin-top: 20px; border-bottom: 1px solid #ccc; color: #333; }
+        .kv-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 10pt; }
+        .kv-table td { border: 1px solid #ddd; padding: 4px 8px; }
+        .kv-table tr:nth-child(even) { background-color: #f9f9f9; }
+        .kv-key { font-weight: bold; background-color: #f0f0f0; width: 40%; }
     </style>
 </head>
 <body class="h-screen flex flex-col grid-bg text-slate-200">
@@ -36,63 +42,22 @@
         </div>
 
         <!-- Document List -->
-        <div class="col-span-12 lg:col-span-4 h-[80vh] flex flex-col space-y-4 overflow-y-auto pr-2">
-
-            <!-- Category: Newsletters -->
-            <div class="glass-panel p-4 rounded-lg">
-                <h3 class="text-amber-500 font-mono font-bold text-sm mb-4 uppercase tracking-wider">Newsletters</h3>
-                <div class="space-y-2">
-                    <div onclick="previewDoc('newsletter_mayhem')" class="p-3 bg-slate-800/50 hover:bg-slate-700 border border-slate-700 hover:border-amber-500/50 rounded cursor-pointer transition group">
-                        <div class="flex justify-between items-center">
-                            <h4 class="font-bold text-slate-200 group-hover:text-amber-400">Market Mayhem: July Edition</h4>
-                            <span class="text-[0.6rem] text-slate-500">2025-07-01</span>
-                        </div>
-                        <p class="text-xs text-slate-400 mt-1">Weekly roundup of volatility indices and macro shocks.</p>
-                    </div>
-                    <div onclick="previewDoc('newsletter_tech')" class="p-3 bg-slate-800/50 hover:bg-slate-700 border border-slate-700 hover:border-amber-500/50 rounded cursor-pointer transition group">
-                        <div class="flex justify-between items-center">
-                            <h4 class="font-bold text-slate-200 group-hover:text-amber-400">Tech Sector Deep Dive</h4>
-                            <span class="text-[0.6rem] text-slate-500">2025-06-24</span>
-                        </div>
-                        <p class="text-xs text-slate-400 mt-1">Analysis of AI capex and semiconductor supply chains.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Category: Credit Reports -->
-            <div class="glass-panel p-4 rounded-lg">
-                <h3 class="text-blue-500 font-mono font-bold text-sm mb-4 uppercase tracking-wider">Credit Reports (SNC)</h3>
-                <div class="space-y-2">
-                    <div onclick="previewDoc('report_tsla')" class="p-3 bg-slate-800/50 hover:bg-slate-700 border border-slate-700 hover:border-blue-500/50 rounded cursor-pointer transition group">
-                        <div class="flex justify-between items-center">
-                            <h4 class="font-bold text-slate-200 group-hover:text-blue-400">Tesla Inc. (TSLA)</h4>
-                            <span class="text-[0.6rem] bg-emerald-900/50 text-emerald-400 px-1 rounded border border-emerald-800">BBB+</span>
-                        </div>
-                        <p class="text-xs text-slate-400 mt-1">Full credit risk assessment and ratio analysis.</p>
-                    </div>
-                     <div onclick="previewDoc('report_nvda')" class="p-3 bg-slate-800/50 hover:bg-slate-700 border border-slate-700 hover:border-blue-500/50 rounded cursor-pointer transition group">
-                        <div class="flex justify-between items-center">
-                            <h4 class="font-bold text-slate-200 group-hover:text-blue-400">NVIDIA Corp (NVDA)</h4>
-                            <span class="text-[0.6rem] bg-emerald-900/50 text-emerald-400 px-1 rounded border border-emerald-800">AA-</span>
-                        </div>
-                        <p class="text-xs text-slate-400 mt-1">Growth projection and monopoly regulation risk.</p>
-                    </div>
-                </div>
-            </div>
-
+        <div class="col-span-12 lg:col-span-4 h-[80vh] flex flex-col space-y-4 overflow-y-auto pr-2" id="doc-list">
+            <!-- Loading... -->
+             <div class="glass-panel p-4 rounded text-center text-slate-500">Loading documents...</div>
         </div>
 
         <!-- Preview Area -->
-        <div class="col-span-12 lg:col-span-8 bg-slate-800/30 rounded-lg flex items-center justify-center overflow-hidden border border-slate-800 relative">
+        <div class="col-span-12 lg:col-span-8 bg-slate-800/30 rounded-lg flex flex-col overflow-hidden border border-slate-800 relative h-[80vh]">
             <div class="absolute top-4 right-4 z-10 space-x-2">
                 <button class="bg-slate-900 text-white px-3 py-1 rounded text-xs border border-slate-600 hover:bg-slate-700 shadow">DOWNLOAD PDF</button>
                 <button class="bg-slate-900 text-white px-3 py-1 rounded text-xs border border-slate-600 hover:bg-slate-700 shadow">PRINT</button>
             </div>
 
             <!-- Document Container (Scaled) -->
-            <div id="preview-container" class="w-full h-full overflow-auto flex justify-center p-10 bg-slate-900">
-                <div id="doc-content" class="page-preview shadow-2xl">
-                    <div class="h-full flex flex-col items-center justify-center text-slate-400">
+            <div id="preview-container" class="w-full h-full overflow-y-auto p-10 bg-slate-900">
+                <div id="doc-content" class="page-preview shadow-2xl mx-auto">
+                    <div class="h-full flex flex-col items-center justify-center text-slate-400 mt-20">
                         <p>Select a document to preview</p>
                     </div>
                 </div>
@@ -101,63 +66,128 @@
 
     </main>
 
+    <script src="js/mock_data.js"></script>
     <script src="js/app.js"></script>
     <script src="js/nav.js"></script>
     <script>
-        const DOCS = {
-            'newsletter_mayhem': `
-                <div style="border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 20px;">
-                    <h1 style="font-size: 32px; margin: 0; color: #1a202c;">MARKET MAYHEM</h1>
-                    <div style="display: flex; justify-content: space-between; color: #4a5568; margin-top: 10px; font-style: italic;">
-                        <span>Vol. 45, Issue 12</span>
-                        <span>July 1, 2025</span>
-                    </div>
-                </div>
-                <h3>Executive Summary</h3>
-                <p>Global markets faced significant volatility this week as unexpected inflation data from the Eurozone clashed with dovish signals from the Federal Reserve. The VIX index spiked to 24.5, the highest level in six months.</p>
-                <h3 style="margin-top: 30px; border-bottom: 1px solid #ccc;">Sector Watch: Energy</h3>
-                <p>Oil prices surged past $90/bbl driven by geopolitical tensions in the Strait of Hormuz. Energy stocks outperformed the S&P 500 by 450bps. We maintain an <strong>OVERWEIGHT</strong> rating on integrated majors.</p>
-                <div style="background: #f7fafc; padding: 15px; margin-top: 30px; border-left: 4px solid #e53e3e;">
-                    <strong>RISK ALERT:</strong> Liquidity conditions in high-yield corporate bonds have tightened significantly. Spreads widened by 35bps week-over-week.
-                </div>
-            `,
-            'report_tsla': `
-                <div style="text-align: right; color: #718096; font-size: 12px; margin-bottom: 40px;">
-                    ADAM SYSTEMS | CONFIDENTIAL | CREDIT RISK MEMO
-                </div>
-                <h1 style="color: #2b6cb0; margin-bottom: 5px;">Tesla, Inc. (TSLA)</h1>
-                <h2 style="color: #4a5568; font-size: 18px; margin-top: 0;">Credit Assessment Report</h2>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Wait for app init or use mock data directly
+            const data = window.MOCK_DATA || {};
+            const reports = data.reports || [];
+            const newsletters = data.newsletters || [];
 
-                <table style="width: 100%; border-collapse: collapse; margin-top: 30px;">
-                    <tr style="background: #edf2f7;">
-                        <td style="padding: 10px; border: 1px solid #cbd5e0; font-weight: bold;">Credit Rating</td>
-                        <td style="padding: 10px; border: 1px solid #cbd5e0; color: #2f855a; font-weight: bold;">BBB+ (Stable)</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 10px; border: 1px solid #cbd5e0; font-weight: bold;">Probability of Default (1Y)</td>
-                        <td style="padding: 10px; border: 1px solid #cbd5e0;">0.45%</td>
-                    </tr>
-                </table>
+            const listContainer = document.getElementById('doc-list');
+            listContainer.innerHTML = '';
 
-                <h3 style="margin-top: 30px; color: #2d3748;">Financial Analysis</h3>
-                <p>Tesla maintains a robust balance sheet with net cash position of $22B. Operating margins have compressed to 9.5% due to price cuts, but remain industry-leading for pure EV players.</p>
+            // Newsletters Section
+            if(newsletters.length > 0) {
+                const nsDiv = document.createElement('div');
+                nsDiv.className = 'glass-panel p-4 rounded-lg';
+                nsDiv.innerHTML = `<h3 class="text-amber-500 font-mono font-bold text-sm mb-4 uppercase tracking-wider">Newsletters</h3>`;
+                const nsList = document.createElement('div');
+                nsList.className = 'space-y-2';
 
-                <h3 style="margin-top: 20px; color: #2d3748;">Key Ratios</h3>
-                <ul style="list-style-type: square; color: #4a5568;">
-                    <li><strong>Interest Coverage:</strong> 45.2x (Excellent)</li>
-                    <li><strong>Debt/EBITDA:</strong> 0.2x (Conservative)</li>
-                    <li><strong>Current Ratio:</strong> 1.7 (Healthy)</li>
-                </ul>
-            `
-        };
-
-        function previewDoc(id) {
-            const content = DOCS[id];
-            if (content) {
-                document.getElementById('doc-content').innerHTML = content;
-            } else {
-                document.getElementById('doc-content').innerHTML = `<div class="h-full flex items-center justify-center text-red-500">Document content not found.</div>`;
+                newsletters.forEach((item, idx) => {
+                    const el = document.createElement('div');
+                    el.className = 'p-3 bg-slate-800/50 hover:bg-slate-700 border border-slate-700 hover:border-amber-500/50 rounded cursor-pointer transition group';
+                    el.innerHTML = `
+                         <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-slate-200 group-hover:text-amber-400 text-sm">${item.title || "Newsletter"}</h4>
+                            <span class="text-[0.6rem] text-slate-500">${item.date || 'Unknown'}</span>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1 truncate">${item.file_path}</p>
+                    `;
+                    el.onclick = () => renderDoc(item, 'newsletter');
+                    nsList.appendChild(el);
+                });
+                nsDiv.appendChild(nsList);
+                listContainer.appendChild(nsDiv);
             }
+
+            // Reports Section
+            if(reports.length > 0) {
+                 const repDiv = document.createElement('div');
+                repDiv.className = 'glass-panel p-4 rounded-lg';
+                repDiv.innerHTML = `<h3 class="text-blue-500 font-mono font-bold text-sm mb-4 uppercase tracking-wider">Analysis Reports</h3>`;
+                const repList = document.createElement('div');
+                repList.className = 'space-y-2';
+
+                reports.forEach((item, idx) => {
+                    const el = document.createElement('div');
+                    el.className = 'p-3 bg-slate-800/50 hover:bg-slate-700 border border-slate-700 hover:border-blue-500/50 rounded cursor-pointer transition group';
+                    const rating = item.rating || "N/A"; // Assuming some rating field
+                    el.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-slate-200 group-hover:text-blue-400 text-sm">${item.company || item.title || "Report"}</h4>
+                            <span class="text-[0.6rem] bg-slate-800 px-1 rounded border border-slate-700 text-slate-400">REPORT</span>
+                        </div>
+                         <p class="text-xs text-slate-400 mt-1 truncate">${item.title || item.file_path}</p>
+                    `;
+                    el.onclick = () => renderDoc(item, 'report');
+                    repList.appendChild(el);
+                });
+                repDiv.appendChild(repList);
+                listContainer.appendChild(repDiv);
+            }
+        });
+
+        function renderDoc(data, type) {
+            const container = document.getElementById('doc-content');
+
+            if (data.type === 'markdown') {
+                container.innerHTML = `
+                    <div class="report-title">${data.title}</div>
+                    <div class="report-meta">Source: ${data.file_path}</div>
+                    <div class="whitespace-pre-wrap font-mono text-sm">${data.raw_content_preview || "Markdown content rendering not fully implemented in static preview."}</div>
+                `;
+                return;
+            }
+
+            // Render JSON Report
+            let html = `
+                <div class="text-right text-xs text-gray-500 mb-8">ADAM INTELLIGENCE REPORT | ${new Date().toISOString().split('T')[0]}</div>
+                <div class="report-title">${data.title || data.company + " Report"}</div>
+                <div class="report-meta">
+                    <strong>Company:</strong> ${data.company || "N/A"} <br>
+                    <strong>Date:</strong> ${data.date || new Date().toLocaleDateString()} <br>
+                    <strong>File:</strong> ${data.file_path}
+                </div>
+            `;
+
+            if (data.sections) {
+                data.sections.forEach(sec => {
+                    html += `<div class="section-title">${sec.title}</div>`;
+                    if (sec.content) {
+                        html += `<p class="mt-2 text-justify">${sec.content}</p>`;
+                    }
+                    if (sec.metrics) {
+                        html += `<table class="kv-table">`;
+                        for (const [key, val] of Object.entries(sec.metrics)) {
+                             let displayVal = val;
+                             if (typeof val === 'object') {
+                                 displayVal = Object.entries(val).map(([k,v]) => `${k}: ${v}`).join(', ');
+                             }
+                             html += `<tr><td class="kv-key">${key}</td><td>${displayVal}</td></tr>`;
+                        }
+                        html += `</table>`;
+                    }
+                    if (sec.risks) {
+                        html += `<table class="kv-table">`;
+                         for (const [key, val] of Object.entries(sec.risks)) {
+                             html += `<tr><td class="kv-key">${key}</td><td style="color:${val==='High'?'red':'black'}">${val}</td></tr>`;
+                        }
+                        html += `</table>`;
+                    }
+                    if (sec.analysis) {
+                         html += `<div class="mt-2 text-sm italic border-l-4 border-blue-200 pl-2 text-gray-600">${sec.analysis}</div>`;
+                    }
+                });
+            } else {
+                // Fallback for flat JSON
+                html += `<pre class="text-xs bg-gray-100 p-2 mt-4 overflow-auto">${JSON.stringify(data, null, 2)}</pre>`;
+            }
+
+            container.innerHTML = html;
         }
     </script>
 </body>
