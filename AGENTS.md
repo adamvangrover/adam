@@ -101,6 +101,11 @@ The `HybridOrchestrator` is the central component of the new architecture. It ac
 
 The system is currently evolving towards the v23 "Adaptive System" architecture. This next-generation model introduces a stateful, cyclical graph-based execution engine (leveraging LangGraph) to enable true adaptive intelligence, including iterative self-correction, neuro-symbolic planning, and multimodal perception.
 
+Key Graph Engines:
+*   **Red Team Graph:** Adversarial stress testing (`core/v23_graph_engine/red_team_graph.py`).
+*   **Crisis Simulation Graph:** Macro-economic scenario modeling (`core/v23_graph_engine/crisis_simulation_graph.py`).
+*   **ESG & Compliance Graphs:** Specialized domain reasoning.
+
 The `MetaOrchestrator` is the unified entry point for all execution models, including v21 (synchronous), v22 (asynchronous), and v23 (graph-based). For the complete vision and technical specifications, please refer to the official `docs/v23_architecture_vision.md` mandate.
 
 ## Getting Started
@@ -109,6 +114,7 @@ To get started, please familiarize yourself with the following:
 
 *   **`config/`:** This directory contains the configuration files for the system.
 *   **`core/`:** This directory contains the core components of the system.
+    *   **`core/v23_graph_engine/`:** Contains the "Adaptive" system logic, implemented as LangGraph reasoning loops (e.g., `RedTeamGraph`, `CrisisSimulationGraph`).
 *   **`docs/`:** This directory contains the documentation for the system.
 *   **`tests/`:** This directory contains the tests for the system.
 
