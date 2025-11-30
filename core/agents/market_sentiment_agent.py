@@ -1,75 +1,149 @@
-# core/agents/market_sentiment_agent.py
-
+from __future__ import annotations
+from typing import Any, Dict, Tuple, Optional
+import logging
+import asyncio
+from core.agents.agent_base import AgentBase
 from core.data_sources.financial_news_api import SimulatedFinancialNewsAPI
 from core.data_sources.prediction_market_api import SimulatedPredictionMarketAPI
 from core.data_sources.social_media_api import SimulatedSocialMediaAPI
 from core.data_sources.web_traffic_api import SimulatedWebTrafficAPI
-from core.utils.data_utils import send_message
 
-class MarketSentimentAgent:
-    def __init__(self, config):
-        self.data_sources = config['data_sources']
-        self.sentiment_threshold = config['sentiment_threshold']
+class MarketSentimentAgent(AgentBase):
+    """
+    Agent responsible for gauging market sentiment from a variety of sources,
+    such as news articles, social media, and prediction markets.
+    """
+
+    def __init__(self, config: Dict[str, Any], **kwargs):
+        """
+        Initializes the MarketSentimentAgent.
+        """
+        super().__init__(config, **kwargs)
+        self.data_sources = config.get('data_sources', [])
+        self.sentiment_threshold = config.get('sentiment_threshold', 0.5)
+
+        # Initialize sources
+        # In a real system, these might be injected or configured
         self.news_api = SimulatedFinancialNewsAPI()
         self.prediction_market_api = SimulatedPredictionMarketAPI()
         self.social_media_api = SimulatedSocialMediaAPI()
         self.web_traffic_api = SimulatedWebTrafficAPI()
 
-    def analyze_sentiment(self):
-        # 1. Analyze News Sentiment
-        headlines, news_sentiment = self.news_api.get_headlines()
-        print("Analyzing market sentiment from news headlines...")
-        # ... (Implement more sophisticated sentiment analysis for news)
-
-        # 2. Analyze Prediction Market Sentiment
-        prediction_market_sentiment = self.prediction_market_api.get_market_sentiment()
-        print("Analyzing market sentiment from prediction markets...")
-        # ... (Implement analysis of prediction market data)
-
-        # 3. Analyze Social Media Sentiment
-        social_media_sentiment = self.social_media_api.get_social_media_sentiment()
-        print("Analyzing market sentiment from social media...")
-        # ... (Implement analysis of social media data)
-
-        # 4. Analyze Web Traffic Data
-        web_traffic_sentiment = self.web_traffic_api.get_web_traffic_sentiment()
-        print("Analyzing market sentiment from web traffic data...")
-        # ... (Implement analysis of web traffic data)
-
-        # 5. Combine Sentiment from All Sources
-        overall_sentiment = self.combine_sentiment(news_sentiment, prediction_market_sentiment, social_media_sentiment, web_traffic_sentiment)
-        print(f"Overall Market Sentiment: {overall_sentiment}")
-
-        # 6. Send sentiment to message queue
-        message = {'agent': 'market_sentiment_agent', 'sentiment': overall_sentiment}
-        send_message(message)
-
-        return overall_sentiment
-
-    def combine_sentiment(self, news_sentiment, prediction_market_sentiment, social_media_sentiment, web_traffic_sentiment):
+    async def execute(self, **kwargs) -> Dict[str, Any]:
         """
-        Combines sentiment from different sources into an overall sentiment score.
-
-        Args:
-            news_sentiment (float): Sentiment score from news analysis.
-            prediction_market_sentiment (float): Sentiment score from prediction markets.
-            social_media_sentiment (float): Sentiment score from social media analysis.
-            web_traffic_sentiment (float): Sentiment score from web traffic analysis.
+        Executes the sentiment analysis.
 
         Returns:
-            float: The overall sentiment score.
+            Dict containing the sentiment score and analysis details.
         """
-        # ... (Implement logic to combine sentiment scores)
-        # This could involve weighting different sources or using a more
-        # sophisticated aggregation method.
-        pass
+        logging.info("MarketSentimentAgent execution started.")
 
-# Example usage (eventually, this would be managed by the system)
+        overall_sentiment, details = await self.analyze_sentiment()
+
+        result = {
+            "sentiment_score": overall_sentiment,
+            "details": details,
+            "status": "success"
+        }
+
+        # Optionally send to message broker if configured
+        if hasattr(self, 'message_broker') and self.message_broker:
+            await self.send_message("system_monitor", result) # Example target
+
+        return result
+
+    async def analyze_sentiment(self) -> Tuple[float, Dict[str, float]]:
+        """
+        Analyzes sentiment from configured sources.
+        """
+        # 1. News
+        # Assuming get_headlines is synchronous/simulated.
+        # If it were real I/O, we'd wrap it.
+        try:
+            headlines, news_sentiment = self.news_api.get_headlines()
+        except Exception as e:
+            logging.error(f"Error fetching news: {e}")
+            news_sentiment = 0.0
+
+        logging.info(f"News Sentiment: {news_sentiment}")
+
+        # 2. Prediction Markets
+        try:
+            pred_sentiment = self.prediction_market_api.get_market_sentiment()
+        except Exception as e:
+            logging.error(f"Error fetching prediction market data: {e}")
+            pred_sentiment = 0.0
+
+        logging.info(f"Prediction Market Sentiment: {pred_sentiment}")
+
+        # 3. Social Media
+        try:
+            social_sentiment = self.social_media_api.get_social_media_sentiment()
+        except Exception as e:
+            logging.error(f"Error fetching social media data: {e}")
+            social_sentiment = 0.0
+
+        logging.info(f"Social Media Sentiment: {social_sentiment}")
+
+        # 4. Web Traffic
+        try:
+            web_sentiment = self.web_traffic_api.get_web_traffic_sentiment()
+        except Exception as e:
+            logging.error(f"Error fetching web traffic data: {e}")
+            web_sentiment = 0.0
+
+        logging.info(f"Web Traffic Sentiment: {web_sentiment}")
+
+        # 5. Combine
+        overall = self.combine_sentiment(news_sentiment, pred_sentiment, social_sentiment, web_sentiment)
+        logging.info(f"Overall Market Sentiment: {overall}")
+
+        details = {
+            "news_sentiment": news_sentiment,
+            "prediction_market_sentiment": pred_sentiment,
+            "social_media_sentiment": social_sentiment,
+            "web_traffic_sentiment": web_sentiment
+        }
+
+        return overall, details
+
+    def combine_sentiment(self, news: float, pred: float, social: float, web: float) -> float:
+        """
+        Combines sentiment from different sources into an overall sentiment score.
+        """
+        # Simple weighted average
+        weights = {
+            'news': 0.4,
+            'prediction': 0.3,
+            'social': 0.2,
+            'web': 0.1
+        }
+
+        # Ensure inputs are floats (mock APIs might return None or ints)
+        def clean(val):
+            if val is None: return 0.0
+            if isinstance(val, (int, float)): return float(val)
+            return 0.0
+
+        score = (
+            clean(news) * weights['news'] +
+            clean(pred) * weights['prediction'] +
+            clean(social) * weights['social'] +
+            clean(web) * weights['web']
+        )
+        return score
+
 if __name__ == "__main__":
-    import yaml
-    with open("../../config/agents.yaml", "r") as f:
-        agent_config = yaml.safe_load(f)
+    # Test harness
+    logging.basicConfig(level=logging.INFO)
 
-    agent = MarketSentimentAgent(agent_config['market_sentiment_agent'])
-    sentiment = agent.analyze_sentiment()
-    print(f"Market Sentiment Score: {sentiment}")
+    async def main():
+        config = {
+            'data_sources': ['news', 'prediction_market', 'social_media', 'web_traffic'],
+            'sentiment_threshold': 0.5
+        }
+        agent = MarketSentimentAgent(config)
+        result = await agent.execute()
+        print(f"Result: {result}")
+
+    asyncio.run(main())

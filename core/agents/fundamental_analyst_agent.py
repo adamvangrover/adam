@@ -13,6 +13,7 @@ from core.agents.agent_base import AgentBase
 from semantic_kernel import Kernel # Added for type hinting
 import asyncio # Added import
 import yaml # Added for example usage block
+import json
 
 # Placeholder for message queue interaction (replace with real implementation later)
 # from core.system.message_queue import MessageQueue
@@ -33,7 +34,7 @@ class FundamentalAnalystAgent(AgentBase):
     """
 
     def __init__(self, config: Dict[str, Any], kernel: Optional[Kernel] = None):
-        super().__init__(config, kernel) 
+        super().__init__(config, kernel=kernel)
         self.persona = self.config.get('persona', "Financial Analyst")
         self.description = self.config.get('description', "Performs fundamental company analysis.")
         # The 'peers' key in self.config (e.g., ['DataRetrievalAgent']) is used by AgentOrchestrator
