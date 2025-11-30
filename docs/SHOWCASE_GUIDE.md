@@ -43,6 +43,17 @@ Demonstrates how Adam "thinks" before acting.
 **Concept:**
 Adam creates "What-If" scenarios to test resilience. In the showcase, look for "Red Team" events in the dashboard, simulating cyber attacks or macro shocks.
 
+## 5. Architectural Self-Improvement (Demo)
+**Prompt ID:** `DEV-REFAC-v23`
+
+Demonstrates Adam's ability to maintain its own codebase using the "Code Alchemist" persona.
+
+### How to Demo This to Investors
+1.  **Setup:** Open the **Legacy File** (e.g., `core/utils/data_utils.py`, specifically the `send_message` function) on the left of your screen and your **Agent Interface** on the right.
+2.  **Trigger:** Send the `DEV-REFAC-v23` prompt from `prompts/enterprise_ai_prompt_library.md` along with the legacy code.
+3.  **The "Async" Moment:** While the agent is "thinking" (processing), explain to the investors: *"In a traditional setup, a developer stops working to refactor this. In Adam v23, we dispatch this as an async background task to our 'Code Alchemist' swarm. It ensures our architecture self-heals and stays modern automatically."*
+4.  **The Reveal:** When the code generates, highlight the `async def`, the `TypedDict` state input, and the standardized logging. This proves the system understands *architecture*, not just syntax.
+
 ---
 
 ## Troubleshooting
