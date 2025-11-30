@@ -56,7 +56,7 @@ class EquityAnalysis(BaseModel):
 class Facility(BaseModel):
     id: str
     amount: str
-    regulatory_rating: str
+    regulatory_rating: Literal["Pass", "Special Mention", "Substandard", "Doubtful"]
     collateral_coverage: str
     covenant_headroom: str
 
@@ -91,7 +91,7 @@ class SimulationEngine(BaseModel):
 
 class FinalVerdict(BaseModel):
     recommendation: Literal["Long", "Short", "Hold"]
-    conviction_level: int = Field(ge=0, le=10)
+    conviction_level: int = Field(ge=1, le=10)
     time_horizon: str
     rationale_summary: str
     justification_trace: List[str]

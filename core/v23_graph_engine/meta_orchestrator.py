@@ -9,11 +9,13 @@ a user query should take:
 2. Async Path (v22): Message-driven workflow (e.g. "Monitor news").
 3. Adaptive Path (v23): Neuro-Symbolic Planner (e.g. "Analyze complex credit risk").
 4. Specialized Paths: ESG, Compliance, Red Team.
+5. Deep Dive Path (v23.5): 5-Phase autonomous financial analysis.
 """
 
 import logging
 import asyncio
 from typing import Dict, Any, Optional
+
 from core.v23_graph_engine.neuro_symbolic_planner import NeuroSymbolicPlanner
 from core.v23_graph_engine.states import init_risk_state, init_esg_state, init_compliance_state, init_crisis_state, init_omniscient_state
 from core.v23_graph_engine.red_team_graph import red_team_app
@@ -22,6 +24,17 @@ from core.v23_graph_engine.regulatory_compliance_graph import compliance_graph_a
 from core.v23_graph_engine.crisis_simulation_graph import crisis_simulation_app
 from core.v23_graph_engine.deep_dive_graph import deep_dive_app
 from core.system.agent_orchestrator import AgentOrchestrator
+
+# v23.5 Deep Dive Agents
+from core.agents.specialized.ManagementAssessmentAgent import ManagementAssessmentAgent
+from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
+from core.agents.specialized.PeerComparisonAgent import PeerComparisonAgent
+from core.agents.specialized.SNCRatingAgent import SNCRatingAgent
+from core.agents.specialized.CovenantAnalystAgent import CovenantAnalystAgent
+from core.agents.specialized.MonteCarloRiskAgent import MonteCarloRiskAgent
+from core.agents.specialized.QuantumScenarioAgent import QuantumScenarioAgent
+from core.agents.specialized.PortfolioManagerAgent import PortfolioManagerAgent
+from core.schemas.v23_5_schema import V23KnowledgeGraph, Meta, Nodes, HyperDimensionalKnowledgeGraph, EquityAnalysis, Fundamentals, ValuationEngine, DCFModel, PriceTargets
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +48,7 @@ class MetaOrchestrator:
         Analyzes the query complexity and routes to the best engine.
         Now Async!
         """
-        complexity = self._assess_complexity(query)
+        complexity = self._assess_complexity(query, context)
         logger.info(f"MetaOrchestrator: Query complexity is {complexity}")
         
         if complexity == "DEEP_DIVE":
@@ -60,12 +73,17 @@ class MetaOrchestrator:
             self.legacy_orchestrator.execute_agent("QueryUnderstandingAgent", context={"user_query": query})
             return {"status": "Dispatched to Message Broker", "query": query}
 
-    def _assess_complexity(self, query: str) -> str:
+    def _assess_complexity(self, query: str, context: Dict[str, Any] = None) -> str:
         """
         Simple heuristic for routing. 
         In production, this would be a BERT classifier or Router LLM.
         """
         query_lower = query.lower()
+        context = context or {}
+
+        # v23.5 Deep Dive Trigger
+        if "deep dive" in query_lower or context.get("simulation_depth") == "Deep":
+            return "DEEP_DIVE"
 
         # Deep Dive / v23.5
         if any(x in query_lower for x in ["deep dive", "full analysis", "partner", "valuation", "covenant"]):
@@ -96,6 +114,111 @@ class MetaOrchestrator:
         # v21 is best for simple lookups
         return "LOW"
 
+    async def _run_deep_dive_flow(self, query: str):
+        logger.info("Engaging Deep Dive Protocol (v23.5)...")
+
+        # Initialize Agents
+        mgmt_agent = ManagementAssessmentAgent(config={})
+        fund_agent = FundamentalAnalystAgent(config={})
+        peer_agent = PeerComparisonAgent(config={})
+        snc_agent = SNCRatingAgent(config={})
+        # cov_agent = CovenantAnalystAgent(config={})
+        mc_agent = MonteCarloRiskAgent(config={})
+        quant_agent = QuantumScenarioAgent(config={})
+        pm_agent = PortfolioManagerAgent(config={})
+
+        try:
+            # Phase 1: Entity & Management
+            logger.info("Phase 1: Entity & Management")
+            # In a real system, we'd extract the company name precisely using an LLM or Named Entity Recognition
+            # Here we assume the query might contain it or we use the query as is.
+            # A simplistic heuristic: use the query as the company name.
+            company_name_extraction = query.replace("Perform a deep dive analysis on", "").strip() or query
+
+            entity_eco = await mgmt_agent.execute({"company_name": company_name_extraction})
+
+            # Phase 2: Deep Fundamental
+            logger.info("Phase 2: Deep Fundamental")
+            company_id = company_name_extraction # Using name as ID for now
+            fund_data = await fund_agent.execute(company_id)
+
+            # Map fund_data to EquityAnalysis
+            dcf_val = 0.0
+            if isinstance(fund_data, dict):
+                 # Safely extract with fallback
+                 dcf_val = fund_data.get("dcf_valuation", 0.0)
+                 if dcf_val is None: dcf_val = 0.0
+
+            equity_analysis = EquityAnalysis(
+                fundamentals=Fundamentals(
+                    revenue_cagr_3yr="5%", # Mock extraction
+                    ebitda_margin_trend="Expanding"
+                ),
+                valuation_engine=ValuationEngine(
+                    dcf_model=DCFModel(
+                        wacc=0.08,
+                        terminal_growth=0.02,
+                        intrinsic_value=float(dcf_val)
+                    ),
+                    multiples_analysis=await peer_agent.execute({"company_id": company_id}),
+                    price_targets=PriceTargets(bear_case=80.0, base_case=100.0, bull_case=120.0)
+                )
+            )
+
+            # Phase 3: Credit
+            logger.info("Phase 3: Credit")
+            credit_input = {
+                "facilities": [{"id": "TLB", "amount": "500M", "ltv": 0.5}],
+                "current_leverage": 3.0
+            }
+            credit_analysis = await snc_agent.execute(credit_input)
+
+            # Phase 4: Risk
+            logger.info("Phase 4: Risk")
+            # Monte Carlo Agent needs EBITDA, Debt, Volatility.
+            # We should try to get these from fund_data if available.
+            ebitda = 100.0
+            debt = 300.0
+            if isinstance(fund_data, dict):
+                 # Attempt to extract if structure matches mock data from FundamentalAnalystAgent
+                 # fund_data["financial_ratios"] might have it? Or raw data?
+                 pass
+
+            sim_engine = await mc_agent.execute({"ebitda": ebitda, "debt": debt, "volatility": 0.2})
+            scenarios = await quant_agent.execute({})
+            sim_engine.quantum_scenarios = scenarios
+
+            # Phase 5: Synthesis
+            logger.info("Phase 5: Synthesis")
+            synthesis = await pm_agent.execute({
+                "phase1": entity_eco,
+                "phase2": equity_analysis,
+                "phase3": credit_analysis,
+                "phase4": sim_engine
+            })
+
+            # Construct Knowledge Graph
+            nodes = Nodes(
+                entity_ecosystem=entity_eco,
+                equity_analysis=equity_analysis,
+                credit_analysis=credit_analysis,
+                simulation_engine=sim_engine,
+                strategic_synthesis=synthesis
+            )
+
+            kg = V23KnowledgeGraph(
+                meta=Meta(target=query, generated_at="2023-10-27", model_version="Adam-v23.5"),
+                nodes=nodes
+            )
+
+            result = HyperDimensionalKnowledgeGraph(v23_knowledge_graph=kg)
+            return result.model_dump(by_alias=True)
+
+        except Exception as e:
+            logger.error(f"Deep Dive Execution Failed: {e}", exc_info=True)
+            return {"error": str(e)}
+
+    # ... (rest of methods)
     async def _run_adaptive_flow(self, query: str):
         logger.info("Engaging v23 Neuro-Symbolic Planner...")
         

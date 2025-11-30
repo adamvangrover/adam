@@ -335,6 +335,23 @@ class LLMPlugin:
         self.config = self._load_internal_config(config_path)
         self.cache = CacheManager() if use_cache else None
         self.llm = self._initialize_llm()
+        self.slm = self._initialize_slm()
+
+    def _initialize_slm(self) -> Optional[BaseLLM]:
+        """Initializes a Small Language Model (SLM) for specialized tasks."""
+        slm_provider = self.config.get("slm_provider")
+        if not slm_provider:
+            return None
+
+        try:
+            model_name = self.config.get("slm_model_name", "microsoft/phi-2")
+            if slm_provider == "huggingface":
+                # Ensure we use pipeline or appropriate method
+                return HuggingFaceLLM(model_name=model_name, use_pipeline=True)
+            # Add other providers if needed
+        except Exception as e:
+            logger.warning(f"Failed to initialize SLM: {e}")
+        return None
 
     def _load_internal_config(self, config_path: str) -> Dict[str, Any]:
         """Loads LLM plugin configuration from a YAML file (internal)."""
@@ -388,19 +405,26 @@ class LLMPlugin:
 
     def generate_text(self, prompt: str, task: str = "default", **kwargs) -> str:
         """Generates text using the configured LLM with caching and task-specific prompting."""
+
+        # Router Logic for SLM
+        model = self.llm
+        if self.slm and task in ["financial_extraction", "summarization"]:
+            model = self.slm
+            logger.info(f"Routing task '{task}' to SLM ({model.get_model_name()})")
+
         formatted_prompt = PromptTemplate.format(task, input=prompt, **kwargs)
 
         if self.cache:
-            cached_response = self.cache.get(formatted_prompt, self.llm.get_model_name())
+            cached_response = self.cache.get(formatted_prompt, model.get_model_name())
             if cached_response:
                 return cached_response
 
-        response = self.llm.generate_text(formatted_prompt, **kwargs)
+        response = model.generate_text(formatted_prompt, **kwargs)
         
-        if self.cache: # Corrected indentation for this block
-            self.cache.set(formatted_prompt, self.llm.get_model_name(), response)
+        if self.cache:
+            self.cache.set(formatted_prompt, model.get_model_name(), response)
 
-        return response # Corrected indentation for return
+        return response
 
     def get_token_count(self, text: str) -> int:
         """Returns the token count for a given text."""
