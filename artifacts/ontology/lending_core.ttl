@@ -1,0 +1,51 @@
+@prefix : <https://ontology.yourbank.com/lending#>.
+@prefix fibo-fbc-dae-dbt: <https://spec.edmcouncil.org/fibo/ontology/FBC/DebtAndEquities/Debt/>.
+@prefix fibo-be-le-lp: <https://spec.edmcouncil.org/fibo/ontology/BE/LegalEntities/LegalPersons/>.
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#>.
+
+### Classes ###
+
+:LeveragedLoan a owl:Class ;
+    rdfs:subClassOf fibo-fbc-dae-dbt:CreditAgreement ;
+    rdfs:label "Leveraged Loan" ;
+    rdfs:comment "A loan extended to companies with high debt-to-EBITDA ratios, typically rated below investment grade.".
+
+:CovenantLiteFacility a owl:Class ;
+    rdfs:subClassOf :LeveragedLoan ;
+    rdfs:label "Covenant-Lite Facility" ;
+    rdfs:comment "A facility lacking financial maintenance covenants, relying on incurrence covenants.".
+
+:UnrestrictedSubsidiary a owl:Class ;
+    rdfs:subClassOf fibo-be-le-lp:LegalEntity ;
+    rdfs:label "Unrestricted Subsidiary" ;
+    rdfs:comment "A subsidiary designated outside the credit group, a key vector for value leakage.".
+
+:EBITDA_Adjustment a owl:Class ;
+    rdfs:label "EBITDA Adjustment" ;
+    rdfs:comment "An add-back or deduction applied to GAAP earnings.".
+
+:GeopoliticalRiskEvent a owl:Class ;
+    rdfs:label "Geopolitical Risk Event" ;
+    rdfs:comment "External shock impacting creditworthiness, e.g., 'Operation Midnight Hammer'.".
+
+### Properties ###
+
+:hasJCrewBlocker a owl:DatatypeProperty ;
+    rdfs:domain :LeveragedLoan ;
+    rdfs:range xsd:boolean ;
+    rdfs:label "has J.Crew blocker" ;
+    rdfs:comment "Indicates prohibition of IP transfers to unrestricted subsidiaries.".
+
+:calculatedDSCR a owl:DatatypeProperty ;
+    rdfs:domain :LeveragedLoan ;
+    rdfs:range xsd:decimal ;
+    rdfs:label "Calculated DSCR" ;
+    rdfs:comment "Debt Service Coverage Ratio: (EBITDA - Capex) / Debt Service.".
+
+:isExposedTo a owl:ObjectProperty ;
+    rdfs:domain fibo-be-le-lp:LegalEntity ;
+    rdfs:range :GeopoliticalRiskEvent ;
+    rdfs:label "is exposed to" ;
+    rdfs:comment "Models causal link between macro event and borrower.".
