@@ -1,0 +1,140 @@
+{
+  "v23_unified_knowledge_graph": {
+    "version": "23.0-alpha",
+    "ontology_standard": "FIBO-v2",
+    "generated_at": "2025-05-23T12:00:00Z",
+    "nodes": {
+      "legal_entities": [
+        {
+          "legal_name": "JPMorgan Chase & Co.",
+          "lei_code": "8I5DZWZKVSZI1NUHU748",
+          "headquarters_address": "383 Madison Avenue, New York, NY 10179, USA",
+          "jurisdiction": "US-DE",
+          "provenance": "https://lei.bloomberg.com/leis/view/8I5DZWZKVSZI1NUHU748"
+        },
+        {
+          "legal_name": "Exxon Mobil Corporation",
+          "lei_code": "J3WHBG0MTS7O8ZVMDC91",
+          "headquarters_address": "22777 Springwoods Village Parkway, Spring, TX 77389, USA",
+          "jurisdiction": "US-NJ",
+          "provenance": "https://www.legalentityidentifier.in/leicert/J3WHBG0MTS7O8ZVMDC91/"
+        },
+        {
+          "legal_name": "Microsoft Corporation",
+          "lei_code": "INR2EJN1ERAN0W5ZP974",
+          "headquarters_address": "One Microsoft Way, Redmond, WA 98052, USA",
+          "jurisdiction": "US-WA",
+          "provenance": "https://www.legalentityidentifier.in/leicert/INR2EJN1ERAN0W5ZP974/"
+        }
+      ],
+      "financial_instruments": {
+        "loans": [
+          {
+            "loan_id": "LN-XOM-2025-A",
+            "borrower_lei": "J3WHBG0MTS7O8ZVMDC91",
+            "principal_amount": 5000000000,
+            "currency": "USD",
+            "interest_rate": "SOFR + 150bps",
+            "covenants": [
+              {
+                "covenant_id": "COV-001",
+                "type": "Financial",
+                "description": "Net Leverage Ratio <= 3.5x",
+                "is_legally_binding": true
+              }
+            ],
+            "status": "Performing",
+            "provenance": "Synthetic Construction for SNC Graph Testing"
+          }
+        ],
+        "securities": [
+          {
+            "cusip": "594918CS1",
+            "issuer_lei": "INR2EJN1ERAN0W5ZP974",
+            "type": "Corporate Bond",
+            "maturity_date": "2030-09-15",
+            "face_value": 1000,
+            "coupon": "1.35%",
+            "provenance": "https://public.com/bonds/corporate/microsoft-corp/msft-1.35-09-15-2030-594918cs1"
+          }
+        ]
+      },
+      "esg_profiles": [
+        {
+          "lei_code": "J3WHBG0MTS7O8ZVMDC91",
+          "environmental_score": 4.5,
+          "controversies": [
+            "California AG Lawsuit (2023): Alleged deception regarding plastic recycling recyclability.",
+            "Climate Risk Disclosure Lawsuit (2024): Legal challenge to block California's emissions reporting laws."
+          ],
+          "greenwashing_risk_score": 0.85,
+          "provenance": "https://oag.ca.gov/news/press-releases/attorney-general-bonta-sues-exxonmobil-deceiving-public-recyclability-plastic"
+        },
+        {
+          "lei_code": "INR2EJN1ERAN0W5ZP974",
+          "environmental_score": 8.2,
+          "controversies": [
+            "CSRB Report (2024): Cyber Safety Review Board cited 'cascade of avoidable errors' allowing Chinese intrusion into US government emails, highlighting governance failure in security culture."
+          ],
+          "greenwashing_risk_score": 0.15,
+          "provenance": "https://www.cisa.gov/news-events/news/csrb-releases-report-microsoft-online-exchange-incident"
+        }
+      ]
+    },
+    "simulation_parameters": {
+      "crisis_scenarios": [
+        {
+          "scenario_id": "CRISIS-001",
+          "name": "The 8% World",
+          "description": "Fed Funds rate hits 8%, triggering widespread default.",
+          "shocks": {
+            "interest_rates_us": 0.08,
+            "sp500_drawdown": -0.35,
+            "corporate_default_rate": 0.05
+          }
+        },
+        {
+          "scenario_id": "CRISIS-002",
+          "name": "Strait Closure",
+          "description": "Oil hits $200/bbl due to geopolitical conflict, then collapses due to demand destruction.",
+          "shocks": {
+            "oil_price_peak": 200.0,
+            "oil_price_settle": 40.0,
+            "energy_sector_capex": -0.50
+          }
+        },
+        {
+          "scenario_id": "CRISIS-003",
+          "name": "AI Winter",
+          "description": "Regulatory crackdown on LLMs slashes Tech sector capex by 40%.",
+          "shocks": {
+            "tech_sector_capex": -0.40,
+            "nasdaq_drawdown": -0.45,
+            "ai_regulation_index": 0.9
+          }
+        }
+      ]
+    },
+    "regulatory_rules": {
+      "basel_iii": [
+        {
+          "rule_id": "B3-CAP-01",
+          "description": "Tier 1 Capital > 6%",
+          "metric": "tier_1_ratio",
+          "threshold": 0.06
+        }
+      ],
+      "gdpr": [
+        {
+          "rule_id": "GDPR-sov-01",
+          "description": "Data Sovereignty: EU Customer data must reside in EU-West-1",
+          "metric": "data_region",
+          "allowed_values": [
+            "EU-West-1",
+            "EU-Central-1"
+          ]
+        }
+      ]
+    }
+  }
+}
