@@ -59,6 +59,39 @@ class RiskAssessmentAgent(AgentBase):
         if context is None:
             context = {}
 
+        # --- v23 Update: Check for Cyclical Reasoning Graph ---
+        use_graph = self.config.get("use_v23_graph", False) or context.get("use_v23_graph", False)
+
+        if risk_type == "investment" and use_graph:
+            try:
+                from core.v23_graph_engine.cyclical_reasoning_graph import cyclical_reasoning_app
+                from core.v23_graph_engine.states import init_risk_state
+
+                logging.info("Delegating to v23 CyclicalReasoningGraph...")
+                ticker = target_data.get("company_name", "UNKNOWN")
+                intent = context.get("user_intent", f"Assess risk for {ticker}")
+
+                initial_state = init_risk_state(ticker, intent)
+                config = {"configurable": {"thread_id": "1"}}
+
+                if hasattr(cyclical_reasoning_app, 'ainvoke'):
+                    final_state = await cyclical_reasoning_app.ainvoke(initial_state, config=config)
+                else:
+                    final_state = cyclical_reasoning_app.invoke(initial_state, config=config)
+
+                return {
+                    "overall_risk_score": final_state.get("quality_score", 0) * 100,
+                    "risk_factors": {"Analysis": "See detailed report"},
+                    "detailed_report": final_state.get("draft_analysis", ""),
+                    "graph_state": final_state
+                }
+
+            except ImportError:
+                logging.warning("v23 CyclicalReasoningGraph not available. Falling back to v21 logic.")
+            except Exception as e:
+                logging.error(f"Error executing v23 graph: {e}. Falling back to v21 logic.")
+
+        # --- v21 Legacy Logic ---
         if risk_type == "investment":
             result = self.assess_investment_risk(target_data.get("company_name"), target_data.get("financial_data", {}), target_data.get("market_data", {}))
         elif risk_type == "loan":
