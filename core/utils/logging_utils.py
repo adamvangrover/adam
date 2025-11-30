@@ -24,3 +24,9 @@ def setup_logging(config=None, default_path='config/logging.yaml', default_level
     else:
         logging.basicConfig(level=default_level)
         logging.info("Logging configured with default basicConfig")
+
+def get_logger(name: str) -> logging.Logger:
+    """
+    Get a logger instance with the specified name.
+    """
+    return logging.getLogger(name)
