@@ -58,3 +58,26 @@ graph TD
     D -->|Export| E["window.MOCK_DATA"]
     E -->|Load| F["Static Web UI"]
 ```
+```mermaid
+graph TD
+    A[Start Ingestion] --> B{Scan Directories}
+    B --> C[File List]
+    C --> D[ProcessPoolExecutor]
+    
+    subgraph Parallel Workers
+    D --> E[Worker 1: FileHandler]
+    D --> F[Worker 2: FileHandler]
+    D --> G[Worker 3: FileHandler]
+    end
+    
+    E --> H[Scrubber: Clean & Hash]
+    F --> H
+    G --> H
+    
+    H --> I[Scrubber: Conviction Score]
+    I --> J[Return Artifact Object]
+    
+    J --> K[Main Thread: Aggregator]
+    K --> L[Save .jsonl]
+    K --> M[Update State Hash Map]
+```
