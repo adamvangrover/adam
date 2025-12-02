@@ -1,3 +1,45 @@
+{
+  "supply_chain_nodes": [
+    {
+      "id": "TSMC",
+      "name": "Taiwan Semiconductor Manufacturing Co",
+      "role": "Critical Supplier",
+      "impact": "High"
+    },
+    {
+      "id": "ASML",
+      "name": "ASML Holding",
+      "role": "Equipment Supplier",
+      "impact": "High"
+    },
+    {
+      "id": "SK_HYNIX",
+      "name": "SK Hynix",
+      "role": "Component Supplier (HBM)",
+      "impact": "Medium"
+    }
+  ],
+  "edges": [
+    {
+      "source": "NVDA",
+      "target": "TSMC",
+      "relationship": "Manufacturing Partner",
+      "risk_factor": "Geopolitical concentration"
+    },
+    {
+      "source": "TSMC",
+      "target": "ASML",
+      "relationship": "Equipment Buyer",
+      "risk_factor": "Single source EUV technology"
+    },
+    {
+      "source": "NVDA",
+      "target": "SK_HYNIX",
+      "relationship": "Memory Supplier",
+      "risk_factor": "Supply bottleneck"
+    }
+  ]
+}
 [
   { "source": "NVDA", "target": "TSMC", "type": "SUPPLIER" },
   { "source": "MSFT", "target": "NVDA", "type": "CUSTOMER" }
