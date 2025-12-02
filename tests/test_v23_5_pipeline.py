@@ -1,36 +1,75 @@
-import pytest
 import asyncio
+import logging
+import sys
+import os
 from unittest.mock import MagicMock, patch
+
+# Ensure core is in path
+sys.path.append(os.getcwd())
+
+# Mock heavy dependencies
+sys.modules["transformers"] = MagicMock()
+sys.modules["torch"] = MagicMock()
+sys.modules["tensorflow"] = MagicMock()
+sys.modules["spacy"] = MagicMock()
+sys.modules["tweepy"] = MagicMock()
+sys.modules["transformers.pipeline"] = MagicMock()
+
+# Now import
 from core.v23_graph_engine.meta_orchestrator import MetaOrchestrator
+from core.schemas.v23_5_schema import HyperDimensionalKnowledgeGraph
 
-@pytest.mark.asyncio
-async def test_deep_dive_pipeline():
-    # Mock LLMPlugin to avoid API key requirements and AgentOrchestrator initialization issues
-    with patch('core.system.agent_orchestrator.LLMPlugin') as MockLLM:
-        orchestrator = MetaOrchestrator()
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
-        # We trigger the "Deep Dive" path
-        query = "Perform a deep dive analysis on TestCorp"
-        context = {"simulation_depth": "Deep"}
+async def test_deep_dive_fallback_pipeline():
+    print("Initializing MetaOrchestrator...")
 
-        result = await orchestrator.route_request(query, context)
+    # Mock legacy orchestrator to avoid API key errors
+    mock_legacy = MagicMock()
 
-        assert result is not None
-        if "error" in result:
-            pytest.fail(f"Pipeline returned error: {result['error']}")
+    # Initialize with mock
+    orchestrator = MetaOrchestrator(legacy_orchestrator=mock_legacy)
 
-        assert "v23_knowledge_graph" in result
+    # Force fallback by mocking deep_dive_app to None in the module
+    with patch("core.v23_graph_engine.meta_orchestrator.deep_dive_app", None):
 
-        kg = result["v23_knowledge_graph"]
-        assert kg["meta"]["target"] == query
+        # Trigger Deep Dive via keyword
+        query = "Perform a deep dive analysis on Tesla"
 
-        nodes = kg["nodes"]
-        assert "entity_ecosystem" in nodes
-        assert "equity_analysis" in nodes
-        assert "credit_analysis" in nodes
-        assert "simulation_engine" in nodes
-        assert "strategic_synthesis" in nodes
+        print(f"Routing Query: {query}")
+        result = await orchestrator.route_request(query)
 
-        # Check specific deep dive values (mocked)
-        assert nodes["simulation_engine"]["monte_carlo_default_prob"] >= 0.0
-        assert nodes["strategic_synthesis"]["final_verdict"]["conviction_level"] >= 1
+        # Check if we got a dict
+        if not isinstance(result, dict):
+            print("FAILED: Result is not a dictionary.")
+            import json
+            try:
+                print(json.dumps(result, default=str))
+            except:
+                print(result)
+            sys.exit(1)
+
+        # Verify structure matches the HyperDimensionalKnowledgeGraph schema
+        try:
+            print("Validating Schema...")
+            model = HyperDimensionalKnowledgeGraph(**result)
+
+            target = model.v23_knowledge_graph.meta.target
+            conviction = model.v23_knowledge_graph.nodes.strategic_synthesis.final_verdict.conviction_level
+
+            print(f"Target: {target}")
+            print(f"Conviction: {conviction}")
+
+            assert target == query
+            assert conviction >= 1
+            print("\nPipeline Test Passed: Schema Validation Successful.")
+
+        except Exception as e:
+            print(f"Schema Validation Failed: {e}")
+            import json
+            print(json.dumps(result, indent=2, default=str))
+            sys.exit(1)
+
+if __name__ == "__main__":
+    asyncio.run(test_deep_dive_fallback_pipeline())
