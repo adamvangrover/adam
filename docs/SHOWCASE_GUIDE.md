@@ -48,7 +48,7 @@ Located in the `showcase/` directory, this is a vanilla JS + Tailwind CSS interf
 *   **Adding New Data**: Simply place JSON or Markdown files in `data/`, `docs/`, or `core/libraries_and_archives/`. The next time the generator runs, they will be ingested.
 *   **Adding Code Documentation**: The system now automatically scans `core/` for Python files and extracts docstrings as `code_doc` artifacts. These are available in the `data/gold_standard/` output.
 
-## Architecture
+## Architecture (universal_ingestor.py & universal_ingestor_v2.py)
 
 ```mermaid
 graph TD
@@ -81,3 +81,21 @@ graph TD
     K --> L[Save .jsonl]
     K --> M[Update State Hash Map]
 ```
+
+Concurrency: Uses ProcessPoolExecutor to scrub files in parallel.
+
+Incremental State: Uses MD5 hashing to skip files that haven't changed since the last run.
+
+Abstracted Handlers: Can easily plug in new file types (CSV, YAML, PDF) without breaking the core loop.
+
+Rich Metadata: Added basic code complexity metrics (Cyclomatic complexity) and "Key Term" extraction.
+
+Configurable Weights: The GoldStandardScrubber now uses a WEIGHTS dictionary. This means you can tune how strict you want the scoring to be without rewriting logic.
+
+Strategy Pattern for Files: The FileHandlers class separates the logic. If you want to add PDF support later, you just add handle_pdf and register it in self.handlers. You don't touch the main loop.
+
+Parallelism: By using ProcessPoolExecutor, this script will utilize all CPU cores. If you have 1,000 files, this will be significantly faster than the loop approach.
+
+Dataclasses: Using @dataclass for GoldStandardArtifact reduces boilerplate code and makes the object easier to serialize/deserialize.
+
+State Management: The ingestion_state.json saves hashes. Currently, I have it generating the full JSONL every time (safest for static builds), but the infrastructure is there to implement a "Diff Only" mode easily.
