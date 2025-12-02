@@ -1,0 +1,1439 @@
+{
+  "Valuation": {
+    "DCF": {
+      "machine_readable": {
+        "inputs": {
+          "revenue": {
+            "type": "array",
+            "description": "Annual revenue projections (in millions)",
+            "example":
+          },
+          "expenses": {
+            "type": "array",
+            "description": "Annual operating expenses (in millions)",
+            "example":
+          },
+          "capex": {
+            "type": "array",
+            "description": "Annual capital expenditures (in millions)",
+            "example":
+          },
+          "depreciation": {
+            "type": "array",
+            "description": "Annual depreciation expense (in millions)",
+            "example":
+          },
+          "tax_rate": {
+            "type": "number",
+            "description": "Corporate tax rate",
+            "example": 0.25
+          },
+          "discount_rate": {
+            "type": "number",
+            "description": "Weighted average cost of capital (WACC)",
+            "example": 0.1
+          },
+          "terminal_growth_rate": {
+            "type": "number",
+            "description": "Perpetual growth rate for terminal value",
+            "example": 0.02
+          }
+        },
+        "formulas": {
+          "free_cash_flow": "(revenue - expenses - capex) * (1 - tax_rate) + depreciation",
+          "terminal_value": "free_cash_flow[-1] * (1 + terminal_growth_rate) / (discount_rate - terminal_growth_rate)",
+          "present_value": "free_cash_flow[i] / (1 + discount_rate) ** (i + 1)",
+          "enterprise_value": "sum(present_value) + terminal_value / (1 + discount_rate) ** len(free_cash_flow)"
+        }
+      },
+      "human_readable": {
+        "definition": "Discounted Cash Flow (DCF) analysis is a valuation method that estimates the intrinsic value of an investment based on its expected future cash flows. It's like looking into a crystal ball to see how much money an investment will generate over its lifetime.",
+        "explanation": "The DCF model calculates the present value of all expected future cash flows, discounted back to today's value using a discount rate that reflects the riskiness of the investment. The sum of these present values represents the intrinsic value of the investment.",
+        "steps": [
+          "Forecast future free cash flows (FCF) for a specific period (e.g., 5 or 10 years).",
+          "Estimate the terminal value (TV) of the investment beyond the forecast period.",
+          "Discount the FCF and TV back to their present values using a discount rate (WACC).",
+          "Sum the present values of FCF and TV to arrive at the enterprise value (EV).",
+          "Subtract net debt from EV to arrive at equity value."
+        ],
+        "example": "Imagine you're considering buying a lemonade stand. You estimate that it will generate $1,000 in free cash flow next year, growing at 5% per year for the next 5 years. After that, you assume it will grow at a steady rate of 2% forever. Using a discount rate of 10%, you can calculate the present value of these cash flows and determine whether the lemonade stand is worth buying.",
+        "sources": [
+          {
+            "title": "Investopedia - Discounted Cash Flow (DCF)",
+            "url": "https://www.investopedia.com/terms/d/dcf.asp"
+          },
+          {
+            "title": "Corporate Finance Institute - DCF Model Training",
+            "url": "https://corporatefinanceinstitute.com/resources/knowledge/valuation/dcf-model-training-free-guide/"
+          }
+        ]
+      }
+    },
+    "Comparables": {
+      "machine_readable": {
+        "metrics": {
+          "pe_ratio": {
+            "formula": "market_price / earnings_per_share",
+            "description": "Price-to-Earnings ratio"
+          },
+          "ev_ebitda": {
+            "formula": "enterprise_value / ebitda",
+            "description": "Enterprise Value to EBITDA"
+          },
+          "price_to_book": {
+            "formula": "market_price / book_value_per_share",
+            "description": "Price-to-Book ratio"
+          }
+        }
+      },
+      "human_readable": {
+        "definition": "Comparable company analysis (CCA) is a valuation method that compares a company to its peers based on relative valuation metrics. It's like comparing apples to apples - you look for companies with similar characteristics to get an idea of what a company is worth.",
+        "explanation": "CCA involves identifying comparable companies (comps) in the same industry or sector, analyzing their valuation multiples (e.g., P/E, EV/EBITDA, P/B), and applying these multiples to the target company to estimate its value.",
+        "steps": [
+          "Identify comparable companies based on industry, size, financial performance, and other relevant factors.",
+          "Gather financial data for the comps, including market capitalization, revenue, earnings, EBITDA, and book value.",
+          "Calculate valuation multiples for the comps, such as P/E, EV/EBITDA, and P/B.",
+          "Apply the average or median multiple of the comps to the target company's corresponding financial metric to estimate its value."
+        ],
+        "example": "If a comparable company with similar financial performance is trading at a P/E of 20, and the target company has earnings per share of $5, then the target company's estimated value would be $100 per share.",
+        "sources": [
+          {
+            "title": "Investopedia - Comparable Company Analysis (CCA)",
+            "url": "https://www.investopedia.com/terms/c/comparable-company-analysis.asp"
+          },
+          {
+            "title": "Wall Street Prep - Comparable Company Analysis",
+            "url": "https://www.wallstreetprep.com/knowledge/comparable-company-analysis/"
+          }
+        ]
+      }
+    },
+    "CreditMetrics": {
+      "machine_readable": {
+        "metrics": {
+          "debt_to_equity": {
+            "formula": "total_debt / total_equity",
+            "description": "Debt-to-Equity ratio"
+          },
+          "interest_coverage_ratio": {
+            "formula": "ebit / interest_expense",
+            "description": "Interest Coverage Ratio"
+          },
+          "debt_to_ebitda": {
+            "formula": "total_debt / ebitda",
+            "description": "Debt-to-EBITDA ratio"
+          },
+          "current_ratio": {
+            "formula": "current_assets / current_liabilities",
+            "description": "Current Ratio"
+          },
+          "quick_ratio": {
+            "formula": "(current_assets - inventory) / current_liabilities",
+            "description": "Quick Ratio"
+          },
+          "cash_ratio": {
+            "formula": "(cash + cash_equivalents) / current_liabilities",
+            "description": "Cash Ratio"
+          }
+        }
+      },
+      "human_readable": {
+        "definition": "Credit metrics are financial ratios and indicators that assess a company's creditworthiness, or its ability to repay its debt obligations. They're like a 'credit score' for companies - the higher the score, the better.",
+        "explanation": "Credit metrics analyze a company's financial statements to evaluate its leverage, liquidity, and profitability, providing insights into its ability to meet its financial obligations.",
+        "categories": {
+          "leverage_ratios": "Leverage ratios measure the extent to which a company uses debt to finance its operations. Examples include debt-to-equity ratio, debt-to-asset ratio, and debt-to-EBITDA ratio.",
+          "liquidity_ratios": "Liquidity ratios assess a company's ability to meet its short-term obligations. Examples include current ratio, quick ratio, and cash ratio.",
+          "profitability_ratios": "Profitability ratios measure a company's ability to generate profits from its operations. Examples include gross profit margin, operating profit margin, and net profit margin.",
+          "coverage_ratios": "Coverage ratios assess a company's ability to cover its interest expense and other fixed charges. Examples include interest coverage ratio and fixed charge coverage ratio."
+        },
+        "example": "A company with a high debt-to-equity ratio may be considered riskier than a company with a low debt-to-equity ratio, as it has more debt relative to its equity.",
+        "sources": [
+          {
+            "title": "Investopedia - Credit Metrics",
+            "url": "https://www.investopedia.com/terms/c/creditmetrics.asp"
+          },
+          {
+            "title": "Corporate Finance Institute - Credit Analysis",
+            "url": "https://corporatefinanceinstitute.com/resources/knowledge/credit/credit-analysis/"
+          }
+        ]
+      }
+    }
+  },
+  "RiskManagement": {
+    "VaR": {
+      "machine_readable": {
+        "methods": {
+          "historical_simulation": {
+            "description": "Calculates VaR based on historical returns of the portfolio.",
+            "parameters": {
+              "confidence_level": {
+                "type": "number",
+                "description": "Confidence level for VaR calculation (e.g., 95%, 99%)"
+              },
+              "lookback_period": {
+                "type": "number",
+                "description": "Number of historical periods to use for calculation (e.g., 250 days, 1 year)"
+              }
+            }
+          },
+          "monte_carlo_simulation": {
+            "description": "Simulates a large number of possible scenarios to estimate VaR.",
+            "parameters": {
+              "confidence_level": {
+                "type": "number",
+                "description": "Confidence level for VaR calculation (e.g., 95%, 99%)"
+              },
+              "number_of_simulations": {
+                "type": "number",
+                "description": "Number of simulations to run"
+              }
+            }
+          },
+          "parametric_var": {
+            "description": "Assumes a specific probability distribution for returns (e.g., normal distribution) to calculate VaR.",
+            "parameters": {
+              "confidence_level": {
+                "type": "number",
+                "description": "Confidence level for VaR calculation (e.g., 95%, 99%)"
+              },
+              "mean_return": {
+                "type": "number",
+                "description": "Average return of the portfolio"
+              },
+              "standard_deviation": {
+                "type": "number",
+                "description": "Standard deviation of portfolio returns"
+              }
+            }
+          }
+        }
+      },
+      "human_readable": {
+        "definition": "Value at Risk (VaR) is a statistical measure that quantifies the potential loss in value of a portfolio over a given time period and confidence level. It's like a 'speed limit' for risk - it tells you how much you could potentially lose with a certain degree of confidence.",
+        "explanation": "VaR provides a single number that summarizes the worst-case scenario for a portfolio, helping investors and risk managers understand and manage their risk exposure.",
+        "methods": {
+          "historical_simulation": "Historical simulation VaR uses past data to estimate future losses. It's like looking in the rearview mirror to see what might happen ahead.",
+          "monte_carlo_simulation": "Monte Carlo simulation VaR generates thousands of possible scenarios to estimate potential losses. It's like running a 'what-if' analysis on steroids.",
+          "parametric_var": "Parametric VaR assumes a specific probability distribution for returns, such as the normal distribution. It's like fitting a 'curve' to historical data to predict future losses."
+        },
+        "limitations": "VaR is not a perfect measure of risk, as it relies on historical data and assumptions about future market behavior. It can also underestimate the severity of extreme events.",
+        "example": "A VaR of $1 million at a 95% confidence level means that there is a 5% chance that the portfolio will lose more than $1 million over the given time period.",
+        "sources": [
+          {
+            "title": "Investopedia - Value at Risk (VaR)",
+            "url": "https://www.investopedia.com/terms/v/var.asp"
+          },
+          {
+            "title": "Risk Glossary - Value at Risk",
+            "url": "https://www.riskglossary.com/link/value_at_risk.htm"
+          }
+        ]
+      }
+    },
+    "CreditRisk": {
+      "machine_readable": {
+        "models": {
+          "merton_model": {
+            "description": "Uses option pricing theory to estimate the probability of default.",
+            "parameters": {
+              "asset_value": {
+                "type": "number",
+                "description": "Market value of the borrower's assets"
+              },
+              "debt_value": {
+                "type": "number",
+                "description": "Face value of the borrower's debt"
+              },
+              "volatility": {
+                "type": "number",
+                "description": "Volatility of asset value"
+              },
+              "time_to_maturity": {
+                "type": "number",
+                "description": "Time to maturity of the debt"
+              },
+              "risk_free_rate": {
+                "type": "number",
+                "description": "Risk-free interest rate"
+              }
+            }
+          },
+          " Altman Z Score": {
+            "description": "Bankruptcy prediction model using a weighted sum of five financial ratios.",
+            "parameters": {
+              "working_capital": {
+                "type": "number",
+                "description": "Working capital of the company"
+              },
+              "total_assets": {
+                "type": "number",
+                "description": "Total assets of the company"
+              },
+              "retained_earnings": {
+                "type": "number",
+                "description": "Retained earnings of the company"
+              },
+              "market_value_equity": {
+                "type": "number",
+                "description": "Market value of equity of the company"
+              },
+              "sales": {
+                "type": "number",
+                "description": "Sales of the company"
+              }
+            }
+          }
+        }
+      },
+      "human_readable": {
+        "definition": "Credit risk is the risk of loss resulting from a borrower's failure to make required payments. It's like lending money to a friend - there's always a chance they won't pay you back.",
+        "explanation": "Credit risk arises from various factors, including the borrower's financial condition, the economic environment, and the terms of the loan agreement. Lenders and investors use credit risk models to assess and manage this risk.",
+        "models": {
+          "merton_model": "The Merton model treats a company's equity as a call option on its assets, allowing lenders to estimate the probability of default based on the company's financial structure and asset volatility.",
+          "credit_scoring_models": "Credit scoring models use statistical techniques to assign a credit score to borrowers based on their credit history and other factors. These scores help lenders assess the likelihood of default."
+        },
+        "mitigation": "Credit risk can be mitigated through various techniques, including diversification, credit enhancement, and collateralization.",
+        "example": "A bank lending money to a business faces credit risk if the business defaults on the loan.",
+        "sources": [
+          {
+            "title": "Investopedia - Credit Risk",
+            "url": "https://www.investopedia.com/terms/c/creditrisk.asp"
+          },
+          {
+            "title": "Bank for International Settlements - Credit Risk",
+            "url": "https://www.bis.org/publ/bcbs125.htm"
+          }
+        ]
+      }
+    },
+    "LiquidityRisk": {
+      "machine_readable": {
+        "metrics": {
+          "liquidity_coverage_ratio": {
+            "formula": "high_quality_liquid_assets / total_net_cash_outflows",
+            "description": "Liquidity Coverage Ratio (LCR)"
+          },
+          "net_stable_funding_ratio": {
+            "formula": "available_stable_funding / required_stable_funding",
+            "description": "Net Stable Funding Ratio (NSFR)"
+          }
+        }
+      },
+      "human_readable": {
+        "definition": "Liquidity risk is the risk that a company or financial institution will not be able to meet its short-term obligations as they come due. It's like running out of cash when you need to pay the bills.",
+        "explanation": "Liquidity risk arises from a mismatch between the timing of cash inflows and outflows. It can be exacerbated by market conditions, such as a sudden decrease in trading volume or a credit crunch.",
+        "metrics": {
+          "liquidity_coverage_ratio": "The Liquidity Coverage Ratio (LCR) measures a bank's ability to meet its short-term liquidity needs in a stress scenario. It's like a 'rainy day fund' for banks - it ensures they have enough cash on hand to weather a financial storm.",
+          "net_stable_funding_ratio": "The Net Stable Funding Ratio (NSFR) measures a bank's ability to fund its activities over a one-year horizon. It's like a 'long-term budget' for banks - it ensures they have a stable source of funding to support their operations."
+        },
+        "mitigation": "Liquidity risk can be mitigated through various techniques, including maintaining a diversified funding base, holding liquid assets, and establishing contingent funding lines.",
+        "example": "A company that relies heavily on short-term debt financing may face liquidity risk if it cannot roll over its debt when it matures.",
+        "sources": [
+          {
+            "title": "Investopedia - Liquidity Risk",
+            "url": "https://www.investopedia.com/terms/l/liquidityrisk.asp"
+          },
+          {
+            "title": "Basel Committee on Banking Supervision - Liquidity Risk",
+            "url": "https://www.bis.org/publ/bcbs238.htm"
+          }
+        ]
+      }
+    },
+    "MarketRisk": {
+      "machine_readable": {
+        "factors": {
+          "interest_rate_risk": {
+            "description": "Risk of loss due to changes in interest rates."
+          },
+          "equity_price_risk": {
+            "description": "Risk of loss due to changes in equity prices."
+          },
+          "foreign_exchange_risk": {
+            "description": "Risk of loss due to changes in exchange rates."
+          },
+          "commodity_price_risk": {
+            "description": "Risk of loss due to changes in commodity prices."
+          }
+        }
+      },
+      "human_readable": {
+        "definition": "Market risk is the risk of loss due to changes in market prices or rates. It's like the risk of getting caught in a sudden downpour - you can't predict it, but you can prepare for it.",
+        "explanation": "Market risk arises from various factors, including economic conditions, geopolitical events, and investor sentiment. It affects all types of investments, from stocks and bonds to currencies and commodities.",
+        "factors": {
+          "interest_rate_risk": "Interest rate risk affects fixed-income securities, such as bonds. When interest rates rise, bond prices fall, and vice versa.",
+          "equity_price_risk": "Equity price risk affects stocks. Stock prices can fluctuate significantly due to various factors, including company performance, industry trends, and market sentiment.",
+          "foreign_exchange_risk": "Foreign exchange risk affects investments in foreign currencies. Changes in exchange rates can impact the value of these investments.",
+          "commodity_price_risk": "Commodity price risk affects investments in commodities, such as oil, gold, and agricultural products. Commodity prices can be volatile due to supply and demand factors, weather patterns, and geopolitical events."
+        },
+        "mitigation": "Market risk can be mitigated through various techniques, including diversification, hedging, and stop-loss orders.",
+        "example": "An investor holding a portfolio of stocks faces market risk if the stock market declines.",
+        "sources": [
+          {
+            "title": "Investopedia - Market Risk",
+            "url": "https://www.investopedia.com/terms/m/marketrisk.asp"
+          },
+          {
+            "title": "GARP - Market Risk",
+            "url": "https://www.garp.org/#!/risk-intelligence/all/all/market-risk"
+          }
+        ]
+      }
+    },
+    "OperationalRisk": {
+      "machine_readable": {
+        "types": {
+          "fraud_risk": {
+            "description": "Risk of loss due to fraudulent activities."
+          },
+          "cyber_risk": {
+            "description": "Risk of loss due to cyberattacks or data breaches."
+          },
+          "technology_risk": {
+            "description": "Risk of loss due to technology failures or disruptions."
+          },
+          "human_error_risk": {
+            "description": "Risk of loss due to human errors or negligence."
+          }
+        }
+      },
+      "human_readable": {
+        "definition": "Operational risk is the risk of loss resulting from inadequate or failed internal processes, people, and systems, or from external events. It's like the risk of a kitchen fire - it can happen unexpectedly and cause significant damage.",
+        "explanation": "Operational risk encompasses a wide range of potential events, including fraud, cyberattacks, technology failures, natural disasters, and human error. It affects all types of businesses and organizations.",
+        "types": {
+          "fraud_risk": "Fraud risk is the risk of loss due to intentional deception or misrepresentation. It can involve employees, customers, or external parties.",
+          "cyber_risk": "Cyber risk is the risk of loss due to cyberattacks or data breaches. It can result in financial losses, reputational damage, and regulatory penalties.",
+          "technology_risk": "Technology risk is the risk of loss due to technology failures or disruptions. It can include hardware or software failures, system outages, and data corruption.",
+          "human_error_risk": "Human error risk is the risk of loss due to human errors or negligence. It can involve mistakes in data entry, calculations, or decision-making."
+        },
+        "mitigation": "Operational risk can be mitigated through various techniques, including strong internal controls, robust cybersecurity measures, disaster recovery planning, and employee training.",
+        "example": "A bank that experiences a data breach faces operational risk due to potential financial losses and reputational damage.",
+        "sources": [
+          {
+            "title": "Investopedia - Operational Risk",
+            "url": "https://www.investopedia.com/terms/o/operational_risk.asp"
+          },
+          {
+            "title": "Basel Committee on Banking Supervision - Operational Risk",
+            "url": "https://www.bis.org/publ/bcbs195.htm"
+          }
+        ]
+      }
+    }
+  },
+  "Macroeconomics": {
+    "InterestRateModels": {
+      "machine_readable": {
+        "models": {
+          "vasicek_model": {
+            "description": "One-factor model for interest rate dynamics.",
+            "parameters": {
+              "speed_of_reversion": {
+                "type": "number",
+                "description": "Speed at which the short-term interest rate reverts to its long-term mean"
+              },
+              "long_term_mean": {
+                "type": "number",
+                "description": "Long-term mean of the short-term interest rate"
+              },
+              "volatility": {
+                "type": "number",
+                "description": "Volatility of the short-term interest rate"
+              }
+            }
+          },
+          "cox_ingersoll_ross_model": {
+            "description": "One-factor model for interest rate dynamics with non-negative interest rates.",
+            "parameters": {
+              "speed_of_reversion": {
+                "type": "number",
+                "description": "Speed at which the short-term interest rate reverts to its long-term mean"
+              },
+              "long_term_mean": {
+                "type": "number",
+                "description": "Long-term mean of the short-term interest rate"
+              },
+              "volatility": {
+                "type": "number",
+                "description": "Volatility of the short-term interest rate"
+              }
+            }
+          },
+          "hull_white_model": {
+            "description": "One-factor model for interest rate dynamics with time-varying parameters.",
+            "parameters": {
+              "speed_of_reversion": {
+                "type": "number",
+                "description": "Speed at which the short-term interest rate reverts to its long-term mean"
+              },
+              "long_term_mean": {
+                "type": "number",
+                "description": "Long-term mean of the short-term interest rate"
+              },
+              "volatility": {
+                "type": "number",
+                "description": "Volatility of the short-term interest rate"
+              }
+            }
+          }
+        }
+      },
+      "human_readable": {
+        "definition": "Interest rate models are mathematical models used to describe the evolution of interest rates over time. They're like 'weather forecasts' for the bond market - they help investors predict how interest rates might change and how those changes might affect bond prices.",
+        "explanation": "Interest rate models are used for various purposes, including pricing bonds and other fixed-income securities, managing interest rate risk, and forecasting future interest rate movements.",
+        "types": {
+          "short_rate_models": "Short rate models focus on the dynamics of the short-term interest rate, which is the interest rate for borrowing or lending over a very short period (e.g., overnight).",
+          "term_structure_models": "Term structure models describe the relationship between interest rates and their maturities, or the 'yield curve'. They help explain why interest rates differ for different maturities."
+        },
+        "example": "The Vasicek model is a popular short rate model that assumes that the short-term interest rate follows a mean-reverting process. This means that the interest rate tends to move towards its long-term average over time.",
+        "sources": [
+          {
+            "title": "Investopedia - Interest Rate Model",
+            "url": "https://www.investopedia.com/terms/i/interest-rate-model.asp"
+          },
+          {
+            "title": "CFA Institute - Interest Rate Risk and Modeling",
+            "url": "https://www.cfainstitute.org/en/membership/professional-development/refresher-readings/interest-rate-risk-modeling"
+          }
+        ]
+      }
+    },
+    "MonetaryPolicy": {
+      "machine_readable": {
+        "tools": {
+          "policy_interest_rates": {
+            "description": "Central banks can adjust policy interest rates to influence economic activity."
+          },
+          "reserve_requirements": {
+            "description": "Central banks can change reserve requirements for banks to affect the money supply."
+          },
+          "open_market_operations": {
+            "description": "Central banks can buy or sell government securities to influence the money supply."
+          },
+          "quantitative_easing": {
+            "description": "Central banks can purchase assets to inject liquidity into the financial system."
+          }
+        }
+      },
+      "human_readable": {
+        "definition": "Monetary policy refers to actions undertaken by a central bank to manipulate the money supply and credit conditions to stimulate or restrain economic activity. It's like a 'thermostat' for the economy - central banks adjust the settings to keep the economy running at the right temperature.",
+        "explanation": "Monetary policy aims to achieve macroeconomic objectives such as price stability, full employment, and sustainable economic growth. Central banks use various tools to implement monetary policy, including interest rate adjustments, reserve requirements, open market operations, and quantitative easing.",
+        "example": "If inflation is rising, a central bank may raise interest rates to cool down the economy and bring inflation back to its target level.",
+        "sources": [
+          {
+            "title": "Investopedia - Monetary Policy",
+            "url": "https://www.investopedia.com/terms/m/monetarypolicy.asp"
+          },
+          {
+            "title": "Federal Reserve - Monetary Policy",
+            "url": "https://www.federalreserve.gov/monetarypolicy.htm"
+          }
+        ]
+      }
+    },
+    "StrategicReserves": {
+      "machine_readable": {
+        "types": {
+          "foreign_currency_reserves": {
+            "description": "Foreign currencies held by a central bank to stabilize exchange rates and support the domestic currency."
+          },
+          "commodity_reserves": {
+            "description": "Commodities, such as oil or gold, held by a government to ensure supply security or influence market prices."
+          }
+        }
+      },
+      "human_readable": {
+        "definition": "Strategic reserves are stockpiles of assets held by a government or central bank for various purposes, such as stabilizing markets, ensuring supply security, or influencing prices. They're like a 'safety net' for the economy - they provide a buffer against unexpected events.",
+        "explanation": "Strategic reserves can include foreign currency reserves, commodity reserves (e.g., oil, gold), and other assets deemed essential for national security or economic stability.",
+        "example": "The United States Strategic Petroleum Reserve (SPR) is a government-owned stockpile of crude oil maintained to mitigate disruptions in oil supply.",
+        "sources": [
+          {
+            "title": "Investopedia - Strategic Reserves",
+            "url": "https://www.investopedia.com/terms/s/strategicreserves.asp"
+          },
+          {
+            "title": "International Monetary Fund - Foreign Exchange Reserves",
+            "url": "https://www.imf.org/external/np/sta/ir/IRProcess-FAQs.htm"
+          }
+        ]
+      }
+    }
+  },
+  "TechnicalAnalysis": {
+    "ChartingTechniques": {
+      "machine_readable": {
+        "patterns": {
+          "head_and_shoulders": {
+            "description": "A chart pattern that signals a potential trend reversal."
+          },
+          "double_top": {
+            "description": "A chart pattern that signals a potential trend reversal."
+          },
+          "double_bottom": {
+            "description": "A chart pattern that signals a potential trend reversal."
+          },
+          "flags_and_pennants": {
+            "description": "Continuation patterns that signal a potential pause in a trend before it resumes."
+          }
+        }
+      },
+      "human_readable": {
+        "definition": "Charting techniques involve analyzing charts of past market prices to identify patterns and trends that can help predict future price movements. It's like reading tea leaves - you look for clues in the patterns to anticipate what might happen next.",
+        "explanation": "Technical analysts use various charting techniques, including candlestick patterns, chart patterns, and trend lines, to identify support and resistance levels, trend reversals, and other trading signals.",
+        "example": "A head and shoulders pattern is a bearish reversal pattern that resembles a head with two shoulders on either side. It suggests that an uptrend is likely to reverse and turn into a downtrend.",
+        "sources": [
+          {
+            "title": "Investopedia - Chart Patterns",
+            "url": "https://www.investopedia.com/terms/c/chartpattern.asp"
+          },
+          {
+            "title": "StockCharts - Chart School",
+            "url": "https://stockcharts.com/school/"
+          }
+        ]
+      }
+    },
+    "TechnicalIndicators": {
+      "machine_readable": {
+        "indicators": {
+          "moving_average_convergence_divergence": {
+            "abbreviation": "MACD",
+            "description": "A trend-following momentum indicator that shows the relationship between two moving averages of prices."
+          },
+          "relative_strength_index": {
+            "abbreviation": "RSI",
+            "description": "A momentum indicator that measures the magnitude of recent price changes to evaluate overbought or oversold conditions."
+          },
+          "bollinger_bands": {
+            "description": "A volatility indicator that shows the upper and lower bounds of normal price fluctuations."
+          },
+          "stochastic_oscillator": {
+            "description": "A momentum indicator that compares a stock's closing price to its price range over a given period."
+          }
+        }
+      },
+      "human_readable": {
+        "definition": "Technical indicators are mathematical calculations based on past market prices and volumes that help identify trends, momentum, and volatility. They're like 'gauges' for the market - they provide readings on various aspects of market behavior.",
+        "explanation": "Technical analysts use a wide variety of indicators to generate trading signals and confirm their analysis based on chart patterns and other techniques.",
+        "categories": {
+          "trend_indicators": "Trend indicators help identify the direction and strength of a trend. Examples include moving averages, MACD, and Average Directional Index (ADX).",
+          "momentum_indicators": "Momentum indicators measure the rate of change of price movements. Examples include RSI, Stochastic Oscillator, and Commodity Channel Index (CCI).",
+          "volatility_indicators": "Volatility indicators measure the degree of price fluctuations. Examples include Bollinger Bands, Average True Range (ATR), and standard deviation.",
+          "volume_indicators": "Volume indicators analyze trading volume to confirm price trends and identify potential reversals. Examples include On-Balance Volume (OBV) and Chaikin Money Flow (CMF)."
+        },
+        "example": "The MACD indicator generates buy and sell signals when its two lines cross above or below each other.",
+        "sources": [
+          {
+            "title": "Investopedia - Technical Indicator",
+            "url": "https://www.investopedia.com/terms/t/technicalindicator.asp"
+          },
+          {
+            "title": "TradingView - Indicators and Strategies",
+            "url": "https:// www.tradingview.com/indicators/"
+          }
+        ]
+      }
+    },
+    "AlgorithmicTrading": {
+      "machine_readable": {
+        "strategies": {
+          "mean_reversion": {
+            "description": "A trading strategy that capitalizes on the tendency of prices to revert to their mean or average value."
+          },
+          "trend_following": {
+            "description": "A trading strategy that identifies and follows trends in market prices."
+          },
+          "arbitrage": {
+            "description": "A trading strategy that exploits price discrepancies between different markets or assets."
+          },
+          "market_making": {
+            "description": "A trading strategy that involves providing liquidity to the market by placing both buy and sell orders."
+          }
+        }
+      },
+      "human_readable": {
+        "definition": "Algorithmic trading involves using computer programs to execute trading orders based on pre-defined rules and strategies. It's like putting your trading on autopilot - the computer does the work for you.",
+        "explanation": "Algorithmic trading can improve trading efficiency, reduce costs, and minimize emotional biases in decision-making. It is used by institutional investors, hedge funds, and individual traders.",
+        "strategies": {
+          "mean_reversion": "Mean reversion strategies buy assets that have fallen below their historical average price and sell assets that have risen above their average price.",
+          "trend_following": "Trend following strategies identify and follow trends in market prices, buying assets that are rising in price and selling assets that are falling in price.",
+          "arbitrage": "Arbitrage strategies exploit price discrepancies between different markets or assets, buying an asset in one market and simultaneously selling it in another market at a higher price.",
+          "market_making": "Market making strategies involve placing both buy and sell orders to provide liquidity to the market. Market makers profit from the spread between the bid and ask prices."
+        },
+        "risks": "Algorithmic trading can be risky if not properly managed. Risks include technology failures, programming errors, and unexpected market events.",
+        "example": "A high-frequency trading (HFT) firm uses algorithms to execute thousands of trades per second, taking advantage of small price discrepancies in the market.",
+        "sources": [
+          {
+            "title": "Investopedia - Algorithmic Trading",
+            "url": "https://www.investopedia.com/terms/a/algorithmictrading.asp"
+          },
+          {
+            "title": "QuantStart - Algorithmic Trading",
+            "url": "https://www.quantstart.com/articles/topic/algorithmic-trading/"
+          }
+        ]
+      }
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{
+  "Valuation": {
+    "DCF": {
+      "machine_readable": {
+        "inputs": {
+          "revenue": {
+            "type": "array",
+            "description": "Annual revenue projections (in millions)"
+            // "example":  // Example to be added later
+          },
+          "expenses": {
+            "type": "array",
+            "description": "Annual operating expenses (in millions)"
+            // "example":  // Example to be added later
+          },
+          "capex": {
+            "type": "array",
+            "description": "Annual capital expenditures (in millions)"
+            // "example":  // Example to be added later
+          },
+          "depreciation": {
+            "type": "array",
+            "description": "Annual depreciation expense (in millions)"
+            // "example":  // Example to be added later
+          },
+          "tax_rate": {
+            "type": "number",
+            "description": "Corporate tax rate"
+            // "example": 0.25  // Example to be added later
+          },
+          "discount_rate": {
+            "type": "number",
+            "description": "Weighted average cost of capital (WACC)"
+            // "example": 0.1  // Example to be added later
+          },
+          "terminal_growth_rate": {
+            "type": "number",
+            "description": "Perpetual growth rate for terminal value"
+            // "example": 0.02  // Example to be added later
+          }
+        },
+        "formulas": {
+          "free_cash_flow": "(revenue - expenses - capex) * (1 - tax_rate) + depreciation",
+          "terminal_value": "free_cash_flow[-1] * (1 + terminal_growth_rate) / (discount_rate - terminal_growth_rate)",
+          "present_value": "free_cash_flow[i] / (1 + discount_rate) ** (i + 1)",
+          "enterprise_value": "sum(present_value) + terminal_value / (1 + discount_rate) ** len(free_cash_flow)"
+        }
+        // Development node: Add more detailed DCF parameters and calculations
+      },
+      "human_readable": {
+        "definition": "Discounted Cash Flow (DCF) analysis is a valuation method that estimates the intrinsic value of an investment based on its expected future cash flows. It's like looking into a crystal ball to see how much money an investment will generate over its lifetime.",
+        "explanation": "The DCF model calculates the present value of all expected future cash flows, discounted back to today's value using a discount rate that reflects the riskiness of the investment. The sum of these present values represents the intrinsic value of the investment.",
+        "steps": [
+          "Forecast future free cash flows (FCF) for a specific period (e.g., 5 or 10 years).",
+          "Estimate the terminal value (TV) of the investment beyond the forecast period.",
+          "Discount the FCF and TV back to their present values using a discount rate (WACC).",
+          "Sum the present values of FCF and TV to arrive at the enterprise value (EV).",
+          "Subtract net debt from EV to arrive at equity value."
+        ],
+        "example": "Imagine you're considering buying a lemonade stand. You estimate that it will generate $1,000 in free cash flow next year, growing at 5% per year for the next 5 years. After that, you assume it will grow at a steady rate of 2% forever. Using a discount rate of 10%, you can calculate the present value of these cash flows and determine whether the lemonade stand is worth buying.",
+        "sources": [
+          {
+            "title": "Investopedia - Discounted Cash Flow (DCF)",
+            "url": "https://www.investopedia.com/terms/d/dcf.asp"
+          },
+          {
+            "title": "Corporate Finance Institute - DCF Model Training",
+            "url": "https://corporatefinanceinstitute.com/resources/knowledge/valuation/dcf-model-training-free-guide/"
+          }
+        ]
+      }
+    },
+    "Comparables": {
+      "machine_readable": {
+        "metrics": {
+          "pe_ratio": {
+            "formula": "market_price / earnings_per_share",
+            "description": "Price-to-Earnings ratio"
+          },
+          "ev_ebitda": {
+            "formula": "enterprise_value / ebitda",
+            "description": "Enterprise Value to EBITDA"
+          },
+          "price_to_book": {
+            "formula": "market_price / book_value_per_share",
+            "description": "Price-to-Book ratio"
+          }
+          // Development node: Add more relative valuation metrics
+        }
+        // Development node: Add industry-specific multiples and benchmarks
+      },
+      "human_readable": {
+        "definition": "Comparable company analysis (CCA) is a valuation method that compares a company to its peers based on relative valuation metrics. It's like comparing apples to apples - you look for companies with similar characteristics to get an idea of what a company is worth.",
+        "explanation": "CCA involves identifying comparable companies (comps) in the same industry or sector, analyzing their valuation multiples (e.g., P/E, EV/EBITDA, P/B), and applying these multiples to the target company to estimate its value.",
+        "steps": [
+          "Identify comparable companies based on industry, size, financial performance, and other relevant factors.",
+          "Gather financial data for the comps, including market capitalization, revenue, earnings, EBITDA, and book value.",
+          "Calculate valuation multiples for the comps, such as P/E, EV/EBITDA, and P/B.",
+          "Apply the average or median multiple of the comps to the target company's corresponding financial metric to estimate its value."
+        ],
+        "example": "If a comparable company with similar financial performance is trading at a P/E of 20, and the target company has earnings per share of $5, then the target company's estimated value would be $100 per share.",
+        "sources": [
+          {
+            "title": "Investopedia - Comparable Company Analysis (CCA)",
+            "url": "https://www.investopedia.com/terms/c/comparable-company-analysis.asp"
+          },
+          {
+            "title": "Wall Street Prep - Comparable Company Analysis",
+            "url": "https://www.wallstreetprep.com/knowledge/comparable-company-analysis/"
+          }
+        ]
+      }
+    },
+    "CreditMetrics": {
+      "machine_readable": {
+        "metrics": {
+          "debt_to_equity": {
+            "formula": "total_debt / total_equity",
+            "description": "Debt-to-Equity ratio"
+          },
+          "interest_coverage_ratio": {
+            "formula": "ebit / interest_expense",
+            "description": "Interest Coverage Ratio"
+          },
+          "debt_to_ebitda": {
+            "formula": "total_debt / ebitda",
+            "description": "Debt-to-EBITDA ratio"
+          },
+          "current_ratio": {
+            "formula": "current_assets / current_liabilities",
+            "description": "Current Ratio"
+          },
+          "quick_ratio": {
+            "formula": "(current_assets - inventory) / current_liabilities",
+            "description": "Quick Ratio"
+          },
+          "cash_ratio": {
+            "formula": "(cash + cash_equivalents) / current_liabilities",
+            "description": "Cash Ratio"
+          }
+          // Development node: Add more credit metrics (e.g., debt-to-asset ratio, working capital)
+        }
+        // Development node: Add credit rating scales and methodologies
+      },
+      "human_readable": {
+        "definition": "Credit metrics are financial ratios and indicators that assess a company's creditworthiness, or its ability to repay its debt obligations. They're like a 'credit score' for companies - the higher the score, the better.",
+        "explanation": "Credit metrics analyze a company's financial statements to evaluate its leverage, liquidity, and profitability, providing insights into its ability to meet its financial obligations.",
+        "categories": {
+          "leverage_ratios": "Leverage ratios measure the extent to which a company uses debt to finance its operations. Examples include debt-to-equity ratio, debt-to-asset ratio, and debt-to-EBITDA ratio.",
+          "liquidity_ratios": "Liquidity ratios assess a company's ability to meet its short-term obligations. Examples include current ratio, quick ratio, and cash ratio.",
+          "profitability_ratios": "Profitability ratios measure a company's ability to generate profits from its operations. Examples include gross profit margin, operating profit margin, and net profit margin.",
+          "coverage_ratios": "Coverage ratios assess a company's ability to cover its interest expense and other fixed charges. Examples include interest coverage ratio and fixed charge coverage ratio."
+        },
+        "example": "A company with a high debt-to-equity ratio may be considered riskier than a company with a low debt-to-equity ratio, as it has more debt relative to its equity.",
+        "sources": [
+          {
+            "title": "Investopedia - Credit Metrics",
+            "url": "https://www.investopedia.com/terms/c/creditmetrics.asp"
+          },
+          {
+            "title": "Corporate Finance Institute - Credit Analysis",
+            "url": "https://corporatefinanceinstitute.com/resources/knowledge/credit/credit-analysis/"
+          }
+        ]
+      }
+    }
+  },
+  "RiskManagement": {
+    "VaR": {
+      "machine_readable": {
+        "methods": {
+          "historical_simulation": {
+            "description": "Calculates VaR based on historical returns of the portfolio.",
+            "parameters": {
+              "confidence_level": {
+                "type": "number",
+                "description": "Confidence level for VaR calculation (e.g., 95%, 99%)"
+              },
+              "lookback_period": {
+                "type": "number",
+                "description": "Number of historical periods to use for calculation (e.g., 250 days, 1 year)"
+              }
+            }
+          },
+          "monte_carlo_simulation": {
+            "description": "Simulates a large number of possible scenarios to estimate VaR.",
+            "parameters": {
+              "confidence_level": {
+                "type": "number",
+                "description": "Confidence level for VaR calculation (e.g., 95%, 99%)"
+              },
+              "number_of_simulations": {
+                "type": "number",
+                "description": "Number of simulations to run"
+              }
+            }
+          },
+          "parametric_var": {
+            "description": "Assumes a specific probability distribution for returns (e.g., normal distribution) to calculate VaR.",
+            "parameters": {
+              "confidence_level": {
+                "type": "number",
+                "description": "Confidence level for VaR calculation (e.g., 95%, 99%)"
+              },
+              "mean_return": {
+                "type": "number",
+                "description": "Average return of the portfolio"
+              },
+              "standard_deviation": {
+                "type": "number",
+                "description": "Standard deviation of portfolio returns"
+              }
+            }
+          }
+        }
+        // Development node: Add more advanced VaR models (e.g., conditional VaR, expected shortfall)
+      },
+      "human_readable": {
+        "definition": "Value at Risk (VaR) is a statistical measure that quantifies the potential loss in value of a portfolio over a given time period and confidence level. It's like a 'speed limit' for risk - it tells you how much you could potentially lose with a certain degree of confidence.",
+        "explanation": "VaR provides a single number that summarizes the worst-case scenario for a portfolio, helping investors and risk managers understand and manage their risk exposure.",
+        "methods": {
+          "historical_simulation": "Historical simulation VaR uses past data to estimate future losses. It's like looking in the rearview mirror to see what might happen ahead.",
+          "monte_carlo_simulation": "Monte Carlo simulation VaR generates thousands of possible scenarios to estimate potential losses. It's like running a 'what-if' analysis on steroids.",
+          "parametric_var": "Parametric VaR assumes a specific probability distribution for returns, such as the normal distribution. It's like fitting a 'curve' to historical data to predict future losses."
+        },
+        "limitations": "VaR is not a perfect measure of risk, as it relies on historical data and assumptions about future market behavior. It can also underestimate the severity of extreme events.",
+        "example": "A VaR of $1 million at a 95% confidence level means that there is a 5% chance that the portfolio will lose more than $1 million over the given time period.",
+        "sources": [
+          {
+            "title": "Investopedia - Value at Risk (VaR)",
+            "url": "https://www.investopedia.com/terms/v/var.asp"
+          },
+          {
+            "title": "Risk Glossary - Value at Risk",
+            "url": "https://www.riskglossary.com/link/value_at_risk.htm"
+          }
+        ]
+      }
+    },
+    "CreditRisk": {
+      "machine_readable": {
+        "models": {
+          "merton_model": {
+            "description": "Uses option pricing theory to estimate the probability of default.",
+            "parameters": {
+              "asset_value": {
+                "type": "number",
+                "description": "Market value of the borrower's assets"
+              },
+              "debt_value": {
+                "type": "number",
+                "description": "Face value of the borrower's debt"
+              },
+              "volatility": {
+                "type": "number",
+                "description": "Volatility of asset value"
+              },
+              "time_to_maturity": {
+                "type": "number",
+                "description": "Time to maturity of the debt"
+              },
+              "risk_free_rate": {
+                "type": "number",
+                "description": "Risk-free interest rate"
+              }
+            }
+          },
+          "altman_z_score": {
+            "description": "Bankruptcy prediction model using a weighted sum of five financial ratios.",
+            "parameters": {
+              "working_capital": {
+                "type": "number",
+                "description": "Working capital of the company"
+              },
+              "total_assets": {
+                "type": "number",
+                "description": "Total assets of the company"
+              },
+              "retained_earnings": {
+                "type": "number",
+                "description": "Retained earnings of the company"
+              },
+              "market_value_equity": {
+                "type": "number",
+                "description": "Market value of equity of the company"
+              },
+              "sales": {
+                "type": "number",
+                "description": "Sales of the company"
+              }
+            }
+          }
+          // Development node: Add more credit risk models (e.g., CreditMetrics, KMV)
+        },
+        "metrics": {
+          "probability_of_default": {
+            "abbreviation": "PD",
+            "description": "The likelihood that a borrower will default on its debt obligations."
+          },
+          "loss_given_default": {
+            "abbreviation": "LGD",
+            "description": "The amount of money a lender or investor is likely to lose in the event of a borrower's default."
+          },
+          "exposure_at_default": {
+            "abbreviation": "EAD",
+            "description": "The amount of money a lender or investor is exposed to at the time of a borrower's default."
+          }
+          // Development node: Add more credit risk metrics (e.g., recovery rate, expected loss)
+        }
+      },
+      "human_readable": {
+        "definition": "Credit risk is the risk of loss resulting from a borrower's failure to make required payments. It's like lending money to a friend - there's always a chance they won't pay you back.",
+        "explanation": "Credit risk arises from various factors, including the borrower's financial condition, the economic environment, and the terms of the loan agreement. Lenders and investors use credit risk models to assess and manage this risk.",
+        "models": {
+          "merton_model": "The Merton model treats a company's equity as a call option on its assets, allowing lenders to estimate the probability of default based on the company's financial structure and asset volatility.",
+          "credit_scoring_models": "Credit scoring models use statistical techniques to assign a credit score to borrowers based on their credit history and other factors. These scores help lenders assess the likelihood of default."
+          // Development node: Add explanations of other credit risk models
+        },
+        "mitigation": "Credit risk can be mitigated through various techniques, including diversification, credit enhancement, and collateralization.",
+        "example": "A bank lending money to a business faces credit risk if the business defaults on the loan.",
+        "sources": [
+          {
+            "title": "Investopedia - Credit Risk",
+            "url": "https://www.investopedia.com/terms/c/creditrisk.asp"
+          },
+          {
+            "title": "Bank for International Settlements - Credit Risk",
+            "url": "https://www.bis.org/publ/bcbs125.htm"
+          }
+        ]
+      }
+    },
+    "LiquidityRisk": {
+      "machine_readable": {
+        "metrics": {
+          "liquidity_coverage_ratio": {
+            "formula": "high_quality_liquid_assets / total_net_cash_outflows",
+            "description": "Liquidity Coverage Ratio (LCR)"
+          },
+          "net_stable_funding_ratio": {
+            "formula": "available_stable_funding / required_stable_funding",
+            "description": "Net Stable Funding Ratio (NSFR)"
+          }
+          // Development node: Add more liquidity metrics (e.g., bid-ask spread, market depth)
+        }
+        // Development node: Add liquidity stress testing scenarios and parameters
+      },
+      "human_readable": {
+        "definition": "Liquidity risk is the risk that a company or financial institution will not be able to meet its short-term obligations as they come due. It's like running out of cash when you need to pay the bills.",
+        "explanation": "Liquidity risk arises from a mismatch between the timing of cash inflows and outflows. It can be exacerbated by market conditions, such as a sudden decrease in trading volume or a credit crunch.",
+        "metrics": {
+          "liquidity_coverage_ratio": "The Liquidity Coverage Ratio (LCR) measures a bank's ability to meet its short-term liquidity needs in a stress scenario. It's like a 'rainy day fund' for banks - it ensures they have enough cash on hand to weather a financial storm.",
+          "net_stable_funding_ratio": "The Net Stable Funding Ratio (NSFR) measures a bank's ability to fund its activities over a one-year horizon. It's like a 'long-term budget' for banks - it ensures they have a stable source of funding to support their operations."
+        },
+        "mitigation": "Liquidity risk can be mitigated through various techniques, including maintaining a diversified funding base, holding liquid assets, and establishing contingent funding lines.",
+        "example": "A company that relies heavily on short-term debt financing may face liquidity risk if it cannot roll over its debt when it matures.",
+        "sources": [
+          {
+            "title": "Investopedia - Liquidity Risk",
+            "url": "https://www.investopedia.com/terms/l/liquidityrisk.asp"
+          },
+          {
+            "title": "Basel Committee on Banking Supervision - Liquidity Risk",
+            "url": "https://www.bis.org/publ/bcbs238.htm"
+          }
+        ]
+      }
+    },
+    "MarketRisk": {
+      "machine_readable": {
+        "factors": {
+          "interest_rate_risk": {
+            "description": "Risk of loss due to changes in interest rates."
+          },
+          "equity_price_risk": {
+            "description": "Risk of loss due to changes in equity prices."
+          },
+          "foreign_exchange_risk": {
+            "description": "Risk of loss due to changes in exchange rates."
+          },
+          "commodity_price_risk": {
+            "description": "Risk of loss due to changes in commodity prices."
+          }
+          // Development node: Add more market risk factors (e.g., volatility risk, basis risk)
+        }
+        // Development node: Add market risk models (e.g., CAPM, factor models)
+      },
+      "human_readable": {
+        "definition": "Market risk is the risk of loss due to changes in market prices or rates. It's like the risk of getting caught in a sudden downpour - you can't predict it, but you can prepare for it.",
+        "explanation": "Market risk arises from various factors, including economic conditions, geopolitical events, and investor sentiment. It affects all types of investments, from stocks and bonds to currencies and commodities.",
+        "factors": {
+          "interest_rate_risk": "Interest rate risk affects fixed-income securities, such as bonds. When interest rates rise, bond prices fall, and vice versa.",
+          "equity_price_risk": "Equity price risk affects stocks. Stock prices can fluctuate significantly due to various factors, including company performance, industry trends, and market sentiment.",
+          "foreign_exchange_risk": "Foreign exchange risk affects investments in foreign currencies. Changes in exchange rates can impact the value of these investments.",
+          "commodity_price_risk": "Commodity price risk affects investments in commodities, such as oil, gold, and agricultural products. Commodity prices can be volatile due to supply and demand factors, weather patterns, and geopolitical events."
+        },
+        "mitigation": "Market risk can be mitigated through various techniques, including diversification, hedging, and stop-loss orders.",
+        "example": "An investor holding a portfolio of stocks faces market risk if the stock market declines.",
+        "sources": [
+          {
+            "title": "Investopedia - Market Risk",
+            "url": "https://www.investopedia.com/terms/m/marketrisk.asp"
+          },
+          {
+            "title": "GARP - Market Risk",
+            "url": "https://www.garp.org/#!/risk-intelligence/all/all/market-risk"
+          }
+        ]
+      }
+    },
+    "OperationalRisk": {
+      "machine_readable": {
+        "types": {
+          "fraud_risk": {
+            "description": "Risk of loss due to fraudulent activities."
+          },
+          "cyber_risk": {
+            "description": "Risk of loss due to cyberattacks or data breaches."
+          },
+          "technology_risk": {
+            "description": "Risk of loss due to technology failures or disruptions."
+          },
+          "human_error_risk": {
+            "description": "Risk of loss due to human errors or negligence."
+          }
+          // Development node: Add more operational risk types (e.g., legal risk, regulatory risk)
+        }
+        // Development node: Add operational risk frameworks and assessment methodologies
+      },
+      "human_readable": {
+        "definition": "Operational risk is the risk of loss resulting from inadequate or failed internal processes, people, and systems, or from external events. It's like the risk of a kitchen fire - it can happen unexpectedly and cause significant damage.",
+        "explanation": "Operational risk encompasses a wide range of potential events, including fraud, cyberattacks, technology failures, natural disasters, and human error. It affects all types of businesses and organizations.",
+        "types": {
+          "fraud_risk": "Fraud risk is the risk of loss due to intentional deception or misrepresentation. It can involve employees, customers, or external parties.",
+          "cyber_risk": "Cyber risk is the risk of loss due to cyberattacks or data breaches. It can result in financial losses, reputational damage, and regulatory penalties.",
+          "technology_risk": "Technology risk is the risk of loss due to technology failures or disruptions. It can include hardware or software failures, system outages, and data corruption.",
+          "human_error_risk": "Human error risk is the risk of loss due to human errors or negligence. It can involve mistakes in data entry, calculations, or decision-making."
+        },
+        "mitigation": "Operational risk can be mitigated through various techniques, including strong internal controls, robust cybersecurity measures, disaster recovery planning, and employee training.",
+        "example": "A bank that experiences a data breach faces operational risk due to potential financial losses and reputational damage.",
+        "sources": [
+          {
+            "title": "Investopedia - Operational Risk",
+            "url": "https://www.investopedia.com/terms/o/operational_risk.asp"
+          },
+          {
+            "title": "Basel Committee on Banking Supervision - Operational Risk",
+            "url": "https://www.bis.org/publ/bcbs195.htm"
+          }
+        ]
+      }
+    }
+  },
+  "Macroeconomics": {
+    "InterestRateModels": {
+      "machine_readable": {
+        "models": {
+          "vasicek_model": {
+            "description": "One-factor model for interest rate dynamics.",
+            "parameters": {
+              "speed_of_reversion": {
+                "type": "number",
+                "description": "Speed at which the short-term interest rate reverts to its long-term mean"
+              },
+              "long_term_mean": {
+                "type": "number",
+                "description": "Long-term mean of the short-term interest rate"
+              },
+              "volatility": {
+                "type": "number",
+                "description": "Volatility of the short-term interest rate"
+              }
+            }
+          },
+          "cox_ingersoll_ross_model": {
+            "description": "One-factor model for interest rate dynamics with non-negative interest rates.",
+            "parameters": {
+              "speed_of_reversion": {
+                "type": "number",
+                "description": "Speed at which the short-term interest rate reverts to its long-term mean"
+              },
+              "long_term_mean": {
+                "type": "number",
+                "description": "Long-term mean of the short-term interest rate"
+              },
+              "volatility": {
+                "type": "number",
+                "description": "Volatility of the short-term interest rate"
+              }
+            }
+          },
+          "hull_white_model": {
+            "description": "One-factor model for interest rate dynamics with time-varying parameters.",
+            "parameters": {
+              "speed_of_reversion": {
+                "type": "number",
+                "description": "Speed at which the short-term interest rate reverts to its long-term mean"
+              },
+              "long_term_mean": {
+                "type": "number",
+                "description": "Long-term mean of the short-term interest rate"
+              },
+              "volatility": {
+                "type": "number",
+                "description": "Volatility of the short-term interest rate"
+              }
+            }
+          }
+          // Development node: Add more interest rate models (e.g., Ho-Lee, Black-Karasinski)
+        }
+        // Development node: Add yield curve construction and analysis techniques
+      },
+      "human_readable": {
+        "definition": "Interest rate models are mathematical models used to describe the evolution of interest rates over time. They're like 'weather forecasts' for the bond market - they help investors predict how interest rates might change and how those changes might affect bond prices.",
+        "explanation": "Interest rate models are used for various purposes, including pricing bonds and other fixed-income securities, managing interest rate risk, and forecasting future interest rate movements.",
+        "types": {
+          "short_rate_models": "Short rate models focus on the dynamics of the short-term interest rate, which is the interest rate for borrowing or lending over a very short period (e.g., overnight).",
+          "term_structure_models": "Term structure models describe the relationship between interest rates and their maturities, or the 'yield curve'. They help explain why interest rates differ for different maturities."
+        },
+        "example": "The Vasicek model is a popular short rate model that assumes that the short-term interest rate follows a mean-reverting process. This means that the interest rate tends to move towards its long-term average over time.",
+        "sources": [
+          {
+            "title": "Investopedia - Interest Rate Model",
+            "url": "https://www.investopedia.com/terms/i/interest-rate-model.asp"
+          },
+          {
+            "title": "CFA Institute - Interest Rate Risk and Modeling",
+            "url": "https://www.cfainstitute.org/en/membership/professional-development/refresher-readings/interest-rate-risk-modeling"
+          }
+        ]
+      }
+    },
+    "MonetaryPolicy": {
+      "machine_readable": {
+        "tools": {
+          "policy_interest_rates": {
+            "description": "Central banks can adjust policy interest rates to influence economic activity."
+          },
+          "reserve_requirements": {
+            "description": "Central banks can change reserve requirements for banks to affect the money supply."
+          },
+          "open_market_operations": {
+            "description": "Central banks can buy or sell government securities to influence the money supply."
+          },
+          "quantitative_easing": {
+            "description": "Central banks can purchase assets to inject liquidity into the financial system."
+          }
+          // Development node: Add more monetary policy tools (e.g., forward guidance, macroprudential policies)
+        }
+        // Development node: Add macroeconomic models and frameworks (e.g., DSGE models, New Keynesian models)
+      },
+      "human_readable": {
+        "definition": "Monetary policy refers to actions undertaken by a central bank to manipulate the money supply and credit conditions to stimulate or restrain economic activity. It's like a 'thermostat' for the economy - central banks adjust the settings to keep the economy running at the right temperature.",
+        "explanation": "Monetary policy aims to achieve macroeconomic objectives such as price stability, full employment, and sustainable economic growth. Central banks use various tools to implement monetary policy, including interest rate adjustments, reserve requirements, open market operations, and quantitative easing.",
+        "example": "If inflation is rising, a central bank may raise interest rates to cool down the economy and bring inflation back to its target level.",
+        "sources": [
+          {
+            "title": "Investopedia - Monetary Policy",
+            "url": "https://www.investopedia.com/terms/m/monetarypolicy.asp"
+          },
+          {
+            "title": "Federal Reserve - Monetary Policy",
+            "url": "https://www.federalreserve.gov/monetarypolicy.htm"
+          }
+        ]
+      }
+    },
+    "StrategicReserves": {
+      "machine_readable": {
+        "types": {
+          "foreign_currency_reserves": {
+            "description": "Foreign currencies held by a central bank to stabilize exchange rates and support the domestic currency."
+          },
+          "commodity_reserves": {
+            "description": "Commodities, such as oil or gold, held by a government to ensure supply security or influence market prices."
+          }
+          // Development node: Add more strategic reserve types (e.g., food reserves, medical supplies)
+        }
+        // Development node: Add strategic reserve management strategies and policies
+      },
+      "human_readable": {
+        "definition": "Strategic reserves are stockpiles of assets held by a government or central bank for various purposes, such as stabilizing markets, ensuring supply security, or influencing prices. They're like a 'safety net' for the economy - they provide a buffer against unexpected events.",
+        "explanation": "Strategic reserves can include foreign currency reserves, commodity reserves (e.g., oil, gold), and other assets deemed essential for national security or economic stability.",
+        "example": "The United States Strategic Petroleum Reserve (SPR) is a government-owned stockpile of crude oil maintained to mitigate disruptions in oil supply.",
+        "sources": [
+          {
+            "title": "Investopedia - Strategic Reserves",
+            "url": "https://www.investopedia.com/terms/s/strategicreserves.asp"
+          },
+          {
+            "title": "International Monetary Fund - Foreign Exchange Reserves",
+            "url": "https://www.imf.org/external/np/sta/ir/IRProcess-FAQs.htm"
+          }
+        ]
+      }
+    }
+  },
+  "TechnicalAnalysis": {
+    "ChartingTechniques": {
+      "machine_readable": {
+        "patterns": {
+          "head_and_shoulders": {
+            "description": "A chart pattern that signals a potential trend reversal."
+          },
+          "double_top": {
+            "description": "A chart pattern that signals a potential trend reversal."
+          },
+          "double_bottom": {
+            "description": "A chart pattern that signals a potential trend reversal."
+          },
+          "flags_and_pennants": {
+            "description": "Continuation patterns that signal a potential pause in a trend before it resumes."
+          }
+          // Development node: Add more chart patterns (e.g., triangles, wedges)
+        }
+        // Development node: Add trend line identification and analysis techniques
+      },
+      "human_readable": {
+        "definition": "Charting techniques involve analyzing charts of past market prices to identify patterns and trends that can help predict future price movements. It's like reading tea leaves - you look for clues in the patterns to anticipate what might happen next.",
+        "explanation": "Technical analysts use various charting techniques, including candlestick patterns, chart patterns, and trend lines, to identify support and resistance levels, trend reversals, and other trading signals.",
+        "example": "A head and shoulders pattern is a bearish reversal pattern that resembles a head with two shoulders on either side. It suggests that an uptrend is likely to reverse and turn into a downtrend.",
+        "sources": [
+          {
+            "title": "Investopedia - Chart Patterns",
+            "url": "https://www.investopedia.com/terms/c/chartpattern.asp"
+          },
+          {
+            "title": "StockCharts - Chart School",
+            "url : "https://stockcharts.com/school/"
+          }
+        ]
+      }
+    },
+    "TechnicalIndicators": {
+      "machine_readable": {
+        "indicators": {
+          "moving_average_convergence_divergence": {
+            "abbreviation": "MACD",
+            "description": "A trend-following momentum indicator that shows the relationship between two moving averages of prices."
+            // Development node: Add MACD calculation parameters and interpretation guidelines
+          },
+          "relative_strength_index": {
+            "abbreviation": "RSI",
+            "description": "A momentum indicator that measures the magnitude of recent price changes to evaluate overbought or oversold conditions."
+            // Development node: Add RSI calculation parameters and interpretation guidelines
+          },
+          "bollinger_bands": {
+            "description": "A volatility indicator that shows the upper and lower bounds of normal price fluctuations."
+            // Development node: Add Bollinger Bands calculation parameters and interpretation guidelines
+          },
+          "stochastic_oscillator": {
+            "description": "A momentum indicator that compares a stock's closing price to its price range over a given period."
+            // Development node: Add Stochastic Oscillator calculation parameters and interpretation guidelines
+          }
+          // Development node: Add more technical indicators (e.g., ADX, CCI, ATR)
+        }
+        // Development node: Add trading strategies based on technical indicators
+      },
+      "human_readable": {
+        "definition": "Technical indicators are mathematical calculations based on past market prices and volumes that help identify trends, momentum, and volatility. They're like 'gauges' for the market - they provide readings on various aspects of market behavior.",
+        "explanation": "Technical analysts use a wide variety of indicators to generate trading signals and confirm their analysis based on chart patterns and other techniques.",
+        "categories": {
+          "trend_indicators": "Trend indicators help identify the direction and strength of a trend. Examples include moving averages, MACD, and Average Directional Index (ADX).",
+          "momentum_indicators": "Momentum indicators measure the rate of change of price movements. Examples include RSI, Stochastic Oscillator, and Commodity Channel Index (CCI).",
+          "volatility_indicators": "Volatility indicators measure the degree of price fluctuations. Examples include Bollinger Bands, Average True Range (ATR), and standard deviation.",
+          "volume_indicators": "Volume indicators analyze trading volume to confirm price trends and identify potential reversals. Examples include On-Balance Volume (OBV) and Chaikin Money Flow (CMF)."
+        },
+        "example": "The MACD indicator generates buy and sell signals when its two lines cross above or below each other.",
+        "sources": [
+          {
+            "title": "Investopedia - Technical Indicator",
+            "url": "https://www.investopedia.com/terms/t/technicalindicator.asp"
+          },
+          {
+            "title": "TradingView - Indicators and Strategies",
+            "url": "https://www.tradingview.com/indicators/"
+          }
+        ]
+      }
+    },
+    "AlgorithmicTrading": {
+      "machine_readable": {
+        "strategies": {
+          "mean_reversion": {
+            "description": "A trading strategy that capitalizes on the tendency of prices to revert to their mean or average value."
+            // Development node: Add mean reversion algorithms and parameters
+          },
+          "trend_following": {
+            "description": "A trading strategy that identifies and follows trends in market prices."
+            // Development node: Add trend following algorithms and parameters
+          },
+          "arbitrage": {
+            "description": "A trading strategy that exploits price discrepancies between different markets or assets."
+            // Development node: Add arbitrage algorithms and parameters
+          },
+          "market_making": {
+            "description": "A trading strategy that involves providing liquidity to the market by placing both buy and sell orders."
+            // Development node: Add market making algorithms and parameters
+          }
+          // Development node: Add more algorithmic trading strategies (e.g., statistical arbitrage, sentiment analysis-based trading)
+        }
+        // Development node: Add risk management and optimization techniques for algorithmic trading
+      },
+      "human_readable": {
+        "definition": "Algorithmic trading involves using computer programs to execute trading orders based on pre-defined rules and strategies. It's like putting your trading on autopilot - the computer does the work for you.",
+        "explanation": "Algorithmic trading can improve trading efficiency, reduce costs, and minimize emotional biases in decision-making. It is used by institutional investors, hedge funds, and individual traders.",
+        "strategies": {
+          "mean_reversion": "Mean reversion strategies buy assets that have fallen below their historical average price and sell assets that have risen above their average price.",
+          "trend_following": "Trend following strategies identify and follow trends in market prices, buying assets that are rising in price and selling assets that are falling in price.",
+          "arbitrage": "Arbitrage strategies exploit price discrepancies between different markets or assets, buying an asset in one market and simultaneously selling it in another market at a higher price.",
+          "market_making": "Market making strategies involve placing both buy and sell orders to provide liquidity to the market. Market makers profit from the spread between the bid and ask prices."
+        },
+        "risks": "Algorithmic trading can be risky if not properly managed. Risks include technology failures, programming errors, and unexpected market events.",
+        "example": "A high-frequency trading (HFT) firm uses algorithms to execute thousands of trades per second, taking advantage of small price discrepancies in the market.",
+        "sources": [
+          {
+            "title": "Investopedia - Algorithmic Trading",
+            "url": "https://www.investopedia.com/terms/a/algorithmictrading.asp"
+          },
+          {
+            "title": "QuantStart - Algorithmic Trading",
+            "url": "https://www.quantstart.com/articles/topic/algorithmic-trading/"
+          }
+        ]
+      }
+    }
+  },
+  // Development node: Add "Emerging Trends" module with DeFi, Cryptocurrency Markets, and Sustainable Investing
+  // Development node: Add "LLM_Optimization" module with Context Windows, Memory Management, and Parameter Tuning
+}

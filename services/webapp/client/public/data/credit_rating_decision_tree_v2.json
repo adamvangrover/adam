@@ -1,0 +1,503 @@
+{
+  "tree": {
+    "name": "Creditworthiness Assessment and Rating Assignment",
+    "type": "root",
+    "children": [
+      {
+        "name": "Borrower Type",
+        "type": "decision",
+        "question": "Is the borrower a company or a sovereign entity?",
+        "children": [
+          {
+            "condition": "Company",
+            "node_id": "company_analysis"
+          },
+          {
+            "condition": "Sovereign",
+            "node_id": "sovereign_analysis"
+          }
+        ]
+      },
+      {
+        "node_id": "company_analysis",
+        "type": "factor",
+        "name": "Company Creditworthiness",
+        "children": [
+          {
+            "name": "Financial Risk",
+            "type": "factor",
+            "weight": 0.4,
+            "children": [
+              {
+                "name": "Profitability",
+                "type": "metric",
+                "children": [
+                  {
+                    "name": "Return on Equity",
+                    "type": "leaf",
+                    "condition": "> 15%",
+                    "score": 10
+                  },
+                  {
+                    "name": "Operating Margin",
+                    "type": "leaf",
+                    "condition": "> 10%",
+                    "score": 8
+                  },
+                  {
+                    "name": "Net Income Growth",
+                    "type": "leaf",
+                    "condition": "> 5%",
+                    "score": 7
+                  }
+                ]
+              },
+              {
+                "name": "Leverage",
+                "type": "metric",
+                "children": [
+                  {
+                    "name": "Debt-to-Equity Ratio",
+                    "type": "leaf",
+                    "condition": "< 1.5",
+                    "score": 9
+                  },
+                  {
+                    "name": "Debt-to-Asset Ratio",
+                    "type": "leaf",
+                    "condition": "< 0.5",
+                    "score": 8
+                  }
+                ]
+              },
+              {
+                "name": "Cash Flow",
+                "type": "metric",
+                "children": [
+                  {
+                    "name": "Operating Cash Flow",
+                    "type": "leaf",
+                    "condition": "> 100,000",
+                    "score": 9
+                  },
+                  {
+                    "name": "Free Cash Flow",
+                    "type": "leaf",
+                    "condition": "> 50,000",
+                    "score": 8
+                  }
+                ]
+              },
+              {
+                "name": "Liquidity",
+                "type": "metric",
+                "children": [
+                  {
+                    "name": "Current Ratio",
+                    "type": "leaf",
+                    "condition": "> 2",
+                    "score": 9
+                  },
+                  {
+                    "name": "Quick Ratio",
+                    "type": "leaf",
+                    "condition": "> 1",
+                    "score": 8
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Business Risk",
+            "type": "factor",
+            "weight": 0.3,
+            "children": [
+              {
+                "name": "Industry",
+                "type": "metric",
+                "children": [
+                  {
+                    "name": "Growth Prospects",
+                    "type": "leaf",
+                    "condition": "High",
+                    "score": 7
+                  },
+                  {
+                    "name": "Competitive Landscape",
+                    "type": "leaf",
+                    "condition": "Favorable",
+                    "score": 8
+                  }
+                ]
+              },
+              {
+                "name": "Market Position",
+                "type": "metric",
+                "children": [
+                  {
+                    "name": "Market Share",
+                    "type": "leaf",
+                    "condition": "> 20%",
+                    "score": 9
+                  },
+                  {
+                    "name": "Pricing Power",
+                    "type": "leaf",
+                    "condition": "High",
+                    "score": 8
+                  }
+                ]
+              },
+              {
+                "name": "Management",
+                "type": "metric",
+                "children": [
+                  {
+                    "name": "Quality of Leadership",
+                    "type": "leaf",
+                    "condition": "Strong",
+                    "score": 9
+                  },
+                  {
+                    "name": "Strategic Direction",
+                    "type": "leaf",
+                    "condition": "Clear",
+                    "score": 8
+                  }
+                ]
+              },
+              {
+                "name": "Operational Efficiency",
+                "type": "metric",
+                "children": [
+                  {
+                    "name": "Cost Structure",
+                    "type": "leaf",
+                    "condition": "Efficient",
+                    "score": 9
+                  },
+                  {
+                    "name": "Asset Turnover",
+                    "type": "leaf",
+                    "condition": "High",
+                    "score": 8
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Other Factors",
+            "type": "factor",
+            "weight": 0.3,
+            "children": [
+              {
+                "name": "Macroeconomic Conditions",
+                "type": "metric",
+                "children": [
+                  {
+                    "name": "GDP Growth",
+                    "type": "leaf",
+                    "condition": "> 2%",
+                    "score": 8
+                  },
+                  {
+                    "name": "Inflation",
+                    "type": "leaf",
+                    "condition": "< 3%",
+                    "score": 7
+                  },
+                  {
+                    "name": "Unemployment",
+                    "type": "leaf",
+                    "condition": "< 5%",
+                    "score": 8
+                  }
+                ]
+              },
+              {
+                "name": "Regulatory Environment",
+                "type": "metric",
+                "children": [
+                  {
+                    "name": "Compliance",
+                    "type": "leaf",
+                    "condition": "Strong",
+                    "score": 9
+                  },
+                  {
+                    "name": "Legal Risks",
+                    "type": "leaf",
+                    "condition": "Low",
+                    "score": 8
+                  }
+                ]
+              },
+              {
+                "name": "ESG Factors",
+                "type": "metric",
+                "children": [
+                  {
+                    "name": "Environmental",
+                    "type": "leaf",
+                    "condition": "Positive",
+                    "score": 7
+                  },
+                  {
+                    "name": "Social",
+                    "type": "leaf",
+                    "condition": "Positive",
+                    "score": 8
+                  },
+                  {
+                    "name": "Governance",
+                    "type": "leaf",
+                    "condition": "Strong",
+                    "score": 9
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "node_id": "sovereign_analysis",
+        "type": "factor",
+        "name": "Sovereign Creditworthiness",
+        "children": [
+          {
+            "name": "Economic Risk",
+            "type": "factor",
+            "weight": 0.4,
+            "children": [
+              {
+                "name": "Growth and Development",
+                "type": "metric",
+                "children": [
+                  {
+                    "name": "Real GDP Growth",
+                    "type": "leaf",
+                    "condition": "> 3%",
+                    "score": 9
+                  },
+                  {
+                    "name": "GDP per Capita",
+                    "type": "leaf",
+                    "condition": "> $20,000",
+                    "score": 8
+                  },
+                  {
+                    "name": "Economic Diversification",
+                    "type": "leaf",
+                    "condition": "High",
+                    "score": 7
+                  }
+                ]
+              },
+              {
+                "name": "Fiscal Strength",
+                "type": "metric",
+                "children": [
+                  {
+                    "name": "Government Debt-to-GDP Ratio",
+                    "type": "leaf",
+                    "condition": "< 60%",
+                    "score": 9
+                  },
+                  {
+                    "name": "Budget Balance",
+                    "type": "leaf",
+                    "condition": "Surplus or Small Deficit",
+                    "score": 8
+                  }
+                ]
+              },
+              {
+                "name": "External Stability",
+                "type": "metric",
+                "children": [
+                  {
+                    "name": "Current Account Balance",
+                    "type": "leaf",
+                    "condition": "Sustainable",
+                    "score": 9
+                  },
+                  {
+                    "name": "Foreign Currency Reserves",
+                    "type": "leaf",
+                    "condition": "Adequate",
+                    "score": 8
+                  }
+                ]
+              },
+              {
+                "name": "Monetary Stability",
+                "type": "metric",
+                "children": [
+                  {
+                    "name": "Inflation Rate",
+                    "type": "leaf",
+                    "condition": "< 3%",
+                    "score": 9
+                  },
+                  {
+                    "name": "Exchange Rate Stability",
+                    "type": "leaf",
+                    "condition": "Stable",
+                    "score": 8
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Political Risk",
+            "type": "factor",
+            "weight": 0.3,
+            "children": [
+              {
+                "name": "Political Stability",
+                "type": "metric",
+                "children": [
+                  {
+                    "name": "Government Effectiveness",
+                    "type": "leaf",
+                    "condition": "High",
+                    "score": 9
+                  },
+                  {
+                    "name": "Rule of Law",
+                    "type": "leaf",
+                    "condition": "Strong",
+                    "score": 8
+                  },
+                  {
+                    "name": "Corruption Control",
+                    "type": "leaf",
+                    "condition": "Effective",
+                    "score": 7
+                  }
+                ]
+              },
+              {
+                "name": "Geopolitical Risk",
+                "type": "metric",
+                "children": [
+                  {
+                    "name": "External Conflicts",
+                    "type": "leaf",
+                    "condition": "None",
+                    "score": 9
+                  },
+                  {
+                    "name": "Regional Stability",
+                    "type": "leaf",
+                    "condition": "Stable",
+                    "score": 8
+                  }
+                ]
+              },
+              {
+                "name": "Social Risk",
+                "type": "metric",
+                "children": [
+                  {
+                    "name": "Social Cohesion",
+                    "type": "leaf",
+                    "condition": "High",
+                    "score": 9
+                  },
+                  {
+                    "name": "Income Inequality",
+                    "type": "leaf",
+                    "condition": "Low",
+                    "score": 8
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Other Factors",
+            "type": "factor",
+            "weight": 0.3,
+            "children": [
+              {
+                "name": "Debt Sustainability",
+                "type": "metric",
+                "children": [
+                  {
+                    "name": "Debt Structure",
+                    "type": "leaf",
+                    "condition": "Favorable",
+                    "score": 9
+                  },
+                  {
+                    "name": "Debt Service Capacity",
+                    "type": "leaf",
+                    "condition": "Strong",
+                    "score": 8
+                  }
+                ]
+              },
+              {
+                "name": "External Liquidity",
+                "type": "metric",
+                "children": [
+                  {
+                    "name": "Access to International Capital Markets",
+                    "type": "leaf",
+                    "condition": "Good",
+                    "score": 9
+                  },
+                  {
+                    "name": "External Financing Needs",
+                    "type": "leaf",
+                    "condition": "Manageable",
+                    "score": 8
+                  }
+                ]
+              },
+              {
+                "name": "Contingent Liabilities",
+                "type": "metric",
+                "children": [
+                  {
+                    "name": "Financial Sector Risks",
+                    "type": "leaf",
+                    "condition": "Low",
+                    "score": 9
+                  },
+                  {
+                    "name": "Public Guarantees",
+                    "type": "leaf",
+                    "condition": "Limited",
+                    "score": 8
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "rating_scale": {
+    "90-100": "AAA",
+    "80-89": "AA",
+    "70-79": "A",
+    "60-69": "BBB",
+    "50-59": "BB",
+    "40-49": "B",
+    "30-39": "CCC",
+    "20-29": "CC",
+    "10-19": "C",
+    "0-9": "D"
+  },
+  "metadata": {
+    "version": "2.0",
+    "description": "Creditworthiness assessment and rating assignment decision tree based on borrower type, financial and business risk factors, and other relevant considerations."
+  }
+}

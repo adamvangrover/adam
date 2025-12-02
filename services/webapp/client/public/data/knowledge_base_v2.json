@@ -1,0 +1,1021 @@
+{
+  "metadata": {
+    "version": "2.1.0",
+    "description": "A knowledge base defining core concepts in Valuation, Risk Management, Macroeconomics, and Technical Analysis for LLM understanding and potential application. This version adds new sections for Portfolio Management, Derivatives, and Behavioral Finance.",
+    "last_updated": "2025-05-30T10:00:00Z",
+    "_comment": "Timestamp of the last significant update to this knowledge base structure or content."
+  },
+  "formula_notation_and_acronyms": {
+    "notation_guide": {
+      "array": "Represents a time series of values, e.g., for yearly projections.",
+      "[-1]": "Refers to the last element/period in an array.",
+      "[i]": "Refers to the element/period at index 'i' in an array (0-based).",
+      "**": "Exponentiation (power of)."
+    },
+    "acronyms": {
+      "CAPEX": "Capital Expenditures",
+      "CAPM": "Capital Asset Pricing Model",
+      "CCA": "Comparable Company Analysis",
+      "CVaR": "Conditional Value at Risk (Expected Shortfall)",
+      "D&A": "Depreciation and Amortization",
+      "DCF": "Discounted Cash Flow",
+      "EAD": "Exposure at Default",
+      "EBIT": "Earnings Before Interest and Taxes",
+      "EBITDA": "Earnings Before Interest, Taxes, Depreciation, and Amortization",
+      "ESG": "Environmental, Social, and Governance",
+      "EV": "Enterprise Value",
+      "FCF": "Free Cash Flow",
+      "GDP": "Gross Domestic Product",
+      "LBO": "Leveraged Buyout",
+      "LGD": "Loss Given Default",
+      "NWC": "Net Working Capital (Current Assets - Current Liabilities, excluding Cash and Short-Term Debt)",
+      "PD": "Probability of Default",
+      "PMI": "Purchasing Managers' Index",
+      "P/B": "Price-to-Book Ratio",
+      "P/E": "Price-to-Earnings Ratio",
+      "Re": "Cost of Equity",
+      "Rd": "Cost of Debt",
+      "UFCF": "Unlevered Free Cash Flow",
+      "VaR": "Value at Risk",
+      "WACC": "Weighted Average Cost of Capital"
+    }
+  },
+  "Valuation": {
+    "DCF": {
+      "machine_readable": {
+        "type": "Intrinsic Valuation",
+        "inputs": {
+          "EBIT": {
+            "type": "array",
+            "description": "Annual Earnings Before Interest and Taxes projections (in millions)",
+            "example": [100, 110, 121, 133, 146]
+          },
+          "Tax_Rate": {
+            "type": "number",
+            "description": "Effective corporate tax rate (as decimal)",
+            "example": 0.25
+          },
+          "Depreciation_Amortization": {
+            "type": "array",
+            "description": "Annual Depreciation & Amortization expense (in millions)",
+            "example": [20, 22, 24, 26, 28]
+          },
+          "Capital_Expenditures": {
+            "type": "array",
+            "description": "Annual Capital Expenditures (in millions)",
+            "example": [30, 33, 36, 39, 42]
+          },
+          "Change_in_NetWorkingCapital": {
+            "type": "array",
+            "description": "Annual Change in Net Working Capital (in millions, increase is outflow)",
+            "example": [5, 5.5, 6, 6.5, 7]
+          },
+          "Discount_Rate_WACC": {
+            "type": "number",
+            "description": "Weighted Average Cost of Capital (WACC, as decimal)",
+            "example": 0.10
+          },
+          "Terminal_Growth_Rate": {
+            "type": "number",
+            "description": "Perpetual growth rate for terminal value (as decimal, typically <= long-term GDP growth)",
+            "example": 0.02
+          },
+          "Initial_Net_Debt": {
+             "type": "number",
+             "description": "Company's Net Debt (Total Debt - Cash & Equivalents) at valuation date (in millions)",
+             "example": 150
+          }
+        },
+        "formulas": {
+          "Unlevered_Free_Cash_Flow_UFCF": "EBIT * (1 - Tax_Rate) + Depreciation_Amortization - Capital_Expenditures - Change_in_NetWorkingCapital",
+          "Terminal_Value_TV_Perpetuity": "UFCF[-1] * (1 + Terminal_Growth_Rate) / (Discount_Rate_WACC - Terminal_Growth_Rate)",
+          "Terminal_Value_TV_Exit_Multiple": "Financial_Metric_Final_Year * Assumed_Exit_Multiple (e.g., EBITDA[-1] * EV/EBITDA Multiple)",
+          "Present_Value_PV_Cash_Flow": "UFCF[i] / (1 + Discount_Rate_WACC) ** (i + 1)",
+          "Present_Value_PV_Terminal_Value": "Terminal_Value_TV / (1 + Discount_Rate_WACC) ** len(UFCF)",
+          "Enterprise_Value_EV": "sum(PV_Cash_Flow) + PV_Terminal_Value",
+          "Implied_Equity_Value": "Enterprise_Value_EV - Initial_Net_Debt",
+          "Implied_Share_Price": "Implied_Equity_Value / Shares_Outstanding"
+        },
+        "WACC_Calculation": {
+           "description": "Details for calculating the Discount_Rate_WACC.",
+           "formula": "(E/V * Re) + (D/V * Rd * (1 - Tax_Rate))",
+           "components": {
+               "E_Market_Value_Equity": {"description": "Market Capitalization (Shares Outstanding * Share Price)"},
+               "D_Market_Value_Debt": {"description": "Market value of company's debt (often estimated using book value if market value unavailable)"},
+               "V_Total_Firm_Value": {"formula": "E + D"},
+               "Re_Cost_of_Equity": {"description": "Typically calculated using CAPM", "formula_CAPM": "RiskFreeRate + Beta * (ExpectedMarketReturn - RiskFreeRate)"},
+               "Rd_Cost_of_Debt": {"description": "Yield to maturity (YTM) on company's long-term debt or based on its credit rating and market yields"},
+               "Tax_Rate": {"description": "Effective or Marginal Corporate Tax Rate"}
+           }
+        },
+        "_future_enhancements": ["Add sensitivity analysis parameters", "Incorporate different DCF variations (FCFE)", "Detail calculation of Beta and Market Risk Premium for CAPM"]
+      },
+      "human_readable": {
+        "definition": "Discounted Cash Flow (DCF) analysis estimates the intrinsic value of an investment based on the present value of its expected future free cash flows.",
+        "explanation": "It projects future Unlevered Free Cash Flows (cash flow available to all investors, equity and debt holders), discounts them back to today using the Weighted Average Cost of Capital (WACC) reflecting the investment's risk, and sums them up. A terminal value captures the value beyond the projection period.",
+        "steps": [
+          "Project future financial performance (Revenue, EBIT, etc.).",
+          "Calculate UFCF for each year in the projection period (typically 5-10 years).",
+          "Calculate the discount rate (WACC).",
+          "Estimate the terminal value (TV) using either the perpetuity growth method or an exit multiple.",
+          "Discount the projected UFCFs and the TV back to their present values.",
+          "Sum the present values to get the Enterprise Value (EV).",
+          "Subtract Net Debt from EV to arrive at the Equity Value.",
+          "Divide Equity Value by shares outstanding to get implied share price."
+        ],
+        "pros": ["Based on fundamental cash flows", "Not heavily influenced by short-term market fluctuations", "Allows detailed scenario analysis"],
+        "cons": ["Highly sensitive to assumptions (growth rates, WACC, TV)", "Requires detailed forecasting", "Terminal value often constitutes a large portion of total value"],
+        "example": "Estimate a coffee shop's UFCF for 5 years. Calculate its WACC based on its debt/equity mix and risk. Assume a 2% terminal growth rate. Discount all cash flows (yearly UFCFs and the terminal value) back to present value. Summing these gives the shop's Enterprise Value. Subtracting its net debt gives the Equity Value.",
+        "sources": [
+          {"title": "Investopedia - Discounted Cash Flow (DCF)", "url": "https://www.investopedia.com/terms/d/dcf.asp"},
+          {"title": "Corporate Finance Institute - DCF Model", "url": "https://corporatefinanceinstitute.com/resources/knowledge/valuation/dcf-model-training-free-guide/"}
+        ]
+      }
+    },
+    "Comparables": {
+      "machine_readable": {
+        "type": "Relative Valuation",
+        "method": "Comparable Company Analysis (CCA)",
+        "metrics": {
+          "P/E_Ratio": {"formula": "Current_Share_Price / Earnings_Per_Share_EPS", "description": "Price-to-Earnings ratio"},
+          "EV/EBITDA": {"formula": "Enterprise_Value / EBITDA", "description": "Enterprise Value to EBITDA"},
+          "EV/Sales": {"formula": "Enterprise_Value / Total_Revenue", "description": "Enterprise Value to Sales"},
+          "P/B_Ratio": {"formula": "Current_Share_Price / Book_Value_Per_Share", "description": "Price-to-Book ratio"},
+          "P/Sales_Ratio": {"formula": "Current_Share_Price / Revenue_Per_Share", "description": "Price-to-Sales ratio"},
+          "Dividend_Yield": {"formula": "Annual_Dividend_Per_Share / Current_Share_Price", "description": "Dividend Yield (%)"}
+        },
+        "data_sources": ["Financial data providers (Bloomberg, Refinitiv, FactSet, Capital IQ)", "Company filings (10-K, 10-Q)", "Equity research reports"],
+        "_future_enhancements": ["Add LTM vs Forward multiples", "Include industry-specific multiples (e.g., P/FFO for REITs)", "Detail adjustments for non-recurring items"]
+      },
+      "human_readable": {
+        "definition": "Comparable Company Analysis (CCA) values a company by comparing its valuation multiples to those of similar publicly traded companies.",
+        "explanation": "It assumes that similar companies (in terms of industry, size, growth, risk) should trade at similar multiples (like P/E or EV/EBITDA). By finding the average or median multiple for a peer group, one can apply it to the target company's relevant financial metric to imply its value.",
+        "steps": [
+          "Select a peer group of comparable public companies.",
+          "Gather necessary financial data (market cap, debt, cash, revenue, EBITDA, earnings) for the peer group.",
+          "Calculate relevant valuation multiples for each peer company.",
+          "Determine the average or median multiple for the peer group.",
+          "Apply this multiple to the target company's corresponding financial metric (e.g., target's EBITDA * median EV/EBITDA multiple) to estimate its Enterprise Value or Equity Value."
+        ],
+        "pros": ["Market-based (reflects current sentiment)", "Relatively easy to calculate and understand", "Widely used"],
+        "cons": ["Difficult to find truly comparable companies", "Market sentiment can lead to over/undervaluation", "Doesn't account for control premium or specific synergies", "Accounting differences can distort multiples"],
+        "example": "To value a mid-sized software company, find 5-10 publicly traded software companies of similar size and growth profile. Calculate their average EV/EBITDA multiple (e.g., 15x). Multiply the target company's LTM EBITDA by 15 to estimate its EV.",
+        "sources": [
+          {"title": "Investopedia - Comparable Company Analysis (CCA)", "url": "https://www.investopedia.com/terms/c/comparable-company-analysis.asp"},
+          {"title": "Wall Street Prep - Comparable Company Analysis", "url": "https://www.wallstreetprep.com/knowledge/comparable-company-analysis/"}
+        ]
+      }
+    },
+    "Precedent_Transactions": {
+       "machine_readable": {
+           "type": "Relative Valuation",
+           "method": "Precedent Transaction Analysis",
+           "metrics": {
+               "EV/EBITDA": {"formula": "Transaction_EV / Target_LTM_EBITDA", "description": "Transaction EV to Target LTM EBITDA"},
+               "EV/Sales": {"formula": "Transaction_EV / Target_LTM_Sales", "description": "Transaction EV to Target LTM Sales"},
+               "Price/Earnings": {"formula": "Offer_Price_Per_Share / Target_LTM_EPS", "description": "Offer Price to Target LTM Earnings"}
+               // Other relevant multiples depending on industry
+           },
+           "data_sources": ["M&A databases (SDC Platinum, Bloomberg, Refinitiv)", "Company press releases", "Proxy statements"],
+           "_future_enhancements": ["Detail calculation of Transaction EV", "Incorporate control premium analysis"]
+       },
+       "human_readable": {
+           "definition": "Precedent Transaction Analysis values a company by looking at the prices paid for similar companies in past M&A deals.",
+           "explanation": "It assumes that the multiples paid in recent, comparable M&A transactions (e.g., EV/EBITDA) reflect the market value for acquiring a similar company, including any control premium.",
+           "steps": [
+               "Identify a set of recent, comparable M&A transactions.",
+               "Gather details for each transaction (deal value, target financials at the time of the deal).",
+               "Calculate relevant transaction multiples (e.g., EV/EBITDA, EV/Sales) paid in these deals.",
+               "Determine the average or median transaction multiple.",
+               "Apply this multiple to the target company's corresponding financial metric to estimate its value (often representing a potential acquisition value)."
+           ],
+           "pros": ["Reflects actual prices paid for companies, including control premium", "Useful in M&A contexts"],
+           "cons": ["Past transactions may not be comparable due to different market conditions or deal specifics", "Data can be harder to find and less standardized than public comps", "Can be influenced by deal synergies or strategic buyer motivations"],
+           "example": "To estimate the potential acquisition value of a private manufacturing firm, find 5-10 recent M&A deals involving similar manufacturing firms. Calculate the median EV/EBITDA multiple paid (e.g., 10x). Multiply the target firm's LTM EBITDA by 10 to estimate its potential acquisition EV.",
+           "sources": [
+               {"title": "Corporate Finance Institute - Precedent Transactions", "url": "https://corporatefinanceinstitute.com/resources/knowledge/valuation/precedent-transactions-analysis/"},
+               {"title": "Investopedia - Precedent Transactions Analysis", "url": "https://www.investopedia.com/terms/p/precedenttransactionanalysis.asp"}
+           ]
+       }
+    },
+     "CreditMetrics": { // Note: Moved from Valuation root, kept here for consistency with v1 structure but logically tied to Credit Risk.
+      "machine_readable": {
+        "category": "Financial Ratios",
+        "purpose": "Assess financial health, leverage, liquidity, profitability, and coverage.",
+        "metrics": {
+          "Debt_to_Equity": {"formula": "Total_Debt / Total_Equity", "description": "Measures financial leverage."},
+          "Interest_Coverage_Ratio_ICR": {"formula": "EBIT / Interest_Expense", "description": "Ability to pay interest expenses from operating income."},
+          "Total_Debt_to_EBITDA": {"formula": "Total_Debt / EBITDA", "description": "Leverage relative to cash flow generation. Higher ratio indicates higher leverage."},
+          "Net_Debt_to_EBITDA": {"formula": "(Total_Debt - Cash_and_Equivalents) / EBITDA", "description": "Leverage net of cash reserves relative to cash flow."},
+          "Current_Ratio": {"formula": "Current_Assets / Current_Liabilities", "description": "Short-term liquidity measure."},
+          "Quick_Ratio_Acid_Test": {"formula": "(Current_Assets - Inventories) / Current_Liabilities", "description": "More stringent short-term liquidity measure."},
+          "Cash_Ratio": {"formula": "(Cash + Cash_Equivalents) / Current_Liabilities", "description": "Most conservative liquidity measure."},
+          "Debt_to_Assets": {"formula": "Total_Debt / Total_Assets", "description": "Proportion of assets financed by debt."},
+          "FFO_to_Debt": {"formula": "Funds_From_Operations / Total_Debt", "description": "Cash flow generation relative to debt load (common in some industries like REITs)."}
+          // "Operating_Margin": { "formula": "EBIT / Revenue", "description": "Operating profitability."} // Profitability metrics are also relevant
+        },
+        "_future_enhancements": ["Add industry benchmarks for ratios", "Include definitions of Funds From Operations (FFO)"]
+      },
+      "human_readable": {
+        "definition": "Credit metrics are financial ratios used to assess a company's creditworthiness and ability to meet its debt obligations.",
+        "explanation": "These ratios analyze leverage (debt levels), liquidity (short-term solvency), profitability (ability to generate earnings), and coverage (ability to service debt payments) based on financial statement data.",
+        "categories": {
+          "Leverage_Ratios": "Measure debt relative to equity or assets (e.g., Debt/Equity, Debt/Assets, Debt/EBITDA). High leverage implies higher risk.",
+          "Liquidity_Ratios": "Assess ability to meet short-term obligations (e.g., Current Ratio, Quick Ratio). Low liquidity implies higher risk.",
+          "Coverage_Ratios": "Measure ability to meet interest or fixed charge payments from earnings (e.g., Interest Coverage Ratio). Low coverage implies higher risk.",
+          "Profitability_Ratios": "Indicate ability to generate profit (e.g., Operating Margin, Net Margin). Strong profitability supports creditworthiness."
+        },
+        "example": "A company with a Debt/EBITDA ratio of 6x is generally considered highly leveraged compared to one with a ratio of 2x. A Current Ratio below 1.0 suggests potential difficulty meeting short-term liabilities.",
+        "sources": [
+          {"title": "Investopedia - Financial Ratios", "url": "https://www.investopedia.com/financial-edge/0910/6-basic-financial-ratios-and-what-they-tell-you.aspx"},
+          {"title": "Corporate Finance Institute - Credit Analysis Ratios", "url": "https://corporatefinanceinstitute.com/resources/knowledge/credit/credit-analysis-ratios/"}
+        ]
+      }
+    }
+  },
+  "RiskManagement": {
+    "VaR": {
+      "machine_readable": {
+        "metric_type": "Downside Risk Measure",
+        "output": "Potential loss amount (or percentage) over a specific time horizon at a given confidence level.",
+        "methods": {
+          "Historical_Simulation": {
+            "description": "Uses historical data distribution directly. Ranks past returns and identifies the return corresponding to the confidence level.",
+            "parameters": {
+              "Confidence_Level": {"type": "number", "description": "E.g., 0.95 (for 95%) or 0.99 (for 99%)"},
+              "Lookback_Period_Days": {"type": "integer", "description": "Number of historical trading days (e.g., 252 for 1 year)"},
+              "Time_Horizon_Days": {"type": "integer", "description": "Holding period for VaR calculation (e.g., 1, 10)"}
+            },
+            "pros": ["Easy to implement", "No distribution assumption"],
+            "cons": ["Assumes past predicts future", "Sensitive to lookback period", "Doesn't capture 'unseen' tail events"]
+          },
+          "Monte_Carlo_Simulation": {
+            "description": "Models risk factors using stochastic processes, generates many random scenarios, calculates portfolio value for each, and determines VaR from the resulting distribution.",
+            "parameters": {
+              "Confidence_Level": {"type": "number"},
+              "Number_of_Simulations": {"type": "integer", "description": "Number of random paths generated (e.g., 10000)"},
+              "Time_Horizon_Days": {"type": "integer"},
+              "Model_Parameters": {"type": "object", "description": "Parameters for the stochastic processes used (e.g., drift, volatility, correlations)"}
+            },
+            "pros": ["Flexible", "Can model complex dependencies", "Doesn't assume normality"],
+            "cons": ["Computationally intensive", "Model risk (dependent on chosen model and parameters)"]
+          },
+          "Parametric_Variance_Covariance": {
+            "description": "Assumes portfolio returns are normally distributed and uses mean, standard deviation, and correlations to calculate VaR.",
+            "parameters": {
+              "Confidence_Level": {"type": "number"},
+              "Time_Horizon_Days": {"type": "integer"},
+              "Portfolio_Mean_Return": {"type": "number", "description": "Expected portfolio return over the horizon"},
+              "Portfolio_Standard_Deviation": {"type": "number", "description": "Volatility of portfolio returns over the horizon"},
+              "Z_Score": {"type": "number", "description": "Standard normal deviate corresponding to the confidence level (e.g., 1.645 for 95%, 2.326 for 99%)"}
+            },
+            "formula_example": "Portfolio_Value * (Portfolio_Mean_Return - Z_Score * Portfolio_Standard_Deviation * sqrt(Time_Horizon_Days))",
+            "pros": ["Easy to calculate", "Requires less data than historical"],
+            "cons": ["Assumes normality (often violated, 'fat tails')", "Less accurate for non-linear instruments (options)"]
+          }
+        },
+        "_future_enhancements": ["Add VaR backtesting methodologies"]
+      },
+      "human_readable": {
+        "definition": "Value at Risk (VaR) estimates the maximum potential loss on a portfolio over a defined period for a given confidence level.",
+        "explanation": "It answers the question: 'What is the most I can expect to lose with X% probability over the next T days?'. For example, a 1-day 99% VaR of $1 million means there's a 1% chance of losing more than $1 million in the next day, under normal market conditions.",
+        "methods": {
+          "Historical": "Looks at past daily returns and finds the cutoff point (e.g., the 5th percentile loss for 95% VaR).",
+          "Monte Carlo": "Simulates thousands of possible future market movements based on models and finds the VaR from the distribution of simulated outcomes.",
+          "Parametric": "Assumes returns follow a normal distribution and uses statistical properties (mean, standard deviation) to calculate the VaR."
+        },
+        "limitations": ["Doesn't describe the magnitude of loss *beyond* the VaR threshold (tail risk)", "Can be misleading if assumptions (e.g., normality) don't hold", "Different methods can give different results"],
+        "sources": [
+          {"title": "Investopedia - Value at Risk (VaR)", "url": "https://www.investopedia.com/terms/v/var.asp"},
+          {"title": "Risk Glossary - Value at Risk", "url": "https://www.riskglossary.com/link/value_at_risk.htm"}
+        ]
+      }
+    },
+    "Expected_Shortfall_CVaR": {
+       "machine_readable": {
+           "metric_type": "Tail Risk Measure",
+           "output": "Expected loss amount (or percentage) *given* that the loss exceeds the VaR threshold.",
+           "relationship_to_VaR": "CVaR is always greater than or equal to VaR at the same confidence level.",
+           "calculation_methods": ["Often derived from the same simulations/data used for VaR calculations (e.g., averaging all losses beyond the VaR cutoff in historical or Monte Carlo)."]
+       },
+       "human_readable": {
+           "definition": "Expected Shortfall (ES), also known as Conditional Value at Risk (CVaR), measures the expected loss during an extreme event, given that the loss exceeds the VaR threshold.",
+           "explanation": "While VaR tells you the maximum loss *up to* a certain confidence level, CVaR tells you the *average* loss you'd expect if you actually cross that threshold. It provides better insight into the severity of 'tail risk'.",
+           "example": "If the 1-day 99% VaR is $1 million, the 1-day 99% CVaR might be $1.5 million. This means that on the worst 1% of days, the *average* loss is expected to be $1.5 million.",
+           "advantages_over_VaR": ["Better captures tail risk", "Coherent risk measure (satisfies properties like subadditivity)"],
+           "sources": [
+               {"title": "Investopedia - Expected Shortfall (ES)", "url": "https://www.investopedia.com/terms/e/expectedshortfall.asp"},
+               {"title": "AnalystPrep - Conditional Value-at-Risk (CVaR)", "url": "https://analystprep.com/cfa-level-1-exam/quantitative-methods/conditional-value-at-risk-cvar/"}
+           ]
+       }
+    },
+    "CreditRisk": {
+      "machine_readable": {
+        "definition": "Risk of loss due to a counterparty's failure to meet its financial obligations.",
+        "key_components": {
+          "Probability_of_Default_PD": {"type": "number", "range": "[0, 1]", "description": "Likelihood a borrower defaults within a specific timeframe (e.g., 1 year)."},
+          "Loss_Given_Default_LGD": {"type": "number", "range": "[0, 1]", "description": "Proportion of exposure expected to be lost if default occurs (1 - Recovery Rate)."},
+          "Exposure_at_Default_EAD": {"type": "number", "description": "Amount outstanding if the borrower defaults."}
+        },
+        "Expected_Loss_EL": {"formula": "PD * LGD * EAD"},
+        "models": {
+          "Merton_Model_Structural": {
+            "description": "Models equity as a call option on firm assets. Default occurs if asset value falls below debt value at maturity. Uses option pricing (Black-Scholes-Merton).",
+            "parameters": ["Asset_Value", "Asset_Volatility", "Debt_Value", "Time_to_Maturity", "Risk_Free_Rate"],
+            "outputs": ["Distance_to_Default", "Implied_PD"]
+          },
+          "Altman_Z_Score_Empirical": {
+            "description": "Predicts bankruptcy using weighted financial ratios.",
+            "formula_public": "1.2 * (Working_Capital / Total_Assets) + 1.4 * (Retained_Earnings / Total_Assets) + 3.3 * (EBIT / Total_Assets) + 0.6 * (Market_Value_Equity / Book_Value_Total_Liabilities) + 1.0 * (Sales / Total_Assets)",
+            "interpretation_zones_public": {
+              "Distress": "< 1.81",
+              "Grey": "1.81 to 2.99",
+              "Safe": "> 2.99"
+            },
+            "variations": ["Versions exist for private firms and non-manufacturers with different weights/ratios."]
+          },
+          "KMV_Model_Structural": {
+              "description": "Proprietary model extending Merton's framework, widely used for calculating Expected Default Frequency (EDF™). Empirically maps Distance-to-Default to PD.",
+              "_comment": "Specific parameters/formula are proprietary."
+          },
+          "CreditMetrics_Model_Portfolio": {
+              "description": "Portfolio VaR model for credit risk (developed by JP Morgan, now MSCI). Focuses on rating migrations and correlations.",
+              "_comment": "Focuses on portfolio level risk, not single obligor PD in isolation."
+          },
+          "Logistic_Regression_Scoring": {
+              "description": "Statistical technique using various financial and non-financial variables to predict the probability of default (often used in credit scoring)."
+          }
+        },
+        "_future_enhancements": ["Add details on Recovery Rate estimation", "Include Unexpected Loss (UL) concept"]
+      },
+      "human_readable": {
+        "definition": "Credit risk is the potential loss arising from a borrower or counterparty failing to meet their financial obligations.",
+        "explanation": "It's fundamental to lending and trading. Key components are the likelihood of default (PD), the amount exposed (EAD), and the percentage lost if default occurs (LGD). Expected Loss (EL = PD * LGD * EAD) is the average loss anticipated.",
+        "models": {
+          "Structural_Models": "Like Merton and KMV, link default to a company's balance sheet structure and asset volatility. Theoretically elegant but rely on unobservable inputs (asset value/volatility).",
+          "Reduced_Form_Models": "Model default as an unpredictable statistical process (e.g., using hazard rates), often calibrated to market data like CDS spreads. Don't explain *why* default happens.",
+          "Empirical/Scoring_Models": "Like Altman Z-Score or regression models, use historical data and ratios to predict default likelihood without strong economic theory."
+        },
+        "mitigation": ["Collateral", "Covenants", "Credit Derivatives (CDS)", "Diversification", "Netting Agreements"],
+        "sources": [
+          {"title": "Investopedia - Credit Risk", "url": "https://www.investopedia.com/terms/c/creditrisk.asp"},
+          {"title": "Bank for International Settlements - Credit Risk", "url": "https://www.bis.org/publ/bcbs128.htm"} // Updated BIS Basel II link
+        ]
+      }
+    },
+    "LiquidityRisk": {
+      "machine_readable": {
+        "definition": "Risk that an entity cannot meet its short-term financial obligations without incurring unacceptable losses.",
+        "types": {
+          "Funding_Liquidity_Risk": {"description": "Risk of being unable to raise cash to meet obligations (e.g., cannot roll over debt)."},
+          "Market_Liquidity_Risk": {"description": "Risk of being unable to sell assets quickly without significant price discounts."}
+        },
+        "metrics_regulatory_focus_banking": {
+          "Liquidity_Coverage_Ratio_LCR": {"formula": "Stock_of_High_Quality_Liquid_Assets_HQLA / Total_Net_Cash_Outflows_over_next_30_calendar_days", "description": "Basel III metric for short-term (30-day) resilience.", "target": ">= 1.0"},
+          "Net_Stable_Funding_Ratio_NSFR": {"formula": "Available_Amount_of_Stable_Funding_ASF / Required_Amount_of_Stable_Funding_RSF", "description": "Basel III metric for medium-term (1-year) funding stability.", "target": ">= 1.0"}
+        },
+        "metrics_general": {
+             // Refer back to Valuation/CreditMetrics for Current Ratio, Quick Ratio, Cash Ratio
+             "Cash_Conversion_Cycle": {"formula": "Days_Inventory_Outstanding + Days_Sales_Outstanding - Days_Payables_Outstanding", "description": "Time taken to convert resource inputs into cash flows."},
+             "Bid_Ask_Spread": {"description": "Indicator of market liquidity for specific assets."},
+             "Trading_Volume_Market_Depth": {"description": "Indicators of market liquidity for specific assets."}
+        },
+        "_future_enhancements": ["Add liquidity stress testing parameters", "Detail HQLA criteria"]
+      },
+      "human_readable": {
+        "definition": "Liquidity risk is the inability to meet payment obligations when they come due because of an inability to liquidate assets or obtain adequate funding.",
+        "explanation": "Funding liquidity risk is about accessing cash (e.g., bank lines, debt markets). Market liquidity risk is about selling assets quickly without a fire-sale price. They are often interconnected.",
+        "metrics": {
+          "LCR/NSFR": "Key regulatory ratios for banks (Basel III) ensuring sufficient liquid assets for short-term stress and stable funding for the medium term.",
+          "Current/Quick/Cash Ratios": "Basic balance sheet ratios indicating short-term asset coverage of liabilities.",
+          "Cash Conversion Cycle": "Operational metric showing efficiency in managing working capital liquidity."
+        },
+        "mitigation": ["Holding sufficient cash/HQLA", "Diversified funding sources (short/long term, different markets)", "Contingency funding plans (e.g., committed credit lines)", "Asset-liability management (ALM)", "Stress testing"],
+        "example": "A hedge fund facing large margin calls (funding risk) might be forced to sell assets quickly, potentially at depressed prices if the market for those assets is illiquid (market risk), amplifying losses.",
+        "sources": [
+          {"title": "Investopedia - Liquidity Risk", "url": "https://www.investopedia.com/terms/l/liquidityrisk.asp"},
+          {"title": "Basel Committee - Basel III Liquidity Framework", "url": "https://www.bis.org/bcbs/basel3.htm"}
+        ]
+      }
+    },
+    "MarketRisk": {
+      "machine_readable": {
+        "definition": "Risk of losses due to factors that affect the overall performance of financial markets.",
+        "factors": {
+          "Interest_Rate_Risk": {"description": "Impact of changing interest rates on asset values (esp. bonds) and borrowing costs.", "metrics": ["Duration", "Convexity"]},
+          "Equity_Price_Risk": {"description": "Impact of changing stock prices.", "metrics": ["Beta", "Volatility"]},
+          "Foreign_Exchange_FX_Risk": {"description": "Impact of changing currency exchange rates on value of foreign assets/liabilities/cash flows.", "metrics": ["FX Exposure"]},
+          "Commodity_Price_Risk": {"description": "Impact of changing commodity prices (e.g., oil, metals, agriculture)."},
+          "Volatility_Risk_Vega": {"description": "Risk associated with changes in the implied volatility of assets (esp. options)."},
+          "Basis_Risk": {"description": "Risk that offsetting investments in a hedging strategy do not experience price changes in perfect correlation."}
+        },
+        "measurement_tools": ["VaR", "CVaR", "Sensitivity Analysis (e.g., DV01 for interest rates)", "Factor Models (e.g., Fama-French)", "Stress Testing"],
+        "_future_enhancements": ["Detail calculation of Duration and Convexity", "Expand on Factor Models"]
+      },
+      "human_readable": {
+        "definition": "Market risk (or systematic risk) is the possibility of experiencing losses due to factors affecting the overall financial market performance.",
+        "explanation": "This risk cannot be eliminated through diversification within an asset class. It stems from broad economic, political, or social events.",
+        "factors": {
+          "Interest Rate": "Affects bond prices inversely, influences discount rates for equities, impacts borrowing costs.",
+          "Equity": "General stock market movements driven by economy, sentiment, earnings outlook.",
+          "FX": "Fluctuations in exchange rates impacting international investments and trade.",
+          "Commodity": "Price swings in raw materials affecting producers, consumers, and related investments."
+        },
+        "mitigation": ["Hedging (using derivatives like futures, options, swaps)", "Asset Allocation (diversifying across *different* asset classes)", "Stop-loss orders (limited effectiveness in systemic crises)"],
+        "example": "During a global recession, most stock markets decline regardless of individual company performance – this is market risk.",
+        "sources": [
+          {"title": "Investopedia - Market Risk", "url": "https://www.investopedia.com/terms/m/marketrisk.asp"},
+          {"title": "GARP - Market Risk Topics", "url": "https://www.garp.org/risk-intelligence/market-risk"} // Updated URL path
+        ]
+      }
+    },
+    "OperationalRisk": {
+      "machine_readable": {
+        "definition": "Risk of loss resulting from inadequate or failed internal processes, people, and systems or from external events.",
+        "categories_basel": [ // Basel Committee categories
+             "Internal Fraud",
+             "External Fraud",
+             "Employment Practices and Workplace Safety",
+             "Clients, Products & Business Practices",
+             "Damage to Physical Assets",
+             "Business Disruption and System Failures",
+             "Execution, Delivery & Process Management"
+         ],
+        "examples_by_type": {
+          "People_Risk": ["Employee error", "Internal fraud", "Lack of skilled personnel", "Key person dependency"],
+          "Process_Risk": ["Failed transaction processing", "Poor documentation", "Inadequate controls", "Model errors"],
+          "Systems_Risk": ["IT system failure", "Cybersecurity breach", "Data loss/corruption", "Technology obsolescence"],
+          "External_Events": ["Natural disasters", "Terrorism", "Regulatory changes", "Supplier failure"]
+        },
+        "measurement_approaches": ["Basic Indicator Approach (BIA)", "Standardized Approach (TSA)", "Advanced Measurement Approach (AMA) - less common now under Basel III updates"],
+        "_future_enhancements": ["Detail specific OpRisk frameworks (COSO)", "Add Key Risk Indicators (KRIs) examples"]
+      },
+      "human_readable": {
+        "definition": "Operational risk is the risk of direct or indirect loss resulting from failed or inadequate internal processes, people, systems, or external events.",
+        "explanation": "It covers a vast range of non-financial risks, from simple human error to catastrophic system failures or external shocks. Unlike market or credit risk, it's often harder to model quantitatively.",
+        "types": {
+          "Internal Fraud": "Theft by employees.",
+          "External Fraud": "Hacking, robbery, check fraud.",
+          "Process Flaws": "Errors in transaction execution, compliance failures.",
+          "System Failures": "IT outages, data breaches.",
+          "People Issues": "Incompetence, negligence, ethical breaches.",
+          "External Events": "Natural disasters, political instability."
+        },
+        "mitigation": ["Strong internal controls", "Segregation of duties", "IT security measures", "Business continuity planning (BCP)", "Disaster recovery (DR)", "Employee training", "Insurance"],
+        "example": "A trading firm experiences a large loss because a 'fat finger' error by a trader led to an incorrect order size being executed.",
+        "sources": [
+          {"title": "Investopedia - Operational Risk", "url": "https://www.investopedia.com/terms/o/operational_risk.asp"},
+          {"title": "Basel Committee - Operational Risk Framework", "url": "https://www.bis.org/bcbs/publ/d424.htm"} // Basel III finalising post-crisis reforms
+        ]
+      }
+    },
+     "StrategicRisk": {
+         "machine_readable": {
+             "definition": "Risk associated with adverse business decisions, improper implementation of decisions, or lack of responsiveness to industry changes.",
+             "drivers": ["Competitive landscape changes", "Technological disruption", "Shifts in customer preferences", "M&A integration failures", "Poor strategic planning/execution"],
+             "assessment_methods": ["SWOT analysis", "PESTLE analysis", "Scenario planning", "War gaming"]
+         },
+         "human_readable": {
+             "definition": "Strategic risk pertains to the potential negative impact of strategic business decisions (or lack thereof) on a company's long-term objectives and value.",
+             "explanation": "It involves risks like choosing the wrong strategy, failing to execute a chosen strategy effectively, or not adapting quickly enough to fundamental shifts in the business environment.",
+             "example": "A traditional retailer failing to invest adequately in e-commerce capabilities faces strategic risk as consumer behavior shifts online.",
+             "mitigation": ["Robust strategic planning process", "Continuous environmental scanning", "Agile decision-making", "Strong corporate governance", "Clear communication of strategy"],
+             "sources": [
+                 {"title": "Deloitte - Strategic Risk", "url": "https://www2.deloitte.com/us/en/pages/risk/topics/strategic-risk.html"},
+                 {"title": "Investopedia - Strategic Risk", "url": "https://www.investopedia.com/terms/s/strategic-risk.asp"}
+             ]
+         }
+     },
+     "ReputationalRisk": {
+          "machine_readable": {
+              "definition": "Risk of damage to an organization's reputation, potentially leading to loss of revenue, decreased customer loyalty, or destruction of shareholder value.",
+              "drivers": ["Ethical scandals", "Product safety issues/recalls", "Poor customer service", "Environmental incidents", "Data breaches", "Negative media coverage", "Misleading marketing"],
+              "impacts": ["Loss of customers", "Difficulty attracting/retaining talent", "Increased regulatory scrutiny", "Stock price decline", "Reduced brand value"]
+          },
+          "human_readable": {
+              "definition": "Reputational risk is the threat or danger to an organization's good name or standing due to negative public perception.",
+              "explanation": "Damage to reputation can arise from various operational failures, ethical lapses, or controversial business practices, often amplified by social media. It can have significant financial consequences.",
+              "example": "A food company faces reputational risk after a product contamination incident leads to widespread illness and negative publicity.",
+              "mitigation": ["Strong corporate governance and ethics programs", "Effective communication and PR strategy", "Crisis management planning", "Quality control", "Social media monitoring", "Transparency"],
+              "sources": [
+                  {"title": "Investopedia - Reputational Risk", "url": "https://www.investopedia.com/terms/r/reputational-risk.asp"},
+                  {"title": "GARP - Reputational Risk", "url": "https://www.garp.org/risk-intelligence/operational-risk-and-regulation/reputational-risk"}
+              ]
+          }
+     },
+      "ESG_Risk": {
+          "machine_readable": {
+              "definition": "Risks arising from Environmental, Social, and Governance factors that can impact a company's financial performance or reputation.",
+              "components": {
+                  "Environmental": {"description": "Risks related to climate change (physical & transition risks), pollution, resource depletion, waste management."},
+                  "Social": {"description": "Risks related to human rights, labor standards, employee relations, diversity & inclusion, data privacy, product safety, community impact."},
+                  "Governance": {"description": "Risks related to board structure, executive compensation, shareholder rights, business ethics, bribery & corruption, accounting practices."}
+              },
+              "impacts": ["Regulatory fines/penalties", "Litigation costs", "Reputational damage", "Reduced access to capital", "Operational disruptions", "Stranded assets (Environmental)"]
+          },
+          "human_readable": {
+              "definition": "ESG risk refers to the potential negative impacts on a company stemming from environmental, social, or governance issues.",
+              "explanation": "Investors and stakeholders increasingly consider ESG factors as material to long-term value creation and risk management. Poor ESG performance can lead to tangible financial losses and reputational harm.",
+              "example": "An energy company faces transition risk (an Environmental risk) if regulations phase out fossil fuels, potentially stranding its assets. A tech company faces Social risk if found using exploitative labor practices.",
+              "mitigation": ["Integrating ESG into strategy and risk management", "Setting ESG targets and reporting progress", "Stakeholder engagement", "Investing in sustainable practices", "Strong corporate governance"],
+              "sources": [
+                  {"title": "MSCI - What is ESG?", "url": "https://www.msci.com/what-is-esg"},
+                  {"title": "CFA Institute - ESG Investing", "url": "https://www.cfainstitute.org/en/research/esg-investing"}
+              ]
+          }
+     },
+     "StressTesting_ScenarioAnalysis": {
+         "machine_readable": {
+             "definition": "Techniques used to assess the potential impact of specific, severe but plausible events or changes in market conditions on a portfolio or firm.",
+             "types": {
+                 "Stress_Testing": {"description": "Examines impact of extreme changes in one or a few key risk factors (e.g., interest rate shock, market crash)."},
+                 "Scenario_Analysis": {"description": "Examines impact of a specific, coherently defined event involving simultaneous moves in multiple risk factors (e.g., a geopolitical crisis, a specific economic downturn scenario)."},
+                 "Reverse_Stress_Testing": {"description": "Starts by identifying a disastrous outcome (e.g., insolvency) and works backward to determine the scenarios that could cause it."}
+             },
+             "purpose": ["Assess capital adequacy", "Identify risk concentrations", "Inform risk limits", "Improve risk management strategies", "Regulatory requirements (e.g., CCAR for banks)"]
+         },
+         "human_readable": {
+             "definition": "Stress testing and scenario analysis are 'what-if' exercises designed to evaluate the resilience of a financial institution or portfolio under severe conditions.",
+             "explanation": "Unlike VaR which estimates losses under normal conditions, stress tests simulate specific crises or extreme market moves (e.g., 2008 financial crisis replay, sharp rise in unemployment). Scenario analysis uses plausible narratives (e.g., pandemic outbreak) to define shocks across multiple factors.",
+             "example": "A bank might run a stress test simulating a 30% drop in equity markets and a 200 basis point rise in interest rates to see the impact on its capital levels and profitability.",
+             "sources": [
+                 {"title": "Investopedia - Stress Testing", "url": "https://www.investopedia.com/terms/s/stresstesting.asp"},
+                 {"title": "GARP - Stress Testing", "url": "https://www.garp.org/risk-intelligence/market-risk/stress-testing"}
+             ]
+         }
+     }
+  },
+  "Macroeconomics": {
+     "Key_Macro_Indicators": {
+         "machine_readable": {
+             "GDP": {"name": "Gross Domestic Product", "description": "Total market value of all final goods and services produced in a country in a given period. Measures economic output and growth."},
+             "Inflation": {"name": "Inflation Rate", "description": "Rate at which the general level of prices for goods and services is rising, eroding purchasing power. Measured by CPI (Consumer Price Index) or PPI (Producer Price Index)."},
+             "Unemployment_Rate": {"name": "Unemployment Rate", "description": "Percentage of the labor force that is jobless and actively seeking employment."},
+             "Interest_Rates": {"name": "Interest Rates", "description": "Cost of borrowing money. Includes central bank policy rates (e.g., Fed Funds Rate) and market rates (e.g., Treasury yields)."},
+             "PMI": {"name": "Purchasing Managers' Index", "description": "Diffusion index summarizing economic activity in manufacturing or services sectors based on surveys. >50 indicates expansion, <50 indicates contraction."}
+             // Add others like Consumer Confidence, Housing Starts, Retail Sales, Balance of Trade etc.
+         },
+         "human_readable": {
+             "definition": "Key macroeconomic indicators are statistics that reflect the health and trends of an economy.",
+             "explanation": "Governments, central banks, businesses, and investors monitor these indicators to understand economic performance, make forecasts, and guide policy or investment decisions.",
+             "interpretation_notes": ["Data is often revised", "Trends are usually more important than single data points", "Leading vs. Lagging indicators", "Consider data in context (e.g., inflation target)"],
+             "sources": ["National statistics agencies (e.g., BEA, BLS in US; Eurostat)", "Central Banks (e.g., Federal Reserve, ECB)", "International organizations (e.g., IMF, World Bank)", "Private data providers (e.g., IHS Markit for PMI)"]
+         }
+     },
+    "InterestRateModels": {
+      "machine_readable": {
+        "purpose": "Model the stochastic evolution of interest rates (usually the short rate or instantaneous forward rate).",
+        "categories": {
+            "Equilibrium_Models": {"description": "Derive term structure based on assumptions about economic variables (e.g., Vasicek, CIR).", "pros": ["Economic intuition"], "cons": ["May not fit current yield curve perfectly."]},
+            "No_Arbitrage_Models": {"description": "Designed to fit the current yield curve exactly (e.g., Ho-Lee, Hull-White).", "pros": ["Accurate pricing of current derivatives"], "cons": ["Less economic intuition, future curve shapes less constrained."]}
+        },
+        "models": {
+          "Vasicek_Model": {
+            "type": "Equilibrium, One-Factor",
+            "description": "Mean-reverting process for the short rate (r). dr = k(θ - r)dt + σdW.",
+            "parameters": ["k (speed_of_reversion)", "θ (long_term_mean)", "σ (volatility)"],
+            "pros": ["Analytically tractable (formulas for bond prices/options)"],
+            "cons": ["Allows negative interest rates."]
+          },
+          "Cox_Ingersoll_Ross_CIR_Model": {
+            "type": "Equilibrium, One-Factor",
+            "description": "Mean-reverting process with volatility proportional to sqrt(r). dr = k(θ - r)dt + σ*sqrt(r)dW. Ensures non-negative rates if 2kθ >= σ^2.",
+            "parameters": ["k", "θ", "σ"],
+            "pros": ["Ensures positive rates", "Analytically tractable"],
+            "cons": ["Volatility decreases at low rates, potentially unrealistic."]
+          },
+          "Hull_White_Model": {
+            "type": "No-Arbitrage, One-Factor",
+            "description": "Extended Vasicek model with time-varying mean level (θ(t)) to fit the initial term structure. dr = [θ(t) - ar]dt + σdW.",
+            "parameters": ["a (mean reversion speed)", "σ (volatility)", "θ(t) function derived from market curve"],
+             "pros": ["Fits current yield curve", "Analytically tractable"],
+             "cons": ["Can allow negative rates", "Future yield curve dynamics depend heavily on calibration."]
+          },
+          "Ho_Lee_Model": {
+               "type": "No-Arbitrage, One-Factor",
+               "description": "Simple model with constant volatility and time-varying drift. dr = θ(t)dt + σdW.",
+               "parameters": ["σ (volatility)", "θ(t) function"],
+               "pros": ["Simple", "Fits current yield curve"],
+               "cons": ["No mean reversion", "Allows negative rates."]
+          }
+          // Add others like Black-Derman-Toy (BDT), Heath-Jarrow-Morton (HJM) framework
+        },
+        "_future_enhancements": ["Add multi-factor models (e.g., Two-Factor Vasicek)", "Include calibration techniques"]
+      },
+      "human_readable": {
+        "definition": "Interest rate models are mathematical frameworks used to describe the potential future paths of interest rates.",
+        "explanation": "They are crucial for pricing fixed-income derivatives (like options on bonds, swaps, caps/floors), managing interest rate risk, and simulating future economic scenarios. They typically model the short-term interest rate's random movements.",
+        "types_explained": {
+          "Equilibrium": "Start with economic assumptions (like mean reversion) and derive the yield curve. May not perfectly match today's market prices.",
+          "No-Arbitrage": "Start by matching today's market yield curve exactly, ensuring current bond prices are correct. Primarily used for derivative pricing."
+        },
+        "factors": "Models can be 'one-factor' (driven by a single source of randomness, usually the short rate) or 'multi-factor' (incorporating other sources, like long-term rate or volatility, often more realistic but complex).",
+        "sources": [
+          {"title": "Wikipedia - Short-rate model", "url": "https://en.wikipedia.org/wiki/Short-rate_model"},
+          {"title": "QuantLib - Short Rate Models", "url": "https://www.quantlib.org/reference/group__shortratemodels.html"} // Developer library documentation
+        ]
+      }
+    },
+    "MonetaryPolicy": {
+      "machine_readable": {
+        "definition": "Actions by a central bank to manage the money supply and credit conditions to foster price stability and maximum employment.",
+        "objectives": ["Price Stability (low, stable inflation)", "Maximum Sustainable Employment", "Moderate Long-Term Interest Rates", "Financial Stability"],
+        "tools_conventional": {
+          "Policy_Interest_Rate": {"description": "Target rate for interbank lending (e.g., Fed Funds Rate Target, ECB Main Refinancing Rate). Influences other rates.", "mechanism": "Changes cost of borrowing for banks."},
+          "Reserve_Requirements": {"description": "Fraction of deposits banks must hold in reserve, not lend out.", "mechanism": "Affects money multiplier and credit creation (less used now in some economies)."},
+          "Open_Market_Operations_OMO": {"description": "Buying/Selling government securities in the open market.", "mechanism": "Buying injects money, lowers rates; Selling withdraws money, raises rates."}
+        },
+        "tools_unconventional_post_GFC": {
+             "Quantitative_Easing_QE": {"description": "Large-scale purchases of assets (e.g., government bonds, MBS) beyond normal OMO, aimed at lowering long-term rates and increasing liquidity when policy rates are near zero."},
+             "Forward_Guidance": {"description": "Communicating future policy intentions to influence market expectations."},
+             "Negative_Interest_Rates_NIRP": {"description": "Charging banks to hold reserves at the central bank."}
+        },
+        "stance": ["Expansionary/Accommodative ('Loose')", "Contractionary/Restrictive ('Tight')", "Neutral"],
+        "_future_enhancements": ["Add transmission mechanisms", "Taylor Rule concept"]
+      },
+      "human_readable": {
+        "definition": "Monetary policy involves a central bank influencing the availability and cost of money and credit to achieve national economic goals.",
+        "explanation": "Central banks like the Federal Reserve (US), European Central Bank (Eurozone), Bank of England (UK), and Bank of Japan use various tools to control inflation and support employment. Their decisions significantly impact financial markets.",
+        "tools": {
+            "Policy Rate": "The main lever, affecting borrowing costs throughout the economy.",
+            "OMO": "The day-to-day tool for managing bank reserves and hitting the policy rate target.",
+            "QE": "Used during crises or when rates are zero to provide additional stimulus by buying assets."
+        },
+        "stance_explained": {
+            "Expansionary": "Lowering rates, buying assets (QE) to encourage borrowing and spending, boost growth.",
+            "Contractionary": "Raising rates, selling assets (QT) to discourage borrowing, slow down inflation."
+        },
+        "example": "To combat high inflation, a central bank might raise its policy interest rate, making loans more expensive, slowing down business investment and consumer spending.",
+        "sources": [
+          {"title": "Investopedia - Monetary Policy", "url": "https://www.investopedia.com/terms/m/monetarypolicy.asp"},
+          {"title": "Federal Reserve - Monetary Policy Basics", "url": "https://www.federalreserve.gov/monetarypolicy/basics.htm"}
+        ]
+      }
+    },
+    "FiscalPolicy": {
+         "machine_readable": {
+             "definition": "Use of government spending levels and tax rates to monitor and influence a nation's economy.",
+             "actors": ["Government (Executive and Legislative branches)"],
+             "tools": {
+                 "Government_Spending": {"description": "Expenditures on infrastructure, defense, social programs, subsidies, etc.", "impact_expansionary": "Increase spending", "impact_contractionary": "Decrease spending"},
+                 "Taxation": {"description": "Income taxes, corporate taxes, sales taxes, tariffs, etc.", "impact_expansionary": "Decrease taxes", "impact_contractionary": "Increase taxes"}
+             },
+             "stance": ["Expansionary ('Loose')", "Contractionary ('Tight')", "Neutral"],
+             "concepts": ["Budget Deficit/Surplus", "National Debt", "Automatic Stabilizers (e.g., unemployment benefits)", "Discretionary Policy"]
+         },
+         "human_readable": {
+             "definition": "Fiscal policy refers to the government's use of its spending and taxation powers to influence economic activity.",
+             "explanation": "Distinct from monetary policy (handled by central banks), fiscal policy is determined by elected officials. It directly impacts aggregate demand through government purchases and indirectly through effects on private consumption and investment via taxes and transfers.",
+             "stance_explained": {
+                 "Expansionary": "Increasing spending or cutting taxes to boost economic growth (often leads to budget deficits).",
+                 "Contractionary": "Decreasing spending or raising taxes to slow down inflation or reduce government debt."
+             },
+             "interaction_with_monetary_policy": "Fiscal and monetary policies can reinforce or counteract each other. Coordination is often desirable but not always achieved.",
+             "example": "During a recession, the government might implement an expansionary fiscal policy by increasing spending on infrastructure projects and providing tax rebates to citizens.",
+             "sources": [
+                 {"title": "Investopedia - Fiscal Policy", "url": "https://www.investopedia.com/terms/f/fiscalpolicy.asp"},
+                 {"title": "IMF - Fiscal Policy", "url": "https://www.imf.org/en/About/Factsheets/Sheets/2023/fiscal-policy"}
+             ]
+         }
+     },
+    "StrategicReserves": { // Kept from v1, definition refined
+      "machine_readable": {
+        "definition": "Stockpiles of assets (commodities, currencies) held by governments or central banks for national security, economic stability, or market intervention purposes.",
+        "types": {
+          "Foreign_Exchange_Reserves": {"holder": "Central Bank", "assets": ["Foreign currencies (USD, EUR, JPY, etc.)", "Gold", "SDRs"], "purpose": ["Manage exchange rate", "Maintain confidence", "Service foreign debt", "Emergency liquidity"]},
+          "Strategic_Petroleum_Reserve_SPR": {"holder": "Government (e.g., US Dept of Energy)", "assets": ["Crude Oil"], "purpose": ["Mitigate supply disruptions", "Meet international obligations (IEA)"]},
+          "Other_Commodity_Reserves": {"holder": "Government", "assets": ["Grain", "Metals", etc."], "purpose": ["Food security", "Price stabilization", "Industrial supply"]}
+        },
+        "_future_enhancements": ["Add data on major reserve holdings by country"]
+      },
+      "human_readable": {
+        "definition": "Strategic reserves are government or central bank-controlled stockpiles held to address specific economic or security vulnerabilities.",
+        "explanation": "Foreign exchange reserves are crucial for international trade and financial stability, managed by central banks. Commodity reserves, like the SPR, are typically managed by government agencies to buffer against supply shocks.",
+        "example": "A central bank might sell some of its US Dollar reserves to buy its own currency if the domestic currency is depreciating too rapidly. The US government might release oil from the SPR if a hurricane disrupts domestic oil production.",
+        "sources": [
+          {"title": "Investopedia - Foreign Exchange Reserves", "url": "https://www.investopedia.com/terms/f/foreign-exchange-reserves.asp"},
+          {"title": "US Department of Energy - SPR", "url": "https://www.energy.gov/fe/services/petroleum-reserves/strategic-petroleum-reserve"}
+        ]
+      }
+    }
+  },
+  "TechnicalAnalysis": {
+    "Core_Principles_Dow_Theory": {
+        "machine_readable": {
+             "concept": "Foundation of technical analysis based on Charles Dow's writings.",
+             "tenets": [
+                 {"name": "Market Averages Discount Everything", "description": "All known and foreseeable information is reflected in market prices."},
+                 {"name": "Market Has Three Trends", "description": "Primary (years), Secondary (weeks/months - corrections within primary), Minor (days - noise)."},
+                 {"name": "Primary Trends Have Three Phases", "description": "Accumulation (smart money buys), Public Participation (trend followers join), Distribution (smart money sells)."},
+                 {"name": "Averages Must Confirm Each Other", "description": "e.g., Dow Industrials and Transports should signal the same trend."},
+                 {"name": "Volume Must Confirm the Trend", "description": "Volume should increase in the direction of the primary trend."},
+                 {"name": "A Trend Is Assumed to Continue Until a Definitive Signal of Reversal", "description": "Inertia principle."}
+             ]
+        },
+        "human_readable": {
+             "definition": "Dow Theory is a framework for technical analysis based on the idea that market price action reflects all available information and that market movements occur in identifiable trends.",
+             "explanation": "Developed from Charles Dow's Wall Street Journal editorials, it outlines principles for identifying primary market trends (bull or bear) using market averages (like the Dow Jones Industrial and Transportation Averages), volume, and trend phases.",
+             "relevance": "While old, its core concepts (trends, confirmation, volume) remain fundamental to much of modern technical analysis.",
+             "sources": [
+                 {"title": "Investopedia - Dow Theory", "url": "https://www.investopedia.com/terms/d/dowtheory.asp"},
+                 {"title": "StockCharts - ChartSchool - Dow Theory", "url": "https://stockcharts.com/school/doku.php?id=chart_school:market_analysis:dow_theory"}
+             ]
+        }
+    },
+    "ChartingTechniques": {
+      "machine_readable": {
+        "purpose": "Visual analysis of price history to identify patterns suggesting future movements.",
+        "chart_types": ["Line", "Bar (OHLC)", "Candlestick"],
+        "concepts": ["Support", "Resistance", "Trendlines", "Channels"],
+        "patterns_reversal": {
+          "Head_and_Shoulders_Top": {"description": "Bearish reversal. Three peaks, middle (head) highest. Neckline break confirms."},
+          "Head_and_Shoulders_Bottom_Inverse": {"description": "Bullish reversal. Inverse pattern."},
+          "Double_Top": {"description": "Bearish reversal. Two distinct peaks at similar levels. Trough break confirms."},
+          "Double_Bottom": {"description": "Bullish reversal. Two distinct troughs at similar levels. Peak break confirms."},
+          "Triple_Top_Bottom": {"description": "Similar to doubles, but with three peaks/troughs."},
+          "Rounding_Top_Bottom_Saucer": {"description": "Gradual shift in trend direction."}
+        },
+        "patterns_continuation": {
+          "Flags": {"description": "Brief consolidation (rectangle sloped against trend) after sharp move, suggests trend resumption."},
+          "Pennants": {"description": "Brief consolidation (small symmetrical triangle) after sharp move, suggests trend resumption."},
+          "Triangles_Symmetrical": {"description": "Converging trendlines, breakout can be either way (often continuation)."},
+          "Triangles_Ascending": {"description": "Flat top, rising bottom. Usually bullish continuation."},
+          "Triangles_Descending": {"description": "Falling top, flat bottom. Usually bearish continuation."},
+          "Wedges_Falling_Rising": {"description": "Converging trendlines, both sloped up (rising wedge - often bearish reversal/continuation) or down (falling wedge - often bullish reversal/continuation)."},
+          "Rectangles_Ranges": {"description": "Sideways price movement between support and resistance. Breakout confirms direction."}
+        },
+        "_future_enhancements": ["Add Candlestick patterns (Doji, Hammer, etc.)", "Include gap analysis"]
+      },
+      "human_readable": {
+        "definition": "Charting involves visually analyzing price charts to identify patterns, trends, support, and resistance levels to forecast potential future price movements.",
+        "explanation": "Technical analysts believe that historical price patterns tend to repeat and offer clues about market psychology and future direction. Common chart types include line, bar, and candlestick charts.",
+        "key_elements": {
+            "Support": "A price level where falling prices tend to stop and potentially reverse upwards due to concentrated demand.",
+            "Resistance": "A price level where rising prices tend to stop and potentially reverse downwards due to concentrated supply.",
+            "Trendlines": "Lines drawn connecting lows (uptrend) or highs (downtrend) to visualize the trend's direction and slope.",
+            "Channels": "Parallel trendlines containing price action."
+        },
+        "pattern_types": {
+            "Reversal Patterns": "Suggest an existing trend is likely to change direction (e.g., Head and Shoulders, Double Tops/Bottoms).",
+            "Continuation Patterns": "Suggest a pause or consolidation within an existing trend before it resumes (e.g., Flags, Pennants, Triangles)."
+        },
+        "sources": [
+          {"title": "Investopedia - Technical Analysis Chart Patterns", "url": "https://www.investopedia.com/articles/technical/112601.asp"},
+          {"title": "StockCharts - Chart School", "url": "https://stockcharts.com/school/"}
+        ]
+      }
+    },
+    "TechnicalIndicators": {
+      "machine_readable": {
+        "purpose": "Mathematical calculations based on price, volume, or open interest data to provide insights into market momentum, volatility, trend strength, etc.",
+        "categories": ["Trend-Following", "Momentum Oscillators", "Volatility", "Volume"],
+        "indicators": {
+          "Moving_Averages_MA": {"types": ["Simple (SMA)", "Exponential (EMA)"], "description": "Smooths price data to identify trend direction.", "use": ["Trend identification", "Support/Resistance", "Crossovers"]},
+          "MACD": {
+            "name": "Moving Average Convergence Divergence",
+            "type": "Trend/Momentum",
+            "components": ["MACD Line (e.g., 12-period EMA - 26-period EMA)", "Signal Line (e.g., 9-period EMA of MACD Line)", "Histogram (MACD Line - Signal Line)"],
+            "signals": ["Crossovers (MACD vs Signal)", "Centerline (0) Crossovers", "Divergences"]
+          },
+          "RSI": {
+            "name": "Relative Strength Index",
+            "type": "Momentum Oscillator",
+            "range": "[0, 100]",
+            "interpretation": ["Overbought (>70 or >80)", "Oversold (<30 or <20)", "Divergences", "Centerline (50) Crossovers"],
+            "formula_basis": "Compares magnitude of recent gains to recent losses."
+          },
+          "Bollinger_Bands": {
+            "type": "Volatility",
+            "components": ["Middle Band (SMA, e.g., 20-period)", "Upper Band (Middle + K * StdDev, e.g., K=2)", "Lower Band (Middle - K * StdDev, e.g., K=2)"],
+            "interpretation": ["Volatility (band width)", "Price relative to bands (potential overbought/oversold)", "Band Squeeze (potential breakout)"]
+          },
+          "Stochastic_Oscillator": {
+            "type": "Momentum Oscillator",
+            "range": "[0, 100]",
+            "components": ["%K Line", "%D Line (MA of %K)"],
+            "interpretation": ["Overbought (>80)", "Oversold (<20)", "Crossovers (%K vs %D)", "Divergences"],
+            "formula_basis": "Compares closing price to its price range over a period."
+          },
+          "ADX": {
+              "name": "Average Directional Index",
+              "type": "Trend Strength",
+              "components": ["ADX Line", "+DI Line", "-DI Line"],
+              "interpretation": ["ADX value indicates trend strength (rising ADX = strengthening trend, regardless of direction)", "+DI/-DI crossovers indicate direction"],
+              "range": "[0, 100]"
+          },
+          "OBV": {
+              "name": "On-Balance Volume",
+              "type": "Volume",
+              "calculation": "Cumulatively adds volume on up days and subtracts volume on down days.",
+              "interpretation": ["Confirming trends (OBV follows price)", "Divergences (OBV fails to confirm price move, potential reversal)"]
+          },
+           "Fibonacci_Retracements": {
+               "type": "Support/Resistance Levels",
+               "basis": "Fibonacci sequence ratios (23.6%, 38.2%, 50%, 61.8%, 78.6%).",
+               "application": "Drawn between significant high and low points of a trend to identify potential price reversal levels.",
+               "interpretation": "Prices often pause or reverse near these retracement levels."
+           }
+        },
+        "_future_enhancements": ["Add indicator calculation formulas", "Include interpretation guidelines/examples"]
+      },
+      "human_readable": {
+        "definition": "Technical indicators apply mathematical formulas to price and/or volume data to generate trading signals or provide insights into market conditions.",
+        "explanation": "They complement chart patterns by providing quantitative measures of trend, momentum, volatility, etc. They are rarely used in isolation; traders often combine multiple indicators.",
+        "categories_explained": {
+          "Trend": "Identify the direction of the market (e.g., Moving Averages, MACD).",
+          "Momentum": "Measure the speed/strength of price changes, identify overbought/oversold conditions (e.g., RSI, Stochastics).",
+          "Volatility": "Measure the magnitude of price fluctuations (e.g., Bollinger Bands, ATR).",
+          "Volume": "Analyze trading volume for insights into trend strength or potential reversals (e.g., OBV)."
+        },
+        "common_signals": ["Crossovers (indicator lines crossing each other or key levels)", "Divergences (indicator moving opposite to price, suggesting weakening trend)", "Overbought/Oversold readings"],
+        "sources": [
+          {"title": "Investopedia - Technical Indicator", "url": "https://www.investopedia.com/terms/t/technicalindicator.asp"},
+          {"title": "TradingView - Indicators", "url": "https://www.tradingview.com/indicators/"}
+        ]
+      }
+    },
+     "ElliottWaveTheory": {
+         "machine_readable": {
+             "concept": "Theory suggesting market prices move in predictable, repetitive wave patterns driven by mass psychology.",
+             "structure": {
+                 "Impulse_Waves": {"count": 5, "direction": "With the main trend", "subdivision": "5-3-5-3-5"},
+                 "Corrective_Waves": {"count": 3, "direction": "Against the main trend", "subdivision": "A-B-C (often 5-3-5 or variations)"}
+             },
+             "fractal_nature": "Patterns repeat on different time scales (minutes to centuries).",
+             "fibonacci_relationship": "Wave lengths often exhibit Fibonacci ratios (e.g., corrections retracing 38.2%/61.8% of impulse waves)."
+         },
+         "human_readable": {
+             "definition": "Elliott Wave Theory proposes that financial markets follow natural rhythms, moving in specific wave patterns identified by Ralph Nelson Elliott.",
+             "explanation": "The basic pattern consists of a five-wave 'impulse' move in the direction of the main trend, followed by a three-wave 'corrective' move against it. These patterns are fractal, meaning they occur on all timeframes. Fibonacci relationships are often observed between wave lengths.",
+             "application": "Used by traders to identify current market position within the larger pattern and forecast potential future turning points.",
+             "criticism": ["Highly subjective interpretation", "Patterns can be complex and ambiguous", "Lacks rigorous empirical validation"],
+             "sources": [
+                 {"title": "Investopedia - Elliott Wave Theory", "url": "https://www.investopedia.com/terms/e/elliottwavetheory.asp"},
+                 {"title": "Elliott Wave International", "url": "https://www.elliottwave.com/"}
+             ]
+         }
+     },
+    "AlgorithmicTrading": {
+      "machine_readable": {
+        "definition": "Using computer programs to execute trades based on predefined instructions (algorithms).",
+        "scope": ["Order execution", "Arbitrage", "Market making", "Proprietary trading strategies"],
+        "key_components": ["Trading strategy logic", "Market data feeds", "Order execution engine", "Risk management module"],
+        "strategies": {
+          "Mean_Reversion": {"description": "Exploits tendency of prices to return to historical average. Buy low, sell high relative to mean."},
+          "Trend_Following": {"description": "Identifies and follows established trends. Buy in uptrend, sell/short in downtrend."},
+          "Arbitrage": {"description": "Simultaneous buy/sell of related assets to capture risk-free profit from price discrepancies (e.g., statistical arbitrage, index arbitrage, latency arbitrage)."},
+          "Market_Making": {"description": "Providing liquidity by simultaneously quoting bid and ask prices, profiting from the spread."},
+          "Event_Driven": {"description": "Trading based on predictable patterns around specific events (e.g., earnings announcements, mergers)."},
+          "Sentiment_Analysis": {"description": "Using news, social media data to gauge market sentiment and trade accordingly."}
+          // High-Frequency Trading (HFT) is a speed-focused implementation of various strategies.
+        },
+        "_future_enhancements": ["Add HFT specifics", "Include backtesting and optimization concepts"]
+      },
+      "human_readable": {
+        "definition": "Algorithmic trading (or algo trading) uses computer algorithms to automatically place trading orders with speed and frequency beyond human capability.",
+        "explanation": "Algorithms are programmed with rules based on timing, price, quantity, or mathematical models. It ranges from simple execution algorithms (e.g., VWAP) to complex strategies run by hedge funds.",
+        "benefits": ["Speed", "Accuracy (reduces manual errors)", "Backtesting capability", "Reduced emotional influence", "Lower transaction costs (potentially)"],
+        "risks": ["Model risk (flawed strategy)", "Programming errors", "System failures", "Over-optimization", "Market structure changes", "Potential for systemic risk ('flash crashes')"],
+        "example": "An algorithm might be programmed to buy 100 shares of stock XYZ whenever its price crosses above its 50-day moving average and the RSI is below 70.",
+        "sources": [
+          {"title": "Investopedia - Algorithmic Trading", "url": "https://www.investopedia.com/terms/a/algorithmictrading.asp"},
+          {"title": "QuantInsti - Algorithmic Trading", "url": "https://blog.quantinsti.com/algorithmic-trading/"} // Resource blog
+        ]
+      }
+    }
+  },
+  "PortfolioManagement": {
+    "ModernPortfolioTheory": {
+      "machine_readable": {
+        "type": "Investment Framework",
+        "key_concepts": {
+          "Diversification": {
+            "description": "Combining assets with non-perfect correlations to reduce portfolio risk without sacrificing potential return."
+          },
+          "Efficient_Frontier": {
+            "description": "A curve representing the set of optimal portfolios that offer the highest expected return for a defined level of risk or the lowest risk for a given level of expected return."
+          },
+          "Capital_Allocation_Line_CAL": {
+            "description": "Represents the risk-return combinations available by combining a risk-free asset with an optimal risky portfolio."
+          },
+          "Optimal_Risky_Portfolio": {
+            "description": "The specific portfolio on the efficient frontier that, when combined with the risk-free asset, results in the steepest CAL (highest Sharpe Ratio)."
+          }
+        },
+        "inputs": {
+          "Expected_Returns": { "type": "array", "description": "Expected return for each asset in the portfolio." },
+          "Standard_Deviations": { "type": "array", "description": "Volatility (standard deviation) of each asset." },
+          "Correlation_Matrix": { "type": "matrix", "description": "Correlation coefficients between each pair of assets." },
+          "Risk_Free_Rate": { "type": "number", "description": "The return on a risk-free asset." }
+        },
+        "formulas": {
+          "Portfolio_Expected_Return": "Sum(weight[i] * expected_return[i])",
+          "Portfolio_Variance": "Sum(Sum(weight[i] * weight[j] * correlation[i,j] * std_dev[i] * std_dev[j]))"
+        },
+        "_future_enhancements": ["Add Black-Litterman model as an extension", "Detail optimization algorithms for finding the efficient frontier"]
+      },
+      "human_readable": {
+        "definition": "Modern Portfolio Theory (MPT) is a framework for assembling a portfolio of assets such that the expected return is maximized for a given level of risk.",
+        "explanation": "Developed by Harry Markowitz, MPT's core idea is that an asset's risk and return should not be viewed in isolation, but by how it contributes to the overall portfolio's risk and return. It emphasizes that diversification can reduce portfolio risk.",
+        "example": "Instead of holding only a high-growth tech stock, an MPT investor might combine it with government bonds and international stocks. Even if the bonds have lower returns, their low correlation with the tech stock can significantly reduce the total portfolio's volatility.",
+        "criticism": ["Relies heavily on historical data and assumptions about future returns and correlations, which may not hold true, especially in crises.", "Assumes investors are rational and that returns are normally distributed."],
+        "sources": [
+          { "title": "Investopedia - Modern Portfolio Theory (MPT)", "url": "https://www.investopedia.com/terms/m/modernportfoliotheory.asp" }
+        ]
+      }
+    },
+    "PerformanceMeasurement": {
+      "machine_readable": {
+        "metrics": {
+          "Sharpe_Ratio": {
+            "formula": "(Portfolio_Return - Risk_Free_Rate) / Portfolio_Standard_Deviation",
+            "description": "Measures risk-adjusted return. Higher is better."
+          },
+          "Sortino_Ratio": {
+            "formula": "(Portfolio_Return - Risk_Free_Rate) / Downside_Deviation",
+            "description": "Similar to Sharpe, but only penalizes for downside volatility. Higher is better."
+          },
+          "Treynor_Ratio": {
+            "formula": "(Portfolio_Return - Risk_Free_Rate) / Portfolio_Beta",
+            "description": "Measures excess return per unit of systematic risk (beta)."
+          },
+          "Jensens_Alpha": {
+            "formula": "Portfolio_Return - (Risk_Free_Rate + Portfolio_Beta * (Market_Return - Risk_Free_Rate))",
+            "description": "Measures the portfolio's return above or below what would be predicted by the CAPM. Positive alpha indicates outperformance."
+          },
+          "Information_Ratio": {
+            "formula": "(Portfolio_Return - Benchmark_Return) / Tracking_Error",
+            "description": "Measures portfolio returns above the returns of a benchmark, adjusted for the volatility of those returns (tracking error)."
+          }
+        },
+        "_future_enhancements": ["Add details on calculating downside deviation and tracking error"]
+      },
+      "human_readable": {
+        "definition": "Portfolio performance measurement involves evaluating a portfolio's return and risk characteristics, often relative to a benchmark.",
+        "explanation": "These metrics help investors understand if the returns generated were appropriate for the level of risk taken. They provide a standardized way to compare different investments and managers.",
+        "example": "A portfolio with a 15% return and high volatility might have a lower Sharpe Ratio than a portfolio with a 12% return and very low volatility, indicating the second portfolio had better risk-adjusted performance.",
+        "sources": [
+          { "title": "Investopedia - Sharpe Ratio", "url": "https://www.investopedia.com/terms/s/sharperatio.asp" }
+        ]
+      }
+    }
+  },
+  "Derivatives": {
+    "Options": {
+      "machine_readable": {
+        "type": "Derivative Security",
+        "definition": "A contract giving the buyer the right, but not the obligation, to buy or sell an underlying asset at a specified strike price on or before a certain expiration date.",
+        "option_types": {
+          "Call_Option": { "right": "To buy the underlying asset." },
+          "Put_Option": { "right": "To sell the underlying asset." }
+        },
+        "key_terms": ["Underlying Asset", "Strike Price (Exercise Price)", "Expiration Date", "Premium (Option Price)"],
+        "styles": ["American (exercisable at any time)", "European (exercisable only at expiration)"],
+        "pricing_models": {
+          "Black_Scholes_Merton": {
+            "description": "A mathematical model for pricing European-style options.",
+            "inputs": ["Underlying_Price", "Strike_Price", "Time_to_Expiration", "Volatility", "Risk_Free_Rate", "Dividend_Yield"]
+          }
+        },
+        "the_greeks": {
+          "Delta": { "measures": "Rate of change of option price with respect to the underlying asset's price." },
+          "Gamma": { "measures": "Rate of change of Delta." },
+          "Theta": { "measures": "Rate of change of option price with respect to time (time decay)." },
+          "Vega": { "measures": "Rate of change of option price with respect to volatility." },
+          "Rho": { "measures": "Rate of change of option price with respect to the risk-free interest rate." }
+        },
+        "_future_enhancements": ["Add binomial option pricing model", "Detail common option strategies (covered calls, protective puts, spreads)"]
+      },
+      "human_readable": {
+        "definition": "Options are contracts that derive their value from an underlying asset, like a stock. They offer the right, not an obligation, to buy (a call) or sell (a put) the asset at a set price within a specific timeframe.",
+        "example": "Buying a call option on Apple stock with a $180 strike price gives you the right to buy Apple shares at $180 anytime before the option expires. If the stock price goes to $200, your right is valuable. If it stays at $170, you can let the option expire worthless, losing only the premium you paid.",
+        "sources": [
+          { "title": "Investopedia - Option", "url": "https://www.investopedia.com/terms/o/option.asp" }
+        ]
+      }
+    }
+  },
+  "BehavioralFinance": {
+    "Cognitive_Biases": {
+      "machine_readable": {
+        "type": "Psychological Bias",
+        "biases": {
+          "Confirmation_Bias": { "description": "The tendency to search for, interpret, favor, and recall information that confirms or supports one's preexisting beliefs." },
+          "Anchoring_Bias": { "description": "Relying too heavily on the first piece of information offered (the 'anchor') when making decisions." },
+          "Loss_Aversion": { "description": "The tendency to prefer avoiding losses to acquiring equivalent gains. The pain of losing is psychologically more powerful than the pleasure of winning." },
+          "Herding": { "description": "The tendency for individuals to follow the actions of a larger group, whether those actions are rational or not." },
+          "Overconfidence_Bias": { "description": "A person's subjective confidence in their judgments is reliably greater than their objective accuracy." }
+        },
+        "_future_enhancements": ["Add more biases like Recency Bias, Hindsight Bias, Endowment Effect"]
+      },
+      "human_readable": {
+        "definition": "Behavioral finance studies the effects of psychology on financial decision-makers and the subsequent effects on markets. It posits that investors are not always rational.",
+        "explanation": "Cognitive biases are systematic patterns of deviation from norm or rationality in judgment. They can lead investors to make suboptimal decisions.",
+        "example": "An investor might hold onto a losing stock for too long because of Loss Aversion, hoping it will 'come back,' even when fundamentals suggest it won't. This is in contrast to a rational decision to cut losses and reinvest elsewhere.",
+        "sources": [
+          { "title": "Investopedia - Behavioral Finance", "url": "https://www.investopedia.com/terms/b/behavioralfinance.asp" }
+        ]
+      }
+    }
+  }
+}

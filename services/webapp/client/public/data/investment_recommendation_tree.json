@@ -1,0 +1,48 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "description": "A decision tree to guide an agent through a buy/hold/sell investment recommendation.",
+    "last_updated": "2025-05-30T10:00:00Z"
+  },
+  "tree": {
+    "name": "Investment Recommendation",
+    "type": "root",
+    "children": [
+      {
+        "name": "Valuation Check",
+        "type": "decision",
+        "question": "Is the company undervalued, fairly valued, or overvalued based on DCF analysis?",
+        "children": [
+          {"condition": "Undervalued", "next_node_id": "risk_assessment"},
+          {"condition": "Fairly Valued", "next_node_id": "hold_recommendation"},
+          {"condition": "Overvalued", "next_node_id": "sell_recommendation"}
+        ]
+      },
+      {
+        "node_id": "risk_assessment",
+        "type": "decision",
+        "question": "What is the company's risk profile based on VaR and other risk metrics?",
+        "children": [
+          {"condition": "Low", "next_node_id": "buy_recommendation"},
+          {"condition": "Medium", "next_node_id": "hold_recommendation"},
+          {"condition": "High", "next_node_id": "sell_recommendation"}
+        ]
+      },
+      {
+        "node_id": "buy_recommendation",
+        "type": "leaf",
+        "recommendation": "Buy"
+      },
+      {
+        "node_id": "hold_recommendation",
+        "type": "leaf",
+        "recommendation": "Hold"
+      },
+      {
+        "node_id": "sell_recommendation",
+        "type": "leaf",
+        "recommendation": "Sell"
+      }
+    ]
+  }
+}
