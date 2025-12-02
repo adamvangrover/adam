@@ -58,3 +58,9 @@ graph TD
     D -->|Export| E[window.MOCK_DATA]
     E -->|Load| F[Static Web UI]
 ```
+graph TD
+    A["Raw Files (.json, .md, .py)"] -->|UniversalIngestor| B("Gold Standard Scrubber")
+    B -->|Conviction Scoring| C["Gold Standard Artifacts (.jsonl)"]
+    C -->|generate_ui_data.py| D["UI Data (.json)"]
+    D -->|Export| E["window.MOCK_DATA"]
+    E -->|Load| F["Static Web UI"]
