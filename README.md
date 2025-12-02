@@ -1,6 +1,6 @@
 ````markdown
 README content formatted as a Markdown file.
-````markdown
+
 # Adam v23.0: Your AI-Powered Partner
 
 > **Note:** This document describes the current active version of the Adam system (v23.0). For details on the legacy stable version, please see the v21.0 Documentation.
