@@ -26,14 +26,14 @@ from core.engine.deep_dive_graph import deep_dive_app
 from core.system.agent_orchestrator import AgentOrchestrator
 
 # v23.5 Deep Dive Agents (for Fallback)
-from core.agents.specialized.ManagementAssessmentAgent import ManagementAssessmentAgent
+from core.agents.specialized.management_assessment_agent import ManagementAssessmentAgent
 from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
-from core.agents.specialized.PeerComparisonAgent import PeerComparisonAgent
-from core.agents.specialized.SNCRatingAgent import SNCRatingAgent
-from core.agents.specialized.CovenantAnalystAgent import CovenantAnalystAgent
-from core.agents.specialized.MonteCarloRiskAgent import MonteCarloRiskAgent
-from core.agents.specialized.QuantumScenarioAgent import QuantumScenarioAgent
-from core.agents.specialized.PortfolioManagerAgent import PortfolioManagerAgent
+from core.agents.specialized.peer_comparison_agent import PeerComparisonAgent
+from core.agents.specialized.snc_rating_agent import SNCRatingAgent
+from core.agents.specialized.covenant_analyst_agent import CovenantAnalystAgent
+from core.agents.specialized.monte_carlo_risk_agent import MonteCarloRiskAgent
+from core.agents.specialized.quantum_scenario_agent import QuantumScenarioAgent
+from core.agents.specialized.portfolio_manager_agent import PortfolioManagerAgent
 from core.schemas.v23_5_schema import V23KnowledgeGraph, Meta, Nodes, HyperDimensionalKnowledgeGraph, EquityAnalysis, Fundamentals, ValuationEngine, DCFModel, PriceTargets
 
 logger = logging.getLogger(__name__)
@@ -141,10 +141,8 @@ class MetaOrchestrator:
                     result = deep_dive_app.invoke(initial_state, config=config)
 
                 logger.info("Deep Dive Graph Execution Successful.")
-                return {
-                    "status": "Deep Dive Complete",
-                    "final_state": result
-                }
+                # We normalize the output to be the OmniscientState directly (which contains v23_knowledge_graph)
+                return result
             else:
                 logger.warning("Deep Dive App is not initialized.")
                 raise Exception("Graph App Missing")
