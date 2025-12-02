@@ -2,6 +2,7 @@ import os
 import json
 import uuid
 import glob
+import ast
 from typing import List, Dict, Any, Optional
 from enum import Enum
 from datetime import datetime
@@ -69,6 +70,11 @@ class GoldStandardScrubber:
             if '# ' in content: score += 0.1 # Has headings
             if '```' in content: score += 0.1 # Has code blocks
 
+            # Python Docstrings
+            if artifact_type == "code_doc":
+                if "Args:" in content or "Returns:" in content: score += 0.2
+                if "class " in content: score += 0.1
+
         # Cap at 1.0
         return min(score, 1.0)
 
@@ -77,7 +83,7 @@ class GoldStandardScrubber:
         """Extracts useful metadata for indexing."""
         metadata = {
             "processed_at": str(datetime.now()),
-            "scrubber_version": "1.0"
+            "scrubber_version": "1.1"
         }
 
         if isinstance(content, str):
@@ -169,9 +175,13 @@ class UniversalIngestor:
         """Determines file type and processes it."""
         filename = os.path.basename(filepath)
 
-        # Skip hidden files and python files (unless we want to document code)
-        if filename.startswith('.') or filename.startswith('__'):
+        # Skip hidden files
+        if filename.startswith('.'):
             return
+
+        # Skip init files unless we are specifically targeting them? No, usually skip.
+        if filename == "__init__.py":
+            pass # We might want to read init for package docs, but let's skip for now.
 
         # Skip this file itself and generated files to avoid loops
         if "gold_standard" in filepath or "ui_data.json" in filepath:
@@ -186,6 +196,8 @@ class UniversalIngestor:
                 self._process_markdown(filepath)
             elif filepath.endswith('.txt'):
                 self._process_text(filepath)
+            elif filepath.endswith('.py'):
+                self._process_python(filepath)
         except Exception as e:
             # print(f"Error processing {filepath}: {e}")
             pass
@@ -288,6 +300,45 @@ class UniversalIngestor:
         )
         self.artifacts.append(artifact)
 
+    def _process_python(self, filepath: str):
+        """Extracts docstrings and class/function signatures from Python files."""
+        try:
+            with open(filepath, 'r', encoding='utf-8') as f:
+                source = f.read()
+
+            tree = ast.parse(source)
+            docstring = ast.get_docstring(tree)
+
+            classes = [node.name for node in ast.walk(tree) if isinstance(node, ast.ClassDef)]
+            functions = [node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]
+
+            content = f"Module: {os.path.basename(filepath)}\n"
+            if docstring:
+                content += f"Docstring: {docstring}\n"
+            if classes:
+                content += f"Classes: {', '.join(classes)}\n"
+            if functions:
+                content += f"Functions: {', '.join(functions)}\n"
+
+            metadata = {
+                "classes": classes,
+                "functions": functions,
+                "has_docstring": bool(docstring)
+            }
+
+            artifact = GoldStandardArtifact(
+                source_path=filepath,
+                content=content,
+                artifact_type=ArtifactType.CODE_DOC,
+                title=f"Doc: {os.path.basename(filepath)}",
+                metadata=metadata
+            )
+            self.artifacts.append(artifact)
+
+        except Exception as e:
+            # Parse error or other issue
+            pass
+
     def save_to_jsonl(self, output_path: str):
         """Saves all artifacts to a JSONL file."""
         with open(output_path, 'w', encoding='utf-8') as f:
@@ -301,11 +352,9 @@ class UniversalIngestor:
 if __name__ == "__main__":
     # Example usage
     ingestor = UniversalIngestor()
-    ingestor.scan_directory("core/libraries_and_archives")
+    ingestor.scan_directory("core") # Scan core for code docs
     ingestor.scan_directory("prompt_library")
     ingestor.scan_directory("data")
-
-    # Also scan docs for newsletters/manuals
     ingestor.scan_directory("docs")
 
     # Create output directory if it doesn't exist
