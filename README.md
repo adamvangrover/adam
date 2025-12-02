@@ -1,5 +1,5 @@
+````markdown
 README content formatted as a Markdown file.
-
 ````markdown
 # Adam v23.0: Your AI-Powered Partner
 
