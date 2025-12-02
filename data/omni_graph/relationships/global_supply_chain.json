@@ -1,44 +1,42 @@
-[
-  {
-    "source": "TSMC",
-    "target": "NVDA",
-    "type": "SUPPLIER",
-    "strength": 0.95,
-    "description": "Sole source for advanced GPU packaging (CoWoS) and wafer fabrication (4nm/5nm)."
-  },
-  {
-    "source": "ASML",
-    "target": "TSMC",
-    "type": "SUPPLIER",
-    "strength": 1.0,
-    "description": "Monopoly supplier of EUV lithography machines critical for advanced nodes."
-  },
-  {
-    "source": "NVDA",
-    "target": "MSFT",
-    "type": "CUSTOMER",
-    "strength": 0.8,
-    "description": "Major hyperscaler customer for H100/Blackwell GPUs."
-  },
-  {
-    "source": "NVDA",
-    "target": "META",
-    "type": "CUSTOMER",
-    "strength": 0.8,
-    "description": "Major hyperscaler customer for H100/Blackwell GPUs."
-  },
-  {
-    "source": "SK Hynix",
-    "target": "NVDA",
-    "type": "SUPPLIER",
-    "strength": 0.9,
-    "description": "Primary supplier of HBM3e memory for AI accelerators."
-  },
-  {
-    "source": "Samsung",
-    "target": "NVDA",
-    "type": "SUPPLIER",
-    "strength": 0.4,
-    "description": "Secondary supplier for HBM and potential foundry partner."
-  }
-]
+{
+  "supply_chain_nodes": [
+    {
+      "id": "TSMC",
+      "name": "Taiwan Semiconductor Manufacturing Co",
+      "role": "Critical Supplier",
+      "impact": "High"
+    },
+    {
+      "id": "ASML",
+      "name": "ASML Holding",
+      "role": "Equipment Supplier",
+      "impact": "High"
+    },
+    {
+      "id": "SK_HYNIX",
+      "name": "SK Hynix",
+      "role": "Component Supplier (HBM)",
+      "impact": "Medium"
+    }
+  ],
+  "edges": [
+    {
+      "source": "NVDA",
+      "target": "TSMC",
+      "relationship": "Manufacturing Partner",
+      "risk_factor": "Geopolitical concentration"
+    },
+    {
+      "source": "TSMC",
+      "target": "ASML",
+      "relationship": "Equipment Buyer",
+      "risk_factor": "Single source EUV technology"
+    },
+    {
+      "source": "NVDA",
+      "target": "SK_HYNIX",
+      "relationship": "Memory Supplier",
+      "risk_factor": "Supply bottleneck"
+    }
+  ]
+}

@@ -1,38 +1,32 @@
-# The Adam Omni-Graph (v23.5 Data Layer)
+# The Adam Omni-Graph
 
-## Strategic Overview
-The Adam Omni-Graph is the "Golden Source" universe for the Adam v23.5 platform. It replaces simple seed data with a structured, tiered architecture designed to support both broad market visualization and deep, specific simulations.
+**Strategic Goal:** Move Adam v23.5 from a "Proof of Concept" to a "Platform" by establishing a "Golden Source" Universe.
 
-## Tiered Architecture
+This structured Data Layer acts as the system's "Knowledge Graph," providing a rich library of pre-computed profiles and relationships. This allows the UI to look densely populated (breadth) while enabling deep simulations on specific entities (depth).
+
+## Tiered Data Architecture
+
+The data is organized into three tiers to balance performance and depth:
 
 ### Tier 1: The Constellations (Breadth)
+*   **Purpose:** Populate the visual graph (e.g., 3D webapp) with lightweight nodes.
+*   **Content:** Name, Ticker, Sector, Market Cap, Relationship to Hero.
 *   **Location:** `constellations/`
-*   **Purpose:** Lightweight nodes to populate the visual graph (e.g., in a 3D web application).
-*   **Content:** Minimal viable data: ID, Name, Sector, Role, Market Cap, Relationship to Hero.
-*   **Use Case:** Providing context and visual density around the primary "Hero" targets.
 
 ### Tier 2: The Hero Dossiers (Depth)
+*   **Purpose:** Serve as "Ground Truth" for "Deep Dive" demonstrations. These are full v23.5 Schema-compliant JSONs that act as pre-computed runtime results.
+*   **Content:** Full entity ecosystem, equity analysis, credit analysis, simulation engine results.
 *   **Location:** `dossiers/`
-*   **Purpose:** Fully fleshed-out, schema-compliant JSONs that represent a "perfect run" of the Deep Dive analysis.
-*   **Content:** Comprehensive data matching `v23_5_schema.py`: Entity Ecosystem, Equity Analysis, Credit Analysis, Simulation Engine, Strategic Synthesis.
-*   **Use Case:** Instant, high-fidelity demos of the system's capabilities without incurring the latency or cost of live agent execution.
 
 ### Tier 3: The Archetypes (Templates)
+*   **Purpose:** Instantly generate new, realistic dummy companies for simulations.
+*   **Content:** Abstract templates (e.g., "SaaS_Growth_HighBeta") with defined financial profiles and risk factors.
 *   **Location:** `templates/`
-*   **Purpose:** Abstract templates for generating synthetic entities.
-*   **Content:** Patterns for naming, financial profiles, risk factors, and default scenarios.
-*   **Use Case:** Enabling "what-if" simulations on hypothetical companies (e.g., "Simulate a distressed retail chain in a high-interest rate environment").
 
-### Relationships (The Edges)
+## Relationships (Edges)
+*   **Purpose:** Define the connections between entities (e.g., supply chains, competitors).
 *   **Location:** `relationships/`
-*   **Purpose:** Defining the connectivity between nodes.
-*   **Content:** Supply chain links, competitor mappings, customer relationships.
-*   **Use Case:** Modeling second and third-order effects (e.g., "How does a strike at TSMC affect NVDA?").
 
 ## Usage
-The graph is designed to be ingested by the `OmniGraphLoader` script (`scripts/load_omni_graph.py`), which constructs a `networkx` graph object at runtime for the MetaOrchestrator or UI backend.
 
-## Roadmap
-*   **Expansion:** Continue adding Hero Dossiers for top S&P 500 constituents.
-*   **Dynamic Loading:** Implement lazy loading for the Constellation tier to support thousands of nodes.
-*   **Live Updates:** Integrate with market data APIs to update Tier 1 nodes in real-time.
+Use the `scripts/load_omni_graph.py` utility to ingest these JSON files into a NetworkX or Neo4j graph object at runtime.
