@@ -1,4 +1,4 @@
-# core/v23_graph_engine/meta_orchestrator.py
+# core/engine/meta_orchestrator.py
 
 """
 Agent Notes (Meta-Commentary):
@@ -16,24 +16,24 @@ import logging
 import asyncio
 from typing import Dict, Any, Optional
 
-from core.v23_graph_engine.neuro_symbolic_planner import NeuroSymbolicPlanner
-from core.v23_graph_engine.states import init_risk_state, init_esg_state, init_compliance_state, init_crisis_state, init_omniscient_state
-from core.v23_graph_engine.red_team_graph import red_team_app
-from core.v23_graph_engine.esg_graph import esg_graph_app
-from core.v23_graph_engine.regulatory_compliance_graph import compliance_graph_app
-from core.v23_graph_engine.crisis_simulation_graph import crisis_simulation_app
-from core.v23_graph_engine.deep_dive_graph import deep_dive_app
+from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner
+from core.engine.states import init_risk_state, init_esg_state, init_compliance_state, init_crisis_state, init_omniscient_state
+from core.engine.red_team_graph import red_team_app
+from core.engine.esg_graph import esg_graph_app
+from core.engine.regulatory_compliance_graph import compliance_graph_app
+from core.engine.crisis_simulation_graph import crisis_simulation_app
+from core.engine.deep_dive_graph import deep_dive_app
 from core.system.agent_orchestrator import AgentOrchestrator
 
 # v23.5 Deep Dive Agents (for Fallback)
-from core.agents.specialized.management_assessment_agent import ManagementAssessmentAgent
+from core.agents.specialized.ManagementAssessmentAgent import ManagementAssessmentAgent
 from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
-from core.agents.specialized.peer_comparison_agent import PeerComparisonAgent
-from core.agents.specialized.snc_rating_agent import SNCRatingAgent
-from core.agents.specialized.covenant_analyst_agent import CovenantAnalystAgent
-from core.agents.specialized.monte_carlo_risk_agent import MonteCarloRiskAgent
-from core.agents.specialized.quantum_scenario_agent import QuantumScenarioAgent
-from core.agents.specialized.portfolio_manager_agent import PortfolioManagerAgent
+from core.agents.specialized.PeerComparisonAgent import PeerComparisonAgent
+from core.agents.specialized.SNCRatingAgent import SNCRatingAgent
+from core.agents.specialized.CovenantAnalystAgent import CovenantAnalystAgent
+from core.agents.specialized.MonteCarloRiskAgent import MonteCarloRiskAgent
+from core.agents.specialized.QuantumScenarioAgent import QuantumScenarioAgent
+from core.agents.specialized.PortfolioManagerAgent import PortfolioManagerAgent
 from core.schemas.v23_5_schema import V23KnowledgeGraph, Meta, Nodes, HyperDimensionalKnowledgeGraph, EquityAnalysis, Fundamentals, ValuationEngine, DCFModel, PriceTargets
 
 logger = logging.getLogger(__name__)
@@ -200,7 +200,7 @@ class MetaOrchestrator:
                     dcf_model=DCFModel(
                         wacc=0.08,
                         terminal_growth=0.02,
-                        intrinsic_value=float(dcf_val) if dcf_val else 0.0
+                        intrinsic_value=float(dcf_val)
                     ),
                     multiples_analysis=multiples,
                     price_targets=PriceTargets(bear_case=80.0, base_case=100.0, bull_case=120.0)
@@ -213,35 +213,13 @@ class MetaOrchestrator:
                 "facilities": [{"id": "TLB", "amount": "500M", "ltv": 0.5}],
                 "current_leverage": 3.0
             }
-            # For snc_rating_agent.py, args are (financials, capital_structure, enterprise_value)
-            # The manual fallback needs to adapt to the agent's signature.
-            # SNCRatingAgent.execute(financials, capital_structure, enterprise_value)
-
-            financials_mock = {"ebitda": 100.0, "total_debt": 300.0, "interest_expense": 50.0}
-            cap_structure_mock = [{"name": "Term Loan B", "amount": 300.0, "priority": 1, "security": "Secured"}]
-            ev_mock = 1000.0
-
-            credit_analysis_model = snc_agent.execute(financials_mock, cap_structure_mock, ev_mock)
-
-            # Map SNCRatingModel to CreditAnalysis
-            # Note: SNCRatingAgent returns SNCRatingModel, but CreditAnalysis wraps it.
-            credit_analysis = {
-                "snc_rating_model": credit_analysis_model,
-                "cds_market_implied_rating": "BB",
-                "covenant_risk_analysis": {
-                    "primary_constraint": "Net Leverage",
-                    "current_level": 3.0,
-                    "breach_threshold": 4.5,
-                    "risk_assessment": "Low"
-                }
-            }
+            credit_analysis = await snc_agent.execute(credit_input)
 
             # Phase 4: Risk
             logger.info("Fallback Phase 4: Risk")
             ebitda = 100.0
             debt = 300.0
-            # MonteCarloRiskAgent.execute(current_ebitda, ebitda_volatility, interest_expense, capex_maintenance)
-            sim_engine = mc_agent.execute(current_ebitda=ebitda, ebitda_volatility=0.2, interest_expense=50.0, capex_maintenance=10.0)
+            sim_engine = await mc_agent.execute({"ebitda": ebitda, "debt": debt, "volatility": 0.2})
 
             try:
                 scenarios = await quant_agent.execute({})
@@ -268,7 +246,7 @@ class MetaOrchestrator:
             )
 
             kg = V23KnowledgeGraph(
-                meta=Meta(target=query, generated_at="2023-10-27", model_version="Adam-v23.5"),
+                meta=Meta(target=query, generated_at="2023-10-27", model_version="Adam-v23.5-Fallback"),
                 nodes=nodes
             )
 
