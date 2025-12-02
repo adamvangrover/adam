@@ -14,8 +14,11 @@ class CovenantAnalystAgent(AgentBase):
         super().__init__(config)
         self.persona = "Credit Lawyer"
 
-    async def execute(self, params: Dict[str, Any]) -> CovenantRiskAnalysis:
+    async def execute(self, **kwargs) -> CovenantRiskAnalysis:
         logger.info("Executing Covenant Analysis...")
+
+        # Support both nested 'params' key and flat kwargs
+        params = kwargs.get('params', kwargs)
 
         # Mock Logic
         current_leverage = params.get("leverage", 3.0)

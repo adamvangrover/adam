@@ -14,8 +14,11 @@ class PortfolioManagerAgent(AgentBase):
         super().__init__(config)
         self.persona = "CIO"
 
-    async def execute(self, params: Dict[str, Any]) -> StrategicSynthesis:
+    async def execute(self, **kwargs) -> StrategicSynthesis:
         logger.info("Executing Strategic Synthesis...")
+
+        # Support both nested 'params' key and flat kwargs
+        params = kwargs.get('params', kwargs)
 
         # In production, this would implement a weighted scoring algorithm
         # based on the outputs of the other agents.

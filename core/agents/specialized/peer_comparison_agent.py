@@ -14,8 +14,12 @@ class PeerComparisonAgent(AgentBase):
         super().__init__(config)
         self.persona = "Equity Strategist"
 
-    async def execute(self, params: Dict[str, Any]) -> MultiplesAnalysis:
+    async def execute(self, **kwargs) -> MultiplesAnalysis:
         logger.info("Executing Peer Comparison...")
+
+        # Support both nested 'params' key and flat kwargs
+        params = kwargs.get('params', kwargs)
+
         company_id = params.get("company_id", "Unknown")
 
         # Mock Data

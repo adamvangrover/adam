@@ -36,6 +36,9 @@ from core.agents.snc_analyst_agent import SNCAnalystAgent # Added import
 from core.agents.behavioral_economics_agent import BehavioralEconomicsAgent
 from core.agents.meta_cognitive_agent import MetaCognitiveAgent
 
+from pydantic import ValidationError
+from core.schemas.config_schema import AgentsYamlConfig
+
 from core.utils.config_utils import load_config
 from core.utils.secrets_utils import get_api_key # Added import
 from core.system.message_broker import MessageBroker
@@ -100,7 +103,19 @@ class AgentOrchestrator:
         if 'agents' not in self.config:
             agents_cfg = load_config("config/agents.yaml")
             if agents_cfg and 'agents' in agents_cfg:
-                self.config['agents'] = agents_cfg['agents']
+                try:
+                    # Validate configuration against Pydantic schema
+                    validated_config = AgentsYamlConfig(**agents_cfg)
+                    # Use the validated data
+                    self.config['agents'] = validated_config.model_dump(exclude_none=True)['agents']
+                    logging.info("Agents configuration validated successfully against strict schema.")
+                except ValidationError as e:
+                    logging.critical(f"Agent configuration validation failed: {e}")
+                    # Fail fast as recommended by analysis
+                    raise RuntimeError(f"Startup Aborted: Invalid agent configuration in agents.yaml. \n{e}")
+                except Exception as e:
+                    logging.exception(f"Unexpected error during config validation: {e}")
+                    raise
 
         self.workflows = self.load_workflows()  # Load workflows
         self.llm_plugin = LLMPlugin()
