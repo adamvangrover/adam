@@ -1,0 +1,20 @@
+scenario_name: "The Fractured Ouroboros"
+description: "Compound shock: Tariffs + Rates + Energy."
+variables:
+  - name: "tariff_rate"
+    target_sector: "Technology"
+    shock_type: "additive"
+    value: 0.10  # +10% Tariff
+    transmission_channel: "COGS"
+
+  - name: "interest_rate"
+    target_metric: "SOFR"
+    shock_type: "additive"
+    value: 0.01  # +100bps
+    transmission_channel: "InterestExpense"
+
+  - name: "energy_cost"
+    target_sector:
+    shock_type: "multiplicative"
+    value: 1.15  # +15% Energy Cost
+    transmission_channel: "OPEX"

@@ -4,6 +4,12 @@ import time
 import re
 import random
 import datetime
+import sys
+
+# Ensure core modules are accessible
+sys.path.append(os.getcwd())
+
+from core.data_processing.universal_ingestor import UniversalIngestor, ArtifactType
 
 # --- 1. The Generator (The "Gold Standard") ---
 class DataFactory:
@@ -118,14 +124,11 @@ class DataFactory:
             }
         }
 
-# --- 2. Helper Functions & Scanners ---
+# --- 2. Helper Functions ---
 
 def clean_json_text(text):
-    # Remove single line comments
     text = re.sub(r'//.*', '', text)
-    # Remove multi-line comments
     text = re.sub(r'/\*.*?\*/', '', text, flags=re.DOTALL)
-    # Fix trailing commas (simple case)
     text = re.sub(r',(\s*[}\]])', r'\1', text)
     return text
 
@@ -147,22 +150,12 @@ def get_file_tree(root_dir):
         for file in files:
             if file.startswith('.'):
                 continue
-
-            file_path = os.path.join(root, file)
-            try:
-                size = os.path.getsize(file_path)
-                modified = os.path.getmtime(file_path)
-            except OSError:
-                size = 0
-                modified = 0
-
             file_tree.append({
                 'path': os.path.join(rel_path, file),
                 'type': 'blob',
-                'size': size,
-                'last_modified': modified
+                'size': 0,
+                'last_modified': 0
             })
-
     return file_tree
 
 def parse_agents_md(root_dir):
@@ -171,178 +164,122 @@ def parse_agents_md(root_dir):
     if os.path.exists(agents_md_path):
         with open(agents_md_path, 'r', encoding='utf-8') as f:
             lines = f.readlines()
-
         current_section = None
         for line in lines:
             line = line.strip()
-            if line.startswith('### Sub-Agents'):
-                current_section = 'Sub-Agent'
-            elif line.startswith('### Meta-Agents'):
-                current_section = 'Meta-Agent'
-            elif line.startswith('### Orchestrator Agents'):
-                current_section = 'Orchestrator'
+            if line.startswith('### Sub-Agents'): current_section = 'Sub-Agent'
+            elif line.startswith('### Meta-Agents'): current_section = 'Meta-Agent'
+            elif line.startswith('### Orchestrator Agents'): current_section = 'Orchestrator'
 
             if current_section and line.startswith('* **') and '**:' in line:
                 parts = line.replace('* **', '').split('**:', 1)
                 if len(parts) == 2:
-                    name = parts[0].strip()
-                    desc = parts[1].strip()
                     agents.append({
-                        'name': name,
+                        'name': parts[0].strip(),
                         'type': current_section,
-                        'description': desc,
+                        'description': parts[1].strip(),
                         'status': 'Active'
                     })
     return agents
-
-def get_reports(root_dir):
-    reports = []
-    reports_dir = os.path.join(root_dir, 'core/libraries_and_archives/reports')
-    if os.path.exists(reports_dir):
-        for root, _, files in os.walk(reports_dir):
-            for file in files:
-                file_path = os.path.join(root, file)
-                rel_path = os.path.relpath(file_path, root_dir)
-
-                if file.endswith('.json'):
-                    try:
-                        with open(file_path, 'r', encoding='utf-8') as f:
-                            content = f.read()
-                            clean_content = clean_json_text(content)
-                            data = json.loads(clean_content)
-                            data['file_path'] = rel_path
-                            # Ensure we have a title or company name
-                            if 'title' not in data and 'company' in data:
-                                data['title'] = f"{data['company']} Report"
-                            reports.append(data)
-                    except Exception as e:
-                        # Fallback for really broken JSON: just verify existence
-                        reports.append({
-                            "title": file.replace('.json', '').replace('_', ' ').title(),
-                            "file_path": rel_path,
-                            "error": str(e),
-                            "raw_content_preview": content[:200] if 'content' in locals() else ""
-                        })
-                elif file.endswith('.md'):
-                     reports.append({
-                         "title": file.replace('.md', '').replace('_', ' ').title(),
-                         "type": "markdown",
-                         "file_path": rel_path,
-                         "date": "2025-01-01"
-                     })
-    return reports
-
-def get_newsletters(root_dir):
-    newsletters = []
-    news_dir = os.path.join(root_dir, 'core/libraries_and_archives/newsletters')
-    if os.path.exists(news_dir):
-        for file in os.listdir(news_dir):
-            file_path = os.path.join(news_dir, file)
-            rel_path = os.path.join('core/libraries_and_archives/newsletters', file)
-
-            if file.endswith('.json'):
-                try:
-                    with open(file_path, 'r', encoding='utf-8') as f:
-                        content = f.read()
-                        clean_content = clean_json_text(content)
-                        data = json.loads(clean_content)
-                        data['file_path'] = rel_path
-                        newsletters.append(data)
-                except Exception as e:
-                      print(f"Error reading newsletter {file}: {e}")
-            elif file.endswith('.md'):
-                 newsletters.append({
-                     "title": file.replace('.md', '').replace('_', ' ').title(),
-                     "type": "markdown",
-                     "file_path": rel_path,
-                     "date": "2025-01-01"
-                 })
-    return newsletters
 
 def get_company_data(root_dir):
     path = os.path.join(root_dir, 'data/company_data.json')
     if os.path.exists(path):
         try:
             with open(path, 'r', encoding='utf-8') as f:
-                content = f.read()
-                clean_content = clean_json_text(content)
-                return json.loads(clean_content)
-        except Exception as e:
-            print(f"Error reading company data: {e}")
+                return json.loads(clean_json_text(f.read()))
+        except: pass
     return {}
 
 def get_market_baseline(root_dir):
     path = os.path.join(root_dir, 'data/adam_market_baseline.json')
     if os.path.exists(path):
         try:
-            with open(path, 'r', encoding='utf-8') as f:
-                content = f.read()
-                # Handle concatenated JSON objects if present
-                clean_content = clean_json_text(content)
-                try:
-                    return json.loads(clean_content)
-                except:
-                     # Attempt to split if multiple objects
-                     parts = clean_content.split('\n{')
-                     if len(parts) > 1:
-                         return json.loads('{' + parts[-1])
-        except Exception as e:
-            print(f"Error reading market baseline: {e}")
+            content = clean_json_text(open(path).read())
+            # Simple heuristic for concatenated JSON
+            if '}{' in content:
+                return json.loads(content.split('}{')[1].replace('}', '', 1)) # Very rough
+            return json.loads(content)
+        except: pass
     return {}
 
-def get_prompts(root_dir):
-    prompts = []
-    prompt_dir = os.path.join(root_dir, 'prompt_library')
-    if os.path.exists(prompt_dir):
-        for root, _, files in os.walk(prompt_dir):
-            for file in files:
-                if file.endswith('.md') or file.endswith('.json') or file.endswith('.yaml'):
-                    prompts.append({
-                        'name': file,
-                        'path': os.path.relpath(os.path.join(root, file), root_dir),
-                        'category': os.path.basename(root) if root != prompt_dir else 'General'
-                    })
-    return prompts
+# --- 3. Integration with Universal Ingestor ---
 
-# --- 3. The Hybrid Orchestrator ---
-def get_combined_reports(root_dir):
-    """
-    Combines real reports scanned from disk with synthetic data if needed.
-    """
-    # 1. Try to get real data
-    real_reports = get_reports(root_dir)
+def get_ingested_data(ingestor: UniversalIngestor, root_dir):
+    # 1. Reports
+    reports_artifacts = ingestor.get_artifacts_by_type(ArtifactType.REPORT)
+    reports = []
+    for art in reports_artifacts:
+        # Convert artifact format to UI format
+        report_data = art['content']
+        if isinstance(report_data, dict):
+            # Ensure essential keys
+            report_data['title'] = art['title']
+            report_data['file_path'] = os.path.relpath(art['source_path'], root_dir)
+            reports.append(report_data)
+        else:
+             # Fallback for text reports
+             reports.append({
+                 "title": art['title'],
+                 "file_path": os.path.relpath(art['source_path'], root_dir),
+                 "content": str(report_data)[:500] + "..."
+             })
     
-    # 2. Check if we need synthetic backfill (e.g. if we have fewer than 5 reports)
-    if len(real_reports) < 5:
-        print("⚠️  Insufficient real data found. Injecting synthetic Deep Dives...")
+    # Synthetic Backfill
+    if len(reports) < 5:
         synthetic_tickers = ["MSFT", "GOOGL", "NVDA", "TSLA", "AAPL"]
         scenarios = ["bull", "bear", "neutral"]
-        
         for ticker in synthetic_tickers:
-            # Randomize scenario for variety
-            scenario = random.choice(scenarios)
-            # Generate the mock report
-            synthetic_report = DataFactory.generate_deep_dive(ticker, scenario)
-            # Add to the list
-            real_reports.append(synthetic_report)
-            
-    return real_reports
+            reports.append(DataFactory.generate_deep_dive(ticker, random.choice(scenarios)))
 
-# --- Main Execution ---
+    # 2. Newsletters
+    news_artifacts = ingestor.get_artifacts_by_type(ArtifactType.NEWSLETTER)
+    newsletters = []
+    for art in news_artifacts:
+        newsletters.append({
+            "title": art['title'],
+            "file_path": os.path.relpath(art['source_path'], root_dir),
+            "content": str(art['content'])[:200]
+        })
+
+    # 3. Prompts
+    prompt_artifacts = ingestor.get_artifacts_by_type(ArtifactType.PROMPT)
+    prompts = []
+    for art in prompt_artifacts:
+        prompts.append({
+            "name": art['title'],
+            "path": os.path.relpath(art['source_path'], root_dir),
+            "category": "General" # Could extract from path
+        })
+
+    return reports, newsletters, prompts
+
 def main():
     root_dir = os.path.abspath('.')
     print(f"Scanning {root_dir}...")
 
-    # Note: We use get_combined_reports here instead of just get_reports
+    # Run Gold Standard Ingestor
+    ingestor = UniversalIngestor()
+    ingestor.scan_directory(os.path.join(root_dir, "core/libraries_and_archives"))
+    ingestor.scan_directory(os.path.join(root_dir, "prompt_library"))
+    ingestor.scan_directory(os.path.join(root_dir, "data")) # For specific data
+
+    # Save the Gold Standard JSONL
+    os.makedirs(os.path.join(root_dir, "data/gold_standard"), exist_ok=True)
+    ingestor.save_to_jsonl(os.path.join(root_dir, "data/gold_standard/knowledge_artifacts.jsonl"))
+
+    # Map to UI Data
+    reports, newsletters, prompts = get_ingested_data(ingestor, root_dir)
+
     data = {
         'generated_at': time.time(),
         'files': get_file_tree(root_dir),
         'agents': parse_agents_md(root_dir),
-        'reports': get_combined_reports(root_dir), 
-        'newsletters': get_newsletters(root_dir),
+        'reports': reports,
+        'newsletters': newsletters,
         'company_data': get_company_data(root_dir),
         'market_data': get_market_baseline(root_dir),
-        'prompts': get_prompts(root_dir),
+        'prompts': prompts,
         'system_stats': {
             'cpu_usage': 12.5,
             'memory_usage': 45.2,

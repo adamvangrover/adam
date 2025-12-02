@@ -25,7 +25,7 @@ from core.v23_graph_engine.crisis_simulation_graph import crisis_simulation_app
 from core.v23_graph_engine.deep_dive_graph import deep_dive_app
 from core.system.agent_orchestrator import AgentOrchestrator
 
-# v23.5 Deep Dive Agents
+# v23.5 Deep Dive Agents (for Fallback)
 from core.agents.specialized.ManagementAssessmentAgent import ManagementAssessmentAgent
 from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
 from core.agents.specialized.PeerComparisonAgent import PeerComparisonAgent
@@ -115,43 +115,85 @@ class MetaOrchestrator:
         return "LOW"
 
     async def _run_deep_dive_flow(self, query: str):
-        logger.info("Engaging Deep Dive Protocol (v23.5)...")
+        """
+        Primary execution method for Deep Dive.
+        Tries the v23 Graph first, falls back to Manual Orchestration.
+        """
+        logger.info("Engaging v23.5 Deep Dive Protocol...")
 
-        # Initialize Agents
-        mgmt_agent = ManagementAssessmentAgent(config={})
-        fund_agent = FundamentalAnalystAgent(config={})
-        peer_agent = PeerComparisonAgent(config={})
-        snc_agent = SNCRatingAgent(config={})
-        # cov_agent = CovenantAnalystAgent(config={})
-        mc_agent = MonteCarloRiskAgent(config={})
-        quant_agent = QuantumScenarioAgent(config={})
-        pm_agent = PortfolioManagerAgent(config={})
+        # Mock Ticker Extraction
+        ticker = "AAPL"
+        if "apple" in query.lower(): ticker = "AAPL"
+        elif "tesla" in query.lower(): ticker = "TSLA"
+        elif "microsoft" in query.lower(): ticker = "MSFT"
+
+        initial_state = init_omniscient_state(ticker)
+
+        # 1. Try Graph Execution
+        try:
+            logger.info("Attempting Deep Dive Graph Execution...")
+            config = {"configurable": {"thread_id": "1"}}
+
+            if deep_dive_app:
+                if hasattr(deep_dive_app, 'ainvoke'):
+                    result = await deep_dive_app.ainvoke(initial_state, config=config)
+                else:
+                    result = deep_dive_app.invoke(initial_state, config=config)
+
+                logger.info("Deep Dive Graph Execution Successful.")
+                return {
+                    "status": "Deep Dive Complete",
+                    "final_state": result
+                }
+            else:
+                logger.warning("Deep Dive App is not initialized.")
+                raise Exception("Graph App Missing")
+
+        except Exception as e:
+            logger.error(f"Deep Dive Graph Failed: {e}. Falling back to Manual Orchestration.", exc_info=True)
+            return await self._run_deep_dive_manual_fallback(query)
+
+    async def _run_deep_dive_manual_fallback(self, query: str):
+        """
+        Fallback method that manually calls agents if the graph fails.
+        """
+        logger.info("Engaging Deep Dive Manual Fallback...")
 
         try:
-            # Phase 1: Entity & Management
-            logger.info("Phase 1: Entity & Management")
-            # In a real system, we'd extract the company name precisely using an LLM or Named Entity Recognition
-            # Here we assume the query might contain it or we use the query as is.
-            # A simplistic heuristic: use the query as the company name.
-            company_name_extraction = query.replace("Perform a deep dive analysis on", "").strip() or query
+            # Initialize Agents (Empty config for now as they use defaults/mocks)
+            mgmt_agent = ManagementAssessmentAgent(config={})
+            fund_agent = FundamentalAnalystAgent(config={})
+            peer_agent = PeerComparisonAgent(config={})
+            snc_agent = SNCRatingAgent(config={})
+            mc_agent = MonteCarloRiskAgent(config={})
+            quant_agent = QuantumScenarioAgent(config={})
+            pm_agent = PortfolioManagerAgent(config={})
 
+            # Phase 1: Entity & Management
+            logger.info("Fallback Phase 1: Entity & Management")
+            company_name_extraction = query.replace("Perform a deep dive analysis on", "").strip() or query
             entity_eco = await mgmt_agent.execute({"company_name": company_name_extraction})
 
             # Phase 2: Deep Fundamental
-            logger.info("Phase 2: Deep Fundamental")
-            company_id = company_name_extraction # Using name as ID for now
+            logger.info("Fallback Phase 2: Deep Fundamental")
+            company_id = company_name_extraction
             fund_data = await fund_agent.execute(company_id)
 
-            # Map fund_data to EquityAnalysis
+            # Map fund_data
             dcf_val = 0.0
             if isinstance(fund_data, dict):
-                 # Safely extract with fallback
                  dcf_val = fund_data.get("dcf_valuation", 0.0)
-                 if dcf_val is None: dcf_val = 0.0
+
+            # Safe Fallback for Peer Agent
+            multiples = {}
+            try:
+                multiples = await peer_agent.execute({"company_id": company_id})
+            except:
+                multiples = {"error": "Peer Agent Failed"}
 
             equity_analysis = EquityAnalysis(
                 fundamentals=Fundamentals(
-                    revenue_cagr_3yr="5%", # Mock extraction
+                    revenue_cagr_3yr="5%",
                     ebitda_margin_trend="Expanding"
                 ),
                 valuation_engine=ValuationEngine(
@@ -160,13 +202,13 @@ class MetaOrchestrator:
                         terminal_growth=0.02,
                         intrinsic_value=float(dcf_val)
                     ),
-                    multiples_analysis=await peer_agent.execute({"company_id": company_id}),
+                    multiples_analysis=multiples,
                     price_targets=PriceTargets(bear_case=80.0, base_case=100.0, bull_case=120.0)
                 )
             )
 
             # Phase 3: Credit
-            logger.info("Phase 3: Credit")
+            logger.info("Fallback Phase 3: Credit")
             credit_input = {
                 "facilities": [{"id": "TLB", "amount": "500M", "ltv": 0.5}],
                 "current_leverage": 3.0
@@ -174,22 +216,19 @@ class MetaOrchestrator:
             credit_analysis = await snc_agent.execute(credit_input)
 
             # Phase 4: Risk
-            logger.info("Phase 4: Risk")
-            # Monte Carlo Agent needs EBITDA, Debt, Volatility.
-            # We should try to get these from fund_data if available.
+            logger.info("Fallback Phase 4: Risk")
             ebitda = 100.0
             debt = 300.0
-            if isinstance(fund_data, dict):
-                 # Attempt to extract if structure matches mock data from FundamentalAnalystAgent
-                 # fund_data["financial_ratios"] might have it? Or raw data?
-                 pass
-
             sim_engine = await mc_agent.execute({"ebitda": ebitda, "debt": debt, "volatility": 0.2})
-            scenarios = await quant_agent.execute({})
-            sim_engine.quantum_scenarios = scenarios
+
+            try:
+                scenarios = await quant_agent.execute({})
+                sim_engine.quantum_scenarios = scenarios
+            except:
+                pass
 
             # Phase 5: Synthesis
-            logger.info("Phase 5: Synthesis")
+            logger.info("Fallback Phase 5: Synthesis")
             synthesis = await pm_agent.execute({
                 "phase1": entity_eco,
                 "phase2": equity_analysis,
@@ -207,7 +246,7 @@ class MetaOrchestrator:
             )
 
             kg = V23KnowledgeGraph(
-                meta=Meta(target=query, generated_at="2023-10-27", model_version="Adam-v23.5"),
+                meta=Meta(target=query, generated_at="2023-10-27", model_version="Adam-v23.5-Fallback"),
                 nodes=nodes
             )
 
@@ -215,26 +254,31 @@ class MetaOrchestrator:
             return result.model_dump(by_alias=True)
 
         except Exception as e:
-            logger.error(f"Deep Dive Execution Failed: {e}", exc_info=True)
-            return {"error": str(e)}
+            logger.error(f"Deep Dive Fallback Failed: {e}", exc_info=True)
+            return {"error": f"All Deep Dive methods failed. Last error: {str(e)}"}
 
-    # ... (rest of methods)
     async def _run_adaptive_flow(self, query: str):
         logger.info("Engaging v23 Neuro-Symbolic Planner...")
         
         # 1. Discover Plan
-        plan = self.planner.discover_plan(query)
-        if not plan:
-            return {"error": "Failed to generate a plan."}
+        try:
+            plan = self.planner.discover_plan(query)
+            if not plan:
+                return {"error": "Failed to generate a plan."}
+        except Exception as e:
+            logger.error(f"Planner failed: {e}")
+            return {"error": "Planner Exception"}
             
         # 2. Compile Graph
-        app = self.planner.to_executable_graph(plan)
-        if not app:
-             return {"error": "Failed to compile graph."}
+        try:
+            app = self.planner.to_executable_graph(plan)
+            if not app:
+                 return {"error": "Failed to compile graph."}
+        except Exception as e:
+            logger.error(f"Graph compilation failed: {e}")
+            return {"error": "Compilation Exception"}
 
         # 3. Execute
-        # We guess the ticker for now or extract it. 
-        # In a real system, the planner would extract parameters into the state.
         ticker = "AAPL" # Default/Mock
         if "apple" in query.lower(): ticker = "AAPL"
         if "microsoft" in query.lower(): ticker = "MSFT"
@@ -365,29 +409,4 @@ class MetaOrchestrator:
             }
         except Exception as e:
             logger.error(f"Crisis Simulation Failed: {e}")
-            return {"error": str(e)}
-
-    async def _run_deep_dive_flow(self, query: str):
-        logger.info("Engaging v23.5 Deep Dive Protocol...")
-        # Mock Ticker Extraction
-        ticker = "AAPL"
-        if "apple" in query.lower(): ticker = "AAPL"
-        elif "tesla" in query.lower(): ticker = "TSLA"
-        elif "microsoft" in query.lower(): ticker = "MSFT"
-
-        initial_state = init_omniscient_state(ticker)
-
-        try:
-            config = {"configurable": {"thread_id": "1"}}
-            if hasattr(deep_dive_app, 'ainvoke'):
-                result = await deep_dive_app.ainvoke(initial_state, config=config)
-            else:
-                result = deep_dive_app.invoke(initial_state, config=config)
-
-            return {
-                "status": "Deep Dive Complete",
-                "final_state": result
-            }
-        except Exception as e:
-            logger.error(f"Deep Dive Failed: {e}")
             return {"error": str(e)}
