@@ -5,10 +5,10 @@ import logging
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from core.v23_graph_engine.neuro_symbolic_planner import NeuroSymbolicPlanner
-from core.v23_graph_engine.autonomous_self_improvement import AutonomousSelfImprovementController
-from core.v23_graph_engine.cyclical_reasoning_graph import cyclical_reasoning_app
-from core.v23_graph_engine.states import init_risk_state
+from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner
+from core.engine.autonomous_self_improvement import AutonomousSelfImprovementController
+from core.engine.cyclical_reasoning_graph import cyclical_reasoning_app
+from core.engine.states import init_risk_state
 
 # Configure logging to see the flow
 logging.basicConfig(level=logging.INFO, format='%(message)s')

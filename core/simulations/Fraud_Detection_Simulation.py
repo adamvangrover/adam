@@ -2,9 +2,9 @@
 
 import json
 from utils.api_communication import APICommunication
-from agents.Anomaly_Detection_Agent import AnomalyDetectionAgent
-from agents.Machine_Learning_Model_Training_Agent import MachineLearningModelTrainingAgent
-from agents.Alternative_Data_Agent import AlternativeDataAgent
+from core.agents.anomaly_detection_agent import AnomalyDetectionAgent
+from core.agents.machine_learning_model_training_agent import MachineLearningModelTrainingAgent
+from core.agents.alternative_data_agent import AlternativeDataAgent
 
 class FraudDetectionSimulation:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):

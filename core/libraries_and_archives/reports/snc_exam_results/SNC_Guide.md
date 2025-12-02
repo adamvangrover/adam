@@ -348,7 +348,7 @@ The internal risk rating is a focal point for examiners.
 
 ## Understanding and Applying SNC Guidelines
 
-A thorough understanding of SNC definitions and guidelines is essential for accurate internal risk rating and successful exam outcomes. Refer to official regulatory guidance for complete definitions. Internally, resources like the `risk_rating_mapping_v2.json` file, which is utilized by tools such as the `SNC_analyst_agent.py`, can serve as helpful references for how the bank maps its internal ratings and criteria to SNC classifications.
+A thorough understanding of SNC definitions and guidelines is essential for accurate internal risk rating and successful exam outcomes. Refer to official regulatory guidance for complete definitions. Internally, resources like the `risk_rating_mapping_v2.json` file, which is utilized by tools such as the `snc_analyst_agent.py`, can serve as helpful references for how the bank maps its internal ratings and criteria to SNC classifications.
 
 ### Key Definitions
 
@@ -616,5 +616,5 @@ Beyond the formal guidelines, here are some practical tips gathered from experie
 *   **Learn from Past Exams:** Review findings from previous SNC exams (and other regulatory exams) to identify recurring themes or areas needing improvement.
 *   **Build Relationships:** Foster professional and respectful relationships with the examiners. A cooperative (but not overly deferential) attitude can lead to more productive discussions.
 *   **The Exit Meeting is Not the End:** Even if there are disagreements at the exit meeting, there may still be opportunities to provide additional clarifying information before the final report is issued. Understand the process for post-exit meeting communication.
-*   **Use Your Tools:** Refer to internal resources like `risk_rating_mapping_v2.json` and the principles embedded in tools like `SNC_analyst_agent.py` to ensure alignment with established definitions and analytical approaches. The previously generated SNC reports are good examples of well-structured justifications.
+*   **Use Your Tools:** Refer to internal resources like `risk_rating_mapping_v2.json` and the principles embedded in tools like `snc_analyst_agent.py` to ensure alignment with established definitions and analytical approaches. The previously generated SNC reports are good examples of well-structured justifications.
 

@@ -18,7 +18,7 @@ The **Meta-Orchestrator** is the "Brain" of the Adam v23.0 system. It acts as th
 
 ## Usage
 ```python
-from core.v23_graph_engine.meta_orchestrator import MetaOrchestrator
+from core.engine.meta_orchestrator import MetaOrchestrator
 
 orchestrator = MetaOrchestrator()
 result = orchestrator.route_request("Analyze Apple Inc. Credit Risk")

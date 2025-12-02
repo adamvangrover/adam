@@ -8,7 +8,7 @@ It converts these logs into a structured JSON format, representing a trace of
 the agent's execution flow, including inputs to methods, outputs, Semantic Kernel 
 skill interactions, and rule-based decisions.
 
-The primary focus of the initial version is on logs from `SNC_analyst_agent.py`.
+The primary focus of the initial version is on logs from `snc_analyst_agent.py`.
 
 Basic Usage:
   python scripts/extract_xai_reasoning.py --log_file /path/to/agent_run.log --output_file /path/to/trace.json
@@ -191,7 +191,7 @@ def main():
     # Prepare the final JSON output structure
     output_data = {
         "agent_execution_trace": {
-            "agent_name": "SNC_analyst_agent", # Hardcoded for this PoC, could be made dynamic
+            "agent_name": "snc_analyst_agent", # Hardcoded for this PoC, could be made dynamic
             "log_file": args.log_file,
             "trace_events": trace_events,
         }

@@ -14,14 +14,14 @@ sys.modules["pandas"] = MagicMock()
 
 # --- IMPORTS ---
 try:
-    from core.v23_graph_engine.market_sentiment_graph import sentiment_graph_app
-    from core.v23_graph_engine.states import init_sentiment_state
+    from core.engine.market_sentiment_graph import sentiment_graph_app
+    from core.engine.states import init_sentiment_state
 except ImportError as e:
     print(f"Import failed even with mocks: {e}")
     # Fallback for checking if the file is at least parseable
     print("Checking syntax only...")
-    with open("core/v23_graph_engine/market_sentiment_graph.py", "r") as f:
-        compile(f.read(), "core/v23_graph_engine/market_sentiment_graph.py", "exec")
+    with open("core/engine/market_sentiment_graph.py", "r") as f:
+        compile(f.read(), "core/engine/market_sentiment_graph.py", "exec")
     print("Syntax Check Passed.")
     sys.exit(0)
 

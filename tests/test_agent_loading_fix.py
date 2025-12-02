@@ -18,7 +18,7 @@ agent_modules = [
     'industry_specialist_agent', 'fundamental_analyst_agent', 'technical_analyst_agent',
     'risk_assessment_agent', 'newsletter_layout_specialist_agent', 'data_verification_agent',
     'lexica_agent', 'archive_manager_agent', 'agent_forge', 'prompt_tuner', 'code_alchemist',
-    'lingua_maestro', 'sense_weaver', 'SNC_analyst_agent', 'behavioral_economics_agent',
+    'lingua_maestro', 'sense_weaver', 'snc_analyst_agent', 'behavioral_economics_agent',
     'meta_cognitive_agent', 'NewsBot'
 ]
 

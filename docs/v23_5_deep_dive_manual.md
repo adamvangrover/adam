@@ -44,7 +44,7 @@ The v23.5 "AI Partner" upgrade transforms Adam from a simple research assistant 
 
 ## Architecture
 
-The system uses a **Hyper-Dimensional Knowledge Graph (HDKG)** as its state object, defined in `core/schemas/v23_5_schema.py`. This state is populated sequentially by the `DeepDiveGraph` (`core/v23_graph_engine/deep_dive_graph.py`).
+The system uses a **Hyper-Dimensional Knowledge Graph (HDKG)** as its state object, defined in `core/schemas/v23_5_schema.py`. This state is populated sequentially by the `DeepDiveGraph` (`core/engine/deep_dive_graph.py`).
 
 ### Routing
 The `MetaOrchestrator` detects high-complexity intents (e.g., "Deep Dive on Apple", "Full Analysis") and routes them to the `DeepDiveGraph` instead of the legacy `AgentOrchestrator`.

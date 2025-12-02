@@ -1,4 +1,4 @@
-# core/v23_graph_engine/__init__.py
+# core/engine/__init__.py
 
 """
 This package contains the core components of the Adam v23.0 'Adaptive' architecture.

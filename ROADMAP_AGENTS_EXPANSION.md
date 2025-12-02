@@ -13,7 +13,7 @@ Update core agents to inherit from `core.agents.agent_base.AgentBase` and implem
 - [ ] `RiskAssessmentAgent` (`core/agents/risk_assessment_agent.py`)
 - [ ] `MarketSentimentAgent` (`core/agents/market_sentiment_agent.py`)
 - [ ] `FundamentalAnalystAgent` (`core/agents/fundamental_analyst_agent.py`)
-- [ ] `SNCAnalystAgent` (`core/agents/SNC_analyst_agent.py`)
+- [ ] `SNCAnalystAgent` (`core/agents/snc_analyst_agent.py`)
 - [ ] `AlgoTradingAgent` (`core/agents/algo_trading_agent.py`)
 
 **Standardization Requirements:**

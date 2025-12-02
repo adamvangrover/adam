@@ -1,4 +1,4 @@
-# core/v23_graph_engine/cyclical_reasoning_graph.py
+# core/engine/cyclical_reasoning_graph.py
 
 """
 Agent Notes (Meta-Commentary):
@@ -15,7 +15,7 @@ import numpy as np
 from typing import Literal, Dict, Any, List, Optional
 from langgraph.graph import StateGraph, END, START
 from langgraph.checkpoint.memory import MemorySaver
-from core.v23_graph_engine.states import RiskAssessmentState, ResearchArtifact
+from core.engine.states import RiskAssessmentState, ResearchArtifact
 from core.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)

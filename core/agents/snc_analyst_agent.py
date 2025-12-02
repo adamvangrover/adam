@@ -1,10 +1,10 @@
-# core/agents/SNC_analyst_agent.py
+# core/agents/snc_analyst_agent.py
 import sys
 import os
 # Add the project root to sys.path to allow imports like 'from core...'
 # when running this script directly for its __main__ block.
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..')) # core/agents/SNC_analyst_agent.py -> core/agents -> core -> /app
+PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..')) # core/agents/snc_analyst_agent.py -> core/agents -> core -> /app
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
@@ -60,7 +60,7 @@ class SNCAnalystAgent(AgentBase):
             return None, error_msg
 
         if 'DataRetrievalAgent' not in self.peer_agents:
-            error_msg = "DataRetrievalAgent not found in peer agents for SNC_analyst_agent."
+            error_msg = "DataRetrievalAgent not found in peer agents for snc_analyst_agent."
             logging.error(error_msg)
             return None, error_msg
         

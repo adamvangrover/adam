@@ -1,4 +1,4 @@
-# core/agents/Discussion_Chair_Agent.py
+# core/agents/discussion_chair_agent.py
 
 import json
 

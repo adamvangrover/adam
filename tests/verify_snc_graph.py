@@ -1,7 +1,7 @@
 # tests/verify_snc_graph.py
 
-from core.v23_graph_engine.snc_graph import snc_graph_app
-from core.v23_graph_engine.states import init_snc_state
+from core.engine.snc_graph import snc_graph_app
+from core.engine.states import init_snc_state
 import json
 
 def test_snc_graph():

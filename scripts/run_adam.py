@@ -9,7 +9,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from core.utils.config_utils import load_app_config
 from core.utils.logging_utils import setup_logging
-from core.v23_graph_engine.meta_orchestrator import MetaOrchestrator
+from core.engine.meta_orchestrator import MetaOrchestrator
 from core.system.agent_orchestrator import AgentOrchestrator
 
 async def main():

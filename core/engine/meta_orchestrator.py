@@ -1,4 +1,4 @@
-# core/v23_graph_engine/meta_orchestrator.py
+# core/engine/meta_orchestrator.py
 
 """
 Agent Notes (Meta-Commentary):
@@ -16,13 +16,13 @@ import logging
 import asyncio
 from typing import Dict, Any, Optional
 
-from core.v23_graph_engine.neuro_symbolic_planner import NeuroSymbolicPlanner
-from core.v23_graph_engine.states import init_risk_state, init_esg_state, init_compliance_state, init_crisis_state, init_omniscient_state
-from core.v23_graph_engine.red_team_graph import red_team_app
-from core.v23_graph_engine.esg_graph import esg_graph_app
-from core.v23_graph_engine.regulatory_compliance_graph import compliance_graph_app
-from core.v23_graph_engine.crisis_simulation_graph import crisis_simulation_app
-from core.v23_graph_engine.deep_dive_graph import deep_dive_app
+from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner
+from core.engine.states import init_risk_state, init_esg_state, init_compliance_state, init_crisis_state, init_omniscient_state
+from core.engine.red_team_graph import red_team_app
+from core.engine.esg_graph import esg_graph_app
+from core.engine.regulatory_compliance_graph import compliance_graph_app
+from core.engine.crisis_simulation_graph import crisis_simulation_app
+from core.engine.deep_dive_graph import deep_dive_app
 from core.system.agent_orchestrator import AgentOrchestrator
 
 # v23.5 Deep Dive Agents (for Fallback)

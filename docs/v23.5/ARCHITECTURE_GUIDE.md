@@ -49,7 +49,7 @@ The `V23KnowledgeGraph` contains:
 
 ## Orchestration
 
-The `MetaOrchestrator` (`core/v23_graph_engine/meta_orchestrator.py`) handles the routing.
+The `MetaOrchestrator` (`core/engine/meta_orchestrator.py`) handles the routing.
 *   **Trigger:** If `complexity == "DEEP_DIVE"` (e.g., query contains "deep dive" or context flag is set).
 *   **Flow:** Sequentially executes agents, passing state objects to build the HDKG.
 

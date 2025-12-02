@@ -1,7 +1,7 @@
 import pytest
 import asyncio
 from unittest.mock import MagicMock, patch
-from core.v23_graph_engine.meta_orchestrator import MetaOrchestrator
+from core.engine.meta_orchestrator import MetaOrchestrator
 
 @pytest.mark.asyncio
 async def test_deep_dive_pipeline():

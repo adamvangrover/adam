@@ -15,7 +15,7 @@ Located in `core/system/v22_async/`, the Body handles the heavy lifting.
 - **Role:** Like the autonomic nervous system, it handles reflexes and standard operations without deep thought.
 
 ### 2. The Brain: Cyclical Reasoning Graphs
-Located in `core/v23_graph_engine/`, the Brain uses `LangGraph` to model thought as a graph of state transitions.
+Located in `core/engine/`, the Brain uses `LangGraph` to model thought as a graph of state transitions.
 
 #### Key Graphs:
 *   **Neuro-Symbolic Planner:** Breaks down high-level user intents into directed acyclic graphs (DAGs) of tasks.
@@ -42,7 +42,7 @@ The `RedTeamGraph` continuously attacks the system's own analysis.
 
 ## Developer Guide: Adding a New Graph
 
-1.  **Define State:** Create a `TypedDict` in `core/v23_graph_engine/states.py`.
+1.  **Define State:** Create a `TypedDict` in `core/engine/states.py`.
 2.  **Define Nodes:** Write pure Python functions that take `State` and return a dict of updates.
 3.  **Define Edges:** Use `workflow.add_edge` and `workflow.add_conditional_edges` to define the logic flow.
 4.  **Register:** Add the graph to the `MetaOrchestrator` (or use it standalone).

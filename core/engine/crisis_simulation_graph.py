@@ -1,4 +1,4 @@
-# core/v23_graph_engine/crisis_simulation_graph.py
+# core/engine/crisis_simulation_graph.py
 
 """
 Agent Notes (Meta-Commentary):
@@ -18,7 +18,7 @@ from typing import Literal, Dict, Any, List
 from langgraph.graph import StateGraph, END, START
 from langgraph.checkpoint.memory import MemorySaver
 
-from core.v23_graph_engine.states import CrisisSimulationState
+from core.engine.states import CrisisSimulationState
 
 logger = logging.getLogger(__name__)
 
