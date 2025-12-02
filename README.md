@@ -1,11 +1,16 @@
 '````markdown
 'README content formatted as a Markdown file.
 
-# Adam v23.0: Your AI-Powered Partner
+# Adam v23.5: Your AI-Powered Partner
 
 > **Note:** This document describes the current active version of the Adam system (v23.0). For details on the legacy stable version, please see the v21.0 Documentation.
 
 ---
+
+*   **Cyclical Reasoning Graph:** A self-correcting neuro-symbolic engine.
+*   **Neural Dashboard:** Real-time visualization of agent thought processes.
+*   **Hybrid Architecture:** Combining v21's reliability with v22's speed and v23's intelligence.
+*   **Gold Standard Data Pipeline:** A rigorous "universal ingestion" process that scrubs and certifies all system knowledge.
 
 ## 🧠 Adam v23.0: The Adaptive Hive Mind
 
@@ -16,6 +21,10 @@ Adam has evolved. v23.0 introduces the **"Adaptive System" architecture**—a se
 [🚀 Launch Neural Dashboard](#) | [📖 Read the User Guide](#) | [⚡ Quick Start](#)
 
 ---
+
+## 🚀 Mission Control
+[**Launch Neural Dashboard**](./showcase/neural_dashboard.html)
+Monitor real-time agent reasoning, knowledge graph updates, and risk simulations.
 
 ### 🏗️ System Architecture
 
@@ -74,6 +83,13 @@ Garbage in, garbage out. Adam v23.0 utilizes a rigorous **Gold Standard Data Pip
 
 ### 💡 Example Outputs
 
+### 3. Gold Standard Data Pipeline
+A new "Universal Ingestor" ensures that every piece of data in the system is high-quality.
+
+*   **Ingest & Scrub:** Recursively scans reports, prompts, code, and data.
+*   **Conviction Scoring:** Automatically assesses the quality and "conviction" of data (0-100%).
+*   **Unified Access:** All data is normalized into a standard JSONL format accessible by any agent.
+*   [Read the Pipeline Documentation](./docs/GOLD_STANDARD_PIPELINE.md)
 Adam doesn't just chat; it produces structured, professional-grade financial artifacts ready for investment committees.
 
 #### 1\. Strategic Deep Dive (JSON Snippet)
@@ -112,6 +128,26 @@ Adam doesn't just chat; it produces structured, professional-grade financial art
 
 -----
 
+3.  **Run Adam:**
+    ```bash
+    python scripts/run_adam.py
+    ```
+
+4.  **View the Showcase:**
+    Open `showcase/index.html` in your browser.
+
+## 📂 Repository Structure
+
+*   `core/v23_graph_engine/`: The heart of the new system.
+    *   `cyclical_reasoning_graph.py`: The self-correcting analysis loop.
+    *   `neuro_symbolic_planner.py`: The logic for pathfinding in the KG.
+    *   `meta_orchestrator.py`: The central brain routing tasks.
+*   `core/data_processing/`: Data ingestion and standardisation.
+    *   `universal_ingestor.py`: The Gold Standard Pipeline.
+*   `showcase/`: The "Mission Control" UI assets.
+*   `data/`: Knowledge base and artisanal training sets.
+*   `docs/`: Comprehensive documentation.
+
 ### 🚀 Key Capabilities
 
   * **Cyclical Reasoning:** Unlike standard chatbots, Adam iterates. If data is missing, it creates a sub-task to find it. If logic is flawed, it self-corrects.
@@ -142,11 +178,21 @@ Adam doesn't just chat; it produces structured, professional-grade financial art
     cd adam
     ```
 
+*   [Adam v20.0 Implementation Plan](docs/v20.0)
+*   [System Requirements](docs/REQUIREMENTS.md)
+*   [User Guide](docs/user_guide.md)
+*   [API Documentation](docs/api_docs.yaml)
+*   [Contribution Guidelines](CONTRIBUTING.md)
+*   [Showcase Guide](docs/SHOWCASE_GUIDE.md): Walkthrough of the demo.
+*   [v23 Architecture Vision](docs/v23_architecture_vision.md): Deep dive into the "Adaptive Hive".
+*   [Gold Standard Pipeline](docs/GOLD_STANDARD_PIPELINE.md): Data ingestion guide.
+
 2.  **Install Python Dependencies**
 
     ```bash
     pip install -r requirements.txt
     ```
+
 
 3.  **Configure API Keys**
     Create a `.env` file or update `config/api_keys.yaml`:

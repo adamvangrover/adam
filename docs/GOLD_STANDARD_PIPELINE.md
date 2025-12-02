@@ -1,49 +1,60 @@
 # Gold Standard Data Pipeline
 
+The Gold Standard Data Pipeline is a key component of the Adam v23.5 "Adaptive System". Its purpose is to ingest, standardize, and certify data from across the repository, converting it into high-quality, machine-readable knowledge artifacts.
+
 ## Overview
-The "Gold Standard" Data Pipeline is a robust ingestion and standardization system designed to convert heterogeneous data sources (reports, newsletters, prompts, raw data) into a high-quality, unified format. This ensures that all agents, knowledge graphs, and UI components have access to a single, verified source of truth.
 
-## Architecture
+The pipeline operates on the principle of "Universal Ingestion". It scans the entire repository for valuable information—reports, prompts, code documentation, newsletters, and raw data—and processes it through a rigorous scrubbing and conviction assessment stage.
 
-### 1. Universal Ingestor
-Located at `core/data_processing/universal_ingestor.py`, this module acts as the entry point.
-- **Scans:** Recursively scans specified directories (`core/libraries_and_archives`, `prompt_library`, `data`).
-- **Parses:** Handles multiple file formats (`.json`, `.jsonl`, `.md`, `.txt`).
-- **Standardizes:** Converts all inputs into `GoldStandardArtifact` objects.
+### Key Components
 
-### 2. Gold Standard Artifact Schema
-Every ingested item is normalized to the following schema:
+1.  **Universal Ingestor** (`core/data_processing/universal_ingestor.py`):
+    *   Recursively scans directories.
+    *   Identifies artifact types (Reports, Prompts, Data, etc.).
+    *   Standardizes content into a common schema.
+
+2.  **Gold Standard Scrubber** (`core/data_processing/gold_standard_scrubber.py`):
+    *   **Cleaning**: Removes artifacts, fixes encoding, standardizes whitespace.
+    *   **Metadata Extraction**: Automatically extracts keys, entities, and structure metrics.
+    *   **Conviction Assessment**: Assigns a `conviction_score` (0.0 - 1.0) based on data quality, completeness, and structure.
+
+3.  **Knowledge Artifacts** (`data/gold_standard/knowledge_artifacts.jsonl`):
+    *   The final output is a JSONL file where every line is a standardized `GoldStandardArtifact`.
+    *   This file serves as the "Long Term Memory" for the system.
+
+## Usage
+
+To run the pipeline and generate the UI data:
+
+```bash
+python scripts/generate_ui_data.py
+```
+
+This script will:
+1.  Initialize the `UniversalIngestor`.
+2.  Scan `core/libraries_and_archives`, `prompt_library`, `data`, and `docs`.
+3.  Process and score all findings.
+4.  Output `data/gold_standard/knowledge_artifacts.jsonl`.
+5.  Generate `showcase/data/ui_data.json` and `showcase/js/mock_data.js` for the frontend.
+
+## Schema
+
+Each artifact in the Gold Standard dataset follows this structure:
+
 ```json
 {
-  "id": "uuid-v4",
+  "id": "uuid",
   "source_path": "path/to/original/file",
-  "type": "report|newsletter|prompt|data|code_doc",
-  "title": "Extracted Title",
-  "content": "Raw content or parsed JSON",
+  "type": "report|prompt|data|...",
+  "title": "Artifact Title",
+  "content": "...",
   "metadata": { ... },
   "conviction_score": 0.95,
   "ingestion_timestamp": "ISO-8601"
 }
 ```
 
-### 3. Storage
-The processed data is saved to `data/gold_standard/knowledge_artifacts.jsonl`. This file serves as the "Long Term Memory" for the system.
+## Future Enhancements
 
-### 4. UI Integration
-The script `scripts/generate_ui_data.py` utilizes the Universal Ingestor to populate the static UI data (`showcase/js/mock_data.js`). This ensures that the "Showcase" experience is always grounded in the actual repository content, with graceful fallbacks to synthetic data only when necessary.
-
-## Usage
-
-### Running the Pipeline
-To regenerate the gold standard dataset and update the UI:
-```bash
-python scripts/generate_ui_data.py
-```
-
-### Extending the Pipeline
-To add new data sources or formats, modify `core/data_processing/universal_ingestor.py`:
-- Add a new `_process_extension` method.
-- Update the `scan_directory` logic to include new paths.
-
-## Conviction Scoring
-Currently, all repository data is assigned a default high conviction score (0.95) as it represents the "Brain" of the system. Future iterations can implement an LLM-based `assess_conviction` method to dynamically score incoming external data.
+*   **AI Review**: Integrate an LLM call to semantically verify the content of high-value artifacts.
+*   **Vector Embedding**: Automatically generate embeddings for each artifact during ingestion.
