@@ -1,4 +1,4 @@
-# core/v23_graph_engine/unified_knowledge_graph.py
+# core/engine/unified_knowledge_graph.py
 
 """
 Manages the integration of the FIBO domain ontology and the W3C PROV-O provenance ontology.

@@ -120,7 +120,7 @@ Accessing and Utilizing the Knowledge Graph and API
 Knowledge Graph: Access and query the knowledge graph data directly or through the API. The data is stored in the data/knowledge_graph.json file and managed by the Neo4j graph database.
 API: The Adam v21.0 API provides a unified interface for interacting with the system. Refer to the docs/api_docs.yaml file for detailed API documentation.
 📂 Repository Structure
-core/v23_graph_engine/: The heart of the new system.
+core/engine/: The heart of the new system.
 cyclical_reasoning_graph.py: The self-correcting analysis loop.
 neuro_symbolic_planner.py: The logic for pathfinding in the KG.
 meta_orchestrator.py: The central brain routing tasks.

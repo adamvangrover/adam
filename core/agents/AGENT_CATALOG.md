@@ -197,7 +197,7 @@ This document provides a comprehensive catalog of all the agents in the ADAM sys
 
 ## `news_bot`
 
-*   **File:** `core/agents/NewsBot.py`
+*   **File:** `core/agents/news_bot.py`
 *   **Description:** This agent is responsible for retrieving and processing news articles from a variety of sources. It can filter news articles by topic, source, and date, and can extract key information from the articles, such as the headline, summary, and author.
 *   **Configuration:** `config/agents.yaml`
     *   `news_sources`: A list of news sources to retrieve articles from.
@@ -216,7 +216,7 @@ This document provides a comprehensive catalog of all the agents in the ADAM sys
 
 ## `discussion_chair_agent`
 
-*   **File:** `core/agents/Discussion_Chair_Agent.py`
+*   **File:** `core/agents/discussion_chair_agent.py`
 *   **Description:** This agent is responsible for facilitating discussions between other agents. It can start new discussions, invite agents to join discussions, and moderate discussions to ensure that they are productive.
 *   **Configuration:** `config/agents.yaml`
     *   `discussion_topics`: A list of topics that can be discussed.
@@ -234,7 +234,7 @@ This document provides a comprehensive catalog of all the agents in the ADAM sys
 
 ## `snc_analyst_agent`
 
-*   **File:** `core/agents/SNC_analyst_agent.py`
+*   **File:** `core/agents/snc_analyst_agent.py`
 *   **Description:** This agent is responsible for analyzing and rating the creditworthiness of companies. It uses a variety of data sources, including financial statements, news articles, and analyst reports, to generate a credit rating for a company.
 *   **Configuration:** `config/agents.yaml`
     *   `rating_model`: The name of the credit rating model to use.
@@ -390,7 +390,7 @@ This document provides a comprehensive catalog of all the agents in the ADAM sys
     *   **Tools:** `CrisisSimulationPlugin` (Fallback), `CrisisSimulationGraph` (Primary)
     *   **Hooks:** None
 *   **Compute and Resource Requirements:** High (Cyclical LLM calls).
-*   **Dependencies:** `langgraph`, `core.v23_graph_engine.crisis_simulation_graph`.
+*   **Dependencies:** `langgraph`, `core.engine.crisis_simulation_graph`.
 *   **Developer Notes:** The v23 graph provides better reasoning traces than the v21 prompt-only approach.
 
 ---
@@ -846,7 +846,7 @@ This document provides a comprehensive catalog of all the agents in the ADAM sys
 ## `red_team_agent`
 
 *   **File:** `core/agents/red_team_agent.py`
-*   **Description:** The Red Team Agent acts as an adversary to the system. It generates novel and challenging scenarios (stress tests) to validate risk models and system resilience. **Updated for v23:** Now wraps the `RedTeamGraph` (`core/v23_graph_engine/red_team_graph.py`) for cyclical adversarial reasoning (Attack -> Simulate -> Critique).
+*   **Description:** The Red Team Agent acts as an adversary to the system. It generates novel and challenging scenarios (stress tests) to validate risk models and system resilience. **Updated for v23:** Now wraps the `RedTeamGraph` (`core/engine/red_team_graph.py`) for cyclical adversarial reasoning (Attack -> Simulate -> Critique).
 *   **Configuration:** `config/agents.yaml`
     *   `num_scenarios`: Number of scenarios to generate.
 *   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.AgentBase`. Wraps `LangGraph` app.

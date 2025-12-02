@@ -3,13 +3,13 @@
 import json
 from datetime import datetime
 from utils.api_communication import APICommunication
-from agents.Fundamental_Analysis_Agent import FundamentalAnalystAgent
-from agents.Technical_Analysis_Agent import TechnicalAnalystAgent
-from agents.Risk_Assessment_Agent import RiskAssessmentAgent
-from agents.Prediction_Market_Agent import PredictionMarketAgent
-from agents.Alternative_Data_Agent import AlternativeDataAgent
-from agents.Crypto_Agent import CryptoAgent
-from agents.Discussion_Chair_Agent import DiscussionChairAgent  # Import the Discussion Chair Agent
+from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
+from core.agents.technical_analyst_agent import TechnicalAnalystAgent
+from core.agents.risk_assessment_agent import RiskAssessmentAgent
+from core.agents.prediction_market_agent import PredictionMarketAgent
+from core.agents.alternative_data_agent import AlternativeDataAgent
+from core.agents.crypto_agent import CryptoAgent
+from core.agents.discussion_chair_agent import DiscussionChairAgent  # Import the Discussion Chair Agent
 
 class InvestmentCommitteeSimulation:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json", wsm_model_path="world_simulation_model/WSM_v7.1.json"):

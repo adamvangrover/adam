@@ -22,7 +22,7 @@ Currently implemented using an in-memory `NetworkX` graph for rapid prototyping,
 
 ## Usage
 ```python
-from core.v23_graph_engine.neuro_symbolic_planner import NeuroSymbolicPlanner
+from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner
 
 planner = NeuroSymbolicPlanner()
 plan = planner.discover_plan("Analyze Apple Inc. Credit Rating")

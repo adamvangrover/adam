@@ -1,7 +1,7 @@
 from typing import Any, Dict, List, Optional
 import logging
 from core.agents.agent_base import AgentBase
-from core.v23_graph_engine.unified_knowledge_graph import UnifiedKnowledgeGraph
+from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
 try:
     from semantic_kernel import Kernel
 except ImportError:

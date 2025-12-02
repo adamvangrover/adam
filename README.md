@@ -63,9 +63,9 @@ graph TD
 
 #### Core Components
 
-  * **Meta Orchestrator** (`core/v23_graph_engine/meta_orchestrator.py`): The central "cortex" that routes tasks, manages state, and orchestrates the swarm of specialized agents.
-  * **Neuro-Symbolic Planner** (`core/v23_graph_engine/neuro_symbolic_planner.py`): Combines the creativity of LLMs with the logical rigor of Knowledge Graphs to plan execution paths that are both novel and grounded in fact.
-  * **Cyclical Reasoning Engine** (`core/v23_graph_engine/cyclical_reasoning_graph.py`): A feedback loop (Draft -\> Critique -\> Refine) that ensures high conviction. It detects logical fallacies or missing data and automatically schedules remedial tasks.
+  * **Meta Orchestrator** (`core/engine/meta_orchestrator.py`): The central "cortex" that routes tasks, manages state, and orchestrates the swarm of specialized agents.
+  * **Neuro-Symbolic Planner** (`core/engine/neuro_symbolic_planner.py`): Combines the creativity of LLMs with the logical rigor of Knowledge Graphs to plan execution paths that are both novel and grounded in fact.
+  * **Cyclical Reasoning Engine** (`core/engine/cyclical_reasoning_graph.py`): A feedback loop (Draft -\> Critique -\> Refine) that ensures high conviction. It detects logical fallacies or missing data and automatically schedules remedial tasks.
 
 -----
 
@@ -138,7 +138,7 @@ Adam doesn't just chat; it produces structured, professional-grade financial art
 
 ## 📂 Repository Structure
 
-*   `core/v23_graph_engine/`: The heart of the new system.
+*   `core/engine/`: The heart of the new system.
     *   `cyclical_reasoning_graph.py`: The self-correcting analysis loop.
     *   `neuro_symbolic_planner.py`: The logic for pathfinding in the KG.
     *   `meta_orchestrator.py`: The central brain routing tasks.
@@ -221,7 +221,7 @@ A high-level overview of the "Hive Mind" structure:
 
 | Directory | Description |
 | :--- | :--- |
-| `core/v23_graph_engine/` | **The Brain.** Contains the cyclical graph, neuro-symbolic planner, and meta-orchestrator. |
+| `core/engine/` | **The Brain.** Contains the cyclical graph, neuro-symbolic planner, and meta-orchestrator. |
 | `core/agents/` | **The Workforce.** Specialized agents (Analyst, Risk, Legal, Industry Specialists). |
 | `core/simulations/` | **The Simulator.** Modules for running stress tests (e.g., Fraud\_Detection, Stress\_Testing). |
 | `core/data_processing/` | **The Stomach.** Universal Ingestor and data quality scrubbers. |

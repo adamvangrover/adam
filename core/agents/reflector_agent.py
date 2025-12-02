@@ -2,13 +2,13 @@ from __future__ import annotations
 from typing import Dict, Any, List
 import logging
 from core.agents.agent_base import AgentBase
-from core.v23_graph_engine.states import init_reflector_state
+from core.engine.states import init_reflector_state
 
 logger = logging.getLogger(__name__)
 
 # Try to import v23 Graph
 try:
-    from core.v23_graph_engine.reflector_graph import reflector_app
+    from core.engine.reflector_graph import reflector_app
     GRAPH_AVAILABLE = True
 except ImportError:
     GRAPH_AVAILABLE = False

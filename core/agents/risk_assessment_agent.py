@@ -64,8 +64,8 @@ class RiskAssessmentAgent(AgentBase):
 
         if risk_type == "investment" and use_graph:
             try:
-                from core.v23_graph_engine.cyclical_reasoning_graph import cyclical_reasoning_app
-                from core.v23_graph_engine.states import init_risk_state
+                from core.engine.cyclical_reasoning_graph import cyclical_reasoning_app
+                from core.engine.states import init_risk_state
 
                 logging.info("Delegating to v23 CyclicalReasoningGraph...")
                 ticker = target_data.get("company_name", "UNKNOWN")

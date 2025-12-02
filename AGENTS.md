@@ -102,8 +102,8 @@ The `HybridOrchestrator` is the central component of the new architecture. It ac
 The system is currently evolving towards the v23 "Adaptive System" architecture. This next-generation model introduces a stateful, cyclical graph-based execution engine (leveraging LangGraph) to enable true adaptive intelligence, including iterative self-correction, neuro-symbolic planning, and multimodal perception.
 
 Key Graph Engines:
-*   **Red Team Graph:** Adversarial stress testing (`core/v23_graph_engine/red_team_graph.py`).
-*   **Crisis Simulation Graph:** Macro-economic scenario modeling (`core/v23_graph_engine/crisis_simulation_graph.py`).
+*   **Red Team Graph:** Adversarial stress testing (`core/engine/red_team_graph.py`).
+*   **Crisis Simulation Graph:** Macro-economic scenario modeling (`core/engine/crisis_simulation_graph.py`).
 *   **ESG & Compliance Graphs:** Specialized domain reasoning.
 
 The `MetaOrchestrator` is the unified entry point for all execution models, including v21 (synchronous), v22 (asynchronous), and v23 (graph-based). For the complete vision and technical specifications, please refer to the official `docs/v23_architecture_vision.md` mandate.
@@ -124,7 +124,7 @@ To get started, please familiarize yourself with the following:
 
 *   **`config/`:** This directory contains the configuration files for the system.
 *   **`core/`:** This directory contains the core components of the system.
-    *   **`core/v23_graph_engine/`:** Contains the "Adaptive" system logic, implemented as LangGraph reasoning loops (e.g., `RedTeamGraph`, `CrisisSimulationGraph`).
+    *   **`core/engine/`:** Contains the "Adaptive" system logic, implemented as LangGraph reasoning loops (e.g., `RedTeamGraph`, `CrisisSimulationGraph`).
 *   **`docs/`:** This directory contains the documentation for the system.
 *   **`tests/`:** This directory contains the tests for the system.
 
@@ -159,7 +159,7 @@ Following the strategic analysis in `docs/whitepapers/quantum_ai_convergence.md`
 The v23.5 upgrade massively expands the scope of the system from a simple graph extractor to a full-spectrum **Autonomous Financial Analyst**.
 
 *   **New "Deep Dive" Pipeline:** A 5-phase execution protocol covering Entity Resolution, Deep Fundamental/Valuation, Credit/SNC Ratings, Risk/Quantum Simulation, and Strategic Synthesis.
-*   **Omniscient State:** A new `OmniscientState` in `core/v23_graph_engine/states.py` supports the hyper-dimensional knowledge graph output.
+*   **Omniscient State:** A new `OmniscientState` in `core/engine/states.py` supports the hyper-dimensional knowledge graph output.
 *   **Portable Prompt:** A comprehensive system prompt is available in `prompt_library/AOPL-v1.0/system_architecture/autonomous_financial_analyst_v23_5.md`.
 
 ## Directives for v25 Development

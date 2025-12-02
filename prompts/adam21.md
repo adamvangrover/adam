@@ -88,10 +88,10 @@ world_simulation
 AGENTS.md
 AGENT_CATALOG.md
 AGENT_DEVELOPMENT.md
-Discussion_Chair_Agent.py
-NewsBot.py
+discussion_chair_agent.py
+news_bot.py
 RAG_AGENT_README.md
-SNC_analyst_agent.py
+snc_analyst_agent.py
 __init__.py
 agent_base.py
 agent_forge.py
@@ -1441,7 +1441,7 @@ from core.agents.prompt_tuner import PromptTuner
 from core.agents.code_alchemist import CodeAlchemist
 from core.agents.lingua_maestro import LinguaMaestro
 from core.agents.sense_weaver import SenseWeaver
-from core.agents.SNC_analyst_agent import SNCAnalystAgent # Added import
+from core.agents.snc_analyst_agent import SNCAnalystAgent # Added import
 from core.agents.behavioral_economics_agent import BehavioralEconomicsAgent
 from core.agents.meta_cognitive_agent import MetaCognitiveAgent
 
@@ -1483,10 +1483,10 @@ AGENT_CLASSES = {
     "DataRetrievalAgent": "core.agents.data_retrieval_agent",
     "ResultAggregationAgent": "core.agents.result_aggregation_agent",
     "ReportGeneratorAgent": "core.agents.report_generator_agent",
-    "SNCAnalystAgent": "core.agents.SNC_analyst_agent", # Added SNC_analyst_agent
+    "SNCAnalystAgent": "core.agents.snc_analyst_agent", # Added snc_analyst_agent
     "BehavioralEconomicsAgent": "core.agents.behavioral_economics_agent",
     "MetaCognitiveAgent": "core.agents.meta_cognitive_agent",
-    "NewsBotAgent": "core.agents.NewsBot",
+    "NewsBotAgent": "core.agents.news_bot",
     "NexusAgent": NexusAgent,
     "IngestionAgent": AgentBase, # Using AgentBase as a placeholder
     "AuditorAgent": AgentBase, # Using AgentBase as a placeholder
@@ -2958,7 +2958,7 @@ agents:  # This top-level 'agents' key is REQUIRED
     communication_style: formal and precise with clear explanations of compliance requirements
   
   # SNC Analyst Agent - NEWLY ADDED
-  SNC_analyst_agent:
+  snc_analyst_agent:
     <<: *defaults
     persona: "SNC Examiner"
     description: "Analyzes Shared National Credits based on regulatory guidelines."

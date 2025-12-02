@@ -3,12 +3,12 @@ from typing import Any, Dict
 from core.agents.agent_base import AgentBase
 from core.prompting.plugins.crisis_simulation_plugin import CrisisSimulationPlugin
 from core.schemas.crisis_simulation import CrisisSimulationInput, CrisisSimulationOutput, CrisisLogEntry
-from core.v23_graph_engine.states import init_crisis_state
+from core.engine.states import init_crisis_state
 import logging
 
 # Try to import v23 Graph logic
 try:
-    from core.v23_graph_engine.crisis_simulation_graph import crisis_simulation_app
+    from core.engine.crisis_simulation_graph import crisis_simulation_app
     GRAPH_AVAILABLE = True
 except ImportError:
     GRAPH_AVAILABLE = False

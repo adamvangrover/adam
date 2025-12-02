@@ -3,10 +3,10 @@
 
 import json
 from utils.api_communication import APICommunication
-from agents.Fundamental_Analysis_Agent import FundamentalAnalystAgent
-from agents.Industry_Specialist_Agent import IndustrySpecialistAgent
-from agents.Risk_Assessment_Agent import RiskAssessmentAgent
-from agents.Legal_Agent import LegalAgent
+from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
+from core.agents.industry_specialist_agent import IndustrySpecialistAgent
+from core.agents.risk_assessment_agent import RiskAssessmentAgent
+from core.agents.legal_agent import LegalAgent
 
 class MergerAcquisitionSimulation:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):

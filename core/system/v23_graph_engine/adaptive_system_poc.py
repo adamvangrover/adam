@@ -1,4 +1,4 @@
-# core/v23_graph_engine/adaptive_system_poc.py
+# core/engine/adaptive_system_poc.py
 
 import logging
 from typing import TypedDict, List, Dict, Any, Optional

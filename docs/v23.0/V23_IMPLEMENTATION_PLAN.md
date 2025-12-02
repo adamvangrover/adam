@@ -4,11 +4,11 @@
 
 This document outlines the technical implementation plan for evolving the Adam platform from the v22.0 "Autonomous" simulation to the v23.0 "Adaptive" ecosystem. The core principle is a paradigm shift from a static, prompt-driven system to a dynamic, multi-component architecture that can reason about and evolve itself.
 
-The implementation is broken down by the core components scaffolded in `core/v23_graph_engine/`.
+The implementation is broken down by the core components scaffolded in `core/engine/`.
 
 ## 2. Phase 1: Implement the Cyclical Reasoning Graph (LangGraph)
 
-**Target Module:** `core/v23_graph_engine/cyclical_reasoning_graph.py`
+**Target Module:** `core/engine/cyclical_reasoning_graph.py`
 
 The first and most critical step is to replace the v22.0 *simulation* of an asynchronous message bus with a *real*, stateful runtime.
 
@@ -33,7 +33,7 @@ The first and most critical step is to replace the v22.0 *simulation* of an asyn
 
 ## 3. Phase 2: Implement the Neuro-Symbolic Planner (PoG)
 
-**Target Module:** `core/v23_graph_engine/neuro_symbolic_planner.py`
+**Target Module:** `core/engine/neuro_symbolic_planner.py`
 
 This phase replaces the unreliable, generative `WorkflowCompositionSkill` with a verifiable, grounded planner.
 
@@ -56,7 +56,7 @@ This phase replaces the unreliable, generative `WorkflowCompositionSkill` with a
 
 ## 4. Phase 3: Implement the Autonomous Self-Improvement Controller (SEAL)
 
-**Target Module:** `core/v23_graph_engine/autonomous_self_improvement.py`
+**Target Module:** `core/engine/autonomous_self_improvement.py`
 
 This is the final and most advanced phase, which enables the system to evolve its own components.
 

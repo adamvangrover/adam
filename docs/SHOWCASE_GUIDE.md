@@ -13,7 +13,7 @@ The Dashboard is the "Face" of Adam. It simulates a live connection to the Neura
 - **Financial Terminal:** Links to `dashboard.html` for deep-dive financial charts.
 
 ## 2. The Cyclical Reasoning Engine
-**File:** `core/v23_graph_engine/cyclical_reasoning_graph.py`
+**File:** `core/engine/cyclical_reasoning_graph.py`
 
 This is the "Brain". It demonstrates **System 2 Thinking** (Slow, Deliberate).
 
@@ -32,7 +32,7 @@ python tests/verify_v23_full.py
 Look for logs indicating `--- Node: Critique ---` and `--- Node: Correction ---`.
 
 ## 3. Neuro-Symbolic Planning
-**File:** `core/v23_graph_engine/neuro_symbolic_planner.py`
+**File:** `core/engine/neuro_symbolic_planner.py`
 
 Demonstrates how Adam "thinks" before acting.
 

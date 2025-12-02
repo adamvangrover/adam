@@ -1,4 +1,4 @@
-# core/v23_graph_engine/market_sentiment_graph.py
+# core/engine/market_sentiment_graph.py
 
 """
 Agent Notes (Meta-Commentary):
@@ -18,7 +18,7 @@ from typing import Literal, Dict, Any, List
 from langgraph.graph import StateGraph, END, START
 from langgraph.checkpoint.memory import MemorySaver
 
-from core.v23_graph_engine.states import MarketSentimentState
+from core.engine.states import MarketSentimentState
 
 logger = logging.getLogger(__name__)
 

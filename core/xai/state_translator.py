@@ -1,4 +1,4 @@
-from core.v23_graph_engine.states import RiskAssessmentState
+from core.engine.states import RiskAssessmentState
 
 class ExplainableStateTranslator:
     @staticmethod

@@ -2,9 +2,9 @@
 
 import json
 from utils.api_communication import APICommunication
-from agents.SNC_Analyst_Agent import SNCAnalystAgent
-from agents.Regulatory_Compliance_Agent import RegulatoryComplianceAgent
-from agents.Legal_Agent import LegalAgent
+from core.agents.snc_analyst_agent import SNCAnalystAgent
+from core.agents.regulatory_compliance_agent import RegulatoryComplianceAgent
+from core.agents.legal_agent import LegalAgent
 
 class RegulatoryComplianceSimulation:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):

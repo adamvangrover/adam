@@ -17,8 +17,8 @@ The graph is implemented using `langgraph` and consists of the following statefu
 ## Usage
 
 ```python
-from core.v23_graph_engine.snc_graph import snc_graph_app
-from core.v23_graph_engine.states import init_snc_state
+from core.engine.snc_graph import snc_graph_app
+from core.engine.states import init_snc_state
 
 # 1. Define Input Data
 obligor_id = "Titan Energy"

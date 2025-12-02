@@ -1,4 +1,4 @@
-# core/v23_graph_engine/autonomous_self_improvement.py
+# core/engine/autonomous_self_improvement.py
 
 """
 Implements the MIT SEAL-based 'Outer Loop' for persistent agent learning and evolution.
@@ -55,7 +55,7 @@ Key Components:
 #         )
 #         print(f"Successfully deployed {new_model_version}")
 
-# core/v23_graph_engine/autonomous_self_improvement.py
+# core/engine/autonomous_self_improvement.py
 
 """
 Agent Notes (Meta-Commentary):

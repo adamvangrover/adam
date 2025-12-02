@@ -4,7 +4,7 @@ import random
 from typing import Dict, Any, Literal
 
 from langgraph.graph import StateGraph, END
-from core.v23_graph_engine.states import RedTeamState
+from core.engine.states import RedTeamState
 
 logger = logging.getLogger(__name__)
 

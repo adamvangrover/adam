@@ -3,11 +3,11 @@ from typing import Dict, Any, List
 from langgraph.graph import StateGraph, END, START
 from langgraph.checkpoint.memory import MemorySaver
 
-from core.v23_graph_engine.states import OmniscientState
-from core.v23_graph_engine.valuation_utils import calculate_dcf, calculate_multiples, get_price_targets
-from core.v23_graph_engine.strategy_utils import determine_ma_posture, synthesize_verdict
-from core.v23_graph_engine.entity_utils import assess_management, assess_competitive_position
-from core.v23_graph_engine.snc_utils import map_financials_to_rating, calculate_leverage
+from core.engine.states import OmniscientState
+from core.engine.valuation_utils import calculate_dcf, calculate_multiples, get_price_targets
+from core.engine.strategy_utils import determine_ma_posture, synthesize_verdict
+from core.engine.entity_utils import assess_management, assess_competitive_position
+from core.engine.snc_utils import map_financials_to_rating, calculate_leverage
 from core.vertical_risk_agent.generative_risk import GenerativeRiskEngine
 
 logger = logging.getLogger(__name__)

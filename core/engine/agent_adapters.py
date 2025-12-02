@@ -1,4 +1,4 @@
-# core/v23_graph_engine/agent_adapters.py
+# core/engine/agent_adapters.py
 
 """
 Agent Notes (Meta-Commentary):

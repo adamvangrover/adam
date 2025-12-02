@@ -90,8 +90,8 @@ The graph uses conditional edges to determine the flow:
 ## Usage
 
 ```python
-from core.v23_graph_engine.cyclical_reasoning_graph import cyclical_reasoning_app
-from core.v23_graph_engine.states import init_risk_state
+from core.engine.cyclical_reasoning_graph import cyclical_reasoning_app
+from core.engine.states import init_risk_state
 
 initial_state = init_risk_state("AAPL", "Assess credit risk")
 config = {"configurable": {"thread_id": "test_1"}}

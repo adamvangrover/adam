@@ -1,4 +1,4 @@
-# core/v23_graph_engine/snc_utils.py
+# core/engine/snc_utils.py
 
 """
 Agent Notes (Meta-Commentary):

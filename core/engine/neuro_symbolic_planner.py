@@ -1,4 +1,4 @@
-# core/v23_graph_engine/neuro_symbolic_planner.py
+# core/engine/neuro_symbolic_planner.py
 
 """
 Implements the Plan-on-Graph (PoG) framework for verifiable, grounded planning.
@@ -15,7 +15,7 @@ import logging
 import networkx as nx
 from typing import List, Dict, Any, Optional, TypedDict
 from langgraph.graph import StateGraph, END, START
-from core.v23_graph_engine.unified_knowledge_graph import UnifiedKnowledgeGraph
+from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
 
 # Attempt to import GraphState from the POC, or define a compatible one
 try:

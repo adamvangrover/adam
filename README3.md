@@ -141,7 +141,7 @@ A full-spectrum autonomous analyst capable of deep credit analysis, valuation, a
 
 ## 📂 Repository Structure
 
-*   `core/v23_graph_engine/`: The heart of the new system.
+*   `core/engine/`: The heart of the new system.
     *   `cyclical_reasoning_graph.py`: The self-correcting analysis loop.
     *   `neuro_symbolic_planner.py`: The logic for pathfinding in the KG.
     *   `meta_orchestrator.py`: The central brain routing tasks.

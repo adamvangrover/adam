@@ -2,12 +2,12 @@
 
 import json
 from utils.api_communication import APICommunication
-from agents.Risk_Assessment_Agent import RiskAssessmentAgent
-from agents.Fundamental_Analysis_Agent import FundamentalAnalystAgent
-from agents.Technical_Analysis_Agent import TechnicalAnalystAgent
-from agents.Market_Sentiment_Agent import MarketSentimentAgent
-from agents.Prediction_Market_Agent import PredictionMarketAgent
-from agents.Alternative_Data_Agent import AlternativeDataAgent
+from core.agents.risk_assessment_agent import RiskAssessmentAgent
+from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
+from core.agents.technical_analyst_agent import TechnicalAnalystAgent
+from core.agents.market_sentiment_agent import MarketSentimentAgent
+from core.agents.prediction_market_agent import PredictionMarketAgent
+from core.agents.alternative_data_agent import AlternativeDataAgent
 
 class PortfolioOptimizationSimulation:
 

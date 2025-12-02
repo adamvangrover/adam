@@ -6,7 +6,7 @@ import asyncio
 
 from core.agents.agent_base import AgentBase
 from langgraph.graph import StateGraph, END
-from core.v23_graph_engine.states import RedTeamState
+from core.engine.states import RedTeamState
 
 # Attempt to import GraphState for type checking compliance
 try:

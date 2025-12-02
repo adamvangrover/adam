@@ -14,12 +14,12 @@ This document outlines the strategic roadmap for migrating legacy v21 agents to 
 
 - [ ] **CrisisSimulationMetaAgent** (`core/agents/meta_agents/crisis_simulation_agent.py`)
     - **Objective**: Integrate `CrisisSimulationGraph` for dynamic scenario modeling.
-    - **Action**: Update agent to wrap `core/v23_graph_engine/crisis_simulation_graph.py`.
+    - **Action**: Update agent to wrap `core/engine/crisis_simulation_graph.py`.
     - **Fallback**: Maintain prompt-based legacy logic if dependencies fail.
 
 - [ ] **RiskAssessmentAgent** (`core/agents/risk_assessment_agent.py`)
     - **Objective**: Adopt `CyclicalReasoningGraph` for deep credit risk analysis.
-    - **Action**: Refactor to use `core/v23_graph_engine/cyclical_reasoning_graph.py`.
+    - **Action**: Refactor to use `core/engine/cyclical_reasoning_graph.py`.
     - **Logic**: Use graph for deep dives, legacy rules for quick checks.
 
 - [ ] **RedTeamAgent** (`core/agents/red_team_agent.py`)
@@ -31,7 +31,7 @@ This document outlines the strategic roadmap for migrating legacy v21 agents to 
 - [ ] **ReflectorAgent** (`core/agents/reflector_agent.py`)
     - **Objective**: Move from heuristics to graph-based self-correction.
     - **Action**:
-        1. Create `core/v23_graph_engine/reflector_graph.py` (Critique -> Refine Loop).
+        1. Create `core/engine/reflector_graph.py` (Critique -> Refine Loop).
         2. Update agent to wrap this graph.
 
 ### Phase 3: New Agent Development
@@ -48,12 +48,12 @@ This document outlines the strategic roadmap for migrating legacy v21 agents to 
 
 | Track | Owner | Focus |
 | :--- | :--- | :--- |
-| **Graph Track** | Core Eng | Building `LangGraph` definitions in `core/v23_graph_engine/`. |
+| **Graph Track** | Core Eng | Building `LangGraph` definitions in `core/engine/`. |
 | **Wrapper Track** | Agent Eng | Updating `core/agents/` classes to import and invoke graphs. |
 | **Orchestration** | System Arch | Updating `MetaOrchestrator` to route to new agents. |
 
 ## Technical Guidelines
 
-- **Imports**: Always use `try/except` when importing from `core.v23_graph_engine` to ensure the system runs in "Mock Mode" if `langgraph` is missing.
-- **State**: Use Pydantic models or `TypedDict` from `core.v23_graph_engine.states`.
+- **Imports**: Always use `try/except` when importing from `core.engine` to ensure the system runs in "Mock Mode" if `langgraph` is missing.
+- **State**: Use Pydantic models or `TypedDict` from `core.engine.states`.
 - **Async**: All v23 integrations must use `await app.ainvoke(...)`.

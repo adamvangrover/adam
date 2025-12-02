@@ -2,10 +2,10 @@
 
 import json
 from utils.api_communication import APICommunication
-from agents.Risk_Assessment_Agent import RiskAssessmentAgent
-from agents.Macroeconomic_Analysis_Agent import MacroeconomicAnalysisAgent
-from agents.Geopolitical_Risk_Agent import GeopoliticalRiskAgent
-from agents.Industry_Specialist_Agent import IndustrySpecialistAgent
+from core.agents.risk_assessment_agent import RiskAssessmentAgent
+from core.agents.macroeconomic_analysis_agent import MacroeconomicAnalysisAgent
+from core.agents.geopolitical_risk_agent import GeopoliticalRiskAgent
+from core.agents.industry_specialist_agent import IndustrySpecialistAgent
 
 class StressTestingSimulation:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):
