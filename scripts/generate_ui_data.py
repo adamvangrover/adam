@@ -1,132 +1,20 @@
 import os
 import json
 import time
-import re
 import random
-import datetime
 import sys
 
 # Ensure core modules are accessible
 sys.path.append(os.getcwd())
 
 from core.data_processing.universal_ingestor import UniversalIngestor, ArtifactType
+from core.data_processing.synthetic_data_factory import DataFactory
 
-# --- 1. The Generator (The "Gold Standard") ---
-class DataFactory:
-    @staticmethod
-    def generate_deep_dive(ticker="AAPL", scenario="neutral"):
-        """
-        Generates a synthetic v23_knowledge_graph report.
-        Allows for dynamic modification based on scenario.
-        """
-        base_valuation = 245.50 if ticker == "AAPL" else 150.00
-        
-        # Adjust numbers based on scenario
-        if scenario == "bear":
-            conviction = 3
-            recommendation = "Sell"
-            modifier = 0.8
-        elif scenario == "bull":
-            conviction = 9
-            recommendation = "Buy"
-            modifier = 1.2
-        else:
-            conviction = 5
-            recommendation = "Hold"
-            modifier = 1.0
-
-        return {
-            "title": f"{ticker} Deep Dive Analysis ({scenario.title()} Case)",
-            "file_path": f"synthetic/{ticker}_{scenario}.json",
-            "type": "synthetic_report",
-            "v23_knowledge_graph": {
-                "meta": {
-                    "target": ticker,
-                    "generated_at": datetime.datetime.now().isoformat(),
-                    "model_version": "Adam-v23.5-Synthetic"
-                },
-                "nodes": {
-                    "entity_ecosystem": {
-                        "legal_entity": {
-                            "name": f"{ticker} Inc.",
-                            "jurisdiction": "California, USA"
-                        },
-                        "management_assessment": {
-                            "capital_allocation_score": 9.2 if scenario == "bull" else 6.5,
-                            "alignment_analysis": "High ownership structure. Buybacks active.",
-                            "key_person_risk": "Low"
-                        },
-                        "competitive_positioning": {
-                            "moat_status": "Wide" if scenario != "bear" else "Narrowing",
-                            "technology_risk_vector": "Generative AI integration neutralizes disruption risk."
-                        }
-                    },
-                    "equity_analysis": {
-                        "fundamentals": {
-                            "revenue_cagr_3yr": "8.5%" if scenario == "bull" else "4.2%",
-                            "ebitda_margin_trend": "Expanding" if scenario == "bull" else "Contracting"
-                        },
-                        "valuation_engine": {
-                            "dcf_model": {
-                                "wacc": 0.085,
-                                "terminal_growth": 0.03,
-                                "intrinsic_value": round(3200000.0 * modifier, 2),
-                                "intrinsic_share_price": round(base_valuation * modifier, 2)
-                            },
-                            "multiples_analysis": {
-                                "current_ev_ebitda": 22.5,
-                                "peer_median_ev_ebitda": 25.0
-                            },
-                            "price_targets": {
-                                "bear_case": round(base_valuation * 0.7, 2),
-                                "base_case": round(base_valuation, 2),
-                                "bull_case": round(base_valuation * 1.3, 2)
-                            }
-                        }
-                    },
-                    "credit_analysis": {
-                        "snc_rating_model": {
-                            "overall_borrower_rating": "Pass",
-                            "facilities": [
-                                {"id": "Revolver", "amount": "$5B", "regulatory_rating": "Pass", "collateral_coverage": "Unsecured", "covenant_headroom": ">50%"}
-                            ]
-                        },
-                        "cds_market_implied_rating": "AA",
-                        "covenant_risk_analysis": {
-                            "primary_constraint": "None",
-                            "current_level": 0.0,
-                            "breach_threshold": 0.0,
-                            "risk_assessment": "Minimal"
-                        }
-                    },
-                    "simulation_engine": {
-                        "monte_carlo_default_prob": 0.0001,
-                        "quantum_scenarios": [
-                            {"name": "Supply Chain Decoupling", "probability": 0.15, "estimated_impact_ev": "-12%"},
-                            {"name": "Antitrust Breakup", "probability": 0.05, "estimated_impact_ev": "-25%"}
-                        ],
-                        "trading_dynamics": {
-                            "short_interest": "0.8%",
-                            "liquidity_risk": "None"
-                        }
-                    },
-                    "strategic_synthesis": {
-                        "m_and_a_posture": "Buyer",
-                        "final_verdict": {
-                            "recommendation": recommendation,
-                            "conviction_level": conviction,
-                            "time_horizon": "Long Term",
-                            "rationale_summary": f"Automated scenario generation for {scenario} market conditions.",
-                            "justification_trace": ["Strong Cash Flow", "Wide Moat", "Valuation Analysis"]
-                        }
-                    }
-                }
-            }
-        }
-
-# --- 2. Helper Functions ---
+# --- Helper Functions ---
 
 def clean_json_text(text):
+    if not text: return "{}"
+    import re
     text = re.sub(r'//.*', '', text)
     text = re.sub(r'/\*.*?\*/', '', text, flags=re.DOTALL)
     text = re.sub(r',(\s*[}\]])', r'\1', text)
@@ -195,7 +83,8 @@ def get_market_baseline(root_dir):
     path = os.path.join(root_dir, 'data/adam_market_baseline.json')
     if os.path.exists(path):
         try:
-            content = clean_json_text(open(path).read())
+            with open(path, 'r', encoding='utf-8') as f:
+                content = clean_json_text(f.read())
             # Simple heuristic for concatenated JSON
             if '}{' in content:
                 return json.loads(content.split('}{')[1].replace('}', '', 1)) # Very rough
@@ -203,7 +92,7 @@ def get_market_baseline(root_dir):
         except: pass
     return {}
 
-# --- 3. Integration with Universal Ingestor ---
+# --- Integration with Universal Ingestor ---
 
 def get_ingested_data(ingestor: UniversalIngestor, root_dir):
     # 1. Reports
@@ -262,7 +151,8 @@ def main():
     ingestor = UniversalIngestor()
     ingestor.scan_directory(os.path.join(root_dir, "core/libraries_and_archives"))
     ingestor.scan_directory(os.path.join(root_dir, "prompt_library"))
-    ingestor.scan_directory(os.path.join(root_dir, "data")) # For specific data
+    ingestor.scan_directory(os.path.join(root_dir, "data"))
+    ingestor.scan_directory(os.path.join(root_dir, "docs")) # Add docs scan
 
     # Save the Gold Standard JSONL
     os.makedirs(os.path.join(root_dir, "data/gold_standard"), exist_ok=True)
@@ -298,6 +188,7 @@ def main():
     print(f"Data written to {output_path}")
 
     js_output_path = os.path.join(root_dir, 'showcase/js/mock_data.js')
+    os.makedirs(os.path.dirname(js_output_path), exist_ok=True)
     with open(js_output_path, 'w', encoding='utf-8') as f:
         f.write(f"window.MOCK_DATA = {json.dumps(data, indent=2)};")
     print(f"JS Data written to {js_output_path}")
