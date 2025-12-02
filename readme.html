@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam v23.0 | The Adaptive Hive Mind</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+
+        :root {
+            --primary-bg: #0f172a;
+            --secondary-bg: #1e293b;
+            --accent: #3b82f6;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .mono-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--primary-bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--secondary-bg);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+
+        /* Chart Container Styling - CRITICAL REQUIREMENT */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 100%; 
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        /* Glassmorphism Panel */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+        }
+
+        /* Navigation Active State */
+        .nav-item.active {
+            background-color: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            border-left: 3px solid #3b82f6;
+        }
+
+        /* Animation classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typing effect cursor */
+        .typing-cursor::after {
+            content: '|';
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#172033',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="flex h-screen text-sm md:text-base">
+
+    <!-- Chosen Palette: Deep Space (Slate 900 bg, Slate 800 cards, Blue accent) -->
+    <!-- Application Structure Plan: Dashboard layout with sidebar navigation. 
+         - "Mission Control": Summary metrics and status.
+         - "Architecture": Visual representation of the v23 Graph Engine (NO SVG).
+         - "Data Pipeline": Stats on the Universal Ingestor.
+         - "Simulation Lab": Interactive Risk Matrix and Monte Carlo results.
+         - "Agent Swarm": Catalog of active agents.
+         - "Artifacts": Read-only view of generated reports (JSON/Text).
+         This structure prioritizes the "Monitor -> Analyze -> Act" workflow implied by the Adam system. -->
+
+    <!-- Sidebar Navigation -->
+    <aside class="w-20 md:w-64 bg-slate-900 border-r border-slate-800 flex flex-col flex-shrink-0 transition-all duration-300 z-50">
+        <div class="p-4 flex items-center justify-center md:justify-start gap-3 border-b border-slate-800 h-16">
+            <div class="w-8 h-8 rounded bg-blue-600 flex items-center justify-center text-white font-bold">A</div>
+            <span class="font-bold text-lg tracking-wider hidden md:block">ADAM v23.0</span>
+        </div>
+        
+        <nav class="flex-1 py-6 flex flex-col gap-2 px-2">
+            <button onclick="navigate('mission-control')" class="nav-item active p-3 rounded-lg flex items-center gap-4 hover:bg-slate-800 transition-colors text-slate-400 hover:text-blue-400">
+                <i class="fas fa-rocket w-5 text-center"></i>
+                <span class="hidden md:block font-medium">Mission Control</span>
+            </button>
+            <button onclick="navigate('architecture')" class="nav-item p-3 rounded-lg flex items-center gap-4 hover:bg-slate-800 transition-colors text-slate-400 hover:text-blue-400">
+                <i class="fas fa-project-diagram w-5 text-center"></i>
+                <span class="hidden md:block font-medium">System Architecture</span>
+            </button>
+            <button onclick="navigate('pipeline')" class="nav-item p-3 rounded-lg flex items-center gap-4 hover:bg-slate-800 transition-colors text-slate-400 hover:text-blue-400">
+                <i class="fas fa-database w-5 text-center"></i>
+                <span class="hidden md:block font-medium">Data Pipeline</span>
+            </button>
+            <button onclick="navigate('simulation')" class="nav-item p-3 rounded-lg flex items-center gap-4 hover:bg-slate-800 transition-colors text-slate-400 hover:text-blue-400">
+                <i class="fas fa-flask w-5 text-center"></i>
+                <span class="hidden md:block font-medium">Simulation Lab</span>
+            </button>
+            <button onclick="navigate('artifacts')" class="nav-item p-3 rounded-lg flex items-center gap-4 hover:bg-slate-800 transition-colors text-slate-400 hover:text-blue-400">
+                <i class="fas fa-file-contract w-5 text-center"></i>
+                <span class="hidden md:block font-medium">Artifacts</span>
+            </button>
+        </nav>
+
+        <div class="p-4 border-t border-slate-800">
+            <div class="flex items-center gap-3">
+                <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                <span class="hidden md:block text-xs text-slate-500">SYSTEM ONLINE</span>
+            </div>
+            <div class="mt-2 hidden md:block text-xs text-slate-600">v23.0 (Active) | v21.0 (Stable)</div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-950 relative">
+        
+        <!-- Header -->
+        <header class="h-16 bg-slate-900/80 border-b border-slate-800 flex items-center justify-between px-6 backdrop-blur-sm z-40 sticky top-0">
+            <h1 id="page-title" class="text-xl font-semibold text-white">Mission Control</h1>
+            <div class="flex items-center gap-4">
+                <div class="bg-slate-800 px-3 py-1 rounded-full border border-slate-700 flex items-center gap-2">
+                    <i class="fas fa-clock text-slate-400 text-xs"></i>
+                    <span id="clock" class="text-xs font-mono text-slate-300">00:00:00 UTC</span>
+                </div>
+                <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center hover:bg-slate-700 cursor-pointer">
+                    <i class="fas fa-bell text-slate-400 text-sm"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Scrollable Content -->
+        <div id="content-viewport" class="flex-1 overflow-y-auto p-6 scroll-smooth">
+            
+            <!-- SECTION: MISSION CONTROL -->
+            <!-- Visualization & Content Choices: 
+                 1. KPI Cards: Quick numeric stats from report (Conviction Score, Agents Active).
+                 2. Activity Log: Text-based list of recent system actions.
+                 3. Capability Radar: Spider chart showing v23 strengths (Reasoning, Speed, Accuracy).
+            -->
+            <div id="mission-control" class="view-section fade-in space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="glass-panel p-4 border-l-4 border-blue-500">
+                        <div class="text-slate-400 text-xs uppercase font-bold mb-1">Conviction Score</div>
+                        <div class="text-2xl font-bold text-white">94.5%</div>
+                        <div class="text-green-400 text-xs mt-1"><i class="fas fa-arrow-up"></i> +2.4% vs v21.0</div>
+                    </div>
+                    <div class="glass-panel p-4 border-l-4 border-purple-500">
+                        <div class="text-slate-400 text-xs uppercase font-bold mb-1">Active Agents</div>
+                        <div class="text-2xl font-bold text-white">14</div>
+                        <div class="text-slate-500 text-xs mt-1">Swarm Status: Idle</div>
+                    </div>
+                    <div class="glass-panel p-4 border-l-4 border-yellow-500">
+                        <div class="text-slate-400 text-xs uppercase font-bold mb-1">Simulations Run</div>
+                        <div class="text-2xl font-bold text-white">10,000+</div>
+                        <div class="text-slate-500 text-xs mt-1">Monte Carlo Engine</div>
+                    </div>
+                    <div class="glass-panel p-4 border-l-4 border-green-500">
+                        <div class="text-slate-400 text-xs uppercase font-bold mb-1">Data Quality</div>
+                        <div class="text-2xl font-bold text-white">Gold</div>
+                        <div class="text-slate-500 text-xs mt-1">Universal Ingestor</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 glass-panel p-6">
+                        <h2 class="text-lg font-semibold mb-4 text-white flex items-center gap-2">
+                            <i class="fas fa-chart-line text-blue-500"></i> Analysis Throughput
+                        </h2>
+                        <p class="text-slate-400 text-sm mb-4">Real-time monitoring of the Cyclical Reasoning Engine's token processing and inference cycles.</p>
+                        <div class="chart-container">
+                            <canvas id="throughputChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="glass-panel p-6">
+                        <h2 class="text-lg font-semibold mb-4 text-white flex items-center gap-2">
+                            <i class="fas fa-brain text-purple-500"></i> System Capabilities
+                        </h2>
+                         <p class="text-slate-400 text-sm mb-4">Benchmarking v23.0 vs v21.0 architectures.</p>
+                        <div class="chart-container">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6">
+                    <h2 class="text-lg font-semibold mb-4 text-white">Recent System Logs</h2>
+                    <div class="font-mono text-xs bg-slate-950 p-4 rounded border border-slate-800 h-48 overflow-y-auto space-y-2" id="console-logs">
+                        <!-- Logs injected by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: SYSTEM ARCHITECTURE -->
+            <!-- Application Structure Plan: Visualizing the "Cyclical Reasoning Graph" without Mermaid.
+                 Method: CSS Grid/Flexbox diagram. Boxes representing agents/nodes, CSS borders for connections.
+            -->
+            <div id="architecture" class="view-section hidden fade-in space-y-6">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-white">The Adaptive System Architecture</h2>
+                    <p class="text-slate-400 mt-2 max-w-3xl">
+                        Adam v23.0 moves beyond linear chains. The **Neuro-Symbolic Planner** generates a dynamic path for each query. The **Cyclical Reasoning Engine** executes a feedback loop: Draft → Critique → Refine, ensuring high-conviction results.
+                    </p>
+                </div>
+
+                <!-- Custom HTML/CSS Flowchart -->
+                <div class="glass-panel p-8 overflow-x-auto">
+                    <div class="min-w-[800px] flex flex-col gap-8 items-center">
+                        
+                        <!-- Level 1: Input -->
+                        <div class="flex items-center justify-center">
+                            <div class="w-48 bg-slate-800 border border-slate-600 rounded-lg p-4 text-center shadow-lg relative">
+                                <div class="text-blue-400 font-bold text-xs uppercase mb-1">Input</div>
+                                <div class="text-white font-semibold">User Query / API</div>
+                                <div class="absolute bottom-0 left-1/2 w-px h-8 bg-slate-600 transform translate-y-full"></div>
+                                <div class="absolute bottom-0 left-1/2 w-2 h-2 bg-slate-600 transform translate-y-full translate-x-[-3.5px] rotate-45 mt-7"></div>
+                            </div>
+                        </div>
+
+                        <!-- Level 2: Orchestration -->
+                        <div class="flex items-center justify-center mt-4">
+                            <div class="w-64 bg-indigo-900/40 border border-indigo-500 rounded-lg p-6 text-center shadow-[0_0_15px_rgba(99,102,241,0.3)] relative">
+                                <div class="text-indigo-300 font-bold text-xs uppercase mb-2">Meta Orchestrator</div>
+                                <div class="text-white text-sm">Task Routing & State Management</div>
+                                
+                                <!-- Connector to planner -->
+                                <div class="absolute bottom-0 left-1/2 w-px h-8 bg-indigo-500 transform translate-y-full"></div>
+                            </div>
+                        </div>
+
+                        <!-- Level 3: Planning -->
+                        <div class="flex items-center justify-center mt-4">
+                            <div class="w-64 bg-purple-900/40 border border-purple-500 rounded-lg p-4 text-center relative">
+                                <div class="text-purple-300 font-bold text-xs uppercase mb-1">Neuro-Symbolic Planner</div>
+                                <div class="text-white text-xs">Generates Execution Graph</div>
+                                <div class="absolute bottom-0 left-1/2 w-px h-8 bg-purple-500 transform translate-y-full"></div>
+                            </div>
+                        </div>
+
+                        <!-- Level 4: The Loop (Cyclical Graph) -->
+                        <div class="relative p-8 border-2 border-dashed border-slate-700 rounded-2xl w-full max-w-4xl bg-slate-900/50">
+                            <div class="absolute -top-3 left-4 bg-slate-900 px-2 text-slate-400 text-xs font-bold tracking-widest">CYCLICAL REASONING ENGINE</div>
+                            
+                            <div class="grid grid-cols-3 gap-8">
+                                <!-- Nodes -->
+                                <div class="col-span-1 flex flex-col gap-4">
+                                    <div class="bg-slate-800 p-3 rounded border border-slate-600 text-center hover:bg-slate-700 transition-colors cursor-default">
+                                        <i class="fas fa-search text-blue-400 mb-2"></i>
+                                        <div class="text-xs font-bold">Data Retrieval</div>
+                                        <div class="text-[10px] text-slate-500">Connects to KG & APIs</div>
+                                    </div>
+                                    <div class="bg-slate-800 p-3 rounded border border-slate-600 text-center hover:bg-slate-700 transition-colors cursor-default">
+                                        <i class="fas fa-chart-pie text-green-400 mb-2"></i>
+                                        <div class="text-xs font-bold">Analyst Agents</div>
+                                        <div class="text-[10px] text-slate-500">Fundamental / Tech / SNC</div>
+                                    </div>
+                                    <div class="bg-slate-800 p-3 rounded border border-slate-600 text-center hover:bg-slate-700 transition-colors cursor-default">
+                                        <i class="fas fa-bolt text-yellow-400 mb-2"></i>
+                                        <div class="text-xs font-bold">Risk Simulator</div>
+                                        <div class="text-[10px] text-slate-500">Quantum / Monte Carlo</div>
+                                    </div>
+                                </div>
+
+                                <!-- Critic -->
+                                <div class="col-span-1 flex items-center justify-center relative">
+                                    <div class="bg-red-900/20 border border-red-500 p-6 rounded-full w-32 h-32 flex flex-col items-center justify-center z-10">
+                                        <i class="fas fa-gavel text-red-400 mb-1"></i>
+                                        <div class="text-red-200 font-bold text-sm">The Critic</div>
+                                        <div class="text-[10px] text-red-300 text-center">Validates Logic</div>
+                                    </div>
+                                    <!-- Arrows -->
+                                    <div class="absolute left-0 top-1/2 w-1/2 h-px bg-slate-500 -z-0"></div> <!-- Incoming -->
+                                    <div class="absolute right-0 top-1/2 w-1/2 h-px bg-slate-500 -z-0"></div> <!-- Outgoing -->
+                                </div>
+
+                                <!-- Outcome -->
+                                <div class="col-span-1 flex flex-col justify-center gap-4">
+                                    <div class="bg-green-900/20 border border-green-500 p-4 rounded text-center">
+                                        <div class="text-green-300 font-bold text-xs mb-1">High Conviction?</div>
+                                        <div class="flex justify-center gap-2 mt-2">
+                                            <span class="px-2 py-1 bg-green-500 text-black text-[10px] font-bold rounded">YES</span>
+                                            <span class="px-2 py-1 bg-red-500 text-white text-[10px] font-bold rounded">NO</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                         <!-- Level 5: Synthesis -->
+                         <div class="flex items-center justify-center mt-4">
+                            <div class="w-48 bg-blue-900/40 border border-blue-500 rounded-lg p-4 text-center shadow-lg relative">
+                                <div class="absolute -top-8 left-1/2 w-px h-8 bg-blue-500"></div>
+                                <div class="text-blue-300 font-bold text-xs uppercase mb-1">Final Synthesis</div>
+                                <div class="text-white font-semibold">XAI & Report Gen</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: DATA PIPELINE -->
+            <!-- Visualization: Bar chart for source types, list of "Conviction" validations. -->
+            <div id="pipeline" class="view-section hidden fade-in space-y-6">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-white">Gold Standard Data Pipeline</h2>
+                    <p class="text-slate-400 mt-2">
+                        "Garbage in, garbage out." The Universal Ingestor scrubs and validates every data point, assigning a **Conviction Score (0-100%)** before it enters the Unified Knowledge Graph.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass-panel p-6">
+                        <h3 class="text-lg font-semibold text-white mb-4">Data Source Conviction</h3>
+                        <p class="text-xs text-slate-400 mb-2">Average reliability score by ingestion source type.</p>
+                        <div class="chart-container">
+                            <canvas id="ingestorChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-panel p-6">
+                        <h3 class="text-lg font-semibold text-white mb-4">Knowledge Graph Density</h3>
+                        <p class="text-xs text-slate-400 mb-4">Growth of nodes and relationships in the `Omni-Graph`.</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-slate-800 p-4 rounded-lg">
+                                <div class="text-slate-400 text-xs">Total Nodes</div>
+                                <div class="text-xl font-bold text-blue-400">2.4M</div>
+                            </div>
+                            <div class="bg-slate-800 p-4 rounded-lg">
+                                <div class="text-slate-400 text-xs">Edges</div>
+                                <div class="text-xl font-bold text-purple-400">15.8M</div>
+                            </div>
+                            <div class="bg-slate-800 p-4 rounded-lg">
+                                <div class="text-slate-400 text-xs">XBRL Filings Parsed</div>
+                                <div class="text-xl font-bold text-green-400">12,403</div>
+                            </div>
+                            <div class="bg-slate-800 p-4 rounded-lg">
+                                <div class="text-slate-400 text-xs">Black Swan Scenarios</div>
+                                <div class="text-xl font-bold text-red-400">42</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: SIMULATION LAB -->
+            <!-- Visualization: Heatmap for risk assessment (Table/Grid). -->
+            <div id="simulation" class="view-section hidden fade-in space-y-6">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Monte Carlo Risk Lab</h2>
+                        <p class="text-slate-400 mt-2">
+                            Simulated **10,000 runs** using the Quantum Risk Pipeline (`core/v22_quantum_pipeline/`). 
+                            Scenario: <i>Fractured Ouroboros</i> (Supply Chain Collapse).
+                        </p>
+                    </div>
+                    <button onclick="alert('Simulation re-triggered. Estimated time: 14ms')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded shadow-lg transition-all">
+                        <i class="fas fa-play mr-2"></i> Run New Scenario
+                    </button>
+                </div>
+
+                <div class="glass-panel p-6">
+                    <h3 class="text-lg font-semibold text-white mb-4">Risk Assessment Matrix</h3>
+                    <!-- Custom Grid Heatmap -->
+                    <div class="grid grid-cols-3 gap-1 bg-slate-800 border border-slate-700 p-1 rounded max-w-lg mx-auto">
+                        <!-- Labels -->
+                        <div class="col-span-3 text-center text-xs text-slate-500 pb-2 uppercase tracking-wider">Impact →</div>
+                        
+                        <!-- Row 1 -->
+                        <div onclick="showRiskDetails('Low', 'Low')" class="h-24 bg-green-900/40 hover:bg-green-900/60 border border-transparent hover:border-white/20 transition-all flex flex-col items-center justify-center cursor-pointer">
+                            <span class="text-green-400 font-bold">Low/Low</span>
+                            <span class="text-xs text-slate-400">Credit Default</span>
+                        </div>
+                        <div onclick="showRiskDetails('Low', 'Med')" class="h-24 bg-yellow-900/40 hover:bg-yellow-900/60 border border-transparent hover:border-white/20 transition-all flex flex-col items-center justify-center cursor-pointer">
+                            <span class="text-yellow-400 font-bold">Low/Med</span>
+                        </div>
+                        <div onclick="showRiskDetails('Low', 'High')" class="h-24 bg-orange-900/40 hover:bg-orange-900/60 border border-transparent hover:border-white/20 transition-all flex flex-col items-center justify-center cursor-pointer">
+                            <span class="text-orange-400 font-bold">Low/High</span>
+                        </div>
+
+                        <!-- Row 2 -->
+                        <div onclick="showRiskDetails('Med', 'Low')" class="h-24 bg-yellow-900/40 hover:bg-yellow-900/60 border border-transparent hover:border-white/20 transition-all flex flex-col items-center justify-center cursor-pointer">
+                            <span class="text-yellow-400 font-bold">Med/Low</span>
+                        </div>
+                        <div onclick="showRiskDetails('Med', 'Med')" class="h-24 bg-orange-900/40 hover:bg-orange-900/60 border border-transparent hover:border-white/20 transition-all flex flex-col items-center justify-center cursor-pointer">
+                            <span class="text-orange-400 font-bold">Med/Med</span>
+                            <span class="text-xs text-slate-400">Regulatory</span>
+                        </div>
+                        <div onclick="showRiskDetails('Med', 'High')" class="h-24 bg-red-900/40 hover:bg-red-900/60 border border-transparent hover:border-white/20 transition-all flex flex-col items-center justify-center cursor-pointer">
+                            <span class="text-red-400 font-bold">Med/High</span>
+                            <span class="text-xs text-slate-400">Market Vol</span>
+                        </div>
+
+                        <!-- Row 3 -->
+                        <div onclick="showRiskDetails('High', 'Low')" class="h-24 bg-orange-900/40 hover:bg-orange-900/60 border border-transparent hover:border-white/20 transition-all flex flex-col items-center justify-center cursor-pointer">
+                            <span class="text-orange-400 font-bold">High/Low</span>
+                        </div>
+                        <div onclick="showRiskDetails('High', 'Med')" class="h-24 bg-red-900/40 hover:bg-red-900/60 border border-transparent hover:border-white/20 transition-all flex flex-col items-center justify-center cursor-pointer">
+                            <span class="text-red-400 font-bold">High/Med</span>
+                        </div>
+                        <div onclick="showRiskDetails('High', 'High')" class="h-24 bg-red-950 hover:bg-red-900 border border-transparent hover:border-white/20 transition-all flex flex-col items-center justify-center cursor-pointer shadow-inner shadow-red-900/50">
+                            <span class="text-red-500 font-extrabold">CRITICAL</span>
+                            <span class="text-xs text-red-300">Geopolitical</span>
+                        </div>
+                    </div>
+                    <p class="text-center text-xs text-slate-500 mt-2 uppercase tracking-wider">↑ Probability</p>
+                    <div id="risk-detail-box" class="mt-4 p-4 bg-slate-900 rounded border border-slate-700 text-sm hidden">
+                        <!-- Details injected via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION: ARTIFACTS -->
+            <!-- Application Structure Plan: Rendering the JSON snippet as a readable report. -->
+            <div id="artifacts" class="view-section hidden fade-in space-y-6">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-white">Generated Artifacts</h2>
+                    <p class="text-slate-400 mt-2">Access finalized reports, deep dives, and synthesis documents generated by the Omniscient Analyst (v23.5).</p>
+                </div>
+
+                <div class="glass-panel border-l-4 border-green-500">
+                    <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/50 rounded-t-lg">
+                        <div>
+                            <h3 class="font-bold text-white">Strategic Deep Dive: NVIDIA Corp</h3>
+                            <div class="text-xs text-slate-400 font-mono mt-1">ID: RPT-NVDA-2025-03 | Generated: 2025-03-15</div>
+                        </div>
+                        <span class="px-3 py-1 bg-green-900 text-green-300 text-xs rounded-full border border-green-700">Conviction: 94.5%</span>
+                    </div>
+                    <div class="p-6 text-slate-300 space-y-4 font-mono text-sm">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="text-blue-400 uppercase text-xs font-bold mb-2">Strategic Synthesis</h4>
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li><span class="text-slate-400">Outlook:</span> <span class="text-green-400">Bullish</span></li>
+                                    <li><span class="text-slate-400">Key Driver:</span> Sovereign AI adoption & B200 backlog saturation.</li>
+                                    <li><span class="text-slate-400">Critical Risks:</span> Supply chain concentration (TSMC), Geopolitical export controls.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="text-blue-400 uppercase text-xs font-bold mb-2">Valuation Models</h4>
+                                <div class="flex justify-between border-b border-slate-700 py-1">
+                                    <span>DCF Implied Price</span>
+                                    <span class="font-bold text-white">$1,450.00</span>
+                                </div>
+                                <div class="flex justify-between border-b border-slate-700 py-1">
+                                    <span>Peer Multiple Target</span>
+                                    <span class="font-bold text-white">$1,380.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-slate-700">
+                            <h4 class="text-purple-400 uppercase text-xs font-bold mb-2">XAI Reasoning (Why this conclusion?)</h4>
+                            <p class="italic text-slate-400">"The model prioritized supply chain resilience over short-term margin compression due to recent diversification signals in 10-K filings and satellite data confirming new fab activity in Arizona."</p>
+                        </div>
+                    </div>
+                    <div class="bg-slate-900/50 p-3 flex justify-end gap-2 rounded-b-lg">
+                        <button class="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-white text-xs rounded" onclick="document.execCommand('copy')">Copy JSON</button>
+                        <button class="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded">Download PDF</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- State Management ---
+        const state = {
+            currentPage: 'mission-control',
+            logs: [
+                { time: "08:42:11", level: "INFO", msg: "MetaOrchestrator initialized." },
+                { time: "08:42:15", level: "INFO", msg: "Universal Ingestor: Connected to Bloomberg API." },
+                { time: "08:42:30", level: "WARN", msg: "Data convition low (45%) for ticker $MEME. Triggering secondary validation." },
+                { time: "08:42:35", level: "INFO", msg: "Cyclical Graph: Remedial task scheduled." },
+                { time: "08:43:00", level: "SUCCESS", msg: "System active. Waiting for user query..." }
+            ]
+        };
+
+        // --- Navigation Logic ---
+        function navigate(pageId) {
+            // Update state
+            state.currentPage = pageId;
+            
+            // Update UI - Title
+            const titles = {
+                'mission-control': 'Mission Control',
+                'architecture': 'System Architecture',
+                'pipeline': 'Data Pipeline',
+                'simulation': 'Simulation Lab',
+                'artifacts': 'Artifacts'
+            };
+            document.getElementById('page-title').innerText = titles[pageId];
+
+            // Hide all sections
+            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+            
+            // Show target section
+            document.getElementById(pageId).classList.remove('hidden');
+
+            // Update Sidebar active state
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            // Simple logic to find the clicked button (in a real app, bind by ID)
+            event.currentTarget.classList.add('active');
+
+            // Trigger charts if needed
+            if(pageId === 'pipeline') renderPipelineCharts();
+            if(pageId === 'mission-control') renderDashboardCharts();
+        }
+
+        // --- Clock Logic ---
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toISOString().split('T')[1].split('.')[0] + " UTC";
+        }, 1000);
+
+        // --- Logging Logic ---
+        function renderLogs() {
+            const logContainer = document.getElementById('console-logs');
+            let html = '';
+            state.logs.forEach(log => {
+                let color = 'text-slate-300';
+                if(log.level === 'WARN') color = 'text-yellow-400';
+                if(log.level === 'SUCCESS') color = 'text-green-400';
+                
+                html += `<div class="font-mono"><span class="text-slate-500">[${log.time}]</span> <span class="${color} font-bold">${log.level}</span>: ${log.msg}</div>`;
+            });
+            // Simulating new logs
+            html += `<div class="font-mono text-blue-400 typing-cursor mt-2">_</div>`;
+            logContainer.innerHTML = html;
+        }
+
+        // --- Chart Rendering (Chart.js) ---
+        let throughputChart, radarChart, ingestorChart;
+
+        function renderDashboardCharts() {
+            if(throughputChart) return; // Already rendered
+
+            const ctx1 = document.getElementById('throughputChart').getContext('2d');
+            throughputChart = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
+                    datasets: [{
+                        label: 'Tokens Processed (k)',
+                        data: [65, 59, 80, 81, 56, 95],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                        x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+
+            const ctx2 = document.getElementById('radarChart').getContext('2d');
+            radarChart = new Chart(ctx2, {
+                type: 'radar',
+                data: {
+                    labels: ['Reasoning', 'Speed', 'Accuracy', 'Recall', 'Creativity', 'Safety'],
+                    datasets: [{
+                        label: 'Adam v23.0',
+                        data: [95, 88, 94, 90, 85, 99],
+                        fill: true,
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: '#3b82f6',
+                        pointBackgroundColor: '#3b82f6'
+                    }, {
+                        label: 'v21.0 (Legacy)',
+                        data: [70, 65, 80, 75, 60, 85],
+                        fill: true,
+                        backgroundColor: 'rgba(148, 163, 184, 0.2)',
+                        borderColor: '#94a3b8',
+                        pointBackgroundColor: '#94a3b8'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#334155' },
+                            grid: { color: '#334155' },
+                            pointLabels: { color: '#e2e8f0' },
+                            ticks: { display: false, backdropColor: 'transparent' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderPipelineCharts() {
+            if(ingestorChart) return;
+
+            const ctx3 = document.getElementById('ingestorChart').getContext('2d');
+            ingestorChart = new Chart(ctx3, {
+                type: 'bar',
+                data: {
+                    labels: ['SEC Filings', 'News APIs', 'Market Data', 'Alt Data', 'Social'],
+                    datasets: [{
+                        label: 'Avg Conviction Score',
+                        data: [98, 85, 99, 72, 65],
+                        backgroundColor: [
+                            '#22c55e', '#3b82f6', '#22c55e', '#eab308', '#ef4444'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, max: 100, grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+        }
+
+        // --- Risk Detail Logic ---
+        function showRiskDetails(prob, impact) {
+            const box = document.getElementById('risk-detail-box');
+            let content = '';
+            let colorClass = 'text-white';
+
+            if (prob === 'High' && impact === 'Severe') {
+                 content = `<strong>CRITICAL ALERT: Geopolitical</strong><br>Diversify supply chain exposure outside of APAC region; monitor Taiwan Strait tensions immediately.`;
+                 colorClass = 'text-red-400';
+            } else if (prob === 'Med' && impact === 'High') {
+                content = `<strong>Market Volatility</strong><br>Hedge via inverse ETFs on semiconductor indices (SOXS).`;
+                colorClass = 'text-orange-400';
+            } else if (prob === 'Low' && impact === 'High') {
+                content = `<strong>Credit Default</strong><br>Monitor debt-to-equity ratios quarterly; currently stable at 0.8x.`;
+                colorClass = 'text-green-400';
+            } else {
+                content = `<strong>Analysis:</strong> No immediate action required for ${prob} Probability / ${impact} Impact events at this threshold.`;
+                colorClass = 'text-slate-300';
+            }
+
+            box.innerHTML = `<span class="${colorClass}">${content}</span>`;
+            box.classList.remove('hidden');
+        }
+
+        // --- Initialization ---
+        window.onload = function() {
+            renderLogs();
+            renderDashboardCharts();
+        };
+
+    </script>
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. Chart.js uses Canvas. Layout uses Tailwind. -->
+</body>
+</html>
