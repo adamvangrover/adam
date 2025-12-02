@@ -1,0 +1,154 @@
+{
+  "metadata": {
+    "version": "3.1.0",
+    "description": "Enhanced creditworthiness assessment and rating assignment decision tree with structured condition logic, explicit aggregation methods, qualitative mappings, a refined rating scale, and integration with the knowledge graph.",
+    "last_updated": "2025-05-30T10:00:00Z",
+    "qualitative_score_mapping": {
+      "_comment": "Standard mapping for qualitative assessments to a 0-10 leaf score. Higher is better.",
+      "Very Strong": 10,
+      "Strong": 8,
+      "High": 8,
+      "Favorable": 8,
+      "Positive": 8,
+      "Good": 8,
+      "Above Average": 7,
+      "Moderate": 6,
+      "Average": 5,
+      "Adequate": 5,
+      "Manageable": 5,
+      "Sustainable": 5,
+      "Stable": 5,
+      "Neutral": 5,
+      "Weak": 4,
+      "Low": 4,
+      "Limited": 4,
+      "Unfavorable": 3,
+      "Below Average": 3,
+      "Very Weak": 2,
+      "Poor": 1,
+      "Ineffective": 1,
+      "None": 10,
+      "Yes": 2,
+      "No": 8
+    },
+    "scoring_methodology_notes": "Leaf nodes are scored 0-10 based on conditions (using qualitative map if needed). Scores are aggregated up using 'simple_average' at metric level and 'weighted_average' at factor level. Final score (0-100 range expected) maps to rating scale."
+  },
+  "tree": {
+    "name": "Creditworthiness Assessment and Rating Assignment",
+    "type": "root",
+    "children": [
+      {
+        "name": "Borrower Type Check",
+        "type": "decision",
+        "question": "Is the borrower a Company or a Sovereign entity?",
+        "children": [
+          {"condition": "Company", "next_node_id": "company_analysis_v3"},
+          {"condition": "Sovereign", "next_node_id": "sovereign_analysis_v3"}
+        ]
+      },
+      {
+        "node_id": "company_analysis_v3",
+        "type": "factor_group",
+        "name": "Company Creditworthiness Analysis",
+        "aggregation_method": "weighted_average",
+        "children": [
+          {
+            "name": "Financial Risk Profile",
+            "type": "factor",
+            "weight": 0.45,
+            "aggregation_method": "simple_average",
+            "children": [
+              {
+                "name": "Profitability Assessment",
+                "type": "metric",
+                "aggregation_method": "simple_average",
+                "children": [
+                  {"name": "Return on Equity (ROE)", "type": "leaf", "metric_id": "roe", "condition_logic": {"operator": "ge", "value": 0.15}, "score": 10, "default_score_if_unmet": 4},
+                  {"name": "Operating Margin", "type": "leaf", "metric_id": "op_margin", "condition_logic": {"operator": "ge", "value": 0.12}, "score": 9, "default_score_if_unmet": 3},
+                  {"name": "Net Income Trend", "type": "leaf", "metric_id": "ni_trend", "condition_logic": {"operator": "qual_eq", "qual_value": "Consistently Growing"}, "score": 8, "default_score_if_unmet": 2}
+                ]
+              },
+              {
+                "name": "Leverage Assessment",
+                "type": "metric",
+                "aggregation_method": "simple_average",
+                "children": [
+                  {"name": "Net Debt / EBITDA", "type": "leaf", "metric_id": "net_debt_ebitda", "condition_logic": {"operator": "le", "value": 3.0}, "score": 9, "default_score_if_unmet": 2},
+                  {"name": "Total Debt / Capital", "type": "leaf", "metric_id": "debt_capital", "condition_logic": {"operator": "le", "value": 0.50}, "score": 8, "default_score_if_unmet": 3}
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Business Risk Profile",
+            "type": "factor",
+            "weight": 0.30,
+            "aggregation_method": "simple_average",
+            "children": [
+              {
+                "name": "Industry Risk Evaluation",
+                "type": "metric",
+                "aggregation_method": "simple_average",
+                "children": [
+                  {
+                    "name": "Industry Growth Rate",
+                    "type": "leaf",
+                    "metric_id": "ind_growth",
+                    "condition_logic": {
+                      "operator": "ge",
+                      "value": {
+                        "type": "knowledge_graph_lookup",
+                        "query": "MATCH (c:Company {id: $company_id})-[:IN_INDUSTRY]->(i:Industry) RETURN i.average_growth_rate"
+                      }
+                    },
+                    "score": 8,
+                    "default_score_if_unmet": 4
+                  },
+                  {
+                    "name": "Industry Cyclicality",
+                    "type": "leaf",
+                    "metric_id": "ind_cyclicality",
+                    "condition_logic": {"operator": "qual_eq", "qual_value": "Low"},
+                    "score": 7,
+                    "default_score_if_unmet": 3
+                  },
+                  {
+                    "name": "Competitive Intensity",
+                    "type": "leaf",
+                    "metric_id": "ind_competition",
+                    "condition_logic": {"operator": "qual_eq", "qual_value": "Moderate"},
+                    "score": 6,
+                    "default_score_if_unmet": 3
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "rating_scale": {
+    "_comment": "Mapping of final aggregated score (0-100) to letter rating.",
+    "95-100": "AAA",
+    "90-94": "AA+",
+    "85-89": "AA",
+    "80-84": "AA-",
+    "75-79": "A+",
+    "70-74": "A",
+    "65-69": "A-",
+    "60-64": "BBB+",
+    "55-59": "BBB",
+    "50-54": "BBB-",
+    "45-49": "BB+",
+    "40-44": "BB",
+    "35-39": "BB-",
+    "30-34": "B+",
+    "25-29": "B",
+    "20-24": "B-",
+    "15-19": "CCC",
+    "10-14": "CC",
+    "5-9": "C",
+    "0-4": "D"
+  }
+}

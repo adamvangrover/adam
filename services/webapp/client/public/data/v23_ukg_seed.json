@@ -1,0 +1,591 @@
+{
+  "v23_unified_knowledge_graph": {
+    "meta": {
+      "version": "23.2-bedrock",
+      "ontology_standard": "FIBO-v2",
+      "generated_at": "2025-05-24T08:00:00Z",
+      "graph_integrity_hash": "sha256:generated_dynamic_hash",
+      "description": "Foundational seed data for the Adam v23 Adaptive System. Supports real-time ingestion, stress testing, and neuro-symbolic planning.",
+      "maintainer": "Adam System Architect"
+    },
+    "system_config": {
+      "real_time_enabled": true,
+      "api_endpoints": {
+        "market_data": "https://api.adam-financial.com/v1/market/ticker/{ticker}",
+        "esg_data": "https://api.adam-financial.com/v1/esg/score/{lei}",
+        "news_feed": "https://api.adam-financial.com/v1/news/entity/{node_id}",
+        "regulatory_filings": "https://api.adam-financial.com/v1/sec/edgar/{cik}"
+      },
+      "simulation_engine": {
+        "default_model": "MonteCarlo_v23",
+        "scenarios_path": "data/simulation/scenarios/"
+      }
+    },
+    "nodes": {
+      "macro_indicators": [
+        {
+          "indicator_id": "MACRO-US-CPI",
+          "name": "US Consumer Price Index (YoY)",
+          "current_value": 0.034,
+          "unit": "Percentage",
+          "frequency": "Monthly",
+          "source": "BLS",
+          "impact_map": {
+             "Financials": "Direct",
+             "Technology": "Inverse",
+             "Consumer Discretionary": "Inverse"
+          }
+        },
+        {
+          "indicator_id": "MACRO-US-UNEMP",
+          "name": "US Unemployment Rate",
+          "current_value": 0.039,
+          "unit": "Percentage",
+          "frequency": "Monthly",
+          "source": "BLS"
+        },
+        {
+          "indicator_id": "MACRO-FED-FUNDS",
+          "name": "Federal Funds Effective Rate",
+          "current_value": 0.0533,
+          "unit": "Percentage",
+          "frequency": "Daily",
+          "source": "FRED"
+        },
+        {
+          "indicator_id": "MACRO-WTI-OIL",
+          "name": "WTI Crude Oil Price",
+          "current_value": 78.50,
+          "unit": "USD/Barrel",
+          "frequency": "Real-time",
+          "source": "NYMEX"
+        }
+      ],
+      "legal_entities": [
+        {
+          "node_id": "LE-JPM-001",
+          "legal_name": "JPMORGAN CHASE & CO.",
+          "lei_code": "8I5DZWZKVSZI1NUHU748",
+          "ticker": "JPM",
+          "cik": "0000019617",
+          "sector": "Financials",
+          "sub_sector": "Diversified Banks",
+          "headquarters_address": "383 MADISON AVENUE, NEW YORK, NY, 10179, UNITED STATES",
+          "jurisdiction": "US-DE",
+          "risk_weight": "G-SIB (Bucket 4)",
+          "provenance": "https://lei.bloomberg.com/leis/view/8I5DZWZKVSZI1NUHU748",
+          "financials": {
+             "market_cap": 580000000000,
+             "pe_ratio": 12.5,
+             "beta": 1.1
+          }
+        },
+        {
+          "node_id": "LE-GS-005",
+          "legal_name": "THE GOLDMAN SACHS GROUP, INC.",
+          "lei_code": "W22LROWP2IHZNBB6K528",
+          "ticker": "GS",
+          "cik": "0000886982",
+          "sector": "Financials",
+          "sub_sector": "Investment Banking & Brokerage",
+          "headquarters_address": "200 WEST STREET, NEW YORK, NY, 10282, UNITED STATES",
+          "jurisdiction": "US-DE",
+          "risk_weight": "G-SIB (Bucket 2)"
+        },
+        {
+          "node_id": "LE-XOM-002",
+          "legal_name": "EXXON MOBIL CORPORATION",
+          "lei_code": "J3WHBG0MTS7O8ZVMDC91",
+          "ticker": "XOM",
+          "cik": "0000034088",
+          "sector": "Energy",
+          "sub_sector": "Integrated Oil & Gas",
+          "headquarters_address": "22777 SPRINGWOODS VILLAGE PARKWAY, SPRING, TX, 77389, UNITED STATES",
+          "jurisdiction": "US-NJ",
+          "provenance": "https://www.lei-lookup.com/record/J3WHBG0MTS7O8ZVMDC91/"
+        },
+        {
+          "node_id": "LE-CVX-006",
+          "legal_name": "CHEVRON CORPORATION",
+          "lei_code": "261200I87M21R2W95J91",
+          "ticker": "CVX",
+          "cik": "0000093410",
+          "sector": "Energy",
+          "sub_sector": "Integrated Oil & Gas",
+          "headquarters_address": "6001 BOLLINGER CANYON ROAD, SAN RAMON, CA, 94583, UNITED STATES",
+          "jurisdiction": "US-DE"
+        },
+        {
+          "node_id": "LE-MSFT-003",
+          "legal_name": "MICROSOFT CORPORATION",
+          "lei_code": "INR2EJN1ERAN0W5ZP974",
+          "ticker": "MSFT",
+          "cik": "0000789019",
+          "sector": "Technology",
+          "sub_sector": "Systems Software",
+          "headquarters_address": "ONE MICROSOFT WAY, REDMOND, WA, 98052-8300, UNITED STATES",
+          "jurisdiction": "US-WA",
+          "provenance": "https://www.legalentityidentifier.in/leicert/INR2EJN1ERAN0W5ZP974/"
+        },
+        {
+          "node_id": "LE-AAPL-007",
+          "legal_name": "APPLE INC.",
+          "lei_code": "HWUPXR0DFCOO941L1J60",
+          "ticker": "AAPL",
+          "cik": "0000320193",
+          "sector": "Technology",
+          "sub_sector": "Technology Hardware, Storage & Peripherals",
+          "headquarters_address": "ONE APPLE PARK WAY, CUPERTINO, CA, 95014, UNITED STATES",
+          "jurisdiction": "US-CA"
+        },
+        {
+          "node_id": "LE-NVDA-008",
+          "legal_name": "NVIDIA CORPORATION",
+          "lei_code": "549300X4F0T9125K8036",
+          "ticker": "NVDA",
+          "cik": "0001045810",
+          "sector": "Technology",
+          "sub_sector": "Semiconductors",
+          "headquarters_address": "2788 SAN TOMAS EXPRESSWAY, SANTA CLARA, CA, 95051, UNITED STATES",
+          "jurisdiction": "US-DE",
+          "role": "Critical_AI_Supplier"
+        },
+        {
+          "node_id": "LE-TSMC-004",
+          "legal_name": "TAIWAN SEMICONDUCTOR MANUFACTURING COMPANY LTD.",
+          "lei_code": "5493001R2JKJ5K51L616",
+          "ticker": "TSM",
+          "sector": "Technology",
+          "sub_sector": "Semiconductors",
+          "headquarters_address": "HSINCHU SCIENCE PARK, TAIWAN",
+          "jurisdiction": "TW",
+          "role": "Critical_Global_Supplier",
+          "provenance": "https://search.gleif.org/"
+        },
+        {
+          "node_id": "LE-ASML-009",
+          "legal_name": "ASML HOLDING N.V.",
+          "lei_code": "724500Y6ZJMXD5C4S306",
+          "ticker": "ASML",
+          "sector": "Technology",
+          "sub_sector": "Semiconductor Equipment",
+          "headquarters_address": "DE RUN 6501, VELDHOVEN, 5504 DR, NETHERLANDS",
+          "jurisdiction": "NL",
+          "role": "Monopoly_Supplier_Lithography"
+        },
+        {
+          "node_id": "LE-TSLA-010",
+          "legal_name": "TESLA, INC.",
+          "lei_code": "549300N61H6H7L4F6F74",
+          "ticker": "TSLA",
+          "cik": "0001318605",
+          "sector": "Consumer Discretionary",
+          "sub_sector": "Automobile Manufacturers",
+          "headquarters_address": "13101 HAROLD GREEN ROAD, AUSTIN, TX, 78725, UNITED STATES",
+          "jurisdiction": "US-DE"
+        },
+        {
+          "node_id": "LE-AMZN-011",
+          "legal_name": "AMAZON.COM, INC.",
+          "lei_code": "RWA8NUQF48GC12319962",
+          "ticker": "AMZN",
+          "cik": "0001018724",
+          "sector": "Consumer Discretionary",
+          "sub_sector": "Broadline Retail",
+          "headquarters_address": "410 TERRY AVENUE NORTH, SEATTLE, WA, 98109, UNITED STATES",
+          "jurisdiction": "US-DE"
+        },
+        {
+          "node_id": "LE-PFE-012",
+          "legal_name": "PFIZER INC.",
+          "lei_code": "21380068C22244462145",
+          "ticker": "PFE",
+          "cik": "0000078003",
+          "sector": "Health Care",
+          "sub_sector": "Pharmaceuticals",
+          "headquarters_address": "235 EAST 42ND STREET, NEW YORK, NY, 10017, UNITED STATES",
+          "jurisdiction": "US-DE"
+        }
+      ],
+      "supply_chain_relations": [
+        {
+          "source_lei": "5493001R2JKJ5K51L616",
+          "target_lei": "INR2EJN1ERAN0W5ZP974",
+          "relationship_type": "Supplier",
+          "criticality_score": 0.95,
+          "dependency_description": "Exclusive supplier for Azure AI Accelerator Chips (Maia 100)"
+        },
+        {
+          "source_lei": "5493001R2JKJ5K51L616",
+          "target_lei": "HWUPXR0DFCOO941L1J60",
+          "relationship_type": "Supplier",
+          "criticality_score": 0.99,
+          "dependency_description": "Sole source for A-series and M-series Silicon"
+        },
+        {
+          "source_lei": "5493001R2JKJ5K51L616",
+          "target_lei": "549300X4F0T9125K8036",
+          "relationship_type": "Supplier",
+          "criticality_score": 0.98,
+          "dependency_description": "Sole source for H100/Blackwell GPUs"
+        },
+        {
+          "source_lei": "724500Y6ZJMXD5C4S306",
+          "target_lei": "5493001R2JKJ5K51L616",
+          "relationship_type": "Supplier",
+          "criticality_score": 1.00,
+          "dependency_description": "Monopoly supplier of EUV Lithography machines"
+        },
+        {
+          "source_lei": "549300X4F0T9125K8036",
+          "target_lei": "INR2EJN1ERAN0W5ZP974",
+          "relationship_type": "Supplier",
+          "criticality_score": 0.85,
+          "dependency_description": "Primary supplier of AI data center GPUs"
+        },
+        {
+          "source_lei": "549300X4F0T9125K8036",
+          "target_lei": "549300N61H6H7L4F6F74",
+          "relationship_type": "Supplier",
+          "criticality_score": 0.90,
+          "dependency_description": "GPUs for Dojo Supercomputer training clusters"
+        },
+        {
+          "source_lei": "RWA8NUQF48GC12319962",
+          "target_lei": "549300N61H6H7L4F6F74",
+          "relationship_type": "Competitor",
+          "criticality_score": 0.40,
+          "dependency_description": "Competition in cloud compute (AWS vs Dojo) and robotics"
+        }
+      ],
+      "financial_instruments": {
+        "loans": [
+          {
+            "instrument_id": "LN-XOM-2025-A",
+            "type": "Syndicated Revolving Credit Facility",
+            "borrower_lei": "J3WHBG0MTS7O8ZVMDC91",
+            "lead_arranger_lei": "8I5DZWZKVSZI1NUHU748",
+            "principal_amount": 5000000000,
+            "currency": "USD",
+            "interest_rate_model": {
+              "benchmark": "SOFR",
+              "spread_bps": 150,
+              "floor": 0.00
+            },
+            "maturity_date": "2028-05-21",
+            "status": "Performing",
+            "covenants": [
+              {
+                "covenant_id": "COV-XOM-001",
+                "type": "Financial Maintenance",
+                "description": "Net Leverage Ratio <= 3.5x",
+                "metric": "net_debt_to_ebitda",
+                "threshold": 3.5,
+                "testing_frequency": "Quarterly",
+                "is_legally_binding": true
+              },
+              {
+                "covenant_id": "COV-XOM-002",
+                "type": "Affirmative",
+                "description": "Must maintain insurance coverage > $10B",
+                "is_legally_binding": true
+              }
+            ]
+          },
+          {
+             "instrument_id": "LN-TSLA-2024-B",
+             "type": "Term Loan B",
+             "borrower_lei": "549300N61H6H7L4F6F74",
+             "lead_arranger_lei": "W22LROWP2IHZNBB6K528",
+             "principal_amount": 2000000000,
+             "currency": "USD",
+             "interest_rate_model": {
+               "benchmark": "SOFR",
+               "spread_bps": 225
+             },
+             "maturity_date": "2029-01-15",
+             "status": "Performing"
+          }
+        ],
+        "securities": [
+          {
+            "instrument_id": "SEC-MSFT-2030",
+            "isin": "US594918CS19",
+            "cusip": "594918CS1",
+            "issuer_lei": "INR2EJN1ERAN0W5ZP974",
+            "type": "Corporate Bond",
+            "seniority": "Senior Unsecured",
+            "maturity_date": "2030-09-15",
+            "face_value": 1000,
+            "currency": "USD",
+            "coupon_structure": {
+              "rate": 0.0135,
+              "frequency": "Semi-Annual",
+              "type": "Fixed"
+            },
+            "market_data": {
+              "price": 89.45,
+              "yield_to_maturity": 0.0385,
+              "duration": 4.8
+            }
+          },
+          {
+            "instrument_id": "SEC-AAPL-2033",
+            "isin": "US037833EF43",
+            "issuer_lei": "HWUPXR0DFCOO941L1J60",
+            "type": "Green Bond",
+            "seniority": "Senior Unsecured",
+            "maturity_date": "2033-05-10",
+            "face_value": 1000,
+            "currency": "USD",
+            "coupon_structure": {
+               "rate": 0.028,
+               "frequency": "Semi-Annual",
+               "type": "Fixed"
+            },
+            "market_data": {
+               "price": 92.10,
+               "yield_to_maturity": 0.039,
+               "duration": 8.1
+            }
+          }
+        ]
+      },
+      "esg_profiles": [
+        {
+          "lei_code": "J3WHBG0MTS7O8ZVMDC91",
+          "company_name": "Exxon Mobil Corporation",
+          "overall_score": 4.2,
+          "environmental_score": 3.1,
+          "governance_score": 6.5,
+          "social_score": 4.0,
+          "greenwashing_risk_score": 0.92,
+          "controversies": [
+            {
+              "id": "CON-XOM-2024-001",
+              "event": "California AG Lawsuit: Deception on Plastic Recycling",
+              "date": "2024-09-23",
+              "severity": "High",
+              "status": "Active Litigation",
+              "source": "https://oag.ca.gov/news/press-releases/attorney-general-bonta-sues-exxonmobil-deceiving-public-recyclability-plastic"
+            },
+            {
+              "id": "CON-XOM-2025-001",
+              "event": "2025 Climate Report Failed Scientific Review",
+              "date": "2025-01-15",
+              "severity": "Medium",
+              "status": "Reputational Damage",
+              "source": "https://blog.ucs.org/carly-phillips/exxonmobils-2025-climate-report-fails-scientific-review-again/"
+            }
+          ],
+          "commitments": {
+            "net_zero_target": 2050,
+            "scope_3_included": false,
+            "sbti_verified": false
+          }
+        },
+        {
+          "lei_code": "INR2EJN1ERAN0W5ZP974",
+          "company_name": "Microsoft Corporation",
+          "overall_score": 8.8,
+          "environmental_score": 9.2,
+          "governance_score": 7.5,
+          "social_score": 8.5,
+          "greenwashing_risk_score": 0.18,
+          "controversies": [
+            {
+              "id": "CON-MSFT-2024-001",
+              "event": "CSRB Report: Cascade of Avoidable Security Errors",
+              "date": "2024-04-02",
+              "severity": "High",
+              "status": "Remediation Phase",
+              "category": "Governance/Cybersecurity",
+              "source": "https://www.cisa.gov/news-events/news/csrb-releases-report-microsoft-online-exchange-incident"
+            },
+            {
+              "id": "CON-MSFT-2024-002",
+              "event": "EU Antitrust Preliminary View (Teams Bundling)",
+              "date": "2024-06-25",
+              "severity": "Medium",
+              "status": "Regulatory Probe",
+              "source": "https://ec.europa.eu/commission/presscorner/detail/en/ip_24_3462"
+            }
+          ],
+          "commitments": {
+            "net_zero_target": 2030,
+            "water_positive_target": 2030,
+            "sbti_verified": true
+          }
+        },
+        {
+          "lei_code": "HWUPXR0DFCOO941L1J60",
+          "company_name": "Apple Inc.",
+          "overall_score": 8.5,
+          "environmental_score": 8.9,
+          "governance_score": 8.0,
+          "social_score": 7.8,
+          "greenwashing_risk_score": 0.25,
+          "commitments": {
+             "net_zero_target": 2030,
+             "sbti_verified": true
+          },
+          "controversies": [
+             {
+                "id": "CON-AAPL-2024-001",
+                "event": "DOJ Antitrust Suit: Smartphone Monopoly",
+                "date": "2024-03-21",
+                "severity": "High",
+                "status": "Active Litigation"
+             }
+          ]
+        },
+        {
+           "lei_code": "549300N61H6H7L4F6F74",
+           "company_name": "Tesla, Inc.",
+           "overall_score": 5.8,
+           "environmental_score": 8.5,
+           "governance_score": 3.2,
+           "social_score": 4.5,
+           "greenwashing_risk_score": 0.45,
+           "controversies": [
+              {
+                 "id": "CON-TSLA-2024-001",
+                 "event": "Delaware Court Voids CEO Compensation Package",
+                 "date": "2024-01-30",
+                 "severity": "High",
+                 "status": "Governance Reform"
+              }
+           ]
+        }
+      ]
+    },
+    "simulation_parameters": {
+      "crisis_scenarios": [
+        {
+          "scenario_id": "CRISIS-001",
+          "name": "The 8% World (Stagflation Shock)",
+          "type": "Macroeconomic",
+          "probability": 0.15,
+          "shocks": {
+            "fed_funds_rate": 0.08,
+            "us_10y_yield": 0.075,
+            "sp500_drawdown": -0.35,
+            "corporate_default_rate_hy": 0.12,
+            "unemployment_rate": 0.065
+          },
+          "cascading_effects": [
+            "Trigger COV-001 breach for high-leverage energy companies",
+            "JPM Loan Loss Provision increase by 40%"
+          ]
+        },
+        {
+          "scenario_id": "CRISIS-002",
+          "name": "Strait of Hormuz Closure",
+          "type": "Geopolitical",
+          "probability": 0.05,
+          "shocks": {
+            "oil_price_peak": 200.0,
+            "oil_price_settle": 45.0,
+            "energy_sector_revenue_lag": -0.20,
+            "global_gdp_impact": -0.025,
+            "shipping_cost_index_multiplier": 4.5
+          }
+        },
+        {
+          "scenario_id": "CRISIS-003",
+          "name": "AI Winter (Regulatory Freeze)",
+          "type": "Sector_Specific",
+          "probability": 0.10,
+          "shocks": {
+            "tech_sector_capex": -0.40,
+            "nasdaq_drawdown": -0.25,
+            "ai_regulation_compliance_cost_increase": 3.0,
+            "semiconductor_demand_drop": -0.30
+          }
+        },
+        {
+           "scenario_id": "CRISIS-004",
+           "name": "Global Cyber Blackout (Class 5)",
+           "type": "Operational",
+           "probability": 0.02,
+           "shocks": {
+              "global_it_spend": 0.15,
+              "insurance_payout_ratio": 3.5,
+              "business_interruption_days_avg": 5,
+              "tech_sector_reputation_damage": 0.6
+           },
+           "affected_nodes": ["LE-MSFT-003", "LE-CRWD-013"],
+           "description": "Simultaneous failure of critical OS infrastructure leading to grounding of flights, banking halts, and medical system failures."
+        },
+        {
+           "scenario_id": "CRISIS-005",
+           "name": "Taiwan Strait Blockade",
+           "type": "Geopolitical",
+           "probability": 0.12,
+           "shocks": {
+              "semiconductor_supply_shock": -0.90,
+              "tech_hardware_cost_increase": 0.50,
+              "aapl_revenue_impact": -0.35,
+              "nvda_revenue_impact": -0.60,
+              "global_gdp_impact": -0.05
+           },
+           "cascading_effects": [
+              "Halt in AI model training globally due to hardware shortage",
+              "Automotive production halts due to chip famine",
+              "Crash in TSMC (TSM) equity value > 80%"
+           ]
+        }
+      ]
+    },
+    "regulatory_rules": {
+      "basel_iii": [
+        {
+          "rule_id": "B3-CAP-01",
+          "name": "Tier 1 Capital Ratio",
+          "description": "Core equity capital must exceed 6% of risk-weighted assets.",
+          "metric": "tier_1_capital_ratio",
+          "threshold": 0.06,
+          "operator": "gt",
+          "impact_on_breach": "Dividend Suspension"
+        },
+        {
+          "rule_id": "B3-LIQ-01",
+          "name": "Liquidity Coverage Ratio (LCR)",
+          "description": "High Quality Liquid Assets / Total Net Cash Outflows > 100%",
+          "metric": "lcr_ratio",
+          "threshold": 1.0,
+          "operator": "gt"
+        }
+      ],
+      "gdpr": [
+        {
+          "rule_id": "GDPR-SOV-01",
+          "name": "Data Sovereignty (Schrems II)",
+          "description": "EU Customer data must reside in EEA or equivalent adequacy zones.",
+          "metric": "data_residency_region",
+          "allowed_values": ["EU-West-1", "EU-Central-1", "Europe-North1"],
+          "remediation_period_days": 30
+        }
+      ],
+      "dora": [
+        {
+          "rule_id": "DORA-ICT-01",
+          "name": "ICT Third Party Risk",
+          "description": "Critical ICT providers (e.g., Cloud) must have penetration testing results on file.",
+          "metric": "supplier_audit_status",
+          "required_value": "Current"
+        }
+      ],
+      "ai_act": [
+         {
+            "rule_id": "EU-AI-01",
+            "name": "High-Risk Model Compliance",
+            "description": "Foundation models with > 10^25 FLOPs training compute must provide detailed technical documentation and risk assessments.",
+            "metric": "training_compute_flops",
+            "threshold": 1.0e25,
+            "compliance_action": "Mandatory Disclosure"
+         }
+      ]
+    }
+  }
+}
