@@ -1,111 +1,48 @@
-# Adam v23.0: Your AI-Powered Partner
-
-> **Note:** This document describes the current stable version of the Adam system (v21.0). For details on the next-generation architecture, please see the [Adam v23.0 "Adaptive Hive" Vision](./docs/v23_architecture_vision.md).
-
-# Adam v23.0: The Adaptive Hive Mind
-**System Status:** v23.0 (Active) | v21.0 (Stable)
-**Mission:** Autonomous Financial Analysis & Adaptive Reasoning
-
-Adam has evolved. v23.0 introduces the "Adaptive System" architecture, featuring:
-
-*   **Cyclical Reasoning Graph:** A self-correcting neuro-symbolic engine.
-*   **Neural Dashboard:** Real-time visualization of agent thought processes.
-*   **Hybrid Architecture:** Combining v21's reliability with v22's speed and v23's intelligence.
-*   **Gold Standard Data Pipeline:** A rigorous "universal ingestion" process that scrubs and certifies all system knowledge.
-
-[**Launch Neural Dashboard**](./showcase/neural_dashboard.html)
-
-> **Note:** For details on the original v21.0 architecture, please see the v21.0 Documentation.
-
-(Welcome to Adam, the most advanced financial AI system yet! We've supercharged our capabilities with an expanded agent network, enhanced simulation workflows, and a more sophisticated knowledge base to deliver unparalleled financial analysis and investment insights.)
-
-[**Explore the interactive demo here!**](./showcase/index.html)
-
-## 🚀 Mission Control
-[**Launch Neural Dashboard**](./showcase/neural_dashboard.html)
-Monitor real-time agent reasoning, knowledge graph updates, and risk simulations.
-
-## 🌟 Key Capabilities (v23.0)
-
-### 1. Cyclical Reasoning Engine
-Unlike traditional linear chains, Adam v23 uses a cyclical graph (built on LangGraph) to iterate on analysis.
-
-*   **Draft -> Critique -> Refine:** The system critiques its own work and refines it until quality thresholds are met.
-*   **Self-Correction:** Detects missing data or logical fallacies and automatically launches remedial tasks.
-
-### 2. Neuro-Symbolic Planner
-Combines the creativity of LLMs with the logical rigor of Knowledge Graphs.
-
-*   **Path Discovery:** "Plan a path from Apple Inc. to Credit Risk considering Supply Chain Constraints."
-*   **Traceability:** Every conclusion is back-linked to specific nodes in the PROV-O ontology.
-
-### 3. Gold Standard Data Pipeline
-A new "Universal Ingestor" ensures that every piece of data in the system is high-quality.
-
-*   **Ingest & Scrub:** Recursively scans reports, prompts, code, and data.
-*   **Conviction Scoring:** Automatically assesses the quality and "conviction" of data (0-100%).
-*   **Unified Access:** All data is normalized into a standard JSONL format accessible by any agent.
-*   [Read the Pipeline Documentation](./docs/GOLD_STANDARD_PIPELINE.md)
-
-### 4. AI Partner v23.5
-A full-spectrum autonomous analyst capable of deep credit analysis, valuation, and quantum risk modeling.
-
-*   **Deep Dive Pipeline:** 5-phase execution from Entity Resolution to Strategic Synthesis.
-*   **Portable Prompt:** `prompt_library/AOPL-v1.0/system_architecture/autonomous_financial_analyst_v23_5.md`
-*   **Config:** `config/Adam_v23.5_Portable_Config.json`
-
-## 🛠️ Getting Started
-
-### Prerequisites
-*   Python 3.10+
-*   Node.js (for full UI dev)
-
-### Quick Start
-
-1.  **Clone the Repository:**
-    ```bash
-    git clone https://github.com/adamvangrover/adam.git
-    cd adam
-    ```
-
-2.  **Install Dependencies:**
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-3.  **Run Adam:**
-    ```bash
-    python scripts/run_adam.py
-    ```
-
-4.  **View the Showcase:**
-    Open `showcase/index.html` in your browser.
-
-## 📂 Repository Structure
-
-*   `core/v23_graph_engine/`: The heart of the new system.
-    *   `cyclical_reasoning_graph.py`: The self-correcting analysis loop.
-    *   `neuro_symbolic_planner.py`: The logic for pathfinding in the KG.
-    *   `meta_orchestrator.py`: The central brain routing tasks.
-*   `core/data_processing/`: Data ingestion and standardisation.
-    *   `universal_ingestor.py`: The Gold Standard Pipeline.
-*   `showcase/`: The "Mission Control" UI assets.
-*   `data/`: Knowledge base and artisanal training sets.
-*   `docs/`: Comprehensive documentation.
-
-## 📚 Documentation
-
-*   [Adam v20.0 Implementation Plan](docs/v20.0)
-*   [System Requirements](docs/REQUIREMENTS.md)
-*   [User Guide](docs/user_guide.md)
-*   [API Documentation](docs/api_docs.yaml)
-*   [Contribution Guidelines](CONTRIBUTING.md)
-*   [Showcase Guide](docs/SHOWCASE_GUIDE.md): Walkthrough of the demo.
-*   [v23 Architecture Vision](docs/v23_architecture_vision.md): Deep dive into the "Adaptive Hive".
-*   [Gold Standard Pipeline](docs/GOLD_STANDARD_PIPELINE.md): Data ingestion guide.
-
-## 🤝 Contributing
-Contributions are welcome! Please check [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-## 📄 License
-MIT License. See LICENSE for details.
+Adam v23.0: Your AI-Powered PartnerNote: This document describes the current active version of the Adam system (v23.0). For details on the legacy stable version, please see the v21.0 Documentation.🧠 Adam v23.0: The Adaptive Hive MindMission: Autonomous Financial Analysis & Adaptive ReasoningAdam has evolved. v23.0 introduces the "Adaptive System" architecture—a self-correcting, neuro-symbolic engine designed to perform deep financial deep dives, risk assessments, and market simulations with human-like reasoning and machine-speed execution.🚀 Launch Neural Dashboard | 📖 Read the User Guide | ⚡ Quick Start🏗️ System ArchitectureAdam v23.0 moves beyond linear chains to a dynamic, graph-based execution model. The system creates a "Cyclical Reasoning Graph" for every query, allowing it to draft, critique, and refine its own analysis before presenting results.graph TD
+    User[User / API] -->|Query| Meta[Meta Orchestrator]
+    
+    subgraph "The Brain (v23 Graph Engine)"
+        Meta --> Planner[Neuro-Symbolic Planner]
+        Planner -->|Generates Path| Graph[Dynamic Reasoning Graph]
+        
+        Graph --> Node1[Data Retrieval]
+        Graph --> Node2[Analysis Agent]
+        Graph --> Node3[Risk Simulation]
+        
+        Node1 -->|Evidence| Critic[Self-Correction Loop]
+        Node2 -->|Draft| Critic
+        Node3 -->|Scenarios| Critic
+        
+        Critic -->|Refinement Needed| Graph
+        Critic -->|Approved| Synthesis[Final Synthesis]
+    end
+    
+    subgraph "Memory & Knowledge"
+        KG[(Unified Knowledge Graph)]
+        Vec[(Vector Store)]
+    end
+    
+    Node1 <--> KG
+    Node1 <--> Vec
+    
+    Synthesis -->|Final Report| Output[JSON / HTML / PDF]
+Core ComponentsMeta Orchestrator: The central "cortex" that routes tasks and manages state.Neuro-Symbolic Planner: Combines LLM creativity with Knowledge Graph logic to plan execution paths.Cyclical Reasoning Engine: A feedback loop (Draft -> Critique -> Refine) that ensures high conviction.📊 Data & The Gold Standard PipelineGarbage in, garbage out. Adam v23.0 utilizes a rigorous Gold Standard Data Pipeline ("The Universal Ingestor") to ensure all insights are based on verified, high-quality data.Ingestion Sources: Financial news APIs, SEC filings (XBRL), market data feeds, and macroeconomic reports.Scrubbing & Validation: Every data point is scored for "Conviction" (0-100%) based on source reliability and cross-verification.Unified Format: Data is normalized into a standard JSONL format for agent consumption.View Data Pipeline Documentation💡 Example OutputsAdam doesn't just chat; it produces structured, professional-grade financial artifacts.1. Strategic Deep Dive (JSON Snippet)Generated by the Omniscient Analyst (v23.5){
+  "report_id": "RPT-NVDA-2025-03",
+  "entity": "NVIDIA Corp",
+  "conviction_score": 94.5,
+  "strategic_synthesis": {
+    "outlook": "Bullish",
+    "key_driver": "Sovereign AI adoption and B200 backlog.",
+    "risks": ["Supply chain concentration (TSMC)", "Geopolitical export controls"]
+  },
+  "valuation_models": {
+    "dcf_implied_price": 1450.00,
+    "peer_multiple_target": 1380.00
+  },
+  "generated_at": "2025-03-15T14:30:00Z"
+}
+2. Risk Assessment MatrixAdam automatically generates risk matrices for portfolio stress testing.Risk CategoryProbabilityImpactMitigation StrategyMarketMediumHighHedge via inverse ETFs on semiconductor indices.CreditLowHighMonitor debt-to-equity ratios quarterly; currently stable.GeopoliticalHighSevereDiversify supply chain exposure outside of APAC region.🚀 Key CapabilitiesCyclical Reasoning: Unlike standard chatbots, Adam iterates. If data is missing, it creates a sub-task to find it. If logic is flawed, it self-corrects.Quantum Risk Modeling: (v23.5) Uses Monte Carlo simulations to model "Black Swan" events and their impact on portfolios.Traceability: Every conclusion is back-linked to source documents in the Knowledge Graph (PROV-O ontology compliant).Multi-Modal Output: Generates interactive HTML dashboards, PDF reports, and raw JSON data streams.🛠️ Getting StartedPrerequisitesPython 3.10+Node.js (Required for the Neural Dashboard UI)API Keys: OpenAI (or compatible LLM provider), Neo4j (optional for full KG).Quick Start GuideClone the Repositorygit clone [https://github.com/adamvangrover/adam.git](https://github.com/adamvangrover/adam.git)
+cd adam
+Install Python Dependenciespip install -r requirements.txt
+Launch the Systempython scripts/run_adam.py
+Open Mission ControlLaunch the interactive dashboard to watch Adam think in real-time.Open showcase/index.html in your browser.📂 Repository StructureDirectoryDescriptioncore/v23_graph_engine/The Brain. Contains the cyclical graph, planner, and orchestrator.core/data_processing/The Stomach. Universal Ingestor and data scrubbers.core/agents/The Workforce. Specialized agents (Analyst, Risk, Legal, etc.).showcase/The Face. UI assets for the Neural Dashboard and demos.data/The Memory. Knowledge base, seeds, and training sets.config/The DNA. System configuration YAMLs and prompt libraries.📚 Resources & DocumentationArchitecture Vision: Adam v23.0 "Adaptive Hive" VisionPipeline Details: Gold Standard Data PipelineAPI Reference: API DocumentationUser Manual: Comprehensive User GuideDemo Guide: Showcase Walkthrough🤝 ContributingWe welcome contributions from the community! Whether it's a new agent skill, a data connector, or a UI enhancement.Read our Contribution Guidelines.Fork the repo and create your branch (git checkout -b feature/amazing-feature).Commit your changes (git commit -m 'Add some amazing feature').Push to the branch (git push origin feature/amazing-feature).Open a Pull Request.📄 LicenseDistributed under the MIT License. See LICENSE for more information.
