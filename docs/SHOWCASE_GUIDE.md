@@ -52,9 +52,9 @@ Located in the `showcase/` directory, this is a vanilla JS + Tailwind CSS interf
 
 ```mermaid
 graph TD
-    A["Raw Files (.json, .md, .py)"] -->|UniversalIngestor| B("Gold Standard Scrubber")
-    B -->|Conviction Scoring| C["Gold Standard Artifacts (.jsonl)"]
-    C -->|generate_ui_data.py| D["UI Data (.json)"]
-    D -->|Export| E["window.MOCK_DATA"]
-    E -->|Load| F["Static Web UI"]
+    A[Raw Files (.json, .md, .py)] -->|UniversalIngestor| B(Gold Standard Scrubber)
+    B -->|Conviction Scoring| C[Gold Standard Artifacts (.jsonl)]
+    C -->|generate_ui_data.py| D[UI Data (.json)]
+    D -->|Export| E[window.MOCK_DATA]
+    E -->|Load| F[Static Web UI]
 ```
