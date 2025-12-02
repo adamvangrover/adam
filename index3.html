@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v23.5 | Autonomous Nexus</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        neon: {
+                            blue: '#00f3ff',
+                            red: '#ff003c',
+                            green: '#0aff0a',
+                            purple: '#bd00ff',
+                            dark: '#050505',
+                            panel: '#111111'
+                        }
+                    },
+                    fontFamily: {
+                        mono: ['"Courier New"', 'Courier', 'monospace'],
+                        sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #050505;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+
+        /* Cyberpunk Effects */
+        .glass-panel {
+            background: rgba(17, 17, 17, 0.85);
+            border: 1px solid #333;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, var(--neon-blue, #00f3ff), transparent);
+            opacity: 0.3;
+        }
+
+        .neon-border {
+            border: 1px solid #00f3ff;
+            box-shadow: 0 0 5px #00f3ff, inset 0 0 5px rgba(0, 243, 255, 0.2);
+        }
+
+        .neon-text {
+            color: #00f3ff;
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+        }
+
+        .neon-text-red {
+            color: #ff003c;
+            text-shadow: 0 0 8px rgba(255, 0, 60, 0.6);
+        }
+
+        /* Scanline Animation */
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 50;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px;
+            animation: fadeIn 0.5s;
+        }
+        
+        .scanline-bar {
+            position: absolute;
+            top: -10%;
+            left: 0;
+            width: 100%;
+            height: 5%;
+            background: rgba(0, 243, 255, 0.1);
+            animation: scan 6s linear infinite;
+            z-index: 51;
+            pointer-events: none;
+        }
+
+        @keyframes scan {
+            0% { top: -10%; }
+            100% { top: 110%; }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00f3ff; }
+
+        /* Utilities */
+        .blink { animation: blinker 1.5s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
+        
+        .tab-btn {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .tab-btn::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background: #00f3ff;
+            transition: width 0.3s ease;
+        }
+        .tab-btn.active { color: #00f3ff; }
+        .tab-btn.active::after { width: 100%; }
+
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-mono text-sm">
+
+    <div class="scanline"></div>
+    <div class="scanline-bar"></div>
+
+    <!-- Header -->
+    <header class="border-b border-gray-800 bg-black/90 p-4 sticky top-0 z-40 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <div class="w-8 h-8 bg-black border border-neon-blue flex items-center justify-center rounded">
+                    <i class="fas fa-cube neon-text text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tighter text-white">ADAM <span class="neon-text text-sm ml-1">v23.5</span></h1>
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2 h-2 bg-green-500 rounded-full blink"></span>
+                        <span class="text-[10px] text-gray-500 tracking-widest">SYSTEM ONLINE // NODE: ALPHA-1</span>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="hidden md:flex space-x-8">
+                <button onclick="switchTab('prompts')" id="btn-prompts" class="tab-btn active uppercase tracking-wider text-xs font-bold py-2">Prompt Library</button>
+                <button onclick="switchTab('repo')" id="btn-repo" class="tab-btn text-gray-500 hover:text-gray-300 uppercase tracking-wider text-xs font-bold py-2">Architecture</button>
+                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="tab-btn text-gray-500 hover:text-gray-300 uppercase tracking-wider text-xs font-bold py-2">Live Telemetry</button>
+            </nav>
+
+            <div class="flex items-center space-x-3">
+                <button class="text-gray-500 hover:text-neon-blue transition"><i class="fas fa-terminal"></i></button>
+                <button class="text-gray-500 hover:text-neon-blue transition"><i class="fas fa-cog"></i></button>
+                <div class="h-8 w-[1px] bg-gray-800"></div>
+                <button class="px-3 py-1 border border-neon-blue/50 text-neon-blue/80 hover:bg-neon-blue hover:text-black transition text-xs font-bold rounded-sm flex items-center">
+                    <span>CONNECT</span> <i class="fas fa-network-wired ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow p-4 md:p-8 relative z-10 max-w-7xl mx-auto w-full">
+
+        <!-- SECTION: PROMPT LIBRARY -->
+        <section id="prompts" class="tab-content h-[calc(100vh-140px)] flex flex-col md:flex-row gap-6">
+            <!-- Sidebar -->
+            <div class="w-full md:w-1/3 flex flex-col space-y-4 overflow-y-auto pr-2 pb-4">
+                <div class="p-4 bg-gray-900/50 border border-gray-800 rounded">
+                    <h3 class="text-neon-blue font-bold mb-1"><i class="fas fa-database mr-2"></i>INJECTION MODULES</h3>
+                    <p class="text-xs text-gray-500">Select a cognitive module to load into the viewer.</p>
+                </div>
+
+                <div class="space-y-3">
+                    <button onclick="loadPrompt('system_v23')" class="w-full text-left p-4 glass-panel border-l-2 border-l-transparent hover:border-l-neon-blue hover:bg-white/5 transition group">
+                        <div class="flex justify-between items-start mb-1">
+                            <h4 class="font-bold text-gray-200 group-hover:text-neon-blue transition">System Architect v23.5</h4>
+                            <span class="text-[10px] bg-blue-900/30 text-blue-400 px-1 rounded">CORE</span>
+                        </div>
+                        <p class="text-xs text-gray-500 leading-relaxed">Full "AI Partner" persona. Includes Monte Carlo orchestration, SNC rating logic, and deep valuation subroutines.</p>
+                    </button>
+
+                    <button onclick="loadPrompt('config_v22')" class="w-full text-left p-4 glass-panel border-l-2 border-l-transparent hover:border-l-purple-500 hover:bg-white/5 transition group">
+                        <div class="flex justify-between items-start mb-1">
+                            <h4 class="font-bold text-gray-200 group-hover:text-purple-400 transition">Configuration v22.0</h4>
+                            <span class="text-[10px] bg-purple-900/30 text-purple-400 px-1 rounded">JSON</span>
+                        </div>
+                        <p class="text-xs text-gray-500 leading-relaxed">Orchestration JSON for the 7-step autonomous reasoning loop and agent state management.</p>
+                    </button>
+
+                    <button onclick="loadPrompt('risk_agent')" class="w-full text-left p-4 glass-panel border-l-2 border-l-transparent hover:border-l-red-500 hover:bg-white/5 transition group">
+                        <div class="flex justify-between items-start mb-1">
+                            <h4 class="font-bold text-gray-200 group-hover:text-red-400 transition">Risk Assessment Agent</h4>
+                            <span class="text-[10px] bg-red-900/30 text-red-400 px-1 rounded">AGENT</span>
+                        </div>
+                        <p class="text-xs text-gray-500 leading-relaxed">Specialized logic for Volatility, Liquidity analysis, and Credit Default Probability estimation.</p>
+                    </button>
+
+                    <button onclick="loadPrompt('quantum_sim')" class="w-full text-left p-4 glass-panel border-l-2 border-l-transparent hover:border-l-green-500 hover:bg-white/5 transition group">
+                        <div class="flex justify-between items-start mb-1">
+                            <h4 class="font-bold text-gray-200 group-hover:text-green-400 transition">Quantum Scenario Engine</h4>
+                            <span class="text-[10px] bg-green-900/30 text-green-400 px-1 rounded">SIM</span>
+                        </div>
+                        <p class="text-xs text-gray-500 leading-relaxed">Black Swan event injection templates for tail-risk stress testing.</p>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Editor -->
+            <div class="w-full md:w-2/3 glass-panel flex flex-col h-full rounded border-t-2 border-t-neon-blue">
+                <div class="flex justify-between items-center p-3 border-b border-gray-800 bg-black/40">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-code text-gray-500"></i>
+                        <span id="prompt-title" class="text-xs font-bold text-neon-blue tracking-wider uppercase">LOADING CORE...</span>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="copyToClipboard()" class="flex items-center px-3 py-1 bg-gray-800 hover:bg-gray-700 text-xs border border-gray-700 hover:border-gray-500 transition rounded text-gray-300">
+                            <i class="far fa-copy mr-2"></i> COPY
+                        </button>
+                        <button class="px-3 py-1 bg-gray-800 text-xs border border-gray-700 text-gray-500 cursor-not-allowed">
+                            <i class="fas fa-play mr-2"></i> RUN (OFFLINE)
+                        </button>
+                    </div>
+                </div>
+                <div class="flex-grow relative bg-gray-900/20">
+                    <textarea id="prompt-viewer" class="w-full h-full bg-transparent text-gray-300 p-4 font-mono text-xs resize-none focus:outline-none leading-relaxed custom-scrollbar" spellcheck="false"></textarea>
+                    <!-- Copy Feedback Overlay -->
+                    <div id="copy-feedback" class="absolute inset-0 bg-black/80 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+                        <div class="text-neon-blue border border-neon-blue p-4 rounded bg-black">
+                            <i class="fas fa-check-circle text-2xl mb-2 block text-center"></i>
+                            <span class="font-bold">COPIED TO CLIPBOARD</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-2 bg-black border-t border-gray-800 text-[10px] text-gray-600 flex justify-between">
+                    <span>Ln 1, Col 1</span>
+                    <span>UTF-8</span>
+                    <span>Python/JSON</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: SYSTEM ARCHITECTURE -->
+        <section id="repo" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Architecture Tree -->
+                <div class="glass-panel p-6 rounded">
+                    <h3 class="text-lg font-bold text-white mb-4 border-b border-gray-800 pb-2"><i class="fas fa-sitemap text-neon-blue mr-2"></i>SYSTEM DIRECTORY STRUCTURE</h3>
+                    <ul class="space-y-4 text-sm font-mono text-gray-400">
+                        <li class="group cursor-default">
+                            <div class="flex items-center text-neon-blue mb-1"><i class="far fa-folder-open mr-2"></i> /core/agents</div>
+                            <div class="pl-6 text-xs border-l border-gray-800 ml-1 group-hover:border-neon-blue transition-colors">
+                                <p>Contains strict Python logic for 30+ specialized agents including SNC Analyst, Risk Officer, and Fundamental Analyst.</p>
+                            </div>
+                        </li>
+                        <li class="group cursor-default">
+                            <div class="flex items-center text-neon-blue mb-1"><i class="far fa-folder mr-2"></i> /core/simulations</div>
+                            <div class="pl-6 text-xs border-l border-gray-800 ml-1 group-hover:border-neon-blue transition-colors">
+                                <p>Monte Carlo & Quantum engines designed for "Black Swan" stress testing and non-linear event generation.</p>
+                            </div>
+                        </li>
+                        <li class="group cursor-default">
+                            <div class="flex items-center text-neon-blue mb-1"><i class="far fa-folder mr-2"></i> /config</div>
+                            <div class="pl-6 text-xs border-l border-gray-800 ml-1 group-hover:border-neon-blue transition-colors">
+                                <p>YAML/JSON orchestration files defining the v22/v23 autonomous loops and environment variables.</p>
+                            </div>
+                        </li>
+                        <li class="group cursor-default">
+                            <div class="flex items-center text-neon-blue mb-1"><i class="far fa-folder mr-2"></i> /data/knowledge_graph</div>
+                            <div class="pl-6 text-xs border-l border-gray-800 ml-1 group-hover:border-neon-blue transition-colors">
+                                <p>Neo4j/JSON seeds for the "Hyper-Dimensional Knowledge Graph" (HDKG) connecting entities and risk factors.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Use Cases -->
+                <div class="space-y-6">
+                    <div class="glass-panel p-6 rounded border-l-4 border-l-red-500">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-white">Distressed Debt Officer</h4>
+                            <i class="fas fa-chart-line text-red-500"></i>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-3">Simulates defaults, calculates covenant headroom, and parses complex credit agreements to identify 4.0x leverage breaches before they happen.</p>
+                        <div class="flex gap-2">
+                            <span class="px-2 py-1 bg-red-900/20 text-red-400 text-[10px] rounded border border-red-900">Term Loan B</span>
+                            <span class="px-2 py-1 bg-red-900/20 text-red-400 text-[10px] rounded border border-red-900">Covenants</span>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded border-l-4 border-l-green-500">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-white">Long/Short Equity</h4>
+                            <i class="fas fa-balance-scale text-green-500"></i>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-3">Generates Bear/Base/Bull price targets using DCF & EV/EBITDA multiples combined with sentiment analysis from unstructured news data.</p>
+                        <div class="flex gap-2">
+                            <span class="px-2 py-1 bg-green-900/20 text-green-400 text-[10px] rounded border border-green-900">DCF</span>
+                            <span class="px-2 py-1 bg-green-900/20 text-green-400 text-[10px] rounded border border-green-900">Multiples</span>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded border-l-4 border-l-purple-500">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-white">Macro Strategist</h4>
+                            <i class="fas fa-globe text-purple-500"></i>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-3">Monitors "Market Mayhem" signals (e.g., HY Spreads > 400bps) to trigger automatic "Fortress" (defensive) vs "Hunt" (aggressive) allocation protocols.</p>
+                        <div class="flex gap-2">
+                            <span class="px-2 py-1 bg-purple-900/20 text-purple-400 text-[10px] rounded border border-purple-900">Global Macro</span>
+                            <span class="px-2 py-1 bg-purple-900/20 text-purple-400 text-[10px] rounded border border-purple-900">Allocation</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: DASHBOARD -->
+        <section id="dashboard" class="tab-content hidden space-y-6">
+            <!-- Warning Banner -->
+            <div class="w-full border border-red-900/50 bg-red-900/10 p-3 flex items-center justify-center text-red-400 text-xs rounded">
+                <i class="fas fa-exclamation-triangle mr-2"></i> STATIC SIMULATION MODE - LIVE FEED DISCONNECTED. DISPLAYING CACHED ARTIFACTS.
+            </div>
+
+            <!-- KPI Row -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="glass-panel p-4 text-center rounded relative group">
+                    <div class="absolute top-2 right-2 text-gray-700 group-hover:text-yellow-500"><i class="fas fa-shield-alt"></i></div>
+                    <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Global Risk Score</div>
+                    <div class="text-4xl font-bold text-yellow-500">6.8</div>
+                    <div class="text-[10px] text-yellow-700 mt-2">ELEVATED VOLATILITY</div>
+                </div>
+                <div class="glass-panel p-4 text-center rounded relative group">
+                    <div class="absolute top-2 right-2 text-gray-700 group-hover:text-blue-500"><i class="fas fa-robot"></i></div>
+                    <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Active Agents</div>
+                    <div class="text-4xl font-bold text-neon-blue">12<span class="animate-pulse">_</span></div>
+                    <div class="text-[10px] text-blue-900 mt-2">ORCHESTRATING WORKFLOWS</div>
+                </div>
+                <div class="glass-panel p-4 text-center rounded relative group">
+                    <div class="absolute top-2 right-2 text-gray-700 group-hover:text-red-500"><i class="fas fa-bell"></i></div>
+                    <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">SNC Alerts</div>
+                    <div class="text-4xl font-bold text-neon-red">3</div>
+                    <div class="text-[10px] text-red-900 mt-2">SUBSTANDARD DETECTED</div>
+                </div>
+                <div class="glass-panel p-4 text-center rounded relative group">
+                    <div class="absolute top-2 right-2 text-gray-700 group-hover:text-purple-500"><i class="fas fa-chess"></i></div>
+                    <div class="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Market Regime</div>
+                    <div class="text-4xl font-bold text-purple-500">HUNT</div>
+                    <div class="text-[10px] text-purple-900 mt-2">ASYMMETRIC UPSIDE</div>
+                </div>
+            </div>
+
+            <!-- Content Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Main Activity Log -->
+                <div class="lg:col-span-2 glass-panel p-0 flex flex-col rounded">
+                    <div class="p-4 border-b border-gray-800 flex justify-between items-center">
+                        <h3 class="font-bold text-white text-sm"><i class="fas fa-list-alt text-neon-blue mr-2"></i>LATEST SYSTEM INFERENCES</h3>
+                        <span class="text-[10px] bg-gray-800 px-2 py-1 rounded text-gray-400">LIVE FEED</span>
+                    </div>
+                    
+                    <div class="p-4 overflow-y-auto max-h-[300px] space-y-4 font-mono text-xs">
+                        <div class="flex items-start opacity-70 hover:opacity-100 transition">
+                            <span class="text-gray-600 min-w-[80px]">[14:02:11]</span>
+                            <div>
+                                <span class="text-neon-blue font-bold">[FundamentalAnalyst]</span>
+                                <span class="text-gray-300 ml-2">TSLA: EBITDA margin compression detected (-2.4% YoY). Revising Bull Case target to $310 based on automotive segment drag.</span>
+                            </div>
+                        </div>
+                        <div class="flex items-start opacity-70 hover:opacity-100 transition border-l-2 border-red-900/50 pl-2">
+                            <span class="text-gray-600 min-w-[80px]">[14:02:15]</span>
+                            <div>
+                                <span class="text-neon-red font-bold">[RiskOfficer]</span>
+                                <span class="text-gray-300 ml-2">AMC: Term Loan B covenant headroom critical (&lt; 5%). Simulating default scenario #44B (Liquidity Crunch).</span>
+                            </div>
+                        </div>
+                        <div class="flex items-start opacity-70 hover:opacity-100 transition">
+                            <span class="text-gray-600 min-w-[80px]">[14:02:45]</span>
+                            <div>
+                                <span class="text-purple-400 font-bold">[QuantumModeler]</span>
+                                <span class="text-gray-300 ml-2">MACRO: Black Swan "Geopolitical Flashpoint" probability elevated to 12%. Triggering defensive hedge suggestions for Energy sector.</span>
+                            </div>
+                        </div>
+                        <div class="flex items-start opacity-70 hover:opacity-100 transition">
+                            <span class="text-gray-600 min-w-[80px]">[14:03:01]</span>
+                            <div>
+                                <span class="text-green-400 font-bold">[PortfolioMgr]</span>
+                                <span class="text-gray-300 ml-2">ALLOCATION: Shifting 5% from Consumer Discretionary to Energy Majors. Rationale: Inflation stickiness.</span>
+                            </div>
+                        </div>
+                        <div class="flex items-start opacity-70 hover:opacity-100 transition">
+                            <span class="text-gray-600 min-w-[80px]">[14:04:22]</span>
+                            <div>
+                                <span class="text-neon-blue font-bold">[SentimentBot]</span>
+                                <span class="text-gray-300 ml-2">NVDA: Social volume spike (+400%) detected. Topic: "Next Gen Chip". Correlation with price action: 0.85.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Watchlist & Chart -->
+                <div class="lg:col-span-1 flex flex-col gap-6">
+                    <div class="glass-panel p-4 rounded">
+                        <h3 class="font-bold text-white text-sm mb-4 border-b border-gray-800 pb-2">CONVICTION WATCHLIST</h3>
+                        <table class="w-full text-xs text-left">
+                            <thead>
+                                <tr class="text-gray-600 border-b border-gray-800">
+                                    <th class="pb-2">TICKER</th>
+                                    <th class="pb-2 text-right">RATING</th>
+                                    <th class="pb-2 text-right">PD %</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-300">
+                                <tr class="border-b border-gray-800/50 hover:bg-white/5 transition">
+                                    <td class="py-2 font-bold text-white">NVDA</td>
+                                    <td class="text-right text-green-400">LONG (9.2)</td>
+                                    <td class="text-right text-gray-500">0.01%</td>
+                                </tr>
+                                <tr class="border-b border-gray-800/50 hover:bg-white/5 transition">
+                                    <td class="py-2 font-bold text-white">AMC</td>
+                                    <td class="text-right text-neon-red">SHORT (2.1)</td>
+                                    <td class="text-right text-neon-red">18.50%</td>
+                                </tr>
+                                <tr class="border-b border-gray-800/50 hover:bg-white/5 transition">
+                                    <td class="py-2 font-bold text-white">JPM</td>
+                                    <td class="text-right text-blue-400">HOLD (6.5)</td>
+                                    <td class="text-right text-gray-500">0.45%</td>
+                                </tr>
+                                <tr class="hover:bg-white/5 transition">
+                                    <td class="py-2 font-bold text-white">PLTR</td>
+                                    <td class="text-right text-green-400">LONG (8.8)</td>
+                                    <td class="text-right text-gray-500">0.12%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="glass-panel p-4 rounded flex flex-col">
+                        <h3 class="font-bold text-white text-sm mb-2">RISK DISTRIBUTION</h3>
+                        <div class="flex-grow min-h-[150px]">
+                            <canvas id="riskChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="p-4 border-t border-gray-800 bg-black text-center text-[10px] text-gray-600 relative z-10">
+        ADAM v23.5 SYSTEM &copy; 2025 // UNAUTHORIZED ACCESS PROHIBITED // ENCRYPTION LEVEL: QUANTUM-256
+    </footer>
+
+    <!-- Textarea workaround for copy -->
+    <textarea id="copy-helper" style="position: absolute; left: -9999px;"></textarea>
+
+    <script>
+        // --- DATA & CONTENT ---
+        const prompts = {
+            system_v23: `### SYSTEM ROLE:
+You are the **Adam v23.5 "AI Partner" Architect**. Your directive is to function as a unified Multi-Agent Financial System.
+
+### INPUT PARAMETERS:
+* **Target Subject:** [INSERT COMPANY/TICKER]
+* **Simulation Depth:** "Deep" (Monte Carlo & Quantum Scenarios)
+
+### EXECUTION PROTOCOL (The "Deep Dive" Pipeline):
+
+**Phase 1: Entity & Ecosystem**
+* **Business Risk:** Moat, Cyclicality, Management Assessment (Capital Allocation Score).
+
+**Phase 2: Deep Fundamental & Valuation**
+* **DCF Analysis:** Estimate WACC, Terminal Growth, and Intrinsic Value.
+* **Price Targets:** Bear/Base/Bull cases.
+
+**Phase 3: Credit & SNC Ratings**
+* **Covenant Analysis:** Net Leverage vs. Maintenance Covenants.
+* **SNC Simulation:** Assign regulatory rating (Pass/Substandard) to specific debt facilities.
+
+**Phase 4: Risk & Quantum Modeling**
+* **Monte Carlo:** 10,000-path iteration on EBITDA volatility.
+* **Black Swan:** Model low-probability, high-impact events (e.g., "Cyber Paralysis").
+
+### OUTPUT SCHEMA (Strict JSON):
+Return a valid JSON object with keys: "entity_ecosystem", "equity_analysis", "credit_analysis", "simulation_engine", "strategic_synthesis".`,
+
+            config_v22: `{
+  "adam_version": "22.0",
+  "system_prompt_content": {
+    "persona": "You are Adam, a sophisticated AI financial analyst. Core mandate: Auditable, grounded, transparent analysis.",
+    "operational_loop": [
+      { "step": 1, "phase": "Initialize & Acknowledge" },
+      { "step": 2, "phase": "Dynamic Workflow Generation" },
+      { "step": 3, "phase": "Asynchronous Agent Simulation" },
+      { "step": 4, "phase": "Explicit Skill Invocation (e.g., CounterfactualReasoning)" },
+      { "step": 5, "phase": "Groundedness & Provenance (MANDATORY CITATIONS)" },
+      { "step": 6, "phase": "Autonomous Red Team Challenge" },
+      { "step": 7, "phase": "Final Synthesis" }
+    ]
+  }
+}`,
+            risk_agent: `### AGENT PROMPT: RISK ASSESSMENT OFFICER
+**Role:** You are the dedicated Risk Assessment Agent within the ADAM ecosystem.
+**Input:** Financial Data (JSON), Market Data (Volatility Series).
+
+**Directives:**
+1. **Market Risk:** Calculate annualized volatility (Sigma) from log returns.
+2. **Liquidity Risk:** If daily volume < 100k shares, flag as "Illiquid/High Risk".
+3. **Credit Risk:** Estimate Probability of Default (PD) based on Interest Coverage Ratio (< 1.5x implies > 5% PD).
+4. **Geopolitical Overlay:** Identify exposure to trade tensions (e.g., China/US revenue split).
+
+**Output Format:**
+{
+  "risk_score": 0-100,
+  "factors": { "market": "High", "credit": "Low" },
+  "warning_flags": ["..."]
+}`,
+            quantum_sim: `### LOGIC ENGINE: QUANTUM MONTE CARLO (QMC)
+**Objective:** Simulate non-linear tail risks for [TARGET_ASSET].
+
+**Parameters:**
+* **Paths:** 10,000
+* **Distribution:** Fat-tailed (Student-t)
+* **Shock Factor:** Global Liquidity Crunch (-20% liquidity depth)
+
+**Scenario Injection:**
+1. **"The Gray Rhino":** Slow moving credit contraction.
+2. **"The Black Swan":** Sudden geopolitical flashpoint shutting down 15% of supply chain.
+
+**Task:**
+Generate the projected EBITDA bridge for the Bear Case under these specific shock conditions. Quantify the impact on the Net Leverage Ratio.`
+        };
+
+        // --- NAVIGATION LOGIC ---
+        function switchTab(tabId) {
+            // Hide all contents
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            
+            // Deactivate all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active', 'text-neon-blue'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('text-gray-500'));
+
+            // Show selected content
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            // Activate button
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.add('active', 'text-neon-blue');
+            activeBtn.classList.remove('text-gray-500');
+
+            // Specific initialization
+            if(tabId === 'prompts') {
+                const viewer = document.getElementById('prompt-viewer');
+                if(!viewer.value) loadPrompt('system_v23');
+            }
+            if(tabId === 'dashboard') {
+                initChart();
+            }
+        }
+
+        // --- PROMPT LOADER ---
+        function loadPrompt(key) {
+            const viewer = document.getElementById('prompt-viewer');
+            const title = document.getElementById('prompt-title');
+            
+            // Simple type-writer effect simulation or just load
+            viewer.value = prompts[key];
+            title.innerText = "SELECTED: " + key.replace('_', ' ').toUpperCase();
+        }
+
+        // --- CLIPBOARD LOGIC ---
+        function copyToClipboard() {
+            const textToCopy = document.getElementById("prompt-viewer").value;
+            const helper = document.getElementById("copy-helper");
+            
+            helper.value = textToCopy;
+            helper.select();
+            
+            try {
+                document.execCommand("copy");
+                showFeedback();
+            } catch (err) {
+                console.error("Fallback copy failed", err);
+                alert("Copy failed. Please select text manually.");
+            }
+        }
+
+        function showFeedback() {
+            const feedback = document.getElementById('copy-feedback');
+            feedback.style.opacity = '1';
+            setTimeout(() => {
+                feedback.style.opacity = '0';
+            }, 1500);
+        }
+
+        // --- CHART JS LOGIC ---
+        let chartInstance = null;
+
+        function initChart() {
+            const ctx = document.getElementById('riskChart');
+            if(!ctx || chartInstance) return;
+
+            chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Market Risk', 'Credit Risk', 'Liquidity', 'Operational'],
+                    datasets: [{
+                        data: [35, 45, 10, 10],
+                        backgroundColor: [
+                            'rgba(0, 243, 255, 0.6)',  // Neon Blue
+                            'rgba(255, 0, 60, 0.6)',   // Neon Red
+                            'rgba(189, 0, 255, 0.6)',  // Purple
+                            'rgba(255, 255, 255, 0.2)' // Grey
+                        ],
+                        borderColor: '#111',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { color: '#aaa', font: { family: 'Courier New', size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initial Load
+        window.onload = function() {
+            loadPrompt('system_v23');
+        }
+
+    </script>
+</body>
+</html>
