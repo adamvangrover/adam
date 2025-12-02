@@ -14,8 +14,11 @@ class QuantumScenarioAgent(AgentBase):
         super().__init__(config)
         self.persona = "Futurist"
 
-    async def execute(self, params: Dict[str, Any]) -> List[QuantumScenario]:
+    async def execute(self, **kwargs) -> List[QuantumScenario]:
         logger.info("Executing Quantum Scenario Generation...")
+
+        # Support both nested 'params' key and flat kwargs
+        params = kwargs.get('params', kwargs)
 
         # Mock Logic
         # In production, this uses LLM prompting for "Unknown Unknowns".

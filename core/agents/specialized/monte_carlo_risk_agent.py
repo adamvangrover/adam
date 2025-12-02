@@ -22,15 +22,11 @@ class MonteCarloRiskAgent(AgentBase):
         self.persona = "Quantitative Risk Modeler"
         self.iterations = 10000
 
-    def execute(self,
-                current_ebitda: float,
-                ebitda_volatility: float,
-                interest_expense: float,
-                capex_maintenance: float) -> SimulationEngine:
+    async def execute(self, **kwargs) -> SimulationEngine:
         """
         Runs the Monte Carlo simulation.
 
-        Args:
+        Args (in kwargs):
             current_ebitda: TTM EBITDA.
             ebitda_volatility: Annualized standard deviation of EBITDA (e.g., 0.15 for 15%).
             interest_expense: Annual fixed interest cost.
@@ -40,6 +36,12 @@ class MonteCarloRiskAgent(AgentBase):
             SimulationEngine: Schema object with default probability and scenario placeholders.
         """
         logger.info(f"Running Monte Carlo Simulation ({self.iterations} paths)...")
+
+        # Extract parameters with defaults
+        current_ebitda = float(kwargs.get("current_ebitda", 0.0))
+        ebitda_volatility = float(kwargs.get("ebitda_volatility", 0.2))
+        interest_expense = float(kwargs.get("interest_expense", 0.0))
+        capex_maintenance = float(kwargs.get("capex_maintenance", 0.0))
 
         # 1. Define Distress Threshold (Cash Flow Solvency)
         # If EBITDA < Interest + Capex, the company is burning cash and relies on Revolver/Cash Balance.
