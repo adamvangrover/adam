@@ -40,6 +40,8 @@ Each prompt is stored in its own detailed Markdown file, named according to its 
     *   **Objective:** To parse dense legal documents and extract all financial covenants into a structured format.
 *   **`LIB-PRO-005: Industry Risk Report Generator`**
     *   **Objective:** To generate a concise, structured risk report for a specific industry using frameworks like Porter's Five Forces.
+*   **`LIB-PRO-006: Strategic Market Assessment & Valuation`**
+    *   **Objective:** To act as a Senior Portfolio Manager and Quantitative Analyst to catalog current market levels, perform intrinsic valuation, and rank assets based on expected returns.
 
 ### **Category 3: AI System Architecture (`/system_architecture`)**
 *"Meta-prompts" designed to help build, refine, document, and manage the 'Adam' AI system itself.*
