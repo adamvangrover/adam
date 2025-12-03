@@ -1,0 +1,56 @@
+{
+  "portfolio_name": "Adam Gold Standard (20-Year Horizon)",
+  "version": "1.0",
+  "target_allocation": {
+    "equities": {
+      "weight": 0.40,
+      "components": {
+        "us_total_stock_market": {
+          "weight": 0.20,
+          "ticker_proxy": "VTI",
+          "rationale": "Capture US innovation and growth."
+        },
+        "ex_us_total_stock_market": {
+          "weight": 0.20,
+          "ticker_proxy": "VXUS",
+          "rationale": "Hedge against US dollar dominance decline and capture emerging market growth."
+        }
+      }
+    },
+    "fixed_income": {
+      "weight": 0.40,
+      "components": {
+        "long_term_treasuries": {
+          "weight": 0.30,
+          "ticker_proxy": "TLT",
+          "rationale": "Deflation hedge. Historical negative correlation to equity crashes."
+        },
+        "tips": {
+          "weight": 0.10,
+          "ticker_proxy": "SCHP",
+          "rationale": "Protection against unexpected inflation shocks."
+        }
+      }
+    },
+    "alternatives": {
+      "weight": 0.20,
+      "components": {
+        "gold": {
+          "weight": 0.10,
+          "ticker_proxy": "GLD",
+          "rationale": "Currency debasement hedge and store of value."
+        },
+        "commodities": {
+          "weight": 0.10,
+          "ticker_proxy": "DBC",
+          "rationale": "Broad inflation hedge (energy, agriculture, metals)."
+        }
+      }
+    }
+  },
+  "rebalancing_rules": {
+    "frequency": "Quarterly",
+    "threshold": 0.05
+  },
+  "architect_notes": "This allocation follows a modified risk-parity approach. Unlike a 60/40 which is dominated by equity risk, this 40/40/20 split better balances the drivers of asset returns: Growth (Equities), Deflation (Treasuries), and Inflation (Gold/Commodities)."
+}
