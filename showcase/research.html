@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM System | Research Lab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="h-screen flex flex-col grid-bg overflow-hidden">
+    <div class="scan-line"></div>
+
+    <!-- Header -->
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a] z-50 shrink-0">
+        <div class="flex items-center gap-4">
+            <button id="nav-toggle" class="text-slate-400 hover:text-white transition">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-cyan-400">v23.5</span> <span class="text-slate-500 font-normal">| Research Lab</span></h1>
+        </div>
+        <div class="flex gap-4 mono text-xs text-slate-400">
+             <div>GPU_CLUSTER: <span class="text-emerald-400">ONLINE (8x H100)</span></div>
+             <div>JOBS_RUNNING: <span class="text-cyan-400">2</span></div>
+             <div>TINKER_COOKBOOK: <span class="text-purple-400">SYNCED</span></div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 grid grid-cols-12 gap-6 overflow-y-auto">
+
+        <!-- Training Overview -->
+        <div class="col-span-12 lg:col-span-8 glass-panel p-6">
+            <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-2">
+                <h3 class="text-slate-400 text-xs uppercase font-bold tracking-wider">Active Training Run: Adam-v24-Base (Epoch 42/100)</h3>
+                <div class="flex gap-2">
+                    <span class="text-[10px] bg-emerald-900 text-emerald-400 px-2 py-1 rounded font-mono">LOSS: 0.241</span>
+                    <span class="text-[10px] bg-blue-900 text-blue-400 px-2 py-1 rounded font-mono">ETA: 4h 12m</span>
+                </div>
+            </div>
+            <div class="h-64 w-full">
+                <canvas id="lossChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Model Registry / Versions -->
+        <div class="col-span-12 lg:col-span-4 glass-panel p-6 flex flex-col">
+            <h3 class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-4 border-b border-slate-700 pb-2">Model Registry</h3>
+            <div class="space-y-3 flex-1 overflow-y-auto">
+                <!-- Model Card -->
+                <div class="p-3 bg-slate-800/50 rounded border border-slate-700 hover:border-cyan-500 transition cursor-pointer group">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-sm text-white group-hover:text-cyan-400">Adam-v23.5-Instruct</span>
+                        <span class="text-[10px] bg-cyan-900/30 text-cyan-400 px-1 rounded">PROD</span>
+                    </div>
+                    <div class="text-xs text-slate-400 mb-2">Fine-tuned on artisanal_data_snc_v2.jsonl</div>
+                    <div class="flex gap-2 text-[10px] mono text-slate-500">
+                        <span><i class="fas fa-tag mr-1"></i>Llama-3-70B</span>
+                        <span><i class="fas fa-database mr-1"></i>4.2GB</span>
+                    </div>
+                </div>
+                <!-- Model Card -->
+                <div class="p-3 bg-slate-800/50 rounded border border-slate-700 hover:border-purple-500 transition cursor-pointer group">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-sm text-white group-hover:text-purple-400">Adam-v24-Beta-Reasoning</span>
+                        <span class="text-[10px] bg-purple-900/30 text-purple-400 px-1 rounded">TRAINING</span>
+                    </div>
+                    <div class="text-xs text-slate-400 mb-2">Reinforcement Learning from AI Feedback (RLAIF)</div>
+                    <div class="flex gap-2 text-[10px] mono text-slate-500">
+                        <span><i class="fas fa-tag mr-1"></i>Qwen-2.5-Coder</span>
+                        <span><i class="fas fa-database mr-1"></i>12.1GB</span>
+                    </div>
+                </div>
+                 <!-- Model Card -->
+                <div class="p-3 bg-slate-800/50 rounded border border-slate-700 hover:border-emerald-500 transition cursor-pointer group">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-sm text-white group-hover:text-emerald-400">Adam-Quant-LoRA-v1</span>
+                        <span class="text-[10px] bg-slate-700 text-slate-400 px-1 rounded">ARCHIVED</span>
+                    </div>
+                    <div class="text-xs text-slate-400 mb-2">Specialized adapter for quantitative extraction.</div>
+                </div>
+            </div>
+            <button class="mt-4 w-full py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold rounded uppercase transition">
+                <i class="fas fa-cloud-upload-alt mr-2"></i> Deploy Model
+            </button>
+        </div>
+
+        <!-- Datasets -->
+        <div class="col-span-12 lg:col-span-6 glass-panel p-6">
+             <h3 class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-4 border-b border-slate-700 pb-2">Artisanal Datasets</h3>
+             <table class="w-full text-left text-xs text-slate-400">
+                 <thead>
+                     <tr class="border-b border-slate-700">
+                         <th class="pb-2 font-mono">FILENAME</th>
+                         <th class="pb-2 font-mono">TYPE</th>
+                         <th class="pb-2 font-mono">SAMPLES</th>
+                         <th class="pb-2 font-mono text-right">STATUS</th>
+                     </tr>
+                 </thead>
+                 <tbody class="divide-y divide-slate-800">
+                     <tr class="hover:bg-slate-800/50 transition">
+                         <td class="py-2 text-white">artisanal_data_snc_v2.jsonl</td>
+                         <td class="py-2">Instruction</td>
+                         <td class="py-2">1,420</td>
+                         <td class="py-2 text-right text-emerald-400">Ready</td>
+                     </tr>
+                     <tr class="hover:bg-slate-800/50 transition">
+                         <td class="py-2 text-white">finance_bench.json</td>
+                         <td class="py-2">Evaluation</td>
+                         <td class="py-2">150</td>
+                         <td class="py-2 text-right text-emerald-400">Ready</td>
+                     </tr>
+                     <tr class="hover:bg-slate-800/50 transition">
+                         <td class="py-2 text-white">synthetic_black_swan.csv</td>
+                         <td class="py-2">Simulation</td>
+                         <td class="py-2">10,000</td>
+                         <td class="py-2 text-right text-amber-400">Processing</td>
+                     </tr>
+                      <tr class="hover:bg-slate-800/50 transition">
+                         <td class="py-2 text-white">graph_reasoning_traces.jsonl</td>
+                         <td class="py-2">Chain-of-Thought</td>
+                         <td class="py-2">542</td>
+                         <td class="py-2 text-right text-emerald-400">Ready</td>
+                     </tr>
+                 </tbody>
+             </table>
+        </div>
+
+        <!-- Hardware Metrics -->
+        <div class="col-span-12 lg:col-span-6 glass-panel p-6">
+             <h3 class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-4 border-b border-slate-700 pb-2">Cluster Metrics</h3>
+             <div class="grid grid-cols-2 gap-4">
+                 <div class="bg-slate-800/50 p-3 rounded">
+                     <div class="text-slate-500 text-[10px] uppercase mb-1">GPU Utilization (Avg)</div>
+                     <div class="flex items-end gap-2">
+                         <span class="text-2xl font-mono text-white">94%</span>
+                         <span class="text-xs text-emerald-400 mb-1"><i class="fas fa-arrow-up"></i> High</span>
+                     </div>
+                     <div class="w-full bg-slate-700 h-1 mt-2 rounded overflow-hidden">
+                         <div class="bg-emerald-500 h-full w-[94%]"></div>
+                     </div>
+                 </div>
+                 <div class="bg-slate-800/50 p-3 rounded">
+                     <div class="text-slate-500 text-[10px] uppercase mb-1">VRAM Usage</div>
+                     <div class="flex items-end gap-2">
+                         <span class="text-2xl font-mono text-white">68GB</span>
+                         <span class="text-xs text-slate-400 mb-1">/ 80GB</span>
+                     </div>
+                     <div class="w-full bg-slate-700 h-1 mt-2 rounded overflow-hidden">
+                         <div class="bg-purple-500 h-full w-[85%]"></div>
+                     </div>
+                 </div>
+                 <div class="bg-slate-800/50 p-3 rounded">
+                     <div class="text-slate-500 text-[10px] uppercase mb-1">System Temperature</div>
+                     <div class="flex items-end gap-2">
+                         <span class="text-2xl font-mono text-white">72°C</span>
+                         <span class="text-xs text-emerald-400 mb-1">Optimal</span>
+                     </div>
+                 </div>
+                 <div class="bg-slate-800/50 p-3 rounded">
+                     <div class="text-slate-500 text-[10px] uppercase mb-1">Power Draw</div>
+                     <div class="flex items-end gap-2">
+                         <span class="text-2xl font-mono text-white">2.4kW</span>
+                         <span class="text-xs text-amber-400 mb-1">Peak</span>
+                     </div>
+                 </div>
+             </div>
+        </div>
+
+    </main>
+
+    <script src="js/mock_data.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/nav.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('lossChart').getContext('2d');
+
+            // Generate simulated loss curve
+            const epochs = Array.from({length: 42}, (_, i) => i + 1);
+            const trainLoss = epochs.map(e => 2.5 * Math.exp(-0.05 * e) + Math.random() * 0.1);
+            const valLoss = epochs.map(e => 2.6 * Math.exp(-0.05 * e) + 0.2 + Math.random() * 0.1);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: epochs,
+                    datasets: [
+                        {
+                            label: 'Training Loss',
+                            data: trainLoss,
+                            borderColor: '#06b6d4',
+                            backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: false,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Validation Loss',
+                            data: valLoss,
+                            borderColor: '#a855f7',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: false,
+                            pointRadius: 0,
+                            borderDash: [5, 5]
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                            ticks: { color: '#94a3b8' },
+                            title: { display: true, text: 'Epoch', color: '#64748b' }
+                        },
+                        y: {
+                            grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                            ticks: { color: '#94a3b8' },
+                            title: { display: true, text: 'Cross-Entropy Loss', color: '#64748b' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: true, labels: { color: '#cbd5e1' } }
+                    },
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
