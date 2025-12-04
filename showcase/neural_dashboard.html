@@ -3,143 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v23 | Neural Dashboard</title>
+    <title>ADAM v23.5 | Neural Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
-    <style>
-        /* Base styles */
-        body { background-color: #0f172a; color: #e2e8f0; }
-        
-        /* Glassmorphism */
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.4);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(51, 65, 85, 0.5);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        }
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 
-        /* Scanline Effect */
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* --- Core Theme Overrides --- */
+        body { background-color: #0f172a; font-family: 'Inter', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* CRT Scanline */
         .scan-line {
-            position: fixed; top: 0; left: 0; width: 100%; height: 5px;
-            background: rgba(16, 185, 129, 0.1);
-            opacity: 0.4; animation: scan 6s linear infinite; pointer-events: none; z-index: 9999;
+            position: fixed; top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(to bottom, rgba(16, 185, 129, 0), rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0));
+            opacity: 0.1; animation: scan 8s linear infinite; pointer-events: none; z-index: 9999;
         }
         @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
 
-        /* Vis.js Customization */
-        #viz-canvas { width: 100%; height: 100%; outline: none; }
-        .vis-tooltip {
-            background-color: rgba(15, 23, 42, 0.9) !important;
-            border: 1px solid #3b82f6 !important;
-            color: #e2e8f0 !important;
-            font-family: monospace !important;
-            padding: 8px !important;
-            border-radius: 4px !important;
+        /* Glass Panels */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Graph Container */
+        #viz-canvas { 
+            width: 100%; height: 100%; 
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%); 
+            cursor: crosshair;
         }
 
         /* Animations */
-        @keyframes fadeIn { from { opacity: 0; transform: translateX(-5px); } to { opacity: 1; transform: translateX(0); } }
-        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        .pulse-text { animation: pulse-glow 2s infinite; }
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(34, 211, 238, 0.5); }
+            50% { opacity: 0.7; text-shadow: 0 0 0px transparent; }
+        }
+
+        /* Scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden font-sans">
-
+<body class="h-screen flex flex-col overflow-hidden text-slate-200">
     <div class="scan-line"></div>
 
-    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-50 shrink-0">
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 shrink-0">
         <div class="flex items-center gap-4">
-            <button id="nav-toggle" class="text-slate-400 hover:text-white transition">
-                <i class="fas fa-bars"></i>
-            </button>
-            <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
-            <h1 class="text-xl font-bold tracking-tight">ADAM <span class="text-cyan-400">v23</span> <span class="text-slate-500 font-normal">| Neural Dashboard</span></h1>
+            <a href="index.html" class="text-slate-400 hover:text-white transition"><i class="fas fa-arrow-left"></i></a>
+            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-cyan-400">v23.5</span> <span class="text-slate-500 font-normal">| Neural Dashboard</span></h1>
         </div>
-        <div class="flex gap-6 font-mono text-xs text-slate-400 hidden md:flex">
-            <div>MEM: <span class="text-emerald-400" id="mem-usage">14.2 GB</span></div>
-            <div>OPS: <span class="text-cyan-400" id="ops-rate">2,340 /s</span></div>
-            <div>STATUS: <span class="text-emerald-400">ONLINE</span></div>
+        <div class="flex items-center gap-6 font-mono text-xs hidden md:flex">
+            <div>
+                <span class="text-slate-500">CYCLE_ID:</span>
+                <span class="text-white font-bold ml-1">8849-AFX</span>
+            </div>
+            <div>
+                <span class="text-slate-500">SYNAPTIC LOAD:</span>
+                <span class="text-emerald-400 font-bold ml-1">14.2 TB</span>
+            </div>
+            <div class="flex items-center gap-2 px-3 py-1 bg-slate-800 rounded border border-slate-700">
+                <span class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span>
+                <span>CORTEX ONLINE</span>
+            </div>
         </div>
     </header>
 
-    <main class="flex-1 flex flex-col lg:flex-row gap-4 p-4 relative z-10 overflow-hidden">
+    <main class="flex-1 flex overflow-hidden p-4 gap-4 relative z-10">
 
-        <aside class="w-full lg:w-64 glass-panel p-4 flex flex-col gap-4 shrink-0 transition-all duration-300 overflow-y-auto">
-            <h2 class="text-xs uppercase tracking-widest text-slate-500 font-bold border-b border-slate-700 pb-2">Reasoning Circuits</h2>
-
-            <div class="p-3 bg-slate-800/50 border border-cyan-500/20 rounded cursor-pointer hover:bg-slate-700/50 hover:border-cyan-500/50 transition group" onclick="loadGraph('SNC')">
-                <div class="flex justify-between items-center mb-1">
-                    <span class="font-bold text-sm text-cyan-400 group-hover:text-cyan-300">SNC Analyzer</span>
-                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+        <aside class="w-72 flex flex-col gap-4 shrink-0">
+            
+            <div class="glass-panel p-4 rounded-lg flex flex-col gap-3">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Active Circuits</h3>
+                
+                <div class="p-3 bg-slate-800/50 border border-cyan-500/30 rounded cursor-pointer hover:bg-cyan-900/20 transition group" onclick="loadGraph('SNC')">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-sm text-cyan-400 group-hover:text-cyan-300">SNC Analyzer</span>
+                        <i class="fas fa-network-wired text-cyan-500 text-xs"></i>
+                    </div>
+                    <div class="text-[10px] text-slate-400 font-mono">Credit Risk Topology</div>
                 </div>
-                <div class="text-xs text-slate-400">Cyclical Logic: Credit Risk</div>
+
+                <div class="p-3 bg-slate-800/50 border border-purple-500/30 rounded cursor-pointer hover:bg-purple-900/20 transition group" onclick="loadGraph('Sentiment')">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-sm text-purple-400 group-hover:text-purple-300">Market Sentiment</span>
+                        <i class="fas fa-brain text-purple-500 text-xs"></i>
+                    </div>
+                    <div class="text-[10px] text-slate-400 font-mono">NLP & Contagion Graph</div>
+                </div>
+
+                <div class="p-3 bg-slate-800/50 border border-red-500/30 rounded cursor-pointer hover:bg-red-900/20 transition group" onclick="loadGraph('RedTeam')">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-sm text-red-400 group-hover:text-red-300">Red Team</span>
+                        <i class="fas fa-shield-alt text-red-500 text-xs"></i>
+                    </div>
+                    <div class="text-[10px] text-slate-400 font-mono">Adversarial Simulation</div>
+                </div>
             </div>
 
-            <div class="p-3 bg-slate-800/50 border border-purple-500/20 rounded cursor-pointer hover:bg-slate-700/50 hover:border-purple-500/50 transition group" onclick="loadGraph('Sentiment')">
-                <div class="flex justify-between items-center mb-1">
-                    <span class="font-bold text-sm text-purple-400 group-hover:text-purple-300">Market Sentiment</span>
-                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <div class="glass-panel p-4 rounded-lg flex-1 flex flex-col overflow-hidden">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Neural Operations</h3>
+                
+                <div class="mb-4">
+                    <label class="text-[10px] text-slate-500 font-mono block mb-1">LOCATE NODE</label>
+                    <div class="relative">
+                        <input type="text" id="node-search" placeholder="e.g. 'Liquidity_Risk'" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:border-cyan-500 outline-none font-mono">
+                        <button onclick="searchNode()" class="absolute right-1 top-1 text-slate-400 hover:text-white p-1"><i class="fas fa-search text-xs"></i></button>
+                    </div>
                 </div>
-                <div class="text-xs text-slate-400">State: Ingesting News</div>
-            </div>
 
-            <div class="p-3 bg-slate-800/50 border border-red-500/20 rounded cursor-pointer hover:bg-slate-700/50 hover:border-red-500/50 transition group" onclick="loadGraph('RedTeam')">
-                <div class="flex justify-between items-center mb-1">
-                    <span class="font-bold text-sm text-red-400 group-hover:text-red-300">Red Team</span>
-                    <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                <div class="mb-4 space-y-2">
+                    <label class="text-[10px] text-slate-500 font-mono block mb-1">RUN SIMULATION</label>
+                    <select id="sim-type" class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white outline-none font-mono">
+                        <option value="stress">Stress Test (Universe)</option>
+                        <option value="propagation">Risk Propagation</option>
+                        <option value="pathway">Optimal Pathway</option>
+                    </select>
+                    <button onclick="runSimulation()" class="w-full bg-cyan-900/50 hover:bg-cyan-800 border border-cyan-700 text-cyan-400 text-xs py-1.5 rounded font-mono transition flex items-center justify-center gap-2">
+                        <i class="fas fa-play"></i> EXECUTE
+                    </button>
                 </div>
-                <div class="text-xs text-slate-400">Adversarial Simulator</div>
-            </div>
 
-            <div class="p-3 bg-slate-800/50 border border-blue-500/20 rounded cursor-pointer hover:bg-slate-700/50 hover:border-blue-500/50 transition group" onclick="loadGraph('Macro')">
-                <div class="flex justify-between items-center mb-1">
-                    <span class="font-bold text-sm text-blue-400 group-hover:text-blue-300">Macro Planner</span>
-                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <div class="mt-auto space-y-2 pt-4 border-t border-slate-700/50">
+                    <button onclick="extendGraph()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-300 text-xs py-1.5 rounded font-mono transition">
+                        <i class="fas fa-plus-circle mr-1"></i> Add / Extend Nodes
+                    </button>
+                    <button onclick="loadDatabase()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-300 text-xs py-1.5 rounded font-mono transition">
+                        <i class="fas fa-database mr-1"></i> Load Full DB
+                    </button>
                 </div>
-                <div class="text-xs text-slate-400">Neuro-Symbolic Pathfinding</div>
-            </div>
-
-            <div class="mt-auto pt-4 border-t border-slate-700/50">
-                 <div class="text-xs text-slate-500 font-mono mb-1">SYSTEM LOAD</div>
-                 <div class="h-1 w-full bg-slate-700 rounded overflow-hidden">
-                     <div class="h-full bg-cyan-500 w-3/4 animate-pulse"></div>
-                 </div>
             </div>
         </aside>
 
-        <section class="flex-1 glass-panel relative flex flex-col min-h-[400px] rounded-lg overflow-hidden">
+        <section class="flex-1 glass-panel rounded-lg relative overflow-hidden flex flex-col shadow-2xl">
             <div class="absolute top-4 left-4 z-10 pointer-events-none">
-                <h2 id="graph-title" class="text-lg font-bold text-white drop-shadow-md">System Ready</h2>
-                <p id="graph-status" class="text-sm text-cyan-400 font-mono mt-1 drop-shadow-md">Select a circuit to visualize...</p>
+                <h2 id="graph-title" class="text-2xl font-bold text-white drop-shadow-md font-mono">SYSTEM_IDLE</h2>
+                <div class="flex items-center gap-2 mt-1">
+                    <span id="graph-status" class="text-xs text-cyan-400 font-mono bg-slate-900/80 px-2 py-0.5 rounded border border-cyan-900">Waiting for input...</span>
+                </div>
             </div>
 
-            <div id="viz-canvas" class="bg-[#0b1120]"></div>
+            <div id="viz-canvas"></div>
 
-            <div class="absolute bottom-4 right-4 flex gap-2">
-                <button class="p-2 bg-slate-800 text-slate-300 rounded hover:text-white border border-slate-700" onclick="if(network) network.fit()"><i class="fas fa-compress"></i> Fit</button>
+            <div class="absolute bottom-4 right-4 z-10 flex gap-2">
+                <button class="p-2 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded border border-slate-600 backdrop-blur transition" onclick="network.fit({animation:true})">
+                    <i class="fas fa-compress"></i> Fit
+                </button>
+                <button class="p-2 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded border border-slate-600 backdrop-blur transition" onclick="togglePhysics()">
+                    <i class="fas fa-snowflake"></i> Freeze
+                </button>
             </div>
         </section>
 
-        <aside class="w-full lg:w-80 glass-panel flex flex-col shrink-0 h-48 lg:h-auto rounded-lg overflow-hidden">
-            <div class="p-3 border-b border-slate-700/50 bg-slate-800/30 flex justify-between items-center">
-                <h2 class="text-xs uppercase tracking-widest text-slate-400 font-bold"><i class="fas fa-terminal mr-2"></i>Live Stream</h2>
-                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+        <aside class="w-72 flex flex-col gap-4 shrink-0">
+            
+            <div class="glass-panel rounded-lg flex-1 flex flex-col overflow-hidden border border-slate-700">
+                <div class="p-3 border-b border-slate-700 bg-slate-800/30 flex justify-between items-center">
+                    <h3 class="text-xs font-bold text-purple-400 uppercase tracking-wider">Thought Stream</h3>
+                    <div class="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></div>
+                </div>
+                <div id="log-container" class="flex-1 overflow-y-auto p-3 font-mono text-[10px] space-y-2 bg-[#0a0a0c] custom-scrollbar">
+                    <div class="text-slate-500 border-l-2 border-slate-700 pl-2">[SYSTEM] Dashboard initialized.</div>
+                </div>
             </div>
-            <div id="log-container" class="flex-1 overflow-y-auto p-3 font-mono text-xs space-y-2 scroll-smooth bg-[#0a0f18]">
-                <div class="text-slate-500 border-l-2 border-slate-600 pl-2">[SYSTEM] Neural Dashboard initialized.</div>
+
+            <div class="glass-panel p-4 rounded-lg h-1/3 flex flex-col justify-center gap-4">
+                <div>
+                    <div class="flex justify-between text-xs text-slate-400 mb-1 font-mono">
+                        <span>Graph Entropy</span>
+                        <span class="text-cyan-400">Low</span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
+                        <div class="bg-cyan-500 h-full w-[25%] animate-pulse"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-xs text-slate-400 mb-1 font-mono">
+                        <span>Active Agents</span>
+                        <span class="text-emerald-400">12/15</span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
+                        <div class="bg-emerald-500 h-full w-[80%]"></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="flex justify-between text-xs text-slate-400 mb-1 font-mono">
+                        <span>Compute Load</span>
+                        <span class="text-amber-400">65%</span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
+                        <div class="bg-amber-500 h-full w-[65%]"></div>
+                    </div>
+                </div>
             </div>
+
         </aside>
 
     </main>
 
+    <script src="js/mock_data.js"></script>
+    <script src="js/nav.js"></script>
     <script>
-        // --- DATA DEFINITIONS ---
-        // Merged from both branches to ensure all graphs work
+        // --- CONFIGURATION ---
         const GRAPHS = {
             'SNC': {
-                title: "Shared National Credit (SNC) Analysis",
+                title: "SNC_ANALYZER_GRAPH",
                 nodes: [
                     { id: 1, label: 'START', group: 'start' },
                     { id: 2, label: 'Structure Analysis', group: 'agent' },
@@ -158,23 +233,23 @@
                     { from: 4, to: 6, arrows: 'to', label: 'Approve', color: { color: '#10b981' } },
                     { from: 6, to: 7, arrows: 'to' }
                 ],
-                logMessages: [
-                    { msg: "Ingesting credit facility documents...", type: "info" },
-                    { msg: "Analyzing covenant compliance structure...", type: "active" },
-                    { msg: "Calculating leverage ratios (Net Debt/EBITDA)...", type: "active" },
-                    { msg: "CRITIQUE: Lenders seeking higher spread given risk profile.", type: "critique" },
-                    { msg: "Revising risk grade recommendation to 'Substandard'...", type: "action" },
-                    { msg: "Draft ready for final review.", type: "success" }
+                logs: [
+                    "Ingesting credit facility docs...",
+                    "Analyzing covenant compliance...",
+                    "Calculating leverage ratios...",
+                    "CRITIQUE: Spread too low for risk profile.",
+                    "Revising risk grade to 'Substandard'.",
+                    "Ready for final review."
                 ]
             },
             'Sentiment': {
-                title: "Market Sentiment & Contagion",
+                title: "SENTIMENT_CONTAGION_NET",
                 nodes: [
                     { id: 1, label: 'News Ingest', group: 'start' },
-                    { id: 2, label: 'NLP Analysis', group: 'agent' },
-                    { id: 3, label: 'KG Cross-Ref', group: 'agent' },
+                    { id: 2, label: 'NLP Engine', group: 'agent' },
+                    { id: 3, label: 'KG Lookup', group: 'agent' },
                     { id: 4, label: 'Contagion Check', group: 'critique' },
-                    { id: 5, label: 'Alert Generation', group: 'action' },
+                    { id: 5, label: 'Alert Gen', group: 'action' },
                     { id: 6, label: 'Publish', group: 'end' }
                 ],
                 edges: [
@@ -182,207 +257,229 @@
                     { from: 2, to: 3, arrows: 'to' },
                     { from: 3, to: 4, arrows: 'to' },
                     { from: 4, to: 5, arrows: 'to', label: 'High Risk' },
-                    { from: 4, to: 1, arrows: 'to', label: 'Low Risk', dashes: true },
                     { from: 5, to: 6, arrows: 'to' }
                 ],
-                logMessages: [
-                    { msg: "Scanning Bloomberg/Reuters feeds...", type: "info" },
-                    { msg: "Detected negative sentiment spike: TECH sector.", type: "active" },
-                    { msg: "Mapping supply chain dependencies for NVDA...", type: "active" },
-                    { msg: "CRITIQUE: Verify source credibility.", type: "critique" },
-                    { msg: "Confirmed signal. Generating alert.", type: "success" }
+                logs: [
+                    "Scanning Bloomberg feeds...",
+                    "Detected negative sentiment in Tech sector.",
+                    "Mapping supply chain dependencies...",
+                    "CRITIQUE: Confirm source credibility.",
+                    "Confirmed. Generating Alert #992."
                 ]
             },
             'RedTeam': {
-                title: "Adversarial Red Team Simulation",
+                title: "ADVERSARIAL_SIM_NET",
                 nodes: [
                     { id: 1, label: 'Scenario Gen', group: 'start' },
                     { id: 2, label: 'Attack Vector', group: 'critique' },
                     { id: 3, label: 'System Defense', group: 'agent' },
-                    { id: 4, label: 'Impact Analysis', group: 'agent' },
+                    { id: 4, label: 'Impact Calc', group: 'agent' },
                     { id: 5, label: 'Report', group: 'end' }
                 ],
                 edges: [
                     { from: 1, to: 2, arrows: 'to' },
                     { from: 2, to: 3, arrows: 'to' },
                     { from: 3, to: 4, arrows: 'to' },
-                    { from: 4, to: 5, arrows: 'to' },
-                    { from: 5, to: 1, arrows: 'to', label: 'Monitor', dashes: true }
+                    { from: 4, to: 5, arrows: 'to' }
                 ],
-                logMessages: [
-                    { msg: "Generating Black Swan event: Cyber Attack...", type: "info" },
-                    { msg: "Simulating liquidity freeze in bond markets.", type: "critique" },
-                    { msg: "Defense Protocol Alpha activated.", type: "active" },
-                    { msg: "Impact: 15% drop in collateral value.", type: "active" },
-                    { msg: "Scenario stored in memory.", type: "success" }
-                ]
-            },
-            'Macro': {
-                title: "Macroeconomic Neuro-Symbolic Planner",
-                nodes: [
-                    { id: 1, label: 'Global Data', group: 'start' },
-                    { id: 2, label: 'Causal Inference', group: 'agent' },
-                    { id: 3, label: 'Scenario Planner', group: 'agent' },
-                    { id: 4, label: 'Strategy Eval', group: 'critique' },
-                    { id: 5, label: 'Memo Gen', group: 'end' }
-                ],
-                edges: [
-                    { from: 1, to: 2, arrows: 'to' },
-                    { from: 2, to: 3, arrows: 'to' },
-                    { from: 3, to: 4, arrows: 'to' },
-                    { from: 4, to: 3, arrows: 'to', label: 'Refine', dashes: true },
-                    { from: 4, to: 5, arrows: 'to', label: 'Finalize' }
-                ],
-                logMessages: [
-                    { msg: "Ingesting Fed minutes and CPI data...", type: "info" },
-                    { msg: "Inference: Rate hike probability > 60%.", type: "active" },
-                    { msg: "Planning asset allocation shift...", type: "active" },
-                    { msg: "CRITIQUE: Check correlation with Oil prices.", type: "critique" },
-                    { msg: "Investment Memo generated.", type: "success" }
+                logs: [
+                    "Generating Black Swan: Cyber Attack.",
+                    "Simulating liquidity freeze.",
+                    "Defense Protocol Alpha activated.",
+                    "Impact: 15% collateral drop.",
+                    "Scenario archived."
                 ]
             }
         };
 
-        // --- APP STATE ---
+        // --- STATE & OPTIONS ---
         let network = null;
-        let simulationInterval = null;
-        let animationInterval = null;
+        let logInterval = null;
+        let physicsEnabled = true;
 
-        // --- CONFIGURATION ---
-        const options = {
+        const networkOptions = {
             nodes: {
-                shape: 'dot',
-                size: 20,
-                font: { face: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas', color: '#e2e8f0', size: 14 },
-                borderWidth: 2,
-                shadow: true
+                shape: 'dot', size: 20,
+                font: { face: 'JetBrains Mono', color: '#e2e8f0', size: 12 },
+                borderWidth: 2, shadow: true,
+                color: { background: '#1e293b', border: '#cbd5e1' }
             },
             edges: {
-                width: 2,
-                color: { color: '#64748b', highlight: '#22d3ee' },
-                smooth: { type: 'curvedCW', roundness: 0.2 },
-                shadow: true
+                width: 1, color: { color: '#475569', highlight: '#22d3ee' },
+                smooth: { type: 'continuous', roundness: 0.5 },
+                arrows: { to: { enabled: true, scaleFactor: 0.5 } }
             },
             groups: {
-                start: { color: { background: '#10b981', border: '#059669' }, size: 25 }, // Emerald
-                end: { color: { background: '#64748b', border: '#475569' }, size: 25 },   // Slate
-                agent: { color: { background: '#3b82f6', border: '#2563eb' } },            // Blue
-                critique: { color: { background: '#ef4444', border: '#dc2626' } },         // Red
-                action: { color: { background: '#f59e0b', border: '#d97706' } },           // Amber
-                human: { color: { background: '#8b5cf6', border: '#7c3aed' } }             // Violet
+                start: { color: { background: '#10b981', border: '#059669' }, size: 25 },
+                end: { color: { background: '#64748b', border: '#475569' }, size: 25 },
+                agent: { color: { background: '#3b82f6', border: '#2563eb' } },
+                critique: { color: { background: '#ef4444', border: '#dc2626' } },
+                action: { color: { background: '#f59e0b', border: '#d97706' } },
+                human: { color: { background: '#8b5cf6', border: '#7c3aed' } }
             },
             physics: {
                 stabilization: false,
-                barnesHut: { gravitationalConstant: -2000, springLength: 120 }
+                barnesHut: { gravitationalConstant: -3000, springLength: 150, springConstant: 0.04 }
             },
             interaction: { hover: true, tooltipDelay: 200 }
         };
 
-        // --- FUNCTIONS ---
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadGraph('SNC'); // Default load
+        });
+
+        // --- CORE FUNCTIONS ---
 
         function loadGraph(key) {
             const data = GRAPHS[key];
-            if(!data) return;
+            if (!data) return;
 
+            // UI Updates
             document.getElementById('graph-title').innerText = data.title;
-            document.getElementById('graph-status').innerText = "Simulation Running...";
+            document.getElementById('graph-status').innerText = "Simulation Cycle Active";
+            document.getElementById('graph-status').className = "text-xs text-emerald-400 font-mono bg-slate-900/80 px-2 py-0.5 rounded border border-emerald-900 animate-pulse";
 
+            // Init Network
             const container = document.getElementById('viz-canvas');
             const nodes = new vis.DataSet(data.nodes);
             const edges = new vis.DataSet(data.edges);
 
-            if(network) network.destroy();
-            network = new vis.Network(container, { nodes, edges }, options);
+            if (network) network.destroy();
+            network = new vis.Network(container, { nodes, edges }, networkOptions);
 
-            // 1. Text Log Simulation
-            runLogSimulation(data.logMessages);
-
-            // 2. Visual Node Animation
-            runVisualAnimation(nodes);
-        }
-
-        function runLogSimulation(messages) {
-            const logContainer = document.getElementById('log-container');
-            if(simulationInterval) clearInterval(simulationInterval);
-
-            // Clear previous specific logs but keep system log
-            logContainer.innerHTML = '<div class="text-slate-500 border-l-2 border-slate-600 pl-2 mb-2">[SYSTEM] Context switched.</div>';
-
-            let index = 0;
-            simulationInterval = setInterval(() => {
-                if(index >= messages.length) {
-                    index = 0; // Loop logs
-                    addLogEntry("--- Cycle Complete ---", "info");
+            // Click Handler
+            network.on("click", (params) => {
+                if(params.nodes.length > 0) {
+                    const node = nodes.get(params.nodes[0]);
+                    log(`Inspecting Node: ${node.label} [ID:${node.id}]`, 'info');
                 }
-                const m = messages[index];
-                addLogEntry(m.msg, m.type);
-                index++;
-            }, 1800);
+            });
+
+            // Start Logs
+            startLogSimulation(data.logs);
         }
 
-        function addLogEntry(msg, type) {
+        function startLogSimulation(messages) {
+            const container = document.getElementById('log-container');
+            if(logInterval) clearInterval(logInterval);
+            
+            container.innerHTML = '<div class="text-slate-500 border-l-2 border-slate-700 pl-2 mb-2">[SYSTEM] Context switched.</div>';
+            
+            let i = 0;
+            logInterval = setInterval(() => {
+                if(i >= messages.length) {
+                    i = 0; // Loop logs
+                    log("--- Cycle Complete ---", "system");
+                }
+                
+                const msg = messages[i];
+                let type = 'info';
+                if(msg.includes('CRITIQUE')) type = 'critique';
+                if(msg.includes('Alert') || msg.includes('Revision')) type = 'action';
+                
+                log(msg, type);
+                
+                // Visual Pulse on random node
+                if(network) {
+                    const ids = network.body.data.nodes.getIds();
+                    const rand = ids[Math.floor(Math.random() * ids.length)];
+                    network.selectNodes([rand]);
+                    setTimeout(() => network.unselectAll(), 500);
+                }
+
+                i++;
+            }, 2000);
+        }
+
+        function log(msg, type='info') {
             const div = document.createElement('div');
-            const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+            const time = new Date().toLocaleTimeString('en-US', {hour12:false});
+            
+            let color = "text-slate-400 border-slate-700";
+            if(type === 'critique') color = "text-red-400 border-red-500";
+            if(type === 'action') color = "text-amber-400 border-amber-500";
+            if(type === 'system') color = "text-emerald-500 border-emerald-900";
 
-            let colorClass = "text-slate-400";
-            let borderClass = "border-transparent";
-
-            if(type === 'active' || type === 'action') { colorClass = "text-cyan-400"; borderClass = "border-cyan-500"; }
-            if(type === 'critique') { colorClass = "text-red-400"; borderClass = "border-red-500"; }
-            if(type === 'success') { colorClass = "text-emerald-400"; borderClass = "border-emerald-500"; }
-
-            div.className = `${colorClass} border-l-2 ${borderClass} pl-2 text-xs font-mono animate-fade-in`;
-            div.innerHTML = `<span class="opacity-50">[${time}]</span> ${msg}`;
-
+            div.className = `${color} border-l-2 pl-2 leading-tight`;
+            div.innerHTML = `<span class="opacity-50 mr-2">[${time}]</span>${msg}`;
+            
             const container = document.getElementById('log-container');
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
         }
 
-        function runVisualAnimation(nodes) {
-            if(animationInterval) clearInterval(animationInterval);
-            
-            animationInterval = setInterval(() => {
-                if(!network) return;
-                
-                const allNodes = nodes.getIds();
-                if(allNodes.length === 0) return;
-                
-                // Pick a random node to highlight
-                const randomNodeId = allNodes[Math.floor(Math.random() * allNodes.length)];
-                
-                network.selectNodes([randomNodeId], false);
-                
-                // Unselect after short delay
-                setTimeout(() => {
-                   if(network) network.unselectAll(); 
-                }, 600);
+        // --- OPERATIONS ---
 
-            }, 1200);
+        function searchNode() {
+            const term = document.getElementById('node-search').value.toLowerCase();
+            if(!term || !network) return;
+
+            const allNodes = network.body.data.nodes.get();
+            const found = allNodes.find(n => n.label.toLowerCase().includes(term));
+            
+            if(found) {
+                network.focus(found.id, { animation: true, scale: 1.2 });
+                network.selectNodes([found.id]);
+                log(`Node found: ${found.label}`, 'success');
+            } else {
+                log(`Node '${term}' not found in active circuit.`, 'critique');
+            }
         }
 
-        // --- INITIALIZATION ---
-        // Shim for dataManager if app.js fails to load or mock_data is missing
-        window.dataManager = window.dataManager || {
-            init: async () => Promise.resolve(),
-            getSystemStats: () => ({ memory_usage: "14.5" })
-        };
-
-        window.addEventListener('load', () => {
-            // Load stats (using shim or real)
-            window.dataManager.init().then(() => {
-                const stats = window.dataManager.getSystemStats ? window.dataManager.getSystemStats() : { memory_usage: "14.2" };
-                document.getElementById('mem-usage').innerText = (stats.memory_usage || "14.2") + " GB";
-            });
+        function runSimulation() {
+            const type = document.getElementById('sim-type').value;
+            log(`Initiating simulation: ${type.toUpperCase()}...`, 'action');
             
-            // Randomize Ops Rate
-            setInterval(() => {
-                 document.getElementById('ops-rate').innerText = Math.floor(2000 + Math.random() * 500) + " /s";
-            }, 1000);
+            // Visual Effect: Shake nodes
+            const positions = network.getPositions();
+            network.body.data.nodes.update(
+                network.body.data.nodes.getIds().map(id => ({
+                    id: id, 
+                    color: { background: '#ef4444' } // Flash red
+                }))
+            );
 
-            // Load default graph
-            loadGraph('SNC');
-        });
+            setTimeout(() => {
+                // Reset colors (simplified reset)
+                loadGraph('SNC'); // Just reload for demo reset
+                log(`Simulation ${type} completed. Risk factors updated.`, 'system');
+            }, 1500);
+        }
+
+        function extendGraph() {
+            if(!network) return;
+            log("Extending graph with satellite nodes...", 'info');
+            
+            const currentCount = network.body.data.nodes.length;
+            const newNodes = [
+                { id: currentCount + 1, label: 'Ext_Data_1', group: 'agent' },
+                { id: currentCount + 2, label: 'Ext_Data_2', group: 'agent' }
+            ];
+            const newEdges = [
+                { from: 2, to: currentCount + 1 },
+                { from: 2, to: currentCount + 2 }
+            ];
+            
+            network.body.data.nodes.add(newNodes);
+            network.body.data.edges.add(newEdges);
+        }
+
+        function loadDatabase() {
+            // Mocking a large data pull
+            log("Connecting to Neo4j / Vector DB...", 'action');
+            setTimeout(() => {
+                log("Data stream established. 1,402 nodes loaded.", 'success');
+                alert("Database Connection Simulated.\nIn a live environment, this would populate the graph with the full Knowledge Graph schema.");
+            }, 1000);
+        }
+
+        function togglePhysics() {
+            physicsEnabled = !physicsEnabled;
+            network.setOptions({ physics: { enabled: physicsEnabled } });
+            log(`Physics engine: ${physicsEnabled ? 'ENABLED' : 'PAUSED'}`, 'info');
+        }
+
     </script>
 </body>
 </html>

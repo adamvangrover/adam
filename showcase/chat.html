@@ -3,223 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM System | Interactive Chat</title>
+    <title>ADAM | Neural Chat</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .chat-bubble {
-            max-width: 80%;
-            padding: 12px 16px;
-            border-radius: 12px;
-            margin-bottom: 12px;
-            font-size: 0.9rem;
-            line-height: 1.5;
-            position: relative;
+        .typing-indicator span {
+            animation: blink 1.4s infinite both;
         }
-        .user-bubble {
-            background-color: #0f172a;
-            border: 1px solid #334155;
-            color: #e2e8f0;
-            margin-left: auto;
-            border-bottom-right-radius: 2px;
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes blink {
+            0% { opacity: 0.2; }
+            20% { opacity: 1; }
+            100% { opacity: 0.2; }
         }
-        .bot-bubble {
-            background-color: #1e293b;
-            border: 1px solid #3b82f6; /* Blue border for Adam */
-            color: #e2e8f0;
-            margin-right: auto;
-            border-bottom-left-radius: 2px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        .chat-msg {
+            animation: slideUp 0.3s ease-out forwards;
         }
-        .bot-bubble::before {
-            content: "ADAM v23";
-            position: absolute;
-            top: -18px;
-            left: 0;
-            font-size: 0.65rem;
-            color: #60a5fa;
-            font-family: monospace;
-            font-weight: bold;
-        }
-        .typing-dot {
-            animation: bounce 1.4s infinite ease-in-out both;
-            width: 6px;
-            height: 6px;
-            background-color: #94a3b8;
-            border-radius: 50%;
-            display: inline-block;
-            margin: 0 2px;
-        }
-        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
-        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
-
-        @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
-<body class="h-screen flex flex-col grid-bg overflow-hidden text-slate-200">
+<body class="h-screen flex flex-col grid-bg">
     <div class="scan-line"></div>
-    <!-- Nav via nav.js -->
+
+    <!-- Nav injected by nav.js -->
 
     <main class="flex-1 flex overflow-hidden">
 
-        <!-- Sidebar: Session History -->
-        <div class="hidden lg:flex w-64 border-r border-slate-700 bg-slate-900/80 flex-col">
-            <div class="p-4 border-b border-slate-700">
-                <button class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded text-xs flex items-center justify-center space-x-2 transition">
-                    <span>+ NEW SESSION</span>
+        <!-- Sidebar: History & Config -->
+        <div class="w-80 glass-panel border-r border-slate-700 flex flex-col hidden md:flex">
+             <div class="p-4 border-b border-slate-700">
+                <button class="w-full py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-sm font-bold shadow-lg shadow-cyan-500/20 transition flex items-center justify-center gap-2" onclick="newChat()">
+                    <span>+</span> NEW SESSION
                 </button>
             </div>
+
             <div class="flex-1 overflow-y-auto p-2 space-y-1">
-                <div class="p-3 bg-slate-800 rounded cursor-pointer border-l-2 border-blue-500">
-                    <div class="text-xs font-bold text-white truncate">TSLA Credit Analysis</div>
-                    <div class="text-[0.6rem] text-slate-500 mt-1">2 hours ago</div>
+                <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider px-2 py-2">Recent Sessions</div>
+                <!-- Mock History -->
+                <div class="p-2 rounded hover:bg-slate-800 cursor-pointer text-xs text-slate-300 truncate">
+                    Analysis: Apple Q3 Earnings
                 </div>
-                 <div class="p-3 hover:bg-slate-800/50 rounded cursor-pointer border-l-2 border-transparent hover:border-slate-600">
-                    <div class="text-xs font-bold text-slate-300 truncate">Macro Shock Simulation</div>
-                    <div class="text-[0.6rem] text-slate-500 mt-1">Yesterday</div>
+                <div class="p-2 rounded hover:bg-slate-800 cursor-pointer text-xs text-slate-300 truncate">
+                    Risk Simulation: Oil Shock
+                </div>
+                <div class="p-2 rounded hover:bg-slate-800 cursor-pointer text-xs text-slate-300 truncate">
+                    Competitor Scan: EV Market
                 </div>
             </div>
-            <!-- User Profile -->
-            <div class="p-4 border-t border-slate-700 flex items-center space-x-3">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500"></div>
-                <div>
-                    <div class="text-xs font-bold text-white">Operator</div>
-                    <div class="text-[0.6rem] text-emerald-400">Online</div>
+
+            <div class="p-4 border-t border-slate-700 bg-slate-800/30">
+                <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2">Model Config</div>
+                <select class="w-full bg-slate-900 border border-slate-700 rounded p-1 text-xs text-white mb-2">
+                    <option>Adam v23.5 (Adaptive)</option>
+                    <option>Adam v22.0 (Fast)</option>
+                    <option>GPT-4o (Passthrough)</option>
+                </select>
+                <div class="flex items-center justify-between text-xs text-slate-400">
+                    <span>Temp: 0.7</span>
+                    <span>Graph: ON</span>
                 </div>
             </div>
         </div>
 
         <!-- Chat Area -->
-        <div class="flex-1 flex flex-col relative bg-slate-900/30">
+        <div class="flex-1 flex flex-col relative bg-slate-900/50">
 
             <!-- Messages -->
-            <div id="chat-container" class="flex-1 overflow-y-auto p-6 flex flex-col space-y-4">
-                <div class="flex justify-center my-4">
-                    <span class="text-[0.65rem] bg-slate-800 text-slate-500 px-3 py-1 rounded-full border border-slate-700">Session Started: Today at 09:42 AM</span>
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6" id="chat-container">
+
+                <!-- Welcome Message -->
+                <div class="flex gap-4 max-w-3xl mx-auto w-full">
+                    <div class="w-8 h-8 rounded bg-cyan-600 flex-shrink-0 flex items-center justify-center font-bold text-white shadow-lg shadow-cyan-500/20">A</div>
+                    <div class="flex-1 space-y-2">
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-white text-sm">Adam v23.5</span>
+                            <span class="text-[10px] text-slate-500 bg-slate-800 px-1 rounded border border-slate-700">SYSTEM</span>
+                        </div>
+                        <div class="text-slate-300 text-sm leading-relaxed prose prose-invert">
+                            <p>Greetings, Operator. The Adaptive System is online.</p>
+                            <p>I can assist with:</p>
+                            <ul class="list-disc pl-4 space-y-1 text-slate-400">
+                                <li>Deep Dive Financial Analysis (SNC, Credit, Valuation)</li>
+                                <li>Market Risk Simulation (Monte Carlo, Stress Testing)</li>
+                                <li>Knowledge Graph Exploration</li>
+                            </ul>
+                            <p class="mt-2">How shall we proceed?</p>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Initial Greeting -->
-                <div class="bot-bubble">
-                    Hello. I am Adam, your financial intelligence system.<br>
-                    I am connected to the v23.0 Graph Engine.<br><br>
-                    <strong>Capabilities available:</strong>
-                    <ul class="list-disc ml-5 mt-2 text-xs text-slate-300">
-                        <li>Real-time Credit Risk Assessment</li>
-                        <li>SNC Portfolio Analysis</li>
-                        <li>Market Sentiment Tracking</li>
-                        <li>Crisis Simulation (Red Team)</li>
-                    </ul>
-                </div>
             </div>
 
             <!-- Input Area -->
-            <div class="p-4 bg-slate-900 border-t border-slate-700">
-                <div class="relative max-w-4xl mx-auto">
-                    <input type="text" id="user-input"
-                        class="w-full bg-slate-800 text-slate-200 border border-slate-600 rounded-lg pl-4 pr-12 py-3 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition shadow-lg placeholder-slate-500"
-                        placeholder="Ask about a company, run a simulation, or query the knowledge graph..."
-                        onkeydown="if(event.key === 'Enter') sendMessage()">
-
-                    <button onclick="sendMessage()" class="absolute right-2 top-2 p-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-md transition">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+            <div class="p-4 border-t border-slate-700 bg-slate-900/80 backdrop-blur">
+                <div class="max-w-3xl mx-auto relative">
+                    <textarea
+                        id="user-input"
+                        class="w-full bg-slate-800 border border-slate-600 rounded-lg pl-4 pr-12 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 resize-none shadow-inner transition"
+                        rows="2"
+                        placeholder="Ask Adam to analyze a ticker, simulate a crisis, or explain a concept..."
+                        onkeydown="handleKey(event)"
+                    ></textarea>
+                    <button class="absolute right-2 bottom-2.5 p-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded transition disabled:opacity-50 disabled:cursor-not-allowed" onclick="sendMessage()" id="send-btn">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                     </button>
                 </div>
-                <div class="text-center mt-2 text-[0.6rem] text-slate-600 font-mono">
-                    Adam v23.0 | AI-Generated responses may require verification.
+                <div class="text-center mt-2 text-[10px] text-slate-600 font-mono">
+                    AI generated content can be inaccurate. Always verify financial data.
                 </div>
             </div>
 
         </div>
+
     </main>
 
     <script src="js/mock_data.js"></script>
-    <script src="js/app.js"></script>
     <script src="js/nav.js"></script>
     <script>
         const chatContainer = document.getElementById('chat-container');
-        const inputField = document.getElementById('user-input');
+        const userInput = document.getElementById('user-input');
 
-        function sendMessage() {
-            const text = inputField.value.trim();
-            if (!text) return;
+        function handleKey(e) {
+            if(e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
 
-            // Add User Message
-            addMessage(text, 'user');
-            inputField.value = '';
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if(!text) return;
 
-            // Show Typing Indicator
-            const typingId = addTypingIndicator();
+            // User Message
+            addMessage('User', text, 'U');
+            userInput.value = '';
 
-            // Simulate Network Delay and Response
+            // Loading Indicator
+            const loadingId = addLoading();
+
+            // Simulate Network Delay
             setTimeout(() => {
-                removeMessage(typingId);
-                const response = generateMockResponse(text);
-                addMessage(response, 'bot');
-            }, 1000 + Math.random() * 1000);
+                removeMessage(loadingId);
+
+                // Mock Response Logic
+                let response = "I'm processing that request on the v23 Graph...";
+                if(text.toLowerCase().includes('apple') || text.toLowerCase().includes('aapl')) {
+                    response = "## Apple Inc. (AAPL) Analysis\n\n**Conviction:** HIGH\n**Price Target:** $215\n\nI've analyzed the latest 10-K and market sentiment. Key findings:\n1. Services revenue growth offsets hardware cyclicality.\n2. Supply chain risks in China remain elevated but manageable.\n3. **SNC Rating:** PASS\n\nWould you like to run a Monte Carlo simulation on this ticker?";
+                } else if (text.toLowerCase().includes('risk') || text.toLowerCase().includes('sim')) {
+                    response = "Initiating **Crisis Simulation Protocol**...\n\nScenario: *Global Interest Rate Shock (+50bps)*\n\nRunning 10,000 paths...\n\n**Result:**\n- Portfolio VaR (99%): -4.2%\n- Expected Drawdown: -12.5%\n- Most impacted sector: Real Estate (REITs)\n\nGraph updated.";
+                } else {
+                    response = "I've logged that query. To provide a precise answer, I need to consult the Knowledge Graph. \n\nQuerying `Neo4j`...\n\nFound 12 related nodes. The consensus is neutral at this time.";
+                }
+
+                addMessage('Adam v23.5', response, 'A', true);
+
+            }, 1500);
         }
 
-        function addMessage(text, sender) {
+        function addMessage(name, text, initial, isMarkdown=false) {
             const div = document.createElement('div');
-            div.className = sender === 'user' ? 'user-bubble' : 'bot-bubble';
-            div.innerHTML = text; // Allow HTML for bot responses
-            chatContainer.appendChild(div);
-            scrollToBottom();
-            return div.id = 'msg-' + Date.now();
-        }
+            div.className = "flex gap-4 max-w-3xl mx-auto w-full chat-msg";
 
-        function addTypingIndicator() {
-            const id = 'typing-' + Date.now();
-            const div = document.createElement('div');
-            div.id = id;
-            div.className = 'bot-bubble w-16';
+            let avatarColor = name === 'User' ? 'bg-slate-600' : 'bg-cyan-600';
+
+            // Markdown parsing (very basic for demo)
+            let content = text;
+            if(isMarkdown) {
+                content = text
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\n/g, '<br>');
+            }
+
             div.innerHTML = `
-                <div class="text-center">
-                    <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+                <div class="w-8 h-8 rounded ${avatarColor} flex-shrink-0 flex items-center justify-center font-bold text-white shadow-lg shadow-black/20">${initial}</div>
+                <div class="flex-1 space-y-1">
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-white text-sm">${name}</span>
+                        ${name !== 'User' ? '<span class="text-[10px] text-slate-500 bg-slate-800 px-1 rounded border border-slate-700">SYSTEM</span>' : ''}
+                    </div>
+                    <div class="text-slate-300 text-sm leading-relaxed prose prose-invert">
+                        ${content}
+                    </div>
                 </div>
             `;
             chatContainer.appendChild(div);
-            scrollToBottom();
-            return id;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return div.id = 'msg-' + Date.now();
+        }
+
+        function addLoading() {
+            const div = document.createElement('div');
+            div.className = "flex gap-4 max-w-3xl mx-auto w-full chat-msg";
+            div.id = 'loading-' + Date.now();
+            div.innerHTML = `
+                 <div class="w-8 h-8 rounded bg-cyan-600 flex-shrink-0 flex items-center justify-center font-bold text-white shadow-lg">A</div>
+                 <div class="flex items-center">
+                    <div class="typing-indicator flex gap-1 bg-slate-800 px-3 py-2 rounded-full">
+                        <span class="w-2 h-2 bg-slate-400 rounded-full"></span>
+                        <span class="w-2 h-2 bg-slate-400 rounded-full"></span>
+                        <span class="w-2 h-2 bg-slate-400 rounded-full"></span>
+                    </div>
+                 </div>
+            `;
+            chatContainer.appendChild(div);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return div.id;
         }
 
         function removeMessage(id) {
             const el = document.getElementById(id);
-            if (el) el.remove();
+            if(el) el.remove();
         }
 
-        function scrollToBottom() {
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
-
-        // Simple Mock Logic
-        function generateMockResponse(query) {
-            const lower = query.toLowerCase();
-
-            if (lower.includes('tesla') || lower.includes('tsla')) {
-                return `<strong>Analyzing Tesla, Inc. (TSLA)...</strong><br><br>
-                        Currently rating: <span class="text-green-400">BBB+</span>.<br>
-                        Sentiment is mixed due to recent margin compression, but long-term growth thesis remains intact based on energy storage segment expansion.<br><br>
-                        Would you like to generate a full <a href="reports.html" class="text-blue-400 underline">credit report</a>?`;
-            }
-            if (lower.includes('risk') || lower.includes('simulation')) {
-                return `Initiating <strong>Risk Assessment Protocol</strong>.<br>
-                        Scanning for macro-economic triggers...<br><br>
-                        <em>Detected:</em> Interest Rate Volatility (High Probability).<br>
-                        Running Monte Carlo simulation (10,000 iterations)... done.<br><br>
-                        Projected Impact: -2.4% on Portfolio Alpha.`;
-            }
-            if (lower.includes('graph') || lower.includes('connection')) {
-                return `Querying Knowledge Graph... found 12 entities related to your request.<br>
-                        Primary node: <span class="font-mono text-purple-400">Entity_XYZ</span>.<br>
-                        Please visualize this in the <a href="graph.html" class="text-blue-400 underline">Knowledge Graph Explorer</a>.`;
-            }
-
-            return `I received your query: "<em>${query}</em>".<br>
-                    However, my generative engine is currently in <strong>Static Mock Mode</strong>.<br>
-                    Please try asking about "Tesla", "Risk", or "Graph".`;
+        function newChat() {
+            chatContainer.innerHTML = ''; // Clear but keep welcome msg ideally, but here clear all
+            // Re-add welcome
+            // ... (simplified)
+            location.reload();
         }
     </script>
 </body>

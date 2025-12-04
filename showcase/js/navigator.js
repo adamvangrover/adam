@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const icon = document.createElement('span');
             icon.className = 'mr-2 text-xs text-gray-500';
-            icon.textContent = val._type === 'dir' ? '📁' : 'mb_'; // 'mb_' as mock file icon
+            icon.textContent = val._type === 'dir' ? '📁' : '📄';
 
             const span = document.createElement('span');
             span.textContent = key;

@@ -3,195 +3,279 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v23 | Agent Registry</title>
+    <title>ADAM v23.5 | Agent Registry & Control</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Base styles */
-        body { background-color: #0f172a; }
-        
-        /* CRT Scanline effect */
+        /* --- Core Theme Overrides --- */
+        body { background-color: #0f172a; font-family: 'Inter', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* CRT Scanline */
         .scan-line {
-            position: fixed; top: 0; left: 0; width: 100%; height: 5px;
-            background: rgba(16, 185, 129, 0.1);
-            opacity: 0.4; animation: scan 6s linear infinite; pointer-events: none; z-index: 9999;
+            position: fixed; top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(to bottom, rgba(16, 185, 129, 0), rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0));
+            opacity: 0.1; animation: scan 8s linear infinite; pointer-events: none; z-index: 9999;
         }
         @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
 
-        /* Glassmorphism Panel */
-        .glass-panel {
+        /* Glass Cards */
+        .agent-card {
             background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(51, 65, 85, 0.5);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .agent-card:hover {
+            background: rgba(30, 41, 59, 0.6);
+            transform: translateY(-4px);
+            border-color: rgba(34, 211, 238, 0.5); /* Cyan-400 */
+            box-shadow: 0 10px 30px -10px rgba(6, 182, 212, 0.2);
+        }
+
+        /* Logic Modal */
+        .code-block {
+            background: #0a0a0c;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: #a5b4fc;
+            overflow-x: auto;
         }
 
         /* Slide-up Terminal */
         .terminal-overlay {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            height: 350px;
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 350px;
             background: rgba(10, 10, 12, 0.95);
             border-top: 1px solid #334155;
             backdrop-filter: blur(10px);
             z-index: 50;
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            transform: translateY(100%); /* Hidden by default */
+            transform: translateY(100%);
         }
         .terminal-overlay.open { transform: translateY(0); }
-        
-        /* Scrollbar styling */
-        ::-webkit-scrollbar { width: 8px; }
+
+        /* Utilities */
+        .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-200 font-sans h-screen flex flex-col overflow-hidden">
+<body class="h-screen flex flex-col overflow-hidden text-slate-200">
     <div class="scan-line"></div>
 
     <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 shrink-0">
         <div class="flex items-center gap-4">
-            <button id="nav-toggle" class="text-slate-400 hover:text-white transition">
-                <i class="fas fa-bars"></i>
-            </button>
-            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-emerald-400">v23</span> <span class="text-slate-500 font-normal">| Agent Registry</span></h1>
+            <a href="index.html" class="text-slate-400 hover:text-white transition"><i class="fas fa-arrow-left"></i></a>
+            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-emerald-400">v23.5</span> <span class="text-slate-500 font-normal">| Agent Registry</span></h1>
         </div>
-        <div class="flex gap-4 font-mono text-xs text-slate-400 hidden md:flex">
-             <div>AGENTS: <span class="text-emerald-400" id="agent-count">0</span></div>
-             <div>SYSTEM: <span class="text-emerald-400">ONLINE</span></div>
+        <div class="flex items-center gap-6 font-mono text-xs">
+            <div class="hidden md:block text-slate-400">AGENTS: <span class="text-white" id="agent-count">--</span></div>
+            <div class="hidden md:block text-slate-400">STATUS: <span class="text-emerald-400">ONLINE</span></div>
+            
+            <button onclick="toggleSettings()" class="text-slate-400 hover:text-cyan-400 transition" title="Runtime Configuration">
+                <i class="fas fa-cog fa-lg"></i>
+            </button>
         </div>
     </header>
 
-    <main class="flex-1 p-4 lg:p-8 overflow-y-auto pb-40"> 
+    <main class="flex-1 p-6 overflow-y-auto pb-40">
         
-        <div class="mb-6 flex flex-wrap gap-2 text-sm font-mono sticky top-0 z-30 py-2 bg-slate-900/50 backdrop-blur-sm" id="filters">
-            <button class="px-3 py-1 bg-blue-600 text-white border border-blue-500 rounded hover:bg-blue-500 transition shadow-[0_0_10px_rgba(37,99,235,0.5)]" onclick="filter('ALL', this)" id="btn-all">ALL</button>
-            <button class="px-3 py-1 bg-slate-800 text-slate-400 border border-slate-700 rounded hover:bg-slate-700 hover:text-white transition" onclick="filter('Specialist', this)">SPECIALISTS</button>
-            <button class="px-3 py-1 bg-slate-800 text-slate-400 border border-slate-700 rounded hover:bg-slate-700 hover:text-white transition" onclick="filter('Meta-Agent', this)">META-AGENTS</button>
-            <button class="px-3 py-1 bg-slate-800 text-slate-400 border border-slate-700 rounded hover:bg-slate-700 hover:text-white transition" onclick="filter('Orchestrator', this)">ORCHESTRATORS</button>
-            <div class="w-px h-6 bg-slate-700 mx-2"></div>
-            <button class="px-3 py-1 bg-slate-800 text-slate-400 border border-slate-700 rounded hover:bg-slate-700 hover:text-white transition" onclick="filterStatus('IDLE', this)">IDLE ONLY</button>
+        <div class="mb-8 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex gap-2" id="filters">
+                <button class="px-4 py-1.5 rounded-full bg-blue-600/20 border border-blue-500/50 text-blue-400 text-xs font-bold font-mono hover:bg-blue-600/40 transition active-filter" onclick="filter('ALL', this)">ALL</button>
+                <button class="px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition" onclick="filter('Specialist', this)">SPECIALISTS</button>
+                <button class="px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition" onclick="filter('Meta-Agent', this)">META-AGENTS</button>
+                <button class="px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition" onclick="filter('Orchestrator', this)">ORCHESTRATORS</button>
+            </div>
+            
+            <div class="relative">
+                <input type="text" id="search-agent" placeholder="Search agents..." class="bg-slate-900 border border-slate-700 rounded-lg px-4 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-500 w-64 font-mono transition" onkeyup="handleSearch(this.value)">
+                <i class="fas fa-search absolute right-3 top-2 text-slate-600 text-xs"></i>
+            </div>
         </div>
 
         <div id="agents-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <div class="col-span-full text-center text-slate-500 py-20 font-mono animate-pulse">
-                Initializing Neural Link...
+            <div class="col-span-full flex flex-col items-center justify-center py-20 text-slate-500 animate-pulse">
+                <i class="fas fa-circle-notch fa-spin fa-2x mb-4 text-cyan-500"></i>
+                <span class="font-mono text-sm">Querying Agent Mesh...</span>
             </div>
         </div>
+
     </main>
 
     <div id="terminal" class="terminal-overlay flex flex-col font-mono text-sm shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
         <div class="h-10 bg-slate-800 flex items-center justify-between px-4 border-b border-slate-700 cursor-pointer hover:bg-slate-750 transition" onclick="toggleTerminal()">
             <div class="flex items-center gap-2">
                 <i class="fas fa-terminal text-emerald-400"></i>
-                <span class="text-slate-300 font-bold" id="terminal-title">SYSTEM CONSOLE</span>
+                <span class="text-slate-300 font-bold text-xs" id="terminal-title">SYSTEM CONSOLE</span>
             </div>
             <button class="text-slate-400 hover:text-white"><i class="fas fa-chevron-down"></i></button>
         </div>
-        
-        <div class="flex-1 overflow-y-auto p-4 text-slate-300 space-y-1 bg-[#0a0a0c]" id="terminal-output">
-            <div class="text-slate-500">System initialized. Select an agent to inspect logs...</div>
+        <div class="flex-1 overflow-y-auto p-4 space-y-1 bg-[#0a0a0c]" id="terminal-output">
+            <div class="text-slate-500">[SYSTEM] Console ready. Select an agent to view telemetry.</div>
         </div>
     </div>
 
-    <script>
-        // -- DATA & STATE --
-        let allAgents = [];
-        let currentTypeFilter = 'ALL';
-        let statusFilter = null;
+    <div id="logic-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-lg shadow-2xl w-full max-w-3xl flex flex-col max-h-[80vh]">
+            <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/50 rounded-t-lg">
+                <h3 class="text-lg font-bold text-white font-mono flex items-center gap-2">
+                    <i class="fas fa-brain text-purple-400"></i> <span id="modal-agent-name">Agent Logic</span>
+                </h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-4 overflow-y-auto flex-1 bg-[#0f1115]">
+                <div class="text-xs text-slate-400 mb-2 font-mono uppercase tracking-widest">System Prompt / Configuration</div>
+                <pre class="code-block" id="modal-content">Loading...</pre>
+            </div>
+            <div class="p-4 border-t border-slate-700 bg-slate-800/50 rounded-b-lg flex justify-end gap-3">
+                <button onclick="copyLogic()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold rounded flex items-center gap-2 transition">
+                    <i class="fas fa-copy"></i> Copy Prompt
+                </button>
+                <button onclick="closeModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
 
-        // Fallback data in case external files are missing
-        const fallbackData = [
-            { name: "Meta_Orchestrator", type: "Orchestrator", status: "ACTIVE", load: 85, path: "core/orch/main.py", tasks: 12 },
-            { name: "SNC_Analyst", type: "Specialist", status: "ACTIVE", load: 62, path: "modules/finance/snc.py", tasks: 4 },
-            { name: "Market_Sentiment", type: "Analyst", status: "IDLE", load: 5, path: "modules/social/twitter.py", tasks: 0 },
-            { name: "Red_Team_Lead", type: "Adversarial", status: "IDLE", load: 0, path: "security/red_team.py", tasks: 0 },
-            { name: "Compliance_Bot", type: "Support", status: "ACTIVE", load: 45, path: "audit/compliance.py", tasks: 8 },
-            { name: "Planner_Node", type: "Orchestrator", status: "ACTIVE", load: 30, path: "core/planning/bfs.py", tasks: 2 }
+    <div id="settings-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-lg shadow-2xl w-full max-w-md p-6">
+            <h2 class="text-xl font-bold text-white mb-4">Runtime Configuration</h2>
+            
+            <div class="mb-4">
+                <label class="block text-xs font-mono text-slate-400 mb-2">OPENAI / LLM API KEY</label>
+                <input type="password" id="api-key-input" class="w-full bg-black border border-slate-700 rounded p-2 text-white text-sm focus:border-emerald-500 outline-none" placeholder="sk-...">
+                <p class="text-[10px] text-slate-500 mt-1">Key is stored in localStorage. Required for live generation.</p>
+            </div>
+
+            <div class="mb-6">
+                <label class="flex items-center cursor-pointer">
+                    <input type="checkbox" id="live-mode-toggle" class="sr-only peer">
+                    <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600 relative"></div>
+                    <span class="ml-3 text-sm font-medium text-slate-300">Enable Live Mode</span>
+                </label>
+            </div>
+
+            <div class="flex justify-end">
+                <button onclick="saveSettings()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-bold text-sm transition">Save & Reload</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/mock_data.js"></script>
+    <script src="js/nav.js"></script>
+    <script>
+        // -- STATE --
+        let agents = [];
+        let currentFilter = 'ALL';
+        let searchQuery = '';
+        let terminalInterval;
+
+        // -- FALLBACK DATA (If mock_data.js fails) --
+        const FALLBACK_AGENTS = [
+            { name: "Risk_Architect", type: "Orchestrator", status: "ACTIVE", load: 78, description: "System-wide risk aggregation and routing.", prompt: "You are the Risk Architect. Your goal is to synthesize inputs from all sub-agents..." },
+            { name: "SNC_Analyst", type: "Specialist", status: "ACTIVE", load: 45, description: "Shared National Credit portfolio analysis.", prompt: "Analyze the following loan documents for regulatory compliance..." },
+            { name: "Market_Sentience", type: "Meta-Agent", status: "IDLE", load: 12, description: "Real-time sentiment tracking.", prompt: "Monitor twitter and news feeds for negative sentiment regarding..." },
+            { name: "Red_Team_Lead", type: "Adversarial", status: "SLEEP", load: 0, description: "Scenario injection and stress testing.", prompt: "Simulate a liquidity crisis in the Asian markets..." },
+            { name: "Reflector_Node", type: "Meta-Agent", status: "THINKING", load: 92, description: "Self-correction and output validation.", prompt: "Critique the previous analysis for logical fallacies..." }
         ];
 
-        // -- INITIALIZATION --
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Simulate data fetching
-            try {
-                // If you have a window.dataManager or window.MOCK_DATA, use it here
-                if (window.MOCK_DATA && window.MOCK_DATA.agents) {
-                    allAgents = window.MOCK_DATA.agents;
-                } else {
-                    console.log("Using fallback data");
-                    allAgents = fallbackData;
-                }
-            } catch (e) {
-                allAgents = fallbackData;
-            }
-
-            document.getElementById('agent-count').innerText = allAgents.length;
-            renderAgents();
+        // -- INIT --
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAgents();
+            loadSettings();
         });
 
-        // -- RENDERING LOGIC --
-        function renderAgents() {
+        function loadAgents() {
+            // Priority: Window Mock -> Fallback
+            if (window.MOCK_DATA && window.MOCK_DATA.agents && window.MOCK_DATA.agents.length > 0) {
+                agents = window.MOCK_DATA.agents;
+            } else {
+                console.warn("Using Fallback Agent Data");
+                agents = FALLBACK_AGENTS;
+            }
+            
+            document.getElementById('agent-count').innerText = agents.length;
+            renderGrid();
+        }
+
+        // -- RENDERING --
+        function renderGrid() {
             const grid = document.getElementById('agents-grid');
             grid.innerHTML = '';
 
-            let filtered = allAgents;
+            let filtered = agents;
 
-            // Apply Filters
-            if (currentTypeFilter !== 'ALL') {
-                filtered = filtered.filter(a => a.type === currentTypeFilter);
+            // Type Filter
+            if (currentFilter !== 'ALL') {
+                filtered = filtered.filter(a => a.type === currentFilter);
             }
-            if (statusFilter) {
-                filtered = filtered.filter(a => a.status === statusFilter);
+
+            // Search Filter
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                filtered = filtered.filter(a => a.name.toLowerCase().includes(q) || (a.description && a.description.toLowerCase().includes(q)));
             }
 
             if (filtered.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center text-slate-500 py-10 font-mono">No agents found matching criteria.</div>';
+                grid.innerHTML = `<div class="col-span-full text-center text-slate-500 py-12 border border-dashed border-slate-800 rounded">No agents found matching "${searchQuery}"</div>`;
                 return;
             }
 
             filtered.forEach(agent => {
-                const isActive = agent.status === 'ACTIVE';
-                const statusColor = isActive ? 'bg-emerald-500' : (agent.status === 'IDLE' ? 'bg-amber-500' : 'bg-slate-500');
-                
-                // Dynamic styling based on type
-                let typeBadgeStyle = "text-blue-400 border-blue-900/50 bg-blue-900/20";
-                if(agent.type === 'Meta-Agent') typeBadgeStyle = "text-purple-400 border-purple-900/50 bg-purple-900/20";
-                if(agent.type === 'Orchestrator') typeBadgeStyle = "text-amber-400 border-amber-900/50 bg-amber-900/20";
-
                 const card = document.createElement('div');
-                // Merged classes: uses glass-panel from v23 but layout from main
-                card.className = 'glass-panel p-5 rounded-lg border border-slate-700 hover:border-cyan-500/50 hover:shadow-[0_0_20px_rgba(6,182,212,0.1)] group flex flex-col justify-between h-48 transition cursor-pointer relative overflow-hidden agent-card';
-                card.onclick = () => selectAgent(agent);
+                card.className = 'agent-card rounded-xl p-5 relative overflow-hidden group flex flex-col justify-between h-52';
+                
+                // Color Logic
+                let typeColor = "text-blue-400 border-blue-500/30 bg-blue-500/10";
+                if(agent.type === 'Meta-Agent') typeColor = "text-purple-400 border-purple-500/30 bg-purple-500/10";
+                if(agent.type === 'Orchestrator') typeColor = "text-amber-400 border-amber-500/30 bg-amber-500/10";
+                if(agent.type === 'Adversarial') typeColor = "text-red-400 border-red-500/30 bg-red-500/10";
+
+                const statusColor = getStatusColor(agent.status);
+                const icon = getIcon(agent.type);
 
                 card.innerHTML = `
-                    <div class="absolute top-0 right-0 p-2 opacity-10 text-6xl text-slate-500 -rotate-12 select-none pointer-events-none group-hover:opacity-20 transition">
-                        <i class="fas fa-microchip"></i>
+                    <div class="absolute -right-4 -top-4 text-8xl text-white opacity-[0.03] group-hover:opacity-[0.06] transition-opacity rotate-12 select-none pointer-events-none">
+                        <i class="fas ${icon}"></i>
                     </div>
 
                     <div class="relative z-10">
                         <div class="flex justify-between items-start mb-3">
-                            <span class="text-[10px] font-bold font-mono px-2 py-0.5 rounded border ${typeBadgeStyle} uppercase tracking-wider">${agent.type}</span>
-                            <span class="flex items-center space-x-2 text-[10px] font-mono text-slate-400">
-                                <span class="w-1.5 h-1.5 rounded-full ${statusColor} ${isActive ? 'animate-pulse' : ''}"></span>
-                                <span>${agent.status}</span>
-                            </span>
+                            <span class="text-[10px] font-bold font-mono px-2 py-0.5 rounded border ${typeColor} uppercase tracking-wider">${agent.type}</span>
+                            <div class="flex items-center gap-2 bg-black/20 px-2 py-1 rounded-full border border-white/5">
+                                <span class="status-dot ${statusColor} ${agent.status === 'ACTIVE' || agent.status === 'THINKING' ? 'animate-pulse' : ''}"></span>
+                                <span class="text-[10px] font-mono font-bold text-slate-300">${agent.status}</span>
+                            </div>
                         </div>
-                        <h3 class="text-lg font-bold text-slate-200 group-hover:text-cyan-400 transition mb-1 leading-tight truncate font-mono">${agent.name.replace(/_/g, ' ')}</h3>
-                        <p class="text-[10px] text-slate-500 font-mono truncate">${agent.path}</p>
+                        <h3 class="text-lg font-bold text-white group-hover:text-cyan-400 transition font-mono truncate" title="${agent.name}">${agent.name.replace(/_/g, ' ')}</h3>
+                        <p class="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">${agent.description || 'No description available.'}</p>
                     </div>
 
-                    <div class="mt-4 relative z-10">
-                        <div class="flex justify-between text-[10px] text-slate-500 font-mono mb-1">
-                            <span>CPU LOAD</span>
+                    <div class="relative z-10 mt-auto">
+                        <div class="flex justify-between text-[10px] font-mono text-slate-500 mb-1">
+                            <span>COGNITIVE LOAD</span>
                             <span class="${agent.load > 80 ? 'text-red-400' : 'text-cyan-400'}">${agent.load}%</span>
                         </div>
-                        <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
-                            <div class="h-full ${isActive ? 'bg-cyan-500' : 'bg-slate-600'} transition-all duration-1000" style="width: ${agent.load}%"></div>
+                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-3">
+                            <div class="h-full ${getLoadColor(agent.load)} transition-all duration-1000" style="width: ${agent.load}%"></div>
                         </div>
-                        <div class="mt-2 text-[10px] text-slate-500 flex justify-between">
-                            <span>Tasks: ${agent.tasks || 0}</span>
-                            <span>v23.5</span>
+                        
+                        <div class="flex gap-2 border-t border-slate-700/50 pt-3">
+                            <button onclick="viewLogs('${agent.name}')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs py-1.5 rounded border border-slate-700 transition font-mono">
+                                <i class="fas fa-terminal mr-1"></i> LOGS
+                            </button>
+                            <button onclick="viewLogic('${agent.name}')" class="flex-1 bg-blue-900/20 hover:bg-blue-900/40 text-blue-300 text-xs py-1.5 rounded border border-blue-800/50 transition font-mono">
+                                <i class="fas fa-code mr-1"></i> LOGIC
+                            </button>
                         </div>
                     </div>
                 `;
@@ -199,76 +283,85 @@
             });
         }
 
-        // -- FILTERING LOGIC --
+        // -- LOGIC & HELPERS --
+
         function filter(type, btn) {
-            currentTypeFilter = type;
-            // Update UI
+            currentFilter = type;
+            // Reset styles
             document.querySelectorAll('#filters button').forEach(b => {
-                if(b.innerText === 'IDLE ONLY') return; // Skip status toggle
-                b.className = "px-3 py-1 bg-slate-800 text-slate-400 border border-slate-700 rounded hover:bg-slate-700 hover:text-white transition";
+                b.className = "px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition";
             });
-            btn.className = "px-3 py-1 bg-blue-600 text-white border border-blue-500 rounded hover:bg-blue-500 transition shadow-[0_0_10px_rgba(37,99,235,0.5)]";
-            renderAgents();
+            // Set active
+            btn.className = "px-4 py-1.5 rounded-full bg-blue-600/20 border border-blue-500/50 text-blue-400 text-xs font-bold font-mono hover:bg-blue-600/40 transition active-filter";
+            renderGrid();
         }
 
-        function filterStatus(status, btn) {
-            if (statusFilter === status) {
-                statusFilter = null;
-                btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-500');
-                btn.classList.add('bg-slate-800', 'text-slate-400', 'border-slate-700');
-            } else {
-                statusFilter = status;
-                btn.classList.remove('bg-slate-800', 'text-slate-400', 'border-slate-700');
-                btn.classList.add('bg-blue-600', 'text-white', 'border-blue-500');
+        function handleSearch(val) {
+            searchQuery = val;
+            renderGrid();
+        }
+
+        function getStatusColor(status) {
+            switch(status?.toUpperCase()) {
+                case 'ACTIVE': return 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]';
+                case 'THINKING': return 'bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.6)]';
+                case 'IDLE': return 'bg-amber-500';
+                default: return 'bg-slate-600';
             }
-            renderAgents();
         }
 
-        // -- TERMINAL LOGIC --
-        let terminalInterval;
+        function getLoadColor(load) {
+            if (load > 80) return 'bg-red-500';
+            if (load > 50) return 'bg-amber-400';
+            return 'bg-cyan-500';
+        }
 
-        function selectAgent(agent) {
+        function getIcon(type) {
+            if(type === 'Orchestrator') return 'fa-network-wired';
+            if(type === 'Adversarial') return 'fa-skull-crossbones';
+            if(type === 'Meta-Agent') return 'fa-brain';
+            return 'fa-robot';
+        }
+
+        // -- MODALS & TERMINAL --
+
+        function viewLogs(agentName) {
             const terminal = document.getElementById('terminal');
             const output = document.getElementById('terminal-output');
-            const title = document.getElementById('terminal-title');
-
+            
+            document.getElementById('terminal-title').innerText = `CONSOLE: ${agentName.toUpperCase()}`;
             terminal.classList.add('open');
-            title.innerText = `CONSOLE: ${agent.name.toUpperCase()}`;
-            output.innerHTML = ''; 
-            if(terminalInterval) clearInterval(terminalInterval);
+            output.innerHTML = '';
 
-            // Simulation logs
+            if (terminalInterval) clearInterval(terminalInterval);
+
             const logs = [
-                `[SYSTEM] Establishing secure handshake with ${agent.name}...`,
-                `[AUTH] Identity verified (Signature: 0x8F3A...)`,
-                `[KERNEL] Loading context from ${agent.path}...`,
-                `[STATE] Memory integrity: 99.8%`,
-                `[NETWORK] Latency: 12ms`,
-                `[READY] Agent listening on main bus.`
+                `[SYSTEM] Connecting to ${agentName} telemetry stream...`,
+                `[AUTH] Handshake successful (Token: 0x8F2A...)`,
+                `[INIT] Loading runtime environment v23.5...`,
+                `[STATE] Context window: 128k | Memory Usage: 45MB`,
+                `[INFO] Listening for task queue events...`,
+                `[READY] Agent is online and awaiting instructions.`
             ];
 
             let i = 0;
             terminalInterval = setInterval(() => {
-                if(i >= logs.length) {
+                if (i >= logs.length) {
                     clearInterval(terminalInterval);
-                    const line = document.createElement('div');
-                    line.className = "text-emerald-400 mt-2";
-                    line.innerHTML = `root@adam:${agent.name.toLowerCase().replace(/ /g,'_')}# <span class="animate-pulse">_</span>`;
-                    output.appendChild(line);
-                    output.scrollTop = output.scrollHeight;
+                    const prompt = document.createElement('div');
+                    prompt.className = "text-emerald-400 mt-2";
+                    prompt.innerHTML = `root@adam:${agentName.toLowerCase()}# <span class="animate-pulse">_</span>`;
+                    output.appendChild(prompt);
                     return;
                 }
-
                 const div = document.createElement('div');
-                div.className = "text-xs font-mono mb-1 text-slate-300";
-                
+                div.className = "text-xs font-mono text-slate-400 mb-1";
                 const time = new Date().toISOString().split('T')[1].split('.')[0];
-                let colorClass = 'text-slate-300';
-                if(logs[i].includes('[READY]')) colorClass = 'text-emerald-400';
-                if(logs[i].includes('[SYSTEM]')) colorClass = 'text-blue-400';
-
-                div.innerHTML = `<span class="text-slate-600">[${time}]</span> <span class="${colorClass}">${logs[i]}</span>`;
+                let color = 'text-slate-300';
+                if(logs[i].includes('[READY]')) color = 'text-emerald-400';
+                if(logs[i].includes('[SYSTEM]')) color = 'text-blue-400';
                 
+                div.innerHTML = `<span class="text-slate-600 mr-2">[${time}]</span> <span class="${color}">${logs[i]}</span>`;
                 output.appendChild(div);
                 output.scrollTop = output.scrollHeight;
                 i++;
@@ -276,9 +369,57 @@
         }
 
         function toggleTerminal() {
-            const t = document.getElementById('terminal');
-            t.classList.toggle('open');
+            document.getElementById('terminal').classList.toggle('open');
         }
+
+        function viewLogic(agentName) {
+            const agent = agents.find(a => a.name === agentName);
+            const promptText = agent?.prompt || agent?.system_prompt || "No explicit system prompt definition found in registry.";
+            
+            document.getElementById('modal-agent-name').innerText = agentName;
+            document.getElementById('modal-content').innerText = promptText;
+            document.getElementById('logic-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('logic-modal').classList.add('hidden');
+        }
+
+        function copyLogic() {
+            const content = document.getElementById('modal-content').innerText;
+            navigator.clipboard.writeText(content).then(() => {
+                const btn = document.querySelector('#logic-modal button i.fa-copy').parentNode;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = `<i class="fas fa-check"></i> Copied!`;
+                setTimeout(() => btn.innerHTML = originalText, 2000);
+            });
+        }
+
+        // -- SETTINGS --
+        function toggleSettings() {
+            document.getElementById('settings-modal').classList.toggle('hidden');
+        }
+
+        function loadSettings() {
+            const key = localStorage.getItem('adam_api_key');
+            const live = localStorage.getItem('adam_live_mode') === 'true';
+            
+            if(key) document.getElementById('api-key-input').value = key;
+            document.getElementById('live-mode-toggle').checked = live;
+        }
+
+        function saveSettings() {
+            const key = document.getElementById('api-key-input').value;
+            const live = document.getElementById('live-mode-toggle').checked;
+            
+            localStorage.setItem('adam_api_key', key);
+            localStorage.setItem('adam_live_mode', live);
+            
+            toggleSettings();
+            // Optional: Reload logic to switch data sources
+            if(live) alert("Live Mode Enabled. The system will now attempt to poll the backend API.");
+        }
+
     </script>
 </body>
 </html>
