@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v23.0 | Integrated Financial Intelligence Platform</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Marked (Markdown) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Prism (Code Highlight) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Shell specific overrides */
+        body { overflow: hidden; } /* Shell handles scrolling */
+        .sidebar-link.active {
+            background-color: rgba(6, 182, 212, 0.1);
+            color: #22d3ee; /* cyan-400 */
+            border-right: 2px solid #22d3ee;
+        }
+        #terminal-pane {
+            transition: height 0.3s ease-in-out;
+        }
+        .terminal-text {
+            font-family: 'Courier New', Courier, monospace;
+        }
+        /* Scrollbar for sidebar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155; 
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569; 
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-200 font-sans h-screen flex flex-col">
+
+    <!-- Top Bar -->
+    <header class="h-14 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-4 shrink-0 z-20">
+        <div class="flex items-center space-x-4">
+            <div class="text-cyan-500 font-bold text-xl tracking-tighter flex items-center">
+                <i class="fas fa-cube mr-2"></i> ADAM <span class="text-slate-500 text-xs ml-2 font-mono">v23.0</span>
+            </div>
+            
+            <!-- Global Search -->
+            <div class="relative hidden md:block">
+                <i class="fas fa-search absolute left-3 top-2.5 text-slate-500 text-sm"></i>
+                <input type="text" id="global-search" placeholder="Search Assets, Reports, Agents..." 
+                    class="bg-slate-800 border border-slate-700 text-slate-300 text-sm rounded-full pl-9 pr-4 py-1.5 focus:outline-none focus:border-cyan-500 w-64 transition-all focus:w-80">
+                <!-- Search Results Dropdown -->
+                <div id="search-results" class="hidden absolute top-full left-0 w-full mt-2 bg-slate-900 border border-slate-700 rounded-lg shadow-xl max-h-64 overflow-y-auto z-50"></div>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-4">
+            <button id="toggle-terminal" class="text-slate-400 hover:text-cyan-400 text-sm font-mono flex items-center transition" title="Toggle Terminal">
+                <i class="fas fa-terminal mr-2"></i> <span class="hidden sm:inline">TERMINAL</span>
+            </button>
+            <div class="h-6 w-px bg-slate-800 mx-2"></div>
+            <div class="flex items-center space-x-2">
+                <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                <span class="text-xs font-mono text-slate-400">SYSTEM ONLINE</span>
+            </div>
+            <img src="https://ui-avatars.com/api/?name=Admin&background=0f172a&color=22d3ee" class="w-8 h-8 rounded border border-slate-700 p-0.5">
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-16 md:w-64 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 transition-all duration-300 group">
+            <div class="flex-1 overflow-y-auto py-4 space-y-1">
+                <div class="px-4 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 hidden md:block">Main Modules</div>
+                
+                <a href="#mission_control" class="sidebar-link active flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-cyan-400 transition cursor-pointer" data-target="mission_control.html">
+                    <i class="fas fa-tachometer-alt w-6 text-center"></i>
+                    <span class="ml-3 font-medium hidden md:block">Mission Control</span>
+                </a>
+                
+                <a href="#neural_dashboard" class="sidebar-link flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-purple-400 transition cursor-pointer" data-target="neural_dashboard.html">
+                    <i class="fas fa-project-diagram w-6 text-center"></i>
+                    <span class="ml-3 font-medium hidden md:block">Neural Dashboard</span>
+                </a>
+
+                <a href="#deep_dive" class="sidebar-link flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-blue-400 transition cursor-pointer" data-target="deep_dive.html">
+                    <i class="fas fa-search-dollar w-6 text-center"></i>
+                    <span class="ml-3 font-medium hidden md:block">Deep Dive Analyst</span>
+                </a>
+
+                <a href="#financial_twin" class="sidebar-link flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-emerald-400 transition cursor-pointer" data-target="financial_twin.html">
+                    <i class="fas fa-globe w-6 text-center"></i>
+                    <span class="ml-3 font-medium hidden md:block">Financial Digital Twin</span>
+                </a>
+
+                <div class="mt-6 px-4 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 hidden md:block">Resources</div>
+
+                <a href="#agents" class="sidebar-link flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-amber-400 transition cursor-pointer" data-target="agents.html">
+                    <i class="fas fa-robot w-6 text-center"></i>
+                    <span class="ml-3 font-medium hidden md:block">Agent Registry</span>
+                </a>
+
+                <a href="#reports" class="sidebar-link flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-rose-400 transition cursor-pointer" data-target="reports.html">
+                    <i class="fas fa-file-alt w-6 text-center"></i>
+                    <span class="ml-3 font-medium hidden md:block">The Vault (Reports)</span>
+                </a>
+
+                <a href="#prompts" class="sidebar-link flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-indigo-400 transition cursor-pointer" data-target="prompts.html">
+                    <i class="fas fa-code w-6 text-center"></i>
+                    <span class="ml-3 font-medium hidden md:block">Prompt Library</span>
+                </a>
+
+                <a href="#data" class="sidebar-link flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-teal-400 transition cursor-pointer" data-target="data.html">
+                    <i class="fas fa-database w-6 text-center"></i>
+                    <span class="ml-3 font-medium hidden md:block">Data Lake</span>
+                </a>
+            </div>
+
+            <!-- Footer -->
+            <div class="p-4 border-t border-slate-800 hidden md:block">
+                <div class="text-xs text-slate-600">Connected to:</div>
+                <div class="text-xs font-mono text-cyan-500 truncate">wss://api.adam-platform.io/v1/stream</div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col relative bg-slate-950 overflow-hidden">
+            <!-- Iframe Container -->
+            <iframe id="content-frame" class="w-full h-full border-none bg-slate-950" src="mission_control.html" title="Module Content"></iframe>
+            
+            <!-- Terminal Pane (Overlay or Bottom) -->
+            <div id="terminal-pane" class="h-0 bg-slate-900 border-t border-slate-700 absolute bottom-0 w-full flex flex-col overflow-hidden z-30 shadow-[0_-5px_15px_rgba(0,0,0,0.5)]">
+                <div class="flex items-center justify-between px-4 py-1 bg-slate-800 border-b border-slate-700">
+                    <div class="text-xs font-mono text-slate-400 uppercase flex items-center">
+                        <i class="fas fa-terminal mr-2"></i> Adam System Console
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button id="clear-terminal" class="text-slate-500 hover:text-white text-xs"><i class="fas fa-ban"></i> Clear</button>
+                        <button id="close-terminal" class="text-slate-500 hover:text-white text-xs"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <div id="terminal-content" class="flex-1 p-4 font-mono text-xs text-green-400 overflow-y-auto space-y-1">
+                    <div><span class="text-slate-500">[SYSTEM]</span> Initializing Adam v23.0 Shell...</div>
+                    <div><span class="text-slate-500">[SYSTEM]</span> Connecting to local mock data provider... OK.</div>
+                    <div><span class="text-slate-500">[SYSTEM]</span> Routing engine ready.</div>
+                </div>
+                <!-- Input Line -->
+                <div class="px-4 py-2 bg-slate-900 flex items-center border-t border-slate-800">
+                    <span class="text-green-500 mr-2">➜</span>
+                    <input type="text" id="terminal-input" class="bg-transparent border-none focus:outline-none text-slate-200 text-xs font-mono w-full" placeholder="Enter command...">
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Universal Viewer Modal -->
+    <div id="universal-viewer" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-lg shadow-2xl w-full max-w-5xl h-[80vh] flex flex-col">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-700">
+                <div class="flex items-center">
+                    <i id="viewer-icon" class="fas fa-file-code text-cyan-500 mr-3 text-xl"></i>
+                    <div>
+                        <h3 id="viewer-title" class="text-lg font-bold text-white">filename.ext</h3>
+                        <p id="viewer-meta" class="text-xs text-slate-400 font-mono">/path/to/file • 12KB</p>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="text-slate-400 hover:text-white px-3 py-1 rounded hover:bg-slate-800 transition" onclick="window.shell.closeViewer()">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Modal Content -->
+            <div class="flex-1 overflow-auto p-6 bg-slate-900" id="viewer-body">
+                <!-- Content injected here -->
+                <pre class="text-sm font-mono text-slate-300">Loading...</pre>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-3 border-t border-slate-700 flex justify-between items-center bg-slate-900 rounded-b-lg">
+                <button class="text-xs text-slate-400 hover:text-cyan-400 flex items-center">
+                    <i class="fas fa-download mr-1"></i> Download
+                </button>
+                <div class="text-xs text-slate-500 font-mono">READ ONLY</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/mock_data.js"></script>
+    <script src="js/shell.js"></script>
+</body>
+</html>
