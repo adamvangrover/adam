@@ -6,6 +6,7 @@
     <title>ADAM | Neural Chat</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .typing-indicator span {
             animation: blink 1.4s infinite both;
@@ -26,45 +27,53 @@
         }
     </style>
 </head>
-<body class="h-screen flex flex-col grid-bg">
+<body class="h-screen flex flex-col grid-bg overflow-hidden">
     <div class="scan-line"></div>
+
+    <!-- Mobile Header -->
+    <div class="md:hidden flex items-center justify-between p-4 border-b border-slate-700 bg-slate-900/80 backdrop-blur z-20">
+        <div class="font-bold text-white tracking-wider">ADAM <span class="text-cyan-500">CHAT</span></div>
+        <button id="nav-toggle" class="text-white">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
 
     <!-- Nav injected by nav.js -->
 
-    <main class="flex-1 flex overflow-hidden">
+    <main class="flex-1 flex overflow-hidden md:ml-64 relative">
 
-        <!-- Sidebar: History & Config -->
-        <div class="w-80 glass-panel border-r border-slate-700 flex flex-col hidden md:flex">
+        <!-- History Sidebar (Desktop) -->
+        <div class="w-72 glass-panel border-r border-slate-700 flex flex-col hidden lg:flex z-10">
              <div class="p-4 border-b border-slate-700">
                 <button class="w-full py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-sm font-bold shadow-lg shadow-cyan-500/20 transition flex items-center justify-center gap-2" onclick="newChat()">
-                    <span>+</span> NEW SESSION
+                    <i class="fas fa-plus"></i> NEW SESSION
                 </button>
             </div>
 
             <div class="flex-1 overflow-y-auto p-2 space-y-1">
                 <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider px-2 py-2">Recent Sessions</div>
                 <!-- Mock History -->
-                <div class="p-2 rounded hover:bg-slate-800 cursor-pointer text-xs text-slate-300 truncate">
-                    Analysis: Apple Q3 Earnings
+                <div class="p-2 rounded hover:bg-slate-800 cursor-pointer text-xs text-slate-300 truncate border-l-2 border-transparent hover:border-cyan-500 transition-colors">
+                    <i class="fas fa-chart-line mr-2 text-slate-500"></i> Analysis: Apple Q3
                 </div>
-                <div class="p-2 rounded hover:bg-slate-800 cursor-pointer text-xs text-slate-300 truncate">
-                    Risk Simulation: Oil Shock
+                <div class="p-2 rounded hover:bg-slate-800 cursor-pointer text-xs text-slate-300 truncate border-l-2 border-transparent hover:border-cyan-500 transition-colors">
+                    <i class="fas fa-exclamation-triangle mr-2 text-slate-500"></i> Risk: Oil Shock
                 </div>
-                <div class="p-2 rounded hover:bg-slate-800 cursor-pointer text-xs text-slate-300 truncate">
-                    Competitor Scan: EV Market
+                <div class="p-2 rounded hover:bg-slate-800 cursor-pointer text-xs text-slate-300 truncate border-l-2 border-transparent hover:border-cyan-500 transition-colors">
+                    <i class="fas fa-search mr-2 text-slate-500"></i> EV Market Scan
                 </div>
             </div>
 
             <div class="p-4 border-t border-slate-700 bg-slate-800/30">
                 <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2">Model Config</div>
-                <select class="w-full bg-slate-900 border border-slate-700 rounded p-1 text-xs text-white mb-2">
+                <select class="w-full bg-slate-900 border border-slate-700 rounded p-1 text-xs text-white mb-2 focus:border-cyan-500 outline-none">
                     <option>Adam v23.5 (Adaptive)</option>
                     <option>Adam v22.0 (Fast)</option>
                     <option>GPT-4o (Passthrough)</option>
                 </select>
                 <div class="flex items-center justify-between text-xs text-slate-400">
                     <span>Temp: 0.7</span>
-                    <span>Graph: ON</span>
+                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span> Graph ON</span>
                 </div>
             </div>
         </div>
@@ -73,15 +82,15 @@
         <div class="flex-1 flex flex-col relative bg-slate-900/50">
 
             <!-- Messages -->
-            <div class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6" id="chat-container">
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 scroll-smooth" id="chat-container">
 
                 <!-- Welcome Message -->
-                <div class="flex gap-4 max-w-3xl mx-auto w-full">
-                    <div class="w-8 h-8 rounded bg-cyan-600 flex-shrink-0 flex items-center justify-center font-bold text-white shadow-lg shadow-cyan-500/20">A</div>
+                <div class="flex gap-4 max-w-3xl mx-auto w-full chat-msg">
+                    <div class="w-8 h-8 rounded bg-gradient-to-br from-cyan-600 to-blue-700 flex-shrink-0 flex items-center justify-center font-bold text-white shadow-lg shadow-cyan-500/20">A</div>
                     <div class="flex-1 space-y-2">
                         <div class="flex items-center gap-2">
                             <span class="font-bold text-white text-sm">Adam v23.5</span>
-                            <span class="text-[10px] text-slate-500 bg-slate-800 px-1 rounded border border-slate-700">SYSTEM</span>
+                            <span class="text-[10px] text-cyan-400 bg-cyan-900/20 px-1 rounded border border-cyan-800">SYSTEM</span>
                         </div>
                         <div class="text-slate-300 text-sm leading-relaxed prose prose-invert">
                             <p>Greetings, Operator. The Adaptive System is online.</p>
@@ -99,17 +108,18 @@
             </div>
 
             <!-- Input Area -->
-            <div class="p-4 border-t border-slate-700 bg-slate-900/80 backdrop-blur">
+            <div class="p-4 border-t border-slate-700 bg-slate-900/80 backdrop-blur z-20">
                 <div class="max-w-3xl mx-auto relative">
                     <textarea
                         id="user-input"
-                        class="w-full bg-slate-800 border border-slate-600 rounded-lg pl-4 pr-12 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 resize-none shadow-inner transition"
-                        rows="2"
+                        class="w-full bg-slate-800 border border-slate-600 rounded-lg pl-4 pr-12 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 resize-none shadow-inner transition text-sm"
+                        rows="1"
                         placeholder="Ask Adam to analyze a ticker, simulate a crisis, or explain a concept..."
                         onkeydown="handleKey(event)"
+                        oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"
                     ></textarea>
-                    <button class="absolute right-2 bottom-2.5 p-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded transition disabled:opacity-50 disabled:cursor-not-allowed" onclick="sendMessage()" id="send-btn">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    <button class="absolute right-2 bottom-2.5 p-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded transition disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-cyan-500/20" onclick="sendMessage()" id="send-btn">
+                        <i class="fas fa-paper-plane text-sm"></i>
                     </button>
                 </div>
                 <div class="text-center mt-2 text-[10px] text-slate-600 font-mono">
@@ -121,8 +131,11 @@
 
     </main>
 
+    <!-- Dependencies -->
     <script src="js/mock_data.js"></script>
+    <script src="js/app.js"></script>
     <script src="js/nav.js"></script>
+
     <script>
         const chatContainer = document.getElementById('chat-container');
         const userInput = document.getElementById('user-input');
@@ -141,57 +154,91 @@
             // User Message
             addMessage('User', text, 'U');
             userInput.value = '';
+            userInput.style.height = 'auto'; // Reset height
 
             // Loading Indicator
             const loadingId = addLoading();
 
-            // Simulate Network Delay
-            setTimeout(() => {
+            // Simulate Think Time
+            setTimeout(async () => {
                 removeMessage(loadingId);
-
-                // Mock Response Logic
-                let response = "I'm processing that request on the v23 Graph...";
-                if(text.toLowerCase().includes('apple') || text.toLowerCase().includes('aapl')) {
-                    response = "## Apple Inc. (AAPL) Analysis\n\n**Conviction:** HIGH\n**Price Target:** $215\n\nI've analyzed the latest 10-K and market sentiment. Key findings:\n1. Services revenue growth offsets hardware cyclicality.\n2. Supply chain risks in China remain elevated but manageable.\n3. **SNC Rating:** PASS\n\nWould you like to run a Monte Carlo simulation on this ticker?";
-                } else if (text.toLowerCase().includes('risk') || text.toLowerCase().includes('sim')) {
-                    response = "Initiating **Crisis Simulation Protocol**...\n\nScenario: *Global Interest Rate Shock (+50bps)*\n\nRunning 10,000 paths...\n\n**Result:**\n- Portfolio VaR (99%): -4.2%\n- Expected Drawdown: -12.5%\n- Most impacted sector: Real Estate (REITs)\n\nGraph updated.";
-                } else {
-                    response = "I've logged that query. To provide a precise answer, I need to consult the Knowledge Graph. \n\nQuerying `Neo4j`...\n\nFound 12 related nodes. The consensus is neutral at this time.";
-                }
-
+                const response = await generateResponse(text);
                 addMessage('Adam v23.5', response, 'A', true);
+            }, 1000 + Math.random() * 1000);
+        }
 
-            }, 1500);
+        async function generateResponse(query) {
+            // 1. Check for specific keywords for Demo Scenarios
+            const q = query.toLowerCase();
+
+            if (q.includes('apple') || q.includes('aapl')) {
+                return "## Apple Inc. (AAPL) Analysis\n\n**Conviction:** HIGH\n**Price Target:** $215\n\nI've analyzed the latest 10-K and market sentiment. Key findings:\n1. Services revenue growth offsets hardware cyclicality.\n2. Supply chain risks in China remain elevated but manageable.\n3. **SNC Rating:** PASS\n\nWould you like to run a Monte Carlo simulation on this ticker?";
+            }
+            if (q.includes('risk') || q.includes('sim')) {
+                return "Initiating **Crisis Simulation Protocol**...\n\nScenario: *Global Interest Rate Shock (+50bps)*\n\nRunning 10,000 paths...\n\n**Result:**\n- Portfolio VaR (99%): -4.2%\n- Expected Drawdown: -12.5%\n- Most impacted sector: Real Estate (REITs)\n\nGraph updated.";
+            }
+
+            // 2. Client-Side RAG (Static Mode)
+            // Use window.globalSearch to find relevant documents
+            if (window.globalSearch) {
+                const results = window.globalSearch.search(q);
+                if (results.length > 0) {
+                    const topResult = results[0];
+                    let context = "";
+
+                    // Simple logic to fetch content based on type
+                    // In a real RAG, we'd use vector similarity. Here we use keyword match from globalSearch.
+                    if (topResult.type === 'Report') {
+                         const report = window.dataManager.getReports().find(r => r.title === topResult.title);
+                         if (report) context = report.content.text || report.content;
+                    } else if (topResult.type === 'Agent') {
+                         const agent = window.dataManager.getAgents().find(a => a.name === topResult.title);
+                         if (agent) context = agent.docstring;
+                    }
+
+                    if (context) {
+                        return `I found relevant information in **${topResult.title}** (${topResult.type}):\n\n> ${context.substring(0, 300)}...\n\n[Click here to view full ${topResult.type}](${topResult.link})`;
+                    }
+                }
+            }
+
+            // 3. Fallback
+            return "I've logged that query. To provide a precise answer, I need to consult the Knowledge Graph. \n\nQuerying `Neo4j`...\n\nFound 12 related nodes. The consensus is neutral at this time.";
         }
 
         function addMessage(name, text, initial, isMarkdown=false) {
             const div = document.createElement('div');
             div.className = "flex gap-4 max-w-3xl mx-auto w-full chat-msg";
 
-            let avatarColor = name === 'User' ? 'bg-slate-600' : 'bg-cyan-600';
+            let avatar = name === 'User'
+                ? '<div class="w-8 h-8 rounded bg-slate-600 flex-shrink-0 flex items-center justify-center font-bold text-white shadow-lg">U</div>'
+                : '<div class="w-8 h-8 rounded bg-gradient-to-br from-cyan-600 to-blue-700 flex-shrink-0 flex items-center justify-center font-bold text-white shadow-lg shadow-cyan-500/20">A</div>';
 
-            // Markdown parsing (very basic for demo)
+            // Basic Markdown Parsing
             let content = text;
             if(isMarkdown) {
                 content = text
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-cyan-400">$1</strong>') // Bold -> Cyan
+                    .replace(/\*(.*?)\*/g, '<em class="text-slate-400">$1</em>') // Italic -> Slate
+                    .replace(/^> (.*$)/gim, '<blockquote class="border-l-2 border-cyan-500 pl-4 text-slate-400 italic my-2">$1</blockquote>') // Blockquote
+                    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="text-cyan-400 hover:underline">$1</a>') // Links
                     .replace(/\n/g, '<br>');
             }
 
             div.innerHTML = `
-                <div class="w-8 h-8 rounded ${avatarColor} flex-shrink-0 flex items-center justify-center font-bold text-white shadow-lg shadow-black/20">${initial}</div>
+                ${avatar}
                 <div class="flex-1 space-y-1">
                     <div class="flex items-center gap-2">
                         <span class="font-bold text-white text-sm">${name}</span>
-                        ${name !== 'User' ? '<span class="text-[10px] text-slate-500 bg-slate-800 px-1 rounded border border-slate-700">SYSTEM</span>' : ''}
+                        ${name !== 'User' ? '<span class="text-[10px] text-cyan-400 bg-cyan-900/20 px-1 rounded border border-cyan-800">SYSTEM</span>' : ''}
                     </div>
-                    <div class="text-slate-300 text-sm leading-relaxed prose prose-invert">
+                    <div class="text-slate-300 text-sm leading-relaxed prose prose-invert max-w-none">
                         ${content}
                     </div>
                 </div>
             `;
             chatContainer.appendChild(div);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            chatContainer.scrollTo({ top: chatContainer.scrollHeight, behavior: 'smooth' });
             return div.id = 'msg-' + Date.now();
         }
 
@@ -200,12 +247,12 @@
             div.className = "flex gap-4 max-w-3xl mx-auto w-full chat-msg";
             div.id = 'loading-' + Date.now();
             div.innerHTML = `
-                 <div class="w-8 h-8 rounded bg-cyan-600 flex-shrink-0 flex items-center justify-center font-bold text-white shadow-lg">A</div>
+                 <div class="w-8 h-8 rounded bg-gradient-to-br from-cyan-600 to-blue-700 flex-shrink-0 flex items-center justify-center font-bold text-white shadow-lg">A</div>
                  <div class="flex items-center">
-                    <div class="typing-indicator flex gap-1 bg-slate-800 px-3 py-2 rounded-full">
-                        <span class="w-2 h-2 bg-slate-400 rounded-full"></span>
-                        <span class="w-2 h-2 bg-slate-400 rounded-full"></span>
-                        <span class="w-2 h-2 bg-slate-400 rounded-full"></span>
+                    <div class="typing-indicator flex gap-1 bg-slate-800 px-3 py-2 rounded-full border border-slate-700">
+                        <span class="w-1.5 h-1.5 bg-slate-400 rounded-full"></span>
+                        <span class="w-1.5 h-1.5 bg-slate-400 rounded-full"></span>
+                        <span class="w-1.5 h-1.5 bg-slate-400 rounded-full"></span>
                     </div>
                  </div>
             `;
@@ -220,9 +267,8 @@
         }
 
         function newChat() {
-            chatContainer.innerHTML = ''; // Clear but keep welcome msg ideally, but here clear all
-            // Re-add welcome
-            // ... (simplified)
+            chatContainer.innerHTML = '';
+            // Re-inject welcome msg (omitted for brevity, or could function-ize it)
             location.reload();
         }
     </script>
