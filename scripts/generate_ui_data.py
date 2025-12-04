@@ -20,9 +20,40 @@ def clean_json_text(text):
     text = re.sub(r',(\s*[}\]])', r'\1', text)
     return text
 
+def get_file_content(filepath):
+    """Reads file content with strict size limit and text decoding."""
+    # REDUCED LIMIT to avoid blowing up the JS file size
+    MAX_SIZE = 1024 * 30 # 30 KB limit for inline viewing
+
+    try:
+        size = os.path.getsize(filepath)
+        if size > MAX_SIZE:
+            return f"File content too large to display inline ({size / 1024:.1f} KB). Please download to view."
+
+        # Binary check
+        with open(filepath, 'rb') as f:
+            chunk = f.read(1024)
+            if b'\0' in chunk:
+                return "Binary file (not displayed)."
+
+        with open(filepath, 'r', encoding='utf-8', errors='replace') as f:
+            return f.read()
+    except Exception as e:
+        return f"Error reading file: {str(e)}"
+
 def get_file_tree(root_dir):
     file_tree = []
-    exclude_dirs = {'.git', '__pycache__', 'node_modules', '.github', 'venv', 'env', 'site-packages', 'dist', 'build'}
+    # Exclude directories
+    exclude_dirs = {
+        '.git', '__pycache__', 'node_modules', '.github', 'venv', 'env',
+        'site-packages', 'dist', 'build', '.idea', '.vscode', 'pytest_cache',
+        'coverage', 'htmlcov', '.mypy_cache', 'tmp', 'temp'
+    }
+    # Include extensions
+    include_exts = {
+        '.md', '.json', '.jsonl', '.html', '.py', '.ttl',
+        '.yaml', '.yml', '.sh', '.css', '.js', '.txt', '.csv'
+    }
 
     for root, dirs, files in os.walk(root_dir):
         dirs[:] = [d for d in dirs if d not in exclude_dirs]
@@ -38,11 +69,25 @@ def get_file_tree(root_dir):
         for file in files:
             if file.startswith('.'):
                 continue
+
+            ext = os.path.splitext(file)[1].lower()
+            if ext not in include_exts and file not in ['AGENTS.md', 'Dockerfile', 'Makefile']:
+                continue
+
+            filepath = os.path.join(root, file)
+
+            # Decide whether to read content
+            content = None
+            # Only read content if it's a target extension
+            if ext in include_exts or file == 'AGENTS.md':
+                content = get_file_content(filepath)
+
             file_tree.append({
-                'path': os.path.join(rel_path, file),
-                'type': 'blob',
-                'size': 0,
-                'last_modified': 0
+                'path': os.path.join(rel_path, file).replace('\\', '/'),
+                'type': 'file',
+                'size': os.path.getsize(filepath),
+                'last_modified': os.path.getmtime(filepath),
+                'content': content
             })
     return file_tree
 
@@ -138,7 +183,8 @@ def get_ingested_data(ingestor: UniversalIngestor, root_dir):
         prompts.append({
             "name": art['title'],
             "path": os.path.relpath(art['source_path'], root_dir),
-            "category": "General" # Could extract from path
+            "category": "General", # Could extract from path
+            "content": str(art['content'])
         })
 
     return reports, newsletters, prompts
@@ -152,18 +198,21 @@ def main():
     ingestor.scan_directory(os.path.join(root_dir, "core/libraries_and_archives"))
     ingestor.scan_directory(os.path.join(root_dir, "prompt_library"))
     ingestor.scan_directory(os.path.join(root_dir, "data"))
-    ingestor.scan_directory(os.path.join(root_dir, "docs")) # Add docs scan
+    ingestor.scan_directory(os.path.join(root_dir, "docs"))
 
-    # Save the Gold Standard JSONL
-    os.makedirs(os.path.join(root_dir, "data/gold_standard"), exist_ok=True)
-    ingestor.save_to_jsonl(os.path.join(root_dir, "data/gold_standard/knowledge_artifacts.jsonl"))
+    # Save the Gold Standard JSONL - SKIP if too large to avoid sandbox limits
+    # os.makedirs(os.path.join(root_dir, "data/gold_standard"), exist_ok=True)
+    # ingestor.save_to_jsonl(os.path.join(root_dir, "data/gold_standard/knowledge_artifacts.jsonl"))
 
     # Map to UI Data
     reports, newsletters, prompts = get_ingested_data(ingestor, root_dir)
 
+    # Get Full File Tree with Content
+    files = get_file_tree(root_dir)
+
     data = {
         'generated_at': time.time(),
-        'files': get_file_tree(root_dir),
+        'files': files,
         'agents': parse_agents_md(root_dir),
         'reports': reports,
         'newsletters': newsletters,
@@ -179,13 +228,11 @@ def main():
         }
     }
 
-    output_path = os.path.join(root_dir, 'showcase/data/ui_data.json')
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-
-    with open(output_path, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=2)
-
-    print(f"Data written to {output_path}")
+    # Don't write the huge raw JSON for now, just the JS file
+    # output_path = os.path.join(root_dir, 'showcase/data/ui_data.json')
+    # os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    # with open(output_path, 'w', encoding='utf-8') as f:
+    #     json.dump(data, f, indent=2)
 
     js_output_path = os.path.join(root_dir, 'showcase/js/mock_data.js')
     os.makedirs(os.path.dirname(js_output_path), exist_ok=True)
