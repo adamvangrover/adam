@@ -3,174 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM System | Data & Libraries</title>
+    <title>ADAM v23 | Data Vault</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <!-- Prism for Syntax Highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <style>
+        .tree-item {
+            padding-left: 1rem;
+            border-left: 1px solid rgba(71, 85, 105, 0.3);
+        }
+    </style>
 </head>
-<body class="h-screen flex flex-col grid-bg text-slate-200">
+<body class="bg-slate-900 text-slate-200 font-sans h-screen flex flex-col overflow-hidden">
     <div class="scan-line"></div>
-    <!-- Nav via nav.js -->
 
-    <main class="flex-1 p-8 overflow-y-auto grid grid-cols-12 gap-6">
-
-        <!-- Header -->
-        <div class="col-span-12 glass-panel p-6 rounded-lg border-l-4 border-purple-500 flex justify-between items-center">
-            <div>
-                <h1 class="text-3xl font-bold text-white mb-2 font-mono">DATA & LIBRARIES</h1>
-                <p class="text-slate-400">Central repository for training sets, financial ontologies, and artisanal data.</p>
-            </div>
-            <div class="text-right font-mono text-xs text-slate-400">
-                 <div class="mb-1"><span class="text-white font-bold">Total Storage:</span> <span id="total-storage">--</span></div>
-                 <div><span class="text-white font-bold">Last Index:</span> <span id="last-index">--</span></div>
-            </div>
+    <!-- Header -->
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-slate-900/80 backdrop-blur-md z-50">
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="text-slate-500 hover:text-white transition">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+            <h1 class="text-xl font-bold tracking-tight text-slate-100">DATA <span class="text-amber-400">VAULT</span></h1>
         </div>
-
-        <!-- Directory View -->
-        <div class="col-span-12 lg:col-span-8 glass-panel rounded-lg overflow-hidden">
-            <div class="bg-slate-900/80 p-3 border-b border-slate-700 flex space-x-2 text-xs font-mono">
-                <span class="text-slate-500">ROOT /</span>
-                <span class="text-slate-300 hover:text-white cursor-pointer">data</span>
-                <span class="text-slate-500">/</span>
-                <span class="text-cyan-400 font-bold" id="current-dir">ALL</span>
-            </div>
-
-            <table class="w-full text-left text-sm">
-                <thead>
-                    <tr class="bg-slate-800 text-slate-400 font-mono text-xs uppercase">
-                        <th class="p-3">Name</th>
-                        <th class="p-3">Type</th>
-                        <th class="p-3">Size</th>
-                        <th class="p-3">Modified</th>
-                        <th class="p-3">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="file-list" class="divide-y divide-slate-700">
-                    <!-- Populated by JS -->
-                    <tr><td colspan="5" class="p-3 text-center text-slate-500">Loading data files...</td></tr>
-                </tbody>
-            </table>
+        <div class="text-xs font-mono text-slate-500">
+            <i class="fas fa-database mr-2"></i> SYSTEM_ROOT/DATA/
         </div>
+    </header>
 
-        <!-- Data Preview / Stats -->
-        <div class="col-span-12 lg:col-span-4 flex flex-col space-y-6">
+    <!-- Main Content -->
+    <main class="flex-1 flex gap-4 p-4 overflow-hidden">
 
-            <!-- Quick Stats -->
-            <div class="glass-panel p-4 rounded-lg">
-                <h3 class="text-purple-400 font-bold font-mono text-sm mb-3 uppercase">Dataset Quality</h3>
-                <div class="space-y-3">
-                    <div>
-                        <div class="flex justify-between text-xs mb-1">
-                            <span>SNC Training Data</span>
-                            <span class="text-white">98.5% Clean</span>
-                        </div>
-                        <div class="w-full bg-slate-700 h-1 rounded">
-                            <div class="bg-emerald-500 h-1 rounded" style="width: 98%"></div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-xs mb-1">
-                            <span>Risk Taxonomy Alignment</span>
-                            <span class="text-white">92.0%</span>
-                        </div>
-                        <div class="w-full bg-slate-700 h-1 rounded">
-                            <div class="bg-blue-500 h-1 rounded" style="width: 92%"></div>
-                        </div>
-                    </div>
+        <!-- File Explorer -->
+        <aside class="w-96 glass-panel flex flex-col rounded-lg overflow-hidden">
+            <div class="p-3 border-b border-slate-700 bg-slate-800/50 flex justify-between items-center">
+                <span class="text-xs uppercase font-bold text-slate-500">File Explorer</span>
+                <i class="fas fa-sync-alt text-slate-600 cursor-pointer hover:text-white text-xs"></i>
+            </div>
+            <div id="file-tree" class="flex-1 overflow-y-auto p-2 font-mono text-sm text-slate-400">
+                <!-- Tree injected here -->
+            </div>
+        </aside>
+
+        <!-- Preview Pane -->
+        <section class="flex-1 glass-panel rounded-lg overflow-hidden flex flex-col">
+            <div class="h-10 border-b border-slate-700 bg-slate-800 flex items-center px-4 justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-file-code text-cyan-500 text-sm"></i>
+                    <span id="preview-filename" class="text-sm font-mono text-slate-200">Select a file...</span>
                 </div>
+                <div class="text-xs text-slate-500" id="preview-meta"></div>
             </div>
-
-            <!-- Preview Card -->
-            <div class="glass-panel p-4 rounded-lg flex-1 flex flex-col h-64 lg:h-auto">
-                <h3 class="text-slate-400 font-bold font-mono text-sm mb-3 uppercase">File Preview</h3>
-                <div class="flex-1 bg-slate-900 rounded p-3 font-mono text-xs text-slate-300 overflow-auto whitespace-pre-wrap" id="file-preview">
-Select a file to view snippet...
-                </div>
+            <div class="flex-1 overflow-auto bg-[#1e1e1e] relative">
+                <pre class="m-0 p-4 min-h-full"><code id="code-preview" class="language-json text-xs font-mono"></code></pre>
             </div>
-
-        </div>
+        </section>
 
     </main>
 
     <script src="js/mock_data.js"></script>
     <script src="js/app.js"></script>
-    <script src="js/nav.js"></script>
     <script>
-        let dataFiles = [];
+        const treeContainer = document.getElementById('file-tree');
+        const codePreview = document.getElementById('code-preview');
+        const filenameLabel = document.getElementById('preview-filename');
+        const metaLabel = document.getElementById('preview-meta');
 
-        document.addEventListener('DOMContentLoaded', () => {
-             const data = window.MOCK_DATA || {};
-             const allFiles = data.files || [];
-
-             // Filter for data directory
-             dataFiles = allFiles.filter(f => f.path.startsWith('data/'));
-
-             renderFiles();
-             updateStats();
+        window.dataManager.init().then(() => {
+            const files = window.dataManager.getFiles();
+            renderTree(files);
         });
 
-        function renderFiles() {
-            const tbody = document.getElementById('file-list');
-            tbody.innerHTML = '';
+        function renderTree(files) {
+            // Group flat list into a simple hierarchy for visual purposes
+            // Assume files have 'path' like 'core/agents/...'
 
-            if (dataFiles.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-slate-500">No data files found.</td></tr>';
-                return;
-            }
+            const root = {};
 
-            dataFiles.forEach((file, idx) => {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-800 transition cursor-pointer group';
-                tr.onclick = () => showPreview(file);
-
-                const name = file.path.replace('data/', '');
-                const type = name.split('.').pop().toUpperCase();
-                const size = formatSize(file.size);
-                const date = new Date(file.last_modified * 1000).toISOString().split('T')[0];
-
-                tr.innerHTML = `
-                    <td class="p-3 font-mono text-slate-300 group-hover:text-white flex items-center">
-                        <svg class="w-4 h-4 mr-2 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        ${name}
-                    </td>
-                    <td class="p-3 text-slate-400">${type}</td>
-                    <td class="p-3 text-slate-400 font-mono">${size}</td>
-                    <td class="p-3 text-slate-500">${date}</td>
-                    <td class="p-3">
-                        <button class="text-cyan-600 hover:text-cyan-400 font-bold text-xs uppercase" onclick="alert('Download mock')">Download</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+            files.forEach(file => {
+                const parts = file.path.split('/');
+                let current = root;
+                parts.forEach((part, index) => {
+                    if (!current[part]) {
+                        // Is leaf?
+                        if (index === parts.length - 1) {
+                            current[part] = { _type: 'file', ...file, name: part };
+                        } else {
+                            current[part] = { _type: 'folder', _children: {} };
+                        }
+                    }
+                    if (index !== parts.length - 1) {
+                        current = current[part]._children;
+                    }
+                });
             });
+
+            treeContainer.innerHTML = buildTreeHTML(root, 0);
         }
 
-        async function showPreview(file) {
-            const el = document.getElementById('file-preview');
-            el.innerHTML = '<span class="text-slate-500">Loading...</span>';
-            el.classList.add('animate-pulse');
+        function buildTreeHTML(node, depth) {
+            let html = '';
+            const padding = depth * 12;
 
-            // Try to fetch content
-            const content = await window.dataManager.getFileContent(file.path);
+            // Sort: Folders first
+            const keys = Object.keys(node).sort((a, b) => {
+                const isAFolder = node[a]._type === 'folder';
+                const isBFolder = node[b]._type === 'folder';
+                if(isAFolder && !isBFolder) return -1;
+                if(!isAFolder && isBFolder) return 1;
+                return a.localeCompare(b);
+            });
 
-            // Truncate if too long
-            const displayContent = content.length > 2000 ? content.substring(0, 2000) + "\n... [Truncated]" : content;
+            keys.forEach(key => {
+                if (key.startsWith('_')) return; // skip metadata keys
+                const item = node[key];
 
-            el.textContent = displayContent;
-            el.classList.remove('animate-pulse');
+                if (item._type === 'folder') {
+                    html += `
+                        <div>
+                            <div class="flex items-center gap-2 py-1 cursor-pointer hover:text-white transition group" onclick="toggleFolder(this)" style="padding-left: ${padding}px">
+                                <i class="fas fa-folder text-amber-500/80 group-hover:text-amber-400"></i>
+                                <span>${key}</span>
+                            </div>
+                            <div class="folder-content hidden border-l border-slate-700 ml-3">
+                                ${buildTreeHTML(item._children, depth + 1)}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    const icon = getFileIcon(key);
+                    const color = getFileColor(key);
+                    // Encode path for click handler
+                    html += `
+                        <div class="flex items-center gap-2 py-1 cursor-pointer hover:bg-slate-800 hover:text-white transition"
+                             style="padding-left: ${padding}px"
+                             onclick="viewFile('${item.path}')">
+                            <i class="${icon} ${color}"></i>
+                            <span class="truncate">${key}</span>
+                        </div>
+                    `;
+                }
+            });
+            return html;
         }
 
-        function formatSize(bytes) {
-            if (bytes === 0) return '0 B';
-            const k = 1024;
-            const sizes = ['B', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+        function toggleFolder(el) {
+            const content = el.nextElementSibling;
+            content.classList.toggle('hidden');
+            const icon = el.querySelector('.fa-folder');
+            if (content.classList.contains('hidden')) {
+                icon.classList.remove('fa-folder-open');
+                icon.classList.add('fa-folder');
+            } else {
+                icon.classList.remove('fa-folder');
+                icon.classList.add('fa-folder-open');
+            }
         }
 
-        function updateStats() {
-            let totalSize = 0;
-            dataFiles.forEach(f => totalSize += f.size);
-            document.getElementById('total-storage').textContent = formatSize(totalSize);
-            document.getElementById('last-index').textContent = new Date().toISOString().replace('T', ' ').substring(0, 16);
+        function getFileIcon(filename) {
+            if (filename.endsWith('.json')) return 'fas fa-code';
+            if (filename.endsWith('.md')) return 'fas fa-book';
+            if (filename.endsWith('.py')) return 'fab fa-python';
+            if (filename.endsWith('.js')) return 'fab fa-js';
+            return 'fas fa-file';
+        }
+
+        function getFileColor(filename) {
+            if (filename.endsWith('.json')) return 'text-yellow-500';
+            if (filename.endsWith('.md')) return 'text-blue-400';
+            if (filename.endsWith('.py')) return 'text-green-500';
+            return 'text-slate-500';
+        }
+
+        async function viewFile(path) {
+            filenameLabel.innerText = path;
+            metaLabel.innerText = "Loading...";
+
+            const content = await window.dataManager.getFileContent(path);
+
+            codePreview.textContent = content;
+
+            // Set language class for Prism
+            codePreview.className = "text-xs font-mono"; // Reset
+            if (path.endsWith('.json')) codePreview.classList.add('language-json');
+            else if (path.endsWith('.py')) codePreview.classList.add('language-python');
+            else if (path.endsWith('.js')) codePreview.classList.add('language-javascript');
+            else codePreview.classList.add('language-markdown');
+
+            Prism.highlightElement(codePreview);
+
+            metaLabel.innerText = `${content.length} bytes | UTF-8`;
         }
     </script>
 </body>
