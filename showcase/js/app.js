@@ -79,6 +79,12 @@ class DataManager {
         };
     }
 
+    // Robust Accessors
+
+    get(path, defaultValue = "N/A") {
+        return path.split('.').reduce((o, p) => (o ? o[p] : defaultValue), this.data) || defaultValue;
+    }
+
     getSystemStats() {
         // If "Live Mode" is on but we are using static data, maybe simulate some fluctuations
         const stats = this.data?.system_stats || {};
