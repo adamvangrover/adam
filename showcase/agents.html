@@ -45,17 +45,20 @@
             font-size: 0.75rem;
             color: #a5b4fc;
             overflow-x: auto;
+            white-space: pre-wrap;
         }
 
         /* Slide-up Terminal */
         .terminal-overlay {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 350px;
-            background: rgba(10, 10, 12, 0.95);
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 400px;
+            background: rgba(10, 10, 12, 0.98);
             border-top: 1px solid #334155;
             backdrop-filter: blur(10px);
             z-index: 50;
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             transform: translateY(100%);
+            display: flex;
+            flex-direction: column;
         }
         .terminal-overlay.open { transform: translateY(0); }
 
@@ -65,6 +68,13 @@
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* Animations */
+        @keyframes pulse-soft {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .animate-pulse-soft { animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden text-slate-200">
@@ -85,7 +95,7 @@
         </div>
     </header>
 
-    <main class="flex-1 p-6 overflow-y-auto pb-40">
+    <main class="flex-1 p-6 overflow-y-auto pb-40" id="main-content">
         
         <div class="mb-8 flex flex-wrap justify-between items-center gap-4">
             <div class="flex gap-2" id="filters">
@@ -93,6 +103,7 @@
                 <button class="px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition" onclick="filter('Specialist', this)">SPECIALISTS</button>
                 <button class="px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition" onclick="filter('Meta-Agent', this)">META-AGENTS</button>
                 <button class="px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition" onclick="filter('Orchestrator', this)">ORCHESTRATORS</button>
+                <button class="px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition" onclick="filter('Sub-Agent', this)">SUB-AGENTS</button>
             </div>
             
             <div class="relative">
@@ -110,42 +121,125 @@
 
     </main>
 
-    <div id="terminal" class="terminal-overlay flex flex-col font-mono text-sm shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+    <!-- TERMINAL -->
+    <div id="terminal" class="terminal-overlay font-mono text-sm shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
         <div class="h-10 bg-slate-800 flex items-center justify-between px-4 border-b border-slate-700 cursor-pointer hover:bg-slate-750 transition" onclick="toggleTerminal()">
             <div class="flex items-center gap-2">
                 <i class="fas fa-terminal text-emerald-400"></i>
                 <span class="text-slate-300 font-bold text-xs" id="terminal-title">SYSTEM CONSOLE</span>
             </div>
-            <button class="text-slate-400 hover:text-white"><i class="fas fa-chevron-down"></i></button>
+            <div class="flex gap-4">
+                 <div id="hil-indicator" class="hidden flex items-center gap-2 text-amber-400 text-xs animate-pulse">
+                    <i class="fas fa-exclamation-triangle"></i> HUMAN APPROVAL REQUIRED
+                </div>
+                <button class="text-slate-400 hover:text-white"><i class="fas fa-chevron-down"></i></button>
+            </div>
         </div>
         <div class="flex-1 overflow-y-auto p-4 space-y-1 bg-[#0a0a0c]" id="terminal-output">
             <div class="text-slate-500">[SYSTEM] Console ready. Select an agent to view telemetry.</div>
         </div>
+        <div id="terminal-input-area" class="p-2 border-t border-slate-700 bg-slate-900 hidden">
+             <div class="flex gap-2">
+                <span class="text-emerald-400 select-none">root@adam:~#</span>
+                <input type="text" id="manual-command" class="bg-transparent border-none outline-none text-white flex-1" placeholder="Type command..." onkeydown="handleManualCommand(event)">
+             </div>
+        </div>
+        <div id="approval-controls" class="p-4 border-t border-slate-700 bg-slate-900 flex justify-center gap-4 hidden">
+            <button onclick="handleApproval(true)" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded text-xs transition">
+                <i class="fas fa-check mr-2"></i> APPROVE ACTION
+            </button>
+            <button onclick="handleApproval(false)" class="px-6 py-2 bg-red-600 hover:bg-red-500 text-white font-bold rounded text-xs transition">
+                <i class="fas fa-times mr-2"></i> DENY
+            </button>
+        </div>
     </div>
 
+    <!-- LOGIC MODAL -->
     <div id="logic-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-700 rounded-lg shadow-2xl w-full max-w-3xl flex flex-col max-h-[80vh]">
+        <div class="bg-slate-900 border border-slate-700 rounded-lg shadow-2xl w-full max-w-4xl flex flex-col max-h-[85vh]">
             <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/50 rounded-t-lg">
                 <h3 class="text-lg font-bold text-white font-mono flex items-center gap-2">
                     <i class="fas fa-brain text-purple-400"></i> <span id="modal-agent-name">Agent Logic</span>
                 </h3>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+                <button onclick="closeModal('logic-modal')" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
             </div>
-            <div class="p-4 overflow-y-auto flex-1 bg-[#0f1115]">
-                <div class="text-xs text-slate-400 mb-2 font-mono uppercase tracking-widest">System Prompt / Configuration</div>
-                <pre class="code-block" id="modal-content">Loading...</pre>
+            <div class="p-6 overflow-y-auto flex-1 bg-[#0f1115] grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                    <div class="text-xs text-slate-400 mb-2 font-mono uppercase tracking-widest flex justify-between">
+                        <span>System Prompt / Instructions</span>
+                        <span class="text-emerald-400 cursor-pointer hover:underline" onclick="injectPrompt()">[INJECT FROM LIBRARY]</span>
+                    </div>
+                    <pre class="code-block h-[400px]" id="modal-content" contenteditable="true">Loading...</pre>
+                </div>
+                <div class="flex flex-col gap-4">
+                    <div>
+                        <div class="text-xs text-slate-400 mb-2 font-mono uppercase tracking-widest">Registered Capabilities</div>
+                        <div id="modal-capabilities" class="space-y-2">
+                            <!-- Capabilities populated here -->
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="text-xs text-slate-400 mb-2 font-mono uppercase tracking-widest">Metadata</div>
+                        <div class="text-xs text-slate-300 font-mono space-y-1" id="modal-metadata">
+                            <!-- Metadata populated here -->
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="p-4 border-t border-slate-700 bg-slate-800/50 rounded-b-lg flex justify-end gap-3">
-                <button onclick="copyLogic()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold rounded flex items-center gap-2 transition">
-                    <i class="fas fa-copy"></i> Copy Prompt
+                <button onclick="saveLogic()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold rounded transition">
+                    <i class="fas fa-save mr-2"></i> Update Runtime
                 </button>
-                <button onclick="closeModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded transition">
+                <button onclick="closeModal('logic-modal')" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded transition">
                     Close
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- TASK MODAL -->
+    <div id="task-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-lg shadow-2xl w-full max-w-lg p-6 relative">
+            <button onclick="closeModal('task-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+            <h2 class="text-xl font-bold text-white mb-1 font-mono">DEPLOY AGENT</h2>
+            <p class="text-xs text-slate-400 mb-6 font-mono" id="task-agent-name">Target: Unknown</p>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-mono text-slate-400 mb-2">MISSION DIRECTIVE</label>
+                    <textarea id="task-input" class="w-full bg-black border border-slate-700 rounded p-3 text-white text-sm focus:border-cyan-500 outline-none h-32 font-mono" placeholder="Enter natural language instructions (e.g., 'Analyze Q3 earnings for AAPL and flag any risks')."></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-mono text-slate-400 mb-2">COMPLEXITY</label>
+                        <select id="task-complexity" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white text-xs outline-none">
+                            <option value="low">Standard (Low)</option>
+                            <option value="medium">Detailed (Medium)</option>
+                            <option value="high">Deep Dive (High)</option>
+                            <option value="critical">Critical (Max)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-mono text-slate-400 mb-2">MODE</label>
+                        <select id="task-mode" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-white text-xs outline-none">
+                            <option value="auto">Autonomous</option>
+                            <option value="hil">Human-in-the-Loop</option>
+                            <option value="shadow">Shadow (Dry Run)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-end">
+                <button onclick="executeTask()" class="px-6 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded font-bold text-sm transition font-mono flex items-center gap-2">
+                    <i class="fas fa-rocket"></i> INITIATE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SETTINGS MODAL -->
     <div id="settings-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-700 rounded-lg shadow-2xl w-full max-w-md p-6">
             <h2 class="text-xl font-bold text-white mb-4">Runtime Configuration</h2>
@@ -178,15 +272,8 @@
         let currentFilter = 'ALL';
         let searchQuery = '';
         let terminalInterval;
-
-        // -- FALLBACK DATA (If mock_data.js fails) --
-        const FALLBACK_AGENTS = [
-            { name: "Risk_Architect", type: "Orchestrator", status: "ACTIVE", load: 78, description: "System-wide risk aggregation and routing.", prompt: "You are the Risk Architect. Your goal is to synthesize inputs from all sub-agents..." },
-            { name: "SNC_Analyst", type: "Specialist", status: "ACTIVE", load: 45, description: "Shared National Credit portfolio analysis.", prompt: "Analyze the following loan documents for regulatory compliance..." },
-            { name: "Market_Sentience", type: "Meta-Agent", status: "IDLE", load: 12, description: "Real-time sentiment tracking.", prompt: "Monitor twitter and news feeds for negative sentiment regarding..." },
-            { name: "Red_Team_Lead", type: "Adversarial", status: "SLEEP", load: 0, description: "Scenario injection and stress testing.", prompt: "Simulate a liquidity crisis in the Asian markets..." },
-            { name: "Reflector_Node", type: "Meta-Agent", status: "THINKING", load: 92, description: "Self-correction and output validation.", prompt: "Critique the previous analysis for logical fallacies..." }
-        ];
+        let selectedAgent = null;
+        let pendingApproval = null;
 
         // -- INIT --
         document.addEventListener('DOMContentLoaded', () => {
@@ -195,12 +282,11 @@
         });
 
         function loadAgents() {
-            // Priority: Window Mock -> Fallback
-            if (window.MOCK_DATA && window.MOCK_DATA.agents && window.MOCK_DATA.agents.length > 0) {
+            if (window.MOCK_DATA && window.MOCK_DATA.agents) {
                 agents = window.MOCK_DATA.agents;
             } else {
                 console.warn("Using Fallback Agent Data");
-                agents = FALLBACK_AGENTS;
+                agents = []; // Fallback empty
             }
             
             document.getElementById('agent-count').innerText = agents.length;
@@ -214,12 +300,10 @@
 
             let filtered = agents;
 
-            // Type Filter
             if (currentFilter !== 'ALL') {
                 filtered = filtered.filter(a => a.type === currentFilter);
             }
 
-            // Search Filter
             if (searchQuery) {
                 const q = searchQuery.toLowerCase();
                 filtered = filtered.filter(a => a.name.toLowerCase().includes(q) || (a.description && a.description.toLowerCase().includes(q)));
@@ -232,13 +316,13 @@
 
             filtered.forEach(agent => {
                 const card = document.createElement('div');
-                card.className = 'agent-card rounded-xl p-5 relative overflow-hidden group flex flex-col justify-between h-52';
+                card.className = 'agent-card rounded-xl p-5 relative overflow-hidden group flex flex-col justify-between h-64';
                 
-                // Color Logic
                 let typeColor = "text-blue-400 border-blue-500/30 bg-blue-500/10";
                 if(agent.type === 'Meta-Agent') typeColor = "text-purple-400 border-purple-500/30 bg-purple-500/10";
                 if(agent.type === 'Orchestrator') typeColor = "text-amber-400 border-amber-500/30 bg-amber-500/10";
                 if(agent.type === 'Adversarial') typeColor = "text-red-400 border-red-500/30 bg-red-500/10";
+                if(agent.type === 'Sub-Agent') typeColor = "text-slate-400 border-slate-500/30 bg-slate-500/10";
 
                 const statusColor = getStatusColor(agent.status);
                 const icon = getIcon(agent.type);
@@ -256,24 +340,16 @@
                                 <span class="text-[10px] font-mono font-bold text-slate-300">${agent.status}</span>
                             </div>
                         </div>
-                        <h3 class="text-lg font-bold text-white group-hover:text-cyan-400 transition font-mono truncate" title="${agent.name}">${agent.name.replace(/_/g, ' ')}</h3>
-                        <p class="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">${agent.description || 'No description available.'}</p>
+                        <h3 class="text-lg font-bold text-white group-hover:text-cyan-400 transition font-mono truncate" title="${agent.name}">${formatName(agent.name)}</h3>
+                        <p class="text-xs text-slate-400 mt-2 line-clamp-3 leading-relaxed">${agent.description || 'No description available.'}</p>
                     </div>
 
-                    <div class="relative z-10 mt-auto">
-                        <div class="flex justify-between text-[10px] font-mono text-slate-500 mb-1">
-                            <span>COGNITIVE LOAD</span>
-                            <span class="${agent.load > 80 ? 'text-red-400' : 'text-cyan-400'}">${agent.load}%</span>
-                        </div>
-                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-3">
-                            <div class="h-full ${getLoadColor(agent.load)} transition-all duration-1000" style="width: ${agent.load}%"></div>
-                        </div>
-                        
-                        <div class="flex gap-2 border-t border-slate-700/50 pt-3">
-                            <button onclick="viewLogs('${agent.name}')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs py-1.5 rounded border border-slate-700 transition font-mono">
-                                <i class="fas fa-terminal mr-1"></i> LOGS
+                    <div class="relative z-10 mt-auto pt-4">
+                        <div class="flex gap-2">
+                            <button onclick="openTaskModal('${agent.id}')" class="flex-1 bg-cyan-900/30 hover:bg-cyan-600 hover:text-white text-cyan-400 text-xs py-1.5 rounded border border-cyan-800/50 transition font-mono font-bold">
+                                <i class="fas fa-play mr-1"></i> DEPLOY
                             </button>
-                            <button onclick="viewLogic('${agent.name}')" class="flex-1 bg-blue-900/20 hover:bg-blue-900/40 text-blue-300 text-xs py-1.5 rounded border border-blue-800/50 transition font-mono">
+                            <button onclick="viewLogic('${agent.id}')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs py-1.5 rounded border border-slate-700 transition font-mono">
                                 <i class="fas fa-code mr-1"></i> LOGIC
                             </button>
                         </div>
@@ -283,15 +359,12 @@
             });
         }
 
-        // -- LOGIC & HELPERS --
-
+        // -- HELPERS --
         function filter(type, btn) {
             currentFilter = type;
-            // Reset styles
             document.querySelectorAll('#filters button').forEach(b => {
                 b.className = "px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition";
             });
-            // Set active
             btn.className = "px-4 py-1.5 rounded-full bg-blue-600/20 border border-blue-500/50 text-blue-400 text-xs font-bold font-mono hover:bg-blue-600/40 transition active-filter";
             renderGrid();
         }
@@ -299,6 +372,10 @@
         function handleSearch(val) {
             searchQuery = val;
             renderGrid();
+        }
+
+        function formatName(name) {
+            return name.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1').trim();
         }
 
         function getStatusColor(status) {
@@ -310,89 +387,208 @@
             }
         }
 
-        function getLoadColor(load) {
-            if (load > 80) return 'bg-red-500';
-            if (load > 50) return 'bg-amber-400';
-            return 'bg-cyan-500';
-        }
-
         function getIcon(type) {
             if(type === 'Orchestrator') return 'fa-network-wired';
             if(type === 'Adversarial') return 'fa-skull-crossbones';
             if(type === 'Meta-Agent') return 'fa-brain';
+            if(type === 'Sub-Agent') return 'fa-cogs';
             return 'fa-robot';
         }
 
-        // -- MODALS & TERMINAL --
+        // -- LOGIC MODAL --
+        function viewLogic(agentId) {
+            const agent = agents.find(a => a.id === agentId);
+            selectedAgent = agent;
 
-        function viewLogs(agentName) {
+            document.getElementById('modal-agent-name').innerText = formatName(agent.name);
+            document.getElementById('modal-content').innerText = agent.prompt || "System prompt not explicitly defined in class.";
+
+            // Capabilities
+            const capDiv = document.getElementById('modal-capabilities');
+            capDiv.innerHTML = '';
+            if (agent.capabilities && agent.capabilities.length > 0) {
+                agent.capabilities.forEach(cap => {
+                    const tag = document.createElement('div');
+                    tag.className = "text-xs text-cyan-300 font-mono bg-cyan-900/20 px-2 py-1 rounded border border-cyan-800/30 truncate";
+                    tag.innerText = cap;
+                    capDiv.appendChild(tag);
+                });
+            } else {
+                capDiv.innerHTML = '<span class="text-xs text-slate-500 italic">No explicit capabilities detected via AST.</span>';
+            }
+
+            // Metadata
+            const metaDiv = document.getElementById('modal-metadata');
+            metaDiv.innerHTML = `
+                <div>ID: <span class="text-white">${agent.id}</span></div>
+                <div>File: <span class="text-white">${agent.file_path || 'N/A'}</span></div>
+                <div>Type: <span class="text-white">${agent.type}</span></div>
+            `;
+
+            document.getElementById('logic-modal').classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function saveLogic() {
+            // Simulated save
+            const newPrompt = document.getElementById('modal-content').innerText;
+            if(selectedAgent) selectedAgent.prompt = newPrompt;
+            alert("Logic updated in runtime memory.");
+            closeModal('logic-modal');
+        }
+
+        function injectPrompt() {
+            // Simulate injecting from library
+            const prompts = [
+                "You are a sophisticated financial analyst specializing in credit risk...",
+                "You are an adversarial Red Team agent designed to challenge assumptions...",
+                "You are a meta-cognitive observer tasked with ensuring logical consistency...",
+                "You are a precision instrument for extracting data from unstructured text..."
+            ];
+            const random = prompts[Math.floor(Math.random() * prompts.length)];
+            document.getElementById('modal-content').innerText = random;
+        }
+
+        // -- TASKING & TERMINAL --
+        function openTaskModal(agentId) {
+            const agent = agents.find(a => a.id === agentId);
+            selectedAgent = agent;
+            document.getElementById('task-agent-name').innerText = `Target: ${formatName(agent.name)} (${agent.type})`;
+            document.getElementById('task-modal').classList.remove('hidden');
+        }
+
+        function executeTask() {
+            const query = document.getElementById('task-input').value;
+            const complexity = document.getElementById('task-complexity').value;
+            const mode = document.getElementById('task-mode').value;
+
+            if (!query) {
+                alert("Please enter a mission directive.");
+                return;
+            }
+
+            closeModal('task-modal');
+            openTerminal(selectedAgent, query, complexity, mode);
+        }
+
+        function openTerminal(agent, query, complexity, mode) {
             const terminal = document.getElementById('terminal');
             const output = document.getElementById('terminal-output');
             
-            document.getElementById('terminal-title').innerText = `CONSOLE: ${agentName.toUpperCase()}`;
+            document.getElementById('terminal-title').innerText = `CONSOLE: ${agent.name.toUpperCase()}`;
             terminal.classList.add('open');
             output.innerHTML = '';
 
+            // Reset UI state
+            document.getElementById('approval-controls').classList.add('hidden');
+            document.getElementById('hil-indicator').classList.add('hidden');
+            document.getElementById('terminal-input-area').classList.add('hidden');
+
             if (terminalInterval) clearInterval(terminalInterval);
 
-            const logs = [
-                `[SYSTEM] Connecting to ${agentName} telemetry stream...`,
-                `[AUTH] Handshake successful (Token: 0x8F2A...)`,
-                `[INIT] Loading runtime environment v23.5...`,
-                `[STATE] Context window: 128k | Memory Usage: 45MB`,
-                `[INFO] Listening for task queue events...`,
-                `[READY] Agent is online and awaiting instructions.`
+            // Simulation Sequence
+            const steps = [
+                `[INIT] Booting sequence for ${agent.name}...`,
+                `[AUTH] Verifying credentials... OK.`,
+                `[LOAD] Loading context window (128k tokens)...`,
+                `[RECV] Mission: "${query.substring(0, 40)}..."`,
+                `[PLAN] Generating execution plan (${complexity} complexity)...`,
             ];
+
+            // Add dynamic steps based on capabilities
+            if (agent.capabilities) {
+                agent.capabilities.slice(0, 3).forEach(cap => {
+                    steps.push(`[TOOL] Engaging capability: ${cap}()...`);
+                });
+            } else {
+                steps.push(`[THINK] Synthesizing internal knowledge base...`);
+            }
+
+            // HIL Simulation
+            let requiresApproval = (mode === 'hil') || (Math.random() > 0.7);
 
             let i = 0;
             terminalInterval = setInterval(() => {
-                if (i >= logs.length) {
+                if (requiresApproval && i === steps.length) {
                     clearInterval(terminalInterval);
-                    const prompt = document.createElement('div');
-                    prompt.className = "text-emerald-400 mt-2";
-                    prompt.innerHTML = `root@adam:${agentName.toLowerCase()}# <span class="animate-pulse">_</span>`;
-                    output.appendChild(prompt);
+                    logToTerminal(output, `[WAIT] Critical action requires human approval. Pausing execution...`, 'text-amber-400');
+                    document.getElementById('approval-controls').classList.remove('hidden');
+                    document.getElementById('hil-indicator').classList.remove('hidden');
+                    pendingApproval = { agent, output };
                     return;
                 }
-                const div = document.createElement('div');
-                div.className = "text-xs font-mono text-slate-400 mb-1";
-                const time = new Date().toISOString().split('T')[1].split('.')[0];
-                let color = 'text-slate-300';
-                if(logs[i].includes('[READY]')) color = 'text-emerald-400';
-                if(logs[i].includes('[SYSTEM]')) color = 'text-blue-400';
-                
-                div.innerHTML = `<span class="text-slate-600 mr-2">[${time}]</span> <span class="${color}">${logs[i]}</span>`;
-                output.appendChild(div);
-                output.scrollTop = output.scrollHeight;
+
+                if (i >= steps.length) {
+                    clearInterval(terminalInterval);
+                    logToTerminal(output, `[SUCCESS] Task complete. Output generated.`, 'text-emerald-400');
+                    document.getElementById('terminal-input-area').classList.remove('hidden');
+                    return;
+                }
+
+                logToTerminal(output, steps[i]);
                 i++;
-            }, 150);
+            }, 800);
+        }
+
+        function logToTerminal(container, text, colorClass = 'text-slate-300') {
+            const div = document.createElement('div');
+            div.className = "text-xs font-mono mb-1";
+            const time = new Date().toISOString().split('T')[1].split('.')[0];
+
+            // Highlighting keys
+            let formatted = text
+                .replace(/\[(.*?)\]/g, '<span class="text-blue-400 font-bold">[$1]</span>')
+                .replace(/"(.*?)"/g, '<span class="text-yellow-200">"$1"</span>');
+
+            div.innerHTML = `<span class="text-slate-600 mr-2">[${time}]</span> <span class="${colorClass}">${formatted}</span>`;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function handleApproval(approved) {
+            document.getElementById('approval-controls').classList.add('hidden');
+            document.getElementById('hil-indicator').classList.add('hidden');
+            
+            const output = pendingApproval.output;
+
+            if (approved) {
+                logToTerminal(output, `[USER] Action APPROVED. Resuming...`, 'text-emerald-400');
+                setTimeout(() => {
+                    logToTerminal(output, `[EXEC] Committing changes to database...`);
+                    logToTerminal(output, `[SUCCESS] Mission accomplished.`);
+                    document.getElementById('terminal-input-area').classList.remove('hidden');
+                }, 800);
+            } else {
+                logToTerminal(output, `[USER] Action DENIED. Aborting sequence.`, 'text-red-400');
+                logToTerminal(output, `[STOP] Process terminated by user.`);
+                document.getElementById('terminal-input-area').classList.remove('hidden');
+            }
         }
 
         function toggleTerminal() {
             document.getElementById('terminal').classList.toggle('open');
         }
 
-        function viewLogic(agentName) {
-            const agent = agents.find(a => a.name === agentName);
-            const promptText = agent?.prompt || agent?.system_prompt || "No explicit system prompt definition found in registry.";
-            
-            document.getElementById('modal-agent-name').innerText = agentName;
-            document.getElementById('modal-content').innerText = promptText;
-            document.getElementById('logic-modal').classList.remove('hidden');
-        }
+        function handleManualCommand(e) {
+            if (e.key === 'Enter') {
+                const cmd = e.target.value;
+                const output = document.getElementById('terminal-output');
+                logToTerminal(output, `root@adam:~# ${cmd}`, 'text-white');
+                e.target.value = '';
 
-        function closeModal() {
-            document.getElementById('logic-modal').classList.add('hidden');
-        }
-
-        function copyLogic() {
-            const content = document.getElementById('modal-content').innerText;
-            navigator.clipboard.writeText(content).then(() => {
-                const btn = document.querySelector('#logic-modal button i.fa-copy').parentNode;
-                const originalText = btn.innerHTML;
-                btn.innerHTML = `<i class="fas fa-check"></i> Copied!`;
-                setTimeout(() => btn.innerHTML = originalText, 2000);
-            });
+                setTimeout(() => {
+                    if (cmd === 'clear') {
+                        output.innerHTML = '';
+                    } else if (cmd === 'help') {
+                        logToTerminal(output, `Available commands: status, clear, reboot, exit`);
+                    } else {
+                        logToTerminal(output, `[ERR] Command not found: ${cmd}`, 'text-red-400');
+                    }
+                }, 200);
+            }
         }
 
         // -- SETTINGS --
@@ -403,7 +599,6 @@
         function loadSettings() {
             const key = localStorage.getItem('adam_api_key');
             const live = localStorage.getItem('adam_live_mode') === 'true';
-            
             if(key) document.getElementById('api-key-input').value = key;
             document.getElementById('live-mode-toggle').checked = live;
         }
@@ -411,13 +606,9 @@
         function saveSettings() {
             const key = document.getElementById('api-key-input').value;
             const live = document.getElementById('live-mode-toggle').checked;
-            
             localStorage.setItem('adam_api_key', key);
             localStorage.setItem('adam_live_mode', live);
-            
             toggleSettings();
-            // Optional: Reload logic to switch data sources
-            if(live) alert("Live Mode Enabled. The system will now attempt to poll the backend API.");
         }
 
     </script>
