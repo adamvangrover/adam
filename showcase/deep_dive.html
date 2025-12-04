@@ -3,436 +3,273 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v23.5 | Deep Dive Explorer</title>
+    <title>ADAM | Deep Dive Explorer</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="js/mock_data.js"></script>
+    <link rel="stylesheet" href="css/style.css">
     <style>
-        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; }
-        .sidebar { width: 260px; height: 100vh; position: fixed; left: 0; top: 0; background: #1e293b; border-right: 1px solid #334155; overflow-y: auto; }
-        .main-content { margin-left: 260px; padding: 2rem; min-height: 100vh; }
-
-        /* Cards */
-        .phase-card { background: #1e293b; border: 1px solid #334155; padding: 1.5rem; border-radius: 0.5rem; }
-        .phase-title { font-size: 1.25rem; font-weight: 700; color: #60a5fa; margin-bottom: 1rem; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; }
-
-        /* Data Display */
-        .data-label { color: #94a3b8; font-size: 0.875rem; }
-        .data-value { color: #f8fafc; font-weight: 600; }
-        .rating-badge { padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; }
-        .rating-pass { background: #064e3b; color: #34d399; }
-        .rating-substandard { background: #7f1d1d; color: #fca5a5; }
-        .rating-fail { background: #7f1d1d; color: #fca5a5; }
-
-        /* Navigation */
-        .nav-item { padding: 0.75rem 1.5rem; cursor: pointer; color: #94a3b8; font-size: 0.9rem; transition: all 0.2s; }
-        .nav-item:hover { color: #f8fafc; background: #334155; }
-        .nav-item.active { color: #3b82f6; background: #1e293b; border-right: 3px solid #3b82f6; }
-        .nav-header { padding: 1.5rem; font-weight: 800; font-size: 1.25rem; color: #3b82f6; border-bottom: 1px solid #334155; }
-        .nav-section { padding: 1rem 1.5rem 0.5rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; font-weight: 700; }
-
-        /* Interactive Elements */
-        .tab-active { border-bottom: 2px solid #3b82f6; color: #3b82f6; }
-        .tab-inactive { color: #94a3b8; }
-        .tab-inactive:hover { color: #e2e8f0; }
-        .search-input { background: #0f172a; border: 1px solid #334155; color: #f8fafc; padding: 0.5rem; width: 100%; border-radius: 0.25rem; font-size: 0.875rem; margin-bottom: 1rem; }
-
-        /* Animations */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .fade-in { animation: fadeIn 0.3s ease-out; }
+        .tab-active {
+            border-bottom: 2px solid #22d3ee;
+            color: #22d3ee;
+        }
+        .tab-inactive {
+            border-bottom: 2px solid transparent;
+            color: #94a3b8;
+        }
+        .tab-inactive:hover {
+            color: #cbd5e1;
+        }
+        .metric-card {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.4), rgba(15, 23, 42, 0.6));
+        }
     </style>
 </head>
-<body>
+<body class="h-screen flex flex-col grid-bg">
+    <div class="scan-line"></div>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="nav-header">ADAM v23.5</div>
+    <!-- Nav injected by nav.js -->
 
-        <div class="px-4 py-2">
-            <input type="text" id="global-search" placeholder="Search (e.g. AAPL, Risk)" class="search-input" onkeyup="handleSearch(this.value)">
-        </div>
+    <main class="flex-1 p-6 grid grid-cols-12 gap-6 overflow-hidden h-full">
 
-        <div class="nav-section">Explore</div>
-        <div class="nav-item active" onclick="setView('dashboard')">Market Radar</div>
-        <div class="nav-item" onclick="setView('library')">Reports Library</div>
-
-        <div class="nav-section">Sectors</div>
-        <div id="sector-nav-list">
-            <!-- Injected -->
-        </div>
-
-        <div class="nav-section">Recent Deep Dives</div>
-        <div id="recent-nav-list">
-            <!-- Injected -->
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="main-content">
-
-        <!-- Header -->
-        <header class="mb-8 flex justify-between items-center border-b border-slate-700 pb-4">
-            <div>
-                <h1 id="page-title" class="text-3xl font-bold text-white">Market Radar</h1>
-                <p id="page-subtitle" class="text-gray-400">Real-time surveillance of high-risk anomalies.</p>
+        <!-- Left Sidebar: Entity Selector -->
+        <div class="col-span-12 lg:col-span-3 glass-panel rounded-lg flex flex-col h-[calc(100vh-140px)]">
+            <div class="p-4 border-b border-slate-700">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Target Entity</h3>
+                <div class="relative">
+                    <input type="text" placeholder="Search Ticker / Name..." class="w-full bg-slate-900 border border-slate-700 rounded p-2 pl-8 text-sm text-white focus:outline-none focus:border-cyan-500 transition">
+                    <svg class="w-4 h-4 text-slate-500 absolute left-2 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
             </div>
-            <div id="header-meta" class="text-right text-sm text-gray-500">
-                <!-- Injected -->
-            </div>
-        </header>
-
-        <!-- View: Market Radar (Dashboard) -->
-        <div id="view-dashboard" class="fade-in">
-            <!-- Featured Alerts -->
-             <div class="phase-card border-yellow-600 border mb-8">
-                <h2 class="phase-title text-yellow-500">📉 High-Risk Watchlist (Active)</h2>
-                <div id="radar-summary" class="mb-4 text-sm text-gray-300"></div>
-                <div id="radar-clusters" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
-            </div>
-
-            <!-- Featured Reports Grid -->
-            <h3 class="text-xl font-bold text-gray-300 mb-4">Latest Deep Dives</h3>
-            <div id="dashboard-reports-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Injected -->
+            <div class="flex-1 overflow-y-auto p-2 space-y-2" id="entity-list">
+                <!-- List items injected -->
             </div>
         </div>
 
-        <!-- View: Library (List) -->
-        <div id="view-library" class="hidden fade-in">
-            <div id="library-list" class="space-y-4">
-                <!-- Injected -->
-            </div>
-        </div>
+        <!-- Main Content Area -->
+        <div class="col-span-12 lg:col-span-9 flex flex-col h-[calc(100vh-140px)]">
 
-        <!-- View: Deep Dive Analysis -->
-        <div id="view-analysis" class="hidden fade-in">
-
-            <!-- Target Selector Tabs (for Multi-Target Reports) -->
-            <div id="target-tabs" class="flex space-x-6 border-b border-slate-700 mb-6 text-sm font-medium"></div>
-
-            <div id="analysis-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Phase 1 -->
-                <div class="phase-card">
-                    <h2 class="phase-title">Phase 1: Entity & Ecosystem</h2>
-                    <div id="phase1-content" class="space-y-3"></div>
-                </div>
-                <!-- Phase 2 -->
-                <div class="phase-card">
-                    <h2 class="phase-title">Phase 2: Valuation</h2>
-                    <div id="phase2-content" class="space-y-3"></div>
-                </div>
-                <!-- Phase 3 -->
-                <div class="phase-card">
-                    <h2 class="phase-title">Phase 3: Credit & SNC</h2>
-                    <div id="phase3-content" class="space-y-3"></div>
-                </div>
-                <!-- Phase 4 -->
-                <div class="phase-card">
-                    <h2 class="phase-title">Phase 4: Risk Simulation</h2>
-                    <div id="phase4-content" class="space-y-3"></div>
-                </div>
-                <!-- Phase 5 -->
-                <div class="phase-card col-span-1 md:col-span-2 lg:col-span-2 border-l-4 border-l-green-500">
-                    <h2 class="phase-title text-green-400">Phase 5: Strategic Synthesis</h2>
-                    <div id="phase5-content" class="grid grid-cols-2 gap-4"></div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <script>
-        // State
-        let allReports = [];
-        let currentReport = null;
-        let activeTargetKey = null;
-
-        // Utilities
-        const formatCurrency = (val) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // Load Data
-            allReports = window.MOCK_DATA.reports || [];
-
-            // Initial Render
-            initSidebar();
-            initDashboard();
-        });
-
-        function initSidebar() {
-            // Populate Sectors (Dynamic based on data would be better, hardcoded for now)
-            const sectors = ['Technology', 'Consumer', 'Energy', 'Financials', 'Healthcare'];
-            document.getElementById('sector-nav-list').innerHTML = sectors.map(s =>
-                `<div class="nav-item" onclick="filterBySector('${s}')">${s}</div>`
-            ).join('');
-
-            // Populate Recent
-            const recent = allReports.slice(0, 5);
-            document.getElementById('recent-nav-list').innerHTML = recent.map((r, i) =>
-                `<div class="nav-item" onclick="loadReport(${i})">${r.title || 'Untitled Report'}</div>`
-            ).join('');
-        }
-
-        function initDashboard() {
-            // Find a report with market radar to feature
-            const radarReport = allReports.find(r => r.v23_knowledge_graph?.market_radar_node);
-
-            if (radarReport) {
-                const radar = radarReport.v23_knowledge_graph.market_radar_node;
-                document.getElementById('radar-summary').textContent = radar.summary;
-                document.getElementById('radar-clusters').innerHTML = radar.high_alert_clusters.map(c => `
-                    <div class="bg-slate-800 p-3 rounded hover:bg-slate-700 transition cursor-pointer" onclick="loadReportByTitle('${radarReport.title}')">
-                        <div class="font-bold text-white mb-1">${c.sector}</div>
-                        <div class="text-xs text-red-400 mb-2">${c.risk_driver}</div>
-                        <div class="text-xs text-gray-400">Watch: ${c.indicative_names.join(', ')}</div>
-                    </div>
-                `).join('');
-            }
-
-            // Report Grid
-            document.getElementById('dashboard-reports-grid').innerHTML = allReports.map((r, i) => `
-                <div class="phase-card cursor-pointer hover:border-blue-500 transition" onclick="loadReport(${i})">
-                    <div class="font-bold text-blue-400 mb-2">${r.title}</div>
-                    <div class="text-xs text-gray-400 mb-4">${new Date().toLocaleDateString()}</div>
-                    <div class="text-sm text-gray-300">
-                        ${r.v23_knowledge_graph?.meta?.target_scope || r.v23_knowledge_graph?.meta?.target || 'General Analysis'}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Navigation Logic
-        window.setView = (viewName) => {
-            // Hide all
-            ['view-dashboard', 'view-library', 'view-analysis'].forEach(id => {
-                const el = document.getElementById(id);
-                if(el) el.classList.add('hidden');
-            });
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-
-            // Show selected
-            const target = document.getElementById(`view-${viewName}`);
-            if(target) target.classList.remove('hidden');
-
-            // Header Update
-            if (viewName === 'dashboard') {
-                document.getElementById('page-title').textContent = "Market Radar";
-                document.getElementById('page-subtitle').textContent = "Real-time surveillance of high-risk anomalies.";
-            } else if (viewName === 'library') {
-                document.getElementById('page-title').textContent = "Reports Library";
-                document.getElementById('page-subtitle').textContent = "Archive of all generated analysis.";
-                renderLibrary();
-            }
-        };
-
-        window.loadReport = (index) => {
-            currentReport = allReports[index];
-            renderAnalysisView();
-        };
-
-        window.loadReportByTitle = (title) => {
-            const index = allReports.findIndex(r => r.title === title);
-            if (index >= 0) loadReport(index);
-        };
-
-        window.filterBySector = (sector) => {
-            // Simple filter implementation for Library view
-            setView('library');
-            renderLibrary(sector);
-        };
-
-        window.handleSearch = (query) => {
-            if (!query) {
-                renderLibrary();
-                return;
-            }
-            query = query.toLowerCase();
-            const filtered = allReports.filter(r =>
-                JSON.stringify(r).toLowerCase().includes(query)
-            );
-            setView('library');
-            renderLibrary(null, filtered);
-        };
-
-        // Renderers
-        function renderLibrary(sectorFilter = null, explicitList = null) {
-            let list = explicitList || allReports;
-
-            if (sectorFilter) {
-                list = list.filter(r => JSON.stringify(r).includes(sectorFilter)); // Loose filtering
-                document.getElementById('page-subtitle').textContent = `Filtered by Sector: ${sectorFilter}`;
-            }
-
-            document.getElementById('library-list').innerHTML = list.map((r, i) => `
-                <div class="phase-card flex justify-between items-center cursor-pointer hover:bg-slate-800" onclick="loadReportByTitle('${(r.title || "").replace(/'/g, "\\'")}')">
+            <!-- Header & Tabs -->
+            <div class="glass-panel rounded-t-lg p-6 pb-0 mb-1 border-b-0 border-slate-700">
+                <div class="flex justify-between items-start mb-6">
                     <div>
-                        <div class="font-bold text-white">${r.title || "Untitled"}</div>
-                        <div class="text-sm text-gray-400">${r.file_path || 'Generated Report'}</div>
+                        <div class="flex items-center gap-3">
+                            <h1 class="text-3xl font-bold text-white font-mono" id="entity-name">--</h1>
+                            <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-sm border border-slate-600 font-mono" id="entity-ticker">--</span>
+                        </div>
+                        <p class="text-slate-400 text-sm mt-1" id="entity-industry">--</p>
                     </div>
-                    <div class="text-blue-500 font-bold text-sm">View Analysis &rarr;</div>
+                    <div class="text-right">
+                         <div class="text-xs text-slate-500 uppercase tracking-wider mb-1">Conviction</div>
+                         <div class="text-2xl font-bold text-emerald-400 font-mono" id="conviction-score">--</div>
+                    </div>
                 </div>
-            `).join('');
-        }
 
-        function renderAnalysisView() {
-            setView('analysis');
-            const data = currentReport.v23_knowledge_graph;
+                <!-- Tabs -->
+                <div class="flex space-x-6 text-sm font-semibold font-mono">
+                    <button class="pb-3 tab-active transition" onclick="switchTab('overview')">OVERVIEW</button>
+                    <button class="pb-3 tab-inactive transition" onclick="switchTab('financials')">FINANCIALS</button>
+                    <button class="pb-3 tab-inactive transition" onclick="switchTab('snc')">SNC / CREDIT</button>
+                    <button class="pb-3 tab-inactive transition" onclick="switchTab('valuation')">VALUATION</button>
+                    <button class="pb-3 tab-inactive transition" onclick="switchTab('risk')">RISK & SIM</button>
+                </div>
+            </div>
 
-            document.getElementById('page-title').textContent = currentReport.title;
-            document.getElementById('page-subtitle').textContent = data.meta.target_scope || data.meta.target || "Deep Dive Analysis";
+            <!-- Tab Content Panels -->
+            <div class="glass-panel rounded-b-lg flex-1 p-6 overflow-y-auto border-t-0 border-slate-700 relative">
 
-            // Determine Targets
-            let targets = {};
-            if (data.deep_dive_nodes) {
-                targets = data.deep_dive_nodes;
-            } else if (data.nodes) {
-                targets['TARGET_1'] = data.nodes;
-            }
-
-            const targetKeys = Object.keys(targets);
-            if (targetKeys.length === 0) return;
-
-            // Setup Tabs
-            activeTargetKey = targetKeys[0];
-            const renderTabs = () => {
-                const tabsHtml = targetKeys.map(key => {
-                    const t = targets[key];
-                    const name = t.entity_ecosystem?.legal_entity?.ticker || key.replace('TARGET_', 'Target ');
-                    const isActive = key === activeTargetKey;
-                    const classes = isActive ? 'tab-active' : 'tab-inactive cursor-pointer';
-                    return `<div onclick="switchTarget('${key}')" class="pb-2 ${classes}">${name}</div>`;
-                }).join('');
-                document.getElementById('target-tabs').innerHTML = tabsHtml;
-            };
-
-            window.switchTarget = (key) => {
-                activeTargetKey = key;
-                renderTabs();
-                renderAnalysisGrid(targets[key]);
-            };
-
-            renderTabs();
-            renderAnalysisGrid(targets[activeTargetKey]);
-        }
-
-        function renderAnalysisGrid(nodes) {
-             // Phase 1
-             const p1 = nodes.entity_ecosystem;
-            if (p1) {
-                const ma = p1.management_assessment || p1.business_risk_assessment || {};
-                const maHtml = ma.capital_allocation_score
-                    ? `<div><span class="data-label">Capital Allocation:</span> <div class="data-value">${ma.capital_allocation_score}/10</div></div>`
-                    : `<div><span class="data-label">Narrative:</span> <div class="text-xs text-gray-400 mt-1">${ma.narrative || 'N/A'}</div></div>`;
-
-                document.getElementById('phase1-content').innerHTML = `
-                    <div><span class="data-label">Legal Name:</span> <div class="data-value">${p1.legal_entity.name}</div></div>
-                    <div><span class="data-label">Sector:</span> <div class="data-value text-gray-300">${p1.legal_entity.sector || 'N/A'}</div></div>
-                    <div class="mt-2"><span class="data-label">Moat Status:</span> <div class="data-value text-yellow-400">${p1.competitive_positioning?.moat_status || p1.business_risk_assessment?.moat_status || 'N/A'}</div></div>
-                    ${maHtml}
-                `;
-            } else {
-                document.getElementById('phase1-content').innerHTML = '<div class="text-gray-500">No Data</div>';
-            }
-
-            // Phase 2
-            const p2 = nodes.equity_analysis?.valuation_engine;
-            if (p2) {
-                const dcf = p2.dcf_model || {};
-                const multiples = p2.multiples_analysis || {};
-                const targets = p2.price_targets || {};
-
-                const intrinsicVal = dcf.intrinsic_share_price || dcf.intrinsic_value_estimate || 'N/A';
-                const divergence = dcf.current_price_divergence || 'N/A';
-
-                document.getElementById('phase2-content').innerHTML = `
-                    <div class="flex justify-between">
-                        <div><span class="data-label">Intrinsic Value:</span> <div class="data-value text-xl">${typeof intrinsicVal === 'number' ? '$'+intrinsicVal : intrinsicVal}</div></div>
-                        <div><span class="data-label">Verdict:</span> <div class="data-value text-blue-400 text-xs">${divergence}</div></div>
-                    </div>
-                    <div class="mt-2"><span class="data-label">Multiples:</span> <span class="text-xs text-gray-300">${multiples.current_pe ? 'PE ' + multiples.current_pe : ''} ${multiples.verdict || ''}</span></div>
-                    ${targets.base_case ? `
-                    <div class="mt-2 text-sm">
-                        <span class="data-label">Bear:</span> $${targets.bear_case} |
-                        <span class="data-label">Base:</span> $${targets.base_case} |
-                        <span class="data-label">Bull:</span> $${targets.bull_case}
-                    </div>` : ''}
-                `;
-            } else {
-                document.getElementById('phase2-content').innerHTML = '<div class="text-gray-500">No Data</div>';
-            }
-
-            // Phase 3
-            const p3 = nodes.credit_analysis;
-            if (p3) {
-                const snc = p3.snc_rating_model || {};
-                const cov = p3.covenant_risk_analysis || {};
-                const ratingClass = snc.overall_borrower_rating === 'Pass' ? 'rating-pass' : 'rating-substandard';
-
-                document.getElementById('phase3-content').innerHTML = `
-                    <div><span class="data-label">SNC Rating:</span> <span class="rating-badge ${ratingClass}">${snc.overall_borrower_rating || 'N/A'}</span></div>
-                    <div class="mt-2 text-sm">
-                        ${(snc.facilities || []).map(f => `<div>• ${f.id}: <span class="${f.regulatory_rating === 'Pass' ? 'text-green-400' : 'text-red-400'}">${f.regulatory_rating}</span></div>`).join('')}
-                    </div>
-                    <div class="mt-2 border-t border-slate-700 pt-2">
-                            <span class="data-label">Covenant Risk:</span>
-                            <div class="text-xs text-red-300">${cov.risk_assessment || 'N/A'}</div>
-                    </div>
-                `;
-            } else {
-                 const creditProfile = nodes.entity_ecosystem?.credit_profile;
-                    if (creditProfile) {
-                         document.getElementById('phase3-content').innerHTML = `
-                            <div><span class="data-label">Rating Agency:</span> <div class="data-value">${creditProfile.rating_agency_view}</div></div>
-                            <div><span class="data-label">Leverage:</span> <div class="data-value text-red-400">${creditProfile.leverage_ratio}</div></div>
-                            <div class="text-xs text-gray-500 mt-2">Full SNC analysis not available.</div>
-                        `;
-                    } else {
-                        document.getElementById('phase3-content').innerHTML = '<div class="text-gray-500 italic">Not Applicable / No Credit Data</div>';
-                    }
-            }
-
-            // Phase 4
-            const p4 = nodes.simulation_engine;
-            if (p4) {
-                const mcProb = p4.monte_carlo_default_prob
-                    ? (typeof p4.monte_carlo_default_prob === 'number' ? (p4.monte_carlo_default_prob * 100).toFixed(2) + '%' : p4.monte_carlo_default_prob)
-                    : (p4.monte_carlo_outcome || 'N/A');
-
-                const scenarios = p4.quantum_scenarios || (p4.quantum_scenario ? [p4.quantum_scenario] : []);
-
-                document.getElementById('phase4-content').innerHTML = `
-                    <div><span class="data-label">Monte Carlo Outcome:</span> <div class="data-value">${mcProb}</div></div>
-                    <div class="mt-2"><span class="data-label">Quantum Scenarios:</span></div>
-                    <ul class="list-disc list-inside text-xs text-gray-400 space-y-1">
-                        ${scenarios.map(s => `<li><strong class="text-gray-300">${s.name}</strong> (${s.probability}): ${s.impact || s.estimated_impact_ev}</li>`).join('')}
-                    </ul>
-                `;
-            } else {
-                document.getElementById('phase4-content').innerHTML = '<div class="text-gray-500">No Data</div>';
-            }
-
-            // Phase 5
-            const p5 = nodes.strategic_synthesis;
-            if (p5) {
-                const verdict = p5.final_verdict || {};
-                document.getElementById('phase5-content').innerHTML = `
-                    <div>
-                        <span class="data-label">Final Verdict:</span>
-                        <div class="text-2xl font-bold text-white my-1">${verdict.recommendation}</div>
-                        <div class="text-sm">Conviction: ${verdict.conviction_level}/10</div>
-                    </div>
-                    <div>
-                        <span class="data-label">M&A Posture:</span>
-                        <div class="data-value text-purple-400">${p5.m_and_a_posture || 'Neutral'}</div>
-                    </div>
-                    <div class="col-span-2 mt-2">
-                        <div class="p-3 bg-slate-800 rounded italic text-gray-300 text-sm border-l-2 border-blue-500">
-                            "${verdict.rationale || verdict.rationale_summary}"
+                <!-- OVERVIEW TAB -->
+                <div id="tab-overview" class="tab-content animate-fade-in space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="metric-card p-4 rounded border border-slate-700">
+                            <div class="text-slate-400 text-xs uppercase mb-1">Market Cap</div>
+                            <div class="text-xl text-white font-mono">$2.4T</div>
+                        </div>
+                        <div class="metric-card p-4 rounded border border-slate-700">
+                            <div class="text-slate-400 text-xs uppercase mb-1">P/E Ratio</div>
+                            <div class="text-xl text-white font-mono">32.4x</div>
+                        </div>
+                        <div class="metric-card p-4 rounded border border-slate-700">
+                            <div class="text-slate-400 text-xs uppercase mb-1">Adam Rating</div>
+                            <div class="text-xl text-emerald-400 font-mono">OUTPERFORM</div>
                         </div>
                     </div>
+                    <div>
+                        <h3 class="text-lg text-cyan-400 font-bold mb-3 border-b border-slate-700 pb-1">Executive Summary</h3>
+                        <p class="text-slate-300 leading-relaxed text-sm">
+                            Dominant market position maintained through robust ecosystem lock-in and services growth. Hardware cycle currently in maturation phase, but offset by high-margin services.
+                            Macro headwinds (inflation, supply chain) are present but manageable due to pricing power.
+                            <br><br>
+                            <span class="text-slate-500 italic">Analysis generated by Adam v23.5 on <span id="report-date">2025-05-12</span></span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FINANCIALS TAB -->
+                <div id="tab-financials" class="tab-content hidden animate-fade-in space-y-6">
+                     <h3 class="text-lg text-cyan-400 font-bold mb-3">Key Metrics</h3>
+                     <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-slate-300">
+                            <thead class="text-xs text-slate-400 uppercase bg-slate-800">
+                                <tr>
+                                    <th class="px-4 py-3">Metric</th>
+                                    <th class="px-4 py-3">2021</th>
+                                    <th class="px-4 py-3">2022</th>
+                                    <th class="px-4 py-3">2023</th>
+                                    <th class="px-4 py-3 text-cyan-400">2024 (E)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-700" id="financial-table-body">
+                                <!-- JS Injected -->
+                            </tbody>
+                        </table>
+                     </div>
+                </div>
+
+                <!-- SNC TAB -->
+                <div id="tab-snc" class="tab-content hidden animate-fade-in">
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="text-lg text-cyan-400 font-bold mb-3">Shared National Credit Rating</h3>
+                            <div class="text-4xl font-bold text-emerald-400 font-mono mb-2">PASS</div>
+                            <p class="text-slate-400 text-sm">Facility assessed as Pass. Strong primary repayment source (Operating Cash Flow). Secondary repayment (Collateral) coverage is robust at 2.5x.</p>
+                        </div>
+                        <div class="bg-slate-800/50 p-4 rounded border border-slate-700">
+                            <h4 class="text-xs text-slate-400 uppercase mb-2">Covenant Compliance</h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-white">Leverage Ratio (Max 4.0x)</span>
+                                        <span class="text-emerald-400">1.8x - OK</span>
+                                    </div>
+                                    <div class="w-full bg-slate-700 h-1.5 rounded-full"><div class="bg-emerald-500 w-[45%] h-full rounded-full"></div></div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-white">Interest Coverage (Min 3.0x)</span>
+                                        <span class="text-emerald-400">12.5x - OK</span>
+                                    </div>
+                                    <div class="w-full bg-slate-700 h-1.5 rounded-full"><div class="bg-emerald-500 w-[100%] h-full rounded-full"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VALUATION TAB -->
+                <div id="tab-valuation" class="tab-content hidden animate-fade-in">
+                     <h3 class="text-lg text-cyan-400 font-bold mb-3">Intrinsic Value Model (DCF)</h3>
+                     <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div class="metric-card p-4 rounded">
+                            <div class="text-xs text-slate-400 uppercase">Current Price</div>
+                            <div class="text-lg font-mono text-white">$185.00</div>
+                        </div>
+                         <div class="metric-card p-4 rounded border border-cyan-900/50">
+                            <div class="text-xs text-cyan-400 uppercase">Intrinsic Value</div>
+                            <div class="text-lg font-mono text-cyan-300">$215.50</div>
+                        </div>
+                         <div class="metric-card p-4 rounded">
+                            <div class="text-xs text-slate-400 uppercase">Margin of Safety</div>
+                            <div class="text-lg font-mono text-emerald-400">+16.5%</div>
+                        </div>
+                     </div>
+                     <div class="h-64 bg-slate-800/30 rounded border border-slate-700 flex items-center justify-center text-slate-500">
+                        [ Interactive DCF Sensitivity Chart Placeholder ]
+                     </div>
+                </div>
+
+                 <!-- RISK TAB -->
+                <div id="tab-risk" class="tab-content hidden animate-fade-in">
+                     <h3 class="text-lg text-cyan-400 font-bold mb-3">Monte Carlo Simulation (10,000 Runs)</h3>
+                     <div class="grid grid-cols-2 gap-6">
+                        <div class="h-64 bg-slate-800/30 rounded border border-slate-700 flex items-center justify-center text-slate-500">
+                             [ Histogram of Returns Placeholder ]
+                        </div>
+                        <div class="space-y-4">
+                            <div class="p-3 bg-red-900/20 border border-red-900/50 rounded">
+                                <h4 class="text-red-400 font-bold text-sm mb-1">Tail Risk (VaR 99%)</h4>
+                                <p class="text-xs text-slate-300">In a worst-case scenario (1 in 100 days), expected loss is <span class="text-white font-mono">-12.4%</span>.</p>
+                            </div>
+                             <div class="p-3 bg-blue-900/20 border border-blue-900/50 rounded">
+                                <h4 class="text-blue-400 font-bold text-sm mb-1">Black Swan Scenario</h4>
+                                <p class="text-xs text-slate-300">Simulation "Geopolitical Conflict Escalation" results in -25% equity drawdown.</p>
+                            </div>
+                        </div>
+                     </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script src="js/mock_data.js"></script>
+    <script src="js/nav.js"></script>
+    <script>
+        // Mock Entity Data Logic
+        const ENTITIES = [
+            { ticker: 'AAPL', name: 'Apple Inc.', industry: 'Technology / Consumer Electronics' },
+            { ticker: 'MSFT', name: 'Microsoft Corp', industry: 'Technology / Software' },
+            { ticker: 'TSLA', name: 'Tesla Inc.', industry: 'Automotive / Energy' },
+            { ticker: 'NVDA', name: 'Nvidia Corp', industry: 'Semiconductors' },
+            { ticker: 'JPM', name: 'JPMorgan Chase', industry: 'Financial Services' }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderEntityList();
+            loadEntity(ENTITIES[0]); // Load first by default
+        });
+
+        function renderEntityList() {
+            const list = document.getElementById('entity-list');
+            list.innerHTML = '';
+            ENTITIES.forEach(e => {
+                const div = document.createElement('div');
+                div.className = "p-3 rounded hover:bg-slate-800 cursor-pointer transition flex justify-between items-center group border border-transparent hover:border-slate-700";
+                div.innerHTML = `
+                    <div>
+                        <div class="font-bold text-white text-sm group-hover:text-cyan-400 transition">${e.ticker}</div>
+                        <div class="text-[10px] text-slate-500">${e.name}</div>
+                    </div>
+                    <svg class="w-4 h-4 text-slate-600 opacity-0 group-hover:opacity-100 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 `;
-            } else {
-                document.getElementById('phase5-content').innerHTML = '<div class="text-gray-500">No Data</div>';
-            }
+                div.onclick = () => loadEntity(e);
+                list.appendChild(div);
+            });
+        }
+
+        function loadEntity(entity) {
+            document.getElementById('entity-name').textContent = entity.name;
+            document.getElementById('entity-ticker').textContent = entity.ticker;
+            document.getElementById('entity-industry').textContent = entity.industry;
+            document.getElementById('conviction-score').textContent = (Math.random() * 2 + 8).toFixed(1) + "/10";
+
+            // Inject mock financial data
+            const tbody = document.getElementById('financial-table-body');
+            const metrics = ['Revenue ($B)', 'Net Income ($B)', 'EBITDA ($B)', 'EPS ($)'];
+            tbody.innerHTML = metrics.map(m => `
+                <tr class="hover:bg-slate-800/50">
+                    <td class="px-4 py-3 font-medium text-slate-200">${m}</td>
+                    <td class="px-4 py-3 text-slate-400">${(Math.random()*100).toFixed(1)}</td>
+                    <td class="px-4 py-3 text-slate-400">${(Math.random()*110).toFixed(1)}</td>
+                    <td class="px-4 py-3 text-slate-400">${(Math.random()*120).toFixed(1)}</td>
+                    <td class="px-4 py-3 text-cyan-400 font-bold">${(Math.random()*130).toFixed(1)}</td>
+                </tr>
+            `).join('');
+        }
+
+        function switchTab(tabId) {
+            // Hide all
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            // Show target
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+
+            // Update buttons
+            const buttons = document.querySelectorAll('button[onclick^="switchTab"]');
+            buttons.forEach(btn => {
+                if(btn.getAttribute('onclick').includes(tabId)) {
+                    btn.className = "pb-3 tab-active transition";
+                } else {
+                    btn.className = "pb-3 tab-inactive transition";
+                }
+            });
         }
     </script>
 </body>

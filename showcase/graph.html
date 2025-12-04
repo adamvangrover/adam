@@ -3,211 +3,256 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM System | Knowledge Graph</title>
+    <title>ADAM | Knowledge Graph</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        #mynetwork {
-            width: 100%;
-            height: 100%;
-            border: 0px solid lightgray;
-            background: #0f172a;
-        }
-    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
 </head>
-<body class="h-screen flex flex-col grid-bg overflow-hidden text-slate-200">
+<body class="h-screen flex flex-col grid-bg overflow-hidden">
     <div class="scan-line"></div>
-    <!-- Nav via nav.js -->
 
-    <div class="flex-1 relative">
+    <!-- Nav injected by nav.js -->
+
+    <main class="flex-1 flex overflow-hidden relative">
+
         <!-- Graph Container -->
-        <div id="mynetwork"></div>
+        <div id="graph-container" class="flex-1 bg-slate-900/50 cursor-move"></div>
 
-        <!-- Overlay Controls -->
-        <div class="absolute top-4 left-4 p-4 glass-panel rounded-lg w-80 shadow-2xl">
-            <h2 class="text-xl font-bold text-white mb-2 font-mono border-b border-slate-700 pb-2">KNOWLEDGE GRAPH</h2>
-            <div class="space-y-3">
-                <div class="flex justify-between text-xs text-slate-400">
-                    <span>Nodes:</span>
-                    <span class="text-white font-mono" id="node-count">--</span>
-                </div>
-                <div class="flex justify-between text-xs text-slate-400">
-                    <span>Edges:</span>
-                    <span class="text-white font-mono" id="edge-count">--</span>
-                </div>
-
-                <hr class="border-slate-700">
-
-                <h3 class="text-xs font-bold text-slate-500 uppercase">Search Entity</h3>
-                <div class="flex space-x-2">
-                    <input type="text" placeholder="e.g. Tesla, Inc." class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-sm text-white focus:outline-none focus:border-cyan-500">
-                    <button class="bg-cyan-600 hover:bg-cyan-500 text-white px-2 rounded">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-2 gap-2 mt-4">
-                     <button onclick="filterGraph('Company')" class="bg-blue-900/50 hover:bg-blue-800 text-blue-300 text-xs py-1 rounded border border-blue-800">Companies</button>
-                     <button onclick="filterGraph('Person')" class="bg-purple-900/50 hover:bg-purple-800 text-purple-300 text-xs py-1 rounded border border-purple-800">People</button>
-                     <button onclick="filterGraph('Risk')" class="bg-red-900/50 hover:bg-red-800 text-red-300 text-xs py-1 rounded border border-red-800">Risks</button>
-                     <button onclick="resetGraph()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs py-1 rounded">Reset</button>
-                </div>
-            </div>
-
-            <div class="mt-6 p-2 bg-slate-900/80 rounded border border-slate-700 text-[10px] font-mono text-cyan-500 leading-tight">
-                > Graph DB connected.<br>
-                > Reasoning engine online.<br>
-                > Inferred links found.
+        <!-- Overlay UI -->
+        <div class="absolute top-4 left-4 pointer-events-none">
+            <h2 class="text-2xl font-bold text-white font-mono drop-shadow-md">KNOWLEDGE_GRAPH_VISUALIZER</h2>
+            <div class="flex gap-2 mt-2 pointer-events-auto">
+                <div class="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded border border-blue-500/50">Entities</div>
+                <div class="px-2 py-1 bg-emerald-500/20 text-emerald-400 text-xs rounded border border-emerald-500/50">Risks</div>
+                <div class="px-2 py-1 bg-purple-500/20 text-purple-400 text-xs rounded border border-purple-500/50">Events</div>
+                <div class="px-2 py-1 bg-amber-500/20 text-amber-400 text-xs rounded border border-amber-500/50">Financials</div>
             </div>
         </div>
 
-        <!-- Node Details Panel (Right) -->
-        <div id="details-panel" class="hidden absolute top-4 right-4 p-4 glass-panel rounded-lg w-80 shadow-2xl transition-all duration-300 transform translate-x-0">
-            <button onclick="closeDetails()" class="absolute top-2 right-2 text-slate-500 hover:text-white">&times;</button>
-            <h2 id="node-label" class="text-lg font-bold text-white mb-1 font-mono text-cyan-400">Node Name</h2>
-            <div id="node-type" class="text-xs bg-slate-700 text-slate-300 px-2 py-0.5 rounded inline-block mb-4">TYPE</div>
-
-            <div class="space-y-2 text-sm text-slate-300 max-h-60 overflow-y-auto" id="node-desc">
-                Details go here...
+        <!-- Right Panel: Node Details -->
+        <div class="w-80 glass-panel border-l border-slate-700 flex flex-col transform transition-transform duration-300 translate-x-0" id="details-panel">
+            <div class="p-4 border-b border-slate-700 flex justify-between items-center">
+                <h3 class="text-sm font-bold text-white font-mono uppercase">Node Details</h3>
+                <button onclick="togglePanel()" class="text-slate-500 hover:text-white">&times;</button>
             </div>
 
-            <div class="mt-4 pt-4 border-t border-slate-700">
-                <button class="w-full bg-slate-700 hover:bg-slate-600 text-white py-1 rounded text-xs mb-2">Expand Neighbors</button>
-                <button class="w-full bg-slate-700 hover:bg-slate-600 text-white py-1 rounded text-xs">Run Risk Analysis</button>
+            <div class="p-4 flex-1 overflow-y-auto space-y-4" id="node-info">
+                <div class="text-center text-slate-500 mt-10 italic">Select a node to view details...</div>
+            </div>
+
+            <div class="p-4 border-t border-slate-700 bg-slate-800/50">
+                <div class="text-[10px] text-slate-500 font-mono mb-2">GRAPH METRICS</div>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div class="text-slate-400">Nodes: <span class="text-white" id="stat-nodes">--</span></div>
+                    <div class="text-slate-400">Edges: <span class="text-white" id="stat-edges">--</span></div>
+                    <div class="text-slate-400">Density: <span class="text-white">0.14</span></div>
+                    <div class="text-slate-400">Cluster: <span class="text-white">0.65</span></div>
+                </div>
             </div>
         </div>
-    </div>
+
+    </main>
 
     <script src="js/mock_data.js"></script>
-    <script src="js/app.js"></script>
     <script src="js/nav.js"></script>
     <script>
-        let network;
-        let nodes;
-        let edges;
-
         document.addEventListener('DOMContentLoaded', () => {
-            const data = window.MOCK_DATA || {};
-            const companies = data.company_data || {};
+            initGraph();
+        });
 
-            const nodesArray = [];
-            const edgesArray = [];
-            let idCounter = 1;
-            const idMap = {};
+        function initGraph() {
+            const container = document.getElementById('graph-container');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
 
-            // Default mock nodes if empty
-            if (Object.keys(companies).length === 0) {
-                // ... use hardcoded fallback ...
-                nodesArray.push({ id: 1, label: 'Tesla, Inc.', group: 'Company', value: 20 });
-                nodesArray.push({ id: 2, label: 'Market Risk', group: 'Risk', value: 15 });
-                edgesArray.push({ from: 1, to: 2, label: 'EXPOSED_TO' });
-            } else {
-                // Build graph from company data
-                Object.keys(companies).forEach(ticker => {
-                    const comp = companies[ticker];
-                    const id = idCounter++;
-                    idMap[ticker] = id;
-                    nodesArray.push({
-                        id: id,
-                        label: ticker,
-                        group: 'Company',
-                        value: 20,
-                        title: comp.name + "\n" + comp.industry
-                    });
-                });
+            const svg = d3.select("#graph-container").append("svg")
+                .attr("width", "100%")
+                .attr("height", "100%")
+                .attr("viewBox", [0, 0, width, height])
+                .attr("style", "max-width: 100%; height: auto;");
 
-                // Edges for competitors
-                Object.keys(companies).forEach(ticker => {
-                    const comp = companies[ticker];
-                    const fromId = idMap[ticker];
-                    if(comp.competitors) {
-                        comp.competitors.forEach(rival => {
-                            if(idMap[rival]) {
-                                edgesArray.push({ from: fromId, to: idMap[rival], label: 'COMPETES_WITH' });
-                            } else {
-                                // Add missing node
-                                const rivalId = idCounter++;
-                                idMap[rival] = rivalId;
-                                nodesArray.push({ id: rivalId, label: rival, group: 'Company', value: 15, title: "Competitor" });
-                                edgesArray.push({ from: fromId, to: rivalId, label: 'COMPETES_WITH' });
-                            }
-                        });
-                    }
+            // Mock Graph Data
+            // We'll create a central hub (Entity) and connected concepts
+            const data = {
+                nodes: [
+                    { id: "AAPL", group: 1, label: "Apple Inc.", type: "Entity" },
+                    { id: "Tech", group: 2, label: "Technology", type: "Sector" },
+                    { id: "ConsElec", group: 2, label: "Consumer Electronics", type: "Industry" },
+                    { id: "iPhone", group: 3, label: "iPhone", type: "Product" },
+                    { id: "Services", group: 3, label: "Services", type: "Segment" },
+                    { id: "Inflation", group: 4, label: "Inflation Risk", type: "Risk" },
+                    { id: "SupplyChain", group: 4, label: "Supply Chain", type: "Risk" },
+                    { id: "Foxconn", group: 1, label: "Foxconn", type: "Entity" },
+                    { id: "China", group: 5, label: "China", type: "Region" },
+                    { id: "USA", group: 5, label: "USA", type: "Region" },
+                    { id: "TimCook", group: 6, label: "Tim Cook", type: "Person" },
+                    { id: "Revenue", group: 7, label: "Revenue Growth", type: "Metric" }
+                ],
+                links: [
+                    { source: "AAPL", target: "Tech" },
+                    { source: "AAPL", target: "ConsElec" },
+                    { source: "AAPL", target: "iPhone" },
+                    { source: "AAPL", target: "Services" },
+                    { source: "AAPL", target: "Foxconn" },
+                    { source: "AAPL", target: "TimCook" },
+                    { source: "AAPL", target: "Revenue" },
+                    { source: "Foxconn", target: "China" },
+                    { source: "Foxconn", target: "SupplyChain" },
+                    { source: "SupplyChain", target: "Inflation" },
+                    { source: "AAPL", target: "USA" },
+                    { source: "Tech", target: "ConsElec" }
+                ]
+            };
+
+            // Add more random nodes to make it look complex
+            for(let i=0; i<20; i++) {
+                const id = "Node"+i;
+                data.nodes.push({ id: id, group: 8, label: "Concept "+i, type: "Abstract" });
+                data.links.push({
+                    source: "AAPL",
+                    target: id,
+                    value: Math.random()
                 });
             }
 
-            document.getElementById('node-count').textContent = nodesArray.length;
-            document.getElementById('edge-count').textContent = edgesArray.length;
+            document.getElementById('stat-nodes').innerText = data.nodes.length;
+            document.getElementById('stat-edges').innerText = data.links.length;
 
-            nodes = new vis.DataSet(nodesArray);
-            edges = new vis.DataSet(edgesArray);
+            const simulation = d3.forceSimulation(data.nodes)
+                .force("link", d3.forceLink(data.links).id(d => d.id).distance(100))
+                .force("charge", d3.forceManyBody().strength(-300))
+                .force("center", d3.forceCenter(width / 2, height / 2))
+                .force("collide", d3.forceCollide(30));
 
-            const container = document.getElementById('mynetwork');
-            const graphData = { nodes: nodes, edges: edges };
-            const options = {
-                nodes: {
-                    shape: 'dot',
-                    font: { size: 14, color: '#ffffff', face: 'monospace' },
-                    borderWidth: 2,
-                },
-                edges: {
-                    width: 1,
-                    color: { color: '#4b5563', highlight: '#22d3ee' },
-                    smooth: { type: 'continuous' },
-                    font: { size: 10, align: 'middle', color: '#94a3b8', background: 'none' }
-                },
-                groups: {
-                    Company: { color: { background: '#1e3a8a', border: '#3b82f6' } }, // Blue
-                    Person: { color: { background: '#581c87', border: '#a855f7' } }, // Purple
-                    Risk: { color: { background: '#7f1d1d', border: '#ef4444' } }, // Red
-                    MarketTrend: { color: { background: '#064e3b', border: '#10b981' } } // Green
-                },
-                physics: {
-                    stabilization: false,
-                    barnesHut: {
-                        gravitationalConstant: -2000,
-                        springConstant: 0.04,
-                        springLength: 95
-                    }
-                },
-                interaction: { hover: true }
-            };
+            const g = svg.append("g");
 
-            network = new vis.Network(container, graphData, options);
+            // Zoom capabilities
+            svg.call(d3.zoom()
+                .extent([[0, 0], [width, height]])
+                .scaleExtent([0.1, 4])
+                .on("zoom", ({transform}) => {
+                    g.attr("transform", transform);
+                }));
 
-            // Events
-            network.on("click", function (params) {
-                if (params.nodes.length > 0) {
-                    const nodeId = params.nodes[0];
-                    const node = nodes.get(nodeId);
-                    showDetails(node);
-                } else {
-                    closeDetails();
-                }
+            const link = g.append("g")
+                .attr("stroke", "#475569")
+                .attr("stroke-opacity", 0.6)
+                .selectAll("line")
+                .data(data.links)
+                .join("line")
+                .attr("stroke-width", 1.5);
+
+            const node = g.append("g")
+                .selectAll("g")
+                .data(data.nodes)
+                .join("g")
+                .call(drag(simulation))
+                .on("click", (event, d) => showNodeDetails(d));
+
+            // Node Circles
+            node.append("circle")
+                .attr("r", d => d.group === 1 ? 15 : 8)
+                .attr("fill", d => getNodeColor(d.group))
+                .attr("stroke", "#fff")
+                .attr("stroke-width", 1.5);
+
+            // Node Labels
+            node.append("text")
+                .text(d => d.label)
+                .attr("x", 12)
+                .attr("y", 4)
+                .attr("fill", "#cbd5e1")
+                .attr("font-size", "10px")
+                .attr("font-family", "monospace")
+                .style("pointer-events", "none");
+
+            simulation.on("tick", () => {
+                link
+                    .attr("x1", d => d.source.x)
+                    .attr("y1", d => d.source.y)
+                    .attr("x2", d => d.target.x)
+                    .attr("y2", d => d.target.y);
+
+                node
+                    .attr("transform", d => `translate(${d.x},${d.y})`);
             });
-        });
-
-        function showDetails(node) {
-            const panel = document.getElementById('details-panel');
-            document.getElementById('node-label').textContent = node.label;
-            document.getElementById('node-type').textContent = node.group.toUpperCase();
-            document.getElementById('node-desc').innerText = node.title || "No description available.";
-
-            panel.classList.remove('hidden');
         }
 
-        function closeDetails() {
-            document.getElementById('details-panel').classList.add('hidden');
+        function drag(simulation) {
+            function dragstarted(event) {
+                if (!event.active) simulation.alphaTarget(0.3).restart();
+                event.subject.fx = event.subject.x;
+                event.subject.fy = event.subject.y;
+            }
+
+            function dragged(event) {
+                event.subject.fx = event.x;
+                event.subject.fy = event.y;
+            }
+
+            function dragended(event) {
+                if (!event.active) simulation.alphaTarget(0);
+                event.subject.fx = null;
+                event.subject.fy = null;
+            }
+
+            return d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended);
         }
 
-        function filterGraph(group) {
-            // Very simple filter: mock implementation
-            alert(`Filtering for ${group} (Mock functionality)`);
+        function getNodeColor(group) {
+            const colors = {
+                1: "#3b82f6", // Entity (Blue)
+                2: "#8b5cf6", // Sector (Purple)
+                3: "#06b6d4", // Product (Cyan)
+                4: "#ef4444", // Risk (Red)
+                5: "#f59e0b", // Region (Amber)
+                6: "#10b981", // Person (Emerald)
+                7: "#ec4899", // Metric (Pink)
+                8: "#64748b"  // Abstract (Slate)
+            };
+            return colors[group] || "#94a3b8";
         }
 
-        function resetGraph() {
-            network.fit();
+        function showNodeDetails(d) {
+            const panel = document.getElementById('node-info');
+            panel.innerHTML = `
+                <div class="mb-4">
+                    <h2 class="text-xl font-bold text-white mb-1">${d.label}</h2>
+                    <span class="px-2 py-0.5 rounded bg-slate-700 text-xs text-slate-300 border border-slate-600">${d.type}</span>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="bg-slate-800/50 p-3 rounded">
+                        <div class="text-[10px] text-slate-500 uppercase">UUID</div>
+                        <div class="text-xs font-mono text-cyan-400 truncate">${crypto.randomUUID()}</div>
+                    </div>
+
+                    <div class="bg-slate-800/50 p-3 rounded">
+                        <div class="text-[10px] text-slate-500 uppercase">Connectivity</div>
+                        <div class="text-xs text-slate-300">Degree Centrality: ${(Math.random()).toFixed(3)}</div>
+                        <div class="text-xs text-slate-300">PageRank: ${(Math.random()).toFixed(3)}</div>
+                    </div>
+
+                    <div class="bg-slate-800/50 p-3 rounded">
+                        <div class="text-[10px] text-slate-500 uppercase">Metadata</div>
+                        <div class="text-xs text-slate-300 mt-1">
+                            Source: EDGAR_SEC<br>
+                            Confidence: 0.98<br>
+                            Last Updated: 2025-05-12
+                        </div>
+                    </div>
+
+                    <button class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded transition mt-4">Expand Neighborhood</button>
+                    <button class="w-full py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold rounded transition">Run Deep Dive</button>
+                </div>
+            `;
+        }
+
+        function togglePanel() {
+            // Optional: hide panel logic
         }
     </script>
 </body>

@@ -3,147 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM System | Agent Registry</title>
+    <title>ADAM | Agent Registry</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .agent-card {
+            background: rgba(30, 41, 59, 0.4);
+            transition: all 0.3s ease;
+        }
+        .agent-card:hover {
+            background: rgba(30, 41, 59, 0.8);
+            transform: translateY(-5px);
+            border-color: #22d3ee;
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
+        }
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+    </style>
 </head>
-<body class="h-screen flex flex-col grid-bg text-slate-200">
+<body class="h-screen flex flex-col grid-bg overflow-hidden">
     <div class="scan-line"></div>
-    <!-- Nav via nav.js -->
 
-    <main class="flex-1 p-8 overflow-y-auto">
+    <!-- Nav injected by nav.js -->
 
-        <header class="mb-8 flex justify-between items-center glass-panel p-6 rounded-lg border-l-4 border-emerald-500">
+    <main class="flex-1 p-6 overflow-y-auto">
+
+        <div class="flex justify-between items-end mb-8 border-b border-slate-700 pb-4">
             <div>
-                <h1 class="text-3xl font-bold text-white mb-2 font-mono">AGENT REGISTRY</h1>
-                <p class="text-slate-400">Manage and monitor autonomous agents, swarms, and meta-agents.</p>
+                <h2 class="text-3xl font-bold text-white font-mono">AGENT_REGISTRY</h2>
+                <p class="text-slate-400 text-sm mt-1">Status and telemetry for autonomous swarms.</p>
             </div>
-            <div class="flex space-x-4">
-                 <button class="px-4 py-2 bg-emerald-900/50 hover:bg-emerald-800 text-emerald-400 border border-emerald-700 rounded text-sm font-mono transition">
-                    + DEPLOY NEW
-                 </button>
-                 <button class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-600 rounded text-sm font-mono transition" onclick="renderAgents()">
-                    REFRESH STATUS
-                 </button>
+            <div class="flex gap-4">
+                 <div class="text-center">
+                    <div class="text-xs text-slate-500 uppercase">Total Agents</div>
+                    <div class="text-xl font-bold text-white font-mono" id="total-agents">--</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-xs text-slate-500 uppercase">Active</div>
+                    <div class="text-xl font-bold text-emerald-400 font-mono" id="active-agents">--</div>
+                </div>
             </div>
-        </header>
-
-        <!-- Filters -->
-        <div class="flex space-x-2 mb-6 text-sm font-mono" id="filters">
-            <button class="px-3 py-1 bg-blue-900/40 text-blue-300 border border-blue-800 rounded hover:bg-blue-800/50 active" onclick="filter('ALL')">ALL</button>
-            <button class="px-3 py-1 bg-slate-800 text-slate-400 border border-slate-700 rounded hover:bg-slate-700" onclick="filter('Sub-Agent')">SUB-AGENTS</button>
-            <button class="px-3 py-1 bg-slate-800 text-slate-400 border border-slate-700 rounded hover:bg-slate-700" onclick="filter('Meta-Agent')">META-AGENTS</button>
-            <button class="px-3 py-1 bg-slate-800 text-slate-400 border border-slate-700 rounded hover:bg-slate-700" onclick="filter('Orchestrator')">ORCHESTRATORS</button>
         </div>
 
-        <!-- Agents Grid -->
-        <div id="agents-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <!-- Populated by JS -->
-            <div class="col-span-full text-center text-slate-500 py-20 font-mono animate-pulse">
-                Accessing Agent Registry...
-            </div>
+        <!-- Filter Bar -->
+        <div class="flex gap-4 mb-6">
+            <button class="px-4 py-1 rounded bg-slate-800 border border-cyan-500/50 text-cyan-400 text-xs font-bold uppercase hover:bg-slate-700 transition">All Agents</button>
+            <button class="px-4 py-1 rounded bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold uppercase hover:bg-slate-700 transition">Risk</button>
+            <button class="px-4 py-1 rounded bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold uppercase hover:bg-slate-700 transition">Market</button>
+            <button class="px-4 py-1 rounded bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold uppercase hover:bg-slate-700 transition">Meta-Cog</button>
+        </div>
+
+        <!-- Agent Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="agent-grid">
+            <!-- Cards injected via JS -->
         </div>
 
     </main>
 
     <script src="js/mock_data.js"></script>
-    <script src="js/app.js"></script>
     <script src="js/nav.js"></script>
     <script>
-        let allAgents = [];
-        let currentFilter = 'ALL';
+        const AGENT_TYPES = [
+            { id: "RISK_ASSESS", name: "Risk Assessment Agent", role: "Risk", icon: "R", status: "Active", load: 85 },
+            { id: "SNC_ANALYST", name: "SNC Analyst", role: "Credit", icon: "S", status: "Active", load: 60 },
+            { id: "MARKET_SENT", name: "Market Sentiment", role: "Market", icon: "M", status: "Idle", load: 10 },
+            { id: "META_COG", name: "Meta-Cognitive", role: "System", icon: "C", status: "Active", load: 45 },
+            { id: "REFLECTOR", name: "Reflector Agent", role: "System", icon: "X", status: "Thinking", load: 92 },
+            { id: "PLANNER", name: "Neuro-Sym Planner", role: "System", icon: "P", status: "Active", load: 30 },
+            { id: "ESG_SCAN", name: "ESG Scanner", role: "Market", icon: "E", status: "Idle", load: 5 },
+            { id: "RED_TEAM", name: "Red Team Adversary", role: "Risk", icon: "A", status: "Sleep", load: 0 },
+            { id: "QUANT_SIM", name: "Quantum Simulator", role: "Risk", icon: "Q", status: "Active", load: 99 },
+            { id: "LEGAL_BOT", name: "Legal Compliance", role: "Legal", icon: "L", status: "Idle", load: 12 },
+            { id: "NEWS_BOT", name: "News Ingestor", role: "Market", icon: "N", status: "Active", load: 78 },
+            { id: "CODE_GEN", name: "Code Alchemist", role: "Dev", icon: "D", status: "Idle", load: 0 }
+        ];
 
         document.addEventListener('DOMContentLoaded', () => {
-             const data = window.MOCK_DATA || {};
-             allAgents = data.agents || [];
-             // Simulate loading delay for effect
-             setTimeout(renderAgents, 500);
+            renderAgents();
+            updateStats();
         });
 
-        function filter(type) {
-            currentFilter = type;
-            // Update UI buttons
-            const buttons = document.getElementById('filters').querySelectorAll('button');
-            buttons.forEach(btn => {
-                if(btn.textContent === type || (type === 'ALL' && btn.textContent === 'ALL')) {
-                    btn.className = "px-3 py-1 bg-blue-900/40 text-blue-300 border border-blue-800 rounded hover:bg-blue-800/50 active";
-                } else if (btn.textContent === 'SUB-AGENTS' && type === 'Sub-Agent') {
-                    btn.className = "px-3 py-1 bg-blue-900/40 text-blue-300 border border-blue-800 rounded hover:bg-blue-800/50 active";
-                } else if (btn.textContent === 'META-AGENTS' && type === 'Meta-Agent') {
-                    btn.className = "px-3 py-1 bg-blue-900/40 text-blue-300 border border-blue-800 rounded hover:bg-blue-800/50 active";
-                } else if (btn.textContent === 'ORCHESTRATORS' && type === 'Orchestrator') {
-                    btn.className = "px-3 py-1 bg-blue-900/40 text-blue-300 border border-blue-800 rounded hover:bg-blue-800/50 active";
-                } else {
-                    btn.className = "px-3 py-1 bg-slate-800 text-slate-400 border border-slate-700 rounded hover:bg-slate-700";
-                }
-            });
-            renderAgents();
-        }
-
         function renderAgents() {
-            const grid = document.getElementById('agents-grid');
+            const grid = document.getElementById('agent-grid');
             grid.innerHTML = '';
 
-            if (allAgents.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center text-slate-500 py-10">No agents found in registry.</div>';
-                return;
-            }
-
-            const filtered = currentFilter === 'ALL' ? allAgents : allAgents.filter(a => a.type === currentFilter);
-
-            filtered.forEach(agent => {
-                // Generate consistent mock stats based on name hash
-                const hash = agent.name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-                const load = hash % 100;
-                const statusOpts = ['ACTIVE', 'IDLE', 'PROCESSING', 'MAINTENANCE'];
-                const status = statusOpts[hash % 4];
-                const version = `v${(hash % 5) + 1}.0`;
-                const id = `AGT-${hash.toString().slice(0, 3)}`;
-
-                const isProcessing = status === 'PROCESSING';
-                const isIdle = status === 'IDLE' || status === 'SLEEP';
-                const isMaint = status === 'MAINTENANCE';
-
-                let statusColor = 'bg-emerald-500';
-                if(isProcessing) statusColor = 'bg-blue-500';
-                if(isIdle) statusColor = 'bg-slate-500';
-                if(isMaint) statusColor = 'bg-amber-500';
-
-                // Map type to color
-                let typeColor = "text-slate-400 border-slate-600";
-                if(agent.type === 'Sub-Agent') typeColor = "text-blue-400 border-blue-600";
-                if(agent.type === 'Meta-Agent') typeColor = "text-purple-400 border-purple-600";
-                if(agent.type === 'Orchestrator') typeColor = "text-amber-400 border-amber-600";
+            AGENT_TYPES.forEach(agent => {
+                const color = getStatusColor(agent.status);
 
                 const card = document.createElement('div');
-                card.className = 'glass-panel p-5 rounded-lg border border-slate-700 hover:border-slate-500 hover-card group flex flex-col justify-between h-56 transition';
+                card.className = "agent-card rounded-lg p-5 border border-slate-700 flex flex-col relative overflow-hidden";
 
                 card.innerHTML = `
-                    <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-[0.65rem] font-bold font-mono px-2 py-0.5 rounded bg-slate-800 ${typeColor} border uppercase">${agent.type}</span>
-                            <span class="flex items-center space-x-2 text-xs font-mono text-slate-300">
-                                <span class="w-2 h-2 rounded-full ${statusColor} ${isProcessing ? 'animate-pulse' : ''}"></span>
-                                <span>${status}</span>
-                            </span>
+                    <div class="absolute top-0 right-0 p-2 opacity-10 font-bold text-6xl select-none text-slate-500">${agent.icon}</div>
+
+                    <div class="flex items-center gap-3 mb-4 z-10">
+                        <div class="w-10 h-10 rounded bg-slate-800 flex items-center justify-center font-bold text-xl text-white border border-slate-600 shadow-inner">
+                            ${agent.icon}
                         </div>
-                        <h3 class="text-lg font-bold text-white group-hover:text-cyan-400 transition mb-1 leading-tight">${agent.name}</h3>
-                        <p class="text-xs text-slate-400 line-clamp-3 mb-3 overflow-hidden" title="${agent.description}">${agent.description}</p>
+                        <div>
+                            <h3 class="font-bold text-slate-200 text-sm">${agent.name}</h3>
+                            <div class="text-[10px] text-slate-500 uppercase tracking-wider">${agent.role}</div>
+                        </div>
                     </div>
 
-                    <div>
-                        <div class="flex justify-between text-[0.6rem] text-slate-500 font-mono mb-1">
-                            <span>ID: ${id}</span>
-                            <span>VER: ${version}</span>
+                    <div class="flex-1 space-y-3 z-10">
+                        <div>
+                            <div class="flex justify-between text-[10px] text-slate-400 mb-1">
+                                <span>Status</span>
+                                <span class="${color.text} font-bold flex items-center gap-1">
+                                    <span class="status-dot ${color.bg} ${agent.status === 'Active' ? 'animate-pulse' : ''}"></span>
+                                    ${agent.status.toUpperCase()}
+                                </span>
+                            </div>
                         </div>
-                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-                            <div class="h-full ${statusColor} opacity-80" style="width: ${load}%"></div>
+
+                        <div>
+                            <div class="flex justify-between text-[10px] text-slate-400 mb-1">
+                                <span>Cognitive Load</span>
+                                <span>${agent.load}%</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
+                                <div class="bg-blue-500 h-full rounded-full transition-all duration-1000" style="width: ${agent.load}%"></div>
+                            </div>
                         </div>
-                         <div class="text-[0.6rem] text-right text-slate-500 mt-1">LOAD: ${load}%</div>
+
+                        <div class="pt-3 border-t border-slate-700/50">
+                            <div class="text-[10px] text-slate-500 font-mono">LAST ACTION:</div>
+                            <div class="text-[10px] text-cyan-400/80 truncate font-mono mt-1">
+                                ${generateMockAction(agent.role)}
+                            </div>
+                        </div>
                     </div>
                 `;
                 grid.appendChild(card);
             });
+        }
+
+        function getStatusColor(status) {
+            switch(status) {
+                case 'Active': return { text: 'text-emerald-400', bg: 'bg-emerald-500' };
+                case 'Thinking': return { text: 'text-purple-400', bg: 'bg-purple-500' };
+                case 'Idle': return { text: 'text-slate-400', bg: 'bg-slate-500' };
+                case 'Sleep': return { text: 'text-slate-600', bg: 'bg-slate-700' };
+                default: return { text: 'text-slate-400', bg: 'bg-slate-500' };
+            }
+        }
+
+        function generateMockAction(role) {
+            const actions = {
+                'Risk': ['Calculating VaR...', 'Scanning credit default swaps...', 'Simulating crash scenario...'],
+                'Market': ['Parsing Reuters feed...', 'Detecting sentiment shift...', 'Updating price targets...'],
+                'System': ['Optimizing graph traversal...', 'Garbage collecting...', 'Re-planning execution path...'],
+                'Legal': ['Checking SEC filings...', 'Verifying covenant clauses...'],
+                'Dev': ['Generating unit tests...', 'Refactoring async loop...']
+            };
+            const list = actions[role] || ['Processing...'];
+            return list[Math.floor(Math.random() * list.length)] + " [" + (Math.random() * 200).toFixed(0) + "ms]";
+        }
+
+        function updateStats() {
+            document.getElementById('total-agents').textContent = AGENT_TYPES.length;
+            document.getElementById('active-agents').textContent = AGENT_TYPES.filter(a => a.status === 'Active' || a.status === 'Thinking').length;
         }
     </script>
 </body>
