@@ -1,0 +1,72 @@
+{
+  "portfolio_id": "GS_2045_HYBRID_AW",
+  "strategy_name": "Gold Standard Hybrid All-Weather 2045",
+  "investment_horizon": "20 Years (2025-2045)",
+  "rebalancing_frequency": "Annually",
+  "currency": "USD",
+  "risk_profile": {
+    "volatility_target": "Medium",
+    "max_drawdown_tolerance": "25%",
+    "regime_resilience": "Stagflation, Deflation, Growth"
+  },
+  "allocations": [
+    {
+      "asset_class": "Equities",
+      "allocation": "35%",
+      "strategy": "Global Cap Weighted",
+      "instruments": [
+        {
+          "name": "Total World Stock ETF",
+          "ticker": "VT",
+          "weight_within_class": "100%"
+        }
+      ],
+      "rationale": "Captures global growth. US/Ex-US split auto-balances."
+    },
+    {
+      "asset_class": "Fixed Income",
+      "allocation": "35%",
+      "strategy": "Defensive Anchor",
+      "instruments": [
+        {
+          "name": "Long-Term Treasuries (20+ Year)",
+          "ticker": "TLT",
+          "weight_within_class": "57%",
+          "note": "20% of total portfolio"
+        },
+        {
+          "name": "TIPS (Inflation Protected)",
+          "ticker": "SCHP",
+          "weight_within_class": "43%",
+          "note": "15% of total portfolio"
+        }
+      ],
+      "rationale": "TLT for deflation crashes; TIPS for inflation shocks."
+    },
+    {
+      "asset_class": "Alternatives",
+      "allocation": "30%",
+      "strategy": "Stagflation Buffer",
+      "instruments": [
+        {
+          "name": "Gold",
+          "ticker": "GLD",
+          "weight_within_class": "50%",
+          "note": "15% of total portfolio"
+        },
+        {
+          "name": "Commodities Broad Basket",
+          "ticker": "DBC",
+          "weight_within_class": "50%",
+          "note": "15% of total portfolio"
+        }
+      ],
+      "rationale": "Hard assets to counter fiscal dominance and currency debasement."
+    }
+  ],
+  "architect_notes": {
+    "correlation_matrix_assumption": "Equities/Bonds correlation approaches 1.0 during inflation spikes; Alternatives provide the necessary decorrelation.",
+    "execution_strategy": "passive_etf",
+    "fee_drag_target": "<0.15%"
+  }
+}

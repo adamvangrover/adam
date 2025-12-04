@@ -3,303 +3,330 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v23 | Deep Dive Reports</title>
+    <title>ADAM v23 | Deep Dive Explorer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
+    
     <style>
-        .page-a4 {
-            width: 210mm;
-            min-height: 297mm;
-            margin: auto;
-            background: white;
-            color: black;
-            padding: 20mm;
-            display: none; /* Hidden by default */
+        /* --- Base & Glassmorphism --- */
+        body { background-color: #0f172a; }
+        
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         }
-        .print-mode body {
-            background: #525659;
-            overflow: auto;
+
+        /* --- Scanline Effect --- */
+        .scan-line {
+            position: fixed; top: 0; left: 0; width: 100%; height: 5px;
+            background: rgba(6, 182, 212, 0.1);
+            opacity: 0.4; animation: scan 6s linear infinite; pointer-events: none; z-index: 9999;
         }
-        .print-mode .app-layout {
-            display: none;
+        @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
+
+        /* --- Phase Widgets --- */
+        .phase-widget { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .phase-widget:hover {
+            border-color: rgba(56, 189, 248, 0.5);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.1);
         }
-        .print-mode .page-a4 {
-            display: block;
-        }
-        /* Chart bars */
-        .chart-bar {
-            transition: height 1s ease-out;
+
+        /* --- Charts & Gauges --- */
+        .chart-bar-fill { transition: width 1.5s ease-out; }
+        
+        /* --- Print Mode --- */
+        @media print {
+            body { background: white !important; color: black !important; -webkit-print-color-adjust: exact; }
+            .glass-panel { background: white !important; border: 1px solid #ccc !important; box-shadow: none !important; }
+            .hidden-print { display: none !important; }
+            .text-slate-200 { color: black !important; }
+            .text-slate-300 { color: #333 !important; }
+            .text-slate-400 { color: #555 !important; }
+            .text-slate-500 { color: #666 !important; }
         }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-200 font-sans h-screen flex flex-col overflow-hidden">
-    <div class="scan-line"></div>
+<body class="bg-[#0f172a] text-slate-200 h-screen flex flex-col overflow-hidden font-sans">
 
-    <!-- Header -->
-    <header class="app-layout h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-slate-900/80 backdrop-blur-md z-50">
+    <div class="scan-line hidden-print"></div>
+
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-50 shrink-0 hidden-print">
         <div class="flex items-center gap-4">
-            <a href="index.html" class="text-slate-500 hover:text-white transition">
-                <i class="fas fa-chevron-left"></i>
-            </a>
-            <h1 class="text-xl font-bold tracking-tight text-slate-100">DEEP DIVE <span class="text-cyan-400">EXPLORER</span></h1>
+            <button class="text-slate-400 hover:text-white transition"><i class="fas fa-bars"></i></button>
+            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-cyan-400">v23.5</span> <span class="text-slate-500 font-normal">| Deep Dive</span></h1>
         </div>
         <div class="flex items-center gap-4">
-            <button onclick="togglePrintMode()" class="px-3 py-1 text-xs border border-slate-600 rounded hover:bg-slate-800 text-slate-300 transition">
-                <i class="fas fa-print mr-2"></i> Export PDF
+            <button onclick="window.print()" class="px-3 py-1 text-xs border border-slate-600 rounded hover:bg-slate-700 transition flex items-center gap-2">
+                <i class="fas fa-print"></i> PDF Export
             </button>
-            <div class="relative group">
-                <button class="w-8 h-8 rounded-full bg-slate-800 border border-slate-600 flex items-center justify-center hover:border-cyan-500 transition">
-                    <i class="fas fa-filter text-xs text-slate-400"></i>
-                </button>
+            <div class="relative">
+                <input type="text" id="report-search" placeholder="Search Reports..." class="bg-slate-800 border border-slate-700 rounded px-3 py-1 text-sm focus:outline-none focus:border-cyan-500 w-64">
+                <i class="fas fa-search absolute right-3 top-2 text-slate-500 text-xs"></i>
             </div>
         </div>
     </header>
 
-    <!-- Main App Layout -->
-    <main class="app-layout flex-1 flex gap-4 p-4 overflow-hidden">
+    <main class="flex-1 flex overflow-hidden">
 
-        <!-- Left: Report List -->
-        <aside class="w-80 glass-panel flex flex-col rounded-lg overflow-hidden">
-            <div class="p-4 border-b border-slate-700 bg-slate-800/50">
-                <input type="text" placeholder="Search reports..." class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-cyan-500 transition">
+        <aside class="w-72 glass-panel border-r border-slate-700/50 flex flex-col hidden-print shrink-0">
+            <div class="p-4 border-b border-slate-700/50 bg-slate-800/30">
+                <h3 class="text-xs uppercase tracking-widest text-slate-500 font-bold">Available Reports</h3>
             </div>
-            <div id="report-list" class="flex-1 overflow-y-auto p-2 space-y-2">
-                <!-- Report items injected here -->
-            </div>
+            <div id="report-list" class="flex-1 overflow-y-auto p-2 space-y-1">
+                </div>
         </aside>
 
-        <!-- Right: Report Content -->
-        <section id="report-viewer" class="flex-1 glass-panel rounded-lg overflow-y-auto p-8 relative scroll-smooth">
-            <!-- Content Injected Here -->
-            <div class="flex flex-col items-center justify-center h-full text-slate-500">
-                <i class="fas fa-file-invoice text-4xl mb-4 opacity-50"></i>
-                <p>Select a report to analyze</p>
+        <section id="content-area" class="flex-1 overflow-y-auto p-4 lg:p-8 relative scroll-smooth">
+
+            <div id="empty-state" class="flex flex-col items-center justify-center h-full text-slate-500">
+                <i class="fas fa-microscope text-6xl mb-4 opacity-20"></i>
+                <p>Select a report to initialize Deep Dive Protocol.</p>
+            </div>
+
+            <div id="report-view" class="hidden max-w-6xl mx-auto">
+                
+                <div class="mb-8 border-b border-slate-700/50 pb-6 flex justify-between items-start">
+                    <div>
+                        <div class="flex items-center gap-3 mb-2">
+                            <h1 id="r-title" class="text-3xl font-bold text-white tracking-tight font-mono">Report Title</h1>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-900/50 text-blue-300 border border-blue-700/50">EQUITY_ANALYSIS</span>
+                        </div>
+                        <p id="r-meta" class="text-slate-400 mono text-sm">Target: N/A | Date: N/A</p>
+                    </div>
+                    <div class="text-right">
+                        <div id="r-verdict" class="text-2xl font-bold text-emerald-400">BUY</div>
+                        <div class="text-xs text-slate-500 uppercase tracking-wider font-mono">Recommendation</div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6 mb-8 rounded-lg border-l-4 border-cyan-500">
+                    <h3 class="text-xs uppercase tracking-widest text-cyan-400 font-bold mb-3 flex items-center gap-2">
+                        <i class="fas fa-brain"></i> Executive Summary
+                    </h3>
+                    <p id="r-summary" class="text-slate-300 leading-relaxed text-sm">Loading summary...</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+
+                    <div class="phase-widget glass-panel p-5 rounded-lg border border-slate-700/50">
+                        <div class="flex justify-between items-center mb-4 border-b border-slate-700/50 pb-2">
+                            <h3 class="text-sm font-bold text-slate-200"><i class="fas fa-chart-line text-blue-400 mr-2"></i>Valuation Engine</h3>
+                            <span class="text-xs mono text-slate-500">PHASE 2</span>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-slate-400">Intrinsic Value (DCF)</span>
+                                    <span id="val-intrinsic" class="font-bold text-emerald-400">$0.00</span>
+                                </div>
+                                <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                    <div id="bar-intrinsic" class="bg-emerald-500 h-full chart-bar-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span class="text-slate-400">Market Price</span>
+                                    <span id="val-market" class="font-bold text-blue-400">$0.00</span>
+                                </div>
+                                <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                    <div id="bar-market" class="bg-blue-500 h-full chart-bar-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div id="val-comment" class="text-xs text-slate-400 mt-4 italic border-l-2 border-slate-600 pl-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="phase-widget glass-panel p-5 rounded-lg border border-slate-700/50">
+                        <div class="flex justify-between items-center mb-4 border-b border-slate-700/50 pb-2">
+                            <h3 class="text-sm font-bold text-slate-200"><i class="fas fa-shield-alt text-red-400 mr-2"></i>Risk Profile</h3>
+                            <span class="text-xs mono text-slate-500">PHASE 4</span>
+                        </div>
+                        <div class="flex items-center justify-center relative h-32">
+                            <svg viewBox="0 0 200 100" class="w-48 h-24">
+                                <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#1e293b" stroke-width="20" stroke-linecap="round" />
+                                <path id="risk-gauge-arc" d="M 20 100 A 80 80 0 0 1 20 100" fill="none" stroke="#ef4444" stroke-width="20" stroke-linecap="round" style="transition: stroke-dasharray 1s ease;"/>
+                                <text x="100" y="85" text-anchor="middle" fill="white" class="text-2xl font-bold font-mono" id="risk-score">0%</text>
+                                <text x="100" y="98" text-anchor="middle" fill="#64748b" class="text-[8px] font-mono tracking-widest">PROBABILITY OF DEFAULT</text>
+                            </svg>
+                        </div>
+                        <div id="risk-factors" class="space-y-1 mt-2 pl-4"></div>
+                    </div>
+
+                    <div class="phase-widget glass-panel p-5 rounded-lg border border-slate-700/50">
+                        <div class="flex justify-between items-center mb-4 border-b border-slate-700/50 pb-2">
+                            <h3 class="text-sm font-bold text-slate-200"><i class="fas fa-university text-purple-400 mr-2"></i>Credit & SNC</h3>
+                            <span class="text-xs mono text-slate-500">PHASE 3</span>
+                        </div>
+                        <div id="credit-content" class="text-sm text-slate-300">Loading...</div>
+                    </div>
+
+                    <div class="phase-widget glass-panel p-5 rounded-lg border border-slate-700/50">
+                        <div class="flex justify-between items-center mb-4 border-b border-slate-700/50 pb-2">
+                            <h3 class="text-sm font-bold text-slate-200"><i class="fas fa-chess text-amber-400 mr-2"></i>Strategic Synthesis</h3>
+                            <span class="text-xs mono text-slate-500">PHASE 5</span>
+                        </div>
+                        <div id="synthesis-content" class="text-sm text-slate-300">Loading...</div>
+                    </div>
+                </div>
+
             </div>
         </section>
-
     </main>
 
-    <!-- Hidden Print Layout (A4) -->
-    <div id="print-view" class="page-a4 shadow-2xl">
-        <div id="print-content"></div>
-    </div>
-
-    <!-- Scripts -->
-    <script src="js/mock_data.js"></script>
-    <script src="js/app.js"></script>
     <script>
-        const reportListEl = document.getElementById('report-list');
-        const viewerEl = document.getElementById('report-viewer');
-        const printContentEl = document.getElementById('print-content');
+        // -- Fallback Data --
+        const fallbackReports = [
+            {
+                id: 1, title: "Acme Corp LBO Analysis", date: "2025-10-15",
+                v23_knowledge_graph: {
+                    meta: { target: "Acme Corp" },
+                    nodes: {
+                        entity_ecosystem: { management_assessment: { narrative: "Management has strong track record but faces headwinds in APAC region. Operational efficiency is high." } },
+                        equity_analysis: { valuation_engine: { dcf_model: { intrinsic_share_price: 145.50, current_price_divergence: "Stock is undervalued by 15%." } } },
+                        simulation_engine: { monte_carlo_default_prob: 0.12 },
+                        credit_analysis: { snc_rating_model: { overall_borrower_rating: "Pass", facilities: [{id: "Term Loan B", regulatory_rating: "Pass"}] } },
+                        strategic_synthesis: { final_verdict: { recommendation: "BUY", conviction_level: 8, rationale_summary: "Strong cash flows outweigh geopolitical risks." } }
+                    }
+                },
+                risk_factors: ["Currency fluctuation", "Supply chain disruption"]
+            },
+            {
+                id: 2, title: "Globex Logistics Credit Review", date: "2025-10-12",
+                v23_knowledge_graph: {
+                    meta: { target: "Globex" },
+                    nodes: {
+                        entity_ecosystem: { management_assessment: { narrative: "High leverage concerns. Recent CFO departure raises governance questions." } },
+                        equity_analysis: { valuation_engine: { dcf_model: { intrinsic_share_price: 42.00, current_price_divergence: "Market implies higher growth than realistic." } } },
+                        simulation_engine: { monte_carlo_default_prob: 0.45 },
+                        credit_analysis: { snc_rating_model: { overall_borrower_rating: "Special Mention", facilities: [{id: "Revolver", regulatory_rating: "Substandard"}] } },
+                        strategic_synthesis: { final_verdict: { recommendation: "SELL", conviction_level: 9, rationale_summary: "Debt maturity wall in 2026 presents default risk." } }
+                    }
+                },
+                risk_factors: ["Liquidity Crunch", "Covenant Breach"]
+            }
+        ];
 
-        // Init
-        window.dataManager.init().then(() => {
-            renderList();
-            // Auto load first report
-            const reports = window.dataManager.getReports();
-            if(reports.length > 0) loadReport(0);
+        let currentReports = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check for external data or use fallback
+            if (window.dataManager) {
+                try {
+                    await window.dataManager.init();
+                    currentReports = window.dataManager.getReports();
+                } catch(e) { currentReports = fallbackReports; }
+            } else {
+                currentReports = fallbackReports;
+            }
+
+            renderReportList(currentReports);
+            
+            // Search Listener
+            document.getElementById('report-search').addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                renderReportList(currentReports.filter(r => (r.title || '').toLowerCase().includes(term)));
+            });
         });
 
-        function renderList() {
-            const reports = window.dataManager.getReports();
-            reportListEl.innerHTML = '';
-
-            reports.forEach((rep, index) => {
-                const item = document.createElement('div');
-                item.className = `p-3 rounded cursor-pointer border border-transparent hover:bg-slate-800 hover:border-slate-700 transition group`;
-                item.onclick = () => loadReport(index);
-
-                item.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <h3 class="font-bold text-sm text-slate-200 group-hover:text-cyan-400 line-clamp-1">${rep.title || rep.file_name}</h3>
-                        <span class="text-[10px] bg-slate-800 px-1 rounded text-slate-500 border border-slate-700">${rep.date || 'N/A'}</span>
+        function renderReportList(reports) {
+            const list = document.getElementById('report-list');
+            list.innerHTML = '';
+            reports.forEach((report, index) => {
+                const div = document.createElement('div');
+                div.className = 'p-3 rounded cursor-pointer hover:bg-slate-700/50 transition border-l-2 border-transparent hover:border-cyan-500 group mb-1';
+                div.onclick = () => loadReport(report);
+                div.innerHTML = `
+                    <div class="font-bold text-sm text-slate-300 group-hover:text-white truncate font-mono">${report.title}</div>
+                    <div class="flex justify-between items-center mt-1">
+                         <span class="text-[10px] text-slate-500 mono">${report.date}</span>
+                         <i class="fas fa-chevron-right text-[10px] text-slate-600 group-hover:text-cyan-400"></i>
                     </div>
-                    <p class="text-xs text-slate-500 mt-1 line-clamp-2">${rep.executive_summary || rep.summary || 'No summary available.'}</p>
                 `;
-                reportListEl.appendChild(item);
+                list.appendChild(div);
             });
         }
 
-        function loadReport(index) {
-            const rep = window.dataManager.getReports()[index];
-            if (!rep) return;
+        function loadReport(report) {
+            // UI Toggle
+            document.getElementById('empty-state').classList.add('hidden');
+            document.getElementById('report-view').classList.remove('hidden');
 
-            // Highlight active in list
-            Array.from(reportListEl.children).forEach((el, i) => {
-                if (i === index) el.classList.add('bg-slate-800', 'border-cyan-500/50');
-                else el.classList.remove('bg-slate-800', 'border-cyan-500/50');
-            });
+            // Data Extraction (Knowledge Graph Traversal)
+            const kg = report.v23_knowledge_graph || {};
+            const nodes = kg.nodes || {};
+            const meta = kg.meta || {};
 
-            // Render Interactive View
-            const contentHTML = generateReportHTML(rep);
-            viewerEl.innerHTML = contentHTML;
+            // 1. Header
+            document.getElementById('r-title').innerText = report.title;
+            document.getElementById('r-meta').innerText = `Target: ${meta.target || 'Unknown'} | Date: ${report.date}`;
+            
+            // 2. Summary
+            const summary = nodes.entity_ecosystem?.management_assessment?.narrative || "No executive summary available.";
+            document.getElementById('r-summary').innerText = summary;
 
-            // Render Print View
-            printContentEl.innerHTML = `
-                <h1 style="font-size: 24pt; font-weight: bold; margin-bottom: 20px;">${rep.title || 'Analysis Report'}</h1>
-                <div style="font-family: serif; line-height: 1.6;">
-                    <p><strong>Date:</strong> ${rep.date || new Date().toISOString().split('T')[0]}</p>
-                    <p><strong>Analyst:</strong> ${rep.analyst || 'Adam v23'}</p>
-                    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #ccc;">
-                    ${generatePrintHTML(rep)}
-                </div>
-            `;
+            // 3. Valuation (Math Logic)
+            const dcf = nodes.equity_analysis?.valuation_engine?.dcf_model || {};
+            const iVal = dcf.intrinsic_share_price || 0;
+            const mVal = report.id === 1 ? 125.00 : 55.00; // Mock market price for demo
+            const maxVal = Math.max(iVal, mVal) * 1.2;
 
-            // Initialize charts or interactions if any
-            setTimeout(initCharts, 100);
-        }
-
-        function generateReportHTML(data) {
-            // Helper to render sections
-            const renderSection = (title, content, icon='info-circle', extraClass='') => `
-                <div class="mb-8 animate-fade-in ${extraClass}">
-                    <h2 class="text-lg font-bold text-cyan-400 mb-3 flex items-center gap-2 border-b border-slate-700 pb-2">
-                        <i class="fas fa-${icon}"></i> ${title}
-                    </h2>
-                    <div class="text-sm text-slate-300 leading-relaxed space-y-4">
-                        ${content}
-                    </div>
-                </div>
-            `;
-
-            // Dynamic Content Parsing
-            let mainContent = '';
-
-            // 1. Executive Summary
-            if (data.executive_summary) {
-                mainContent += renderSection("Executive Summary", `<p>${data.executive_summary}</p>`, "brain");
-            } else if (data.summary) {
-                mainContent += renderSection("Summary", `<p>${data.summary}</p>`, "brain");
-            }
-
-            // 2. Valuation Widget (Interactive)
-            if (data.valuation || data.financial_analysis) {
-                const priceTarget = data.valuation?.price_target || data.price_target || 0;
-                const currentPrice = data.current_price || (priceTarget * 0.8); // Mock if missing
-                const upside = ((priceTarget - currentPrice) / currentPrice * 100).toFixed(1);
-
-                const widget = `
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-                        <div class="glass-panel p-4 rounded-lg border border-slate-700">
-                            <h3 class="text-xs uppercase text-slate-500 font-bold mb-4">Valuation Model</h3>
-                            <div class="flex items-end gap-4 h-32 relative">
-                                <div class="w-1/2 bg-slate-700 rounded-t relative group">
-                                    <div class="absolute bottom-full mb-1 w-full text-center text-xs text-slate-400">$${currentPrice}</div>
-                                    <div class="h-full w-full bg-slate-600 rounded-t flex items-end justify-center text-xs text-white/20 pb-2">Current</div>
-                                </div>
-                                <div class="w-1/2 bg-cyan-600 rounded-t relative group chart-bar" style="height: 0%" data-height="100%">
-                                    <div class="absolute bottom-full mb-1 w-full text-center text-xs text-cyan-400 font-bold">$${priceTarget}</div>
-                                    <div class="h-full w-full bg-cyan-500/20 rounded-t flex items-end justify-center text-xs text-white/20 pb-2">Target</div>
-                                </div>
-                            </div>
-                            <div class="mt-4 text-center">
-                                <span class="text-2xl font-bold ${upside > 0 ? 'text-emerald-400' : 'text-red-400'}">${upside > 0 ? '+' : ''}${upside}%</span>
-                                <span class="text-xs text-slate-500 block">Upside Potential</span>
-                            </div>
-                        </div>
-                         <div class="glass-panel p-4 rounded-lg border border-slate-700">
-                            <h3 class="text-xs uppercase text-slate-500 font-bold mb-4">Risk Gauge (Monte Carlo)</h3>
-                            <div class="relative h-32 flex items-center justify-center">
-                                <!-- Simple CSS Gauge -->
-                                <div class="w-32 h-16 bg-slate-800 rounded-t-full relative overflow-hidden">
-                                    <div class="absolute bottom-0 left-0 w-full h-full bg-gradient-to-r from-emerald-500 via-yellow-500 to-red-500 opacity-20"></div>
-                                    <div class="absolute bottom-0 left-1/2 w-1 h-16 bg-white origin-bottom transform -rotate-45 transition-transform duration-1000" id="risk-needle"></div>
-                                </div>
-                                <div class="absolute bottom-0 text-center">
-                                    <span class="text-xl font-bold text-slate-200">Medium</span>
-                                </div>
-                            </div>
-                            <div class="mt-4 text-xs text-slate-400 text-center">
-                                Probability of Default: <span class="text-white">2.4%</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                mainContent += renderSection("Financial Intelligence", widget, "chart-bar", "");
-            }
-
-            // 3. Generic JSON Dump (formatted) for other fields
-            // Just for showcase, we pretty print analysis object if exists
-            if (data.analysis) {
-                 // Convert analysis object to HTML
-                 let analysisHTML = '';
-                 if (data.analysis.segments) {
-                     analysisHTML += `<h4 class="font-bold text-white mt-2">Segments</h4><ul class="list-disc pl-5">`;
-                     data.analysis.segments.forEach(seg => {
-                         analysisHTML += `<li><strong class="text-cyan-300">${seg.name}</strong>: ${seg.revenue_growth || ''} growth. ${seg.highlights?.[0] || ''}</li>`;
-                     });
-                     analysisHTML += `</ul>`;
-                 }
-                 if (data.analysis.competitive_landscape) {
-                     analysisHTML += `<h4 class="font-bold text-white mt-4">Competitive Landscape</h4>`;
-                     for (const [key, val] of Object.entries(data.analysis.competitive_landscape)) {
-                         analysisHTML += `<div class="mt-2"><span class="text-slate-400 uppercase text-xs">${key}</span>: ${val.main_competitors?.join(', ')}</div>`;
-                     }
-                 }
-                 mainContent += renderSection("Deep Analysis", analysisHTML, "microscope");
-            }
-
-            // 4. Raw text for markdown body if any (like newsletters)
-            if (data.content) {
-                // Simple markdown-ish parser or just text
-                 mainContent += renderSection("Content", `<pre class="whitespace-pre-wrap font-mono text-xs text-slate-400 bg-slate-900 p-4 rounded border border-slate-800">${data.content}</pre>`, "align-left");
-            }
-
-
-            return `
-                <div class="max-w-4xl mx-auto pb-20">
-                    <div class="flex items-center justify-between mb-8">
-                        <div>
-                            <h1 class="text-3xl font-bold text-white mb-2 font-mono">${data.title || data.company_name || 'Report'}</h1>
-                            <div class="flex gap-4 text-xs text-slate-500">
-                                <span><i class="far fa-calendar mr-1"></i> ${data.date || 'N/A'}</span>
-                                <span><i class="far fa-user mr-1"></i> ${data.analyst || 'Adam AI'}</span>
-                                <span class="bg-slate-800 px-2 py-0.5 rounded border border-slate-700 text-cyan-400">${data.rating || 'NEUTRAL'}</span>
-                            </div>
-                        </div>
-                        <img src="https://ui-avatars.com/api/?name=${(data.company || data.title || 'A').substring(0,2)}&background=0f172a&color=22d3ee&font-size=0.33" class="w-16 h-16 rounded-lg border border-slate-700 shadow-lg">
-                    </div>
-
-                    ${mainContent}
-
-                    <div class="mt-12 pt-8 border-t border-slate-800 text-center text-xs text-slate-600">
-                        <p>Generated by ADAM v23.0 Adaptive System. Confidential.</p>
-                    </div>
-                </div>
-            `;
-        }
-
-        function generatePrintHTML(data) {
-            // Simplified plain HTML for print
-            let html = `<h3>Executive Summary</h3><p>${data.executive_summary || data.summary || data.content || ''}</p>`;
-            if (data.analysis) {
-                 html += `<h3>Analysis Details</h3><pre>${JSON.stringify(data.analysis, null, 2)}</pre>`;
-            }
-            return html;
-        }
-
-        function initCharts() {
+            document.getElementById('val-intrinsic').innerText = `$${iVal.toFixed(2)}`;
+            document.getElementById('val-market').innerText = `$${mVal.toFixed(2)}`;
+            
             // Animate bars
-            document.querySelectorAll('.chart-bar').forEach(el => {
-                setTimeout(() => {
-                    el.style.height = el.dataset.height;
-                }, 100);
-            });
+            setTimeout(() => {
+                document.getElementById('bar-intrinsic').style.width = `${(iVal / maxVal) * 100}%`;
+                document.getElementById('bar-market').style.width = `${(mVal / maxVal) * 100}%`;
+            }, 100);
+            document.getElementById('val-comment').innerText = dcf.current_price_divergence || "Reviewing pricing models.";
 
-            // Animate needle
-            const needle = document.getElementById('risk-needle');
-            if (needle) {
-                // Random angle for demo
-                const angle = Math.floor(Math.random() * 180) - 90;
-                setTimeout(() => {
-                    needle.style.transform = `rotate(${angle}deg)`;
-                }, 100);
-            }
-        }
+            // 4. Risk Gauge (SVG Path Math)
+            const pd = nodes.simulation_engine?.monte_carlo_default_prob || 0;
+            document.getElementById('risk-score').innerText = `${(pd * 100).toFixed(1)}%`;
+            document.getElementById('risk-score').setAttribute('fill', pd > 0.2 ? '#ef4444' : '#10b981');
 
-        function togglePrintMode() {
-            document.body.classList.toggle('print-mode');
+            // Calculate SVG Arc
+            // Center 100,100. Radius 80. Start at 180deg (left). End determined by PD.
+            // SVG coordinate system: 0 degrees is 3 o'clock. 
+            // We want gauge to go from 9 o'clock (180 deg) to 3 o'clock (0 deg) counter-clockwise?
+            // Actually simpler: 180 degrees total span. 
+            // Start point: x=20, y=100.
+            const angleRad = Math.PI * (1 - pd); // 0 PD = PI (left), 1 PD = 0 (right)
+            const endX = 100 + 80 * Math.cos(angleRad); // cos(PI) is -1 -> 20. cos(0) is 1 -> 180
+            const endY = 100 - 80 * Math.sin(angleRad); // sin is positive in upper half, so minus to go up
+            
+            const largeArc = 0; // We define arc to be upper half mostly
+            const d = `M 20 100 A 80 80 0 ${largeArc} 1 ${endX} ${endY}`;
+            document.getElementById('risk-gauge-arc').setAttribute('d', d);
+            document.getElementById('risk-gauge-arc').setAttribute('stroke', pd > 0.2 ? '#ef4444' : '#10b981');
+
+            // Risk Factors
+            const riskList = document.getElementById('risk-factors');
+            riskList.innerHTML = (report.risk_factors || []).map(r => `<div class="text-xs text-red-400">• ${r}</div>`).join('');
+
+            // 5. Credit & Synthesis
+            const snc = nodes.credit_analysis?.snc_rating_model || {};
+            const synth = nodes.strategic_synthesis?.final_verdict || {};
+
+            document.getElementById('credit-content').innerHTML = `
+                <div class="mb-2">SNC Rating: <span class="font-bold font-mono ${snc.overall_borrower_rating === 'Pass' ? 'text-emerald-400' : 'text-red-400'}">${snc.overall_borrower_rating || 'N/A'}</span></div>
+                <div class="text-xs text-slate-500">
+                    ${(snc.facilities || []).map(f => `Facility: ${f.id} (${f.regulatory_rating})`).join('<br>')}
+                </div>
+            `;
+
+            document.getElementById('synthesis-content').innerHTML = `
+                <div class="font-bold text-white mb-1 text-lg">${synth.recommendation || 'HOLD'}</div>
+                <div class="text-xs text-slate-400 mb-2">Conviction: ${synth.conviction_level || '0'}/10</div>
+                <p class="text-xs italic text-slate-500 border-l border-slate-600 pl-2">"${synth.rationale_summary || 'No rationale.'}"</p>
+            `;
+            
+            const v = document.getElementById('r-verdict');
+            v.innerText = synth.recommendation || "HOLD";
+            v.className = `text-2xl font-bold ${synth.recommendation === 'BUY' ? 'text-emerald-400' : (synth.recommendation === 'SELL' ? 'text-red-500' : 'text-amber-400')}`;
         }
     </script>
 </body>

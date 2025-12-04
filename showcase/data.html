@@ -6,197 +6,271 @@
     <title>ADAM v23 | Data Vault</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
-    <!-- Prism for Syntax Highlighting -->
+    
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markdown.min.js"></script>
+
     <style>
-        .tree-item {
-            padding-left: 1rem;
-            border-left: 1px solid rgba(71, 85, 105, 0.3);
+        /* Base & Scrollbars */
+        body { background-color: #0f172a; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* CRT Scanline */
+        .scan-line {
+            position: fixed; top: 0; left: 0; width: 100%; height: 5px;
+            background: rgba(16, 185, 129, 0.1);
+            opacity: 0.4; animation: scan 6s linear infinite; pointer-events: none; z-index: 9999;
         }
+        @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Tree Styling */
+        .tree-node { padding-left: 1rem; border-left: 1px solid rgba(51, 65, 85, 0.5); }
+        .tree-item:hover { background-color: rgba(51, 65, 85, 0.5); color: white; }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-200 font-sans h-screen flex flex-col overflow-hidden">
     <div class="scan-line"></div>
 
-    <!-- Header -->
-    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-slate-900/80 backdrop-blur-md z-50">
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 shrink-0">
         <div class="flex items-center gap-4">
-            <a href="index.html" class="text-slate-500 hover:text-white transition">
-                <i class="fas fa-chevron-left"></i>
-            </a>
-            <h1 class="text-xl font-bold tracking-tight text-slate-100">DATA <span class="text-amber-400">VAULT</span></h1>
+            <button id="nav-toggle" class="text-slate-400 hover:text-white transition">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-amber-400">v23</span> <span class="text-slate-500 font-normal">| Data Vault</span></h1>
         </div>
-        <div class="text-xs font-mono text-slate-500">
-            <i class="fas fa-database mr-2"></i> SYSTEM_ROOT/DATA/
+        <div class="flex gap-4 font-mono text-xs text-slate-400 hidden md:flex">
+             <div>STORAGE: <span class="text-emerald-400" id="total-storage">--</span></div>
+             <div>FILES: <span class="text-emerald-400" id="file-count">--</span></div>
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="flex-1 flex gap-4 p-4 overflow-hidden">
 
-        <!-- File Explorer -->
-        <aside class="w-96 glass-panel flex flex-col rounded-lg overflow-hidden">
-            <div class="p-3 border-b border-slate-700 bg-slate-800/50 flex justify-between items-center">
-                <span class="text-xs uppercase font-bold text-slate-500">File Explorer</span>
-                <i class="fas fa-sync-alt text-slate-600 cursor-pointer hover:text-white text-xs"></i>
+        <aside class="w-80 glass-panel flex flex-col rounded-lg overflow-hidden shrink-0">
+            <div class="p-3 border-b border-slate-700/50 bg-slate-800/50 flex justify-between items-center">
+                <span class="text-xs uppercase font-bold text-slate-500 tracking-wider">File System</span>
+                <i class="fas fa-sync-alt text-slate-600 cursor-pointer hover:text-white text-xs" title="Refresh"></i>
             </div>
-            <div id="file-tree" class="flex-1 overflow-y-auto p-2 font-mono text-sm text-slate-400">
-                <!-- Tree injected here -->
+            
+            <div id="file-tree" class="flex-1 overflow-y-auto p-2 font-mono text-xs text-slate-400">
+                <div class="text-center text-slate-500 mt-10 animate-pulse">Scanning index...</div>
             </div>
         </aside>
 
-        <!-- Preview Pane -->
-        <section class="flex-1 glass-panel rounded-lg overflow-hidden flex flex-col">
-            <div class="h-10 border-b border-slate-700 bg-slate-800 flex items-center px-4 justify-between">
+        <section class="flex-1 glass-panel rounded-lg overflow-hidden flex flex-col relative">
+            
+            <div class="h-10 border-b border-slate-700/50 bg-slate-800/50 flex items-center px-4 justify-between">
                 <div class="flex items-center gap-2">
-                    <i class="fas fa-file-code text-cyan-500 text-sm"></i>
+                    <i class="fas fa-cube text-amber-500 text-sm"></i>
                     <span id="preview-filename" class="text-sm font-mono text-slate-200">Select a file...</span>
                 </div>
-                <div class="text-xs text-slate-500" id="preview-meta"></div>
+                <div class="flex gap-3 text-slate-400">
+                     <button class="hover:text-white transition" title="Copy Content"><i class="far fa-copy text-xs"></i></button>
+                     <button class="hover:text-white transition" title="Download"><i class="fas fa-download text-xs"></i></button>
+                </div>
             </div>
-            <div class="flex-1 overflow-auto bg-[#1e1e1e] relative">
-                <pre class="m-0 p-4 min-h-full"><code id="code-preview" class="language-json text-xs font-mono"></code></pre>
+
+            <div class="flex-1 overflow-auto bg-[#0b1120] relative custom-scrollbar">
+                <pre id="code-viewer" class="m-0 p-4 text-xs font-mono min-h-full hidden"><code id="code-content" class="language-json"></code></pre>
+
+                <div id="empty-state" class="absolute inset-0 flex items-center justify-center flex-col text-slate-600 pointer-events-none">
+                    <i class="fas fa-file-code text-6xl mb-4 opacity-10"></i>
+                    <p class="text-xs font-mono opacity-50">Select a file to inspect content</p>
+                </div>
             </div>
+
+            <div class="h-6 bg-slate-900/80 border-t border-slate-700/50 flex items-center px-4 text-[10px] text-slate-500 justify-between font-mono">
+                <div id="file-meta">No file selected</div>
+                <div>UTF-8</div>
+            </div>
+
         </section>
 
     </main>
 
-    <script src="js/mock_data.js"></script>
-    <script src="js/app.js"></script>
     <script>
-        const treeContainer = document.getElementById('file-tree');
-        const codePreview = document.getElementById('code-preview');
-        const filenameLabel = document.getElementById('preview-filename');
-        const metaLabel = document.getElementById('preview-meta');
+        // -- Fallback Data in case mock_data.js is missing --
+        const fallbackFiles = [
+            { path: "system/config.json", size: 1024, last_modified: 1701234567, content: '{\n  "version": "23.5",\n  "status": "active"\n}' },
+            { path: "system/logs/boot.txt", size: 450, last_modified: 1701234580, content: "Boot sequence initiated...\nKernel loaded.\n" },
+            { path: "data/research/quantum_notes.md", size: 2048, last_modified: 1701234900, content: "# Quantum Risk Analysis\n\nExploring amplitude estimation..." },
+            { path: "core/agents/analyst.py", size: 5000, last_modified: 1701235000, content: "def analyze(data):\n    return data * 2" }
+        ];
 
-        window.dataManager.init().then(() => {
-            const files = window.dataManager.getFiles();
-            renderTree(files);
+        // -- APP LOGIC --
+        document.addEventListener('DOMContentLoaded', async () => {
+            let files = [];
+            
+            // Try loading from window data (if external script loaded)
+            if (window.MOCK_DATA && window.MOCK_DATA.files) {
+                files = window.MOCK_DATA.files;
+            } else if (window.dataManager) {
+                try {
+                    await window.dataManager.init();
+                    files = window.dataManager.getFiles();
+                } catch(e) { files = fallbackFiles; }
+            } else {
+                files = fallbackFiles;
+            }
+
+            buildFileTree(files);
+            updateStats(files);
         });
 
-        function renderTree(files) {
-            // Group flat list into a simple hierarchy for visual purposes
-            // Assume files have 'path' like 'core/agents/...'
+        // -- TREE BUILDING --
+        function buildFileTree(files) {
+            const treeContainer = document.getElementById('file-tree');
+            treeContainer.innerHTML = '';
 
-            const root = {};
-
-            files.forEach(file => {
-                const parts = file.path.split('/');
-                let current = root;
-                parts.forEach((part, index) => {
+            // Group by directory structure
+            const structure = {};
+            files.forEach(f => {
+                const parts = f.path.split('/');
+                let current = structure;
+                parts.forEach((part, i) => {
                     if (!current[part]) {
-                        // Is leaf?
-                        if (index === parts.length - 1) {
-                            current[part] = { _type: 'file', ...file, name: part };
+                        if (i === parts.length - 1) {
+                            current[part] = { _type: 'file', ...f };
                         } else {
-                            current[part] = { _type: 'folder', _children: {} };
+                            current[part] = { _type: 'folder' };
                         }
                     }
-                    if (index !== parts.length - 1) {
-                        current = current[part]._children;
-                    }
+                    current = current[part];
                 });
             });
 
-            treeContainer.innerHTML = buildTreeHTML(root, 0);
-        }
+            // Recursive Render Function
+            function renderNode(node, name, depth = 0) {
+                const container = document.createElement('div');
 
-        function buildTreeHTML(node, depth) {
-            let html = '';
-            const padding = depth * 12;
+                // Case: File
+                if (node._type === 'file') {
+                    const el = document.createElement('div');
+                    el.className = 'tree-item cursor-pointer py-1 px-2 flex items-center gap-2 truncate transition rounded text-slate-400';
+                    el.style.paddingLeft = `${depth * 12 + 8}px`;
+                    el.onclick = () => loadFile(node);
 
-            // Sort: Folders first
-            const keys = Object.keys(node).sort((a, b) => {
-                const isAFolder = node[a]._type === 'folder';
-                const isBFolder = node[b]._type === 'folder';
-                if(isAFolder && !isBFolder) return -1;
-                if(!isAFolder && isBFolder) return 1;
-                return a.localeCompare(b);
-            });
+                    let iconClass = 'fa-file text-slate-500';
+                    if(name.endsWith('.json')) iconClass = 'fa-file-code text-yellow-500';
+                    if(name.endsWith('.md')) iconClass = 'fa-file-alt text-blue-400';
+                    if(name.endsWith('.py')) iconClass = 'fab fa-python text-emerald-500';
+                    if(name.endsWith('.js')) iconClass = 'fab fa-js text-yellow-300';
 
-            keys.forEach(key => {
-                if (key.startsWith('_')) return; // skip metadata keys
-                const item = node[key];
+                    el.innerHTML = `<i class="fas ${iconClass} w-4 text-center"></i> <span>${name}</span>`;
+                    container.appendChild(el);
+                } 
+                // Case: Folder
+                else {
+                    const folderEl = document.createElement('div');
+                    folderEl.className = 'py-1 px-2 flex items-center gap-2 font-bold text-slate-500 hover:text-slate-300 cursor-pointer select-none transition';
+                    folderEl.style.paddingLeft = `${depth * 12 + 8}px`;
+                    folderEl.innerHTML = `<i class="fas fa-folder text-amber-600/80"></i> <span>${name}</span>`;
 
-                if (item._type === 'folder') {
-                    html += `
-                        <div>
-                            <div class="flex items-center gap-2 py-1 cursor-pointer hover:text-white transition group" onclick="toggleFolder(this)" style="padding-left: ${padding}px">
-                                <i class="fas fa-folder text-amber-500/80 group-hover:text-amber-400"></i>
-                                <span>${key}</span>
-                            </div>
-                            <div class="folder-content hidden border-l border-slate-700 ml-3">
-                                ${buildTreeHTML(item._children, depth + 1)}
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    const icon = getFileIcon(key);
-                    const color = getFileColor(key);
-                    // Encode path for click handler
-                    html += `
-                        <div class="flex items-center gap-2 py-1 cursor-pointer hover:bg-slate-800 hover:text-white transition"
-                             style="padding-left: ${padding}px"
-                             onclick="viewFile('${item.path}')">
-                            <i class="${icon} ${color}"></i>
-                            <span class="truncate">${key}</span>
-                        </div>
-                    `;
+                    const childrenContainer = document.createElement('div');
+                    childrenContainer.className = 'border-l border-slate-700/50 ml-3'; // Visual guide line
+
+                    folderEl.onclick = () => {
+                        childrenContainer.classList.toggle('hidden');
+                        const icon = folderEl.querySelector('i');
+                        icon.classList.toggle('fa-folder-open');
+                        icon.classList.toggle('fa-folder');
+                        icon.classList.toggle('text-amber-400'); // Highlight open folder
+                    };
+
+                    container.appendChild(folderEl);
+                    container.appendChild(childrenContainer);
+
+                    // Sort: Folders first, then files
+                    const children = Object.keys(node).filter(k => k !== '_type');
+                    children.sort((a, b) => {
+                        const aIsFolder = node[a]._type !== 'file';
+                        const bIsFolder = node[b]._type !== 'file';
+                        if(aIsFolder && !bIsFolder) return -1;
+                        if(!aIsFolder && bIsFolder) return 1;
+                        return a.localeCompare(b);
+                    });
+
+                    children.forEach(childName => {
+                        childrenContainer.appendChild(renderNode(node[childName], childName, depth + 1));
+                    });
                 }
-            });
-            return html;
-        }
-
-        function toggleFolder(el) {
-            const content = el.nextElementSibling;
-            content.classList.toggle('hidden');
-            const icon = el.querySelector('.fa-folder');
-            if (content.classList.contains('hidden')) {
-                icon.classList.remove('fa-folder-open');
-                icon.classList.add('fa-folder');
-            } else {
-                icon.classList.remove('fa-folder');
-                icon.classList.add('fa-folder-open');
+                return container;
             }
+
+            // Render Root
+            Object.keys(structure).forEach(key => {
+                treeContainer.appendChild(renderNode(structure[key], key));
+            });
         }
 
-        function getFileIcon(filename) {
-            if (filename.endsWith('.json')) return 'fas fa-code';
-            if (filename.endsWith('.md')) return 'fas fa-book';
-            if (filename.endsWith('.py')) return 'fab fa-python';
-            if (filename.endsWith('.js')) return 'fab fa-js';
-            return 'fas fa-file';
+        // -- FILE LOADING --
+        async function loadFile(fileNode) {
+            // UI Updates
+            document.getElementById('empty-state').classList.add('hidden');
+            const codeViewer = document.getElementById('code-viewer');
+            codeViewer.classList.remove('hidden');
+            
+            document.getElementById('preview-filename').innerText = fileNode.path;
+
+            // Determine Language for Prism
+            const ext = fileNode.path.split('.').pop();
+            const codeEl = document.getElementById('code-content');
+            codeEl.className = ''; // reset
+            if(ext === 'json') codeEl.classList.add('language-json');
+            else if(ext === 'md') codeEl.classList.add('language-markdown');
+            else if(ext === 'py') codeEl.classList.add('language-python');
+            else codeEl.classList.add('language-none');
+
+            // Set Content
+            let content = fileNode.content || "// Content not loaded in mock";
+            
+            // If dataManager exists, try to fetch real content
+            if(window.dataManager && !fileNode.content) {
+                 codeEl.textContent = "Loading...";
+                 try {
+                    content = await window.dataManager.getFileContent(fileNode.path);
+                 } catch(e) { content = "// Error loading file content"; }
+            }
+
+            // Prettify JSON if possible
+            if(ext === 'json') {
+                try {
+                    const obj = JSON.parse(content);
+                    content = JSON.stringify(obj, null, 2);
+                } catch(e) {}
+            }
+
+            codeEl.textContent = content;
+
+            // Highlight
+            if(window.Prism) Prism.highlightElement(codeEl);
+
+            // Update Metadata Footer
+            const dateStr = fileNode.last_modified 
+                ? new Date(fileNode.last_modified * 1000).toLocaleString() 
+                : 'Unknown';
+            document.getElementById('file-meta').innerText = `Size: ${fileNode.size} bytes | Modified: ${dateStr}`;
         }
 
-        function getFileColor(filename) {
-            if (filename.endsWith('.json')) return 'text-yellow-500';
-            if (filename.endsWith('.md')) return 'text-blue-400';
-            if (filename.endsWith('.py')) return 'text-green-500';
-            return 'text-slate-500';
-        }
-
-        async function viewFile(path) {
-            filenameLabel.innerText = path;
-            metaLabel.innerText = "Loading...";
-
-            const content = await window.dataManager.getFileContent(path);
-
-            codePreview.textContent = content;
-
-            // Set language class for Prism
-            codePreview.className = "text-xs font-mono"; // Reset
-            if (path.endsWith('.json')) codePreview.classList.add('language-json');
-            else if (path.endsWith('.py')) codePreview.classList.add('language-python');
-            else if (path.endsWith('.js')) codePreview.classList.add('language-javascript');
-            else codePreview.classList.add('language-markdown');
-
-            Prism.highlightElement(codePreview);
-
-            metaLabel.innerText = `${content.length} bytes | UTF-8`;
+        function updateStats(files) {
+            document.getElementById('file-count').innerText = files.length;
+            const size = files.reduce((acc, f) => acc + (f.size || 0), 0);
+            document.getElementById('total-storage').innerText = (size / 1024).toFixed(2) + " KB";
         }
     </script>
 </body>
