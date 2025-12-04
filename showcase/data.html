@@ -5,89 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM System | Data & Libraries</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <!-- Prism for syntax highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-markdown.min.js"></script>
+    <style>
+        .tree-node { padding-left: 1.5rem; border-left: 1px solid #334155; }
+        .tree-item:hover { background-color: rgba(51, 65, 85, 0.5); }
+        .tree-item.selected { background-color: rgba(34, 211, 238, 0.1); border-left: 2px solid #22d3ee; }
+    </style>
 </head>
 <body class="h-screen flex flex-col grid-bg text-slate-200">
     <div class="scan-line"></div>
     <!-- Nav via nav.js -->
-
-    <main class="flex-1 p-8 overflow-y-auto grid grid-cols-12 gap-6">
-
-        <!-- Header -->
-        <div class="col-span-12 glass-panel p-6 rounded-lg border-l-4 border-purple-500 flex justify-between items-center">
-            <div>
-                <h1 class="text-3xl font-bold text-white mb-2 font-mono">DATA & LIBRARIES</h1>
-                <p class="text-slate-400">Central repository for training sets, financial ontologies, and artisanal data.</p>
-            </div>
-            <div class="text-right font-mono text-xs text-slate-400">
-                 <div class="mb-1"><span class="text-white font-bold">Total Storage:</span> <span id="total-storage">--</span></div>
-                 <div><span class="text-white font-bold">Last Index:</span> <span id="last-index">--</span></div>
-            </div>
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a] z-50 shrink-0">
+        <div class="flex items-center gap-4">
+            <button id="nav-toggle" class="text-slate-400 hover:text-white transition">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-purple-400">v23</span> <span class="text-slate-500 font-normal">| The Vault</span></h1>
         </div>
-
-        <!-- Directory View -->
-        <div class="col-span-12 lg:col-span-8 glass-panel rounded-lg overflow-hidden">
-            <div class="bg-slate-900/80 p-3 border-b border-slate-700 flex space-x-2 text-xs font-mono">
-                <span class="text-slate-500">ROOT /</span>
-                <span class="text-slate-300 hover:text-white cursor-pointer">data</span>
-                <span class="text-slate-500">/</span>
-                <span class="text-cyan-400 font-bold" id="current-dir">ALL</span>
-            </div>
-
-            <table class="w-full text-left text-sm">
-                <thead>
-                    <tr class="bg-slate-800 text-slate-400 font-mono text-xs uppercase">
-                        <th class="p-3">Name</th>
-                        <th class="p-3">Type</th>
-                        <th class="p-3">Size</th>
-                        <th class="p-3">Modified</th>
-                        <th class="p-3">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="file-list" class="divide-y divide-slate-700">
-                    <!-- Populated by JS -->
-                    <tr><td colspan="5" class="p-3 text-center text-slate-500">Loading data files...</td></tr>
-                </tbody>
-            </table>
+        <div class="flex gap-4 mono text-xs text-slate-400 hidden md:flex">
+             <div>STORAGE: <span class="text-white" id="total-storage">--</span></div>
+             <div>FILES: <span class="text-white" id="file-count">--</span></div>
         </div>
+    </header>
 
-        <!-- Data Preview / Stats -->
-        <div class="col-span-12 lg:col-span-4 flex flex-col space-y-6">
+    <main class="flex-1 overflow-hidden flex">
 
-            <!-- Quick Stats -->
-            <div class="glass-panel p-4 rounded-lg">
-                <h3 class="text-purple-400 font-bold font-mono text-sm mb-3 uppercase">Dataset Quality</h3>
-                <div class="space-y-3">
-                    <div>
-                        <div class="flex justify-between text-xs mb-1">
-                            <span>SNC Training Data</span>
-                            <span class="text-white">98.5% Clean</span>
-                        </div>
-                        <div class="w-full bg-slate-700 h-1 rounded">
-                            <div class="bg-emerald-500 h-1 rounded" style="width: 98%"></div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-xs mb-1">
-                            <span>Risk Taxonomy Alignment</span>
-                            <span class="text-white">92.0%</span>
-                        </div>
-                        <div class="w-full bg-slate-700 h-1 rounded">
-                            <div class="bg-blue-500 h-1 rounded" style="width: 92%"></div>
-                        </div>
-                    </div>
+        <!-- File Tree -->
+        <aside class="w-80 glass-panel border-r border-slate-700/50 flex flex-col shrink-0">
+            <div class="p-3 bg-slate-900 border-b border-slate-700 flex justify-between items-center">
+                <span class="text-xs font-mono font-bold text-slate-400 uppercase">Explorer</span>
+                <i class="fas fa-sync-alt text-slate-500 hover:text-white cursor-pointer text-xs"></i>
+            </div>
+            <div id="file-tree" class="flex-1 overflow-y-auto p-2 font-mono text-xs text-slate-300">
+                <!-- Injected -->
+                <div class="text-center text-slate-500 mt-10">Loading index...</div>
+            </div>
+        </aside>
+
+        <!-- Preview Pane -->
+        <section class="flex-1 flex flex-col bg-[#0b1120] relative">
+
+            <!-- Breadcrumbs / Actions -->
+            <div class="h-10 border-b border-slate-700/50 flex items-center px-4 justify-between bg-slate-900/50">
+                <div id="breadcrumbs" class="text-xs font-mono text-slate-400 flex items-center gap-2">
+                    <i class="fas fa-cube text-purple-500"></i>
+                    <span id="active-filename">Select a file</span>
+                </div>
+                <div class="flex gap-2">
+                    <button class="text-slate-400 hover:text-white" title="Download"><i class="fas fa-download text-xs"></i></button>
+                    <button class="text-slate-400 hover:text-white" title="Copy"><i class="far fa-copy text-xs"></i></button>
                 </div>
             </div>
 
-            <!-- Preview Card -->
-            <div class="glass-panel p-4 rounded-lg flex-1 flex flex-col h-64 lg:h-auto">
-                <h3 class="text-slate-400 font-bold font-mono text-sm mb-3 uppercase">File Preview</h3>
-                <div class="flex-1 bg-slate-900 rounded p-3 font-mono text-xs text-slate-300 overflow-auto whitespace-pre-wrap" id="file-preview">
-Select a file to view snippet...
+            <!-- Editor / Viewer -->
+            <div class="flex-1 overflow-auto relative custom-scrollbar">
+                <pre id="code-viewer" class="m-0 p-4 text-sm font-mono text-slate-300 hidden"><code id="code-content" class="language-json"></code></pre>
+
+                <div id="empty-state" class="absolute inset-0 flex items-center justify-center flex-col text-slate-600">
+                    <i class="fas fa-file-code text-6xl mb-4 opacity-20"></i>
+                    <p class="text-sm font-mono">Select a JSON/MD file to preview</p>
                 </div>
             </div>
 
-        </div>
+            <!-- Footer Info -->
+            <div class="h-6 bg-slate-900 border-t border-slate-700 flex items-center px-4 text-[10px] text-slate-500 justify-between font-mono">
+                <div id="file-meta">No file selected</div>
+                <div>UTF-8</div>
+            </div>
+
+        </section>
 
     </main>
 
@@ -95,82 +87,143 @@ Select a file to view snippet...
     <script src="js/app.js"></script>
     <script src="js/nav.js"></script>
     <script>
-        let dataFiles = [];
-
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+             await window.dataManager.init();
              const data = window.MOCK_DATA || {};
-             const allFiles = data.files || [];
+             const files = data.files || [];
 
-             // Filter for data directory
-             dataFiles = allFiles.filter(f => f.path.startsWith('data/'));
-
-             renderFiles();
-             updateStats();
+             buildFileTree(files);
+             updateStats(files);
         });
 
-        function renderFiles() {
-            const tbody = document.getElementById('file-list');
-            tbody.innerHTML = '';
+        function buildFileTree(files) {
+            const treeContainer = document.getElementById('file-tree');
+            treeContainer.innerHTML = '';
 
-            if (dataFiles.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="p-3 text-center text-slate-500">No data files found.</td></tr>';
-                return;
+            // Group by directory
+            const structure = {};
+            files.forEach(f => {
+                const parts = f.path.split('/');
+                let current = structure;
+                parts.forEach((part, i) => {
+                    if (!current[part]) {
+                        // Leaf node (file) vs Branch (folder)
+                        if (i === parts.length - 1) {
+                            current[part] = { _type: 'file', ...f };
+                        } else {
+                            current[part] = { _type: 'folder' };
+                        }
+                    }
+                    current = current[part];
+                });
+            });
+
+            // Recursive Render
+            function renderNode(node, name, depth = 0) {
+                const container = document.createElement('div');
+
+                if (node._type === 'file') {
+                    const el = document.createElement('div');
+                    el.className = 'tree-item cursor-pointer py-1 px-2 flex items-center gap-2 truncate transition rounded text-slate-400 hover:text-white';
+                    el.style.paddingLeft = `${depth * 12 + 8}px`;
+                    el.onclick = () => loadFile(node);
+
+                    let icon = 'fa-file';
+                    if(name.endsWith('.json')) icon = 'fa-file-code text-yellow-500';
+                    if(name.endsWith('.md')) icon = 'fa-file-alt text-blue-500';
+                    if(name.endsWith('.py')) icon = 'fa-python text-green-500';
+
+                    el.innerHTML = `<i class="fas ${icon} w-3 text-center"></i> <span>${name}</span>`;
+                    container.appendChild(el);
+                } else {
+                    // Folder
+                    const folderEl = document.createElement('div');
+                    folderEl.className = 'py-1 px-2 flex items-center gap-2 font-bold text-slate-500 hover:text-slate-300 cursor-pointer select-none';
+                    folderEl.style.paddingLeft = `${depth * 12 + 8}px`;
+                    folderEl.innerHTML = `<i class="fas fa-folder text-amber-600"></i> <span>${name}</span>`;
+
+                    const childrenContainer = document.createElement('div');
+                    // childrenContainer.className = 'hidden'; // Default collapsed?
+
+                    folderEl.onclick = () => {
+                        childrenContainer.classList.toggle('hidden');
+                        const icon = folderEl.querySelector('i');
+                        icon.classList.toggle('fa-folder-open');
+                        icon.classList.toggle('fa-folder');
+                    };
+
+                    container.appendChild(folderEl);
+                    container.appendChild(childrenContainer);
+
+                    // Sort children: folders first, then files
+                    const children = Object.keys(node).filter(k => k !== '_type');
+                    children.sort((a, b) => {
+                        const aIsFolder = node[a]._type !== 'file';
+                        const bIsFolder = node[b]._type !== 'file';
+                        if(aIsFolder && !bIsFolder) return -1;
+                        if(!aIsFolder && bIsFolder) return 1;
+                        return a.localeCompare(b);
+                    });
+
+                    children.forEach(childName => {
+                        childrenContainer.appendChild(renderNode(node[childName], childName, depth + 1));
+                    });
+                }
+                return container;
             }
 
-            dataFiles.forEach((file, idx) => {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-800 transition cursor-pointer group';
-                tr.onclick = () => showPreview(file);
-
-                const name = file.path.replace('data/', '');
-                const type = name.split('.').pop().toUpperCase();
-                const size = formatSize(file.size);
-                const date = new Date(file.last_modified * 1000).toISOString().split('T')[0];
-
-                tr.innerHTML = `
-                    <td class="p-3 font-mono text-slate-300 group-hover:text-white flex items-center">
-                        <svg class="w-4 h-4 mr-2 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        ${name}
-                    </td>
-                    <td class="p-3 text-slate-400">${type}</td>
-                    <td class="p-3 text-slate-400 font-mono">${size}</td>
-                    <td class="p-3 text-slate-500">${date}</td>
-                    <td class="p-3">
-                        <button class="text-cyan-600 hover:text-cyan-400 font-bold text-xs uppercase" onclick="alert('Download mock')">Download</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+            // Render root folders
+            Object.keys(structure).forEach(key => {
+                if (key === 'data') { // Prioritize data folder as root context
+                     // Directly render contents of data folder for cleaner view?
+                     // Or just render the whole tree.
+                }
+                treeContainer.appendChild(renderNode(structure[key], key));
             });
         }
 
-        async function showPreview(file) {
-            const el = document.getElementById('file-preview');
-            el.innerHTML = '<span class="text-slate-500">Loading...</span>';
-            el.classList.add('animate-pulse');
+        async function loadFile(fileNode) {
+            document.getElementById('empty-state').classList.add('hidden');
+            const codeViewer = document.getElementById('code-viewer');
+            codeViewer.classList.remove('hidden');
 
-            // Try to fetch content
-            const content = await window.dataManager.getFileContent(file.path);
+            document.getElementById('active-filename').innerText = fileNode.path;
 
-            // Truncate if too long
-            const displayContent = content.length > 2000 ? content.substring(0, 2000) + "\n... [Truncated]" : content;
+            // Syntax class
+            const ext = fileNode.path.split('.').pop();
+            const codeEl = document.getElementById('code-content');
+            codeEl.className = `language-${ext === 'md' ? 'markdown' : 'json'}`;
 
-            el.textContent = displayContent;
-            el.classList.remove('animate-pulse');
+            // Set loading
+            codeEl.textContent = "Loading content...";
+
+            // Fetch content
+            const content = await window.dataManager.getFileContent(fileNode.path);
+
+            // Attempt to format if JSON
+            let formattedContent = content;
+            if(ext === 'json') {
+                try {
+                    const obj = JSON.parse(content);
+                    formattedContent = JSON.stringify(obj, null, 2);
+                } catch(e) {}
+            }
+
+            codeEl.textContent = formattedContent;
+
+            // Trigger Prism highlight
+            if(window.Prism) {
+                Prism.highlightElement(codeEl);
+            }
+
+            // Update Meta
+            document.getElementById('file-meta').innerText = `Size: ${fileNode.size} B | Modified: ${new Date(fileNode.last_modified * 1000).toLocaleString()}`;
         }
 
-        function formatSize(bytes) {
-            if (bytes === 0) return '0 B';
-            const k = 1024;
-            const sizes = ['B', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-        }
-
-        function updateStats() {
-            let totalSize = 0;
-            dataFiles.forEach(f => totalSize += f.size);
-            document.getElementById('total-storage').textContent = formatSize(totalSize);
-            document.getElementById('last-index').textContent = new Date().toISOString().replace('T', ' ').substring(0, 16);
+        function updateStats(files) {
+            document.getElementById('file-count').innerText = files.length;
+            const size = files.reduce((acc, f) => acc + f.size, 0);
+            document.getElementById('total-storage').innerText = (size / 1024 / 1024).toFixed(2) + " MB";
         }
     </script>
 </body>
