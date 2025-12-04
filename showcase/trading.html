@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM System | Trading Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="h-screen flex flex-col grid-bg overflow-hidden">
+    <div class="scan-line"></div>
+
+    <!-- Header -->
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a] z-50 shrink-0">
+        <div class="flex items-center gap-4">
+            <button id="nav-toggle" class="text-slate-400 hover:text-white transition">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-cyan-400">v23.5</span> <span class="text-slate-500 font-normal">| HFT & Algo Trading</span></h1>
+        </div>
+        <div class="flex gap-4 mono text-xs text-slate-400">
+             <div>MARKET_STATUS: <span class="text-emerald-400">OPEN</span></div>
+             <div>LATENCY: <span class="text-cyan-400">4ms</span></div>
+             <div>MODE: <span class="text-purple-400">QUANTUM_ENHANCED</span></div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-4 grid grid-cols-12 grid-rows-6 gap-4 overflow-hidden">
+
+        <!-- Ticker Tape (Top) -->
+        <div class="col-span-12 row-span-1 h-12 glass-panel flex items-center overflow-hidden whitespace-nowrap relative">
+            <div id="ticker-tape" class="animate-marquee mono text-sm text-slate-300 flex gap-8">
+                <!-- Populated by JS -->
+                <span>LOADING MARKET DATA...</span>
+            </div>
+        </div>
+
+        <!-- Order Book & Depth -->
+        <div class="col-span-12 md:col-span-3 row-span-5 glass-panel p-4 flex flex-col">
+            <h3 class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-2 border-b border-slate-700 pb-2">L3 Order Book (AAPL)</h3>
+            <div class="flex-1 overflow-hidden relative">
+                <div class="grid grid-cols-3 text-xs mono text-slate-500 mb-1">
+                    <span>SIZE</span>
+                    <span class="text-center">PRICE</span>
+                    <span class="text-right">TOTAL</span>
+                </div>
+                <!-- Asks -->
+                <div id="order-book-asks" class="flex flex-col-reverse justify-end h-1/2 overflow-hidden border-b border-slate-700/50 text-red-400 mono text-xs"></div>
+                <!-- Spread -->
+                <div class="h-8 flex items-center justify-center text-slate-300 font-bold mono text-sm bg-slate-800/50 my-1 rounded">
+                    <span id="current-price">---.--</span>
+                </div>
+                <!-- Bids -->
+                <div id="order-book-bids" class="flex flex-col h-1/2 overflow-hidden text-emerald-400 mono text-xs"></div>
+            </div>
+        </div>
+
+        <!-- Main Chart -->
+        <div class="col-span-12 md:col-span-6 row-span-3 glass-panel p-4 relative">
+             <div class="absolute top-4 right-4 flex gap-2">
+                <button class="px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-cyan-600 transition">1M</button>
+                <button class="px-2 py-1 text-xs bg-cyan-600 text-white rounded">5M</button>
+                <button class="px-2 py-1 text-xs bg-slate-700 text-slate-300 rounded hover:bg-cyan-600 transition">15M</button>
+            </div>
+            <h3 class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-2">Price Action & Signals</h3>
+            <canvas id="priceChart" class="w-full h-full"></canvas>
+        </div>
+
+        <!-- Active Algos / Strategy Performance -->
+        <div class="col-span-12 md:col-span-3 row-span-3 glass-panel p-4 flex flex-col">
+            <h3 class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-4 border-b border-slate-700 pb-2">Active Strategies</h3>
+            <div class="space-y-3 flex-1 overflow-y-auto" id="algo-list">
+                <!-- Strategy Card -->
+                <div class="bg-slate-800/50 p-3 rounded border-l-2 border-purple-500">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-sm text-slate-200">Quantum_Arb_v2</span>
+                        <span class="text-[10px] bg-emerald-900 text-emerald-400 px-1 rounded">RUNNING</span>
+                    </div>
+                    <div class="flex justify-between text-xs mono text-slate-400">
+                        <span>PnL: <span class="text-emerald-400">+$12,450</span></span>
+                        <span>Sharpe: 2.8</span>
+                    </div>
+                </div>
+            </div>
+            <button class="mt-4 w-full py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold rounded uppercase transition">
+                Deploy New Strategy
+            </button>
+        </div>
+
+        <!-- Execution Logs / Terminal -->
+        <div class="col-span-12 md:col-span-6 row-span-2 glass-panel p-4 font-mono text-xs flex flex-col">
+            <h3 class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-2 border-b border-slate-700 pb-2">Execution Log</h3>
+            <div id="trade-log" class="flex-1 overflow-y-auto space-y-1 text-slate-300">
+                <div class="text-slate-500">Waiting for stream...</div>
+            </div>
+        </div>
+
+        <!-- Risk Metrics -->
+        <div class="col-span-12 md:col-span-3 row-span-2 glass-panel p-4">
+             <h3 class="text-slate-400 text-xs uppercase font-bold tracking-wider mb-4 border-b border-slate-700 pb-2">Risk Exposure</h3>
+             <div class="grid grid-cols-2 gap-4">
+                 <div>
+                     <div class="text-slate-500 text-[10px] uppercase">VaR (99%)</div>
+                     <div class="text-xl font-mono text-red-400">$450k</div>
+                 </div>
+                 <div>
+                     <div class="text-slate-500 text-[10px] uppercase">Gross Leverage</div>
+                     <div class="text-xl font-mono text-white">2.4x</div>
+                 </div>
+                 <div>
+                     <div class="text-slate-500 text-[10px] uppercase">Beta</div>
+                     <div class="text-xl font-mono text-slate-300">0.04</div>
+                 </div>
+                 <div>
+                     <div class="text-slate-500 text-[10px] uppercase">Open Orders</div>
+                     <div class="text-xl font-mono text-cyan-400">142</div>
+                 </div>
+             </div>
+             <div class="mt-4">
+                 <div class="flex justify-between text-xs mb-1">
+                    <span class="text-slate-400">Daily Drawdown</span>
+                    <span class="text-slate-200">1.2% / 5.0%</span>
+                 </div>
+                 <div class="w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                     <div class="bg-emerald-500 h-full w-[24%]"></div>
+                 </div>
+             </div>
+        </div>
+
+    </main>
+
+    <script src="js/mock_data.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/nav.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const chartCtx = document.getElementById('priceChart').getContext('2d');
+
+            // Mock Chart Data
+            const priceData = Array.from({length: 50}, (_, i) => ({
+                x: i,
+                y: 170 + Math.random() * 5 - 2.5
+            }));
+
+            const chart = new Chart(chartCtx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 50}, (_, i) => i),
+                    datasets: [{
+                        label: 'AAPL Price',
+                        data: priceData.map(d => d.y),
+                        borderColor: '#06b6d4',
+                        backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { display: false },
+                        y: {
+                            grid: { color: 'rgba(51, 65, 85, 0.3)' },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    animation: false
+                }
+            });
+
+            // Simulate Real-time Updates
+            const currentPriceEl = document.getElementById('current-price');
+            const tickerEl = document.getElementById('ticker-tape');
+            const logEl = document.getElementById('trade-log');
+            const asksEl = document.getElementById('order-book-asks');
+            const bidsEl = document.getElementById('order-book-bids');
+
+            // Render Initial Order Book
+            const renderOrderBook = (price) => {
+                asksEl.innerHTML = '';
+                bidsEl.innerHTML = '';
+
+                // Asks
+                for(let i=5; i>0; i--) {
+                    const p = (price + i * 0.05).toFixed(2);
+                    const s = Math.floor(Math.random() * 500);
+                    asksEl.innerHTML += `<div class="grid grid-cols-3 hover:bg-slate-800/50 px-1"><span class="text-slate-500">${s}</span><span class="text-center">${p}</span><span class="text-right text-slate-600">${(s*p/1000).toFixed(1)}k</span></div>`;
+                }
+
+                // Bids
+                for(let i=1; i<=5; i++) {
+                    const p = (price - i * 0.05).toFixed(2);
+                    const s = Math.floor(Math.random() * 500);
+                    bidsEl.innerHTML += `<div class="grid grid-cols-3 hover:bg-slate-800/50 px-1"><span class="text-slate-500">${s}</span><span class="text-center">${p}</span><span class="text-right text-slate-600">${(s*p/1000).toFixed(1)}k</span></div>`;
+                }
+            };
+
+            const tickers = ["AAPL", "MSFT", "GOOGL", "AMZN", "TSLA", "NVDA", "BTC-USD", "ETH-USD"];
+
+            // Loop
+            setInterval(() => {
+                const newPrice = 170 + Math.random() * 5 - 2.5;
+                priceData.push({x: priceData.length, y: newPrice});
+                priceData.shift();
+
+                chart.data.datasets[0].data = priceData.map(d => d.y);
+                chart.update();
+
+                currentPriceEl.textContent = newPrice.toFixed(2);
+                renderOrderBook(newPrice);
+
+                // Update Ticker
+                let tickerHtml = "";
+                tickers.forEach(t => {
+                    const change = (Math.random() * 2 - 1).toFixed(2);
+                    const color = change >= 0 ? 'text-emerald-400' : 'text-red-400';
+                    tickerHtml += `<span class="font-bold text-slate-400">${t} <span class="${color}">${change}%</span></span>`;
+                });
+                tickerEl.innerHTML = tickerHtml + tickerHtml; // Double for seamless loop
+
+                // Random Trade Log
+                if(Math.random() > 0.5) {
+                    const action = Math.random() > 0.5 ? "BUY" : "SELL";
+                    const color = action === "BUY" ? "text-emerald-400" : "text-red-400";
+                    const symbol = tickers[Math.floor(Math.random() * tickers.length)];
+                    const time = new Date().toLocaleTimeString('en-US', {hour12: false});
+                    const div = document.createElement('div');
+                    div.innerHTML = `<span class="text-slate-600">[${time}]</span> <span class="${color}">${action}</span> ${symbol} @ ${(Math.random()*1000).toFixed(2)} <span class="text-slate-500">| Strat: HFT_Mom_v4</span>`;
+                    logEl.prepend(div);
+                    if(logEl.children.length > 20) logEl.lastChild.remove();
+                }
+
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
