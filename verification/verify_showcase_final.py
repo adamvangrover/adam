@@ -1,78 +1,108 @@
-
 import os
-import subprocess
 import time
+import subprocess
 from playwright.sync_api import sync_playwright
 
+# Configuration
+PORT = 8000
+DIRECTORY = "showcase"  # The folder where your HTML files are located
+SCREENSHOT_DIR = "verification"
+
+def ensure_dir(directory):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
 def verify_ui():
+    ensure_dir(SCREENSHOT_DIR)
+    
+    print(f"Starting local server on port {PORT} serving '{DIRECTORY}'...")
     # Start a static file server in the background
-    server_process = subprocess.Popen(["python3", "-m", "http.server", "8000"], cwd="showcase")
-    time.sleep(2)  # Wait for server to start
+    # We use subprocess to keep it independent of the test thread
+    server_process = subprocess.Popen(
+        ["python3", "-m", "http.server", str(PORT)], 
+        cwd=DIRECTORY
+    )
+    
+    time.sleep(2)  # Give server time to spin up
 
     try:
         with sync_playwright() as p:
+            print("Launching Browser...")
             browser = p.chromium.launch(headless=True)
             page = browser.new_page()
 
-            # Capture console logs
-            page.on("console", lambda msg: print(f"PAGE LOG: {msg.text}"))
-            page.on("pageerror", lambda err: print(f"PAGE ERROR: {err}"))
-
-            # Verify Neural Dashboard
-            print("Verifying Neural Dashboard...")
-            page.goto("http://localhost:8000/neural_dashboard.html")
+            # 1. Verify Neural Dashboard
+            # --------------------------
+            print("1. Verifying Neural Dashboard...")
             try:
+                page.goto(f"http://localhost:{PORT}/neural_dashboard.html")
+                # Wait for the specific graph canvas ID
                 page.wait_for_selector("#viz-canvas", timeout=5000)
-                time.sleep(2)
-                page.screenshot(path="verification/neural_dashboard.png")
+                # Allow animations (pulse/logs) to run briefly
+                time.sleep(2) 
+                page.screenshot(path=f"{SCREENSHOT_DIR}/1_neural_dashboard.png")
+                print("   -> Success")
             except Exception as e:
-                print(f"Error verifying Neural Dashboard: {e}")
-                page.screenshot(path="verification/error_neural.png")
+                print(f"   -> Failed: {e}")
 
-            # Verify Deep Dive
-            print("Verifying Deep Dive Explorer...")
-            page.goto("http://localhost:8000/deep_dive.html")
+            # 2. Verify Deep Dive Explorer
+            # --------------------------
+            print("2. Verifying Deep Dive Explorer...")
             try:
-                # Wait for sidebar items
+                page.goto(f"http://localhost:{PORT}/deep_dive.html")
+                # Wait for sidebar items to populate
                 page.wait_for_selector("#report-list div", timeout=5000)
-                page.screenshot(path="verification/deep_dive_sidebar.png")
-
-                # Click first report in sidebar
+                
+                # Simulate user interaction: Click the first report
                 page.click("#report-list > div:first-child")
-
-                # Now wait for report view widgets
+                
+                # Wait for the charts (phase-widgets) to render
                 page.wait_for_selector(".phase-widget", timeout=5000)
                 time.sleep(1)
-                page.screenshot(path="verification/deep_dive_report.png")
+                page.screenshot(path=f"{SCREENSHOT_DIR}/2_deep_dive.png")
+                print("   -> Success")
             except Exception as e:
-                print(f"Error verifying Deep Dive: {e}")
-                page.screenshot(path="verification/error_deep_dive.png")
+                print(f"   -> Failed: {e}")
 
-            # Verify Financial Twin
-            print("Verifying Financial Twin...")
-            page.goto("http://localhost:8000/financial_twin.html")
+            # 3. Verify Financial Digital Twin
+            # --------------------------
+            print("3. Verifying Financial Twin...")
             try:
+                page.goto(f"http://localhost:{PORT}/financial_twin.html")
+                # Wait for Vis.js network container
                 page.wait_for_selector("#network-container", timeout=5000)
-                time.sleep(1)
-                page.screenshot(path="verification/financial_twin.png")
+                time.sleep(2) # Wait for physics stabilization
+                page.screenshot(path=f"{SCREENSHOT_DIR}/3_financial_twin.png")
+                print("   -> Success")
             except Exception as e:
-                print(f"Error verifying Financial Twin: {e}")
-                page.screenshot(path="verification/error_twin.png")
+                print(f"   -> Failed: {e}")
 
-            # Verify Agents
-            print("Verifying Agent Registry...")
-            page.goto("http://localhost:8000/agents.html")
+            # 4. Verify Agent Registry
+            # --------------------------
+            print("4. Verifying Agent Registry...")
             try:
+                page.goto(f"http://localhost:{PORT}/agents.html")
+                # Wait for the glass cards
                 page.wait_for_selector(".glass-panel", timeout=5000)
-                page.screenshot(path="verification/agents.png")
+                
+                # Simulate opening the terminal
+                page.click("#terminal") 
+                time.sleep(1)
+                
+                page.screenshot(path=f"{SCREENSHOT_DIR}/4_agent_registry.png")
+                print("   -> Success")
             except Exception as e:
-                print(f"Error verifying Agents: {e}")
-                page.screenshot(path="verification/error_agents.png")
+                print(f"   -> Failed: {e}")
 
-            print("Screenshots saved to verification/")
             browser.close()
+            print(f"\nVerification complete. Screenshots saved to '{SCREENSHOT_DIR}/'")
+
+    except Exception as e:
+        print(f"CRITICAL ERROR: {e}")
 
     finally:
+        # Always kill the server, even if tests fail
+        print("Shutting down server...")
         server_process.terminate()
 
 if __name__ == "__main__":

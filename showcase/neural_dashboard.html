@@ -7,54 +7,67 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet">
-    <script src="js/mock_data.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/nav.js"></script>
+    
     <style>
-        /* Custom pulse for active nodes if needed, though Vis.js handles most drawing */
-        #viz-canvas {
-            width: 100%;
-            height: 100%;
-            outline: none;
+        /* Base styles */
+        body { background-color: #0f172a; color: #e2e8f0; }
+        
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         }
+
+        /* Scanline Effect */
+        .scan-line {
+            position: fixed; top: 0; left: 0; width: 100%; height: 5px;
+            background: rgba(16, 185, 129, 0.1);
+            opacity: 0.4; animation: scan 6s linear infinite; pointer-events: none; z-index: 9999;
+        }
+        @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
+
+        /* Vis.js Customization */
+        #viz-canvas { width: 100%; height: 100%; outline: none; }
         .vis-tooltip {
             background-color: rgba(15, 23, 42, 0.9) !important;
             border: 1px solid #3b82f6 !important;
             color: #e2e8f0 !important;
-            font-family: 'JetBrains Mono', monospace !important;
-            font-size: 12px !important;
+            font-family: monospace !important;
             padding: 8px !important;
             border-radius: 4px !important;
         }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-5px); } to { opacity: 1; transform: translateX(0); } }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
     </style>
 </head>
-<body class="bg-grid h-screen flex flex-col overflow-hidden text-slate-200">
+<body class="h-screen flex flex-col overflow-hidden font-sans">
 
     <div class="scan-line"></div>
 
-    <!-- Header -->
-    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a] z-50 relative">
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-50 shrink-0">
         <div class="flex items-center gap-4">
             <button id="nav-toggle" class="text-slate-400 hover:text-white transition">
                 <i class="fas fa-bars"></i>
             </button>
-            <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse box-shadow-emerald"></div>
+            <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
             <h1 class="text-xl font-bold tracking-tight">ADAM <span class="text-cyan-400">v23</span> <span class="text-slate-500 font-normal">| Neural Dashboard</span></h1>
         </div>
-        <div class="flex gap-6 mono text-xs text-slate-400 hidden md:flex">
+        <div class="flex gap-6 font-mono text-xs text-slate-400 hidden md:flex">
             <div>MEM: <span class="text-emerald-400" id="mem-usage">14.2 GB</span></div>
-            <div>OPS: <span class="text-cyan-400">2,340 /s</span></div>
+            <div>OPS: <span class="text-cyan-400" id="ops-rate">2,340 /s</span></div>
             <div>STATUS: <span class="text-emerald-400">ONLINE</span></div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="flex-1 flex flex-col lg:flex-row gap-4 p-4 relative z-10">
+    <main class="flex-1 flex flex-col lg:flex-row gap-4 p-4 relative z-10 overflow-hidden">
 
-        <!-- Sidebar: Active Agents -->
-        <aside class="w-full lg:w-64 glass-panel p-4 flex flex-col gap-4 shrink-0 transition-all duration-300" id="sidebar">
-            <h2 class="text-xs uppercase tracking-widest text-slate-500 font-bold mb-2">Reasoning Circuits</h2>
+        <aside class="w-full lg:w-64 glass-panel p-4 flex flex-col gap-4 shrink-0 transition-all duration-300 overflow-y-auto">
+            <h2 class="text-xs uppercase tracking-widest text-slate-500 font-bold border-b border-slate-700 pb-2">Reasoning Circuits</h2>
 
             <div class="p-3 bg-slate-800/50 border border-cyan-500/20 rounded cursor-pointer hover:bg-slate-700/50 hover:border-cyan-500/50 transition group" onclick="loadGraph('SNC')">
                 <div class="flex justify-between items-center mb-1">
@@ -80,37 +93,41 @@
                 <div class="text-xs text-slate-400">Adversarial Simulator</div>
             </div>
 
+            <div class="p-3 bg-slate-800/50 border border-blue-500/20 rounded cursor-pointer hover:bg-slate-700/50 hover:border-blue-500/50 transition group" onclick="loadGraph('Macro')">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="font-bold text-sm text-blue-400 group-hover:text-blue-300">Macro Planner</span>
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                </div>
+                <div class="text-xs text-slate-400">Neuro-Symbolic Pathfinding</div>
+            </div>
+
             <div class="mt-auto pt-4 border-t border-slate-700/50">
-                 <div class="text-xs text-slate-500 mono mb-1">ACTIVE NODES</div>
+                 <div class="text-xs text-slate-500 font-mono mb-1">SYSTEM LOAD</div>
                  <div class="h-1 w-full bg-slate-700 rounded overflow-hidden">
                      <div class="h-full bg-cyan-500 w-3/4 animate-pulse"></div>
                  </div>
             </div>
         </aside>
 
-        <!-- Main Visualization Area -->
-        <section class="flex-1 glass-panel relative flex flex-col min-h-[400px]">
+        <section class="flex-1 glass-panel relative flex flex-col min-h-[400px] rounded-lg overflow-hidden">
             <div class="absolute top-4 left-4 z-10 pointer-events-none">
-                <h2 id="graph-title" class="text-lg font-bold text-white drop-shadow-md">Select a Circuit</h2>
-                <p id="graph-status" class="text-sm text-cyan-400 mono mt-1 drop-shadow-md">Waiting for input...</p>
+                <h2 id="graph-title" class="text-lg font-bold text-white drop-shadow-md">System Ready</h2>
+                <p id="graph-status" class="text-sm text-cyan-400 font-mono mt-1 drop-shadow-md">Select a circuit to visualize...</p>
             </div>
 
-            <!-- Vis.js Container -->
-            <div id="viz-canvas"></div>
+            <div id="viz-canvas" class="bg-[#0b1120]"></div>
 
-            <!-- Legend/Controls overlay could go here -->
             <div class="absolute bottom-4 right-4 flex gap-2">
-                <button class="p-2 bg-slate-800 text-slate-300 rounded hover:text-white" onclick="network.fit()"><i class="fas fa-compress"></i> Fit</button>
+                <button class="p-2 bg-slate-800 text-slate-300 rounded hover:text-white border border-slate-700" onclick="if(network) network.fit()"><i class="fas fa-compress"></i> Fit</button>
             </div>
         </section>
 
-        <!-- Right Panel: Stream Log -->
-        <aside class="w-full lg:w-80 glass-panel flex flex-col shrink-0 h-64 lg:h-auto">
-            <div class="p-3 border-b border-slate-700/50 bg-slate-800/30 rounded-t-lg flex justify-between items-center">
-                <h2 class="text-xs uppercase tracking-widest text-slate-400 font-bold">Live Thought Stream</h2>
+        <aside class="w-full lg:w-80 glass-panel flex flex-col shrink-0 h-48 lg:h-auto rounded-lg overflow-hidden">
+            <div class="p-3 border-b border-slate-700/50 bg-slate-800/30 flex justify-between items-center">
+                <h2 class="text-xs uppercase tracking-widest text-slate-400 font-bold"><i class="fas fa-terminal mr-2"></i>Live Stream</h2>
                 <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
             </div>
-            <div id="log-container" class="flex-1 overflow-y-auto p-3 mono text-xs space-y-2 scroll-smooth">
+            <div id="log-container" class="flex-1 overflow-y-auto p-3 font-mono text-xs space-y-2 scroll-smooth bg-[#0a0f18]">
                 <div class="text-slate-500 border-l-2 border-slate-600 pl-2">[SYSTEM] Neural Dashboard initialized.</div>
             </div>
         </aside>
@@ -118,14 +135,15 @@
     </main>
 
     <script>
-        // Graph Data Definitions (Could be in mock_data.js)
+        // --- DATA DEFINITIONS ---
+        // Merged from both branches to ensure all graphs work
         const GRAPHS = {
             'SNC': {
                 title: "Shared National Credit (SNC) Analysis",
                 nodes: [
                     { id: 1, label: 'START', group: 'start' },
                     { id: 2, label: 'Structure Analysis', group: 'agent' },
-                    { id: 3, label: 'Credit Assessment', group: 'agent' },
+                    { id: 3, label: 'Credit Risk Model', group: 'agent' },
                     { id: 4, label: 'Risk Critique', group: 'critique' },
                     { id: 5, label: 'Revision', group: 'action' },
                     { id: 6, label: 'Human Approval', group: 'human' },
@@ -136,7 +154,7 @@
                     { from: 2, to: 3, arrows: 'to' },
                     { from: 3, to: 4, arrows: 'to' },
                     { from: 4, to: 5, arrows: 'to', label: 'Reject', color: { color: '#ef4444' } },
-                    { from: 5, to: 4, arrows: 'to', label: 'Resubmit' },
+                    { from: 5, to: 3, arrows: 'to', label: 'Retry' },
                     { from: 4, to: 6, arrows: 'to', label: 'Approve', color: { color: '#10b981' } },
                     { from: 6, to: 7, arrows: 'to' }
                 ],
@@ -145,12 +163,12 @@
                     { msg: "Analyzing covenant compliance structure...", type: "active" },
                     { msg: "Calculating leverage ratios (Net Debt/EBITDA)...", type: "active" },
                     { msg: "CRITIQUE: Lenders seeking higher spread given risk profile.", type: "critique" },
-                    { msg: "Revising risk grade recommendation to 'Substandard'...", type: "active" },
+                    { msg: "Revising risk grade recommendation to 'Substandard'...", type: "action" },
                     { msg: "Draft ready for final review.", type: "success" }
                 ]
             },
             'Sentiment': {
-                title: "Market Sentiment & Contagion Graph",
+                title: "Market Sentiment & Contagion",
                 nodes: [
                     { id: 1, label: 'News Ingest', group: 'start' },
                     { id: 2, label: 'NLP Analysis', group: 'agent' },
@@ -188,41 +206,61 @@
                     { from: 1, to: 2, arrows: 'to' },
                     { from: 2, to: 3, arrows: 'to' },
                     { from: 3, to: 4, arrows: 'to' },
-                    { from: 4, to: 2, arrows: 'to', label: 'Iterate' },
-                    { from: 4, to: 5, arrows: 'to', label: 'Finalize' }
+                    { from: 4, to: 5, arrows: 'to' },
+                    { from: 5, to: 1, arrows: 'to', label: 'Monitor', dashes: true }
                 ],
                 logMessages: [
                     { msg: "Generating Black Swan event: Cyber Attack...", type: "info" },
                     { msg: "Simulating liquidity freeze in bond markets.", type: "critique" },
                     { msg: "Defense Protocol Alpha activated.", type: "active" },
-                    { msg: "Impact: 15% drop in collateral value.", type: "active" }
+                    { msg: "Impact: 15% drop in collateral value.", type: "active" },
+                    { msg: "Scenario stored in memory.", type: "success" }
+                ]
+            },
+            'Macro': {
+                title: "Macroeconomic Neuro-Symbolic Planner",
+                nodes: [
+                    { id: 1, label: 'Global Data', group: 'start' },
+                    { id: 2, label: 'Causal Inference', group: 'agent' },
+                    { id: 3, label: 'Scenario Planner', group: 'agent' },
+                    { id: 4, label: 'Strategy Eval', group: 'critique' },
+                    { id: 5, label: 'Memo Gen', group: 'end' }
+                ],
+                edges: [
+                    { from: 1, to: 2, arrows: 'to' },
+                    { from: 2, to: 3, arrows: 'to' },
+                    { from: 3, to: 4, arrows: 'to' },
+                    { from: 4, to: 3, arrows: 'to', label: 'Refine', dashes: true },
+                    { from: 4, to: 5, arrows: 'to', label: 'Finalize' }
+                ],
+                logMessages: [
+                    { msg: "Ingesting Fed minutes and CPI data...", type: "info" },
+                    { msg: "Inference: Rate hike probability > 60%.", type: "active" },
+                    { msg: "Planning asset allocation shift...", type: "active" },
+                    { msg: "CRITIQUE: Check correlation with Oil prices.", type: "critique" },
+                    { msg: "Investment Memo generated.", type: "success" }
                 ]
             }
         };
 
+        // --- APP STATE ---
         let network = null;
         let simulationInterval = null;
+        let animationInterval = null;
 
-        // Vis.js Options
+        // --- CONFIGURATION ---
         const options = {
             nodes: {
                 shape: 'dot',
                 size: 20,
-                font: {
-                    face: 'JetBrains Mono',
-                    color: '#e2e8f0',
-                    size: 14
-                },
+                font: { face: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas', color: '#e2e8f0', size: 14 },
                 borderWidth: 2,
                 shadow: true
             },
             edges: {
                 width: 2,
                 color: { color: '#64748b', highlight: '#22d3ee' },
-                smooth: {
-                    type: 'curvedCW',
-                    roundness: 0.2
-                },
+                smooth: { type: 'curvedCW', roundness: 0.2 },
                 shadow: true
             },
             groups: {
@@ -235,17 +273,12 @@
             },
             physics: {
                 stabilization: false,
-                barnesHut: {
-                    gravitationalConstant: -2000,
-                    springConstant: 0.04,
-                    springLength: 95
-                }
+                barnesHut: { gravitationalConstant: -2000, springLength: 120 }
             },
-            interaction: {
-                hover: true,
-                tooltipDelay: 200
-            }
+            interaction: { hover: true, tooltipDelay: 200 }
         };
+
+        // --- FUNCTIONS ---
 
         function loadGraph(key) {
             const data = GRAPHS[key];
@@ -255,51 +288,50 @@
             document.getElementById('graph-status').innerText = "Simulation Running...";
 
             const container = document.getElementById('viz-canvas');
-
-            // Transform nodes for Vis.js
             const nodes = new vis.DataSet(data.nodes);
             const edges = new vis.DataSet(data.edges);
 
             if(network) network.destroy();
-
             network = new vis.Network(container, { nodes, edges }, options);
 
-            // Start Simulation Log
+            // 1. Text Log Simulation
             runLogSimulation(data.logMessages);
 
-            // Pulse animation logic could go here by updating node properties
-            startPulseAnimation(nodes);
+            // 2. Visual Node Animation
+            runVisualAnimation(nodes);
         }
 
         function runLogSimulation(messages) {
             const logContainer = document.getElementById('log-container');
             if(simulationInterval) clearInterval(simulationInterval);
 
+            // Clear previous specific logs but keep system log
+            logContainer.innerHTML = '<div class="text-slate-500 border-l-2 border-slate-600 pl-2 mb-2">[SYSTEM] Context switched.</div>';
+
             let index = 0;
             simulationInterval = setInterval(() => {
                 if(index >= messages.length) {
-                    index = 0; // Loop
+                    index = 0; // Loop logs
                     addLogEntry("--- Cycle Complete ---", "info");
                 }
-
                 const m = messages[index];
                 addLogEntry(m.msg, m.type);
                 index++;
-            }, 2000);
+            }, 1800);
         }
 
         function addLogEntry(msg, type) {
             const div = document.createElement('div');
-            const time = new Date().toISOString().split('T')[1].split('.')[0];
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false });
 
             let colorClass = "text-slate-400";
             let borderClass = "border-transparent";
 
-            if(type === 'active') { colorClass = "text-cyan-400"; borderClass = "border-cyan-500"; }
+            if(type === 'active' || type === 'action') { colorClass = "text-cyan-400"; borderClass = "border-cyan-500"; }
             if(type === 'critique') { colorClass = "text-red-400"; borderClass = "border-red-500"; }
             if(type === 'success') { colorClass = "text-emerald-400"; borderClass = "border-emerald-500"; }
 
-            div.className = `${colorClass} border-l-2 ${borderClass} pl-2 text-xs font-mono animate-in fade-in slide-in-from-left-2 duration-300`;
+            div.className = `${colorClass} border-l-2 ${borderClass} pl-2 text-xs font-mono animate-fade-in`;
             div.innerHTML = `<span class="opacity-50">[${time}]</span> ${msg}`;
 
             const container = document.getElementById('log-container');
@@ -307,39 +339,50 @@
             container.scrollTop = container.scrollHeight;
         }
 
-        function startPulseAnimation(nodes) {
-             // Simple visual effect: Randomly scale nodes slightly to simulate "thinking"
-             setInterval(() => {
-                 const allNodes = nodes.get();
-                 if(allNodes.length === 0) return;
-                 const randomNode = allNodes[Math.floor(Math.random() * allNodes.length)];
+        function runVisualAnimation(nodes) {
+            if(animationInterval) clearInterval(animationInterval);
+            
+            animationInterval = setInterval(() => {
+                if(!network) return;
+                
+                const allNodes = nodes.getIds();
+                if(allNodes.length === 0) return;
+                
+                // Pick a random node to highlight
+                const randomNodeId = allNodes[Math.floor(Math.random() * allNodes.length)];
+                
+                network.selectNodes([randomNodeId], false);
+                
+                // Unselect after short delay
+                setTimeout(() => {
+                   if(network) network.unselectAll(); 
+                }, 600);
 
-                 // We can't easily animate size in Vis.js without updating dataset, which triggers redraw.
-                 // Use highlighting instead
-                 network.selectNodes([randomNode.id], false);
-                 setTimeout(() => {
-                     network.unselectAll();
-                 }, 500);
-             }, 1000);
+            }, 1200);
         }
 
-        // Initialize with default
+        // --- INITIALIZATION ---
+        // Shim for dataManager if app.js fails to load or mock_data is missing
+        window.dataManager = window.dataManager || {
+            init: async () => Promise.resolve(),
+            getSystemStats: () => ({ memory_usage: "14.5" })
+        };
+
         window.addEventListener('load', () => {
-            // Check DataManager
+            // Load stats (using shim or real)
             window.dataManager.init().then(() => {
-                const stats = window.dataManager.getSystemStats();
-                if(stats && stats.memory_usage) {
-                    document.getElementById('mem-usage').innerText = stats.memory_usage + " GB";
-                }
-                loadGraph('SNC');
+                const stats = window.dataManager.getSystemStats ? window.dataManager.getSystemStats() : { memory_usage: "14.2" };
+                document.getElementById('mem-usage').innerText = (stats.memory_usage || "14.2") + " GB";
             });
+            
+            // Randomize Ops Rate
+            setInterval(() => {
+                 document.getElementById('ops-rate').innerText = Math.floor(2000 + Math.random() * 500) + " /s";
+            }, 1000);
 
-            // Nav Toggle
-            document.getElementById('nav-toggle').addEventListener('click', () => {
-                window.location.href = 'index.html'; // Or toggle sidebar visibility
-            });
+            // Load default graph
+            loadGraph('SNC');
         });
-
     </script>
 </body>
 </html>

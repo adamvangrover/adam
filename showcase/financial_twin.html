@@ -3,111 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM System | Financial Digital Twin</title>
+    <title>ADAM v23 | Financial Digital Twin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
-    <link rel="stylesheet" href="css/style.css">
-    <script src="js/mock_data.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/nav.js"></script>
+
     <style>
-        #network-container {
-            width: 100%;
-            height: 100%;
+        /* Base Settings */
+        body { background-color: #0f172a; }
+        
+        /* Glassmorphism Panel */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         }
+
+        /* Scanline Effect */
+        .scan-line {
+            position: fixed; top: 0; left: 0; width: 100%; height: 5px;
+            background: rgba(99, 102, 241, 0.2);
+            opacity: 0.4; animation: scan 6s linear infinite; pointer-events: none; z-index: 9999;
+        }
+        @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
+
+        /* Contagion Alert Animation */
+        .contagion-alert {
+            animation: flashRed 2s infinite;
+        }
+        @keyframes flashRed {
+            0%, 100% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.1) inset; }
+            50% { box-shadow: 0 0 50px rgba(239, 68, 68, 0.4) inset; }
+        }
+
+        /* Graph Container */
+        #network-container { width: 100%; height: 100%; background: #0b1120; }
+        
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
     </style>
 </head>
-<body class="h-screen flex flex-col grid-bg text-slate-200">
+<body class="bg-slate-900 text-slate-200 font-sans overflow-hidden h-screen flex flex-col">
     <div class="scan-line"></div>
 
-    <!-- Header -->
-    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a] z-50 shrink-0">
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-50 shrink-0">
         <div class="flex items-center gap-4">
             <button id="nav-toggle" class="text-slate-400 hover:text-white transition">
                 <i class="fas fa-bars"></i>
             </button>
             <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-indigo-400">v23</span> <span class="text-slate-500 font-normal">| Financial Digital Twin</span></h1>
         </div>
-        <div class="flex gap-4 mono text-xs text-slate-400 hidden md:flex">
-             <div>FIBO_ONTOLOGY: <span class="text-emerald-400">LOADED</span></div>
+        <div class="flex gap-4 mono text-xs text-slate-400 hidden md:flex items-center">
+             <div class="flex items-center gap-2 px-3 py-1 bg-slate-800 rounded border border-slate-700">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Live Feed
+             </div>
              <div>NODES: <span class="text-cyan-400" id="node-count">0</span></div>
         </div>
     </header>
 
-    <main class="flex-1 p-4 lg:p-8 overflow-y-auto grid grid-cols-12 gap-6 relative z-10">
+    <main class="flex-1 p-4 lg:p-6 overflow-hidden grid grid-cols-12 gap-6 relative z-10">
 
-        <!-- Header Panel -->
-        <div class="col-span-12 glass-panel p-6 rounded-lg border-l-4 border-indigo-500 flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-bold text-white mb-2 font-mono">ENTITY MAPPER & CONTAGION SIMULATOR</h1>
-                <p class="text-slate-400 text-sm max-w-2xl">
-                    Visualizing inter-company dependencies, supply chain risks, and financial contagion paths using the <span class="text-indigo-400 font-bold">FIBO Ontology</span>.
-                </p>
-            </div>
-            <div class="text-right">
-                <button onclick="resetGraph()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded text-sm text-white transition"><i class="fas fa-sync-alt mr-2"></i>Reset View</button>
-            </div>
-        </div>
-
-        <!-- 3D Visualization Area -->
-        <div class="col-span-12 lg:col-span-8 glass-panel rounded-lg h-[600px] relative overflow-hidden flex flex-col shadow-2xl">
+        <div class="col-span-12 lg:col-span-8 glass-panel rounded-lg relative overflow-hidden flex flex-col shadow-2xl h-full">
             <div class="absolute top-4 left-4 z-10 pointer-events-none">
-                <span class="text-xs font-mono bg-slate-900/80 px-2 py-1 rounded text-cyan-400 border border-slate-700">LIVE SIMULATION</span>
+                <span class="text-xs font-mono bg-slate-900/80 px-2 py-1 rounded text-cyan-400 border border-slate-700">INTERACTIVE TOPOLOGY</span>
                 <div id="selected-company-overlay" class="mt-2 text-xl font-bold text-white drop-shadow-md">Select Entity</div>
             </div>
 
-            <!-- Vis.js Network Container -->
-            <div id="network-container" class="bg-[#0b1120]"></div>
+            <div id="network-container" class="flex-1"></div>
 
-            <!-- Legend -->
-            <div class="absolute bottom-4 left-4 z-10 bg-slate-900/80 p-2 rounded border border-slate-700 text-[10px] flex flex-col gap-1">
+            <div class="absolute bottom-4 left-4 z-10 bg-slate-900/80 p-2 rounded border border-slate-700 text-[10px] flex flex-col gap-1 backdrop-blur-sm">
                 <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-indigo-500"></span> Target Entity</div>
                 <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-cyan-500"></span> Competitor</div>
                 <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-emerald-500"></span> Supplier</div>
                 <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-500"></span> High Risk</div>
             </div>
 
-            <!-- Controls -->
-            <div class="h-12 bg-slate-800 border-t border-slate-700 flex items-center justify-between px-6 shrink-0">
+            <div class="h-12 bg-slate-800/80 border-t border-slate-700 flex items-center justify-between px-6 shrink-0 backdrop-blur-sm">
                 <div class="flex space-x-4">
                     <button class="text-slate-400 hover:text-white" onclick="network.fit()"><i class="fas fa-expand"></i></button>
                     <button class="text-slate-400 hover:text-white" onclick="network.zoomIn()"><i class="fas fa-search-plus"></i></button>
                     <button class="text-slate-400 hover:text-white" onclick="network.zoomOut()"><i class="fas fa-search-minus"></i></button>
                 </div>
+                <div class="text-xs text-slate-500 font-mono" id="last-updated">Updated: --:--:--</div>
             </div>
         </div>
 
-        <!-- Info Panel -->
-        <div class="col-span-12 lg:col-span-4 space-y-6 flex flex-col h-[600px]">
+        <div class="col-span-12 lg:col-span-4 flex flex-col gap-6 h-full overflow-hidden">
 
-            <!-- Entity Selector -->
-             <div class="glass-panel p-5 rounded-lg shrink-0">
-                <h3 class="text-emerald-400 font-bold font-mono uppercase mb-4 text-sm tracking-wider">Tracked Entities</h3>
-                <div class="space-y-1 h-32 overflow-y-auto pr-2 custom-scrollbar" id="company-list">
-                    <!-- Populated by JS -->
-                </div>
+            <div class="glass-panel p-5 rounded-lg shrink-0 flex flex-col max-h-[30%]">
+                <h3 class="text-emerald-400 font-bold font-mono uppercase mb-4 text-sm tracking-wider flex justify-between">
+                    Tracked Entities <i class="fas fa-globe"></i>
+                </h3>
+                <div class="space-y-1 overflow-y-auto custom-scrollbar flex-1" id="company-list">
+                    </div>
             </div>
 
-            <!-- Dynamic Details Panel (Slide out effect simulated) -->
-            <div id="info-panel" class="glass-panel p-5 rounded-lg flex-1 overflow-y-auto transition-all duration-300 border border-slate-700/50">
+            <div id="info-panel" class="glass-panel p-5 rounded-lg flex-1 overflow-y-auto custom-scrollbar border border-slate-700/50">
                 <h3 class="text-indigo-400 font-bold font-mono uppercase mb-4 text-sm tracking-wider">Real-Time Telemetry</h3>
                 <div id="entity-details" class="space-y-4 font-mono text-xs text-slate-400">
-                    <p class="text-center italic mt-10">Select a node to view financial health, ESG scores, and credit ratings.</p>
+                    <div class="flex flex-col items-center justify-center h-40 text-slate-600">
+                        <i class="fas fa-project-diagram text-4xl mb-4 opacity-50"></i>
+                        <p>Select a node to view digital twin data.</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Scenarios -->
             <div class="glass-panel p-5 rounded-lg shrink-0">
-                <h3 class="text-amber-400 font-bold font-mono uppercase mb-4 text-sm tracking-wider">Contagion Scenarios</h3>
-                <div class="grid grid-cols-2 gap-2">
-                    <button onclick="simulateContagion('supply')" class="p-2 bg-slate-800 hover:bg-slate-700 rounded text-xs text-slate-300 border border-slate-600 hover:border-amber-500 transition text-left">
-                        <i class="fas fa-truck text-amber-500 mr-1"></i> Supply Shock
+                <h3 class="text-amber-400 font-bold font-mono uppercase mb-4 text-sm tracking-wider">Simulation Engine</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="simulateContagion('supply')" class="p-3 bg-slate-800 hover:bg-slate-700 rounded text-xs text-slate-300 border border-slate-600 hover:border-amber-500 transition text-left group">
+                        <i class="fas fa-truck text-amber-500 mr-2 group-hover:scale-110 transition-transform"></i> Supply Shock
                     </button>
-                    <button onclick="simulateContagion('credit')" class="p-2 bg-slate-800 hover:bg-slate-700 rounded text-xs text-slate-300 border border-slate-600 hover:border-red-500 transition text-left">
-                        <i class="fas fa-chart-down text-red-500 mr-1"></i> Credit Default
+                    <button onclick="simulateContagion('credit')" class="p-3 bg-slate-800 hover:bg-slate-700 rounded text-xs text-slate-300 border border-slate-600 hover:border-red-500 transition text-left group">
+                        <i class="fas fa-chart-down text-red-500 mr-2 group-hover:scale-110 transition-transform"></i> Credit Default
                     </button>
                 </div>
+                <button onclick="resetGraph()" class="w-full mt-3 py-2 border border-slate-600 text-slate-400 hover:bg-slate-700 rounded text-xs transition">
+                    <i class="fas fa-undo mr-2"></i> Reset State
+                </button>
             </div>
 
         </div>
@@ -115,80 +132,112 @@
     </main>
 
     <script>
+        // -- 1. Data Mock (Standalone Fallback) --
+        const mockData = {
+            "NVDA": {
+                name: "Nvidia Corporation", industry: "Semiconductors",
+                financials: { revenue: "60.9B", net_income: "29.7B", credit_rating: "AA" },
+                competitors: ["AMD", "INTC", "QCOM"],
+                suppliers: ["TSMC", "Samsung", "Micron"]
+            },
+            "JPM": {
+                name: "JPMorgan Chase", industry: "Banking",
+                financials: { revenue: "158.1B", net_income: "49.5B", credit_rating: "A+" },
+                competitors: ["BAC", "C", "GS", "MS"],
+                suppliers: ["Fiserv", "Oracle"]
+            },
+            "TSLA": {
+                name: "Tesla Inc", industry: "Automotive",
+                financials: { revenue: "96.7B", net_income: "14.9B", credit_rating: "BBB" },
+                competitors: ["F", "GM", "TM", "BYD"],
+                suppliers: ["Panasonic", "CATL", "LG Chem"]
+            },
+            "AAPL": {
+                name: "Apple Inc", industry: "Consumer Electronics",
+                financials: { revenue: "383.3B", net_income: "97.0B", credit_rating: "AAA" },
+                competitors: ["MSFT", "GOOGL", "SAMSUNG"],
+                suppliers: ["Foxconn", "TSMC", "Sony"]
+            }
+        };
+
+        // -- 2. Global State --
         let network = null;
-        let companyData = {};
+        let nodes = new vis.DataSet([]);
+        let edges = new vis.DataSet([]);
         let currentTicker = null;
+        let isContagionActive = false;
 
-        // Vis.js DataSets
-        const nodes = new vis.DataSet([]);
-        const edges = new vis.DataSet([]);
-
-        document.addEventListener('DOMContentLoaded', async () => {
-             // Load Data
-             await window.dataManager.init();
-             const data = window.MOCK_DATA || {};
-             companyData = data.company_data || {};
-
-             // Setup List
-             const companyList = document.getElementById('company-list');
-             if (Object.keys(companyData).length === 0) {
-                 companyList.innerHTML = '<div class="text-slate-500 text-xs">No company data loaded.</div>';
-             } else {
-                 Object.keys(companyData).forEach(ticker => {
-                     const comp = companyData[ticker];
-                     const el = document.createElement('div');
-                     el.className = 'p-2 bg-slate-800/50 hover:bg-slate-700 rounded cursor-pointer flex justify-between items-center border-l-2 border-transparent hover:border-emerald-500 transition group';
-                     el.innerHTML = `
-                        <span class="font-bold text-slate-300 group-hover:text-white text-xs">${ticker}</span>
-                        <span class="text-[10px] text-slate-500 truncate w-32 text-right">${comp.name}</span>
-                     `;
-                     el.onclick = () => loadEntityGraph(ticker);
-                     companyList.appendChild(el);
-                 });
-             }
-
-             // Initialize Empty Graph
-             initGraph();
-
-             // Load first if available
-             const first = Object.keys(companyData)[0];
-             if(first) loadEntityGraph(first);
+        // -- 3. Initialization --
+        document.addEventListener('DOMContentLoaded', () => {
+            initList();
+            initGraph();
+            
+            // Load first entity by default
+            const first = Object.keys(mockData)[0];
+            loadEntityGraph(first);
+            
+            // Time ticker
+            setInterval(() => {
+                document.getElementById("last-updated").innerText = "Updated: " + new Date().toLocaleTimeString();
+            }, 1000);
         });
+
+        // -- 4. Functions --
+
+        function initList() {
+            const list = document.getElementById('company-list');
+            list.innerHTML = '';
+            Object.keys(mockData).forEach(ticker => {
+                const comp = mockData[ticker];
+                const div = document.createElement('div');
+                div.className = 'p-3 bg-slate-800/30 hover:bg-slate-700/50 rounded cursor-pointer flex justify-between items-center border-l-2 border-transparent hover:border-emerald-500 transition group mb-1';
+                div.innerHTML = `
+                    <span class="font-bold text-slate-300 group-hover:text-white text-xs font-mono">${ticker}</span>
+                    <span class="text-[10px] text-slate-500 truncate w-24 text-right">${comp.name}</span>
+                `;
+                div.onclick = () => loadEntityGraph(ticker);
+                list.appendChild(div);
+            });
+        }
 
         function initGraph() {
             const container = document.getElementById('network-container');
             const data = { nodes: nodes, edges: edges };
             const options = {
                 nodes: {
-                    shape: 'dot',
-                    size: 20,
-                    font: { face: 'JetBrains Mono', color: '#e2e8f0', size: 12 },
-                    borderWidth: 2,
-                    shadow: true
+                    shape: 'dot', size: 20,
+                    font: { face: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas', color: '#e2e8f0', size: 14 },
+                    borderWidth: 2, shadow: true
                 },
                 edges: {
-                    width: 1,
-                    color: { color: '#475569', highlight: '#3b82f6' },
+                    width: 1, color: { color: '#475569', highlight: '#3b82f6' },
                     smooth: { type: 'continuous' }
                 },
                 physics: {
                     stabilization: true,
-                    barnesHut: { gravitationalConstant: -3000, springLength: 150 }
+                    barnesHut: { gravitationalConstant: -4000, springLength: 150, springConstant: 0.04 }
                 },
-                interaction: { hover: true }
+                interaction: { hover: true, tooltipDelay: 200 }
             };
             network = new vis.Network(container, data, options);
 
+            // Click Handler
             network.on("click", function (params) {
                 if (params.nodes.length > 0) {
                     const nodeId = params.nodes[0];
                     const node = nodes.get(nodeId);
-                    if(node.group === 'target' || node.group === 'competitor') {
-                        // Show details for this node if we have data, otherwise show generic
-                        // For simplicity, we just reload the main entity details if it matches
-                        if(companyData[node.label]) {
-                             showDetails(node.label);
-                        }
+                    // Show details if it's a known entity, else show simplified
+                    if (mockData[node.label]) {
+                        showDetails(node.label);
+                    } else {
+                        // Simple external node detail
+                        document.getElementById('entity-details').innerHTML = `
+                            <div class="bg-slate-800/50 p-4 rounded border border-slate-700">
+                                <h4 class="text-white font-bold text-lg mb-1">${node.label}</h4>
+                                <span class="text-xs text-slate-500 uppercase font-mono">${node.group} Node</span>
+                                <p class="text-xs text-slate-400 mt-2">External relationship entity. Deep telemetry not established.</p>
+                            </div>
+                        `;
                     }
                 }
             });
@@ -196,46 +245,42 @@
 
         function loadEntityGraph(ticker) {
             currentTicker = ticker;
-            const data = companyData[ticker];
+            const data = mockData[ticker];
             if (!data) return;
 
             document.getElementById('selected-company-overlay').textContent = `${data.name} (${ticker})`;
             showDetails(ticker);
 
-            // Clear
+            // Reset Animation State
+            document.body.classList.remove('contagion-alert');
+            isContagionActive = false;
+
+            // Build Topology
             nodes.clear();
             edges.clear();
 
-            // Add Central Node
+            // 1. Central Node
             nodes.add({
-                id: 0,
-                label: ticker,
-                group: 'target',
+                id: 0, label: ticker, group: 'target',
                 color: { background: '#6366f1', border: '#4f46e5' }, // Indigo
-                size: 30
+                size: 35, font: { size: 18, color: '#fff' }
             });
 
-            // Add Competitors
-            const competitors = data.competitors || [];
-            competitors.forEach((comp, i) => {
+            // 2. Competitors
+            data.competitors.forEach((comp, i) => {
                 const id = i + 1;
                 nodes.add({
-                    id: id,
-                    label: comp,
-                    group: 'competitor',
+                    id: id, label: comp, group: 'competitor',
                     color: { background: '#06b6d4', border: '#0891b2' } // Cyan
                 });
-                edges.add({ from: 0, to: id, label: 'Competes' });
+                edges.add({ from: 0, to: id, label: 'Competes', dashes: true });
             });
 
-            // Add Fake Supply Chain Nodes
-            const suppliers = ['TSMC', 'Foxconn', 'Samsung', 'Intel'];
-            suppliers.forEach((sup, i) => {
+            // 3. Suppliers
+            data.suppliers.forEach((sup, i) => {
                 const id = 100 + i;
                 nodes.add({
-                    id: id,
-                    label: sup,
-                    group: 'supplier',
+                    id: id, label: sup, group: 'supplier',
                     color: { background: '#10b981', border: '#059669' } // Emerald
                 });
                 edges.add({ from: id, to: 0, arrows: 'to', label: 'Supplies' });
@@ -246,115 +291,81 @@
         }
 
         function showDetails(ticker) {
-            const data = companyData[ticker];
-            const details = document.getElementById('entity-details');
+            const data = mockData[ticker];
+            if (!data) return;
 
-            if(!data) {
-                // If clicking a node we don't have deep data for
-                details.innerHTML = `<div class="p-4 text-center"><h4 class="text-white text-lg font-bold">${ticker}</h4><p class="text-slate-500">External Entity (No deep data loaded)</p></div>`;
-                return;
-            }
-
-            // Simulate some extra fields
-            const revenue = (data.financial_statements?.income_statement?.revenue || []).slice(-1)[0] || 'N/A';
-            const netIncome = (data.financial_statements?.income_statement?.net_income || []).slice(-1)[0] || 'N/A';
-
-            details.innerHTML = `
-                <div class="mb-4">
-                    <h4 class="text-white text-lg font-bold border-b border-slate-700 pb-2 mb-2">${data.name}</h4>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <span class="text-slate-500 block text-[10px] uppercase">Sector</span>
-                            <span class="text-white">${data.industry}</span>
+            const html = `
+                <div class="mb-6">
+                    <h4 class="text-white text-xl font-bold border-b border-slate-700 pb-2 mb-2 flex justify-between items-center">
+                        ${ticker}
+                        <span class="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-400 font-normal">Active</span>
+                    </h4>
+                    <p class="text-xs text-slate-500 mb-4">${data.name} | ${data.industry}</p>
+                    
+                    <div class="space-y-3">
+                        <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex justify-between items-center">
+                            <span class="text-slate-400">Revenue</span>
+                            <span class="text-emerald-400 font-bold">$${data.financials.revenue}</span>
                         </div>
-                        <div>
-                            <span class="text-slate-500 block text-[10px] uppercase">Ticker</span>
-                            <span class="text-white font-mono">${ticker}</span>
+                        <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex justify-between items-center">
+                            <span class="text-slate-400">Net Income</span>
+                            <span class="text-blue-400 font-bold">$${data.financials.net_income}</span>
+                        </div>
+                        <div class="bg-slate-800/50 p-3 rounded border border-slate-700 flex justify-between items-center">
+                            <span class="text-slate-400">Credit Rating</span>
+                            <span class="text-white font-bold">${data.financials.credit_rating}</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="space-y-3">
-                    <div class="bg-slate-800/50 p-3 rounded border border-slate-700">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-slate-400">Revenue (LTM)</span>
-                            <span class="text-emerald-400 font-bold">$${revenue}M</span>
-                        </div>
-                         <div class="w-full bg-slate-700 h-1.5 rounded-full">
-                            <div class="bg-emerald-500 h-1.5 rounded-full" style="width: 75%"></div>
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-800/50 p-3 rounded border border-slate-700">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-slate-400">Net Income</span>
-                            <span class="text-blue-400 font-bold">$${netIncome}M</span>
-                        </div>
-                         <div class="w-full bg-slate-700 h-1.5 rounded-full">
-                            <div class="bg-blue-500 h-1.5 rounded-full" style="width: 45%"></div>
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-800/50 p-3 rounded border border-slate-700">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-slate-400">ESG Score</span>
-                            <span class="text-amber-400 font-bold">A-</span>
-                        </div>
-                         <div class="w-full bg-slate-700 h-1.5 rounded-full">
-                            <div class="bg-amber-500 h-1.5 rounded-full" style="width: 85%"></div>
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-800/50 p-3 rounded border border-slate-700">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-slate-400">Credit Rating</span>
-                            <span class="text-white font-bold">BBB+</span>
-                        </div>
-                    </div>
+                <div>
+                    <span class="text-xs uppercase font-bold text-slate-500 mb-2 block">Recent Signals</span>
+                    <ul class="space-y-2 text-xs text-slate-300 font-mono">
+                        <li class="flex gap-2"><span class="text-slate-600">10:42</span> <span>10-K Filing Ingested</span></li>
+                        <li class="flex gap-2"><span class="text-slate-600">09:15</span> <span>Market Move: +1.2%</span></li>
+                        <li class="flex gap-2"><span class="text-slate-600">08:00</span> <span>Analyst Upgrade (GS)</span></li>
+                    </ul>
                 </div>
             `;
+            document.getElementById('entity-details').innerHTML = html;
         }
 
         function simulateContagion(type) {
-            if (!currentTicker) return;
+            if (!currentTicker || isContagionActive) return;
+            isContagionActive = true;
 
-            // Reset colors
+            document.body.classList.add('contagion-alert');
             const allNodes = nodes.get();
-            allNodes.forEach(n => {
-                if (n.group === 'competitor') nodes.update({ id: n.id, color: { background: '#06b6d4', border: '#0891b2' } });
-                if (n.group === 'supplier') nodes.update({ id: n.id, color: { background: '#10b981', border: '#059669' } });
-                if (n.group === 'target') nodes.update({ id: n.id, color: { background: '#6366f1', border: '#4f46e5' } });
-            });
             const allEdges = edges.get();
-            allEdges.forEach(e => edges.update({ id: e.id, color: { color: '#475569' }, width: 1 }));
 
-            // Simulate
             if (type === 'supply') {
-                // Highlight suppliers red and edges to target
+                // Find suppliers
                 const suppliers = allNodes.filter(n => n.group === 'supplier');
-                const impacted = suppliers.slice(0, 2); // Pick first 2
-
-                impacted.forEach(n => {
-                    nodes.update({ id: n.id, color: { background: '#ef4444', border: '#991b1b' } }); // Red
-                    // Find edges
-                    const connectedEdges = allEdges.filter(e => e.from === n.id && e.to === 0);
-                    connectedEdges.forEach(e => {
-                        edges.update({ id: e.id, color: { color: '#ef4444' }, width: 3, dashes: true });
+                if(suppliers.length > 0) {
+                    const victim = suppliers[0];
+                    // Turn victim Red
+                    nodes.update({ id: victim.id, color: { background: '#ef4444', border: '#991b1b' }, size: 30 });
+                    
+                    // Thicken edges to target
+                    const riskEdges = allEdges.filter(e => e.from === victim.id && e.to === 0);
+                    riskEdges.forEach(e => {
+                        edges.update({ id: e.id, color: { color: '#ef4444' }, width: 4, dashes: true });
                     });
-                });
 
-                // Target turns amber
-                nodes.update({ id: 0, color: { background: '#f59e0b', border: '#b45309' } }); // Amber
-
+                    // Target turns Amber
+                    nodes.update({ id: 0, color: { background: '#f59e0b', border: '#b45309' } });
+                }
             } else if (type === 'credit') {
-                 // Target turns red, competitors turn green (advantage)
-                 nodes.update({ id: 0, color: { background: '#ef4444', border: '#991b1b' } });
-
-                 const comps = allNodes.filter(n => n.group === 'competitor');
-                 comps.forEach(n => {
-                      nodes.update({ id: n.id, color: { background: '#10b981', border: '#059669' } });
-                 });
+                // Target turns Red
+                nodes.update({ id: 0, color: { background: '#ef4444', border: '#991b1b' } });
+                
+                // Competitors turn Green (Market Share gain)
+                const comps = allNodes.filter(n => n.group === 'competitor');
+                comps.forEach(n => {
+                    nodes.update({ id: n.id, color: { background: '#10b981', border: '#059669' } });
+                });
             }
+            network.fit({ animation: { duration: 1000, easingFunction: "easeInOutQuad" } });
         }
 
         function resetGraph() {
