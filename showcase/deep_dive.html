@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM v23.5 | Deep Dive Explorer</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
@@ -41,24 +42,47 @@
         
         .chart-bar-fill { transition: width 1.5s ease-out; }
         
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* Reasoning Trace Timeline */
+        .trace-node { position: relative; padding-left: 24px; border-left: 1px solid #334155; padding-bottom: 24px; }
+        .trace-node:last-child { border-left: none; }
+        .trace-node::before {
+            content: ''; position: absolute; left: -5px; top: 0; width: 9px; height: 9px;
+            background: #0f172a; border: 2px solid #22d3ee; border-radius: 50%;
+        }
+
         /* Print Styles */
         @media print {
-            body { background: white !important; color: black !important; }
-            .glass-panel { background: white !important; border: 1px solid #ccc !important; box-shadow: none !important; }
+            body { background: white !important; color: black !important; height: auto !important; overflow: visible !important; }
+            .glass-panel { background: white !important; border: 1px solid #ccc !important; box-shadow: none !important; break-inside: avoid; }
             .hidden-print { display: none !important; }
-            .text-white, .text-slate-200, .text-slate-300 { color: black !important; }
+            .text-white, .text-slate-200, .text-slate-300, .text-slate-400 { color: black !important; }
+            .bg-slate-800, .bg-slate-900 { background: #f1f5f9 !important; }
+            #report-content { display: block !important; overflow: visible !important; }
+            .tab-content { display: block !important; margin-bottom: 2rem; border-bottom: 1px solid #ccc; padding-bottom: 2rem; }
+            canvas { max-height: 300px !important; }
         }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden text-slate-200">
+<body class="h-screen flex flex-col overflow-hidden text-slate-200 selection:bg-cyan-500/30">
     <div class="scan-line hidden-print"></div>
 
+    <!-- Header -->
     <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 shrink-0 hidden-print">
         <div class="flex items-center gap-4">
             <a href="index.html" class="text-slate-400 hover:text-white transition"><i class="fas fa-arrow-left"></i></a>
             <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-cyan-400">v23.5</span> <span class="text-slate-500 font-normal">| Deep Dive Explorer</span></h1>
         </div>
         <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2 text-xs font-mono text-slate-500">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                SYSTEM ONLINE
+            </div>
             <button onclick="window.print()" class="px-3 py-1.5 bg-slate-800 border border-slate-600 rounded text-xs hover:bg-slate-700 transition flex items-center gap-2">
                 <i class="fas fa-print"></i> PDF Export
             </button>
@@ -67,27 +91,42 @@
 
     <main class="flex-1 p-6 grid grid-cols-12 gap-6 overflow-hidden h-full">
 
+        <!-- Sidebar: Report List -->
         <aside class="col-span-12 lg:col-span-3 glass-panel rounded-lg flex flex-col h-full hidden-print">
             <div class="p-4 border-b border-slate-700/50 bg-slate-800/30">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Analysis Reports</h3>
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Intelligence Archive</h3>
+                    <button onclick="startSimulation()" class="text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/50 px-2 py-1 rounded hover:bg-cyan-500/20 transition flex items-center gap-1">
+                        <i class="fas fa-plus"></i> NEW
+                    </button>
+                </div>
                 <div class="relative">
                     <input type="text" id="report-search" placeholder="Search Ticker / Report..." class="w-full bg-slate-900 border border-slate-700 rounded p-2 pl-8 text-xs text-white focus:outline-none focus:border-cyan-500 transition font-mono">
                     <i class="fas fa-search absolute left-2.5 top-2.5 text-slate-500 text-xs"></i>
                 </div>
             </div>
-            <div class="flex-1 overflow-y-auto p-2 space-y-1" id="report-list">
-                </div>
+            <div class="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar" id="report-list">
+                <!-- Populated via JS -->
+            </div>
         </aside>
 
+        <!-- Main Content Area -->
         <section class="col-span-12 lg:col-span-9 flex flex-col h-full overflow-hidden relative">
             
+            <!-- Empty State -->
             <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 z-10 bg-slate-900/50 glass-panel rounded-lg">
-                <i class="fas fa-microscope text-6xl mb-4 opacity-20 text-cyan-500"></i>
-                <p class="font-mono text-sm">Select a report to initialize Deep Dive Protocol.</p>
+                <div class="relative mb-6">
+                    <i class="fas fa-circle-notch fa-spin text-7xl text-slate-800 absolute top-0 left-0"></i>
+                    <i class="fas fa-fingerprint text-6xl text-cyan-500/50 relative z-10"></i>
+                </div>
+                <h2 class="text-xl font-bold text-slate-300 mb-2">Awaiting Target Selection</h2>
+                <p class="font-mono text-sm text-slate-500">Select an entity from the archive to initialize Deep Dive Protocol.</p>
             </div>
 
+            <!-- Active Report View -->
             <div id="report-content" class="flex flex-col h-full hidden">
                 
+                <!-- Report Header -->
                 <div class="glass-panel rounded-t-lg p-6 pb-0 mb-1 border-b-0 border-slate-700 shrink-0">
                     <div class="flex justify-between items-start mb-6">
                         <div>
@@ -95,28 +134,41 @@
                                 <h1 class="text-3xl font-bold text-white font-mono" id="r-title">--</h1>
                                 <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-xs border border-slate-600 font-mono" id="r-type">EQUITY_ANALYSIS</span>
                             </div>
-                            <p class="text-slate-400 text-xs mt-1 font-mono" id="r-meta">--</p>
+                            <div class="flex items-center gap-4 mt-2">
+                                <p class="text-slate-400 text-xs font-mono" id="r-meta">--</p>
+                                <span class="text-xs text-slate-500">|</span>
+                                <span id="r-sector" class="text-xs text-cyan-400 font-mono">--</span>
+                            </div>
                         </div>
                         <div class="text-right">
-                            <div class="text-xs text-slate-500 uppercase tracking-wider mb-1">Conviction</div>
-                            <div class="text-2xl font-bold text-emerald-400 font-mono" id="r-conviction">--</div>
+                            <div class="text-xs text-slate-500 uppercase tracking-wider mb-1">Adam Conviction</div>
+                            <div class="flex items-center justify-end gap-2">
+                                <div class="text-2xl font-bold text-emerald-400 font-mono" id="r-conviction">--</div>
+                                <div id="conviction-pill" class="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="flex space-x-6 text-xs font-bold font-mono">
-                        <button class="pb-3 tab-active transition focus:outline-none" onclick="switchTab('overview')">OVERVIEW</button>
-                        <button class="pb-3 tab-inactive transition focus:outline-none" onclick="switchTab('valuation')">VALUATION</button>
-                        <button class="pb-3 tab-inactive transition focus:outline-none" onclick="switchTab('risk')">RISK & SIM</button>
-                        <button class="pb-3 tab-inactive transition focus:outline-none" onclick="switchTab('snc')">CREDIT / SNC</button>
+                    <!-- Tabs -->
+                    <div class="flex space-x-6 text-xs font-bold font-mono overflow-x-auto">
+                        <button class="pb-3 tab-active transition focus:outline-none whitespace-nowrap" onclick="switchTab('overview')">DASHBOARD</button>
+                        <button class="pb-3 tab-inactive transition focus:outline-none whitespace-nowrap" onclick="switchTab('financials')">FINANCIALS</button>
+                        <button class="pb-3 tab-inactive transition focus:outline-none whitespace-nowrap" onclick="switchTab('valuation')">VALUATION</button>
+                        <button class="pb-3 tab-inactive transition focus:outline-none whitespace-nowrap" onclick="switchTab('risk')">RISK & SIM</button>
+                        <button class="pb-3 tab-inactive transition focus:outline-none whitespace-nowrap" onclick="switchTab('snc')">CREDIT / SNC</button>
+                        <button class="pb-3 tab-inactive transition focus:outline-none whitespace-nowrap" onclick="switchTab('synthesis')">SYNTHESIS</button>
                     </div>
                 </div>
 
+                <!-- Scrollable Tab Content -->
                 <div class="glass-panel rounded-b-lg flex-1 p-6 overflow-y-auto border-t-0 border-slate-700 bg-slate-900/50 custom-scrollbar">
 
+                    <!-- TAB: DASHBOARD -->
                     <div id="tab-overview" class="tab-content space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- KPI Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <div class="glass-panel p-4 rounded border border-slate-700/50 bg-slate-800/20">
-                                <div class="text-slate-400 text-[10px] uppercase mb-1 font-mono">Adam Rating</div>
+                                <div class="text-slate-400 text-[10px] uppercase mb-1 font-mono">Rating</div>
                                 <div class="text-xl text-emerald-400 font-bold tracking-tight" id="metric-rating">--</div>
                             </div>
                             <div class="glass-panel p-4 rounded border border-slate-700/50 bg-slate-800/20">
@@ -124,19 +176,70 @@
                                 <div class="text-xl text-white font-mono" id="metric-target">--</div>
                             </div>
                             <div class="glass-panel p-4 rounded border border-slate-700/50 bg-slate-800/20">
-                                <div class="text-slate-400 text-[10px] uppercase mb-1 font-mono">Risk Score</div>
+                                <div class="text-slate-400 text-[10px] uppercase mb-1 font-mono">Default Prob (1Y)</div>
                                 <div class="text-xl text-white font-mono" id="metric-risk">--</div>
+                            </div>
+                            <div class="glass-panel p-4 rounded border border-slate-700/50 bg-slate-800/20">
+                                <div class="text-slate-400 text-[10px] uppercase mb-1 font-mono">SNC Status</div>
+                                <div class="text-xl text-white font-mono" id="metric-snc">--</div>
                             </div>
                         </div>
 
+                        <!-- Executive Summary -->
                         <div class="p-5 bg-slate-800/30 border border-slate-700/50 rounded-lg">
                             <h3 class="text-sm text-cyan-400 font-bold mb-3 border-b border-slate-700/50 pb-2 uppercase tracking-wider">Executive Summary</h3>
-                            <p class="text-slate-300 leading-relaxed text-sm font-light" id="r-summary">Loading...</p>
+                            <p class="text-slate-300 leading-relaxed text-sm font-light whitespace-pre-line" id="r-summary">Loading...</p>
+                        </div>
+
+                        <!-- Sentiment & Catalysts -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="glass-panel p-5 rounded-lg border border-slate-700/50">
+                                <h3 class="text-xs font-bold text-slate-400 uppercase mb-4">Market Sentiment Analysis</h3>
+                                <div class="flex items-center gap-4 mb-4">
+                                    <div class="flex-1 h-4 bg-slate-800 rounded-full overflow-hidden">
+                                        <div id="sentiment-bar" class="h-full bg-gradient-to-r from-red-500 via-yellow-400 to-emerald-500" style="width: 0%; transition: width 1s;"></div>
+                                    </div>
+                                    <span id="sentiment-score" class="font-mono text-sm font-bold">0.0</span>
+                                </div>
+                                <p class="text-xs text-slate-400 italic" id="sentiment-text">Analysis based on news flow and social volume.</p>
+                            </div>
+                            <div class="glass-panel p-5 rounded-lg border border-slate-700/50">
+                                <h3 class="text-xs font-bold text-slate-400 uppercase mb-4">Key Catalysts</h3>
+                                <ul class="space-y-2 text-xs" id="r-catalysts">
+                                    <li class="flex items-start gap-2 text-slate-300"><i class="fas fa-bolt text-yellow-400 mt-0.5"></i> No catalysts identified.</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
 
+                    <!-- TAB: FINANCIALS -->
+                    <div id="tab-financials" class="tab-content hidden space-y-6">
+                        <div class="glass-panel p-6 rounded-lg border border-slate-700/50">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase mb-4">Historical Performance (Revenue vs. EBITDA)</h3>
+                            <div class="h-[300px] w-full">
+                                <canvas id="financialsChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="p-4 border border-slate-700 rounded bg-slate-800/20">
+                                <div class="text-slate-400 text-xs">Revenue CAGR (3Y)</div>
+                                <div class="text-lg font-mono text-white" id="fin-cagr">--</div>
+                            </div>
+                            <div class="p-4 border border-slate-700 rounded bg-slate-800/20">
+                                <div class="text-slate-400 text-xs">EBITDA Margin</div>
+                                <div class="text-lg font-mono text-white" id="fin-margin">--</div>
+                            </div>
+                            <div class="p-4 border border-slate-700 rounded bg-slate-800/20">
+                                <div class="text-slate-400 text-xs">Net Leverage</div>
+                                <div class="text-lg font-mono text-white" id="fin-leverage">--</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB: VALUATION -->
                     <div id="tab-valuation" class="tab-content hidden space-y-6">
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- DCF Model -->
                             <div class="glass-panel p-6 rounded-lg border border-slate-700/50">
                                 <h3 class="text-xs font-bold text-slate-400 uppercase mb-4">Intrinsic Valuation (DCF)</h3>
                                 <div class="space-y-6">
@@ -159,21 +262,25 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div id="val-divergence" class="mt-6 text-xs text-center font-mono py-2 bg-slate-800/50 rounded text-slate-300">
+                                <div id="val-divergence" class="mt-6 text-xs text-center font-mono py-2 bg-slate-800/50 rounded text-slate-300 border border-slate-700">
                                     --
                                 </div>
                             </div>
                             
+                            <!-- Multiples -->
                             <div class="glass-panel p-6 rounded-lg border border-slate-700/50">
                                 <h3 class="text-xs font-bold text-slate-400 uppercase mb-4">Relative Valuation</h3>
-                                <div class="space-y-3 text-sm" id="val-multiples">
-                                    </div>
+                                <div class="space-y-4 text-sm" id="val-multiples">
+                                    <!-- Populated via JS -->
+                                </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- TAB: RISK & SIM -->
                     <div id="tab-risk" class="tab-content hidden space-y-6">
                         <div class="flex flex-col lg:flex-row gap-6">
+                            <!-- Gauge -->
                             <div class="glass-panel p-6 rounded-lg border border-slate-700/50 flex-1 flex flex-col items-center justify-center min-h-[250px]">
                                 <h3 class="text-xs font-bold text-slate-400 uppercase mb-4 w-full text-left">Default Probability (1yr)</h3>
                                 <div class="relative w-48 h-24 mt-4">
@@ -188,40 +295,73 @@
                                 </div>
                             </div>
 
+                            <!-- Scenarios -->
                             <div class="glass-panel p-6 rounded-lg border border-slate-700/50 flex-[2]">
-                                <h3 class="text-xs font-bold text-slate-400 uppercase mb-4">Stress Test Scenarios</h3>
+                                <h3 class="text-xs font-bold text-slate-400 uppercase mb-4">Quantum Scenarios (Tail Risk)</h3>
                                 <div class="space-y-3" id="risk-scenarios">
-                                    </div>
+                                    <!-- Populated via JS -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- MC Distribution Chart -->
+                        <div class="glass-panel p-6 rounded-lg border border-slate-700/50">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase mb-4">Monte Carlo Outcome Distribution</h3>
+                            <div class="h-[250px] w-full">
+                                <canvas id="riskChart"></canvas>
                             </div>
                         </div>
                     </div>
 
-                    <div id="tab-snc" class="tab-content hidden">
+                    <!-- TAB: CREDIT / SNC -->
+                    <div id="tab-snc" class="tab-content hidden space-y-6">
                         <div class="grid grid-cols-1 gap-6">
-                            <div class="p-4 bg-emerald-900/20 border border-emerald-500/30 rounded-lg flex justify-between items-center" id="snc-banner">
+                            <!-- Banner -->
+                            <div class="p-4 bg-slate-800/50 border border-slate-700 rounded-lg flex justify-between items-center transition-colors duration-500" id="snc-banner">
                                 <div>
-                                    <h3 class="text-emerald-400 font-bold text-sm">Shared National Credit (SNC) Status</h3>
+                                    <h3 class="text-slate-200 font-bold text-sm">Shared National Credit (SNC) Status</h3>
                                     <p class="text-xs text-slate-400 mt-1">Regulatory Rating Assessment</p>
                                 </div>
-                                <div class="text-2xl font-bold text-white font-mono tracking-widest" id="snc-rating">PASS</div>
+                                <div class="text-2xl font-bold text-white font-mono tracking-widest" id="snc-rating">--</div>
                             </div>
                             
+                            <!-- Facilities Table -->
                             <div class="glass-panel p-6 rounded-lg border border-slate-700/50">
-                                <h3 class="text-xs font-bold text-slate-400 uppercase mb-4">Facility Ratings</h3>
+                                <h3 class="text-xs font-bold text-slate-400 uppercase mb-4">Facility Ratings & Exposure</h3>
                                 <div class="overflow-x-auto">
                                     <table class="w-full text-left text-xs font-mono">
                                         <thead class="text-slate-500 border-b border-slate-700">
                                             <tr>
-                                                <th class="pb-2">Facility ID</th>
+                                                <th class="pb-2 pl-2">Facility ID</th>
                                                 <th class="pb-2">Type</th>
                                                 <th class="pb-2">Commitment</th>
+                                                <th class="pb-2">Maturity</th>
                                                 <th class="pb-2">Rating</th>
                                             </tr>
                                         </thead>
                                         <tbody class="text-slate-300 divide-y divide-slate-800" id="snc-facilities">
-                                            </tbody>
+                                            <!-- Populated via JS -->
+                                        </tbody>
                                     </table>
                                 </div>
+                            </div>
+
+                            <!-- Covenants -->
+                            <div class="glass-panel p-6 rounded-lg border border-slate-700/50">
+                                <h3 class="text-xs font-bold text-slate-400 uppercase mb-4">Covenant Analysis</h3>
+                                <div id="snc-covenants" class="space-y-3">
+                                    <!-- Populated via JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB: SYNTHESIS -->
+                    <div id="tab-synthesis" class="tab-content hidden">
+                        <div class="glass-panel p-6 rounded-lg border border-slate-700/50">
+                            <h3 class="text-xs font-bold text-slate-400 uppercase mb-6">Reasoning Trace (Chain of Thought)</h3>
+                            <div class="space-y-0" id="reasoning-trace">
+                                <!-- Populated via JS -->
                             </div>
                         </div>
                     </div>
@@ -231,64 +371,346 @@
         </section>
     </main>
 
+    <!-- Simulation Modal -->
+    <div id="sim-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+        <div class="glass-panel w-[500px] p-6 rounded-lg border border-cyan-500/30 shadow-[0_0_50px_rgba(34,211,238,0.1)]">
+            <div class="flex justify-between items-center mb-6 border-b border-slate-700/50 pb-4">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-microchip text-cyan-400 animate-pulse"></i>
+                    <h2 class="text-lg font-bold font-mono text-white">Adam v23.5 Agent Swarm</h2>
+                </div>
+                <div class="text-xs text-slate-500 font-mono">PROCESSING_ID: <span class="text-cyan-400">0x8F2A</span></div>
+            </div>
+            
+            <div class="space-y-4 mb-6">
+                <div class="flex items-center gap-3 text-xs font-mono">
+                    <span class="w-16 text-slate-500">TARGET</span>
+                    <span class="text-white font-bold">SYNTHETIC CORP (SYNC)</span>
+                </div>
+                <div class="flex items-center gap-3 text-xs font-mono">
+                    <span class="w-16 text-slate-500">TASK</span>
+                    <span class="text-white">Full Deep Dive Protocol (L5)</span>
+                </div>
+                
+                <div class="h-32 bg-black/50 rounded border border-slate-800 p-3 overflow-hidden font-mono text-[10px] leading-relaxed text-emerald-500/80" id="sim-terminal">
+                    > Initializing Meta-Orchestrator...<br>
+                </div>
+            </div>
+
+            <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
+                <div id="sim-progress" class="h-full bg-cyan-500 shadow-[0_0_10px_#22d3ee]" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
+
     <script src="js/mock_data.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/nav.js"></script>
+    <!-- <script src="js/app.js"></script> --> <!-- Disabled to use internal logic for this deep dive specific page -->
     <script>
-        // -- STATE --
-        let reports = [];
-        const FALLBACK_REPORTS = [
+        // --- CHARTS CONFIG ---
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.borderColor = '#334155';
+        
+        let financialsChartInstance = null;
+        let riskChartInstance = null;
+
+        // --- MOCK DATA (Enhanced) ---
+        const ENHANCED_REPORTS = [
             {
-                id: 1, title: "Nvidia Corp (NVDA) Deep Dive", date: "2025-10-24",
+                id: "NVDA-2025-10",
+                title: "Nvidia Corp (NVDA) Deep Dive",
+                date: "2025-10-24",
+                sector: "Technology",
+                market_price: 1020.50,
+                sentiment_score: 0.85,
+                financials: {
+                    years: ['2022', '2023', '2024', '2025 (E)'],
+                    revenue: [26.9, 60.9, 98.5, 125.0],
+                    ebitda: [11.2, 34.5, 62.0, 81.5]
+                },
                 v23_knowledge_graph: {
                     meta: { target: "NVDA" },
                     nodes: {
-                        entity_ecosystem: { management_assessment: { narrative: "Dominant AI infrastructure player. Software moat expanding via CUDA." } },
-                        equity_analysis: { valuation_engine: { dcf_model: { intrinsic_share_price: 1150.00, current_price_divergence: "Undervalued by 12%" }, multiples_analysis: { current_pe: 45.2, verdict: "Premium justified by growth" } } },
-                        simulation_engine: { monte_carlo_default_prob: 0.02, quantum_scenarios: [{name: "Supply Chain Shock", impact: "-15% Revenue"}, {name: "AI Regulation", impact: "-5% Revenue"}] },
-                        credit_analysis: { snc_rating_model: { overall_borrower_rating: "Pass", facilities: [{id: "Revolver 2028", type: "Revolving", commitment: "$3.0B", regulatory_rating: "Pass"}] } },
-                        strategic_synthesis: { final_verdict: { recommendation: "BUY", conviction_level: 9, rationale_summary: "Secular AI tailwinds remain intact. Valuation reasonable given PEG ratio." } }
+                        entity_ecosystem: { 
+                            management_assessment: { narrative: "Nvidia remains the undisputed king of AI infrastructure. The software moat (CUDA) is expanding, and the transition to 'Blackwell' architecture is accelerating revenue recognition. Management is effectively navigating export controls." },
+                            catalysts: ["Blackwell B200 Shipments", "Sovereign AI Demand", "Robotics/Edge AI Growth"]
+                        },
+                        equity_analysis: { 
+                            valuation_engine: { 
+                                dcf_model: { intrinsic_share_price: 1150.00, current_price_divergence: "Undervalued by 12%" }, 
+                                multiples_analysis: { current_pe: 45.2, sector_avg_pe: 25.0, verdict: "Premium justified by hyper-growth" } 
+                            },
+                            financial_ratios: { revenue_cagr: "58%", ebitda_margin: "65%", net_leverage: "0.1x" }
+                        },
+                        simulation_engine: { 
+                            monte_carlo_default_prob: 0.005, 
+                            monte_carlo_distribution: [5, 15, 40, 60, 45, 20, 5], // Mock histogram data
+                            quantum_scenarios: [
+                                {name: "Supply Chain Shock (Taiwan)", impact: "-35% Revenue", probability: "Low"},
+                                {name: "US-China Export Ban 2.0", impact: "-10% Revenue", probability: "Medium"},
+                                {name: "AGI Breakthrough", impact: "+50% TAM", probability: "Low"}
+                            ]
+                        },
+                        credit_analysis: { 
+                            snc_rating_model: { 
+                                overall_borrower_rating: "Pass", 
+                                facilities: [
+                                    {id: "RCF-2028", type: "Revolving", commitment: "$3.0B", maturity: "2028", regulatory_rating: "Pass"},
+                                    {id: "Bond-2030", type: "Senior Notes", commitment: "$2.0B", maturity: "2030", regulatory_rating: "Pass"}
+                                ],
+                                covenants: [
+                                    {name: "Max Leverage Ratio", limit: "3.5x", current: "0.1x", status: "Pass"},
+                                    {name: "Interest Coverage", limit: "4.0x", current: "45.0x", status: "Pass"}
+                                ]
+                            } 
+                        },
+                        strategic_synthesis: { 
+                            final_verdict: { recommendation: "BUY", conviction_level: 9, rationale_summary: "Secular AI tailwinds remain intact. Valuation reasonable given PEG ratio < 1.0." },
+                            reasoning_trace: [
+                                {step: "Ingestion", detail: "Parsed 10-K, Earnings Call, and 45 Analyst Notes."},
+                                {step: "Valuation", detail: "DCF Model indicates $1150 intrinsic value based on 30% terminal growth in AI compute."},
+                                {step: "Risk Check", detail: "Geopolitical simulation flagged Taiwan risk, but probability weighted impact is manageable."},
+                                {step: "Conviction", detail: "High conviction due to lack of viable competitors in training inference for next 24 months."}
+                            ]
+                        }
                     }
-                },
-                market_price: 1020.50
+                }
             },
             {
-                id: 2, title: "Tesla Inc (TSLA) Credit Review", date: "2025-10-22",
+                id: "AMC-2025-10",
+                title: "AMC Entertainment (AMC) Credit Review",
+                date: "2025-10-22",
+                sector: "Consumer Cyclical",
+                market_price: 3.50,
+                sentiment_score: -0.4,
+                financials: {
+                    years: ['2022', '2023', '2024', '2025 (E)'],
+                    revenue: [3.9, 4.8, 4.5, 4.2],
+                    ebitda: [-0.1, 0.2, 0.15, 0.1]
+                },
+                v23_knowledge_graph: {
+                    meta: { target: "AMC" },
+                    nodes: {
+                        entity_ecosystem: { 
+                            management_assessment: { narrative: "Company faces secular headwinds in theatrical exhibition and heavy debt load. Dilution strategy has reached diminishing returns." },
+                            catalysts: ["Debt Restructuring", "Blockbuster Slate Q4", "Asset Sales"]
+                        },
+                        equity_analysis: { 
+                            valuation_engine: { 
+                                dcf_model: { intrinsic_share_price: 1.50, current_price_divergence: "Overvalued by 133%" }, 
+                                multiples_analysis: { current_pe: "N/A", sector_avg_pe: 18.0, verdict: "Disconnected from fundamentals" } 
+                            },
+                            financial_ratios: { revenue_cagr: "2%", ebitda_margin: "3%", net_leverage: "12.5x" }
+                        },
+                        simulation_engine: { 
+                            monte_carlo_default_prob: 0.28, 
+                            monte_carlo_distribution: [40, 50, 30, 10, 5, 2, 0], 
+                            quantum_scenarios: [
+                                {name: "Recession (Consumer Pullback)", impact: "-25% EBITDA", probability: "High"},
+                                {name: "Strike Delays", impact: "-15% Revenue", probability: "Medium"},
+                                {name: "Meme Rally 3.0", impact: "+200% Price", probability: "Low"}
+                            ]
+                        },
+                        credit_analysis: { 
+                            snc_rating_model: { 
+                                overall_borrower_rating: "Substandard", 
+                                facilities: [
+                                    {id: "Term Loan B", type: "Term", commitment: "$1.8B", maturity: "2026", regulatory_rating: "Substandard"},
+                                    {id: "2nd Lien", type: "Notes", commitment: "$900M", maturity: "2027", regulatory_rating: "Doubtful"}
+                                ],
+                                covenants: [
+                                    {name: "Min Liquidity", limit: "$100M", current: "$150M", status: "Watch"},
+                                    {name: "Net Leverage", limit: "6.0x", current: "12.5x", status: "Fail"}
+                                ]
+                            } 
+                        },
+                        strategic_synthesis: { 
+                            final_verdict: { recommendation: "SELL", conviction_level: 8, rationale_summary: "Capital structure is unsustainable. Restructuring likely within 18 months." },
+                            reasoning_trace: [
+                                {step: "Credit Analysis", detail: "Leverage at 12.5x is critical. Cash burn continues."},
+                                {step: "Market Check", detail: "Box office trends are below 2019 levels permanently."},
+                                {step: "SNC Rating", detail: "Downgraded to Substandard due to repayment uncertainty."},
+                                {step: "Conclusion", detail: "Equity has high probability of zero in restructuring scenario."}
+                            ]
+                        }
+                    }
+                }
+            },
+            {
+                id: "TSLA-2025-10",
+                title: "Tesla Inc (TSLA) Strategic Analysis",
+                date: "2025-10-20",
+                sector: "Consumer / Tech",
+                market_price: 215.00,
+                sentiment_score: 0.2,
+                financials: {
+                    years: ['2022', '2023', '2024', '2025 (E)'],
+                    revenue: [81.5, 96.8, 105.0, 118.0],
+                    ebitda: [14.7, 13.5, 12.0, 15.5]
+                },
                 v23_knowledge_graph: {
                     meta: { target: "TSLA" },
                     nodes: {
-                        entity_ecosystem: { management_assessment: { narrative: "Margin compression in auto segment. Energy storage growth is the key offset." } },
-                        equity_analysis: { valuation_engine: { dcf_model: { intrinsic_share_price: 180.00, current_price_divergence: "Overvalued by 20%" }, multiples_analysis: { current_pe: 65.0, verdict: "Rich" } } },
-                        simulation_engine: { monte_carlo_default_prob: 0.08, quantum_scenarios: [{name: "Rate Hike +100bps", impact: "-12% Demand"}, {name: "FSD Approval", impact: "+40% Market Cap"}] },
-                        credit_analysis: { snc_rating_model: { overall_borrower_rating: "Pass", facilities: [{id: "Term Loan A", type: "Term", commitment: "$1.5B", regulatory_rating: "Pass"}] } },
-                        strategic_synthesis: { final_verdict: { recommendation: "HOLD", conviction_level: 6, rationale_summary: "Execution risk high on robotaxi rollout. Balance sheet remains healthy." } }
+                        entity_ecosystem: { 
+                            management_assessment: { narrative: "Transition year. Auto margins compressing, but Energy Storage is booming. Robotaxi execution is the binary risk." },
+                            catalysts: ["Model 2 Launch", "FSD Licensing", "Energy Margins"]
+                        },
+                        equity_analysis: { 
+                            valuation_engine: { 
+                                dcf_model: { intrinsic_share_price: 180.00, current_price_divergence: "Overvalued by 19%" }, 
+                                multiples_analysis: { current_pe: 65.0, verdict: "Rich valuation" } 
+                            },
+                            financial_ratios: { revenue_cagr: "15%", ebitda_margin: "13%", net_leverage: "0.0x" }
+                        },
+                        simulation_engine: { 
+                            monte_carlo_default_prob: 0.01, 
+                            monte_carlo_distribution: [2, 8, 20, 50, 40, 10, 5], 
+                            quantum_scenarios: [
+                                {name: "Rate Hike +100bps", impact: "-12% Demand", probability: "Medium"},
+                                {name: "FSD Regulatory Approval", impact: "+$500B Market Cap", probability: "Low"}
+                            ]
+                        },
+                        credit_analysis: { 
+                            snc_rating_model: { 
+                                overall_borrower_rating: "Pass", 
+                                facilities: [
+                                    {id: "ABL Revolver", type: "Revolving", commitment: "$5.0B", maturity: "2028", regulatory_rating: "Pass"}
+                                ],
+                                covenants: [
+                                    {name: "Max Leverage", limit: "N/A", current: "N/A", status: "Pass"}
+                                ]
+                            } 
+                        },
+                        strategic_synthesis: { 
+                            final_verdict: { recommendation: "HOLD", conviction_level: 6, rationale_summary: "Balance sheet is fortress, but growth is slowing in core auto. Wait for better entry." },
+                            reasoning_trace: [
+                                {step: "Financial Review", detail: "Auto gross margins dropped below 16%. Energy is the new growth driver."},
+                                {step: "Valuation", detail: "Stock is pricing in significant AI success which is uncertain."},
+                                {step: "Verdict", detail: "Neutral rating until Robotaxi roadmap is clarified."}
+                            ]
+                        }
                     }
-                },
-                market_price: 215.00
+                }
             }
         ];
 
-        // -- INIT --
-        document.addEventListener('DOMContentLoaded', async () => {
-            if (window.dataManager) {
-                try {
-                    await window.dataManager.init();
-                    reports = window.dataManager.getReports();
-                } catch(e) { reports = FALLBACK_REPORTS; }
-            } else {
-                reports = FALLBACK_REPORTS;
-            }
-            if(!reports || reports.length === 0) reports = FALLBACK_REPORTS;
-
-            renderSidebar(reports);
+        // --- APP LOGIC ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSidebar(ENHANCED_REPORTS);
             
-            // Search Logic
+            // Search Listener
             document.getElementById('report-search').addEventListener('keyup', (e) => {
                 const term = e.target.value.toLowerCase();
-                const filtered = reports.filter(r => r.title.toLowerCase().includes(term));
+                const filtered = ENHANCED_REPORTS.filter(r => 
+                    r.title.toLowerCase().includes(term) || r.id.toLowerCase().includes(term)
+                );
                 renderSidebar(filtered);
             });
         });
+
+        // --- SIMULATION LOGIC ---
+        const SIM_STEPS = [
+            "Connecting to SEC EDGAR database...",
+            "Parsing 10-K filings (245 pages)...",
+            "Extracting Financial Statements (XBRL)...",
+            "Running Monte Carlo Simulation (10,000 paths)...",
+            "Analyzing Credit Covenants...",
+            "Querying Market Sentiment (Bloomberg/Reuters)...",
+            "Synthesizing Strategic Verdict...",
+            "Finalizing Knowledge Graph..."
+        ];
+
+        function startSimulation() {
+            const modal = document.getElementById('sim-modal');
+            const terminal = document.getElementById('sim-terminal');
+            const progress = document.getElementById('sim-progress');
+            
+            modal.classList.remove('hidden');
+            terminal.innerHTML = '> Initializing Meta-Orchestrator...<br>';
+            progress.style.width = '0%';
+            
+            let step = 0;
+            const interval = setInterval(() => {
+                if(step >= SIM_STEPS.length) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        finishSimulation();
+                    }, 800);
+                    return;
+                }
+                
+                terminal.innerHTML += `> ${SIM_STEPS[step]}<br>`;
+                terminal.scrollTop = terminal.scrollHeight;
+                progress.style.width = `${((step + 1) / SIM_STEPS.length) * 100}%`;
+                step++;
+            }, 600);
+        }
+
+        function finishSimulation() {
+            document.getElementById('sim-modal').classList.add('hidden');
+            
+            // Generate Random Report
+            const isBull = Math.random() > 0.5;
+            const newReport = {
+                id: `SYNC-${Math.floor(Math.random() * 1000)}`,
+                title: "Synthetic Corp (SYNC) Auto-Generated",
+                date: new Date().toISOString().split('T')[0],
+                sector: "Industrial / AI",
+                market_price: (Math.random() * 200 + 50).toFixed(2),
+                sentiment_score: isBull ? 0.6 : -0.3,
+                financials: {
+                    years: ['2022', '2023', '2024', '2025 (E)'],
+                    revenue: [100, 120, 150, 180].map(v => v * (0.8 + Math.random() * 0.4)),
+                    ebitda: [20, 30, 45, 60].map(v => v * (0.8 + Math.random() * 0.4))
+                },
+                v23_knowledge_graph: {
+                    meta: { target: "SYNC" },
+                    nodes: {
+                        entity_ecosystem: { 
+                            management_assessment: { narrative: "Automated analysis detects significant momentum in core segments. Supply chain risks are elevated but manageable." },
+                            catalysts: ["New Product Launch", "M&A Rumors"]
+                        },
+                        equity_analysis: { 
+                            valuation_engine: { 
+                                dcf_model: { intrinsic_share_price: isBull ? 350 : 40, current_price_divergence: isBull ? "Undervalued" : "Overvalued" }, 
+                                multiples_analysis: { current_pe: (20 + Math.random() * 20).toFixed(1), sector_avg_pe: 25.0, verdict: isBull ? "Attractive" : "Expensive" } 
+                            },
+                            financial_ratios: { revenue_cagr: "12%", ebitda_margin: "22%", net_leverage: "1.5x" }
+                        },
+                        simulation_engine: { 
+                            monte_carlo_default_prob: Math.random() * 0.1, 
+                            monte_carlo_distribution: [5, 10, 20, 40, 20, 5, 0], 
+                            quantum_scenarios: [
+                                {name: "Global Recession", impact: "-20% Rev", probability: "Medium"},
+                                {name: "Tech Breakthrough", impact: "+40% Rev", probability: "Low"}
+                            ]
+                        },
+                        credit_analysis: { 
+                            snc_rating_model: { 
+                                overall_borrower_rating: isBull ? "Pass" : "Special Mention", 
+                                facilities: [
+                                    {id: "Term Loan A", type: "Term", commitment: "$500M", maturity: "2029", regulatory_rating: isBull ? "Pass" : "Special Mention"}
+                                ],
+                                covenants: [
+                                    {name: "Max Leverage", limit: "4.0x", current: "2.1x", status: "Pass"}
+                                ]
+                            } 
+                        },
+                        strategic_synthesis: { 
+                            final_verdict: { recommendation: isBull ? "BUY" : "HOLD", conviction_level: Math.floor(Math.random() * 4) + 6, rationale_summary: "AI-generated synthesis based on 10,000 simulations." },
+                            reasoning_trace: [
+                                {step: "Data Ingestion", detail: "Processed 1.2GB of structured data."},
+                                {step: "Risk Modeling", detail: "Monte Carlo simulation converged after 10k iterations."},
+                                {step: "Conclusion", detail: "Risk/Reward profile favors long position."}
+                            ]
+                        }
+                    }
+                }
+            };
+
+            ENHANCED_REPORTS.unshift(newReport);
+            renderSidebar(ENHANCED_REPORTS);
+            loadReport(newReport);
+        }
 
         function renderSidebar(list) {
             const container = document.getElementById('report-list');
@@ -296,14 +718,17 @@
             
             list.forEach(r => {
                 const div = document.createElement('div');
-                div.className = "p-3 rounded-lg hover:bg-slate-800 cursor-pointer transition border border-transparent hover:border-slate-700 group mb-1";
+                div.className = "p-3 rounded-lg hover:bg-slate-800 cursor-pointer transition border border-transparent hover:border-slate-700 group mb-2";
                 div.onclick = () => loadReport(r);
                 div.innerHTML = `
                     <div class="flex justify-between items-start mb-1">
                         <span class="font-bold text-xs text-slate-300 group-hover:text-cyan-400 transition truncate w-3/4">${r.title}</span>
-                        <span class="text-[9px] px-1.5 py-0.5 bg-slate-900 rounded text-slate-500 font-mono">V23</span>
+                        <span class="text-[9px] px-1.5 py-0.5 bg-slate-900 rounded text-slate-500 font-mono border border-slate-800">V23</span>
                     </div>
-                    <div class="text-[10px] text-slate-500 font-mono">${r.date || 'N/A'}</div>
+                    <div class="flex justify-between items-center text-[10px] text-slate-500 font-mono">
+                        <span>${r.date}</span>
+                        <span class="${r.sentiment_score > 0 ? 'text-emerald-500' : 'text-red-500'}">${r.sentiment_score > 0 ? 'BULL' : 'BEAR'}</span>
+                    </div>
                 `;
                 container.appendChild(div);
             });
@@ -315,80 +740,144 @@
 
             const kg = report.v23_knowledge_graph || {};
             const nodes = kg.nodes || {};
-            
+            const syn = nodes.strategic_synthesis || {};
+            const verdict = syn.final_verdict || {};
+
             // Header
             document.getElementById('r-title').textContent = report.title;
-            document.getElementById('r-meta').textContent = `Target: ${kg.meta?.target || 'N/A'} | ID: ${report.id}`;
+            document.getElementById('r-type').textContent = "DEEP_DIVE_PROTOCOL_V23.5";
+            document.getElementById('r-meta').textContent = `ID: ${report.id} | ${report.date}`;
+            document.getElementById('r-sector').textContent = report.sector;
             
-            const verdict = nodes.strategic_synthesis?.final_verdict || {};
+            // Conviction
             const rec = verdict.recommendation || "NEUTRAL";
-            document.getElementById('r-conviction').textContent = `${rec} (${verdict.conviction_level || 5}/10)`;
+            document.getElementById('r-conviction').textContent = rec;
             document.getElementById('r-conviction').className = `text-2xl font-bold font-mono ${rec === 'BUY' ? 'text-emerald-400' : (rec === 'SELL' ? 'text-red-500' : 'text-amber-400')}`;
+            document.getElementById('conviction-pill').className = `w-3 h-3 rounded-full shadow-[0_0_10px_rgba(255,255,255,0.3)] ${rec === 'BUY' ? 'bg-emerald-500' : (rec === 'SELL' ? 'bg-red-500' : 'bg-amber-400')}`;
 
-            // Overview
-            document.getElementById('r-summary').textContent = nodes.entity_ecosystem?.management_assessment?.narrative || "No summary available.";
+            // Overview Tab
             document.getElementById('metric-rating').textContent = rec;
+            document.getElementById('metric-rating').className = `text-xl font-bold tracking-tight ${rec === 'BUY' ? 'text-emerald-400' : (rec === 'SELL' ? 'text-red-500' : 'text-amber-400')}`;
             
-            const target = nodes.equity_analysis?.valuation_engine?.price_targets?.base_case;
-            document.getElementById('metric-target').textContent = target ? `$${target}` : "N/A";
+            const target = nodes.equity_analysis?.valuation_engine?.dcf_model?.intrinsic_share_price;
+            document.getElementById('metric-target').textContent = target ? `$${target.toFixed(2)}` : "N/A";
             
             const pd = nodes.simulation_engine?.monte_carlo_default_prob || 0;
             document.getElementById('metric-risk').textContent = (pd * 100).toFixed(2) + "%";
+            document.getElementById('metric-risk').className = `text-xl font-mono ${pd > 0.1 ? 'text-red-400' : 'text-emerald-400'}`;
 
-            // Valuation
+            const sncStatus = nodes.credit_analysis?.snc_rating_model?.overall_borrower_rating || "N/A";
+            document.getElementById('metric-snc').textContent = sncStatus;
+            document.getElementById('metric-snc').className = `text-xl font-mono ${sncStatus === 'Pass' ? 'text-emerald-400' : 'text-red-400'}`;
+
+            document.getElementById('r-summary').textContent = nodes.entity_ecosystem?.management_assessment?.narrative || "No summary available.";
+
+            // Sentiment
+            const score = report.sentiment_score || 0;
+            const sentimentPercent = ((score + 1) / 2) * 100; // Map -1..1 to 0..100
+            document.getElementById('sentiment-bar').style.width = `${sentimentPercent}%`;
+            document.getElementById('sentiment-score').textContent = score.toFixed(2);
+            document.getElementById('sentiment-text').textContent = score > 0.5 ? "Market sentiment is overwhelmingly positive." : (score < -0.2 ? "Market sentiment is fearful." : "Market sentiment is mixed.");
+
+            // Catalysts
+            const catalysts = nodes.entity_ecosystem?.catalysts || [];
+            document.getElementById('r-catalysts').innerHTML = catalysts.length ? catalysts.map(c => `
+                <li class="flex items-start gap-2 text-slate-300"><i class="fas fa-bolt text-yellow-400 mt-0.5"></i> ${c}</li>
+            `).join('') : '<li class="text-slate-500">None</li>';
+
+            // Financials Tab (Chart)
+            document.getElementById('fin-cagr').textContent = nodes.equity_analysis?.financial_ratios?.revenue_cagr || "--";
+            document.getElementById('fin-margin').textContent = nodes.equity_analysis?.financial_ratios?.ebitda_margin || "--";
+            document.getElementById('fin-leverage').textContent = nodes.equity_analysis?.financial_ratios?.net_leverage || "--";
+            
+            renderFinancialsChart(report.financials);
+
+            // Valuation Tab
             const dcf = nodes.equity_analysis?.valuation_engine?.dcf_model || {};
             const intrinsic = dcf.intrinsic_share_price || 0;
-            const market = report.market_price || dcf.market_price || 100;
+            const market = report.market_price || 0;
             const maxVal = Math.max(intrinsic, market) * 1.2;
 
             document.getElementById('val-intrinsic').textContent = `$${intrinsic.toFixed(2)}`;
             document.getElementById('val-market').textContent = `$${market.toFixed(2)}`;
             
-            // Animate Bars
             setTimeout(() => {
                 document.getElementById('bar-intrinsic').style.width = `${(intrinsic / maxVal) * 100}%`;
                 document.getElementById('bar-market').style.width = `${(market / maxVal) * 100}%`;
             }, 100);
 
-            document.getElementById('val-divergence').textContent = dcf.current_price_divergence || "Calculating divergence...";
-
-            // Risk Gauge
-            document.getElementById('risk-score').textContent = (pd * 100).toFixed(1) + "%";
-            document.getElementById('risk-score').style.color = pd > 0.1 ? '#ef4444' : '#10b981';
+            document.getElementById('val-divergence').textContent = dcf.current_price_divergence || "--";
             
-            // Gauge Arc Math
-            const angleRad = Math.PI * (1 - Math.min(pd * 5, 1)); // Scale PD for visual effect
+            const mult = nodes.equity_analysis?.valuation_engine?.multiples_analysis || {};
+            document.getElementById('val-multiples').innerHTML = `
+                <div class="flex justify-between border-b border-slate-700 pb-2"><span>Current P/E</span><span class="font-mono text-white">${mult.current_pe || 'N/A'}</span></div>
+                <div class="flex justify-between border-b border-slate-700 pb-2"><span>Sector Avg P/E</span><span class="font-mono text-slate-400">${mult.sector_avg_pe || 'N/A'}</span></div>
+                <div class="flex justify-between pt-2"><span class="text-cyan-400">Verdict</span><span class="font-bold text-white">${mult.verdict || '--'}</span></div>
+            `;
+
+            // Risk Tab
+            document.getElementById('risk-score').textContent = (pd * 100).toFixed(1) + "%";
+            document.getElementById('risk-score').style.color = pd > 0.05 ? '#ef4444' : '#10b981';
+            
+            const angleRad = Math.PI * (1 - Math.min(pd * 5, 1)); 
             const endX = 100 + 80 * Math.cos(angleRad);
             const endY = 100 - 80 * Math.sin(angleRad);
             document.getElementById('risk-gauge-arc').setAttribute('d', `M 20 100 A 80 80 0 0 1 ${endX} ${endY}`);
-            document.getElementById('risk-gauge-arc').setAttribute('stroke', pd > 0.1 ? '#ef4444' : '#10b981');
+            document.getElementById('risk-gauge-arc').setAttribute('stroke', pd > 0.05 ? '#ef4444' : '#10b981');
 
-            // Scenarios
             const scenarios = nodes.simulation_engine?.quantum_scenarios || [];
             document.getElementById('risk-scenarios').innerHTML = scenarios.map(s => `
                 <div class="flex justify-between items-center p-2 bg-slate-800/30 rounded border border-slate-700/50">
-                    <span class="text-xs text-slate-300">${s.name}</span>
+                    <div class="flex flex-col">
+                        <span class="text-xs text-slate-300 font-bold">${s.name}</span>
+                        <span class="text-[9px] text-slate-500 uppercase">Prob: ${s.probability}</span>
+                    </div>
                     <span class="text-xs font-mono ${s.impact.includes('-') ? 'text-red-400' : 'text-emerald-400'}">${s.impact}</span>
                 </div>
             `).join('');
 
-            // SNC
-            const snc = nodes.credit_analysis?.snc_rating_model || {};
-            document.getElementById('snc-rating').textContent = snc.overall_borrower_rating || "N/A";
+            renderRiskChart(nodes.simulation_engine?.monte_carlo_distribution || []);
+
+            // SNC Tab
+            document.getElementById('snc-rating').textContent = sncStatus;
             const sncBanner = document.getElementById('snc-banner');
-            if(snc.overall_borrower_rating === 'Pass') {
+            if(sncStatus === 'Pass') {
                 sncBanner.className = "p-4 bg-emerald-900/20 border border-emerald-500/30 rounded-lg flex justify-between items-center";
+            } else if (sncStatus === 'Substandard') {
+                sncBanner.className = "p-4 bg-amber-900/20 border border-amber-500/30 rounded-lg flex justify-between items-center";
             } else {
                 sncBanner.className = "p-4 bg-red-900/20 border border-red-500/30 rounded-lg flex justify-between items-center";
             }
 
-            document.getElementById('snc-facilities').innerHTML = (snc.facilities || []).map(f => `
+            const facilities = nodes.credit_analysis?.snc_rating_model?.facilities || [];
+            document.getElementById('snc-facilities').innerHTML = facilities.map(f => `
                 <tr>
-                    <td class="py-2">${f.id}</td>
-                    <td class="py-2 text-slate-500">${f.type || 'N/A'}</td>
-                    <td class="py-2 font-mono">${f.commitment || 'N/A'}</td>
-                    <td class="py-2"><span class="px-1.5 py-0.5 rounded text-[10px] ${f.regulatory_rating === 'Pass' ? 'bg-emerald-900/50 text-emerald-400' : 'bg-red-900/50 text-red-400'}">${f.regulatory_rating}</span></td>
+                    <td class="py-2 pl-2 text-white">${f.id}</td>
+                    <td class="py-2 text-slate-500">${f.type}</td>
+                    <td class="py-2 font-mono">${f.commitment}</td>
+                    <td class="py-2 text-slate-500">${f.maturity}</td>
+                    <td class="py-2"><span class="px-1.5 py-0.5 rounded text-[10px] border ${f.regulatory_rating === 'Pass' ? 'bg-emerald-950 text-emerald-400 border-emerald-800' : 'bg-red-950 text-red-400 border-red-800'}">${f.regulatory_rating}</span></td>
                 </tr>
+            `).join('');
+
+            const covenants = nodes.credit_analysis?.snc_rating_model?.covenants || [];
+            document.getElementById('snc-covenants').innerHTML = covenants.map(c => `
+                <div class="flex justify-between items-center p-2 rounded border ${c.status === 'Pass' ? 'border-emerald-900/50 bg-emerald-900/10' : 'border-red-900/50 bg-red-900/10'}">
+                    <span class="text-xs text-slate-300">${c.name} (Limit: ${c.limit})</span>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-mono text-white">${c.current}</span>
+                        <span class="text-[10px] px-1 rounded ${c.status === 'Pass' ? 'bg-emerald-500 text-black' : 'bg-red-500 text-white'}">${c.status}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            // Synthesis Tab
+            const trace = syn.reasoning_trace || [];
+            document.getElementById('reasoning-trace').innerHTML = trace.map(t => `
+                <div class="trace-node">
+                    <div class="text-xs font-bold text-cyan-400 mb-1 uppercase tracking-wider">${t.step}</div>
+                    <div class="text-sm text-slate-300">${t.detail}</div>
+                </div>
             `).join('');
         }
 
@@ -398,9 +887,75 @@
             
             document.querySelectorAll('button[onclick^="switchTab"]').forEach(btn => {
                 if(btn.getAttribute('onclick').includes(tab)) {
-                    btn.className = "pb-3 tab-active transition focus:outline-none";
+                    btn.className = "pb-3 tab-active transition focus:outline-none whitespace-nowrap";
                 } else {
-                    btn.className = "pb-3 tab-inactive transition focus:outline-none";
+                    btn.className = "pb-3 tab-inactive transition focus:outline-none whitespace-nowrap";
+                }
+            });
+        }
+
+        // --- CHART RENDERING ---
+        function renderFinancialsChart(data) {
+            const ctx = document.getElementById('financialsChart').getContext('2d');
+            if (financialsChartInstance) financialsChartInstance.destroy();
+
+            financialsChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.years,
+                    datasets: [
+                        {
+                            label: 'Revenue ($B)',
+                            data: data.revenue,
+                            backgroundColor: '#22d3ee',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'EBITDA ($B)',
+                            data: data.ebitda,
+                            backgroundColor: '#10b981',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#94a3b8' } } },
+                    scales: {
+                        y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+        }
+
+        function renderRiskChart(distData) {
+            const ctx = document.getElementById('riskChart').getContext('2d');
+            if (riskChartInstance) riskChartInstance.destroy();
+
+            // Simple distribution curve approximation
+            riskChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['-30%', '-20%', '-10%', '0%', '+10%', '+20%', '+30%'],
+                    datasets: [{
+                        label: 'Probability Density',
+                        data: distData.length ? distData : [5, 15, 25, 40, 25, 15, 5],
+                        borderColor: '#f472b6',
+                        backgroundColor: 'rgba(244, 114, 182, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { display: false },
+                        x: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } }
+                    }
                 }
             });
         }
