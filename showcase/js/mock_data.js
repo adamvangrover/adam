@@ -6824,7 +6824,72 @@ window.MOCK_DATA = {
       "last_modified": 0
     }
   ],
-  "agents": [],
+  "agents": [
+    { "id": "A001", "name": "Meta_Orchestrator", "type": "Orchestrator", "status": "ACTIVE", "load": 85, "task": "Coordinating Deep Dive" },
+    { "id": "A002", "name": "Risk_Assessment_Agent", "type": "Analyst", "status": "ACTIVE", "load": 62, "task": "Monte Carlo Simulation" },
+    { "id": "A003", "name": "Red_Team_Agent", "type": "Adversary", "status": "IDLE", "load": 12, "task": "Waiting for simulation results" },
+    { "id": "A004", "name": "Market_Sentiment_Agent", "type": "Analyst", "status": "ACTIVE", "load": 45, "task": "Scraping Bloomberg Terminal" },
+    { "id": "A005", "name": "Regulatory_Compliance_Agent", "type": "Audit", "status": "IDLE", "load": 5, "task": "Standby" },
+    { "id": "A006", "name": "Quantum_Scenario_Agent", "type": "Simulation", "status": "ACTIVE", "load": 92, "task": "Calculating Tail Risk" }
+  ],
+  "reasoning_circuits": {
+    "nodes": [
+      { "id": 1, "label": "Query Ingest", "group": "input" },
+      { "id": 2, "label": "Meta-Orchestrator", "group": "orchestrator" },
+      { "id": 3, "label": "Risk Analyst", "group": "analyst" },
+      { "id": 4, "label": "Market Sentiment", "group": "analyst" },
+      { "id": 5, "label": "Red Team", "group": "critic" },
+      { "id": 6, "label": "Synthesis", "group": "output" }
+    ],
+    "edges": [
+      { "from": 1, "to": 2 },
+      { "from": 2, "to": 3 },
+      { "from": 2, "to": 4 },
+      { "from": 3, "to": 5 },
+      { "from": 4, "to": 5 },
+      { "from": 5, "to": 2, "dashes": true, "label": "Critique" },
+      { "from": 5, "to": 6 },
+      { "from": 3, "to": 6 }
+    ]
+  },
+  "thought_stream": [
+    { "timestamp": "10:42:01", "agent": "Meta_Orchestrator", "type": "info", "message": "Received query: 'Analyze AAPL credit risk'." },
+    { "timestamp": "10:42:02", "agent": "Risk_Assessment_Agent", "type": "analysis", "message": "Fetching 10-K filings from EDGAR." },
+    { "timestamp": "10:42:05", "agent": "Market_Sentiment_Agent", "type": "analysis", "message": "Sentiment analysis on 500+ news articles: Bullish (0.75)." },
+    { "timestamp": "10:42:08", "agent": "Red_Team_Agent", "type": "critique", "message": "Challenge: Have you considered the antitrust lawsuit impact?" },
+    { "timestamp": "10:42:10", "agent": "Risk_Assessment_Agent", "type": "refinement", "message": "Re-calculating risk model with litigation penalty scenario." }
+  ],
+  "entity_graph": {
+    "nodes": [
+      { "id": 1, "label": "Apple Inc.", "group": "target", "value": 20 },
+      { "id": 2, "label": "Foxconn", "group": "supplier", "value": 10 },
+      { "id": 3, "label": "TSMC", "group": "supplier", "value": 15 },
+      { "id": 4, "label": "Samsung", "group": "competitor", "value": 12 },
+      { "id": 5, "label": "Google", "group": "competitor", "value": 12 },
+      { "id": 6, "label": "Qualcomm", "group": "supplier", "value": 8 },
+      { "id": 7, "label": "EU Commission", "group": "regulatory", "value": 15 }
+    ],
+    "edges": [
+      { "from": 2, "to": 1, "label": "Supply Chain" },
+      { "from": 3, "to": 1, "label": "Chip Supply" },
+      { "from": 6, "to": 1, "label": "Modems" },
+      { "from": 4, "to": 1, "label": "Competition" },
+      { "from": 5, "to": 1, "label": "OS Rivalry" },
+      { "from": 7, "to": 1, "label": "Antitrust Probe", "color": "red", "dashes": true }
+    ]
+  },
+  "deep_dive_metrics": {
+    "valuation": {
+      "intrinsic_value": 185.50,
+      "market_price": 172.30,
+      "method": "DCF (5yr)"
+    },
+    "risk": {
+      "monte_carlo_probability": 85,
+      "var_95": 12.4,
+      "beta": 1.15
+    }
+  },
   "reports": [
     {
       "file_name": "geopolitics_market_impact_20250224.json",

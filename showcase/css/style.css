@@ -67,6 +67,52 @@ h1, h2, h3, h4, h5, h6 {
     text-shadow: 0 0 5px rgba(34, 211, 238, 0.5);
 }
 
+.neon-text {
+    color: #22d3ee; /* Cyan 400 */
+    text-shadow: 0 0 8px rgba(34, 211, 238, 0.6);
+}
+
+.neon-border {
+    border-color: #22d3ee;
+    box-shadow: 0 0 8px rgba(34, 211, 238, 0.4);
+}
+
+.cyber-border {
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    position: relative;
+}
+
+.cyber-border::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    border-top: 2px solid #22d3ee;
+    border-right: 2px solid #22d3ee;
+}
+
+.cyber-border::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 20px;
+    height: 20px;
+    border-bottom: 2px solid #22d3ee;
+    border-left: 2px solid #22d3ee;
+}
+
+.pulse-anim {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .5; }
+}
+
 .grid-bg {
     background-image: linear-gradient(rgba(51, 65, 85, 0.1) 1px, transparent 1px),
     linear-gradient(90deg, rgba(51, 65, 85, 0.1) 1px, transparent 1px);

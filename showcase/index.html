@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM System | Mission Control</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <style>
         .stat-card {
@@ -16,7 +17,19 @@
 <body class="h-screen flex flex-col grid-bg">
     <div class="scan-line"></div>
 
-    <!-- Nav will be injected by nav.js -->
+    <!-- Header -->
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a] z-50 shrink-0">
+        <div class="flex items-center gap-4">
+            <button id="nav-toggle" class="text-slate-400 hover:text-white transition">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-cyan-400">v23.5</span> <span class="text-slate-500 font-normal">| Mission Control</span></h1>
+        </div>
+        <div class="flex gap-4 mono text-xs text-slate-400 hidden md:flex">
+             <div>SYSTEM_READY: <span class="text-emerald-400">TRUE</span></div>
+             <div>MODE: <span class="text-cyan-400">LIVE</span></div>
+        </div>
+    </header>
 
     <!-- Main Content -->
     <main class="flex-1 p-6 grid grid-cols-12 gap-6 overflow-y-auto">
@@ -106,6 +119,31 @@
                         Enter Neural Dashboard <span class="ml-2">&rarr;</span>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Additional Links -->
+        <div class="col-span-12 glass-panel rounded p-6 mt-6">
+            <h2 class="text-xl mb-4 font-semibold text-white flex items-center">
+                <span class="w-1 h-6 bg-emerald-500 mr-3 rounded"></span> Platform & Research
+            </h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <a href="#" class="p-3 bg-slate-800 hover:bg-slate-700 rounded border border-slate-700 hover:border-emerald-500 transition text-sm text-center">
+                    <i class="fas fa-chart-line mb-2 text-2xl text-emerald-400 block"></i>
+                    Platform Trading
+                </a>
+                <a href="#" class="p-3 bg-slate-800 hover:bg-slate-700 rounded border border-slate-700 hover:border-emerald-500 transition text-sm text-center">
+                    <i class="fas fa-robot mb-2 text-2xl text-emerald-400 block"></i>
+                    Robo Advisor
+                </a>
+                <a href="#" class="p-3 bg-slate-800 hover:bg-slate-700 rounded border border-slate-700 hover:border-emerald-500 transition text-sm text-center">
+                    <i class="fas fa-flask mb-2 text-2xl text-emerald-400 block"></i>
+                    Research Model Training
+                </a>
+                <a href="#" class="p-3 bg-slate-800 hover:bg-slate-700 rounded border border-slate-700 hover:border-emerald-500 transition text-sm text-center">
+                    <i class="fas fa-cogs mb-2 text-2xl text-emerald-400 block"></i>
+                    Platform Features
+                </a>
             </div>
         </div>
 
