@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM | Reports Library</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <style>
         .report-cover {
@@ -23,12 +24,22 @@
     <div class="scan-line"></div>
 
     <!-- Nav injected by nav.js -->
+     <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 shrink-0">
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="text-slate-400 hover:text-white transition"><i class="fas fa-arrow-left"></i></a>
+            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-amber-400">v23.5</span> <span class="text-slate-500 font-normal">| Reports Library</span></h1>
+        </div>
+        <div class="flex gap-6 font-mono text-xs hidden md:flex">
+             <div>INDEX: <span class="text-emerald-400">SYNCED</span></div>
+             <div>REPORTS: <span class="text-white" id="report-count">--</span></div>
+        </div>
+    </header>
 
     <main class="flex-1 p-6 flex flex-col overflow-hidden">
 
         <div class="flex justify-between items-end mb-6 border-b border-slate-700 pb-4">
             <div>
-                <h2 class="text-3xl font-bold text-white font-mono">REPORTS_LIBRARY</h2>
+                <h2 class="text-3xl font-bold text-white font-mono">INTELLIGENCE_PRODUCTS</h2>
                 <p class="text-slate-400 text-sm mt-1">Archive of generated financial analyses and strategic briefs.</p>
             </div>
 
@@ -44,7 +55,7 @@
             </div>
         </div>
 
-        <div class="flex-1 overflow-y-auto pr-2">
+        <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar">
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8" id="report-grid">
                 <!-- Report cards injected here -->
             </div>
@@ -54,19 +65,19 @@
 
     <!-- Modal for Preview -->
     <div id="preview-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-8">
-        <div class="bg-slate-900 w-full max-w-4xl h-full max-h-[90vh] rounded-lg border border-slate-700 flex flex-col shadow-2xl">
-            <div class="flex justify-between items-center p-4 border-b border-slate-700 bg-slate-800 rounded-t-lg">
+        <div class="bg-slate-900 w-full max-w-4xl h-full max-h-[90vh] rounded-lg border border-slate-700 flex flex-col shadow-2xl glass-panel">
+            <div class="flex justify-between items-center p-4 border-b border-slate-700 bg-slate-800/50 rounded-t-lg">
                 <h3 class="text-xl font-bold text-white font-mono" id="modal-title">Report Preview</h3>
                 <button onclick="closeModal()" class="text-slate-400 hover:text-white text-2xl">&times;</button>
             </div>
-            <div class="flex-1 overflow-y-auto p-8 font-serif text-slate-300 leading-relaxed bg-white/5" id="modal-content">
+            <div class="flex-1 overflow-y-auto p-8 font-serif text-slate-300 leading-relaxed bg-white/5 custom-scrollbar" id="modal-content">
                 <!-- Content -->
             </div>
-            <div class="p-4 border-t border-slate-700 bg-slate-800 rounded-b-lg flex justify-end gap-3">
-                <button class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm font-bold" onclick="closeModal()">Close</button>
-                <button class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-sm font-bold flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    Download PDF
+            <div class="p-4 border-t border-slate-700 bg-slate-800/50 rounded-b-lg flex justify-end gap-3">
+                <button class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm font-bold border border-slate-600" onclick="closeModal()">Close</button>
+                <button class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-sm font-bold flex items-center gap-2 border border-cyan-400" onclick="downloadCurrentReport()">
+                    <i class="fas fa-download"></i>
+                    Download JSON
                 </button>
             </div>
         </div>
@@ -75,7 +86,13 @@
     <script src="js/mock_data.js"></script>
     <script src="js/nav.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        let currentReport = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+             // Fallback to MOCK_DATA but prefer DataManager if available
+            if(window.dataManager) {
+                await window.dataManager.init();
+            }
             renderReports();
         });
 
@@ -83,11 +100,18 @@
             const grid = document.getElementById('report-grid');
             grid.innerHTML = '';
 
-            const reports = window.MOCK_DATA.reports || [];
+            let reports = [];
+            if (window.MOCK_DATA && window.MOCK_DATA.reports) {
+                reports = window.MOCK_DATA.reports;
+            }
 
-            // If mock data is empty, generate some
+            // Update stats
+            const countEl = document.getElementById('report-count');
+            if(countEl) countEl.innerText = reports.length;
+
             if (reports.length === 0) {
-                // ... (fallback generation logic if needed)
+                 grid.innerHTML = '<div class="col-span-full text-center text-slate-500 italic mt-20">No reports found in the archives.</div>';
+                 return;
             }
 
             reports.forEach(r => {
@@ -95,27 +119,32 @@
                 card.className = "report-cover aspect-[3/4] rounded-lg border border-slate-600 p-6 flex flex-col justify-between relative cursor-pointer group";
                 card.onclick = () => openModal(r);
 
-                // Determine type color
+                // Use title or fallback to filename
+                const title = r.title || (r.file_path ? r.file_path.split('/').pop() : "Untitled Report");
+                // Determine type color based on title keywords
                 let typeColor = "text-slate-400 border-slate-500";
-                if(r.title.includes("SNC") || r.file_name.includes("snc")) typeColor = "text-purple-400 border-purple-500";
-                if(r.title.includes("Risk")) typeColor = "text-red-400 border-red-500";
-                if(r.title.includes("Market")) typeColor = "text-emerald-400 border-emerald-500";
+                if(title.includes("SNC") || title.includes("Credit")) typeColor = "text-purple-400 border-purple-500";
+                if(title.includes("Risk") || title.includes("Crisis")) typeColor = "text-red-400 border-red-500";
+                if(title.includes("Market") || title.includes("Trading")) typeColor = "text-emerald-400 border-emerald-500";
+
+                // Summary extraction
+                let summary = r.executive_summary || r.summary || (typeof r.content === 'string' ? r.content.substring(0, 100) + "..." : "Confidential Intelligence Product.");
 
                 card.innerHTML = `
-                    <div class="absolute top-4 right-4 opacity-50 text-6xl font-mono font-bold text-white/5 pointer-events-none">PDF</div>
+                    <div class="absolute top-4 right-4 opacity-50 text-6xl font-mono font-bold text-white/5 pointer-events-none">DOC</div>
 
                     <div>
                         <div class="text-[10px] font-bold uppercase tracking-widest mb-4 border-b pb-2 ${typeColor.split(' ')[1]} ${typeColor.split(' ')[0]} inline-block">
-                            ${r.analyst || 'ADAM v23.5'}
+                            ${r.analyst || 'ADAM ANALYST'}
                         </div>
-                        <h3 class="text-lg font-bold text-white font-mono leading-tight mb-2 group-hover:text-cyan-400 transition">${r.title || r.file_name}</h3>
-                        <p class="text-xs text-slate-400 line-clamp-4">${r.executive_summary || r.summary || "No summary available."}</p>
+                        <h3 class="text-lg font-bold text-white font-mono leading-tight mb-2 group-hover:text-cyan-400 transition break-words">${title}</h3>
+                        <p class="text-xs text-slate-400 line-clamp-4 leading-relaxed">${summary}</p>
                     </div>
 
                     <div class="flex justify-between items-end">
-                        <div class="text-[10px] text-slate-500 font-mono">${r.date || new Date().toISOString().split('T')[0]}</div>
-                        <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-white group-hover:bg-cyan-600 transition shadow-lg">
-                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        <div class="text-[10px] text-slate-500 font-mono">${r.date || new Date().toLocaleDateString()}</div>
+                        <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-white group-hover:bg-cyan-600 transition shadow-lg border border-slate-600">
+                             <i class="fas fa-eye text-xs"></i>
                         </div>
                     </div>
                 `;
@@ -124,25 +153,41 @@
         }
 
         function openModal(report) {
+            currentReport = report;
             document.getElementById('preview-modal').classList.remove('hidden');
-            document.getElementById('modal-title').innerText = report.title || report.file_name;
+            document.getElementById('modal-title').innerText = report.title || (report.file_path ? report.file_path.split('/').pop() : "Report Preview");
 
             const contentDiv = document.getElementById('modal-content');
 
             // Format JSON content nicely
-            let html = `<div class="prose prose-invert max-w-none">`;
+            let html = `<div class="prose prose-invert max-w-none text-sm">`;
+
+            // Metadata block
+            html += `<div class="bg-slate-800/50 p-3 rounded mb-4 border border-slate-700 grid grid-cols-2 gap-2 text-xs font-mono text-slate-400">
+                <div>SOURCE: ${report.file_path || 'Unknown'}</div>
+                <div>DATE: ${report.date || 'N/A'}</div>
+                <div>AUTHOR: ${report.analyst || 'System'}</div>
+                <div>CLASS: UNCLASSIFIED</div>
+            </div>`;
 
             if(report.executive_summary) {
-                html += `<h4>Executive Summary</h4><p>${report.executive_summary}</p>`;
+                html += `<h4 class="text-cyan-400 font-bold uppercase tracking-wider mb-2 mt-4">Executive Summary</h4><p class="mb-4 text-slate-300">${report.executive_summary}</p>`;
             }
 
             if(report.analysis) {
-                 html += `<h4>Detailed Analysis</h4><pre class="bg-slate-900 p-4 rounded text-xs font-mono overflow-x-auto text-emerald-400">${JSON.stringify(report.analysis, null, 2)}</pre>`;
+                 html += `<h4 class="text-cyan-400 font-bold uppercase tracking-wider mb-2 mt-4">Detailed Analysis</h4>
+                 <pre class="bg-[#0b1120] p-4 rounded text-xs font-mono overflow-x-auto text-emerald-400 border border-slate-700 shadow-inner">${JSON.stringify(report.analysis, null, 2)}</pre>`;
             }
 
-            // Fallback to dumping whole object if specific fields missing
+            // Fallback to dumping whole object if specific fields missing, but formatted
             if(!report.executive_summary && !report.analysis) {
-                 html += `<pre class="bg-slate-900 p-4 rounded text-xs font-mono overflow-x-auto text-emerald-400">${JSON.stringify(report, null, 2)}</pre>`;
+                 // Try to see if it's text content
+                 if (report.content && typeof report.content === 'string' && !report.content.startsWith('{')) {
+                     html += `<div class="whitespace-pre-wrap font-mono text-xs text-slate-300">${report.content}</div>`;
+                 } else {
+                     const dump = report.content && typeof report.content === 'string' ? JSON.parse(report.content) : report;
+                     html += `<pre class="bg-[#0b1120] p-4 rounded text-xs font-mono overflow-x-auto text-emerald-400 border border-slate-700 shadow-inner">${JSON.stringify(dump, null, 2)}</pre>`;
+                 }
             }
 
             html += `</div>`;
@@ -151,6 +196,18 @@
 
         function closeModal() {
             document.getElementById('preview-modal').classList.add('hidden');
+            currentReport = null;
+        }
+
+        function downloadCurrentReport() {
+            if(!currentReport) return;
+            const blob = new Blob([JSON.stringify(currentReport, null, 2)], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = (currentReport.title || "report").replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".json";
+            a.click();
+            window.URL.revokeObjectURL(url);
         }
 
         function filterReports(query) {
