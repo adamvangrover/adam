@@ -1,0 +1,42 @@
+{
+  "portfolio_name": "Adam Gold Standard (Dragon Portfolio)",
+  "version": "2.0",
+  "architect_notes": "Based on the Christopher Cole 'Dragon Portfolio' framework. Designed for Stagflation resilience.",
+  "target_allocation": {
+    "secular_equities": {
+      "weight": 0.20,
+      "description": "Global Equities (MSCI World)",
+      "rationale": "Captures human productivity and growth. Essential for 'Boom' cycles.",
+      "ticker_proxy": "VT"
+    },
+    "fixed_income": {
+      "weight": 0.20,
+      "description": "Long-Duration U.S. Treasuries",
+      "rationale": "Hedge against Deflationary Bust. Flight-to-safety asset.",
+      "ticker_proxy": "TLT"
+    },
+    "gold": {
+      "weight": 0.20,
+      "description": "Physical Gold / Gold Trust",
+      "rationale": "Hedge against Fiat Devaluation and negative real rates.",
+      "ticker_proxy": "GLD"
+    },
+    "commodity_trend": {
+      "weight": 0.20,
+      "description": "Trend Following (CTA) on Commodities",
+      "rationale": "Hedge against Inflation/Supply Shocks. Captures sustained moves.",
+      "ticker_proxy": "KMLM"
+    },
+    "long_volatility": {
+      "weight": 0.20,
+      "description": "Long Volatility / Tail Risk",
+      "rationale": "'Crisis Alpha' - Profits from systemic instability and crashes.",
+      "ticker_proxy": "TAIL"
+    }
+  },
+  "rebalancing_rules": {
+    "frequency": "Volatility-Weighted",
+    "threshold": 0.05,
+    "logic": "Rebalance when asset weight drifts > 5% or volatility spikes (Shannon's Demon effect)."
+  }
+}
