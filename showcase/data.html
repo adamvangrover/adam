@@ -7,12 +7,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
+    <!-- Syntax Highlighting -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markdown.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    <!-- Turtle Syntax Support (using similar highlighting) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-turtle.min.js"></script>
 
     <link rel="stylesheet" href="css/style.css">
     <style>
@@ -194,6 +199,7 @@
                     if (['md', 'txt'].includes(ext)) icon = 'fa-file-alt text-blue-400';
                     if (['py', 'js', 'html', 'css'].includes(ext)) icon = 'fa-file-code text-emerald-500';
                     if (['csv', 'xlsx'].includes(ext)) icon = 'fa-file-csv text-green-400';
+                    if (['sh'].includes(ext)) icon = 'fa-terminal text-purple-400';
 
                     return `
                         <div class="tree-node node-content text-slate-400 hover:bg-white/5 truncate" 
@@ -251,7 +257,7 @@
             const codeEl = document.getElementById('code-content');
             
             // Show "Run" button for executable types
-            const ext = path.split('.').pop();
+            const ext = path.split('.').pop().toLowerCase();
             const btnExec = document.getElementById('btn-exec');
             if(['py', 'js', 'sh'].includes(ext)) {
                 btnExec.classList.remove('hidden');
@@ -265,6 +271,9 @@
             else if(ext === 'md') codeEl.classList.add('language-markdown');
             else if(ext === 'py') codeEl.classList.add('language-python');
             else if(ext === 'js') codeEl.classList.add('language-javascript');
+            else if(ext === 'sh') codeEl.classList.add('language-bash');
+            else if(ext === 'ttl') codeEl.classList.add('language-turtle');
+            else if(ext === 'yaml' || ext === 'yml') codeEl.classList.add('language-yaml');
             else codeEl.classList.add('language-none');
 
             // 1. Check if content is already loaded in metadata
@@ -291,11 +300,19 @@
                 content = generateStub(path, ext);
             }
 
-            // Prettify JSON
-            if (ext === 'json') {
+            // Prettify JSON if it's a JSON file
+            if (ext === 'json' || ext === 'jsonl') {
                 try { 
                     if(typeof content === 'object') content = JSON.stringify(content, null, 2);
-                    else content = JSON.stringify(JSON.parse(content), null, 2);
+                    else {
+                        // Check if it's stringified JSON
+                        try {
+                            const parsed = JSON.parse(content);
+                             content = JSON.stringify(parsed, null, 2);
+                        } catch(e) {
+                            // If it fails, maybe it's JSONL or already formatted text, leave as is
+                        }
+                    }
                 } catch(e){}
             }
 
@@ -303,7 +320,7 @@
             codeEl.textContent = content;
             
             // Update Footer
-            const size = (content.length / 1024).toFixed(1) + " KB";
+            const size = ((fileNode.size || content.length) / 1024).toFixed(1) + " KB";
             const date = fileNode.last_modified ? new Date(fileNode.last_modified * 1000).toLocaleDateString() : "N/A";
             document.getElementById('file-meta').textContent = `${size} | Modified: ${date}`;
             document.getElementById('file-type').textContent = ext.toUpperCase();
