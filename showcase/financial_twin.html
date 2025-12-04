@@ -3,441 +3,288 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v23.5 | Financial Digital Twin</title>
+    <title>ADAM | Digital Twin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
-
     <link rel="stylesheet" href="css/style.css">
+
     <style>
-        /* --- Core Theme Overrides --- */
-        body { background-color: #0f172a; font-family: 'Inter', sans-serif; }
-        .mono { font-family: 'JetBrains Mono', monospace; }
-
-        /* CRT Scanline */
-        .scan-line {
-            position: fixed; top: 0; left: 0; width: 100%; height: 4px;
-            background: linear-gradient(to bottom, rgba(16, 185, 129, 0), rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0));
-            opacity: 0.1; animation: scan 8s linear infinite; pointer-events: none; z-index: 9999;
-        }
-        @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
-
-        /* Glass Panels */
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.6);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(51, 65, 85, 0.5);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Ticker Tape Animation */
-        .ticker-wrap { width: 100%; overflow: hidden; background: #0f172a; border-bottom: 1px solid rgba(51,65,85,0.5); }
-        .ticker-content { display: flex; animation: ticker 30s linear infinite; }
-        @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-        .ticker-item { white-space: nowrap; padding: 0 2rem; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #94a3b8; display: flex; align-items: center; }
-
-        /* Contagion Alert Animation */
-        .contagion-alert { animation: flashRed 2s infinite; }
-        @keyframes flashRed {
-            0%, 100% { box-shadow: 0 0 10px rgba(239, 68, 68, 0.1) inset; }
-            50% { box-shadow: 0 0 50px rgba(239, 68, 68, 0.4) inset; }
-        }
-
-        /* Map & Graph Containers */
-        #network-container { width: 100%; height: 100%; background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%); }
-        #world-map svg { width: 100%; height: 100%; }
-        
-        /* Scrollbars */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        .entity-panel { background: rgba(15, 23, 42, 0.9); border-left: 1px solid #334155; }
+        .node-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #94a3b8; }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden text-slate-200">
+<body class="h-screen flex flex-col grid-bg overflow-hidden text-slate-200">
     <div class="scan-line"></div>
-
-    <div class="ticker-wrap h-8 flex items-center z-50">
-        <div class="ticker-content" id="ticker-content">
-            </div>
-    </div>
 
     <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 shrink-0">
         <div class="flex items-center gap-4">
             <a href="index.html" class="text-slate-400 hover:text-white transition"><i class="fas fa-arrow-left"></i></a>
-            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-indigo-400">v23.5</span> <span class="text-slate-500 font-normal">| Financial Digital Twin</span></h1>
+            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-cyan-400">v23.5</span> <span class="text-slate-500 font-normal">| Financial Digital Twin</span></h1>
         </div>
-        <div class="flex items-center gap-4 font-mono text-xs text-slate-400">
-            <div class="flex items-center gap-2 px-3 py-1 bg-slate-800 rounded border border-slate-700">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>LIVE FEED</span>
+        <div class="flex items-center gap-4 text-xs font-mono">
+            <div class="bg-slate-800 border border-slate-700 rounded px-3 py-1 flex items-center gap-2">
+                <span class="text-slate-400">ENTITY:</span>
+                <span class="text-white font-bold">JPMORGAN CHASE & CO.</span>
             </div>
-            <div>NODES: <span class="text-cyan-400" id="node-count">0</span></div>
+            <button class="bg-cyan-900/30 hover:bg-cyan-600 text-cyan-400 hover:text-white border border-cyan-800/50 rounded px-3 py-1 transition" onclick="runSimulation()">
+                <i class="fas fa-play mr-1"></i> Simulate Shock
+            </button>
         </div>
     </header>
 
-    <main class="flex-1 p-4 lg:p-6 overflow-hidden grid grid-cols-12 gap-6 relative z-10">
+    <main class="flex-1 flex overflow-hidden relative">
 
-        <aside class="col-span-12 lg:col-span-2 flex flex-col gap-4 h-full overflow-hidden">
-            <div class="glass-panel p-3 rounded-lg shrink-0">
-                <input type="text" placeholder="Search Entity..." class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono">
+        <!-- Graph Area -->
+        <div id="twin-network" class="flex-1 bg-gradient-to-b from-[#0f172a] to-[#050b14]"></div>
+
+        <!-- Entity Inspector -->
+        <aside class="w-80 entity-panel absolute right-0 top-0 h-full transform transition-transform duration-300 translate-x-full z-20 flex flex-col shadow-2xl" id="inspector">
+            <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/50">
+                <h3 class="font-bold text-white font-mono flex items-center gap-2">
+                    <i class="fas fa-cube text-cyan-400"></i>
+                    <span id="insp-title">Node Details</span>
+                </h3>
+                <button onclick="closeInspector()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
             </div>
-
-            <div class="glass-panel p-0 rounded-lg flex-1 flex flex-col overflow-hidden">
-                <div class="p-3 border-b border-slate-700/50 bg-slate-800/30">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tracked Assets</h3>
-                </div>
-                <div class="flex-1 overflow-y-auto p-2 space-y-1" id="company-list">
-                    </div>
-            </div>
-
-            <div class="glass-panel p-4 rounded-lg shrink-0">
-                <h3 class="text-amber-400 font-bold font-mono uppercase mb-3 text-[10px] tracking-wider">Simulation Engine</h3>
-                <div class="space-y-2">
-                    <button onclick="simulateContagion('supply')" class="w-full p-2 bg-slate-800 hover:bg-slate-700 rounded text-[10px] text-slate-300 border border-slate-600 hover:border-amber-500 transition text-left flex items-center gap-2 group">
-                        <i class="fas fa-truck text-amber-500 group-hover:scale-110 transition"></i> Supply Shock
-                    </button>
-                    <button onclick="simulateContagion('credit')" class="w-full p-2 bg-slate-800 hover:bg-slate-700 rounded text-[10px] text-slate-300 border border-slate-600 hover:border-red-500 transition text-left flex items-center gap-2 group">
-                        <i class="fas fa-chart-down text-red-500 group-hover:scale-110 transition"></i> Credit Default
-                    </button>
-                    <button onclick="resetGraph()" class="w-full py-2 border border-slate-600 text-slate-400 hover:bg-slate-700 rounded text-[10px] transition mt-2">
-                        <i class="fas fa-undo mr-1"></i> Reset
-                    </button>
-                </div>
-            </div>
-        </aside>
-
-        <section class="col-span-12 lg:col-span-7 flex flex-col gap-6 h-full overflow-hidden">
             
-            <div class="glass-panel rounded-lg relative overflow-hidden flex-1 shadow-2xl flex flex-col">
-                <div class="absolute top-4 left-4 z-10 pointer-events-none">
-                    <span class="text-[10px] font-mono bg-slate-900/80 px-2 py-1 rounded text-cyan-400 border border-slate-700">INTERACTIVE TOPOLOGY</span>
-                    <div id="selected-company-overlay" class="mt-1 text-2xl font-bold text-white drop-shadow-md">Select Entity</div>
-                </div>
+            <div class="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-6">
                 
-                <div id="network-container" class="flex-1"></div>
-
-                <div class="absolute bottom-4 left-4 z-10 bg-slate-900/80 p-2 rounded border border-slate-700 text-[10px] flex gap-3 backdrop-blur-sm">
-                    <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-indigo-500"></span> Target</div>
-                    <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-cyan-500"></span> Peer</div>
-                    <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Supplier</div>
-                    <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Risk</div>
-                </div>
-
-                <div class="absolute bottom-4 right-4 z-10 flex flex-col gap-2">
-                    <button class="w-8 h-8 bg-slate-800/80 hover:bg-slate-700 rounded text-slate-300 border border-slate-600 flex items-center justify-center transition" onclick="network.zoomIn()"><i class="fas fa-plus"></i></button>
-                    <button class="w-8 h-8 bg-slate-800/80 hover:bg-slate-700 rounded text-slate-300 border border-slate-600 flex items-center justify-center transition" onclick="network.zoomOut()"><i class="fas fa-minus"></i></button>
-                    <button class="w-8 h-8 bg-slate-800/80 hover:bg-slate-700 rounded text-slate-300 border border-slate-600 flex items-center justify-center transition" onclick="network.fit()"><i class="fas fa-expand"></i></button>
-                </div>
-            </div>
-
-            <div class="glass-panel rounded-lg h-1/3 relative overflow-hidden flex flex-col">
-                <div class="absolute top-2 left-3 z-10">
-                    <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-900/50 px-2 py-0.5 rounded border border-slate-700">Production Geometry</h3>
-                </div>
-                <div id="world-map" class="w-full h-full bg-[#0b1120]"></div>
-            </div>
-
-        </section>
-
-        <aside class="col-span-12 lg:col-span-3 flex flex-col gap-4 h-full overflow-hidden">
-            
-            <div class="glass-panel p-4 rounded-lg border border-slate-700">
-                <h3 class="text-xs text-slate-400 uppercase font-bold mb-2">Live Sentiment</h3>
-                <div class="relative h-24 flex items-center justify-center">
-                    <svg viewBox="0 0 100 50" class="w-full h-full">
-                        <path d="M10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#1e293b" stroke-width="8" stroke-linecap="round"/>
-                        <path d="M10 50 A 40 40 0 0 1 40 16" fill="none" stroke="#6366f1" stroke-width="8" stroke-linecap="round" class="animate-[dash_2s_ease-in-out_infinite_alternate]"/>
-                        <text x="50" y="45" text-anchor="middle" fill="white" font-size="10" font-family="monospace" font-weight="bold">NEUTRAL</text>
-                    </svg>
-                </div>
-            </div>
-
-            <div class="glass-panel p-0 rounded-lg flex-1 flex flex-col overflow-hidden border border-slate-700">
-                <div class="p-3 border-b border-slate-700/50 bg-slate-800/30">
-                    <h3 class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Entity Telemetry</h3>
-                </div>
-                <div id="entity-details" class="flex-1 overflow-y-auto p-4 space-y-4 font-mono text-xs text-slate-400 custom-scrollbar">
-                    <div class="flex flex-col items-center justify-center h-full text-slate-600 opacity-50">
-                        <i class="fas fa-cube text-4xl mb-2"></i>
-                        <p>Select node to analyze</p>
+                <!-- Metrics -->
+                <div>
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 border-b border-slate-700 pb-1">Core Metrics</h4>
+                    <div class="grid grid-cols-2 gap-3" id="insp-metrics">
+                        <!-- Injected -->
                     </div>
                 </div>
-            </div>
 
-            <div class="glass-panel p-0 rounded-lg h-1/3 flex flex-col overflow-hidden border border-slate-700">
-                <div class="p-3 border-b border-slate-700/50 bg-slate-800/30 flex justify-between items-center">
-                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Live Wire</h3>
-                    <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
-                </div>
-                <div class="flex-1 overflow-y-auto p-3 space-y-3 font-mono text-[10px]" id="news-feed">
-                    <div class="text-slate-300 border-l-2 border-emerald-500 pl-2">
-                        <span class="text-slate-500">10:42:01</span><br>
-                        Volume spike detected in APAC region (+12σ).
-                    </div>
-                    <div class="text-slate-300 border-l-2 border-indigo-500 pl-2">
-                        <span class="text-slate-500">10:41:45</span><br>
-                        Supply chain latency nominal (45ms).
-                    </div>
-                    <div class="text-slate-300 border-l-2 border-slate-600 pl-2">
-                        <span class="text-slate-500">10:40:12</span><br>
-                        Routine heartbeat signal received.
+                <!-- Exposure -->
+                <div>
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 border-b border-slate-700 pb-1">Risk Exposure</h4>
+                    <div class="space-y-3" id="insp-risks">
+                        <!-- Injected -->
                     </div>
                 </div>
+
+                <!-- Relationships -->
+                <div>
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 border-b border-slate-700 pb-1">Dependencies</h4>
+                    <ul class="text-xs text-slate-300 space-y-2 font-mono" id="insp-deps">
+                        <!-- Injected -->
+                    </ul>
+                </div>
+
             </div>
 
+            <div class="p-4 border-t border-slate-700 bg-slate-800/50">
+                <button class="w-full bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold py-2 rounded border border-slate-600 transition">
+                    View Full Dossier
+                </button>
+            </div>
         </aside>
+
+        <!-- Controls -->
+        <div class="absolute bottom-6 left-6 flex flex-col gap-2 z-10">
+            <div class="bg-slate-900/80 backdrop-blur border border-slate-700 rounded-lg p-3 w-64">
+                <h4 class="text-xs font-bold text-slate-400 mb-2">Filters</h4>
+                <div class="flex flex-wrap gap-2">
+                    <button class="text-[10px] bg-blue-900/30 text-blue-300 border border-blue-800 rounded px-2 py-1 hover:bg-blue-800/50 transition">Subsidiaries</button>
+                    <button class="text-[10px] bg-red-900/30 text-red-300 border border-red-800 rounded px-2 py-1 hover:bg-red-800/50 transition">Risks</button>
+                    <button class="text-[10px] bg-green-900/30 text-green-300 border border-green-800 rounded px-2 py-1 hover:bg-green-800/50 transition">Assets</button>
+                </div>
+            </div>
+        </div>
 
     </main>
 
-    <script src="js/mock_data.js"></script>
     <script src="js/nav.js"></script>
     <script>
-        // -- 1. Data Mock (Extended) --
-        const mockData = {
-            "NVDA": {
-                name: "Nvidia Corp", industry: "Semiconductors",
-                financials: { revenue: "60.9B", net_income: "29.7B", credit: "AA" },
-                competitors: ["AMD", "INTC", "QCOM"],
-                suppliers: ["TSMC", "Samsung", "Micron", "ASML"],
-                geo_coords: { x: 0.2, y: 0.4 } // Mock map coords
-            },
-            "TSLA": {
-                name: "Tesla Inc", industry: "Automotive",
-                financials: { revenue: "96.7B", net_income: "14.9B", credit: "BBB" },
-                competitors: ["F", "GM", "TM", "BYD", "RIVN"],
-                suppliers: ["Panasonic", "CATL", "LG Chem", "Albemarle"],
-                geo_coords: { x: 0.3, y: 0.5 }
-            },
-            "AAPL": {
-                name: "Apple Inc", industry: "Consumer Electronics",
-                financials: { revenue: "383.3B", net_income: "97.0B", credit: "AAA" },
-                competitors: ["MSFT", "GOOGL", "SAMSUNG"],
-                suppliers: ["Foxconn", "TSMC", "Sony", "Corning"],
-                geo_coords: { x: 0.25, y: 0.45 }
-            },
-            "JPM": {
-                name: "JPMorgan Chase", industry: "Financials",
-                financials: { revenue: "158.1B", net_income: "49.5B", credit: "A+" },
-                competitors: ["BAC", "C", "GS", "MS"],
-                suppliers: ["Fiserv", "Oracle"],
-                geo_coords: { x: 0.7, y: 0.3 }
-            }
-        };
-
-        // -- 2. Global State --
         let network = null;
-        let nodes = new vis.DataSet([]);
-        let edges = new vis.DataSet([]);
-        let currentTicker = null;
-        let isContagionActive = false;
+        let nodes = null;
+        let edges = null;
 
-        // -- 3. Initialization --
         document.addEventListener('DOMContentLoaded', () => {
-            initTicker();
-            initList();
             initGraph();
-            initMap();
-            
-            // Load Default
-            loadEntityGraph("NVDA");
         });
 
-        // -- 4. Components --
-
-        function initTicker() {
-            const items = [
-                { s: 'AAPL', p: '185.00', c: 'text-emerald-400', d: '+1.2%' },
-                { s: 'MSFT', p: '402.10', c: 'text-emerald-400', d: '+0.8%' },
-                { s: 'TSLA', p: '172.50', c: 'text-red-400', d: '-2.1%' },
-                { s: 'NVDA', p: '850.00', c: 'text-emerald-400', d: '+3.5%' },
-                { s: 'BTC', p: '65,400', c: 'text-emerald-400', d: '+1.5%' },
-                { s: 'EUR/USD', p: '1.085', c: 'text-red-400', d: '-0.2%' }
-            ];
-            const content = document.getElementById('ticker-content');
-            // Duplicate for smooth loop
-            const html = items.map(i => `<div class="ticker-item">${i.s} <span class="${i.c} ml-2">${i.p} (${i.d})</span></div>`).join('');
-            content.innerHTML = html + html + html + html; 
-        }
-
-        function initList() {
-            const list = document.getElementById('company-list');
-            list.innerHTML = '';
-            Object.keys(mockData).forEach(ticker => {
-                const comp = mockData[ticker];
-                const div = document.createElement('div');
-                div.className = 'p-2 bg-slate-800/50 hover:bg-slate-700/50 rounded cursor-pointer flex justify-between items-center border-l-2 border-transparent hover:border-indigo-500 transition group mb-1';
-                div.innerHTML = `
-                    <div class="flex items-center gap-2">
-                        <span class="w-6 h-6 rounded bg-slate-700 flex items-center justify-center text-[8px] font-bold text-slate-300 group-hover:bg-indigo-600 transition">${ticker[0]}</span>
-                        <span class="font-bold text-slate-300 group-hover:text-white text-xs font-mono">${ticker}</span>
-                    </div>
-                    <span class="text-[9px] text-slate-500">${comp.industry}</span>
-                `;
-                div.onclick = () => loadEntityGraph(ticker);
-                list.appendChild(div);
-            });
-        }
-
         function initGraph() {
-            const container = document.getElementById('network-container');
-            const data = { nodes: nodes, edges: edges };
+            // Mock Data representing JPM Digital Twin
+            const data = {
+                nodes: [
+                    { id: 1, label: 'JPMORGAN CHASE', group: 'core', value: 50 },
+
+                    // Business Lines
+                    { id: 2, label: 'Consumer & Community', group: 'unit', value: 30 },
+                    { id: 3, label: 'Corporate & Inv. Bank', group: 'unit', value: 35 },
+                    { id: 4, label: 'Asset Management', group: 'unit', value: 25 },
+
+                    // Risks
+                    { id: 10, label: 'Credit Risk', group: 'risk', value: 20 },
+                    { id: 11, label: 'Market Risk', group: 'risk', value: 15 },
+                    { id: 12, label: 'Cyber Threat', group: 'risk', value: 10 },
+
+                    // Assets / Exposures
+                    { id: 20, label: 'CRE Loans', group: 'asset', value: 15 },
+                    { id: 21, label: 'Treasury Sec.', group: 'asset', value: 20 },
+                    { id: 22, label: 'Derivatives', group: 'asset', value: 25 },
+
+                    // Subsidiaries
+                    { id: 30, label: 'Chase Bank NA', group: 'sub', value: 20 },
+                    { id: 31, label: 'JPM Securities', group: 'sub', value: 15 }
+                ],
+                edges: [
+                    { from: 1, to: 2 }, { from: 1, to: 3 }, { from: 1, to: 4 },
+                    { from: 1, to: 30 }, { from: 1, to: 31 },
+                    { from: 3, to: 11 }, { from: 2, to: 10 }, { from: 1, to: 12 },
+                    { from: 2, to: 20 }, { from: 3, to: 22 }, { from: 4, to: 21 }
+                ]
+            };
+
+            const container = document.getElementById('twin-network');
+
+            nodes = new vis.DataSet(data.nodes);
+            edges = new vis.DataSet(data.edges);
+
             const options = {
                 nodes: {
-                    shape: 'dot', size: 20,
+                    shape: 'dot',
                     font: { face: 'JetBrains Mono', color: '#e2e8f0', size: 12 },
-                    borderWidth: 2, shadow: true
+                    borderWidth: 2,
+                    shadow: true
                 },
                 edges: {
-                    width: 1, color: { color: '#475569', highlight: '#6366f1' },
+                    width: 1,
+                    color: { color: '#475569', highlight: '#22d3ee' },
                     smooth: { type: 'continuous' }
                 },
-                physics: {
-                    stabilization: true,
-                    barnesHut: { gravitationalConstant: -3000, springLength: 120, springConstant: 0.05 }
+                groups: {
+                    core: { color: { background: '#0f172a', border: '#22d3ee' }, size: 40 },
+                    unit: { color: { background: '#1e293b', border: '#3b82f6' } },
+                    risk: { color: { background: '#450a0a', border: '#ef4444' }, shape: 'diamond' },
+                    asset: { color: { background: '#064e3b', border: '#10b981' }, shape: 'square' },
+                    sub: { color: { background: '#334155', border: '#94a3b8' } }
                 },
-                interaction: { hover: true, tooltipDelay: 200 }
+                physics: {
+                    stabilization: false,
+                    barnesHut: { gravitationalConstant: -2000, springConstant: 0.04 }
+                },
+                interaction: { hover: true }
             };
-            network = new vis.Network(container, data, options);
+
+            network = new vis.Network(container, { nodes, edges }, options);
 
             network.on("click", function (params) {
                 if (params.nodes.length > 0) {
                     const nodeId = params.nodes[0];
                     const node = nodes.get(nodeId);
-                    if (mockData[node.label]) showDetails(node.label);
+                    openInspector(node);
+                } else {
+                    closeInspector();
                 }
             });
         }
 
-        function initMap() {
-            const width = document.getElementById('world-map').clientWidth || 400;
-            const height = document.getElementById('world-map').clientHeight || 200;
+        function openInspector(node) {
+            const insp = document.getElementById('inspector');
+            insp.classList.remove('translate-x-full');
 
-            const svg = d3.select("#world-map").append("svg")
-                .attr("width", "100%")
-                .attr("height", "100%");
+            document.getElementById('insp-title').innerText = node.label;
 
-            // Mock Grid for "Cyber" look
-            const grid = svg.append("g").attr("class", "grid").attr("opacity", 0.1);
-            for (let x = 0; x < width; x += 30) grid.append("line").attr("x1", x).attr("y1", 0).attr("x2", x).attr("y2", height).attr("stroke", "#38bdf8");
-            for (let y = 0; y < height; y += 30) grid.append("line").attr("x1", 0).attr("y1", y).attr("x2", width).attr("y2", y).attr("stroke", "#38bdf8");
+            // Mock Data Generation based on node type
+            let metricsHtml = '';
+            let riskHtml = '';
 
-            // Mock Data Points
-            const points = [
-                {x: width*0.2, y: height*0.4}, {x: width*0.8, y: height*0.3}, 
-                {x: width*0.5, y: height*0.5}, {x: width*0.3, y: height*0.7}
-            ];
-
-            svg.selectAll("circle")
-                .data(points).join("circle")
-                .attr("cx", d => d.x).attr("cy", d => d.y).attr("r", 3)
-                .attr("fill", "#6366f1").attr("class", "animate-pulse");
-                
-            // Connecting Lines
-            svg.append("line").attr("x1", points[0].x).attr("y1", points[0].y).attr("x2", points[1].x).attr("y2", points[1].y).attr("stroke", "#6366f1").attr("stroke-width", 1).attr("opacity", 0.3);
-        }
-
-        // -- 5. Logic --
-
-        function loadEntityGraph(ticker) {
-            currentTicker = ticker;
-            const data = mockData[ticker];
-            if (!data) return;
-
-            document.getElementById('selected-company-overlay').textContent = `${data.name} (${ticker})`;
-            showDetails(ticker);
-            document.body.classList.remove('contagion-alert');
-            isContagionActive = false;
-
-            nodes.clear();
-            edges.clear();
-
-            // Central Node
-            nodes.add({
-                id: 0, label: ticker, group: 'target',
-                color: { background: '#6366f1', border: '#4f46e5' },
-                size: 30, font: { size: 16, color: '#fff' }
-            });
-
-            // Competitors
-            data.competitors.forEach((comp, i) => {
-                const id = i + 1;
-                nodes.add({ id: id, label: comp, group: 'competitor', color: { background: '#06b6d4', border: '#0891b2' } });
-                edges.add({ from: 0, to: id, dashes: true, color: { opacity: 0.3 } });
-            });
-
-            // Suppliers
-            data.suppliers.forEach((sup, i) => {
-                const id = 100 + i;
-                nodes.add({ id: id, label: sup, group: 'supplier', color: { background: '#10b981', border: '#059669' } });
-                edges.add({ from: id, to: 0, arrows: 'to' });
-            });
-
-            document.getElementById('node-count').innerText = nodes.length;
-            network.fit();
-        }
-
-        function showDetails(ticker) {
-            const data = mockData[ticker];
-            if (!data) return;
-
-            document.getElementById('entity-details').innerHTML = `
-                <div class="mb-4">
-                    <div class="flex justify-between items-end mb-2">
-                        <h4 class="text-white text-lg font-bold">${ticker}</h4>
-                        <span class="text-[10px] text-slate-500 mono">${data.industry}</span>
+            if (node.group === 'unit' || node.group === 'core') {
+                metricsHtml = `
+                    <div class="bg-slate-800 p-2 rounded">
+                        <div class="text-[10px] text-slate-500 uppercase">Revenue (TTM)</div>
+                        <div class="text-sm font-bold text-white font-mono">$${(Math.random()*50).toFixed(1)}B</div>
                     </div>
-                    <div class="space-y-2">
-                        <div class="flex justify-between p-2 bg-slate-800/50 rounded border border-slate-700/50">
-                            <span>Rev</span> <span class="text-emerald-400 font-bold">$${data.financials.revenue}</span>
-                        </div>
-                        <div class="flex justify-between p-2 bg-slate-800/50 rounded border border-slate-700/50">
-                            <span>Net</span> <span class="text-blue-400 font-bold">$${data.financials.net_income}</span>
-                        </div>
-                        <div class="flex justify-between p-2 bg-slate-800/50 rounded border border-slate-700/50">
-                            <span>Credit</span> <span class="text-white font-bold">${data.financials.credit}</span>
-                        </div>
+                    <div class="bg-slate-800 p-2 rounded">
+                        <div class="text-[10px] text-slate-500 uppercase">Employees</div>
+                        <div class="text-sm font-bold text-white font-mono">${(Math.random()*100).toFixed(1)}k</div>
+                    </div>
+                `;
+            } else if (node.group === 'risk') {
+                metricsHtml = `
+                    <div class="bg-slate-800 p-2 rounded">
+                        <div class="text-[10px] text-slate-500 uppercase">VaR (99%)</div>
+                        <div class="text-sm font-bold text-red-400 font-mono">$${(Math.random()*500).toFixed(0)}M</div>
+                    </div>
+                    <div class="bg-slate-800 p-2 rounded">
+                        <div class="text-[10px] text-slate-500 uppercase">Sensitivity</div>
+                        <div class="text-sm font-bold text-white font-mono">High</div>
+                    </div>
+                `;
+            } else {
+                metricsHtml = `
+                    <div class="bg-slate-800 p-2 rounded">
+                        <div class="text-[10px] text-slate-500 uppercase">Value</div>
+                        <div class="text-sm font-bold text-white font-mono">$${(Math.random()*10).toFixed(1)}B</div>
+                    </div>
+                `;
+            }
+            document.getElementById('insp-metrics').innerHTML = metricsHtml;
+
+            // Risks
+            document.getElementById('insp-risks').innerHTML = `
+                <div class="flex items-center justify-between text-xs">
+                    <span class="text-slate-400">Contagion Score</span>
+                    <div class="w-24 bg-slate-700 h-2 rounded-full overflow-hidden">
+                        <div class="bg-amber-500 h-full" style="width: ${Math.random()*100}%"></div>
                     </div>
                 </div>
-                <div>
-                    <h5 class="text-[10px] uppercase font-bold text-slate-500 mb-2">Latest Signals</h5>
-                    <ul class="space-y-1 text-[10px] mono text-slate-400">
-                        <li>▶ 10-K Ingested (Verified)</li>
-                        <li>▶ Sentiment: Neutral</li>
-                        <li>▶ Supply Chain: Stable</li>
-                    </ul>
+                <div class="flex items-center justify-between text-xs">
+                    <span class="text-slate-400">Regulatory Impact</span>
+                    <span class="text-slate-300 font-mono">Medium</span>
                 </div>
             `;
+
+            // Dependencies
+            const connectedIds = network.getConnectedNodes(node.id);
+            let depsHtml = '';
+            connectedIds.forEach(id => {
+                const n = nodes.get(id);
+                depsHtml += `
+                    <li class="flex items-center gap-2">
+                        <i class="fas fa-link text-slate-600 text-[10px]"></i>
+                        <span>${n.label}</span>
+                        <span class="text-[10px] text-slate-500 ml-auto uppercase">${n.group}</span>
+                    </li>
+                `;
+            });
+            document.getElementById('insp-deps').innerHTML = depsHtml;
         }
 
-        function simulateContagion(type) {
-            if (!currentTicker || isContagionActive) return;
-            isContagionActive = true;
-            document.body.classList.add('contagion-alert');
-
-            const allNodes = nodes.get();
-            const allEdges = edges.get();
-
-            if (type === 'supply') {
-                // Find a supplier to fail
-                const supplier = allNodes.find(n => n.group === 'supplier');
-                if(supplier) {
-                    nodes.update({ id: supplier.id, color: { background: '#ef4444', border: '#991b1b' }, size: 25 });
-                    // Target Stress
-                    setTimeout(() => {
-                        nodes.update({ id: 0, color: { background: '#f59e0b', border: '#b45309' } }); // Amber
-                        network.fit({ animation: true });
-                    }, 800);
-                }
-            } else if (type === 'credit') {
-                nodes.update({ id: 0, color: { background: '#ef4444', border: '#991b1b' } });
-            }
+        function closeInspector() {
+            document.getElementById('inspector').classList.add('translate-x-full');
+            network.unselectAll();
         }
 
-        function resetGraph() {
-            if(currentTicker) loadEntityGraph(currentTicker);
+        function runSimulation() {
+            // Visual shockwave
+            const nodeIds = nodes.getIds();
+            const updates = nodeIds.map(id => {
+                const isRisk = nodes.get(id).group === 'risk';
+                return {
+                    id: id,
+                    color: isRisk ? { background: '#ff0000' } : null,
+                    size: isRisk ? 30 : 20
+                };
+            });
+            nodes.update(updates);
+
+            setTimeout(() => {
+                // Revert
+                nodes.update(nodeIds.map(id => ({
+                    id: id,
+                    color: { background: nodes.get(id).group === 'risk' ? '#450a0a' : undefined },
+                    size: nodes.get(id).group === 'core' ? 40 : 20
+                })));
+                alert("Simulation Complete: Stress impact recorded in risk nodes.");
+            }, 1000);
         }
     </script>
 </body>

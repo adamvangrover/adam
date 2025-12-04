@@ -3,31 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM | Reports Library</title>
+    <title>ADAM | Intelligence Library</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <style>
         .report-cover {
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .report-cover::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: var(--primary-color);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
         }
         .report-cover:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(34, 211, 238, 0.3);
-            border-color: #22d3ee;
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 0 15px var(--primary-glow);
+            border-color: var(--primary-color);
+        }
+        .report-cover:hover::before {
+            transform: scaleX(1);
+        }
+        .json-preview {
+            background: #0b1120;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: #a5b4fc;
+            overflow-x: auto;
+            border: 1px solid #334155;
         }
     </style>
 </head>
-<body class="h-screen flex flex-col grid-bg">
+<body class="h-screen flex flex-col grid-bg overflow-hidden text-slate-200">
     <div class="scan-line"></div>
 
-    <!-- Nav injected by nav.js -->
-     <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 shrink-0">
+    <!-- Header -->
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 shrink-0">
         <div class="flex items-center gap-4">
-            <a href="index.html" class="text-slate-400 hover:text-white transition"><i class="fas fa-arrow-left"></i></a>
-            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-amber-400">v23.5</span> <span class="text-slate-500 font-normal">| Reports Library</span></h1>
+            <button id="nav-toggle" class="text-slate-400 hover:text-white transition md:hidden">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-amber-400">v23.5</span> <span class="text-slate-500 font-normal">| Intelligence Library</span></h1>
         </div>
         <div class="flex gap-6 font-mono text-xs hidden md:flex">
              <div>INDEX: <span class="text-emerald-400">SYNCED</span></div>
@@ -35,163 +62,285 @@
         </div>
     </header>
 
-    <main class="flex-1 p-6 flex flex-col overflow-hidden">
+    <main class="flex-1 p-6 flex flex-col overflow-hidden relative">
 
-        <div class="flex justify-between items-end mb-6 border-b border-slate-700 pb-4">
+        <!-- Toolbar -->
+        <div class="flex flex-col md:flex-row justify-between items-end mb-6 border-b border-slate-700/50 pb-4 gap-4">
             <div>
-                <h2 class="text-3xl font-bold text-white font-mono">INTELLIGENCE_PRODUCTS</h2>
-                <p class="text-slate-400 text-sm mt-1">Archive of generated financial analyses and strategic briefs.</p>
+                <h2 class="text-2xl font-bold text-white font-mono flex items-center gap-2">
+                    <i class="fas fa-layer-group text-amber-500"></i> ARTIFACTS
+                </h2>
+                <p class="text-slate-400 text-xs mt-1 font-mono">Archive of generated financial analyses and strategic briefs.</p>
             </div>
 
-            <div class="flex gap-4">
-                <input type="text" placeholder="Search reports..." class="bg-slate-800 border border-slate-700 rounded px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500 w-64" onkeyup="filterReports(this.value)">
-                <select class="bg-slate-800 border border-slate-700 rounded px-4 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
-                    <option>All Types</option>
-                    <option>SNC Analysis</option>
-                    <option>Market Update</option>
-                    <option>Company Profile</option>
-                    <option>Risk Alert</option>
+            <div class="flex gap-4 w-full md:w-auto">
+                <div class="relative flex-1 md:w-64">
+                    <input type="text" id="search-input" placeholder="Search reports..." class="w-full bg-slate-800 border border-slate-700 rounded px-4 py-2 text-xs text-white focus:outline-none focus:border-cyan-500 font-mono transition" onkeyup="filterReports(this.value)">
+                    <i class="fas fa-search absolute right-3 top-2.5 text-slate-500 text-xs pointer-events-none"></i>
+                </div>
+                <select class="bg-slate-800 border border-slate-700 rounded px-4 py-2 text-xs text-slate-300 focus:outline-none focus:border-cyan-500 font-mono transition" onchange="filterType(this.value)">
+                    <option value="ALL">All Classifications</option>
+                    <option value="SNC">SNC Rating</option>
+                    <option value="MARKET">Market Update</option>
+                    <option value="RISK">Risk Assessment</option>
+                    <option value="CRYPTO">Digital Assets</option>
                 </select>
             </div>
         </div>
 
-        <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8" id="report-grid">
+        <!-- Grid -->
+        <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar pb-20">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6" id="report-grid">
                 <!-- Report cards injected here -->
             </div>
         </div>
 
     </main>
 
-    <!-- Modal for Preview -->
-    <div id="preview-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-8">
-        <div class="bg-slate-900 w-full max-w-4xl h-full max-h-[90vh] rounded-lg border border-slate-700 flex flex-col shadow-2xl glass-panel">
-            <div class="flex justify-between items-center p-4 border-b border-slate-700 bg-slate-800/50 rounded-t-lg">
-                <h3 class="text-xl font-bold text-white font-mono" id="modal-title">Report Preview</h3>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-white text-2xl">&times;</button>
+    <!-- Preview Modal -->
+    <div id="preview-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4 md:p-8">
+        <div class="bg-slate-900 w-full max-w-5xl h-full max-h-[90vh] rounded-lg border border-slate-700 flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+
+            <!-- Modal Header -->
+            <div class="flex justify-between items-center p-4 border-b border-slate-700 bg-slate-800/80 rounded-t-lg">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-slate-700 rounded text-amber-400"><i class="fas fa-file-alt"></i></div>
+                    <div>
+                        <h3 class="text-sm font-bold text-white font-mono break-all line-clamp-1" id="modal-title">Report Preview</h3>
+                        <div class="text-[10px] text-slate-400 font-mono" id="modal-meta">ID: -- | DATE: --</div>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button class="text-slate-400 hover:text-white px-3 py-1 hover:bg-slate-700 rounded transition" onclick="toggleViewMode()">
+                        <i class="fas fa-code"></i> / <i class="fas fa-eye"></i>
+                    </button>
+                    <button onclick="closeModal()" class="text-slate-400 hover:text-white px-3 py-1 hover:bg-red-500/20 hover:text-red-400 rounded transition"><i class="fas fa-times"></i></button>
+                </div>
             </div>
-            <div class="flex-1 overflow-y-auto p-8 font-serif text-slate-300 leading-relaxed bg-white/5 custom-scrollbar" id="modal-content">
-                <!-- Content -->
+
+            <!-- Modal Content -->
+            <div class="flex-1 overflow-hidden relative bg-[#0f1115]">
+                <div class="absolute inset-0 overflow-y-auto p-8 custom-scrollbar" id="modal-content-view">
+                    <!-- Rendered View -->
+                </div>
+                <div class="absolute inset-0 overflow-y-auto p-0 custom-scrollbar hidden bg-[#0d1117]" id="modal-json-view">
+                    <pre class="p-4 text-xs font-mono text-emerald-400" id="json-pre">Loading...</pre>
+                </div>
             </div>
-            <div class="p-4 border-t border-slate-700 bg-slate-800/50 rounded-b-lg flex justify-end gap-3">
-                <button class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm font-bold border border-slate-600" onclick="closeModal()">Close</button>
-                <button class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-sm font-bold flex items-center gap-2 border border-cyan-400" onclick="downloadCurrentReport()">
-                    <i class="fas fa-download"></i>
-                    Download JSON
-                </button>
+
+            <!-- Modal Footer -->
+            <div class="p-4 border-t border-slate-700 bg-slate-800/80 rounded-b-lg flex justify-between items-center">
+                <div class="text-[10px] text-slate-500 font-mono hidden md:block">CONFIDENTIAL // INTERNAL USE ONLY</div>
+                <div class="flex gap-3">
+                    <button class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-xs font-bold border border-slate-600 transition font-mono" onclick="closeModal()">CLOSE</button>
+                    <button class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-xs font-bold flex items-center gap-2 border border-cyan-400 transition font-mono shadow-[0_0_15px_rgba(6,182,212,0.3)]" onclick="downloadCurrentReport()">
+                        <i class="fas fa-download"></i> EXPORT JSON
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
     <script src="js/mock_data.js"></script>
+    <script src="js/app.js"></script>
     <script src="js/nav.js"></script>
     <script>
+        let reportsData = [];
         let currentReport = null;
+        let viewMode = 'render'; // 'render' or 'json'
 
-        document.addEventListener('DOMContentLoaded', async () => {
-             // Fallback to MOCK_DATA but prefer DataManager if available
-            if(window.dataManager) {
-                await window.dataManager.init();
-            }
-            renderReports();
+        document.addEventListener('DOMContentLoaded', () => {
+            loadReports();
         });
 
-        function renderReports() {
+        function loadReports() {
+            if (window.MOCK_DATA && window.MOCK_DATA.reports) {
+                reportsData = window.MOCK_DATA.reports;
+            } else {
+                reportsData = [];
+            }
+            document.getElementById('report-count').innerText = reportsData.length;
+            renderGrid(reportsData);
+        }
+
+        function renderGrid(data) {
             const grid = document.getElementById('report-grid');
             grid.innerHTML = '';
 
-            let reports = [];
-            if (window.MOCK_DATA && window.MOCK_DATA.reports) {
-                reports = window.MOCK_DATA.reports;
-            }
-
-            // Update stats
-            const countEl = document.getElementById('report-count');
-            if(countEl) countEl.innerText = reports.length;
-
-            if (reports.length === 0) {
-                 grid.innerHTML = '<div class="col-span-full text-center text-slate-500 italic mt-20">No reports found in the archives.</div>';
+            if (data.length === 0) {
+                 grid.innerHTML = `
+                    <div class="col-span-full flex flex-col items-center justify-center py-20 opacity-50">
+                        <i class="fas fa-folder-open text-4xl text-slate-600 mb-4"></i>
+                        <span class="text-slate-500 font-mono text-xs">No artifacts found in repository.</span>
+                    </div>`;
                  return;
             }
 
-            reports.forEach(r => {
+            data.forEach(r => {
+                // Determine styling based on content
+                const title = r.title || (r.file_path ? r.file_path.split('/').pop() : "Untitled Artifact");
+                let type = "GENERAL";
+                let badgeClass = "badge-slate";
+
+                const titleUpper = title.toUpperCase();
+                if(titleUpper.includes("SNC") || titleUpper.includes("CREDIT")) { type = "CREDIT RISK"; badgeClass = "badge-purple"; }
+                else if(titleUpper.includes("RISK") || titleUpper.includes("CRISIS")) { type = "RISK ALERT"; badgeClass = "badge-red"; }
+                else if(titleUpper.includes("MARKET") || titleUpper.includes("TRADING")) { type = "MARKET INTEL"; badgeClass = "badge-green"; }
+                else if(titleUpper.includes("CRYPTO") || titleUpper.includes("COIN")) { type = "DIGITAL ASSETS"; badgeClass = "badge-amber"; }
+
+                // Extract summary
+                let summary = "No summary available.";
+                if (r.executive_summary) summary = r.executive_summary;
+                else if (r.content && r.content.executive_summary) summary = r.content.executive_summary;
+                else if (r.content && r.content.summary) summary = r.content.summary;
+                else if (typeof r.content === 'string') summary = r.content.substring(0, 150) + "...";
+
+                const date = r.date || (r.content && r.content.date) || new Date().toISOString().split('T')[0];
+                const analyst = r.analyst || (r.content && r.content.analyst) || "System";
+
                 const card = document.createElement('div');
-                card.className = "report-cover aspect-[3/4] rounded-lg border border-slate-600 p-6 flex flex-col justify-between relative cursor-pointer group";
+                card.className = "cyber-card rounded-lg p-5 flex flex-col justify-between h-[300px] cursor-pointer group hover:bg-slate-800/80 transition relative overflow-hidden";
                 card.onclick = () => openModal(r);
 
-                // Use title or fallback to filename
-                const title = r.title || (r.file_path ? r.file_path.split('/').pop() : "Untitled Report");
-                // Determine type color based on title keywords
-                let typeColor = "text-slate-400 border-slate-500";
-                if(title.includes("SNC") || title.includes("Credit")) typeColor = "text-purple-400 border-purple-500";
-                if(title.includes("Risk") || title.includes("Crisis")) typeColor = "text-red-400 border-red-500";
-                if(title.includes("Market") || title.includes("Trading")) typeColor = "text-emerald-400 border-emerald-500";
-
-                // Summary extraction
-                let summary = r.executive_summary || r.summary || (typeof r.content === 'string' ? r.content.substring(0, 100) + "..." : "Confidential Intelligence Product.");
-
                 card.innerHTML = `
-                    <div class="absolute top-4 right-4 opacity-50 text-6xl font-mono font-bold text-white/5 pointer-events-none">DOC</div>
+                    <div class="absolute -right-8 -bottom-8 text-8xl text-white opacity-[0.02] group-hover:opacity-[0.05] transition-opacity -rotate-12 pointer-events-none font-mono font-bold">DOC</div>
 
                     <div>
-                        <div class="text-[10px] font-bold uppercase tracking-widest mb-4 border-b pb-2 ${typeColor.split(' ')[1]} ${typeColor.split(' ')[0]} inline-block">
-                            ${r.analyst || 'ADAM ANALYST'}
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="cyber-badge ${badgeClass}">${type}</span>
+                            <span class="text-[10px] text-slate-500 font-mono">${date}</span>
                         </div>
-                        <h3 class="text-lg font-bold text-white font-mono leading-tight mb-2 group-hover:text-cyan-400 transition break-words">${title}</h3>
-                        <p class="text-xs text-slate-400 line-clamp-4 leading-relaxed">${summary}</p>
+
+                        <h3 class="text-sm font-bold text-white font-mono leading-tight mb-3 group-hover:text-cyan-400 transition line-clamp-2">${title}</h3>
+
+                        <div class="text-[10px] text-slate-400 mb-2 font-mono flex items-center gap-2">
+                            <i class="fas fa-user-circle"></i> ${analyst}
+                        </div>
+
+                        <p class="text-xs text-slate-400 leading-relaxed line-clamp-4 font-sans opacity-80 border-l-2 border-slate-700 pl-3 group-hover:border-cyan-500/50 transition-colors">
+                            ${summary}
+                        </p>
                     </div>
 
-                    <div class="flex justify-between items-end">
-                        <div class="text-[10px] text-slate-500 font-mono">${r.date || new Date().toLocaleDateString()}</div>
-                        <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-white group-hover:bg-cyan-600 transition shadow-lg border border-slate-600">
-                             <i class="fas fa-eye text-xs"></i>
-                        </div>
+                    <div class="pt-4 border-t border-slate-700/50 flex justify-between items-center mt-auto">
+                        <div class="text-[10px] text-slate-500 font-mono uppercase tracking-wider">Confidential</div>
+                        <i class="fas fa-arrow-right text-slate-600 group-hover:text-cyan-400 transition -translate-x-2 group-hover:translate-x-0"></i>
                     </div>
                 `;
                 grid.appendChild(card);
             });
         }
 
+        function filterReports(query) {
+            const lowerQuery = query.toLowerCase();
+            const filtered = reportsData.filter(r => {
+                const title = r.title || "";
+                const contentStr = JSON.stringify(r.content || "");
+                return title.toLowerCase().includes(lowerQuery) || contentStr.toLowerCase().includes(lowerQuery);
+            });
+            renderGrid(filtered);
+        }
+
+        function filterType(type) {
+            if (type === 'ALL') {
+                renderGrid(reportsData);
+                return;
+            }
+            const filtered = reportsData.filter(r => {
+                const title = (r.title || "").toUpperCase();
+                if (type === 'SNC' && (title.includes('SNC') || title.includes('CREDIT'))) return true;
+                if (type === 'RISK' && (title.includes('RISK') || title.includes('CRISIS'))) return true;
+                if (type === 'MARKET' && (title.includes('MARKET') || title.includes('TRADING'))) return true;
+                if (type === 'CRYPTO' && (title.includes('CRYPTO') || title.includes('BITCOIN'))) return true;
+                return false;
+            });
+            renderGrid(filtered);
+        }
+
+        // -- MODAL LOGIC --
+
         function openModal(report) {
             currentReport = report;
-            document.getElementById('preview-modal').classList.remove('hidden');
-            document.getElementById('modal-title').innerText = report.title || (report.file_path ? report.file_path.split('/').pop() : "Report Preview");
+            const modal = document.getElementById('preview-modal');
+            const title = report.title || (report.file_path ? report.file_path.split('/').pop() : "Report Preview");
+            const date = report.date || (report.content && report.content.date) || "Unknown Date";
 
-            const contentDiv = document.getElementById('modal-content');
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-meta').innerText = `ID: ${btoa(title).substring(0,8)} | DATE: ${date}`;
 
-            // Format JSON content nicely
-            let html = `<div class="prose prose-invert max-w-none text-sm">`;
+            // Prepare content
+            const contentObj = report.content || report;
 
-            // Metadata block
-            html += `<div class="bg-slate-800/50 p-3 rounded mb-4 border border-slate-700 grid grid-cols-2 gap-2 text-xs font-mono text-slate-400">
-                <div>SOURCE: ${report.file_path || 'Unknown'}</div>
-                <div>DATE: ${report.date || 'N/A'}</div>
-                <div>AUTHOR: ${report.analyst || 'System'}</div>
-                <div>CLASS: UNCLASSIFIED</div>
-            </div>`;
+            // 1. Rendered View
+            const renderDiv = document.getElementById('modal-content-view');
+            renderDiv.innerHTML = renderReportHTML(contentObj);
 
-            if(report.executive_summary) {
-                html += `<h4 class="text-cyan-400 font-bold uppercase tracking-wider mb-2 mt-4">Executive Summary</h4><p class="mb-4 text-slate-300">${report.executive_summary}</p>`;
+            // 2. JSON View
+            document.getElementById('json-pre').textContent = JSON.stringify(contentObj, null, 2);
+
+            // Show
+            modal.classList.remove('hidden');
+            viewMode = 'render';
+            updateViewModeUI();
+        }
+
+        function renderReportHTML(data) {
+            // Helper to recursively render JSON as nice HTML
+            // If it's a known schema (e.g. from our mock data), format nicely.
+
+            let html = '<div class="prose prose-invert max-w-none text-sm">';
+
+            // Extract common fields for header
+            if (data.title || data.company_name) {
+                html += `<h1 class="text-2xl font-bold text-white mb-2 font-mono">${data.title || data.company_name}</h1>`;
+            }
+            if (data.executive_summary || data.summary) {
+                html += `<div class="bg-slate-800/50 p-4 rounded-l border-l-4 border-cyan-500 mb-6 text-slate-300 italic">
+                    ${data.executive_summary || data.summary}
+                </div>`;
             }
 
-            if(report.analysis) {
-                 html += `<h4 class="text-cyan-400 font-bold uppercase tracking-wider mb-2 mt-4">Detailed Analysis</h4>
-                 <pre class="bg-[#0b1120] p-4 rounded text-xs font-mono overflow-x-auto text-emerald-400 border border-slate-700 shadow-inner">${JSON.stringify(report.analysis, null, 2)}</pre>`;
+            // Generic Iterator for the rest
+            const ignoreKeys = ['title', 'company_name', 'executive_summary', 'summary', 'file_name', 'path'];
+
+            for (const [key, value] of Object.entries(data)) {
+                if (ignoreKeys.includes(key)) continue;
+
+                const label = key.replace(/_/g, ' ').toUpperCase();
+
+                if (typeof value === 'object' && value !== null) {
+                    if (Array.isArray(value)) {
+                        // List
+                        html += `<h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-6 mb-2 border-b border-slate-800 pb-1">${label}</h3>`;
+                        html += `<ul class="list-disc list-inside space-y-1 text-slate-300 pl-2">`;
+                        value.forEach(item => {
+                            if (typeof item === 'object') {
+                                html += `<li class="mb-2"><span class="font-bold text-cyan-400">${item.name || item.metric || ''}</span>: ${item.description || item.value || JSON.stringify(item)}</li>`;
+                            } else {
+                                html += `<li>${item}</li>`;
+                            }
+                        });
+                        html += `</ul>`;
+                    } else {
+                        // Nested Object
+                        html += `<h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-6 mb-2 border-b border-slate-800 pb-1">${label}</h3>`;
+                        html += `<div class="grid grid-cols-1 md:grid-cols-2 gap-4 pl-2">`;
+                        for (const [subKey, subVal] of Object.entries(value)) {
+                            const subLabel = subKey.replace(/_/g, ' ');
+                            let displayVal = subVal;
+                            if (typeof subVal === 'object') displayVal = JSON.stringify(subVal).substring(0,50) + '...';
+                            html += `<div><span class="text-xs text-slate-400 font-mono">${subLabel}:</span> <span class="text-sm text-white">${displayVal}</span></div>`;
+                        }
+                        html += `</div>`;
+                    }
+                } else {
+                    // Primitive
+                    html += `<div class="mt-2"><span class="text-xs text-slate-500 font-mono uppercase mr-2">${label}:</span> <span class="text-white">${value}</span></div>`;
+                }
             }
 
-            // Fallback to dumping whole object if specific fields missing, but formatted
-            if(!report.executive_summary && !report.analysis) {
-                 // Try to see if it's text content
-                 if (report.content && typeof report.content === 'string' && !report.content.startsWith('{')) {
-                     html += `<div class="whitespace-pre-wrap font-mono text-xs text-slate-300">${report.content}</div>`;
-                 } else {
-                     const dump = report.content && typeof report.content === 'string' ? JSON.parse(report.content) : report;
-                     html += `<pre class="bg-[#0b1120] p-4 rounded text-xs font-mono overflow-x-auto text-emerald-400 border border-slate-700 shadow-inner">${JSON.stringify(dump, null, 2)}</pre>`;
-                 }
-            }
-
-            html += `</div>`;
-            contentDiv.innerHTML = html;
+            html += '</div>';
+            return html;
         }
 
         function closeModal() {
@@ -199,26 +348,34 @@
             currentReport = null;
         }
 
-        function downloadCurrentReport() {
-            if(!currentReport) return;
-            const blob = new Blob([JSON.stringify(currentReport, null, 2)], { type: 'application/json' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = (currentReport.title || "report").replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".json";
-            a.click();
-            window.URL.revokeObjectURL(url);
+        function toggleViewMode() {
+            viewMode = viewMode === 'render' ? 'json' : 'render';
+            updateViewModeUI();
         }
 
-        function filterReports(query) {
-            const cards = document.getElementById('report-grid').children;
-            Array.from(cards).forEach(card => {
-                if(card.innerText.toLowerCase().includes(query.toLowerCase())) {
-                    card.classList.remove('hidden');
-                } else {
-                    card.classList.add('hidden');
-                }
-            });
+        function updateViewModeUI() {
+            const renderDiv = document.getElementById('modal-content-view');
+            const jsonDiv = document.getElementById('modal-json-view');
+
+            if (viewMode === 'render') {
+                renderDiv.classList.remove('hidden');
+                jsonDiv.classList.add('hidden');
+            } else {
+                renderDiv.classList.add('hidden');
+                jsonDiv.classList.remove('hidden');
+            }
+        }
+
+        function downloadCurrentReport() {
+            if(!currentReport) return;
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentReport.content || currentReport, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            const filename = (currentReport.title || "report").replace(/[^a-z0-9]/gi, '_').toLowerCase() + ".json";
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", filename);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
         }
     </script>
 </body>
