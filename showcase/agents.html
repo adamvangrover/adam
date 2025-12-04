@@ -3,139 +3,279 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM | Agent Registry</title>
+    <title>ADAM v23.5 | Agent Registry & Control</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <style>
+        /* --- Core Theme Overrides --- */
+        body { background-color: #0f172a; font-family: 'Inter', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* CRT Scanline */
+        .scan-line {
+            position: fixed; top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(to bottom, rgba(16, 185, 129, 0), rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0));
+            opacity: 0.1; animation: scan 8s linear infinite; pointer-events: none; z-index: 9999;
+        }
+        @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
+
+        /* Glass Cards */
         .agent-card {
             background: rgba(30, 41, 59, 0.4);
-            transition: all 0.3s ease;
+            border: 1px solid rgba(51, 65, 85, 0.5);
+            backdrop-filter: blur(12px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .agent-card:hover {
-            background: rgba(30, 41, 59, 0.8);
-            transform: translateY(-5px);
-            border-color: #22d3ee;
-            box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
+            background: rgba(30, 41, 59, 0.6);
+            transform: translateY(-4px);
+            border-color: rgba(34, 211, 238, 0.5); /* Cyan-400 */
+            box-shadow: 0 10px 30px -10px rgba(6, 182, 212, 0.2);
         }
-        .status-dot {
-            height: 8px;
-            width: 8px;
-            border-radius: 50%;
-            display: inline-block;
+
+        /* Logic Modal */
+        .code-block {
+            background: #0a0a0c;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: #a5b4fc;
+            overflow-x: auto;
         }
+
+        /* Slide-up Terminal */
+        .terminal-overlay {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 350px;
+            background: rgba(10, 10, 12, 0.95);
+            border-top: 1px solid #334155;
+            backdrop-filter: blur(10px);
+            z-index: 50;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(100%);
+        }
+        .terminal-overlay.open { transform: translateY(0); }
+
+        /* Utilities */
+        .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
 </head>
-<body class="h-screen flex flex-col grid-bg overflow-hidden">
+<body class="h-screen flex flex-col overflow-hidden text-slate-200">
     <div class="scan-line"></div>
 
-    <!-- Nav injected by nav.js -->
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 shrink-0">
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="text-slate-400 hover:text-white transition"><i class="fas fa-arrow-left"></i></a>
+            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-emerald-400">v23.5</span> <span class="text-slate-500 font-normal">| Agent Registry</span></h1>
+        </div>
+        <div class="flex items-center gap-6 font-mono text-xs">
+            <div class="hidden md:block text-slate-400">AGENTS: <span class="text-white" id="agent-count">--</span></div>
+            <div class="hidden md:block text-slate-400">STATUS: <span class="text-emerald-400">ONLINE</span></div>
+            
+            <button onclick="toggleSettings()" class="text-slate-400 hover:text-cyan-400 transition" title="Runtime Configuration">
+                <i class="fas fa-cog fa-lg"></i>
+            </button>
+        </div>
+    </header>
 
-    <main class="flex-1 p-6 overflow-y-auto">
-
-        <div class="flex justify-between items-end mb-8 border-b border-slate-700 pb-4">
-            <div>
-                <h2 class="text-3xl font-bold text-white font-mono">AGENT_REGISTRY</h2>
-                <p class="text-slate-400 text-sm mt-1">Status and telemetry for autonomous swarms.</p>
+    <main class="flex-1 p-6 overflow-y-auto pb-40">
+        
+        <div class="mb-8 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex gap-2" id="filters">
+                <button class="px-4 py-1.5 rounded-full bg-blue-600/20 border border-blue-500/50 text-blue-400 text-xs font-bold font-mono hover:bg-blue-600/40 transition active-filter" onclick="filter('ALL', this)">ALL</button>
+                <button class="px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition" onclick="filter('Specialist', this)">SPECIALISTS</button>
+                <button class="px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition" onclick="filter('Meta-Agent', this)">META-AGENTS</button>
+                <button class="px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition" onclick="filter('Orchestrator', this)">ORCHESTRATORS</button>
             </div>
-            <div class="flex gap-4">
-                 <div class="text-center">
-                    <div class="text-xs text-slate-500 uppercase">Total Agents</div>
-                    <div class="text-xl font-bold text-white font-mono" id="total-agents">--</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-xs text-slate-500 uppercase">Active</div>
-                    <div class="text-xl font-bold text-emerald-400 font-mono" id="active-agents">--</div>
-                </div>
+            
+            <div class="relative">
+                <input type="text" id="search-agent" placeholder="Search agents..." class="bg-slate-900 border border-slate-700 rounded-lg px-4 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-500 w-64 font-mono transition" onkeyup="handleSearch(this.value)">
+                <i class="fas fa-search absolute right-3 top-2 text-slate-600 text-xs"></i>
             </div>
         </div>
 
-        <!-- Filter Bar -->
-        <div class="flex gap-4 mb-6">
-            <button class="px-4 py-1 rounded bg-slate-800 border border-cyan-500/50 text-cyan-400 text-xs font-bold uppercase hover:bg-slate-700 transition">All Agents</button>
-            <button class="px-4 py-1 rounded bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold uppercase hover:bg-slate-700 transition">Risk</button>
-            <button class="px-4 py-1 rounded bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold uppercase hover:bg-slate-700 transition">Market</button>
-            <button class="px-4 py-1 rounded bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold uppercase hover:bg-slate-700 transition">Meta-Cog</button>
-        </div>
-
-        <!-- Agent Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="agent-grid">
-            <!-- Cards injected via JS -->
+        <div id="agents-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div class="col-span-full flex flex-col items-center justify-center py-20 text-slate-500 animate-pulse">
+                <i class="fas fa-circle-notch fa-spin fa-2x mb-4 text-cyan-500"></i>
+                <span class="font-mono text-sm">Querying Agent Mesh...</span>
+            </div>
         </div>
 
     </main>
 
+    <div id="terminal" class="terminal-overlay flex flex-col font-mono text-sm shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+        <div class="h-10 bg-slate-800 flex items-center justify-between px-4 border-b border-slate-700 cursor-pointer hover:bg-slate-750 transition" onclick="toggleTerminal()">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-terminal text-emerald-400"></i>
+                <span class="text-slate-300 font-bold text-xs" id="terminal-title">SYSTEM CONSOLE</span>
+            </div>
+            <button class="text-slate-400 hover:text-white"><i class="fas fa-chevron-down"></i></button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-4 space-y-1 bg-[#0a0a0c]" id="terminal-output">
+            <div class="text-slate-500">[SYSTEM] Console ready. Select an agent to view telemetry.</div>
+        </div>
+    </div>
+
+    <div id="logic-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-lg shadow-2xl w-full max-w-3xl flex flex-col max-h-[80vh]">
+            <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/50 rounded-t-lg">
+                <h3 class="text-lg font-bold text-white font-mono flex items-center gap-2">
+                    <i class="fas fa-brain text-purple-400"></i> <span id="modal-agent-name">Agent Logic</span>
+                </h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-4 overflow-y-auto flex-1 bg-[#0f1115]">
+                <div class="text-xs text-slate-400 mb-2 font-mono uppercase tracking-widest">System Prompt / Configuration</div>
+                <pre class="code-block" id="modal-content">Loading...</pre>
+            </div>
+            <div class="p-4 border-t border-slate-700 bg-slate-800/50 rounded-b-lg flex justify-end gap-3">
+                <button onclick="copyLogic()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold rounded flex items-center gap-2 transition">
+                    <i class="fas fa-copy"></i> Copy Prompt
+                </button>
+                <button onclick="closeModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-lg shadow-2xl w-full max-w-md p-6">
+            <h2 class="text-xl font-bold text-white mb-4">Runtime Configuration</h2>
+            
+            <div class="mb-4">
+                <label class="block text-xs font-mono text-slate-400 mb-2">OPENAI / LLM API KEY</label>
+                <input type="password" id="api-key-input" class="w-full bg-black border border-slate-700 rounded p-2 text-white text-sm focus:border-emerald-500 outline-none" placeholder="sk-...">
+                <p class="text-[10px] text-slate-500 mt-1">Key is stored in localStorage. Required for live generation.</p>
+            </div>
+
+            <div class="mb-6">
+                <label class="flex items-center cursor-pointer">
+                    <input type="checkbox" id="live-mode-toggle" class="sr-only peer">
+                    <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600 relative"></div>
+                    <span class="ml-3 text-sm font-medium text-slate-300">Enable Live Mode</span>
+                </label>
+            </div>
+
+            <div class="flex justify-end">
+                <button onclick="saveSettings()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-bold text-sm transition">Save & Reload</button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/mock_data.js"></script>
     <script src="js/nav.js"></script>
     <script>
-        const AGENT_TYPES = [
-            { id: "RISK_ASSESS", name: "Risk Assessment Agent", role: "Risk", icon: "R", status: "Active", load: 85 },
-            { id: "SNC_ANALYST", name: "SNC Analyst", role: "Credit", icon: "S", status: "Active", load: 60 },
-            { id: "MARKET_SENT", name: "Market Sentiment", role: "Market", icon: "M", status: "Idle", load: 10 },
-            { id: "META_COG", name: "Meta-Cognitive", role: "System", icon: "C", status: "Active", load: 45 },
-            { id: "REFLECTOR", name: "Reflector Agent", role: "System", icon: "X", status: "Thinking", load: 92 },
-            { id: "PLANNER", name: "Neuro-Sym Planner", role: "System", icon: "P", status: "Active", load: 30 },
-            { id: "ESG_SCAN", name: "ESG Scanner", role: "Market", icon: "E", status: "Idle", load: 5 },
-            { id: "RED_TEAM", name: "Red Team Adversary", role: "Risk", icon: "A", status: "Sleep", load: 0 },
-            { id: "QUANT_SIM", name: "Quantum Simulator", role: "Risk", icon: "Q", status: "Active", load: 99 },
-            { id: "LEGAL_BOT", name: "Legal Compliance", role: "Legal", icon: "L", status: "Idle", load: 12 },
-            { id: "NEWS_BOT", name: "News Ingestor", role: "Market", icon: "N", status: "Active", load: 78 },
-            { id: "CODE_GEN", name: "Code Alchemist", role: "Dev", icon: "D", status: "Idle", load: 0 }
+        // -- STATE --
+        let agents = [];
+        let currentFilter = 'ALL';
+        let searchQuery = '';
+        let terminalInterval;
+
+        // -- FALLBACK DATA (If mock_data.js fails) --
+        const FALLBACK_AGENTS = [
+            { name: "Risk_Architect", type: "Orchestrator", status: "ACTIVE", load: 78, description: "System-wide risk aggregation and routing.", prompt: "You are the Risk Architect. Your goal is to synthesize inputs from all sub-agents..." },
+            { name: "SNC_Analyst", type: "Specialist", status: "ACTIVE", load: 45, description: "Shared National Credit portfolio analysis.", prompt: "Analyze the following loan documents for regulatory compliance..." },
+            { name: "Market_Sentience", type: "Meta-Agent", status: "IDLE", load: 12, description: "Real-time sentiment tracking.", prompt: "Monitor twitter and news feeds for negative sentiment regarding..." },
+            { name: "Red_Team_Lead", type: "Adversarial", status: "SLEEP", load: 0, description: "Scenario injection and stress testing.", prompt: "Simulate a liquidity crisis in the Asian markets..." },
+            { name: "Reflector_Node", type: "Meta-Agent", status: "THINKING", load: 92, description: "Self-correction and output validation.", prompt: "Critique the previous analysis for logical fallacies..." }
         ];
 
+        // -- INIT --
         document.addEventListener('DOMContentLoaded', () => {
-            renderAgents();
-            updateStats();
+            loadAgents();
+            loadSettings();
         });
 
-        function renderAgents() {
-            const grid = document.getElementById('agent-grid');
+        function loadAgents() {
+            // Priority: Window Mock -> Fallback
+            if (window.MOCK_DATA && window.MOCK_DATA.agents && window.MOCK_DATA.agents.length > 0) {
+                agents = window.MOCK_DATA.agents;
+            } else {
+                console.warn("Using Fallback Agent Data");
+                agents = FALLBACK_AGENTS;
+            }
+            
+            document.getElementById('agent-count').innerText = agents.length;
+            renderGrid();
+        }
+
+        // -- RENDERING --
+        function renderGrid() {
+            const grid = document.getElementById('agents-grid');
             grid.innerHTML = '';
 
-            AGENT_TYPES.forEach(agent => {
-                const color = getStatusColor(agent.status);
+            let filtered = agents;
 
+            // Type Filter
+            if (currentFilter !== 'ALL') {
+                filtered = filtered.filter(a => a.type === currentFilter);
+            }
+
+            // Search Filter
+            if (searchQuery) {
+                const q = searchQuery.toLowerCase();
+                filtered = filtered.filter(a => a.name.toLowerCase().includes(q) || (a.description && a.description.toLowerCase().includes(q)));
+            }
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center text-slate-500 py-12 border border-dashed border-slate-800 rounded">No agents found matching "${searchQuery}"</div>`;
+                return;
+            }
+
+            filtered.forEach(agent => {
                 const card = document.createElement('div');
-                card.className = "agent-card rounded-lg p-5 border border-slate-700 flex flex-col relative overflow-hidden";
+                card.className = 'agent-card rounded-xl p-5 relative overflow-hidden group flex flex-col justify-between h-52';
+                
+                // Color Logic
+                let typeColor = "text-blue-400 border-blue-500/30 bg-blue-500/10";
+                if(agent.type === 'Meta-Agent') typeColor = "text-purple-400 border-purple-500/30 bg-purple-500/10";
+                if(agent.type === 'Orchestrator') typeColor = "text-amber-400 border-amber-500/30 bg-amber-500/10";
+                if(agent.type === 'Adversarial') typeColor = "text-red-400 border-red-500/30 bg-red-500/10";
+
+                const statusColor = getStatusColor(agent.status);
+                const icon = getIcon(agent.type);
 
                 card.innerHTML = `
-                    <div class="absolute top-0 right-0 p-2 opacity-10 font-bold text-6xl select-none text-slate-500">${agent.icon}</div>
-
-                    <div class="flex items-center gap-3 mb-4 z-10">
-                        <div class="w-10 h-10 rounded bg-slate-800 flex items-center justify-center font-bold text-xl text-white border border-slate-600 shadow-inner">
-                            ${agent.icon}
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-slate-200 text-sm">${agent.name}</h3>
-                            <div class="text-[10px] text-slate-500 uppercase tracking-wider">${agent.role}</div>
-                        </div>
+                    <div class="absolute -right-4 -top-4 text-8xl text-white opacity-[0.03] group-hover:opacity-[0.06] transition-opacity rotate-12 select-none pointer-events-none">
+                        <i class="fas ${icon}"></i>
                     </div>
 
-                    <div class="flex-1 space-y-3 z-10">
-                        <div>
-                            <div class="flex justify-between text-[10px] text-slate-400 mb-1">
-                                <span>Status</span>
-                                <span class="${color.text} font-bold flex items-center gap-1">
-                                    <span class="status-dot ${color.bg} ${agent.status === 'Active' ? 'animate-pulse' : ''}"></span>
-                                    ${agent.status.toUpperCase()}
-                                </span>
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="text-[10px] font-bold font-mono px-2 py-0.5 rounded border ${typeColor} uppercase tracking-wider">${agent.type}</span>
+                            <div class="flex items-center gap-2 bg-black/20 px-2 py-1 rounded-full border border-white/5">
+                                <span class="status-dot ${statusColor} ${agent.status === 'ACTIVE' || agent.status === 'THINKING' ? 'animate-pulse' : ''}"></span>
+                                <span class="text-[10px] font-mono font-bold text-slate-300">${agent.status}</span>
                             </div>
                         </div>
+                        <h3 class="text-lg font-bold text-white group-hover:text-cyan-400 transition font-mono truncate" title="${agent.name}">${agent.name.replace(/_/g, ' ')}</h3>
+                        <p class="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">${agent.description || 'No description available.'}</p>
+                    </div>
 
-                        <div>
-                            <div class="flex justify-between text-[10px] text-slate-400 mb-1">
-                                <span>Cognitive Load</span>
-                                <span>${agent.load}%</span>
-                            </div>
-                            <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
-                                <div class="bg-blue-500 h-full rounded-full transition-all duration-1000" style="width: ${agent.load}%"></div>
-                            </div>
+                    <div class="relative z-10 mt-auto">
+                        <div class="flex justify-between text-[10px] font-mono text-slate-500 mb-1">
+                            <span>COGNITIVE LOAD</span>
+                            <span class="${agent.load > 80 ? 'text-red-400' : 'text-cyan-400'}">${agent.load}%</span>
                         </div>
-
-                        <div class="pt-3 border-t border-slate-700/50">
-                            <div class="text-[10px] text-slate-500 font-mono">LAST ACTION:</div>
-                            <div class="text-[10px] text-cyan-400/80 truncate font-mono mt-1">
-                                ${generateMockAction(agent.role)}
-                            </div>
+                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-3">
+                            <div class="h-full ${getLoadColor(agent.load)} transition-all duration-1000" style="width: ${agent.load}%"></div>
+                        </div>
+                        
+                        <div class="flex gap-2 border-t border-slate-700/50 pt-3">
+                            <button onclick="viewLogs('${agent.name}')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs py-1.5 rounded border border-slate-700 transition font-mono">
+                                <i class="fas fa-terminal mr-1"></i> LOGS
+                            </button>
+                            <button onclick="viewLogic('${agent.name}')" class="flex-1 bg-blue-900/20 hover:bg-blue-900/40 text-blue-300 text-xs py-1.5 rounded border border-blue-800/50 transition font-mono">
+                                <i class="fas fa-code mr-1"></i> LOGIC
+                            </button>
                         </div>
                     </div>
                 `;
@@ -143,32 +283,143 @@
             });
         }
 
+        // -- LOGIC & HELPERS --
+
+        function filter(type, btn) {
+            currentFilter = type;
+            // Reset styles
+            document.querySelectorAll('#filters button').forEach(b => {
+                b.className = "px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition";
+            });
+            // Set active
+            btn.className = "px-4 py-1.5 rounded-full bg-blue-600/20 border border-blue-500/50 text-blue-400 text-xs font-bold font-mono hover:bg-blue-600/40 transition active-filter";
+            renderGrid();
+        }
+
+        function handleSearch(val) {
+            searchQuery = val;
+            renderGrid();
+        }
+
         function getStatusColor(status) {
-            switch(status) {
-                case 'Active': return { text: 'text-emerald-400', bg: 'bg-emerald-500' };
-                case 'Thinking': return { text: 'text-purple-400', bg: 'bg-purple-500' };
-                case 'Idle': return { text: 'text-slate-400', bg: 'bg-slate-500' };
-                case 'Sleep': return { text: 'text-slate-600', bg: 'bg-slate-700' };
-                default: return { text: 'text-slate-400', bg: 'bg-slate-500' };
+            switch(status?.toUpperCase()) {
+                case 'ACTIVE': return 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]';
+                case 'THINKING': return 'bg-purple-500 shadow-[0_0_8px_rgba(168,85,247,0.6)]';
+                case 'IDLE': return 'bg-amber-500';
+                default: return 'bg-slate-600';
             }
         }
 
-        function generateMockAction(role) {
-            const actions = {
-                'Risk': ['Calculating VaR...', 'Scanning credit default swaps...', 'Simulating crash scenario...'],
-                'Market': ['Parsing Reuters feed...', 'Detecting sentiment shift...', 'Updating price targets...'],
-                'System': ['Optimizing graph traversal...', 'Garbage collecting...', 'Re-planning execution path...'],
-                'Legal': ['Checking SEC filings...', 'Verifying covenant clauses...'],
-                'Dev': ['Generating unit tests...', 'Refactoring async loop...']
-            };
-            const list = actions[role] || ['Processing...'];
-            return list[Math.floor(Math.random() * list.length)] + " [" + (Math.random() * 200).toFixed(0) + "ms]";
+        function getLoadColor(load) {
+            if (load > 80) return 'bg-red-500';
+            if (load > 50) return 'bg-amber-400';
+            return 'bg-cyan-500';
         }
 
-        function updateStats() {
-            document.getElementById('total-agents').textContent = AGENT_TYPES.length;
-            document.getElementById('active-agents').textContent = AGENT_TYPES.filter(a => a.status === 'Active' || a.status === 'Thinking').length;
+        function getIcon(type) {
+            if(type === 'Orchestrator') return 'fa-network-wired';
+            if(type === 'Adversarial') return 'fa-skull-crossbones';
+            if(type === 'Meta-Agent') return 'fa-brain';
+            return 'fa-robot';
         }
+
+        // -- MODALS & TERMINAL --
+
+        function viewLogs(agentName) {
+            const terminal = document.getElementById('terminal');
+            const output = document.getElementById('terminal-output');
+            
+            document.getElementById('terminal-title').innerText = `CONSOLE: ${agentName.toUpperCase()}`;
+            terminal.classList.add('open');
+            output.innerHTML = '';
+
+            if (terminalInterval) clearInterval(terminalInterval);
+
+            const logs = [
+                `[SYSTEM] Connecting to ${agentName} telemetry stream...`,
+                `[AUTH] Handshake successful (Token: 0x8F2A...)`,
+                `[INIT] Loading runtime environment v23.5...`,
+                `[STATE] Context window: 128k | Memory Usage: 45MB`,
+                `[INFO] Listening for task queue events...`,
+                `[READY] Agent is online and awaiting instructions.`
+            ];
+
+            let i = 0;
+            terminalInterval = setInterval(() => {
+                if (i >= logs.length) {
+                    clearInterval(terminalInterval);
+                    const prompt = document.createElement('div');
+                    prompt.className = "text-emerald-400 mt-2";
+                    prompt.innerHTML = `root@adam:${agentName.toLowerCase()}# <span class="animate-pulse">_</span>`;
+                    output.appendChild(prompt);
+                    return;
+                }
+                const div = document.createElement('div');
+                div.className = "text-xs font-mono text-slate-400 mb-1";
+                const time = new Date().toISOString().split('T')[1].split('.')[0];
+                let color = 'text-slate-300';
+                if(logs[i].includes('[READY]')) color = 'text-emerald-400';
+                if(logs[i].includes('[SYSTEM]')) color = 'text-blue-400';
+                
+                div.innerHTML = `<span class="text-slate-600 mr-2">[${time}]</span> <span class="${color}">${logs[i]}</span>`;
+                output.appendChild(div);
+                output.scrollTop = output.scrollHeight;
+                i++;
+            }, 150);
+        }
+
+        function toggleTerminal() {
+            document.getElementById('terminal').classList.toggle('open');
+        }
+
+        function viewLogic(agentName) {
+            const agent = agents.find(a => a.name === agentName);
+            const promptText = agent?.prompt || agent?.system_prompt || "No explicit system prompt definition found in registry.";
+            
+            document.getElementById('modal-agent-name').innerText = agentName;
+            document.getElementById('modal-content').innerText = promptText;
+            document.getElementById('logic-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('logic-modal').classList.add('hidden');
+        }
+
+        function copyLogic() {
+            const content = document.getElementById('modal-content').innerText;
+            navigator.clipboard.writeText(content).then(() => {
+                const btn = document.querySelector('#logic-modal button i.fa-copy').parentNode;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = `<i class="fas fa-check"></i> Copied!`;
+                setTimeout(() => btn.innerHTML = originalText, 2000);
+            });
+        }
+
+        // -- SETTINGS --
+        function toggleSettings() {
+            document.getElementById('settings-modal').classList.toggle('hidden');
+        }
+
+        function loadSettings() {
+            const key = localStorage.getItem('adam_api_key');
+            const live = localStorage.getItem('adam_live_mode') === 'true';
+            
+            if(key) document.getElementById('api-key-input').value = key;
+            document.getElementById('live-mode-toggle').checked = live;
+        }
+
+        function saveSettings() {
+            const key = document.getElementById('api-key-input').value;
+            const live = document.getElementById('live-mode-toggle').checked;
+            
+            localStorage.setItem('adam_api_key', key);
+            localStorage.setItem('adam_live_mode', live);
+            
+            toggleSettings();
+            // Optional: Reload logic to switch data sources
+            if(live) alert("Live Mode Enabled. The system will now attempt to poll the backend API.");
+        }
+
     </script>
 </body>
 </html>
