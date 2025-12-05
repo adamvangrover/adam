@@ -15,7 +15,8 @@ const MarketData = React.lazy(() => import('./MarketData'));
 const AnalysisTools = React.lazy(() => import('./AnalysisTools'));
 const PortfolioManagement = React.lazy(() => import('./PortfolioManagement'));
 const Simulations = React.lazy(() => import('./Simulations'));
-const KnowledgeGraph = React.lazy(() => import('./KnowledgeGraph'));
+// const KnowledgeGraph = React.lazy(() => import('./KnowledgeGraph'));
+const NeuralDashboard = React.lazy(() => import('./components/dashboard/NeuralDashboard'));
 
 function App() {
   const { t } = useTranslation();
@@ -55,7 +56,7 @@ function App() {
                 <Route path="/analysis" element={<AnalysisTools />} />
                 <Route path="/portfolios" element={<PortfolioManagement />} />
                 <Route path="/simulations" element={<Simulations />} />
-                <Route path="/knowledge-graph" element={<KnowledgeGraph />} />
+                <Route path="/knowledge-graph" element={<NeuralDashboard />} />
                 <Route path="/agents" element={<AgentRegistry />} />
                 <Route path="/intel" element={<IntelFeed />} />
             </Routes>

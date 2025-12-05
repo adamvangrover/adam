@@ -112,23 +112,20 @@ def create_app(config_name='default'):
 
 
     # Initialize the core components
+    global meta_orchestrator
     if app.config['CORE_INTEGRATION']:
         sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-        try:
-            from core.system.agent_orchestrator import AgentOrchestrator
-            from core.engine.meta_orchestrator import MetaOrchestrator
+        from core.utils.config_utils import load_app_config
+        from core.system.agent_orchestrator import AgentOrchestrator
+        from core.system.knowledge_base import KnowledgeBase
+        from core.system.data_manager import DataManager
+        from core.engine.meta_orchestrator import MetaOrchestrator
 
-            # Initialize Legacy Orchestrator
-            agent_orchestrator = AgentOrchestrator()
-
-            # Initialize Meta Orchestrator (v23 Brain)
-            meta_orchestrator = MetaOrchestrator(legacy_orchestrator=agent_orchestrator)
-            print("Adam v23 Core Integration Initialized.")
-
-        except Exception as e:
-            print(f"Failed to initialize Core Integration: {e}")
-            agent_orchestrator = None
-            meta_orchestrator = None
+        core_config = load_app_config()
+        knowledge_base = KnowledgeBase(core_config)
+        data_manager = DataManager(core_config)
+        agent_orchestrator = AgentOrchestrator(core_config, knowledge_base, data_manager)
+        meta_orchestrator = MetaOrchestrator(legacy_orchestrator=agent_orchestrator)
 
     # ---------------------------------------------------------------------------- #
     # API Endpoints
@@ -138,32 +135,36 @@ def create_app(config_name='default'):
     def hello_world():
         return 'Hello, World!'
 
-    @app.route('/api/adaptive/query', methods=['POST'])
-    async def adaptive_query():
-        """
-        Routes a query through the v23 MetaOrchestrator.
-        """
-        if not app.config['CORE_INTEGRATION'] or not meta_orchestrator:
-             return jsonify({'error': 'Adaptive System Core not initialized'}), 503
-
+    @app.route('/api/v23/analyze', methods=['POST'])
+    def run_v23_analysis():
         data = request.get_json()
         query = data.get('query')
-        context = data.get('context', {})
-
         if not query:
-            return jsonify({'error': 'Query is required'}), 400
+             return jsonify({'error': 'No query provided'}), 400
 
-        try:
-            # Execute async route
-            result = await meta_orchestrator.route_request(query, context)
+        if app.config['CORE_INTEGRATION'] and meta_orchestrator:
+             import asyncio
+             try:
+                 # Ensure we have an event loop
+                 try:
+                     loop = asyncio.get_event_loop()
+                 except RuntimeError:
+                     loop = asyncio.new_event_loop()
+                     asyncio.set_event_loop(loop)
 
-            # If the result is a Pydantic model (like HyperDimensionalKnowledgeGraph), dump it
-            if hasattr(result, 'model_dump'):
-                return jsonify(result.model_dump(by_alias=True))
+                 if loop.is_running():
+                      # If we are already in a loop (e.g. uvicorn/hypercorn), handle differently
+                      # But Flask dev server is threaded.
+                      future = asyncio.run_coroutine_threadsafe(meta_orchestrator.route_request(query), loop)
+                      result = future.result()
+                 else:
+                      result = loop.run_until_complete(meta_orchestrator.route_request(query))
 
-            return jsonify(result)
-        except Exception as e:
-            return jsonify({'error': str(e)}), 500
+                 return jsonify(result)
+             except Exception as e:
+                 return jsonify({'error': str(e)}), 500
+        else:
+             return jsonify({'status': 'Mock Result', 'analysis': 'Core not integrated or MetaOrchestrator not ready.'})
 
     # ---------------------------------------------------------------------------- #
     # Agent Endpoints
