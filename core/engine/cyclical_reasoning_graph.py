@@ -11,7 +11,10 @@ suitable for the v23 graph architecture.
 import json
 import logging
 import random
-import numpy as np
+try:
+    import numpy as np
+except ImportError:
+    np = None
 from typing import Literal, Dict, Any, List, Optional
 from langgraph.graph import StateGraph, END, START
 from langgraph.checkpoint.memory import MemorySaver
