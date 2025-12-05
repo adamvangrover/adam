@@ -258,3 +258,28 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ```
 ```
+
+## ⚡ Modernization & Optimization (v23.5+)
+
+As part of the 2025 Strategic Technical Modernization, the following high-performance components have been added:
+
+*   **Modern Build System:** `pyproject.toml` and `uv` support for hermetic builds.
+*   **Optimization Service:** A dedicated stateful microservice (`src/adam/api`) providing "Optimizer as a Service" via FastAPI and Redis.
+*   **State-of-the-Art Optimizers:**
+    *   **AdamW:** Decoupled Weight Decay.
+    *   **Lion:** Evolved Sign Momentum (Google ADK).
+    *   **Adam-mini:** Memory-efficient block-wise optimization (2025 Frontier).
+
+### Quick Start (Modern Stack)
+
+1.  **Build with Docker:**
+    ```bash
+    docker build -f Dockerfile.modern -t adam-optimizer .
+    ```
+
+2.  **Run the API:**
+    ```bash
+    docker run -p 8000:8000 -e REDIS_URL=redis://host.docker.internal:6379/0 adam-optimizer
+    ```
+
+For details, see [Modernization Report](docs/modernization_report.md).
