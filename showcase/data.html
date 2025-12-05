@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM | Codex</title>
+    <title>ADAM | Data Vault</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
@@ -18,15 +18,33 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markdown.min.js"></script>
 
     <link rel="stylesheet" href="css/style.css">
     <style>
-        body { background-color: #050b14; } /* Deep space black */
-        .glass-panel {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(51, 65, 85, 0.5);
+        :root {
+            --bg-dark: #050b14;
+            --panel-bg: rgba(15, 23, 42, 0.7);
+            --cyan-glow: 0 0 10px rgba(34, 211, 238, 0.3);
+            --border-color: rgba(51, 65, 85, 0.5);
         }
+        body { background-color: var(--bg-dark); }
+
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* File Tree */
         .file-tree-item {
             cursor: pointer;
             padding: 2px 8px;
@@ -41,78 +59,79 @@
             display: flex;
             align-items: center;
         }
-        .file-tree-item:hover {
-            color: #38bdf8;
-            background: rgba(56, 189, 248, 0.05);
+        .file-tree-item:hover { color: #38bdf8; background: rgba(56, 189, 248, 0.05); }
+        .file-tree-item.active { color: #22d3ee; background: rgba(34, 211, 238, 0.1); border-right: 2px solid #22d3ee; }
+        .file-tree-item.folder { color: #94a3b8; font-weight: bold; }
+
+        /* Code/Notebook View */
+        #code-view-container {
+            background-color: #0d1117;
+            background-image: radial-gradient(#1f2937 1px, transparent 1px);
+            background-size: 20px 20px;
         }
-        .file-tree-item.active {
-            color: #22d3ee;
-            background: rgba(34, 211, 238, 0.1);
-            border-right: 2px solid #22d3ee;
+        .notebook-cell {
+            border: 1px solid transparent;
+            transition: border-color 0.2s;
         }
-        .file-tree-item.folder {
-            color: #94a3b8;
-            font-weight: bold;
+        .notebook-cell:hover {
+            border-color: #1f2937;
+        }
+        .notebook-cell.focused {
+            border-left: 2px solid #22d3ee;
+            background: rgba(15, 23, 42, 0.5);
         }
 
-        #graph-container {
-            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
-        }
-
-        /* Overlay */
-        .code-overlay {
-            position: absolute;
-            top: 0; right: 0; bottom: 0;
-            width: 0;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(20px);
-            border-left: 1px solid #334155;
-            transition: width 0.3s ease-in-out;
-            overflow: hidden;
-            z-index: 50;
-            display: flex;
-            flex-direction: column;
-        }
-        .code-overlay.open {
-            width: 600px;
-        }
-
+        /* Scanline */
         .scan-line {
             position: fixed; top: 0; left: 0; width: 100%; height: 2px;
             background: linear-gradient(to right, transparent, rgba(34, 211, 238, 0.5), transparent);
-            animation: scan 4s linear infinite; pointer-events: none; z-index: 9999; opacity: 0.3;
+            animation: scan 6s linear infinite; pointer-events: none; z-index: 9999; opacity: 0.2;
         }
         @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
+
+        /* Chat Panel */
+        .chat-bubble {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(71, 85, 105, 0.4);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            margin-bottom: 8px;
+            max-width: 85%;
+        }
+        .chat-bubble.user { align-self: flex-end; background: rgba(6, 182, 212, 0.15); border-color: rgba(6, 182, 212, 0.3); color: #a5f3fc; }
+        .chat-bubble.ai { align-self: flex-start; color: #e2e8f0; }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
     </style>
 </head>
 <body class="h-screen flex flex-col overflow-hidden text-slate-300 font-sans selection:bg-cyan-500/30">
     <div class="scan-line"></div>
 
     <!-- Header -->
-    <header class="h-14 border-b border-slate-800 flex items-center justify-between px-6 bg-[#0f172a]/80 backdrop-blur-md z-40 shrink-0">
+    <header class="h-14 border-b border-slate-800 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 shrink-0">
         <div class="flex items-center gap-4">
             <a href="index.html" class="text-slate-500 hover:text-cyan-400 transition"><i class="fas fa-chevron-left"></i></a>
             <div class="flex flex-col">
-                <h1 class="text-sm font-bold tracking-widest uppercase text-slate-200">System <span class="text-cyan-400">Codex</span></h1>
-                <span class="text-[10px] text-slate-500 font-mono tracking-tighter">REPOSITORY_VULNERABILITY_SCAN_ACTIVE</span>
+                <h1 class="text-sm font-bold tracking-widest uppercase text-slate-200">ADAM | <span class="text-cyan-400 text-shadow-glow">DATA VAULT</span></h1>
+                <span class="text-[10px] text-slate-500 font-mono tracking-tighter">SECURE_ARCHIVE_ACCESS // V23.5</span>
             </div>
         </div>
 
-        <div class="flex items-center gap-4">
-            <div class="relative group">
-                <input type="text" id="global-search" placeholder="Search Codex..."
-                    class="bg-slate-900/50 border border-slate-700 rounded-full px-4 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-cyan-500 w-64 transition-all focus:w-80 font-mono"
-                    onkeyup="handleSearch(this.value)">
-                <i class="fas fa-search absolute right-3 top-2 text-slate-600 text-xs"></i>
+        <div class="flex items-center gap-6">
+            <!-- Mode Switcher -->
+            <div class="flex bg-slate-900 rounded-lg p-1 border border-slate-700">
+                <button onclick="setViewMode('code')" id="btn-mode-code" class="px-3 py-1 rounded text-[10px] font-bold uppercase transition bg-slate-700 text-cyan-400">Code</button>
+                <button onclick="setViewMode('graph')" id="btn-mode-graph" class="px-3 py-1 rounded text-[10px] font-bold uppercase text-slate-500 hover:text-slate-300 transition">Graph</button>
+                <button onclick="setViewMode('notebook')" id="btn-mode-notebook" class="px-3 py-1 rounded text-[10px] font-bold uppercase text-slate-500 hover:text-slate-300 transition">Notebook</button>
             </div>
 
-            <div class="h-6 w-px bg-slate-800 mx-2"></div>
+            <div class="h-6 w-px bg-slate-800"></div>
 
-            <div class="flex gap-2 text-[10px] font-mono text-slate-500">
-                <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Python</div>
-                <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-yellow-500"></span> JS</div>
-                <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span> JSON</div>
-                <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-slate-500"></span> Doc</div>
+            <div class="flex items-center gap-3 text-xs text-cyan-500 font-mono">
+                <span class="animate-pulse">●</span> SYSTEM ONLINE
             </div>
         </div>
     </header>
@@ -120,186 +139,186 @@
     <!-- Main Content -->
     <main class="flex-1 flex overflow-hidden relative">
 
-        <!-- Sidebar: File Tree -->
-        <aside class="w-80 bg-[#0b1120] border-r border-slate-800 flex flex-col shrink-0 z-20">
+        <!-- Left: File Explorer -->
+        <aside class="w-72 bg-[#0b1120] border-r border-slate-800 flex flex-col shrink-0 z-20 transition-all duration-300" id="file-sidebar">
             <div class="p-3 border-b border-slate-800/50 flex justify-between items-center">
-                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">File System</span>
-                <span class="text-[10px] font-mono text-slate-600" id="file-count">Scanning...</span>
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider"><i class="fas fa-sitemap mr-2"></i>Repository</span>
+                <span class="text-[10px] font-mono text-slate-600" id="file-count">Loading...</span>
+            </div>
+            <div class="p-2 border-b border-slate-800/50">
+                <input type="text" placeholder="Filter files..." class="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-[10px] text-slate-300 focus:border-cyan-500 outline-none transition" onkeyup="filterTree(this.value)">
             </div>
             <div class="flex-1 overflow-y-auto custom-scrollbar p-2" id="file-tree-container">
                 <!-- Tree Injected Here -->
             </div>
-            <div class="p-2 border-t border-slate-800/50 text-[10px] text-slate-600 font-mono text-center">
-                /root/adam_v23_core/
-            </div>
         </aside>
 
-        <!-- Center: Graph Visualization -->
-        <section class="flex-1 relative bg-slate-950 overflow-hidden" id="graph-container">
-            <div id="network" class="w-full h-full"></div>
+        <!-- Center: Content Area -->
+        <section class="flex-1 relative flex flex-col overflow-hidden" id="center-panel">
             
-            <!-- Floating Controls -->
-            <div class="absolute bottom-6 left-6 flex gap-2 z-10">
-                <button onclick="network.fit({animation:true})" class="p-2 bg-slate-900/80 hover:bg-cyan-900/50 text-slate-400 hover:text-cyan-400 rounded border border-slate-700 backdrop-blur transition">
-                    <i class="fas fa-compress"></i>
-                </button>
-                <button onclick="togglePhysics()" class="p-2 bg-slate-900/80 hover:bg-cyan-900/50 text-slate-400 hover:text-cyan-400 rounded border border-slate-700 backdrop-blur transition" id="physics-btn">
-                    <i class="fas fa-snowflake"></i>
-                </button>
-            </div>
-
-            <!-- Graph Stats -->
-            <div class="absolute top-4 left-4 pointer-events-none">
-                <div class="text-xs font-mono text-slate-500">NODES: <span class="text-slate-300" id="stat-nodes">0</span></div>
-                <div class="text-xs font-mono text-slate-500">EDGES: <span class="text-slate-300" id="stat-edges">0</span></div>
-            </div>
-        </section>
-
-        <!-- Right: Code/Detail Overlay -->
-        <div class="code-overlay" id="detail-panel">
-            <div class="h-10 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-4 shrink-0">
-                <div class="flex items-center gap-2 overflow-hidden">
-                    <i class="fas fa-file-code text-cyan-500 text-xs"></i>
-                    <span class="text-xs font-mono text-cyan-400 truncate" id="detail-filename">filename.py</span>
+            <!-- Views -->
+            <div id="view-graph" class="absolute inset-0 bg-slate-950 hidden">
+                <div id="network" class="w-full h-full"></div>
+                <!-- Graph Controls -->
+                <div class="absolute bottom-6 right-6 flex gap-2 z-10">
+                    <button onclick="network.fit({animation:true})" class="p-2 bg-slate-900/80 text-slate-400 hover:text-cyan-400 rounded border border-slate-700 backdrop-blur"><i class="fas fa-compress"></i></button>
                 </div>
-                <button onclick="closeDetail()" class="text-slate-500 hover:text-white transition"><i class="fas fa-times"></i></button>
             </div>
 
-            <div class="p-4 bg-slate-900/50 border-b border-slate-800 flex gap-4 text-[10px] font-mono text-slate-400 shrink-0">
-                <div>SIZE: <span class="text-slate-200" id="detail-size">-- KB</span></div>
-                <div>LINES: <span class="text-slate-200" id="detail-lines">--</span></div>
-                <div>TYPE: <span class="text-slate-200" id="detail-type">PYTHON</span></div>
-            </div>
+            <div id="view-code" class="absolute inset-0 flex flex-col bg-[#0d1117]">
+                <!-- File Tab Bar -->
+                <div class="h-9 bg-[#010409] border-b border-slate-800 flex items-center px-2 gap-2 overflow-x-auto custom-scrollbar" id="tab-bar">
+                    <!-- Tabs go here -->
+                    <div class="px-3 py-1.5 bg-[#0d1117] border-t-2 border-cyan-500 text-xs text-slate-200 flex items-center gap-2 rounded-t shrink-0">
+                        <i class="fas fa-file-code text-cyan-600"></i> <span id="active-filename">Welcome</span>
+                    </div>
+                </div>
 
-            <div class="flex-1 overflow-auto custom-scrollbar bg-[#0d1117] p-4 relative group">
-                <pre class="text-xs font-mono m-0"><code id="detail-code" class="language-python">
-# Loading preview...
-# Only logic structure is available for large files.
-                </code></pre>
+                <!-- Code Editor/Viewer -->
+                <div class="flex-1 overflow-auto custom-scrollbar relative">
+                    <div class="absolute inset-0 p-4" id="code-content-wrapper">
+                        <pre class="text-sm font-mono m-0" style="background: transparent;"><code id="main-code-block" class="language-python">
+# ADAM v23.5 Data Vault
+# Select a file from the explorer to view its contents.
+# Toggle 'Graph' mode to see relationships.
+# Toggle 'Notebook' mode for interactive execution.
+                        </code></pre>
+                    </div>
+                </div>
 
-                <div class="absolute inset-0 flex items-center justify-center pointer-events-none" id="preview-placeholder">
-                    <div class="text-center">
-                        <i class="fas fa-lock text-4xl text-slate-800 mb-2"></i>
-                        <p class="text-xs text-slate-600 font-mono">CONTENT SECURED</p>
+                <!-- Status Bar -->
+                <div class="h-6 bg-[#010409] border-t border-slate-800 flex items-center justify-between px-3 text-[10px] text-slate-500 font-mono">
+                    <div class="flex gap-4">
+                        <span id="status-lines">Ln 1, Col 1</span>
+                        <span id="status-encoding">UTF-8</span>
+                        <span id="status-type">Python</span>
+                    </div>
+                    <div class="flex gap-2 items-center">
+                        <i class="fas fa-check text-green-500"></i> Saved
                     </div>
                 </div>
             </div>
 
-            <div class="p-3 border-t border-slate-800 bg-slate-900/80 shrink-0">
-                <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-2">Imports / Dependencies</h4>
-                <div class="flex flex-wrap gap-1" id="detail-imports">
+            <div id="view-notebook" class="absolute inset-0 flex flex-col bg-[#0d1117] hidden overflow-auto custom-scrollbar p-8">
+                <div class="max-w-4xl mx-auto w-full space-y-6" id="notebook-container">
+                    <!-- Cells injected here -->
+                    <div class="text-center mt-20 opacity-50">
+                        <i class="fas fa-book-open text-4xl mb-4 text-slate-600"></i>
+                        <p>Select a Python file or Notebook (.ipynb) to view in interactive mode.</p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Right: Neural Link / Assistant -->
+        <aside class="w-80 bg-[#0b1120] border-l border-slate-800 flex flex-col shrink-0 z-30 transform transition-transform duration-300 translate-x-0" id="assistant-panel">
+            <!-- Tabs -->
+            <div class="flex border-b border-slate-800">
+                <button class="flex-1 py-2 text-[10px] font-bold uppercase text-cyan-400 border-b-2 border-cyan-500 bg-slate-900/50">Neural Link</button>
+                <button class="flex-1 py-2 text-[10px] font-bold uppercase text-slate-500 hover:text-slate-300">Controls</button>
+            </div>
+
+            <!-- Chat Area -->
+            <div class="flex-1 flex flex-col overflow-hidden">
+                <div class="flex-1 overflow-y-auto custom-scrollbar p-4 flex flex-col gap-2" id="chat-history">
+                    <div class="chat-bubble ai">
+                        <div class="flex items-center gap-2 mb-1 text-cyan-500 font-bold text-[9px] uppercase tracking-wider">
+                            <i class="fas fa-robot"></i> ADAM v23.5
+                        </div>
+                        Greetings. I am connected to the repository context. Select a file to analyze logic, explain code, or simulate execution.
+                    </div>
+                </div>
+
+                <!-- Input -->
+                <div class="p-3 border-t border-slate-800 bg-slate-900/50">
+                    <div class="relative">
+                        <textarea id="chat-input" rows="2" placeholder="Ask about the selected code..."
+                            class="w-full bg-[#050b14] border border-slate-700 rounded-lg p-2 pr-8 text-xs text-slate-300 focus:border-cyan-500 outline-none resize-none custom-scrollbar"></textarea>
+                        <button onclick="sendMessage()" class="absolute right-2 bottom-2 text-cyan-500 hover:text-cyan-300"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Context Info -->
+            <div class="p-3 border-t border-slate-800 bg-slate-900/80">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">Active Context</span>
+                    <span class="text-[9px] px-1.5 py-0.5 bg-green-900/30 text-green-400 border border-green-800 rounded">LIVE</span>
+                </div>
+                <div class="text-[10px] font-mono text-slate-400 truncate" id="context-file">No file selected</div>
+                <div class="mt-2 flex gap-1 flex-wrap" id="context-tags">
                     <!-- Badges -->
                 </div>
             </div>
-        </div>
+        </aside>
 
     </main>
 
     <!-- Data Source -->
-    <script src="js/mock_data.js"></script>
     <script src="js/repo_data.js"></script>
 
     <script>
         // --- GLOBALS ---
+        let currentView = 'code';
+        let currentNode = null;
         let network = null;
-        let physicsEnabled = true;
-        let repoData = window.REPO_DATA || { nodes: [], edges: [], tree: {} };
         let nodesDS, edgesDS;
+        const repoData = window.REPO_DATA || { nodes: [], edges: [], tree: {} };
 
         // --- INIT ---
         document.addEventListener('DOMContentLoaded', () => {
-            initGraph();
             initTree();
             updateStats();
+
+            // Default view
+            setViewMode('code');
         });
 
-        // --- GRAPH LOGIC ---
-        function initGraph() {
-            const container = document.getElementById('network');
+        // --- VIEW MANAGEMENT ---
+        function setViewMode(mode) {
+            currentView = mode;
 
-            // Prepare Data
-            nodesDS = new vis.DataSet(repoData.nodes);
-            edgesDS = new vis.DataSet(repoData.edges);
-
-            const options = {
-                nodes: {
-                    shape: 'dot',
-                    font: { face: 'JetBrains Mono', color: '#94a3b8', size: 10, strokeWidth: 0 },
-                    borderWidth: 0,
-                    scaling: { min: 5, max: 30, label: { enabled: false } }, // Scale node size by 'value'
-                },
-                edges: {
-                    width: 0.5,
-                    color: { color: '#334155', opacity: 0.5 },
-                    smooth: { type: 'continuous', roundness: 0.2 },
-                    selectionWidth: 2
-                },
-                groups: {
-                    root: { color: '#f59e0b', size: 30 },
-                    folder: { color: '#475569', size: 10 },
-                    py: { color: '#3b82f6' }, // Blue
-                    js: { color: '#eab308' }, // Yellow
-                    json: { color: '#22c55e' }, // Green
-                    md: { color: '#94a3b8' }, // Grey
-                    html: { color: '#f97316' }, // Orange
-                    css: { color: '#ec4899' }, // Pink
-                    txt: { color: '#64748b' }
-                },
-                physics: {
-                    stabilization: { iterations: 200 }, // Pre-stabilize
-                    barnesHut: {
-                        gravitationalConstant: -20000,
-                        springLength: 100,
-                        springConstant: 0.01
-                    },
-                    maxVelocity: 50,
-                    minVelocity: 0.1
-                },
-                interaction: { hover: true, tooltipDelay: 200, hideEdgesOnDrag: true }
-            };
-
-            network = new vis.Network(container, { nodes: nodesDS, edges: edgesDS }, options);
-
-            // Events
-            network.on("click", (params) => {
-                if(params.nodes.length > 0) {
-                    selectNode(params.nodes[0]);
+            // Buttons
+            ['code', 'graph', 'notebook'].forEach(m => {
+                const btn = document.getElementById(`btn-mode-${m}`);
+                if (m === mode) {
+                    btn.className = "px-3 py-1 rounded text-[10px] font-bold uppercase transition bg-slate-700 text-cyan-400 shadow-lg shadow-cyan-900/20";
                 } else {
-                    closeDetail();
+                    btn.className = "px-3 py-1 rounded text-[10px] font-bold uppercase text-slate-500 hover:text-slate-300 transition hover:bg-slate-800";
                 }
             });
 
-            // Stabilize faster visually
-            network.once("stabilizationIterationsDone", function() {
-                document.getElementById('physics-btn').innerHTML = '<i class="fas fa-snowflake"></i>';
-                // network.setOptions( { physics: false } ); // Optional auto-freeze
-                // physicsEnabled = false;
-            });
+            // Panels
+            document.getElementById('view-code').classList.add('hidden');
+            document.getElementById('view-graph').classList.add('hidden');
+            document.getElementById('view-notebook').classList.add('hidden');
+
+            document.getElementById(`view-${mode}`).classList.remove('hidden');
+
+            if (mode === 'graph') {
+                if (!network) initGraph();
+            } else if (mode === 'notebook') {
+                if (currentNode) renderNotebook(currentNode);
+            }
         }
 
-        function togglePhysics() {
-            physicsEnabled = !physicsEnabled;
-            network.setOptions({ physics: { enabled: physicsEnabled } });
-            document.getElementById('physics-btn').innerHTML = physicsEnabled ? '<i class="fas fa-snowflake"></i>' : '<i class="fas fa-play"></i>';
+        // --- FILE TREE ---
+        function initTree() {
+            const container = document.getElementById('file-tree-container');
+            container.innerHTML = '';
+            renderTreeLevel(repoData.tree, container, "");
         }
 
         function updateStats() {
-            document.getElementById('stat-nodes').innerText = repoData.nodes.length;
-            document.getElementById('stat-edges').innerText = repoData.edges.length;
-            document.getElementById('file-count').innerText = `${repoData.nodes.filter(n => n.group !== 'folder' && n.group !== 'root').length} FILES`;
-        }
-
-        // --- TREE LOGIC ---
-        function initTree() {
-            const container = document.getElementById('file-tree-container');
-            renderTreeLevel(repoData.tree, container, "");
+            const fileCount = repoData.nodes.filter(n => n.group !== 'folder' && n.group !== 'root').length;
+            document.getElementById('file-count').innerText = `${fileCount} FILES`;
         }
 
         function renderTreeLevel(node, container, path) {
             const ul = document.createElement('ul');
-            ul.className = "pl-3 border-l border-slate-800/50 ml-1";
+            ul.className = "pl-3 border-l border-slate-800/30 ml-1";
 
-            // Folders first, then files
             const keys = Object.keys(node).sort((a, b) => {
                 const isFolderA = !node[a].__file__;
                 const isFolderB = !node[b].__file__;
@@ -309,7 +328,7 @@
             });
 
             keys.forEach(key => {
-                if(key === '__file__') return; // Skip metadata keys if they leak (though they are inside item)
+                if(key === '__file__' || key === 'type' || key === 'size' || key === 'lines') return;
 
                 const item = node[key];
                 const isFolder = !item.__file__;
@@ -322,38 +341,35 @@
 
                 // Icon
                 let iconClass = 'fa-file text-slate-600';
-                if (isFolder) iconClass = 'fa-folder';
+                if (isFolder) iconClass = 'fa-folder text-slate-500';
                 else if (key.endsWith('.py')) iconClass = 'fa-brands fa-python text-blue-500';
                 else if (key.endsWith('.js')) iconClass = 'fa-brands fa-js text-yellow-500';
                 else if (key.endsWith('.json')) iconClass = 'fa-code text-green-500';
                 else if (key.endsWith('.md')) iconClass = 'fa-file-lines text-slate-400';
                 else if (key.endsWith('.html')) iconClass = 'fa-html5 text-orange-500';
+                else if (key.endsWith('.ipynb')) iconClass = 'fa-book text-orange-400';
 
-                div.innerHTML = `<i class="fas ${iconClass} w-4 text-center mr-2 text-[10px]"></i> ${key}`;
+                div.innerHTML = `<i class="fas ${iconClass} w-3 text-center mr-2 text-[10px]"></i> ${key}`;
 
                 div.onclick = (e) => {
                     e.stopPropagation();
                     if (isFolder) {
-                        // Toggle
                         const childUl = li.querySelector('ul');
                         if (childUl) {
                             childUl.classList.toggle('hidden');
                             const icon = div.querySelector('.fa-folder, .fa-folder-open');
-                            icon.classList.toggle('fa-folder');
-                            icon.classList.toggle('fa-folder-open');
+                            if(icon) {
+                                icon.classList.toggle('fa-folder');
+                                icon.classList.toggle('fa-folder-open');
+                            }
                         }
                     } else {
-                        // Select
+                        // Select File
                         document.querySelectorAll('.file-tree-item').forEach(el => el.classList.remove('active'));
                         div.classList.add('active');
 
-                        // Find node ID
                         const node = repoData.nodes.find(n => n.path === fullPath);
-                        if (node) {
-                            network.selectNodes([node.id]);
-                            network.focus(node.id, { scale: 1.5, animation: true });
-                            showDetail(node);
-                        }
+                        if (node) loadFile(node);
                     }
                 };
 
@@ -361,8 +377,14 @@
 
                 if (isFolder) {
                     const subContainer = document.createElement('div');
+                    subContainer.className = "hidden"; // Start collapsed
                     renderTreeLevel(item, subContainer, fullPath);
-                    if(subContainer.firstChild) li.appendChild(subContainer.firstChild);
+                    li.appendChild(subContainer);
+
+                    // Allow folders to expand
+                    const childUl = li.querySelector('ul');
+                    if (childUl) subContainer.classList.remove('hidden'); // Logic fix: actually the subcontainer wraps the ul
+                    subContainer.appendChild(ul.cloneNode(false)); // Just a placeholder logic, `renderTreeLevel` appends `ul` to container
                 }
 
                 ul.appendChild(li);
@@ -371,103 +393,289 @@
             container.appendChild(ul);
         }
 
-        // --- INTERACTION ---
-
-        function selectNode(nodeId) {
-            const node = repoData.nodes.find(n => n.id === nodeId);
-            if (!node) return;
-
-            // Highlight in Tree
-            const treeItems = document.querySelectorAll('.file-tree-item');
-            treeItems.forEach(el => el.classList.remove('active'));
-
-            // Find by path
-            const el = document.querySelector(`.file-tree-item[data-path="${node.path}"]`);
-            if (el) {
-                el.classList.add('active');
-                el.scrollIntoView({ block: 'center', behavior: 'smooth' });
-                // Expand parents? Not implemented for simplicity, but scrolling works.
+        function filterTree(query) {
+            // Simple visual filtering (expand all if searching?)
+            // For now, let's just highlight matches
+            const items = document.querySelectorAll('.file-tree-item');
+            if(!query) {
+                items.forEach(el => el.style.display = 'flex');
+                return;
             }
-
-            if (node.group !== 'folder' && node.group !== 'root') {
-                showDetail(node);
-            } else {
-                closeDetail();
-            }
+            items.forEach(el => {
+                if(el.textContent.toLowerCase().includes(query.toLowerCase())) {
+                    el.style.display = 'flex';
+                    // Expand parents... tricky in vanilla JS without explicit parent links in DOM efficiently
+                } else {
+                    el.style.display = 'none';
+                }
+            });
         }
 
-        function showDetail(node) {
-            const panel = document.getElementById('detail-panel');
-            panel.classList.add('open');
-            
-            document.getElementById('detail-filename').innerText = node.label;
-            document.getElementById('detail-size').innerText = (node.size / 1024).toFixed(1) + " KB";
-            document.getElementById('detail-lines').innerText = node.lines || "0";
-            document.getElementById('detail-type').innerText = node.group.toUpperCase();
-            
-            // Imports
-            const impContainer = document.getElementById('detail-imports');
-            impContainer.innerHTML = "";
-            if (node.imports && node.imports.length > 0) {
-                node.imports.forEach(imp => {
-                    const span = document.createElement('span');
-                    span.className = "px-1.5 py-0.5 bg-slate-800 text-slate-400 rounded text-[9px] border border-slate-700";
-                    span.innerText = imp;
-                    impContainer.appendChild(span);
+        // --- CONTENT LOADING ---
+        function loadFile(node) {
+            currentNode = node;
+
+            // Update Headers
+            document.getElementById('active-filename').innerText = node.label;
+            document.getElementById('status-lines').innerText = `Ln ${node.lines}, Col 0`;
+            document.getElementById('status-type').innerText = node.group.toUpperCase();
+
+            // Context Panel Update
+            document.getElementById('context-file').innerText = node.path;
+            const tagContainer = document.getElementById('context-tags');
+            tagContainer.innerHTML = '';
+            if (node.imports) {
+                node.imports.slice(0, 5).forEach(imp => {
+                    tagContainer.innerHTML += `<span class="text-[9px] px-1 bg-slate-800 rounded border border-slate-700 text-slate-400">${imp}</span>`;
                 });
-            } else {
-                impContainer.innerHTML = "<span class='text-slate-600 italic'>No explicit dependencies detected.</span>";
+                if(node.imports.length > 5) tagContainer.innerHTML += `<span class="text-[9px] text-slate-500">+${node.imports.length - 5}</span>`;
             }
 
-            // Mock Content Preview based on logic
-            const codeBlock = document.getElementById('detail-code');
-            codeBlock.className = `language-${node.group === 'js' ? 'javascript' : node.group}`;
+            // Render Content based on View Mode
+            if (currentView === 'code') {
+                renderCode(node);
+            } else if (currentView === 'notebook') {
+                renderNotebook(node);
+            } else if (currentView === 'graph') {
+                if(network) {
+                    network.selectNodes([node.id]);
+                    network.focus(node.id, { scale: 1.5, animation: true });
+                }
+            }
+        }
+
+        function renderCode(node) {
+            const block = document.getElementById('main-code-block');
             
-            if (node.group === 'py') {
-                codeBlock.textContent = `
-# File: ${node.path}
-# Auto-generated preview
+            // Determine language class for Prism
+            let lang = 'python';
+            if (node.group === 'js') lang = 'javascript';
+            if (node.group === 'json') lang = 'json';
+            if (node.group === 'html') lang = 'markup';
+            if (node.group === 'css') lang = 'css';
+            if (node.group === 'md') lang = 'markdown';
+            if (node.group === 'yaml') lang = 'yaml';
+            if (node.group === 'sh') lang = 'bash';
 
-import ${node.imports ? node.imports.join('\nimport ') : 'os'}
+            block.className = `language-${lang}`;
+            
+            if (node.content) {
+                block.textContent = node.content;
+            } else {
+                block.textContent = "# Content not loaded or empty.";
+            }
 
-class ${node.label.split('.')[0].replace(/_/g, '').replace(/^\w/, c => c.toUpperCase())}:
-    """
-    Documentation for ${node.label}
-    Auto-scanned by ADAM Codex.
-    """
-    def __init__(self):
-        pass
+            if(window.Prism) Prism.highlightElement(block);
+        }
 
-    def execute(self):
-        # Implementation hidden
-        pass
+        function renderNotebook(node) {
+            const container = document.getElementById('notebook-container');
+            container.innerHTML = '';
+
+            // Header
+            container.innerHTML += `
+                <div class="flex items-center justify-between border-b border-slate-700 pb-4 mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-white">${node.label}</h2>
+                        <p class="text-sm text-slate-500 font-mono">${node.path}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="px-3 py-1 bg-green-900/20 text-green-400 border border-green-800 rounded text-xs hover:bg-green-900/40"><i class="fas fa-play mr-1"></i> Run All</button>
+                        <button class="px-3 py-1 bg-slate-800 text-slate-400 border border-slate-700 rounded text-xs hover:bg-slate-700"><i class="fas fa-redo mr-1"></i> Restart</button>
+                    </div>
+                </div>
+            `;
+
+            let cells = [];
+
+            // If it's a real notebook (json parsing)
+            if (node.path.endsWith('.ipynb') && node.content && !node.content.startsWith('#')) {
+                try {
+                    const nb = JSON.parse(node.content);
+                    if (nb.cells) cells = nb.cells;
+                } catch(e) {
+                    cells = [{ cell_type: 'raw', source: ["Error parsing notebook JSON."] }];
+                }
+            } else {
+                // Treat regular file as one big code cell
+                cells = [{
+                    cell_type: 'code',
+                    execution_count: 1,
+                    source: node.content ? node.content.split('\n') : ["# No content"]
+                }];
+            }
+
+            // Render Cells
+            cells.forEach((cell, index) => {
+                const isCode = cell.cell_type === 'code';
+                const source = Array.isArray(cell.source) ? cell.source.join('') : cell.source;
+
+                const cellDiv = document.createElement('div');
+                cellDiv.className = `notebook-cell p-4 rounded-lg bg-[#0d1117] relative group ${isCode ? '' : 'pl-8'}`;
+
+                if (isCode) {
+                    const count = cell.execution_count || ' ';
+                    cellDiv.innerHTML = `
+                        <div class="flex gap-4">
+                            <div class="w-8 text-right font-mono text-[10px] text-slate-600 pt-1 select-none">In [${count}]:</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="bg-[#161b22] border border-slate-800 rounded p-3 relative">
+                                    <pre class="text-xs font-mono m-0 overflow-x-auto"><code class="language-python">${escapeHtml(source)}</code></pre>
+                                    <button class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition text-slate-500 hover:text-green-400"><i class="fas fa-play"></i></button>
+                                </div>
+                                ${cell.outputs ? renderOutputs(cell.outputs) : ''}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Markdown/Raw
+                    cellDiv.innerHTML = `
+                        <div class="prose prose-invert prose-sm max-w-none text-slate-300">
+                            <!-- Simple rendering, ideally use marked.js -->
+                            <pre class="font-sans whitespace-pre-wrap">${escapeHtml(source)}</pre>
+                        </div>
+                    `;
+                }
+
+                container.appendChild(cellDiv);
+
+                // Highlight code blocks inside cells
+                const codeEl = cellDiv.querySelector('code');
+                if (codeEl && window.Prism) Prism.highlightElement(codeEl);
+            });
+        }
+
+        function renderOutputs(outputs) {
+            if (!outputs || outputs.length === 0) return '';
+            
+            return outputs.map(out => {
+                let content = '';
+                if (out.text) {
+                    content = `<pre class="text-[10px] font-mono text-slate-400 mt-2 whitespace-pre-wrap">${Array.isArray(out.text) ? out.text.join('') : out.text}</pre>`;
+                } else if (out.data && out.data['text/plain']) {
+                     content = `<pre class="text-[10px] font-mono text-slate-400 mt-2 whitespace-pre-wrap">${Array.isArray(out.data['text/plain']) ? out.data['text/plain'].join('') : out.data['text/plain']}</pre>`;
+                }
+
+                return content ? `
+                    <div class="mt-2 pl-2 border-l-2 border-slate-800">
+                        ${content}
+                    </div>
+                ` : '';
+            }).join('');
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // --- GRAPH ---
+        function initGraph() {
+            const container = document.getElementById('network');
+            nodesDS = new vis.DataSet(repoData.nodes);
+            edgesDS = new vis.DataSet(repoData.edges);
+
+            const options = {
+                nodes: {
+                    shape: 'dot',
+                    font: { face: 'JetBrains Mono', color: '#64748b', size: 10, strokeWidth: 0 },
+                    borderWidth: 0,
+                    scaling: { min: 4, max: 20 },
+                },
+                edges: {
+                    width: 0.5,
+                    color: { color: '#334155', opacity: 0.3 },
+                    smooth: { type: 'continuous', roundness: 0.2 },
+                },
+                groups: {
+                    root: { color: '#f59e0b', size: 25 },
+                    folder: { color: '#334155', size: 8 },
+                    py: { color: '#3b82f6' },
+                    js: { color: '#eab308' },
+                    json: { color: '#22c55e' },
+                    md: { color: '#94a3b8' }
+                },
+                physics: {
+                    stabilization: false,
+                    barnesHut: { gravitationalConstant: -30000, springConstant: 0.001, springLength: 200 }
+                },
+                interaction: { hover: true, tooltipDelay: 200, hideEdgesOnDrag: true }
+            };
+
+            network = new vis.Network(container, { nodes: nodesDS, edges: edgesDS }, options);
+
+            network.on("click", (params) => {
+                if(params.nodes.length > 0) {
+                    const nodeId = params.nodes[0];
+                    const node = repoData.nodes.find(n => n.id === nodeId);
+                    if(node) {
+                        setViewMode('code'); // Switch back to code/notebook view on click
+                        loadFile(node);
+                    }
+                }
+            });
+        }
+
+        // --- CHAT ---
+        function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            // User Message
+            addChatBubble(text, 'user');
+            input.value = '';
+
+            // Simulated Response
+            setTimeout(() => {
+                const response = simulateAIResponse(text);
+                addChatBubble(response, 'ai');
+            }, 600 + Math.random() * 800);
+        }
+
+        function addChatBubble(text, type) {
+            const history = document.getElementById('chat-history');
+            const bubble = document.createElement('div');
+            bubble.className = `chat-bubble ${type} fade-in`;
+
+            if (type === 'ai') {
+                bubble.innerHTML = `
+                    <div class="flex items-center gap-2 mb-1 text-cyan-500 font-bold text-[9px] uppercase tracking-wider">
+                        <i class="fas fa-robot"></i> ADAM v23.5
+                    </div>
+                    ${text}
                 `;
-            } else if (node.group === 'json') {
-                codeBlock.textContent = `{\n  "meta": "Preview for ${node.label}",\n  "size": ${node.size}\n}`;
             } else {
-                 codeBlock.textContent = `// Preview not available for ${node.group} files.\n// View source code directly in IDE.`;
+                bubble.innerText = text;
             }
-            
-            document.getElementById('preview-placeholder').style.display = 'none';
 
-            if(window.Prism) Prism.highlightElement(codeBlock);
+            history.appendChild(bubble);
+            history.scrollTop = history.scrollHeight;
         }
 
-        function closeDetail() {
-            document.getElementById('detail-panel').classList.remove('open');
+        function simulateAIResponse(query) {
+            const file = currentNode ? currentNode.label : "the repository";
+            const q = query.toLowerCase();
+
+            if (q.includes('explain')) return `Analyzing logical structure of **${file}**... \n\nThis module appears to handle core functionality. I've detected ${currentNode ? currentNode.imports.length : 0} dependencies. The primary logic flow suggests a sequential execution pattern suited for synchronous operations.`;
+            if (q.includes('error') || q.includes('bug')) return `Scanning **${file}** for vulnerabilities... \n\nNo critical syntax errors detected. However, I recommend adding more robust error handling around external API calls to prevent runtime exceptions in production environments.`;
+            if (q.includes('refactor')) return `Proposed refactoring for **${file}**: \n\n1. Abstract the data processing logic into a separate utility class.\n2. Implement async/await for I/O bound operations.\n3. Add type hints to function signatures for better maintainability.`;
+
+            return `I have processed your query regarding **${file}**. \n\nBased on the current context, I can assist with code explanation, refactoring suggestions, or test generation. Please specify your intent.`;
         }
 
-        function handleSearch(query) {
-            if (!query) return;
-            query = query.toLowerCase();
-
-            const found = repoData.nodes.find(n => n.label.toLowerCase().includes(query));
-            if (found) {
-                selectNode(found.id);
-                network.selectNodes([found.id]);
-                network.focus(found.id, { scale: 1.5, animation: true });
+        // Input enter key
+        document.getElementById('chat-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
             }
-        }
+        });
 
     </script>
 </body>

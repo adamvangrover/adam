@@ -8,41 +8,54 @@ EXCLUDE_DIRS = {
     'webapp', 'experimental' # Excluding some large/irrelevant folders to keep graph clean
 }
 EXCLUDE_FILES = {
-    '.DS_Store', 'package-lock.json', 'yarn.lock', 'repo_data.js'
+    '.DS_Store', 'package-lock.json', 'yarn.lock', 'repo_data.js', 'mock_data_v2.js'
 }
+
+MAX_FILE_SIZE = 50 * 1024 # 50KB limit for content inclusion
 
 def get_file_info(filepath):
     try:
         size = os.path.getsize(filepath)
         line_count = 0
         imports = []
+        content = None
 
         # Simple line count and import detection for text files
-        if filepath.endswith(('.py', '.js', '.html', '.css', '.md', '.json', '.txt', '.sh')):
-            with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
-                content = f.read()
-                line_count = len(content.splitlines())
+        if filepath.endswith(('.py', '.js', '.html', '.css', '.md', '.json', '.txt', '.sh', '.yaml', '.yml', '.ipynb')):
+            try:
+                with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+                    content_raw = f.read()
+                    line_count = len(content_raw.splitlines())
 
-                if filepath.endswith('.py'):
-                    try:
-                        tree = ast.parse(content)
-                        for node in ast.walk(tree):
-                            if isinstance(node, ast.Import):
-                                for n in node.names:
-                                    imports.append(n.name)
-                            elif isinstance(node, ast.ImportFrom):
-                                if node.module:
-                                    imports.append(node.module)
-                    except:
-                        pass # Ignore parse errors
+                    # Content Extraction
+                    if size < MAX_FILE_SIZE:
+                        content = content_raw
+                    else:
+                        content = f"# Content too large to display ({size/1024:.1f} KB). \n# View source file directly."
+
+                    if filepath.endswith('.py'):
+                        try:
+                            tree = ast.parse(content_raw)
+                            for node in ast.walk(tree):
+                                if isinstance(node, ast.Import):
+                                    for n in node.names:
+                                        imports.append(n.name)
+                                elif isinstance(node, ast.ImportFrom):
+                                    if node.module:
+                                        imports.append(node.module)
+                        except:
+                            pass # Ignore parse errors
+            except Exception as e:
+                content = f"# Error reading file: {str(e)}"
 
         return {
             "size": size,
             "lines": line_count,
-            "imports": imports
+            "imports": imports,
+            "content": content
         }
     except Exception as e:
-        return {"size": 0, "lines": 0, "imports": []}
+        return {"size": 0, "lines": 0, "imports": [], "content": None}
 
 def scan_repo(root_dir):
     nodes = []
@@ -118,6 +131,7 @@ def scan_repo(root_dir):
                 "size": info['size'],
                 "lines": info['lines'],
                 "imports": info['imports'],
+                "content": info['content'],
                 "value": 5
             })
 
