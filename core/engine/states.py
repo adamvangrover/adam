@@ -8,6 +8,27 @@ class ResearchArtifact(TypedDict):
     source: str
     credibility_score: float
 
+class PlanOnGraph(TypedDict):
+    """A symbolic scaffold representing the causal links and logical steps."""
+    id: str
+    steps: List[Dict[str, Any]]
+    is_complete: bool
+    cypher_query: Optional[str]
+
+class GraphState(TypedDict):
+    """
+    Represents the state of the general purpose Adaptive System Graph.
+    Used by the NeuroSymbolicPlanner.
+    """
+    request: str
+    plan: Optional[PlanOnGraph]
+    current_task_index: int
+    assessment: Optional[Dict[str, Any]]
+    critique: Optional[Dict[str, Any]]
+    human_feedback: Optional[str]
+    iteration: int
+    max_iterations: int
+
 class RiskAssessmentState(TypedDict):
     """
     The 'Memory' of a v23 Reasoning Loop. 

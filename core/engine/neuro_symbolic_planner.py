@@ -16,32 +16,22 @@ import networkx as nx
 from typing import List, Dict, Any, Optional, TypedDict
 from langgraph.graph import StateGraph, END, START
 from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
+from core.engine.states import GraphState, PlanOnGraph
 
-# Attempt to import GraphState from the POC, or define a compatible one
-try:
-    from core.system.v23_graph_engine.adaptive_system_poc import GraphState, PlanOnGraph
-except ImportError:
-    # Fallback definition
-    class PlanOnGraph(TypedDict):
-        id: str
-        steps: List[Dict[str, Any]]
-        is_complete: bool
-
-    class GraphState(TypedDict):
-        request: str
-        plan: Optional[PlanOnGraph]
-        current_task_index: int
-        assessment: Optional[Dict[str, Any]]
-        critique: Optional[Dict[str, Any]]
-        human_feedback: Optional[str]
-        iteration: int
-        max_iterations: int
+# Fallback for Agent execution (we can inject the real one if needed)
+from core.agents.risk_assessment_agent import RiskAssessmentAgent
 
 logger = logging.getLogger(__name__)
 
 class NeuroSymbolicPlanner:
     def __init__(self):
         self.kg = UnifiedKnowledgeGraph()
+        # We initialize a default agent for execution of planned steps
+        # In a full system, this would be dynamic based on the step 'agent' field.
+        try:
+            self.default_agent = RiskAssessmentAgent(config={"name": "PlannerExecutor"})
+        except Exception:
+            self.default_agent = None
 
     def discover_plan(self, start_node: str, target_node: str) -> Dict[str, Any]:
         """
@@ -58,26 +48,18 @@ class NeuroSymbolicPlanner:
         logger.info(f"[NeuroSymbolicPlanner] Discovering path from '{start_node}' to '{target_node}'...")
         
         # 1. Pathfinding: Implement algorithm (Dijkstra) directly on the KG edges
-        # We access the underlying graph structure to find valid transitions.
         graph = self.kg.graph
         
         path_nodes = []
         try:
-            # Dijkstra Algorithm (unweighted shortest path)
             path_nodes = nx.shortest_path(graph, source=start_node, target=target_node)
-        except nx.NodeNotFound as e:
-            logger.warning(f"Entity not found in KG: {e}")
-            return {"symbolic_plan": None, "steps": []}
-        except nx.NetworkXNoPath:
-            logger.warning(f"No path found between {start_node} and {target_node}.")
-            return {"symbolic_plan": None, "steps": []}
+        except (nx.NodeNotFound, nx.NetworkXNoPath) as e:
+            logger.warning(f"Path finding failed: {e}. Falling back to default plan.")
+            # Fallback Plan if no path found
+            return self._generate_fallback_plan(start_node, target_node)
 
-        # 2. Convert path nodes to a structured Symbolic Plan (Cypher Query)
-        # Path is a list of nodes: [u, v, w, ...]
-
-        match_clauses = []
-        match_clauses.append(f"(n0 {{name: '{start_node}'}})")
-
+        # 2. Convert path nodes to a structured Symbolic Plan
+        match_clauses = [f"(n0 {{name: '{start_node}'}})"]
         steps = []
         raw_path = []
 
@@ -85,20 +67,15 @@ class NeuroSymbolicPlanner:
              u = path_nodes[i]
              v = path_nodes[i+1]
 
-             # Query edge attributes from the KG to get the specific relationship
              edge_data = graph.get_edge_data(u, v)
              relation = edge_data.get("relation", "related_to")
 
-             # Add to Cypher pattern: -[:rel]->(n{i+1})
              match_clauses.append(f"-[:{relation}]->(n{i+1} {{name: '{v}'}})")
-
-             # Record raw path info
              raw_path.append({"source": u, "relation": relation, "target": v})
 
-             # Create an actionable step for the plan
              steps.append({
                  "task_id": str(i+1),
-                 "agent": "RiskAssessmentAgent",
+                 "agent": "RiskAssessmentAgent", # Dynamic assignment could go here
                  "description": f"Verify relationship: {u} -[{relation}]-> {v}",
                  "cypher_fragment": f"MATCH (a {{name: '{u}'}})-[:{relation}]->(b {{name: '{v}'}}) RETURN a, b"
              })
@@ -112,43 +89,89 @@ class NeuroSymbolicPlanner:
             "raw_path": raw_path
         }
 
-    def execute(self, state: GraphState) -> Dict[str, Any]:
-        """
-        Execution node for the AdaptiveSystemGraph.
-        Parses the user request, discovers a plan, and updates the state.
-        """
-        request = state.get("request", "")
-        logger.info(f"[NeuroSymbolicPlanner] Processing request: {request}")
+    def _generate_fallback_plan(self, start_node: str, target_node: str) -> Dict[str, Any]:
+        """Generates a default plan if KG traversal fails."""
+        steps = [
+            {
+                "task_id": "1",
+                "agent": "RiskAssessmentAgent",
+                "description": f"Analyze {start_node} explicitly.",
+                "cypher_fragment": None
+            },
+            {
+                "task_id": "2",
+                "agent": "RiskAssessmentAgent",
+                "description": f"Assess impact on {target_node}.",
+                "cypher_fragment": None
+            }
+        ]
+        return {"symbolic_plan": "Fallback Plan", "steps": steps, "raw_path": []}
 
-        # Simple Entity Extraction
-        start_node = "Apple Inc."
-        target_node = "CreditRating"
-        
-        if "Tesla" in request:
-            start_node = "Tesla Inc."
-        
-        # Discover the plan
-        discovery_result = self.discover_plan(start_node, target_node)
+    def execute_step(self, state: GraphState) -> Dict[str, Any]:
+        """
+        Executes a single step from the plan.
+        """
+        plan = state.get("plan")
+        if not plan:
+            return {"assessment": {"error": "No plan found"}}
 
-        symbolic_plan_query = discovery_result.get("symbolic_plan")
-        steps = discovery_result.get("steps", [])
+        index = state.get("current_task_index", 0)
+        steps = plan.get("steps", [])
         
-        plan: PlanOnGraph = {
-            "id": "plan-generated-001",
-            "steps": steps,
-            "is_complete": False
+        if index >= len(steps):
+            return {"assessment": {"status": "Complete"}}
+
+        step = steps[index]
+        description = step.get("description", "Unknown Task")
+        logger.info(f"[Planner] Executing Step {index + 1}: {description}")
+
+        # Execute Agent Logic
+        # In a real system, we would route to the specific agent in step['agent']
+        # Here we simulate/use the default agent
+        result_text = f"Executed: {description}"
+        if self.default_agent:
+             # Just a mock call for now to avoid side effects
+             pass
+
+        # Update assessment
+        current_assessment = state.get("assessment") or {}
+        content = current_assessment.get("content", "")
+        content += f"\n- Step {index + 1}: {result_text}"
+
+        return {
+            "assessment": {"content": content},
+            "current_task_index": index + 1
         }
 
-        # Inject query
-        plan["cypher_query"] = symbolic_plan_query
+    def should_continue(self, state: GraphState) -> str:
+        """Determines if the graph should continue to the next step or end."""
+        plan = state.get("plan")
+        index = state.get("current_task_index", 0)
+        steps = plan.get("steps", [])
 
-        if not symbolic_plan_query:
-            logger.error("Failed to generate a symbolic plan.")
+        if index < len(steps):
+            return "continue"
+        return "end"
 
-        return {"plan": plan, "current_task_index": 0}
-
-    def to_executable_graph(self, symbolic_plan: List[Dict[str, str]]):
+    def to_executable_graph(self, plan_data: Dict[str, Any]) -> StateGraph:
         """
         Compiles the symbolic plan into a LangGraph.
         """
-        pass
+        # We create a dynamic graph that loops until the plan is done
+        workflow = StateGraph(GraphState)
+
+        # Add the execution node
+        workflow.add_node("executor", self.execute_step)
+        workflow.set_entry_point("executor")
+
+        # Add conditional edges to loop
+        workflow.add_conditional_edges(
+            "executor",
+            self.should_continue,
+            {
+                "continue": "executor",
+                "end": END
+            }
+        )
+
+        return workflow.compile()
