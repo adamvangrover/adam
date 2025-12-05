@@ -8,6 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import sys
 import os
 import json
+import asyncio
 from datetime import datetime, timezone
 from .config import config
 from .celery import celery
@@ -20,6 +21,7 @@ db = SQLAlchemy()
 socketio = SocketIO()
 jwt = JWTManager()
 agent_orchestrator = None
+meta_orchestrator = None
 
 
 # ---------------------------------------------------------------------------- #
@@ -87,6 +89,8 @@ def create_app(config_name='default'):
     Application factory.
     """
     global agent_orchestrator
+    global meta_orchestrator
+
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
@@ -110,14 +114,21 @@ def create_app(config_name='default'):
     # Initialize the core components
     if app.config['CORE_INTEGRATION']:
         sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-        from core.utils.config_utils import load_app_config
-        from core.system.agent_orchestrator import AgentOrchestrator
-        from core.system.knowledge_base import KnowledgeBase
-        from core.system.data_manager import DataManager
-        core_config = load_app_config()
-        knowledge_base = KnowledgeBase(core_config)
-        data_manager = DataManager(core_config)
-        agent_orchestrator = AgentOrchestrator(core_config, knowledge_base, data_manager)
+        try:
+            from core.system.agent_orchestrator import AgentOrchestrator
+            from core.engine.meta_orchestrator import MetaOrchestrator
+
+            # Initialize Legacy Orchestrator
+            agent_orchestrator = AgentOrchestrator()
+
+            # Initialize Meta Orchestrator (v23 Brain)
+            meta_orchestrator = MetaOrchestrator(legacy_orchestrator=agent_orchestrator)
+            print("Adam v23 Core Integration Initialized.")
+
+        except Exception as e:
+            print(f"Failed to initialize Core Integration: {e}")
+            agent_orchestrator = None
+            meta_orchestrator = None
 
     # ---------------------------------------------------------------------------- #
     # API Endpoints
@@ -126,6 +137,33 @@ def create_app(config_name='default'):
     @app.route('/api/hello')
     def hello_world():
         return 'Hello, World!'
+
+    @app.route('/api/adaptive/query', methods=['POST'])
+    async def adaptive_query():
+        """
+        Routes a query through the v23 MetaOrchestrator.
+        """
+        if not app.config['CORE_INTEGRATION'] or not meta_orchestrator:
+             return jsonify({'error': 'Adaptive System Core not initialized'}), 503
+
+        data = request.get_json()
+        query = data.get('query')
+        context = data.get('context', {})
+
+        if not query:
+            return jsonify({'error': 'Query is required'}), 400
+
+        try:
+            # Execute async route
+            result = await meta_orchestrator.route_request(query, context)
+
+            # If the result is a Pydantic model (like HyperDimensionalKnowledgeGraph), dump it
+            if hasattr(result, 'model_dump'):
+                return jsonify(result.model_dump(by_alias=True))
+
+            return jsonify(result)
+        except Exception as e:
+            return jsonify({'error': str(e)}), 500
 
     # ---------------------------------------------------------------------------- #
     # Agent Endpoints
@@ -152,8 +190,10 @@ def create_app(config_name='default'):
         Invokes a specific agent with the given arguments.
         """
         data = request.get_json()
-        result = agent_orchestrator.run_agent(agent_name, data)
-        return jsonify(result)
+        if agent_orchestrator:
+            result = agent_orchestrator.execute_agent(agent_name, data)
+            return jsonify(result)
+        return jsonify({'error': 'Agent Orchestrator not initialized'}), 503
 
     @app.route('/api/agents/<agent_name>/schema')
     def get_agent_schema(agent_name):
