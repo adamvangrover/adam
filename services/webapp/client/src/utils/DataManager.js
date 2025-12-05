@@ -53,6 +53,32 @@ class DataManager {
     }
   }
 
+  async sendAdaptiveQuery(query, context = {}) {
+    await this.checkConnection();
+
+    if (this.useFallback) {
+      console.log("Offline Mode: Simulating Adaptive Query");
+      return {
+        status: "Offline Simulation",
+        data: {
+             human_readable_status: "Simulating Deep Dive for " + query + " (Offline Mode)...",
+             v23_knowledge_graph: { nodes: {} }
+        }
+      };
+    }
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/adaptive/query`, {
+        query,
+        context
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Adaptive Query failed:", error);
+      throw error;
+    }
+  }
+
   async loadLocalJson(endpoint) {
     let localPath = ENDPOINT_MAPPING[endpoint];
 
