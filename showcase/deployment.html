@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v23.5 | APP DEPLOY</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Syntax Highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+
+    <style>
+        /* --- Core Theme Overrides --- */
+        body { background-color: #0f172a; font-family: 'Inter', sans-serif; }
+        .mono { font-family: 'Courier New', Courier, monospace; }
+
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* CRT Scanline */
+        .scan-line {
+            position: fixed; top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(to bottom, rgba(16, 185, 129, 0), rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0));
+            opacity: 0.1; animation: scan 8s linear infinite; pointer-events: none; z-index: 9999;
+        }
+        @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
+
+        /* Tree View */
+        .tree-node { cursor: pointer; user-select: none; margin-bottom: 2px; }
+        .tree-node:hover > .node-content { color: #fff; background: rgba(255,255,255,0.05); }
+        .node-content { display: flex; align-items: center; padding: 4px 8px; border-radius: 4px; transition: all 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .node-indent { margin-left: 12px; border-left: 1px solid #334155; }
+        .active-file > .node-content { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border-left: 2px solid #60a5fa; }
+
+        /* Terminal */
+        #terminal-container { transition: height 0.3s ease-in-out; }
+        .cmd-input:focus { outline: none; }
+        .cursor { display: inline-block; width: 8px; height: 16px; background: #10b981; animation: blink 1s step-end infinite; vertical-align: middle; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* Editable Content */
+        textarea#code-editor {
+            font-family: 'Consolas', 'Monaco', 'Andale Mono', 'Ubuntu Mono', monospace;
+            line-height: 1.5;
+            tab-size: 4;
+        }
+
+        pre[class*="language-"] {
+            margin: 0 !important;
+            padding: 1.5rem !important;
+            background: transparent !important;
+            text-shadow: none !important;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden text-slate-200 bg-slate-900">
+    <div class="scan-line"></div>
+
+    <!-- Header -->
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 shrink-0">
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="text-slate-400 hover:text-white transition cursor-pointer"><i class="fas fa-chevron-left mr-2"></i><i class="fas fa-cube"></i></a>
+            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-amber-400">v23.5</span> <span class="text-slate-500 font-normal">| Data Vault</span></h1>
+        </div>
+
+        <!-- Deployment Status / Action -->
+        <div class="flex items-center gap-6 font-mono text-xs">
+             <div class="hidden md:flex gap-4 text-slate-400">
+                 <div>ENV: <span class="text-emerald-400">PROD</span></div>
+                 <div>BRANCH: <span class="text-cyan-400">main</span></div>
+                 <div id="clock" class="text-slate-500">00:00:00</div>
+             </div>
+             <button onclick="window.vaultApp.toggleDeploymentModal()" class="px-3 py-1.5 bg-blue-600/20 border border-blue-500/50 hover:bg-blue-600/40 text-blue-300 rounded transition flex items-center gap-2">
+                <i class="fas fa-rocket"></i> DEPLOY
+             </button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex overflow-hidden">
+
+        <!-- Sidebar -->
+        <aside class="w-80 bg-slate-900/50 border-r border-slate-700 flex flex-col shrink-0">
+            <div class="p-3 border-b border-slate-700 bg-slate-800/30">
+                <div class="relative">
+                    <input type="text" placeholder="Filter files..." class="w-full bg-slate-950 border border-slate-700 rounded px-3 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500 font-mono transition" onkeyup="window.vaultApp.filterTree(this.value)">
+                    <i class="fas fa-search absolute right-3 top-2 text-slate-600 text-xs"></i>
+                </div>
+            </div>
+
+            <div id="file-tree" class="flex-1 overflow-y-auto p-2 font-mono text-xs text-slate-400 custom-scrollbar select-none">
+                <div class="text-center mt-10 opacity-50 animate-pulse">Scanning repository...</div>
+            </div>
+
+            <div class="p-2 border-t border-slate-700 bg-slate-900 text-[10px] text-slate-500 font-mono flex justify-between">
+                <span id="file-count">0 Files</span>
+                <span id="total-storage">0 KB</span>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <section class="flex-1 flex flex-col bg-[#0b1120] relative overflow-hidden">
+
+            <!-- Toolbar -->
+            <div class="h-12 border-b border-slate-700/50 bg-slate-800/50 flex items-center px-4 justify-between backdrop-blur shrink-0">
+                <div class="flex items-center gap-3 overflow-hidden">
+                    <i class="fas fa-file-code text-amber-500/80"></i>
+                    <span id="preview-filename" class="text-sm font-mono text-slate-200 truncate">Select a file...</span>
+                    <span id="unsaved-indicator" class="hidden text-amber-500 text-xs">*</span>
+                </div>
+
+                <div class="flex items-center gap-2" id="toolbar-actions">
+                    <button onclick="window.vaultApp.toggleEditMode()" id="btn-edit" class="px-3 py-1 bg-slate-700/50 hover:bg-slate-700 text-slate-300 rounded text-xs font-mono transition opacity-50 cursor-not-allowed" disabled>
+                        <i class="fas fa-edit mr-1"></i> EDIT
+                    </button>
+                    <button onclick="window.vaultApp.saveFile()" id="btn-save" class="hidden px-3 py-1 bg-emerald-900/50 border border-emerald-700 hover:bg-emerald-800 text-emerald-400 rounded text-xs font-mono transition">
+                        <i class="fas fa-save mr-1"></i> SAVE
+                    </button>
+                    <div class="h-4 w-px bg-slate-700 mx-1"></div>
+                    <button onclick="window.vaultApp.executeFile()" id="btn-exec" class="hidden px-3 py-1 bg-purple-900/50 border border-purple-700 hover:bg-purple-800 text-purple-400 rounded text-xs font-mono transition flex items-center gap-2">
+                        <i class="fas fa-play"></i> RUN
+                    </button>
+                </div>
+            </div>
+
+            <!-- Editor / Viewer -->
+            <div class="flex-1 overflow-auto relative custom-scrollbar group bg-[#0b1120]">
+                <!-- Code Viewer (Prism) -->
+                <pre id="code-viewer" class="m-0 p-0 text-xs font-mono min-h-full outline-none hidden"><code id="code-content" class="language-json"></code></pre>
+
+                <!-- Code Editor (Textarea) -->
+                <textarea id="code-editor" class="hidden w-full h-full bg-[#0b1120] text-slate-300 p-6 text-xs font-mono outline-none resize-none border-none" spellcheck="false"></textarea>
+
+                <div id="empty-state" class="absolute inset-0 flex items-center justify-center flex-col text-slate-600 pointer-events-none">
+                    <div class="w-20 h-20 rounded-full bg-slate-800/50 flex items-center justify-center mb-4 border border-slate-700">
+                        <i class="fas fa-cube text-4xl opacity-20"></i>
+                    </div>
+                    <p class="text-xs font-mono opacity-50 uppercase tracking-widest">System Ready</p>
+                </div>
+            </div>
+
+            <!-- Terminal Panel -->
+            <div id="terminal-container" class="h-48 border-t border-slate-700 bg-slate-950 flex flex-col shrink-0 transition-all">
+                <div class="h-8 bg-slate-800/50 flex items-center justify-between px-3 border-b border-slate-700 cursor-row-resize" title="Resize Terminal">
+                    <div class="flex items-center gap-2 text-xs font-mono text-slate-400">
+                        <i class="fas fa-terminal"></i>
+                        <span>TERMINAL</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="window.vaultApp.clearTerminal()" class="hover:text-white text-slate-500" title="Clear"><i class="fas fa-ban"></i></button>
+                        <button onclick="window.vaultApp.toggleTerminal()" class="hover:text-white text-slate-500" title="Maximize/Minimize"><i class="fas fa-chevron-down" id="term-toggle-icon"></i></button>
+                    </div>
+                </div>
+                <div id="terminal-output" class="flex-1 overflow-y-auto p-3 font-mono text-xs text-slate-300 custom-scrollbar bg-black" onclick="document.getElementById('cmd-input').focus()">
+                    <div class="mb-2 text-slate-500">Adam v23.5 Shell [Version 1.0.4]<br>(c) 2025 Adam Financial Systems. All rights reserved.<br>Type 'help' for available commands.</div>
+                    <div id="terminal-history"></div>
+                    <div class="flex items-center text-emerald-500 mt-1">
+                        <span class="mr-2">admin@adam:~/root$</span>
+                        <input type="text" id="cmd-input" class="flex-1 bg-transparent border-none text-slate-200 focus:ring-0 p-0 text-xs font-mono cmd-input" autocomplete="off" spellcheck="false">
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Deployment Modal -->
+    <div id="deploy-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+        <div class="bg-slate-900 border border-slate-700 rounded-lg w-[500px] shadow-2xl overflow-hidden">
+            <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/50">
+                <h3 class="text-white font-mono font-bold"><i class="fas fa-rocket text-blue-500 mr-2"></i>Deployment Sequence</h3>
+                <button onclick="window.vaultApp.toggleDeploymentModal()" class="text-slate-500 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div class="space-y-2 font-mono text-xs">
+                    <div class="flex justify-between text-slate-400"><span>Target Environment:</span> <span class="text-white">Production (AWS/Kubernetes)</span></div>
+                    <div class="flex justify-between text-slate-400"><span>Branch:</span> <span class="text-white">main (HEAD)</span></div>
+                    <div class="flex justify-between text-slate-400"><span>Build Artifact:</span> <span class="text-white">v23.5.1-stable</span></div>
+                </div>
+
+                <div class="h-px bg-slate-700 my-4"></div>
+
+                <div id="deploy-steps" class="space-y-3 font-mono text-xs">
+                    <div class="flex items-center gap-3 text-slate-500 step" id="step-1">
+                        <i class="far fa-circle w-4 text-center icon"></i> <span>Running Unit Tests...</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-slate-500 step" id="step-2">
+                        <i class="far fa-circle w-4 text-center icon"></i> <span>Building Container Images...</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-slate-500 step" id="step-3">
+                        <i class="far fa-circle w-4 text-center icon"></i> <span>Updating Cluster Config...</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-slate-500 step" id="step-4">
+                        <i class="far fa-circle w-4 text-center icon"></i> <span>Verifying Health Checks...</span>
+                    </div>
+                </div>
+
+                <div id="deploy-status" class="hidden p-3 bg-emerald-900/20 border border-emerald-500/30 rounded text-emerald-400 text-center text-xs font-mono">
+                    Deployment Successful! System Online.
+                </div>
+            </div>
+            <div class="p-4 border-t border-slate-700 bg-slate-800/50 flex justify-end">
+                <button id="btn-start-deploy" onclick="window.vaultApp.runDeployment()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-bold transition">INITIATE DEPLOYMENT</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Source -->
+    <script src="js/repo_data.js"></script>
+
+    <!-- Application Logic -->
+    <script>
+        // --- Mock Data ---
+        let MOCK_FILE_SYSTEM = [
+            {
+                id: 'root',
+                name: 'deployment_config',
+                type: 'folder',
+                children: [
+                    {
+                        id: 'config',
+                        name: 'config.json',
+                        type: 'file',
+                        language: 'json',
+                        content: `{\n  "system": "ADAM-v23.5",\n  "cluster": "us-east-1",\n  "replicas": 4,\n  "features": {\n    "neural_net": true,\n    "auto_scale": false,\n    "legacy_mode": false\n  },\n  "database": {\n    "host": "10.0.0.55",\n    "port": 5432,\n    "user": "admin_ro"\n  }\n}`
+                    },
+                    {
+                        id: 'manifest',
+                        name: 'manifest.yaml',
+                        type: 'file',
+                        language: 'yaml',
+                        content: `apiVersion: v1\nkind: Pod\nmetadata:\n  name: adam-core\n  labels:\n    app: financial-engine\nspec:\n  containers:\n  - name: engine\n    image: adam/engine:23.5\n    ports:\n    - containerPort: 8080\n    resources:\n      requests:\n        memory: "64Mi"\n        cpu: "250m"`
+                    },
+                    {
+                        id: 'scripts',
+                        name: 'scripts',
+                        type: 'folder',
+                        children: [
+                            {
+                                id: 'deploy_py',
+                                name: 'deploy_service.py',
+                                type: 'file',
+                                language: 'python',
+                                content: `import os\nimport sys\nimport time\n\ndef main():\n    print("Starting deployment sequence...")\n    target = os.getenv('TARGET_ENV', 'staging')\n    \n    # Simulate connection\n    if not connect_cluster(target):\n        print("Error: Connection failed")\n        sys.exit(1)\n        \n    print(f"Deploying to {target}...")\n    time.sleep(2)\n    print("Success!")\n\ndef connect_cluster(target):\n    return True\n\nif __name__ == "__main__":\n    main()`
+                            },
+                            {
+                                id: 'health_check',
+                                name: 'health_check.sh',
+                                type: 'file',
+                                language: 'bash',
+                                content: `#!/bin/bash\n\necho "Checking system vitals..."\n\nCPU_LOAD=$(grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}')\n\necho "CPU Load: $CPU_LOAD%"\necho "Memory: OK"\necho "Disk: OK"\n\nexit 0`
+                            }
+                        ]
+                    },
+                    {
+                        id: 'logs',
+                        name: 'logs',
+                        type: 'folder',
+                        children: [
+                            { id: 'err_log', name: 'error.log', type: 'file', language: 'text', content: `[2023-10-27 14:22:01] ERROR: Connection timeout waiting for DB\n[2023-10-27 14:22:05] WARN: Retrying connection (Attempt 2)\n[2023-10-27 14:22:10] INFO: Connection established` },
+                            { id: 'access_log', name: 'access.log', type: 'file', language: 'text', content: `192.168.1.1 - - [27/Oct/2023:14:23:00] "GET /api/v1/status HTTP/1.1" 200 452\n192.168.1.5 - - [27/Oct/2023:14:23:05] "POST /api/v1/auth HTTP/1.1" 401 120` }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'notes',
+                name: 'readme.md',
+                type: 'file',
+                language: 'markdown',
+                content: `# ADAM System Documentation\n\n## Overview\nADAM is a high-frequency trading algorithm engine.\n\n## Setup\n1. Run \`npm install\`\n2. Configure \`config.json\`\n3. Run deployment script.\n\n> Warning: Do not touch the core kernel parameters without authorization.`
+            }
+        ];
+
+        // --- Data Integration ---
+        if (window.REPO_DATA && window.REPO_DATA.tree) {
+            function convertRepoDataToVault(tree, path = "") {
+                const children = [];
+                Object.keys(tree).forEach(key => {
+                    if (key === '__file__') return; // Skip metadata
+                    const node = tree[key];
+                    const isFile = node.__file__;
+                    const currentPath = path ? path + '/' + key : key;
+
+                    if (isFile) {
+                        let lang = 'text';
+                        if (key.endsWith('.py')) lang = 'python';
+                        else if (key.endsWith('.js')) lang = 'javascript';
+                        else if (key.endsWith('.html')) lang = 'html';
+                        else if (key.endsWith('.json')) lang = 'json';
+                        else if (key.endsWith('.css')) lang = 'css';
+                        else if (key.endsWith('.md')) lang = 'markdown';
+                        else if (key.endsWith('.yaml') || key.endsWith('.yml')) lang = 'yaml';
+                        else if (key.endsWith('.sh')) lang = 'bash';
+
+                        children.push({
+                            id: currentPath,
+                            name: key,
+                            type: 'file',
+                            language: lang,
+                            content: `// File: ${key}\n// Path: ${currentPath}\n// Size: ${node.size} bytes\n// Lines: ${node.lines}\n\n// Content loading is simulated in this vault view.\n// Use the main Codex for full inspection.`
+                        });
+                    } else {
+                        children.push({
+                            id: currentPath,
+                            name: key,
+                            type: 'folder',
+                            children: convertRepoDataToVault(node, currentPath)
+                        });
+                    }
+                });
+                return children.sort((a, b) => (a.type === b.type ? 0 : a.type === 'folder' ? -1 : 1));
+            }
+
+            const sourceCode = convertRepoDataToVault(window.REPO_DATA.tree);
+            MOCK_FILE_SYSTEM.push({
+                id: 'repo_root',
+                name: 'source_code',
+                type: 'folder',
+                children: sourceCode
+            });
+        }
+
+        // --- Application Class ---
+        class VaultApp {
+            constructor() {
+                this.files = MOCK_FILE_SYSTEM;
+                this.activeFile = null;
+                this.isEditing = false;
+                this.termCollapsed = false;
+
+                // Elements
+                this.treeEl = document.getElementById('file-tree');
+                this.codeViewer = document.getElementById('code-viewer');
+                this.codeContent = document.getElementById('code-content');
+                this.codeEditor = document.getElementById('code-editor');
+                this.previewFilename = document.getElementById('preview-filename');
+                this.emptyState = document.getElementById('empty-state');
+                this.btnEdit = document.getElementById('btn-edit');
+                this.btnSave = document.getElementById('btn-save');
+                this.btnExec = document.getElementById('btn-exec');
+                this.unsavedInd = document.getElementById('unsaved-indicator');
+                this.termInput = document.getElementById('cmd-input');
+                this.termHistory = document.getElementById('terminal-history');
+                this.termContainer = document.getElementById('terminal-container');
+                this.deployModal = document.getElementById('deploy-modal');
+
+                this.init();
+            }
+
+            init() {
+                this.renderTree();
+                this.updateStats();
+                this.startClock();
+
+                // Terminal listener
+                this.termInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        this.handleCommand(this.termInput.value);
+                        this.termInput.value = '';
+                    }
+                });
+            }
+
+            // --- File System UI ---
+            renderTree(filter = '') {
+                this.treeEl.innerHTML = '';
+                const buildNode = (items, container, depth = 0) => {
+                    items.forEach(item => {
+                        // Filter logic
+                        if (filter && item.type === 'file' && !item.name.toLowerCase().includes(filter.toLowerCase())) return;
+                        if (filter && item.type === 'folder') {
+                            // Only show folder if it has matching children (simplified logic)
+                            // For complex filtering, we'd need a recursive check first.
+                            // This basic filter just hides files.
+                        }
+
+                        const node = document.createElement('div');
+                        node.className = 'tree-node';
+
+                        const content = document.createElement('div');
+                        content.className = 'node-content';
+                        if (depth > 0) content.style.paddingLeft = `${depth * 16}px`;
+
+                        // Icon selection
+                        let iconClass = 'fa-file text-slate-500';
+                        if (item.type === 'folder') iconClass = 'fa-folder text-amber-500';
+                        else if (item.name.endsWith('.js')) iconClass = 'fa-brands fa-js text-yellow-300';
+                        else if (item.name.endsWith('.py')) iconClass = 'fa-brands fa-python text-blue-400';
+                        else if (item.name.endsWith('.html')) iconClass = 'fa-brands fa-html5 text-orange-500';
+                        else if (item.name.endsWith('.json')) iconClass = 'fa-code text-green-400';
+                        else if (item.name.endsWith('.md')) iconClass = 'fa-info-circle text-blue-200';
+
+                        content.innerHTML = `<i class="fas ${iconClass} w-5 text-center mr-1"></i> ${item.name}`;
+
+                        if (item.type === 'file') {
+                            node.onclick = () => this.openFile(item, node);
+                            // Highlight if active
+                            if (this.activeFile && this.activeFile.id === item.id) {
+                                node.classList.add('active-file');
+                            }
+                        } else if (item.type === 'folder') {
+                            node.onclick = (e) => {
+                                e.stopPropagation();
+                                const nextSibling = node.nextElementSibling;
+                                if(nextSibling && nextSibling.classList.contains('folder-children')) {
+                                    nextSibling.classList.toggle('hidden');
+                                    const icon = content.querySelector('.fa-folder, .fa-folder-open');
+                                    if(icon) {
+                                        icon.classList.toggle('fa-folder');
+                                        icon.classList.toggle('fa-folder-open');
+                                    }
+                                }
+                            };
+                        }
+
+                        container.appendChild(node);
+
+                        if (item.children) {
+                            const childContainer = document.createElement('div');
+                            childContainer.className = 'folder-children'; // Added class for toggle
+                            // Start children
+                            buildNode(item.children, childContainer, depth + 1);
+                            container.appendChild(childContainer);
+                        }
+                    });
+                };
+
+                buildNode(this.files, this.treeEl);
+            }
+
+            filterTree(val) {
+                this.renderTree(val);
+            }
+
+            updateStats() {
+                // Simplified count
+                const countFiles = (items) => {
+                    let count = 0;
+                    let size = 0;
+                    items.forEach(i => {
+                        if (i.type === 'file') {
+                            count++;
+                            size += i.content.length;
+                        } else if (i.children) {
+                            const res = countFiles(i.children);
+                            count += res.count;
+                            size += res.size;
+                        }
+                    });
+                    return { count, size };
+                };
+
+                const stats = countFiles(this.files);
+                document.getElementById('file-count').innerText = `${stats.count} Files`;
+                document.getElementById('total-storage').innerText = `${(stats.size / 1024).toFixed(2)} KB`;
+            }
+
+            // --- File Operations ---
+            openFile(file, nodeEl) {
+                if (this.isEditing) this.toggleEditMode(); // Exit edit mode if changing files
+
+                this.activeFile = file;
+                this.previewFilename.innerText = file.name;
+                this.emptyState.style.display = 'none';
+                this.codeViewer.style.display = 'block';
+                this.codeViewer.classList.remove('hidden');
+
+                // Update UI selection
+                document.querySelectorAll('.tree-node').forEach(n => n.classList.remove('active-file'));
+                nodeEl.classList.add('active-file');
+
+                // Set content
+                this.codeContent.className = `language-${file.language}`;
+                this.codeContent.textContent = file.content;
+
+                // Highlight
+                if(window.Prism) Prism.highlightElement(this.codeContent);
+
+                // Enable/Disable buttons
+                this.btnEdit.disabled = false;
+                this.btnEdit.classList.remove('opacity-50', 'cursor-not-allowed');
+
+                if (['python', 'bash', 'javascript'].includes(file.language)) {
+                    this.btnExec.classList.remove('hidden');
+                    this.btnExec.classList.add('flex');
+                } else {
+                    this.btnExec.classList.add('hidden');
+                    this.btnExec.classList.remove('flex');
+                }
+            }
+
+            toggleEditMode() {
+                if (!this.activeFile) return;
+
+                this.isEditing = !this.isEditing;
+
+                if (this.isEditing) {
+                    // Switch to Edit
+                    this.codeViewer.classList.add('hidden');
+                    this.codeEditor.classList.remove('hidden');
+                    this.codeEditor.value = this.activeFile.content;
+                    this.btnEdit.innerHTML = '<i class="fas fa-times mr-1"></i> CANCEL';
+                    this.btnSave.classList.remove('hidden');
+                    this.btnSave.classList.add('flex'); // Add flex because generic hidden removes it
+                } else {
+                    // Switch to View (Cancel)
+                    this.codeEditor.classList.add('hidden');
+                    this.codeViewer.classList.remove('hidden');
+                    this.btnEdit.innerHTML = '<i class="fas fa-edit mr-1"></i> EDIT';
+                    this.btnSave.classList.add('hidden');
+                    this.btnSave.classList.remove('flex');
+                    this.unsavedInd.classList.add('hidden');
+                }
+            }
+
+            saveFile() {
+                if (!this.activeFile || !this.isEditing) return;
+
+                const newContent = this.codeEditor.value;
+                this.activeFile.content = newContent;
+
+                // Update View
+                this.codeContent.textContent = newContent;
+                if(window.Prism) Prism.highlightElement(this.codeContent);
+
+                // Flash message in terminal
+                this.logTerminal(`File '${this.activeFile.name}' saved successfully.`, 'text-emerald-400');
+
+                this.toggleEditMode(); // Switch back to view
+                this.updateStats();
+            }
+
+            executeFile() {
+                if (!this.activeFile) return;
+
+                this.logTerminal(`> Executing ./${this.activeFile.name}...`, 'text-purple-400');
+
+                setTimeout(() => {
+                    if (this.activeFile.language === 'python') {
+                        this.logTerminal('Starting deployment sequence...');
+                        this.logTerminal('Deploying to staging...');
+                        this.logTerminal('Success!', 'text-emerald-400');
+                    } else if (this.activeFile.language === 'bash') {
+                        this.logTerminal('CPU Load: 12%');
+                        this.logTerminal('Memory: OK');
+                        this.logTerminal('Disk: OK');
+                    } else {
+                        this.logTerminal('Script execution complete.');
+                    }
+                }, 800);
+            }
+
+            // --- Terminal ---
+            toggleTerminal() {
+                this.termCollapsed = !this.termCollapsed;
+                const icon = document.getElementById('term-toggle-icon');
+                if (this.termCollapsed) {
+                    this.termContainer.style.height = '32px'; // header only
+                    icon.classList.remove('fa-chevron-down');
+                    icon.classList.add('fa-chevron-up');
+                } else {
+                    this.termContainer.style.height = '192px'; // h-48
+                    icon.classList.remove('fa-chevron-up');
+                    icon.classList.add('fa-chevron-down');
+                }
+            }
+
+            clearTerminal() {
+                this.termHistory.innerHTML = '';
+            }
+
+            logTerminal(msg, colorClass = 'text-slate-300') {
+                const line = document.createElement('div');
+                line.className = `mb-1 ${colorClass}`;
+                line.textContent = msg;
+                this.termHistory.appendChild(line);
+                // Auto scroll
+                const out = document.getElementById('terminal-output');
+                out.scrollTop = out.scrollHeight;
+            }
+
+            handleCommand(cmd) {
+                const command = cmd.trim().toLowerCase();
+
+                // Echo command
+                this.logTerminal(`admin@adam:~/root$ ${cmd}`, 'text-slate-400');
+
+                if (command === 'help') {
+                    this.logTerminal('Available commands: help, ls, clear, whoami, date, cat [file]');
+                } else if (command === 'clear') {
+                    this.clearTerminal();
+                } else if (command === 'ls') {
+                    this.logTerminal('config.json  manifest.yaml  scripts/  logs/  readme.md', 'text-blue-300');
+                } else if (command === 'whoami') {
+                    this.logTerminal('admin (uid=0, gid=0)');
+                } else if (command === 'date') {
+                    this.logTerminal(new Date().toString());
+                } else if (command.startsWith('cat ')) {
+                    const fname = command.split(' ')[1];
+                    this.logTerminal(`Error: Permission denied or file not found in current context (Mock FS limitation)`, 'text-red-400');
+                } else if (command !== '') {
+                    this.logTerminal(`Command not found: ${command}`, 'text-red-400');
+                }
+            }
+
+            // --- Deployment Modal ---
+            toggleDeploymentModal() {
+                const isHidden = this.deployModal.classList.contains('hidden');
+                if (isHidden) {
+                    this.deployModal.classList.remove('hidden');
+                } else {
+                    this.deployModal.classList.add('hidden');
+                    // Reset UI
+                    document.getElementById('deploy-status').classList.add('hidden');
+                    document.getElementById('btn-start-deploy').disabled = false;
+                    document.getElementById('btn-start-deploy').classList.remove('bg-gray-600', 'cursor-not-allowed');
+                    document.querySelectorAll('.step').forEach(s => {
+                        s.classList.remove('text-emerald-400', 'text-blue-400', 'text-white');
+                        s.classList.add('text-slate-500');
+                        s.querySelector('.icon').className = 'far fa-circle w-4 text-center icon';
+                    });
+                }
+            }
+
+            runDeployment() {
+                const btn = document.getElementById('btn-start-deploy');
+                btn.disabled = true;
+                btn.classList.add('bg-gray-600', 'cursor-not-allowed');
+                btn.innerText = 'DEPLOYING...';
+
+                const steps = [1, 2, 3, 4];
+
+                const processStep = (index) => {
+                    if (index >= steps.length) {
+                        // Done
+                        document.getElementById('deploy-status').classList.remove('hidden');
+                        btn.innerText = 'DEPLOYMENT COMPLETE';
+                        return;
+                    }
+
+                    const stepId = `step-${steps[index]}`;
+                    const el = document.getElementById(stepId);
+                    const icon = el.querySelector('.icon');
+
+                    // Set to in-progress
+                    el.classList.remove('text-slate-500');
+                    el.classList.add('text-blue-400');
+                    icon.classList.remove('far', 'fa-circle');
+                    icon.classList.add('fas', 'fa-spinner', 'fa-spin');
+
+                    // Wait then set to done
+                    setTimeout(() => {
+                        el.classList.remove('text-blue-400');
+                        el.classList.add('text-emerald-400');
+                        icon.classList.remove('fa-spinner', 'fa-spin');
+                        icon.classList.add('fa-check-circle');
+
+                        processStep(index + 1);
+                    }, 1000);
+                };
+
+                processStep(0);
+            }
+
+            startClock() {
+                setInterval(() => {
+                    const now = new Date();
+                    document.getElementById('clock').innerText = now.toISOString().split('T')[1].split('.')[0] + " UTC";
+                }, 1000);
+            }
+        }
+
+        // Initialize
+        window.vaultApp = new VaultApp();
+    </script>
+</body>
+</html>
