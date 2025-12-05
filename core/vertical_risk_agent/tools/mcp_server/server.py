@@ -25,6 +25,21 @@ except ImportError:
     GenerativeRiskEngine = None
     QuantumMonteCarloEngine = None
 
+try:
+    from core.engine.meta_orchestrator import MetaOrchestrator
+    import asyncio
+except ImportError:
+    MetaOrchestrator = None
+
+# Global Orchestrator Singleton
+_orchestrator = None
+
+def get_orchestrator_instance():
+    global _orchestrator
+    if _orchestrator is None and MetaOrchestrator:
+        _orchestrator = MetaOrchestrator()
+    return _orchestrator
+
 # Initialize the MCP Server
 mcp = FastMCP("Financial Data Room")
 
@@ -102,6 +117,22 @@ def generate_stress_scenarios(regime: str = "stress", n_samples: int = 5) -> str
     engine = GenerativeRiskEngine()
     scenarios = engine.generate_scenarios(n_samples=n_samples, regime=regime)
     return "\n".join([str(s) for s in scenarios])
+
+@mcp.tool()
+async def run_deep_dive_analysis(query: str) -> str:
+    """
+    Triggers a full v23.5 Deep Dive analysis using the MetaOrchestrator.
+    Returns the JSON result as a string.
+    """
+    orchestrator = get_orchestrator_instance()
+    if not orchestrator:
+        return "Error: MetaOrchestrator not available."
+
+    try:
+        result = await orchestrator.route_request(query)
+        return str(result)
+    except Exception as e:
+        return f"Error running Deep Dive: {str(e)}"
 
 if __name__ == "__main__":
     mcp.run()

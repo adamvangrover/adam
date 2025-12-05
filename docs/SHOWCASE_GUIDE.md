@@ -1,8 +1,8 @@
-# Adam v23.0 Showcase & Gold Standard Pipeline Guide
+# Adam v23.5 Showcase & Gold Standard Pipeline Guide
 
 ## Overview
 
-The Adam v23.0 repository includes a comprehensive system for ingesting, standardizing, and displaying "Gold Standard" knowledge artifacts. This pipeline ensures that all data—from reports and newsletters to code documentation and prompts—is accessible to both the automated agents and the human operator via a static "Mission Control" interface.
+The Adam v23.5 repository includes a comprehensive system for ingesting, standardizing, and displaying "Gold Standard" knowledge artifacts. This pipeline ensures that all data—from reports and newsletters to code documentation and prompts—is accessible to both the automated agents and the human operator via a static "Mission Control" interface.
 
 ## The Gold Standard Pipeline
 
@@ -26,9 +26,18 @@ The script `scripts/generate_ui_data.py` bridges the backend and the frontend.
 Located in the `showcase/` directory, this is a vanilla JS + Tailwind CSS interface designed for GitHub Pages hosting.
 
 *   **Mission Control (`index.html`)**: The central dashboard monitoring system status.
+*   **Deep Dive Analyst (`deep_dive.html`)**: Interactive visualization of the v23.5 Deep Dive protocol (Valuation, Risk, Strategy).
+*   **Deployment Console (`deployment.html`)**: A simulated DevOps terminal for managing system lifecycle and configuration.
 *   **Reports Library (`reports.html`)**: A searchable viewer for all ingested reports, supporting both standard JSON and complex v23 Knowledge Graph structures.
 *   **Navigator (`navigator.html`)**: A file system explorer for the repo.
 *   **Neural Dashboard (`neural_dashboard.html`)**: Visualization of the v23 agent architecture.
+
+## React Application Integration
+
+The `showcase/` directory serves as a lightweight, static preview of the full application. The complete, interactive user interface is built with React and located in `services/webapp/client`.
+
+*   **Shared Design System**: The "Cyber-Minimalist" aesthetic is shared between the static Showcase and the React app.
+*   **Component Mirroring**: Key visualizations like the `KnowledgeGraphVisualizer` and `ConvictionMeter` are implemented as React components in the full app, while the Showcase uses simplified D3/Chart.js versions for demonstration.
 
 ## How to Run the Showcase
 
