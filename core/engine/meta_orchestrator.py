@@ -23,6 +23,8 @@ from core.engine.esg_graph import esg_graph_app
 from core.engine.regulatory_compliance_graph import compliance_graph_app
 from core.engine.crisis_simulation_graph import crisis_simulation_app
 from core.engine.deep_dive_graph import deep_dive_app
+from core.engine.reflector_graph import reflector_app
+from core.engine.states import init_reflector_state
 from core.system.agent_orchestrator import AgentOrchestrator
 
 # v23.5 Deep Dive Agents (for Fallback)
@@ -51,27 +53,73 @@ class MetaOrchestrator:
         complexity = self._assess_complexity(query, context)
         logger.info(f"MetaOrchestrator: Query complexity is {complexity}")
         
+        result = None
         if complexity == "DEEP_DIVE":
-            return await self._run_deep_dive_flow(query)
+            result = await self._run_deep_dive_flow(query)
         elif complexity == "RED_TEAM":
-            return await self._run_red_team_flow(query)
+            result = await self._run_red_team_flow(query)
         elif complexity == "CRISIS":
-            return await self._run_crisis_flow(query)
+            result = await self._run_crisis_flow(query)
         elif complexity == "ESG":
-            return await self._run_esg_flow(query)
+            result = await self._run_esg_flow(query)
         elif complexity == "COMPLIANCE":
-            return await self._run_compliance_flow(query)
+            result = await self._run_compliance_flow(query)
         elif complexity == "HIGH":
-            return await self._run_adaptive_flow(query)
+            result = await self._run_adaptive_flow(query)
         elif complexity == "MEDIUM":
             # Route to legacy workflow (Async v22 style via AgentOrchestrator)
             logger.info("Routing to Legacy/Async Workflow...")
-            return await self.legacy_orchestrator.execute_workflow("test_workflow", initial_context={"user_query": query})
+            result = await self.legacy_orchestrator.execute_workflow("test_workflow", initial_context={"user_query": query})
         else:
             # Low complexity -> Legacy Single Agent Execution
             logger.info("Routing to Legacy Single Agent...")
             self.legacy_orchestrator.execute_agent("QueryUnderstandingAgent", context={"user_query": query})
-            return {"status": "Dispatched to Message Broker", "query": query}
+            result = {"status": "Dispatched to Message Broker", "query": query}
+
+        # Optional: Reflection Step for high-value outputs
+        if complexity in ["DEEP_DIVE", "HIGH", "CRISIS", "RED_TEAM"]:
+             result = await self._reflect_on_result(result, query)
+
+        return result
+
+    async def _reflect_on_result(self, result: Any, query: str) -> Any:
+        """
+        Runs the ReflectorGraph to critique and potentially refine the result.
+        """
+        logger.info("Engaging Reflector (Meta-Cognition)...")
+
+        # Extract content to reflect on
+        content_to_reflect = str(result)
+        # Try to find a human readable status or summary
+        if isinstance(result, dict):
+            if "human_readable_status" in result:
+                content_to_reflect = result["human_readable_status"]
+            elif "final_state" in result:
+                # drill down
+                fs = result["final_state"]
+                if isinstance(fs, dict):
+                    content_to_reflect = fs.get("human_readable_status", str(fs))
+
+        # Initialize Reflector
+        initial_state = init_reflector_state(content_to_reflect, context={"original_query": query})
+
+        try:
+            config = {"configurable": {"thread_id": "reflector_1"}}
+            if hasattr(reflector_app, 'ainvoke'):
+                reflection = await reflector_app.ainvoke(initial_state, config=config)
+            else:
+                reflection = reflector_app.invoke(initial_state, config=config)
+
+            # Attach reflection to result
+            if isinstance(result, dict):
+                result["meta_reflection"] = reflection
+
+            logger.info("Reflection Complete.")
+            return result
+
+        except Exception as e:
+            logger.warning(f"Reflection failed: {e}. Returning original result.")
+            return result
 
     def _assess_complexity(self, query: str, context: Dict[str, Any] = None) -> str:
         """
@@ -258,31 +306,53 @@ class MetaOrchestrator:
     async def _run_adaptive_flow(self, query: str):
         logger.info("Engaging v23 Neuro-Symbolic Planner...")
         
+        # 0. Entity Extraction (Simple Heuristic)
+        start_node = "Apple Inc."
+        if "tesla" in query.lower(): start_node = "Tesla Inc."
+        elif "microsoft" in query.lower(): start_node = "Microsoft Corp"
+
+        target_node = "CreditRating"
+        if "esg" in query.lower(): target_node = "ESGScore"
+        elif "risk" in query.lower(): target_node = "RiskScore"
+        elif "sentiment" in query.lower(): target_node = "Sentiment"
+
         # 1. Discover Plan
         try:
-            plan = self.planner.discover_plan(query)
-            if not plan:
+            plan_data = self.planner.discover_plan(start_node, target_node)
+            if not plan_data:
                 return {"error": "Failed to generate a plan."}
         except Exception as e:
-            logger.error(f"Planner failed: {e}")
+            logger.error(f"Planner failed: {e}", exc_info=True)
             return {"error": "Planner Exception"}
             
         # 2. Compile Graph
         try:
-            app = self.planner.to_executable_graph(plan)
+            app = self.planner.to_executable_graph(plan_data)
             if not app:
                  return {"error": "Failed to compile graph."}
         except Exception as e:
-            logger.error(f"Graph compilation failed: {e}")
+            logger.error(f"Graph compilation failed: {e}", exc_info=True)
             return {"error": "Compilation Exception"}
 
         # 3. Execute
-        ticker = "AAPL" # Default/Mock
-        if "apple" in query.lower(): ticker = "AAPL"
-        if "microsoft" in query.lower(): ticker = "MSFT"
-        if "tesla" in query.lower(): ticker = "TSLA"
+        # Transform plan_data into the expected PlanOnGraph structure for the state
+        plan_struct = {
+            "id": "plan-001",
+            "steps": plan_data.get("steps", []),
+            "is_complete": False,
+            "cypher_query": plan_data.get("symbolic_plan")
+        }
         
-        initial_state = init_risk_state(ticker, query)
+        initial_state = {
+            "request": query,
+            "plan": plan_struct,
+            "current_task_index": 0,
+            "assessment": {"content": ""},
+            "critique": None,
+            "human_feedback": None,
+            "iteration": 0,
+            "max_iterations": 5
+        }
         
         try:
             config = {"configurable": {"thread_id": "1"}}
@@ -296,7 +366,7 @@ class MetaOrchestrator:
                 "final_state": result
             }
         except Exception as e:
-            logger.error(f"v23 Execution Failed: {e}")
+            logger.error(f"v23 Execution Failed: {e}", exc_info=True)
             return {"error": str(e)}
 
     async def _run_red_team_flow(self, query: str):
