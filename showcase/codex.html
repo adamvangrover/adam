@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Codex</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Vis.js for Graph -->
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+
+    <!-- Prism for Syntax Highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body { background-color: #050b14; } /* Deep space black */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+        }
+        .file-tree-item {
+            cursor: pointer;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: #64748b;
+            transition: all 0.2s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+        }
+        .file-tree-item:hover {
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.05);
+        }
+        .file-tree-item.active {
+            color: #22d3ee;
+            background: rgba(34, 211, 238, 0.1);
+            border-right: 2px solid #22d3ee;
+        }
+        .file-tree-item.folder {
+            color: #94a3b8;
+            font-weight: bold;
+        }
+
+        #graph-container {
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+        }
+
+        /* Overlay */
+        .code-overlay {
+            position: absolute;
+            top: 0; right: 0; bottom: 0;
+            width: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid #334155;
+            transition: width 0.3s ease-in-out;
+            overflow: hidden;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+        }
+        .code-overlay.open {
+            width: 600px;
+        }
+
+        .scan-line {
+            position: fixed; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(to right, transparent, rgba(34, 211, 238, 0.5), transparent);
+            animation: scan 4s linear infinite; pointer-events: none; z-index: 9999; opacity: 0.3;
+        }
+        @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden text-slate-300 font-sans selection:bg-cyan-500/30">
+    <div class="scan-line"></div>
+
+    <!-- Header -->
+    <header class="h-14 border-b border-slate-800 flex items-center justify-between px-6 bg-[#0f172a]/80 backdrop-blur-md z-40 shrink-0">
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="text-slate-500 hover:text-cyan-400 transition"><i class="fas fa-chevron-left"></i></a>
+            <div class="flex flex-col">
+                <h1 class="text-sm font-bold tracking-widest uppercase text-slate-200">System <span class="text-cyan-400">Codex</span></h1>
+                <span class="text-[10px] text-slate-500 font-mono tracking-tighter">REPOSITORY_VULNERABILITY_SCAN_ACTIVE</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div class="relative group">
+                <input type="text" id="global-search" placeholder="Search Codex..."
+                    class="bg-slate-900/50 border border-slate-700 rounded-full px-4 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-cyan-500 w-64 transition-all focus:w-80 font-mono"
+                    onkeyup="handleSearch(this.value)">
+                <i class="fas fa-search absolute right-3 top-2 text-slate-600 text-xs"></i>
+            </div>
+
+            <div class="h-6 w-px bg-slate-800 mx-2"></div>
+
+            <div class="flex gap-2 text-[10px] font-mono text-slate-500">
+                <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Python</div>
+                <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-yellow-500"></span> JS</div>
+                <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span> JSON</div>
+                <div class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-slate-500"></span> Doc</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex overflow-hidden relative">
+
+        <!-- Sidebar: File Tree -->
+        <aside class="w-80 bg-[#0b1120] border-r border-slate-800 flex flex-col shrink-0 z-20">
+            <div class="p-3 border-b border-slate-800/50 flex justify-between items-center">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">File System</span>
+                <span class="text-[10px] font-mono text-slate-600" id="file-count">Scanning...</span>
+            </div>
+            <div class="flex-1 overflow-y-auto custom-scrollbar p-2" id="file-tree-container">
+                <!-- Tree Injected Here -->
+            </div>
+            <div class="p-2 border-t border-slate-800/50 text-[10px] text-slate-600 font-mono text-center">
+                /root/adam_v23_core/
+            </div>
+        </aside>
+
+        <!-- Center: Graph Visualization -->
+        <section class="flex-1 relative bg-slate-950 overflow-hidden" id="graph-container">
+            <div id="network" class="w-full h-full"></div>
+            
+            <!-- Floating Controls -->
+            <div class="absolute bottom-6 left-6 flex gap-2 z-10">
+                <button onclick="network.fit({animation:true})" class="p-2 bg-slate-900/80 hover:bg-cyan-900/50 text-slate-400 hover:text-cyan-400 rounded border border-slate-700 backdrop-blur transition">
+                    <i class="fas fa-compress"></i>
+                </button>
+                <button onclick="togglePhysics()" class="p-2 bg-slate-900/80 hover:bg-cyan-900/50 text-slate-400 hover:text-cyan-400 rounded border border-slate-700 backdrop-blur transition" id="physics-btn">
+                    <i class="fas fa-snowflake"></i>
+                </button>
+            </div>
+
+            <!-- Graph Stats -->
+            <div class="absolute top-4 left-4 pointer-events-none">
+                <div class="text-xs font-mono text-slate-500">NODES: <span class="text-slate-300" id="stat-nodes">0</span></div>
+                <div class="text-xs font-mono text-slate-500">EDGES: <span class="text-slate-300" id="stat-edges">0</span></div>
+            </div>
+        </section>
+
+        <!-- Right: Code/Detail Overlay -->
+        <div class="code-overlay" id="detail-panel">
+            <div class="h-10 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-4 shrink-0">
+                <div class="flex items-center gap-2 overflow-hidden">
+                    <i class="fas fa-file-code text-cyan-500 text-xs"></i>
+                    <span class="text-xs font-mono text-cyan-400 truncate" id="detail-filename">filename.py</span>
+                </div>
+                <button onclick="closeDetail()" class="text-slate-500 hover:text-white transition"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="p-4 bg-slate-900/50 border-b border-slate-800 flex gap-4 text-[10px] font-mono text-slate-400 shrink-0">
+                <div>SIZE: <span class="text-slate-200" id="detail-size">-- KB</span></div>
+                <div>LINES: <span class="text-slate-200" id="detail-lines">--</span></div>
+                <div>TYPE: <span class="text-slate-200" id="detail-type">PYTHON</span></div>
+            </div>
+
+            <div class="flex-1 overflow-auto custom-scrollbar bg-[#0d1117] p-4 relative group">
+                <pre class="text-xs font-mono m-0"><code id="detail-code" class="language-python">
+# Loading preview...
+# Only logic structure is available for large files.
+                </code></pre>
+
+                <div class="absolute inset-0 flex items-center justify-center pointer-events-none" id="preview-placeholder">
+                    <div class="text-center">
+                        <i class="fas fa-lock text-4xl text-slate-800 mb-2"></i>
+                        <p class="text-xs text-slate-600 font-mono">CONTENT SECURED</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-3 border-t border-slate-800 bg-slate-900/80 shrink-0">
+                <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-2">Imports / Dependencies</h4>
+                <div class="flex flex-wrap gap-1" id="detail-imports">
+                    <!-- Badges -->
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Data Source -->
+    <script src="js/mock_data.js"></script>
+    <script src="js/repo_data.js"></script>
+
+    <script>
+        // --- GLOBALS ---
+        let network = null;
+        let physicsEnabled = true;
+        let repoData = window.REPO_DATA || { nodes: [], edges: [], tree: {} };
+        let nodesDS, edgesDS;
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initGraph();
+            initTree();
+            updateStats();
+        });
+
+        // --- GRAPH LOGIC ---
+        function initGraph() {
+            const container = document.getElementById('network');
+
+            // Prepare Data
+            nodesDS = new vis.DataSet(repoData.nodes);
+            edgesDS = new vis.DataSet(repoData.edges);
+
+            const options = {
+                nodes: {
+                    shape: 'dot',
+                    font: { face: 'JetBrains Mono', color: '#94a3b8', size: 10, strokeWidth: 0 },
+                    borderWidth: 0,
+                    scaling: { min: 5, max: 30, label: { enabled: false } }, // Scale node size by 'value'
+                },
+                edges: {
+                    width: 0.5,
+                    color: { color: '#334155', opacity: 0.5 },
+                    smooth: { type: 'continuous', roundness: 0.2 },
+                    selectionWidth: 2
+                },
+                groups: {
+                    root: { color: '#f59e0b', size: 30 },
+                    folder: { color: '#475569', size: 10 },
+                    py: { color: '#3b82f6' }, // Blue
+                    js: { color: '#eab308' }, // Yellow
+                    json: { color: '#22c55e' }, // Green
+                    md: { color: '#94a3b8' }, // Grey
+                    html: { color: '#f97316' }, // Orange
+                    css: { color: '#ec4899' }, // Pink
+                    txt: { color: '#64748b' }
+                },
+                physics: {
+                    stabilization: { iterations: 200 }, // Pre-stabilize
+                    barnesHut: {
+                        gravitationalConstant: -20000,
+                        springLength: 100,
+                        springConstant: 0.01
+                    },
+                    maxVelocity: 50,
+                    minVelocity: 0.1
+                },
+                interaction: { hover: true, tooltipDelay: 200, hideEdgesOnDrag: true }
+            };
+
+            network = new vis.Network(container, { nodes: nodesDS, edges: edgesDS }, options);
+
+            // Events
+            network.on("click", (params) => {
+                if(params.nodes.length > 0) {
+                    selectNode(params.nodes[0]);
+                } else {
+                    closeDetail();
+                }
+            });
+
+            // Stabilize faster visually
+            network.once("stabilizationIterationsDone", function() {
+                document.getElementById('physics-btn').innerHTML = '<i class="fas fa-snowflake"></i>';
+                // network.setOptions( { physics: false } ); // Optional auto-freeze
+                // physicsEnabled = false;
+            });
+        }
+
+        function togglePhysics() {
+            physicsEnabled = !physicsEnabled;
+            network.setOptions({ physics: { enabled: physicsEnabled } });
+            document.getElementById('physics-btn').innerHTML = physicsEnabled ? '<i class="fas fa-snowflake"></i>' : '<i class="fas fa-play"></i>';
+        }
+
+        function updateStats() {
+            document.getElementById('stat-nodes').innerText = repoData.nodes.length;
+            document.getElementById('stat-edges').innerText = repoData.edges.length;
+            document.getElementById('file-count').innerText = `${repoData.nodes.filter(n => n.group !== 'folder' && n.group !== 'root').length} FILES`;
+        }
+
+        // --- TREE LOGIC ---
+        function initTree() {
+            const container = document.getElementById('file-tree-container');
+            renderTreeLevel(repoData.tree, container, "");
+        }
+
+        function renderTreeLevel(node, container, path) {
+            const ul = document.createElement('ul');
+            ul.className = "pl-3 border-l border-slate-800/50 ml-1";
+
+            // Folders first, then files
+            const keys = Object.keys(node).sort((a, b) => {
+                const isFolderA = !node[a].__file__;
+                const isFolderB = !node[b].__file__;
+                if(isFolderA && !isFolderB) return -1;
+                if(!isFolderA && isFolderB) return 1;
+                return a.localeCompare(b);
+            });
+
+            keys.forEach(key => {
+                if(key === '__file__') return; // Skip metadata keys if they leak (though they are inside item)
+
+                const item = node[key];
+                const isFolder = !item.__file__;
+                const fullPath = path ? `${path}/${key}` : key;
+                const li = document.createElement('li');
+
+                const div = document.createElement('div');
+                div.className = `file-tree-item ${isFolder ? 'folder' : ''}`;
+                div.dataset.path = fullPath;
+
+                // Icon
+                let iconClass = 'fa-file text-slate-600';
+                if (isFolder) iconClass = 'fa-folder';
+                else if (key.endsWith('.py')) iconClass = 'fa-brands fa-python text-blue-500';
+                else if (key.endsWith('.js')) iconClass = 'fa-brands fa-js text-yellow-500';
+                else if (key.endsWith('.json')) iconClass = 'fa-code text-green-500';
+                else if (key.endsWith('.md')) iconClass = 'fa-file-lines text-slate-400';
+                else if (key.endsWith('.html')) iconClass = 'fa-html5 text-orange-500';
+
+                div.innerHTML = `<i class="fas ${iconClass} w-4 text-center mr-2 text-[10px]"></i> ${key}`;
+
+                div.onclick = (e) => {
+                    e.stopPropagation();
+                    if (isFolder) {
+                        // Toggle
+                        const childUl = li.querySelector('ul');
+                        if (childUl) {
+                            childUl.classList.toggle('hidden');
+                            const icon = div.querySelector('.fa-folder, .fa-folder-open');
+                            icon.classList.toggle('fa-folder');
+                            icon.classList.toggle('fa-folder-open');
+                        }
+                    } else {
+                        // Select
+                        document.querySelectorAll('.file-tree-item').forEach(el => el.classList.remove('active'));
+                        div.classList.add('active');
+
+                        // Find node ID
+                        const node = repoData.nodes.find(n => n.path === fullPath);
+                        if (node) {
+                            network.selectNodes([node.id]);
+                            network.focus(node.id, { scale: 1.5, animation: true });
+                            showDetail(node);
+                        }
+                    }
+                };
+
+                li.appendChild(div);
+
+                if (isFolder) {
+                    const subContainer = document.createElement('div');
+                    renderTreeLevel(item, subContainer, fullPath);
+                    if(subContainer.firstChild) li.appendChild(subContainer.firstChild);
+                }
+
+                ul.appendChild(li);
+            });
+
+            container.appendChild(ul);
+        }
+
+        // --- INTERACTION ---
+
+        function selectNode(nodeId) {
+            const node = repoData.nodes.find(n => n.id === nodeId);
+            if (!node) return;
+
+            // Highlight in Tree
+            const treeItems = document.querySelectorAll('.file-tree-item');
+            treeItems.forEach(el => el.classList.remove('active'));
+
+            // Find by path
+            const el = document.querySelector(`.file-tree-item[data-path="${node.path}"]`);
+            if (el) {
+                el.classList.add('active');
+                el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                // Expand parents? Not implemented for simplicity, but scrolling works.
+            }
+
+            if (node.group !== 'folder' && node.group !== 'root') {
+                showDetail(node);
+            } else {
+                closeDetail();
+            }
+        }
+
+        function showDetail(node) {
+            const panel = document.getElementById('detail-panel');
+            panel.classList.add('open');
+            
+            document.getElementById('detail-filename').innerText = node.label;
+            document.getElementById('detail-size').innerText = (node.size / 1024).toFixed(1) + " KB";
+            document.getElementById('detail-lines').innerText = node.lines || "0";
+            document.getElementById('detail-type').innerText = node.group.toUpperCase();
+            
+            // Imports
+            const impContainer = document.getElementById('detail-imports');
+            impContainer.innerHTML = "";
+            if (node.imports && node.imports.length > 0) {
+                node.imports.forEach(imp => {
+                    const span = document.createElement('span');
+                    span.className = "px-1.5 py-0.5 bg-slate-800 text-slate-400 rounded text-[9px] border border-slate-700";
+                    span.innerText = imp;
+                    impContainer.appendChild(span);
+                });
+            } else {
+                impContainer.innerHTML = "<span class='text-slate-600 italic'>No explicit dependencies detected.</span>";
+            }
+
+            // Mock Content Preview based on logic
+            const codeBlock = document.getElementById('detail-code');
+            codeBlock.className = `language-${node.group === 'js' ? 'javascript' : node.group}`;
+            
+            if (node.group === 'py') {
+                codeBlock.textContent = `
+# File: ${node.path}
+# Auto-generated preview
+
+import ${node.imports ? node.imports.join('\nimport ') : 'os'}
+
+class ${node.label.split('.')[0].replace(/_/g, '').replace(/^\w/, c => c.toUpperCase())}:
+    """
+    Documentation for ${node.label}
+    Auto-scanned by ADAM Codex.
+    """
+    def __init__(self):
+        pass
+
+    def execute(self):
+        # Implementation hidden
+        pass
+                `;
+            } else if (node.group === 'json') {
+                codeBlock.textContent = `{\n  "meta": "Preview for ${node.label}",\n  "size": ${node.size}\n}`;
+            } else {
+                 codeBlock.textContent = `// Preview not available for ${node.group} files.\n// View source code directly in IDE.`;
+            }
+            
+            document.getElementById('preview-placeholder').style.display = 'none';
+
+            if(window.Prism) Prism.highlightElement(codeBlock);
+        }
+
+        function closeDetail() {
+            document.getElementById('detail-panel').classList.remove('open');
+        }
+
+        function handleSearch(query) {
+            if (!query) return;
+            query = query.toLowerCase();
+
+            const found = repoData.nodes.find(n => n.label.toLowerCase().includes(query));
+            if (found) {
+                selectNode(found.id);
+                network.selectNodes([found.id]);
+                network.focus(found.id, { scale: 1.5, animation: true });
+            }
+        }
+
+    </script>
+</body>
+</html>
