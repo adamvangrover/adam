@@ -20,6 +20,7 @@ db = SQLAlchemy()
 socketio = SocketIO()
 jwt = JWTManager()
 agent_orchestrator = None
+meta_orchestrator = None
 
 
 # ---------------------------------------------------------------------------- #
@@ -108,16 +109,20 @@ def create_app(config_name='default'):
 
 
     # Initialize the core components
+    global meta_orchestrator
     if app.config['CORE_INTEGRATION']:
         sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
         from core.utils.config_utils import load_app_config
         from core.system.agent_orchestrator import AgentOrchestrator
         from core.system.knowledge_base import KnowledgeBase
         from core.system.data_manager import DataManager
+        from core.engine.meta_orchestrator import MetaOrchestrator
+
         core_config = load_app_config()
         knowledge_base = KnowledgeBase(core_config)
         data_manager = DataManager(core_config)
         agent_orchestrator = AgentOrchestrator(core_config, knowledge_base, data_manager)
+        meta_orchestrator = MetaOrchestrator(legacy_orchestrator=agent_orchestrator)
 
     # ---------------------------------------------------------------------------- #
     # API Endpoints
@@ -126,6 +131,37 @@ def create_app(config_name='default'):
     @app.route('/api/hello')
     def hello_world():
         return 'Hello, World!'
+
+    @app.route('/api/v23/analyze', methods=['POST'])
+    def run_v23_analysis():
+        data = request.get_json()
+        query = data.get('query')
+        if not query:
+             return jsonify({'error': 'No query provided'}), 400
+
+        if app.config['CORE_INTEGRATION'] and meta_orchestrator:
+             import asyncio
+             try:
+                 # Ensure we have an event loop
+                 try:
+                     loop = asyncio.get_event_loop()
+                 except RuntimeError:
+                     loop = asyncio.new_event_loop()
+                     asyncio.set_event_loop(loop)
+
+                 if loop.is_running():
+                      # If we are already in a loop (e.g. uvicorn/hypercorn), handle differently
+                      # But Flask dev server is threaded.
+                      future = asyncio.run_coroutine_threadsafe(meta_orchestrator.route_request(query), loop)
+                      result = future.result()
+                 else:
+                      result = loop.run_until_complete(meta_orchestrator.route_request(query))
+
+                 return jsonify(result)
+             except Exception as e:
+                 return jsonify({'error': str(e)}), 500
+        else:
+             return jsonify({'status': 'Mock Result', 'analysis': 'Core not integrated or MetaOrchestrator not ready.'})
 
     # ---------------------------------------------------------------------------- #
     # Agent Endpoints
