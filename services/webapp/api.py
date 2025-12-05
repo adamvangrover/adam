@@ -8,6 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import sys
 import os
 import json
+import asyncio
 from datetime import datetime, timezone
 from .config import config
 from .celery import celery
@@ -88,6 +89,8 @@ def create_app(config_name='default'):
     Application factory.
     """
     global agent_orchestrator
+    global meta_orchestrator
+
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
@@ -188,8 +191,10 @@ def create_app(config_name='default'):
         Invokes a specific agent with the given arguments.
         """
         data = request.get_json()
-        result = agent_orchestrator.run_agent(agent_name, data)
-        return jsonify(result)
+        if agent_orchestrator:
+            result = agent_orchestrator.execute_agent(agent_name, data)
+            return jsonify(result)
+        return jsonify({'error': 'Agent Orchestrator not initialized'}), 503
 
     @app.route('/api/agents/<agent_name>/schema')
     def get_agent_schema(agent_name):
