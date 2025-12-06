@@ -252,12 +252,12 @@ A high-level overview of the "Hive Mind" structure:
 
 ### 📚 Resources & Documentation
 
-  * **Architecture Vision:** [Adam v23.0 "Adaptive Hive" Vision](https://www.google.com/search?q=%23)
-  * **Pipeline Details:** [Gold Standard Data Pipeline](https://www.google.com/search?q=%23)
-  * **API Reference:** [API Documentation](https://www.google.com/search?q=%23)
-  * **User Manual:** [Comprehensive User Guide](https://www.google.com/search?q=%23)
-  * **Demo Guide:** [Showcase Walkthrough](https://www.google.com/search?q=%23)
-  * **Prompt Library:** [v23.5 Autonomous Analyst Prompt](https://www.google.com/search?q=%23)
+  * **Architecture Vision:** [Adam v23.0 "Adaptive Hive" Vision](https://github.com/adamvangrover/adam/tree/main/docs/v23_architecture_vision.md)
+  * **Pipeline Details:** [Gold Standard Data Pipeline]((https://github.com/adamvangrover/adam/tree/main/docs/GOLD_STANDARD_PIPELINE.md)
+  * **API Reference:** [API Documentation](https://github.com/adamvangrover/adam/tree/main/docs/api.md)
+  * **User Manual:** [Comprehensive User Guide](https://github.com/adamvangrover/adam/tree/main/docs/user_guide.md)
+  * **Demo Guide:** [Showcase Walkthrough](https://github.com/adamvangrover/adam/tree/main/docs/SHOWCASE_GUIDE.md)
+  * **Prompt Library:** [v23.5 Autonomous Analyst Prompt](https://github.com/adamvangrover/adam/tree/main/prompt_library/Adam_v23.5_System_Prompt.md)
 
 -----
 
@@ -265,7 +265,7 @@ A high-level overview of the "Hive Mind" structure:
 
 We welcome contributions from the community\! Whether it's a new agent skill, a data connector, or a UI enhancement.
 
-1.  Read our [Contribution Guidelines](https://www.google.com/search?q=%23).
+1.  Read our [Contribution Guidelines](https://github.com/adamvangrover/adam/tree/main).
 2.  Fork the repo and create your branch (`git checkout -b feature/amazing-feature`).
 3.  Commit your changes (`git commit -m 'Add some amazing feature'`).
 4.  Push to the branch (`git push origin feature/amazing-feature`).
