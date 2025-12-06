@@ -192,47 +192,44 @@ streamlit run app.py
 
 #### Quick Start Guide
 
-1.  **Clone the Repository**
-
+1.  **Clone and Enter Repository**
     ```bash
-    git clone [https://github.com/adamvangrover/adam.git](https://github.com/adamvangrover/adam.git)
+    git clone https://github.com/adamvangrover/adam.git
     cd adam
     ```
 
-*   [Adam v20.0 Implementation Plan](docs/v20.0)
-*   [System Requirements](docs/REQUIREMENTS.md)
-*   [User Guide](docs/user_guide.md)
-*   [API Documentation](docs/api_docs.yaml)
-*   [Contribution Guidelines](CONTRIBUTING.md)
-*   [Showcase Guide](docs/SHOWCASE_GUIDE.md): Walkthrough of the demo.
-*   [v23 Architecture Vision](docs/v23_architecture_vision.md): Deep dive into the "Adaptive Hive".
-*   [Gold Standard Pipeline](docs/GOLD_STANDARD_PIPELINE.md): Data ingestion guide.
-
-2.  **Install Python Dependencies**
-
+2.  **One-Click Launch**
+    Run the automated launcher script. It checks for Docker or Python, installs dependencies, and starts the system.
     ```bash
-    pip install -r requirements.txt
+    ./run_adam.sh
     ```
 
-
-3.  **Configure API Keys**
-    Create a `.env` file or update `config/api_keys.yaml`:
-
-    ```yaml
-    openai: "sk-..."
-    neo4j: "bolt://..."
-    ```
-
-4.  **Launch the System**
-
+    *Alternatively, for manual setup:*
     ```bash
-    python scripts/run_adam.py
+    pip install -e .           # Install as a package
+    python core/main.py        # Run the engine
     ```
 
-5.  **Open Mission Control**
-    Launch the interactive dashboard to watch Adam think in real-time.
+3.  **Configure API Keys (Optional but Recommended)**
+    The launcher creates a `.env` file if missing. Edit it to add your keys:
+    ```bash
+    OPENAI_API_KEY=sk-...
+    ```
 
-      * Open `showcase/index.html` in your browser.
+4.  **Open Mission Control**
+    *   **UI:** `http://localhost:80` (Docker) or `http://localhost:3000` (Local)
+    *   **Neural Dashboard:** `showcase/index.html`
+
+#### Developer Experience
+
+We provide standard tooling for developers:
+
+*   **Install Dependencies:** `make install`
+*   **Run Tests:** `make test`
+*   **Lint Code:** `make lint`
+*   **CI/CD:** Automated testing via GitHub Actions is configured in `.github/workflows/ci.yml`.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
 
 -----
 
@@ -282,3 +279,28 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ```
 ```
+
+## ⚡ Modernization & Optimization (v23.5+)
+
+As part of the 2025 Strategic Technical Modernization, the following high-performance components have been added:
+
+*   **Modern Build System:** `pyproject.toml` and `uv` support for hermetic builds.
+*   **Optimization Service:** A dedicated stateful microservice (`src/adam/api`) providing "Optimizer as a Service" via FastAPI and Redis.
+*   **State-of-the-Art Optimizers:**
+    *   **AdamW:** Decoupled Weight Decay.
+    *   **Lion:** Evolved Sign Momentum (Google ADK).
+    *   **Adam-mini:** Memory-efficient block-wise optimization (2025 Frontier).
+
+### Quick Start (Modern Stack)
+
+1.  **Build with Docker:**
+    ```bash
+    docker build -f Dockerfile.modern -t adam-optimizer .
+    ```
+
+2.  **Run the API:**
+    ```bash
+    docker run -p 8000:8000 -e REDIS_URL=redis://host.docker.internal:6379/0 adam-optimizer
+    ```
+
+For details, see [Modernization Report](docs/modernization_report.md).

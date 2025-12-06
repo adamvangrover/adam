@@ -1,0 +1,86 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "adam"
+version = "23.5.0"
+description = "Autonomous Digital Asset Manager & Optimization Toolkit"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Adam Van Grover", email = "adam@example.com" }
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    # Core Data & Math
+    "numpy>=1.26.4",
+    "pandas>=1.5.3",
+    "scipy>=1.11.4",
+    "scikit-learn>=1.2.2",
+    "torch>=2.3.0",
+
+    # Modern API Stack (New)
+    "fastapi>=0.109.0",
+    "uvicorn>=0.27.0",
+    "pydantic>=2.5.0",
+    "python-multipart>=0.0.9",
+    "authlib>=1.3.0",
+
+    # Agents & Graph
+    "langchain",
+    "langgraph",
+    "semantic-kernel",
+    "networkx>=3.1",
+
+    # Optimization
+    "redis>=4.5.1",
+
+    # Legacy / Existing Support
+    "Flask>=3.0.0",
+    "Flask-JWT-Extended>=4.6.0",
+    "requests>=2.31.0",
+    "pyyaml>=6.0.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "hypothesis>=6.98.0",
+    "ruff>=0.3.0",
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.5.0",
+    "mkdocstrings[python]>=0.24.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/adam"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "I"]
+ignore = []
+
+[tool.ruff.lint.isort]
+known-first-party = ["adam"]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q --asyncio-mode=auto"
+testpaths = [
+    "tests",
+]
+pythonpath = [
+    "src"
+]
