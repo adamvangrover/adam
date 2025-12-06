@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM | Neural Chat</title>
+    <title>ADAM | CHAT</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .typing-indicator span {
@@ -25,25 +24,26 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        /* Custom Scrollbar for Code Blocks */
+        .custom-scrollbar::-webkit-scrollbar { height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { bg: #1e293b; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { bg: #475569; border-radius: 3px; }
     </style>
 </head>
-<body class="h-screen flex flex-col grid-bg overflow-hidden">
-    <div class="scan-line"></div>
+<body class="h-screen flex flex-col bg-slate-900 overflow-hidden text-slate-300 font-sans selection:bg-cyan-500/30">
+    
+    <div class="pointer-events-none absolute inset-0 z-50 opacity-[0.03] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%]"></div>
 
-    <!-- Mobile Header -->
     <div class="md:hidden flex items-center justify-between p-4 border-b border-slate-700 bg-slate-900/80 backdrop-blur z-20">
         <div class="font-bold text-white tracking-wider">ADAM <span class="text-cyan-500">CHAT</span></div>
-        <button id="nav-toggle" class="text-white">
+        <button id="nav-toggle" class="text-white hover:text-cyan-400 transition">
             <i class="fas fa-bars"></i>
         </button>
     </div>
 
-    <!-- Nav injected by nav.js -->
+    <main class="flex-1 flex overflow-hidden relative">
 
-    <main class="flex-1 flex overflow-hidden md:ml-64 relative">
-
-        <!-- History Sidebar (Desktop) -->
-        <div class="w-72 glass-panel border-r border-slate-700 flex flex-col hidden lg:flex z-10">
+        <div class="w-72 border-r border-slate-700 flex flex-col hidden lg:flex z-10 bg-slate-900">
              <div class="p-4 border-b border-slate-700">
                 <button class="w-full py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-sm font-bold shadow-lg shadow-cyan-500/20 transition flex items-center justify-center gap-2" onclick="newChat()">
                     <i class="fas fa-plus"></i> NEW SESSION
@@ -52,7 +52,6 @@
 
             <div class="flex-1 overflow-y-auto p-2 space-y-1">
                 <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider px-2 py-2">Recent Sessions</div>
-                <!-- Mock History -->
                 <div class="p-2 rounded hover:bg-slate-800 cursor-pointer text-xs text-slate-300 truncate border-l-2 border-transparent hover:border-cyan-500 transition-colors">
                     <i class="fas fa-chart-line mr-2 text-slate-500"></i> Analysis: Apple Q3
                 </div>
@@ -66,25 +65,22 @@
 
             <div class="p-4 border-t border-slate-700 bg-slate-800/30">
                 <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2">Model Config</div>
-                <select class="w-full bg-slate-900 border border-slate-700 rounded p-1 text-xs text-white mb-2 focus:border-cyan-500 outline-none">
+                <select class="w-full bg-slate-950 border border-slate-700 rounded p-2 text-xs text-white mb-2 focus:border-cyan-500 outline-none">
                     <option>Adam v23.5 (Adaptive)</option>
                     <option>Adam v22.0 (Fast)</option>
                     <option>GPT-4o (Passthrough)</option>
                 </select>
                 <div class="flex items-center justify-between text-xs text-slate-400">
                     <span>Temp: 0.7</span>
-                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span> Graph ON</span>
+                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Graph ON</span>
                 </div>
             </div>
         </div>
 
-        <!-- Chat Area -->
         <div class="flex-1 flex flex-col relative bg-slate-900/50">
 
-            <!-- Messages -->
             <div class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 scroll-smooth" id="chat-container">
 
-                <!-- Welcome Message -->
                 <div class="flex gap-4 max-w-3xl mx-auto w-full chat-msg">
                     <div class="w-8 h-8 rounded bg-gradient-to-br from-cyan-600 to-blue-700 flex-shrink-0 flex items-center justify-center font-bold text-white shadow-lg shadow-cyan-500/20">A</div>
                     <div class="flex-1 space-y-2">
@@ -92,10 +88,10 @@
                             <span class="font-bold text-white text-sm">Adam v23.5</span>
                             <span class="text-[10px] text-cyan-400 bg-cyan-900/20 px-1 rounded border border-cyan-800">SYSTEM</span>
                         </div>
-                        <div class="text-slate-300 text-sm leading-relaxed prose prose-invert">
+                        <div class="text-slate-300 text-sm leading-relaxed">
                             <p>Greetings, Operator. The Adaptive System is online.</p>
-                            <p>I can assist with:</p>
-                            <ul class="list-disc pl-4 space-y-1 text-slate-400">
+                            <p class="mt-2">I can assist with:</p>
+                            <ul class="list-disc pl-4 space-y-1 text-slate-400 mt-1">
                                 <li>Deep Dive Financial Analysis (SNC, Credit, Valuation)</li>
                                 <li>Market Risk Simulation (Monte Carlo, Stress Testing)</li>
                                 <li>Knowledge Graph Exploration</li>
@@ -107,7 +103,6 @@
 
             </div>
 
-            <!-- Input Area -->
             <div class="p-4 border-t border-slate-700 bg-slate-900/80 backdrop-blur z-20">
                 <div class="max-w-3xl mx-auto relative">
                     <textarea
@@ -131,7 +126,6 @@
 
     </main>
 
-    <!-- Dependencies -->
     <script src="js/mock_data.js"></script>
     <script src="js/app.js"></script>
     <script src="js/nav.js"></script>
@@ -151,60 +145,108 @@
             const text = userInput.value.trim();
             if(!text) return;
 
-            // User Message
+            // 1. Render User Message
             addMessage('User', text, 'U');
             userInput.value = '';
             userInput.style.height = 'auto'; // Reset height
 
-            // Loading Indicator
+            // 2. Add Loading State
             const loadingId = addLoading();
 
-            // Simulate Think Time
-            setTimeout(async () => {
+            try {
+                let displayHtml = "";
+                
+                // --- STRATEGY: HYBRID HANDLING ---
+                
+                // PATH A: Check for specific "Demo" triggers first (Fast track)
+                // This allows you to show off specific scenarios instantly.
+                const lowerText = text.toLowerCase();
+                if (lowerText.includes('apple') || lowerText.includes('risk') || lowerText.includes('sim')) {
+                    // Simulate a network delay for realism
+                    await new Promise(r => setTimeout(r, 1200));
+                    displayHtml = generateDemoResponse(lowerText);
+                } 
+                
+                // PATH B: Attempt to use the Backend (dataManager) if it exists
+                else if (window.dataManager) {
+                    const response = await window.dataManager.sendQuery(text);
+                    displayHtml = formatBackendResponse(response);
+                }
+                
+                // PATH C: Fallback / Mock Search (Client-Side RAG)
+                else if (window.globalSearch) {
+                     // Simulate thinking
+                    await new Promise(r => setTimeout(r, 1000));
+                    const results = window.globalSearch.search(text);
+                    if (results.length > 0) {
+                        displayHtml = `I found relevant information in **${results[0].title}**:\n\n> ${results[0].type} content found. Accessing full report...`;
+                    } else {
+                        displayHtml = "Query logged. No local knowledge found. Querying external Knowledge Graph nodes...";
+                    }
+                } 
+                
+                // PATH D: Default fallback if nothing else works
+                else {
+                    await new Promise(r => setTimeout(r, 1000));
+                    displayHtml = "System operational. However, I am not connected to the DataManager. \n\nTry asking about **Apple** or running a **Risk Simulation** to see my demo capabilities.";
+                }
+
+                // 3. Remove Loader and Show Response
                 removeMessage(loadingId);
-                const response = await generateResponse(text);
-                addMessage('Adam v23.5', response, 'A', true);
-            }, 1000 + Math.random() * 1000);
+                addMessage('Adam v23.5', displayHtml, 'A', true);
+
+            } catch (e) {
+                removeMessage(loadingId);
+                addMessage('System', `**Error:** ${e.message}`, '!', true);
+            }
         }
 
-        async function generateResponse(query) {
-            // 1. Check for specific keywords for Demo Scenarios
-            const q = query.toLowerCase();
-
-            if (q.includes('apple') || q.includes('aapl')) {
+        // --- HELPER: Generate Demo Responses (from File 2) ---
+        function generateDemoResponse(query) {
+            if (query.includes('apple') || query.includes('aapl')) {
                 return "## Apple Inc. (AAPL) Analysis\n\n**Conviction:** HIGH\n**Price Target:** $215\n\nI've analyzed the latest 10-K and market sentiment. Key findings:\n1. Services revenue growth offsets hardware cyclicality.\n2. Supply chain risks in China remain elevated but manageable.\n3. **SNC Rating:** PASS\n\nWould you like to run a Monte Carlo simulation on this ticker?";
             }
-            if (q.includes('risk') || q.includes('sim')) {
+            if (query.includes('risk') || query.includes('sim')) {
                 return "Initiating **Crisis Simulation Protocol**...\n\nScenario: *Global Interest Rate Shock (+50bps)*\n\nRunning 10,000 paths...\n\n**Result:**\n- Portfolio VaR (99%): -4.2%\n- Expected Drawdown: -12.5%\n- Most impacted sector: Real Estate (REITs)\n\nGraph updated.";
             }
-
-            // 2. Client-Side RAG (Static Mode)
-            // Use window.globalSearch to find relevant documents
-            if (window.globalSearch) {
-                const results = window.globalSearch.search(q);
-                if (results.length > 0) {
-                    const topResult = results[0];
-                    let context = "";
-
-                    // Simple logic to fetch content based on type
-                    // In a real RAG, we'd use vector similarity. Here we use keyword match from globalSearch.
-                    if (topResult.type === 'Report') {
-                         const report = window.dataManager.getReports().find(r => r.title === topResult.title);
-                         if (report) context = report.content.text || report.content;
-                    } else if (topResult.type === 'Agent') {
-                         const agent = window.dataManager.getAgents().find(a => a.name === topResult.title);
-                         if (agent) context = agent.docstring;
-                    }
-
-                    if (context) {
-                        return `I found relevant information in **${topResult.title}** (${topResult.type}):\n\n> ${context.substring(0, 300)}...\n\n[Click here to view full ${topResult.type}](${topResult.link})`;
-                    }
-                }
-            }
-
-            // 3. Fallback
-            return "I've logged that query. To provide a precise answer, I need to consult the Knowledge Graph. \n\nQuerying `Neo4j`...\n\nFound 12 related nodes. The consensus is neutral at this time.";
+            return "Analysis complete.";
         }
+
+        // --- HELPER: Format Backend JSON (from File 1) ---
+        function formatBackendResponse(response) {
+            if (response.error) {
+                return `**Error:** ${response.error}`;
+            } 
+            
+            if (response.v23_knowledge_graph) {
+                const kg = response.v23_knowledge_graph;
+                const meta = kg.meta || {};
+                const nodes = kg.nodes || {};
+                const synth = nodes.strategic_synthesis || {};
+                const credit = nodes.credit_analysis || {};
+                const val = nodes.equity_analysis ? nodes.equity_analysis.valuation_engine : {};
+                
+                let html = `## Analysis Report: ${meta.target || "Unknown"}\n\n`;
+                html += `**Conviction:** ${synth.conviction || "N/A"}\n`;
+                if (val.dcf_model) html += `**DCF Value:** $${val.dcf_model.intrinsic_value}\n`;
+                if (credit.snc_rating) html += `**SNC Rating:** ${credit.snc_rating.rating} (Lev: ${credit.current_leverage}x)\n\n`;
+                
+                if(synth.investment_thesis) {
+                     html += `### Strategic Thesis\n${synth.investment_thesis}\n\n`;
+                }
+                html += `*Data Version: ${meta.model_version}*`;
+                return html;
+            } 
+            
+            if (response.human_readable_status) {
+                return response.human_readable_status;
+            }
+            
+            // Fallback for raw JSON
+            return "```json\n" + JSON.stringify(response, null, 2) + "\n```";
+        }
+
+        // --- UI UTILS ---
 
         function addMessage(name, text, initial, isMarkdown=false) {
             const div = document.createElement('div');
@@ -214,14 +256,15 @@
                 ? '<div class="w-8 h-8 rounded bg-slate-600 flex-shrink-0 flex items-center justify-center font-bold text-white shadow-lg">U</div>'
                 : '<div class="w-8 h-8 rounded bg-gradient-to-br from-cyan-600 to-blue-700 flex-shrink-0 flex items-center justify-center font-bold text-white shadow-lg shadow-cyan-500/20">A</div>';
 
-            // Basic Markdown Parsing
+            // Markdown Parsing (Bold, Italic, Quotes, Links, Code Blocks)
             let content = text;
             if(isMarkdown) {
                 content = text
-                    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-cyan-400">$1</strong>') // Bold -> Cyan
-                    .replace(/\*(.*?)\*/g, '<em class="text-slate-400">$1</em>') // Italic -> Slate
-                    .replace(/^> (.*$)/gim, '<blockquote class="border-l-2 border-cyan-500 pl-4 text-slate-400 italic my-2">$1</blockquote>') // Blockquote
-                    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="text-cyan-400 hover:underline">$1</a>') // Links
+                    .replace(/\*\*(.*?)\*\*/g, '<strong class="text-cyan-400">$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em class="text-slate-400">$1</em>')
+                    .replace(/^> (.*$)/gim, '<blockquote class="border-l-2 border-cyan-500 pl-4 text-slate-400 italic my-2">$1</blockquote>')
+                    .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="text-cyan-400 hover:underline">$1</a>')
+                    .replace(/```json([\s\S]*?)```/g, '<pre class="bg-slate-950 p-3 rounded border border-slate-700 text-[10px] font-mono text-emerald-400 overflow-x-auto custom-scrollbar my-2">$1</pre>')
                     .replace(/\n/g, '<br>');
             }
 
@@ -232,7 +275,7 @@
                         <span class="font-bold text-white text-sm">${name}</span>
                         ${name !== 'User' ? '<span class="text-[10px] text-cyan-400 bg-cyan-900/20 px-1 rounded border border-cyan-800">SYSTEM</span>' : ''}
                     </div>
-                    <div class="text-slate-300 text-sm leading-relaxed prose prose-invert max-w-none">
+                    <div class="text-slate-300 text-sm leading-relaxed max-w-none">
                         ${content}
                     </div>
                 </div>
@@ -267,8 +310,6 @@
         }
 
         function newChat() {
-            chatContainer.innerHTML = '';
-            // Re-inject welcome msg (omitted for brevity, or could function-ize it)
             location.reload();
         }
     </script>
