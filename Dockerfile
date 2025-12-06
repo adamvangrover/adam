@@ -1,29 +1,26 @@
 # Use an official Python runtime as a parent image
 FROM python:3.12-slim
 
-# Install build dependencies
-RUN apt-get update && apt-get install -y gcc python3-dev
+# Install system dependencies (gcc for compiling some python libs)
+RUN apt-get update && apt-get install -y gcc python3-dev git && rm -rf /var/lib/apt/lists/*
 
-# Set the working directory in the container
+# Set the working directory
 WORKDIR /app
 
-# Copy the requirements file into the container at /app
+# Copy requirements
 COPY requirements.txt .
 
-# Install any needed packages specified in requirements.txt
-# Using psycopg2 instead of psycopg2-binary
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application's code into the container at /app
+# Copy application code
 COPY . .
 
-# Make port 5001 available to the world outside this container
-EXPOSE 5001
+# Expose port
+EXPOSE 5000
 
-# Define environment variable
-ENV FLASK_APP services.webapp.api
-ENV FLASK_CONFIG development
+# Set Python path
+ENV PYTHONPATH=/app
 
-
-# Run api.py when the container launches
-CMD ["flask", "run", "--host=0.0.0.0", "--port=5001"]
+# Run the Unified Server
+CMD ["python", "core/api/server.py"]

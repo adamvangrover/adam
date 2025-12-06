@@ -159,51 +159,50 @@
             // Loading Indicator
             const loadingId = addLoading();
 
-            // Simulate Think Time
-            setTimeout(async () => {
+            try {
+                // Connect to Backend via DataManager
+                const response = await window.dataManager.sendQuery(text);
                 removeMessage(loadingId);
-                const response = await generateResponse(text);
-                addMessage('Adam v23.5', response, 'A', true);
-            }, 1000 + Math.random() * 1000);
-        }
 
-        async function generateResponse(query) {
-            // 1. Check for specific keywords for Demo Scenarios
-            const q = query.toLowerCase();
+                // Format response
+                let displayHtml = "";
+                if (response.error) {
+                    displayHtml = `**Error:** ${response.error}`;
+                } else if (response.v23_knowledge_graph) {
+                    // Deep Dive JSON Result
+                    const kg = response.v23_knowledge_graph;
+                    const meta = kg.meta || {};
+                    const nodes = kg.nodes || {};
+                    const synth = nodes.strategic_synthesis || {};
+                    const credit = nodes.credit_analysis || {};
+                    const val = nodes.equity_analysis ? nodes.equity_analysis.valuation_engine : {};
 
-            if (q.includes('apple') || q.includes('aapl')) {
-                return "## Apple Inc. (AAPL) Analysis\n\n**Conviction:** HIGH\n**Price Target:** $215\n\nI've analyzed the latest 10-K and market sentiment. Key findings:\n1. Services revenue growth offsets hardware cyclicality.\n2. Supply chain risks in China remain elevated but manageable.\n3. **SNC Rating:** PASS\n\nWould you like to run a Monte Carlo simulation on this ticker?";
-            }
-            if (q.includes('risk') || q.includes('sim')) {
-                return "Initiating **Crisis Simulation Protocol**...\n\nScenario: *Global Interest Rate Shock (+50bps)*\n\nRunning 10,000 paths...\n\n**Result:**\n- Portfolio VaR (99%): -4.2%\n- Expected Drawdown: -12.5%\n- Most impacted sector: Real Estate (REITs)\n\nGraph updated.";
-            }
+                    displayHtml = `## Analysis Report: ${meta.target || "Unknown"}\n\n`;
+                    displayHtml += `**Conviction:** ${synth.conviction || "N/A"}\n`;
+                    if (val.dcf_model) displayHtml += `**DCF Value:** $${val.dcf_model.intrinsic_value}\n`;
+                    if (credit.snc_rating) displayHtml += `**SNC Rating:** ${credit.snc_rating.rating} (Lev: ${credit.current_leverage}x)\n\n`;
 
-            // 2. Client-Side RAG (Static Mode)
-            // Use window.globalSearch to find relevant documents
-            if (window.globalSearch) {
-                const results = window.globalSearch.search(q);
-                if (results.length > 0) {
-                    const topResult = results[0];
-                    let context = "";
-
-                    // Simple logic to fetch content based on type
-                    // In a real RAG, we'd use vector similarity. Here we use keyword match from globalSearch.
-                    if (topResult.type === 'Report') {
-                         const report = window.dataManager.getReports().find(r => r.title === topResult.title);
-                         if (report) context = report.content.text || report.content;
-                    } else if (topResult.type === 'Agent') {
-                         const agent = window.dataManager.getAgents().find(a => a.name === topResult.title);
-                         if (agent) context = agent.docstring;
+                    if(synth.investment_thesis) {
+                         displayHtml += `### Strategic Thesis\n${synth.investment_thesis}\n\n`;
                     }
 
-                    if (context) {
-                        return `I found relevant information in **${topResult.title}** (${topResult.type}):\n\n> ${context.substring(0, 300)}...\n\n[Click here to view full ${topResult.type}](${topResult.link})`;
-                    }
+                    displayHtml += `*Data Version: ${meta.model_version}*`;
+
+                } else if (response.human_readable_status) {
+                    displayHtml = response.human_readable_status;
+                } else if (response.final_state && response.final_state.human_readable_status) {
+                    displayHtml = response.final_state.human_readable_status;
+                } else {
+                    // Just dump the object nicely
+                    displayHtml = "```json\n" + JSON.stringify(response, null, 2) + "\n```";
                 }
-            }
 
-            // 3. Fallback
-            return "I've logged that query. To provide a precise answer, I need to consult the Knowledge Graph. \n\nQuerying `Neo4j`...\n\nFound 12 related nodes. The consensus is neutral at this time.";
+                addMessage('Adam v23.5', displayHtml, 'A', true);
+
+            } catch (e) {
+                removeMessage(loadingId);
+                addMessage('System', `**Connection Error:** ${e.message}. \n\nEnsure the backend server is running and API Mode is enabled in the top right.`, '!', true);
+            }
         }
 
         function addMessage(name, text, initial, isMarkdown=false) {
@@ -222,6 +221,7 @@
                     .replace(/\*(.*?)\*/g, '<em class="text-slate-400">$1</em>') // Italic -> Slate
                     .replace(/^> (.*$)/gim, '<blockquote class="border-l-2 border-cyan-500 pl-4 text-slate-400 italic my-2">$1</blockquote>') // Blockquote
                     .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="text-cyan-400 hover:underline">$1</a>') // Links
+                    .replace(/```json([\s\S]*?)```/g, '<pre class="bg-slate-800 p-2 rounded text-[10px] font-mono overflow-x-auto custom-scrollbar">$1</pre>') // Code blocks
                     .replace(/\n/g, '<br>');
             }
 
@@ -268,7 +268,6 @@
 
         function newChat() {
             chatContainer.innerHTML = '';
-            // Re-inject welcome msg (omitted for brevity, or could function-ize it)
             location.reload();
         }
     </script>

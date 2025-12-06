@@ -140,7 +140,6 @@
                 </div>
                 <div id="logs" class="flex-1 p-4 font-mono text-[10px] md:text-xs overflow-y-auto space-y-2 bg-[#050b14] text-slate-300 custom-scrollbar">
                     <div class="text-slate-500">Initializing Adam v23.5 Kernel...</div>
-                    <div class="text-slate-500">Loading modules: [Core, Quant, NLP, Graph]</div>
                     <div class="text-emerald-500">>> SYSTEM READY.</div>
                 </div>
                 <div class="p-2 bg-slate-900 border-t border-slate-700">
@@ -198,8 +197,8 @@
                 element.style.strokeDashoffset = offset;
             };
 
-            const updateStats = () => {
-                // Generate slightly random data for liveliness
+            const updateStats = async () => {
+                // Base Randomness for Visual Liveliness
                 const baseCpu = 12;
                 const baseMem = 34;
                 const cpu = Math.min(100, Math.max(5, baseCpu + Math.floor(Math.random() * 20) - 10));
@@ -207,6 +206,53 @@
                 const agents = 8 + Math.floor(Math.random() * 3);
                 const ops = 240 + Math.floor(Math.random() * 50);
 
+                // Live Data Override
+                if (window.dataManager.useApi) {
+                    try {
+                        const response = await fetch('/api/state');
+                        if (response.ok) {
+                            const state = await response.json();
+
+                            // Process Logs
+                            if (state.logs && state.logs.length > 0) {
+                                // We'll just clear and redraw for simplicity or check last ID
+                                // For now, simple clear/redraw to stay in sync
+                                logs.innerHTML = '';
+                                state.logs.forEach(l => {
+                                    const div = document.createElement('div');
+                                    div.className = "text-[10px] md:text-xs font-mono text-slate-300 mb-1";
+                                    // Syntax highlighting
+                                    if(l.includes('ERROR')) div.classList.add('text-red-400');
+                                    else if(l.includes('WARNING')) div.classList.add('text-amber-400');
+                                    else if(l.includes('INFO')) div.classList.add('text-cyan-400');
+
+                                    div.innerText = l;
+                                    logs.appendChild(div);
+                                });
+                                logs.scrollTop = logs.scrollHeight;
+                            }
+                        }
+                    } catch(e) { console.error("Poll Error", e); }
+                } else {
+                    // Fallback Random Logs
+                    const mockActions = [
+                        "SNC_Analyst_Agent polling credit_sentry_queue...",
+                        "Market_Sentiment_Agent parsing Bloomberg feed...",
+                        "Risk_Assessment_Agent calculating VaR (99% CI)...",
+                        "Knowledge Graph: Ingesting 10-K filing...",
+                        "Garbage collection cycle initiated.",
+                        "Optimizing query execution plan...",
+                        "Neural Link: Synapse connection stable.",
+                        "Alert: Volatility spike detected in Sector X."
+                    ];
+
+                    if(Math.random() > 0.6) {
+                        const msg = mockActions[Math.floor(Math.random() * mockActions.length)];
+                        logMsg(msg, "INFO");
+                    }
+                }
+
+                // Update Gauges (keep animated)
                 document.getElementById('cpu-val').textContent = `${cpu}%`;
                 setGauge(cpuRing, cpu);
 
@@ -215,23 +261,6 @@
 
                 document.getElementById('agent-count').textContent = agents;
                 document.getElementById('ops-count').textContent = ops;
-
-                // Random mock logs
-                const mockActions = [
-                    "SNC_Analyst_Agent polling credit_sentry_queue...",
-                    "Market_Sentiment_Agent parsing Bloomberg feed...",
-                    "Risk_Assessment_Agent calculating VaR (99% CI)...",
-                    "Knowledge Graph: Ingesting 10-K filing...",
-                    "Garbage collection cycle initiated.",
-                    "Optimizing query execution plan...",
-                    "Neural Link: Synapse connection stable.",
-                    "Alert: Volatility spike detected in Sector X."
-                ];
-
-                if(Math.random() > 0.6) {
-                    const msg = mockActions[Math.floor(Math.random() * mockActions.length)];
-                    logMsg(msg, "INFO");
-                }
             };
 
             updateStats();
