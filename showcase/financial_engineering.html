@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM Financial Engineering</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Fallback if style.css is missing or for specific overrides */
+        body { background-color: #050b14; color: #e2e8f0; font-family: 'Courier New', Courier, monospace; }
+        .glass-panel { background: rgba(13, 22, 35, 0.7); backdrop-filter: blur(10px); border: 1px solid #1e293b; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .cyber-card { border-left: 4px solid #06b6d4; }
+        .text-cyan-glow { color: #06b6d4; text-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
+        input[type="number"], input[type="range"] { background: #0f172a; border: 1px solid #334155; color: white; padding: 4px; border-radius: 4px; width: 100%; }
+    </style>
+</head>
+<body class="p-6">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-8 flex justify-between items-center border-b border-gray-800 pb-4">
+            <div>
+                <h1 class="text-3xl font-bold text-cyan-glow">ADAM FINANCIAL ENGINE</h1>
+                <p class="text-sm text-gray-400">Interactive DCF | VC Sponsor Model | Regulatory Ratings</p>
+            </div>
+            <div class="text-right">
+                <span class="text-xs text-cyan-500 font-mono">v23.5_CLIENT_SIDE</span>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-12 gap-6">
+            <!-- Sidebar / Inputs -->
+            <div class="col-span-3 space-y-6">
+                <div class="glass-panel p-4 rounded-lg">
+                    <h3 class="text-lg font-bold text-white mb-4 border-b border-gray-700 pb-2">1. Financial Inputs</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">LTM EBITDA ($)</label>
+                            <input type="number" id="ebitda" value="50000000">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">CAGR Growth Rate (%)</label>
+                            <input type="number" id="growth" value="5">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Total Debt ($)</label>
+                            <input type="number" id="debt" value="200000000">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Annual Interest ($)</label>
+                            <input type="number" id="interest" value="18000000">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-4 rounded-lg">
+                    <h3 class="text-lg font-bold text-white mb-4 border-b border-gray-700 pb-2">2. Capital Structure</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Entry Multiple (x)</label>
+                            <input type="number" id="entryMult" value="10.0" step="0.1">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Equity % (0-100)</label>
+                            <input type="number" id="equityPct" value="40">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Cost of Debt (%)</label>
+                            <input type="number" id="costDebt" value="9">
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="calculate()" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded shadow-lg transition duration-200">
+                    RUN ANALYSIS
+                </button>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-span-9 space-y-6">
+                <!-- KPI Cards -->
+                <div class="grid grid-cols-4 gap-4">
+                    <div class="glass-panel p-4 rounded-lg cyber-card">
+                        <div class="text-gray-400 text-xs uppercase">Enterprise Value (DCF)</div>
+                        <div class="text-2xl font-bold text-white mt-1" id="kpi-ev">$0</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-lg cyber-card">
+                        <div class="text-gray-400 text-xs uppercase">Implied WACC</div>
+                        <div class="text-2xl font-bold text-white mt-1" id="kpi-wacc">0.00%</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-lg cyber-card">
+                        <div class="text-gray-400 text-xs uppercase">Base Reg Rating</div>
+                        <div class="text-2xl font-bold text-white mt-1" id="kpi-rating">-</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-lg cyber-card border-l-red-500">
+                        <div class="text-gray-400 text-xs uppercase">SNC Status</div>
+                        <div class="text-2xl font-bold text-white mt-1" id="kpi-snc">-</div>
+                    </div>
+                </div>
+
+                <!-- Tabs/Charts -->
+                <div class="glass-panel p-6 rounded-lg min-h-[400px]">
+                    <div class="flex space-x-4 border-b border-gray-700 mb-4 pb-2">
+                        <button onclick="switchTab('dcf')" class="text-cyan-400 font-bold border-b-2 border-cyan-400 pb-1">DCF Worksheet</button>
+                        <button onclick="switchTab('credit')" class="text-gray-400 hover:text-cyan-400 pb-1">Credit Sensitivity</button>
+                        <button onclick="switchTab('sponsor')" class="text-gray-400 hover:text-cyan-400 pb-1">VC Sponsor Returns</button>
+                    </div>
+
+                    <div id="tab-dcf" class="block">
+                        <canvas id="dcfChart" height="100"></canvas>
+                        <div class="mt-4 overflow-x-auto">
+                            <table class="w-full text-left text-sm text-gray-300">
+                                <thead class="border-b border-gray-700 text-xs uppercase text-gray-500">
+                                    <tr>
+                                        <th class="py-2">Year</th>
+                                        <th class="py-2">EBITDA</th>
+                                        <th class="py-2">FCF</th>
+                                        <th class="py-2">PV of FCF</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dcfTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="tab-credit" class="hidden">
+                        <h4 class="text-lg text-white mb-2">Downside Sensitivity (EBITDA Stress)</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm text-gray-300">
+                                <thead class="border-b border-gray-700 text-xs uppercase text-gray-500">
+                                    <tr>
+                                        <th class="py-2">Stress Scenario</th>
+                                        <th class="py-2">Leverage (x)</th>
+                                        <th class="py-2">FCCR (x)</th>
+                                        <th class="py-2">Resulting Rating</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="creditTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="tab-sponsor" class="hidden">
+                         <div class="grid grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="text-lg text-white mb-4">Exit Assumptions (Year 5)</h4>
+                                <label class="block text-xs text-gray-400 mb-1">Exit Multiple (x)</label>
+                                <input type="number" id="exitMult" value="10.0" oninput="calculate()" class="w-full mb-4">
+                                <div class="bg-gray-800 p-4 rounded">
+                                    <div class="text-xs text-gray-400">Projected Exit EBITDA</div>
+                                    <div class="text-xl text-white font-mono" id="sponsor-ebitda">$0</div>
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="glass-panel p-4 rounded text-center">
+                                    <div class="text-xs text-gray-400 uppercase">MOIC (Multiple of Money)</div>
+                                    <div class="text-4xl font-bold text-cyan-400 mt-2" id="sponsor-moic">0.00x</div>
+                                </div>
+                                <div class="glass-panel p-4 rounded text-center">
+                                    <div class="text-xs text-gray-400 uppercase">IRR (%)</div>
+                                    <div class="text-4xl font-bold text-cyan-400 mt-2" id="sponsor-irr">0.0%</div>
+                                </div>
+                            </div>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- CONSTANTS ---
+        const TAX_RATE = 0.21;
+        const RISK_FREE = 0.0425;
+        const MRP = 0.06;
+        const TERMINAL_GROWTH = 0.02;
+        const BETA = 1.2;
+        const YEARS = 5;
+
+        // --- RATING MAP ---
+        const RATING_MAP = {
+            1.0: "IG1 (AAA)",
+            3.0: "IG3 (BBB-)",
+            4.0: "Pass 4 (BB)",
+            5.0: "Pass 5 (B+)",
+            6.0: "Pass 6 (B-)",
+            7.0: "Special Mention (CCC)",
+            8.0: "Substandard (D/Default)"
+        };
+
+        // --- CHART INSTANCE ---
+        let dcfChartInstance = null;
+
+        // --- CORE LOGIC ---
+        function calculate() {
+            // Get Inputs
+            const ebitda = parseFloat(document.getElementById('ebitda').value);
+            const growth = parseFloat(document.getElementById('growth').value) / 100;
+            const debt = parseFloat(document.getElementById('debt').value);
+            const interest = parseFloat(document.getElementById('interest').value);
+            const entryMult = parseFloat(document.getElementById('entryMult').value);
+            const equityPct = parseFloat(document.getElementById('equityPct').value) / 100;
+            const kd = parseFloat(document.getElementById('costDebt').value) / 100;
+            const exitMult = parseFloat(document.getElementById('exitMult').value);
+
+            // 1. WACC
+            const ke = RISK_FREE + BETA * MRP;
+            const we = equityPct;
+            const wd = 1 - equityPct;
+            const wacc = (we * ke) + (wd * kd * (1 - TAX_RATE));
+
+            // 2. DCF Projection
+            let currentEbitda = ebitda;
+            let projections = [];
+            let pvFcfSum = 0;
+            let cumFcf = 0;
+
+            // Simple proxy assumptions from Python code
+            const capexPct = 0.05;
+            const nwcPct = 0.02;
+
+            for (let i = 1; i <= YEARS; i++) {
+                currentEbitda = currentEbitda * (1 + growth);
+                let tax = currentEbitda * TAX_RATE;
+                let capex = currentEbitda * capexPct;
+                let nwcChange = currentEbitda * nwcPct;
+                let fcf = currentEbitda - tax - capex - nwcChange;
+
+                let df = 1 / Math.pow((1 + wacc), i);
+                let pvFcf = fcf * df;
+
+                pvFcfSum += pvFcf;
+                cumFcf += fcf;
+
+                projections.push({
+                    year: i,
+                    ebitda: currentEbitda,
+                    fcf: fcf,
+                    pvFcf: pvFcf
+                });
+            }
+
+            // Terminal Value
+            let terminalFcf = projections[YEARS-1].fcf * (1 + TERMINAL_GROWTH);
+            let tv = terminalFcf / (wacc - TERMINAL_GROWTH);
+            let pvTv = tv / Math.pow((1 + wacc), YEARS);
+
+            let ev = pvFcfSum + pvTv;
+
+            // 3. Credit Logic
+            function getRating(lev, fccr) {
+                if (lev < 3.0 && fccr > 2.5) return RATING_MAP[3.0];
+                if (lev < 4.5 && fccr > 1.5) return RATING_MAP[4.0];
+                if (lev < 6.0 && fccr > 1.1) return RATING_MAP[5.0];
+                if (lev < 7.5 && fccr > 1.0) return RATING_MAP[6.0];
+                return RATING_MAP[8.0];
+            }
+
+            let leverage = debt / ebitda;
+            let fccr = (ebitda * 0.9) / interest; // Simplified proxy from Python
+            let baseRating = getRating(leverage, fccr);
+            let snc = debt > 100000000 ? "YES (Review Required)" : "NO";
+
+            // 4. Stress Test
+            let stressResults = [];
+            [0, 0.1, 0.2, 0.3].forEach(s => {
+                let sEbitda = ebitda * (1 - s);
+                let sLev = debt / sEbitda;
+                let sFccr = (sEbitda * 0.9) / interest;
+                stressResults.push({
+                    scenario: "-" + (s*100).toFixed(0) + "%",
+                    lev: sLev,
+                    fccr: sFccr,
+                    rating: getRating(sLev, sFccr)
+                });
+            });
+
+            // 5. Sponsor Model
+            let futureEbitda = projections[YEARS-1].ebitda;
+            let exitEv = futureEbitda * exitMult;
+            let remainingDebt = Math.max(0, debt - (cumFcf * 0.5)); // 50% cash sweep
+            let exitEquity = exitEv - remainingDebt;
+            let initialEquity = (ebitda * entryMult) * equityPct;
+
+            let moic = exitEquity / initialEquity;
+            let irr = Math.pow(moic, 1/YEARS) - 1;
+
+            // --- UPDATE UI ---
+            document.getElementById('kpi-ev').innerText = "$" + ev.toLocaleString(undefined, {maximumFractionDigits:0});
+            document.getElementById('kpi-wacc').innerText = (wacc*100).toFixed(2) + "%";
+            document.getElementById('kpi-rating').innerText = baseRating;
+            document.getElementById('kpi-snc').innerText = snc;
+            if(snc.startsWith("YES")) document.getElementById('kpi-snc').style.color = "#ef4444";
+            else document.getElementById('kpi-snc').style.color = "white";
+
+            // DCF Table
+            let tbody = document.getElementById('dcfTableBody');
+            tbody.innerHTML = "";
+            projections.forEach(p => {
+                let row = `<tr>
+                    <td class="py-2">Year ${p.year}</td>
+                    <td class="py-2 text-white">$${p.ebitda.toLocaleString(undefined, {maximumFractionDigits:0})}</td>
+                    <td class="py-2 text-cyan-400">$${p.fcf.toLocaleString(undefined, {maximumFractionDigits:0})}</td>
+                    <td class="py-2 text-gray-400">$${p.pvFcf.toLocaleString(undefined, {maximumFractionDigits:0})}</td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+
+            // Credit Table
+            let cbody = document.getElementById('creditTableBody');
+            cbody.innerHTML = "";
+            stressResults.forEach(r => {
+                let row = `<tr>
+                    <td class="py-2 text-white font-bold">${r.scenario}</td>
+                    <td class="py-2">${r.lev.toFixed(2)}x</td>
+                    <td class="py-2">${r.fccr.toFixed(2)}x</td>
+                    <td class="py-2 text-cyan-400">${r.rating}</td>
+                </tr>`;
+                cbody.innerHTML += row;
+            });
+
+            // Sponsor
+            document.getElementById('sponsor-ebitda').innerText = "$" + futureEbitda.toLocaleString(undefined, {maximumFractionDigits:0});
+            document.getElementById('sponsor-moic').innerText = moic.toFixed(2) + "x";
+            document.getElementById('sponsor-irr').innerText = (irr*100).toFixed(1) + "%";
+
+            // Chart
+            updateChart(projections);
+        }
+
+        function updateChart(data) {
+            const ctx = document.getElementById('dcfChart').getContext('2d');
+
+            if (dcfChartInstance) dcfChartInstance.destroy();
+
+            dcfChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => 'Year ' + d.year),
+                    datasets: [{
+                        label: 'Free Cash Flow (FCF)',
+                        data: data.map(d => d.fcf),
+                        backgroundColor: 'rgba(6, 182, 212, 0.6)',
+                        borderColor: '#06b6d4',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#334155' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#e2e8f0' } }
+                    }
+                }
+            });
+        }
+
+        function switchTab(tabId) {
+            document.getElementById('tab-dcf').classList.add('hidden');
+            document.getElementById('tab-credit').classList.add('hidden');
+            document.getElementById('tab-sponsor').classList.add('hidden');
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+        }
+
+        // Init
+        window.onload = calculate;
+
+    </script>
+</body>
+</html>
