@@ -136,6 +136,27 @@ Adam doesn't just chat; it produces structured, professional-grade financial art
 4.  **View the Showcase:**
     Open `showcase/index.html` in your browser.
 
+## 💰 Financial Engineering Platform (v23.5)
+
+A modular, portable, and configurable Financial Engine for DCF Valuation, VC/LBO Sponsor Modeling, and Regulatory Credit Risk Analysis (SNC/Rating).
+
+### 🚀 Launch Dashboard
+[**Launch Financial Engine (Client Side)**](./showcase/financial_engineering.html)
+Interactive dashboard for valuation, credit ratings, and sensitivity analysis.
+
+### 🐍 Python Core
+The core logic is available in `src/` and can be run as a Streamlit app.
+
+```bash
+# Run the Interactive Streamlit App
+streamlit run app.py
+```
+
+### Modules
+- **`src/core_valuation.py`**: Discounted Cash Flow (DCF), WACC, and Terminal Value logic.
+- **`src/credit_risk.py`**: Credit Sponsor Model, Downside Sensitivity, and Regulatory Ratings (SNC).
+- **`src/config.py`**: Global financial assumptions (Tax rates, Risk-free rates).
+
 ## 📂 Repository Structure
 
 *   `core/engine/`: The heart of the new system.
@@ -231,12 +252,12 @@ A high-level overview of the "Hive Mind" structure:
 
 ### 📚 Resources & Documentation
 
-  * **Architecture Vision:** [Adam v23.0 "Adaptive Hive" Vision](https://www.google.com/search?q=%23)
-  * **Pipeline Details:** [Gold Standard Data Pipeline](https://www.google.com/search?q=%23)
-  * **API Reference:** [API Documentation](https://www.google.com/search?q=%23)
-  * **User Manual:** [Comprehensive User Guide](https://www.google.com/search?q=%23)
-  * **Demo Guide:** [Showcase Walkthrough](https://www.google.com/search?q=%23)
-  * **Prompt Library:** [v23.5 Autonomous Analyst Prompt](https://www.google.com/search?q=%23)
+  * **Architecture Vision:** [Adam v23.0 "Adaptive Hive" Vision](https://github.com/adamvangrover/adam/tree/main/docs/v23_architecture_vision.md)
+  * **Pipeline Details:** [Gold Standard Data Pipeline]((https://github.com/adamvangrover/adam/tree/main/docs/GOLD_STANDARD_PIPELINE.md)
+  * **API Reference:** [API Documentation](https://github.com/adamvangrover/adam/tree/main/docs/api.md)
+  * **User Manual:** [Comprehensive User Guide](https://github.com/adamvangrover/adam/tree/main/docs/user_guide.md)
+  * **Demo Guide:** [Showcase Walkthrough](https://github.com/adamvangrover/adam/tree/main/docs/SHOWCASE_GUIDE.md)
+  * **Prompt Library:** [v23.5 Autonomous Analyst Prompt](https://github.com/adamvangrover/adam/tree/main/prompt_library/Adam_v23.5_System_Prompt.md)
 
 -----
 
@@ -244,7 +265,7 @@ A high-level overview of the "Hive Mind" structure:
 
 We welcome contributions from the community\! Whether it's a new agent skill, a data connector, or a UI enhancement.
 
-1.  Read our [Contribution Guidelines](https://www.google.com/search?q=%23).
+1.  Read our [Contribution Guidelines](https://github.com/adamvangrover/adam/tree/main).
 2.  Fork the repo and create your branch (`git checkout -b feature/amazing-feature`).
 3.  Commit your changes (`git commit -m 'Add some amazing feature'`).
 4.  Push to the branch (`git push origin feature/amazing-feature`).
