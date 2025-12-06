@@ -1,26 +1,60 @@
-# Use an official Python runtime as a parent image
-FROM python:3.12-slim
+# ==========================================
+# STAGE 1: Builder (Compilers & Tools)
+# ==========================================
+FROM python:3.12-slim as builder
 
-# Install system dependencies (gcc for compiling some python libs)
-RUN apt-get update && apt-get install -y gcc python3-dev git && rm -rf /var/lib/apt/lists/*
+# Prevent Python from writing pyc files and buffering stdout
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-# Set the working directory
 WORKDIR /app
 
-# Copy requirements
+# Install system dependencies required for BUILD only
+# (gcc, python3-dev for compiling; libpq-dev if using psycopg2)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends gcc python3-dev libpq-dev
+
+# Create a virtual environment to isolate dependencies
+RUN python -m venv /opt/venv
+# Enable venv for the upcoming pip install
+ENV PATH="/opt/venv/bin:$PATH"
+
 COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# ==========================================
+# STAGE 2: Runtime (Production Image)
+# ==========================================
+FROM python:3.12-slim as runner
 
-# Copy application code
-COPY . .
+# Extra security: standard logic
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PATH="/opt/venv/bin:$PATH"
 
-# Expose port
-EXPOSE 5000
+WORKDIR /app
 
-# Set Python path
-ENV PYTHONPATH=/app
+# Install only RUNTIME system dependencies 
+# (e.g., libpq5 for postgres runtime, distinct from libpq-dev)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libpq5 && \
+    rm -rf /var/lib/apt/lists/*
 
-# Run the Unified Server
-CMD ["python", "core/api/server.py"]
+# Copy the virtual environment from the builder stage
+COPY --from=builder /opt/venv /opt/venv
+
+# Create a non-root user for security
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+# Change ownership of the app directory
+COPY --chown=appuser:appuser . .
+
+# Switch to non-root user
+USER appuser
+
+# Expose the port
+EXPOSE 5001
+
+# Use Gunicorn for production (Flask/Django dev servers are not for prod)
+# Make sure gunicorn is in your requirements.txt
+CMD ["gunicorn", "--bind", "0.0.0.0:5001", "--workers", "3", "services.webapp.api:app"]
