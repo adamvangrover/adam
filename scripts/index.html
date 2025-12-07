@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam System :: scripts</title>
+    <link rel="stylesheet" href="../showcase/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .readme-content { padding: 20px; }
+        .readme-content h1 { font-size: 1.5rem; margin-bottom: 1rem; color: var(--primary-color); }
+        .readme-content h2 { font-size: 1.25rem; margin-top: 1.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--panel-border); padding-bottom: 0.25rem; }
+        .readme-content p { margin-bottom: 1rem; line-height: 1.6; color: var(--text-secondary); }
+        .readme-content pre { background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 4px; overflow-x: auto; border: 1px solid var(--panel-border); }
+        .readme-content code { font-family: var(--font-mono); color: var(--accent-color); }
+
+        .file-icon { display: inline-block; width: 20px; text-align: center; margin-right: 8px; color: var(--text-muted); }
+        .dir-icon { color: var(--primary-color); }
+    </style>
+</head>
+<body>
+    <div class="scan-line"></div>
+    <div class="scan-glow"></div>
+
+    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+
+        <!-- Header -->
+        <header style="margin-bottom: 40px; border-bottom: 1px solid var(--panel-border); padding-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 class="glitch-text" data-text="ADAM v23.5" style="font-size: 2rem; margin: 0; color: var(--primary-color);">ADAM v23.5</h1>
+                <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">
+                    PATH: <span style="color: var(--text-primary);">/scripts</span>
+                </div>
+            </div>
+            <div style="text-align: right;">
+                <div class="cyber-badge badge-cyan">SYSTEM ONLINE</div>
+                <div style="margin-top: 5px; font-size: 0.7rem; color: var(--text-muted);">Mode: SHOWCASE</div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav style="margin-bottom: 30px; display: flex; gap: 10px;">
+            <a href="../index.html" class="cyber-btn">&uarr; UP LEVEL</a>
+            <a href="../index.html" class="cyber-btn">ROOT</a>
+            <button onclick="toggleRuntime()" class="cyber-btn">LIVE RUNTIME</button>
+            <a href="https://github.com/adamvangrover/adam" class="cyber-btn" target="_blank">GITHUB</a>
+        </nav>
+
+        <div style="display: grid; grid-template-columns: 250px 1fr; gap: 20px;">
+
+            <!-- Sidebar / File Explorer -->
+            <aside class="glass-panel" style="padding: 20px; border-radius: 4px; height: fit-content;">
+                <h3 style="margin-top: 0; font-size: 0.9rem; text-transform: uppercase; color: var(--text-secondary); border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 15px;">
+                    Directory Contents
+                </h3>
+                <ul style="list-style: none; padding: 0; margin: 0; font-family: var(--font-mono); font-size: 0.85rem;">
+                    <li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="migration/index.html" style="color: var(--primary-color);">migration/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="poc/index.html" style="color: var(--primary-color);">poc/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="setup_agents/index.html" style="color: var(--primary-color);">setup_agents/</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="AGENTS.md" style="color: var(--text-secondary);">AGENTS.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="analyze_simulation_results.py" style="color: var(--text-secondary);">analyze_simulation_results.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="archive_html.py" style="color: var(--text-secondary);">archive_html.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="archive_ui_artifacts.py" style="color: var(--text-secondary);">archive_ui_artifacts.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="create_agent.py" style="color: var(--text-secondary);">create_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="create_data_source.py" style="color: var(--text-secondary);">create_data_source.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="daily_headlines.py" style="color: var(--text-secondary);">daily_headlines.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="data_processing.py" style="color: var(--text-secondary);">data_processing.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="extract_xai_reasoning.py" style="color: var(--text-secondary);">extract_xai_reasoning.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="generate_newsletter.py" style="color: var(--text-secondary);">generate_newsletter.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="generate_repo_structure.py" style="color: var(--text-secondary);">generate_repo_structure.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="generate_showcase.py" style="color: var(--text-secondary);">generate_showcase.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="generate_ui_data.py" style="color: var(--text-secondary);">generate_ui_data.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="generate_ui_data_v2.py" style="color: var(--text-secondary);">generate_ui_data_v2.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="load_omni_graph.py" style="color: var(--text-secondary);">load_omni_graph.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="main.py" style="color: var(--text-secondary);">main.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="rag_agent_example.py" style="color: var(--text-secondary);">rag_agent_example.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="report_generation.py" style="color: var(--text-secondary);">report_generation.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="run_adam.py" style="color: var(--text-secondary);">run_adam.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="run_llm_driven_simulation.py" style="color: var(--text-secondary);">run_llm_driven_simulation.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="run_simple_simulation.py" style="color: var(--text-secondary);">run_simple_simulation.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="run_simulations.sh " style="color: var(--text-secondary);">run_simulations.sh </a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="run_v22_seed_pipeline.py" style="color: var(--text-secondary);">run_v22_seed_pipeline.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="scan_agents_for_ui.py" style="color: var(--text-secondary);">scan_agents_for_ui.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="setup_agent.py" style="color: var(--text-secondary);">setup_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="setup_and_run.sh" style="color: var(--text-secondary);">setup_and_run.sh</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="startup_helper.py" style="color: var(--text-secondary);">startup_helper.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="test_new_agents.py" style="color: var(--text-secondary);">test_new_agents.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="test_new_agents_isolated.py" style="color: var(--text-secondary);">test_new_agents_isolated.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="test_sentiment_graph.py" style="color: var(--text-secondary);">test_sentiment_graph.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="upgrade_ui_architecture.py" style="color: var(--text-secondary);">upgrade_ui_architecture.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="version_data.py" style="color: var(--text-secondary);">version_data.py</a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main>
+                <!-- Runtime Overlay (Hidden by default) -->
+                <div id="runtime-panel" class="glass-panel fade-in" style="display: none; padding: 20px; margin-bottom: 20px; border-color: var(--success-color);">
+                    <h3 style="color: var(--success-color); margin-top: 0;">Live System Interface</h3>
+                    <p style="font-size: 0.9rem;">Connecting to Orchestrator at localhost:5001...</p>
+                    <div style="background: black; padding: 10px; border-radius: 4px; font-family: var(--font-mono); height: 100px; overflow-y: auto; font-size: 0.8rem; color: #0f0;">
+                        > Connecting...<br>
+                        > Error: API Unreachable (Mock Mode Active)<br>
+                        > System Status: STANDBY
+                    </div>
+                </div>
+
+                <!-- Readme Content -->
+                <div class="glass-panel" style="border-radius: 4px;">
+                    <div class="readme-content" style="text-align: center; color: var(--text-muted); padding: 40px;">No README found in this directory.</div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Footer -->
+        <footer style="margin-top: 50px; border-top: 1px solid var(--panel-border); padding-top: 20px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">
+            ADAM AUTO-GENERATED SHOWCASE | <span class="mono">REF: scripts</span>
+        </footer>
+    </div>
+
+    <script>
+        function toggleRuntime() {
+            const panel = document.getElementById('runtime-panel');
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

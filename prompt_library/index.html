@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam System :: prompt_library</title>
+    <link rel="stylesheet" href="../showcase/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .readme-content { padding: 20px; }
+        .readme-content h1 { font-size: 1.5rem; margin-bottom: 1rem; color: var(--primary-color); }
+        .readme-content h2 { font-size: 1.25rem; margin-top: 1.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--panel-border); padding-bottom: 0.25rem; }
+        .readme-content p { margin-bottom: 1rem; line-height: 1.6; color: var(--text-secondary); }
+        .readme-content pre { background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 4px; overflow-x: auto; border: 1px solid var(--panel-border); }
+        .readme-content code { font-family: var(--font-mono); color: var(--accent-color); }
+
+        .file-icon { display: inline-block; width: 20px; text-align: center; margin-right: 8px; color: var(--text-muted); }
+        .dir-icon { color: var(--primary-color); }
+    </style>
+</head>
+<body>
+    <div class="scan-line"></div>
+    <div class="scan-glow"></div>
+
+    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+
+        <!-- Header -->
+        <header style="margin-bottom: 40px; border-bottom: 1px solid var(--panel-border); padding-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 class="glitch-text" data-text="ADAM v23.5" style="font-size: 2rem; margin: 0; color: var(--primary-color);">ADAM v23.5</h1>
+                <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">
+                    PATH: <span style="color: var(--text-primary);">/prompt_library</span>
+                </div>
+            </div>
+            <div style="text-align: right;">
+                <div class="cyber-badge badge-cyan">SYSTEM ONLINE</div>
+                <div style="margin-top: 5px; font-size: 0.7rem; color: var(--text-muted);">Mode: SHOWCASE</div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav style="margin-bottom: 30px; display: flex; gap: 10px;">
+            <a href="../index.html" class="cyber-btn">&uarr; UP LEVEL</a>
+            <a href="../index.html" class="cyber-btn">ROOT</a>
+            <button onclick="toggleRuntime()" class="cyber-btn">LIVE RUNTIME</button>
+            <a href="https://github.com/adamvangrover/adam" class="cyber-btn" target="_blank">GITHUB</a>
+        </nav>
+
+        <div style="display: grid; grid-template-columns: 250px 1fr; gap: 20px;">
+
+            <!-- Sidebar / File Explorer -->
+            <aside class="glass-panel" style="padding: 20px; border-radius: 4px; height: fit-content;">
+                <h3 style="margin-top: 0; font-size: 0.9rem; text-transform: uppercase; color: var(--text-secondary); border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 15px;">
+                    Directory Contents
+                </h3>
+                <ul style="list-style: none; padding: 0; margin: 0; font-family: var(--font-mono); font-size: 0.85rem;">
+                    <li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="AOPL-v1.0/index.html" style="color: var(--primary-color);">AOPL-v1.0/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="credit_lifecycle/index.html" style="color: var(--primary-color);">credit_lifecycle/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="risk_architect_agent/index.html" style="color: var(--primary-color);">risk_architect_agent/</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="Adam_v23.5_System_Prompt.md" style="color: var(--text-secondary);">Adam_v23.5_System_Prompt.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="README.md" style="color: var(--text-secondary);">README.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="communication.json" style="color: var(--text-secondary);">communication.json</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="communication.md" style="color: var(--text-secondary);">communication.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="credit_analysis.json" style="color: var(--text-secondary);">credit_analysis.json</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="credit_analysis.md" style="color: var(--text-secondary);">credit_analysis.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="due_diligence.json" style="color: var(--text-secondary);">due_diligence.json</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="due_diligence.md" style="color: var(--text-secondary);">due_diligence.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="esg_analysis.json" style="color: var(--text-secondary);">esg_analysis.json</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="esg_analysis.md" style="color: var(--text-secondary);">esg_analysis.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="market_analysis.json" style="color: var(--text-secondary);">market_analysis.json</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="market_analysis.md" style="color: var(--text-secondary);">market_analysis.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="model_validation.json" style="color: var(--text-secondary);">model_validation.json</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="model_validation.md" style="color: var(--text-secondary);">model_validation.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="prompt.schema.json" style="color: var(--text-secondary);">prompt.schema.json</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="regulatory_rating.json" style="color: var(--text-secondary);">regulatory_rating.json</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="regulatory_rating.md" style="color: var(--text-secondary);">regulatory_rating.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="unified_v1.json" style="color: var(--text-secondary);">unified_v1.json</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="unified_v1.md" style="color: var(--text-secondary);">unified_v1.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="unified_v2.md" style="color: var(--text-secondary);">unified_v2.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="workflow.jsonl" style="color: var(--text-secondary);">workflow.jsonl</a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main>
+                <!-- Runtime Overlay (Hidden by default) -->
+                <div id="runtime-panel" class="glass-panel fade-in" style="display: none; padding: 20px; margin-bottom: 20px; border-color: var(--success-color);">
+                    <h3 style="color: var(--success-color); margin-top: 0;">Live System Interface</h3>
+                    <p style="font-size: 0.9rem;">Connecting to Orchestrator at localhost:5001...</p>
+                    <div style="background: black; padding: 10px; border-radius: 4px; font-family: var(--font-mono); height: 100px; overflow-y: auto; font-size: 0.8rem; color: #0f0;">
+                        > Connecting...<br>
+                        > Error: API Unreachable (Mock Mode Active)<br>
+                        > System Status: STANDBY
+                    </div>
+                </div>
+
+                <!-- Readme Content -->
+                <div class="glass-panel" style="border-radius: 4px;">
+                    <div class="readme-content"><h1>ADAM Prompt Library</h1>
+<p>Welcome to the ADAM Prompt Library! This library provides a comprehensive collection of prompts for a variety of financial analysis and communication tasks. The prompts are designed to be used with large language models (LLMs) to help you generate high-quality, consistent, and insightful content.</p>
+<h2>Structure</h2>
+<p>The prompt library is organized into the following modules:</p>
+<ul>
+<li><strong><code>credit_analysis</code></strong>: Prompts for conducting corporate credit risk analysis, underwriting, review, and monitoring.</li>
+<li><strong><code>due_diligence</code></strong>: Prompts for conducting due diligence on a company.</li>
+<li><strong><code>market_analysis</code></strong>: Prompts for conducting market analysis, including daily briefings, sector deep dives, and risk assessments.</li>
+<li><strong><code>esg_analysis</code></strong>: Prompts for conducting ESG analysis, including investment opportunity scans and risk assessments.</li>
+<li><strong><code>communication</code></strong>: Prompts for generating professional communications, such as escalation emails.</li>
+<li><strong><code>model_validation</code></strong>: Prompts for generating challenges to financial models.</li>
+</ul>
+<p>Each module contains a JSON file with the prompts and a Markdown file with a guide on how to use them.</p>
+<h2>How to Use</h2>
+<p>To use a prompt from the library, you will need to:</p>
+<ol>
+<li><strong>Choose a module</strong> that corresponds to the task you want to perform.</li>
+<li><strong>Select a prompt</strong> from the JSON file in that module.</li>
+<li><strong>Use the prompt</strong> to guide the LLM in generating the desired content.</li>
+</ol>
+<p>For more detailed instructions on how to use the prompts in each module, please refer to the corresponding Markdown guide.</p>
+<h2>Contributing</h2>
+<p>If you would like to contribute to the prompt library, please follow these guidelines:</p>
+<ul>
+<li><strong>Create a new module</strong> for each new task or workflow.</li>
+<li><strong>Use a consistent structure</strong> for your JSON and Markdown files.</li>
+<li><strong>Write clear and concise prompts</strong> that are easy to understand and use.</li>
+<li><strong>Test your prompts</strong> with a variety of inputs to ensure that they are working as expected.</li>
+</ul>
+<p>Thank you for your contributions to the ADAM Prompt Library!</p></div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Footer -->
+        <footer style="margin-top: 50px; border-top: 1px solid var(--panel-border); padding-top: 20px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">
+            ADAM AUTO-GENERATED SHOWCASE | <span class="mono">REF: prompt_library</span>
+        </footer>
+    </div>
+
+    <script>
+        function toggleRuntime() {
+            const panel = document.getElementById('runtime-panel');
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

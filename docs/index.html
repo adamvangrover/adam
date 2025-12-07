@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam System :: docs</title>
+    <link rel="stylesheet" href="../showcase/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .readme-content { padding: 20px; }
+        .readme-content h1 { font-size: 1.5rem; margin-bottom: 1rem; color: var(--primary-color); }
+        .readme-content h2 { font-size: 1.25rem; margin-top: 1.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--panel-border); padding-bottom: 0.25rem; }
+        .readme-content p { margin-bottom: 1rem; line-height: 1.6; color: var(--text-secondary); }
+        .readme-content pre { background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 4px; overflow-x: auto; border: 1px solid var(--panel-border); }
+        .readme-content code { font-family: var(--font-mono); color: var(--accent-color); }
+
+        .file-icon { display: inline-block; width: 20px; text-align: center; margin-right: 8px; color: var(--text-muted); }
+        .dir-icon { color: var(--primary-color); }
+    </style>
+</head>
+<body>
+    <div class="scan-line"></div>
+    <div class="scan-glow"></div>
+
+    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+
+        <!-- Header -->
+        <header style="margin-bottom: 40px; border-bottom: 1px solid var(--panel-border); padding-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 class="glitch-text" data-text="ADAM v23.5" style="font-size: 2rem; margin: 0; color: var(--primary-color);">ADAM v23.5</h1>
+                <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">
+                    PATH: <span style="color: var(--text-primary);">/docs</span>
+                </div>
+            </div>
+            <div style="text-align: right;">
+                <div class="cyber-badge badge-cyan">SYSTEM ONLINE</div>
+                <div style="margin-top: 5px; font-size: 0.7rem; color: var(--text-muted);">Mode: SHOWCASE</div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav style="margin-bottom: 30px; display: flex; gap: 10px;">
+            <a href="../index.html" class="cyber-btn">&uarr; UP LEVEL</a>
+            <a href="../index.html" class="cyber-btn">ROOT</a>
+            <button onclick="toggleRuntime()" class="cyber-btn">LIVE RUNTIME</button>
+            <a href="https://github.com/adamvangrover/adam" class="cyber-btn" target="_blank">GITHUB</a>
+        </nav>
+
+        <div style="display: grid; grid-template-columns: 250px 1fr; gap: 20px;">
+
+            <!-- Sidebar / File Explorer -->
+            <aside class="glass-panel" style="padding: 20px; border-radius: 4px; height: fit-content;">
+                <h3 style="margin-top: 0; font-size: 0.9rem; text-transform: uppercase; color: var(--text-secondary); border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 15px;">
+                    Directory Contents
+                </h3>
+                <ul style="list-style: none; padding: 0; margin: 0; font-family: var(--font-mono); font-size: 0.85rem;">
+                    <li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="api/index.html" style="color: var(--primary-color);">api/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="chatbot-ui/index.html" style="color: var(--primary-color);">chatbot-ui/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="dev/index.html" style="color: var(--primary-color);">dev/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="notebooks/index.html" style="color: var(--primary-color);">notebooks/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="reviews/index.html" style="color: var(--primary-color);">reviews/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="static_site/index.html" style="color: var(--primary-color);">static_site/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="strategies/index.html" style="color: var(--primary-color);">strategies/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="system/index.html" style="color: var(--primary-color);">system/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="templates/index.html" style="color: var(--primary-color);">templates/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="ui_archive_v1/index.html" style="color: var(--primary-color);">ui_archive_v1/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="v20.0/index.html" style="color: var(--primary-color);">v20.0/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="v21.0/index.html" style="color: var(--primary-color);">v21.0/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="v22.0/index.html" style="color: var(--primary-color);">v22.0/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="v23.0/index.html" style="color: var(--primary-color);">v23.0/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="v23.5/index.html" style="color: var(--primary-color);">v23.5/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="v23_manual/index.html" style="color: var(--primary-color);">v23_manual/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="whitepapers/index.html" style="color: var(--primary-color);">whitepapers/</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="AGENTS.md" style="color: var(--text-secondary);">AGENTS.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="Adam v19.1 System Management and Optimization Guide.md" style="color: var(--text-secondary);">Adam v19.1 System Management and Optimization Guide.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="Adam v19.2 Mapping Document.txt" style="color: var(--text-secondary);">Adam v19.2 Mapping Document.txt</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="Adam v19.2 system prompt.txt" style="color: var(--text-secondary);">Adam v19.2 system prompt.txt</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="Adam v21.0 Mapping Document.txt" style="color: var(--text-secondary);">Adam v21.0 Mapping Document.txt</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="Adam v21.0 system prompt.txt" style="color: var(--text-secondary);">Adam v21.0 system prompt.txt</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="Conceptual CACM-ADK System Architecture (Mermaid Syntax).md" style="color: var(--text-secondary);">Conceptual CACM-ADK System Architecture (Mermaid Syntax).md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="DEVELOPMENT_BEST_PRACTICES.md" style="color: var(--text-secondary);">DEVELOPMENT_BEST_PRACTICES.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="GOLD_STANDARD_PIPELINE.md" style="color: var(--text-secondary);">GOLD_STANDARD_PIPELINE.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="REPO_ASSESSMENT_AND_PLAN.md" style="color: var(--text-secondary);">REPO_ASSESSMENT_AND_PLAN.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="REQUIREMENTS.md" style="color: var(--text-secondary);">REQUIREMENTS.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="SHOWCASE_GUIDE.md" style="color: var(--text-secondary);">SHOWCASE_GUIDE.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="SYSTEM_OVERVIEW.md" style="color: var(--text-secondary);">SYSTEM_OVERVIEW.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="adam_github_summary.json" style="color: var(--text-secondary);">adam_github_summary.json</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="adam_project_simulation.json" style="color: var(--text-secondary);">adam_project_simulation.json</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="adam_v15.4_guide.md" style="color: var(--text-secondary);">adam_v15.4_guide.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="adam_v22_technical_migration_plan.md" style="color: var(--text-secondary);">adam_v22_technical_migration_plan.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="api.md" style="color: var(--text-secondary);">api.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="api_docs.yaml" style="color: var(--text-secondary);">api_docs.yaml</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="architecture.md" style="color: var(--text-secondary);">architecture.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="architecture_v19.md" style="color: var(--text-secondary);">architecture_v19.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="automated_agent_improvement.md" style="color: var(--text-secondary);">automated_agent_improvement.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="counterfactual_reasoning.md" style="color: var(--text-secondary);">counterfactual_reasoning.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="credit_sentry_architecture.md" style="color: var(--text-secondary);">credit_sentry_architecture.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="data_provenance.md" style="color: var(--text-secondary);">data_provenance.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="demo_v23_refactor.md" style="color: var(--text-secondary);">demo_v23_refactor.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="deployment.md" style="color: var(--text-secondary);">deployment.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="dynamic_workflows.md" style="color: var(--text-secondary);">dynamic_workflows.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="federated learning model setup guide.md" style="color: var(--text-secondary);">federated learning model setup guide.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="financial_suite_usage.md" style="color: var(--text-secondary);">financial_suite_usage.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="getting_started.md" style="color: var(--text-secondary);">getting_started.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="github_pages_deployment.md" style="color: var(--text-secondary);">github_pages_deployment.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="hybrid_forecasting.md" style="color: var(--text-secondary);">hybrid_forecasting.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="knowledge_graph_optimization.md" style="color: var(--text-secondary);">knowledge_graph_optimization.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="llm_readability_audit.md" style="color: var(--text-secondary);">llm_readability_audit.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="modernization_report.md" style="color: var(--text-secondary);">modernization_report.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="outstanding_errors.md" style="color: var(--text-secondary);">outstanding_errors.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="red_teaming.md" style="color: var(--text-secondary);">red_teaming.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="setup_guide.md" style="color: var(--text-secondary);">setup_guide.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="simulation.ipynb" style="color: var(--text-secondary);">simulation.ipynb</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="tutorials.md" style="color: var(--text-secondary);">tutorials.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="ui_overview.md" style="color: var(--text-secondary);">ui_overview.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="user_guide.md" style="color: var(--text-secondary);">user_guide.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="v22_architecture_integration.md" style="color: var(--text-secondary);">v22_architecture_integration.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="v22_quantum_pipeline.md" style="color: var(--text-secondary);">v22_quantum_pipeline.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="v23.5_MIGRATION_PLAN.md" style="color: var(--text-secondary);">v23.5_MIGRATION_PLAN.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="v23.5_showcase_updates.md" style="color: var(--text-secondary);">v23.5_showcase_updates.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="v23_5_deep_dive_manual.md" style="color: var(--text-secondary);">v23_5_deep_dive_manual.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="v23_agent_roadmap.md" style="color: var(--text-secondary);">v23_agent_roadmap.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="v23_architecture_vision.md" style="color: var(--text-secondary);">v23_architecture_vision.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="v23_snc_graph.md" style="color: var(--text-secondary);">v23_snc_graph.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="v25_architectural_blueprint.md" style="color: var(--text-secondary);">v25_architectural_blueprint.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="v25_implementation_status.md" style="color: var(--text-secondary);">v25_implementation_status.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="verify_agent_registry.md" style="color: var(--text-secondary);">verify_agent_registry.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="walkthrough.ipynb" style="color: var(--text-secondary);">walkthrough.ipynb</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="webapp.md" style="color: var(--text-secondary);">webapp.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="xai.md" style="color: var(--text-secondary);">xai.md</a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main>
+                <!-- Runtime Overlay (Hidden by default) -->
+                <div id="runtime-panel" class="glass-panel fade-in" style="display: none; padding: 20px; margin-bottom: 20px; border-color: var(--success-color);">
+                    <h3 style="color: var(--success-color); margin-top: 0;">Live System Interface</h3>
+                    <p style="font-size: 0.9rem;">Connecting to Orchestrator at localhost:5001...</p>
+                    <div style="background: black; padding: 10px; border-radius: 4px; font-family: var(--font-mono); height: 100px; overflow-y: auto; font-size: 0.8rem; color: #0f0;">
+                        > Connecting...<br>
+                        > Error: API Unreachable (Mock Mode Active)<br>
+                        > System Status: STANDBY
+                    </div>
+                </div>
+
+                <!-- Readme Content -->
+                <div class="glass-panel" style="border-radius: 4px;">
+                    <div class="readme-content" style="text-align: center; color: var(--text-muted); padding: 40px;">No README found in this directory.</div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Footer -->
+        <footer style="margin-top: 50px; border-top: 1px solid var(--panel-border); padding-top: 20px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">
+            ADAM AUTO-GENERATED SHOWCASE | <span class="mono">REF: docs</span>
+        </footer>
+    </div>
+
+    <script>
+        function toggleRuntime() {
+            const panel = document.getElementById('runtime-panel');
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
