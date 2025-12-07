@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v23.5 | Mission Control</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #050b14;
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .glass-panel {
+            background: rgba(13, 20, 31, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.1);
+        }
+        .text-cyan-glow {
+            color: #06b6d4;
+            text-shadow: 0 0 10px rgba(6, 182, 212, 0.5);
+        }
+        .scan-line {
+            width: 100%;
+            height: 2px;
+            background: rgba(6, 182, 212, 0.3);
+            opacity: 0.5;
+            animation: scan 3s linear infinite;
+            position: fixed;
+            top: 0;
+            pointer-events: none;
+            z-index: 50;
+        }
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="scan-line"></div>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Mock Data for Static Mode
+        const MOCK_AGENTS = [
+            { id: "M-001", name: "MetaOrchestrator", status: "ACTIVE", type: "Supervisor", load: "12%" },
+            { id: "A-023", name: "Vertical Risk Agent", status: "IDLE", type: "Specialist", load: "0%" },
+            { id: "A-045", name: "SNC Rating Agent", status: "PROCESSING", type: "Analyst", load: "78%" },
+            { id: "A-099", name: "Red Team Agent", status: "STANDBY", type: "Adversary", load: "2%" },
+        ];
+
+        const MOCK_LOGS = [
+            { timestamp: "10:00:01", level: "INFO", source: "System", message: "Adam v23.5 initialized." },
+            { timestamp: "10:00:05", level: "INFO", source: "MetaOrchestrator", message: "Knowledge Graph loaded (150k nodes)." },
+            { timestamp: "10:02:30", level: "WARN", source: "SNC Rating", message: "Discrepancy in Q3 EBITDA for Ticker: F." },
+            { timestamp: "10:05:00", level: "INFO", source: "Market", message: "Data ingestion stream active." },
+        ];
+
+        const Dashboard = () => {
+            const [view, setView] = useState("dashboard");
+            const [agents, setAgents] = useState(MOCK_AGENTS);
+            const [logs, setLogs] = useState(MOCK_LOGS);
+
+            // Attempt to load live state if available (e.g. from window.ADAM_STATE or API)
+            useEffect(() => {
+                if (window.ADAM_STATE) {
+                    console.log("Loading state from window.ADAM_STATE");
+                    // Logic to parse ADAM_STATE would go here
+                }
+            }, []);
+
+            return (
+                <div className="min-h-screen p-6">
+                    <header className="flex justify-between items-center mb-8 glass-panel p-4 rounded-lg">
+                        <div>
+                            <h1 className="text-3xl font-bold text-cyan-glow tracking-tighter">ADAM v23.5</h1>
+                            <p className="text-xs text-slate-400">AUTONOMOUS FINANCIAL ANALYST // OS-LEVEL OVERHAUL</p>
+                        </div>
+                        <div className="flex space-x-4">
+                            <button onClick={() => setView("dashboard")} className={`px-4 py-2 rounded border ${view === 'dashboard' ? 'border-cyan-500 bg-cyan-900/20 text-cyan-400' : 'border-slate-700 text-slate-500 hover:text-cyan-400'}`}>OVERVIEW</button>
+                            <button onClick={() => setView("agents")} className={`px-4 py-2 rounded border ${view === 'agents' ? 'border-cyan-500 bg-cyan-900/20 text-cyan-400' : 'border-slate-700 text-slate-500 hover:text-cyan-400'}`}>AGENTS</button>
+                            <button onClick={() => setView("logs")} className={`px-4 py-2 rounded border ${view === 'logs' ? 'border-cyan-500 bg-cyan-900/20 text-cyan-400' : 'border-slate-700 text-slate-500 hover:text-cyan-400'}`}>TERMINAL</button>
+                        </div>
+                    </header>
+
+                    <main className="grid grid-cols-12 gap-6">
+                        {/* Sidebar / Status */}
+                        <div className="col-span-12 lg:col-span-3 space-y-6">
+                            <div className="glass-panel p-6 rounded-lg">
+                                <h2 className="text-xl font-bold mb-4 border-b border-slate-700 pb-2">SYSTEM STATUS</h2>
+                                <div className="space-y-4">
+                                    <div className="flex justify-between">
+                                        <span className="text-slate-400">CORE</span>
+                                        <span className="text-green-400 font-bold">ONLINE</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-slate-400">MCP SERVER</span>
+                                        <span className="text-green-400 font-bold">ACTIVE</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-slate-400">MEMORY</span>
+                                        <span className="text-cyan-400">12.4 GB</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-slate-400">UPTIME</span>
+                                        <span className="text-white">4d 12h 30m</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                             <div className="glass-panel p-6 rounded-lg">
+                                <h2 className="text-xl font-bold mb-4 border-b border-slate-700 pb-2">QUICK ACTIONS</h2>
+                                <div className="space-y-2">
+                                    <button className="w-full text-left px-4 py-2 hover:bg-cyan-900/30 rounded text-sm text-cyan-300 transition-colors">>> Run Deep Dive Analysis</button>
+                                    <button className="w-full text-left px-4 py-2 hover:bg-cyan-900/30 rounded text-sm text-cyan-300 transition-colors">>> Generate Risk Report</button>
+                                    <button className="w-full text-left px-4 py-2 hover:bg-cyan-900/30 rounded text-sm text-cyan-300 transition-colors">>> Query MCP Server</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Main Content Area */}
+                        <div className="col-span-12 lg:col-span-9">
+                            {view === 'dashboard' && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="glass-panel p-6 rounded-lg col-span-2">
+                                        <h2 className="text-2xl font-bold mb-4 text-cyan-glow">ACTIVE MISSION: PORTFOLIO REBALANCE</h2>
+                                        <p className="text-slate-300 mb-4">
+                                            Current objective is to optimize the 'Gold Standard' portfolio against rising interest rate volatility.
+                                            SNC agents are analyzing credit facilities for 'Special Mention' downgrades.
+                                        </p>
+                                        <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                                            <div className="h-full bg-cyan-500 w-2/3"></div>
+                                        </div>
+                                        <div className="flex justify-between text-xs mt-2 text-slate-500">
+                                            <span>Start: 08:00 AM</span>
+                                            <span>Progress: 67%</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="glass-panel p-6 rounded-lg">
+                                        <h3 className="text-lg font-bold mb-3 text-white">Risk Exposure</h3>
+                                        <div className="flex items-center justify-center h-40 border border-dashed border-slate-700 rounded bg-slate-900/50">
+                                            <span className="text-slate-500 italic">[Visualization Placeholder]</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="glass-panel p-6 rounded-lg">
+                                        <h3 className="text-lg font-bold mb-3 text-white">Market Sentiment</h3>
+                                        <div className="flex items-center justify-center h-40 border border-dashed border-slate-700 rounded bg-slate-900/50">
+                                            <span className="text-green-500 text-4xl font-bold">BULLISH</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {view === 'agents' && (
+                                <div className="glass-panel p-6 rounded-lg">
+                                    <h2 className="text-2xl font-bold mb-6 text-cyan-glow">AGENT REGISTRY</h2>
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-left">
+                                            <thead>
+                                                <tr className="border-b border-slate-700 text-slate-400">
+                                                    <th className="pb-3 pl-2">ID</th>
+                                                    <th className="pb-3">NAME</th>
+                                                    <th className="pb-3">TYPE</th>
+                                                    <th className="pb-3">STATUS</th>
+                                                    <th className="pb-3">LOAD</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-slate-800">
+                                                {agents.map(agent => (
+                                                    <tr key={agent.id} className="hover:bg-slate-800/50 transition-colors">
+                                                        <td className="py-3 pl-2 font-mono text-xs text-slate-500">{agent.id}</td>
+                                                        <td className="py-3 font-bold text-white">{agent.name}</td>
+                                                        <td className="py-3 text-sm text-slate-300">{agent.type}</td>
+                                                        <td className="py-3">
+                                                            <span className={`px-2 py-1 rounded text-xs font-bold ${
+                                                                agent.status === 'ACTIVE' ? 'bg-green-900/50 text-green-400 border border-green-800' :
+                                                                agent.status === 'PROCESSING' ? 'bg-blue-900/50 text-blue-400 border border-blue-800' :
+                                                                'bg-slate-800 text-slate-500'
+                                                            }`}>
+                                                                {agent.status}
+                                                            </span>
+                                                        </td>
+                                                        <td className="py-3 font-mono text-cyan-400">{agent.load}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            )}
+
+                            {view === 'logs' && (
+                                <div className="glass-panel p-6 rounded-lg h-[600px] flex flex-col">
+                                    <h2 className="text-2xl font-bold mb-4 text-cyan-glow">TERMINAL OUTPUT</h2>
+                                    <div className="flex-1 overflow-y-auto font-mono text-sm space-y-2 bg-black/40 p-4 rounded border border-slate-800">
+                                        {logs.map((log, idx) => (
+                                            <div key={idx} className="flex space-x-3">
+                                                <span className="text-slate-500">[{log.timestamp}]</span>
+                                                <span className={`font-bold ${
+                                                    log.level === 'INFO' ? 'text-green-500' :
+                                                    log.level === 'WARN' ? 'text-yellow-500' :
+                                                    'text-red-500'
+                                                }`}>{log.level}</span>
+                                                <span className="text-purple-400">@{log.source}:</span>
+                                                <span className="text-slate-300">{log.message}</span>
+                                            </div>
+                                        ))}
+                                        <div className="animate-pulse text-cyan-500">_</div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </main>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<Dashboard />);
+    </script>
+</body>
+</html>
