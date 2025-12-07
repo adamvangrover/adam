@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam System :: core</title>
+    <link rel="stylesheet" href="../showcase/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .readme-content { padding: 20px; }
+        .readme-content h1 { font-size: 1.5rem; margin-bottom: 1rem; color: var(--primary-color); }
+        .readme-content h2 { font-size: 1.25rem; margin-top: 1.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--panel-border); padding-bottom: 0.25rem; }
+        .readme-content p { margin-bottom: 1rem; line-height: 1.6; color: var(--text-secondary); }
+        .readme-content pre { background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 4px; overflow-x: auto; border: 1px solid var(--panel-border); }
+        .readme-content code { font-family: var(--font-mono); color: var(--accent-color); }
+
+        .file-icon { display: inline-block; width: 20px; text-align: center; margin-right: 8px; color: var(--text-muted); }
+        .dir-icon { color: var(--primary-color); }
+    </style>
+</head>
+<body>
+    <div class="scan-line"></div>
+    <div class="scan-glow"></div>
+
+    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+
+        <!-- Header -->
+        <header style="margin-bottom: 40px; border-bottom: 1px solid var(--panel-border); padding-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 class="glitch-text" data-text="ADAM v23.5" style="font-size: 2rem; margin: 0; color: var(--primary-color);">ADAM v23.5</h1>
+                <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">
+                    PATH: <span style="color: var(--text-primary);">/core</span>
+                </div>
+            </div>
+            <div style="text-align: right;">
+                <div class="cyber-badge badge-cyan">SYSTEM ONLINE</div>
+                <div style="margin-top: 5px; font-size: 0.7rem; color: var(--text-muted);">Mode: SHOWCASE</div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav style="margin-bottom: 30px; display: flex; gap: 10px;">
+            <a href="../index.html" class="cyber-btn">&uarr; UP LEVEL</a>
+            <a href="../index.html" class="cyber-btn">ROOT</a>
+            <button onclick="toggleRuntime()" class="cyber-btn">LIVE RUNTIME</button>
+            <a href="https://github.com/adamvangrover/adam" class="cyber-btn" target="_blank">GITHUB</a>
+        </nav>
+
+        <div style="display: grid; grid-template-columns: 250px 1fr; gap: 20px;">
+
+            <!-- Sidebar / File Explorer -->
+            <aside class="glass-panel" style="padding: 20px; border-radius: 4px; height: fit-content;">
+                <h3 style="margin-top: 0; font-size: 0.9rem; text-transform: uppercase; color: var(--text-secondary); border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 15px;">
+                    Directory Contents
+                </h3>
+                <ul style="list-style: none; padding: 0; margin: 0; font-family: var(--font-mono); font-size: 0.85rem;">
+                    <li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="advisory/index.html" style="color: var(--primary-color);">advisory/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="agents/index.html" style="color: var(--primary-color);">agents/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="analysis/index.html" style="color: var(--primary-color);">analysis/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="api/index.html" style="color: var(--primary-color);">api/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="capability_monitoring/index.html" style="color: var(--primary-color);">capability_monitoring/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="data_access/index.html" style="color: var(--primary-color);">data_access/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="data_processing/index.html" style="color: var(--primary-color);">data_processing/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="data_sources/index.html" style="color: var(--primary-color);">data_sources/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="embeddings/index.html" style="color: var(--primary-color);">embeddings/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="engine/index.html" style="color: var(--primary-color);">engine/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="financial_suite/index.html" style="color: var(--primary-color);">financial_suite/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="libraries_and_archives/index.html" style="color: var(--primary-color);">libraries_and_archives/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="llm/index.html" style="color: var(--primary-color);">llm/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="newsletter_layout/index.html" style="color: var(--primary-color);">newsletter_layout/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="prompting/index.html" style="color: var(--primary-color);">prompting/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="rag/index.html" style="color: var(--primary-color);">rag/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="schemas/index.html" style="color: var(--primary-color);">schemas/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="simulations/index.html" style="color: var(--primary-color);">simulations/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="system/index.html" style="color: var(--primary-color);">system/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="tools/index.html" style="color: var(--primary-color);">tools/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="trading/index.html" style="color: var(--primary-color);">trading/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="utils/index.html" style="color: var(--primary-color);">utils/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="v22_quantum_pipeline/index.html" style="color: var(--primary-color);">v22_quantum_pipeline/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="v23_graph_engine/index.html" style="color: var(--primary-color);">v23_graph_engine/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="vectorstore/index.html" style="color: var(--primary-color);">vectorstore/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="vertical_risk_agent/index.html" style="color: var(--primary-color);">vertical_risk_agent/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="world_simulation/index.html" style="color: var(--primary-color);">world_simulation/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="xai/index.html" style="color: var(--primary-color);">xai/</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="AGENTS.md" style="color: var(--text-secondary);">AGENTS.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="__init__.py" style="color: var(--text-secondary);">__init__.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="api.py" style="color: var(--text-secondary);">api.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="llm_plugin.py" style="color: var(--text-secondary);">llm_plugin.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="main.py" style="color: var(--text-secondary);">main.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="settings.py" style="color: var(--text-secondary);">settings.py</a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main>
+                <!-- Runtime Overlay (Hidden by default) -->
+                <div id="runtime-panel" class="glass-panel fade-in" style="display: none; padding: 20px; margin-bottom: 20px; border-color: var(--success-color);">
+                    <h3 style="color: var(--success-color); margin-top: 0;">Live System Interface</h3>
+                    <p style="font-size: 0.9rem;">Connecting to Orchestrator at localhost:5001...</p>
+                    <div style="background: black; padding: 10px; border-radius: 4px; font-family: var(--font-mono); height: 100px; overflow-y: auto; font-size: 0.8rem; color: #0f0;">
+                        > Connecting...<br>
+                        > Error: API Unreachable (Mock Mode Active)<br>
+                        > System Status: STANDBY
+                    </div>
+                </div>
+
+                <!-- Readme Content -->
+                <div class="glass-panel" style="border-radius: 4px;">
+                    <div class="readme-content" style="text-align: center; color: var(--text-muted); padding: 40px;">No README found in this directory.</div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Footer -->
+        <footer style="margin-top: 50px; border-top: 1px solid var(--panel-border); padding-top: 20px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">
+            ADAM AUTO-GENERATED SHOWCASE | <span class="mono">REF: core</span>
+        </footer>
+    </div>
+
+    <script>
+        function toggleRuntime() {
+            const panel = document.getElementById('runtime-panel');
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
