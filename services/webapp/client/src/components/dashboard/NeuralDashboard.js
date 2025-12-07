@@ -4,35 +4,35 @@ import { useTranslation } from 'react-i18next';
 import GlassCard from '../common/GlassCard';
 import { Brain, Play, RotateCcw } from 'lucide-react';
 
+// Mock graph structure for the "Cyclical Reasoning Engine"
+const initialGraph = {
+    nodes: [
+        { id: "MetaOrchestrator", group: 1, label: "Meta Orchestrator" },
+        { id: "Planner", group: 2, label: "Neuro-Symbolic Planner" },
+        { id: "GraphEngine", group: 3, label: "Reasoning Graph" },
+        { id: "Draft", group: 4, label: "Draft Agent" },
+        { id: "Critique", group: 4, label: "Critique Agent" },
+        { id: "Refine", group: 4, label: "Refinement Node" },
+        { id: "KnowledgeBase", group: 5, label: "Unified Knowledge Graph" }
+    ],
+    links: [
+        { source: "MetaOrchestrator", target: "Planner" },
+        { source: "Planner", target: "GraphEngine" },
+        { source: "GraphEngine", target: "Draft" },
+        { source: "Draft", target: "Critique" },
+        { source: "Critique", target: "Refine" },
+        { source: "Refine", target: "Draft" }, // The Cycle
+        { source: "Draft", target: "KnowledgeBase" }
+    ]
+};
+
 const NeuralDashboard = () => {
-    const { t } = useTranslation();
+    useTranslation();
     const fgRef = useRef();
     const [graphData, setGraphData] = useState({ nodes: [], links: [] });
     const [activeNode, setActiveNode] = useState(null);
     const [query, setQuery] = useState("Analyze Apple Inc. credit risk");
     const [status, setStatus] = useState("Idle");
-
-    // Mock graph structure for the "Cyclical Reasoning Engine"
-    const initialGraph = {
-        nodes: [
-            { id: "MetaOrchestrator", group: 1, label: "Meta Orchestrator" },
-            { id: "Planner", group: 2, label: "Neuro-Symbolic Planner" },
-            { id: "GraphEngine", group: 3, label: "Reasoning Graph" },
-            { id: "Draft", group: 4, label: "Draft Agent" },
-            { id: "Critique", group: 4, label: "Critique Agent" },
-            { id: "Refine", group: 4, label: "Refinement Node" },
-            { id: "KnowledgeBase", group: 5, label: "Unified Knowledge Graph" }
-        ],
-        links: [
-            { source: "MetaOrchestrator", target: "Planner" },
-            { source: "Planner", target: "GraphEngine" },
-            { source: "GraphEngine", target: "Draft" },
-            { source: "Draft", target: "Critique" },
-            { source: "Critique", target: "Refine" },
-            { source: "Refine", target: "Draft" }, // The Cycle
-            { source: "Draft", target: "KnowledgeBase" }
-        ]
-    };
 
     useEffect(() => {
         setGraphData(initialGraph);
