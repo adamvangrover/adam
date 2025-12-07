@@ -21,7 +21,7 @@ import asyncio
 import random
 import time
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Type
 from enum import Enum
 
 # --- Constants & Configuration ---
@@ -149,10 +149,10 @@ class OrderManager:
 # --- Main Strategy Engine ---
 
 class HFTStrategy:
-    def __init__(self, symbol: str, balance: float):
+    def __init__(self, symbol: str, balance: float, data_handler_cls: Type = MarketDataHandler):
         self.symbol = symbol
         self.market_queue = asyncio.Queue()
-        self.md_handler = MarketDataHandler([symbol], self.market_queue)
+        self.md_handler = data_handler_cls([symbol], self.market_queue)
         self.order_manager = OrderManager()
         self.risk_gate = CircuitBreaker(balance)
         self.position = 0
