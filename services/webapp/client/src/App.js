@@ -19,7 +19,7 @@ const Simulations = React.lazy(() => import('./Simulations'));
 const NeuralDashboard = React.lazy(() => import('./components/dashboard/NeuralDashboard'));
 
 function App() {
-  const { t } = useTranslation();
+  useTranslation();
   // Simplified auth for now, can be expanded
   const isLoggedIn = !!getToken() || true; // Force login for demo purposes if token missing is annoying
   const navigate = useNavigate();
