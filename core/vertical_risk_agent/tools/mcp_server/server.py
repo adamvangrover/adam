@@ -53,6 +53,35 @@ DB_PATH = "finance_data.db"
 
 # --- Resources ---
 
+@mcp.resource("financial://market/book/{symbol}")
+def get_order_book(symbol: str) -> str:
+    """
+    Returns the current Level 2 order book for a symbol.
+    Resource URI: financial://market/book/AAPL
+    """
+    # Mock order book data for UFOS demo
+    book = {
+        "symbol": symbol,
+        "timestamp": 1698765432,
+        "bids": [{"price": 150.23, "size": 500}, {"price": 150.22, "size": 1200}],
+        "asks": [{"price": 150.26, "size": 400}, {"price": 150.27, "size": 800}]
+    }
+    return json.dumps(book, indent=2)
+
+@mcp.resource("financial://portfolio/{id}/risk")
+def get_portfolio_risk(id: str) -> str:
+    """
+    Returns real-time risk metrics (VaR, Beta).
+    Resource URI: financial://portfolio/123/risk
+    """
+    return json.dumps({
+        "portfolio_id": id,
+        "VaR_95": "1.4%",
+        "Beta": 1.2,
+        "Sharpe": 2.1,
+        "Drawdown": "0.5%"
+    }, indent=2)
+
 @mcp.resource("finance://{ticker}/{year}/10k")
 def get_10k_filing(ticker: str, year: str) -> str:
     """
@@ -81,6 +110,60 @@ def get_repo_assessment() -> str:
         return "Assessment not found."
 
 # --- Tools ---
+
+@mcp.tool()
+def execute_market_order(symbol: str, quantity: int, side: str) -> str:
+    """
+    Executes a market order. Requires Human-in-the-Loop confirmation.
+    """
+    # In a real system, this would:
+    # 1. Validate against risk limits (Pre-Trade Check)
+    # 2. Pop a confirmation dialog to the user via the UI
+    # 3. Send to OEMS
+    return json.dumps({
+        "status": "SENT_TO_CONFIRMATION",
+        "order": {"symbol": symbol, "quantity": quantity, "side": side},
+        "message": "Please confirm execution in the UI."
+    })
+
+@mcp.tool()
+def run_backtest(strategy_id: str, start_date: str, end_date: str) -> str:
+    """
+    Runs a backtest for a given strategy ID over a time range.
+    """
+    # Simulates spinning up a sandbox container
+    return json.dumps({
+        "status": "COMPLETED",
+        "strategy": strategy_id,
+        "pnl_pct": 12.5,
+        "sharpe": 1.8,
+        "max_drawdown": 0.15,
+        "report_url": f"/reports/backtest_{strategy_id}_{start_date}.html"
+    })
+
+@mcp.tool()
+def query_memory(query: str) -> str:
+    """
+    Queries the 'Personal Memory' (Vector Store + Knowledge Graph) for qualitative insights.
+    """
+    # Mock RAG response
+    return f"Based on your personal memory: You have a preference for 'Low Volatility' stocks and a restriction against 'Tobacco'. Regarding '{query}': We found 3 related emails from 2023 discussing this topic."
+
+@mcp.tool()
+def rebalance_portfolio(portfolio_id: str, target_allocation: str) -> str:
+    """
+    Calculates and proposes a rebalancing plan.
+    target_allocation should be a JSON string like '{"AAPL": 0.5, "GOOG": 0.5}'
+    """
+    return json.dumps({
+        "plan_id": "PLAN-999",
+        "trades": [
+            {"action": "SELL", "symbol": "MSFT", "quantity": 50},
+            {"action": "BUY", "symbol": "AAPL", "quantity": 20}
+        ],
+        "estimated_commission": 10.00,
+        "action": "CONFIRM_REQUIRED"
+    })
 
 @mcp.tool()
 def query_sql(query: str) -> str:
