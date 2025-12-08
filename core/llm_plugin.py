@@ -327,12 +327,20 @@ class CacheManager:
 class LLMPlugin:
     """Manages LLM interactions with caching and configuration."""
 
-    def __init__(self, config_path: str = "config/llm_plugin.yaml", use_cache: bool = True):
-        # Assuming core.utils.config_utils.load_config exists and works
-        # from core.utils.config_utils import load_config 
-        # self.config = load_config(config_path) # This would be ideal
-        # For now, using simpler internal load to avoid circular dependency if config_utils imports this
-        self.config = self._load_internal_config(config_path)
+    def __init__(self, config_path: str = "config/llm_plugin.yaml", use_cache: bool = True, config: Optional[Dict[str, Any]] = None):
+        """
+        Initialize LLMPlugin.
+
+        Args:
+            config_path: Path to YAML config file.
+            use_cache: Whether to use caching.
+            config: Direct configuration dictionary (overrides config_path).
+        """
+        if config:
+            self.config = config
+        else:
+            self.config = self._load_internal_config(config_path)
+
         self.cache = CacheManager() if use_cache else None
         self.llm = self._initialize_llm()
         self.slm = self._initialize_slm()
@@ -375,10 +383,14 @@ class LLMPlugin:
             "openai": OpenAILLM,
             "huggingface": HuggingFaceLLM,
             "cohere": CohereLLM,
+            "mock": lambda **kwargs: MockLLM(**kwargs) # Basic support for mock
         }
         provider = self.config.get("provider", "huggingface").lower() # Default to huggingface if no provider
 
         if provider not in provider_map:
+             # Basic support for unknown provider for testing
+             if provider == "mock":
+                 return MockLLM()
              raise ValueError(f"Unsupported LLM provider: {provider}")
 
         api_key_env_var = f"{provider.upper()}_API_KEY"
@@ -386,21 +398,27 @@ class LLMPlugin:
         
         # For HuggingFace, API key is optional (for inference API or gated models)
         # For others, it's typically required.
-        if not api_key and provider not in ["huggingface"]: # allow HF to proceed without API key for local models
+        if not api_key and provider not in ["huggingface", "mock"]:
             raise LLMConfigurationError(f"API key for {provider} ({api_key_env_var}) not found in environment variables.")
 
         # Get model name from config, or use default from the LLM class if not specified
-        default_model_name = provider_map[provider](api_key="dummy_key_if_needed_for_default_name_only").get_model_name() if provider != "huggingface" else "google/flan-t5-base" # HF needs specific default
+        default_model_name = "default-model"
+        if provider == "huggingface":
+            default_model_name = "google/flan-t5-base"
+        elif provider in ["openai", "cohere"]:
+            # Instantiate temporarily to get default name (inefficient but safe)
+            # Or just hardcode common defaults here to avoid instantiation loop
+            default_model_name = "gpt-3.5-turbo" if provider == "openai" else "command"
+
         model_name = self.config.get(f"{provider}_model_name", default_model_name)
 
 
         if provider == "huggingface":
             use_pipeline = self.config.get("huggingface_use_pipeline", True)
-            # Pass api_key which might be None (handled by HuggingFaceLLM)
             return HuggingFaceLLM(model_name=model_name, use_pipeline=use_pipeline, api_key=api_key) 
+        elif provider == "mock":
+            return MockLLM(model_name=model_name)
         else:
-            if not api_key: # Should have been caught earlier, but as a safeguard
-                 raise LLMConfigurationError(f"API key for {provider} is required but not found.")
             return provider_map[provider](api_key=api_key, model_name=model_name)
 
     def generate_text(self, prompt: str, task: str = "default", **kwargs) -> str:
@@ -434,6 +452,10 @@ class LLMPlugin:
         """Returns the current LLM model name."""
         return self.llm.get_model_name()
 
+    def query(self, prompt: str, **kwargs) -> str:
+        """Alias for generate_text to support legacy agents."""
+        return self.generate_text(prompt, **kwargs)
+
     def identify_intent_and_entities(self, query: str) -> Tuple[str, Dict[str, Any], float]:
         """Identifies the intent and entities in a user query using the configured LLM."""
         if self.llm:
@@ -466,43 +488,19 @@ class LLMPlugin:
         """Returns the context length of the current LLM model."""
         return self.llm.get_context_length()
 
-# Example usage (for testing)
-if __name__ == "__main__":
-    try:
-        dummy_config_content = {
-            "provider": "huggingface", 
-            "huggingface_model_name": "google/flan-t5-base",
-            "huggingface_use_pipeline": True
-        }
-        # Ensure config directory exists
-        if not os.path.exists("config"):
-            os.makedirs("config")
-        with open("config/llm_plugin.yaml", "w") as f:
-            yaml.dump(dummy_config_content, f)
-        
-        # Note: For OpenAI/Cohere, set relevant API keys in environment for this test
-        # e.g. os.environ["OPENAI_API_KEY"] = "your_key_here" 
-        
-        plugin = LLMPlugin(config_path="config/llm_plugin.yaml")
+class MockLLM(BaseLLM):
+    """Mock LLM for testing."""
+    def __init__(self, model_name="mock-model", **kwargs):
+        self.model_name = model_name
 
-        prompt = "What is the capital of France?"
-        generated_text = plugin.generate_text(prompt, max_length=50) # HuggingFace uses max_length
-        print(f"Generated text for '{prompt}': {generated_text}")
+    def generate_text(self, prompt: str, **kwargs) -> str:
+        return "Mock response"
 
-        summarization_prompt = "Artificial intelligence is transforming many industries. Large language models are a key component of this transformation, enabling new applications and capabilities."
-        summary = plugin.generate_text(summarization_prompt, task="summarization", max_length=50)
-        print(f"Summary: {summary}")
-        
-        token_count = plugin.get_token_count(prompt)
-        print(f"Token count for '{prompt}': {token_count}")
-        print(f"Context Length for {plugin.get_model_name()}: {plugin.get_context_length()}")
+    def get_token_count(self, text: str) -> int:
+        return len(text.split())
 
-    except LLMPluginError as e:
-        print(f"LLM Plugin Error: {e}")
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-    finally:
-        if os.path.exists("config/llm_plugin.yaml"):
-            os.remove("config/llm_plugin.yaml")
-# End of the coherent, first definition block of LLMPlugin and related classes.
-# The rest of the original file contained duplicate/alternative definitions.
+    def get_model_name(self) -> str:
+        return self.model_name
+
+    def get_context_length(self) -> int:
+        return 2048
