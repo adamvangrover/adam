@@ -9,6 +9,7 @@ from pathlib import Path
 import json
 import time
 import hashlib
+
 try:
     import tiktoken
 except ImportError:
@@ -58,6 +59,24 @@ class BaseLLM(ABC):
         pass
 
 
+class MockLLM(BaseLLM):
+    """Mock LLM for testing and development without API costs."""
+    def __init__(self, model_name="mock-model", **kwargs):
+        self.model_name = model_name
+    
+    def generate_text(self, prompt: str, **kwargs) -> str:
+        return f"Mock response to: {prompt[:20]}..."
+    
+    def get_token_count(self, text: str) -> int:
+        return len(text.split())
+    
+    def get_model_name(self) -> str:
+        return self.model_name
+    
+    def get_context_length(self) -> int:
+        return 2048
+
+
 class OpenAILLM(BaseLLM):
     """Implementation for OpenAI's LLMs."""
 
@@ -94,7 +113,7 @@ class OpenAILLM(BaseLLM):
 
     def get_token_count(self, text: str) -> int:
         if tiktoken is None:
-            logger.warning("tiktoken not installed. Using whitespace splitting for token counting.  Install with 'pip install tiktoken'.")
+            logger.warning("tiktoken not installed. Using whitespace splitting for token counting. Install with 'pip install tiktoken'.")
             return len(text.split())
         try:
             encoding = tiktoken.encoding_for_model(self.model_name)
@@ -330,7 +349,7 @@ class LLMPlugin:
     def __init__(self, config_path: str = "config/llm_plugin.yaml", use_cache: bool = True, config: Optional[Dict[str, Any]] = None):
         """
         Initialize LLMPlugin.
-
+        
         Args:
             config_path: Path to YAML config file.
             use_cache: Whether to use caching.
@@ -340,7 +359,7 @@ class LLMPlugin:
             self.config = config
         else:
             self.config = self._load_internal_config(config_path)
-
+            
         self.cache = CacheManager() if use_cache else None
         self.llm = self._initialize_llm()
         self.slm = self._initialize_slm()
@@ -376,14 +395,13 @@ class LLMPlugin:
             logger.exception(f"Error parsing LLM configuration file: {e}")
             raise LLMConfigurationError(f"Error parsing LLM config file: {e}")
 
-
     def _initialize_llm(self) -> BaseLLM:
         """Initializes the LLM based on the configuration."""
         provider_map = {
             "openai": OpenAILLM,
             "huggingface": HuggingFaceLLM,
             "cohere": CohereLLM,
-            "mock": lambda **kwargs: MockLLM(**kwargs) # Basic support for mock
+            "mock": lambda **kwargs: MockLLM(**kwargs)
         }
         provider = self.config.get("provider", "huggingface").lower() # Default to huggingface if no provider
 
@@ -396,9 +414,8 @@ class LLMPlugin:
         api_key_env_var = f"{provider.upper()}_API_KEY"
         api_key = os.getenv(api_key_env_var)
         
-        # For HuggingFace, API key is optional (for inference API or gated models)
-        # For others, it's typically required.
-        if not api_key and provider not in ["huggingface", "mock"]:
+        # For HuggingFace and Mock, API key is optional. For others, it's typically required.
+        if not api_key and provider not in ["huggingface", "mock"]: 
             raise LLMConfigurationError(f"API key for {provider} ({api_key_env_var}) not found in environment variables.")
 
         # Get model name from config, or use default from the LLM class if not specified
@@ -406,12 +423,12 @@ class LLMPlugin:
         if provider == "huggingface":
             default_model_name = "google/flan-t5-base"
         elif provider in ["openai", "cohere"]:
-            # Instantiate temporarily to get default name (inefficient but safe)
-            # Or just hardcode common defaults here to avoid instantiation loop
+            # Use safe strings for defaults to avoid premature instantiation
             default_model_name = "gpt-3.5-turbo" if provider == "openai" else "command"
+        elif provider == "mock":
+            default_model_name = "mock-model"
 
         model_name = self.config.get(f"{provider}_model_name", default_model_name)
-
 
         if provider == "huggingface":
             use_pipeline = self.config.get("huggingface_use_pipeline", True)
@@ -444,6 +461,10 @@ class LLMPlugin:
 
         return response
 
+    def query(self, prompt: str, **kwargs) -> str:
+        """Alias for generate_text to support legacy agents."""
+        return self.generate_text(prompt, **kwargs)
+
     def get_token_count(self, text: str) -> int:
         """Returns the token count for a given text."""
         return self.llm.get_token_count(text)
@@ -451,10 +472,6 @@ class LLMPlugin:
     def get_model_name(self) -> str:
         """Returns the current LLM model name."""
         return self.llm.get_model_name()
-
-    def query(self, prompt: str, **kwargs) -> str:
-        """Alias for generate_text to support legacy agents."""
-        return self.generate_text(prompt, **kwargs)
 
     def identify_intent_and_entities(self, query: str) -> Tuple[str, Dict[str, Any], float]:
         """Identifies the intent and entities in a user query using the configured LLM."""
@@ -488,19 +505,51 @@ class LLMPlugin:
         """Returns the context length of the current LLM model."""
         return self.llm.get_context_length()
 
-class MockLLM(BaseLLM):
-    """Mock LLM for testing."""
-    def __init__(self, model_name="mock-model", **kwargs):
-        self.model_name = model_name
+# Example usage (for testing)
+if __name__ == "__main__":
+    try:
+        # Test 1: HuggingFace via file config (simulated)
+        dummy_config_content = {
+            "provider": "huggingface", 
+            "huggingface_model_name": "google/flan-t5-base",
+            "huggingface_use_pipeline": True
+        }
+        # Ensure config directory exists
+        if not os.path.exists("config"):
+            os.makedirs("config")
+        with open("config/llm_plugin.yaml", "w") as f:
+            yaml.dump(dummy_config_content, f)
+        
+        print("--- Testing HuggingFace (Simulated Config File) ---")
+        plugin = LLMPlugin(config_path="config/llm_plugin.yaml")
 
-    def generate_text(self, prompt: str, **kwargs) -> str:
-        return "Mock response"
+        prompt = "What is the capital of France?"
+        generated_text = plugin.generate_text(prompt, max_length=50) # HuggingFace uses max_length
+        print(f"Generated text for '{prompt}': {generated_text}")
 
-    def get_token_count(self, text: str) -> int:
-        return len(text.split())
+        summarization_prompt = "Artificial intelligence is transforming many industries. Large language models are a key component of this transformation."
+        summary = plugin.generate_text(summarization_prompt, task="summarization", max_length=50)
+        print(f"Summary: {summary}")
+        
+        token_count = plugin.get_token_count(prompt)
+        print(f"Token count for '{prompt}': {token_count}")
+        print(f"Context Length: {plugin.get_context_length()}")
 
-    def get_model_name(self) -> str:
-        return self.model_name
+        # Test 2: Mock Provider via Direct Config Injection
+        print("\n--- Testing Mock Provider (Direct Config) ---")
+        mock_config = {
+            "provider": "mock",
+            "mock_model_name": "test-mock-v1"
+        }
+        mock_plugin = LLMPlugin(config=mock_config, use_cache=False)
+        print(f"Model Name: {mock_plugin.get_model_name()}")
+        print(f"Mock Response: {mock_plugin.generate_text('Hello mock world')}")
+        print(f"Mock Query Alias: {mock_plugin.query('Legacy query test')}")
 
-    def get_context_length(self) -> int:
-        return 2048
+    except LLMPluginError as e:
+        print(f"LLM Plugin Error: {e}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+    finally:
+        if os.path.exists("config/llm_plugin.yaml"):
+            os.remove("config/llm_plugin.yaml")
