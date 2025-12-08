@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Load Snapshot Data -->
+    <script src="js/market_snapshot.js"></script>
     <style>
         body { font-family: 'JetBrains Mono', monospace; background-color: #050505; color: #e5e5e5; }
         .glass-panel { background: rgba(20, 20, 30, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
@@ -204,6 +206,45 @@
     <script>
         lucide.createIcons();
 
+        // --- Data Loading Logic ---
+        function loadMarketData() {
+            if (window.MARKET_SNAPSHOT && window.MARKET_SNAPSHOT.market_data) {
+                console.log("Loading Snapshot Data...");
+                const aapl = window.MARKET_SNAPSHOT.market_data["AAPL"];
+                if (aapl) {
+                    // Update Header Price/Change (Mock location for now)
+                    // In a real app we'd bind these to specific IDs.
+                    // For now, let's just log it to prove it's loaded.
+                    console.log("AAPL Loaded:", aapl);
+
+                    // Update L2 Header
+                    const l2Header = document.querySelector('.text-yellow-400');
+                    if (l2Header) {
+                        l2Header.innerText = `AAPL ($${aapl.price})`;
+                    }
+                }
+
+                // Load News
+                const news = window.MARKET_SNAPSHOT.news_feed;
+                if (news && news.length > 0) {
+                    const chatLog = document.getElementById('chat-log');
+                    // Add latest news item to chat
+                    const latestNews = news[news.length - 1];
+
+                    const newsEl = document.createElement('div');
+                    newsEl.className = "flex gap-2 mt-4";
+                    newsEl.innerHTML = `
+                        <div class="w-1 bg-yellow-500 h-full"></div>
+                        <div>
+                            <div class="text-gray-400 mb-1">FLASHWIRE [News]</div>
+                            <div class="text-yellow-100">${latestNews.headline}</div>
+                        </div>
+                    `;
+                    chatLog.appendChild(newsEl);
+                }
+            }
+        }
+
         // Mock Update Loop
         setInterval(() => {
             // Update random numbers
@@ -212,6 +253,9 @@
                 el.style.opacity = Math.random() > 0.5 ? 1 : 0.5;
             });
         }, 1000);
+
+        // Init
+        window.addEventListener('load', loadMarketData);
     </script>
 </body>
 </html>
