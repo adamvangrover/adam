@@ -1,5 +1,25 @@
-'````markdown
-'README content formatted as a Markdown file.
+# FO Super-App: The Unified Front Office
+
+> **Vision:** A "Super-App" that unifies markets, ratings, execution, analytics, and personal memory into one autonomous architecture.
+
+**FO Super-App** builds upon the Adam v23 foundation to create a complete institutional-grade platform. It integrates:
+*   **Markets & Pricing:** Competitive market making and execution.
+*   **Credit & Ratings:** S&P-like scoring and regulatory compliance.
+*   **Strategy:** Alpha signal ingestion and RL-based optimization.
+*   **Personal Memory:** A local "co-pilot brain" that learns your investment philosophy.
+*   **MCP Control Layer:** Universal tool access for LLM agents.
+
+## 🏰 FO Super-App: Family Office Edition
+
+The system now includes a specialized "Family Office" layer unifying:
+*   **Wealth Management:** Goal planning, Trust modeling.
+*   **Investment Banking:** Deal flow screening and Deep Dive analysis.
+*   **Asset Management:** Risk aggregation across multiple entities.
+*   **Governance:** Automated Investment Policy Statement (IPS) generation.
+
+[📚 Master Prompt](./docs/01_master_prompt.md) | [🏗️ System Architecture](./specs/system_architecture.md)
+
+---
 
 # Adam v23.5: Your AI-Powered Partner
 
@@ -59,7 +79,7 @@ graph TD
     Node1 <--> Vec
     
     Synthesis -->|Final Report| Output[JSON / HTML / PDF]
-````
+```
 
 #### Core Components
 
