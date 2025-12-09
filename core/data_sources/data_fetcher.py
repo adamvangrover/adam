@@ -4,6 +4,7 @@ import pandas as pd
 import time
 from typing import Dict, List, Any, Optional
 from core.utils.logging_utils import get_logger
+from core.utils.retry_utils import retry_with_backoff
 
 logger = get_logger(__name__)
 
@@ -17,6 +18,7 @@ class DataFetcher:
         """Initialize the DataFetcher."""
         pass
 
+    @retry_with_backoff(retries=2, backoff_in_seconds=1)
     def fetch_market_data(self, ticker_symbol: str) -> Dict[str, Any]:
         """
         Fetches current market data for a given ticker.
@@ -56,7 +58,13 @@ class DataFetcher:
                 "industry": info.get("industry"),
                 "description": info.get("longBusinessSummary"),
                 "currency": info.get("currency"),
-                "exchange": info.get("exchange")
+                "exchange": info.get("exchange"),
+                "country": info.get("country"),
+                "debtToEquity": info.get("debtToEquity"),
+                "profitMargins": info.get("profitMargins"),
+                "returnOnEquity": info.get("returnOnEquity"),
+                "totalCash": info.get("totalCash"),
+                "totalDebt": info.get("totalDebt")
             }
             logger.info(f"Successfully fetched data for {ticker_symbol}")
             return data
@@ -65,6 +73,7 @@ class DataFetcher:
             logger.error(f"Error fetching market data for {ticker_symbol}: {e}")
             return {}
 
+    @retry_with_backoff(retries=2, backoff_in_seconds=1)
     def fetch_historical_data(self, ticker_symbol: str, period: str = "1mo", interval: str = "1d") -> List[Dict[str, Any]]:
         """
         Fetches historical price data.
@@ -125,6 +134,7 @@ class DataFetcher:
             logger.error(f"Error fetching historical data for {ticker_symbol}: {e}")
             return []
 
+    @retry_with_backoff(retries=2, backoff_in_seconds=1)
     def fetch_news(self, ticker_symbol: str) -> List[Dict[str, Any]]:
         """
         Fetches latest news for the ticker.
@@ -162,6 +172,7 @@ class DataFetcher:
             logger.error(f"Error fetching news for {ticker_symbol}: {e}")
             return []
 
+    @retry_with_backoff(retries=2, backoff_in_seconds=1)
     def fetch_financials(self, ticker_symbol: str) -> Dict[str, Any]:
         """
         Fetches financial statements (balance sheet, income statement, cash flow).
@@ -231,4 +242,47 @@ class DataFetcher:
             return snapshot
         except Exception as e:
             logger.error(f"Error fetching snapshot for {ticker_symbol}: {e}")
+            return {}
+
+    @retry_with_backoff(retries=2, backoff_in_seconds=1)
+    def fetch_recommendations(self, ticker_symbol: str) -> List[Dict[str, Any]]:
+        """
+        Fetches analyst recommendations.
+        """
+        try:
+            logger.info(f"Fetching recommendations for {ticker_symbol}...")
+            ticker = yf.Ticker(ticker_symbol)
+            recs = ticker.recommendations
+            if recs is None or recs.empty:
+                return []
+
+            # Handle DataFrame conversion
+            if isinstance(recs, pd.DataFrame):
+                # Reset index if it's not default range index, to ensure we get all data columns
+                return recs.reset_index().to_dict(orient='records')
+
+            return []
+        except Exception as e:
+            logger.error(f"Error fetching recommendations: {e}")
+            return []
+
+    @retry_with_backoff(retries=2, backoff_in_seconds=1)
+    def fetch_calendar(self, ticker_symbol: str) -> Dict[str, Any]:
+        """
+        Fetches earnings calendar and other events.
+        """
+        try:
+            logger.info(f"Fetching calendar for {ticker_symbol}...")
+            ticker = yf.Ticker(ticker_symbol)
+            cal = ticker.calendar
+            if cal is None: return {}
+
+            if isinstance(cal, pd.DataFrame):
+                 # Transpose to make it json friendly {Event: [Date]} or {0: {Earnings Date: ...}}
+                 return cal.to_dict()
+            elif isinstance(cal, dict):
+                 return cal
+            return {}
+        except Exception as e:
+            logger.error(f"Error fetching calendar: {e}")
             return {}
