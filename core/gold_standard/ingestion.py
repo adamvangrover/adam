@@ -105,6 +105,17 @@ class IngestionEngine:
                 df = self._download_chunk([ticker], period="7d", interval="1m", prepost=True)
 
                 if not df.empty:
+                    # Flatten MultiIndex if present (yfinance returns MultiIndex if input is list)
+                    if isinstance(df.columns, pd.MultiIndex):
+                        df.columns = df.columns.get_level_values(0)
+
+                    # Ensure index name is Date for schema validation
+                    df.index.name = "Date"
+
+                    # Convert index to naive datetime to satisfy Pandera schema (and avoid TZ issues)
+                    if df.index.tz is not None:
+                        df.index = df.index.tz_localize(None)
+
                     # Validate
                     try:
                         validate_dataframe(df)
@@ -112,6 +123,7 @@ class IngestionEngine:
                         self.storage.store_intraday(df, ticker, frequency="1m")
                     except Exception as val_e:
                         logger.error(f"Validation failed for {ticker}: {val_e}")
+                        logger.error(f"Head: {df.head()}")
             except Exception as e:
                 logger.error(f"Intraday ingestion failed for {ticker}: {e}")
 
