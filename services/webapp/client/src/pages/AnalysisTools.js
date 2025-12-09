@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getAuthHeaders } from './utils/auth';
-import FundamentalAnalysis from './FundamentalAnalysis';
-import TechnicalAnalysis from './TechnicalAnalysis';
-import RiskAssessment from './RiskAssessment';
+import { getAuthHeaders } from '../utils/auth';
+import FundamentalAnalysis from '../FundamentalAnalysis';
+import TechnicalAnalysis from '../TechnicalAnalysis';
+import RiskAssessment from '../RiskAssessment';
 
 // --- Components ---
 

@@ -1,6 +1,6 @@
 import React from 'react';
-import './Dashboard.css';
-import AgentRunner from './AgentRunner';
+import '../Dashboard.css';
+import AgentRunner from '../AgentRunner';
 
 function Dashboard() {
   return (

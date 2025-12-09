@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getAuthHeaders } from './utils/auth';
+import { getAuthHeaders } from '../utils/auth';
 
 const SimulationHistory = ({ history, onSelect }) => {
     const { t } = useTranslation();
