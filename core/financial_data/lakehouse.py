@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import List, Optional, Union
 import pandas as pd
 import yfinance as yf
+import uuid
 from .schema import MarketTicker
 
 logger = logging.getLogger(__name__)
@@ -11,19 +12,33 @@ logger = logging.getLogger(__name__)
 class DataLakehouse:
     """
     Manages the 'Gold Standard' static repository of market data.
-    Uses Apache Parquet for efficient, columnar storage.
+    Uses Apache Parquet for efficient, columnar storage with Hive partitioning.
     """
 
-    def __init__(self, root_path: str = "data/market_lakehouse"):
+    def __init__(self, root_path: str = "data"):
         self.root_path = Path(root_path)
-        self.prices_path = self.root_path / "prices"
+        # Target: data/daily/region={region}/year={year}/{uuid}.parquet
+        self.daily_path = self.root_path / "daily"
         self.metadata_path = self.root_path / "metadata"
 
         self._ensure_directories()
 
     def _ensure_directories(self):
-        self.prices_path.mkdir(parents=True, exist_ok=True)
+        self.daily_path.mkdir(parents=True, exist_ok=True)
         self.metadata_path.mkdir(parents=True, exist_ok=True)
+
+    def _get_region(self, symbol: str) -> str:
+        """Determines region from ticker symbol."""
+        if "." not in symbol:
+            return "US"
+        suffix = symbol.split(".")[-1]
+        # Common EU suffixes
+        if suffix in ["L", "PA", "DE", "AM", "BR", "MI", "MC", "LS", "IR", "AS", "HE", "SW"]:
+            return "EU"
+        # Common APAC suffixes
+        if suffix in ["HK", "T", "SS", "SZ", "KS", "AX", "NZ"]:
+            return "APAC"
+        return "ROW"
 
     def ingest_tickers(self, tickers: List[Union[str, MarketTicker]], period: str = "10y", interval: str = "1d"):
         """
@@ -62,41 +77,42 @@ class DataLakehouse:
         if df.index.tz is not None:
             df.index = df.index.tz_convert(None)
 
-        # Add symbol column for partitioning/filtering if needed later,
-        # though we partition by directory currently.
         df['symbol'] = symbol
+        region = self._get_region(symbol)
 
-        # Save to Parquet with partitioning
-        # Structure: root/prices/symbol=AAPL/data.parquet
-        output_dir = self.prices_path / f"symbol={symbol}"
-        output_dir.mkdir(exist_ok=True)
+        # Partition by Year
+        df['year'] = df.index.year
 
-        file_path = output_dir / "data.parquet"
+        # We iterate by year to save partitioned files
+        for year, group in df.groupby('year'):
+            # Path: data/daily/region={region}/year={year}/{uuid}.parquet
+            partition_dir = self.daily_path / f"region={region}" / f"year={year}"
+            partition_dir.mkdir(parents=True, exist_ok=True)
 
-        # If exists, we might want to merge, but for now we overwrite/update based on blueprint
-        # "edits only as needed... updating solely for new price action".
-        # A simple approach is load existing, combine, deduplicate, save.
+            # Use UUID for filename to support massive parallel ingestion (append-only)
+            file_name = f"{uuid.uuid4()}.parquet"
+            file_path = partition_dir / file_name
 
-        if file_path.exists():
-            existing_df = pd.read_parquet(file_path)
-            combined = pd.concat([existing_df, df])
-            combined = combined[~combined.index.duplicated(keep='last')]
-            combined.sort_index(inplace=True)
-            combined.to_parquet(file_path, compression='snappy')
-            logger.info(f"Updated {symbol} data at {file_path}")
-        else:
-            df.to_parquet(file_path, compression='snappy')
-            logger.info(f"Created {symbol} data at {file_path}")
+            # Drop the partition column 'year' before saving, as it's in the directory structure
+            # Keep 'symbol' as it's a column, not a directory partition in this level
+            group_to_save = group.drop(columns=['year'])
+            group_to_save.to_parquet(file_path, compression='snappy')
 
-    def load_data(self, symbol: str) -> pd.DataFrame:
+        logger.info(f"Ingested {symbol} into Hive partitions.")
+
+    def load_data(self, symbol: str, region: str = None) -> pd.DataFrame:
         """
         Loads historical data for a symbol from the Lakehouse.
         """
-        file_path = self.prices_path / f"symbol={symbol}" / "data.parquet"
-        if not file_path.exists():
-            raise FileNotFoundError(f"No data found for {symbol} in Lakehouse")
-
-        return pd.read_parquet(file_path)
+        # Best effort load using pyarrow dataset filters if available via pandas
+        try:
+            return pd.read_parquet(
+                self.daily_path,
+                filters=[('symbol', '=', symbol)]
+            )
+        except Exception as e:
+            logger.error(f"Error loading data for {symbol}: {e}")
+            raise
 
     def store_metadata(self, tickers: List[MarketTicker]):
         """
