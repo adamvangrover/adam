@@ -1,6 +1,7 @@
 from __future__ import annotations
 import yfinance as yf
 import pandas as pd
+import time
 from typing import Dict, List, Any, Optional
 from core.utils.logging_utils import get_logger
 
@@ -201,4 +202,33 @@ class DataFetcher:
 
         except Exception as e:
             logger.error(f"Error fetching financials for {ticker_symbol}: {e}")
+            return {}
+
+    def fetch_realtime_snapshot(self, ticker_symbol: str) -> Dict[str, Any]:
+        """
+        Fetches a low-latency L1 market data snapshot using yfinance fast_info.
+        """
+        try:
+            logger.info(f"Fetching realtime snapshot for {ticker_symbol}...")
+            ticker = yf.Ticker(ticker_symbol)
+            fi = ticker.fast_info
+
+            # fast_info provides direct access to these properties
+            snapshot = {
+                "symbol": ticker_symbol,
+                "last_price": fi.last_price,
+                "previous_close": fi.previous_close,
+                "open": fi.open,
+                "day_high": fi.day_high,
+                "day_low": fi.day_low,
+                "year_high": fi.year_high,
+                "year_low": fi.year_low,
+                "market_cap": fi.market_cap,
+                "currency": fi.currency,
+                "timestamp": time.time()
+            }
+            logger.info(f"Successfully fetched snapshot for {ticker_symbol}")
+            return snapshot
+        except Exception as e:
+            logger.error(f"Error fetching snapshot for {ticker_symbol}: {e}")
             return {}
