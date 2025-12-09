@@ -26,6 +26,7 @@ from core.engine.deep_dive_graph import deep_dive_app
 from core.engine.reflector_graph import reflector_app
 from core.engine.states import init_reflector_state
 from core.system.agent_orchestrator import AgentOrchestrator
+from core.mcp.registry import MCPRegistry
 
 # v23.5 Deep Dive Agents (for Fallback)
 from core.agents.specialized.management_assessment_agent import ManagementAssessmentAgent
@@ -44,6 +45,7 @@ class MetaOrchestrator:
     def __init__(self, legacy_orchestrator: AgentOrchestrator = None):
         self.planner = NeuroSymbolicPlanner()
         self.legacy_orchestrator = legacy_orchestrator or AgentOrchestrator()
+        self.mcp_registry = MCPRegistry() # FO Super-App Integration
         
     async def route_request(self, query: str, context: Dict[str, Any] = None) -> Any:
         """
@@ -64,6 +66,14 @@ class MetaOrchestrator:
             result = await self._run_esg_flow(query)
         elif complexity == "COMPLIANCE":
             result = await self._run_compliance_flow(query)
+        elif complexity == "FO_WEALTH":
+            result = await self._run_fo_wealth(query)
+        elif complexity == "FO_DEAL":
+            result = await self._run_fo_deal(query)
+        elif complexity == "FO_EXECUTION":
+            result = await self._run_fo_execution(query)
+        elif complexity == "FO_MARKET":
+            result = await self._run_fo_market(query)
         elif complexity == "HIGH":
             result = await self._run_adaptive_flow(query)
         elif complexity == "MEDIUM":
@@ -152,6 +162,22 @@ class MetaOrchestrator:
         # Compliance
         if any(x in query_lower for x in ["compliance", "kyc", "aml", "regulation", "violation", "dodd-frank", "basel"]):
             return "COMPLIANCE"
+
+        # FO Super-App: Wealth & Governance
+        if any(x in query_lower for x in ["ips", "trust", "estate", "wealth", "goal", "governance"]):
+            return "FO_WEALTH"
+
+        # FO Super-App: Deal Flow
+        if any(x in query_lower for x in ["deal", "private equity", "venture", "screening", "multiple"]):
+            return "FO_DEAL"
+
+        # FO Super-App: Execution
+        if any(x in query_lower for x in ["buy", "sell", "execute trade", "place order"]):
+            return "FO_EXECUTION"
+
+        # FO Super-App: Market Data
+        if any(x in query_lower for x in ["price", "quote", "ticker", "market data"]):
+            return "FO_MARKET"
 
         # v23 is best for analysis, planning, and risk
         if any(x in query_lower for x in ["analyze", "risk", "plan", "strategy", "report"]):
@@ -478,3 +504,87 @@ class MetaOrchestrator:
         except Exception as e:
             logger.error(f"Crisis Simulation Failed: {e}")
             return {"error": str(e)}
+
+    async def _run_fo_market(self, query: str):
+        logger.info("Engaging FO Super-App Market Module...")
+        # Simple extraction logic
+        words = query.split()
+        symbol = "AAPL" # Default
+        for w in words:
+            if w.isupper() and len(w) <= 5 and w.isalpha():
+                symbol = w
+
+        if "price" in query.lower() or "quote" in query.lower():
+            result = self.mcp_registry.invoke("price_asset", symbol=symbol, side="mid")
+        else:
+            result = self.mcp_registry.invoke("retrieve_market_data", symbol=symbol)
+
+        return {
+            "status": "FO Market Data Retrieved",
+            "data": result
+        }
+
+    async def _run_fo_execution(self, query: str):
+        logger.info("Engaging FO Super-App Execution Module...")
+        # Simple extraction
+        words = query.split()
+        symbol = "AAPL"
+        side = "buy"
+        qty = 100
+
+        if "sell" in query.lower(): side = "sell"
+
+        for w in words:
+            if w.isupper() and len(w) <= 5 and w.isalpha():
+                symbol = w
+            if w.isdigit():
+                qty = float(w)
+
+        result = self.mcp_registry.invoke("execute_order", order={"symbol": symbol, "side": side, "qty": qty})
+        return {
+            "status": "FO Execution Submitted",
+            "report": result
+        }
+
+    async def _run_fo_wealth(self, query: str):
+        logger.info("Engaging FO Super-App Wealth Module...")
+
+        # Simple heuristic extraction
+        # "Plan goal for Education target 500000 horizon 10"
+        if "plan" in query.lower() and "goal" in query.lower():
+            # Mock extraction
+            goal_name = "General Wealth Goal"
+            target = 1000000.0
+            horizon = 10
+
+            words = query.split()
+            for i, w in enumerate(words):
+                if w.isdigit():
+                    if target == 1000000.0: target = float(w)
+                    else: horizon = int(w)
+
+            result = self.mcp_registry.invoke("plan_wealth_goal", goal_name=goal_name, target_amount=target, horizon_years=horizon, current_savings=target*0.1)
+            return {"status": "Wealth Plan Generated", "plan": result}
+
+        elif "ips" in query.lower() or "governance" in query.lower():
+            result = self.mcp_registry.invoke("generate_ips", family_name="Smith", risk_profile="Growth", goals=["Preserve Capital", "Growth"], constraints=["ESG"])
+            return {"status": "IPS Generated", "ips": result}
+
+        return {"status": "Wealth Module: Unknown Action"}
+
+    async def _run_fo_deal(self, query: str):
+        logger.info("Engaging FO Super-App Deal Flow Module...")
+
+        # "Screen deal Project X sector Tech val 50 ebitda 5"
+        deal_name = "Project Alpha"
+        sector = "Technology"
+        val = 100.0
+        ebitda = 10.0
+
+        words = query.split()
+        nums = [float(s) for s in words if s.replace('.', '', 1).isdigit()]
+        if len(nums) >= 1: val = nums[0]
+        if len(nums) >= 2: ebitda = nums[1]
+
+        result = self.mcp_registry.invoke("screen_deal", deal_name=deal_name, sector=sector, valuation=val, ebitda=ebitda)
+        return {"status": "Deal Screened", "result": result}
