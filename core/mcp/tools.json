@@ -1,0 +1,210 @@
+[
+  {
+    "name": "price_asset",
+    "description": "Returns a competitive institutional-grade price for asset.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "symbol": { "type": "string" },
+        "side": { "type": "string", "enum": ["buy", "sell"] },
+        "size": { "type": "number" },
+        "constraints": { "type": "object" }
+      },
+      "required": ["symbol"]
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "price": { "type": "number" },
+        "spread": { "type": "number" },
+        "confidence": { "type": "number" }
+      }
+    }
+  },
+  {
+    "name": "generate_strategy",
+    "description": "Generates a trading strategy based on goals and constraints.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "goals": { "type": "string", "description": "Natural language description of goals" },
+        "constraints": { "type": "object", "description": "Risk and capital constraints" }
+      },
+      "required": ["goals"]
+    }
+  },
+  {
+    "name": "execute_order",
+    "description": "Executes a trade order via the Execution Router.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "symbol": { "type": "string" },
+        "side": { "type": "string", "enum": ["buy", "sell"] },
+        "qty": { "type": "number" },
+        "order_type": { "type": "string", "enum": ["market", "limit"] },
+        "limit_price": { "type": "number" }
+      },
+      "required": ["symbol", "side", "qty"]
+    }
+  },
+  {
+    "name": "rate_credit",
+    "description": "Calculates a credit score and probability of default (PD).",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "entity_id": { "type": "string" },
+        "financials": { "type": "object" }
+      },
+      "required": ["entity_id"]
+    }
+  },
+  {
+    "name": "assign_reg_rating",
+    "description": "Assigns a regulatory rating (Pass, Special Mention, etc.).",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "pd_score": { "type": "number" },
+        "leverage_ratio": { "type": "number" }
+      },
+      "required": ["pd_score"]
+    }
+  },
+  {
+    "name": "create_credit_memo",
+    "description": "Generates a formatted credit memo document.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "entity_id": { "type": "string" },
+        "rating_data": { "type": "object" },
+        "analysis_text": { "type": "string" }
+      },
+      "required": ["entity_id", "rating_data"]
+    }
+  },
+  {
+    "name": "load_memory",
+    "description": "Retrieves information from the personal knowledge graph.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "query": { "type": "string" },
+        "limit": { "type": "integer", "default": 5 },
+        "filter_tags": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["query"]
+    }
+  },
+  {
+    "name": "write_memory",
+    "description": "Stores new insights or preferences into memory.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "content": { "type": "string" },
+        "category": { "type": "string", "enum": ["philosophy", "playbook", "fact", "preference"] },
+        "tags": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["content", "category"]
+    }
+  },
+  {
+    "name": "retrieve_market_data",
+    "description": "Fetches market data for analysis.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "symbol": { "type": "string" },
+        "interval": { "type": "string" },
+        "lookback": { "type": "string" }
+      },
+      "required": ["symbol"]
+    }
+  },
+  {
+    "name": "run_backtest",
+    "description": "Runs a historical simulation of a strategy.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "strategy_id": { "type": "string" },
+        "start_date": { "type": "string" },
+        "end_date": { "type": "string" }
+      },
+      "required": ["strategy_id"]
+    }
+  },
+  {
+    "name": "generate_files",
+    "description": "Generates output artifacts (PDFs, JSONs, Reports).",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "content": { "type": "object" },
+        "file_type": { "type": "string", "enum": ["report", "memo", "chart"] },
+        "filename": { "type": "string" }
+      },
+      "required": ["content", "file_type"]
+    }
+  },
+  {
+    "name": "generate_ips",
+    "description": "Generates an Investment Policy Statement (Family Governance).",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "family_name": { "type": "string" },
+        "risk_profile": { "type": "string" },
+        "goals": { "type": "array", "items": { "type": "string" } },
+        "constraints": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["family_name", "risk_profile", "goals", "constraints"]
+    }
+  },
+  {
+    "name": "plan_wealth_goal",
+    "description": "Calculates funding plan for a specific wealth goal.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "goal_name": { "type": "string" },
+        "target_amount": { "type": "number" },
+        "horizon_years": { "type": "integer" },
+        "current_savings": { "type": "number" }
+      },
+      "required": ["goal_name", "target_amount", "horizon_years"]
+    }
+  },
+  {
+    "name": "screen_deal",
+    "description": "Screens a private deal for investment suitability.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "deal_name": { "type": "string" },
+        "sector": { "type": "string" },
+        "valuation": { "type": "number" },
+        "ebitda": { "type": "number" }
+      },
+      "required": ["deal_name", "sector", "valuation"]
+    }
+  },
+  {
+    "name": "aggregate_family_risk",
+    "description": "Aggregates risk metrics across multiple family portfolios.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "portfolios": {
+            "type": "array",
+            "items": { "type": "object" },
+            "description": "List of portfolio dictionaries with 'aum' and 'risk_score'"
+        }
+      },
+      "required": ["portfolios"]
+    }
+  }
+]

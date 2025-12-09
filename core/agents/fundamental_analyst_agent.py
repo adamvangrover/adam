@@ -10,6 +10,7 @@ import numpy as np
 from scipy import stats  # For statistical calculations (e.g., for DCF)
 from typing import Dict, Any, Optional, Union, List
 from core.agents.agent_base import AgentBase
+from core.system.memory_manager import VectorMemoryManager
 from semantic_kernel import Kernel # Added for type hinting
 import asyncio # Added import
 import yaml # Added for example usage block
@@ -63,6 +64,7 @@ class FundamentalAnalystAgent(AgentBase):
         super().__init__(config, kernel=kernel)
         self.persona = self.config.get('persona', "Financial Analyst")
         self.description = self.config.get('description', "Performs fundamental company analysis.")
+        self.memory_manager = VectorMemoryManager()
         # The 'peers' key in self.config (e.g., ['DataRetrievalAgent']) is used by AgentOrchestrator
         # to set up connections via self.add_peer_agent(peer_instance)
 
@@ -73,6 +75,23 @@ class FundamentalAnalystAgent(AgentBase):
         """
         logging.info(f"Executing fundamental analysis for company_id: {company_id}")
         logging.debug(f"FAA_XAI:EXECUTE_INPUT: company_id='{company_id}'")
+
+        # Retrieve past analysis
+        history = self.memory_manager.query_history(company_id, limit=3)
+        history_context = ""
+        if history:
+             history_context = "\nPast Analysis (Same Company):\n" + "\n".join([f"- {h['timestamp']}: {h['analysis_summary'][:200]}..." for h in history])
+
+        # Retrieve similar analysis
+        if hasattr(self.memory_manager, 'search_similar'):
+             similar_docs = self.memory_manager.search_similar(f"Analysis of {company_id}", limit=2)
+             # Filter out self
+             similar_docs = [d for d in similar_docs if d['company_id'] != company_id]
+             if similar_docs:
+                 similar_context = "\nSimilar Past Analyses (Peers/Context):\n" + "\n".join([f"- {d['company_id']} ({d.get('similarity_score',0):.2f}): {d['analysis_summary'][:200]}..." for d in similar_docs])
+                 history_context += similar_context
+
+        logging.info(f"Retrieved {len(history)} past analysis records for {company_id}")
 
         try:
             company_data = await self.retrieve_company_data(company_id) 
@@ -95,8 +114,16 @@ class FundamentalAnalystAgent(AgentBase):
                 dcf_valuation_result, 
                 comps_valuation, 
                 financial_health,
-                enterprise_value_result
+                enterprise_value_result,
+                history_context=history_context
             )
+
+            # Save to Memory
+            self.memory_manager.save_analysis(company_id, analysis_summary, {
+                "dcf": dcf_valuation_result,
+                "health": financial_health,
+                "ev": enterprise_value_result
+            })
 
             result_package = {
                 "company_id": company_id,
@@ -222,7 +249,8 @@ class FundamentalAnalystAgent(AgentBase):
 
     async def generate_analysis_summary(self, company_id: str, financial_ratios: Dict[str, float],
                                       dcf_valuation: Optional[float], comps_valuation: Optional[float],
-                                      financial_health: str, enterprise_value: Optional[float]) -> str:
+                                      financial_health: str, enterprise_value: Optional[float],
+                                      history_context: str = "") -> str:
         # ... (existing summary generation logic, SK or fallback) ...
         # This method's logging is mostly for SK call, fallback summary is straightforward
         # For XAI, the inputs to this are already logged by `execute` and prior calc methods.
@@ -253,7 +281,8 @@ class FundamentalAnalystAgent(AgentBase):
                     "dcf_valuation_summary": dcf_summary,
                     "comps_valuation_summary": comps_summary,
                     "enterprise_value_summary": enterprise_value_summary_str, 
-                    "user_provided_key_insights_or_conclusion_prompt": user_prompt_for_conclusion
+                    "user_provided_key_insights_or_conclusion_prompt": user_prompt_for_conclusion,
+                    "history_context": history_context
                 }
                 
                 logging.info(f"Attempting to generate summary for {company_id} using Semantic Kernel skill 'FundamentalAnalysisSkill.SummarizeAnalysis'.")
