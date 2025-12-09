@@ -62,11 +62,23 @@ class TestFinancialData(unittest.TestCase):
         # Test Ingest
         self.lakehouse.ingest_tickers(['AAPL'], period='2d')
 
-        # Verify file exists
-        expected_path = Path(self.temp_dir) / "prices" / "symbol=AAPL" / "data.parquet"
-        self.assertTrue(expected_path.exists())
+        # Verify file exists in new structure
+        # data/daily/region=US/year=2023/{uuid}.parquet
+        daily_path = Path(self.temp_dir) / "daily"
+        self.assertTrue(daily_path.exists())
+
+        # Check that we have region=US and year=2023
+        region_path = daily_path / "region=US"
+        self.assertTrue(region_path.exists())
+
+        year_path = region_path / "year=2023"
+        self.assertTrue(year_path.exists())
+
+        parquet_files = list(year_path.glob("*.parquet"))
+        self.assertTrue(len(parquet_files) >= 1)
 
         # Verify Load
+        # Because UUIDs are random, loading logic is tested here too
         loaded_df = self.lakehouse.load_data('AAPL')
         self.assertEqual(len(loaded_df), 2)
         self.assertEqual(loaded_df.iloc[0]['Close'], 101.0)
