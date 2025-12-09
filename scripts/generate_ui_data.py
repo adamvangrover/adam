@@ -212,7 +212,13 @@ def main():
     with open(js_output_path, 'w', encoding='utf-8') as f:
         f.write(f"window.MOCK_DATA = {json.dumps(data, indent=2)};")
 
-    print(f"Successfully generated UI data at {js_output_path}")
+    # Output to webapp/public/data/manifest.json
+    manifest_path = os.path.join(root_dir, 'webapp/public/data/manifest.json')
+    os.makedirs(os.path.dirname(manifest_path), exist_ok=True)
+    with open(manifest_path, 'w', encoding='utf-8') as f:
+        json.dump(data, f, indent=2)
+
+    print(f"Successfully generated UI data at {js_output_path} and {manifest_path}")
     print(f"Indexed: {len(strategies)} Strategies, {len(training_sets)} Training Sets, {len(agent_metadata)} Agents.")
 
 if __name__ == "__main__":
