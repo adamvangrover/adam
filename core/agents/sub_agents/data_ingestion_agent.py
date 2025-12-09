@@ -10,6 +10,8 @@ class DataIngestionAgent(AgentBase):
     """
     Agent responsible for data ingestion tasks using the Gold Standard Toolkit.
     Handles daily history downloads, intraday snapshots, and schema validation.
+    
+    Version: Adam v24 (Sprint 1: Sensory Layer)
     """
 
     def __init__(self, config: Dict[str, Any], constitution: Optional[Dict[str, Any]] = None, kernel: Any = None):
@@ -19,6 +21,8 @@ class DataIngestionAgent(AgentBase):
         # Default to 'data' directory if not specified in config
         storage_path = self.config.get("storage_path", "data")
         self.storage = StorageEngine(base_path=storage_path)
+        
+        # Using IngestionEngine (Sprint 1 Standard)
         self.ingestion_engine = IngestionEngine(self.storage)
         logger.info(f"DataIngestionAgent initialized with storage path: {storage_path}")
 
@@ -32,15 +36,18 @@ class DataIngestionAgent(AgentBase):
         - get_snapshot: Get realtime snapshot for a single ticker.
         """
         try:
+            logger.info(f"DataIngestionAgent executing task: {task}")
+
             if task == "ingest_daily":
                 tickers = kwargs.get("tickers", [])
                 if not tickers:
                     return {"status": "error", "message": "No tickers provided"}
 
+                # Feature branch supports configurable period/interval
                 period = kwargs.get("period", "max")
                 interval = kwargs.get("interval", "1d")
 
-                logger.info(f"Starting daily ingestion for {len(tickers)} tickers...")
+                logger.info(f"Starting daily ingestion for {len(tickers)} tickers (Period: {period})...")
                 self.ingestion_engine.ingest_daily_history(tickers, period=period, interval=interval)
                 return {"status": "success", "message": f"Completed daily ingestion for {len(tickers)} tickers"}
 
@@ -54,6 +61,7 @@ class DataIngestionAgent(AgentBase):
                 return {"status": "success", "message": f"Completed intraday ingestion for {len(tickers)} tickers"}
 
             elif task == "get_snapshot":
+                # Feature branch schema specifies single ticker for snapshot
                 ticker = kwargs.get("ticker")
                 if not ticker:
                     return {"status": "error", "message": "No ticker provided"}
@@ -69,6 +77,9 @@ class DataIngestionAgent(AgentBase):
             return {"status": "error", "message": str(e)}
 
     def get_skill_schema(self) -> Dict[str, Any]:
+        """
+        Defines the skills exposed to the Kernel/LLM.
+        """
         return {
             "name": "DataIngestionAgent",
             "description": "Handles ingestion of financial data (daily history, intraday, snapshots).",
