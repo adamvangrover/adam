@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Activity, Cpu, Server, AlertCircle, CheckCircle } from 'lucide-react';
+import { Activity, Server, AlertCircle, CheckCircle } from 'lucide-react';
 
 // Types for our monitoring data
 interface SystemStatus {
