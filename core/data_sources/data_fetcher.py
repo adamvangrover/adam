@@ -11,6 +11,8 @@ class DataFetcher:
     """
     A robust data fetcher that retrieves live market data using yfinance.
     This class replaces manual JSON blobs with real-time data streaming.
+
+    Serves as the primary 'Live Data Connector' for the Adam v23.5 system.
     """
 
     def __init__(self):
@@ -146,13 +148,33 @@ class DataFetcher:
 
             results = []
             for item in news:
+                # yfinance news structure can be flat or nested in 'content'
+                content = item.get("content", item)
+
+                # Extract fields with fallbacks
+                title = content.get("title")
+
+                # Provider/Publisher extraction
+                provider = content.get("provider", {})
+                publisher = provider.get("displayName") if isinstance(provider, dict) else str(provider)
+
+                # Link extraction
+                click_through_url = content.get("clickThroughUrl")
+                canonical_url = content.get("canonicalUrl")
+                link = (click_through_url.get("url") if click_through_url else None) or \
+                       (canonical_url.get("url") if canonical_url else None) or \
+                       content.get("link")
+
+                # Time extraction
+                pub_date = content.get("pubDate") or content.get("providerPublishTime")
+
                 results.append({
-                    "title": item.get("title"),
-                    "publisher": item.get("publisher"),
-                    "link": item.get("link"),
-                    "providerPublishTime": item.get("providerPublishTime"),
-                    "type": item.get("type"),
-                    "thumbnail": item.get("thumbnail")
+                    "title": title,
+                    "publisher": publisher,
+                    "link": link,
+                    "providerPublishTime": pub_date,
+                    "type": content.get("contentType", content.get("type")),
+                    "thumbnail": content.get("thumbnail")
                 })
 
             logger.info(f"Successfully fetched {len(results)} news items for {ticker_symbol}")
