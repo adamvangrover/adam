@@ -1,308 +1,200 @@
 import os
+import sys
 import json
-import urllib.parse
-import ast
+import argparse
 
-ROOT_DIR = "."
-SKIP_DIRS = {
-    ".git", "node_modules", "__pycache__", ".ipynb_checkpoints", "venv", "env", ".vscode", ".idea",
-    "archive", "services", "src", "webapp", "downloads", "tests", "adam_v21_upgrade", "verification",
-    "target", "build", "dist", "site-packages", "evaluation", "evals",
-    "skills", "templates", "assets", "mock_data", "examples", "legacy", "migrations",
-    "libraries_and_archives", "financial_suite"  # Skip deep data archives to focus on logic
-}
-STYLE_PATH = "showcase/css/style.css"
-MAX_DIRS = 35  # Tighter limit to avoid sandbox file limits
+class ShowcaseGenerator:
+    def __init__(self):
+        pass
 
-HTML_TEMPLATE = """<!DOCTYPE html>
+    def generate(self, directory, depth, files):
+        relative_root = "../" * depth if depth > 0 else "./"
+        current_dir_name = os.path.basename(directory) if directory != "." else "ROOT"
+
+        # 1. Generate Sidebar File List
+        try:
+            all_items = sorted(os.listdir(directory))
+        except PermissionError:
+            return
+
+        file_list_html = ""
+
+        # Directories first
+        for item in all_items:
+            if item.startswith('.') or item == 'node_modules': continue
+            full_path = os.path.join(directory, item)
+            if os.path.isdir(full_path):
+                file_list_html += f'<li style="margin-bottom: 0.5rem;">📂 <a href="{item}/index.html" style="color: var(--text-primary);">{item}/</a></li>\n'
+
+        # Then files
+        for item in all_items:
+            if item.startswith('.') or item == 'node_modules' or item == 'index.html': continue
+            full_path = os.path.join(directory, item)
+            if os.path.isfile(full_path):
+                file_list_html += f'<li style="margin-bottom: 0.5rem;">📄 <span style="color: var(--text-secondary);">{item}</span></li>\n'
+
+        # 2. Context-Aware Content
+        main_content = ""
+        readme_path = os.path.join(directory, "README.md")
+        if os.path.exists(readme_path):
+            main_content += f'<div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">'
+            main_content += f'<h3 style="margin-top:0;">📜 README.md Detected</h3>'
+            main_content += f'<p>Documentation available. <button class="cyber-btn" onclick="alert(\'Markdown rendering simulated\')">VIEW DOCS</button></p>'
+            main_content += f'</div>'
+
+        # Generic File Table
+        main_content += '<table class="cyber-table"><thead><tr><th>Type</th><th>Name</th><th>Size</th></tr></thead><tbody>'
+        for item in all_items:
+            if item.startswith('.') or item == 'node_modules' or item == 'index.html': continue
+            full_path = os.path.join(directory, item)
+            is_dir = os.path.isdir(full_path)
+            icon = "📂" if is_dir else "📄"
+            size = "-" if is_dir else f"{os.path.getsize(full_path)} B"
+            link = f'<a href="{item}/index.html">{item}</a>' if is_dir else item
+
+            main_content += f'<tr><td>{icon}</td><td>{link}</td><td class="mono">{size}</td></tr>'
+        main_content += '</tbody></table>'
+
+        # 3. HTML Template
+        html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v23.5 | {dir_name}</title>
-    <link rel="stylesheet" href="{style_path}">
-    <style>
-        /* Fallback styles if stylesheet is missing */
-        body {{ background-color: #050b14; color: #06b6d4; font-family: monospace; margin: 0; padding: 0; }}
-        .header {{ border-bottom: 1px solid #06b6d4; padding: 20px; display: flex; justify-content: space-between; align-items: center; }}
-        .breadcrumb {{ font-size: 1.2em; color: #e2e8f0; }}
-        .badge {{ border: 1px solid #06b6d4; padding: 5px 10px; border-radius: 4px; font-size: 0.8em; text-transform: uppercase; }}
-        .container {{ display: flex; height: calc(100vh - 80px); }}
-        .sidebar {{ width: 300px; border-right: 1px solid #334155; padding: 20px; overflow-y: auto; background: rgba(5, 11, 20, 0.95); }}
-        .main-stage {{ flex: 1; padding: 30px; overflow-y: auto; }}
-        .file-item {{ padding: 8px; cursor: pointer; display: block; color: #94a3b8; text-decoration: none; }}
-        .file-item:hover {{ color: #06b6d4; background: rgba(6, 182, 212, 0.1); }}
-        .folder {{ color: #fbbf24; font-weight: bold; }}
-        .footer {{ border-top: 1px solid #334155; padding: 10px; text-align: center; font-size: 0.8em; color: #64748b; background: #020617; }}
-        .nav-links a {{ margin-left: 15px; color: #06b6d4; text-decoration: none; border: 1px solid #06b6d4; padding: 5px 10px; transition: all 0.2s; }}
-        .nav-links a:hover {{ background: #06b6d4; color: #000; }}
-        pre {{ background: #0f172a; padding: 15px; border-radius: 6px; overflow-x: auto; border: 1px solid #1e293b; }}
-        h1, h2, h3 {{ color: #f8fafc; text-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }}
-        .card {{ background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; padding: 20px; margin-bottom: 20px; border-radius: 8px; }}
-        .glitch {{ position: relative; }}
-        .module-doc {{ margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #334155; }}
-        .doc-text {{ color: #94a3b8; font-style: italic; }}
-    </style>
-    <!-- Mermaid JS -->
-    <script type="module">
-        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-        mermaid.initialize({{ startOnLoad: true, theme: 'dark' }});
-    </script>
+    <title>Adam v23.5 - {current_dir_name}</title>
+    <link rel="stylesheet" href="{relative_root}showcase/css/style.css">
 </head>
 <body>
-    <div class="header">
-        <div>
-            <h1 style="margin:0; display:inline-block;" class="glitch">ADAM v23.5</h1>
-            <span class="breadcrumb" style="margin-left: 20px;">{current_path}</span>
-        </div>
-        <div class="nav-links">
-            <a href="{up_level}">[UP LEVEL]</a>
-            <a href="{root_link}">[ROOT]</a>
-            <a href="#" onclick="window.toggleRuntime()">[LIVE RUNTIME]</a>
-            <a href="https://github.com/your-repo/adam" target="_blank">[GITHUB]</a>
-        </div>
-        <span class="badge">SYSTEM ONLINE</span>
-    </div>
-
-    <div class="container">
-        <div class="sidebar">
-            <h3>Directory Structure</h3>
-            {file_list}
-        </div>
-        <div class="main-stage" id="main-content">
-            <div class="card">
-                <h2>Overview</h2>
-                <div id="readme-content">
-                    {content_preview}
+    <div class="scan-line"></div>
+    <div class="scan-glow"></div>
+    <div class="grid-bg" style="min-height: 100vh; padding: 2rem;">
+        <header style="margin-bottom: 2rem; border-bottom: 1px solid var(--panel-border); padding-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1 class="glitch-text" data-text="ADAM v23.5" style="margin: 0; font-size: 1.5rem; color: var(--primary-color);">ADAM v23.5</h1>
+                    <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                        <span style="color: var(--text-muted);">{directory}</span>
+                    </div>
                 </div>
+                <div class="cyber-badge badge-green">SYSTEM ONLINE</div>
             </div>
+            <nav style="margin-top: 1rem; display: flex; gap: 1rem; font-family: var(--font-mono); font-size: 0.8rem;">
+                <a href="{relative_root}index.html" class="cyber-btn">[UP LEVEL]</a>
+                <a href="{relative_root}index.html" class="cyber-btn">[ROOT]</a>
+                <a href="#" onclick="window.toggleRuntime()" class="cyber-btn">[LIVE RUNTIME]</a>
+                <a href="https://github.com/your-repo" class="cyber-btn">[GITHUB]</a>
+            </nav>
+        </header>
 
-            {mermaid_section}
+        <div style="display: grid; grid-template-columns: 250px 1fr; gap: 2rem;">
+            <aside class="glass-panel" style="padding: 1rem; height: fit-content;">
+                <h3 style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0;">EXPLORER</h3>
+                <ul style="list-style: none; padding: 0; margin: 0; font-family: var(--font-mono); font-size: 0.85rem;">
+                    {file_list_html}
+                </ul>
+            </aside>
 
-            {modules_section}
-
-            <div id="runtime-panel" style="display:none; border-top: 1px solid #06b6d4; margin-top: 20px; padding-top: 20px;">
-                <h3>Runtime Diagnostics</h3>
-                <pre>Mock Mode: ACTIVE\nAgent Swarm: STANDBY</pre>
-            </div>
+            <main class="glass-panel" style="padding: 2rem; min-height: 500px;">
+                <h2 style="margin-top: 0; color: var(--primary-color);">Directory Contents</h2>
+                <div class="fade-in">
+                    {main_content}
+                </div>
+            </main>
         </div>
-    </div>
 
-    <div class="footer">
-        ADAM AUTO-GENERATED SHOWCASE | REF: {dir_name}
+        <footer style="margin-top: 3rem; text-align: center; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted);">
+            ADAM AUTO-GENERATED SHOWCASE | REF: {current_dir_name}
+        </footer>
     </div>
 
     <script>
-    // AUTO-GENERATED: Showcase Runtime
     (function() {{
         const CONFIG = {{
             mockMode: true,
-            rootPath: "{root_link}",
-            currentDir: "{dir_name}"
+            rootPath: "{relative_root}",
+            currentDir: "{current_dir_name}"
         }};
 
-        // 1. Navigation Handler
         function initNav() {{
             console.log("Nav initialized for " + CONFIG.currentDir);
         }}
 
-        // 2. Data Loader (Graceful Fallback)
         async function loadData() {{
             try {{
-                // Attempt to load local descriptor
                 const response = await fetch('./AGENTS.md');
                 if(response.ok) {{
-                    const text = await response.text();
-                    // Simple text render for now, simulated markdown
-                    document.getElementById('readme-content').innerHTML = '<pre>' + text + '</pre>';
+                    console.log("AGENTS.md found");
+                    // Implement markdown rendering logic here
                 }}
             }} catch (e) {{
                 console.warn("No local documentation found.");
             }}
         }}
 
-        // 3. Runtime Toggle
         window.toggleRuntime = function() {{
-            const panel = document.getElementById('runtime-panel');
-            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+            alert('Runtime Toggle: Active');
         }};
 
         document.addEventListener('DOMContentLoaded', () => {{
             initNav();
-            // loadData(); // Disabled to prefer generated content
+            loadData();
         }});
     }})();
     </script>
 </body>
-</html>
-"""
+</html>"""
 
-def analyze_directory(directory):
-    modules = []
-    classes = []
+        # Write index.html
+        index_path = os.path.join(directory, "index.html")
+        with open(index_path, "w") as f:
+            f.write(html)
 
-    for f in sorted(os.listdir(directory)):
-        path = os.path.join(directory, f)
-        if f.endswith('.py') and f != "__init__.py":
-            try:
-                with open(path, 'r', encoding='utf-8') as file:
-                    content = file.read()
-                    tree = ast.parse(content)
-                    docstring = ast.get_docstring(tree)
-                    modules.append({'name': f, 'doc': docstring or "No description available."})
+        # Write manifest
+        manifest_path = os.path.join(directory, "directory_manifest.jsonld")
+        manifest = {
+            "@context": "https://schema.org",
+            "@type": "Dataset",
+            "name": f"Adam v23.5 - {current_dir_name}",
+            "description": f"Auto-generated showcase manifest for {current_dir_name}",
+            "url": "./index.html",
+            "hasPart": [{"@type": "Thing", "name": f} for f in files if f != "index.html"],
+            "variableMeasured": "Interactivity Level: Static"
+        }
+        with open(manifest_path, "w") as f:
+            json.dump(manifest, f, indent=2)
 
-                    for node in ast.walk(tree):
-                        if isinstance(node, ast.ClassDef):
-                            classes.append({'module': f, 'name': node.name})
-            except Exception as e:
-                pass
-
-    return modules, classes
-
-def generate_mermaid_graph(classes):
-    if not classes: return ""
-    graph = '<div class="card"><h2>Class Structure</h2><pre class="mermaid">\nclassDiagram\n'
-    for c in classes:
-        graph += f"    class {c['name']} {{\n        {c['module']}\n    }}\n"
-    graph += '</pre></div>'
-    return graph
-
-def generate_modules_section(modules):
-    if not modules: return ""
-    html = '<div class="card"><h2>Module Documentation</h2>'
-    for m in modules:
-        html += f'<div class="module-doc"><h3>{m["name"]}</h3><p class="doc-text">{m["doc"]}</p></div>'
-    html += '</div>'
-    return html
-
-def get_relative_path(from_dir, to_file):
-    return os.path.relpath(to_file, from_dir)
-
-def generate_file_list_html(directory):
-    try:
-        items = sorted(os.listdir(directory))
-    except OSError:
-        return ""
-
-    html = []
-    if directory != ".":
-         html.append(f'<a href="../index.html" class="file-item folder">📂 .. (Parent)</a>')
-
-    for item in items:
-        if item.startswith('.') or item == "index.html" or item == "directory_manifest.jsonld":
-            continue
-        path = os.path.join(directory, item)
-        if os.path.isdir(path):
-            if item in SKIP_DIRS: continue
-            html.append(f'<a href="{item}/index.html" class="file-item folder">📂 {item}</a>')
-        else:
-            icon = "📄"
-            if item.endswith(".json"): icon = "📊"
-            if item.endswith(".md"): icon = "📝"
-            html.append(f'<a href="{item}" class="file-item">{icon} {item}</a>')
-    return "\n".join(html)
-
-def generate_content_preview(directory):
-    readme_path = os.path.join(directory, "README.md")
-    if os.path.exists(readme_path):
-        try:
-            with open(readme_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-                # Simple line-break to BR
-                html = content.replace('\n', '<br>')
-                return f"<h3>README.md</h3><div style='line-height:1.6;'>{html[:3000]}...</div>"
-        except:
-            pass
-    return "<p>No README.md found. See Module Documentation below.</p>"
-
-def generate_manifest(directory, files):
-    manifest = {
-        "@context": "https://schema.org",
-        "@type": "Dataset",
-        "name": f"Adam v23.5 - {os.path.basename(os.path.abspath(directory))}",
-        "url": "./index.html",
-        "hasPart": [],
-        "variableMeasured": "Interactivity Level: Static"
-    }
-    for f in files:
-        if f.endswith('.py'):
-            manifest["hasPart"].append({"@type": "SoftwareSourceCode", "name": f, "programmingLanguage": "Python"})
-        elif f.endswith('.md'):
-            manifest["hasPart"].append({"@type": "TechArticle", "name": f})
-    return json.dumps(manifest, indent=2)
+        print(f"Generated showcase for {directory}")
 
 def main():
-    print("Starting Showcase Swarm Generator v2 (Enhanced)...")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--limit", type=int, default=10, help="Max directories to process")
+    parser.add_argument("--target", default=".", help="Root directory")
+    args = parser.parse_args()
+
+    generator = ShowcaseGenerator()
 
     count = 0
-    # Walk the directory tree
-    for root, dirs, files in os.walk(ROOT_DIR):
-        # Filter directories
-        dirs[:] = [d for d in dirs if d not in SKIP_DIRS and not d.startswith('.')]
+    for root, dirs, files in os.walk(args.target):
+        # Exclude hidden dirs and node_modules
+        dirs[:] = [d for d in dirs if not d.startswith('.') and d != 'node_modules']
 
-        # Prioritize prompts first (to ensure they are covered)
-        dirs.sort(key=lambda x: 0 if x == "prompts" else (1 if x == "core" else (2 if x == "docs" else 3)))
+        if ".git" in root or "node_modules" in root:
+            continue
 
-        if count >= MAX_DIRS:
-            print(f"Reached MAX_DIRS limit ({MAX_DIRS}). Stopping.")
+        # Skip if index.html already exists to preserve manual work
+        # Also skip the root directory to avoid overwriting the main entry point if it exists
+        if "index.html" in files:
+            print(f"Skipping {root} (index.html exists)")
+            continue
+
+        depth = root.count(os.sep)
+        if root == ".": depth = 0
+
+        generator.generate(root, depth, files)
+        count += 1
+        if args.limit > 0 and count >= args.limit:
+            print(f"Limit of {args.limit} reached. Stopping.")
             break
-
-        # Calculate paths
-        rel_path = os.path.relpath(root, ROOT_DIR)
-        if rel_path == ".": rel_path = ""
-        depth = 0 if rel_path == "" else rel_path.count(os.sep) + 1
-
-        if rel_path == "":
-            style_rel = STYLE_PATH
-            root_link = "./index.html"
-            up_level = "#"
-        else:
-            style_rel = "../" * depth + STYLE_PATH
-            root_link = "../" * depth + "index.html"
-            up_level = "../index.html"
-
-        current_dir_name = os.path.basename(os.path.abspath(root))
-        if not current_dir_name: current_dir_name = "ROOT"
-
-        # Analyze content
-        modules, classes = analyze_directory(root)
-        mermaid_section = generate_mermaid_graph(classes)
-        modules_section = generate_modules_section(modules)
-        file_list_html = generate_file_list_html(root)
-        content_preview = generate_content_preview(root)
-
-        html_content = HTML_TEMPLATE.format(
-            dir_name=current_dir_name,
-            style_path=style_rel,
-            current_path="/" + rel_path.replace(os.sep, "/"),
-            up_level=up_level,
-            root_link=root_link,
-            file_list=file_list_html,
-            content_preview=content_preview,
-            mermaid_section=mermaid_section,
-            modules_section=modules_section
-        )
-
-        # Write files
-        index_path = os.path.join(root, "index.html")
-        if root in ["./showcase", "showcase", "."]:
-             if os.path.exists(index_path):
-                 try:
-                     with open(index_path, 'r', encoding='utf-8') as f:
-                         if "Mission Control" in f.read(): continue
-                 except: pass
-
-        try:
-            with open(index_path, "w", encoding="utf-8") as f:
-                f.write(html_content)
-
-            with open(os.path.join(root, "directory_manifest.jsonld"), "w", encoding="utf-8") as f:
-                f.write(generate_manifest(root, files))
-
-            print(f"Generated enhanced showcase for: {root}")
-            count += 1
-        except Exception as e:
-            print(f"Failed {root}: {e}")
 
 if __name__ == "__main__":
     main()
