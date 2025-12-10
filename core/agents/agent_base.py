@@ -4,6 +4,19 @@ import logging
 import json
 import asyncio
 import uuid
+import warnings
+from datetime import datetime
+
+# HNASP Imports
+from core.schemas.hnasp import HNASPState, Meta, PersonaState, LogicLayer, ContextStream, PersonaDynamics
+# JsonLogic
+try:
+    from core.utils.json_logic import jsonLogic
+except ImportError:
+    # Fallback
+    def jsonLogic(rules, data):
+        logging.warning("Using fallback jsonLogic (always True)")
+        return True
 
 # Import Kernel for type hinting
 try:
@@ -20,7 +33,7 @@ class AgentBase(ABC):
     """
     Abstract base class for all agents in the system.
     Defines the common interface and behavior expected of all agents.
-    This version incorporates MCP, A2A, and Semantic Kernel.
+    This version incorporates MCP, A2A, Semantic Kernel, and HNASP.
     """
 
     def __init__(self, config: Dict[str, Any], constitution: Optional[Dict[str, Any]] = None, kernel: Optional[Kernel] = None):
@@ -32,7 +45,22 @@ class AgentBase(ABC):
         self.config = config
         self.constitution = constitution
         self.kernel = kernel # Store the Semantic Kernel instance
+
+        # HNASP State Initialization
+        # Replace self.context = {} with self.state: HNASPState
+        self.state = HNASPState(
+            meta=Meta(
+                agent_id=config.get("agent_id", str(uuid.uuid4())),
+                trace_id=config.get("trace_id", str(uuid.uuid4()))
+            ),
+            persona=PersonaState(),
+            logic_layer=LogicLayer(),
+            context_stream=ContextStream()
+        )
+
+        # Legacy context support (deprecated)
         self.context: Dict[str, Any] = {}
+
         self.peer_agents: Dict[str, AgentBase] = {}  # For A2A
         self.pending_requests: Dict[str, asyncio.Future] = {} # For Async A2A responses
 
@@ -46,20 +74,114 @@ class AgentBase(ABC):
             log_message += "."
         logging.info(log_message)
 
+        # Monkey-patch execute to enforce logic layer evaluation (Guardrails)
+        self._original_execute = self.execute
+
+        async def wrapped_execute(*args, **kwargs):
+            # Update state variables from inputs if applicable
+            if kwargs:
+                self.state.logic_layer.state_variables.update(kwargs)
+                # Also update legacy context for backward compatibility
+                self.context.update(kwargs)
+
+            # Evaluate Logic Layer
+            self.evaluate_logic_layer()
+
+            # Update Persona (using first string arg if available as input text?)
+            if args and isinstance(args[0], str):
+                self.update_persona(args[0])
+
+            # Execute original logic
+            return await self._original_execute(*args, **kwargs)
+
+        self.execute = wrapped_execute # Bind wrapper to instance
+
 
     def set_context(self, context: Dict[str, Any]):
         """
         Sets the MCP context for the agent. This context contains
         information needed to perform the agent's task.
         """
+        # Update HNASP State
+        if self.state:
+            self.state.logic_layer.state_variables.update(context)
+
+        # Update legacy context
         self.context = context
         logging.debug(f"Agent {type(self).__name__} context set: {context}")
 
     def get_context(self) -> Dict[str, Any]:
         """
-        Returns the current MCP context.
+        Returns the full serialized JSON structure of HNASPState for Observation Lakehouse compatibility.
         """
-        return self.context
+        return self.state.model_dump()
+
+    def evaluate_logic_layer(self):
+        """
+        Utilizes the json-logic library to execute all ASTs defined in
+        self.state.logic_layer.active_rules against state_variables.
+        This must run before the execute method to set guardrails.
+        """
+        try:
+            logic_layer = self.state.logic_layer
+            state_vars = logic_layer.state_variables
+            active_rules = logic_layer.active_rules
+
+            if not active_rules:
+                return
+
+            results = []
+            for rule_id, rule in active_rules.items():
+                try:
+                    result = jsonLogic(rule, state_vars)
+                    results.append({
+                        "rule_id": rule_id,
+                        "result": result,
+                        "timestamp": datetime.utcnow().isoformat()
+                    })
+                    # Implicit guardrail: if result is explicitly False, maybe warn?
+                    # For now we strictly log.
+                except Exception as e:
+                    logging.error(f"Error evaluating HNASP rule {rule_id}: {e}")
+                    results.append({
+                        "rule_id": rule_id,
+                        "error": str(e),
+                        "timestamp": datetime.utcnow().isoformat()
+                    })
+
+            logic_layer.execution_trace.extend(results)
+        except Exception as e:
+            logging.error(f"Critical error in evaluate_logic_layer: {e}")
+
+    def update_persona(self, input_text: str):
+        """
+        Updates transient_epa vectors based on input text.
+        """
+        try:
+            # Simple placeholder logic for EPA update
+            # Ideally this uses a sentiment analysis library
+            fundamental = self.state.persona.identities["user"]["fundamental_epa"]
+
+            # Mock calculation: modify transient based on length and simple keywords
+            # E (Evaluation): Positive/Negative
+            e_val = 0.5 if "good" in input_text.lower() else -0.5 if "bad" in input_text.lower() else 0.0
+
+            # P (Potency): Strong/Weak
+            p_val = 0.5 if "!" in input_text else 0.0
+
+            # A (Activity): Active/Passive
+            a_val = min(len(input_text) / 100.0, 1.0)
+
+            transient = [e_val, p_val, a_val]
+            self.state.persona.identities["user"]["transient_epa"] = transient
+
+            # Update Dynamics
+            # Deflection = Euclidean distance between fundamental and transient (simplified)
+            deflection = sum((f - t) ** 2 for f, t in zip(fundamental, transient)) ** 0.5
+            self.state.persona.dynamics.current_deflection = deflection
+
+        except Exception as e:
+            logging.warning(f"Failed to update persona: {e}")
 
     def add_peer_agent(self, agent: 'AgentBase'):
         """
@@ -174,6 +296,7 @@ class AgentBase(ABC):
 
         try:
             # Execute the agent's logic
+            # This calls self.execute, which is now the wrapped version.
             result = await self.execute(**context)
 
             # Publish the result to the reply_to topic if requested
@@ -240,6 +363,3 @@ class AgentBase(ABC):
         except Exception as e:
             logging.error(f"Error executing Semantic Kernel skill: {e}")
             raise
-
-# Note: The 'Agent' class previously located here has been moved to 'core/agents/rag_agent.py'
-# to improve architectural clarity and separation of concerns.
