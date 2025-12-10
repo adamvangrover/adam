@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v23.5 | core</title>
-    <link rel="stylesheet" href="../showcase/css/style.css">
+    <title>ADAM v23.5 | tools</title>
+    <link rel="stylesheet" href="../../showcase/css/style.css">
     <style>
         /* Fallback styles if stylesheet is missing */
         body { background-color: #050b14; color: #06b6d4; font-family: monospace; margin: 0; padding: 0; }
@@ -37,11 +37,11 @@
     <div class="header">
         <div>
             <h1 style="margin:0; display:inline-block;" class="glitch">ADAM v23.5</h1>
-            <span class="breadcrumb" style="margin-left: 20px;">/core</span>
+            <span class="breadcrumb" style="margin-left: 20px;">/core/tools</span>
         </div>
         <div class="nav-links">
             <a href="../index.html">[UP LEVEL]</a>
-            <a href="../index.html">[ROOT]</a>
+            <a href="../../index.html">[ROOT]</a>
             <a href="#" onclick="window.toggleRuntime()">[LIVE RUNTIME]</a>
             <a href="https://github.com/your-repo/adam" target="_blank">[GITHUB]</a>
         </div>
@@ -52,49 +52,8 @@
         <div class="sidebar">
             <h3>Directory Structure</h3>
             <a href="../index.html" class="file-item folder">📂 .. (Parent)</a>
-<a href="AGENTS.md" class="file-item">📝 AGENTS.md</a>
-<a href="__init__.py" class="file-item">📄 __init__.py</a>
-<a href="advisory/index.html" class="file-item folder">📂 advisory</a>
-<a href="agents/index.html" class="file-item folder">📂 agents</a>
-<a href="analysis/index.html" class="file-item folder">📂 analysis</a>
-<a href="api/index.html" class="file-item folder">📂 api</a>
-<a href="api.py" class="file-item">📄 api.py</a>
-<a href="capability_monitoring/index.html" class="file-item folder">📂 capability_monitoring</a>
-<a href="data_access/index.html" class="file-item folder">📂 data_access</a>
-<a href="data_processing/index.html" class="file-item folder">📂 data_processing</a>
-<a href="data_sources/index.html" class="file-item folder">📂 data_sources</a>
-<a href="embeddings/index.html" class="file-item folder">📂 embeddings</a>
-<a href="engine/index.html" class="file-item folder">📂 engine</a>
-<a href="execution_router/index.html" class="file-item folder">📂 execution_router</a>
-<a href="family_office/index.html" class="file-item folder">📂 family_office</a>
-<a href="financial_data/index.html" class="file-item folder">📂 financial_data</a>
-<a href="gold_standard/index.html" class="file-item folder">📂 gold_standard</a>
-<a href="learning/index.html" class="file-item folder">📂 learning</a>
-<a href="llm/index.html" class="file-item folder">📂 llm</a>
-<a href="llm_plugin.py" class="file-item">📄 llm_plugin.py</a>
-<a href="main.py" class="file-item">📄 main.py</a>
-<a href="market_data/index.html" class="file-item folder">📂 market_data</a>
-<a href="mcp/index.html" class="file-item folder">📂 mcp</a>
-<a href="memory/index.html" class="file-item folder">📂 memory</a>
-<a href="newsletter_layout/index.html" class="file-item folder">📂 newsletter_layout</a>
-<a href="pricing_engine/index.html" class="file-item folder">📂 pricing_engine</a>
-<a href="prompting/index.html" class="file-item folder">📂 prompting</a>
-<a href="rag/index.html" class="file-item folder">📂 rag</a>
-<a href="risk_engine/index.html" class="file-item folder">📂 risk_engine</a>
-<a href="schemas/index.html" class="file-item folder">📂 schemas</a>
-<a href="settings.py" class="file-item">📄 settings.py</a>
-<a href="simulations/index.html" class="file-item folder">📂 simulations</a>
-<a href="strategy/index.html" class="file-item folder">📂 strategy</a>
-<a href="system/index.html" class="file-item folder">📂 system</a>
-<a href="tools/index.html" class="file-item folder">📂 tools</a>
-<a href="trading/index.html" class="file-item folder">📂 trading</a>
-<a href="utils/index.html" class="file-item folder">📂 utils</a>
-<a href="v22_quantum_pipeline/index.html" class="file-item folder">📂 v22_quantum_pipeline</a>
-<a href="v23_graph_engine/index.html" class="file-item folder">📂 v23_graph_engine</a>
-<a href="vectorstore/index.html" class="file-item folder">📂 vectorstore</a>
-<a href="vertical_risk_agent/index.html" class="file-item folder">📂 vertical_risk_agent</a>
-<a href="world_simulation/index.html" class="file-item folder">📂 world_simulation</a>
-<a href="xai/index.html" class="file-item folder">📂 xai</a>
+<a href="base_tool.py" class="file-item">📄 base_tool.py</a>
+<a href="web_search_tool.py" class="file-item">📄 web_search_tool.py</a>
         </div>
         <div class="main-stage" id="main-content">
             <div class="card">
@@ -106,45 +65,15 @@
 
             <div class="card"><h2>Class Structure</h2><pre class="mermaid">
 classDiagram
-    class LLMPluginError {
-        llm_plugin.py
+    class BaseTool {
+        base_tool.py
     }
-    class LLMConfigurationError {
-        llm_plugin.py
-    }
-    class LLMAPIError {
-        llm_plugin.py
-    }
-    class BaseLLM {
-        llm_plugin.py
-    }
-    class MockLLM {
-        llm_plugin.py
-    }
-    class OpenAILLM {
-        llm_plugin.py
-    }
-    class HuggingFaceLLM {
-        llm_plugin.py
-    }
-    class CohereLLM {
-        llm_plugin.py
-    }
-    class PromptTemplate {
-        llm_plugin.py
-    }
-    class CacheManager {
-        llm_plugin.py
-    }
-    class LLMPlugin {
-        llm_plugin.py
-    }
-    class Settings {
-        settings.py
+    class WebSearchTool {
+        web_search_tool.py
     }
 </pre></div>
 
-            <div class="card"><h2>Module Documentation</h2><div class="module-doc"><h3>api.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>llm_plugin.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>main.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>settings.py</h3><p class="doc-text">No description available.</p></div></div>
+            <div class="card"><h2>Module Documentation</h2><div class="module-doc"><h3>base_tool.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>web_search_tool.py</h3><p class="doc-text">No description available.</p></div></div>
 
             <div id="runtime-panel" style="display:none; border-top: 1px solid #06b6d4; margin-top: 20px; padding-top: 20px;">
                 <h3>Runtime Diagnostics</h3>
@@ -155,7 +84,7 @@ Agent Swarm: STANDBY</pre>
     </div>
 
     <div class="footer">
-        ADAM AUTO-GENERATED SHOWCASE | REF: core
+        ADAM AUTO-GENERATED SHOWCASE | REF: tools
     </div>
 
     <script>
@@ -163,8 +92,8 @@ Agent Swarm: STANDBY</pre>
     (function() {
         const CONFIG = {
             mockMode: true,
-            rootPath: "../index.html",
-            currentDir: "core"
+            rootPath: "../../index.html",
+            currentDir: "tools"
         };
 
         // 1. Navigation Handler
