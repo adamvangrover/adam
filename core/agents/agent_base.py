@@ -8,7 +8,7 @@ import warnings
 from datetime import datetime
 
 # HNASP Imports
-from core.schemas.hnasp import HNASPState, Meta, PersonaState, LogicLayer, ContextStream, PersonaDynamics
+from core.schemas.hnasp import HNASPState, Meta, PersonaState, LogicLayer, ContextStream, PersonaDynamics, SecurityContext, PersonaIdentities, Identity, EPAVector
 # JsonLogic
 try:
     from core.utils.json_logic import jsonLogic
@@ -51,9 +51,15 @@ class AgentBase(ABC):
         self.state = HNASPState(
             meta=Meta(
                 agent_id=config.get("agent_id", str(uuid.uuid4())),
-                trace_id=config.get("trace_id", str(uuid.uuid4()))
+                trace_id=config.get("trace_id", str(uuid.uuid4())),
+                security_context=SecurityContext(user_id="system", clearance="public")
             ),
-            persona=PersonaState(),
+            persona_state=PersonaState(
+                identities=PersonaIdentities(
+                    self=Identity(label=config.get("agent_id", "agent"), fundamental_epa=EPAVector(E=0.0, P=0.0, A=0.0)),
+                    user=Identity(label="user", fundamental_epa=EPAVector(E=0.0, P=0.0, A=0.0))
+                )
+            ),
             logic_layer=LogicLayer(),
             context_stream=ContextStream()
         )
@@ -160,7 +166,16 @@ class AgentBase(ABC):
         try:
             # Simple placeholder logic for EPA update
             # Ideally this uses a sentiment analysis library
-            fundamental = self.state.persona.identities["user"]["fundamental_epa"]
+            # Access user identity via dot notation for Pydantic model
+            fundamental = self.state.persona_state.identities.user.fundamental_epa
+            # But wait, fundamental_epa is an EPAVector object, not a list.
+            # We need to access components if we want to iterate.
+            # But the logic below assumes it is iterable (zip).
+            # EPAVector is a Pydantic model. We should use model_dump or similar?
+            # Or assume EPAVector is iterable? No, Pydantic models are not iterable by default.
+
+            # Let's dump to list [E, P, A] for calculation
+            f_vec = [fundamental.E, fundamental.P, fundamental.A]
 
             # Mock calculation: modify transient based on length and simple keywords
             # E (Evaluation): Positive/Negative
@@ -172,13 +187,14 @@ class AgentBase(ABC):
             # A (Activity): Active/Passive
             a_val = min(len(input_text) / 100.0, 1.0)
 
-            transient = [e_val, p_val, a_val]
-            self.state.persona.identities["user"]["transient_epa"] = transient
+            transient = EPAVector(E=e_val, P=p_val, A=a_val)
+            self.state.persona_state.identities.user.transient_epa = transient
 
             # Update Dynamics
             # Deflection = Euclidean distance between fundamental and transient (simplified)
-            deflection = sum((f - t) ** 2 for f, t in zip(fundamental, transient)) ** 0.5
-            self.state.persona.dynamics.current_deflection = deflection
+            t_vec = [transient.E, transient.P, transient.A]
+            deflection = sum((f - t) ** 2 for f, t in zip(f_vec, t_vec)) ** 0.5
+            self.state.persona_state.dynamics.current_deflection = deflection
 
         except Exception as e:
             logging.warning(f"Failed to update persona: {e}")

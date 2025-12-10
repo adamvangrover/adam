@@ -2,7 +2,7 @@ import uuid
 import json
 from datetime import datetime
 from typing import Optional, Dict, Any, List
-from core.schemas.hnasp import HNASP, Meta, PersonaState, LogicLayer, ContextStream, Turn, ModelConfig, SecurityContext, Identity, PersonaIdentities, PersonaDynamics, EPAVector, ExecutionTrace
+from core.schemas.hnasp import HNASPState as HNASP, Meta, PersonaState, LogicLayer, ContextStream, Turn, ModelConfig, SecurityContext, Identity, PersonaIdentities, PersonaDynamics, EPAVector, ExecutionTrace
 from core.hnasp.lakehouse import ObservationLakehouse
 from core.hnasp.logic_engine import LogicEngine
 from core.hnasp.personality import BayesACTEngine
