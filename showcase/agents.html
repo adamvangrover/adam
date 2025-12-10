@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v23.5 | Agent Registry & Control</title>
+    <title>ADAM v23.5 | Agent Registry & Orchestration</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
     <style>
         /* --- Core Theme Overrides --- */
-        body { background-color: #0f172a; font-family: 'Inter', sans-serif; }
+        body { background-color: #0f172a; font-family: 'Inter', sans-serif; overflow: hidden; }
         .mono { font-family: 'JetBrains Mono', monospace; }
 
         /* CRT Scanline */
@@ -50,7 +51,7 @@
 
         /* Slide-up Terminal */
         .terminal-overlay {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 400px;
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 60vh;
             background: rgba(10, 10, 12, 0.98);
             border-top: 1px solid #334155;
             backdrop-filter: blur(10px);
@@ -61,6 +62,19 @@
             flex-direction: column;
         }
         .terminal-overlay.open { transform: translateY(0); }
+
+        /* Network View Container */
+        #network-container {
+            width: 100%;
+            height: 100%;
+            background: #0f172a;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            display: none;
+        }
+        #network-container.active { display: block; }
 
         /* Utilities */
         .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; }
@@ -77,47 +91,62 @@
         .animate-pulse-soft { animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden text-slate-200">
+<body class="h-screen flex flex-col text-slate-200">
     <div class="scan-line"></div>
 
-    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 shrink-0">
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 shrink-0 relative">
         <div class="flex items-center gap-4">
             <a href="index.html" class="text-slate-400 hover:text-white transition"><i class="fas fa-arrow-left"></i></a>
             <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-emerald-400">v23.5</span> <span class="text-slate-500 font-normal">| Agent Registry</span></h1>
         </div>
         <div class="flex items-center gap-6 font-mono text-xs">
             <div class="hidden md:block text-slate-400">AGENTS: <span class="text-white" id="agent-count">--</span></div>
-            <div class="hidden md:block text-slate-400">STATUS: <span class="text-emerald-400">ONLINE</span></div>
+            <div class="hidden md:block text-slate-400">STATUS: <span class="text-emerald-400" id="system-status">ONLINE</span></div>
             
+            <div class="flex bg-slate-800 rounded-lg p-1 gap-1 border border-slate-700">
+                <button onclick="setView('grid')" id="btn-view-grid" class="px-3 py-1 rounded text-white bg-slate-600 shadow-sm transition"><i class="fas fa-th-large"></i></button>
+                <button onclick="setView('network')" id="btn-view-network" class="px-3 py-1 rounded text-slate-400 hover:text-white transition"><i class="fas fa-project-diagram"></i></button>
+            </div>
+
+            <button onclick="toggleTerminal()" class="text-slate-400 hover:text-emerald-400 transition" title="Toggle Console">
+                <i class="fas fa-terminal fa-lg"></i>
+            </button>
+
             <button onclick="toggleSettings()" class="text-slate-400 hover:text-cyan-400 transition" title="Runtime Configuration">
                 <i class="fas fa-cog fa-lg"></i>
             </button>
         </div>
     </header>
 
-    <main class="flex-1 p-6 overflow-y-auto pb-40" id="main-content">
+    <main class="flex-1 relative overflow-hidden" id="main-content">
         
-        <div class="mb-8 flex flex-wrap justify-between items-center gap-4">
-            <div class="flex gap-2" id="filters">
-                <button class="px-4 py-1.5 rounded-full bg-blue-600/20 border border-blue-500/50 text-blue-400 text-xs font-bold font-mono hover:bg-blue-600/40 transition active-filter" onclick="filter('ALL', this)">ALL</button>
-                <button class="px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition" onclick="filter('Specialist', this)">SPECIALISTS</button>
-                <button class="px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition" onclick="filter('Meta-Agent', this)">META-AGENTS</button>
-                <button class="px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition" onclick="filter('Orchestrator', this)">ORCHESTRATORS</button>
-                <button class="px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition" onclick="filter('Sub-Agent', this)">SUB-AGENTS</button>
+        <!-- Grid View -->
+        <div id="view-grid" class="h-full overflow-y-auto p-6 pb-40">
+            <div class="mb-8 flex flex-wrap justify-between items-center gap-4 sticky top-0 bg-[#0f172a]/95 backdrop-blur z-30 py-4 border-b border-slate-800 -mx-6 px-6 -mt-6">
+                <div class="flex gap-2" id="filters">
+                    <button class="px-4 py-1.5 rounded-full bg-blue-600/20 border border-blue-500/50 text-blue-400 text-xs font-bold font-mono hover:bg-blue-600/40 transition active-filter" onclick="filter('ALL', this)">ALL</button>
+                    <button class="px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition" onclick="filter('Specialist', this)">SPECIALISTS</button>
+                    <button class="px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition" onclick="filter('Meta-Agent', this)">META-AGENTS</button>
+                    <button class="px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition" onclick="filter('Orchestrator', this)">ORCHESTRATORS</button>
+                    <button class="px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition" onclick="filter('Sub-Agent', this)">SUB-AGENTS</button>
+                </div>
+
+                <div class="relative">
+                    <input type="text" id="search-agent" placeholder="Search agents..." class="bg-slate-900 border border-slate-700 rounded-lg px-4 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-500 w-64 font-mono transition" onkeyup="handleSearch(this.value)">
+                    <i class="fas fa-search absolute right-3 top-2 text-slate-600 text-xs"></i>
+                </div>
             </div>
-            
-            <div class="relative">
-                <input type="text" id="search-agent" placeholder="Search agents..." class="bg-slate-900 border border-slate-700 rounded-lg px-4 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-500 w-64 font-mono transition" onkeyup="handleSearch(this.value)">
-                <i class="fas fa-search absolute right-3 top-2 text-slate-600 text-xs"></i>
+
+            <div id="agents-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div class="col-span-full flex flex-col items-center justify-center py-20 text-slate-500 animate-pulse">
+                    <i class="fas fa-circle-notch fa-spin fa-2x mb-4 text-cyan-500"></i>
+                    <span class="font-mono text-sm">Querying Agent Mesh...</span>
+                </div>
             </div>
         </div>
 
-        <div id="agents-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <div class="col-span-full flex flex-col items-center justify-center py-20 text-slate-500 animate-pulse">
-                <i class="fas fa-circle-notch fa-spin fa-2x mb-4 text-cyan-500"></i>
-                <span class="font-mono text-sm">Querying Agent Mesh...</span>
-            </div>
-        </div>
+        <!-- Network View -->
+        <div id="network-container"></div>
 
     </main>
 
@@ -136,12 +165,13 @@
             </div>
         </div>
         <div class="flex-1 overflow-y-auto p-4 space-y-1 bg-[#0a0a0c]" id="terminal-output">
-            <div class="text-slate-500">[SYSTEM] Console ready. Select an agent to view telemetry.</div>
+            <div class="text-slate-500">[SYSTEM] Console ready. Live connection established.</div>
+            <div class="text-slate-500">[SYSTEM] Type 'help' for available commands.</div>
         </div>
-        <div id="terminal-input-area" class="p-2 border-t border-slate-700 bg-slate-900 hidden">
-             <div class="flex gap-2">
-                <span class="text-emerald-400 select-none">root@adam:~#</span>
-                <input type="text" id="manual-command" class="bg-transparent border-none outline-none text-white flex-1" placeholder="Type command..." onkeydown="handleManualCommand(event)">
+        <div id="terminal-input-area" class="p-2 border-t border-slate-700 bg-slate-900 flex">
+             <div class="flex gap-2 w-full">
+                <span class="text-emerald-400 select-none pt-1">root@adam:~#</span>
+                <input type="text" id="manual-command" class="bg-transparent border-none outline-none text-white flex-1 h-full" placeholder="Type command..." onkeydown="handleManualCommand(event)" autocomplete="off">
              </div>
         </div>
         <div id="approval-controls" class="p-4 border-t border-slate-700 bg-slate-900 flex justify-center gap-4 hidden">
@@ -169,7 +199,7 @@
                         <span>System Prompt / Instructions</span>
                         <span class="text-emerald-400 cursor-pointer hover:underline" onclick="injectPrompt()">[INJECT FROM LIBRARY]</span>
                     </div>
-                    <pre class="code-block h-[400px]" id="modal-content" contenteditable="true">Loading...</pre>
+                    <pre class="code-block h-[400px] outline-none focus:border-emerald-500" id="modal-content" contenteditable="true">Loading...</pre>
                 </div>
                 <div class="flex flex-col gap-4">
                     <div>
@@ -245,7 +275,17 @@
             <h2 class="text-xl font-bold text-white mb-4">Runtime Configuration</h2>
             
             <div class="mb-4">
-                <label class="block text-xs font-mono text-slate-400 mb-2">OPENAI / LLM API KEY</label>
+                <label class="block text-xs font-mono text-slate-400 mb-2">PROVIDER</label>
+                <select id="provider-select" class="w-full bg-black border border-slate-700 rounded p-2 text-white text-sm focus:border-emerald-500 outline-none">
+                    <option value="openai">OpenAI (GPT-4o/mini)</option>
+                    <option value="anthropic">Anthropic (Claude 3.5)</option>
+                    <option value="local">Local Instance (Ollama/Llama.cpp)</option>
+                    <option value="azure">Azure OpenAI</option>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-xs font-mono text-slate-400 mb-2">API KEY / ENDPOINT</label>
                 <input type="password" id="api-key-input" class="w-full bg-black border border-slate-700 rounded p-2 text-white text-sm focus:border-emerald-500 outline-none" placeholder="sk-...">
                 <p class="text-[10px] text-slate-500 mt-1">Key is stored in localStorage. Required for live generation.</p>
             </div>
@@ -256,9 +296,11 @@
                     <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600 relative"></div>
                     <span class="ml-3 text-sm font-medium text-slate-300">Enable Live Mode</span>
                 </label>
+                <p class="text-[10px] text-slate-500 mt-1 ml-14">If disabled, system runs in Simulation/Mock mode.</p>
             </div>
 
-            <div class="flex justify-end">
+            <div class="flex justify-end gap-3">
+                <button onclick="toggleSettings()" class="px-4 py-2 text-slate-400 hover:text-white text-sm transition">Cancel</button>
                 <button onclick="saveSettings()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-bold text-sm transition">Save & Reload</button>
             </div>
         </div>
@@ -274,11 +316,15 @@
         let terminalInterval;
         let selectedAgent = null;
         let pendingApproval = null;
+        let network = null; // vis-network instance
+        let liveMode = false;
+        let apiKey = '';
+        let provider = 'openai';
 
         // -- INIT --
         document.addEventListener('DOMContentLoaded', () => {
-            loadAgents();
             loadSettings();
+            loadAgents();
         });
 
         function loadAgents() {
@@ -291,6 +337,28 @@
             
             document.getElementById('agent-count').innerText = agents.length;
             renderGrid();
+            initNetwork();
+        }
+
+        // -- VIEW HANDLING --
+        function setView(view) {
+            const grid = document.getElementById('view-grid');
+            const net = document.getElementById('network-container');
+            const btnGrid = document.getElementById('btn-view-grid');
+            const btnNet = document.getElementById('btn-view-network');
+
+            if (view === 'grid') {
+                grid.style.display = 'block';
+                net.style.display = 'none';
+                btnGrid.className = "px-3 py-1 rounded text-white bg-slate-600 shadow-sm transition";
+                btnNet.className = "px-3 py-1 rounded text-slate-400 hover:text-white transition";
+            } else {
+                grid.style.display = 'none';
+                net.style.display = 'block';
+                btnNet.className = "px-3 py-1 rounded text-white bg-slate-600 shadow-sm transition";
+                btnGrid.className = "px-3 py-1 rounded text-slate-400 hover:text-white transition";
+                if(network) network.fit();
+            }
         }
 
         // -- RENDERING --
@@ -337,25 +405,87 @@
                             <span class="text-[10px] font-bold font-mono px-2 py-0.5 rounded border ${typeColor} uppercase tracking-wider">${agent.type}</span>
                             <div class="flex items-center gap-2 bg-black/20 px-2 py-1 rounded-full border border-white/5">
                                 <span class="status-dot ${statusColor} ${agent.status === 'ACTIVE' || agent.status === 'THINKING' ? 'animate-pulse' : ''}"></span>
-                                <span class="text-[10px] font-mono font-bold text-slate-300">${agent.status}</span>
+                                <span class="text-[10px] font-mono font-bold text-slate-300">${agent.status || 'IDLE'}</span>
                             </div>
                         </div>
                         <h3 class="text-lg font-bold text-white group-hover:text-cyan-400 transition font-mono truncate" title="${agent.name}">${formatName(agent.name)}</h3>
-                        <p class="text-xs text-slate-400 mt-2 line-clamp-3 leading-relaxed">${agent.description || 'No description available.'}</p>
+                        <p class="text-xs text-slate-400 mt-2 line-clamp-3 leading-relaxed">${agent.docstring || 'No description available.'}</p>
                     </div>
 
                     <div class="relative z-10 mt-auto pt-4">
                         <div class="flex gap-2">
-                            <button onclick="openTaskModal('${agent.id}')" class="flex-1 bg-cyan-900/30 hover:bg-cyan-600 hover:text-white text-cyan-400 text-xs py-1.5 rounded border border-cyan-800/50 transition font-mono font-bold">
+                            <button onclick="openTaskModal('${agent.name}')" class="flex-1 bg-cyan-900/30 hover:bg-cyan-600 hover:text-white text-cyan-400 text-xs py-1.5 rounded border border-cyan-800/50 transition font-mono font-bold">
                                 <i class="fas fa-play mr-1"></i> DEPLOY
                             </button>
-                            <button onclick="viewLogic('${agent.id}')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs py-1.5 rounded border border-slate-700 transition font-mono">
+                            <button onclick="viewLogic('${agent.name}')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs py-1.5 rounded border border-slate-700 transition font-mono">
                                 <i class="fas fa-code mr-1"></i> LOGIC
                             </button>
                         </div>
                     </div>
                 `;
                 grid.appendChild(card);
+            });
+        }
+
+        // -- VIS NETWORK --
+        function initNetwork() {
+            const container = document.getElementById('network-container');
+            if(!container) return;
+
+            const nodes = agents.map((a, i) => {
+                let color = '#475569'; // slate
+                if(a.type === 'Orchestrator') color = '#f59e0b'; // amber
+                if(a.type === 'Meta-Agent') color = '#a855f7'; // purple
+                if(a.type === 'Core') color = '#3b82f6'; // blue
+
+                return {
+                    id: i,
+                    label: formatName(a.name),
+                    title: a.docstring,
+                    color: { background: color, border: '#cbd5e1' },
+                    shape: 'dot',
+                    size: 20 + (Math.random() * 10),
+                    font: { color: '#e2e8f0', face: 'JetBrains Mono', size: 12 }
+                };
+            });
+
+            // Create some edges based on types
+            const edges = [];
+            const orchestrators = nodes.filter(n => agents[n.id].type === 'Orchestrator');
+
+            nodes.forEach(node => {
+                if (agents[node.id].type !== 'Orchestrator') {
+                    // Connect to a random orchestrator
+                    if(orchestrators.length > 0) {
+                        const target = orchestrators[Math.floor(Math.random() * orchestrators.length)];
+                        edges.push({ from: target.id, to: node.id, color: { color: '#334155', opacity: 0.3 } });
+                    }
+                    // Random peer connection
+                    if (Math.random() > 0.8) {
+                        const peer = nodes[Math.floor(Math.random() * nodes.length)];
+                        if(peer.id !== node.id) edges.push({ from: node.id, to: peer.id, color: { color: '#334155', opacity: 0.1 } });
+                    }
+                }
+            });
+
+            const data = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) };
+            const options = {
+                nodes: { borderWidth: 2 },
+                physics: {
+                    stabilization: false,
+                    barnesHut: { gravitationalConstant: -3000, springConstant: 0.04, springLength: 200 }
+                },
+                interaction: { hover: true, tooltipDelay: 200 }
+            };
+
+            network = new vis.Network(container, data, options);
+
+            network.on("click", function (params) {
+                if (params.nodes.length > 0) {
+                    const agentIndex = params.nodes[0];
+                    const agent = agents[agentIndex];
+                    viewLogic(agent.name);
+                }
             });
         }
 
@@ -396,12 +526,12 @@
         }
 
         // -- LOGIC MODAL --
-        function viewLogic(agentId) {
-            const agent = agents.find(a => a.id === agentId);
+        function viewLogic(agentName) {
+            const agent = agents.find(a => a.name === agentName);
             selectedAgent = agent;
 
             document.getElementById('modal-agent-name').innerText = formatName(agent.name);
-            document.getElementById('modal-content').innerText = agent.prompt || "System prompt not explicitly defined in class.";
+            document.getElementById('modal-content').innerText = agent.prompt || `/* System Prompt for ${agent.name} */\n\nYou are a specialized agent designed to...\n\n(No explicit prompt found in registry)`;
 
             // Capabilities
             const capDiv = document.getElementById('modal-capabilities');
@@ -420,8 +550,8 @@
             // Metadata
             const metaDiv = document.getElementById('modal-metadata');
             metaDiv.innerHTML = `
-                <div>ID: <span class="text-white">${agent.id}</span></div>
-                <div>File: <span class="text-white">${agent.file_path || 'N/A'}</span></div>
+                <div>ID: <span class="text-white">${agent.name}</span></div>
+                <div>File: <span class="text-white">${agent.file || 'N/A'}</span></div>
                 <div>Type: <span class="text-white">${agent.type}</span></div>
             `;
 
@@ -433,7 +563,6 @@
         }
 
         function saveLogic() {
-            // Simulated save
             const newPrompt = document.getElementById('modal-content').innerText;
             if(selectedAgent) selectedAgent.prompt = newPrompt;
             alert("Logic updated in runtime memory.");
@@ -441,7 +570,6 @@
         }
 
         function injectPrompt() {
-            // Simulate injecting from library
             const prompts = [
                 "You are a sophisticated financial analyst specializing in credit risk...",
                 "You are an adversarial Red Team agent designed to challenge assumptions...",
@@ -453,14 +581,14 @@
         }
 
         // -- TASKING & TERMINAL --
-        function openTaskModal(agentId) {
-            const agent = agents.find(a => a.id === agentId);
+        function openTaskModal(agentName) {
+            const agent = agents.find(a => a.name === agentName);
             selectedAgent = agent;
             document.getElementById('task-agent-name').innerText = `Target: ${formatName(agent.name)} (${agent.type})`;
             document.getElementById('task-modal').classList.remove('hidden');
         }
 
-        function executeTask() {
+        async function executeTask() {
             const query = document.getElementById('task-input').value;
             const complexity = document.getElementById('task-complexity').value;
             const mode = document.getElementById('task-mode').value;
@@ -471,10 +599,17 @@
             }
 
             closeModal('task-modal');
-            openTerminal(selectedAgent, query, complexity, mode);
+            openTerminal(selectedAgent);
+
+            // Check Live Mode
+            if (liveMode && apiKey) {
+                await runLiveAgent(selectedAgent, query, complexity, mode);
+            } else {
+                runSimulation(selectedAgent, query, complexity, mode);
+            }
         }
 
-        function openTerminal(agent, query, complexity, mode) {
+        function openTerminal(agent) {
             const terminal = document.getElementById('terminal');
             const output = document.getElementById('terminal-output');
             
@@ -482,63 +617,89 @@
             terminal.classList.add('open');
             output.innerHTML = '';
 
-            // Reset UI state
+            // Reset state
             document.getElementById('approval-controls').classList.add('hidden');
             document.getElementById('hil-indicator').classList.add('hidden');
             document.getElementById('terminal-input-area').classList.add('hidden');
+        }
 
-            if (terminalInterval) clearInterval(terminalInterval);
+        // -- SIMULATION --
+        function runSimulation(agent, query, complexity, mode) {
+            const output = document.getElementById('terminal-output');
 
-            // Simulation Sequence
+            // Log logic
             const steps = [
                 `[INIT] Booting sequence for ${agent.name}...`,
                 `[AUTH] Verifying credentials... OK.`,
                 `[LOAD] Loading context window (128k tokens)...`,
                 `[RECV] Mission: "${query.substring(0, 40)}..."`,
                 `[PLAN] Generating execution plan (${complexity} complexity)...`,
+                `[THINK] Synthesizing internal knowledge base...`
             ];
 
-            // Add dynamic steps based on capabilities
-            if (agent.capabilities) {
-                agent.capabilities.slice(0, 3).forEach(cap => {
-                    steps.push(`[TOOL] Engaging capability: ${cap}()...`);
-                });
-            } else {
-                steps.push(`[THINK] Synthesizing internal knowledge base...`);
-            }
-
-            // HIL Simulation
-            let requiresApproval = (mode === 'hil') || (Math.random() > 0.7);
-
             let i = 0;
-            terminalInterval = setInterval(() => {
-                if (requiresApproval && i === steps.length) {
-                    clearInterval(terminalInterval);
-                    logToTerminal(output, `[WAIT] Critical action requires human approval. Pausing execution...`, 'text-amber-400');
-                    document.getElementById('approval-controls').classList.remove('hidden');
-                    document.getElementById('hil-indicator').classList.remove('hidden');
-                    pendingApproval = { agent, output };
-                    return;
-                }
+            if (terminalInterval) clearInterval(terminalInterval);
 
+            terminalInterval = setInterval(() => {
                 if (i >= steps.length) {
                     clearInterval(terminalInterval);
-                    logToTerminal(output, `[SUCCESS] Task complete. Output generated.`, 'text-emerald-400');
+                    logToTerminal(output, `[SUCCESS] Simulation complete.`, 'text-emerald-400');
                     document.getElementById('terminal-input-area').classList.remove('hidden');
                     return;
                 }
-
                 logToTerminal(output, steps[i]);
                 i++;
             }, 800);
         }
 
+        // -- LIVE LLM --
+        async function runLiveAgent(agent, query, complexity, mode) {
+            const output = document.getElementById('terminal-output');
+
+            logToTerminal(output, `[LIVE] Connecting to ${provider.toUpperCase()} API...`, 'text-cyan-400');
+            logToTerminal(output, `[SEND] Payload: ${query.substring(0,50)}...`);
+
+            try {
+                let responseText = "";
+
+                if (provider === 'openai') {
+                    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${apiKey}`
+                        },
+                        body: JSON.stringify({
+                            model: "gpt-4o-mini", // Cost effective for showcase
+                            messages: [
+                                { role: "system", content: `You are ${agent.name}. ${agent.docstring || ''}. Respond as a terminal log.` },
+                                { role: "user", content: query }
+                            ]
+                        })
+                    });
+
+                    if(!res.ok) throw new Error(`API Error: ${res.status}`);
+                    const data = await res.json();
+                    responseText = data.choices[0].message.content;
+                }
+                // Add other providers here if needed
+
+                logToTerminal(output, `[RECV] ${responseText}`, 'text-white');
+                logToTerminal(output, `[SUCCESS] Task executed successfully.`, 'text-emerald-400');
+
+            } catch (err) {
+                logToTerminal(output, `[ERR] Live Execution Failed: ${err.message}`, 'text-red-400');
+                logToTerminal(output, `[FALLBACK] Reverting to simulation...`, 'text-amber-400');
+                runSimulation(agent, query, complexity, mode);
+            }
+            document.getElementById('terminal-input-area').classList.remove('hidden');
+        }
+
         function logToTerminal(container, text, colorClass = 'text-slate-300') {
             const div = document.createElement('div');
-            div.className = "text-xs font-mono mb-1";
+            div.className = "text-xs font-mono mb-1 break-words";
             const time = new Date().toISOString().split('T')[1].split('.')[0];
 
-            // Highlighting keys
             let formatted = text
                 .replace(/\[(.*?)\]/g, '<span class="text-blue-400 font-bold">[$1]</span>')
                 .replace(/"(.*?)"/g, '<span class="text-yellow-200">"$1"</span>');
@@ -546,30 +707,6 @@
             div.innerHTML = `<span class="text-slate-600 mr-2">[${time}]</span> <span class="${colorClass}">${formatted}</span>`;
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
-        }
-
-        function handleApproval(approved) {
-            document.getElementById('approval-controls').classList.add('hidden');
-            document.getElementById('hil-indicator').classList.add('hidden');
-            
-            const output = pendingApproval.output;
-
-            if (approved) {
-                logToTerminal(output, `[USER] Action APPROVED. Resuming...`, 'text-emerald-400');
-                setTimeout(() => {
-                    logToTerminal(output, `[EXEC] Committing changes to database...`);
-                    logToTerminal(output, `[SUCCESS] Mission accomplished.`);
-                    document.getElementById('terminal-input-area').classList.remove('hidden');
-                }, 800);
-            } else {
-                logToTerminal(output, `[USER] Action DENIED. Aborting sequence.`, 'text-red-400');
-                logToTerminal(output, `[STOP] Process terminated by user.`);
-                document.getElementById('terminal-input-area').classList.remove('hidden');
-            }
-        }
-
-        function toggleTerminal() {
-            document.getElementById('terminal').classList.toggle('open');
         }
 
         function handleManualCommand(e) {
@@ -580,14 +717,29 @@
                 e.target.value = '';
 
                 setTimeout(() => {
-                    if (cmd === 'clear') {
-                        output.innerHTML = '';
-                    } else if (cmd === 'help') {
-                        logToTerminal(output, `Available commands: status, clear, reboot, exit`);
-                    } else {
-                        logToTerminal(output, `[ERR] Command not found: ${cmd}`, 'text-red-400');
-                    }
+                    processCommand(cmd, output);
                 }, 200);
+            }
+        }
+
+        function processCommand(cmd, output) {
+            const parts = cmd.split(' ');
+            const action = parts[0].toLowerCase();
+
+            if (action === 'clear') {
+                output.innerHTML = '';
+            } else if (action === 'help') {
+                logToTerminal(output, `Available commands:\n  help          Show this menu\n  clear         Clear console\n  status        Show system status\n  list          List active agents\n  analyze [tkr] Run quick analysis on ticker`);
+            } else if (action === 'status') {
+                logToTerminal(output, `System Status: ONLINE\nActive Agents: ${agents.length}\nAPI Connection: ${liveMode ? 'ACTIVE' : 'OFFLINE'}\nMemory Usage: 34%`);
+            } else if (action === 'list') {
+                logToTerminal(output, `Agents: ` + agents.slice(0,5).map(a=>a.name).join(', ') + '...');
+            } else if (action === 'analyze') {
+                const ticker = parts[1] || 'UNKNOWN';
+                logToTerminal(output, `[TASK] Initiating quick analysis for ${ticker}...`);
+                setTimeout(() => logToTerminal(output, `[RES] ${ticker} appears solvent. Volatility high. Rec: HOLD.`), 1000);
+            } else {
+                logToTerminal(output, `[ERR] Command not found: ${cmd}`, 'text-red-400');
             }
         }
 
@@ -599,16 +751,50 @@
         function loadSettings() {
             const key = localStorage.getItem('adam_api_key');
             const live = localStorage.getItem('adam_live_mode') === 'true';
+            const prov = localStorage.getItem('adam_provider');
+
             if(key) document.getElementById('api-key-input').value = key;
+            if(prov) document.getElementById('provider-select').value = prov;
             document.getElementById('live-mode-toggle').checked = live;
+
+            apiKey = key;
+            liveMode = live;
+            provider = prov || 'openai';
+
+            updateStatusIndicator();
         }
 
         function saveSettings() {
             const key = document.getElementById('api-key-input').value;
             const live = document.getElementById('live-mode-toggle').checked;
+            const prov = document.getElementById('provider-select').value;
+
             localStorage.setItem('adam_api_key', key);
             localStorage.setItem('adam_live_mode', live);
+            localStorage.setItem('adam_provider', prov);
+
+            apiKey = key;
+            liveMode = live;
+            provider = prov;
+
             toggleSettings();
+            updateStatusIndicator();
+            alert("Configuration Saved.");
+        }
+
+        function updateStatusIndicator() {
+            const el = document.getElementById('system-status');
+            if (liveMode && apiKey) {
+                el.innerText = "LIVE / CONNECTED";
+                el.className = "text-emerald-400 animate-pulse";
+            } else {
+                el.innerText = "SIMULATION MODE";
+                el.className = "text-amber-400";
+            }
+        }
+
+        function toggleTerminal() {
+            document.getElementById('terminal').classList.toggle('open');
         }
 
     </script>
