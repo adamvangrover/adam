@@ -16,6 +16,8 @@ import logging
 import asyncio
 from typing import Dict, Any, Optional
 
+import uuid
+from core.schemas.hnasp import HNASPState, Meta as HNASPMeta, PersonaState, LogicLayer, ContextStream
 from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner
 from core.engine.states import init_risk_state, init_esg_state, init_compliance_state, init_crisis_state, init_omniscient_state
 from core.engine.red_team_graph import red_team_app
@@ -232,14 +234,18 @@ class MetaOrchestrator:
         logger.info("Engaging Deep Dive Manual Fallback...")
 
         try:
-            # Initialize Agents (Empty config for now as they use defaults/mocks)
-            mgmt_agent = ManagementAssessmentAgent(config={})
-            fund_agent = FundamentalAnalystAgent(config={})
-            peer_agent = PeerComparisonAgent(config={})
-            snc_agent = SNCRatingAgent(config={})
-            mc_agent = MonteCarloRiskAgent(config={})
-            quant_agent = QuantumScenarioAgent(config={})
-            pm_agent = PortfolioManagerAgent(config={})
+            # Generate Trace ID for HNASP propagation
+            trace_id = str(uuid.uuid4())
+            common_config = {"trace_id": trace_id}
+
+            # Initialize Agents with Trace ID
+            mgmt_agent = ManagementAssessmentAgent(config=common_config)
+            fund_agent = FundamentalAnalystAgent(config=common_config)
+            peer_agent = PeerComparisonAgent(config=common_config)
+            snc_agent = SNCRatingAgent(config=common_config)
+            mc_agent = MonteCarloRiskAgent(config=common_config)
+            quant_agent = QuantumScenarioAgent(config=common_config)
+            pm_agent = PortfolioManagerAgent(config=common_config)
 
             # Phase 1: Entity & Management
             logger.info("Fallback Phase 1: Entity & Management")
