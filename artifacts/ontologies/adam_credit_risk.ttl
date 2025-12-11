@@ -1,0 +1,74 @@
+@prefix : <https://adam-system.io/ontology/credit-risk/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix fibo-fnd-acc-rat: <https://spec.edmcouncil.org/fibo/ontology/FND/Accounting/Ratios/> .
+@prefix fibo-loan: <https://spec.edmcouncil.org/fibo/ontology/LOAN/LoanContracts/LoanContracts/> .
+
+:CreditRiskOntology a owl:Ontology ;
+    rdfs:label "Adam System Credit Risk Ontology v1.0" ;
+    rdfs:comment "Formal mapping of core credit risk parameters to FIBO standards." .
+
+# -----------------------------------------------------------------------------
+# Core Risk Classes
+# -----------------------------------------------------------------------------
+
+:CreditMetric a owl:Class ;
+    rdfs:subClassOf fibo-fnd-acc-rat:FinancialRatio ;
+    rdfs:label "Credit Risk Metric" .
+
+:LeverageRatio a owl:Class ;
+    rdfs:subClassOf :CreditMetric ;
+    rdfs:comment "Ratio of Debt to Earnings (e.g., Total Debt / EBITDA)" .
+
+:CoverageRatio a owl:Class ;
+    rdfs:subClassOf :CreditMetric ;
+    rdfs:comment "Ratio of Earnings to Interest Expense (e.g., EBITDA / Interest)" .
+
+:LiquidityRatio a owl:Class ;
+    rdfs:subClassOf :CreditMetric ;
+    rdfs:comment "Ratio of Liquid Assets to Short-Term Liabilities" .
+
+# -----------------------------------------------------------------------------
+# Specific Parameters (Adam System Definitions)
+# -----------------------------------------------------------------------------
+
+:TotalDebtToEBITDA a owl:Class ;
+    rdfs:subClassOf :LeverageRatio ;
+    rdfs:label "Total Leverage" ;
+    :calculationFormula "Total Debt / EBITDA" ;
+    :thresholdWarning "4.0x" ;
+    :thresholdCritical "6.0x" .
+
+:NetDebtToEBITDA a owl:Class ;
+    rdfs:subClassOf :LeverageRatio ;
+    rdfs:label "Net Leverage" ;
+    :calculationFormula "(Total Debt - Cash) / EBITDA" .
+
+:InterestCoverage a owl:Class ;
+    rdfs:subClassOf :CoverageRatio ;
+    rdfs:label "Interest Coverage Ratio" ;
+    :calculationFormula "EBITDA / Total Interest Expense" ;
+    :thresholdWarning "2.5x" ;
+    :thresholdCritical "1.5x" .
+
+:FixedChargeCoverage a owl:Class ;
+    rdfs:subClassOf :CoverageRatio ;
+    rdfs:label "Fixed Charge Coverage Ratio" ;
+    :calculationFormula "(EBITDA - Capex) / (Interest + Principal)" .
+
+# -----------------------------------------------------------------------------
+# Risk Properties
+# -----------------------------------------------------------------------------
+
+:hasConvictionScore a owl:DatatypeProperty ;
+    rdfs:domain :CreditMetric ;
+    rdfs:range xsd:float ;
+    rdfs:comment "The confidence level (0.0-1.0) of the calculated metric." .
+
+:isCovenantBreach a owl:DatatypeProperty ;
+    rdfs:domain :CreditMetric ;
+    rdfs:range xsd:boolean ;
+    rdfs:comment "True if the metric violates a defined lending covenant." .

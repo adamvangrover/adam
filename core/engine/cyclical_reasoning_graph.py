@@ -11,7 +11,10 @@ suitable for the v23 graph architecture.
 import json
 import logging
 import random
-import numpy as np
+try:
+    import numpy as np
+except ImportError:
+    np = None
 from typing import Literal, Dict, Any, List, Optional
 from langgraph.graph import StateGraph, END, START
 from langgraph.checkpoint.memory import MemorySaver
@@ -115,7 +118,8 @@ def map_dra_to_raa(financials: Dict[str, Any]) -> tuple[Dict, Dict]:
 
 data_retriever = V23DataRetriever()
 try:
-    risk_assessor = RiskAssessmentAgent() if RiskAssessmentAgent else None
+    # Fix: Pass required config to Agent
+    risk_assessor = RiskAssessmentAgent(config={"name": "CyclicalRiskAgent"}) if RiskAssessmentAgent else None
 except Exception as e:
     logger.error(f"Error init RAA: {e}")
     risk_assessor = None

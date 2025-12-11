@@ -1,0 +1,40 @@
+# Modern Dockerfile using uv for fast builds
+# Stage 1: Builder
+FROM python:3.12-slim as builder
+
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+
+WORKDIR /app
+
+# Copy configuration
+COPY pyproject.toml .
+# Copy source code
+COPY src/ src/
+
+# Create virtual environment and install dependencies
+# We use --system to install into the container's python environment in the builder stage,
+# but for multi-stage, venv is better.
+RUN uv venv /app/.venv
+# Install dependencies from pyproject.toml
+# Note: In a real scenario, we'd generate a uv.lock first.
+RUN . /app/.venv/bin/activate && uv pip install .
+
+# Stage 2: Runtime
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# Copy the virtual environment from the builder
+COPY --from=builder /app/.venv /app/.venv
+
+# Copy application code
+COPY src/ src/
+
+# Set environment variables
+ENV PATH="/app/.venv/bin:$PATH"
+ENV PYTHONUNBUFFERED=1
+
+# Run the application
+# We use the factory pattern or direct import
+CMD ["uvicorn", "src.adam.api.main:app", "--host", "0.0.0.0", "--port", "8000"]

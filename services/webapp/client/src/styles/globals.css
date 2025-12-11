@@ -1,0 +1,40 @@
+:root {
+  --primary-color: #00f3ff; /* Cyan */
+  --secondary-color: #ff003c; /* Red/Alert */
+  --accent-color: #f7d51d; /* Amber/Warning */
+  --bg-color: #0a0a0a;
+  --panel-bg: rgba(16, 20, 24, 0.9);
+  --border-color: #333;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: #e0e0e0;
+  font-family: var(--font-sans);
+  margin: 0;
+  overflow: hidden; /* App handles scrolling */
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-color); }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
+
+/* Utility Classes */
+.cyber-panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(10px);
+}
+
+.glitch-text {
+  text-shadow: 2px 0 var(--secondary-color), -2px 0 var(--primary-color);
+  animation: glitch 1s infinite alternate-reverse;
+}
+
+.mono-font { font-family: var(--font-mono); }
+.text-cyan { color: var(--primary-color); }
+.text-amber { color: var(--accent-color); }

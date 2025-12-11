@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam v23.5 - downloads</title>
+    <link rel="stylesheet" href="../showcase/css/style.css">
+</head>
+<body>
+    <div class="scan-line"></div>
+    <div class="scan-glow"></div>
+    <div class="grid-bg" style="min-height: 100vh; padding: 2rem;">
+        <header style="margin-bottom: 2rem; border-bottom: 1px solid var(--panel-border); padding-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1 class="glitch-text" data-text="ADAM v23.5" style="margin: 0; font-size: 1.5rem; color: var(--primary-color);">ADAM v23.5</h1>
+                    <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                        <span style="color: var(--text-muted);">./downloads</span>
+                    </div>
+                </div>
+                <div class="cyber-badge badge-green">SYSTEM ONLINE</div>
+            </div>
+            <nav style="margin-top: 1rem; display: flex; gap: 1rem; font-family: var(--font-mono); font-size: 0.8rem;">
+                <a href="../index.html" class="cyber-btn">[UP LEVEL]</a>
+                <a href="../index.html" class="cyber-btn">[ROOT]</a>
+                <a href="#" onclick="window.toggleRuntime()" class="cyber-btn">[LIVE RUNTIME]</a>
+                <a href="https://github.com/your-repo" class="cyber-btn">[GITHUB]</a>
+            </nav>
+        </header>
+
+        <div style="display: grid; grid-template-columns: 250px 1fr; gap: 2rem;">
+            <aside class="glass-panel" style="padding: 1rem; height: fit-content;">
+                <h3 style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0;">EXPLORER</h3>
+                <ul style="list-style: none; padding: 0; margin: 0; font-family: var(--font-mono); font-size: 0.85rem;">
+                    <li style="margin-bottom: 0.5rem;">📄 <span style="color: var(--text-secondary);">download_agents.py</span></li>
+<li style="margin-bottom: 0.5rem;">📄 <span style="color: var(--text-secondary);">synthetic_black_swan_scenario.csv</span></li>
+<li style="margin-bottom: 0.5rem;">📄 <span style="color: var(--text-secondary);">synthetic_stock_data.csv</span></li>
+
+                </ul>
+            </aside>
+
+            <main class="glass-panel" style="padding: 2rem; min-height: 500px;">
+                <h2 style="margin-top: 0; color: var(--primary-color);">Directory Contents</h2>
+                <div class="fade-in">
+                    <table class="cyber-table"><thead><tr><th>Type</th><th>Name</th><th>Size</th></tr></thead><tbody><tr><td>📄</td><td>download_agents.py</td><td class="mono">538 B</td></tr><tr><td>📄</td><td>synthetic_black_swan_scenario.csv</td><td class="mono">163 B</td></tr><tr><td>📄</td><td>synthetic_stock_data.csv</td><td class="mono">1594 B</td></tr></tbody></table>
+                </div>
+            </main>
+        </div>
+
+        <footer style="margin-top: 3rem; text-align: center; font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted);">
+            ADAM AUTO-GENERATED SHOWCASE | REF: downloads
+        </footer>
+    </div>
+
+    <script>
+    (function() {
+        const CONFIG = {
+            mockMode: true,
+            rootPath: "../",
+            currentDir: "downloads"
+        };
+
+        function initNav() {
+            console.log("Nav initialized for " + CONFIG.currentDir);
+        }
+
+        async function loadData() {
+            try {
+                const response = await fetch('./AGENTS.md');
+                if(response.ok) {
+                    console.log("AGENTS.md found");
+                    // Implement markdown rendering logic here
+                }
+            } catch (e) {
+                console.warn("No local documentation found.");
+            }
+        }
+
+        window.toggleRuntime = function() {
+            alert('Runtime Toggle: Active');
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initNav();
+            loadData();
+        });
+    })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+{
+  "meta": {
+    "version": "2.1.0",
+    "author": "Test",
+    "timestamp": "2023-01-01T00:00:00"
+  },
+  "config": {
+    "mode": "VC_SPONSOR",
+    "calc_engine": "ITERATIVE",
+    "regulatory_standard": "SNC_2025"
+  },
+  "valuation_context": {
+    "wacc_method": "CAPM_STANDARD",
+    "terminal_method": "DUAL_WEIGHTED",
+    "growth_rate_perpetuity": 0.02,
+    "exit_multiple": 10.0,
+    "risk_free_rate": 0.04,
+    "market_return": 0.10,
+    "beta": 1.2,
+    "pre_tax_cost_of_debt": 0.07,
+    "tax_rate": 0.21
+  },
+  "capital_structure": {
+    "securities": [
+      {
+        "name": "Revolver",
+        "security_type": "REVOLVER",
+        "priority": 1,
+        "balance": 10.0,
+        "interest_rate": 0.07,
+        "sofr_spread": 0.03
+      },
+      {
+        "name": "Term Loan B",
+        "security_type": "TERM_LOAN",
+        "priority": 2,
+        "balance": 100.0,
+        "interest_rate": 0.08,
+        "sofr_spread": 0.04
+      },
+      {
+        "name": "Sponsor Equity",
+        "security_type": "COMMON",
+        "priority": 5,
+        "balance": 0.0,
+        "interest_rate": 0.0,
+        "shares": 100.0,
+        "investment": 50.0
+      }
+    ]
+  },
+  "credit_challenge": {
+    "stress_test_active": false,
+    "scenario": "BASE",
+    "pd_method": "LOGISTIC_HYBRID"
+  },
+  "financials": {
+    "current_year_revenue": 100.0,
+    "historical_revenue": [80.0, 90.0, 100.0],
+    "projected_revenue_growth": [0.10, 0.08, 0.06, 0.05, 0.04],
+    "historical_ebitda_margin": [0.20, 0.20, 0.20],
+    "projected_ebitda_margin": [0.22, 0.23, 0.24, 0.25, 0.25],
+    "capex_percent_revenue": 0.03,
+    "nwc_percent_revenue": 0.10,
+    "depreciation_percent_revenue": 0.03
+  },
+  "collateral": {
+    "cash_equivalents": 5.0,
+    "accounts_receivable": 10.0,
+    "inventory": 20.0,
+    "ppe": 50.0,
+    "intangibles": 20.0
+  }
+}

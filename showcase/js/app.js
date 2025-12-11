@@ -2,11 +2,42 @@ class DataManager {
     constructor() {
         this.useApi = localStorage.getItem('adam_live_mode') === 'true';
         this.apiBase = '/api';
-        this.staticBase = 'js/mock_data.js'; // We load via script tag usually, but fetch fallback
+        this.staticBase = 'js/mock_data.js';
         this.data = null;
     }
 
     async init() {
+        // Try to connect to API if in live mode
+        if (this.useApi) {
+            try {
+                const response = await fetch(`${this.apiBase}/state`);
+                if (response.ok) {
+                    const status = await response.json();
+                    console.log("Connected to Live API:", status);
+
+                    // Load basic structure from Mock Data (files, agents list)
+                    // but override status
+                    this.loadMock();
+                    if(this.data) {
+                        this.data.stats.version = status.version;
+                        this.data.stats.orchestrator = status.orchestrator;
+                    }
+                } else {
+                    console.warn("API Error, falling back to mock.");
+                    this.useApi = false;
+                    this.loadMock();
+                }
+            } catch (e) {
+                console.warn("API Unreachable, falling back to mock.");
+                this.useApi = false;
+                this.loadMock();
+            }
+        } else {
+            this.loadMock();
+        }
+    }
+
+    loadMock() {
         if (window.MOCK_DATA) {
             this.data = window.MOCK_DATA;
             console.log("Loaded data from window.MOCK_DATA");
@@ -40,6 +71,41 @@ class DataManager {
         this.useApi = !this.useApi;
         localStorage.setItem('adam_live_mode', this.useApi);
         window.location.reload();
+    }
+
+    async sendQuery(query) {
+        if (!this.useApi) {
+            // Mock Response
+            console.log("Mock Query:", query);
+            return new Promise(resolve => setTimeout(() => {
+                resolve({
+                    status: "Mock Response",
+                    human_readable_status: "This is a mock response. Enable Live Mode (Top Right) to query the real Adam AI.",
+                    v23_knowledge_graph: {
+                        meta: { target: "Mock Target" },
+                        nodes: {
+                            strategic_synthesis: {
+                                conviction: "High",
+                                investment_thesis: "This is a simulation. Connect to the backend for real analysis."
+                            }
+                        }
+                    }
+                });
+            }, 1500));
+        }
+
+        const response = await fetch(`${this.apiBase}/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query })
+        });
+
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error || "API Request Failed");
+        }
+
+        return await response.json();
     }
 }
 

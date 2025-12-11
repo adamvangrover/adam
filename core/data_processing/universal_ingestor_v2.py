@@ -6,6 +6,7 @@ import ast
 import re
 import logging
 import argparse
+import pandas as pd
 from typing import List, Dict, Any, Optional, Callable, Union
 from enum import Enum
 from datetime import datetime
@@ -240,6 +241,43 @@ class FileHandlers:
             logger.error(f"AST Parse Error {filepath}: {e}")
             return None
 
+    @staticmethod
+    def handle_parquet(filepath: str, raw_text: str = None) -> Optional[GoldStandardArtifact]:
+        try:
+            df = pd.read_parquet(filepath)
+
+            # Create a summary
+            summary = f"Parquet Data: {os.path.basename(filepath)}\n"
+            summary += f"Columns: {', '.join(df.columns)}\n"
+            summary += f"Rows: {len(df)}\n"
+
+            if not df.empty:
+                summary += f"Date Range: {df.index.min()} to {df.index.max()}\n"
+                meta = {
+                    "columns": list(df.columns),
+                    "row_count": len(df),
+                    "start_date": str(df.index.min()),
+                    "end_date": str(df.index.max())
+                }
+            else:
+                summary += "Empty DataFrame\n"
+                meta = {
+                    "columns": list(df.columns),
+                    "row_count": 0
+                }
+
+            return GoldStandardArtifact(
+                source_path=filepath,
+                content=summary,
+                artifact_type=ArtifactType.DATA.value,
+                title=f"Market Data: {os.path.basename(filepath)}",
+                metadata=meta,
+                content_hash=hashlib.md5(filepath.encode()).hexdigest()
+            )
+        except Exception as e:
+            logger.error(f"Parquet Read Error {filepath}: {e}")
+            return None
+
 # --- MAIN SYSTEM ---
 
 class UniversalIngestor:
@@ -255,7 +293,8 @@ class UniversalIngestor:
             '.jsonl': FileHandlers.handle_jsonl,
             '.md': FileHandlers.handle_markdown,
             '.txt': FileHandlers.handle_markdown, # Treat txt as MD for now
-            '.py': FileHandlers.handle_python
+            '.py': FileHandlers.handle_python,
+            '.parquet': FileHandlers.handle_parquet
         }
 
     def _load_state(self) -> Dict[str, str]:
@@ -274,11 +313,16 @@ class UniversalIngestor:
             return None
 
         try:
-            with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
-                raw_text = f.read()
+            if ext == '.parquet':
+                raw_text = None
+                current_hash = hashlib.md5(filepath.encode()).hexdigest()
+            else:
+                with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
+                    raw_text = f.read()
+
+                # Check Hash (Incremental Ingestion)
+                current_hash = GoldStandardScrubber.compute_file_hash(raw_text)
             
-            # Check Hash (Incremental Ingestion)
-            current_hash = GoldStandardScrubber.compute_file_hash(raw_text)
             # You would return a special "Unchanged" signal here in a real DB sync, 
             # but for a static rebuild, we just update the hash map and process.
             # (To truly skip, we'd need to load the old artifact from storage, 

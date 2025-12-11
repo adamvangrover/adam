@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam - Live Terminal (PyScript)</title>
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- PyScript -->
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+
+    <!-- xterm.js -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css" />
+    <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-web-links@0.9.0/lib/xterm-addon-web-links.js"></script>
+
+    <style>
+        body { background-color: #0f172a; font-family: 'Inter', sans-serif; }
+        #terminal-container { 
+            height: calc(100vh - 64px); 
+            padding: 10px;
+            background-color: #000;
+        }
+        .xterm-viewport { overflow-y: auto !important; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-200 overflow-hidden">
+
+    <!-- Header -->
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40">
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="text-slate-400 hover:text-white transition cursor-pointer"><i class="fas fa-chevron-left mr-2"></i><i class="fas fa-cube"></i></a>
+            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-emerald-400">RUNTIME</span> <span class="text-slate-500 font-normal">| Live Python Kernel</span></h1>
+        </div>
+        <div class="flex items-center gap-4 text-xs font-mono text-slate-500">
+            <div>KERNEL: <span class="text-emerald-400">Pyodide (WASM)</span></div>
+            <div>STATUS: <span id="status" class="text-yellow-400">INITIALIZING...</span></div>
+        </div>
+    </header>
+
+    <!-- Terminal -->
+    <div id="terminal-container"></div>
+
+    <!-- PyScript Worker -->
+    <script type="py" config='{"packages":["pandas", "numpy", "micropip"], "pf_config": {"pyscript": {"splash": false}}}'>
+        import js
+        import sys
+        import code
+        from pyodide.ffi import to_js
+
+        # Custom Writer to redirect stdout/stderr to xterm
+        class TermWriter:
+            def write(self, data):
+                js.term_write(data)
+            def flush(self):
+                pass
+
+        sys.stdout = TermWriter()
+        sys.stderr = TermWriter()
+
+        print("Adam Agentic Intelligence Engine v23.5")
+        print("Python 3.11 (Pyodide) [WASM]")
+        print("Type 'help', 'copyright', 'credits' or 'license' for more information.")
+        
+        # Interactive Interpreter
+        interpreter = code.InteractiveConsole(globals())
+
+        def process_line(line):
+            try:
+                # push() returns True if more input is required (incomplete statement)
+                more = interpreter.push(line)
+                if more:
+                    js.set_prompt("... ")
+                else:
+                    js.set_prompt(">>> ")
+            except Exception as e:
+                print(e)
+                js.set_prompt(">>> ")
+
+        # Expose to JS
+        js.process_python_line = process_line
+        
+        # Signal ready
+        js.set_status_ready()
+    </script>
+
+    <script>
+        // Terminal Setup
+        const term = new Terminal({
+            theme: {
+                background: '#000000',
+                foreground: '#00ff00',
+                cursor: '#00ff00',
+                selection: '#004400'
+            },
+            fontFamily: 'Menlo, Monaco, "Courier New", monospace',
+            fontSize: 14,
+            cursorBlink: true,
+            convertEol: true // Important for python print output
+        });
+        
+        const fitAddon = new FitAddon.FitAddon();
+        const webLinksAddon = new WebLinksAddon.WebLinksAddon();
+        
+        term.loadAddon(fitAddon);
+        term.loadAddon(webLinksAddon);
+        
+        term.open(document.getElementById('terminal-container'));
+        fitAddon.fit();
+        window.addEventListener('resize', () => fitAddon.fit());
+
+        let currentLine = "";
+        let promptPrefix = ">>> ";
+        
+        term.write('Initializing WebAssembly Environment...\r\n');
+
+        // JS -> Python Bridge
+        window.term_write = (text) => {
+            term.write(text.replace(/\n/g, '\r\n'));
+        };
+
+        window.set_status_ready = () => {
+             document.getElementById('status').innerText = "ONLINE";
+             document.getElementById('status').className = "text-emerald-400";
+             term.write(promptPrefix);
+        };
+        
+        window.set_prompt = (p) => {
+            promptPrefix = p;
+            term.write(promptPrefix);
+        };
+
+        // Input Handling
+        term.onData(e => {
+            switch (e) {
+                case '\r': // Enter
+                    term.write('\r\n');
+                    if (window.process_python_line) {
+                        window.process_python_line(currentLine);
+                    } else {
+                        term.write('Python not ready.\r\n');
+                        term.write(promptPrefix);
+                    }
+                    currentLine = "";
+                    break;
+                case '\u007F': // Backspace
+                    if (currentLine.length > 0) {
+                        term.write('\b \b');
+                        currentLine = currentLine.substring(0, currentLine.length - 1);
+                    }
+                    break;
+                default:
+                    if (e >= String.fromCharCode(0x20) && e <= String.fromCharCode(0x7e) || e >= '\u00a0') {
+                        currentLine += e;
+                        term.write(e);
+                    }
+            }
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+import React, { useState, useEffect } from 'react';
+import { Search, Wifi, Server, Database, FileText, User } from 'lucide-react';
+import Fuse from 'fuse.js';
+import { dataManager } from '../utils/DataManager';
+
+interface GlobalNavProps {
+  isOffline: boolean;
+}
+
+const GlobalNav: React.FC<GlobalNavProps> = ({ isOffline }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [manifest, setManifest] = useState<any>(null);
+
+  useEffect(() => {
+    dataManager.getManifest().then(setManifest);
+  }, []);
+
+  useEffect(() => {
+    if (!searchTerm || !manifest) {
+      setSearchResults([]);
+      return;
+    }
+
+    const agents = (manifest.agents || []).map((a: any) => ({ ...a, type: 'agent' }));
+    const reports = (manifest.reports || []).map((r: any) => ({ ...r, type: 'report' }));
+
+    const fuse = new Fuse([...agents, ...reports], {
+      keys: ['name', 'title', 'docstring', 'content'],
+      threshold: 0.3
+    });
+
+    setSearchResults(fuse.search(searchTerm).slice(0, 5).map(r => r.item));
+  }, [searchTerm, manifest]);
+
+  return (
+    <header className="h-16 bg-cyber-black/90 border-b border-cyber-cyan/20 flex items-center justify-between px-6 backdrop-blur sticky top-0 z-50">
+
+      {/* Left: Brand */}
+      <div className="flex items-center gap-4">
+        <div className="flex flex-col">
+          <h1 className="text-xl font-bold tracking-widest text-cyber-cyan glitch-text cursor-default">
+            ADAM v23.5
+          </h1>
+          <span className="text-[10px] text-cyber-text/60 font-mono tracking-widest">
+            ADAPTIVE FINANCIAL INTELLIGENCE
+          </span>
+        </div>
+      </div>
+
+      {/* Center: Search */}
+      <div className="flex-1 max-w-2xl mx-8 relative z-50">
+        <div className="relative group">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-4 w-4 text-cyber-cyan/50 group-hover:text-cyber-cyan transition-colors" />
+          </div>
+          <input
+            type="text"
+            className="block w-full pl-10 pr-3 py-2 border border-cyber-slate/50 rounded-sm leading-5 bg-cyber-slate/30 text-cyber-text placeholder-cyber-text/30 focus:outline-none focus:bg-cyber-slate/50 focus:border-cyber-cyan/50 focus:ring-1 focus:ring-cyber-cyan/30 sm:text-sm font-mono transition-all"
+            placeholder="SEARCH SYSTEM KNOWLEDGE [CTRL+K]..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        {/* Search Results Dropdown */}
+        {searchResults.length > 0 && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-cyber-slate border border-cyber-cyan/30 rounded shadow-xl max-h-96 overflow-y-auto">
+                {searchResults.map((item, idx) => (
+                    <div key={idx} className="p-3 hover:bg-cyber-cyan/10 cursor-pointer border-b border-white/5 last:border-0 flex items-start gap-3">
+                        {item.type === 'agent' ? <User className="h-4 w-4 text-purple-400 mt-1" /> : <FileText className="h-4 w-4 text-cyber-cyan mt-1" />}
+                        <div>
+                            <div className="text-sm font-bold text-white">{item.name || item.title}</div>
+                            <div className="text-xs text-cyber-text/60 line-clamp-1">{item.docstring || item.content}</div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        )}
+      </div>
+
+      {/* Right: Status Modules */}
+      <div className="flex items-center gap-6 font-mono text-xs">
+
+        {/* Network Status */}
+        <div className="flex items-center gap-2 group cursor-help" title={isOffline ? "Network: OFFLINE" : "Network: CONNECTED"}>
+          <Wifi className={`h-4 w-4 ${isOffline ? 'text-cyber-danger' : 'text-cyber-success'} animate-pulse`} />
+          <span className={isOffline ? 'text-cyber-danger' : 'text-cyber-success'}>
+            {isOffline ? 'OFFLINE' : 'ONLINE'}
+          </span>
+        </div>
+
+        {/* System Mode */}
+        <div className="flex items-center gap-2">
+          <Server className="h-4 w-4 text-cyber-warning" />
+          <span className="text-cyber-warning">MODE: {isOffline ? 'SIMULATION' : 'LIVE'}</span>
+        </div>
+
+        {/* Database */}
+        <div className="flex items-center gap-2">
+          <Database className="h-4 w-4 text-cyber-cyan" />
+          <span className="text-cyber-cyan">KG: READY</span>
+        </div>
+
+        {/* Archive Link */}
+         <a href="/showcase/index.html" className="px-3 py-1 border border-cyber-cyan/30 rounded hover:bg-cyber-cyan/10 text-cyber-cyan transition-colors">
+            ARCHIVES
+         </a>
+
+      </div>
+    </header>
+  );
+};
+
+export default GlobalNav;

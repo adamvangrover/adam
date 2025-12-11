@@ -1,5 +1,25 @@
-'````markdown
-'README content formatted as a Markdown file.
+# FO Super-App: The Unified Front Office
+
+> **Vision:** A "Super-App" that unifies markets, ratings, execution, analytics, and personal memory into one autonomous architecture.
+
+**FO Super-App** builds upon the Adam v23 foundation to create a complete institutional-grade platform. It integrates:
+*   **Markets & Pricing:** Competitive market making and execution.
+*   **Credit & Ratings:** S&P-like scoring and regulatory compliance.
+*   **Strategy:** Alpha signal ingestion and RL-based optimization.
+*   **Personal Memory:** A local "co-pilot brain" that learns your investment philosophy.
+*   **MCP Control Layer:** Universal tool access for LLM agents.
+
+## 🏰 FO Super-App: Family Office Edition
+
+The system now includes a specialized "Family Office" layer unifying:
+*   **Wealth Management:** Goal planning, Trust modeling.
+*   **Investment Banking:** Deal flow screening and Deep Dive analysis.
+*   **Asset Management:** Risk aggregation across multiple entities.
+*   **Governance:** Automated Investment Policy Statement (IPS) generation.
+
+[📚 Master Prompt](./docs/01_master_prompt.md) | [🏗️ System Architecture](./specs/system_architecture.md)
+
+---
 
 # Adam v23.5: Your AI-Powered Partner
 
@@ -59,7 +79,7 @@ graph TD
     Node1 <--> Vec
     
     Synthesis -->|Final Report| Output[JSON / HTML / PDF]
-````
+```
 
 #### Core Components
 
@@ -136,6 +156,27 @@ Adam doesn't just chat; it produces structured, professional-grade financial art
 4.  **View the Showcase:**
     Open `showcase/index.html` in your browser.
 
+## 💰 Financial Engineering Platform (v23.5)
+
+A modular, portable, and configurable Financial Engine for DCF Valuation, VC/LBO Sponsor Modeling, and Regulatory Credit Risk Analysis (SNC/Rating).
+
+### 🚀 Launch Dashboard
+[**Launch Financial Engine (Client Side)**](./showcase/financial_engineering.html)
+Interactive dashboard for valuation, credit ratings, and sensitivity analysis.
+
+### 🐍 Python Core
+The core logic is available in `src/` and can be run as a Streamlit app.
+
+```bash
+# Run the Interactive Streamlit App
+streamlit run app.py
+```
+
+### Modules
+- **`src/core_valuation.py`**: Discounted Cash Flow (DCF), WACC, and Terminal Value logic.
+- **`src/credit_risk.py`**: Credit Sponsor Model, Downside Sensitivity, and Regulatory Ratings (SNC).
+- **`src/config.py`**: Global financial assumptions (Tax rates, Risk-free rates).
+
 ## 📂 Repository Structure
 
 *   `core/engine/`: The heart of the new system.
@@ -171,47 +212,44 @@ Adam doesn't just chat; it produces structured, professional-grade financial art
 
 #### Quick Start Guide
 
-1.  **Clone the Repository**
-
+1.  **Clone and Enter Repository**
     ```bash
-    git clone [https://github.com/adamvangrover/adam.git](https://github.com/adamvangrover/adam.git)
+    git clone https://github.com/adamvangrover/adam.git
     cd adam
     ```
 
-*   [Adam v20.0 Implementation Plan](docs/v20.0)
-*   [System Requirements](docs/REQUIREMENTS.md)
-*   [User Guide](docs/user_guide.md)
-*   [API Documentation](docs/api_docs.yaml)
-*   [Contribution Guidelines](CONTRIBUTING.md)
-*   [Showcase Guide](docs/SHOWCASE_GUIDE.md): Walkthrough of the demo.
-*   [v23 Architecture Vision](docs/v23_architecture_vision.md): Deep dive into the "Adaptive Hive".
-*   [Gold Standard Pipeline](docs/GOLD_STANDARD_PIPELINE.md): Data ingestion guide.
-
-2.  **Install Python Dependencies**
-
+2.  **One-Click Launch**
+    Run the automated launcher script. It checks for Docker or Python, installs dependencies, and starts the system.
     ```bash
-    pip install -r requirements.txt
+    ./run_adam.sh
     ```
 
-
-3.  **Configure API Keys**
-    Create a `.env` file or update `config/api_keys.yaml`:
-
-    ```yaml
-    openai: "sk-..."
-    neo4j: "bolt://..."
-    ```
-
-4.  **Launch the System**
-
+    *Alternatively, for manual setup:*
     ```bash
-    python scripts/run_adam.py
+    pip install -e .           # Install as a package
+    python core/main.py        # Run the engine
     ```
 
-5.  **Open Mission Control**
-    Launch the interactive dashboard to watch Adam think in real-time.
+3.  **Configure API Keys (Optional but Recommended)**
+    The launcher creates a `.env` file if missing. Edit it to add your keys:
+    ```bash
+    OPENAI_API_KEY=sk-...
+    ```
 
-      * Open `showcase/index.html` in your browser.
+4.  **Open Mission Control**
+    *   **UI:** `http://localhost:80` (Docker) or `http://localhost:3000` (Local)
+    *   **Neural Dashboard:** `showcase/index.html`
+
+#### Developer Experience
+
+We provide standard tooling for developers:
+
+*   **Install Dependencies:** `make install`
+*   **Run Tests:** `make test`
+*   **Lint Code:** `make lint`
+*   **CI/CD:** Automated testing via GitHub Actions is configured in `.github/workflows/ci.yml`.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
 
 -----
 
@@ -234,12 +272,12 @@ A high-level overview of the "Hive Mind" structure:
 
 ### 📚 Resources & Documentation
 
-  * **Architecture Vision:** [Adam v23.0 "Adaptive Hive" Vision](https://www.google.com/search?q=%23)
-  * **Pipeline Details:** [Gold Standard Data Pipeline](https://www.google.com/search?q=%23)
-  * **API Reference:** [API Documentation](https://www.google.com/search?q=%23)
-  * **User Manual:** [Comprehensive User Guide](https://www.google.com/search?q=%23)
-  * **Demo Guide:** [Showcase Walkthrough](https://www.google.com/search?q=%23)
-  * **Prompt Library:** [v23.5 Autonomous Analyst Prompt](https://www.google.com/search?q=%23)
+  * **Architecture Vision:** [Adam v23.0 "Adaptive Hive" Vision](https://github.com/adamvangrover/adam/tree/main/docs/v23_architecture_vision.md)
+  * **Pipeline Details:** [Gold Standard Data Pipeline]((https://github.com/adamvangrover/adam/tree/main/docs/GOLD_STANDARD_PIPELINE.md)
+  * **API Reference:** [API Documentation](https://github.com/adamvangrover/adam/tree/main/docs/api.md)
+  * **User Manual:** [Comprehensive User Guide](https://github.com/adamvangrover/adam/tree/main/docs/user_guide.md)
+  * **Demo Guide:** [Showcase Walkthrough](https://github.com/adamvangrover/adam/tree/main/docs/SHOWCASE_GUIDE.md)
+  * **Prompt Library:** [v23.5 Autonomous Analyst Prompt](https://github.com/adamvangrover/adam/tree/main/prompt_library/Adam_v23.5_System_Prompt.md)
 
 -----
 
@@ -247,7 +285,7 @@ A high-level overview of the "Hive Mind" structure:
 
 We welcome contributions from the community\! Whether it's a new agent skill, a data connector, or a UI enhancement.
 
-1.  Read our [Contribution Guidelines](https://www.google.com/search?q=%23).
+1.  Read our [Contribution Guidelines](https://github.com/adamvangrover/adam/tree/main).
 2.  Fork the repo and create your branch (`git checkout -b feature/amazing-feature`).
 3.  Commit your changes (`git commit -m 'Add some amazing feature'`).
 4.  Push to the branch (`git push origin feature/amazing-feature`).
@@ -261,3 +299,28 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ```
 ```
+
+## ⚡ Modernization & Optimization (v23.5+)
+
+As part of the 2025 Strategic Technical Modernization, the following high-performance components have been added:
+
+*   **Modern Build System:** `pyproject.toml` and `uv` support for hermetic builds.
+*   **Optimization Service:** A dedicated stateful microservice (`src/adam/api`) providing "Optimizer as a Service" via FastAPI and Redis.
+*   **State-of-the-Art Optimizers:**
+    *   **AdamW:** Decoupled Weight Decay.
+    *   **Lion:** Evolved Sign Momentum (Google ADK).
+    *   **Adam-mini:** Memory-efficient block-wise optimization (2025 Frontier).
+
+### Quick Start (Modern Stack)
+
+1.  **Build with Docker:**
+    ```bash
+    docker build -f Dockerfile.modern -t adam-optimizer .
+    ```
+
+2.  **Run the API:**
+    ```bash
+    docker run -p 8000:8000 -e REDIS_URL=redis://host.docker.internal:6379/0 adam-optimizer
+    ```
+
+For details, see [Modernization Report](docs/modernization_report.md).

@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam System :: services/webapp</title>
+    <link rel="stylesheet" href="../../showcase/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .readme-content { padding: 20px; }
+        .readme-content h1 { font-size: 1.5rem; margin-bottom: 1rem; color: var(--primary-color); }
+        .readme-content h2 { font-size: 1.25rem; margin-top: 1.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--panel-border); padding-bottom: 0.25rem; }
+        .readme-content p { margin-bottom: 1rem; line-height: 1.6; color: var(--text-secondary); }
+        .readme-content pre { background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 4px; overflow-x: auto; border: 1px solid var(--panel-border); }
+        .readme-content code { font-family: var(--font-mono); color: var(--accent-color); }
+
+        .file-icon { display: inline-block; width: 20px; text-align: center; margin-right: 8px; color: var(--text-muted); }
+        .dir-icon { color: var(--primary-color); }
+    </style>
+</head>
+<body>
+    <div class="scan-line"></div>
+    <div class="scan-glow"></div>
+
+    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+
+        <!-- Header -->
+        <header style="margin-bottom: 40px; border-bottom: 1px solid var(--panel-border); padding-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 class="glitch-text" data-text="ADAM v23.5" style="font-size: 2rem; margin: 0; color: var(--primary-color);">ADAM v23.5</h1>
+                <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">
+                    PATH: <span style="color: var(--text-primary);">/services/webapp</span>
+                </div>
+            </div>
+            <div style="text-align: right;">
+                <div class="cyber-badge badge-cyan">SYSTEM ONLINE</div>
+                <div style="margin-top: 5px; font-size: 0.7rem; color: var(--text-muted);">Mode: SHOWCASE</div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav style="margin-bottom: 30px; display: flex; gap: 10px;">
+            <a href="../index.html" class="cyber-btn">&uarr; UP LEVEL</a>
+            <a href="../../index.html" class="cyber-btn">ROOT</a>
+            <button onclick="toggleRuntime()" class="cyber-btn">LIVE RUNTIME</button>
+            <a href="https://github.com/adamvangrover/adam" class="cyber-btn" target="_blank">GITHUB</a>
+        </nav>
+
+        <div style="display: grid; grid-template-columns: 250px 1fr; gap: 20px;">
+
+            <!-- Sidebar / File Explorer -->
+            <aside class="glass-panel" style="padding: 20px; border-radius: 4px; height: fit-content;">
+                <h3 style="margin-top: 0; font-size: 0.9rem; text-transform: uppercase; color: var(--text-secondary); border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 15px;">
+                    Directory Contents
+                </h3>
+                <ul style="list-style: none; padding: 0; margin: 0; font-family: var(--font-mono); font-size: 0.85rem;">
+                    <li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="client/index.html" style="color: var(--primary-color);">client/</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="README.md" style="color: var(--text-secondary);">README.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="__init__.py" style="color: var(--text-secondary);">__init__.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="api.py" style="color: var(--text-secondary);">api.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="celery.py" style="color: var(--text-secondary);">celery.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="config.py" style="color: var(--text-secondary);">config.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="tests.py" style="color: var(--text-secondary);">tests.py</a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main>
+                <!-- Runtime Overlay (Hidden by default) -->
+                <div id="runtime-panel" class="glass-panel fade-in" style="display: none; padding: 20px; margin-bottom: 20px; border-color: var(--success-color);">
+                    <h3 style="color: var(--success-color); margin-top: 0;">Live System Interface</h3>
+                    <p style="font-size: 0.9rem;">Connecting to Orchestrator at localhost:5001...</p>
+                    <div style="background: black; padding: 10px; border-radius: 4px; font-family: var(--font-mono); height: 100px; overflow-y: auto; font-size: 0.8rem; color: #0f0;">
+                        > Connecting...<br>
+                        > Error: API Unreachable (Mock Mode Active)<br>
+                        > System Status: STANDBY
+                    </div>
+                </div>
+
+                <!-- Readme Content -->
+                <div class="glass-panel" style="border-radius: 4px;">
+                    <div class="readme-content"><h1>Adam Web Application</h1>
+<p>This is the web application for the Adam project. It provides a user-friendly interface for interacting with the Adam AI system.</p>
+<h2>Running the Application</h2>
+<p>The easiest way to run the application is with Docker Compose.</p>
+<ol>
+<li>
+<p><strong>Create a <code>.env</code> file:</strong></p>
+<p>Create a <code>.env</code> file in the root of the project with the following content:</p>
+<p><code>POSTGRES_USER=user
+POSTGRES_PASSWORD=password
+POSTGRES_DB=adam</code></p>
+</li>
+<li>
+<p><strong>Run Docker Compose:</strong></p>
+<p>From the root of the project, run the following command:</p>
+<p><code>docker-compose up --build</code></p>
+<p>This will build the Docker images and start all the services. The web application will be available at <code>http://localhost:80</code>.</p>
+</li>
+</ol>
+<h2>Architecture</h2>
+<p>The web application consists of the following components:</p>
+<ul>
+<li><strong>Flask Backend:</strong> A Python web server built with Flask. It provides a REST API for the frontend to interact with the Adam AI system.</li>
+<li><strong>React Frontend:</strong> A single-page application built with React. It provides the user interface for the web application.</li>
+<li><strong>PostgreSQL Database:</strong> A relational database for storing user data, portfolios, and analysis results.</li>
+<li><strong>Redis:</strong> An in-memory data store used as a message broker for Celery.</li>
+<li><strong>Celery:</strong> A task queue for running long-running asynchronous tasks, such as simulations.</li>
+<li><strong>Neo4j:</strong> A graph database for storing and querying the knowledge graph.</li>
+<li><strong>Nginx:</strong> A web server that serves the React frontend and acts as a reverse proxy for the Flask backend.</li>
+</ul>
+<h2>API Endpoints</h2>
+<p>The Flask backend provides the following API endpoints:</p>
+<ul>
+<li><code>GET /api/hello</code>: A simple test endpoint.</li>
+<li><code>GET /api/agents</code>: Returns a list of all available agents.</li>
+<li><code>GET /api/agents/&lt;agent_name&gt;/schema</code>: Returns the input schema for a specified agent.</li>
+<li><code>POST /api/agents/&lt;agent_name&gt;/invoke</code>: Invokes a specific agent with the given arguments.</li>
+<li><code>POST /api/login</code>: A mock login endpoint.</li>
+<li><code>GET /api/data/&lt;filename&gt;</code>: Returns the contents of a JSON file from the <code>data</code> directory.</li>
+<li><code>POST /api/simulations/&lt;simulation_name&gt;</code>: Starts a simulation.</li>
+<li><code>GET /api/tasks/&lt;task_id&gt;</code>: Returns the status of a Celery task.</li>
+<li><code>GET /api/knowledge_graph</code>: Returns the knowledge graph data from Neo4j.</li>
+</ul></div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Footer -->
+        <footer style="margin-top: 50px; border-top: 1px solid var(--panel-border); padding-top: 20px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">
+            ADAM AUTO-GENERATED SHOWCASE | <span class="mono">REF: services/webapp</span>
+        </footer>
+    </div>
+
+    <script>
+        function toggleRuntime() {
+            const panel = document.getElementById('runtime-panel');
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

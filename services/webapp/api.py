@@ -7,7 +7,9 @@ from werkzeug.exceptions import HTTPException
 from werkzeug.security import generate_password_hash, check_password_hash
 import sys
 import os
+import logging
 import json
+import asyncio
 from datetime import datetime, timezone
 from .config import config
 from .celery import celery
@@ -20,6 +22,7 @@ db = SQLAlchemy()
 socketio = SocketIO()
 jwt = JWTManager()
 agent_orchestrator = None
+meta_orchestrator = None
 
 
 # ---------------------------------------------------------------------------- #
@@ -87,13 +90,16 @@ def create_app(config_name='default'):
     Application factory.
     """
     global agent_orchestrator
+    global meta_orchestrator
+
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
 
     # Initialize extensions
     db.init_app(app)
-    socketio.init_app(app, cors_allowed_origins="*")
+    # 🛡️ Sentinel: Configured CORS from settings to avoid wildcard access.
+    socketio.init_app(app, cors_allowed_origins=app.config.get('CORS_ALLOWED_ORIGINS', []))
     jwt.init_app(app)
 
     # Configure Celery
@@ -108,16 +114,31 @@ def create_app(config_name='default'):
 
 
     # Initialize the core components
+    global meta_orchestrator
     if app.config['CORE_INTEGRATION']:
         sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
         from core.utils.config_utils import load_app_config
         from core.system.agent_orchestrator import AgentOrchestrator
         from core.system.knowledge_base import KnowledgeBase
         from core.system.data_manager import DataManager
+        from core.engine.meta_orchestrator import MetaOrchestrator
+
         core_config = load_app_config()
         knowledge_base = KnowledgeBase(core_config)
         data_manager = DataManager(core_config)
         agent_orchestrator = AgentOrchestrator(core_config, knowledge_base, data_manager)
+        meta_orchestrator = MetaOrchestrator(legacy_orchestrator=agent_orchestrator)
+
+    # ---------------------------------------------------------------------------- #
+    # Security Headers
+    # ---------------------------------------------------------------------------- #
+
+    @app.after_request
+    def add_security_headers(response):
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+        return response
 
     # ---------------------------------------------------------------------------- #
     # API Endpoints
@@ -126,6 +147,37 @@ def create_app(config_name='default'):
     @app.route('/api/hello')
     def hello_world():
         return 'Hello, World!'
+
+    @app.route('/api/v23/analyze', methods=['POST'])
+    def run_v23_analysis():
+        data = request.get_json()
+        query = data.get('query')
+        if not query:
+             return jsonify({'error': 'No query provided'}), 400
+
+        if app.config['CORE_INTEGRATION'] and meta_orchestrator:
+             import asyncio
+             try:
+                 # Ensure we have an event loop
+                 try:
+                     loop = asyncio.get_event_loop()
+                 except RuntimeError:
+                     loop = asyncio.new_event_loop()
+                     asyncio.set_event_loop(loop)
+
+                 if loop.is_running():
+                      # If we are already in a loop (e.g. uvicorn/hypercorn), handle differently
+                      # But Flask dev server is threaded.
+                      future = asyncio.run_coroutine_threadsafe(meta_orchestrator.route_request(query), loop)
+                      result = future.result()
+                 else:
+                      result = loop.run_until_complete(meta_orchestrator.route_request(query))
+
+                 return jsonify(result)
+             except Exception as e:
+                 return jsonify({'error': str(e)}), 500
+        else:
+             return jsonify({'status': 'Mock Result', 'analysis': 'Core not integrated or MetaOrchestrator not ready.'})
 
     # ---------------------------------------------------------------------------- #
     # Agent Endpoints
@@ -152,8 +204,10 @@ def create_app(config_name='default'):
         Invokes a specific agent with the given arguments.
         """
         data = request.get_json()
-        result = agent_orchestrator.run_agent(agent_name, data)
-        return jsonify(result)
+        if agent_orchestrator:
+            result = agent_orchestrator.execute_agent(agent_name, data)
+            return jsonify(result)
+        return jsonify({'error': 'Agent Orchestrator not initialized'}), 503
 
     @app.route('/api/agents/<agent_name>/schema')
     def get_agent_schema(agent_name):
@@ -526,8 +580,12 @@ def create_app(config_name='default'):
         # pass through HTTP errors
         if isinstance(e, HTTPException):
             return e
-        # now you're handling non-HTTP exceptions only
-        return jsonify(error=str(e)), 500
+
+        # 🛡️ Sentinel: Log the full error but return a generic message to prevent leaking sensitive info
+        app.logger.error(f"Unhandled Exception: {e}", exc_info=True)
+
+        # Return generic error message
+        return jsonify(error="An unexpected error occurred."), 500
 
     return app
 
