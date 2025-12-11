@@ -1,99 +1,369 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adam System :: core/agents</title>
+    <title>ADAM v23.5 | agents</title>
     <link rel="stylesheet" href="../../showcase/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        .readme-content { padding: 20px; }
-        .readme-content h1 { font-size: 1.5rem; margin-bottom: 1rem; color: var(--primary-color); }
-        .readme-content h2 { font-size: 1.25rem; margin-top: 1.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--panel-border); padding-bottom: 0.25rem; }
-        .readme-content p { margin-bottom: 1rem; line-height: 1.6; color: var(--text-secondary); }
-        .readme-content pre { background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 4px; overflow-x: auto; border: 1px solid var(--panel-border); }
-        .readme-content code { font-family: var(--font-mono); color: var(--accent-color); }
-
-        .file-icon { display: inline-block; width: 20px; text-align: center; margin-right: 8px; color: var(--text-muted); }
-        .dir-icon { color: var(--primary-color); }
+        /* Fallback styles if stylesheet is missing */
+        body { background-color: #050b14; color: #06b6d4; font-family: monospace; margin: 0; padding: 0; }
+        .header { border-bottom: 1px solid #06b6d4; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .breadcrumb { font-size: 1.2em; color: #e2e8f0; }
+        .badge { border: 1px solid #06b6d4; padding: 5px 10px; border-radius: 4px; font-size: 0.8em; text-transform: uppercase; }
+        .container { display: flex; height: calc(100vh - 80px); }
+        .sidebar { width: 300px; border-right: 1px solid #334155; padding: 20px; overflow-y: auto; background: rgba(5, 11, 20, 0.95); }
+        .main-stage { flex: 1; padding: 30px; overflow-y: auto; }
+        .file-item { padding: 8px; cursor: pointer; display: block; color: #94a3b8; text-decoration: none; }
+        .file-item:hover { color: #06b6d4; background: rgba(6, 182, 212, 0.1); }
+        .folder { color: #fbbf24; font-weight: bold; }
+        .footer { border-top: 1px solid #334155; padding: 10px; text-align: center; font-size: 0.8em; color: #64748b; background: #020617; }
+        .nav-links a { margin-left: 15px; color: #06b6d4; text-decoration: none; border: 1px solid #06b6d4; padding: 5px 10px; transition: all 0.2s; }
+        .nav-links a:hover { background: #06b6d4; color: #000; }
+        pre { background: #0f172a; padding: 15px; border-radius: 6px; overflow-x: auto; border: 1px solid #1e293b; }
+        h1, h2, h3 { color: #f8fafc; text-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
+        .card { background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; padding: 20px; margin-bottom: 20px; border-radius: 8px; }
+        .glitch { position: relative; }
+        .module-doc { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #334155; }
+        .doc-text { color: #94a3b8; font-style: italic; }
     </style>
+    <!-- Mermaid JS -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+    </script>
 </head>
 <body>
-    <div class="scan-line"></div>
-    <div class="scan-glow"></div>
-
-    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-
-        <!-- Header -->
-        <header style="margin-bottom: 40px; border-bottom: 1px solid var(--panel-border); padding-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <h1 class="glitch-text" data-text="ADAM v23.5" style="font-size: 2rem; margin: 0; color: var(--primary-color);">ADAM v23.5</h1>
-                <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">
-                    PATH: <span style="color: var(--text-primary);">/core/agents</span>
-                </div>
-            </div>
-            <div style="text-align: right;">
-                <div class="cyber-badge badge-cyan">SYSTEM ONLINE</div>
-                <div style="margin-top: 5px; font-size: 0.7rem; color: var(--text-muted);">Mode: SHOWCASE</div>
-            </div>
-        </header>
-
-        <!-- Navigation -->
-        <nav style="margin-bottom: 30px; display: flex; gap: 10px;">
-            <a href="../index.html" class="cyber-btn">&uarr; UP LEVEL</a>
-            <a href="../../index.html" class="cyber-btn">ROOT</a>
-            <button onclick="toggleRuntime()" class="cyber-btn">LIVE RUNTIME</button>
-            <a href="https://github.com/adamvangrover/adam" class="cyber-btn" target="_blank">GITHUB</a>
-        </nav>
-
-        <div style="display: grid; grid-template-columns: 250px 1fr; gap: 20px;">
-
-            <!-- Sidebar / File Explorer -->
-            <aside class="glass-panel" style="padding: 20px; border-radius: 4px; height: fit-content;">
-                <h3 style="margin-top: 0; font-size: 0.9rem; text-transform: uppercase; color: var(--text-secondary); border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 15px;">
-                    Directory Contents
-                </h3>
-                <ul style="list-style: none; padding: 0; margin: 0; font-family: var(--font-mono); font-size: 0.85rem;">
-                    <li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="architect_agent/index.html" style="color: var(--primary-color);">architect_agent/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="developer_swarm/index.html" style="color: var(--primary-color);">developer_swarm/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="industry_specialists/index.html" style="color: var(--primary-color);">industry_specialists/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="meta_agents/index.html" style="color: var(--primary-color);">meta_agents/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="orchestrators/index.html" style="color: var(--primary-color);">orchestrators/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="skills/index.html" style="color: var(--primary-color);">skills/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="specialized/index.html" style="color: var(--primary-color);">specialized/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="sub_agents/index.html" style="color: var(--primary-color);">sub_agents/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="templates/index.html" style="color: var(--primary-color);">templates/</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="AGENTS.md" style="color: var(--text-secondary);">AGENTS.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="AGENT_CATALOG.md" style="color: var(--text-secondary);">AGENT_CATALOG.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="AGENT_DEVELOPMENT.md" style="color: var(--text-secondary);">AGENT_DEVELOPMENT.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="RAG_AGENT_README.md" style="color: var(--text-secondary);">RAG_AGENT_README.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="__init__.py" style="color: var(--text-secondary);">__init__.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="agent_base.py" style="color: var(--text-secondary);">agent_base.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="agent_forge.py" style="color: var(--text-secondary);">agent_forge.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="algo_trading_agent.py" style="color: var(--text-secondary);">algo_trading_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="alternative_data_agent.py" style="color: var(--text-secondary);">alternative_data_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="anomaly_detection_agent.py" style="color: var(--text-secondary);">anomaly_detection_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="archive_manager_agent.py" style="color: var(--text-secondary);">archive_manager_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="behavioral_economics_agent.py" style="color: var(--text-secondary);">behavioral_economics_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="catalyst_agent.py" style="color: var(--text-secondary);">catalyst_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="code_alchemist.py" style="color: var(--text-secondary);">code_alchemist.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="crypto_agent.py" style="color: var(--text-secondary);">crypto_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="cyclical_reasoning_agent.py" style="color: var(--text-secondary);">cyclical_reasoning_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="data_retrieval_agent.py" style="color: var(--text-secondary);">data_retrieval_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="data_verification_agent.py" style="color: var(--text-secondary);">data_verification_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="data_visualization_agent.py" style="color: var(--text-secondary);">data_visualization_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="discussion_chair_agent.py" style="color: var(--text-secondary);">discussion_chair_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="echo_agent.py" style="color: var(--text-secondary);">echo_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="event_driven_risk_agent.py" style="color: var(--text-secondary);">event_driven_risk_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="financial_modeling_agent.py" style="color: var(--text-secondary);">financial_modeling_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="fundamental_analyst_agent.py" style="color: var(--text-secondary);">fundamental_analyst_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="geopolitical_risk_agent.py" style="color: var(--text-secondary);">geopolitical_risk_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="industry_specialist_agent.py" style="color: var(--text-secondary);">industry_specialist_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="knowledge_contribution_agent.py" style="color: var(--text-secondary);">knowledge_contribution_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="legal_agent.py" style="color: var(--text-secondary);">legal_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="lexica_agent.py" style="color: var(--text-secondary);">lexica_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="lingua_maestro.py" style="color: var(--text-secondary);">lingua_maestro.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="machine_learning_model_training_agent.py" style="color: var(--text-secondary);">machine_learning_model_training_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="macroeconomic_analysis_agent.py" style="color: var(--text-secondary);">macroeconomic_analysis_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="market_sentiment_agent.py" style="color: var(--text-secondary);">market_sentiment_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="meta_19_agent.py" style="color: var(--text-secondary);">meta_19_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="meta_cognitive_agent.py" style="color: var(--text-secondary);">meta_cognitive_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="model.html" style="color: var(--text-secondary);">model.html</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="natural_language_generation_agent.py" style="color: var(--text-secondary);">natural_language_generation_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="news_bot.py" style="color: var(--text-secondary);">news_bot.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="newsletter_layout_specialist_agent.py" style="color: var(--text-secondary);">newsletter_layout_specialist_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="portfolio_optimization_agent.py" style="color: var(--text-secondary);">portfolio_optimization_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="prediction_market_agent.py" style="color: var(--text-secondary);">prediction_market_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="prompt_generation_agent.py" style="color: var(--text-secondary);">prompt_generation_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="prompt_tuner.py" style="color: var(--text-secondary);">prompt_tuner.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="query_understanding_agent.py" style="color: var(--text-secondary);">query_understanding_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="rag_agent.py" style="color: var(--text-secondary);">rag_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="red_team_agent.py" style="color: var(--text-secondary);">red_team_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="reflector_agent.py" style="color: var(--text-secondary);">reflector_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="regulatory_compliance_agent.py" style="color: var(--text-secondary);">regulatory_compliance_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="report_generator_agent.py" style="color: var(--text-secondary);">report_generator_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="result_aggregation_agent.py" style="color: var(--text-secondary);">result_aggregation_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="risk_assessment_agent.py" style="color: var(--text-secondary);">risk_assessment_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="sense_weaver.py" style="color: var(--text-secondary);">sense_weaver.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="snc_analyst_agent.py" style="color: var(--text-secondary);">snc_analyst_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="supply_chain_risk_agent.py" style="color: var(--text-secondary);">supply_chain_risk_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="technical_analyst_agent.py" style="color: var(--text-secondary);">technical_analyst_agent.py</a></li>
-                </ul>
-            </aside>
-
-            <!-- Main Content -->
-            <main>
-                <!-- Runtime Overlay (Hidden by default) -->
-                <div id="runtime-panel" class="glass-panel fade-in" style="display: none; padding: 20px; margin-bottom: 20px; border-color: var(--success-color);">
-                    <h3 style="color: var(--success-color); margin-top: 0;">Live System Interface</h3>
-                    <p style="font-size: 0.9rem;">Connecting to Orchestrator at localhost:5001...</p>
-                    <div style="background: black; padding: 10px; border-radius: 4px; font-family: var(--font-mono); height: 100px; overflow-y: auto; font-size: 0.8rem; color: #0f0;">
-                        > Connecting...<br>
-                        > Error: API Unreachable (Mock Mode Active)<br>
-                        > System Status: STANDBY
-                    </div>
-                </div>
-
-                <!-- Readme Content -->
-                <div class="glass-panel" style="border-radius: 4px;">
-                    <div class="readme-content" style="text-align: center; color: var(--text-muted); padding: 40px;">No README found in this directory.</div>
-                </div>
-            </main>
+    <div class="header">
+        <div>
+            <h1 style="margin:0; display:inline-block;" class="glitch">ADAM v23.5</h1>
+            <span class="breadcrumb" style="margin-left: 20px;">/core/agents</span>
         </div>
+        <div class="nav-links">
+            <a href="../index.html">[UP LEVEL]</a>
+            <a href="../../index.html">[ROOT]</a>
+            <a href="#" onclick="window.toggleRuntime()">[LIVE RUNTIME]</a>
+            <a href="https://github.com/your-repo/adam" target="_blank">[GITHUB]</a>
+        </div>
+        <span class="badge">SYSTEM ONLINE</span>
+    </div>
 
-        <!-- Footer -->
-        <footer style="margin-top: 50px; border-top: 1px solid var(--panel-border); padding-top: 20px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">
-            ADAM AUTO-GENERATED SHOWCASE | <span class="mono">REF: core/agents</span>
-        </footer>
+    <div class="container">
+        <div class="sidebar">
+            <h3>Directory Structure</h3>
+            <a href="../index.html" class="file-item folder">📂 .. (Parent)</a>
+<a href="AGENTS.md" class="file-item">📝 AGENTS.md</a>
+<a href="AGENT_CATALOG.md" class="file-item">📝 AGENT_CATALOG.md</a>
+<a href="AGENT_DEVELOPMENT.md" class="file-item">📝 AGENT_DEVELOPMENT.md</a>
+<a href="RAG_AGENT_README.md" class="file-item">📝 RAG_AGENT_README.md</a>
+<a href="__init__.py" class="file-item">📄 __init__.py</a>
+<a href="agent_base.py" class="file-item">📄 agent_base.py</a>
+<a href="agent_forge.py" class="file-item">📄 agent_forge.py</a>
+<a href="algo_trading_agent.py" class="file-item">📄 algo_trading_agent.py</a>
+<a href="alternative_data_agent.py" class="file-item">📄 alternative_data_agent.py</a>
+<a href="anomaly_detection_agent.py" class="file-item">📄 anomaly_detection_agent.py</a>
+<a href="architect_agent/index.html" class="file-item folder">📂 architect_agent</a>
+<a href="archive_manager_agent.py" class="file-item">📄 archive_manager_agent.py</a>
+<a href="behavioral_economics_agent.py" class="file-item">📄 behavioral_economics_agent.py</a>
+<a href="catalyst_agent.py" class="file-item">📄 catalyst_agent.py</a>
+<a href="code_alchemist.py" class="file-item">📄 code_alchemist.py</a>
+<a href="crypto_agent.py" class="file-item">📄 crypto_agent.py</a>
+<a href="cyclical_reasoning_agent.py" class="file-item">📄 cyclical_reasoning_agent.py</a>
+<a href="data_retrieval_agent.py" class="file-item">📄 data_retrieval_agent.py</a>
+<a href="data_verification_agent.py" class="file-item">📄 data_verification_agent.py</a>
+<a href="data_visualization_agent.py" class="file-item">📄 data_visualization_agent.py</a>
+<a href="developer_swarm/index.html" class="file-item folder">📂 developer_swarm</a>
+<a href="discussion_chair_agent.py" class="file-item">📄 discussion_chair_agent.py</a>
+<a href="echo_agent.py" class="file-item">📄 echo_agent.py</a>
+<a href="event_driven_risk_agent.py" class="file-item">📄 event_driven_risk_agent.py</a>
+<a href="financial_modeling_agent.py" class="file-item">📄 financial_modeling_agent.py</a>
+<a href="fundamental_analyst_agent.py" class="file-item">📄 fundamental_analyst_agent.py</a>
+<a href="geopolitical_risk_agent.py" class="file-item">📄 geopolitical_risk_agent.py</a>
+<a href="industry_specialist_agent.py" class="file-item">📄 industry_specialist_agent.py</a>
+<a href="industry_specialists/index.html" class="file-item folder">📂 industry_specialists</a>
+<a href="knowledge_contribution_agent.py" class="file-item">📄 knowledge_contribution_agent.py</a>
+<a href="legal_agent.py" class="file-item">📄 legal_agent.py</a>
+<a href="lexica_agent.py" class="file-item">📄 lexica_agent.py</a>
+<a href="lingua_maestro.py" class="file-item">📄 lingua_maestro.py</a>
+<a href="machine_learning_model_training_agent.py" class="file-item">📄 machine_learning_model_training_agent.py</a>
+<a href="macroeconomic_analysis_agent.py" class="file-item">📄 macroeconomic_analysis_agent.py</a>
+<a href="market_sentiment_agent.py" class="file-item">📄 market_sentiment_agent.py</a>
+<a href="meta_19_agent.py" class="file-item">📄 meta_19_agent.py</a>
+<a href="meta_agents/index.html" class="file-item folder">📂 meta_agents</a>
+<a href="meta_cognitive_agent.py" class="file-item">📄 meta_cognitive_agent.py</a>
+<a href="model.html" class="file-item">📄 model.html</a>
+<a href="natural_language_generation_agent.py" class="file-item">📄 natural_language_generation_agent.py</a>
+<a href="news_bot.py" class="file-item">📄 news_bot.py</a>
+<a href="newsletter_layout_specialist_agent.py" class="file-item">📄 newsletter_layout_specialist_agent.py</a>
+<a href="orchestrators/index.html" class="file-item folder">📂 orchestrators</a>
+<a href="portfolio_optimization_agent.py" class="file-item">📄 portfolio_optimization_agent.py</a>
+<a href="prediction_market_agent.py" class="file-item">📄 prediction_market_agent.py</a>
+<a href="prompt_generation_agent.py" class="file-item">📄 prompt_generation_agent.py</a>
+<a href="prompt_tuner.py" class="file-item">📄 prompt_tuner.py</a>
+<a href="query_understanding_agent.py" class="file-item">📄 query_understanding_agent.py</a>
+<a href="rag_agent.py" class="file-item">📄 rag_agent.py</a>
+<a href="red_team_agent.py" class="file-item">📄 red_team_agent.py</a>
+<a href="reflector_agent.py" class="file-item">📄 reflector_agent.py</a>
+<a href="regulatory_compliance_agent.py" class="file-item">📄 regulatory_compliance_agent.py</a>
+<a href="report_generator_agent.py" class="file-item">📄 report_generator_agent.py</a>
+<a href="result_aggregation_agent.py" class="file-item">📄 result_aggregation_agent.py</a>
+<a href="risk_assessment_agent.py" class="file-item">📄 risk_assessment_agent.py</a>
+<a href="sense_weaver.py" class="file-item">📄 sense_weaver.py</a>
+<a href="snc_analyst_agent.py" class="file-item">📄 snc_analyst_agent.py</a>
+<a href="specialized/index.html" class="file-item folder">📂 specialized</a>
+<a href="sub_agents/index.html" class="file-item folder">📂 sub_agents</a>
+<a href="supply_chain_risk_agent.py" class="file-item">📄 supply_chain_risk_agent.py</a>
+<a href="technical_analyst_agent.py" class="file-item">📄 technical_analyst_agent.py</a>
+        </div>
+        <div class="main-stage" id="main-content">
+            <div class="card">
+                <h2>Overview</h2>
+                <div id="readme-content">
+                    <p>No README.md found. See Module Documentation below.</p>
+                </div>
+            </div>
+
+            <div class="card"><h2>Class Structure</h2><pre class="mermaid">
+classDiagram
+    class AgentBase {
+        agent_base.py
+    }
+    class AgentForge {
+        agent_forge.py
+    }
+    class AlgoTradingAgent {
+        algo_trading_agent.py
+    }
+    class AlternativeDataAgent {
+        alternative_data_agent.py
+    }
+    class AnomalyDetectionAgent {
+        anomaly_detection_agent.py
+    }
+    class ArchiveManagerAgent {
+        archive_manager_agent.py
+    }
+    class BehavioralEconomicsAgent {
+        behavioral_economics_agent.py
+    }
+    class CatalystAgent {
+        catalyst_agent.py
+    }
+    class CodeAlchemist {
+        code_alchemist.py
+    }
+    class CryptoAgent {
+        crypto_agent.py
+    }
+    class CyclicalReasoningAgent {
+        cyclical_reasoning_agent.py
+    }
+    class DataRetrievalAgent {
+        data_retrieval_agent.py
+    }
+    class DataVerificationAgent {
+        data_verification_agent.py
+    }
+    class DiscussionChairAgent {
+        discussion_chair_agent.py
+    }
+    class DiscussionChairAgent {
+        discussion_chair_agent.py
+    }
+    class DiscussionChairAgent {
+        discussion_chair_agent.py
+    }
+    class EchoAgent {
+        echo_agent.py
+    }
+    class EventDrivenRiskAgent {
+        event_driven_risk_agent.py
+    }
+    class FinancialModelingAgent {
+        financial_modeling_agent.py
+    }
+    class DCFCalculator {
+        fundamental_analyst_agent.py
+    }
+    class FundamentalAnalystAgent {
+        fundamental_analyst_agent.py
+    }
+    class MockSKFunction {
+        fundamental_analyst_agent.py
+    }
+    class MockSKSkillsCollection {
+        fundamental_analyst_agent.py
+    }
+    class MockKernel {
+        fundamental_analyst_agent.py
+    }
+    class MockSKResult {
+        fundamental_analyst_agent.py
+    }
+    class GeopoliticalRiskAgent {
+        geopolitical_risk_agent.py
+    }
+    class IndustrySpecialistAgent {
+        industry_specialist_agent.py
+    }
+    class LegalAgent {
+        legal_agent.py
+    }
+    class LexicaAgent {
+        lexica_agent.py
+    }
+    class LinguaMaestro {
+        lingua_maestro.py
+    }
+    class MachineLearningModelTrainingAgent {
+        machine_learning_model_training_agent.py
+    }
+    class MacroeconomicAnalysisAgent {
+        macroeconomic_analysis_agent.py
+    }
+    class MarketSentimentAgent {
+        market_sentiment_agent.py
+    }
+    class Meta19Agent {
+        meta_19_agent.py
+    }
+    class MetaCognitiveAgent {
+        meta_cognitive_agent.py
+    }
+    class NaturalLanguageGenerationAgent {
+        natural_language_generation_agent.py
+    }
+    class NewsBot {
+        news_bot.py
+    }
+    class NewsletterLayoutSpecialist {
+        newsletter_layout_specialist_agent.py
+    }
+    class LSTMModel {
+        portfolio_optimization_agent.py
+    }
+    class AIPoweredPortfolioOptimizationAgent {
+        portfolio_optimization_agent.py
+    }
+    class PredictionMarketAgent {
+        prediction_market_agent.py
+    }
+    class PromptGenerationAgent {
+        prompt_generation_agent.py
+    }
+    class PromptTuner {
+        prompt_tuner.py
+    }
+    class QueryUnderstandingAgent {
+        query_understanding_agent.py
+    }
+    class QueryUnderstandingAgent {
+        query_understanding_agent.py
+    }
+    class RAGAgent {
+        rag_agent.py
+    }
+    class Document {
+        rag_agent.py
+    }
+    class RedTeamAgent {
+        red_team_agent.py
+    }
+    class ReflectorAgent {
+        reflector_agent.py
+    }
+    class ReportGeneratorAgent {
+        report_generator_agent.py
+    }
+    class ResultAggregationAgent {
+        result_aggregation_agent.py
+    }
+    class RiskAssessmentAgent {
+        risk_assessment_agent.py
+    }
+    class SenseWeaver {
+        sense_weaver.py
+    }
+    class SNCRating {
+        snc_analyst_agent.py
+    }
+    class SNCAnalystAgent {
+        snc_analyst_agent.py
+    }
+    class MockSKFunction {
+        snc_analyst_agent.py
+    }
+    class MockSKSkillsCollection {
+        snc_analyst_agent.py
+    }
+    class MockKernel {
+        snc_analyst_agent.py
+    }
+    class MockSKResult {
+        snc_analyst_agent.py
+    }
+    class SupplyChainRiskAgent {
+        supply_chain_risk_agent.py
+    }
+    class TechnicalAnalystAgent {
+        technical_analyst_agent.py
+    }
+</pre></div>
+
+            <div class="card"><h2>Module Documentation</h2><div class="module-doc"><h3>agent_base.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>agent_forge.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>algo_trading_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>alternative_data_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>anomaly_detection_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>archive_manager_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>behavioral_economics_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>catalyst_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>code_alchemist.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>crypto_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>cyclical_reasoning_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>data_retrieval_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>data_verification_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>discussion_chair_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>echo_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>event_driven_risk_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>financial_modeling_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>fundamental_analyst_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>geopolitical_risk_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>industry_specialist_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>legal_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>lexica_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>lingua_maestro.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>machine_learning_model_training_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>macroeconomic_analysis_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>market_sentiment_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>meta_19_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>meta_cognitive_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>natural_language_generation_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>news_bot.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>newsletter_layout_specialist_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>portfolio_optimization_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>prediction_market_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>prompt_generation_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>prompt_tuner.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>query_understanding_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>rag_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>red_team_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>reflector_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>report_generator_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>result_aggregation_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>risk_assessment_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>sense_weaver.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>snc_analyst_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>supply_chain_risk_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>technical_analyst_agent.py</h3><p class="doc-text">No description available.</p></div></div>
+
+            <div id="runtime-panel" style="display:none; border-top: 1px solid #06b6d4; margin-top: 20px; padding-top: 20px;">
+                <h3>Runtime Diagnostics</h3>
+                <pre>Mock Mode: ACTIVE
+Agent Swarm: STANDBY</pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        ADAM AUTO-GENERATED SHOWCASE | REF: agents
     </div>
 
     <script>
-        function toggleRuntime() {
-            const panel = document.getElementById('runtime-panel');
-            if (panel.style.display === 'none') {
-                panel.style.display = 'block';
-            } else {
-                panel.style.display = 'none';
+    // AUTO-GENERATED: Showcase Runtime
+    (function() {
+        const CONFIG = {
+            mockMode: true,
+            rootPath: "../../index.html",
+            currentDir: "agents"
+        };
+
+        // 1. Navigation Handler
+        function initNav() {
+            console.log("Nav initialized for " + CONFIG.currentDir);
+        }
+
+        // 2. Data Loader (Graceful Fallback)
+        async function loadData() {
+            try {
+                // Attempt to load local descriptor
+                const response = await fetch('./AGENTS.md');
+                if(response.ok) {
+                    const text = await response.text();
+                    // Simple text render for now, simulated markdown
+                    document.getElementById('readme-content').innerHTML = '<pre>' + text + '</pre>';
+                }
+            } catch (e) {
+                console.warn("No local documentation found.");
             }
         }
+
+        // 3. Runtime Toggle
+        window.toggleRuntime = function() {
+            const panel = document.getElementById('runtime-panel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initNav();
+            // loadData(); // Disabled to prefer generated content
+        });
+    })();
     </script>
 </body>
 </html>

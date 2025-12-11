@@ -7,6 +7,7 @@ from werkzeug.exceptions import HTTPException
 from werkzeug.security import generate_password_hash, check_password_hash
 import sys
 import os
+import logging
 import json
 import asyncio
 from datetime import datetime, timezone
@@ -97,7 +98,8 @@ def create_app(config_name='default'):
 
     # Initialize extensions
     db.init_app(app)
-    socketio.init_app(app, cors_allowed_origins="*")
+    # 🛡️ Sentinel: Configured CORS from settings to avoid wildcard access.
+    socketio.init_app(app, cors_allowed_origins=app.config.get('CORS_ALLOWED_ORIGINS', []))
     jwt.init_app(app)
 
     # Configure Celery
@@ -126,6 +128,17 @@ def create_app(config_name='default'):
         data_manager = DataManager(core_config)
         agent_orchestrator = AgentOrchestrator(core_config, knowledge_base, data_manager)
         meta_orchestrator = MetaOrchestrator(legacy_orchestrator=agent_orchestrator)
+
+    # ---------------------------------------------------------------------------- #
+    # Security Headers
+    # ---------------------------------------------------------------------------- #
+
+    @app.after_request
+    def add_security_headers(response):
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+        return response
 
     # ---------------------------------------------------------------------------- #
     # API Endpoints
@@ -567,8 +580,12 @@ def create_app(config_name='default'):
         # pass through HTTP errors
         if isinstance(e, HTTPException):
             return e
-        # now you're handling non-HTTP exceptions only
-        return jsonify(error=str(e)), 500
+
+        # 🛡️ Sentinel: Log the full error but return a generic message to prevent leaking sensitive info
+        app.logger.error(f"Unhandled Exception: {e}", exc_info=True)
+
+        # Return generic error message
+        return jsonify(error="An unexpected error occurred."), 500
 
     return app
 

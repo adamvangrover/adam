@@ -3,31 +3,44 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def calculate_dcf(financials: Dict[str, Any], risk_free_rate: float = 0.04) -> Dict[str, Any]:
+def calculate_dcf(financials: Dict[str, Any], risk_free_rate: float = 0.04, scenario: Dict[str, Any] = None) -> Dict[str, Any]:
     """
     Performs a simplified Discounted Cash Flow (DCF) analysis.
 
     Args:
         financials: Dict containing 'fcf' (Free Cash Flow), 'growth_rate', 'beta'.
         risk_free_rate: The current risk-free rate (e.g., 10y Treasury).
+        scenario: Optional dict for Scenario Injection (e.g., {'growth_rate': 0.02, 'market_risk_premium': 0.08})
 
     Returns:
         Dict with 'wacc', 'terminal_growth', 'intrinsic_value', 'share_price'.
     """
     logger.info("Running DCF Analysis...")
 
-    # Extract or Default
-    fcf = financials.get("fcf", 1000) # Latest FCF in millions
-    growth_rate = financials.get("growth_rate", 0.05)
-    beta = financials.get("beta", 1.2)
-    shares_outstanding = financials.get("shares_outstanding", 500) # millions
-    market_risk_premium = 0.05
-    cost_of_debt = 0.06
-    tax_rate = 0.21
+    if scenario:
+        logger.info(f"Injecting Scenario: {scenario}")
+
+    # Extract or Default (Scenario overrides financials)
+    scenario = scenario or {}
+
+    fcf = scenario.get("fcf", financials.get("fcf", 1000))
+    growth_rate = scenario.get("growth_rate", financials.get("growth_rate", 0.05))
+    beta = scenario.get("beta", financials.get("beta", 1.2))
+    shares_outstanding = financials.get("shares_outstanding", 500)
+
+    # Market Assumptions (Scenario overrides defaults)
+    market_risk_premium = scenario.get("market_risk_premium", 0.05)
+    cost_of_debt = scenario.get("cost_of_debt", 0.06)
+    tax_rate = scenario.get("tax_rate", 0.21)
+
+    # Capital Structure
     debt_equity_ratio = financials.get("debt_equity_ratio", 0.5)
 
     # 1. Calculate WACC
-    cost_of_equity = risk_free_rate + beta * market_risk_premium
+    # Scenario injection for risk_free_rate is handled by the argument, but check scenario dict too
+    rfr = scenario.get("risk_free_rate", risk_free_rate)
+
+    cost_of_equity = rfr + beta * market_risk_premium
     wacc = (cost_of_equity * (1 / (1 + debt_equity_ratio))) + \
            (cost_of_debt * (1 - tax_rate) * (debt_equity_ratio / (1 + debt_equity_ratio)))
 

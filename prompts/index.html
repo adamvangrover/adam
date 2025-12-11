@@ -3,408 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Guide to Corporate Credit Risk Analysis</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Chosen Palette: Warm Neutrals -->
-    <!-- Application Structure Plan: A two-panel, responsive layout. The left panel serves as a fixed navigation menu listing all 12 steps of the credit analysis process. The right panel dynamically displays the detailed content for the selected step. This structure transforms the linear report into an interactive, task-oriented tool, allowing analysts to easily jump between sections and focus on specific areas without extensive scrolling. This non-linear exploration is more efficient for a professional referencing a guide during their workflow. -->
-    <!-- Visualization & Content Choices: The source report is textual, so no data charts are needed. The primary "visualization" is the process itself, represented by the interactive navigation menu. To enhance engagement and utility, the "Key Questions" for each step are presented as an interactive checklist (using HTML checkboxes). This turns a passive guide into an active tool an analyst can use to track their progress. All content is organized into corresponding sections, activated by clicking the navigation. This is achieved with vanilla JavaScript. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <title>ADAM v23.5 | prompts</title>
+    <link rel="stylesheet" href="../showcase/css/style.css">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        .nav-item.active {
-            background-color: #e7e5e4;
-            color: #1c1917;
-            border-left-color: #14b8a6;
-        }
-        .nav-item {
-            border-left-color: transparent;
-        }
-        .content-section {
-            display: none;
-        }
-        .content-section.active {
-            display: block;
-        }
-        /* Custom checkbox style */
-        .custom-checkbox:checked {
-            background-color: #14b8a6;
-            border-color: #0f766e;
-        }
-         .custom-checkbox:checked + label {
-            text-decoration: line-through;
-            color: #57534e;
-        }
+        /* Fallback styles if stylesheet is missing */
+        body { background-color: #050b14; color: #06b6d4; font-family: monospace; margin: 0; padding: 0; }
+        .header { border-bottom: 1px solid #06b6d4; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .breadcrumb { font-size: 1.2em; color: #e2e8f0; }
+        .badge { border: 1px solid #06b6d4; padding: 5px 10px; border-radius: 4px; font-size: 0.8em; text-transform: uppercase; }
+        .container { display: flex; height: calc(100vh - 80px); }
+        .sidebar { width: 300px; border-right: 1px solid #334155; padding: 20px; overflow-y: auto; background: rgba(5, 11, 20, 0.95); }
+        .main-stage { flex: 1; padding: 30px; overflow-y: auto; }
+        .file-item { padding: 8px; cursor: pointer; display: block; color: #94a3b8; text-decoration: none; }
+        .file-item:hover { color: #06b6d4; background: rgba(6, 182, 212, 0.1); }
+        .folder { color: #fbbf24; font-weight: bold; }
+        .footer { border-top: 1px solid #334155; padding: 10px; text-align: center; font-size: 0.8em; color: #64748b; background: #020617; }
+        .nav-links a { margin-left: 15px; color: #06b6d4; text-decoration: none; border: 1px solid #06b6d4; padding: 5px 10px; transition: all 0.2s; }
+        .nav-links a:hover { background: #06b6d4; color: #000; }
+        pre { background: #0f172a; padding: 15px; border-radius: 6px; overflow-x: auto; border: 1px solid #1e293b; }
+        h1, h2, h3 { color: #f8fafc; text-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
+        .card { background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; padding: 20px; margin-bottom: 20px; border-radius: 8px; }
+        .glitch { position: relative; }
+        .module-doc { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #334155; }
+        .doc-text { color: #94a3b8; font-style: italic; }
     </style>
+    <!-- Mermaid JS -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+    </script>
 </head>
-<body class="bg-stone-50 text-stone-800">
+<body>
+    <div class="header">
+        <div>
+            <h1 style="margin:0; display:inline-block;" class="glitch">ADAM v23.5</h1>
+            <span class="breadcrumb" style="margin-left: 20px;">/prompts</span>
+        </div>
+        <div class="nav-links">
+            <a href="../index.html">[UP LEVEL]</a>
+            <a href="../index.html">[ROOT]</a>
+            <a href="#" onclick="window.toggleRuntime()">[LIVE RUNTIME]</a>
+            <a href="https://github.com/your-repo/adam" target="_blank">[GITHUB]</a>
+        </div>
+        <span class="badge">SYSTEM ONLINE</span>
+    </div>
 
-    <div class="flex flex-col md:flex-row h-screen">
-        
-        <!-- Left-side Navigation -->
-        <aside class="w-full md:w-1/3 lg:w-1/4 bg-stone-100 p-4 sm:p-6 overflow-y-auto border-r border-stone-200">
-            <h1 class="text-xl font-bold text-stone-900 mb-1">Credit Review Process</h1>
-            <p class="text-sm text-stone-500 mb-6">Select a step to view details.</p>
-            <nav id="navigationMenu" class="space-y-2">
-                <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-1">
-                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center mr-3">I</span>
-                    <span class="font-medium">Company & Business Profile</span>
-                </a>
-                <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-2">
-                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center mr-3">II</span>
-                    <span class="font-medium">Industry & Competitive Landscape</span>
-                </a>
-                <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-3">
-                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center mr-3">III</span>
-                    <span class="font-medium">Financial Statement Deep Dive</span>
-                </a>
-                <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-4">
-                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center mr-3">IV</span>
-                    <span class="font-medium">Performance Evaluation</span>
-                </a>
-                <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-5">
-                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center mr-3">V</span>
-                    <span class="font-medium">Management & Governance</span>
-                </a>
-                <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-6">
-                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center mr-3">VI</span>
-                    <span class="font-medium">Strengths & Weaknesses</span>
-                </a>
-                <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-7">
-                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center mr-3">VII</span>
-                    <span class="font-medium">Risk & PD Assessment</span>
-                </a>
-                <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-8">
-                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center mr-3">VIII</span>
-                    <span class="font-medium">Covenant Analysis</span>
-                </a>
-                 <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-9">
-                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center mr-3">IX</span>
-                    <span class="font-medium">Structural Considerations</span>
-                </a>
-                <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-10">
-                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center mr-3">X</span>
-                    <span class="font-medium">External Factors (ESG, etc.)</span>
-                </a>
-                <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-11">
-                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center mr-3">XI</span>
-                    <span class="font-medium">Credit Outlook & Triggers</span>
-                </a>
-                <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-12">
-                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center mr-3">XII</span>
-                    <span class="font-medium">Regulatory Considerations</span>
-                </a>
-                
-                <div class="pt-6 mt-4 border-t border-stone-200">
-                     <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-13">
-                        <span class="font-medium">Utilizing Report Prompts</span>
-                    </a>
-                    <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-14">
-                        <span class="font-medium">General Guidance</span>
-                    </a>
+    <div class="container">
+        <div class="sidebar">
+            <h3>Directory Structure</h3>
+            <a href="../index.html" class="file-item folder">📂 .. (Parent)</a>
+<a href="AGENTS.md" class="file-item">📝 AGENTS.md</a>
+<a href="Adam_v22.0_Portable_Config.json" class="file-item">📊 Adam_v22.0_Portable_Config.json</a>
+<a href="CCM_Trend_Report_6-12MOS.json" class="file-item">📊 CCM_Trend_Report_6-12MOS.json</a>
+<a href="ICRPL.html" class="file-item">📄 ICRPL.html</a>
+<a href="JSON_Prompt_Library.jsonl" class="file-item">📄 JSON_Prompt_Library.jsonl</a>
+<a href="JSON_Prompt_Library.md" class="file-item">📝 JSON_Prompt_Library.md</a>
+<a href="PROMPT_BEST_PRACTICES.md" class="file-item">📝 PROMPT_BEST_PRACTICES.md</a>
+<a href="adam.html" class="file-item">📄 adam.html</a>
+<a href="adam19.md" class="file-item">📝 adam19.md</a>
+<a href="adam21.md" class="file-item">📝 adam21.md</a>
+<a href="adam_v23.md" class="file-item">📝 adam_v23.md</a>
+<a href="company_financial_health_swot.json" class="file-item">📊 company_financial_health_swot.json</a>
+<a href="comparative_company_analysis.json" class="file-item">📊 comparative_company_analysis.json</a>
+<a href="copilot.html" class="file-item">📄 copilot.html</a>
+<a href="copilot2.html" class="file-item">📄 copilot2.html</a>
+<a href="copilot3.html" class="file-item">📄 copilot3.html</a>
+<a href="corporate_credit_risk_analysis.json" class="file-item">📊 corporate_credit_risk_analysis.json</a>
+<a href="corporate_credit_risk_analysis.md" class="file-item">📝 corporate_credit_risk_analysis.md</a>
+<a href="credit_rating_assessment_report.json" class="file-item">📊 credit_rating_assessment_report.json</a>
+<a href="crypto_asset_analysis_report.json" class="file-item">📊 crypto_asset_analysis_report.json</a>
+<a href="daily_market_briefing.json" class="file-item">📊 daily_market_briefing.json</a>
+<a href="enterprise_ai_prompt_library.md" class="file-item">📝 enterprise_ai_prompt_library.md</a>
+<a href="esg_investment_opportunity_scan.json" class="file-item">📊 esg_investment_opportunity_scan.json</a>
+<a href="geopolitical_risk_impact_assessment.json" class="file-item">📊 geopolitical_risk_impact_assessment.json</a>
+<a href="intelligent_credit_monitoring_copilot.json" class="file-item">📊 intelligent_credit_monitoring_copilot.json</a>
+<a href="interactive_feedback_review.json" class="file-item">📊 interactive_feedback_review.json</a>
+<a href="interactive_workflow_definition.json" class="file-item">📊 interactive_workflow_definition.json</a>
+<a href="lib.html" class="file-item">📄 lib.html</a>
+<a href="macroeconomic_themed_investment_strategy.json" class="file-item">📊 macroeconomic_themed_investment_strategy.json</a>
+<a href="market_shock_scenario_analysis.json" class="file-item">📊 market_shock_scenario_analysis.json</a>
+<a href="odyssey_strategic_risk_orchestrator.json" class="file-item">📊 odyssey_strategic_risk_orchestrator.json</a>
+<a href="portfolio_optimization_proposal.json" class="file-item">📊 portfolio_optimization_proposal.json</a>
+<a href="prompt.yaml" class="file-item">📄 prompt.yaml</a>
+<a href="prompt_engineering_guide.ipynb" class="file-item">📄 prompt_engineering_guide.ipynb</a>
+<a href="prompt_library.html" class="file-item">📄 prompt_library.html</a>
+<a href="prompt_library.md" class="file-item">📝 prompt_library.md</a>
+<a href="regulatory_rating_questionnaire.yaml" class="file-item">📄 regulatory_rating_questionnaire.yaml</a>
+<a href="sector_deep_dive_report.json" class="file-item">📊 sector_deep_dive_report.json</a>
+<a href="technical_analysis_stock_report.json" class="file-item">📊 technical_analysis_stock_report.json</a>
+        </div>
+        <div class="main-stage" id="main-content">
+            <div class="card">
+                <h2>Overview</h2>
+                <div id="readme-content">
+                    <p>No README.md found. See Module Documentation below.</p>
                 </div>
-            </nav>
-        </aside>
+            </div>
 
-        <!-- Right-side Content -->
-        <main id="contentContainer" class="w-full md:w-2/3 lg:w-3/4 p-6 sm:p-10 overflow-y-auto">
             
-            <div id="section-intro" class="content-section">
-                <h2 class="text-3xl font-bold text-stone-900 mb-4">Guide to Corporate Credit Risk Analysis</h2>
-                <p class="text-lg text-stone-600 mb-6">This interactive guide helps financial analysts leverage the Prompt Library to conduct comprehensive, consistent, and thorough corporate credit risk reviews. It breaks down the analysis into logical steps, providing key questions and areas of focus for each stage.</p>
-                <div class="bg-teal-50 border-l-4 border-teal-500 text-teal-800 p-4 rounded-r-lg">
-                    <p>Select a step from the navigation menu on the left to begin your analysis. The content for the selected step will be displayed here.</p>
-                </div>
-            </div>
 
-            <div id="section-1" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">I. Company and Business Profile Analysis</h2>
-                <p class="mb-6 text-stone-600"><strong>Objective:</strong> To develop a foundational understanding of the company's operations, business model, scale, and market presence.</p>
-                <div class="mb-6 bg-stone-100 p-4 rounded-lg"><h3 class="font-semibold text-stone-800 mb-2">Relevant Prompt from Library</h3><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1">company_overview_prompt</code></div>
-                <h3 class="font-semibold text-stone-800 mb-4">Key Questions and Areas of Focus:</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center"><input id="q1-1" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q1-1" class="text-stone-700">What are the company's primary business activities and how does it generate revenue?</label></div>
-                    <div class="flex items-center"><input id="q1-2" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q1-2" class="text-stone-700">What are its main products and services?</label></div>
-                    <div class="flex items-center"><input id="q1-3" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q1-3" class="text-stone-700">What is the scale of its operations (consider revenue, assets, employee count)?</label></div>
-                    <div class="flex items-center"><input id="q1-4" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q1-4" class="text-stone-700">In which geographic regions does it operate? Is it diversified?</label></div>
-                    <div class="flex items-center"><input id="q1-5" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q1-5" class="text-stone-700">Who are its key customers and suppliers? Is there significant concentration risk?</label></div>
-                    <div class="flex items-center"><input id="q1-6" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q1-6" class="text-stone-700">What is the company's ownership structure (e.g., public, private, subsidiary)?</label></div>
-                </div>
-            </div>
-
-            <div id="section-2" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">II. Industry and Competitive Landscape</h2>
-                <p class="mb-6 text-stone-600"><strong>Objective:</strong> To evaluate the external environment, including industry trends, risks, and the company's position relative to its competitors.</p>
-                <div class="mb-6 bg-stone-100 p-4 rounded-lg"><h3 class="font-semibold text-stone-800 mb-2">Relevant Prompt from Library</h3><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1">industry_analysis_competitive_landscape_prompt</code></div>
-                <h3 class="font-semibold text-stone-800 mb-4">Key Questions and Areas of Focus:</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center"><input id="q2-1" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q2-1" class="text-stone-700">What are the key economic drivers, growth prospects, and overall health of the industry?</label></div>
-                    <div class="flex items-center"><input id="q2-2" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q2-2" class="text-stone-700">Is the industry cyclical? How sensitive is it to macroeconomic changes?</label></div>
-                    <div class="flex items-center"><input id="q2-3" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q2-3" class="text-stone-700">What are the major trends, such as technological disruption, consolidation, or regulatory shifts?</label></div>
-                    <div class="flex items-center"><input id="q2-4" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q2-4" class="text-stone-700">Who are the main competitors, and what is their market share?</label></div>
-                    <div class="flex items-center"><input id="q2-5" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q2-5" class="text-stone-700">What is the company's market position (e.g., leader, niche player)?</label></div>
-                    <div class="flex items-center"><input id="q2-6" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q2-6" class="text-stone-700">What are the company's key competitive advantages and disadvantages?</label></div>
-                    <div class="flex items-center"><input id="q2-7" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q2-7" class="text-stone-700">How high are the barriers to entry in this industry?</label></div>
-                </div>
-            </div>
             
-            <div id="section-3" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">III. Financial Statement Deep Dive</h2>
-                <p class="mb-6 text-stone-600"><strong>Objective:</strong> To conduct a thorough analysis of the company's financial health, performance, and risk profile using its financial statements.</p>
-                 <div class="mb-6 bg-stone-100 p-4 rounded-lg"><h3 class="font-semibold text-stone-800 mb-2">Relevant Prompt</h3><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1">financial_statement_analysis_prompt</code></div>
-                <h3 class="font-semibold text-stone-800 mb-4">Key Analytical Areas:</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center"><input id="q3-1" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q3-1" class="text-stone-700"><strong>Profitability:</strong> Analyze trends in Gross, EBITDA, and Net Margins and compare to peers.</label></div>
-                    <div class="flex items-center"><input id="q3-2" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q3-2" class="text-stone-700"><strong>Leverage:</strong> Assess key leverage ratios (e.g., Debt-to-EBITDA) and capital structure adequacy.</label></div>
-                    <div class="flex items-center"><input id="q3-3" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q3-3" class="text-stone-700"><strong>Liquidity:</strong> Evaluate ability to meet short-term obligations and working capital efficiency (DSO, DPO).</label></div>
-                    <div class="flex items-center"><input id="q3-4" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q3-4" class="text-stone-700"><strong>Coverage:</strong> Determine how well earnings and cash flow cover debt service obligations.</label></div>
-                    <div class="flex items-center"><input id="q3-5" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q3-5" class="text-stone-700"><strong>Efficiency:</strong> Analyze how effectively assets are used to generate sales (e.g., Asset Turnover).</label></div>
-                    <div class="flex items-center"><input id="q3-6" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q3-6" class="text-stone-700"><strong>Cash Flow:</strong> Analyze quality of cash flow from operations and Free Cash Flow generation.</label></div>
-                </div>
-            </div>
 
-            <div id="section-4" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">IV. Performance Evaluation</h2>
-                <p class="mb-6 text-stone-600"><strong>Objective:</strong> To assess the company's historical performance track record and evaluate the credibility of its future financial projections.</p>
-                <div class="mb-6 bg-stone-100 p-4 rounded-lg"><h3 class="font-semibold text-stone-800 mb-2">Relevant Prompt</h3><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1">performance_evaluation_prompt</code></div>
-                <h3 class="font-semibold text-stone-800 mb-4">Key Questions and Areas of Focus:</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center"><input id="q4-1" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q4-1" class="text-stone-700">What was the company's historical revenue growth rate and its drivers?</label></div>
-                    <div class="flex items-center"><input id="q4-2" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q4-2" class="text-stone-700">How has the company performed against its own past guidance or budgets?</label></div>
-                    <div class="flex items-center"><input id="q4-3" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q4-3" class="text-stone-700">Are management's projections and assumptions realistic given history and industry outlook?</label></div>
-                    <div class="flex items-center"><input id="q4-4" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q4-4" class="text-stone-700">What are the primary risks to the company achieving its future targets?</label></div>
-                    <div class="flex items-center"><input id="q4-5" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q4-5" class="text-stone-700">How resilient have earnings and cash flows been in the past?</label></div>
-                </div>
+            <div id="runtime-panel" style="display:none; border-top: 1px solid #06b6d4; margin-top: 20px; padding-top: 20px;">
+                <h3>Runtime Diagnostics</h3>
+                <pre>Mock Mode: ACTIVE
+Agent Swarm: STANDBY</pre>
             </div>
-            
-            <div id="section-5" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">V. Management and Governance Assessment</h2>
-                <p class="mb-6 text-stone-600"><strong>Objective:</strong> To evaluate the quality, experience, and effectiveness of the management team and the robustness of the company's corporate governance framework.</p>
-                <div class="mb-6 bg-stone-100 p-4 rounded-lg"><h3 class="font-semibold text-stone-800 mb-2">Relevant Prompt</h3><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1">management_assessment_prompt</code></div>
-                <h3 class="font-semibold text-stone-800 mb-4">Key Questions and Areas of Focus:</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center"><input id="q5-1" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q5-1" class="text-stone-700">How experienced and credible is the senior management team? What is their track record?</label></div>
-                    <div class="flex items-center"><input id="q5-2" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q5-2" class="text-stone-700">Is the corporate strategy clear, consistent, and well-executed?</label></div>
-                    <div class="flex items-center"><input id="q5-3" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q5-3" class="text-stone-700">What is the company's financial policy regarding risk, leverage, and shareholder returns?</label></div>
-                    <div class="flex items-center"><input id="q5-4" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q5-4" class="text-stone-700">Are there any corporate governance concerns (board independence, transparency, etc.)?</label></div>
-                    <div class="flex items-center"><input id="q5-5" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q5-5" class="text-stone-700">Are management's incentives aligned with long-term creditworthiness?</label></div>
-                </div>
-            </div>
+        </div>
+    </div>
 
-            <div id="section-6" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">VI. Strengths and Weaknesses Summary</h2>
-                <p class="mb-6 text-stone-600"><strong>Objective:</strong> To synthesize the analysis into a balanced, high-level summary of the key factors supporting and detracting from the company's credit profile.</p>
-                <div class="mb-6 bg-stone-100 p-4 rounded-lg"><h3 class="font-semibold text-stone-800 mb-2">Relevant Prompt</h3><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1">strengths_weaknesses_summary_prompt</code></div>
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div>
-                        <h3 class="font-semibold text-stone-800 mb-4">Credit Strengths:</h3>
-                        <div class="space-y-3">
-                            <div class="flex items-center"><input id="q6-1" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q6-1" class="text-stone-700">Strong market position / brand</label></div>
-                            <div class="flex items-center"><input id="q6-2" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q6-2" class="text-stone-700">Diversified revenues / customers</label></div>
-                            <div class="flex items-center"><input id="q6-3" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q6-3" class="text-stone-700">Conservative financial policy / low leverage</label></div>
-                            <div class="flex items-center"><input id="q6-4" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q6-4" class="text-stone-700">Strong profitability / cash flow</label></div>
-                            <div class="flex items-center"><input id="q6-5" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q6-5" class="text-stone-700">Experienced management team</label></div>
-                        </div>
-                    </div>
-                    <div>
-                        <h3 class="font-semibold text-stone-800 mb-4">Credit Weaknesses:</h3>
-                        <div class="space-y-3">
-                            <div class="flex items-center"><input id="q6-6" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q6-6" class="text-stone-700">High leverage / aggressive policy</label></div>
-                            <div class="flex items-center"><input id="q6-7" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q6-7" class="text-stone-700">Weak profitability / volatile cash flows</label></div>
-                            <div class="flex items-center"><input id="q6-8" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q6-8" class="text-stone-700">Concentration risk (customer, product)</label></div>
-                            <div class="flex items-center"><input id="q6-9" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q6-9" class="text-stone-700">Challenging industry / competition</label></div>
-                            <div class="flex items-center"><input id="q6-10" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q6-10" class="text-stone-700">Operational issues / execution risks</label></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="section-7" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">VII. Risk & Probability of Default (PD) Assessment</h2>
-                <p class="mb-6 text-stone-600"><strong>Objective:</strong> To formally assess the likelihood of the company defaulting on its obligations, considering all quantitative and qualitative factors.</p>
-                <div class="mb-6 bg-stone-100 p-4 rounded-lg"><h3 class="font-semibold text-stone-800 mb-2">Relevant Prompt</h3><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1">probability_of_default_rating_prompt</code></div>
-                <h3 class="font-semibold text-stone-800 mb-4">Key Questions and Areas of Focus:</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center"><input id="q7-1" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q7-1" class="text-stone-700">Based on all analysis, what is the overall risk profile?</label></div>
-                    <div class="flex items-center"><input id="q7-2" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q7-2" class="text-stone-700">How do quantitative (leverage) and qualitative (industry risk) factors translate into a default probability?</label></div>
-                    <div class="flex items-center"><input id="q7-3" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q7-3" class="text-stone-700">If using an internal model/scorecard, what are the key inputs driving the outcome?</label></div>
-                    <div class="flex items-center"><input id="q7-4" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q7-4" class="text-stone-700">What is the final PD estimate or risk category, and what is the core rationale supporting it?</label></div>
-                </div>
-            </div>
-
-            <div id="section-8" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">VIII. Covenant Analysis</h2>
-                <p class="mb-6 text-stone-600"><strong>Objective:</strong> To analyze the financial and operational covenants in the company's debt agreements to assess compliance and available headroom.</p>
-                <div class="mb-6 bg-stone-100 p-4 rounded-lg"><h3 class="font-semibold text-stone-800 mb-2">Relevant Prompt</h3><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1">covenant_analysis_prompt</code></div>
-                <h3 class="font-semibold text-stone-800 mb-4">Key Questions and Areas of Focus:</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center"><input id="q8-1" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q8-1" class="text-stone-700">What are the key financial covenants (e.g., Maximum Leverage, Minimum Interest Coverage)?</label></div>
-                    <div class="flex items-center"><input id="q8-2" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q8-2" class="text-stone-700">What is the current level of compliance and how much headroom or "cushion" does the company have?</label></div>
-                    <div class="flex items-center"><input id="q8-3" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q8-3" class="text-stone-700">How sensitive is covenant compliance to a decline in EBITDA or other key metrics?</label></div>
-                    <div class="flex items-center"><input id="q8-4" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q8-4" class="text-stone-700">What are the consequences of a potential covenant breach?</label></div>
-                </div>
-            </div>
-
-            <div id="section-9" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">IX. Structural Considerations</h2>
-                <p class="mb-6 text-stone-600"><strong>Objective:</strong> To understand risks and support mechanisms arising from the company's position within a larger corporate group.</p>
-                <div class="mb-6 bg-stone-100 p-4 rounded-lg"><h3 class="font-semibold text-stone-800 mb-2">Relevant Prompt</h3><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1">parent_subsidiary_linkage_prompt</code></div>
-                <h3 class="font-semibold text-stone-800 mb-4">Key Questions and Areas of Focus:</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center"><input id="q9-1" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q9-1" class="text-stone-700">Is the company a parent or a subsidiary? How strategically important is it to the wider group?</label></div>
-                    <div class="flex items-center"><input id="q9-2" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q9-2" class="text-stone-700">Are there any explicit support mechanisms like guarantees or cross-default provisions?</label></div>
-                    <div class="flex items-center"><input id="q9-3" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q9-3" class="text-stone-700">Is there a history of the parent company supporting its subsidiaries?</label></div>
-                    <div class="flex items-center"><input id="q9-4" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q9-4" class="text-stone-700">Could problems at the parent or a sister company create contagion risk for the entity?</label></div>
-                </div>
-            </div>
-
-            <div id="section-10" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">X. External Factors (Country, Macroeconomic, ESG)</h2>
-                <p class="mb-6 text-stone-600"><strong>Objective:</strong> To assess the impact of broader environmental, social, political, and economic factors on the company's creditworthiness.</p>
-                <div class="mb-6 bg-stone-100 p-4 rounded-lg"><h3 class="font-semibold text-stone-800 mb-2">Relevant Prompts</h3><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1 mr-2">country_macroeconomic_risk_prompt</code><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1">esg_credit_factors_prompt</code></div>
-                <h3 class="font-semibold text-stone-800 mb-4">Key Questions and Areas of Focus:</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center"><input id="q10-1" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q10-1" class="text-stone-700">What are the key macroeconomic risks (inflation, interest rates, GDP growth)?</label></div>
-                    <div class="flex items-center"><input id="q10-2" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q10-2" class="text-stone-700">Are there significant country-specific risks (political, regulatory, currency)?</label></div>
-                    <div class="flex items-center"><input id="q10-3" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q10-3" class="text-stone-700">What are the most material <strong>Environmental</strong> risks and opportunities (e.g., climate transition)?</label></div>
-                    <div class="flex items-center"><input id="q10-4" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q10-4" class="text-stone-700">What are the most material <strong>Social</strong> risks and opportunities (e.g., labor relations, safety)?</label></div>
-                    <div class="flex items-center"><input id="q10-5" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q10-5" class="text-stone-700">What are the most material <strong>Governance</strong> factors impacting credit risk?</label></div>
-                </div>
-            </div>
-
-            <div id="section-11" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">XI. Credit Outlook and Rating Triggers</h2>
-                <p class="mb-6 text-stone-600"><strong>Objective:</strong> To form a forward-looking view on the likely trajectory of credit quality and to define specific events that would trigger a rating change.</p>
-                <div class="mb-6 bg-stone-100 p-4 rounded-lg"><h3 class="font-semibold text-stone-800 mb-2">Relevant Prompts</h3><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1 mr-2">credit_outlook_assessment_prompt</code><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1">rating_triggers_prompt</code></div>
-                <h3 class="font-semibold text-stone-800 mb-4">Key Questions and Areas of Focus:</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center"><input id="q11-1" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q11-1" class="text-stone-700">Is the credit outlook Stable, Positive, or Negative over the next 12-24 months? What trends support this view?</label></div>
-                    <div class="flex items-center"><input id="q11-2" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q11-2" class="text-stone-700">What specific, measurable events or metric thresholds would cause an <strong>upgrade</strong>?</label></div>
-                    <div class="flex items-center"><input id="q11-3" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q11-3" class="text-stone-700">What specific, measurable events or metric thresholds would cause a <strong>downgrade</strong>?</label></div>
-                </div>
-            </div>
-
-            <div id="section-12" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">XII. Regulatory Considerations</h2>
-                <p class="mb-6 text-stone-600"><strong>Objective:</strong> To analyze the credit from the perspective of a banking regulator, focusing on the ultimate source of repayment.</p>
-                <div class="mb-6 bg-stone-100 p-4 rounded-lg"><h3 class="font-semibold text-stone-800 mb-2">Relevant Prompt</h3><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1">snc_regulatory_rating_prompt</code></div>
-                <h3 class="font-semibold text-stone-800 mb-4">Key Questions and Areas of Focus:</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center"><input id="q12-1" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q12-1" class="text-stone-700">What is the primary source of repayment, and how reliable is it?</label></div>
-                    <div class="flex items-center"><input id="q12-2" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q12-2" class="text-stone-700">Can the company service all its debt obligations in a timely manner from operating cash flow?</label></div>
-                    <div class="flex items-center"><input id="q12-3" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q12-3" class="text-stone-700">Are there any well-defined weaknesses that jeopardize timely repayment?</label></div>
-                    <div class="flex items-center"><input id="q12-4" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q12-4" class="text-stone-700">How does the company's profile map to regulatory rating definitions (Pass, SM, Substandard)?</label></div>
-                </div>
-            </div>
-
-            <div id="section-13" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">Utilizing Full Report Structure Prompts</h2>
-                <p class="mb-6 text-stone-600">The library contains high-level prompts to structure your final report. These templates incorporate the individual analytical sections covered in this guide.</p>
-                <div class="space-y-4">
-                    <div class="bg-stone-100 p-4 rounded-lg">
-                        <h3 class="font-semibold text-stone-800">Comprehensive Credit Underwriting Memo</h3>
-                        <code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1 mb-2 inline-block">underwriting_memo_structure_prompt</code>
-                        <p class="text-stone-600 text-sm">Use this as the master template for a new transaction. It provides a standard, comprehensive structure for an underwriting document.</p>
-                    </div>
-                    <div class="bg-stone-100 p-4 rounded-lg">
-                        <h3 class="font-semibold text-stone-800">Annual Review / Monitoring Update</h3>
-                        <code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1 mb-2 inline-block">annual_review_monitoring_update_prompt</code>
-                        <p class="text-stone-600 text-sm">This template is tailored for periodic reviews, focusing on performance since the last update, covenant compliance, and any changes to the credit profile.</p>
-                    </div>
-                     <div class="bg-stone-100 p-4 rounded-lg">
-                        <h3 class="font-semibold text-stone-800">Credit Due Diligence Checklist</h3>
-                        <code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1 mb-2 inline-block">due_diligence_checklist_credit_prompt</code>
-                        <p class="text-stone-600 text-sm">An excellent tool to use at the beginning of an analysis to ensure you gather all the necessary information and documents.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="section-14" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">General Guidance</h2>
-                <p class="mb-6 text-stone-600">As you use the prompt library, keep these key principles in mind to ensure the highest quality analysis.</p>
-                <ul class="space-y-4 list-none">
-                    <li class="flex items-start">
-                        <span class="text-teal-500 font-bold text-xl mr-3 mt-1">✓</span>
-                        <div>
-                            <h3 class="font-semibold text-stone-800">Be Specific</h3>
-                            <p class="text-stone-600">Always clearly state the company name and the time periods you are analyzing.</p>
-                        </div>
-                    </li>
-                    <li class="flex items-start">
-                        <span class="text-teal-500 font-bold text-xl mr-3 mt-1">✓</span>
-                        <div>
-                            <h3 class="font-semibold text-stone-800">Provide Rationale</h3>
-                            <p class="text-stone-600">Don't just state a conclusion. Clearly link your analysis and data to your recommendations.</p>
-                        </div>
-                    </li>
-                    <li class="flex items-start">
-                        <span class="text-teal-500 font-bold text-xl mr-3 mt-1">✓</span>
-                        <div>
-                            <h3 class="font-semibold text-stone-800">Define Your Terms</h3>
-                            <p class="text-stone-600">Ensure financial metrics are clearly defined and calculated consistently.</p>
-                        </div>
-                    </li>
-                    <li class="flex items-start">
-                        <span class="text-teal-500 font-bold text-xl mr-3 mt-1">✓</span>
-                        <div>
-                            <h3 class="font-semibold text-stone-800">Know Your Context</h3>
-                            <p class="text-stone-600">Tailor your analysis to the specific request—is it a new loan, an annual review, or an event-driven update?</p>
-                        </div>
-                    </li>
-                     <li class="flex items-start">
-                        <span class="text-teal-500 font-bold text-xl mr-3 mt-1">✓</span>
-                        <div>
-                            <h3 class="font-semibold text-stone-800">Break It Down</h3>
-                            <p class="text-stone-600">For very complex companies or situations, use multiple, focused prompts to build your analysis piece by piece.</p>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-
-        </main>
+    <div class="footer">
+        ADAM AUTO-GENERATED SHOWCASE | REF: prompts
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const navigationMenu = document.getElementById('navigationMenu');
-            const contentContainer = document.getElementById('contentContainer');
-            const navItems = navigationMenu.querySelectorAll('.nav-item');
-            const contentSections = contentContainer.querySelectorAll('.content-section');
-            const introSection = document.getElementById('section-intro');
+    // AUTO-GENERATED: Showcase Runtime
+    (function() {
+        const CONFIG = {
+            mockMode: true,
+            rootPath: "../index.html",
+            currentDir: "prompts"
+        };
 
-            function switchTab(targetId) {
-                navItems.forEach(item => item.classList.remove('active'));
-                contentSections.forEach(section => section.classList.remove('active'));
-                
-                const navItem = navigationMenu.querySelector(`[data-target="${targetId}"]`);
-                const contentSection = document.getElementById(targetId);
+        // 1. Navigation Handler
+        function initNav() {
+            console.log("Nav initialized for " + CONFIG.currentDir);
+        }
 
-                if (navItem && contentSection) {
-                    navItem.classList.add('active');
-                    contentSection.classList.add('active');
+        // 2. Data Loader (Graceful Fallback)
+        async function loadData() {
+            try {
+                // Attempt to load local descriptor
+                const response = await fetch('./AGENTS.md');
+                if(response.ok) {
+                    const text = await response.text();
+                    // Simple text render for now, simulated markdown
+                    document.getElementById('readme-content').innerHTML = '<pre>' + text + '</pre>';
                 }
+            } catch (e) {
+                console.warn("No local documentation found.");
             }
+        }
 
-            navigationMenu.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = e.target.closest('.nav-item');
-                if (target && target.dataset.target) {
-                    switchTab(target.dataset.target);
-                }
-            });
-            
-            // Initial state on page load: show the first item.
-            const firstNavItem = navItems[0];
-            if (firstNavItem) {
-                switchTab(firstNavItem.dataset.target);
-            } else {
-                // Fallback to intro if no nav items exist
-                 introSection.classList.add('active');
-            }
+        // 3. Runtime Toggle
+        window.toggleRuntime = function() {
+            const panel = document.getElementById('runtime-panel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initNav();
+            // loadData(); // Disabled to prefer generated content
         });
+    })();
     </script>
 </body>
 </html>

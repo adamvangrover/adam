@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM Analyst OS | v25.5</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-dark: #020408;
+            --cyan-glow: #00f0ff;
+            --purple-glow: #bc13fe;
+            --green-glow: #0aff0a;
+            --panel-glass: rgba(10, 15, 30, 0.85);
+            --dock-glass: rgba(5, 10, 20, 0.6);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+            background-image: url('https://images.unsplash.com/photo-1642427749670-f20e2e76ed8c?q=80&w=2000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Dark overlay for background image */
+        .bg-overlay {
+            position: absolute; inset: 0; background: rgba(2, 4, 8, 0.85); z-index: -1;
+            /* Scanline effect */
+            background-image: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+        }
+
+        /* Window Styling */
+        .os-window {
+            position: absolute;
+            background: #020408;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column;
+            border-radius: 6px;
+            overflow: hidden;
+            resize: both;
+            min-width: 400px; min-height: 300px;
+            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .os-window.active {
+            border-color: var(--cyan-glow);
+            z-index: 50;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+        }
+
+        .window-bar {
+            background: #0f172a;
+            padding: 6px 10px;
+            display: flex; justify-content: space-between; align-items: center;
+            cursor: move;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            user-select: none;
+        }
+
+        .window-content { flex-grow: 1; position: relative; background: #050505; }
+        iframe { width: 100%; height: 100%; border: none; background: #020408; }
+
+        /* Dock Styling */
+        .dock {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--dock-glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 10px 20px;
+            display: flex; gap: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            z-index: 100;
+        }
+
+        .dock-item {
+            width: 48px; height: 48px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .dock-item:hover {
+            transform: translateY(-5px) scale(1.1);
+            background: rgba(255,255,255,0.1);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+        }
+
+        /* Tooltip */
+        .dock-item::after {
+            content: attr(data-title);
+            position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); color: white;
+            padding: 4px 8px; border-radius: 4px; font-size: 10px;
+            opacity: 0; pointer-events: none; transition: opacity 0.2s;
+            white-space: nowrap; border: 1px solid #333;
+        }
+        .dock-item:hover::after { opacity: 1; }
+
+        .app-dot {
+            width: 4px; height: 4px; background: var(--cyan-glow); border-radius: 50%;
+            position: absolute; bottom: -6px; opacity: 0;
+            box-shadow: 0 0 5px var(--cyan-glow);
+        }
+        .app-dot.running { opacity: 1; }
+
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="bg-overlay"></div>
+
+    <div class="fixed top-0 left-0 w-full h-8 bg-black/40 backdrop-blur flex justify-between items-center px-4 z-40 border-b border-white/5">
+        <div class="flex items-center gap-4 text-[10px] font-bold tracking-widest text-gray-400">
+            <span class="text-white">ADAM OS <span class="text-cyan-400">v25.5</span></span>
+            <span class="hover:text-white cursor-pointer transition-colors">FILE</span>
+            <span class="hover:text-white cursor-pointer transition-colors">EDIT</span>
+            <span class="hover:text-white cursor-pointer transition-colors">VIEW</span>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 px-2 py-0.5 bg-green-900/20 border border-green-500/30 rounded text-[10px] text-green-400">
+                <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                LOCAL ENV
+            </div>
+            <div class="text-[10px] text-gray-400 font-mono" id="clock">00:00</div>
+        </div>
+    </div>
+
+    <div id="desktop" class="w-full h-full pt-8 pb-24 relative">
+        </div>
+
+    <div class="dock">
+        <div class="dock-item" onclick="openApp('dcf')" data-title="DCF Valuator">
+            <i data-lucide="bar-chart-2" class="text-cyan-400 w-6 h-6"></i>
+            <div class="app-dot" id="dot-dcf"></div>
+        </div>
+        <div class="dock-item" onclick="openApp('lbo')" data-title="LBO Modeler">
+            <i data-lucide="layers" class="text-purple-400 w-6 h-6"></i>
+            <div class="app-dot" id="dot-lbo"></div>
+        </div>
+        <div class="dock-item" onclick="toggleFullScreen()" data-title="Toggle Fullscreen">
+            <i data-lucide="monitor" class="text-gray-400 w-6 h-6"></i>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let zIndexCounter = 100;
+
+        /* --- EMBEDDED APPS (THE MISSING PIECES) --- */
+        
+        // 1. DCF Valuator App Logic & UI
+        const dcfAppHTML = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <script src="https://cdn.tailwindcss.com"><\/script>
+                <style>
+                    body { background: #050505; color: #ccc; font-family: monospace; padding: 20px; }
+                    input { background: #111; border: 1px solid #333; color: white; width: 100%; padding: 4px; outline: none; }
+                    input:focus { border-color: #00f0ff; }
+                    .label { font-size: 10px; color: #666; text-transform: uppercase; margin-bottom: 2px; display: block; }
+                    .res-box { border: 1px solid #333; padding: 10px; margin-top: 10px; background: #0a0a0a; }
+                    .glow-text { color: #00f0ff; text-shadow: 0 0 10px rgba(0,240,255,0.5); font-weight: bold; }
+                </style>
+            </head>
+            <body>
+                <h2 class="text-sm font-bold mb-4 text-cyan-500 border-b border-gray-800 pb-2">DISCOUNTED CASH FLOW</h2>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="label">FCF (Year 1)</label>
+                        <input type="number" id="fcf" value="100" oninput="calcDCF()">
+                    </div>
+                    <div>
+                        <label class="label">Growth Rate (%)</label>
+                        <input type="number" id="growth" value="5" oninput="calcDCF()">
+                    </div>
+                    <div>
+                        <label class="label">WACC (%)</label>
+                        <input type="number" id="wacc" value="8" oninput="calcDCF()">
+                    </div>
+                    <div>
+                        <label class="label">Term Growth (%)</label>
+                        <input type="number" id="tg" value="2" oninput="calcDCF()">
+                    </div>
+                </div>
+
+                <div class="res-box">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-xs">Sum of PV (5yr):</span>
+                        <span class="text-xs" id="sumPv">--</span>
+                    </div>
+                     <div class="flex justify-between mb-1">
+                        <span class="text-xs">Terminal Value (PV):</span>
+                        <span class="text-xs" id="tvPv">--</span>
+                    </div>
+                    <div class="mt-2 pt-2 border-t border-gray-800 flex justify-between items-center">
+                        <span class="text-sm font-bold text-white">ENTERPRISE VALUE</span>
+                        <span class="text-lg glow-text" id="ev">--</span>
+                    </div>
+                </div>
+
+                <script>
+                    function calcDCF() {
+                        const fcf = parseFloat(document.getElementById('fcf').value);
+                        const growth = parseFloat(document.getElementById('growth').value) / 100;
+                        const wacc = parseFloat(document.getElementById('wacc').value) / 100;
+                        const tg = parseFloat(document.getElementById('tg').value) / 100;
+
+                        if(wacc <= tg) { document.getElementById('ev').innerText = "ERROR (WACC <= TG)"; return; }
+
+                        let sumPV = 0;
+                        let currentFCF = fcf;
+
+                        // 5 Year Projection
+                        for(let i=1; i<=5; i++) {
+                            currentFCF = currentFCF * (1 + growth);
+                            sumPV += currentFCF / Math.pow(1 + wacc, i);
+                        }
+
+                        // Terminal Value
+                        const tv = (currentFCF * (1 + tg)) / (wacc - tg);
+                        const tvPV = tv / Math.pow(1 + wacc, 5);
+
+                        const ev = sumPV + tvPV;
+
+                        document.getElementById('sumPv').innerText = sumPV.toFixed(2);
+                        document.getElementById('tvPv').innerText = tvPV.toFixed(2);
+                        document.getElementById('ev').innerText = "$" + ev.toFixed(2) + "M";
+                    }
+                    calcDCF();
+                <\/script>
+            </body>
+            </html>
+        `;
+
+        // 2. LBO Modeler App Logic & UI
+        const lboAppHTML = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <script src="https://cdn.tailwindcss.com"><\/script>
+                <style>
+                    body { background: #050505; color: #ccc; font-family: monospace; padding: 20px; }
+                    input { background: #111; border: 1px solid #333; color: white; width: 100%; padding: 4px; outline: none; }
+                    input:focus { border-color: #bc13fe; }
+                    .label { font-size: 10px; color: #666; text-transform: uppercase; margin-bottom: 2px; display: block; }
+                    .res-box { border: 1px solid #333; padding: 10px; margin-top: 10px; background: #0a0a0a; border-left: 2px solid #bc13fe; }
+                    .glow-text { color: #bc13fe; text-shadow: 0 0 10px rgba(188, 19, 254, 0.5); font-weight: bold; }
+                </style>
+            </head>
+            <body>
+                <h2 class="text-sm font-bold mb-4 text-purple-500 border-b border-gray-800 pb-2">LBO MODELER</h2>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="label">EBITDA ($M)</label>
+                        <input type="number" id="ebitda" value="50" oninput="calcLBO()">
+                    </div>
+                    <div>
+                        <label class="label">Entry Multiple (x)</label>
+                        <input type="number" id="entryMult" value="10" oninput="calcLBO()">
+                    </div>
+                    <div>
+                        <label class="label">Debt Contribution (%)</label>
+                        <input type="number" id="debtPerc" value="60" oninput="calcLBO()">
+                    </div>
+                    <div>
+                        <label class="label">Exit Multiple (x)</label>
+                        <input type="number" id="exitMult" value="12" oninput="calcLBO()">
+                    </div>
+                     <div class="col-span-2">
+                        <label class="label">Investment Horizon (Years)</label>
+                        <input type="range" id="years" min="3" max="7" value="5" oninput="calcLBO()">
+                        <div class="text-right text-xs text-gray-500" id="yearsVal">5 Years</div>
+                    </div>
+                </div>
+
+                <div class="res-box">
+                    <div class="flex justify-between mb-1">
+                        <span class="text-xs">Entry Equity Check:</span>
+                        <span class="text-xs" id="entryEq">--</span>
+                    </div>
+                     <div class="flex justify-between mb-1">
+                        <span class="text-xs">Exit Equity Value:</span>
+                        <span class="text-xs" id="exitEq">--</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mt-3 pt-2 border-t border-gray-800">
+                        <div>
+                            <span class="label">IRR</span>
+                            <span class="text-lg glow-text" id="irr">--</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="label">MOIC</span>
+                            <span class="text-lg glow-text" id="moic">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    function calcLBO() {
+                        const ebitda = parseFloat(document.getElementById('ebitda').value);
+                        const entryMult = parseFloat(document.getElementById('entryMult').value);
+                        const debtPerc = parseFloat(document.getElementById('debtPerc').value) / 100;
+                        const exitMult = parseFloat(document.getElementById('exitMult').value);
+                        const years = parseFloat(document.getElementById('years').value);
+
+                        document.getElementById('yearsVal').innerText = years + " Years";
+
+                        const enterpriseValue = ebitda * entryMult;
+                        const initialDebt = enterpriseValue * debtPerc;
+                        const initialEquity = enterpriseValue - initialDebt;
+
+                        // Simplified: Assume EBITDA grows 5% annually, Debt paid down 5% of initial per year
+                        let currentEbitda = ebitda * Math.pow(1.05, years);
+                        let currentDebt = initialDebt * Math.max(0, (1 - (0.05 * years))); 
+
+                        const exitEV = currentEbitda * exitMult;
+                        const exitEquity = exitEV - currentDebt;
+
+                        const moic = exitEquity / initialEquity;
+                        const irr = (Math.pow(moic, (1/years)) - 1) * 100;
+
+                        document.getElementById('entryEq').innerText = "$" + initialEquity.toFixed(1) + "M";
+                        document.getElementById('exitEq').innerText = "$" + exitEquity.toFixed(1) + "M";
+                        document.getElementById('moic').innerText = moic.toFixed(2) + "x";
+                        document.getElementById('irr').innerText = irr.toFixed(2) + "%";
+                    }
+                    calcLBO();
+                <\/script>
+            </body>
+            </html>
+        `;
+
+
+        /* --- OS LOGIC --- */
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        function openApp(appId) {
+            let title = "";
+            let content = "";
+            let width = 450;
+            let height = 500;
+
+            if(appId === 'dcf') {
+                title = "DCF Valuator";
+                content = dcfAppHTML;
+            } else if (appId === 'lbo') {
+                title = "LBO Modeler";
+                content = lboAppHTML;
+                width = 500; 
+                height = 550;
+            }
+
+            openWindow(appId, title, content, width, height);
+        }
+
+        function openWindow(id, title, htmlContent, w, h) {
+            // Check if exists
+            let win = document.getElementById(`win-${id}`);
+            if (win) {
+                bringToFront(win);
+                return;
+            }
+
+            // Create Window
+            win = document.createElement('div');
+            win.id = `win-${id}`;
+            win.className = 'os-window active';
+            win.style.width = w + 'px';
+            win.style.height = h + 'px';
+            // Center roughly with random offset
+            win.style.top = (10 + Math.random()*5) + '%';
+            win.style.left = (30 + Math.random()*5) + '%';
+            win.style.zIndex = ++zIndexCounter;
+
+            win.innerHTML = `
+                <div class="window-bar" onmousedown="startDrag(event, '${id}')">
+                    <div class="flex items-center gap-2">
+                         <i data-lucide="app-window" class="w-3 h-3 text-gray-500"></i>
+                         <span class="text-xs font-bold text-gray-300 tracking-wider">${title}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <div onclick="closeWindow('${id}')" class="w-3 h-3 rounded-full bg-red-500/50 hover:bg-red-500 cursor-pointer border border-red-500/30"></div>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <iframe srcdoc='${htmlContent}'></iframe>
+                </div>
+            `;
+
+            document.getElementById('desktop').appendChild(win);
+            
+            const dot = document.getElementById(`dot-${id}`);
+            if(dot) dot.classList.add('running');
+
+            win.onmousedown = () => bringToFront(win);
+            lucide.createIcons();
+        }
+
+        function closeWindow(id) {
+            const win = document.getElementById(`win-${id}`);
+            if(win) win.remove();
+            
+            const dot = document.getElementById(`dot-${id}`);
+            if(dot) dot.classList.remove('running');
+        }
+
+        function bringToFront(el) {
+            document.querySelectorAll('.os-window').forEach(w => w.classList.remove('active'));
+            el.classList.add('active');
+            el.style.zIndex = ++zIndexCounter;
+        }
+
+        // Drag Logic
+        let isDragging = false;
+        let dragOffset = { x: 0, y: 0 };
+        let currentWindow = null;
+
+        function startDrag(e, id) {
+            isDragging = true;
+            currentWindow = document.getElementById(`win-${id}`);
+            bringToFront(currentWindow);
+
+            const rect = currentWindow.getBoundingClientRect();
+            dragOffset.x = e.clientX - rect.left;
+            dragOffset.y = e.clientY - rect.top;
+
+            // Overlay to capture mouse events over iframe
+            const overlay = document.createElement('div');
+            overlay.id = 'drag-overlay';
+            overlay.style.position = 'absolute';
+            overlay.style.inset = '0';
+            overlay.style.zIndex = '999';
+            currentWindow.appendChild(overlay);
+
+            document.body.style.userSelect = 'none';
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging || !currentWindow) return;
+
+            let x = e.clientX - dragOffset.x;
+            let y = e.clientY - dragOffset.y;
+
+            if(y < 32) y = 32; 
+
+            currentWindow.style.left = x + 'px';
+            currentWindow.style.top = y + 'px';
+        });
+
+        document.addEventListener('mouseup', () => {
+            if(isDragging && currentWindow) {
+                const overlay = currentWindow.querySelector('#drag-overlay');
+                if(overlay) overlay.remove();
+            }
+            isDragging = false;
+            currentWindow = null;
+            document.body.style.userSelect = 'auto';
+        });
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+    </script>
+</body>
+</html>

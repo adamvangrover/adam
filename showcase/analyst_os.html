@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM Analyst OS | v25.5</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-dark: #020408;
+            --cyan-glow: #00f0ff;
+            --purple-glow: #bc13fe;
+            --green-glow: #10b981;
+            --panel-glass: rgba(10, 15, 30, 0.85);
+            --dock-glass: rgba(5, 10, 20, 0.6);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+            background-image: url('https://images.unsplash.com/photo-1642427749670-f20e2e76ed8c?q=80&w=2000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Dark overlay for background image */
+        .bg-overlay {
+            position: absolute; inset: 0; background: rgba(2, 4, 8, 0.85); z-index: -1;
+        }
+
+        /* Window Styling */
+        .os-window {
+            position: absolute;
+            background: #020408;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column;
+            border-radius: 6px;
+            overflow: hidden;
+            resize: both;
+            min-width: 400px; min-height: 300px;
+            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .os-window.active {
+            border-color: var(--cyan-glow);
+            z-index: 50;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+        }
+
+        .window-bar {
+            background: #0f172a;
+            padding: 6px 10px;
+            display: flex; justify-content: space-between; items-center;
+            cursor: move;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            user-select: none;
+        }
+
+        .window-content { flex-grow: 1; position: relative; }
+        iframe { width: 100%; height: 100%; border: none; background: #020408; }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 999;
+            backdrop-filter: blur(5px);
+            display: flex; justify-content: center; align-items: center;
+        }
+        .modal-box {
+            background: #0f172a; border: 1px solid var(--green-glow);
+            padding: 30px; max-width: 500px; border-radius: 8px;
+            box-shadow: 0 0 50px rgba(16, 185, 129, 0.2);
+        }
+
+        /* Dock Styling */
+        .dock {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: var(--dock-glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 10px 20px;
+            display: flex; gap: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            z-index: 100;
+        }
+
+        .dock-item {
+            width: 48px; height: 48px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            display: flex; justify-content: center; items-center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .dock-item:hover {
+            transform: translateY(-5px) scale(1.1);
+            background: rgba(255,255,255,0.1);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+        }
+
+        /* Tooltip */
+        .dock-item::after {
+            content: attr(data-title);
+            position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); color: white;
+            padding: 4px 8px; border-radius: 4px; font-size: 10px;
+            opacity: 0; pointer-events: none; transition: opacity 0.2s;
+            white-space: nowrap;
+        }
+        .dock-item:hover::after { opacity: 1; }
+
+        .app-dot {
+            width: 4px; height: 4px; background: var(--cyan-glow); border-radius: 50%;
+            position: absolute; bottom: -6px; opacity: 0;
+        }
+        .app-dot.running { opacity: 1; }
+
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="bg-overlay"></div>
+
+    <!-- Intro Modal -->
+    <div id="intro-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="flex items-center gap-3 mb-4 text-green-400">
+                <i data-lucide="shield-check" class="w-8 h-8"></i>
+                <h2 class="text-xl font-bold tracking-widest">SECURE ENVIRONMENT</h2>
+            </div>
+            <p class="text-gray-300 text-sm mb-4 leading-relaxed">
+                Welcome to <span class="text-white font-bold">ADAM Analyst OS</span>.
+                This environment is engineered for maximum privacy. All calculations for DCF, LBO, and Market Data run
+                <span class="text-green-400 font-bold">locally in your browser</span>.
+            </p>
+            <p class="text-gray-400 text-xs mb-6 border-l-2 border-green-500/30 pl-3">
+                > No data is transmitted to the cloud.<br>
+                > Input data resides in ephemeral memory or local storage.<br>
+                > "Air-Gap" compliant workflow active.
+            </p>
+            <button onclick="closeModal()" class="w-full py-2 bg-green-900/20 hover:bg-green-900/40 border border-green-500/50 text-green-400 font-bold rounded transition">
+                INITIALIZE WORKBENCH
+            </button>
+        </div>
+    </div>
+
+    <!-- Top Bar -->
+    <div class="fixed top-0 left-0 w-full h-8 bg-black/40 backdrop-blur flex justify-between items-center px-4 z-40 border-b border-white/5">
+        <div class="flex items-center gap-4 text-[10px] font-bold tracking-widest text-gray-400">
+            <span class="text-white">ADAM OS <span class="text-cyan-400">v25.5</span></span>
+            <span class="hover:text-white cursor-pointer">FILE</span>
+            <span class="hover:text-white cursor-pointer">EDIT</span>
+            <span class="hover:text-white cursor-pointer">VIEW</span>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 px-2 py-0.5 bg-green-900/20 border border-green-500/30 rounded text-[10px] text-green-400 cursor-help" title="No Data Egress Detected">
+                <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                PRIVACY_SHIELD: ACTIVE
+            </div>
+            <div class="text-[10px] text-gray-400 font-mono" id="clock">00:00</div>
+        </div>
+    </div>
+
+    <!-- Desktop Area -->
+    <div id="desktop" class="w-full h-full pt-8 pb-24 relative">
+        <!-- Windows injected here -->
+    </div>
+
+    <!-- Dock -->
+    <div class="dock">
+        <div class="dock-item" onclick="openWindow('dcf', 'DCF Valuator', 'apps/dcf.html', 900, 650)" data-title="DCF Valuator">
+            <i data-lucide="bar-chart-2" class="text-cyan-400 w-6 h-6"></i>
+            <div class="app-dot" id="dot-dcf"></div>
+        </div>
+        <div class="dock-item" onclick="openWindow('lbo', 'LBO Modeler', 'apps/lbo.html', 900, 650)" data-title="LBO Modeler">
+            <i data-lucide="layers" class="text-purple-400 w-6 h-6"></i>
+            <div class="app-dot" id="dot-lbo"></div>
+        </div>
+        <div class="dock-item" onclick="openWindow('market', 'Market Scrubber', 'apps/market_data.html', 800, 500)" data-title="Market Data">
+            <i data-lucide="database" class="text-green-400 w-6 h-6"></i>
+            <div class="app-dot" id="dot-market"></div>
+        </div>
+        <div class="w-[1px] h-8 bg-white/10 mx-2"></div>
+        <div class="dock-item" onclick="toggleFullScreen()" data-title="Toggle Fullscreen">
+            <i data-lucide="monitor" class="text-gray-400 w-6 h-6"></i>
+        </div>
+        <div class="dock-item" onclick="window.location.href='index.html'" data-title="Exit to System">
+            <i data-lucide="log-out" class="text-red-400 w-6 h-6"></i>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let zIndexCounter = 100;
+
+        function closeModal() {
+            document.getElementById('intro-modal').style.display = 'none';
+            // Auto open DCF
+            setTimeout(() => openWindow('dcf', 'DCF Valuator', 'apps/dcf.html', 900, 650), 500);
+        }
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        function openWindow(id, title, src, w, h) {
+            // Check if exists
+            let win = document.getElementById(`win-${id}`);
+            if (win) {
+                bringToFront(win);
+                return;
+            }
+
+            // Create Window
+            win = document.createElement('div');
+            win.id = `win-${id}`;
+            win.className = 'os-window active';
+            win.style.width = w + 'px';
+            win.style.height = h + 'px';
+
+            // Smart positioning (cascade)
+            const count = document.querySelectorAll('.os-window').length;
+            win.style.top = (50 + (count * 30)) + 'px';
+            win.style.left = (50 + (count * 30)) + 'px';
+            win.style.zIndex = ++zIndexCounter;
+
+            win.innerHTML = `
+                <div class="window-bar" onmousedown="startDrag(event, '${id}')">
+                    <div class="flex items-center gap-2">
+                         <i data-lucide="app-window" class="w-3 h-3 text-gray-500"></i>
+                         <span class="text-xs font-bold text-gray-300 tracking-wider">${title}</span>
+                    </div>
+                    <div class="flex gap-2 items-center">
+                        <div onclick="minimizeWindow('${id}')" class="w-3 h-3 rounded-full bg-yellow-500/50 hover:bg-yellow-500 cursor-pointer border border-yellow-500/30"></div>
+                        <div onclick="closeWindow('${id}')" class="w-3 h-3 rounded-full bg-red-500/50 hover:bg-red-500 cursor-pointer border border-red-500/30"></div>
+                    </div>
+                </div>
+                <div class="window-content">
+                    <iframe src="${src}"></iframe>
+                </div>
+            `;
+
+            document.getElementById('desktop').appendChild(win);
+            document.getElementById(`dot-${id}`).classList.add('running');
+
+            // Bring to front on click
+            win.onmousedown = () => bringToFront(win);
+            lucide.createIcons();
+        }
+
+        function closeWindow(id) {
+            const win = document.getElementById(`win-${id}`);
+            if(win) win.remove();
+            document.getElementById(`dot-${id}`).classList.remove('running');
+        }
+
+        function minimizeWindow(id) {
+            const win = document.getElementById(`win-${id}`);
+            if(win) win.style.display = 'none';
+            // Logic to restore would be needed in dock click, but for now simple toggle
+        }
+
+        function bringToFront(el) {
+            if(el.style.display === 'none') el.style.display = 'flex';
+            document.querySelectorAll('.os-window').forEach(w => w.classList.remove('active'));
+            el.classList.add('active');
+            el.style.zIndex = ++zIndexCounter;
+        }
+
+        // Drag Logic
+        let isDragging = false;
+        let dragOffset = { x: 0, y: 0 };
+        let currentWindow = null;
+
+        function startDrag(e, id) {
+            isDragging = true;
+            currentWindow = document.getElementById(`win-${id}`);
+            bringToFront(currentWindow);
+
+            const rect = currentWindow.getBoundingClientRect();
+            dragOffset.x = e.clientX - rect.left;
+            dragOffset.y = e.clientY - rect.top;
+
+            // Overlay to prevent iframe capturing mouse events
+            const overlay = document.createElement('div');
+            overlay.id = 'drag-overlay';
+            overlay.style.position = 'fixed'; overlay.style.inset = '0'; overlay.style.zIndex = '9999';
+            document.body.appendChild(overlay);
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging || !currentWindow) return;
+
+            let x = e.clientX - dragOffset.x;
+            let y = e.clientY - dragOffset.y;
+
+            if(y < 32) y = 32; // Below top bar
+
+            currentWindow.style.left = x + 'px';
+            currentWindow.style.top = y + 'px';
+        });
+
+        document.addEventListener('mouseup', () => {
+            if(isDragging) {
+                isDragging = false;
+                currentWindow = null;
+                const overlay = document.getElementById('drag-overlay');
+                if(overlay) overlay.remove();
+            }
+        });
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,99 +1,203 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adam System :: core</title>
+    <title>ADAM v23.5 | core</title>
     <link rel="stylesheet" href="../showcase/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        .readme-content { padding: 20px; }
-        .readme-content h1 { font-size: 1.5rem; margin-bottom: 1rem; color: var(--primary-color); }
-        .readme-content h2 { font-size: 1.25rem; margin-top: 1.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--panel-border); padding-bottom: 0.25rem; }
-        .readme-content p { margin-bottom: 1rem; line-height: 1.6; color: var(--text-secondary); }
-        .readme-content pre { background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 4px; overflow-x: auto; border: 1px solid var(--panel-border); }
-        .readme-content code { font-family: var(--font-mono); color: var(--accent-color); }
-
-        .file-icon { display: inline-block; width: 20px; text-align: center; margin-right: 8px; color: var(--text-muted); }
-        .dir-icon { color: var(--primary-color); }
+        /* Fallback styles if stylesheet is missing */
+        body { background-color: #050b14; color: #06b6d4; font-family: monospace; margin: 0; padding: 0; }
+        .header { border-bottom: 1px solid #06b6d4; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .breadcrumb { font-size: 1.2em; color: #e2e8f0; }
+        .badge { border: 1px solid #06b6d4; padding: 5px 10px; border-radius: 4px; font-size: 0.8em; text-transform: uppercase; }
+        .container { display: flex; height: calc(100vh - 80px); }
+        .sidebar { width: 300px; border-right: 1px solid #334155; padding: 20px; overflow-y: auto; background: rgba(5, 11, 20, 0.95); }
+        .main-stage { flex: 1; padding: 30px; overflow-y: auto; }
+        .file-item { padding: 8px; cursor: pointer; display: block; color: #94a3b8; text-decoration: none; }
+        .file-item:hover { color: #06b6d4; background: rgba(6, 182, 212, 0.1); }
+        .folder { color: #fbbf24; font-weight: bold; }
+        .footer { border-top: 1px solid #334155; padding: 10px; text-align: center; font-size: 0.8em; color: #64748b; background: #020617; }
+        .nav-links a { margin-left: 15px; color: #06b6d4; text-decoration: none; border: 1px solid #06b6d4; padding: 5px 10px; transition: all 0.2s; }
+        .nav-links a:hover { background: #06b6d4; color: #000; }
+        pre { background: #0f172a; padding: 15px; border-radius: 6px; overflow-x: auto; border: 1px solid #1e293b; }
+        h1, h2, h3 { color: #f8fafc; text-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
+        .card { background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; padding: 20px; margin-bottom: 20px; border-radius: 8px; }
+        .glitch { position: relative; }
+        .module-doc { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #334155; }
+        .doc-text { color: #94a3b8; font-style: italic; }
     </style>
+    <!-- Mermaid JS -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+    </script>
 </head>
 <body>
-    <div class="scan-line"></div>
-    <div class="scan-glow"></div>
-
-    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-
-        <!-- Header -->
-        <header style="margin-bottom: 40px; border-bottom: 1px solid var(--panel-border); padding-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <h1 class="glitch-text" data-text="ADAM v23.5" style="font-size: 2rem; margin: 0; color: var(--primary-color);">ADAM v23.5</h1>
-                <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">
-                    PATH: <span style="color: var(--text-primary);">/core</span>
-                </div>
-            </div>
-            <div style="text-align: right;">
-                <div class="cyber-badge badge-cyan">SYSTEM ONLINE</div>
-                <div style="margin-top: 5px; font-size: 0.7rem; color: var(--text-muted);">Mode: SHOWCASE</div>
-            </div>
-        </header>
-
-        <!-- Navigation -->
-        <nav style="margin-bottom: 30px; display: flex; gap: 10px;">
-            <a href="../index.html" class="cyber-btn">&uarr; UP LEVEL</a>
-            <a href="../index.html" class="cyber-btn">ROOT</a>
-            <button onclick="toggleRuntime()" class="cyber-btn">LIVE RUNTIME</button>
-            <a href="https://github.com/adamvangrover/adam" class="cyber-btn" target="_blank">GITHUB</a>
-        </nav>
-
-        <div style="display: grid; grid-template-columns: 250px 1fr; gap: 20px;">
-
-            <!-- Sidebar / File Explorer -->
-            <aside class="glass-panel" style="padding: 20px; border-radius: 4px; height: fit-content;">
-                <h3 style="margin-top: 0; font-size: 0.9rem; text-transform: uppercase; color: var(--text-secondary); border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 15px;">
-                    Directory Contents
-                </h3>
-                <ul style="list-style: none; padding: 0; margin: 0; font-family: var(--font-mono); font-size: 0.85rem;">
-                    <li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="advisory/index.html" style="color: var(--primary-color);">advisory/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="agents/index.html" style="color: var(--primary-color);">agents/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="analysis/index.html" style="color: var(--primary-color);">analysis/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="api/index.html" style="color: var(--primary-color);">api/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="capability_monitoring/index.html" style="color: var(--primary-color);">capability_monitoring/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="data_access/index.html" style="color: var(--primary-color);">data_access/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="data_processing/index.html" style="color: var(--primary-color);">data_processing/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="data_sources/index.html" style="color: var(--primary-color);">data_sources/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="embeddings/index.html" style="color: var(--primary-color);">embeddings/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="engine/index.html" style="color: var(--primary-color);">engine/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="financial_suite/index.html" style="color: var(--primary-color);">financial_suite/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="libraries_and_archives/index.html" style="color: var(--primary-color);">libraries_and_archives/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="llm/index.html" style="color: var(--primary-color);">llm/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="newsletter_layout/index.html" style="color: var(--primary-color);">newsletter_layout/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="prompting/index.html" style="color: var(--primary-color);">prompting/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="rag/index.html" style="color: var(--primary-color);">rag/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="schemas/index.html" style="color: var(--primary-color);">schemas/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="simulations/index.html" style="color: var(--primary-color);">simulations/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="system/index.html" style="color: var(--primary-color);">system/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="tools/index.html" style="color: var(--primary-color);">tools/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="trading/index.html" style="color: var(--primary-color);">trading/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="utils/index.html" style="color: var(--primary-color);">utils/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="v22_quantum_pipeline/index.html" style="color: var(--primary-color);">v22_quantum_pipeline/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="v23_graph_engine/index.html" style="color: var(--primary-color);">v23_graph_engine/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="vectorstore/index.html" style="color: var(--primary-color);">vectorstore/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="vertical_risk_agent/index.html" style="color: var(--primary-color);">vertical_risk_agent/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="world_simulation/index.html" style="color: var(--primary-color);">world_simulation/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="xai/index.html" style="color: var(--primary-color);">xai/</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="AGENTS.md" style="color: var(--text-secondary);">AGENTS.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="__init__.py" style="color: var(--text-secondary);">__init__.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="api.py" style="color: var(--text-secondary);">api.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="llm_plugin.py" style="color: var(--text-secondary);">llm_plugin.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="main.py" style="color: var(--text-secondary);">main.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="settings.py" style="color: var(--text-secondary);">settings.py</a></li>
-                </ul>
-            </aside>
-
-            <!-- Main Content -->
-            <main>
-                <!-- Runtime Overlay (Hidden by default) -->
-                <div id="runtime-panel" class="glass-panel fade-in" style="display: none; padding: 20px; margin-bottom: 20px; border-color: var(--success-color);">
-                    <h3 style="color: var(--success-color); margin-top: 0;">Live System Interface</h3>
-                    <p style="font-size: 0.9rem;">Connecting to Orchestrator at localhost:5001...</p>
-                    <div style="background: black; padding: 10px; border-radius: 4px; font-family: var(--font-mono); height: 100px; overflow-y: auto; font-size: 0.8rem; color: #0f0;">
-                        > Connecting...<br>
-                        > Error: API Unreachable (Mock Mode Active)<br>
-                        > System Status: STANDBY
-                    </div>
-                </div>
-
-                <!-- Readme Content -->
-                <div class="glass-panel" style="border-radius: 4px;">
-                    <div class="readme-content" style="text-align: center; color: var(--text-muted); padding: 40px;">No README found in this directory.</div>
-                </div>
-            </main>
+    <div class="header">
+        <div>
+            <h1 style="margin:0; display:inline-block;" class="glitch">ADAM v23.5</h1>
+            <span class="breadcrumb" style="margin-left: 20px;">/core</span>
         </div>
+        <div class="nav-links">
+            <a href="../index.html">[UP LEVEL]</a>
+            <a href="../index.html">[ROOT]</a>
+            <a href="#" onclick="window.toggleRuntime()">[LIVE RUNTIME]</a>
+            <a href="https://github.com/your-repo/adam" target="_blank">[GITHUB]</a>
+        </div>
+        <span class="badge">SYSTEM ONLINE</span>
+    </div>
 
-        <!-- Footer -->
-        <footer style="margin-top: 50px; border-top: 1px solid var(--panel-border); padding-top: 20px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">
-            ADAM AUTO-GENERATED SHOWCASE | <span class="mono">REF: core</span>
-        </footer>
+    <div class="container">
+        <div class="sidebar">
+            <h3>Directory Structure</h3>
+            <a href="../index.html" class="file-item folder">📂 .. (Parent)</a>
+<a href="AGENTS.md" class="file-item">📝 AGENTS.md</a>
+<a href="__init__.py" class="file-item">📄 __init__.py</a>
+<a href="advisory/index.html" class="file-item folder">📂 advisory</a>
+<a href="agents/index.html" class="file-item folder">📂 agents</a>
+<a href="analysis/index.html" class="file-item folder">📂 analysis</a>
+<a href="api/index.html" class="file-item folder">📂 api</a>
+<a href="api.py" class="file-item">📄 api.py</a>
+<a href="capability_monitoring/index.html" class="file-item folder">📂 capability_monitoring</a>
+<a href="data_access/index.html" class="file-item folder">📂 data_access</a>
+<a href="data_processing/index.html" class="file-item folder">📂 data_processing</a>
+<a href="data_sources/index.html" class="file-item folder">📂 data_sources</a>
+<a href="embeddings/index.html" class="file-item folder">📂 embeddings</a>
+<a href="engine/index.html" class="file-item folder">📂 engine</a>
+<a href="execution_router/index.html" class="file-item folder">📂 execution_router</a>
+<a href="family_office/index.html" class="file-item folder">📂 family_office</a>
+<a href="financial_data/index.html" class="file-item folder">📂 financial_data</a>
+<a href="gold_standard/index.html" class="file-item folder">📂 gold_standard</a>
+<a href="learning/index.html" class="file-item folder">📂 learning</a>
+<a href="llm/index.html" class="file-item folder">📂 llm</a>
+<a href="llm_plugin.py" class="file-item">📄 llm_plugin.py</a>
+<a href="main.py" class="file-item">📄 main.py</a>
+<a href="market_data/index.html" class="file-item folder">📂 market_data</a>
+<a href="mcp/index.html" class="file-item folder">📂 mcp</a>
+<a href="memory/index.html" class="file-item folder">📂 memory</a>
+<a href="newsletter_layout/index.html" class="file-item folder">📂 newsletter_layout</a>
+<a href="pricing_engine/index.html" class="file-item folder">📂 pricing_engine</a>
+<a href="prompting/index.html" class="file-item folder">📂 prompting</a>
+<a href="rag/index.html" class="file-item folder">📂 rag</a>
+<a href="risk_engine/index.html" class="file-item folder">📂 risk_engine</a>
+<a href="schemas/index.html" class="file-item folder">📂 schemas</a>
+<a href="settings.py" class="file-item">📄 settings.py</a>
+<a href="simulations/index.html" class="file-item folder">📂 simulations</a>
+<a href="strategy/index.html" class="file-item folder">📂 strategy</a>
+<a href="system/index.html" class="file-item folder">📂 system</a>
+<a href="tools/index.html" class="file-item folder">📂 tools</a>
+<a href="trading/index.html" class="file-item folder">📂 trading</a>
+<a href="utils/index.html" class="file-item folder">📂 utils</a>
+<a href="v22_quantum_pipeline/index.html" class="file-item folder">📂 v22_quantum_pipeline</a>
+<a href="v23_graph_engine/index.html" class="file-item folder">📂 v23_graph_engine</a>
+<a href="vectorstore/index.html" class="file-item folder">📂 vectorstore</a>
+<a href="vertical_risk_agent/index.html" class="file-item folder">📂 vertical_risk_agent</a>
+<a href="world_simulation/index.html" class="file-item folder">📂 world_simulation</a>
+<a href="xai/index.html" class="file-item folder">📂 xai</a>
+        </div>
+        <div class="main-stage" id="main-content">
+            <div class="card">
+                <h2>Overview</h2>
+                <div id="readme-content">
+                    <p>No README.md found. See Module Documentation below.</p>
+                </div>
+            </div>
+
+            <div class="card"><h2>Class Structure</h2><pre class="mermaid">
+classDiagram
+    class LLMPluginError {
+        llm_plugin.py
+    }
+    class LLMConfigurationError {
+        llm_plugin.py
+    }
+    class LLMAPIError {
+        llm_plugin.py
+    }
+    class BaseLLM {
+        llm_plugin.py
+    }
+    class MockLLM {
+        llm_plugin.py
+    }
+    class OpenAILLM {
+        llm_plugin.py
+    }
+    class HuggingFaceLLM {
+        llm_plugin.py
+    }
+    class CohereLLM {
+        llm_plugin.py
+    }
+    class PromptTemplate {
+        llm_plugin.py
+    }
+    class CacheManager {
+        llm_plugin.py
+    }
+    class LLMPlugin {
+        llm_plugin.py
+    }
+    class Settings {
+        settings.py
+    }
+</pre></div>
+
+            <div class="card"><h2>Module Documentation</h2><div class="module-doc"><h3>api.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>llm_plugin.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>main.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>settings.py</h3><p class="doc-text">No description available.</p></div></div>
+
+            <div id="runtime-panel" style="display:none; border-top: 1px solid #06b6d4; margin-top: 20px; padding-top: 20px;">
+                <h3>Runtime Diagnostics</h3>
+                <pre>Mock Mode: ACTIVE
+Agent Swarm: STANDBY</pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        ADAM AUTO-GENERATED SHOWCASE | REF: core
     </div>
 
     <script>
-        function toggleRuntime() {
-            const panel = document.getElementById('runtime-panel');
-            if (panel.style.display === 'none') {
-                panel.style.display = 'block';
-            } else {
-                panel.style.display = 'none';
+    // AUTO-GENERATED: Showcase Runtime
+    (function() {
+        const CONFIG = {
+            mockMode: true,
+            rootPath: "../index.html",
+            currentDir: "core"
+        };
+
+        // 1. Navigation Handler
+        function initNav() {
+            console.log("Nav initialized for " + CONFIG.currentDir);
+        }
+
+        // 2. Data Loader (Graceful Fallback)
+        async function loadData() {
+            try {
+                // Attempt to load local descriptor
+                const response = await fetch('./AGENTS.md');
+                if(response.ok) {
+                    const text = await response.text();
+                    // Simple text render for now, simulated markdown
+                    document.getElementById('readme-content').innerHTML = '<pre>' + text + '</pre>';
+                }
+            } catch (e) {
+                console.warn("No local documentation found.");
             }
         }
+
+        // 3. Runtime Toggle
+        window.toggleRuntime = function() {
+            const panel = document.getElementById('runtime-panel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initNav();
+            // loadData(); // Disabled to prefer generated content
+        });
+    })();
     </script>
 </body>
 </html>

@@ -9,74 +9,113 @@
     <style>
         :root {
             --primary-color: #00f3ff;
+            --accent-color: #0aff60;
             --bg-color: #050b14;
             --panel-bg: rgba(5, 11, 20, 0.8);
             --text-primary: #e0e0e0;
             --text-muted: #888;
+            --panel-border: #333;
         }
         body { margin: 0; background: var(--bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif; overflow-x: hidden; }
         .mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Header Styling */
         .cyber-header {
             height: 60px; display: flex; align-items: center; justify-content: space-between;
             padding: 0 20px; border-bottom: 1px solid var(--primary-color);
             background: rgba(5, 11, 20, 0.95); position: sticky; top: 0; z-index: 100;
         }
+        
+        /* Effects */
         .scan-line { position: fixed; top: 0; left: 0; width: 100%; height: 2px; background: rgba(0, 243, 255, 0.1); animation: scan 3s linear infinite; pointer-events: none; z-index: 999; }
         @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
 
         a { text-decoration: none; color: inherit; transition: color 0.2s; }
         a:hover { color: var(--primary-color); }
 
-        .mode-badge { padding: 4px 8px; border: 1px solid #ffa500; color: #ffa500; font-size: 0.75rem; border-radius: 4px; font-weight: bold; }
+        /* Components */
+        .mode-badge { padding: 4px 8px; border: 1px solid #ffa500; color: #ffa500; font-size: 0.75rem; border-radius: 4px; font-weight: bold; white-space: nowrap; }
+        
+        .cyber-btn {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            padding: 6px 12px;
+            border: 1px solid #444;
+            color: var(--text-primary);
+            background: rgba(0,0,0,0.3);
+            border-radius: 2px;
+            text-transform: uppercase;
+        }
+        .cyber-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--panel-border);
+            backdrop-filter: blur(5px);
+        }
     </style>
 </head>
 <body>
     <div class="scan-line"></div>
 
-    <!-- Global Nav (Static Version) -->
     <header class="cyber-header">
         <div style="display: flex; align-items: center; gap: 20px;">
             <h1 class="mono" style="margin: 0; font-size: 1.5rem; color: var(--primary-color); letter-spacing: 2px;">ADAM v23.5</h1>
             <div class="mono" style="font-size: 0.8rem; color: #666; border-left: 1px solid #333; padding-left: 10px;">UNIFIED FINANCIAL OS</div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 20px;">
-            <a href="/" style="font-size: 0.9rem; font-weight: bold; display: flex; align-items: center; gap: 5px;">
-                <span style="display: block; width: 8px; height: 8px; border-radius: 50%; background: #333;"></span>
-                SWITCH TO LIVE
-            </a>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <nav style="display: flex; gap: 10px;">
+                <a href="../index.html" class="cyber-btn">&uarr; UP LEVEL</a>
+                <a href="/" class="cyber-btn">LIVE OPERATIONS</a>
+                <a href="analyst_os.html" class="cyber-btn" style="border-color: var(--accent-color); color: var(--accent-color);">LAUNCH ANALYST OS</a>
+                <a href="https://github.com/adamvangrover/adam" class="cyber-btn" target="_blank">GITHUB</a>
+            </nav>
             <div class="mode-badge">ARCHIVE MODE</div>
         </div>
     </header>
 
     <div style="display: flex; min-height: calc(100vh - 60px);">
-        <!-- Sidebar -->
-        <aside style="width: 260px; border-right: 1px solid #333; padding: 20px; font-size: 0.9rem;">
-            <div class="mono" style="color: var(--primary-color); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #333;">/// DIRECTORY INDEX</div>
-            <ul style="list-style: none; padding: 0;">
-                <li style="margin-bottom: 10px;"><a href="index.html" style="color: var(--primary-color);">&gt; ROOT</a></li>
-                <li style="margin-bottom: 10px;"><a href="agents.html">&gt; AGENTS</a></li>
-                <li style="margin-bottom: 10px;"><a href="reports.html">&gt; REPORTS</a></li>
-                <li style="margin-bottom: 10px;"><a href="graph.html">&gt; GRAPHS</a></li>
-                <li style="margin-bottom: 10px;"><a href="deployment.html">&gt; DEPLOYMENT</a></li>
+        <aside class="glass-panel" style="width: 260px; border-right: 1px solid var(--panel-border); padding: 20px; font-size: 0.9rem; flex-shrink: 0;">
+            <h3 class="mono" style="margin-top: 0; font-size: 0.8rem; color: var(--primary-color); border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 15px;">
+                /// DIRECTORY INDEX
+            </h3>
+            <ul style="list-style: none; padding: 0; margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">
+                <li style="margin-bottom: 8px;"><span style="margin-right:8px;">🖥️</span> <a href="analyst_os.html" style="color: var(--accent-color); font-weight: bold;">analyst_os.html</a></li>
+                <li style="margin-bottom: 8px;"><span style="margin-right:8px; opacity:0.7;">📂</span> <a href="apps/" style="color: var(--primary-color);">apps/</a></li>
+                <li style="margin-bottom: 8px;"><span style="margin-right:8px; opacity:0.7;">📂</span> <a href="css/index.html" style="color: var(--primary-color);">css/</a></li>
+                <li style="margin-bottom: 8px;"><span style="margin-right:8px; opacity:0.7;">📂</span> <a href="data/index.html" style="color: var(--primary-color);">data/</a></li>
+                <li style="margin-bottom: 8px;"><span style="margin-right:8px; opacity:0.7;">📂</span> <a href="js/index.html" style="color: var(--primary-color);">js/</a></li>
+                <li style="margin-bottom: 6px; padding-top:10px; border-top: 1px dashed #333;"><span style="margin-right:8px; opacity:0.5;">📄</span> <a href="agents.html" style="color: var(--text-muted);">agents.html</a></li>
+                <li style="margin-bottom: 6px;"><span style="margin-right:8px; opacity:0.5;">📄</span> <a href="graph.html" style="color: var(--text-muted);">graph.html</a></li>
+                <li style="margin-bottom: 6px;"><span style="margin-right:8px; opacity:0.5;">📄</span> <a href="reports.html" style="color: var(--text-muted);">reports.html</a></li>
+                <li style="margin-bottom: 6px;"><span style="margin-right:8px; opacity:0.5;">📄</span> <a href="research.html" style="color: var(--text-muted);">research.html</a></li>
+                <li style="margin-bottom: 6px;"><span style="margin-right:8px; opacity:0.5;">📄</span> <a href="trading.html" style="color: var(--text-muted);">trading.html</a></li>
             </ul>
         </aside>
 
-        <!-- Main Content -->
         <main style="flex-grow: 1; padding: 40px;">
             <h2 class="mono" style="color: var(--primary-color); border-bottom: 1px solid #333; padding-bottom: 10px;">SYSTEM ARCHIVE</h2>
-            <p style="color: #ccc; max-width: 800px; line-height: 1.6;">
+            <p style="color: #ccc; max-width: 800px; line-height: 1.6; margin-bottom: 30px;">
                 Welcome to the Adam v23.5 Static Archive. This repository contains historical artifacts, agent logs, and system snapshots.
-                <br><br>
-                For real-time analysis and active agent operations, switch to <strong>LIVE MODE</strong> using the navigation bar above.
+                For real-time analysis and active agent operations, switch to <strong>LIVE MODE</strong> or launch the new Analyst OS below.
             </p>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-top: 40px;">
+            <div class="glass-panel" style="border-radius: 4px; padding: 25px; border: 1px solid var(--accent-color); background: rgba(10, 255, 96, 0.02); margin-bottom: 40px;">
+                <h3 style="margin-top:0; color: var(--accent-color); font-family: 'JetBrains Mono';">NEW: ADAM Analyst OS</h3>
+                <p style="font-size: 0.9rem;">A Client-Side, Privacy-First Financial Workbench ("The Bloomberg Killer Lite").</p>
+                <div style="margin-top: 15px;">
+                    <a href="analyst_os.html" class="cyber-btn" style="background: rgba(10,255,96,0.1); border-color: var(--accent-color); color: var(--accent-color);">LAUNCH DESKTOP &rarr;</a>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
                 <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
                     <h3 class="mono" style="margin-top: 0; font-size: 1rem;">LATEST REPORT</h3>
                     <p style="font-size: 0.8rem; color: #888;">NVDA_Deep_Dive_v23.json</p>
                     <a href="reports.html" style="color: var(--primary-color); font-size: 0.8rem;">VIEW ARTIFACT &rarr;</a>
                 </div>
+                
                 <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
                     <h3 class="mono" style="margin-top: 0; font-size: 1rem;">ACTIVE NODES</h3>
                     <p style="font-size: 0.8rem; color: #888;">Knowledge Graph: 12,405 Entities</p>
