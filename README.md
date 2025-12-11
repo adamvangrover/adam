@@ -218,13 +218,18 @@ streamlit run app.py
     cd adam
     ```
 
-2.  **One-Click Launch**
-    Run the automated launcher script. It checks for Docker or Python, installs dependencies, and starts the system.
+2.  **Interactive Setup (Recommended)**
+    Run the setup wizard to check dependencies, configure API keys (or Mock Mode), and launch the system.
+    ```bash
+    python3 scripts/setup_interactive.py
+    ```
+
+    *Alternatively, use the legacy launcher:*
     ```bash
     ./run_adam.sh
     ```
 
-    *Alternatively, for manual setup:*
+    *Or for manual setup:*
     ```bash
     pip install -e .           # Install as a package
     python core/main.py        # Run the engine
