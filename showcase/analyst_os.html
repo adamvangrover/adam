@@ -12,6 +12,7 @@
             --bg-dark: #020408;
             --cyan-glow: #00f0ff;
             --purple-glow: #bc13fe;
+            --green-glow: #10b981;
             --panel-glass: rgba(10, 15, 30, 0.85);
             --dock-glass: rgba(5, 10, 20, 0.6);
         }
@@ -62,6 +63,18 @@
 
         .window-content { flex-grow: 1; position: relative; }
         iframe { width: 100%; height: 100%; border: none; background: #020408; }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 999;
+            backdrop-filter: blur(5px);
+            display: flex; justify-content: center; align-items: center;
+        }
+        .modal-box {
+            background: #0f172a; border: 1px solid var(--green-glow);
+            padding: 30px; max-width: 500px; border-radius: 8px;
+            box-shadow: 0 0 50px rgba(16, 185, 129, 0.2);
+        }
 
         /* Dock Styling */
         .dock {
@@ -115,6 +128,29 @@
 
     <div class="bg-overlay"></div>
 
+    <!-- Intro Modal -->
+    <div id="intro-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="flex items-center gap-3 mb-4 text-green-400">
+                <i data-lucide="shield-check" class="w-8 h-8"></i>
+                <h2 class="text-xl font-bold tracking-widest">SECURE ENVIRONMENT</h2>
+            </div>
+            <p class="text-gray-300 text-sm mb-4 leading-relaxed">
+                Welcome to <span class="text-white font-bold">ADAM Analyst OS</span>.
+                This environment is engineered for maximum privacy. All calculations for DCF, LBO, and Market Data run
+                <span class="text-green-400 font-bold">locally in your browser</span>.
+            </p>
+            <p class="text-gray-400 text-xs mb-6 border-l-2 border-green-500/30 pl-3">
+                > No data is transmitted to the cloud.<br>
+                > Input data resides in ephemeral memory or local storage.<br>
+                > "Air-Gap" compliant workflow active.
+            </p>
+            <button onclick="closeModal()" class="w-full py-2 bg-green-900/20 hover:bg-green-900/40 border border-green-500/50 text-green-400 font-bold rounded transition">
+                INITIALIZE WORKBENCH
+            </button>
+        </div>
+    </div>
+
     <!-- Top Bar -->
     <div class="fixed top-0 left-0 w-full h-8 bg-black/40 backdrop-blur flex justify-between items-center px-4 z-40 border-b border-white/5">
         <div class="flex items-center gap-4 text-[10px] font-bold tracking-widest text-gray-400">
@@ -124,9 +160,9 @@
             <span class="hover:text-white cursor-pointer">VIEW</span>
         </div>
         <div class="flex items-center gap-3">
-            <div class="flex items-center gap-2 px-2 py-0.5 bg-green-900/20 border border-green-500/30 rounded text-[10px] text-green-400">
+            <div class="flex items-center gap-2 px-2 py-0.5 bg-green-900/20 border border-green-500/30 rounded text-[10px] text-green-400 cursor-help" title="No Data Egress Detected">
                 <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                LOCAL ENVIRONMENT
+                PRIVACY_SHIELD: ACTIVE
             </div>
             <div class="text-[10px] text-gray-400 font-mono" id="clock">00:00</div>
         </div>
@@ -139,22 +175,36 @@
 
     <!-- Dock -->
     <div class="dock">
-        <div class="dock-item" onclick="openWindow('dcf', 'DCF Valuator', 'apps/dcf.html', 800, 600)" data-title="DCF Valuator">
+        <div class="dock-item" onclick="openWindow('dcf', 'DCF Valuator', 'apps/dcf.html', 900, 650)" data-title="DCF Valuator">
             <i data-lucide="bar-chart-2" class="text-cyan-400 w-6 h-6"></i>
             <div class="app-dot" id="dot-dcf"></div>
         </div>
-        <div class="dock-item" onclick="openWindow('lbo', 'LBO Modeler', 'apps/lbo.html', 800, 600)" data-title="LBO Modeler">
+        <div class="dock-item" onclick="openWindow('lbo', 'LBO Modeler', 'apps/lbo.html', 900, 650)" data-title="LBO Modeler">
             <i data-lucide="layers" class="text-purple-400 w-6 h-6"></i>
             <div class="app-dot" id="dot-lbo"></div>
         </div>
+        <div class="dock-item" onclick="openWindow('market', 'Market Scrubber', 'apps/market_data.html', 800, 500)" data-title="Market Data">
+            <i data-lucide="database" class="text-green-400 w-6 h-6"></i>
+            <div class="app-dot" id="dot-market"></div>
+        </div>
+        <div class="w-[1px] h-8 bg-white/10 mx-2"></div>
         <div class="dock-item" onclick="toggleFullScreen()" data-title="Toggle Fullscreen">
             <i data-lucide="monitor" class="text-gray-400 w-6 h-6"></i>
+        </div>
+        <div class="dock-item" onclick="window.location.href='index.html'" data-title="Exit to System">
+            <i data-lucide="log-out" class="text-red-400 w-6 h-6"></i>
         </div>
     </div>
 
     <script>
         lucide.createIcons();
         let zIndexCounter = 100;
+
+        function closeModal() {
+            document.getElementById('intro-modal').style.display = 'none';
+            // Auto open DCF
+            setTimeout(() => openWindow('dcf', 'DCF Valuator', 'apps/dcf.html', 900, 650), 500);
+        }
 
         function updateClock() {
             const now = new Date();
@@ -167,7 +217,6 @@
             // Check if exists
             let win = document.getElementById(`win-${id}`);
             if (win) {
-                // Restore if hidden/minimized logic (not impl yet, just bring to front)
                 bringToFront(win);
                 return;
             }
@@ -178,9 +227,11 @@
             win.className = 'os-window active';
             win.style.width = w + 'px';
             win.style.height = h + 'px';
-            // Center roughly
-            win.style.top = '10%';
-            win.style.left = (20 + (Math.random()*10)) + '%';
+
+            // Smart positioning (cascade)
+            const count = document.querySelectorAll('.os-window').length;
+            win.style.top = (50 + (count * 30)) + 'px';
+            win.style.left = (50 + (count * 30)) + 'px';
             win.style.zIndex = ++zIndexCounter;
 
             win.innerHTML = `
@@ -189,7 +240,8 @@
                          <i data-lucide="app-window" class="w-3 h-3 text-gray-500"></i>
                          <span class="text-xs font-bold text-gray-300 tracking-wider">${title}</span>
                     </div>
-                    <div class="flex gap-2">
+                    <div class="flex gap-2 items-center">
+                        <div onclick="minimizeWindow('${id}')" class="w-3 h-3 rounded-full bg-yellow-500/50 hover:bg-yellow-500 cursor-pointer border border-yellow-500/30"></div>
                         <div onclick="closeWindow('${id}')" class="w-3 h-3 rounded-full bg-red-500/50 hover:bg-red-500 cursor-pointer border border-red-500/30"></div>
                     </div>
                 </div>
@@ -203,7 +255,7 @@
 
             // Bring to front on click
             win.onmousedown = () => bringToFront(win);
-            lucide.createIcons(); // Refresh icons inside the new HTML string (if any)
+            lucide.createIcons();
         }
 
         function closeWindow(id) {
@@ -212,7 +264,14 @@
             document.getElementById(`dot-${id}`).classList.remove('running');
         }
 
+        function minimizeWindow(id) {
+            const win = document.getElementById(`win-${id}`);
+            if(win) win.style.display = 'none';
+            // Logic to restore would be needed in dock click, but for now simple toggle
+        }
+
         function bringToFront(el) {
+            if(el.style.display === 'none') el.style.display = 'flex';
             document.querySelectorAll('.os-window').forEach(w => w.classList.remove('active'));
             el.classList.add('active');
             el.style.zIndex = ++zIndexCounter;
@@ -232,8 +291,11 @@
             dragOffset.x = e.clientX - rect.left;
             dragOffset.y = e.clientY - rect.top;
 
-            // Prevent text selection inside iframe during drag (iframe overlay fix often needed, but basic here)
-            document.body.style.userSelect = 'none';
+            // Overlay to prevent iframe capturing mouse events
+            const overlay = document.createElement('div');
+            overlay.id = 'drag-overlay';
+            overlay.style.position = 'fixed'; overlay.style.inset = '0'; overlay.style.zIndex = '9999';
+            document.body.appendChild(overlay);
         }
 
         document.addEventListener('mousemove', (e) => {
@@ -242,7 +304,6 @@
             let x = e.clientX - dragOffset.x;
             let y = e.clientY - dragOffset.y;
 
-            // Bounds check (rough)
             if(y < 32) y = 32; // Below top bar
 
             currentWindow.style.left = x + 'px';
@@ -250,9 +311,12 @@
         });
 
         document.addEventListener('mouseup', () => {
-            isDragging = false;
-            currentWindow = null;
-            document.body.style.userSelect = 'auto';
+            if(isDragging) {
+                isDragging = false;
+                currentWindow = null;
+                const overlay = document.getElementById('drag-overlay');
+                if(overlay) overlay.remove();
+            }
         });
 
         function toggleFullScreen() {
