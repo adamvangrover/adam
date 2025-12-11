@@ -1,410 +1,750 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Guide to Corporate Credit Risk Analysis</title>
+    <title>ADAM v23.5 - prompts</title>
+    <link rel="stylesheet" href="../showcase/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS (via CDN for standalone) -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Chosen Palette: Warm Neutrals -->
-    <!-- Application Structure Plan: A two-panel, responsive layout. The left panel serves as a fixed navigation menu listing all 12 steps of the credit analysis process. The right panel dynamically displays the detailed content for the selected step. This structure transforms the linear report into an interactive, task-oriented tool, allowing analysts to easily jump between sections and focus on specific areas without extensive scrolling. This non-linear exploration is more efficient for a professional referencing a guide during their workflow. -->
-    <!-- Visualization & Content Choices: The source report is textual, so no data charts are needed. The primary "visualization" is the process itself, represented by the interactive navigation menu. To enhance engagement and utility, the "Key Questions" for each step are presented as an interactive checklist (using HTML checkboxes). This turns a passive guide into an active tool an analyst can use to track their progress. All content is organized into corresponding sections, activated by clicking the navigation. This is achieved with vanilla JavaScript. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#151e2e',
+                            900: '#0f172a',
+                            950: '#020617',
+                        },
+                        cyan: {
+                            400: '#22d3ee',
+                            500: '#06b6d4',
+                            900: '#164e63',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        .nav-item.active {
-            background-color: #e7e5e4;
-            color: #1c1917;
-            border-left-color: #14b8a6;
-        }
-        .nav-item {
-            border-left-color: transparent;
-        }
-        .content-section {
-            display: none;
-        }
-        .content-section.active {
-            display: block;
-        }
-        /* Custom checkbox style */
-        .custom-checkbox:checked {
-            background-color: #14b8a6;
-            border-color: #0f766e;
-        }
-         .custom-checkbox:checked + label {
-            text-decoration: line-through;
-            color: #57534e;
-        }
+        /* Custom overrides from style.css integration */
+        .glitch-text { position: relative; }
+        .cyber-badge { display: inline-block; padding: 0.15rem 0.5rem; font-size: 0.65rem; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; border-radius: 2px; border: 1px solid currentColor; }
+        .badge-green { color: #34d399; background: rgba(16, 185, 129, 0.1); }
+        .badge-blue { color: #60a5fa; background: rgba(59, 130, 246, 0.1); }
+        .glass-panel { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(148, 163, 184, 0.1); }
     </style>
 </head>
-<body class="bg-stone-50 text-stone-800">
+<body class="bg-slate-900 text-slate-100 font-sans antialiased selection:bg-cyan-500 selection:text-white min-h-screen flex flex-col">
+    <div class="scan-line fixed top-0 left-0 w-full h-full pointer-events-none z-50 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSI0cHgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMXB4IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjEiLz48L3N2Zz4=')]"></div>
 
-    <div class="flex flex-col md:flex-row h-screen">
-        
-        <!-- Left-side Navigation -->
-        <aside class="w-full md:w-1/3 lg:w-1/4 bg-stone-100 p-4 sm:p-6 overflow-y-auto border-r border-stone-200">
-            <h1 class="text-xl font-bold text-stone-900 mb-1">Credit Review Process</h1>
-            <p class="text-sm text-stone-500 mb-6">Select a step to view details.</p>
-            <nav id="navigationMenu" class="space-y-2">
-                <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-1">
-                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center mr-3">I</span>
-                    <span class="font-medium">Company & Business Profile</span>
-                </a>
-                <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-2">
-                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center mr-3">II</span>
-                    <span class="font-medium">Industry & Competitive Landscape</span>
-                </a>
-                <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-3">
-                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center mr-3">III</span>
-                    <span class="font-medium">Financial Statement Deep Dive</span>
-                </a>
-                <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-4">
-                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center mr-3">IV</span>
-                    <span class="font-medium">Performance Evaluation</span>
-                </a>
-                <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-5">
-                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center mr-3">V</span>
-                    <span class="font-medium">Management & Governance</span>
-                </a>
-                <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-6">
-                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center mr-3">VI</span>
-                    <span class="font-medium">Strengths & Weaknesses</span>
-                </a>
-                <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-7">
-                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center mr-3">VII</span>
-                    <span class="font-medium">Risk & PD Assessment</span>
-                </a>
-                <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-8">
-                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center mr-3">VIII</span>
-                    <span class="font-medium">Covenant Analysis</span>
-                </a>
-                 <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-9">
-                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center mr-3">IX</span>
-                    <span class="font-medium">Structural Considerations</span>
-                </a>
-                <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-10">
-                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center mr-3">X</span>
-                    <span class="font-medium">External Factors (ESG, etc.)</span>
-                </a>
-                <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-11">
-                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center mr-3">XI</span>
-                    <span class="font-medium">Credit Outlook & Triggers</span>
-                </a>
-                <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-12">
-                    <span class="bg-teal-500 text-white rounded-full w-6 h-6 text-xs flex items-center justify-center mr-3">XII</span>
-                    <span class="font-medium">Regulatory Considerations</span>
-                </a>
-                
-                <div class="pt-6 mt-4 border-t border-stone-200">
-                     <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-13">
-                        <span class="font-medium">Utilizing Report Prompts</span>
-                    </a>
-                    <a href="#" class="nav-item group flex items-center p-3 text-stone-700 rounded-lg hover:bg-stone-200 border-l-4" data-target="section-14">
-                        <span class="font-medium">General Guidance</span>
-                    </a>
+    <div class="container mx-auto p-4 max-w-7xl flex-grow">
+        <!-- HEADER -->
+        <header class="mb-8 border-b border-slate-700 pb-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold font-mono text-cyan-400 tracking-tight">ADAM v23.5</h1>
+                    <div class="text-sm text-slate-400 font-mono mt-1">
+                        PATH: <span class="text-yellow-500">prompts</span>
+                    </div>
                 </div>
+                <div class="flex items-center space-x-4">
+                    <span class="cyber-badge badge-green">SYSTEM ONLINE</span>
+                    <span class="cyber-badge badge-blue">SHOWCASE MODE</span>
+                </div>
+            </div>
+            
+            <!-- NAV -->
+            <nav class="mt-4 flex space-x-6 text-sm font-mono text-cyan-500">
+                <a href="../index.html" class="hover:text-cyan-300 transition-colors">[UP LEVEL]</a>
+                <a href="../index.html" class="hover:text-cyan-300 transition-colors">[ROOT]</a>
+                <button onclick="window.toggleRuntime()" class="hover:text-cyan-300 transition-colors cursor-pointer">[LIVE RUNTIME]</button>
+                <a href="https://github.com/your-repo" target="_blank" class="hover:text-cyan-300 transition-colors">[GITHUB]</a>
             </nav>
-        </aside>
+        </header>
 
-        <!-- Right-side Content -->
-        <main id="contentContainer" class="w-full md:w-2/3 lg:w-3/4 p-6 sm:p-10 overflow-y-auto">
-            
-            <div id="section-intro" class="content-section">
-                <h2 class="text-3xl font-bold text-stone-900 mb-4">Guide to Corporate Credit Risk Analysis</h2>
-                <p class="text-lg text-stone-600 mb-6">This interactive guide helps financial analysts leverage the Prompt Library to conduct comprehensive, consistent, and thorough corporate credit risk reviews. It breaks down the analysis into logical steps, providing key questions and areas of focus for each stage.</p>
-                <div class="bg-teal-50 border-l-4 border-teal-500 text-teal-800 p-4 rounded-r-lg">
-                    <p>Select a step from the navigation menu on the left to begin your analysis. The content for the selected step will be displayed here.</p>
-                </div>
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <!-- SIDEBAR -->
+            <aside class="col-span-1">
+                <div class="glass-panel p-4 rounded-lg">
+                    <h3 class="text-xs font-bold text-slate-500 uppercase mb-3 font-mono">Directory Contents</h3>
+                    <ul class="space-y-2 font-mono text-sm">
 
-            <div id="section-1" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">I. Company and Business Profile Analysis</h2>
-                <p class="mb-6 text-stone-600"><strong>Objective:</strong> To develop a foundational understanding of the company's operations, business model, scale, and market presence.</p>
-                <div class="mb-6 bg-stone-100 p-4 rounded-lg"><h3 class="font-semibold text-stone-800 mb-2">Relevant Prompt from Library</h3><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1">company_overview_prompt</code></div>
-                <h3 class="font-semibold text-stone-800 mb-4">Key Questions and Areas of Focus:</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center"><input id="q1-1" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q1-1" class="text-stone-700">What are the company's primary business activities and how does it generate revenue?</label></div>
-                    <div class="flex items-center"><input id="q1-2" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q1-2" class="text-stone-700">What are its main products and services?</label></div>
-                    <div class="flex items-center"><input id="q1-3" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q1-3" class="text-stone-700">What is the scale of its operations (consider revenue, assets, employee count)?</label></div>
-                    <div class="flex items-center"><input id="q1-4" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q1-4" class="text-stone-700">In which geographic regions does it operate? Is it diversified?</label></div>
-                    <div class="flex items-center"><input id="q1-5" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q1-5" class="text-stone-700">Who are its key customers and suppliers? Is there significant concentration risk?</label></div>
-                    <div class="flex items-center"><input id="q1-6" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q1-6" class="text-stone-700">What is the company's ownership structure (e.g., public, private, subsidiary)?</label></div>
-                </div>
-            </div>
 
-            <div id="section-2" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">II. Industry and Competitive Landscape</h2>
-                <p class="mb-6 text-stone-600"><strong>Objective:</strong> To evaluate the external environment, including industry trends, risks, and the company's position relative to its competitors.</p>
-                <div class="mb-6 bg-stone-100 p-4 rounded-lg"><h3 class="font-semibold text-stone-800 mb-2">Relevant Prompt from Library</h3><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1">industry_analysis_competitive_landscape_prompt</code></div>
-                <h3 class="font-semibold text-stone-800 mb-4">Key Questions and Areas of Focus:</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center"><input id="q2-1" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q2-1" class="text-stone-700">What are the key economic drivers, growth prospects, and overall health of the industry?</label></div>
-                    <div class="flex items-center"><input id="q2-2" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q2-2" class="text-stone-700">Is the industry cyclical? How sensitive is it to macroeconomic changes?</label></div>
-                    <div class="flex items-center"><input id="q2-3" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q2-3" class="text-stone-700">What are the major trends, such as technological disruption, consolidation, or regulatory shifts?</label></div>
-                    <div class="flex items-center"><input id="q2-4" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q2-4" class="text-stone-700">Who are the main competitors, and what is their market share?</label></div>
-                    <div class="flex items-center"><input id="q2-5" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q2-5" class="text-stone-700">What is the company's market position (e.g., leader, niche player)?</label></div>
-                    <div class="flex items-center"><input id="q2-6" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q2-6" class="text-stone-700">What are the company's key competitive advantages and disadvantages?</label></div>
-                    <div class="flex items-center"><input id="q2-7" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q2-7" class="text-stone-700">How high are the barriers to entry in this industry?</label></div>
-                </div>
-            </div>
-            
-            <div id="section-3" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">III. Financial Statement Deep Dive</h2>
-                <p class="mb-6 text-stone-600"><strong>Objective:</strong> To conduct a thorough analysis of the company's financial health, performance, and risk profile using its financial statements.</p>
-                 <div class="mb-6 bg-stone-100 p-4 rounded-lg"><h3 class="font-semibold text-stone-800 mb-2">Relevant Prompt</h3><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1">financial_statement_analysis_prompt</code></div>
-                <h3 class="font-semibold text-stone-800 mb-4">Key Analytical Areas:</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center"><input id="q3-1" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q3-1" class="text-stone-700"><strong>Profitability:</strong> Analyze trends in Gross, EBITDA, and Net Margins and compare to peers.</label></div>
-                    <div class="flex items-center"><input id="q3-2" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q3-2" class="text-stone-700"><strong>Leverage:</strong> Assess key leverage ratios (e.g., Debt-to-EBITDA) and capital structure adequacy.</label></div>
-                    <div class="flex items-center"><input id="q3-3" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q3-3" class="text-stone-700"><strong>Liquidity:</strong> Evaluate ability to meet short-term obligations and working capital efficiency (DSO, DPO).</label></div>
-                    <div class="flex items-center"><input id="q3-4" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q3-4" class="text-stone-700"><strong>Coverage:</strong> Determine how well earnings and cash flow cover debt service obligations.</label></div>
-                    <div class="flex items-center"><input id="q3-5" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q3-5" class="text-stone-700"><strong>Efficiency:</strong> Analyze how effectively assets are used to generate sales (e.g., Asset Turnover).</label></div>
-                    <div class="flex items-center"><input id="q3-6" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q3-6" class="text-stone-700"><strong>Cash Flow:</strong> Analyze quality of cash flow from operations and Free Cash Flow generation.</label></div>
-                </div>
-            </div>
+                        <div class="my-2 border-t border-slate-700/50"></div>
 
-            <div id="section-4" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">IV. Performance Evaluation</h2>
-                <p class="mb-6 text-stone-600"><strong>Objective:</strong> To assess the company's historical performance track record and evaluate the credibility of its future financial projections.</p>
-                <div class="mb-6 bg-stone-100 p-4 rounded-lg"><h3 class="font-semibold text-stone-800 mb-2">Relevant Prompt</h3><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1">performance_evaluation_prompt</code></div>
-                <h3 class="font-semibold text-stone-800 mb-4">Key Questions and Areas of Focus:</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center"><input id="q4-1" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q4-1" class="text-stone-700">What was the company's historical revenue growth rate and its drivers?</label></div>
-                    <div class="flex items-center"><input id="q4-2" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q4-2" class="text-stone-700">How has the company performed against its own past guidance or budgets?</label></div>
-                    <div class="flex items-center"><input id="q4-3" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q4-3" class="text-stone-700">Are management's projections and assumptions realistic given history and industry outlook?</label></div>
-                    <div class="flex items-center"><input id="q4-4" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q4-4" class="text-stone-700">What are the primary risks to the company achieving its future targets?</label></div>
-                    <div class="flex items-center"><input id="q4-5" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q4-5" class="text-stone-700">How resilient have earnings and cash flows been in the past?</label></div>
-                </div>
-            </div>
-            
-            <div id="section-5" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">V. Management and Governance Assessment</h2>
-                <p class="mb-6 text-stone-600"><strong>Objective:</strong> To evaluate the quality, experience, and effectiveness of the management team and the robustness of the company's corporate governance framework.</p>
-                <div class="mb-6 bg-stone-100 p-4 rounded-lg"><h3 class="font-semibold text-stone-800 mb-2">Relevant Prompt</h3><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1">management_assessment_prompt</code></div>
-                <h3 class="font-semibold text-stone-800 mb-4">Key Questions and Areas of Focus:</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center"><input id="q5-1" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q5-1" class="text-stone-700">How experienced and credible is the senior management team? What is their track record?</label></div>
-                    <div class="flex items-center"><input id="q5-2" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q5-2" class="text-stone-700">Is the corporate strategy clear, consistent, and well-executed?</label></div>
-                    <div class="flex items-center"><input id="q5-3" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q5-3" class="text-stone-700">What is the company's financial policy regarding risk, leverage, and shareholder returns?</label></div>
-                    <div class="flex items-center"><input id="q5-4" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q5-4" class="text-stone-700">Are there any corporate governance concerns (board independence, transparency, etc.)?</label></div>
-                    <div class="flex items-center"><input id="q5-5" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q5-5" class="text-stone-700">Are management's incentives aligned with long-term creditworthiness?</label></div>
-                </div>
-            </div>
 
-            <div id="section-6" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">VI. Strengths and Weaknesses Summary</h2>
-                <p class="mb-6 text-stone-600"><strong>Objective:</strong> To synthesize the analysis into a balanced, high-level summary of the key factors supporting and detracting from the company's credit profile.</p>
-                <div class="mb-6 bg-stone-100 p-4 rounded-lg"><h3 class="font-semibold text-stone-800 mb-2">Relevant Prompt</h3><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1">strengths_weaknesses_summary_prompt</code></div>
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div>
-                        <h3 class="font-semibold text-stone-800 mb-4">Credit Strengths:</h3>
-                        <div class="space-y-3">
-                            <div class="flex items-center"><input id="q6-1" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q6-1" class="text-stone-700">Strong market position / brand</label></div>
-                            <div class="flex items-center"><input id="q6-2" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q6-2" class="text-stone-700">Diversified revenues / customers</label></div>
-                            <div class="flex items-center"><input id="q6-3" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q6-3" class="text-stone-700">Conservative financial policy / low leverage</label></div>
-                            <div class="flex items-center"><input id="q6-4" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q6-4" class="text-stone-700">Strong profitability / cash flow</label></div>
-                            <div class="flex items-center"><input id="q6-5" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q6-5" class="text-stone-700">Experienced management team</label></div>
+                        <li>
+                            <a href="AGENTS.md" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="AGENTS.md">
+                                <span class="mr-2 opacity-50">📄</span> AGENTS.md
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="Adam_v22.0_Portable_Config.json" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="Adam_v22.0_Portable_Config.json">
+                                <span class="mr-2 opacity-50">📄</span> Adam_v22.0_Portable_Config.json
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="CCM_Trend_Report_6-12MOS.json" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="CCM_Trend_Report_6-12MOS.json">
+                                <span class="mr-2 opacity-50">📄</span> CCM_Trend_Report_6-12MOS.json
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="ICRPL.html" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="ICRPL.html">
+                                <span class="mr-2 opacity-50">📄</span> ICRPL.html
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="JSON_Prompt_Library.jsonl" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="JSON_Prompt_Library.jsonl">
+                                <span class="mr-2 opacity-50">📄</span> JSON_Prompt_Library.jsonl
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="JSON_Prompt_Library.md" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="JSON_Prompt_Library.md">
+                                <span class="mr-2 opacity-50">📄</span> JSON_Prompt_Library.md
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="PROMPT_BEST_PRACTICES.md" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="PROMPT_BEST_PRACTICES.md">
+                                <span class="mr-2 opacity-50">📄</span> PROMPT_BEST_PRACTICES.md
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="adam.html" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="adam.html">
+                                <span class="mr-2 opacity-50">📄</span> adam.html
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="adam19.md" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="adam19.md">
+                                <span class="mr-2 opacity-50">📄</span> adam19.md
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="adam21.md" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="adam21.md">
+                                <span class="mr-2 opacity-50">📄</span> adam21.md
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="adam_v23.md" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="adam_v23.md">
+                                <span class="mr-2 opacity-50">📄</span> adam_v23.md
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="company_financial_health_swot.json" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="company_financial_health_swot.json">
+                                <span class="mr-2 opacity-50">📄</span> company_financial_health_swot.json
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="comparative_company_analysis.json" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="comparative_company_analysis.json">
+                                <span class="mr-2 opacity-50">📄</span> comparative_company_analysis.json
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="copilot.html" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="copilot.html">
+                                <span class="mr-2 opacity-50">📄</span> copilot.html
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="copilot2.html" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="copilot2.html">
+                                <span class="mr-2 opacity-50">📄</span> copilot2.html
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="copilot3.html" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="copilot3.html">
+                                <span class="mr-2 opacity-50">📄</span> copilot3.html
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="corporate_credit_risk_analysis.json" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="corporate_credit_risk_analysis.json">
+                                <span class="mr-2 opacity-50">📄</span> corporate_credit_risk_analysis.json
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="corporate_credit_risk_analysis.md" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="corporate_credit_risk_analysis.md">
+                                <span class="mr-2 opacity-50">📄</span> corporate_credit_risk_analysis.md
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="credit_rating_assessment_report.json" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="credit_rating_assessment_report.json">
+                                <span class="mr-2 opacity-50">📄</span> credit_rating_assessment_report.json
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="crypto_asset_analysis_report.json" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="crypto_asset_analysis_report.json">
+                                <span class="mr-2 opacity-50">📄</span> crypto_asset_analysis_report.json
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="daily_market_briefing.json" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="daily_market_briefing.json">
+                                <span class="mr-2 opacity-50">📄</span> daily_market_briefing.json
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="enterprise_ai_prompt_library.md" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="enterprise_ai_prompt_library.md">
+                                <span class="mr-2 opacity-50">📄</span> enterprise_ai_prompt_library.md
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="esg_investment_opportunity_scan.json" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="esg_investment_opportunity_scan.json">
+                                <span class="mr-2 opacity-50">📄</span> esg_investment_opportunity_scan.json
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="geopolitical_risk_impact_assessment.json" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="geopolitical_risk_impact_assessment.json">
+                                <span class="mr-2 opacity-50">📄</span> geopolitical_risk_impact_assessment.json
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="index.html" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="index.html">
+                                <span class="mr-2 opacity-50">📄</span> index.html
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="intelligent_credit_monitoring_copilot.json" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="intelligent_credit_monitoring_copilot.json">
+                                <span class="mr-2 opacity-50">📄</span> intelligent_credit_monitoring_copilot.json
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="interactive_feedback_review.json" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="interactive_feedback_review.json">
+                                <span class="mr-2 opacity-50">📄</span> interactive_feedback_review.json
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="interactive_workflow_definition.json" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="interactive_workflow_definition.json">
+                                <span class="mr-2 opacity-50">📄</span> interactive_workflow_definition.json
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="lib.html" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="lib.html">
+                                <span class="mr-2 opacity-50">📄</span> lib.html
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="macroeconomic_themed_investment_strategy.json" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="macroeconomic_themed_investment_strategy.json">
+                                <span class="mr-2 opacity-50">📄</span> macroeconomic_themed_investment_strategy.json
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="market_shock_scenario_analysis.json" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="market_shock_scenario_analysis.json">
+                                <span class="mr-2 opacity-50">📄</span> market_shock_scenario_analysis.json
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="odyssey_strategic_risk_orchestrator.json" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="odyssey_strategic_risk_orchestrator.json">
+                                <span class="mr-2 opacity-50">📄</span> odyssey_strategic_risk_orchestrator.json
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="portfolio_optimization_proposal.json" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="portfolio_optimization_proposal.json">
+                                <span class="mr-2 opacity-50">📄</span> portfolio_optimization_proposal.json
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="prompt.yaml" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="prompt.yaml">
+                                <span class="mr-2 opacity-50">📄</span> prompt.yaml
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="prompt_engineering_guide.ipynb" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="prompt_engineering_guide.ipynb">
+                                <span class="mr-2 opacity-50">📄</span> prompt_engineering_guide.ipynb
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="prompt_library.html" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="prompt_library.html">
+                                <span class="mr-2 opacity-50">📄</span> prompt_library.html
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="prompt_library.md" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="prompt_library.md">
+                                <span class="mr-2 opacity-50">📄</span> prompt_library.md
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="regulatory_rating_questionnaire.yaml" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="regulatory_rating_questionnaire.yaml">
+                                <span class="mr-2 opacity-50">📄</span> regulatory_rating_questionnaire.yaml
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="sector_deep_dive_report.json" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="sector_deep_dive_report.json">
+                                <span class="mr-2 opacity-50">📄</span> sector_deep_dive_report.json
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="technical_analysis_stock_report.json" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="technical_analysis_stock_report.json">
+                                <span class="mr-2 opacity-50">📄</span> technical_analysis_stock_report.json
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- MAIN STAGE -->
+            <main class="col-span-1 md:col-span-3">
+                <div class="glass-panel p-6 rounded-lg min-h-[500px] relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-2 opacity-10 font-mono text-6xl font-bold text-white pointer-events-none">
+                        prompts
+                    </div>
+
+                    <h2 class="text-xl font-bold text-cyan-400 mb-6 font-mono border-l-4 border-cyan-500 pl-3">
+                         DIRECTORY OVERVIEW
+                    </h2>
+
+                    <div class="prose prose-invert prose-cyan max-w-none text-slate-300 font-sans">
+
+                            <div class="text-center py-20 flex flex-col items-center justify-center opacity-50">
+                                <div class="text-6xl mb-4 grayscale">🔮</div>
+                                <h3 class="text-2xl font-mono text-slate-500">AWAITING INPUT</h3>
+                                <p class="text-slate-600 mt-2">No README.md found in this sector.</p>
+                                <p class="text-slate-700 text-xs mt-4 font-mono">system.scan_complete(status="empty")</p>
+                            </div>
+
+                    </div>
+
+
+                    <div class="mt-12 border-t border-slate-700 pt-6">
+                        <h3 class="text-lg font-bold text-yellow-400 mb-4 font-mono flex items-center">
+                            <span class="mr-2">⚡</span> PROMPT LIBRARY DETECTED
+                        </h3>
+                        <div class="grid grid-cols-1 gap-4">
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">AGENTS.md</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/AGENTS.md
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">Adam_v22.0_Portable_Config.json</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/Adam_v22.0_Portable_Config.json
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">CCM_Trend_Report_6-12MOS.json</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/CCM_Trend_Report_6-12MOS.json
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">JSON_Prompt_Library.md</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/JSON_Prompt_Library.md
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">PROMPT_BEST_PRACTICES.md</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/PROMPT_BEST_PRACTICES.md
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">adam19.md</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/adam19.md
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">adam21.md</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/adam21.md
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">adam_v23.md</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/adam_v23.md
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">company_financial_health_swot.json</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/company_financial_health_swot.json
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">comparative_company_analysis.json</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/comparative_company_analysis.json
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">corporate_credit_risk_analysis.json</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/corporate_credit_risk_analysis.json
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">corporate_credit_risk_analysis.md</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/corporate_credit_risk_analysis.md
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">credit_rating_assessment_report.json</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/credit_rating_assessment_report.json
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">crypto_asset_analysis_report.json</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/crypto_asset_analysis_report.json
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">daily_market_briefing.json</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/daily_market_briefing.json
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">enterprise_ai_prompt_library.md</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/enterprise_ai_prompt_library.md
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">esg_investment_opportunity_scan.json</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/esg_investment_opportunity_scan.json
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">geopolitical_risk_impact_assessment.json</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/geopolitical_risk_impact_assessment.json
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">intelligent_credit_monitoring_copilot.json</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/intelligent_credit_monitoring_copilot.json
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">interactive_feedback_review.json</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/interactive_feedback_review.json
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">interactive_workflow_definition.json</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/interactive_workflow_definition.json
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">macroeconomic_themed_investment_strategy.json</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/macroeconomic_themed_investment_strategy.json
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">market_shock_scenario_analysis.json</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/market_shock_scenario_analysis.json
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">odyssey_strategic_risk_orchestrator.json</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/odyssey_strategic_risk_orchestrator.json
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">portfolio_optimization_proposal.json</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/portfolio_optimization_proposal.json
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">prompt_library.md</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/prompt_library.md
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">sector_deep_dive_report.json</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/sector_deep_dive_report.json
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
+                            <div class="bg-slate-900/50 p-4 rounded border border-slate-700 hover:border-cyan-500/30 transition-colors">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="font-mono text-sm text-cyan-300">technical_analysis_stock_report.json</h4>
+                                    <span class="text-xs text-slate-500 font-mono">PROMPT</span>
+                                </div>
+                                <div class="bg-black/30 p-2 rounded mb-2 text-xs text-slate-500 font-mono truncate">
+                                    prompts/prompts/technical_analysis_stock_report.json
+                                </div>
+                                <button class="cyber-btn w-full text-center py-1 text-xs uppercase tracking-widest border border-slate-600 hover:border-cyan-400 hover:text-cyan-400 transition-all rounded" onclick="alert('Copied prompt template to clipboard!')">
+                                    Copy Template
+                                </button>
+                            </div>
+
                         </div>
                     </div>
-                    <div>
-                        <h3 class="font-semibold text-stone-800 mb-4">Credit Weaknesses:</h3>
-                        <div class="space-y-3">
-                            <div class="flex items-center"><input id="q6-6" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q6-6" class="text-stone-700">High leverage / aggressive policy</label></div>
-                            <div class="flex items-center"><input id="q6-7" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q6-7" class="text-stone-700">Weak profitability / volatile cash flows</label></div>
-                            <div class="flex items-center"><input id="q6-8" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q6-8" class="text-stone-700">Concentration risk (customer, product)</label></div>
-                            <div class="flex items-center"><input id="q6-9" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q6-9" class="text-stone-700">Challenging industry / competition</label></div>
-                            <div class="flex items-center"><input id="q6-10" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q6-10" class="text-stone-700">Operational issues / execution risks</label></div>
-                        </div>
-                    </div>
+
                 </div>
-            </div>
+            </main>
+        </div>
 
-            <div id="section-7" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">VII. Risk & Probability of Default (PD) Assessment</h2>
-                <p class="mb-6 text-stone-600"><strong>Objective:</strong> To formally assess the likelihood of the company defaulting on its obligations, considering all quantitative and qualitative factors.</p>
-                <div class="mb-6 bg-stone-100 p-4 rounded-lg"><h3 class="font-semibold text-stone-800 mb-2">Relevant Prompt</h3><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1">probability_of_default_rating_prompt</code></div>
-                <h3 class="font-semibold text-stone-800 mb-4">Key Questions and Areas of Focus:</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center"><input id="q7-1" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q7-1" class="text-stone-700">Based on all analysis, what is the overall risk profile?</label></div>
-                    <div class="flex items-center"><input id="q7-2" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q7-2" class="text-stone-700">How do quantitative (leverage) and qualitative (industry risk) factors translate into a default probability?</label></div>
-                    <div class="flex items-center"><input id="q7-3" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q7-3" class="text-stone-700">If using an internal model/scorecard, what are the key inputs driving the outcome?</label></div>
-                    <div class="flex items-center"><input id="q7-4" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q7-4" class="text-stone-700">What is the final PD estimate or risk category, and what is the core rationale supporting it?</label></div>
-                </div>
-            </div>
-
-            <div id="section-8" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">VIII. Covenant Analysis</h2>
-                <p class="mb-6 text-stone-600"><strong>Objective:</strong> To analyze the financial and operational covenants in the company's debt agreements to assess compliance and available headroom.</p>
-                <div class="mb-6 bg-stone-100 p-4 rounded-lg"><h3 class="font-semibold text-stone-800 mb-2">Relevant Prompt</h3><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1">covenant_analysis_prompt</code></div>
-                <h3 class="font-semibold text-stone-800 mb-4">Key Questions and Areas of Focus:</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center"><input id="q8-1" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q8-1" class="text-stone-700">What are the key financial covenants (e.g., Maximum Leverage, Minimum Interest Coverage)?</label></div>
-                    <div class="flex items-center"><input id="q8-2" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q8-2" class="text-stone-700">What is the current level of compliance and how much headroom or "cushion" does the company have?</label></div>
-                    <div class="flex items-center"><input id="q8-3" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q8-3" class="text-stone-700">How sensitive is covenant compliance to a decline in EBITDA or other key metrics?</label></div>
-                    <div class="flex items-center"><input id="q8-4" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q8-4" class="text-stone-700">What are the consequences of a potential covenant breach?</label></div>
-                </div>
-            </div>
-
-            <div id="section-9" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">IX. Structural Considerations</h2>
-                <p class="mb-6 text-stone-600"><strong>Objective:</strong> To understand risks and support mechanisms arising from the company's position within a larger corporate group.</p>
-                <div class="mb-6 bg-stone-100 p-4 rounded-lg"><h3 class="font-semibold text-stone-800 mb-2">Relevant Prompt</h3><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1">parent_subsidiary_linkage_prompt</code></div>
-                <h3 class="font-semibold text-stone-800 mb-4">Key Questions and Areas of Focus:</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center"><input id="q9-1" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q9-1" class="text-stone-700">Is the company a parent or a subsidiary? How strategically important is it to the wider group?</label></div>
-                    <div class="flex items-center"><input id="q9-2" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q9-2" class="text-stone-700">Are there any explicit support mechanisms like guarantees or cross-default provisions?</label></div>
-                    <div class="flex items-center"><input id="q9-3" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q9-3" class="text-stone-700">Is there a history of the parent company supporting its subsidiaries?</label></div>
-                    <div class="flex items-center"><input id="q9-4" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q9-4" class="text-stone-700">Could problems at the parent or a sister company create contagion risk for the entity?</label></div>
-                </div>
-            </div>
-
-            <div id="section-10" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">X. External Factors (Country, Macroeconomic, ESG)</h2>
-                <p class="mb-6 text-stone-600"><strong>Objective:</strong> To assess the impact of broader environmental, social, political, and economic factors on the company's creditworthiness.</p>
-                <div class="mb-6 bg-stone-100 p-4 rounded-lg"><h3 class="font-semibold text-stone-800 mb-2">Relevant Prompts</h3><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1 mr-2">country_macroeconomic_risk_prompt</code><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1">esg_credit_factors_prompt</code></div>
-                <h3 class="font-semibold text-stone-800 mb-4">Key Questions and Areas of Focus:</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center"><input id="q10-1" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q10-1" class="text-stone-700">What are the key macroeconomic risks (inflation, interest rates, GDP growth)?</label></div>
-                    <div class="flex items-center"><input id="q10-2" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q10-2" class="text-stone-700">Are there significant country-specific risks (political, regulatory, currency)?</label></div>
-                    <div class="flex items-center"><input id="q10-3" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q10-3" class="text-stone-700">What are the most material <strong>Environmental</strong> risks and opportunities (e.g., climate transition)?</label></div>
-                    <div class="flex items-center"><input id="q10-4" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q10-4" class="text-stone-700">What are the most material <strong>Social</strong> risks and opportunities (e.g., labor relations, safety)?</label></div>
-                    <div class="flex items-center"><input id="q10-5" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q10-5" class="text-stone-700">What are the most material <strong>Governance</strong> factors impacting credit risk?</label></div>
-                </div>
-            </div>
-
-            <div id="section-11" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">XI. Credit Outlook and Rating Triggers</h2>
-                <p class="mb-6 text-stone-600"><strong>Objective:</strong> To form a forward-looking view on the likely trajectory of credit quality and to define specific events that would trigger a rating change.</p>
-                <div class="mb-6 bg-stone-100 p-4 rounded-lg"><h3 class="font-semibold text-stone-800 mb-2">Relevant Prompts</h3><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1 mr-2">credit_outlook_assessment_prompt</code><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1">rating_triggers_prompt</code></div>
-                <h3 class="font-semibold text-stone-800 mb-4">Key Questions and Areas of Focus:</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center"><input id="q11-1" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q11-1" class="text-stone-700">Is the credit outlook Stable, Positive, or Negative over the next 12-24 months? What trends support this view?</label></div>
-                    <div class="flex items-center"><input id="q11-2" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q11-2" class="text-stone-700">What specific, measurable events or metric thresholds would cause an <strong>upgrade</strong>?</label></div>
-                    <div class="flex items-center"><input id="q11-3" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q11-3" class="text-stone-700">What specific, measurable events or metric thresholds would cause a <strong>downgrade</strong>?</label></div>
-                </div>
-            </div>
-
-            <div id="section-12" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">XII. Regulatory Considerations</h2>
-                <p class="mb-6 text-stone-600"><strong>Objective:</strong> To analyze the credit from the perspective of a banking regulator, focusing on the ultimate source of repayment.</p>
-                <div class="mb-6 bg-stone-100 p-4 rounded-lg"><h3 class="font-semibold text-stone-800 mb-2">Relevant Prompt</h3><code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1">snc_regulatory_rating_prompt</code></div>
-                <h3 class="font-semibold text-stone-800 mb-4">Key Questions and Areas of Focus:</h3>
-                <div class="space-y-3">
-                    <div class="flex items-center"><input id="q12-1" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q12-1" class="text-stone-700">What is the primary source of repayment, and how reliable is it?</label></div>
-                    <div class="flex items-center"><input id="q12-2" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q12-2" class="text-stone-700">Can the company service all its debt obligations in a timely manner from operating cash flow?</label></div>
-                    <div class="flex items-center"><input id="q12-3" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q12-3" class="text-stone-700">Are there any well-defined weaknesses that jeopardize timely repayment?</label></div>
-                    <div class="flex items-center"><input id="q12-4" type="checkbox" class="custom-checkbox h-4 w-4 rounded border-gray-300 mr-3"><label for="q12-4" class="text-stone-700">How does the company's profile map to regulatory rating definitions (Pass, SM, Substandard)?</label></div>
-                </div>
-            </div>
-
-            <div id="section-13" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">Utilizing Full Report Structure Prompts</h2>
-                <p class="mb-6 text-stone-600">The library contains high-level prompts to structure your final report. These templates incorporate the individual analytical sections covered in this guide.</p>
-                <div class="space-y-4">
-                    <div class="bg-stone-100 p-4 rounded-lg">
-                        <h3 class="font-semibold text-stone-800">Comprehensive Credit Underwriting Memo</h3>
-                        <code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1 mb-2 inline-block">underwriting_memo_structure_prompt</code>
-                        <p class="text-stone-600 text-sm">Use this as the master template for a new transaction. It provides a standard, comprehensive structure for an underwriting document.</p>
-                    </div>
-                    <div class="bg-stone-100 p-4 rounded-lg">
-                        <h3 class="font-semibold text-stone-800">Annual Review / Monitoring Update</h3>
-                        <code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1 mb-2 inline-block">annual_review_monitoring_update_prompt</code>
-                        <p class="text-stone-600 text-sm">This template is tailored for periodic reviews, focusing on performance since the last update, covenant compliance, and any changes to the credit profile.</p>
-                    </div>
-                     <div class="bg-stone-100 p-4 rounded-lg">
-                        <h3 class="font-semibold text-stone-800">Credit Due Diligence Checklist</h3>
-                        <code class="text-sm bg-stone-200 text-stone-700 rounded px-2 py-1 mb-2 inline-block">due_diligence_checklist_credit_prompt</code>
-                        <p class="text-stone-600 text-sm">An excellent tool to use at the beginning of an analysis to ensure you gather all the necessary information and documents.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="section-14" class="content-section">
-                <h2 class="text-2xl font-bold text-stone-900 mb-2">General Guidance</h2>
-                <p class="mb-6 text-stone-600">As you use the prompt library, keep these key principles in mind to ensure the highest quality analysis.</p>
-                <ul class="space-y-4 list-none">
-                    <li class="flex items-start">
-                        <span class="text-teal-500 font-bold text-xl mr-3 mt-1">✓</span>
-                        <div>
-                            <h3 class="font-semibold text-stone-800">Be Specific</h3>
-                            <p class="text-stone-600">Always clearly state the company name and the time periods you are analyzing.</p>
-                        </div>
-                    </li>
-                    <li class="flex items-start">
-                        <span class="text-teal-500 font-bold text-xl mr-3 mt-1">✓</span>
-                        <div>
-                            <h3 class="font-semibold text-stone-800">Provide Rationale</h3>
-                            <p class="text-stone-600">Don't just state a conclusion. Clearly link your analysis and data to your recommendations.</p>
-                        </div>
-                    </li>
-                    <li class="flex items-start">
-                        <span class="text-teal-500 font-bold text-xl mr-3 mt-1">✓</span>
-                        <div>
-                            <h3 class="font-semibold text-stone-800">Define Your Terms</h3>
-                            <p class="text-stone-600">Ensure financial metrics are clearly defined and calculated consistently.</p>
-                        </div>
-                    </li>
-                    <li class="flex items-start">
-                        <span class="text-teal-500 font-bold text-xl mr-3 mt-1">✓</span>
-                        <div>
-                            <h3 class="font-semibold text-stone-800">Know Your Context</h3>
-                            <p class="text-stone-600">Tailor your analysis to the specific request—is it a new loan, an annual review, or an event-driven update?</p>
-                        </div>
-                    </li>
-                     <li class="flex items-start">
-                        <span class="text-teal-500 font-bold text-xl mr-3 mt-1">✓</span>
-                        <div>
-                            <h3 class="font-semibold text-stone-800">Break It Down</h3>
-                            <p class="text-stone-600">For very complex companies or situations, use multiple, focused prompts to build your analysis piece by piece.</p>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-
-        </main>
+        <!-- FOOTER -->
+        <footer class="mt-12 py-6 border-t border-slate-800 text-center text-xs font-mono text-slate-600">
+            <p>ADAM AUTO-GENERATED SHOWCASE | REF: prompts | GENERATED: 2025-12-10 02:59:50</p>
+            <p class="mt-1 opacity-50">SYSTEM STATUS: NOMINAL</p>
+        </footer>
     </div>
 
+    <!-- RUNTIME TOGGLE SCRIPT -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const navigationMenu = document.getElementById('navigationMenu');
-            const contentContainer = document.getElementById('contentContainer');
-            const navItems = navigationMenu.querySelectorAll('.nav-item');
-            const contentSections = contentContainer.querySelectorAll('.content-section');
-            const introSection = document.getElementById('section-intro');
+    (function() {
+        const CONFIG = {
+            mockMode: true,
+            rootPath: "../",
+            currentDir: "prompts"
+        };
 
-            function switchTab(targetId) {
-                navItems.forEach(item => item.classList.remove('active'));
-                contentSections.forEach(section => section.classList.remove('active'));
-                
-                const navItem = navigationMenu.querySelector(`[data-target="${targetId}"]`);
-                const contentSection = document.getElementById(targetId);
-
-                if (navItem && contentSection) {
-                    navItem.classList.add('active');
-                    contentSection.classList.add('active');
-                }
-            }
-
-            navigationMenu.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = e.target.closest('.nav-item');
-                if (target && target.dataset.target) {
-                    switchTab(target.dataset.target);
-                }
-            });
-            
-            // Initial state on page load: show the first item.
-            const firstNavItem = navItems[0];
-            if (firstNavItem) {
-                switchTab(firstNavItem.dataset.target);
-            } else {
-                // Fallback to intro if no nav items exist
-                 introSection.classList.add('active');
-            }
-        });
+        window.toggleRuntime = function() {
+            alert("Runtime connection simulating... [MOCK MODE ACTIVE]\n\nConnecting to MetaOrchestrator...\nError: Connection Refused (Static Mode)");
+        };
+    })();
     </script>
 </body>
 </html>

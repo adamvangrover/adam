@@ -4,96 +4,524 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adam System :: core/agents</title>
+    <title>ADAM v23.5 - agents</title>
     <link rel="stylesheet" href="../../showcase/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS (via CDN for standalone) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#151e2e',
+                            900: '#0f172a',
+                            950: '#020617',
+                        },
+                        cyan: {
+                            400: '#22d3ee',
+                            500: '#06b6d4',
+                            900: '#164e63',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        .readme-content { padding: 20px; }
-        .readme-content h1 { font-size: 1.5rem; margin-bottom: 1rem; color: var(--primary-color); }
-        .readme-content h2 { font-size: 1.25rem; margin-top: 1.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--panel-border); padding-bottom: 0.25rem; }
-        .readme-content p { margin-bottom: 1rem; line-height: 1.6; color: var(--text-secondary); }
-        .readme-content pre { background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 4px; overflow-x: auto; border: 1px solid var(--panel-border); }
-        .readme-content code { font-family: var(--font-mono); color: var(--accent-color); }
-
-        .file-icon { display: inline-block; width: 20px; text-align: center; margin-right: 8px; color: var(--text-muted); }
-        .dir-icon { color: var(--primary-color); }
+        /* Custom overrides from style.css integration */
+        .glitch-text { position: relative; }
+        .cyber-badge { display: inline-block; padding: 0.15rem 0.5rem; font-size: 0.65rem; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; border-radius: 2px; border: 1px solid currentColor; }
+        .badge-green { color: #34d399; background: rgba(16, 185, 129, 0.1); }
+        .badge-blue { color: #60a5fa; background: rgba(59, 130, 246, 0.1); }
+        .glass-panel { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(148, 163, 184, 0.1); }
     </style>
 </head>
-<body>
-    <div class="scan-line"></div>
-    <div class="scan-glow"></div>
+<body class="bg-slate-900 text-slate-100 font-sans antialiased selection:bg-cyan-500 selection:text-white min-h-screen flex flex-col">
+    <div class="scan-line fixed top-0 left-0 w-full h-full pointer-events-none z-50 opacity-10 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSI0cHgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMXB4IiBmaWxsPSIjZmZmZmZmIiBvcGFjaXR5PSIwLjEiLz48L3N2Zz4=')]"></div>
 
-    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-
-        <!-- Header -->
-        <header style="margin-bottom: 40px; border-bottom: 1px solid var(--panel-border); padding-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <h1 class="glitch-text" data-text="ADAM v23.5" style="font-size: 2rem; margin: 0; color: var(--primary-color);">ADAM v23.5</h1>
-                <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">
-                    PATH: <span style="color: var(--text-primary);">/core/agents</span>
-                </div>
-            </div>
-            <div style="text-align: right;">
-                <div class="cyber-badge badge-cyan">SYSTEM ONLINE</div>
-                <div style="margin-top: 5px; font-size: 0.7rem; color: var(--text-muted);">Mode: SHOWCASE</div>
-            </div>
-        </header>
-
-        <!-- Navigation -->
-        <nav style="margin-bottom: 30px; display: flex; gap: 10px;">
-            <a href="../index.html" class="cyber-btn">&uarr; UP LEVEL</a>
-            <a href="../../index.html" class="cyber-btn">ROOT</a>
-            <button onclick="toggleRuntime()" class="cyber-btn">LIVE RUNTIME</button>
-            <a href="https://github.com/adamvangrover/adam" class="cyber-btn" target="_blank">GITHUB</a>
-        </nav>
-
-        <div style="display: grid; grid-template-columns: 250px 1fr; gap: 20px;">
-
-            <!-- Sidebar / File Explorer -->
-            <aside class="glass-panel" style="padding: 20px; border-radius: 4px; height: fit-content;">
-                <h3 style="margin-top: 0; font-size: 0.9rem; text-transform: uppercase; color: var(--text-secondary); border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 15px;">
-                    Directory Contents
-                </h3>
-                <ul style="list-style: none; padding: 0; margin: 0; font-family: var(--font-mono); font-size: 0.85rem;">
-                    <li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="architect_agent/index.html" style="color: var(--primary-color);">architect_agent/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="developer_swarm/index.html" style="color: var(--primary-color);">developer_swarm/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="industry_specialists/index.html" style="color: var(--primary-color);">industry_specialists/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="meta_agents/index.html" style="color: var(--primary-color);">meta_agents/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="orchestrators/index.html" style="color: var(--primary-color);">orchestrators/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="skills/index.html" style="color: var(--primary-color);">skills/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="specialized/index.html" style="color: var(--primary-color);">specialized/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="sub_agents/index.html" style="color: var(--primary-color);">sub_agents/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="templates/index.html" style="color: var(--primary-color);">templates/</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="AGENTS.md" style="color: var(--text-secondary);">AGENTS.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="AGENT_CATALOG.md" style="color: var(--text-secondary);">AGENT_CATALOG.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="AGENT_DEVELOPMENT.md" style="color: var(--text-secondary);">AGENT_DEVELOPMENT.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="RAG_AGENT_README.md" style="color: var(--text-secondary);">RAG_AGENT_README.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="__init__.py" style="color: var(--text-secondary);">__init__.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="agent_base.py" style="color: var(--text-secondary);">agent_base.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="agent_forge.py" style="color: var(--text-secondary);">agent_forge.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="algo_trading_agent.py" style="color: var(--text-secondary);">algo_trading_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="alternative_data_agent.py" style="color: var(--text-secondary);">alternative_data_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="anomaly_detection_agent.py" style="color: var(--text-secondary);">anomaly_detection_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="archive_manager_agent.py" style="color: var(--text-secondary);">archive_manager_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="behavioral_economics_agent.py" style="color: var(--text-secondary);">behavioral_economics_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="catalyst_agent.py" style="color: var(--text-secondary);">catalyst_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="code_alchemist.py" style="color: var(--text-secondary);">code_alchemist.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="crypto_agent.py" style="color: var(--text-secondary);">crypto_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="cyclical_reasoning_agent.py" style="color: var(--text-secondary);">cyclical_reasoning_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="data_retrieval_agent.py" style="color: var(--text-secondary);">data_retrieval_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="data_verification_agent.py" style="color: var(--text-secondary);">data_verification_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="data_visualization_agent.py" style="color: var(--text-secondary);">data_visualization_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="discussion_chair_agent.py" style="color: var(--text-secondary);">discussion_chair_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="echo_agent.py" style="color: var(--text-secondary);">echo_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="event_driven_risk_agent.py" style="color: var(--text-secondary);">event_driven_risk_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="financial_modeling_agent.py" style="color: var(--text-secondary);">financial_modeling_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="fundamental_analyst_agent.py" style="color: var(--text-secondary);">fundamental_analyst_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="geopolitical_risk_agent.py" style="color: var(--text-secondary);">geopolitical_risk_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="industry_specialist_agent.py" style="color: var(--text-secondary);">industry_specialist_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="knowledge_contribution_agent.py" style="color: var(--text-secondary);">knowledge_contribution_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="legal_agent.py" style="color: var(--text-secondary);">legal_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="lexica_agent.py" style="color: var(--text-secondary);">lexica_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="lingua_maestro.py" style="color: var(--text-secondary);">lingua_maestro.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="machine_learning_model_training_agent.py" style="color: var(--text-secondary);">machine_learning_model_training_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="macroeconomic_analysis_agent.py" style="color: var(--text-secondary);">macroeconomic_analysis_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="market_sentiment_agent.py" style="color: var(--text-secondary);">market_sentiment_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="meta_19_agent.py" style="color: var(--text-secondary);">meta_19_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="meta_cognitive_agent.py" style="color: var(--text-secondary);">meta_cognitive_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="model.html" style="color: var(--text-secondary);">model.html</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="natural_language_generation_agent.py" style="color: var(--text-secondary);">natural_language_generation_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="news_bot.py" style="color: var(--text-secondary);">news_bot.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="newsletter_layout_specialist_agent.py" style="color: var(--text-secondary);">newsletter_layout_specialist_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="portfolio_optimization_agent.py" style="color: var(--text-secondary);">portfolio_optimization_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="prediction_market_agent.py" style="color: var(--text-secondary);">prediction_market_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="prompt_generation_agent.py" style="color: var(--text-secondary);">prompt_generation_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="prompt_tuner.py" style="color: var(--text-secondary);">prompt_tuner.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="query_understanding_agent.py" style="color: var(--text-secondary);">query_understanding_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="rag_agent.py" style="color: var(--text-secondary);">rag_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="red_team_agent.py" style="color: var(--text-secondary);">red_team_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="reflector_agent.py" style="color: var(--text-secondary);">reflector_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="regulatory_compliance_agent.py" style="color: var(--text-secondary);">regulatory_compliance_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="report_generator_agent.py" style="color: var(--text-secondary);">report_generator_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="result_aggregation_agent.py" style="color: var(--text-secondary);">result_aggregation_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="risk_assessment_agent.py" style="color: var(--text-secondary);">risk_assessment_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="sense_weaver.py" style="color: var(--text-secondary);">sense_weaver.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="snc_analyst_agent.py" style="color: var(--text-secondary);">snc_analyst_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="supply_chain_risk_agent.py" style="color: var(--text-secondary);">supply_chain_risk_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="technical_analyst_agent.py" style="color: var(--text-secondary);">technical_analyst_agent.py</a></li>
-                </ul>
-            </aside>
-
-            <!-- Main Content -->
-            <main>
-                <!-- Runtime Overlay (Hidden by default) -->
-                <div id="runtime-panel" class="glass-panel fade-in" style="display: none; padding: 20px; margin-bottom: 20px; border-color: var(--success-color);">
-                    <h3 style="color: var(--success-color); margin-top: 0;">Live System Interface</h3>
-                    <p style="font-size: 0.9rem;">Connecting to Orchestrator at localhost:5001...</p>
-                    <div style="background: black; padding: 10px; border-radius: 4px; font-family: var(--font-mono); height: 100px; overflow-y: auto; font-size: 0.8rem; color: #0f0;">
-                        > Connecting...<br>
-                        > Error: API Unreachable (Mock Mode Active)<br>
-                        > System Status: STANDBY
+    <div class="container mx-auto p-4 max-w-7xl flex-grow">
+        <!-- HEADER -->
+        <header class="mb-8 border-b border-slate-700 pb-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-3xl font-bold font-mono text-cyan-400 tracking-tight">ADAM v23.5</h1>
+                    <div class="text-sm text-slate-400 font-mono mt-1">
+                        PATH: <span class="text-yellow-500">core/agents</span>
                     </div>
                 </div>
+                <div class="flex items-center space-x-4">
+                    <span class="cyber-badge badge-green">SYSTEM ONLINE</span>
+                    <span class="cyber-badge badge-blue">SHOWCASE MODE</span>
+                </div>
+            </div>
 
-                <!-- Readme Content -->
-                <div class="glass-panel" style="border-radius: 4px;">
-                    <div class="readme-content" style="text-align: center; color: var(--text-muted); padding: 40px;">No README found in this directory.</div>
+            <!-- NAV -->
+            <nav class="mt-4 flex space-x-6 text-sm font-mono text-cyan-500">
+                <a href="../index.html" class="hover:text-cyan-300 transition-colors">[UP LEVEL]</a>
+                <a href="../../index.html" class="hover:text-cyan-300 transition-colors">[ROOT]</a>
+                <button onclick="window.toggleRuntime()" class="hover:text-cyan-300 transition-colors cursor-pointer">[LIVE RUNTIME]</button>
+                <a href="https://github.com/your-repo" target="_blank" class="hover:text-cyan-300 transition-colors">[GITHUB]</a>
+            </nav>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <!-- SIDEBAR -->
+            <aside class="col-span-1">
+                <div class="glass-panel p-4 rounded-lg">
+                    <h3 class="text-xs font-bold text-slate-500 uppercase mb-3 font-mono">Directory Contents</h3>
+                    <ul class="space-y-2 font-mono text-sm">
+
+                        <li>
+                            <a href="architect_agent/index.html" class="flex items-center text-blue-400 hover:text-blue-300 transition-colors">
+                                <span class="mr-2">📂</span> architect_agent
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="developer_swarm/index.html" class="flex items-center text-blue-400 hover:text-blue-300 transition-colors">
+                                <span class="mr-2">📂</span> developer_swarm
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="industry_specialists/index.html" class="flex items-center text-blue-400 hover:text-blue-300 transition-colors">
+                                <span class="mr-2">📂</span> industry_specialists
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="meta_agents/index.html" class="flex items-center text-blue-400 hover:text-blue-300 transition-colors">
+                                <span class="mr-2">📂</span> meta_agents
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="orchestrators/index.html" class="flex items-center text-blue-400 hover:text-blue-300 transition-colors">
+                                <span class="mr-2">📂</span> orchestrators
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="skills/index.html" class="flex items-center text-blue-400 hover:text-blue-300 transition-colors">
+                                <span class="mr-2">📂</span> skills
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="specialized/index.html" class="flex items-center text-blue-400 hover:text-blue-300 transition-colors">
+                                <span class="mr-2">📂</span> specialized
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="sub_agents/index.html" class="flex items-center text-blue-400 hover:text-blue-300 transition-colors">
+                                <span class="mr-2">📂</span> sub_agents
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="templates/index.html" class="flex items-center text-blue-400 hover:text-blue-300 transition-colors">
+                                <span class="mr-2">📂</span> templates
+                            </a>
+                        </li>
+
+
+                        <div class="my-2 border-t border-slate-700/50"></div>
+
+
+                        <li>
+                            <a href="AGENTS.md" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="AGENTS.md">
+                                <span class="mr-2 opacity-50">📄</span> AGENTS.md
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="AGENT_CATALOG.md" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="AGENT_CATALOG.md">
+                                <span class="mr-2 opacity-50">📄</span> AGENT_CATALOG.md
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="AGENT_DEVELOPMENT.md" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="AGENT_DEVELOPMENT.md">
+                                <span class="mr-2 opacity-50">📄</span> AGENT_DEVELOPMENT.md
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="RAG_AGENT_README.md" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="RAG_AGENT_README.md">
+                                <span class="mr-2 opacity-50">📄</span> RAG_AGENT_README.md
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="__init__.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="__init__.py">
+                                <span class="mr-2 opacity-50">📄</span> __init__.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="agent_base.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="agent_base.py">
+                                <span class="mr-2 opacity-50">📄</span> agent_base.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="agent_forge.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="agent_forge.py">
+                                <span class="mr-2 opacity-50">📄</span> agent_forge.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="algo_trading_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="algo_trading_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> algo_trading_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="alternative_data_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="alternative_data_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> alternative_data_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="anomaly_detection_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="anomaly_detection_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> anomaly_detection_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="archive_manager_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="archive_manager_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> archive_manager_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="behavioral_economics_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="behavioral_economics_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> behavioral_economics_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="catalyst_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="catalyst_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> catalyst_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="code_alchemist.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="code_alchemist.py">
+                                <span class="mr-2 opacity-50">📄</span> code_alchemist.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="crypto_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="crypto_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> crypto_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="cyclical_reasoning_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="cyclical_reasoning_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> cyclical_reasoning_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="data_retrieval_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="data_retrieval_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> data_retrieval_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="data_verification_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="data_verification_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> data_verification_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="data_visualization_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="data_visualization_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> data_visualization_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="discussion_chair_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="discussion_chair_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> discussion_chair_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="echo_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="echo_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> echo_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="event_driven_risk_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="event_driven_risk_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> event_driven_risk_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="financial_modeling_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="financial_modeling_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> financial_modeling_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="fundamental_analyst_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="fundamental_analyst_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> fundamental_analyst_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="geopolitical_risk_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="geopolitical_risk_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> geopolitical_risk_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="index.html" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="index.html">
+                                <span class="mr-2 opacity-50">📄</span> index.html
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="industry_specialist_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="industry_specialist_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> industry_specialist_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="knowledge_contribution_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="knowledge_contribution_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> knowledge_contribution_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="legal_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="legal_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> legal_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="lexica_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="lexica_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> lexica_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="lingua_maestro.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="lingua_maestro.py">
+                                <span class="mr-2 opacity-50">📄</span> lingua_maestro.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="machine_learning_model_training_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="machine_learning_model_training_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> machine_learning_model_training_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="macroeconomic_analysis_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="macroeconomic_analysis_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> macroeconomic_analysis_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="market_sentiment_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="market_sentiment_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> market_sentiment_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="meta_19_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="meta_19_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> meta_19_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="meta_cognitive_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="meta_cognitive_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> meta_cognitive_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="model.html" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="model.html">
+                                <span class="mr-2 opacity-50">📄</span> model.html
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="natural_language_generation_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="natural_language_generation_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> natural_language_generation_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="news_bot.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="news_bot.py">
+                                <span class="mr-2 opacity-50">📄</span> news_bot.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="newsletter_layout_specialist_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="newsletter_layout_specialist_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> newsletter_layout_specialist_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="portfolio_optimization_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="portfolio_optimization_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> portfolio_optimization_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="prediction_market_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="prediction_market_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> prediction_market_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="prompt_generation_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="prompt_generation_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> prompt_generation_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="prompt_tuner.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="prompt_tuner.py">
+                                <span class="mr-2 opacity-50">📄</span> prompt_tuner.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="query_understanding_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="query_understanding_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> query_understanding_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="rag_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="rag_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> rag_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="red_team_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="red_team_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> red_team_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="reflector_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="reflector_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> reflector_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="regulatory_compliance_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="regulatory_compliance_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> regulatory_compliance_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="report_generator_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="report_generator_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> report_generator_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="result_aggregation_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="result_aggregation_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> result_aggregation_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="risk_assessment_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="risk_assessment_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> risk_assessment_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="sense_weaver.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="sense_weaver.py">
+                                <span class="mr-2 opacity-50">📄</span> sense_weaver.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="snc_analyst_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="snc_analyst_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> snc_analyst_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="supply_chain_risk_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="supply_chain_risk_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> supply_chain_risk_agent.py
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="technical_analyst_agent.py" class="flex items-center text-slate-300 hover:text-white transition-colors truncate" title="technical_analyst_agent.py">
+                                <span class="mr-2 opacity-50">📄</span> technical_analyst_agent.py
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+            </aside>
+
+            <!-- MAIN STAGE -->
+            <main class="col-span-1 md:col-span-3">
+                <div class="glass-panel p-6 rounded-lg min-h-[500px] relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-2 opacity-10 font-mono text-6xl font-bold text-white pointer-events-none">
+                        agents
+                    </div>
+
+                    <h2 class="text-xl font-bold text-cyan-400 mb-6 font-mono border-l-4 border-cyan-500 pl-3">
+                         DIRECTORY OVERVIEW
+                    </h2>
+
+                    <div class="prose prose-invert prose-cyan max-w-none text-slate-300 font-sans">
+
+                            <div class="text-center py-20 flex flex-col items-center justify-center opacity-50">
+                                <div class="text-6xl mb-4 grayscale">🔮</div>
+                                <h3 class="text-2xl font-mono text-slate-500">AWAITING INPUT</h3>
+                                <p class="text-slate-600 mt-2">No README.md found in this sector.</p>
+                                <p class="text-slate-700 text-xs mt-4 font-mono">system.scan_complete(status="empty")</p>
+                            </div>
+
+                    </div>
+
+
                 </div>
             </main>
         </div>
 
-        <!-- Footer -->
-        <footer style="margin-top: 50px; border-top: 1px solid var(--panel-border); padding-top: 20px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">
-            ADAM AUTO-GENERATED SHOWCASE | <span class="mono">REF: core/agents</span>
+        <!-- FOOTER -->
+        <footer class="mt-12 py-6 border-t border-slate-800 text-center text-xs font-mono text-slate-600">
+            <p>ADAM AUTO-GENERATED SHOWCASE | REF: agents | GENERATED: 2025-12-10 02:59:50</p>
+            <p class="mt-1 opacity-50">SYSTEM STATUS: NOMINAL</p>
         </footer>
     </div>
 
+    <!-- RUNTIME TOGGLE SCRIPT -->
     <script>
-        function toggleRuntime() {
-            const panel = document.getElementById('runtime-panel');
-            if (panel.style.display === 'none') {
-                panel.style.display = 'block';
-            } else {
-                panel.style.display = 'none';
-            }
-        }
+    (function() {
+        const CONFIG = {
+            mockMode: true,
+            rootPath: "../../",
+            currentDir: "agents"
+        };
+
+        window.toggleRuntime = function() {
+            alert("Runtime connection simulating... [MOCK MODE ACTIVE]\n\nConnecting to MetaOrchestrator...\nError: Connection Refused (Static Mode)");
+        };
+    })();
     </script>
 </body>
 </html>
