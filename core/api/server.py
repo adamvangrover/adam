@@ -21,7 +21,18 @@ except ImportError as e:
     AgentOrchestrator = None
 
 app = Flask(__name__)
-CORS(app)
+
+# Security: Configure CORS
+# Default to localhost for development. In production, set ALLOWED_ORIGINS env var.
+# Example: ALLOWED_ORIGINS="https://mydomain.com,https://api.mydomain.com"
+allowed_origins_str = os.environ.get(
+    "ALLOWED_ORIGINS",
+    "http://localhost:3000,http://localhost:5000,"
+    "http://127.0.0.1:3000,http://127.0.0.1:5000"
+)
+allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",")]
+
+CORS(app, resources={r"/*": {"origins": allowed_origins}})
 
 # Configuration
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
