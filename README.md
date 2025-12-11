@@ -1,3 +1,178 @@
+This is the **Gold Standard README** for Adam v23.5.
+
+This document is designed to be the "source of truth" that positions the repo not just as a tool, but as a **paradigm shift** in open-source financial AI. It highlights the *Neuro-Symbolic* architecture as the solution to LLM hallucination in finance and frames the "Super-App" as the future of institutional workflows.
+
+-----
+
+# ⚛️ Adam v23.5: The Neuro-Symbolic Financial Sovereign
+
+[](https://opensource.org/licenses/MIT) [](https://www.python.org/downloads/) [](https://www.docker.com/) [](https://arxiv.org/abs/2406.16793)
+
+> **The First Autonomous "Front Office" Super-App for Institutional Finance.**
+> Unifying Market Analysis, Credit Risk, and Family Office Wealth Management into a single, self-correcting cognitive architecture.
+
+-----
+
+## 📖 Table of Contents
+
+  - [Why Adam? The "System 2" Advantage](https://www.google.com/search?q=%23-why-adam-the-system-2-advantage)
+  - [🏰 The FO Super-App (Family Office Edition)](https://www.google.com/search?q=%23-the-fo-super-app-family-office-edition)
+  - [🧠 Architecture: The Cyclical Reasoning Graph](https://www.google.com/search?q=%23-architecture-the-cyclical-reasoning-graph)
+  - [📊 Gold Standard Data Pipeline](https://www.google.com/search?q=%23-gold-standard-data-pipeline)
+  - [⚡ Financial Engineering Engine](https://www.google.com/search?q=%23-financial-engineering-engine)
+  - [🚀 Quick Start (Modern Stack)](https://www.google.com/search?q=%23-quick-start-modern-stack)
+  - [🤝 Contributing & Roadmap](https://www.google.com/search?q=%23-contributing--roadmap)
+
+-----
+
+## 💡 Why Adam? The "System 2" Advantage
+
+Most financial AI agents are **linear** (Chain-of-Thought). They are fast ("System 1") but prone to hallucination, making them dangerous for capital allocation.
+
+**Adam v23.5 is different.** It introduces a **Neuro-Symbolic "System 2" Architecture** that forces the AI to "think before it speaks."
+
+1.  **Cyclical Reasoning:** Adam doesn't just answer; it **Drafts**, **Critiques**, and **Refines**. If the math doesn't check out, the *Self-Correction Loop* rejects the draft and triggers a new simulation.
+2.  **Conviction Scoring:** Every insight is scored (0-100%). Low conviction results are automatically flagged or discarded.
+3.  **Universal Memory:** A specialized Knowledge Graph that remembers your *Investment Policy Statement (IPS)*, ensuring every trade recommendation aligns with your specific risk mandate.
+
+-----
+
+## 🏰 The FO Super-App (Family Office Edition)
+
+Adam v23.5 expands beyond pure analysis into a **Unified Operating System** for the modern Family Office. It bridges the gap between *Institutional Investment Banking* and *Private Wealth Management*.
+
+### 1\. Wealth Management Layer
+
+  * **Trust Modeling:** Encodes complex estate structures and beneficiary requirements into the decision engine.
+  * **Automated IPS:** Dynamically generates and enforces Investment Policy Statements based on shifting market conditions.
+  * **Goal-Based Planning:** "Co-pilot" memory that aligns daily execution with multi-generational wealth preservation goals.
+
+### 2\. Institutional Risk Layer
+
+  * **SNC (Shared National Credit) Analyst:** Automated regulatory grading for syndicated loans.
+  * **LBO Deep Dives:** Generates 3-statement models and sensitivity tables for potential buyouts.
+  * **Cross-Entity Risk:** Aggregates exposure across the Family Office, Foundation, and Personal Trust entities to find hidden correlation risks.
+
+-----
+
+## 🧠 Architecture: The Cyclical Reasoning Graph
+
+Adam abandons the "Chain" for the "Graph." The **Neuro-Symbolic Planner** constructs a directed graph of tasks, allowing agents to work in parallel and loop back when they need more information.
+
+```mermaid
+graph TD
+    %% Core Inputs
+    User([User / API]) -->|Complex Query| Meta[Meta Orchestrator]
+    IPS[(Personal IPS Memory)] -.->|Constraints| Meta
+
+    %% The Brain
+    subgraph "System 2: The Reasoning Engine"
+        Meta --> Planner[Neuro-Symbolic Planner]
+        Planner -->|Builds DAG| Graph[Dynamic Execution Graph]
+        
+        %% Parallel Agents
+        Graph --> AgentA[Fundamental Analyst]
+        Graph --> AgentB[Risk & Quant Analyst]
+        Graph --> AgentC[Legal & Trust Analyst]
+        
+        %% The Loop
+        AgentA & AgentB & AgentC -->|Draft Findings| Critic[Self-Correction Critic]
+        
+        Critic -->|Failed: Logic Error| Graph
+        Critic -->|Failed: Low Conviction| Ingest[Trigger New Data Ingest]
+        Ingest --> Graph
+        
+        Critic -->|Passed: High Conviction| Synth[Final Synthesis]
+    end
+
+    %% Output
+    Synth -->|Report| Dashboard[Neural Dashboard]
+    Synth -->|Action| Exec[Execution API]
+```
+
+### Key Components
+
+  * **`core/engine/neuro_symbolic_planner.py`:** The "Cortex" that breaks high-level goals into executable graphs.
+  * **`core/engine/cyclical_reasoning.py`:** The loop logic that prevents hallucination by enforcing critique steps.
+  * **`core/memory/provo_graph.py`:** Implements PROV-O ontology to track *exactly* which document led to which conclusion.
+
+-----
+
+## 📊 Gold Standard Data Pipeline
+
+**"The Universal Ingestor"**
+
+Trust is the currency of finance. Adam's data pipeline scrubs, validates, and normalizes every token before it reaches the reasoning engine.
+
+  * **Recursive Scrubbing:** Scans PDFs, XBRL feeds, and news APIs.
+  * **Source Verification:** Cross-references claims against primary sources (e.g., verifying a news rumor against an SEC 8-K filing).
+  * **Format:** Outputs to strictly typed `JSONL` for high-throughput agent consumption.
+
+> *See [docs/GOLD\_STANDARD\_PIPELINE.md](https://www.google.com/search?q=./docs/GOLD_STANDARD_PIPELINE.md) for ingestion rules.*
+
+-----
+
+## ⚡ Financial Engineering Engine
+
+A standalone, high-performance Python/Rust hybrid engine for deterministic calculations. *We do not let LLMs do math; we let them call this engine.*
+
+| Module | Function | Status |
+| :--- | :--- | :--- |
+| **`src/core_valuation.py`** | DCF, WACC, Terminal Value | ✅ Production |
+| **`src/credit_risk.py`** | LBO Models, DSCR, Leverage Ratios | ✅ Production |
+| **`src/quantum_sim.py`** | Quantum Monte Carlo (Simulated Annealing) | 🧪 Beta |
+| **`src/market_maker.py`** | Order Book Simulation & Liquidity Scoring | 🚧 WIP |
+
+-----
+
+## 🚀 Quick Start (Modern Stack)
+
+We utilize **`uv`** for lightning-fast, hermetic Python environment management and **Docker** for production deployment.
+
+### Option A: The "Mission Control" (Docker)
+
+Best for full system demonstration and UI.
+
+```bash
+# 1. Build the Optimized Container
+docker build -f Dockerfile.modern -t adam-v23 .
+
+# 2. Run with GPU Support (if available)
+docker run --gpus all -p 3000:3000 -p 8000:8000 \
+  -e OPENAI_API_KEY=sk-... \
+  adam-v23
+```
+
+### Option B: The "Hacker" (Local Dev)
+
+Best for modifying the Reasoning Graph or adding new agents.
+
+```bash
+# 1. Install dependencies with UV (10x faster than pip)
+uv pip install -e .
+
+# 2. Launch the CLI in "Interactive Mode"
+python core/main.py --interactive
+```
+
+-----
+
+## 🤝 Contributing & Roadmap
+
+We are building the open-source standard for institutional AI.
+
+  * **Current Focus:** Refining the *Quantum Risk Module* and adding connectors for *Bloomberg Terminal (BBG)* and *FactSet*.
+  * **How to Help:**
+    1.  Fork the repo.
+    2.  Create an Agent Skill (e.g., `core/skills/technical_analysis_rsi.py`).
+    3.  Submit a PR with a test case in `tests/skills/`.
+
+**Join the future of autonomous finance.**
+
+-----
+
+*Use of this software is subject to the MIT License. Financial models are for informational purposes only.*
+
 # FO Super-App: The Unified Front Office
 
 > **Vision:** A "Super-App" that unifies markets, ratings, execution, analytics, and personal memory into one autonomous architecture.
