@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | M&A Modeler</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-dark: #020408;
+            --panel-glass: rgba(10, 15, 30, 0.7);
+            --teal-glow: #2dd4bf;
+            --grid-line: rgba(45, 212, 191, 0.05);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 30px 30px;
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: var(--panel-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(45, 212, 191, 0.1);
+        }
+
+        input[type="number"] {
+            background: #050a14;
+            border: 1px solid #1e293b;
+            color: var(--teal-glow);
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+            font-size: 0.75rem;
+            padding: 4px;
+            width: 100%;
+        }
+        input:focus {
+            border-color: var(--teal-glow);
+            box-shadow: 0 0 8px rgba(45, 212, 191, 0.3);
+            outline: none;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--teal-glow); }
+
+        .section-title { color: #64748b; font-size: 10px; font-weight: bold; text-transform: uppercase; margin-bottom: 8px; border-bottom: 1px solid #1e293b; padding-bottom: 2px; }
+    </style>
+</head>
+<body class="h-screen flex flex-col p-4 text-xs">
+
+    <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2">
+        <h1 class="text-lg font-bold text-white tracking-widest flex items-center">
+            <i data-lucide="merge" class="w-5 h-5 mr-2 text-teal-400"></i>
+            M&A MODELER
+        </h1>
+        <div class="flex gap-2">
+            <button onclick="exportCSV()" class="px-3 py-1 bg-teal-900/20 border border-teal-500/30 text-teal-400 rounded hover:bg-teal-500/30 text-[10px] font-bold flex items-center gap-1">
+                <i data-lucide="download" class="w-3 h-3"></i> EXPORT CSV
+            </button>
+            <div class="text-[10px] text-gray-500 self-center">LOCAL_MODE</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-12 gap-4 flex-grow overflow-hidden">
+
+        <!-- Inputs -->
+        <aside class="col-span-4 space-y-3 overflow-y-auto pr-2">
+
+            <div class="glass-panel p-3 rounded">
+                <div class="section-title">Acquirer</div>
+                <div class="space-y-2">
+                    <div><label class="block text-gray-400 text-[10px]">Share Price ($)</label><input type="number" id="acqPrice" value="50"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Shares Outstanding (M)</label><input type="number" id="acqShares" value="100"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Net Income (M)</label><input type="number" id="acqNI" value="250"></div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-3 rounded">
+                <div class="section-title">Target</div>
+                <div class="space-y-2">
+                    <div><label class="block text-gray-400 text-[10px]">Share Price ($)</label><input type="number" id="tarPrice" value="20"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Shares Outstanding (M)</label><input type="number" id="tarShares" value="50"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Net Income (M)</label><input type="number" id="tarNI" value="80"></div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-3 rounded">
+                <div class="section-title">Deal Structure</div>
+                <div class="space-y-2">
+                    <div><label class="block text-gray-400 text-[10px]">Premium %</label><input type="number" id="premium" value="30"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Synergies (Post-Tax M)</label><input type="number" id="syn" value="20"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Cash Consideration %</label><input type="number" id="cashPct" value="40"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Debt Interest Rate %</label><input type="number" id="debtRate" value="6.0"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Foregone Cash Rate %</label><input type="number" id="cashRate" value="2.0"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Tax Rate %</label><input type="number" id="tax" value="21.0"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Transaction Fees (M)</label><input type="number" id="fees" value="15"></div>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- Main Output -->
+        <main class="col-span-8 flex flex-col gap-4 overflow-y-auto pr-2">
+
+            <!-- Scorecards -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="glass-panel p-3 rounded flex flex-col items-center justify-center">
+                    <div class="text-[10px] text-gray-500 uppercase">Accretion / (Dilution) $</div>
+                    <div class="text-2xl font-bold font-mono mt-1" id="res-amt">$0.00</div>
+                </div>
+                <div class="glass-panel p-3 rounded flex flex-col items-center justify-center">
+                    <div class="text-[10px] text-gray-500 uppercase">Accretion / (Dilution) %</div>
+                    <div class="text-2xl font-bold font-mono mt-1" id="res-pct">0.0%</div>
+                </div>
+            </div>
+
+            <!-- Waterfall Chart or Details -->
+            <div class="glass-panel p-4 rounded flex-grow">
+                 <div class="section-title">Pro-Forma Analysis</div>
+                 <table class="w-full text-xs font-mono mb-4">
+                     <tbody>
+                         <tr><td class="text-gray-400">Acquirer EPS</td><td class="text-right text-white" id="tbl-acq-eps">0.00</td></tr>
+                         <tr><td class="text-gray-400">Target EPS</td><td class="text-right text-white" id="tbl-tar-eps">0.00</td></tr>
+                         <tr><td class="border-t border-gray-700 py-2 font-bold text-teal-400">Pro-Forma EPS</td><td class="text-right text-teal-400 font-bold border-t border-gray-700 py-2" id="tbl-pf-eps">0.00</td></tr>
+                     </tbody>
+                 </table>
+
+                 <div class="section-title mt-4">Transaction Sources & Uses ($M)</div>
+                 <table class="w-full text-xs font-mono">
+                     <thead>
+                         <tr><th>Sources</th><th class="text-right">Amt</th><th>Uses</th><th class="text-right">Amt</th></tr>
+                     </thead>
+                     <tbody>
+                         <tr>
+                             <td class="text-gray-400">Stock Issued</td><td class="text-right text-teal-300" id="src-stock">0</td>
+                             <td class="text-gray-400">Purchase Equity</td><td class="text-right text-rose-300" id="use-equity">0</td>
+                         </tr>
+                         <tr>
+                             <td class="text-gray-400">Cash Used</td><td class="text-right text-teal-300" id="src-cash">0</td>
+                             <td class="text-gray-400">Fees</td><td class="text-right text-rose-300" id="use-fees">0</td>
+                         </tr>
+                         <tr>
+                             <td class="text-gray-400">New Debt</td><td class="text-right text-teal-300" id="src-debt">0</td>
+                             <td></td><td></td>
+                         </tr>
+                         <tr class="font-bold border-t border-gray-700">
+                             <td>Total Sources</td><td class="text-right" id="src-total">0</td>
+                             <td>Total Uses</td><td class="text-right" id="use-total">0</td>
+                         </tr>
+                     </tbody>
+                 </table>
+            </div>
+
+            <div class="glass-panel p-4 rounded h-40">
+                <canvas id="ma-chart"></canvas>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let chartInstance = null;
+        let exportData = {};
+
+        const get = (id) => parseFloat(document.getElementById(id).value) || 0;
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(i => i.addEventListener('change', runModel));
+
+        function fmt(n) { return n.toFixed(2); }
+
+        function runModel() {
+            // Inputs
+            const acqPrice = get('acqPrice');
+            const acqShares = get('acqShares');
+            const acqNI = get('acqNI');
+
+            const tarPrice = get('tarPrice');
+            const tarShares = get('tarShares');
+            const tarNI = get('tarNI');
+
+            const premium = get('premium') / 100;
+            const synergies = get('syn');
+            const cashPct = get('cashPct') / 100;
+            const debtRate = get('debtRate') / 100;
+            const cashRate = get('cashRate') / 100;
+            const taxRate = get('tax') / 100;
+            const fees = get('fees');
+
+            // Deal Calcs
+            const offerPrice = tarPrice * (1 + premium);
+            const equityVal = offerPrice * tarShares;
+            const totalUses = equityVal + fees;
+
+            // Sources
+            const cashUsed = equityVal * cashPct; // Simplified: user defines total consideration split
+            const stockVal = equityVal * (1 - cashPct);
+
+            // Assuming we use Cash on Balance sheet first? No, let's assume New Debt covers the cash portion for simplicity in this "Lite" model, or split.
+            // Let's assume 100% of "Cash Component" is financed via Debt for conservative estimate, or just generic "Cash/Debt".
+            // Let's say "Cash Used" comes from balance sheet (foregone interest) and if needed debt.
+            // For this simple tool: Cash Component = New Debt. Stock Component = New Shares.
+            // Wait, usually "Cash Consideration" implies mix. Let's assume it's New Debt for simplicity of cost calc.
+
+            const newDebt = cashUsed; // Assume all financed
+            const newStockIssued = stockVal;
+            const newSharesIssued = newStockIssued / acqPrice;
+
+            const interestExp = newDebt * debtRate;
+            const foregoneInt = 0; // Assume debt financed
+            const addedIntExp = interestExp + foregoneInt;
+            const taxShield = addedIntExp * taxRate;
+            const netIntExp = addedIntExp - taxShield;
+
+            // Pro Forma
+            const pfNI = acqNI + tarNI + synergies - netIntExp;
+            const pfShares = acqShares + newSharesIssued;
+            const pfEPS = pfNI / pfShares;
+
+            const acqEPS = acqNI / acqShares;
+            const accAmt = pfEPS - acqEPS;
+            const accPct = accAmt / acqEPS;
+
+            // Render
+            const resAmt = document.getElementById('res-amt');
+            const resPct = document.getElementById('res-pct');
+
+            resAmt.innerText = (accAmt >= 0 ? '+' : '') + fmt(accAmt);
+            resPct.innerText = (accPct * 100).toFixed(1) + '%';
+
+            resAmt.className = `text-2xl font-bold font-mono mt-1 ${accAmt >= 0 ? 'text-teal-400' : 'text-rose-400'}`;
+            resPct.className = `text-2xl font-bold font-mono mt-1 ${accAmt >= 0 ? 'text-teal-400' : 'text-rose-400'}`;
+
+            document.getElementById('tbl-acq-eps').innerText = fmt(acqEPS);
+            document.getElementById('tbl-tar-eps').innerText = fmt(tarNI/tarShares); // Standalone
+            document.getElementById('tbl-pf-eps').innerText = fmt(pfEPS);
+
+            // Sources Table
+            document.getElementById('src-stock').innerText = fmt(newStockIssued);
+            document.getElementById('src-debt').innerText = fmt(newDebt);
+            document.getElementById('src-cash').innerText = "0.00"; // Assuming debt financed
+            document.getElementById('src-total').innerText = fmt(newStockIssued + newDebt);
+
+            document.getElementById('use-equity').innerText = fmt(equityVal);
+            document.getElementById('use-fees').innerText = fmt(fees);
+            document.getElementById('use-total').innerText = fmt(totalUses); // Discrepancy if fees not financed? Let's assume fees paid from cash (not modeled in sources for simplicity, or add generic source).
+            // Let's balance it: Sources = Uses. So Debt must cover Fees too?
+            // Re-calc: Total Uses = Equity + Fees. Stock covers (Equity * Stock%). Remainder is Debt.
+            const realStock = equityVal * (1 - cashPct);
+            const realDebt = totalUses - realStock; // Plug
+
+            // Re-run interest with plug debt
+            const realInt = realDebt * debtRate * (1-taxRate);
+            const realPFNI = acqNI + tarNI + synergies - realInt;
+            const realPFEPS = realPFNI / (acqShares + (realStock/acqPrice));
+            // Update UI with better numbers
+            document.getElementById('src-stock').innerText = fmt(realStock);
+            document.getElementById('src-debt').innerText = fmt(realDebt);
+            document.getElementById('src-total').innerText = fmt(realStock + realDebt);
+            document.getElementById('tbl-pf-eps').innerText = fmt(realPFEPS);
+
+            const realAcc = realPFEPS - acqEPS;
+            resAmt.innerText = (realAcc >= 0 ? '+' : '') + fmt(realAcc);
+            resPct.innerText = (realAcc / acqEPS * 100).toFixed(1) + '%';
+            resAmt.className = `text-2xl font-bold font-mono mt-1 ${realAcc >= 0 ? 'text-teal-400' : 'text-rose-400'}`;
+            resPct.className = `text-2xl font-bold font-mono mt-1 ${realAcc >= 0 ? 'text-teal-400' : 'text-rose-400'}`;
+
+            // Chart
+            if(chartInstance) chartInstance.destroy();
+            const ctx = document.getElementById('ma-chart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Acquirer EPS', 'Target EPS', 'Pro-Forma EPS'],
+                    datasets: [{
+                        label: 'EPS',
+                        data: [acqEPS, tarNI/tarShares, realPFEPS],
+                        backgroundColor: ['#94a3b8', '#94a3b8', realAcc >= 0 ? '#2dd4bf' : '#f43f5e']
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: { x: { grid: { color: '#1e293b' } }, y: { grid: { display: false } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            exportData = { acqEPS, pfEPS: realPFEPS, accretion: realAcc, accPct: realAcc/acqEPS };
+        }
+
+        function exportCSV() {
+            let csv = "Metric,Value\n";
+            csv += `Acquirer EPS,${exportData.acqEPS.toFixed(2)}\n`;
+            csv += `Pro-Forma EPS,${exportData.pfEPS.toFixed(2)}\n`;
+            csv += `Accretion $,${exportData.accretion.toFixed(2)}\n`;
+            csv += `Accretion %,${(exportData.accPct*100).toFixed(2)}%\n`;
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'ma_model.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        window.onload = function() {
+            lucide.createIcons();
+            runModel();
+        };
+    </script>
+</body>
+</html>

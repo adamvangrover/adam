@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Ratio Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-dark: #020408;
+            --panel-glass: rgba(10, 15, 30, 0.7);
+            --orange-glow: #f97316;
+            --grid-line: rgba(249, 115, 22, 0.05);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 30px 30px;
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: var(--panel-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(249, 115, 22, 0.1);
+        }
+
+        input[type="number"] {
+            background: #050a14;
+            border: 1px solid #1e293b;
+            color: var(--orange-glow);
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+            font-size: 0.75rem;
+            padding: 4px;
+            width: 100%;
+        }
+        input:focus {
+            border-color: var(--orange-glow);
+            box-shadow: 0 0 8px rgba(249, 115, 22, 0.3);
+            outline: none;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--orange-glow); }
+
+        h2 { font-size: 0.7rem; font-weight: bold; text-transform: uppercase; color: #64748b; margin-bottom: 0.5rem; border-bottom: 1px solid #1e293b; padding-bottom: 2px; }
+        .result-box {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255,255,255,0.03); padding: 6px; border-radius: 4px; margin-bottom: 4px;
+        }
+        .result-val { font-weight: bold; font-family: monospace; }
+        .good { color: #10b981; }
+        .bad { color: #ef4444; }
+        .neutral { color: #f97316; }
+    </style>
+</head>
+<body class="h-screen flex flex-col p-4 text-xs">
+
+    <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2">
+        <h1 class="text-lg font-bold text-white tracking-widest flex items-center">
+            <i data-lucide="calculator" class="w-5 h-5 mr-2 text-orange-400"></i>
+            RATIO CALCULATOR
+        </h1>
+        <div class="flex gap-2">
+            <button onclick="exportCSV()" class="px-3 py-1 bg-orange-900/20 border border-orange-500/30 text-orange-400 rounded hover:bg-orange-500/30 text-[10px] font-bold flex items-center gap-1">
+                <i data-lucide="download" class="w-3 h-3"></i> EXPORT CSV
+            </button>
+            <div class="text-[10px] text-gray-500 self-center">LOCAL_MODE</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-12 gap-4 flex-grow overflow-hidden">
+
+        <!-- Input Column -->
+        <aside class="col-span-4 flex flex-col gap-3 overflow-y-auto pr-2">
+
+            <div class="glass-panel p-3 rounded">
+                <h2>Income Statement (LTM)</h2>
+                <div class="space-y-2">
+                    <div><label class="block text-gray-400 text-[10px]">Revenue</label><input type="number" id="rev" value="1000"></div>
+                    <div><label class="block text-gray-400 text-[10px]">COGS</label><input type="number" id="cogs" value="600"></div>
+                    <div><label class="block text-gray-400 text-[10px]">OpEx</label><input type="number" id="opex" value="200"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Interest Exp</label><input type="number" id="int" value="50"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Net Income</label><input type="number" id="ni" value="100"></div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-3 rounded">
+                <h2>Balance Sheet</h2>
+                <div class="space-y-2">
+                    <div><label class="block text-gray-400 text-[10px]">Cash</label><input type="number" id="cash" value="100"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Accounts Rx</label><input type="number" id="ar" value="150"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Inventory</label><input type="number" id="inv" value="200"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Total Assets</label><input type="number" id="assets" value="2000"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Current Liab</label><input type="number" id="cl" value="300"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Total Debt</label><input type="number" id="debt" value="800"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Total Equity</label><input type="number" id="equity" value="900"></div>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- Output Column -->
+        <main class="col-span-8 grid grid-cols-2 gap-4 overflow-y-auto pr-2 h-full content-start">
+
+            <div class="glass-panel p-3 rounded">
+                <h2>Profitability Ratios</h2>
+                <div id="res-prof" class="space-y-1"></div>
+            </div>
+
+            <div class="glass-panel p-3 rounded">
+                <h2>Liquidity Ratios</h2>
+                <div id="res-liq" class="space-y-1"></div>
+            </div>
+
+            <div class="glass-panel p-3 rounded">
+                <h2>Solvency Ratios</h2>
+                <div id="res-sol" class="space-y-1"></div>
+            </div>
+
+            <div class="glass-panel p-3 rounded">
+                <h2>Efficiency Ratios</h2>
+                <div id="res-eff" class="space-y-1"></div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const get = (id) => parseFloat(document.getElementById(id).value) || 0;
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(i => i.addEventListener('change', calc));
+
+        function calc() {
+            // Inputs
+            const rev = get('rev');
+            const cogs = get('cogs');
+            const opex = get('opex');
+            const intExp = get('int');
+            const ni = get('ni');
+
+            const cash = get('cash');
+            const ar = get('ar');
+            const inv = get('inv');
+            const assets = get('assets');
+            const cl = get('cl');
+            const debt = get('debt');
+            const equity = get('equity');
+
+            const grossProfit = rev - cogs;
+            const ebit = grossProfit - opex;
+            const ebitda = ebit + (opex * 0.1); // Proxy D&A
+            const ca = cash + ar + inv;
+
+            // Calculations
+            const ratios = {
+                prof: [
+                    { name: "Gross Margin", val: (grossProfit/rev), fmt: 'pct' },
+                    { name: "EBITDA Margin", val: (ebitda/rev), fmt: 'pct' },
+                    { name: "Net Margin", val: (ni/rev), fmt: 'pct' },
+                    { name: "ROA", val: (ni/assets), fmt: 'pct' },
+                    { name: "ROE", val: (ni/equity), fmt: 'pct' }
+                ],
+                liq: [
+                    { name: "Current Ratio", val: (ca/cl), fmt: 'x' },
+                    { name: "Quick Ratio", val: ((cash+ar)/cl), fmt: 'x' },
+                    { name: "Cash Ratio", val: (cash/cl), fmt: 'x' }
+                ],
+                sol: [
+                    { name: "Debt / Equity", val: (debt/equity), fmt: 'x' },
+                    { name: "Debt / EBITDA", val: (debt/ebitda), fmt: 'x' },
+                    { name: "Interest Coverage", val: (ebit/intExp), fmt: 'x' }
+                ],
+                eff: [
+                    { name: "Asset Turnover", val: (rev/assets), fmt: 'x' },
+                    { name: "Inv Turnover", val: (cogs/inv), fmt: 'x' },
+                    { name: "Days Sales Out", val: (ar/rev)*365, fmt: 'n' }
+                ]
+            };
+
+            renderGroup('res-prof', ratios.prof);
+            renderGroup('res-liq', ratios.liq);
+            renderGroup('res-sol', ratios.sol);
+            renderGroup('res-eff', ratios.eff);
+
+            // Store for export
+            window.lastRatios = ratios;
+        }
+
+        function renderGroup(id, arr) {
+            const el = document.getElementById(id);
+            el.innerHTML = arr.map(r => {
+                let display = '-';
+                let color = 'neutral';
+                if(isFinite(r.val)) {
+                    if(r.fmt === 'pct') display = (r.val*100).toFixed(1) + '%';
+                    else if(r.fmt === 'x') display = r.val.toFixed(2) + 'x';
+                    else display = r.val.toFixed(1);
+
+                    // Simple heuristic coloring
+                    if(r.name.includes('Margin') || r.name.includes('RO')) color = r.val > 0.1 ? 'good' : 'neutral';
+                    if(r.name.includes('Debt')) color = r.val > 4 ? 'bad' : 'good';
+                }
+
+                return `
+                    <div class="result-box">
+                        <span class="text-gray-400">${r.name}</span>
+                        <span class="result-val ${color}">${display}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function exportCSV() {
+            if(!window.lastRatios) return;
+            let csv = "Category,Metric,Value\n";
+            Object.keys(window.lastRatios).forEach(cat => {
+                window.lastRatios[cat].forEach(r => {
+                     csv += `${cat},${r.name},${r.val.toFixed(4)}\n`;
+                });
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'ratio_analysis.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        window.onload = function() {
+            lucide.createIcons();
+            calc();
+        };
+    </script>
+</body>
+</html>
