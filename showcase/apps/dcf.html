@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | DCF Valuator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-dark: #020408;
+            --panel-glass: rgba(10, 15, 30, 0.7);
+            --cyan-glow: #00f0ff;
+            --grid-line: rgba(0, 240, 255, 0.05);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 30px 30px;
+            overflow: hidden; /* Hide scrollbars for iframe use */
+        }
+
+        .glass-panel {
+            background: var(--panel-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 240, 255, 0.1);
+        }
+
+        input[type="number"] {
+            background: #050a14;
+            border: 1px solid #1e293b;
+            color: var(--cyan-glow);
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+            font-size: 0.75rem;
+        }
+        input[type="number"]:focus {
+            border-color: var(--cyan-glow);
+            box-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
+            outline: none;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--cyan-glow); }
+
+        table { border-collapse: separate; border-spacing: 0; width: 100%; }
+        th { background: rgba(0, 240, 255, 0.05); color: var(--cyan-glow); font-weight: normal; text-transform: uppercase; letter-spacing: 1px; }
+        td { border-bottom: 1px solid #1e293b; }
+    </style>
+</head>
+<body class="h-screen flex flex-col p-4 text-xs">
+
+    <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2">
+        <h1 class="text-lg font-bold text-white tracking-widest flex items-center">
+            <i data-lucide="bar-chart-2" class="w-5 h-5 mr-2 text-cyan-400"></i>
+            DCF VALUATOR
+        </h1>
+        <div class="text-[10px] text-gray-500">LOCAL_MODE_ACTIVE</div>
+    </div>
+
+    <div class="grid grid-cols-12 gap-4 flex-grow overflow-hidden">
+        <!-- Sidebar Inputs -->
+        <aside class="col-span-4 lg:col-span-3 space-y-3 overflow-y-auto pr-2">
+
+            <div class="glass-panel p-3 rounded">
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold">1. Historicals ($M)</div>
+                <div class="space-y-2">
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">LTM Revenue</label>
+                        <input type="number" id="ltmRev" value="100" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">LTM EBITDA</label>
+                        <input type="number" id="ltmEbitda" value="25" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-3 rounded">
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold">2. WACC Assumptions</div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Risk Free %</label>
+                        <input type="number" id="rfRate" value="4.2" step="0.1" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">MRP %</label>
+                        <input type="number" id="mrp" value="6.0" step="0.1" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Beta</label>
+                        <input type="number" id="beta" value="1.2" step="0.1" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Tax Rate %</label>
+                        <input type="number" id="taxRate" value="21.0" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                </div>
+                <div class="mt-2">
+                     <label class="block text-gray-400 text-[10px] mb-1">Terminal Growth %</label>
+                     <input type="number" id="tgr" value="2.0" step="0.1" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                </div>
+            </div>
+
+            <div class="glass-panel p-3 rounded">
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold">3. Projections (Y1-Y5)</div>
+                <div class="space-y-2">
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Rev Growth % (Avg)</label>
+                        <input type="number" id="avgGrowth" value="5.0" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">EBITDA Margin % (Avg)</label>
+                        <input type="number" id="avgMargin" value="25.0" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- Main Output -->
+        <main class="col-span-8 lg:col-span-9 flex flex-col gap-4 overflow-y-auto pr-2">
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="glass-panel p-3 rounded">
+                    <div class="text-[10px] text-gray-500 uppercase">Enterprise Value</div>
+                    <div class="text-2xl font-bold text-white mt-1 font-mono" id="val-ev">$0.0M</div>
+                    <div class="text-[10px] text-cyan-600 mt-1">Implied by DCF</div>
+                </div>
+                <div class="glass-panel p-3 rounded">
+                    <div class="text-[10px] text-gray-500 uppercase">WACC</div>
+                    <div class="text-2xl font-bold text-white mt-1 font-mono" id="val-wacc">0.0%</div>
+                    <div class="text-[10px] text-gray-600 mt-1">Discount Rate</div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-4 rounded flex-grow">
+                <h3 class="text-xs font-bold text-cyan-400 mb-3">Unlevered Free Cash Flow (UFCF)</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs font-mono">
+                        <thead>
+                            <tr class="text-gray-500 border-b border-gray-700">
+                                <th class="text-left py-2">Metric</th>
+                                <th class="text-right">Y1</th><th class="text-right">Y2</th><th class="text-right">Y3</th><th class="text-right">Y4</th><th class="text-right">Y5</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dcf-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="glass-panel p-4 rounded h-48 relative w-full">
+                 <canvas id="chart-dcf"></canvas>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let chartInstance = null;
+
+        const getVal = (id) => parseFloat(document.getElementById(id).value) || 0;
+        const fmtMoney = (n) => `$${n.toFixed(1)}`;
+        const fmtPct = (n) => `${(n*100).toFixed(1)}%`;
+
+        function runModel() {
+            // Inputs
+            const ltmRev = getVal('ltmRev');
+            const avgGrowth = getVal('avgGrowth') / 100;
+            const avgMargin = getVal('avgMargin') / 100;
+            const taxRate = getVal('taxRate') / 100;
+
+            // WACC
+            const rf = getVal('rfRate') / 100;
+            const mrp = getVal('mrp') / 100;
+            const beta = getVal('beta');
+            const ke = rf + (beta * mrp);
+            // Simplified WACC assuming 100% equity for pure asset valuation or user inputs manual wacc
+            // Let's assume standard 60/40 cap structure proxy for WACC calculation
+            const kd = 0.06 * (1-taxRate);
+            const wacc = (0.6 * ke) + (0.4 * kd);
+
+            const tgr = getVal('tgr') / 100;
+
+            // Projections
+            let proj = [];
+            let rev = ltmRev;
+
+            for(let i=1; i<=5; i++) {
+                rev = rev * (1 + avgGrowth);
+                let ebitda = rev * avgMargin;
+                let da = ebitda * 0.05; // 5% proxy
+                let ebit = ebitda - da;
+                let tax = Math.max(0, ebit * taxRate);
+                let nopat = ebit - tax;
+                let capex = rev * 0.03; // 3% proxy
+                let nwc = rev * 0.01; // 1% proxy
+                let ufcf = nopat + da - capex - nwc;
+
+                proj.push({ year: i, rev, ebitda, ufcf });
+            }
+
+            // Valuation
+            let pvFcf = 0;
+            proj.forEach(p => {
+                pvFcf += p.ufcf / Math.pow(1+wacc, p.year);
+            });
+
+            const termFcf = proj[4].ufcf * (1+tgr);
+            const tv = termFcf / (wacc - tgr);
+            const pvTv = tv / Math.pow(1+wacc, 5);
+            const ev = pvFcf + pvTv;
+
+            // Render
+            document.getElementById('val-ev').innerText = fmtMoney(ev);
+            document.getElementById('val-wacc').innerText = fmtPct(wacc);
+
+            const tbody = document.getElementById('dcf-body');
+            tbody.innerHTML = `
+                <tr><td>Revenue</td>${proj.map(p=>`<td class="text-right text-gray-400">${fmtMoney(p.rev)}</td>`).join('')}</tr>
+                <tr><td>EBITDA</td>${proj.map(p=>`<td class="text-right text-gray-300">${fmtMoney(p.ebitda)}</td>`).join('')}</tr>
+                <tr class="font-bold text-cyan-400"><td>UFCF</td>${proj.map(p=>`<td class="text-right">${fmtMoney(p.ufcf)}</td>`).join('')}</tr>
+            `;
+
+            // Chart
+            if(chartInstance) chartInstance.destroy();
+            const ctx = document.getElementById('chart-dcf').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Y1', 'Y2', 'Y3', 'Y4', 'Y5'],
+                    datasets: [
+                        { label: 'EBITDA', data: proj.map(p=>p.ebitda), borderColor: '#94a3b8', borderWidth: 2 },
+                        { label: 'UFCF', data: proj.map(p=>p.ufcf), borderColor: '#00f0ff', borderWidth: 2, backgroundColor: 'rgba(0, 240, 255, 0.1)', fill: true }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { y: { grid: { color: '#1e293b' } }, x: { grid: { display: false } } },
+                    plugins: { legend: { labels: { color: '#cbd5e1' } } }
+                }
+            });
+        }
+
+        window.onload = function() {
+            lucide.createIcons();
+            runModel();
+        };
+    </script>
+</body>
+</html>
