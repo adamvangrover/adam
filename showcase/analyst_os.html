@@ -207,7 +207,14 @@
             <i data-lucide="merge" class="text-teal-400 w-6 h-6"></i>
             <div class="app-dot" id="dot-ma"></div>
         </div>
+        <div class="dock-item" onclick="openWindow('wacc', 'WACC Calc', 'apps/wacc.html', 800, 600)" data-title="WACC Calculator">
+            <i data-lucide="calculator" class="text-orange-400 w-6 h-6"></i>
+            <div class="app-dot" id="dot-wacc"></div>
+        </div>
         <div class="w-[1px] h-8 bg-white/10 mx-2"></div>
+        <div class="dock-item" onclick="openNotepad()" data-title="Secure Notepad">
+            <i data-lucide="sticky-note" class="text-yellow-400 w-6 h-6"></i>
+        </div>
         <div class="dock-item" onclick="toggleFullScreen()" data-title="Toggle Fullscreen">
             <i data-lucide="monitor" class="text-gray-400 w-6 h-6"></i>
         </div>
@@ -347,6 +354,54 @@
                     document.exitFullscreen();
                 }
             }
+        }
+
+        function openNotepad() {
+            let id = 'notepad';
+            let win = document.getElementById(`win-${id}`);
+            if (win) { bringToFront(win); return; }
+
+            win = document.createElement('div');
+            win.id = `win-${id}`;
+            win.className = 'os-window active';
+            win.style.width = '400px'; win.style.height = '500px';
+            win.style.top = '100px'; win.style.left = '100px';
+            win.style.zIndex = ++zIndexCounter;
+
+            const savedNote = localStorage.getItem('adam_secure_note') || '';
+
+            win.innerHTML = `
+                <div class="window-bar" onmousedown="startDrag(event, '${id}')">
+                    <div class="flex items-center gap-2">
+                         <i data-lucide="sticky-note" class="w-3 h-3 text-yellow-500"></i>
+                         <span class="text-xs font-bold text-gray-300 tracking-wider">SECURE_NOTE.TXT</span>
+                    </div>
+                    <div class="flex gap-2 items-center">
+                        <div onclick="document.getElementById('win-${id}').remove()" class="w-3 h-3 rounded-full bg-red-500/50 hover:bg-red-500 cursor-pointer border border-red-500/30"></div>
+                    </div>
+                </div>
+                <div class="window-content bg-[#1e1e1e] flex flex-col">
+                    <textarea id="secure-note-area" class="w-full h-full bg-[#1e1e1e] text-yellow-100 p-4 font-mono text-xs outline-none resize-none border-none" spellcheck="false" placeholder="// Local Storage Only. No Cloud Sync.">${savedNote}</textarea>
+                    <div class="h-6 bg-[#0f172a] border-t border-white/10 flex items-center justify-end px-2">
+                        <span id="note-status" class="text-[9px] text-gray-500">SAVED</span>
+                    </div>
+                </div>
+            `;
+            document.getElementById('desktop').appendChild(win);
+            lucide.createIcons();
+
+            const area = document.getElementById('secure-note-area');
+            const status = document.getElementById('note-status');
+            area.addEventListener('input', () => {
+                localStorage.setItem('adam_secure_note', area.value);
+                status.innerText = 'SAVING...';
+                status.classList.add('text-yellow-500');
+                setTimeout(() => {
+                    status.innerText = 'SAVED LOCALLY';
+                    status.classList.remove('text-yellow-500');
+                    status.classList.add('text-green-500');
+                }, 500);
+            });
         }
     </script>
 </body>
