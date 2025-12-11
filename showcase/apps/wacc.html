@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | WACC Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-dark: #020408;
+            --panel-glass: rgba(10, 15, 30, 0.7);
+            --orange-glow: #f97316;
+            --grid-line: rgba(249, 115, 22, 0.05);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 30px 30px;
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: var(--panel-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(249, 115, 22, 0.1);
+        }
+
+        input[type="number"] {
+            background: #050a14;
+            border: 1px solid #1e293b;
+            color: var(--orange-glow);
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+            font-size: 0.75rem;
+        }
+        input[type="number"]:focus {
+            border-color: var(--orange-glow);
+            box-shadow: 0 0 8px rgba(249, 115, 22, 0.3);
+            outline: none;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--orange-glow); }
+
+        table { border-collapse: separate; border-spacing: 0; width: 100%; }
+        th { background: rgba(249, 115, 22, 0.05); color: var(--orange-glow); font-weight: normal; text-transform: uppercase; letter-spacing: 1px; }
+        td { border-bottom: 1px solid #1e293b; padding: 4px; }
+    </style>
+</head>
+<body class="h-screen flex flex-col p-4 text-xs">
+
+    <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2">
+        <h1 class="text-lg font-bold text-white tracking-widest flex items-center">
+            <i data-lucide="calculator" class="w-5 h-5 mr-2 text-orange-400"></i>
+            WACC CALCULATOR
+        </h1>
+        <div class="flex gap-2">
+            <button onclick="exportCSV()" class="px-3 py-1 bg-orange-900/20 border border-orange-500/30 text-orange-400 rounded hover:bg-orange-500/30 text-[10px] font-bold flex items-center gap-1">
+                <i data-lucide="download" class="w-3 h-3"></i> EXPORT CSV
+            </button>
+            <div class="text-[10px] text-gray-500 self-center">LOCAL_MODE</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-12 gap-4 flex-grow overflow-hidden">
+        <!-- Sidebar Inputs -->
+        <aside class="col-span-5 lg:col-span-4 space-y-3 overflow-y-auto pr-2">
+
+            <div class="glass-panel p-3 rounded">
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold">1. Cost of Equity (CAPM)</div>
+                <div class="space-y-2">
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Risk Free Rate (%)</label>
+                        <input type="number" id="rfRate" value="4.0" step="0.1" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Market Risk Prem (%)</label>
+                        <input type="number" id="mrp" value="6.0" step="0.1" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Levered Beta</label>
+                        <input type="number" id="beta" value="1.2" step="0.05" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                    <div>
+                         <label class="block text-gray-400 text-[10px] mb-1">Size Premium (%)</label>
+                         <input type="number" id="sizePrem" value="0.0" step="0.1" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-3 rounded">
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold">2. Cost of Debt</div>
+                <div class="space-y-2">
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Pre-Tax Cost of Debt (%)</label>
+                        <input type="number" id="costDebt" value="7.0" step="0.1" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Tax Rate (%)</label>
+                        <input type="number" id="taxRate" value="21.0" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-3 rounded">
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold">3. Capital Structure</div>
+                <div class="space-y-2">
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Total Debt ($M)</label>
+                        <input type="number" id="totalDebt" value="500" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Equity Value ($M)</label>
+                        <input type="number" id="equityVal" value="1500" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- Main Output -->
+        <main class="col-span-7 lg:col-span-8 flex flex-col gap-4 overflow-y-auto pr-2">
+
+            <div class="glass-panel p-4 rounded text-center">
+                <div class="text-xs text-gray-500 uppercase tracking-widest mb-2">Weighted Average Cost of Capital</div>
+                <div class="text-4xl font-bold text-white font-mono" id="val-wacc">0.0%</div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                 <div class="glass-panel p-3 rounded">
+                    <div class="text-[10px] text-gray-500 uppercase">Cost of Equity</div>
+                    <div class="text-2xl font-bold text-orange-400 mt-1 font-mono" id="val-ke">0.0%</div>
+                </div>
+                 <div class="glass-panel p-3 rounded">
+                    <div class="text-[10px] text-gray-500 uppercase">Cost of Debt (A-T)</div>
+                    <div class="text-2xl font-bold text-orange-400 mt-1 font-mono" id="val-kd">0.0%</div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-4 rounded flex-grow">
+                <h3 class="text-xs font-bold text-orange-400 mb-3">Calculation Breakdown</h3>
+                <table class="w-full text-xs font-mono">
+                    <tbody id="wacc-body">
+                         <!-- Filled by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="glass-panel p-4 rounded h-48 relative w-full">
+                 <canvas id="chart-wacc"></canvas>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let chartInstance = null;
+
+        const getVal = (id) => parseFloat(document.getElementById(id).value) || 0;
+        const fmtPct = (n) => `${(n*100).toFixed(2)}%`;
+        const fmtMoney = (n) => `$${n.toLocaleString()}`;
+
+        function runModel() {
+            // Inputs
+            const rf = getVal('rfRate') / 100;
+            const mrp = getVal('mrp') / 100;
+            const beta = getVal('beta');
+            const sizePrem = getVal('sizePrem') / 100;
+
+            const rdPre = getVal('costDebt') / 100;
+            const tax = getVal('taxRate') / 100;
+
+            const debt = getVal('totalDebt');
+            const equity = getVal('equityVal');
+
+            // Calcs
+            const ke = rf + (beta * mrp) + sizePrem;
+            const kd = rdPre * (1 - tax);
+
+            const totalCap = debt + equity;
+            const wD = debt / totalCap;
+            const wE = equity / totalCap;
+
+            const wacc = (wE * ke) + (wD * kd);
+
+            // Render Headers
+            document.getElementById('val-wacc').innerText = fmtPct(wacc);
+            document.getElementById('val-ke').innerText = fmtPct(ke);
+            document.getElementById('val-kd').innerText = fmtPct(kd);
+
+            // Render Table
+            const tbody = document.getElementById('wacc-body');
+            tbody.innerHTML = `
+                <tr><td class="py-2 text-gray-400">Risk Free Rate</td><td class="text-right">${fmtPct(rf)}</td></tr>
+                <tr><td class="py-2 text-gray-400">Beta * MRP</td><td class="text-right">${fmtPct(beta * mrp)}</td></tr>
+                <tr><td class="py-2 text-gray-400">Size Premium</td><td class="text-right">${fmtPct(sizePrem)}</td></tr>
+                <tr class="border-t border-gray-700 font-bold text-orange-300"><td class="py-2">Cost of Equity (Ke)</td><td class="text-right">${fmtPct(ke)}</td></tr>
+
+                <tr><td class="py-2 pt-4 text-gray-400">Pre-Tax Cost of Debt</td><td class="text-right pt-4">${fmtPct(rdPre)}</td></tr>
+                <tr><td class="py-2 text-gray-400">Tax Shield</td><td class="text-right text-green-400">(${fmtPct(rdPre * tax)})</td></tr>
+                <tr class="border-t border-gray-700 font-bold text-orange-300"><td class="py-2">Cost of Debt (Kd)</td><td class="text-right">${fmtPct(kd)}</td></tr>
+
+                <tr><td class="py-2 pt-4 text-gray-400">Equity Weight</td><td class="text-right pt-4">${fmtPct(wE)}</td></tr>
+                <tr><td class="py-2 text-gray-400">Debt Weight</td><td class="text-right">${fmtPct(wD)}</td></tr>
+            `;
+
+            // Chart
+            if(chartInstance) chartInstance.destroy();
+            const ctx = document.getElementById('chart-wacc').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Equity', 'Debt'],
+                    datasets: [{
+                        data: [equity, debt],
+                        backgroundColor: ['#f97316', '#334155'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { color: '#cbd5e1' } },
+                        title: { display: true, text: 'Capital Structure', color: '#94a3b8' }
+                    }
+                }
+            });
+        }
+
+        function exportCSV() {
+            const wacc = document.getElementById('val-wacc').innerText;
+            const ke = document.getElementById('val-ke').innerText;
+            const kd = document.getElementById('val-kd').innerText;
+
+            let csv = `Metric,Value\n`;
+            csv += `WACC,${wacc}\nCost of Equity,${ke}\nCost of Debt (A-T),${kd}\n`;
+            csv += `Risk Free Rate,${document.getElementById('rfRate').value}%\n`;
+            csv += `Beta,${document.getElementById('beta').value}\n`;
+            csv += `Equity Value,${document.getElementById('equityVal').value}\n`;
+            csv += `Debt Value,${document.getElementById('totalDebt').value}\n`;
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'wacc_model.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        window.onload = function() {
+            lucide.createIcons();
+            runModel();
+        };
+    </script>
+</body>
+</html>
