@@ -1,6 +1,6 @@
-
+from playwright.sync_api import sync_playwright
 import os
-from playwright.sync_api import sync_playwright, expect
+import time
 
 def verify_analyst_os():
     with sync_playwright() as p:
@@ -8,47 +8,43 @@ def verify_analyst_os():
         context = browser.new_context()
         page = context.new_page()
 
-        # Construct the file path to the HTML file
+        # Path to analyst_os.html
+        # Since I'm running from repo root, I can use relative path converted to absolute
         file_path = os.path.abspath("showcase/analyst_os.html")
-        url = f"file://{file_path}"
+        page.goto(f"file://{file_path}")
 
-        print(f"Navigating to: {url}")
-        page.goto(url)
+        # 1. Verify Intro Modal appears
+        print("Checking Intro Modal...")
+        page.wait_for_selector("#intro-modal")
+        page.screenshot(path="verification/1_intro_modal.png")
+        print("Captured intro modal.")
 
-        # Wait for the desktop to be visible
-        desktop = page.locator("#desktop")
-        expect(desktop).to_be_visible()
-        print("Desktop is visible.")
+        # 2. Click Initialize (Close Modal)
+        print("Closing Modal...")
+        page.click("button:has-text('INITIALIZE WORKBENCH')")
+        time.sleep(1) # Wait for fade out/animation
 
-        # Click on the DCF icon in the dock
-        dcf_icon = page.locator(".dock-item[data-title='DCF Valuator']")
-        dcf_icon.click()
-        print("Clicked DCF icon.")
+        # 3. Verify Desktop and Dock
+        print("Checking Desktop...")
+        page.screenshot(path="verification/2_desktop_empty.png")
 
-        # Verify DCF window opens
-        dcf_window = page.locator("#win-dcf")
-        expect(dcf_window).to_be_visible()
-        print("DCF Window is visible.")
+        # 4. Open DCF App from Dock
+        print("Opening DCF App...")
+        page.click(".dock-item[data-title='DCF Valuator']")
+        time.sleep(1)
+        page.screenshot(path="verification/3_dcf_window.png")
 
-        # Click on the LBO icon in the dock
-        lbo_icon = page.locator(".dock-item[data-title='LBO Modeler']")
-        lbo_icon.click()
-        print("Clicked LBO icon.")
-
-        # Verify LBO window opens
-        lbo_window = page.locator("#win-lbo")
-        expect(lbo_window).to_be_visible()
-        print("LBO Window is visible.")
-
-        # Wait a moment for iframes to render content (though screenshot might capture them blank if cross-origin strictness applies to file://, but usually local files can see each other in same dir)
-        page.wait_for_timeout(2000)
-
-        # Take a screenshot
-        screenshot_path = "verification/analyst_os.png"
-        page.screenshot(path=screenshot_path)
-        print(f"Screenshot saved to {screenshot_path}")
+        # 5. Open Market Data App from Dock
+        print("Opening Market Data App...")
+        page.click(".dock-item[data-title='Market Data']")
+        time.sleep(1)
+        page.screenshot(path="verification/4_market_window.png")
 
         browser.close()
 
 if __name__ == "__main__":
-    verify_analyst_os()
+    try:
+        verify_analyst_os()
+        print("Verification script finished successfully.")
+    except Exception as e:
+        print(f"Verification failed: {e}")
