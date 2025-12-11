@@ -60,6 +60,7 @@ class DataManager {
 
     // Accessors
     getStats() { return this.data?.stats || {}; }
+    getSystemStats() { return this.getStats(); }
     getAgents() { return this.data?.agents || []; }
     getReports() { return this.data?.reports || []; }
     getPrompts() { return this.data?.prompts || []; }

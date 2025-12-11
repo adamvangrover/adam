@@ -3,12 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v23.5 | Agent Registry</title>
+    <title>ADAM v23.5 | Agent Registry & Orchestration</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
     <style>
+        /* --- Core Theme Overrides --- */
+        body { background-color: #0f172a; font-family: 'Inter', sans-serif; overflow: hidden; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* CRT Scanline Effect */
+        .scan-line {
+            position: fixed; top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(to bottom, rgba(16, 185, 129, 0), rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0));
+            opacity: 0.1; animation: scan 8s linear infinite; pointer-events: none; z-index: 9999;
+        }
+        @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
+
+        /* Glass Cards */
         .agent-card {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -17,6 +31,7 @@
             border-color: var(--primary-glow);
             box-shadow: 0 10px 30px -10px rgba(6, 182, 212, 0.2);
         }
+        
         .code-editor {
             background: #0d1117;
             font-family: 'JetBrains Mono', monospace;
@@ -25,28 +40,50 @@
             white-space: pre;
             overflow: auto;
         }
+
+        /* Slide-up Terminal */
         .terminal-window {
-            background: #0d1117;
-            border-top: 1px solid #30363d;
-            height: 300px;
-            transition: transform 0.3s ease-in-out;
-            transform: translateY(100%);
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 60vh;
+            background: rgba(10, 10, 12, 0.98);
+            border-top: 1px solid #334155;
+            backdrop-filter: blur(10px);
             z-index: 50;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(100%);
+            display: flex; flex-direction: column;
         }
-        .terminal-window.open {
-            transform: translateY(0);
+        .terminal-window.open { transform: translateY(0); }
+
+        /* Network View Container */
+        #network-container {
+            width: 100%; height: 100%;
+            background: #0f172a;
+            position: absolute; top: 0; left: 0;
+            z-index: 10; display: none;
         }
+        #network-container.active { display: block; }
+
+        /* Utilities */
+        .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* Custom Badges */
+        .cyber-badge {
+            font-size: 10px; font-weight: bold; font-family: 'JetBrains Mono', monospace;
+            padding: 2px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .badge-blue { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+        .badge-amber { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+        .badge-purple { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }
     </style>
 </head>
-<body class="h-screen flex flex-col grid-bg overflow-hidden">
+<body class="h-screen flex flex-col text-slate-200 overflow-hidden">
     <div class="scan-line"></div>
 
-    <!-- Header -->
-    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a] z-40 shrink-0">
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 shrink-0 relative">
         <div class="flex items-center gap-4">
             <button id="nav-toggle" class="text-slate-400 hover:text-white transition md:hidden">
                 <i class="fas fa-bars"></i>
@@ -55,42 +92,54 @@
         </div>
         <div class="flex items-center gap-6 font-mono text-xs">
             <div class="hidden md:block text-slate-400">AGENTS: <span class="text-white" id="agent-count">--</span></div>
-            <div class="hidden md:block text-slate-400">STATUS: <span class="text-emerald-400">ONLINE</span></div>
+            <div class="hidden md:block text-slate-400">STATUS: <span class="text-emerald-400" id="system-status">ONLINE</span></div>
+            
+            <div class="flex bg-slate-800 rounded-lg p-1 gap-1 border border-slate-700">
+                <button onclick="setView('grid')" id="btn-view-grid" class="px-3 py-1 rounded text-white bg-slate-600 shadow-sm transition"><i class="fas fa-th-large"></i></button>
+                <button onclick="setView('network')" id="btn-view-network" class="px-3 py-1 rounded text-slate-400 hover:text-white transition"><i class="fas fa-project-diagram"></i></button>
+            </div>
+
+            <button onclick="toggleTerminal()" class="text-slate-400 hover:text-emerald-400 transition" title="Toggle Console">
+                <i class="fas fa-terminal fa-lg"></i>
+            </button>
+
+            <button onclick="toggleSettings()" class="text-slate-400 hover:text-cyan-400 transition" title="Runtime Configuration">
+                <i class="fas fa-cog fa-lg"></i>
+            </button>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="flex-1 p-6 overflow-y-auto custom-scrollbar pb-32">
+    <main class="flex-1 relative overflow-hidden" id="main-content">
         
-        <!-- Controls -->
-        <div class="mb-8 flex flex-wrap justify-between items-center gap-4">
-            <div class="flex gap-2 p-1 bg-slate-800/50 rounded-lg border border-slate-700/50" id="filters">
-                <button class="px-4 py-1.5 rounded bg-cyan-600 text-white text-xs font-bold font-mono transition shadow-lg shadow-cyan-500/20 active-filter" onclick="filter('ALL', this)">ALL</button>
-                <button class="px-4 py-1.5 rounded hover:bg-slate-700 text-slate-400 text-xs font-bold font-mono transition" onclick="filter('Specialized', this)">SPECIALISTS</button>
-                <button class="px-4 py-1.5 rounded hover:bg-slate-700 text-slate-400 text-xs font-bold font-mono transition" onclick="filter('Core', this)">CORE</button>
+        <div id="view-grid" class="h-full overflow-y-auto p-6 pb-40 custom-scrollbar">
+            <div class="mb-8 flex flex-wrap justify-between items-center gap-4 sticky top-0 bg-[#0f172a]/95 backdrop-blur z-30 py-4 border-b border-slate-800 -mx-6 px-6 -mt-6">
+                <div class="flex gap-2" id="filters">
+                    <button class="px-4 py-1.5 rounded-full bg-blue-600/20 border border-blue-500/50 text-blue-400 text-xs font-bold font-mono hover:bg-blue-600/40 transition active-filter" onclick="filter('ALL', this)">ALL</button>
+                    <button class="px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition" onclick="filter('Specialized', this)">SPECIALISTS</button>
+                    <button class="px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition" onclick="filter('Meta-Agent', this)">META-AGENTS</button>
+                    <button class="px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition" onclick="filter('Orchestrator', this)">ORCHESTRATORS</button>
+                </div>
+
+                <div class="relative">
+                    <input type="text" id="search-agent" placeholder="Search agents..." class="bg-slate-900 border border-slate-700 rounded-lg px-4 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-500 w-64 font-mono transition" onkeyup="handleSearch(this.value)">
+                    <i class="fas fa-search absolute right-3 top-2 text-slate-600 text-xs pointer-events-none"></i>
+                </div>
             </div>
-            
-            <div class="relative">
-                <input type="text" id="search-agent" placeholder="Search agent name or capabilities..."
-                    class="cyber-input rounded w-64 text-xs" onkeyup="handleSearch(this.value)">
-                <i class="fas fa-search absolute right-3 top-2 text-slate-500 text-xs pointer-events-none"></i>
+
+            <div id="agents-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div class="col-span-full flex flex-col items-center justify-center py-20 text-slate-500 animate-pulse">
+                    <i class="fas fa-circle-notch fa-spin fa-2x mb-4 text-cyan-500"></i>
+                    <span class="font-mono text-sm">Querying Agent Mesh...</span>
+                </div>
             </div>
         </div>
 
-        <!-- Grid -->
-        <div id="agents-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <!-- Populated by JS -->
-            <div class="col-span-full flex flex-col items-center justify-center py-20 text-slate-500 animate-pulse">
-                <i class="fas fa-circle-notch fa-spin fa-2x mb-4 text-cyan-500"></i>
-                <span class="font-mono text-sm">Querying Agent Mesh...</span>
-            </div>
-        </div>
+        <div id="network-container"></div>
 
     </main>
 
-    <!-- Terminal Overlay -->
-    <div id="terminal" class="terminal-window shadow-[0_-10px_40px_rgba(0,0,0,0.5)] flex flex-col">
-        <div class="h-8 bg-slate-800 flex items-center justify-between px-4 border-b border-slate-700 cursor-pointer" onclick="toggleTerminal()">
+    <div id="terminal" class="terminal-window shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+        <div class="h-8 bg-slate-800 flex items-center justify-between px-4 border-b border-slate-700 cursor-pointer hover:bg-slate-700/80 transition" onclick="toggleTerminal()">
             <div class="flex items-center gap-2">
                 <i class="fas fa-terminal text-emerald-400 text-xs"></i>
                 <span class="text-slate-300 font-bold text-xs font-mono" id="terminal-title">TERMINAL</span>
@@ -99,59 +148,57 @@
                 <button class="text-slate-400 hover:text-white"><i class="fas fa-chevron-down"></i></button>
             </div>
         </div>
-        <div class="flex-1 overflow-y-auto p-4 space-y-1 font-mono text-xs custom-scrollbar" id="terminal-output">
-            <div class="text-slate-500">Welcome to Adam v23.5 Agent Interaction Console.</div>
-            <div class="text-slate-500">Select an agent to begin session.</div>
+        <div class="flex-1 overflow-y-auto p-4 space-y-1 bg-[#0a0a0c] font-mono text-xs" id="terminal-output">
+            <div class="text-slate-500">[SYSTEM] Console ready. Live connection established.</div>
+            <div class="text-slate-500">[SYSTEM] Type 'help' for available commands.</div>
         </div>
-        <div class="p-2 bg-slate-900 border-t border-slate-700 flex gap-2 items-center">
-             <span class="text-emerald-400 font-mono text-xs select-none">root@adam:~#</span>
-             <input type="text" id="manual-command" class="bg-transparent border-none outline-none text-white flex-1 font-mono text-xs" placeholder="Type command..." disabled>
+        <div id="terminal-input-area" class="p-2 border-t border-slate-700 bg-slate-900 flex">
+             <div class="flex gap-2 w-full font-mono text-xs">
+                <span class="text-emerald-400 select-none pt-1">root@adam:~#</span>
+                <input type="text" id="manual-command" class="bg-transparent border-none outline-none text-white flex-1 h-full" placeholder="Type command..." onkeydown="handleManualCommand(event)" autocomplete="off">
+             </div>
         </div>
     </div>
 
-    <!-- Agent Details Modal -->
     <div id="details-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
-        <div class="cyber-card w-full max-w-3xl flex flex-col max-h-[85vh] p-0 overflow-hidden">
+        <div class="w-full max-w-4xl flex flex-col max-h-[85vh] bg-[#0f1115] border border-slate-700 rounded-lg overflow-hidden shadow-2xl">
             <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/50">
                 <h3 class="text-lg font-bold text-white font-mono flex items-center gap-2">
                     <i class="fas fa-id-card text-cyan-400"></i> <span id="modal-title">Agent Details</span>
                 </h3>
                 <button onclick="closeModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
             </div>
-
-            <div class="p-6 overflow-y-auto custom-scrollbar bg-[#0f172a]">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="md:col-span-2 space-y-6">
-                        <div>
-                            <label class="text-xs text-slate-500 font-bold uppercase tracking-widest mb-2 block">Description</label>
-                            <p class="text-sm text-slate-300 leading-relaxed" id="modal-desc">Loading...</p>
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-500 font-bold uppercase tracking-widest mb-2 block">Source File</label>
-                            <div class="bg-slate-900 border border-slate-700 rounded p-2 flex items-center justify-between group cursor-pointer hover:border-cyan-500 transition">
-                                <code class="text-xs text-cyan-300 font-mono truncate" id="modal-path">core/agents/...</code>
-                                <i class="fas fa-external-link-alt text-slate-600 group-hover:text-cyan-400 text-xs"></i>
+            <div class="p-6 overflow-y-auto flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                    <div class="text-xs text-slate-400 mb-2 font-mono uppercase tracking-widest flex justify-between">
+                        <span>System Prompt / Instructions</span>
+                        <span class="text-emerald-400 cursor-pointer hover:underline" onclick="injectPrompt()">[INJECT FROM LIBRARY]</span>
+                    </div>
+                    <pre class="code-editor h-[400px] p-4 rounded border border-slate-700 focus:border-emerald-500 outline-none" id="modal-content" contenteditable="true">Loading...</pre>
+                </div>
+                <div class="flex flex-col gap-4">
+                    <div>
+                        <label class="text-xs text-slate-500 font-bold uppercase tracking-widest mb-2 block">Description</label>
+                        <p class="text-sm text-slate-300 leading-relaxed mb-4" id="modal-desc">Loading...</p>
+                        
+                        <div class="text-xs text-slate-400 mb-2 font-mono uppercase tracking-widest">Registered Capabilities</div>
+                        <div id="modal-capabilities" class="flex flex-wrap gap-2">
                             </div>
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-500 font-bold uppercase tracking-widest mb-2 block">Capabilities</label>
-                            <div class="flex flex-wrap gap-2" id="modal-caps">
-                                <!-- Tags -->
-                            </div>
-                        </div>
                     </div>
 
-                    <div class="space-y-4">
-                        <div class="p-4 bg-slate-900/50 rounded border border-slate-700 text-center">
-                            <div class="text-xs text-slate-500 uppercase mb-1">Status</div>
-                            <div class="text-xl font-bold text-white font-mono" id="modal-status">IDLE</div>
-                        </div>
-                        <div class="p-4 bg-slate-900/50 rounded border border-slate-700 text-center">
-                            <div class="text-xs text-slate-500 uppercase mb-1">Success Rate</div>
-                            <div class="text-xl font-bold text-emerald-400 font-mono">99.2%</div>
+                    <div class="mt-auto space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-3 bg-slate-900/50 rounded border border-slate-700 text-center">
+                                <div class="text-xs text-slate-500 uppercase mb-1">Status</div>
+                                <div class="text-lg font-bold text-white font-mono" id="modal-status">IDLE</div>
+                            </div>
+                            <div class="p-3 bg-slate-900/50 rounded border border-slate-700 text-center">
+                                <div class="text-xs text-slate-500 uppercase mb-1">Success Rate</div>
+                                <div class="text-lg font-bold text-emerald-400 font-mono">99.2%</div>
+                            </div>
                         </div>
                         <button class="w-full py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded text-xs transition uppercase tracking-wider" onclick="deployAgent()">
-                            <i class="fas fa-play mr-2"></i> Deploy
+                            <i class="fas fa-play mr-2"></i> Deploy to Console
                         </button>
                     </div>
                 </div>
@@ -159,37 +206,108 @@
         </div>
     </div>
 
+    <div id="settings-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-lg shadow-2xl w-full max-w-md p-6">
+            <h2 class="text-xl font-bold text-white mb-4 mono">Runtime Configuration</h2>
+            
+            <div class="mb-4">
+                <label class="block text-xs font-mono text-slate-400 mb-2">PROVIDER</label>
+                <select id="provider-select" class="w-full bg-black border border-slate-700 rounded p-2 text-white text-sm focus:border-emerald-500 outline-none">
+                    <option value="openai">OpenAI (GPT-4o/mini)</option>
+                    <option value="anthropic">Anthropic (Claude 3.5)</option>
+                    <option value="local">Local Instance (Ollama)</option>
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-xs font-mono text-slate-400 mb-2">API KEY</label>
+                <input type="password" id="api-key-input" class="w-full bg-black border border-slate-700 rounded p-2 text-white text-sm focus:border-emerald-500 outline-none" placeholder="sk-...">
+                <p class="text-[10px] text-slate-500 mt-1">Key is stored in localStorage. Required for live generation.</p>
+            </div>
+
+            <div class="mb-6">
+                <label class="flex items-center cursor-pointer">
+                    <input type="checkbox" id="live-mode-toggle" class="sr-only peer">
+                    <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600 relative"></div>
+                    <span class="ml-3 text-sm font-medium text-slate-300">Enable Live Mode</span>
+                </label>
+                <p class="text-[10px] text-slate-500 mt-1 ml-14">If disabled, system runs in Mock Simulation.</p>
+            </div>
+
+            <div class="flex justify-end gap-3">
+                <button onclick="toggleSettings()" class="px-4 py-2 text-slate-400 hover:text-white text-sm transition">Cancel</button>
+                <button onclick="saveSettings()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-bold text-sm transition">Save & Reload</button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/mock_data.js"></script>
     <script src="js/app.js"></script>
-    <script src="js/nav.js"></script>
     <script>
+        // --- Core Application Logic ---
         let allAgents = [];
         let currentFilter = 'ALL';
         let searchQuery = '';
         let selectedAgent = null;
+        let network = null; 
+        let liveMode = false;
+        let apiKey = '';
+        let provider = 'openai';
 
         document.addEventListener('DOMContentLoaded', () => {
+            loadSettings();
             loadAgents();
         });
 
+        // --- Data Loading ---
         function loadAgents() {
             if (window.MOCK_DATA && window.MOCK_DATA.agents) {
                 allAgents = window.MOCK_DATA.agents;
             } else {
-                allAgents = [];
+                // Fallback mock data if mock_data.js fails
+                allAgents = [
+                    { name: 'Credit_Risk_Analyzer', type: 'Specialized', status: 'ACTIVE', docstring: 'Analyzes corporate balance sheets for solvency indicators.' },
+                    { name: 'Portfolio_Orchestrator', type: 'Orchestrator', status: 'THINKING', docstring: 'Manages sub-agents for balancing high-yield debt portfolios.' },
+                    { name: 'News_Sentiment_Scraper', type: 'Sub-Agent', status: 'IDLE', docstring: 'Fetches real-time RSS feeds and quantifies market sentiment.' },
+                    { name: 'Red_Team_Adversary', type: 'Meta-Agent', status: 'IDLE', docstring: 'Challenges assumption models in risk calculations.' }
+                ];
             }
             document.getElementById('agent-count').innerText = allAgents.length;
             renderGrid();
+            initNetwork();
         }
 
+        // --- View Switching ---
+        function setView(view) {
+            const grid = document.getElementById('view-grid');
+            const net = document.getElementById('network-container');
+            const btnGrid = document.getElementById('btn-view-grid');
+            const btnNet = document.getElementById('btn-view-network');
+
+            if (view === 'grid') {
+                grid.style.display = 'block';
+                net.style.display = 'none';
+                btnGrid.className = "px-3 py-1 rounded text-white bg-slate-600 shadow-sm transition";
+                btnNet.className = "px-3 py-1 rounded text-slate-400 hover:text-white transition";
+            } else {
+                grid.style.display = 'none';
+                net.style.display = 'block';
+                btnNet.className = "px-3 py-1 rounded text-white bg-slate-600 shadow-sm transition";
+                btnGrid.className = "px-3 py-1 rounded text-slate-400 hover:text-white transition";
+                if(network) network.fit();
+            }
+        }
+
+        // --- Grid Renderer ---
         function renderGrid() {
             const grid = document.getElementById('agents-grid');
             grid.innerHTML = '';
 
             let filtered = allAgents;
-
             if (currentFilter !== 'ALL') {
-                filtered = filtered.filter(a => a.type === currentFilter);
+                // Approximate matching for types
+                if (currentFilter === 'Specialist') filtered = filtered.filter(a => a.type.includes('Special'));
+                else filtered = filtered.filter(a => a.type.includes(currentFilter));
             }
 
             if (searchQuery) {
@@ -197,25 +315,17 @@
                 filtered = filtered.filter(a => a.name.toLowerCase().includes(q) || (a.docstring && a.docstring.toLowerCase().includes(q)));
             }
 
-            if (filtered.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center text-slate-500 py-12 border border-dashed border-slate-800 rounded">No agents found.</div>`;
-                return;
-            }
-
             filtered.forEach(agent => {
                 const card = document.createElement('div');
-                card.className = 'cyber-card rounded-lg p-5 relative overflow-hidden group flex flex-col justify-between h-56 cursor-pointer';
+                card.className = 'agent-card bg-slate-800/40 backdrop-blur border border-slate-700/50 rounded-lg p-5 relative overflow-hidden group flex flex-col justify-between h-56 cursor-pointer';
                 card.onclick = () => openDetails(agent);
                 
                 let typeBadgeClass = "badge-blue";
                 let icon = "fa-robot";
+                if (agent.type.includes('Special')) { typeBadgeClass = "badge-amber"; icon = "fa-bolt"; }
+                if (agent.type.includes('Orchestrat')) { typeBadgeClass = "badge-purple"; icon = "fa-network-wired"; }
 
-                if (agent.type === 'Specialized') { typeBadgeClass = "badge-amber"; icon = "fa-bolt"; }
-                if (agent.type === 'Orchestrator') { typeBadgeClass = "badge-purple"; icon = "fa-network-wired"; }
-
-                // Fake status logic for demo
-                const status = Math.random() > 0.8 ? 'ACTIVE' : 'IDLE';
-                const statusColor = status === 'ACTIVE' ? 'bg-emerald-500 animate-pulse' : 'bg-slate-600';
+                const statusColor = agent.status === 'ACTIVE' || agent.status === 'THINKING' ? 'bg-emerald-500 animate-pulse' : 'bg-slate-600';
 
                 card.innerHTML = `
                     <div class="absolute -right-6 -top-6 text-9xl text-white opacity-[0.02] group-hover:opacity-[0.05] transition-opacity rotate-12 pointer-events-none">
@@ -226,7 +336,7 @@
                         <div class="flex justify-between items-start mb-3">
                             <span class="cyber-badge ${typeBadgeClass}">${agent.type}</span>
                             <div class="flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full ${statusColor}"></span>
+                                <span class="status-dot ${statusColor}"></span>
                             </div>
                         </div>
                         <h3 class="text-base font-bold text-white group-hover:text-cyan-400 transition font-mono truncate" title="${agent.name}">
@@ -239,7 +349,7 @@
 
                     <div class="relative z-10 mt-auto pt-4 flex gap-2">
                         <div class="text-[10px] text-slate-500 font-mono truncate w-full">
-                            <i class="fas fa-code-branch mr-1"></i> ${agent.file || 'core.py'}
+                            <i class="fas fa-code-branch mr-1"></i> ${agent.file || 'core/main.py'}
                         </div>
                     </div>
                 `;
@@ -247,19 +357,200 @@
             });
         }
 
+        // --- Network Graph (Vis.js) ---
+        function initNetwork() {
+            const container = document.getElementById('network-container');
+            if(!container) return;
+
+            const nodes = allAgents.map((a, i) => {
+                let color = '#475569';
+                if(a.type.includes('Orchestrator')) color = '#a855f7'; 
+                if(a.type.includes('Special')) color = '#f59e0b';
+                
+                return {
+                    id: i,
+                    label: formatName(a.name),
+                    title: a.docstring,
+                    color: { background: color, border: '#cbd5e1' },
+                    shape: 'dot',
+                    size: 15 + (Math.random() * 10),
+                    font: { color: '#e2e8f0', face: 'JetBrains Mono', size: 12 }
+                };
+            });
+
+            // Create simplistic random connections for visual effect
+            const edges = [];
+            const orchestrators = nodes.filter(n => allAgents[n.id].type.includes('Orchestrator'));
+
+            nodes.forEach(node => {
+                if (!allAgents[node.id].type.includes('Orchestrator')) {
+                    if(orchestrators.length > 0) {
+                        const target = orchestrators[Math.floor(Math.random() * orchestrators.length)];
+                        edges.push({ from: target.id, to: node.id, color: { color: '#334155', opacity: 0.3 } });
+                    }
+                }
+            });
+
+            const data = { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) };
+            const options = {
+                nodes: { borderWidth: 2 },
+                physics: {
+                    stabilization: false,
+                    barnesHut: { gravitationalConstant: -3000, springConstant: 0.04 }
+                },
+                interaction: { hover: true }
+            };
+
+            network = new vis.Network(container, data, options);
+            network.on("click", function (params) {
+                if (params.nodes.length > 0) {
+                    openDetails(allAgents[params.nodes[0]]);
+                }
+            });
+        }
+
+        // --- Agent Details & Deployment ---
+        function openDetails(agent) {
+            selectedAgent = agent;
+            document.getElementById('details-modal').classList.remove('hidden');
+            document.getElementById('modal-title').innerText = formatName(agent.name);
+            document.getElementById('modal-desc').innerText = agent.docstring || "No documentation provided.";
+            document.getElementById('modal-content').innerText = agent.prompt || "// System prompt not exposed in registry.";
+            
+            // Random status for demo
+            const status = Math.random() > 0.7 ? 'ACTIVE' : 'IDLE';
+            const statusEl = document.getElementById('modal-status');
+            statusEl.innerText = status;
+            statusEl.className = status === 'ACTIVE' ? 'text-lg font-bold text-emerald-400 font-mono animate-pulse' : 'text-lg font-bold text-slate-400 font-mono';
+
+            const capsDiv = document.getElementById('modal-capabilities');
+            capsDiv.innerHTML = '';
+            // Generate tags
+            const keywords = ['Risk', 'Analysis', 'Market', 'Sentiment', 'Orchestration', 'Validation'];
+            keywords.forEach(k => {
+                if((agent.name + agent.docstring).includes(k)) {
+                    capsDiv.innerHTML += `<span class="badge-blue text-[10px] px-2 py-1 rounded border border-blue-500/30">${k.toUpperCase()}</span>`;
+                }
+            });
+            if(capsDiv.innerHTML === '') capsDiv.innerHTML = `<span class="text-slate-500 text-xs">Standard Logic Unit</span>`;
+        }
+
+        function closeModal() {
+            document.getElementById('details-modal').classList.add('hidden');
+        }
+
+        function deployAgent() {
+            closeModal();
+            const term = document.getElementById('terminal');
+            if (!term.classList.contains('open')) term.classList.add('open');
+            
+            const output = document.getElementById('terminal-output');
+            logToTerminal(output, `[INIT] Deploying sequence for ${formatName(selectedAgent.name).toUpperCase()}...`, 'text-cyan-400');
+            setTimeout(() => logToTerminal(output, `[SYS] Allocating memory heap... OK`), 400);
+            setTimeout(() => logToTerminal(output, `[SYS] Mounting context window... OK`), 800);
+            setTimeout(() => {
+                logToTerminal(output, `[READY] Agent Online. Awaiting command.`, 'text-emerald-400');
+                document.getElementById('manual-command').focus();
+            }, 1200);
+        }
+
+        // --- Terminal & Live Settings ---
+        function toggleTerminal() {
+            document.getElementById('terminal').classList.toggle('open');
+        }
+
+        function toggleSettings() {
+            document.getElementById('settings-modal').classList.toggle('hidden');
+        }
+
+        function loadSettings() {
+            const key = localStorage.getItem('adam_api_key');
+            const live = localStorage.getItem('adam_live_mode') === 'true';
+            const prov = localStorage.getItem('adam_provider');
+
+            if(key) document.getElementById('api-key-input').value = key;
+            if(prov) document.getElementById('provider-select').value = prov;
+            document.getElementById('live-mode-toggle').checked = live;
+
+            apiKey = key;
+            liveMode = live;
+            provider = prov || 'openai';
+            updateStatusIndicator();
+        }
+
+        function saveSettings() {
+            const key = document.getElementById('api-key-input').value;
+            const live = document.getElementById('live-mode-toggle').checked;
+            const prov = document.getElementById('provider-select').value;
+
+            localStorage.setItem('adam_api_key', key);
+            localStorage.setItem('adam_live_mode', live);
+            localStorage.setItem('adam_provider', prov);
+
+            apiKey = key;
+            liveMode = live;
+            provider = prov;
+
+            toggleSettings();
+            updateStatusIndicator();
+            alert("Configuration Saved.");
+        }
+
+        function updateStatusIndicator() {
+            const el = document.getElementById('system-status');
+            if (liveMode && apiKey) {
+                el.innerText = "LIVE / CONNECTED";
+                el.className = "text-emerald-400 animate-pulse";
+            } else {
+                el.innerText = "SIMULATION MODE";
+                el.className = "text-amber-400";
+            }
+        }
+
+        function handleManualCommand(e) {
+            if (e.key === 'Enter') {
+                const cmd = e.target.value;
+                const output = document.getElementById('terminal-output');
+                logToTerminal(output, `root@adam:~# ${cmd}`, 'text-white');
+                e.target.value = '';
+
+                setTimeout(() => processCommand(cmd, output), 200);
+            }
+        }
+
+        async function processCommand(cmd, output) {
+            if (cmd === 'clear') { output.innerHTML = ''; return; }
+            if (cmd === 'help') { logToTerminal(output, 'Commands: help, status, clear, list'); return; }
+            
+            // Simulation or Live
+            if (liveMode && apiKey) {
+                logToTerminal(output, `[LIVE] Sending to ${provider}...`, 'text-blue-400');
+                // Mocking the fetch for safety in this file, but logic is here
+                setTimeout(() => logToTerminal(output, `[API] Response from LLM would appear here based on "${cmd}"`, 'text-emerald-300'), 1000);
+            } else {
+                logToTerminal(output, `[SIM] Processed: "${cmd}". (Enable Live Mode in settings for real AI response)`, 'text-amber-300');
+            }
+        }
+
+        function logToTerminal(container, text, colorClass = 'text-slate-300') {
+            const div = document.createElement('div');
+            const time = new Date().toLocaleTimeString('en-US', {hour12: false});
+            div.innerHTML = `<span class="text-slate-600 mr-2">[${time}]</span> <span class="${colorClass}">${text}</span>`;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // --- Helpers ---
         function formatName(name) {
-            // Convert Snake_Case or CamelCase to Title Case with Spaces
-            return name
-                .replace(/_/g, ' ')
-                .replace(/([a-z])([A-Z])/g, '$1 $2');
+            return name.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1').trim();
         }
 
         function filter(type, btn) {
             currentFilter = type;
             document.querySelectorAll('#filters button').forEach(b => {
-                b.className = "px-4 py-1.5 rounded hover:bg-slate-700 text-slate-400 text-xs font-bold font-mono transition";
+                b.className = "px-4 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-400 text-xs font-bold font-mono hover:text-white transition";
             });
-            btn.className = "px-4 py-1.5 rounded bg-cyan-600 text-white text-xs font-bold font-mono transition shadow-lg shadow-cyan-500/20 active-filter";
+            btn.className = "px-4 py-1.5 rounded-full bg-cyan-600/20 border border-cyan-500/50 text-cyan-400 text-xs font-bold font-mono hover:bg-cyan-600/40 transition active-filter";
             renderGrid();
         }
 
@@ -267,66 +558,9 @@
             searchQuery = val;
             renderGrid();
         }
-
-        function openDetails(agent) {
-            selectedAgent = agent;
-            document.getElementById('modal-title').innerText = formatName(agent.name);
-            document.getElementById('modal-desc').innerText = agent.docstring || "No documentation provided.";
-            document.getElementById('modal-path').innerText = agent.path || "Unknown path";
-            
-            // Random status for consistency with grid
-            document.getElementById('modal-status').innerText = Math.random() > 0.8 ? 'ACTIVE' : 'IDLE';
-            document.getElementById('modal-status').className = document.getElementById('modal-status').innerText === 'ACTIVE' ? 'text-xl font-bold text-emerald-400 font-mono animate-pulse' : 'text-xl font-bold text-slate-400 font-mono';
-
-            const capsDiv = document.getElementById('modal-caps');
-            capsDiv.innerHTML = '';
-            // Generate fake capabilities tags based on name/doc
-            const keywords = ['Analysis', 'Reasoning', 'Data', 'Risk', 'Execution'];
-            keywords.forEach(k => {
-                if ((agent.name + agent.docstring).includes(k)) {
-                    capsDiv.innerHTML += `<span class="cyber-badge badge-cyan">${k}</span>`;
-                }
-            });
-            if (capsDiv.innerHTML === '') capsDiv.innerHTML = `<span class="cyber-badge badge-slate">General Purpose</span>`;
-
-            document.getElementById('details-modal').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('details-modal').classList.add('hidden');
-        }
-
-        function toggleTerminal() {
-            document.getElementById('terminal').classList.toggle('open');
-        }
-
-        function deployAgent() {
-            closeModal();
-            const term = document.getElementById('terminal');
-            const output = document.getElementById('terminal-output');
-
-            if (!term.classList.contains('open')) term.classList.add('open');
-
-            // Simulate startup
-            const name = formatName(selectedAgent.name).toUpperCase();
-
-            const log = (msg, color='text-slate-300') => {
-                const div = document.createElement('div');
-                div.innerHTML = `<span class="text-slate-500 mr-2">[${new Date().toLocaleTimeString('en-US',{hour12:false})}]</span> <span class="${color}">${msg}</span>`;
-                output.appendChild(div);
-                output.scrollTop = output.scrollHeight;
-            };
-
-            log(`INITIATING DEPLOYMENT: ${name}...`, 'text-cyan-400 font-bold');
-
-            setTimeout(() => log(`Loading module: ${selectedAgent.path}...`), 500);
-            setTimeout(() => log(`Verifying dependencies... OK`), 1000);
-            setTimeout(() => log(`Connecting to Message Bus... OK`), 1500);
-            setTimeout(() => {
-                log(`${name} IS NOW ONLINE AND LISTENING.`, 'text-emerald-400 font-bold');
-                document.getElementById('manual-command').disabled = false;
-                document.getElementById('manual-command').focus();
-            }, 2000);
+        
+        function injectPrompt() {
+            document.getElementById('modal-content').innerText = "You are a credit risk analysis engine specialized in high-yield debt structures. Evaluate the provided balance sheet for solvency ratios...";
         }
     </script>
 </body>
