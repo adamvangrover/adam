@@ -1,50 +1,41 @@
 from playwright.sync_api import sync_playwright
-import os
-import time
 
-def verify_analyst_os():
+def verify_apps():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        context = browser.new_context()
-        page = context.new_page()
+        page = browser.new_page()
 
-        # Path to analyst_os.html
-        # Since I'm running from repo root, I can use relative path converted to absolute
-        file_path = os.path.abspath("showcase/analyst_os.html")
-        page.goto(f"file://{file_path}")
+        # Test Analyst OS Dock
+        page.goto("http://localhost:8080/showcase/analyst_os.html")
+        page.wait_for_selector(".dock-item")
+        page.screenshot(path="verification/analyst_os.png")
 
-        # 1. Verify Intro Modal appears
-        print("Checking Intro Modal...")
-        page.wait_for_selector("#intro-modal")
-        page.screenshot(path="verification/1_intro_modal.png")
-        print("Captured intro modal.")
+        # Test Comps
+        page.goto("http://localhost:8080/showcase/apps/comps.html")
+        page.wait_for_selector("table")
+        page.screenshot(path="verification/comps.png")
 
-        # 2. Click Initialize (Close Modal)
-        print("Closing Modal...")
-        page.click("button:has-text('INITIALIZE WORKBENCH')")
-        time.sleep(1) # Wait for fade out/animation
+        # Test Ratios
+        page.goto("http://localhost:8080/showcase/apps/ratios.html")
+        page.wait_for_selector(".result-box")
+        page.screenshot(path="verification/ratios.png")
 
-        # 3. Verify Desktop and Dock
-        print("Checking Desktop...")
-        page.screenshot(path="verification/2_desktop_empty.png")
+        # Test Black-Scholes
+        page.goto("http://localhost:8080/showcase/apps/black_scholes.html")
+        page.wait_for_selector("canvas")
+        page.screenshot(path="verification/black_scholes.png")
 
-        # 4. Open DCF App from Dock
-        print("Opening DCF App...")
-        page.click(".dock-item[data-title='DCF Valuator']")
-        time.sleep(1)
-        page.screenshot(path="verification/3_dcf_window.png")
+        # Test Loan
+        page.goto("http://localhost:8080/showcase/apps/loan.html")
+        page.wait_for_selector("table")
+        page.screenshot(path="verification/loan.png")
 
-        # 5. Open Market Data App from Dock
-        print("Opening Market Data App...")
-        page.click(".dock-item[data-title='Market Data']")
-        time.sleep(1)
-        page.screenshot(path="verification/4_market_window.png")
+        # Test M&A
+        page.goto("http://localhost:8080/showcase/apps/ma_model.html")
+        page.wait_for_selector("canvas")
+        page.screenshot(path="verification/ma_model.png")
 
         browser.close()
 
 if __name__ == "__main__":
-    try:
-        verify_analyst_os()
-        print("Verification script finished successfully.")
-    except Exception as e:
-        print(f"Verification failed: {e}")
+    verify_apps()

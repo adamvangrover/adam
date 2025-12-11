@@ -67,7 +67,12 @@
             <i data-lucide="database" class="w-5 h-5 mr-2 text-green-400"></i>
             MARKET DATA SCRUBBER
         </h1>
-        <div class="text-[10px] text-gray-500">LOCAL_VAULT_SECURE</div>
+        <div class="flex gap-2">
+            <button onclick="exportCSV()" class="px-3 py-1 bg-green-900/20 border border-green-500/30 text-green-400 rounded hover:bg-green-500/30 text-[10px] font-bold flex items-center gap-1">
+                <i data-lucide="download" class="w-3 h-3"></i> EXPORT CSV
+            </button>
+            <div class="text-[10px] text-gray-500 self-center">LOCAL_VAULT_SECURE</div>
+        </div>
     </div>
 
     <div class="grid grid-cols-12 gap-4 flex-grow overflow-hidden">
@@ -275,6 +280,23 @@
             document.getElementById('stat-records').innerText = marketData.length;
             const now = new Date();
             document.getElementById('stat-update').innerText = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        }
+
+        function exportCSV() {
+            if(!marketData.length) return;
+            let csv = "Ticker,Price,Value\n";
+            marketData.forEach(d => {
+                csv += `"${d.ticker}",${d.price},${d.val}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'market_data_scrubber.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
 
         window.onload = function() {
