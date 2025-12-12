@@ -4,8 +4,8 @@ import { dataManager } from '../utils/DataManager';
 
 // Helper to generate mock graph
 const generateMockGraph = (n = 20) => {
-    const nodes = [...Array(n).keys()].map(i => ({ id: i, name: `Node ${i}`, val: Math.random() * 5 + 1 }));
-    const links = [...Array(n * 2).keys()].map(() => ({
+    const nodes = Array.from({ length: n }, (_, i) => ({ id: i, name: `Node ${i}`, val: Math.random() * 5 + 1 }));
+    const links = Array.from({ length: n * 2 }, () => ({
         source: Math.floor(Math.random() * n),
         target: Math.floor(Math.random() * n)
     }));
@@ -53,7 +53,7 @@ const KnowledgeGraph: React.FC = () => {
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: '0 20px 20px 20px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '60px' }}>
-        <h2 className="text-cyan mono-font">/// KNOWLEDGE GRAPH VISUALIZER</h2>
+        <h2 className="text-cyan mono-font">{'/// KNOWLEDGE GRAPH VISUALIZER'}</h2>
         <div style={{ fontSize: '0.8rem', color: '#666' }}>
             NODES: {graphData.nodes.length} | EDGES: {graphData.links.length}
         </div>

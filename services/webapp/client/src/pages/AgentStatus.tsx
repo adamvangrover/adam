@@ -17,7 +17,7 @@ const AgentStatus: React.FC = () => {
   return (
     <div style={{ padding: '20px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-        <h2 className="text-cyan mono-font">/// AGENT REGISTRY</h2>
+        <h2 className="text-cyan mono-font">{'/// AGENT REGISTRY'}</h2>
         <input
             type="text"
             placeholder="FILTER AGENTS..."
