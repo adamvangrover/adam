@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Bond Pricer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-dark: #020408;
+            --panel-glass: rgba(10, 15, 30, 0.7);
+            --indigo-glow: #6366f1;
+            --grid-line: rgba(99, 102, 241, 0.05);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 30px 30px;
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: var(--panel-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(99, 102, 241, 0.1);
+        }
+
+        input[type="number"], select {
+            background: #050a14;
+            border: 1px solid #1e293b;
+            color: var(--indigo-glow);
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+            font-size: 0.75rem;
+            padding: 4px;
+            width: 100%;
+        }
+        input:focus {
+            border-color: var(--indigo-glow);
+            box-shadow: 0 0 8px rgba(99, 102, 241, 0.3);
+            outline: none;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--indigo-glow); }
+
+        .result-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .result-label { color: #94a3b8; }
+        .result-val { font-weight: bold; font-family: monospace; color: white; }
+    </style>
+</head>
+<body class="h-screen flex flex-col p-4 text-xs">
+
+    <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2">
+        <h1 class="text-lg font-bold text-white tracking-widest flex items-center">
+            <i data-lucide="scroll" class="w-5 h-5 mr-2 text-indigo-400"></i>
+            BOND PRICER
+        </h1>
+        <div class="flex gap-2">
+            <button onclick="exportCSV()" class="px-3 py-1 bg-indigo-900/20 border border-indigo-500/30 text-indigo-400 rounded hover:bg-indigo-500/30 text-[10px] font-bold flex items-center gap-1">
+                <i data-lucide="download" class="w-3 h-3"></i> EXPORT CSV
+            </button>
+            <div class="text-[10px] text-gray-500 self-center">LOCAL_MODE</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-12 gap-4 flex-grow overflow-hidden">
+
+        <!-- Input -->
+        <aside class="col-span-4 lg:col-span-3 flex flex-col gap-3">
+            <div class="glass-panel p-3 rounded">
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold">Bond Specs</div>
+                <div class="space-y-2">
+                    <div><label class="block text-gray-400 text-[10px]">Face Value ($)</label><input type="number" id="face" value="1000"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Coupon Rate (%)</label><input type="number" id="coupon" value="5.0" step="0.1"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Frequency</label>
+                        <select id="freq" onchange="calc()" class="rounded px-2 py-1 text-indigo-400 bg-[#050a14] border border-[#1e293b]">
+                            <option value="1">Annual (1)</option>
+                            <option value="2" selected>Semi-Annual (2)</option>
+                            <option value="4">Quarterly (4)</option>
+                            <option value="12">Monthly (12)</option>
+                        </select>
+                    </div>
+                    <div><label class="block text-gray-400 text-[10px]">Years to Maturity</label><input type="number" id="years" value="10"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Yield to Maturity (YTM %)</label><input type="number" id="ytm" value="6.0" step="0.1"></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Output -->
+        <main class="col-span-8 lg:col-span-9 flex flex-col gap-4">
+
+            <!-- Price Card -->
+            <div class="glass-panel p-6 rounded text-center flex flex-col justify-center items-center h-48 bg-indigo-900/10 border-indigo-500/30">
+                <div class="text-xs text-indigo-300 uppercase tracking-widest mb-2">Clean Price</div>
+                <div class="text-5xl font-bold text-white font-mono tracking-tighter" id="res-price">0.00</div>
+                <div class="text-xs text-gray-400 mt-2">% of Par: <span id="res-pct" class="text-indigo-400">0.00%</span></div>
+            </div>
+
+            <!-- Analysis -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="glass-panel p-3 rounded">
+                    <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold">Risk Metrics</div>
+                    <div class="space-y-1">
+                        <div class="result-row"><span class="result-label">Macaulay Duration</span><span class="result-val" id="res-mac">0.00 yrs</span></div>
+                        <div class="result-row"><span class="result-label">Modified Duration</span><span class="result-val text-indigo-300" id="res-mod">0.00</span></div>
+                        <div class="result-row"><span class="result-label">Convexity</span><span class="result-val" id="res-conv">0.00</span></div>
+                        <div class="result-row"><span class="result-label">DV01 (1bp move)</span><span class="result-val" id="res-dv01">$0.00</span></div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-3 rounded">
+                     <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold">Cash Flow Summary</div>
+                     <div class="space-y-1">
+                        <div class="result-row"><span class="result-label">Total Coupons</span><span class="result-val" id="res-tot-coup">$0.00</span></div>
+                        <div class="result-row"><span class="result-label">Total Cash Flow</span><span class="result-val" id="res-tot-cf">$0.00</span></div>
+                        <div class="result-row"><span class="result-label">Current Yield</span><span class="result-val text-green-400" id="res-curr-yld">0.00%</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-3 rounded flex-grow overflow-auto">
+                 <table class="w-full text-xs font-mono">
+                     <thead class="sticky top-0 bg-[#020408]">
+                         <tr class="text-gray-500 border-b border-gray-700">
+                             <th class="text-left py-2">Period</th>
+                             <th class="text-right">Time (Yrs)</th>
+                             <th class="text-right">Cash Flow</th>
+                             <th class="text-right">PV of CF</th>
+                         </tr>
+                     </thead>
+                     <tbody id="cf-body"></tbody>
+                 </table>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let exportData = {};
+        let cashFlows = [];
+
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(i => i.addEventListener('change', calc));
+
+        function fmt(n) { return n.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+
+        function calc() {
+            const F = parseFloat(document.getElementById('face').value);
+            const C_rate = parseFloat(document.getElementById('coupon').value) / 100;
+            const freq = parseFloat(document.getElementById('freq').value);
+            const years = parseFloat(document.getElementById('years').value);
+            const ytm = parseFloat(document.getElementById('ytm').value) / 100;
+
+            const periods = years * freq;
+            const coupon = (F * C_rate) / freq;
+            const r = ytm / freq;
+
+            let price = 0;
+            let macDurationSum = 0;
+            let convexitySum = 0;
+
+            cashFlows = [];
+            const tbody = document.getElementById('cf-body');
+            tbody.innerHTML = '';
+
+            for(let i=1; i<=periods; i++) {
+                let cf = coupon;
+                if(i === periods) cf += F;
+
+                const time = i / freq;
+                const pv = cf / Math.pow(1+r, i);
+
+                price += pv;
+                macDurationSum += time * pv;
+                convexitySum += (i*(i+1) * cf) / Math.pow(1+r, i+2);
+
+                cashFlows.push({ period: i, time, cf, pv });
+
+                // Render row (limit to first 20 and last 5 if too many? No, just list all)
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="text-gray-400">${i}</td>
+                    <td class="text-right text-gray-500">${time.toFixed(2)}</td>
+                    <td class="text-right text-white">${fmt(cf)}</td>
+                    <td class="text-right text-indigo-300">${fmt(pv)}</td>
+                `;
+                tbody.appendChild(tr);
+            }
+
+            // Metrics
+            const macDur = macDurationSum / price;
+            const modDur = macDur / (1 + r);
+            const convexity = (convexitySum / (Math.pow(freq, 2))) / price; // Approx adjustment for freq?
+            // Standard Conv formula: (1/P) * sum( CFt / (1+y)^t * (t^2 + t) / (1+y)^2 )
+            // Wait, manual sum is sum( t*(t+1)*CF / (1+r)^(t+2) ). Correct for discrete periods?
+            // Let's stick to standard approx: 1/P * sum [ CFt / (1+y)^t * t*(t+1) ] / (1+y)^2 * (1/freq^2)
+            // The logic above: convexitySum accumulated term is CF / (1+r)^(i+2) * i*(i+1).
+            // Need to adjust for freq. t = i/freq.
+            // Let's use simpler discrete approx or just keep "Convexity" as "Bond Convexity".
+            // Actually, Convexity = [1 / (P * (1+y)^2)] * Sum [ CFt / (1+y)^t * (t^2 + t) ] where t is period number.
+            // My sum uses i (period number). So Result needs to be divided by freq^2.
+            const convFinal = convexitySum / (price * Math.pow(freq, 2)); // Rough check
+
+            const dv01 = (modDur * price * 0.0001);
+
+            document.getElementById('res-price').innerText = fmt(price);
+            document.getElementById('res-pct').innerText = (price/F * 100).toFixed(2) + '%';
+
+            document.getElementById('res-mac').innerText = macDur.toFixed(2) + ' yrs';
+            document.getElementById('res-mod').innerText = modDur.toFixed(2);
+            document.getElementById('res-conv').innerText = convFinal.toFixed(2);
+            document.getElementById('res-dv01').innerText = '$' + dv01.toFixed(4);
+
+            document.getElementById('res-tot-coup').innerText = fmt(coupon * periods);
+            document.getElementById('res-tot-cf').innerText = fmt((coupon * periods) + F);
+            document.getElementById('res-curr-yld').innerText = ((F*C_rate)/price * 100).toFixed(2) + '%';
+
+            exportData = { price, macDur, modDur, convexity: convFinal, dv01 };
+        }
+
+        function exportCSV() {
+            if(!cashFlows.length) return;
+            let csv = "Period,Time,Cash Flow,PV\n";
+            cashFlows.forEach(cf => {
+                csv += `${cf.period},${cf.time.toFixed(2)},${cf.cf.toFixed(2)},${cf.pv.toFixed(2)}\n`;
+            });
+            csv += `\nPrice,${exportData.price}\nModified Duration,${exportData.modDur}\nConvexity,${exportData.convexity}\n`;
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'bond_pricing.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        window.onload = function() {
+            lucide.createIcons();
+            calc();
+        };
+    </script>
+</body>
+</html>

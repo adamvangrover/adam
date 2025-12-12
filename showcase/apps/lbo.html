@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM | LBO Modeler</title>
+    <title>ADAM | LBO Modeler Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -55,19 +55,24 @@
 
         table { border-collapse: separate; border-spacing: 0; width: 100%; }
         th { background: rgba(188, 19, 254, 0.05); color: var(--purple-glow); font-weight: normal; text-transform: uppercase; letter-spacing: 1px; }
-        td { border-bottom: 1px solid #1e293b; }
+        td { border-bottom: 1px solid #1e293b; padding: 4px; }
+
+        /* Sensitivity Table Styling */
+        .sens-cell { text-align: center; font-size: 0.7rem; }
+        .sens-header { font-weight: bold; color: #94a3b8; }
+        .sens-highlight { background: rgba(188, 19, 254, 0.15); font-weight: bold; color: white; border: 1px solid var(--purple-glow); }
     </style>
 </head>
 <body class="h-screen flex flex-col p-4 text-xs">
 
-    <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2">
+    <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2 flex-shrink-0">
         <h1 class="text-lg font-bold text-white tracking-widest flex items-center">
             <i data-lucide="layers" class="w-5 h-5 mr-2 text-purple-400"></i>
-            LBO MODELER
+            LBO MODELER <span class="text-[10px] ml-2 px-2 py-0.5 border border-purple-500/50 rounded text-purple-300">PRO</span>
         </h1>
         <div class="flex gap-2">
             <button onclick="exportCSV()" class="px-3 py-1 bg-purple-900/20 border border-purple-500/30 text-purple-400 rounded hover:bg-purple-500/30 text-[10px] font-bold flex items-center gap-1">
-                <i data-lucide="download" class="w-3 h-3"></i> EXPORT CSV
+                <i data-lucide="download" class="w-3 h-3"></i> EXPORT
             </button>
             <div class="text-[10px] text-gray-500 self-center">LOCAL_MODE</div>
         </div>
@@ -75,36 +80,50 @@
 
     <div class="grid grid-cols-12 gap-4 flex-grow overflow-hidden">
         <!-- Sidebar Inputs -->
-        <aside class="col-span-4 lg:col-span-3 space-y-3 overflow-y-auto pr-2">
+        <aside class="col-span-3 space-y-3 overflow-y-auto pr-2 custom-scroll">
 
             <div class="glass-panel p-3 rounded">
-                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold">1. Entry Assumptions</div>
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold flex justify-between">
+                    <span>1. Entry & Uses</span>
+                    <i data-lucide="log-in" class="w-3 h-3"></i>
+                </div>
                 <div class="space-y-2">
                     <div>
                         <label class="block text-gray-400 text-[10px] mb-1">LTM EBITDA ($M)</label>
-                        <input type="number" id="ltmEbitda" value="25" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                        <input type="number" id="ltmEbitda" value="50" class="w-full px-2 py-1 rounded" onchange="runModel()">
                     </div>
                     <div>
                         <label class="block text-gray-400 text-[10px] mb-1">Entry Multiple (x)</label>
                         <input type="number" id="entryMult" value="10.0" step="0.5" class="w-full px-2 py-1 rounded" onchange="runModel()">
                     </div>
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Transaction Fees ($M)</label>
+                        <input type="number" id="fees" value="10" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Min Cash ($M)</label>
+                        <input type="number" id="minCash" value="5" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
                 </div>
             </div>
 
             <div class="glass-panel p-3 rounded">
-                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold">2. Debt Structure</div>
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold flex justify-between">
+                    <span>2. Sources (Debt)</span>
+                    <i data-lucide="coins" class="w-3 h-3"></i>
+                </div>
                 <div class="space-y-2">
                     <div>
                         <label class="block text-gray-400 text-[10px] mb-1">Senior Debt ($M)</label>
-                        <input type="number" id="seniorDebt" value="100" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                        <input type="number" id="seniorDebt" value="200" class="w-full px-2 py-1 rounded" onchange="runModel()">
                     </div>
                     <div>
                         <label class="block text-gray-400 text-[10px] mb-1">Senior Rate %</label>
-                        <input type="number" id="seniorRate" value="8.0" step="0.1" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                        <input type="number" id="seniorRate" value="7.5" step="0.1" class="w-full px-2 py-1 rounded" onchange="runModel()">
                     </div>
                     <div>
-                        <label class="block text-gray-400 text-[10px] mb-1">Sub/Mezz Debt ($M)</label>
-                        <input type="number" id="subDebt" value="25" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                        <label class="block text-gray-400 text-[10px] mb-1">Sub Debt ($M)</label>
+                        <input type="number" id="subDebt" value="50" class="w-full px-2 py-1 rounded" onchange="runModel()">
                     </div>
                     <div>
                         <label class="block text-gray-400 text-[10px] mb-1">Sub Rate % (PIK)</label>
@@ -114,42 +133,84 @@
             </div>
 
             <div class="glass-panel p-3 rounded">
-                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold">3. Exit</div>
-                <div>
-                     <label class="block text-gray-400 text-[10px] mb-1">Exit Multiple (x)</label>
-                     <input type="number" id="exitMult" value="10.0" step="0.5" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold flex justify-between">
+                    <span>3. Operations & Exit</span>
+                    <i data-lucide="log-out" class="w-3 h-3"></i>
                 </div>
-                <div class="mt-2">
-                     <label class="block text-gray-400 text-[10px] mb-1">Hold Period (Yrs)</label>
-                     <input type="number" value="5" disabled class="w-full px-2 py-1 rounded bg-gray-900 text-gray-500 border-gray-800">
+                <div class="space-y-2">
+                     <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">EBITDA Growth %</label>
+                        <input type="number" id="growth" value="5.0" step="0.5" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                     <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Capex % Rev (Proxy)</label>
+                        <input type="number" id="capex" value="3.0" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                    <div>
+                         <label class="block text-gray-400 text-[10px] mb-1">Exit Multiple (x)</label>
+                         <input type="number" id="exitMult" value="10.0" step="0.5" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
                 </div>
             </div>
 
         </aside>
 
         <!-- Main Output -->
-        <main class="col-span-8 lg:col-span-9 flex flex-col gap-4 overflow-y-auto pr-2">
+        <main class="col-span-9 flex flex-col gap-3 overflow-y-auto pr-2 custom-scroll">
 
-            <div class="grid grid-cols-2 gap-4">
-                <div class="glass-panel p-3 rounded">
-                    <div class="text-[10px] text-gray-500 uppercase">Sponsor IRR</div>
-                    <div class="text-2xl font-bold text-white mt-1 font-mono" id="kpi-irr">0.0%</div>
-                    <div class="text-[10px] text-purple-600 mt-1">5-Year Hold</div>
-                </div>
-                <div class="glass-panel p-3 rounded">
-                    <div class="text-[10px] text-gray-500 uppercase">MOIC</div>
-                    <div class="text-2xl font-bold text-white mt-1 font-mono" id="kpi-moic">0.0x</div>
-                    <div class="text-[10px] text-gray-600 mt-1">Multiple of Invested Capital</div>
+            <!-- Sources and Uses Summary -->
+            <div class="glass-panel p-3 rounded">
+                <h3 class="text-xs font-bold text-gray-400 mb-2 uppercase">Transaction Summary (Entry)</h3>
+                <div class="grid grid-cols-2 gap-4">
+                     <!-- Uses -->
+                     <div>
+                        <table class="w-full text-[10px]">
+                            <tr class="border-b border-gray-700"><th class="text-left pb-1">Uses of Funds</th><th class="text-right pb-1">Amount</th><th class="text-right pb-1">%</th></tr>
+                            <tr><td class="text-gray-400 py-1">Purchase Price</td><td class="text-right" id="use-pp">$0</td><td class="text-right text-gray-500" id="use-pp-pct">0%</td></tr>
+                            <tr><td class="text-gray-400 py-1">Fees & Expenses</td><td class="text-right" id="use-fees">$0</td><td class="text-right text-gray-500" id="use-fees-pct">0%</td></tr>
+                            <tr><td class="text-gray-400 py-1">Min Cash to B/S</td><td class="text-right" id="use-cash">$0</td><td class="text-right text-gray-500" id="use-cash-pct">0%</td></tr>
+                            <tr class="font-bold border-t border-gray-700"><td class="text-white py-1">Total Uses</td><td class="text-right" id="use-total">$0</td><td class="text-right">100%</td></tr>
+                        </table>
+                     </div>
+                     <!-- Sources -->
+                     <div>
+                        <table class="w-full text-[10px]">
+                            <tr class="border-b border-gray-700"><th class="text-left pb-1">Sources of Funds</th><th class="text-right pb-1">Amount</th><th class="text-right pb-1">%</th></tr>
+                            <tr><td class="text-gray-400 py-1">Senior Debt</td><td class="text-right" id="src-senior">$0</td><td class="text-right text-gray-500" id="src-senior-pct">0%</td></tr>
+                            <tr><td class="text-gray-400 py-1">Sub Debt</td><td class="text-right" id="src-sub">$0</td><td class="text-right text-gray-500" id="src-sub-pct">0%</td></tr>
+                            <tr><td class="text-purple-400 font-bold py-1">Sponsor Equity</td><td class="text-right text-purple-400 font-bold" id="src-equity">$0</td><td class="text-right text-purple-400 font-bold" id="src-equity-pct">0%</td></tr>
+                            <tr class="font-bold border-t border-gray-700"><td class="text-white py-1">Total Sources</td><td class="text-right" id="src-total">$0</td><td class="text-right">100%</td></tr>
+                        </table>
+                     </div>
                 </div>
             </div>
 
-            <div class="glass-panel p-4 rounded flex-grow">
-                <h3 class="text-xs font-bold text-purple-400 mb-3">Deleveraging Profile & Returns</h3>
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="glass-panel p-3 rounded flex items-center justify-between">
+                    <div>
+                        <div class="text-[10px] text-gray-500 uppercase">Sponsor IRR</div>
+                        <div class="text-2xl font-bold text-white mt-1 font-mono" id="kpi-irr">0.0%</div>
+                    </div>
+                    <div class="text-right">
+                         <div class="text-[10px] text-gray-500 uppercase">MOIC</div>
+                         <div class="text-xl font-bold text-purple-400 mt-1 font-mono" id="kpi-moic">0.0x</div>
+                    </div>
+                </div>
+                <div class="glass-panel p-3 rounded relative h-24">
+                     <canvas id="chart-lbo"></canvas>
+                </div>
+            </div>
+
+            <div class="glass-panel p-4 rounded">
+                <h3 class="text-xs font-bold text-purple-400 mb-3 flex items-center gap-2">
+                    <i data-lucide="table" class="w-3 h-3"></i> Returns & Deleveraging Schedule
+                </h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-xs font-mono">
                         <thead>
                             <tr class="text-gray-500 border-b border-gray-700">
-                                <th class="text-left py-2">Year</th>
+                                <th class="text-left py-2">Metric ($M)</th>
                                 <th class="text-right">Entry</th><th class="text-right">Y1</th><th class="text-right">Y2</th><th class="text-right">Y3</th><th class="text-right">Y4</th><th class="text-right">Exit</th>
                             </tr>
                         </thead>
@@ -158,8 +219,17 @@
                 </div>
             </div>
 
-            <div class="glass-panel p-4 rounded h-48 relative w-full">
-                 <canvas id="chart-lbo"></canvas>
+            <!-- Sensitivity -->
+            <div class="glass-panel p-3 rounded overflow-hidden flex flex-col h-48">
+                 <h3 class="text-xs font-bold text-gray-400 mb-2 flex items-center gap-2">
+                    <i data-lucide="grid" class="w-3 h-3"></i> Sensitivity: IRR
+                    <span class="text-[9px] text-gray-600 ml-auto">(Entry vs Exit Multiple)</span>
+                </h3>
+                <div class="flex-grow flex justify-center items-center">
+                    <div id="sensitivity-container" class="w-full h-full flex items-center justify-center">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
             </div>
 
         </main>
@@ -171,91 +241,174 @@
         let lastProj = [];
 
         const getVal = (id) => parseFloat(document.getElementById(id).value) || 0;
-        const fmtMoney = (n) => `$${n.toFixed(1)}`;
+        const fmtMoney = (n) => `$${n.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}`;
         const fmtPct = (n) => `${(n*100).toFixed(1)}%`;
         const fmtX = (n) => `${n.toFixed(2)}x`;
+
+        function calculateLBO(entryMult, exitMult, inputs) {
+             const ev = inputs.ebitda * entryMult;
+             const totalUses = ev + inputs.fees + inputs.minCash;
+
+             const totalDebt = inputs.seniorDebt + inputs.subDebt;
+             const sponsorEquity = totalUses - totalDebt;
+
+             // Projections
+             let proj = [];
+             let currEbitda = inputs.ebitda;
+             let currSenior = inputs.seniorDebt;
+             let currSub = inputs.subDebt;
+
+             // Entry
+             proj.push({ year: 0, ebitda: currEbitda, senior: currSenior, sub: currSub, equity: sponsorEquity });
+
+             for(let i=1; i<=5; i++) {
+                 currEbitda *= (1 + inputs.growth);
+
+                 // Cash Flow Proxy
+                 // Assume EBITDA to FCF conversion is roughly 60% pre-interest
+                 let proxyFcf = currEbitda * 0.6;
+
+                 let srInt = currSenior * inputs.seniorRate;
+                 let subInt = currSub * inputs.subRate; // PIK
+
+                 let cashAvailable = proxyFcf - srInt; // Pay cash interest
+
+                 // Cash Sweep to Senior
+                 let paydown = Math.max(0, cashAvailable);
+                 currSenior = Math.max(0, currSenior - paydown);
+                 currSub += subInt; // PIK Accrual
+
+                 let netDebt = currSenior + currSub;
+                 // Mark to Market Equity (using Exit Mult as proxy)
+                 let currVal = currEbitda * exitMult;
+                 let currEq = currVal - netDebt;
+
+                 proj.push({ year: i, ebitda: currEbitda, senior: currSenior, sub: currSub, equity: currEq, fcf: cashAvailable });
+             }
+
+             // Returns
+             const exitVal = proj[5].ebitda * exitMult;
+             const exitNetDebt = proj[5].senior + proj[5].sub;
+             const exitEquity = exitVal - exitNetDebt;
+
+             const moic = exitEquity / sponsorEquity;
+             const irr = Math.pow(moic, 1/5) - 1;
+
+             return { irr, moic, proj, sponsorEquity, totalUses, ev };
+        }
 
         function runModel() {
             // Inputs
             const ebitda = getVal('ltmEbitda');
             const entryMult = getVal('entryMult');
+            const fees = getVal('fees');
+            const minCash = getVal('minCash');
             const seniorDebt = getVal('seniorDebt');
             const subDebt = getVal('subDebt');
             const seniorRate = getVal('seniorRate') / 100;
-            const subRate = getVal('subRate') / 100; // All PIK for simplicity
+            const subRate = getVal('subRate') / 100;
             const exitMult = getVal('exitMult');
+            const growth = getVal('growth') / 100;
 
-            const ev = ebitda * entryMult;
+            const inputs = { ebitda, fees, minCash, seniorDebt, subDebt, seniorRate, subRate, growth };
+
+            // Run Base
+            const res = calculateLBO(entryMult, exitMult, inputs);
+            lastProj = res.proj;
+
+            // Render Sources & Uses
             const totalDebt = seniorDebt + subDebt;
-            const equity = ev - totalDebt;
+            document.getElementById('use-pp').innerText = fmtMoney(res.ev);
+            document.getElementById('use-fees').innerText = fmtMoney(fees);
+            document.getElementById('use-cash').innerText = fmtMoney(minCash);
+            document.getElementById('use-total').innerText = fmtMoney(res.totalUses);
 
-            // Projections (Simplified for LBO tool: 5% growth, 60% cash conversion for paydown)
-            let proj = [];
-            let currEbitda = ebitda;
-            let currSenior = seniorDebt;
-            let currSub = subDebt;
+            document.getElementById('use-pp-pct').innerText = fmtPct(res.ev/res.totalUses);
+            document.getElementById('use-fees-pct').innerText = fmtPct(fees/res.totalUses);
+            document.getElementById('use-cash-pct').innerText = fmtPct(minCash/res.totalUses);
 
-            // Entry Row
-            proj.push({ year: 0, ebitda: currEbitda, debt: currSenior + currSub, equity: equity });
+            document.getElementById('src-senior').innerText = fmtMoney(seniorDebt);
+            document.getElementById('src-sub').innerText = fmtMoney(subDebt);
+            document.getElementById('src-equity').innerText = fmtMoney(res.sponsorEquity);
+            document.getElementById('src-total').innerText = fmtMoney(res.totalUses);
 
-            for(let i=1; i<=5; i++) {
-                currEbitda *= 1.05; // 5% growth
-                let interest = (currSenior * seniorRate);
-                let pik = (currSub * subRate);
+            document.getElementById('src-senior-pct').innerText = fmtPct(seniorDebt/res.totalUses);
+            document.getElementById('src-sub-pct').innerText = fmtPct(subDebt/res.totalUses);
+            document.getElementById('src-equity-pct').innerText = fmtPct(res.sponsorEquity/res.totalUses);
 
-                // Cash Sweep
-                let fcf = currEbitda * 0.6; // Proxy conversion
-                let paydown = Math.max(0, fcf - interest);
+            // KPIs
+            document.getElementById('kpi-irr').innerText = fmtPct(res.irr);
+            document.getElementById('kpi-moic').innerText = fmtX(res.moic);
 
-                currSenior = Math.max(0, currSenior - paydown);
-                currSub += pik; // PIK Accrual
-
-                let netDebt = currSenior + currSub;
-                // Theoretical Equity Value at this point
-                let currEv = currEbitda * entryMult; // using entry mult as proxy for interim
-                let currEq = currEv - netDebt;
-
-                proj.push({ year: i, ebitda: currEbitda, debt: netDebt, equity: currEq });
-            }
-
-            lastProj = proj; // Store
-
-            // Exit
-            const exitEv = proj[5].ebitda * exitMult;
-            const exitDebt = proj[5].debt;
-            const exitEquity = exitEv - exitDebt;
-            const moic = exitEquity / equity;
-            const irr = Math.pow(moic, 1/5) - 1;
-
-            // Render
-            document.getElementById('kpi-irr').innerText = fmtPct(irr);
-            document.getElementById('kpi-moic').innerText = fmtX(moic);
-
+            // Table
             const tbody = document.getElementById('lbo-body');
             tbody.innerHTML = `
-                <tr><td>EBITDA</td>${proj.map(p=>`<td class="text-right text-gray-400">${fmtMoney(p.ebitda)}</td>`).join('')}</tr>
-                <tr><td>Total Debt</td>${proj.map(p=>`<td class="text-right text-red-300">${fmtMoney(p.debt)}</td>`).join('')}</tr>
-                <tr class="font-bold text-purple-400"><td>Equity Val</td>${proj.map(p=>`<td class="text-right">${fmtMoney(p.equity)}</td>`).join('')}</tr>
+                <tr><td>EBITDA</td>${lastProj.map(p=>`<td class="text-right text-gray-400">${fmtMoney(p.ebitda)}</td>`).join('')}</tr>
+                <tr><td>Senior Debt</td>${lastProj.map(p=>`<td class="text-right text-red-300">${fmtMoney(p.senior)}</td>`).join('')}</tr>
+                <tr><td>Sub Debt (PIK)</td>${lastProj.map(p=>`<td class="text-right text-red-400">${fmtMoney(p.sub)}</td>`).join('')}</tr>
+                <tr class="font-bold text-purple-400"><td>Equity Val</td>${lastProj.map(p=>`<td class="text-right">${fmtMoney(p.equity)}</td>`).join('')}</tr>
             `;
 
             // Chart
+            updateChart(lastProj);
+
+            // Sensitivity
+            renderSensitivity(entryMult, exitMult, inputs);
+        }
+
+        function updateChart(proj) {
             if(chartInstance) chartInstance.destroy();
             const ctx = document.getElementById('chart-lbo').getContext('2d');
+
             chartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: ['Entry', 'Y1', 'Y2', 'Y3', 'Y4', 'Exit'],
                     datasets: [
-                        { label: 'Debt', data: proj.map(p=>p.debt), backgroundColor: '#ef4444' },
+                        { label: 'Senior', data: proj.map(p=>p.senior), backgroundColor: '#f87171' },
+                        { label: 'Sub', data: proj.map(p=>p.sub), backgroundColor: '#dc2626' },
                         { label: 'Equity', data: proj.map(p=>p.equity), backgroundColor: '#bc13fe' }
                     ]
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    scales: { y: { stacked: true, grid: { color: '#1e293b' } }, x: { stacked: true, grid: { display: false } } },
-                    plugins: { legend: { labels: { color: '#cbd5e1' } } }
+                    scales: { y: { stacked: true, display: false }, x: { stacked: true, grid: { display: false }, ticks: { color: '#64748b', font: {size: 9} } } },
+                    plugins: { legend: { display: false } }
                 }
             });
+        }
+
+        function renderSensitivity(baseEntry, baseExit, inputs) {
+            const container = document.getElementById('sensitivity-container');
+            let html = '<table class="w-full h-full border-collapse">';
+
+            // Header Row (Exit)
+            html += '<tr><td class="sens-header text-right pr-2">Entry \\ Exit</td>';
+            for(let c=-2; c<=2; c++) {
+                const e = baseExit + (c * 0.5);
+                html += `<td class="sens-header sens-cell">${fmtX(e)}</td>`;
+            }
+            html += '</tr>';
+
+            // Rows (Entry)
+            for(let r=-2; r<=2; r++) {
+                const en = baseEntry + (r * 0.5);
+                html += `<tr><td class="sens-header text-right pr-2">${fmtX(en)}</td>`;
+
+                for(let c=-2; c<=2; c++) {
+                    const ex = baseExit + (c * 0.5);
+                    const res = calculateLBO(en, ex, inputs);
+
+                    const isCenter = (r===0 && c===0);
+                    const cls = isCenter ? 'sens-highlight rounded' : (res.irr > 0.20 ? 'text-green-400' : (res.irr > 0.15 ? 'text-yellow-400' : 'text-red-400'));
+
+                    html += `<td class="sens-cell ${cls} p-1">${fmtPct(res.irr)}</td>`;
+                }
+                html += '</tr>';
+            }
+
+            html += '</table>';
+            container.innerHTML = html;
         }
 
         window.onload = function() {
@@ -265,9 +418,9 @@
 
         function exportCSV() {
             if(!lastProj.length) return;
-            let csv = "Year,EBITDA,Debt,Equity\n";
+            let csv = "Year,EBITDA,Senior Debt,Sub Debt,Equity Value\n";
             lastProj.forEach(p => {
-                csv += `${p.year},${p.ebitda.toFixed(2)},${p.debt.toFixed(2)},${p.equity.toFixed(2)}\n`;
+                csv += `${p.year},${p.ebitda.toFixed(2)},${p.senior.toFixed(2)},${p.sub.toFixed(2)},${p.equity.toFixed(2)}\n`;
             });
             const irr = document.getElementById('kpi-irr').innerText;
             const moic = document.getElementById('kpi-moic').innerText;
@@ -278,11 +431,14 @@
             const a = document.createElement('a');
             a.setAttribute('hidden', '');
             a.setAttribute('href', url);
-            a.setAttribute('download', 'lbo_model.csv');
+            a.setAttribute('download', 'lbo_model_pro.csv');
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
         }
     </script>
+
+    <!-- Adam Global Nav -->
+    <script src="../../showcase/js/nav.js" data-root="../.."></script>
 </body>
 </html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Monte Carlo Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-dark: #020408;
+            --panel-glass: rgba(10, 15, 30, 0.7);
+            --pink-glow: #ec4899;
+            --grid-line: rgba(236, 72, 153, 0.05);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 30px 30px;
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: var(--panel-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(236, 72, 153, 0.1);
+        }
+
+        input[type="number"] {
+            background: #050a14;
+            border: 1px solid #1e293b;
+            color: var(--pink-glow);
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+            font-size: 0.75rem;
+            padding: 4px;
+            width: 100%;
+        }
+        input:focus {
+            border-color: var(--pink-glow);
+            box-shadow: 0 0 8px rgba(236, 72, 153, 0.3);
+            outline: none;
+        }
+
+        button { transition: all 0.2s; }
+        button:active { transform: scale(0.95); }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--pink-glow); }
+    </style>
+</head>
+<body class="h-screen flex flex-col p-4 text-xs">
+
+    <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2">
+        <h1 class="text-lg font-bold text-white tracking-widest flex items-center">
+            <i data-lucide="scatter-chart" class="w-5 h-5 mr-2 text-pink-400"></i>
+            MONTE CARLO SIMULATOR
+        </h1>
+        <div class="flex gap-2">
+             <button onclick="runSimulation()" class="px-3 py-1 bg-pink-600 hover:bg-pink-500 text-white rounded text-[10px] font-bold flex items-center gap-1">
+                <i data-lucide="play" class="w-3 h-3"></i> RUN
+            </button>
+            <button onclick="exportCSV()" class="px-3 py-1 bg-pink-900/20 border border-pink-500/30 text-pink-400 rounded hover:bg-pink-500/30 text-[10px] font-bold flex items-center gap-1">
+                <i data-lucide="download" class="w-3 h-3"></i> CSV
+            </button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-12 gap-4 flex-grow overflow-hidden">
+
+        <!-- Sidebar -->
+        <aside class="col-span-3 flex flex-col gap-3">
+            <div class="glass-panel p-3 rounded">
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold">Parameters</div>
+                <div class="space-y-2">
+                    <div><label class="block text-gray-400 text-[10px]">Start Price ($)</label><input type="number" id="S0" value="100"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Exp Return (μ %)</label><input type="number" id="mu" value="8" step="0.5"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Volatility (σ %)</label><input type="number" id="sigma" value="20" step="1"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Time (Years)</label><input type="number" id="T" value="1" step="0.1"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Steps</label><input type="number" id="steps" value="252"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Simulations</label><input type="number" id="sims" value="50"></div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-3 rounded flex-grow">
+                 <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold">Statistics</div>
+                 <div class="space-y-2 font-mono">
+                     <div class="flex justify-between"><span class="text-gray-400">Mean Final</span><span class="text-white" id="stat-mean">-</span></div>
+                     <div class="flex justify-between"><span class="text-gray-400">Median Final</span><span class="text-white" id="stat-median">-</span></div>
+                     <div class="flex justify-between"><span class="text-gray-400">Min Final</span><span class="text-rose-400" id="stat-min">-</span></div>
+                     <div class="flex justify-between"><span class="text-gray-400">Max Final</span><span class="text-green-400" id="stat-max">-</span></div>
+                     <div class="border-t border-gray-700 my-2 pt-2"></div>
+                     <div class="flex justify-between"><span class="text-gray-400">VaR (95%)</span><span class="text-pink-400 font-bold" id="stat-var">-</span></div>
+                 </div>
+            </div>
+        </aside>
+
+        <!-- Main Chart -->
+        <main class="col-span-9 glass-panel p-4 rounded relative flex flex-col">
+             <div class="flex-grow relative">
+                <canvas id="mc-chart"></canvas>
+             </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let chartInstance = null;
+        let lastResults = [];
+
+        function randn_bm() {
+            let u = 0, v = 0;
+            while(u === 0) u = Math.random();
+            while(v === 0) v = Math.random();
+            return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
+        }
+
+        function runSimulation() {
+            const S0 = parseFloat(document.getElementById('S0').value);
+            const mu = parseFloat(document.getElementById('mu').value) / 100;
+            const sigma = parseFloat(document.getElementById('sigma').value) / 100;
+            const T = parseFloat(document.getElementById('T').value);
+            const steps = parseInt(document.getElementById('steps').value);
+            const sims = parseInt(document.getElementById('sims').value);
+
+            const dt = T / steps;
+            const drift = (mu - 0.5 * sigma * sigma) * dt;
+            const vol = sigma * Math.sqrt(dt);
+
+            let allPaths = [];
+            let finalPrices = [];
+
+            // Run sims
+            for(let s=0; s<sims; s++) {
+                let path = [S0];
+                let currentS = S0;
+                for(let t=1; t<=steps; t++) {
+                    const shock = randn_bm();
+                    currentS = currentS * Math.exp(drift + vol * shock);
+                    path.push(currentS);
+                }
+                allPaths.push(path);
+                finalPrices.push(currentS);
+            }
+
+            lastResults = finalPrices;
+
+            // Stats
+            const mean = finalPrices.reduce((a,b)=>a+b,0) / sims;
+            finalPrices.sort((a,b)=>a-b);
+            const median = finalPrices[Math.floor(sims/2)];
+            const min = finalPrices[0];
+            const max = finalPrices[sims-1];
+            const var95 = S0 - finalPrices[Math.floor(sims * 0.05)];
+
+            document.getElementById('stat-mean').innerText = mean.toFixed(2);
+            document.getElementById('stat-median').innerText = median.toFixed(2);
+            document.getElementById('stat-min').innerText = min.toFixed(2);
+            document.getElementById('stat-max').innerText = max.toFixed(2);
+            document.getElementById('stat-var').innerText = var95.toFixed(2);
+
+            // Chart
+            if(chartInstance) chartInstance.destroy();
+            const ctx = document.getElementById('mc-chart').getContext('2d');
+
+            const datasets = allPaths.map((path, i) => ({
+                label: `Sim ${i+1}`,
+                data: path,
+                borderColor: 'rgba(236, 72, 153, 0.3)', // Pink transparent
+                borderWidth: 1,
+                pointRadius: 0,
+                fill: false
+            }));
+
+            // Highlight Mean Path (approx)
+            // Or add a theoretical mean line? Expected Value = S0 * exp(mu*t)
+            let expPath = [];
+            for(let t=0; t<=steps; t++) {
+                expPath.push(S0 * Math.exp(mu * (t*dt)));
+            }
+            datasets.push({
+                label: 'Expected Value',
+                data: expPath,
+                borderColor: '#fff',
+                borderWidth: 2,
+                borderDash: [5,5],
+                pointRadius: 0
+            });
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: steps+1}, (_, i) => i),
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    animation: false,
+                    scales: {
+                        y: { grid: { color: '#1e293b' }, title: { display: true, text: 'Price' } },
+                        x: { display: false }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function exportCSV() {
+            if(!lastResults.length) return;
+            let csv = "Simulation,Final Price\n";
+            lastResults.forEach((p, i) => {
+                csv += `${i+1},${p.toFixed(4)}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'monte_carlo_results.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        window.onload = function() {
+            lucide.createIcons();
+            runSimulation();
+        };
+    </script>
+</body>
+</html>

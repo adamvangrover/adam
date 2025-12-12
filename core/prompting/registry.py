@@ -1,5 +1,6 @@
 from typing import Dict, Type
 from .base_prompt_plugin import BasePromptPlugin
+from .plugins.financial_truth_plugin import FinancialTruthPlugin
 
 class PromptRegistry:
     """
@@ -22,3 +23,6 @@ class PromptRegistry:
     @classmethod
     def list_plugins(cls) -> list[str]:
         return list(cls._registry.keys())
+
+# Register default plugins
+PromptRegistry.register(FinancialTruthPlugin)

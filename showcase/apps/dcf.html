@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM | DCF Valuator</title>
+    <title>ADAM | DCF Valuator Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -24,7 +24,7 @@
                 linear-gradient(var(--grid-line) 1px, transparent 1px),
                 linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
             background-size: 30px 30px;
-            overflow: hidden; /* Hide scrollbars for iframe use */
+            overflow: hidden;
         }
 
         .glass-panel {
@@ -34,7 +34,7 @@
             border: 1px solid rgba(0, 240, 255, 0.1);
         }
 
-        input[type="number"] {
+        input[type="number"], select {
             background: #050a14;
             border: 1px solid #1e293b;
             color: var(--cyan-glow);
@@ -42,7 +42,7 @@
             transition: all 0.3s ease;
             font-size: 0.75rem;
         }
-        input[type="number"]:focus {
+        input[type="number"]:focus, select:focus {
             border-color: var(--cyan-glow);
             box-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
             outline: none;
@@ -55,70 +55,99 @@
 
         table { border-collapse: separate; border-spacing: 0; width: 100%; }
         th { background: rgba(0, 240, 255, 0.05); color: var(--cyan-glow); font-weight: normal; text-transform: uppercase; letter-spacing: 1px; }
-        td { border-bottom: 1px solid #1e293b; }
+        td { border-bottom: 1px solid #1e293b; padding: 4px; }
+
+        /* Sensitivity Table Styling */
+        .sens-cell { text-align: center; font-size: 0.7rem; }
+        .sens-header { font-weight: bold; color: #94a3b8; }
+        .sens-highlight { background: rgba(0, 240, 255, 0.15); font-weight: bold; color: white; border: 1px solid var(--cyan-glow); }
     </style>
 </head>
 <body class="h-screen flex flex-col p-4 text-xs">
 
-    <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2">
+    <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2 flex-shrink-0">
         <h1 class="text-lg font-bold text-white tracking-widest flex items-center">
             <i data-lucide="bar-chart-2" class="w-5 h-5 mr-2 text-cyan-400"></i>
-            DCF VALUATOR
+            DCF VALUATOR <span class="text-[10px] ml-2 px-2 py-0.5 border border-cyan-500/50 rounded text-cyan-300">PRO</span>
         </h1>
         <div class="flex gap-2">
+            <div class="flex items-center gap-2 mr-4">
+                <span class="text-[10px] text-gray-400 uppercase">Scenario:</span>
+                <select id="scenario" onchange="runModel()" class="px-2 py-1 rounded">
+                    <option value="base">Base Case</option>
+                    <option value="bull">Bull Case (+20%)</option>
+                    <option value="bear">Bear Case (-20%)</option>
+                </select>
+            </div>
             <button onclick="exportCSV()" class="px-3 py-1 bg-cyan-900/20 border border-cyan-500/30 text-cyan-400 rounded hover:bg-cyan-500/30 text-[10px] font-bold flex items-center gap-1">
-                <i data-lucide="download" class="w-3 h-3"></i> EXPORT CSV
+                <i data-lucide="download" class="w-3 h-3"></i> EXPORT
             </button>
-            <div class="text-[10px] text-gray-500 self-center">LOCAL_MODE</div>
         </div>
     </div>
 
     <div class="grid grid-cols-12 gap-4 flex-grow overflow-hidden">
         <!-- Sidebar Inputs -->
-        <aside class="col-span-4 lg:col-span-3 space-y-3 overflow-y-auto pr-2">
+        <aside class="col-span-3 space-y-3 overflow-y-auto pr-2 custom-scroll">
 
             <div class="glass-panel p-3 rounded">
-                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold">1. Historicals ($M)</div>
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold flex justify-between">
+                    <span>1. Historicals ($M)</span>
+                    <i data-lucide="history" class="w-3 h-3"></i>
+                </div>
                 <div class="space-y-2">
                     <div>
                         <label class="block text-gray-400 text-[10px] mb-1">LTM Revenue</label>
-                        <input type="number" id="ltmRev" value="100" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                        <input type="number" id="ltmRev" value="1000" class="w-full px-2 py-1 rounded" onchange="runModel()">
                     </div>
                     <div>
                         <label class="block text-gray-400 text-[10px] mb-1">LTM EBITDA</label>
-                        <input type="number" id="ltmEbitda" value="25" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                        <input type="number" id="ltmEbitda" value="250" class="w-full px-2 py-1 rounded" onchange="runModel()">
                     </div>
                 </div>
             </div>
 
             <div class="glass-panel p-3 rounded">
-                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold">2. WACC Assumptions</div>
-                <div class="grid grid-cols-2 gap-2">
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold flex justify-between">
+                    <span>2. Assumptions</span>
+                    <i data-lucide="settings-2" class="w-3 h-3"></i>
+                </div>
+                <div class="grid grid-cols-1 gap-2">
                     <div>
-                        <label class="block text-gray-400 text-[10px] mb-1">Risk Free %</label>
-                        <input type="number" id="rfRate" value="4.2" step="0.1" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                        <label class="block text-gray-400 text-[10px] mb-1">Risk Free Rate (%)</label>
+                        <input type="number" id="rfRate" value="4.0" step="0.1" class="w-full px-2 py-1 rounded" onchange="runModel()">
                     </div>
                     <div>
-                        <label class="block text-gray-400 text-[10px] mb-1">MRP %</label>
+                        <label class="block text-gray-400 text-[10px] mb-1">Market Risk Prem (%)</label>
                         <input type="number" id="mrp" value="6.0" step="0.1" class="w-full px-2 py-1 rounded" onchange="runModel()">
                     </div>
                     <div>
                         <label class="block text-gray-400 text-[10px] mb-1">Beta</label>
-                        <input type="number" id="beta" value="1.2" step="0.1" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                        <input type="number" id="beta" value="1.1" step="0.05" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                     <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Pre-Tax Cost of Debt (%)</label>
+                        <input type="number" id="costDebt" value="6.5" step="0.1" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                     <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Debt / Total Cap (%)</label>
+                        <input type="number" id="debtWeight" value="30.0" step="1" class="w-full px-2 py-1 rounded" onchange="runModel()">
                     </div>
                     <div>
-                        <label class="block text-gray-400 text-[10px] mb-1">Tax Rate %</label>
+                        <label class="block text-gray-400 text-[10px] mb-1">Tax Rate (%)</label>
                         <input type="number" id="taxRate" value="21.0" class="w-full px-2 py-1 rounded" onchange="runModel()">
                     </div>
-                </div>
-                <div class="mt-2">
-                     <label class="block text-gray-400 text-[10px] mb-1">Terminal Growth %</label>
-                     <input type="number" id="tgr" value="2.0" step="0.1" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                     <div class="border-t border-gray-700 pt-2 mt-1">
+                        <label class="block text-gray-400 text-[10px] mb-1 text-cyan-300">Terminal Growth (%)</label>
+                        <input type="number" id="tgr" value="2.5" step="0.1" class="w-full px-2 py-1 rounded border-cyan-500/30" onchange="runModel()">
+                    </div>
                 </div>
             </div>
 
             <div class="glass-panel p-3 rounded">
-                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold">3. Projections (Y1-Y5)</div>
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold flex justify-between">
+                    <span>3. Projections</span>
+                    <i data-lucide="trending-up" class="w-3 h-3"></i>
+                </div>
                 <div class="space-y-2">
                     <div>
                         <label class="block text-gray-400 text-[10px] mb-1">Rev Growth % (Avg)</label>
@@ -128,34 +157,65 @@
                         <label class="block text-gray-400 text-[10px] mb-1">EBITDA Margin % (Avg)</label>
                         <input type="number" id="avgMargin" value="25.0" class="w-full px-2 py-1 rounded" onchange="runModel()">
                     </div>
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Capex % Rev</label>
+                        <input type="number" id="capexPct" value="3.0" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                </div>
+            </div>
+
+             <div class="glass-panel p-3 rounded">
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold flex justify-between">
+                    <span>4. Capital Structure</span>
+                    <i data-lucide="pie-chart" class="w-3 h-3"></i>
+                </div>
+                <div class="space-y-2">
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Net Debt ($M)</label>
+                        <input type="number" id="netDebt" value="500" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Shares Out (M)</label>
+                        <input type="number" id="shares" value="100" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
                 </div>
             </div>
 
         </aside>
 
         <!-- Main Output -->
-        <main class="col-span-8 lg:col-span-9 flex flex-col gap-4 overflow-y-auto pr-2">
+        <main class="col-span-9 flex flex-col gap-3 overflow-y-auto pr-2 custom-scroll">
 
-            <div class="grid grid-cols-2 gap-4">
-                <div class="glass-panel p-3 rounded">
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-4 gap-3">
+                <div class="glass-panel p-2 rounded">
                     <div class="text-[10px] text-gray-500 uppercase">Enterprise Value</div>
-                    <div class="text-2xl font-bold text-white mt-1 font-mono" id="val-ev">$0.0M</div>
-                    <div class="text-[10px] text-cyan-600 mt-1">Implied by DCF</div>
+                    <div class="text-xl font-bold text-white mt-1 font-mono" id="val-ev">$0.0M</div>
                 </div>
-                <div class="glass-panel p-3 rounded">
+                <div class="glass-panel p-2 rounded">
+                    <div class="text-[10px] text-gray-500 uppercase">Equity Value</div>
+                    <div class="text-xl font-bold text-white mt-1 font-mono" id="val-eq">$0.0M</div>
+                </div>
+                <div class="glass-panel p-2 rounded border-cyan-500/30 bg-cyan-900/10">
+                    <div class="text-[10px] text-cyan-400 uppercase font-bold">Implied Share Price</div>
+                    <div class="text-2xl font-bold text-cyan-300 mt-1 font-mono" id="val-share">$0.00</div>
+                </div>
+                <div class="glass-panel p-2 rounded">
                     <div class="text-[10px] text-gray-500 uppercase">WACC</div>
-                    <div class="text-2xl font-bold text-white mt-1 font-mono" id="val-wacc">0.0%</div>
-                    <div class="text-[10px] text-gray-600 mt-1">Discount Rate</div>
+                    <div class="text-xl font-bold text-white mt-1 font-mono" id="val-wacc">0.0%</div>
                 </div>
             </div>
 
-            <div class="glass-panel p-4 rounded flex-grow">
-                <h3 class="text-xs font-bold text-cyan-400 mb-3">Unlevered Free Cash Flow (UFCF)</h3>
+            <!-- DCF Table -->
+            <div class="glass-panel p-3 rounded">
+                <h3 class="text-xs font-bold text-cyan-400 mb-2 flex items-center gap-2">
+                    <i data-lucide="table" class="w-3 h-3"></i> Unlevered Free Cash Flow Build
+                </h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-xs font-mono">
                         <thead>
                             <tr class="text-gray-500 border-b border-gray-700">
-                                <th class="text-left py-2">Metric</th>
+                                <th class="text-left py-1">Metric</th>
                                 <th class="text-right">Y1</th><th class="text-right">Y2</th><th class="text-right">Y3</th><th class="text-right">Y4</th><th class="text-right">Y5</th>
                             </tr>
                         </thead>
@@ -164,8 +224,24 @@
                 </div>
             </div>
 
-            <div class="glass-panel p-4 rounded h-48 relative w-full">
-                 <canvas id="chart-dcf"></canvas>
+            <div class="grid grid-cols-2 gap-3 h-64">
+                <!-- Sensitivity Table -->
+                <div class="glass-panel p-3 rounded overflow-hidden flex flex-col">
+                    <h3 class="text-xs font-bold text-gray-400 mb-2 flex items-center gap-2">
+                        <i data-lucide="grid" class="w-3 h-3"></i> Sensitivity: Share Price
+                        <span class="text-[9px] text-gray-600 ml-auto">(WACC vs TGR)</span>
+                    </h3>
+                    <div class="flex-grow flex justify-center items-center">
+                        <div id="sensitivity-container" class="w-full h-full flex items-center justify-center">
+                            <!-- Injected via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart -->
+                <div class="glass-panel p-3 rounded relative">
+                     <canvas id="chart-dcf"></canvas>
+                </div>
             </div>
 
         </main>
@@ -175,90 +251,182 @@
         lucide.createIcons();
         let chartInstance = null;
         let lastProj = [];
+        let currentSharePrice = 0;
 
         const getVal = (id) => parseFloat(document.getElementById(id).value) || 0;
-        const fmtMoney = (n) => `$${n.toFixed(1)}`;
+        const fmtMoney = (n) => `$${n.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}`;
+        const fmtShare = (n) => `$${n.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
         const fmtPct = (n) => `${(n*100).toFixed(1)}%`;
 
-        function runModel() {
-            // Inputs
-            const ltmRev = getVal('ltmRev');
-            const avgGrowth = getVal('avgGrowth') / 100;
-            const avgMargin = getVal('avgMargin') / 100;
-            const taxRate = getVal('taxRate') / 100;
-
-            // WACC
-            const rf = getVal('rfRate') / 100;
-            const mrp = getVal('mrp') / 100;
-            const beta = getVal('beta');
-            const ke = rf + (beta * mrp);
-            // Simplified WACC assuming 100% equity for pure asset valuation or user inputs manual wacc
-            // Let's assume standard 60/40 cap structure proxy for WACC calculation
-            const kd = 0.06 * (1-taxRate);
-            const wacc = (0.6 * ke) + (0.4 * kd);
-
-            const tgr = getVal('tgr') / 100;
-
-            // Projections
+        function calculateDCF(waccInput, tgrInput, inputs) {
+            let rev = inputs.ltmRev;
             let proj = [];
-            let rev = ltmRev;
 
             for(let i=1; i<=5; i++) {
-                rev = rev * (1 + avgGrowth);
-                let ebitda = rev * avgMargin;
-                let da = ebitda * 0.05; // 5% proxy
+                rev = rev * (1 + inputs.avgGrowth);
+                let ebitda = rev * inputs.avgMargin;
+                let da = ebitda * 0.15; // Assumption: D&A is 15% of EBITDA
                 let ebit = ebitda - da;
-                let tax = Math.max(0, ebit * taxRate);
+                let tax = Math.max(0, ebit * inputs.taxRate);
                 let nopat = ebit - tax;
-                let capex = rev * 0.03; // 3% proxy
+                let capex = rev * inputs.capexPct;
                 let nwc = rev * 0.01; // 1% proxy
                 let ufcf = nopat + da - capex - nwc;
 
                 proj.push({ year: i, rev, ebitda, ufcf });
             }
 
-            lastProj = proj; // Store for export
-
-            // Valuation
             let pvFcf = 0;
             proj.forEach(p => {
-                pvFcf += p.ufcf / Math.pow(1+wacc, p.year);
+                pvFcf += p.ufcf / Math.pow(1 + waccInput, p.year);
             });
 
-            const termFcf = proj[4].ufcf * (1+tgr);
-            const tv = termFcf / (wacc - tgr);
-            const pvTv = tv / Math.pow(1+wacc, 5);
+            const termFcf = proj[4].ufcf * (1 + tgrInput);
+            const tv = termFcf / (waccInput - tgrInput);
+            const pvTv = tv / Math.pow(1 + waccInput, 5);
             const ev = pvFcf + pvTv;
 
-            // Render
+            return { ev, proj };
+        }
+
+        function runModel() {
+            // Get Base Inputs
+            let ltmRev = getVal('ltmRev');
+            let ltmEbitda = getVal('ltmEbitda');
+            let avgGrowth = getVal('avgGrowth') / 100;
+            let avgMargin = getVal('avgMargin') / 100;
+            let capexPct = getVal('capexPct') / 100;
+
+            // Scenario Adjustments
+            const scenario = document.getElementById('scenario').value;
+            if(scenario === 'bull') {
+                avgGrowth *= 1.2;
+                avgMargin *= 1.1;
+            } else if (scenario === 'bear') {
+                avgGrowth *= 0.8;
+                avgMargin *= 0.9;
+            }
+
+            // WACC Calc
+            const rf = getVal('rfRate') / 100;
+            const mrp = getVal('mrp') / 100;
+            const beta = getVal('beta');
+            const costDebt = getVal('costDebt') / 100;
+            const debtWeight = getVal('debtWeight') / 100;
+            const taxRate = getVal('taxRate') / 100;
+
+            const ke = rf + (beta * mrp);
+            const kd = costDebt * (1 - taxRate);
+            const wacc = ((1 - debtWeight) * ke) + (debtWeight * kd);
+
+            const tgr = getVal('tgr') / 100;
+            const netDebt = getVal('netDebt');
+            const shares = getVal('shares');
+
+            const inputs = { ltmRev, avgGrowth, avgMargin, capexPct, taxRate };
+
+            // Run Base Case
+            const result = calculateDCF(wacc, tgr, inputs);
+            const ev = result.ev;
+            lastProj = result.proj;
+
+            const eqVal = ev - netDebt;
+            currentSharePrice = eqVal / shares;
+
+            // Render KPIs
             document.getElementById('val-ev').innerText = fmtMoney(ev);
+            document.getElementById('val-eq').innerText = fmtMoney(eqVal);
+            document.getElementById('val-share').innerText = fmtShare(currentSharePrice);
             document.getElementById('val-wacc').innerText = fmtPct(wacc);
 
+            // Render Table
             const tbody = document.getElementById('dcf-body');
             tbody.innerHTML = `
-                <tr><td>Revenue</td>${proj.map(p=>`<td class="text-right text-gray-400">${fmtMoney(p.rev)}</td>`).join('')}</tr>
-                <tr><td>EBITDA</td>${proj.map(p=>`<td class="text-right text-gray-300">${fmtMoney(p.ebitda)}</td>`).join('')}</tr>
-                <tr class="font-bold text-cyan-400"><td>UFCF</td>${proj.map(p=>`<td class="text-right">${fmtMoney(p.ufcf)}</td>`).join('')}</tr>
+                <tr><td>Revenue</td>${lastProj.map(p=>`<td class="text-right text-gray-400">${fmtMoney(p.rev)}</td>`).join('')}</tr>
+                <tr><td>EBITDA</td>${lastProj.map(p=>`<td class="text-right text-gray-300">${fmtMoney(p.ebitda)}</td>`).join('')}</tr>
+                <tr class="font-bold text-cyan-400"><td>UFCF</td>${lastProj.map(p=>`<td class="text-right">${fmtMoney(p.ufcf)}</td>`).join('')}</tr>
             `;
 
-            // Chart
+            // Render Chart
+            updateChart(lastProj);
+
+            // Render Sensitivity Table
+            renderSensitivity(wacc, tgr, inputs, netDebt, shares);
+        }
+
+        function updateChart(proj) {
             if(chartInstance) chartInstance.destroy();
             const ctx = document.getElementById('chart-dcf').getContext('2d');
+
+            // Gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(0, 240, 255, 0.5)');
+            gradient.addColorStop(1, 'rgba(0, 240, 255, 0)');
+
             chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: ['Y1', 'Y2', 'Y3', 'Y4', 'Y5'],
                     datasets: [
-                        { label: 'EBITDA', data: proj.map(p=>p.ebitda), borderColor: '#94a3b8', borderWidth: 2 },
-                        { label: 'UFCF', data: proj.map(p=>p.ufcf), borderColor: '#00f0ff', borderWidth: 2, backgroundColor: 'rgba(0, 240, 255, 0.1)', fill: true }
+                        {
+                            label: 'UFCF',
+                            data: proj.map(p=>p.ufcf),
+                            borderColor: '#00f0ff',
+                            borderWidth: 2,
+                            backgroundColor: gradient,
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'EBITDA',
+                            data: proj.map(p=>p.ebitda),
+                            borderColor: '#94a3b8',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.4
+                        }
                     ]
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    scales: { y: { grid: { color: '#1e293b' } }, x: { grid: { display: false } } },
+                    scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b' } }, x: { grid: { display: false }, ticks: { color: '#64748b' } } },
                     plugins: { legend: { labels: { color: '#cbd5e1' } } }
                 }
             });
+        }
+
+        function renderSensitivity(baseWacc, baseTgr, inputs, netDebt, shares) {
+            const container = document.getElementById('sensitivity-container');
+            let html = '<table class="w-full h-full border-collapse">';
+
+            // Header Row (WACC)
+            html += '<tr><td class="sens-header text-right pr-2">TGR \\ WACC</td>';
+            for(let c=-2; c<=2; c++) {
+                const w = baseWacc + (c * 0.005);
+                html += `<td class="sens-header sens-cell">${fmtPct(w)}</td>`;
+            }
+            html += '</tr>';
+
+            // Rows (TGR)
+            for(let r=2; r>=-2; r--) {
+                const t = baseTgr + (r * 0.0025);
+                html += `<tr><td class="sens-header text-right pr-2">${fmtPct(t)}</td>`;
+
+                for(let c=-2; c<=2; c++) {
+                    const w = baseWacc + (c * 0.005);
+                    const res = calculateDCF(w, t, inputs);
+                    const sp = (res.ev - netDebt) / shares;
+
+                    const isCenter = (r===0 && c===0);
+                    const cls = isCenter ? 'sens-highlight rounded' : (sp > currentSharePrice ? 'text-green-400' : 'text-red-400');
+
+                    html += `<td class="sens-cell ${cls} p-1">${fmtShare(sp)}</td>`;
+                }
+                html += '</tr>';
+            }
+
+            html += '</table>';
+            container.innerHTML = html;
         }
 
         window.onload = function() {
@@ -273,18 +441,24 @@
                 csv += `${p.year},${p.rev.toFixed(2)},${p.ebitda.toFixed(2)},${p.ufcf.toFixed(2)}\n`;
             });
             const ev = document.getElementById('val-ev').innerText;
-            csv += `\nEnterprise Value,${ev}\n`;
+            const eq = document.getElementById('val-eq').innerText;
+            const share = document.getElementById('val-share').innerText;
+
+            csv += `\nEnterprise Value,${ev}\nEquity Value,${eq}\nImplied Share Price,${share}\n`;
 
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.setAttribute('hidden', '');
             a.setAttribute('href', url);
-            a.setAttribute('download', 'dcf_model.csv');
+            a.setAttribute('download', 'dcf_valuation_pro.csv');
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
         }
     </script>
+
+    <!-- Adam Global Nav -->
+    <script src="../../showcase/js/nav.js" data-root="../.."></script>
 </body>
 </html>
