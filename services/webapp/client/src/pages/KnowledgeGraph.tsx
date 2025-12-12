@@ -4,8 +4,8 @@ import { dataManager } from '../utils/DataManager';
 
 // Helper to generate mock graph
 const generateMockGraph = (n = 20) => {
-    const nodes = [...Array(n).keys()].map(i => ({ id: i, name: `Node ${i}`, val: Math.random() * 5 + 1 }));
-    const links = [...Array(n * 2).keys()].map(() => ({
+    const nodes = Array.from({ length: n }, (_, i) => ({ id: i, name: `Node ${i}`, val: Math.random() * 5 + 1 }));
+    const links = Array.from({ length: n * 2 }, () => ({
         source: Math.floor(Math.random() * n),
         target: Math.floor(Math.random() * n)
     }));
