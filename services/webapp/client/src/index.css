@@ -8,18 +8,150 @@
   }
 }
 
-.glass-panel {
-  @apply bg-slate-900/70 backdrop-blur-md border border-slate-700 shadow-xl;
+/* =========================================
+   Variables & Theme
+   ========================================= */
+:root {
+    /* Cyber Theme (Default) */
+    --bg-color: #050b14;
+    --bg-secondary: #0f172a;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+
+    --primary-color: #06b6d4; /* Cyan 500 */
+    --primary-glow: rgba(6, 182, 212, 0.5);
+
+    --accent-color: #3b82f6;  /* Blue 500 */
+    --success-color: #10b981; /* Emerald 500 */
+    --warning-color: #f59e0b; /* Amber 500 */
+    --danger-color: #ef4444;  /* Red 500 */
+
+    --panel-bg: rgba(15, 23, 42, 0.6);
+    --panel-border: rgba(148, 163, 184, 0.1);
+
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    --grid-color: rgba(56, 189, 248, 0.03);
 }
 
-.scanline {
-  background: linear-gradient(
-    to bottom,
-    rgba(255,255,255,0),
-    rgba(255,255,255,0) 50%,
-    rgba(0,0,0,0.2) 50%,
-    rgba(0,0,0,0.2)
-  );
-  background-size: 100% 4px;
-  pointer-events: none;
+/* =========================================
+   Layout & Grid
+   ========================================= */
+.grid-bg {
+    background-image:
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+    background-size: 30px 30px;
+    background-position: center top;
+}
+
+/* =========================================
+   Cyber Components
+   ========================================= */
+
+/* Glass Panel / Card */
+.glass-panel, .cyber-card {
+    background: var(--panel-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--panel-border);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.cyber-card:hover {
+    border-color: var(--primary-glow);
+    box-shadow: 0 0 15px var(--primary-glow);
+    transform: translateY(-2px);
+}
+
+/* Input Fields */
+.cyber-input {
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid var(--panel-border);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    padding: 0.5rem 1rem;
+    width: 100%;
+    outline: none;
+    transition: all 0.2s;
+}
+.cyber-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 8px var(--primary-glow);
+}
+
+/* Buttons */
+.cyber-btn {
+    background: rgba(6, 182, 212, 0.1);
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    font-family: var(--font-mono);
+    padding: 0.5rem 1rem;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.cyber-btn:hover {
+    background: var(--primary-color);
+    color: #000;
+    box-shadow: 0 0 10px var(--primary-glow);
+}
+
+/* Tables */
+.cyber-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+.cyber-table th {
+    text-align: left;
+    padding: 0.75rem;
+    font-family: var(--font-mono);
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--panel-border);
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+}
+.cyber-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--panel-border);
+    color: var(--text-primary);
+}
+.cyber-table tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* =========================================
+   Effects & Animations
+   ========================================= */
+
+/* Scanline */
+.scan-line {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 0) 50%,
+        rgba(0, 0, 0, 0.1) 50%,
+        rgba(0, 0, 0, 0.1)
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 9998;
+    opacity: 0.15;
+}
+
+.text-cyan-glow {
+    color: var(--primary-color);
+    text-shadow: 0 0 10px var(--primary-glow);
 }

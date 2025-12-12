@@ -320,6 +320,24 @@ def create_app(config_name='default'):
         print('received json: ' + str(json))
         emit('test response', json)
 
+    @socketio.on('command')
+    def handle_command(data):
+        """
+        Handles terminal commands from the frontend.
+        """
+        cmd = data.get('command')
+        print(f"Received command: {cmd}")
+        emit('log', {'message': f'EXECUTING: {cmd}'})
+
+        # Simple echo for now, but could route to orchestrator
+        if cmd.lower() == 'status':
+            emit('log', {'message': 'SYSTEM STATUS: ONLINE'})
+        elif cmd.lower().startswith('query'):
+            emit('log', {'message': 'Delegating to Meta-Orchestrator...'})
+            # In a real scenario, trigger orchestrator here
+
+        emit('log', {'message': 'COMMAND COMPLETE'})
+
     # ---------------------------------------------------------------------------- #
     # Celery Tasks
     # ---------------------------------------------------------------------------- #

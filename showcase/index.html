@@ -1,107 +1,62 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adam System :: showcase</title>
-    <link rel="stylesheet" href="../showcase/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>ADAM v23.5 | Entry Portal</title>
+    <link rel="stylesheet" href="css/style.css">
     <style>
-        .readme-content { padding: 20px; }
-        .readme-content h1 { font-size: 1.5rem; margin-bottom: 1rem; color: var(--primary-color); }
-        .readme-content h2 { font-size: 1.25rem; margin-top: 1.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--panel-border); padding-bottom: 0.25rem; }
-        .readme-content p { margin-bottom: 1rem; line-height: 1.6; color: var(--text-secondary); }
-        .readme-content pre { background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 4px; overflow-x: auto; border: 1px solid var(--panel-border); }
-        .readme-content code { font-family: var(--font-mono); color: var(--accent-color); }
-
-        .file-icon { display: inline-block; width: 20px; text-align: center; margin-right: 8px; color: var(--text-muted); }
-        .dir-icon { color: var(--primary-color); }
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            background: #000;
+        }
+        .portal-card {
+            width: 400px;
+            text-align: center;
+            padding: 40px;
+            position: relative;
+            z-index: 10;
+        }
+        .bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.2;
+            z-index: 0;
+            pointer-events: none;
+        }
     </style>
 </head>
-<body>
+<body class="grid-bg">
     <div class="scan-line"></div>
     <div class="scan-glow"></div>
 
-    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-
-        <!-- Header -->
-        <header style="margin-bottom: 40px; border-bottom: 1px solid var(--panel-border); padding-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <h1 class="glitch-text" data-text="ADAM v23.5" style="font-size: 2rem; margin: 0; color: var(--primary-color);">ADAM v23.5</h1>
-                <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">
-                    PATH: <span style="color: var(--text-primary);">/showcase</span>
-                </div>
-            </div>
-            <div style="text-align: right;">
-                <div class="cyber-badge badge-cyan">SYSTEM ONLINE</div>
-                <div style="margin-top: 5px; font-size: 0.7rem; color: var(--text-muted);">Mode: SHOWCASE</div>
-            </div>
-        </header>
-
-        <!-- Navigation -->
-        <nav style="margin-bottom: 30px; display: flex; gap: 10px;">
-            <a href="../index.html" class="cyber-btn">&uarr; UP LEVEL</a>
-            <a href="/" class="cyber-btn">LIVE OPERATIONS (APP)</a>
-            <a href="analyst_os.html" class="cyber-btn" style="border-color: #0aff60; color: #0aff60; box-shadow: 0 0 10px rgba(10,255,96,0.3);">LAUNCH ANALYST OS</a>
-            <a href="https://github.com/adamvangrover/adam" class="cyber-btn" target="_blank">GITHUB</a>
-        </nav>
-
-        <div style="display: grid; grid-template-columns: 250px 1fr; gap: 20px;">
-
-            <!-- Sidebar / File Explorer -->
-            <aside class="glass-panel" style="padding: 20px; border-radius: 4px; height: fit-content;">
-                <h3 style="margin-top: 0; font-size: 0.9rem; text-transform: uppercase; color: var(--text-secondary); border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 15px;">
-                    Directory Contents
-                </h3>
-                <ul style="list-style: none; padding: 0; margin: 0; font-family: var(--font-mono); font-size: 0.85rem;">
-                    <li style="margin-bottom: 6px;"><span class="file-icon">🖥️</span> <a href="analyst_os.html" style="color: #0aff60; font-weight: bold;">analyst_os.html</a></li>
-                    <li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="apps/" style="color: var(--primary-color);">apps/</a></li>
-                    <li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="css/index.html" style="color: var(--primary-color);">css/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="data/index.html" style="color: var(--primary-color);">data/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="js/index.html" style="color: var(--primary-color);">js/</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="agents.html" style="color: var(--text-secondary);">agents.html</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="chat.html" style="color: var(--text-secondary);">chat.html</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="codex.html" style="color: var(--text-secondary);">codex.html</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="data.html" style="color: var(--text-secondary);">data.html</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="deep_dive.html" style="color: var(--text-secondary);">deep_dive.html</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="deployment.html" style="color: var(--text-secondary);">deployment.html</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="financial_engineering.html" style="color: var(--text-secondary);">financial_engineering.html</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="financial_twin.html" style="color: var(--text-secondary);">financial_twin.html</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="graph.html" style="color: var(--text-secondary);">graph.html</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="navigator.html" style="color: var(--text-secondary);">navigator.html</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="neural_dashboard.html" style="color: var(--text-secondary);">neural_dashboard.html</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="prompts.html" style="color: var(--text-secondary);">prompts.html</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="reports.html" style="color: var(--text-secondary);">reports.html</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="research.html" style="color: var(--text-secondary);">research.html</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="robo_advisor.html" style="color: var(--text-secondary);">robo_advisor.html</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="trading.html" style="color: var(--text-secondary);">trading.html</a></li>
-                </ul>
-            </aside>
-
-            <!-- Main Content -->
-            <main>
-                <!-- Runtime Overlay (Hidden by default) -->
-                <div id="runtime-panel" class="glass-panel fade-in" style="display: none; padding: 20px; margin-bottom: 20px; border-color: var(--success-color);">
-                    <h3 style="color: var(--success-color); margin-top: 0;">Live System Interface</h3>
-                    <p style="font-size: 0.9rem;">Connecting to Orchestrator at localhost:5001...</p>
-                    <div style="background: black; padding: 10px; border-radius: 4px; font-family: var(--font-mono); height: 100px; overflow-y: auto; font-size: 0.8rem; color: #0f0;">
-                        > Connecting...<br>
-                        > Error: API Unreachable (Mock Mode Active)<br>
-                        > System Status: STANDBY
-                    </div>
-                </div>
-
-                <!-- Readme Content -->
-                <div class="glass-panel" style="border-radius: 4px;">
-                     <h2 style="margin-top:0; color: #0aff60;">NEW: ADAM Analyst OS</h2>
-                     <p>A Client-Side, Privacy-First Financial Workbench ("The Bloomberg Killer Lite").</p>
-                     <p>
-                        <a href="analyst_os.html" class="cyber-btn" style="background: rgba(10,255,96,0.1); border-color: #0aff60;">LAUNCH DESKTOP &rarr;</a>
-                     </p>
-                     <hr style="border:0; border-bottom:1px solid #333; margin: 20px 0;">
-                    <div class="readme-content" style="text-align: center; color: var(--text-muted); padding: 20px;">No README found in this directory.</div>
-                </div>
-            </main>
+    <div class="glass-panel portal-card">
+        <h1 class="text-cyan-glow" style="margin-bottom: 10px;">ADAM v23.5</h1>
+        <div class="mono" style="color: var(--text-secondary); margin-bottom: 40px; font-size: 0.9rem;">
+            AUTONOMOUS FINANCIAL ANALYST
         </div>
 
-        <!-- Footer -->
-        <footer style="margin-top: 50px; border-top: 1px solid var(--panel-border); padding-top: 20px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">
-            ADAM AUTO-GENERATED SHOWCASE | <span class="mono">REF: showcase</span>
-        </footer>
-    </div>
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            <a href="/" class="cyber-btn" style="text-decoration: none; padding: 15px;">
+                ENTER MISSION CONTROL (LIVE)
+            </a>
+            <a href="/archive/index.html" class="cyber-btn" style="text-decoration: none; padding: 15px; border-color: var(--text-secondary); color: var(--text-secondary);">
+                ACCESS LEGACY ARCHIVES
+            </a>
+        </div>
 
-    <script>
-        function toggleRuntime() {
-            const panel = document.getElementById('runtime-panel');
-            if (panel.style.display === 'none') {
-                panel.style.display = 'block';
-            } else {
-                panel.style.display = 'none';
-            }
-        }
-    </script>
+        <div class="mono" style="margin-top: 40px; font-size: 0.7rem; color: #444;">
+            SYSTEM STATUS: ONLINE<br>
+            SECURE CONNECTION ESTABLISHED
+        </div>
+    </div>
 </body>
 </html>

@@ -1,95 +1,105 @@
 import axios from 'axios';
 
-// Types for better safety
-interface SystemStatus {
-  status: 'ONLINE' | 'OFFLINE' | 'SIMULATED';
-  latency: number;
-  version: string;
-}
+// Configuration
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000/api';
+const MOCK_DELAY = 500; // ms
 
-interface DataManifest {
-  reports: Array<{ id: string; title: string; date: string; type: string; path: string }>;
-  agents: Array<{ id: string; name: string; status: string; specialization: string }>;
-}
+// Endpoints
+const ENDPOINTS = {
+    STATUS: '/status',
+    AGENTS: '/agents',
+    KNOWLEDGE_GRAPH: '/knowledge-graph',
+    MARKET_DATA: '/market/data',
+    LOGS: '/logs',
+    SIMULATION: '/simulation/run'
+};
 
-const API_BASE_URL = 'http://localhost:5001/api';
+interface ConnectionStatus {
+    status: string;
+    latency: number;
+}
 
 class DataManager {
-  private useFallback: boolean = false;
-  private connectionChecked: boolean = false;
-  private manifestCache: DataManifest | null = null;
+    mode: 'LIVE' | 'ARCHIVE';
+    manifest: any;
+    mockData: any;
 
-  constructor() {
-    // Initialize simulation data if needed
-  }
-
-  async checkConnection(): Promise<SystemStatus> {
-    try {
-      const start = Date.now();
-      await axios.get(`${API_BASE_URL}/health`, { timeout: 2000 });
-      this.useFallback = false;
-      return { status: 'ONLINE', latency: Date.now() - start, version: 'v23.5' };
-    } catch (error) {
-      this.useFallback = true;
-      return { status: 'SIMULATED', latency: 0, version: 'v23.5 (Offline)' };
-    } finally {
-      this.connectionChecked = true;
-    }
-  }
-
-  // Phase 2: Manifest Crawler Simulation
-  async getManifest(): Promise<DataManifest> {
-    if (this.useFallback || !this.manifestCache) {
-      // Simulate crawling core/libraries_and_archives
-      this.manifestCache = {
-        reports: [
-          { id: 'NVDA_2025', title: 'NVDA Deep Dive', date: '2025-02-26', type: 'JSON', path: '/data/nvda.json' },
-          { id: 'MM_OCT', title: 'Market Mayhem: October', date: '2025-10-31', type: 'Markdown', path: '/newsletters/mm_oct.md' },
-          { id: 'CREDIT_AAPL', title: 'Apple Credit Assessment', date: '2025-03-03', type: 'SNC', path: '/reports/aapl_snc.json' }
-        ],
-        agents: [
-          { id: 'risk_arch', name: 'Risk Architect', status: 'Active', specialization: 'Systemic Risk' },
-          { id: 'market_sent', name: 'Sentiment Engine', status: 'Idle', specialization: 'NLP Analysis' },
-          { id: 'quant_core', name: 'Quantum Forecaster', status: 'Processing', specialization: 'Predictive Modeling' }
-        ]
-      };
-    }
-    return this.manifestCache;
-  }
-
-  async getData(endpoint: string): Promise<any> {
-    await this.checkConnection();
-
-    if (this.useFallback) {
-      return this.simulateEndpoint(endpoint);
+    constructor() {
+        this.mode = 'LIVE'; // 'LIVE' or 'ARCHIVE' (Simulated)
+        this.manifest = null;
+        this.mockData = {};
     }
 
-    try {
-      const response = await axios.get(`${API_BASE_URL}${endpoint}`);
-      return response.data;
-    } catch (error) {
-      console.warn(`Live fetch failed for ${endpoint}, switching to simulation.`);
-      return this.simulateEndpoint(endpoint);
+    setMode(mode: 'LIVE' | 'ARCHIVE') {
+        this.mode = mode;
+        console.log(`[DataManager] Switched to ${mode} mode.`);
     }
-  }
 
-  // Phase 2: Simulation Engine
-  private simulateEndpoint(endpoint: string): any {
-    if (endpoint.includes('market')) {
-      // Return slightly randomized market data
-      return {
-        SPY: 512.45 + (Math.random() * 2 - 1),
-        BTC: 68500 + (Math.random() * 100 - 50),
-        VIX: 14.2 + (Math.random() * 0.5)
-      };
+    async checkConnection(): Promise<ConnectionStatus> {
+        if (this.mode === 'ARCHIVE') {
+            return { status: 'SIMULATED', latency: 0 };
+        }
+        try {
+            const start = Date.now();
+            // Assuming hello endpoint is lighter check, or create a simple status check
+            await axios.get(`${API_BASE_URL}/hello`, { timeout: 2000 });
+            const latency = Date.now() - start;
+            return { status: 'ONLINE', latency };
+        } catch (error) {
+            console.warn('[DataManager] Backend unreachable, falling back to SIMULATION.');
+            return { status: 'OFFLINE (Simulated)', latency: -1 };
+        }
     }
-    if (endpoint.includes('system/health')) {
-      return { cpu: 45, memory: 62, active_threads: 12 };
-    }
-    return {};
-  }
 
-  isOfflineMode() { return this.useFallback; }
+    async getManifest() {
+        if (this.manifest) return this.manifest;
+        try {
+            const response = await axios.get('/data/manifest.json');
+            this.manifest = response.data;
+            return this.manifest;
+        } catch (error) {
+            console.error('[DataManager] Failed to load manifest.json', error);
+            return { agents: [], reports: [], knowledge_graph: {} };
+        }
+    }
+
+    // Generic fetcher with fallback
+    async fetchData(endpoint: string, options = {}) {
+        if (this.mode === 'LIVE') {
+            try {
+                const response = await axios.get(`${API_BASE_URL}${endpoint}`, options);
+                return response.data;
+            } catch (error) {
+                console.warn(`[DataManager] API call to ${endpoint} failed. Using simulation.`);
+            }
+        }
+        return this.getSimulatedData(endpoint);
+    }
+
+    async getSimulatedData(endpoint: string) {
+        await new Promise(resolve => setTimeout(resolve, MOCK_DELAY));
+
+        switch (endpoint) {
+            case ENDPOINTS.STATUS:
+                return { status: 'ok', version: 'v23.5.0' };
+            case ENDPOINTS.AGENTS:
+                const manifest = await this.getManifest();
+                return manifest.agents || [];
+            case ENDPOINTS.MARKET_DATA:
+                return this.generateMockMarketData();
+            default:
+                return { error: 'No simulation data available for this endpoint' };
+        }
+    }
+
+    generateMockMarketData() {
+        const tickers = ['AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA'];
+        return tickers.map(t => ({
+            ticker: t,
+            price: (Math.random() * 200 + 100).toFixed(2),
+            change: (Math.random() * 10 - 5).toFixed(2)
+        }));
+    }
 }
 
 export const dataManager = new DataManager();
