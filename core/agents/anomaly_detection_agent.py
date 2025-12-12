@@ -11,8 +11,13 @@ from statsmodels.tsa.seasonal import seasonal_decompose
 from statsmodels.tsa.arima.model import ARIMA
 from sklearn.preprocessing import StandardScaler
 from typing import Dict, List
+import logging
+import random
+from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
 
 # ... (import other necessary libraries for data retrieval, knowledge base interaction, XAI, etc.)
+
+logger = logging.getLogger(__name__)
 
 class AnomalyDetectionAgent:
     """
@@ -70,6 +75,66 @@ class AnomalyDetectionAgent:
         Returns:
             A pandas DataFrame containing company data.
         """
+        try:
+            kg = UnifiedKnowledgeGraph()
+            ticker = self.config.get("ticker", "AAPL")
+
+            # Find company node
+            company_node = None
+            company_data_from_kg = None
+
+            # Search by ticker in node attributes
+            for node, attrs in kg.graph.nodes(data=True):
+                if attrs.get("ticker") == ticker:
+                    company_node = node
+                    company_data_from_kg = attrs
+                    break
+
+            if company_data_from_kg:
+                logger.info(f"Found company data for {ticker} in Knowledge Graph.")
+                financials = company_data_from_kg.get("financials", {})
+
+                # Extract scalars
+                market_cap = financials.get("market_cap", 1000000000)
+                pe_ratio = financials.get("pe_ratio", 20)
+
+                # Estimate base Net Income
+                estimated_net_income = market_cap / pe_ratio if pe_ratio else market_cap * 0.05
+
+                # Estimate base Revenue (assuming 15% net margin)
+                estimated_revenue = estimated_net_income / 0.15
+
+                # Generate synthetic time series (10 periods)
+                revenues = []
+                net_incomes = []
+
+                current_rev = estimated_revenue * 0.6 # Start lower to simulate growth
+                current_ni = estimated_net_income * 0.6
+
+                for _ in range(10):
+                    # Add growth and noise
+                    growth = random.uniform(0.02, 0.08)
+                    noise = random.uniform(0.95, 1.05)
+
+                    current_rev = current_rev * (1 + growth) * noise
+                    current_ni = current_rev * 0.15 * random.uniform(0.9, 1.1) # Fluctuate margin
+
+                    revenues.append(current_rev)
+                    net_incomes.append(current_ni)
+
+                data = {
+                    'revenue': revenues,
+                    'net_income': net_incomes
+                }
+                return pd.DataFrame(data)
+
+            else:
+                logger.warning(f"Company {ticker} not found in Knowledge Graph. Using placeholder data.")
+
+        except Exception as e:
+            logger.error(f"Error accessing Knowledge Graph: {e}. Using placeholder data.")
+
+        # Fallback to placeholder data
         # TODO: Implement data retrieval from knowledge graph using API calls
         # Placeholder company data (replace with actual data)
         # Expanded to include data necessary for financial ratio calculations

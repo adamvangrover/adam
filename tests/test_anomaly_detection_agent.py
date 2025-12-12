@@ -3,16 +3,58 @@ import pandas as pd
 import numpy as np
 import sys
 import os
+from unittest.mock import MagicMock, patch
 
 # Ensure core can be imported
 sys.path.append(os.getcwd())
 
 from core.agents.anomaly_detection_agent import AnomalyDetectionAgent
+from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
 
 class TestAnomalyDetectionAgent(unittest.TestCase):
     def setUp(self):
-        self.config = {}
+        # Combined config: Ticker is required for KG integration tests
+        self.config = {"ticker": "AAPL"} 
         self.agent = AnomalyDetectionAgent(self.config)
+
+    # --- Integration Tests (Knowledge Graph) ---
+
+    def test_load_company_data_integration(self):
+        """
+        Test that _load_company_data retrieves data derived from the KG
+        (simulated time series based on seed data).
+        """
+        # This assumes AAPL exists in seed data and UnifiedKnowledgeGraph works
+        df = self.agent._load_company_data()
+
+        self.assertIsInstance(df, pd.DataFrame)
+        self.assertIn('revenue', df.columns)
+        self.assertIn('net_income', df.columns)
+        self.assertEqual(len(df), 10)
+
+        # Verify it's not the placeholder data (which starts at 1,000,000)
+        # Based on seed AAPL (580B market cap), revenue should be much higher.
+        first_revenue = df['revenue'].iloc[0]
+        self.assertNotEqual(first_revenue, 1000000)
+        self.assertGreater(first_revenue, 10000000) 
+
+    @patch('core.agents.anomaly_detection_agent.UnifiedKnowledgeGraph')
+    def test_load_company_data_fallback(self, mock_ukg_cls):
+        """
+        Test fallback to placeholder when KG fails or returns no data.
+        """
+        # Mock KG to return empty graph or raise error
+        mock_kg = MagicMock()
+        mock_kg.graph.nodes.return_value = [] # Empty iterator
+        mock_ukg_cls.return_value = mock_kg
+
+        agent = AnomalyDetectionAgent({"ticker": "UNKNOWN_CORP"})
+        df = agent._load_company_data()
+
+        # Should be placeholder
+        self.assertEqual(df['revenue'].iloc[0], 1000000)
+
+    # --- Logic Unit Tests (Calculations & Anomalies) ---
 
     def test_financial_ratios_calculation(self):
         # Create dummy data
@@ -54,6 +96,7 @@ class TestAnomalyDetectionAgent(unittest.TestCase):
             'inventory': [200.0, 210.0, 220.0, 230.0, 240.0, 250.0, 260.0, 270.0],
             'total_debt': [1500.0, 1550.0, 6000.0, 1650.0, 1700.0, 1750.0, 1800.0, 1850.0]
         }
+        # Overwrite internal data with test data
         self.agent.company_data = pd.DataFrame(data)
 
         anomalies = self.agent.detect_company_anomalies()
