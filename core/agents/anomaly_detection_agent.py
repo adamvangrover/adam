@@ -71,11 +71,38 @@ class AnomalyDetectionAgent:
             A pandas DataFrame containing company data.
         """
         # TODO: Implement data retrieval from knowledge graph using API calls
-        # Placeholder company data (replace with actual data)
+        # Synthetic company data
+        np.random.seed(42)
+        n_samples = 50
+
+        revenues = np.linspace(1000000, 5000000, n_samples)
+        # Add some noise
+        revenues += np.random.normal(0, 50000, n_samples)
+
+        # Net income correlated with revenue (approx 10% margin)
+        net_incomes = revenues * 0.1 + np.random.normal(0, 10000, n_samples)
+
+        # Total Assets
+        total_assets = revenues * 2.0 + np.random.normal(0, 100000, n_samples)
+
+        # Total Liabilities
+        total_liabilities = total_assets * 0.5 + np.random.normal(0, 50000, n_samples)
+
         data = {
-            'revenue': [1000000, 1100000, 1200000, 1300000, 1400000, 1500000, 1600000, 1700000, 1800000, 1900000],
-            'net_income': [100000, 110000, 120000, 130000, 140000, 150000, 160000, 170000, 180000, 190000]
+            'revenue': revenues,
+            'net_income': net_incomes,
+            'total_assets': total_assets,
+            'total_liabilities': total_liabilities
         }
+
+        # Introduce anomalies
+        # 1. High Revenue, Low Income
+        data['revenue'][-1] = 10000000
+        data['net_income'][-1] = 50000 # Very low margin
+
+        # 2. High Debt
+        data['total_liabilities'][-2] = data['total_assets'][-2] * 1.5 # Insolvent
+
         df = pd.DataFrame(data)
         return df
 
@@ -221,10 +248,15 @@ class AnomalyDetectionAgent:
         Returns:
             A pandas DataFrame with calculated financial ratios.
         """
-        # TODO: Implement financial ratio calculation
-        # ratios = ...
-        # return ratios
-        pass  # Placeholder for future implementation
+        ratios = pd.DataFrame()
+
+        if 'net_income' in company_data.columns and 'revenue' in company_data.columns:
+            ratios['net_profit_margin'] = company_data['net_income'] / company_data['revenue']
+
+        if 'total_liabilities' in company_data.columns and 'total_assets' in company_data.columns:
+            ratios['debt_to_assets'] = company_data['total_liabilities'] / company_data['total_assets']
+
+        return ratios.fillna(0)
 
     def _explain_anomaly(self, anomaly: Dict, data: pd.DataFrame) -> str:
         """
@@ -340,14 +372,55 @@ class AnomalyDetectionAgent:
         for outlier_index in outliers_zscore_revenue:
             anomaly = {
                 'type': 'revenue_outlier',
-                'value': self.company_data['revenue'][outlier_index],
+                'value': self.company_data['revenue'].iloc[outlier_index],
                 'method': 'z-score',
-                'message': f"Unusual revenue value detected: {self.company_data['revenue'][outlier_index]}"
+                'message': f"Unusual revenue value detected: {self.company_data['revenue'].iloc[outlier_index]}"
             }
             anomalies.append(anomaly)
 
-        # TODO: Implement other anomaly detection techniques (LOF, One-Class SVM, financial ratios)
-        # ...
+        # Prepare data for multivariate analysis
+        numeric_data = self.company_data.select_dtypes(include=[np.number])
+        if not numeric_data.empty:
+            scaled_company_data = self.scaler.fit_transform(numeric_data)
+
+            # LOF anomaly detection
+            # Use fewer neighbors than samples. Default is 20, but safe to bound.
+            n_neighbors = min(20, len(self.company_data) - 1)
+            if n_neighbors > 0:
+                outliers_lof = self._detect_outliers_lof(scaled_company_data, n_neighbors=n_neighbors)
+                for outlier_index in outliers_lof:
+                    anomaly = {
+                        'type': 'company_data_anomaly',
+                        'data': self.company_data.iloc[outlier_index].to_dict(),
+                        'method': 'LOF',
+                        'message': f"Unusual company data detected (LOF) at index {outlier_index}"
+                    }
+                    anomalies.append(anomaly)
+
+            # One-Class SVM anomaly detection
+            outliers_svm = self._detect_outliers_one_class_svm(scaled_company_data)
+            for outlier_index in outliers_svm:
+                anomaly = {
+                    'type': 'company_data_anomaly',
+                    'data': self.company_data.iloc[outlier_index].to_dict(),
+                    'method': 'One-Class SVM',
+                    'message': f"Unusual company data detected (One-Class SVM) at index {outlier_index}"
+                }
+                anomalies.append(anomaly)
+
+        # Financial Ratio based anomaly detection
+        ratios = self._get_financial_ratios(self.company_data)
+        for column in ratios.columns:
+            outliers_ratio = self._detect_outliers_zscore(ratios[column], threshold=2)
+            for outlier_index in outliers_ratio:
+                anomaly = {
+                    'type': 'financial_ratio_anomaly',
+                    'ratio': column,
+                    'value': ratios[column].iloc[outlier_index],
+                    'method': 'z-score on ratio',
+                    'message': f"Unusual {column} detected: {ratios[column].iloc[outlier_index]:.4f}"
+                }
+                anomalies.append(anomaly)
 
         return anomalies
 
