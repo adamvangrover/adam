@@ -72,9 +72,17 @@ class AnomalyDetectionAgent:
         """
         # TODO: Implement data retrieval from knowledge graph using API calls
         # Placeholder company data (replace with actual data)
+        # Expanded to include data necessary for financial ratio calculations
         data = {
             'revenue': [1000000, 1100000, 1200000, 1300000, 1400000, 1500000, 1600000, 1700000, 1800000, 1900000],
-            'net_income': [100000, 110000, 120000, 130000, 140000, 150000, 160000, 170000, 180000, 190000]
+            'net_income': [100000, 110000, 120000, 130000, 140000, 150000, 160000, 170000, 180000, 190000],
+            'total_assets': [5000000, 5200000, 5500000, 5800000, 6000000, 6200000, 6500000, 6800000, 7000000, 7200000],
+            'shareholders_equity': [2000000, 2100000, 2200000, 2300000, 2400000, 2500000, 2600000, 2700000, 2800000, 2900000],
+            'total_liabilities': [3000000, 3100000, 3300000, 3500000, 3600000, 3700000, 3900000, 4100000, 4200000, 4300000],
+            'current_assets': [1000000, 1050000, 1100000, 1150000, 1200000, 1250000, 1300000, 1350000, 1400000, 1450000],
+            'current_liabilities': [500000, 520000, 550000, 580000, 600000, 620000, 650000, 680000, 700000, 720000],
+            'inventory': [200000, 210000, 220000, 230000, 240000, 250000, 260000, 270000, 280000, 290000],
+            'total_debt': [1500000, 1550000, 1600000, 1650000, 1700000, 1750000, 1800000, 1850000, 1900000, 1950000]
         }
         df = pd.DataFrame(data)
         return df
@@ -221,10 +229,38 @@ class AnomalyDetectionAgent:
         Returns:
             A pandas DataFrame with calculated financial ratios.
         """
-        # TODO: Implement financial ratio calculation
-        # ratios = ...
-        # return ratios
-        pass  # Placeholder for future implementation
+        ratios = pd.DataFrame(index=company_data.index)
+
+        # 1. Profitability Ratios
+        if 'net_income' in company_data.columns and 'revenue' in company_data.columns:
+            ratios['net_profit_margin'] = company_data['net_income'] / company_data['revenue']
+
+        if 'net_income' in company_data.columns and 'total_assets' in company_data.columns:
+            ratios['return_on_assets'] = company_data['net_income'] / company_data['total_assets']
+
+        if 'net_income' in company_data.columns and 'shareholders_equity' in company_data.columns:
+            ratios['return_on_equity'] = company_data['net_income'] / company_data['shareholders_equity']
+
+        # 2. Liquidity Ratios
+        if 'current_assets' in company_data.columns and 'current_liabilities' in company_data.columns:
+            ratios['current_ratio'] = company_data['current_assets'] / company_data['current_liabilities']
+
+        if 'current_assets' in company_data.columns and 'inventory' in company_data.columns and 'current_liabilities' in company_data.columns:
+            ratios['quick_ratio'] = (company_data['current_assets'] - company_data['inventory']) / company_data['current_liabilities']
+
+        # 3. Solvency/Leverage Ratios
+        if 'total_debt' in company_data.columns and 'shareholders_equity' in company_data.columns:
+            ratios['debt_to_equity'] = company_data['total_debt'] / company_data['shareholders_equity']
+        elif 'total_liabilities' in company_data.columns and 'shareholders_equity' in company_data.columns:
+             ratios['debt_to_equity'] = company_data['total_liabilities'] / company_data['shareholders_equity']
+
+        if 'total_debt' in company_data.columns and 'total_assets' in company_data.columns:
+            ratios['debt_to_assets'] = company_data['total_debt'] / company_data['total_assets']
+
+        # Replace infinite values with NaN
+        ratios.replace([np.inf, -np.inf], np.nan, inplace=True)
+
+        return ratios
 
     def _explain_anomaly(self, anomaly: Dict, data: pd.DataFrame) -> str:
         """
@@ -336,18 +372,38 @@ class AnomalyDetectionAgent:
         anomalies = []
 
         # Z-score outlier detection for revenue
-        outliers_zscore_revenue = self._detect_outliers_zscore(self.company_data['revenue'], threshold=2)
-        for outlier_index in outliers_zscore_revenue:
-            anomaly = {
-                'type': 'revenue_outlier',
-                'value': self.company_data['revenue'][outlier_index],
-                'method': 'z-score',
-                'message': f"Unusual revenue value detected: {self.company_data['revenue'][outlier_index]}"
-            }
-            anomalies.append(anomaly)
+        if 'revenue' in self.company_data.columns:
+            outliers_zscore_revenue = self._detect_outliers_zscore(self.company_data['revenue'], threshold=2)
+            for outlier_index in outliers_zscore_revenue:
+                anomaly = {
+                    'type': 'revenue_outlier',
+                    'value': self.company_data['revenue'].iloc[outlier_index],
+                    'method': 'z-score',
+                    'message': f"Unusual revenue value detected: {self.company_data['revenue'].iloc[outlier_index]}"
+                }
+                anomalies.append(anomaly)
 
-        # TODO: Implement other anomaly detection techniques (LOF, One-Class SVM, financial ratios)
-        # ...
+        # Financial Ratio Analysis
+        ratios = self._get_financial_ratios(self.company_data)
+
+        # Analyze each ratio for outliers
+        for col in ratios.columns:
+            if ratios[col].notna().any(): # Check if ratio has valid data
+                # Use a slightly looser threshold for ratios as they can fluctuate
+                outlier_indices = self._detect_outliers_zscore(ratios[col].dropna(), threshold=2.5)
+
+                # Because we dropped NaNs, indices match the Series, but we need to map back to DataFrame index
+                valid_indices = ratios[col].dropna().index
+
+                for idx in outlier_indices:
+                    original_idx = valid_indices[idx]
+                    anomaly = {
+                        'type': f'{col}_anomaly',
+                        'value': ratios[col].loc[original_idx],
+                        'method': 'ratio_z_score',
+                        'message': f"Unusual {col} detected: {ratios[col].loc[original_idx]:.4f}"
+                    }
+                    anomalies.append(anomaly)
 
         return anomalies
 
