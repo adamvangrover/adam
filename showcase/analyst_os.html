@@ -155,7 +155,7 @@
     <div class="fixed top-0 left-0 w-full h-8 bg-black/40 backdrop-blur flex justify-between items-center px-4 z-40 border-b border-white/5">
         <div class="flex items-center gap-4 text-[10px] font-bold tracking-widest text-gray-400">
             <span class="text-white">ADAM OS <span class="text-cyan-400">v25.5</span></span>
-            <span class="hover:text-white cursor-pointer">FILE</span>
+            <span class="hover:text-white cursor-pointer" onclick="alert('File System is local only.')">FILE</span>
             <span class="hover:text-white cursor-pointer">EDIT</span>
             <span class="hover:text-white cursor-pointer">VIEW</span>
         </div>
@@ -175,6 +175,7 @@
 
     <!-- Dock -->
     <div class="dock">
+        <!-- Core Financial Tools -->
         <div class="dock-item" onclick="openWindow('dcf', 'DCF Valuator', 'apps/dcf.html', 900, 650)" data-title="DCF Valuator">
             <i data-lucide="bar-chart-2" class="text-cyan-400 w-6 h-6"></i>
             <div class="app-dot" id="dot-dcf"></div>
@@ -183,35 +184,62 @@
             <i data-lucide="layers" class="text-purple-400 w-6 h-6"></i>
             <div class="app-dot" id="dot-lbo"></div>
         </div>
-        <div class="dock-item" onclick="openWindow('market', 'Market Scrubber', 'apps/market_data.html', 800, 500)" data-title="Market Data">
-            <i data-lucide="database" class="text-green-400 w-6 h-6"></i>
-            <div class="app-dot" id="dot-market"></div>
-        </div>
         <div class="dock-item" onclick="openWindow('comps', 'Comps Analysis', 'apps/comps.html', 900, 600)" data-title="Comps Analysis">
             <i data-lucide="scale" class="text-blue-400 w-6 h-6"></i>
             <div class="app-dot" id="dot-comps"></div>
-        </div>
-        <div class="dock-item" onclick="openWindow('ratios', 'Ratio Calculator', 'apps/ratios.html', 800, 600)" data-title="Ratio Calculator">
-            <i data-lucide="calculator" class="text-orange-400 w-6 h-6"></i>
-            <div class="app-dot" id="dot-ratios"></div>
-        </div>
-        <div class="dock-item" onclick="openWindow('bs', 'Black-Scholes', 'apps/black_scholes.html', 800, 600)" data-title="Black-Scholes">
-            <i data-lucide="sigma" class="text-rose-400 w-6 h-6"></i>
-            <div class="app-dot" id="dot-bs"></div>
-        </div>
-        <div class="dock-item" onclick="openWindow('loan', 'Loan Amortizer', 'apps/loan.html', 800, 600)" data-title="Loan Amortizer">
-            <i data-lucide="banknote" class="text-yellow-400 w-6 h-6"></i>
-            <div class="app-dot" id="dot-loan"></div>
         </div>
         <div class="dock-item" onclick="openWindow('ma', 'M&A Modeler', 'apps/ma_model.html', 900, 700)" data-title="M&A Modeler">
             <i data-lucide="merge" class="text-teal-400 w-6 h-6"></i>
             <div class="app-dot" id="dot-ma"></div>
         </div>
-        <div class="dock-item" onclick="openWindow('wacc', 'WACC Calc', 'apps/wacc.html', 800, 600)" data-title="WACC Calculator">
+
+        <div class="w-[1px] h-8 bg-white/10 mx-2"></div>
+
+        <!-- Analysis Tools -->
+        <div class="dock-item" onclick="openWindow('market', 'Market Scrubber', 'apps/market_data.html', 800, 500)" data-title="Market Data">
+            <i data-lucide="database" class="text-green-400 w-6 h-6"></i>
+            <div class="app-dot" id="dot-market"></div>
+        </div>
+        <div class="dock-item" onclick="openWindow('ratios', 'Ratio Calculator', 'apps/ratios.html', 800, 600)" data-title="Ratio Calculator">
             <i data-lucide="calculator" class="text-orange-400 w-6 h-6"></i>
+            <div class="app-dot" id="dot-ratios"></div>
+        </div>
+        <div class="dock-item" onclick="openWindow('loan', 'Loan Amortizer', 'apps/loan.html', 800, 600)" data-title="Loan Amortizer">
+            <i data-lucide="banknote" class="text-yellow-400 w-6 h-6"></i>
+            <div class="app-dot" id="dot-loan"></div>
+        </div>
+        <div class="dock-item" onclick="openWindow('wacc', 'WACC Calc', 'apps/wacc.html', 800, 600)" data-title="WACC Calculator">
+            <i data-lucide="percent" class="text-orange-300 w-6 h-6"></i>
             <div class="app-dot" id="dot-wacc"></div>
         </div>
+
         <div class="w-[1px] h-8 bg-white/10 mx-2"></div>
+
+        <!-- Advanced Tools (New) -->
+        <div class="dock-item" onclick="openWindow('bs', 'Black-Scholes', 'apps/black_scholes.html', 800, 600)" data-title="Black-Scholes">
+            <i data-lucide="sigma" class="text-rose-400 w-6 h-6"></i>
+            <div class="app-dot" id="dot-bs"></div>
+        </div>
+        <div class="dock-item" onclick="openWindow('bond', 'Bond Pricer', 'apps/bond_pricer.html', 800, 600)" data-title="Bond Pricer">
+            <i data-lucide="scroll" class="text-indigo-400 w-6 h-6"></i>
+            <div class="app-dot" id="dot-bond"></div>
+        </div>
+        <div class="dock-item" onclick="openWindow('mc', 'Monte Carlo', 'apps/monte_carlo.html', 850, 600)" data-title="Monte Carlo Sim">
+            <i data-lucide="scatter-chart" class="text-pink-400 w-6 h-6"></i>
+            <div class="app-dot" id="dot-mc"></div>
+        </div>
+        <div class="dock-item" onclick="openWindow('port', 'Portfolio Opt', 'apps/portfolio.html', 900, 700)" data-title="Portfolio Optimizer">
+            <i data-lucide="pie-chart" class="text-purple-400 w-6 h-6"></i>
+            <div class="app-dot" id="dot-port"></div>
+        </div>
+
+        <div class="w-[1px] h-8 bg-white/10 mx-2"></div>
+
+        <!-- Utilities -->
+        <div class="dock-item" onclick="openWindow('term', 'Terminal', 'terminal.html', 800, 500)" data-title="Terminal">
+            <i data-lucide="terminal-square" class="text-gray-300 w-6 h-6"></i>
+            <div class="app-dot" id="dot-term"></div>
+        </div>
         <div class="dock-item" onclick="openNotepad()" data-title="Secure Notepad">
             <i data-lucide="sticky-note" class="text-yellow-400 w-6 h-6"></i>
         </div>
@@ -268,8 +296,8 @@
                          <span class="text-xs font-bold text-gray-300 tracking-wider">${title}</span>
                     </div>
                     <div class="flex gap-2 items-center">
-                        <div onclick="minimizeWindow('${id}')" class="w-3 h-3 rounded-full bg-yellow-500/50 hover:bg-yellow-500 cursor-pointer border border-yellow-500/30"></div>
-                        <div onclick="closeWindow('${id}')" class="w-3 h-3 rounded-full bg-red-500/50 hover:bg-red-500 cursor-pointer border border-red-500/30"></div>
+                        <div onclick="minimizeWindow('${id}')" class="w-3 h-3 rounded-full bg-yellow-500/50 hover:bg-yellow-500 cursor-pointer border border-yellow-500/30" title="Minimize"></div>
+                        <div onclick="closeWindow('${id}')" class="w-3 h-3 rounded-full bg-red-500/50 hover:bg-red-500 cursor-pointer border border-red-500/30" title="Close"></div>
                     </div>
                 </div>
                 <div class="window-content">
@@ -278,7 +306,8 @@
             `;
 
             document.getElementById('desktop').appendChild(win);
-            document.getElementById(`dot-${id}`).classList.add('running');
+            const dot = document.getElementById(`dot-${id}`);
+            if(dot) dot.classList.add('running');
 
             // Bring to front on click
             win.onmousedown = () => bringToFront(win);
@@ -288,13 +317,13 @@
         function closeWindow(id) {
             const win = document.getElementById(`win-${id}`);
             if(win) win.remove();
-            document.getElementById(`dot-${id}`).classList.remove('running');
+            const dot = document.getElementById(`dot-${id}`);
+            if(dot) dot.classList.remove('running');
         }
 
         function minimizeWindow(id) {
             const win = document.getElementById(`win-${id}`);
             if(win) win.style.display = 'none';
-            // Logic to restore would be needed in dock click, but for now simple toggle
         }
 
         function bringToFront(el) {

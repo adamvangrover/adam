@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Portfolio Optimizer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-dark: #020408;
+            --panel-glass: rgba(10, 15, 30, 0.7);
+            --purple-glow: #a855f7;
+            --grid-line: rgba(168, 85, 247, 0.05);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 30px 30px;
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: var(--panel-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(168, 85, 247, 0.1);
+        }
+
+        input[type="number"], input[type="text"] {
+            background: #050a14;
+            border: 1px solid #1e293b;
+            color: var(--purple-glow);
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+            font-size: 0.75rem;
+            padding: 4px;
+            width: 100%;
+        }
+        input:focus {
+            border-color: var(--purple-glow);
+            box-shadow: 0 0 8px rgba(168, 85, 247, 0.3);
+            outline: none;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--purple-glow); }
+    </style>
+</head>
+<body class="h-screen flex flex-col p-4 text-xs">
+
+    <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2">
+        <h1 class="text-lg font-bold text-white tracking-widest flex items-center">
+            <i data-lucide="pie-chart" class="w-5 h-5 mr-2 text-purple-400"></i>
+            PORTFOLIO OPTIMIZER
+        </h1>
+        <div class="flex gap-2">
+            <button onclick="exportCSV()" class="px-3 py-1 bg-purple-900/20 border border-purple-500/30 text-purple-400 rounded hover:bg-purple-500/30 text-[10px] font-bold flex items-center gap-1">
+                <i data-lucide="download" class="w-3 h-3"></i> EXPORT CSV
+            </button>
+            <div class="text-[10px] text-gray-500 self-center">LOCAL_MODE</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-12 gap-4 flex-grow overflow-hidden">
+
+        <!-- Sidebar Inputs -->
+        <aside class="col-span-4 flex flex-col gap-3">
+             <div class="glass-panel p-3 rounded flex-grow flex flex-col">
+                 <div class="flex justify-between items-center mb-2">
+                     <span class="text-[10px] text-gray-500 uppercase font-bold">Assets</span>
+                     <button onclick="addAsset()" class="text-green-400 hover:text-green-300"><i data-lucide="plus-circle" class="w-4 h-4"></i></button>
+                 </div>
+                 <div class="overflow-y-auto flex-grow mb-2 pr-1">
+                     <table class="w-full text-xs">
+                         <thead class="text-gray-500 text-left">
+                             <tr><th>Ticker</th><th class="text-right">Ret %</th><th class="text-right">Vol %</th><th class="text-right">Wgt %</th><th></th></tr>
+                         </thead>
+                         <tbody id="asset-body"></tbody>
+                     </table>
+                 </div>
+                 <div class="border-t border-gray-700 pt-2 flex justify-between items-center">
+                     <span class="text-gray-400">Total Weight:</span>
+                     <span class="font-bold text-white" id="total-wgt">0%</span>
+                 </div>
+                 <button onclick="runOptimization()" class="mt-2 w-full py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded">
+                    CALCULATE METRICS
+                 </button>
+             </div>
+
+             <div class="glass-panel p-3 rounded h-48">
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold">Portfolio Stats</div>
+                <div class="space-y-2 font-mono text-sm">
+                    <div class="flex justify-between"><span class="text-gray-400">Expected Return</span><span class="text-green-400 font-bold" id="res-ret">0.0%</span></div>
+                    <div class="flex justify-between"><span class="text-gray-400">Volatility (StdDev)</span><span class="text-rose-400 font-bold" id="res-vol">0.0%</span></div>
+                    <div class="flex justify-between"><span class="text-gray-400">Sharpe Ratio</span><span class="text-purple-400 font-bold" id="res-sharpe">0.00</span></div>
+                    <div class="flex justify-between text-xs mt-2"><span class="text-gray-500">Assumed Rf Rate</span><span class="text-gray-500">3.0%</span></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Charts -->
+        <main class="col-span-8 flex flex-col gap-4">
+            <div class="glass-panel p-4 rounded h-1/2 relative flex flex-col">
+                 <h3 class="text-xs font-bold text-gray-400 mb-2">Allocation</h3>
+                 <div class="flex-grow relative flex justify-center">
+                    <canvas id="pie-chart"></canvas>
+                 </div>
+            </div>
+
+            <div class="glass-panel p-4 rounded h-1/2 relative flex flex-col">
+                 <h3 class="text-xs font-bold text-gray-400 mb-2">Efficient Frontier (Simulated)</h3>
+                 <div class="flex-grow relative">
+                    <canvas id="ef-chart"></canvas>
+                 </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let assets = [
+            { id: 1, ticker: 'SPY', ret: 10, vol: 15, wgt: 60 },
+            { id: 2, ticker: 'TLT', ret: 4, vol: 8, wgt: 40 }
+        ];
+        let nextId = 3;
+        let pieChart = null;
+        let efChart = null;
+
+        function renderAssets() {
+            const tbody = document.getElementById('asset-body');
+            tbody.innerHTML = '';
+            let totalW = 0;
+
+            assets.forEach(a => {
+                totalW += a.wgt;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><input type="text" value="${a.ticker}" onchange="upd(${a.id}, 'ticker', this.value)" class="w-12 bg-transparent text-white font-bold border-none p-0 focus:ring-0"></td>
+                    <td><input type="number" value="${a.ret}" onchange="upd(${a.id}, 'ret', this.value)" class="text-right bg-transparent border-none p-0 focus:ring-0"></td>
+                    <td><input type="number" value="${a.vol}" onchange="upd(${a.id}, 'vol', this.value)" class="text-right bg-transparent border-none p-0 focus:ring-0"></td>
+                    <td><input type="number" value="${a.wgt}" onchange="upd(${a.id}, 'wgt', this.value)" class="text-right bg-transparent border-b border-gray-700 p-0 focus:ring-0"></td>
+                    <td class="text-center"><button onclick="del(${a.id})" class="text-gray-600 hover:text-red-500 ml-1">x</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const el = document.getElementById('total-wgt');
+            el.innerText = totalW.toFixed(1) + '%';
+            el.className = `font-bold ${totalW === 100 ? 'text-green-400' : 'text-yellow-400'}`;
+        }
+
+        function upd(id, field, val) {
+            const idx = assets.findIndex(a => a.id === id);
+            if(idx > -1) {
+                if(field === 'ticker') assets[idx][field] = val;
+                else assets[idx][field] = parseFloat(val) || 0;
+            }
+            renderAssets();
+            // runOptimization(); // Auto run? Maybe wait for button
+        }
+
+        function addAsset() {
+            assets.push({ id: nextId++, ticker: 'NEW', ret: 5, vol: 10, wgt: 0 });
+            renderAssets();
+        }
+
+        function del(id) {
+            assets = assets.filter(a => a.id !== id);
+            renderAssets();
+        }
+
+        function runOptimization() {
+            // Normalize Weights
+            let totalW = assets.reduce((s, a) => s + a.wgt, 0);
+            if(totalW === 0) return;
+            const w = assets.map(a => a.wgt / totalW);
+
+            // Calc Portfolio Ret
+            let portRet = 0;
+            assets.forEach((a, i) => {
+                portRet += (a.ret/100) * w[i];
+            });
+
+            // Calc Portfolio Vol (assuming correlation = 0 for simplicity in this lite version, or 0.2 default)
+            // VarP = w' * Cov * w
+            // Cov_ij = vol_i * vol_j * corr_ij
+            // Let's assume uniform corr = 0.3 for a slightly realistic approximation if not diagonal
+            const CORR = 0.3;
+            let portVar = 0;
+            for(let i=0; i<assets.length; i++) {
+                for(let j=0; j<assets.length; j++) {
+                    const cov = (assets[i].vol/100) * (assets[j].vol/100) * (i===j ? 1 : CORR);
+                    portVar += w[i] * w[j] * cov;
+                }
+            }
+            const portVol = Math.sqrt(portVar);
+
+            const rf = 0.03;
+            const sharpe = (portRet - rf) / portVol;
+
+            document.getElementById('res-ret').innerText = (portRet*100).toFixed(2) + '%';
+            document.getElementById('res-vol').innerText = (portVol*100).toFixed(2) + '%';
+            document.getElementById('res-sharpe').innerText = sharpe.toFixed(2);
+
+            updatePie(w);
+            updateEF();
+        }
+
+        function updatePie(weights) {
+            if(pieChart) pieChart.destroy();
+            const ctx = document.getElementById('pie-chart').getContext('2d');
+            pieChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: assets.map(a => a.ticker),
+                    datasets: [{
+                        data: weights,
+                        backgroundColor: ['#a855f7', '#ec4899', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right', labels: { color: '#cbd5e1', boxWidth: 10 } } }
+                }
+            });
+        }
+
+        function updateEF() {
+            // Simulate random portfolios to draw frontier
+            // 2 assets is a curve. >2 is a cloud.
+            // We'll generate 500 random weight combos
+            let points = [];
+            const CORR = 0.3;
+
+            for(let k=0; k<500; k++) {
+                // Random weights
+                let rW = assets.map(() => Math.random());
+                const sumRW = rW.reduce((a,b)=>a+b,0);
+                rW = rW.map(v => v/sumRW);
+
+                let pRet = 0;
+                assets.forEach((a, i) => { pRet += (a.ret/100) * rW[i]; });
+
+                let pVar = 0;
+                for(let i=0; i<assets.length; i++) {
+                    for(let j=0; j<assets.length; j++) {
+                        const cov = (assets[i].vol/100) * (assets[j].vol/100) * (i===j ? 1 : CORR);
+                        pVar += rW[i] * rW[j] * cov;
+                    }
+                }
+                points.push({ x: Math.sqrt(pVar)*100, y: pRet*100 });
+            }
+
+            // Current Portfolio
+            const currRet = parseFloat(document.getElementById('res-ret').innerText);
+            const currVol = parseFloat(document.getElementById('res-vol').innerText);
+
+            if(efChart) efChart.destroy();
+            const ctx = document.getElementById('ef-chart').getContext('2d');
+            efChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Efficient Frontier (Sim)',
+                            data: points,
+                            backgroundColor: 'rgba(168, 85, 247, 0.2)',
+                            pointRadius: 2
+                        },
+                        {
+                            label: 'Current Allocation',
+                            data: [{x: currVol, y: currRet}],
+                            backgroundColor: '#fff',
+                            pointRadius: 6,
+                            pointBorderColor: '#a855f7',
+                            pointBorderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        x: { type: 'linear', position: 'bottom', title: { display: true, text: 'Volatility %' }, grid: { color: '#1e293b' } },
+                        y: { title: { display: true, text: 'Return %' }, grid: { color: '#1e293b' } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function exportCSV() {
+            let csv = "Ticker,Return,Volatility,Weight\n";
+            assets.forEach(a => {
+                csv += `${a.ticker},${a.ret},${a.vol},${a.wgt}\n`;
+            });
+            const r = document.getElementById('res-ret').innerText;
+            const v = document.getElementById('res-vol').innerText;
+            const s = document.getElementById('res-sharpe').innerText;
+            csv += `\nPortfolio Return,${r}\nPortfolio Volatility,${v}\nSharpe Ratio,${s}\n`;
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'portfolio_optimization.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        window.onload = function() {
+            lucide.createIcons();
+            renderAssets();
+            setTimeout(runOptimization, 500);
+        };
+    </script>
+</body>
+</html>
