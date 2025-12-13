@@ -45,3 +45,25 @@ This library provides a set of user-ready scenarios focused on **Geopolitical Ev
 *   **R-SCM-01 (Supply Chain Risk):** Production lines will halt within days due to a lack of raw materials.
 *   **R-FIN-03 (Liquidity Risk):** We must make massive, unplanned expenditures on air freight to keep critical operations running.
 *   **R-OPS-01 (Operational Risk):** Inability to deliver finished goods to customers results in penalties and lost orders.
+
+---
+
+### Scenario GEO-005: Trade War 2.0 (Universal Tariffs)
+
+**Description:** The US Administration implements a universal baseline tariff of 10-20% on all imports and a 60% tariff on goods from China. Major trading partners (EU, China, Canada) immediately retaliate with targeted tariffs on US agriculture, LNG, and digital services.
+
+**Potential Primary Impact Nodes:**
+*   **R-FIN-01 (Margin Compression):** Cost of Goods Sold (COGS) for retail and tech hardware increases by 15-25%. Companies lacking pricing power see immediate margin erosion.
+*   **R-SCM-01 (Supply Chain Realignment):** Forced acceleration of "China+1" strategies leads to short-term logistical chaos and capacity bottlenecks in Vietnam, India, and Mexico.
+*   **R-MAC-01 (Inflationary Spike):** Higher input costs pass through to consumers, pushing CPI up by 0.5-1.0%, potentially delaying Federal Reserve rate cuts.
+
+---
+
+### Scenario GEO-006: Energy Dominance & Deregulation
+
+**Description:** A massive deregulation package unlocks federal lands for drilling and approves new LNG export terminals, flooding the global market with US energy supply. Oil prices drop below $60/bbl. Concurrently, renewable energy subsidies (IRA) are rolled back or frozen.
+
+**Potential Primary Impact Nodes:**
+*   **R-SEC-01 (Sector Divergence):** Traditional Energy (Oil & Gas) sees volume growth but price pressure. Renewable Energy (Solar, Wind, Green Hydrogen) faces an existential "capital cliff" as project economics collapse without subsidies.
+*   **R-GEO-01 (Petro-State Instability):** Reduced oil revenues destabilize regimes in Russia, Iran, and Venezuela, potentially leading to desperate, asymmetrical geopolitical lash-outs (cyberattacks, regional proxy wars).
+*   **R-IND-01 (Industrial Competitiveness):** US Heavy Industry (Steel, Chemicals, Aluminum) gains a significant global cost advantage due to cheap domestic energy inputs.
