@@ -13,6 +13,7 @@ before any generative agents are invoked.
 
 import logging
 import networkx as nx
+import re
 from typing import List, Dict, Any, Optional, TypedDict
 from langgraph.graph import StateGraph, END, START
 from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
@@ -106,6 +107,37 @@ class NeuroSymbolicPlanner:
             }
         ]
         return {"symbolic_plan": "Fallback Plan", "steps": steps, "raw_path": []}
+
+    def parse_natural_language_plan(self, text: str) -> Dict[str, Any]:
+        """
+        Parses a numbered list of tasks from LLM output (AWO Phase 1).
+        Example input:
+        1. Ingest data.
+        2. Calculate risk.
+        """
+        steps = []
+        # Regex to capture "1. Task description"
+        pattern = re.compile(r"^\s*(\d+)\.\s+(.+)$", re.MULTILINE)
+
+        matches = pattern.findall(text)
+        if not matches:
+             logger.warning("No numbered steps found in text. Returning empty plan.")
+             return {"symbolic_plan": "Manual Plan", "steps": []}
+
+        for i, (num, desc) in enumerate(matches):
+            steps.append({
+                "task_id": str(num),
+                "agent": "GeneralAgent", # Or infer from description
+                "description": desc.strip(),
+                "cypher_fragment": None
+            })
+
+        logger.info(f"[NeuroSymbolicPlanner] Parsed {len(steps)} steps from natural language.")
+        return {
+            "symbolic_plan": "Natural Language Plan",
+            "steps": steps,
+            "raw_path": []
+        }
 
     def execute_step(self, state: GraphState) -> Dict[str, Any]:
         """

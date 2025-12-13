@@ -46,7 +46,13 @@ else
     export NEO4J_URI="bolt://localhost:7687"
 
     echo "Starting Backend..."
-    python scripts/run_adam.py &
+    PROMPT_FILE="prompt_library/AWO_System_Prompt.md"
+    if [ -f "$PROMPT_FILE" ]; then
+        echo "Loading System Prompt from $PROMPT_FILE..."
+        python scripts/run_adam.py --system_prompt_path "$PROMPT_FILE" &
+    else
+        python scripts/run_adam.py &
+    fi
     BACKEND_PID=$!
 
     echo "Starting UI (requires npm)..."

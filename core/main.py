@@ -15,6 +15,8 @@ async def async_main():
     """
     parser = argparse.ArgumentParser(description="Adam v23.0 Execution")
     parser.add_argument("--query", type=str, help="Single query to execute")
+    parser.add_argument("--system_prompt", type=str, help="System Prompt to inject (String)")
+    parser.add_argument("--system_prompt_path", type=str, help="System Prompt to inject (File Path)")
     args = parser.parse_args()
 
     try:
@@ -44,11 +46,24 @@ async def async_main():
         # Initialize Meta Orchestrator (v23 Brain)
         meta_orchestrator = MetaOrchestrator(legacy_orchestrator=legacy_orchestrator)
 
+        # Inject System Prompt into Context
+        context = {}
+        if args.system_prompt_path:
+            logger.info(f"Injecting System Prompt from {args.system_prompt_path}...")
+            try:
+                with open(args.system_prompt_path, 'r') as f:
+                    context["system_prompt"] = f.read()
+            except Exception as e:
+                logger.error(f"Failed to read prompt file: {e}")
+        elif args.system_prompt:
+            logger.info("Injecting System Prompt (String)...")
+            context["system_prompt"] = args.system_prompt
+
         if args.query:
             # Single shot mode
             print(f"User> {args.query}")
             print("Adam> Thinking...")
-            result = await meta_orchestrator.route_request(args.query)
+            result = await meta_orchestrator.route_request(args.query, context=context)
             print(f"Adam> {result}")
             return
 
@@ -70,7 +85,7 @@ async def async_main():
                 print("Adam> Thinking...")
 
                 # Route request via MetaOrchestrator
-                result = await meta_orchestrator.route_request(user_input)
+                result = await meta_orchestrator.route_request(user_input, context=context)
 
                 print(f"Adam> {result}")
 
