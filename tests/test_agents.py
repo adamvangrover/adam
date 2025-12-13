@@ -1,14 +1,14 @@
 # tests/test_agents.py
 
 import unittest
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, AsyncMock
 from core.agents.market_sentiment_agent import MarketSentimentAgent
 from core.agents.macroeconomic_analysis_agent import MacroeconomicAnalysisAgent
 from core.agents.geopolitical_risk_agent import GeopoliticalRiskAgent
 from core.agents.industry_specialist_agent import IndustrySpecialistAgent
 from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
-from core.agents.technical_analyst_agent import TechnicalAnalyst
-from core.agents.risk_assessment_agent import RiskAssessor
+from core.agents.technical_analyst_agent import TechnicalAnalystAgent as TechnicalAnalyst
+from core.agents.risk_assessment_agent import RiskAssessmentAgent as RiskAssessor
 from core.agents.newsletter_layout_specialist_agent import NewsletterLayoutSpecialist
 from core.agents.data_verification_agent import DataVerificationAgent
 from core.agents.lexica_agent import LexicaAgent
@@ -17,56 +17,51 @@ from core.agents.echo_agent import EchoAgent
 
 #... (other imports)
 
-class TestMarketSentimentAgent(unittest.TestCase):
+class TestMarketSentimentAgent(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         """Setup method to create an instance of MarketSentimentAgent."""
         config = {
-            'data_sources': {'financial_news_api': Mock()},
+            'data_sources': [],
             'sentiment_threshold': 0.6
         }
         self.agent = MarketSentimentAgent(config)
+        # Mock APIs
+        self.agent.news_api = Mock()
+        self.agent.prediction_market_api = Mock()
+        self.agent.social_media_api = Mock()
+        self.agent.web_traffic_api = Mock()
 
-    @patch('core.agents.market_sentiment_agent.send_message')
-    def test_analyze_sentiment(self, mock_send_message):
+    async def test_analyze_sentiment(self):
         """Test analyzing market sentiment."""
-        # Mock the data source's response
-        self.agent.data_sources['financial_news_api'].get_headlines.return_value = (
-            ["Positive headline", "Negative headline"], "neutral"
-        )
+        self.agent.news_api.get_headlines.return_value = (["Headline"], 0.5)
+        self.agent.prediction_market_api.get_market_sentiment.return_value = 0.5
+        self.agent.social_media_api.get_social_media_sentiment.return_value = 0.5
+        self.agent.web_traffic_api.get_web_traffic_sentiment.return_value = 0.5
 
-        sentiment = self.agent.analyze_sentiment()
-        self.assertEqual(sentiment, "neutral")  # Check if sentiment is calculated correctly
-        mock_send_message.assert_called_once_with(
-            {'agent': 'market_sentiment_agent', 'sentiment': 'neutral'}
-        )  # Check if message is sent
+        sentiment, details = await self.agent.analyze_sentiment()
+        self.assertAlmostEqual(sentiment, 0.5)
 
-    @patch('core.agents.market_sentiment_agent.send_message')
-    def test_analyze_sentiment_with_positive_news(self, mock_send_message):
+    async def test_analyze_sentiment_with_positive_news(self):
         """Test analyzing market sentiment with positive news."""
-        # Mock the data source's response with positive sentiment
-        self.agent.data_sources['financial_news_api'].get_headlines.return_value = (
-            ["Positive headline 1", "Positive headline 2"], "positive"
-        )
+        self.agent.news_api.get_headlines.return_value = (["Positive"], 1.0)
+        self.agent.prediction_market_api.get_market_sentiment.return_value = 0.0
+        self.agent.social_media_api.get_social_media_sentiment.return_value = 0.0
+        self.agent.web_traffic_api.get_web_traffic_sentiment.return_value = 0.0
 
-        sentiment = self.agent.analyze_sentiment()
-        self.assertEqual(sentiment, "positive")
-        mock_send_message.assert_called_once_with(
-            {'agent': 'market_sentiment_agent', 'sentiment': 'positive'}
-        )
+        sentiment, details = await self.agent.analyze_sentiment()
+        # 1.0 * 0.4 = 0.4
+        self.assertAlmostEqual(sentiment, 0.4)
 
-    @patch('core.agents.market_sentiment_agent.send_message')
-    def test_analyze_sentiment_with_negative_news(self, mock_send_message):
+    async def test_analyze_sentiment_with_negative_news(self):
         """Test analyzing market sentiment with negative news."""
-        # Mock the data source's response with negative sentiment
-        self.agent.data_sources['financial_news_api'].get_headlines.return_value = (
-            ["Negative headline 1", "Negative headline 2"], "negative"
-        )
+        self.agent.news_api.get_headlines.return_value = (["Negative"], -1.0)
+        self.agent.prediction_market_api.get_market_sentiment.return_value = 0.0
+        self.agent.social_media_api.get_social_media_sentiment.return_value = 0.0
+        self.agent.web_traffic_api.get_web_traffic_sentiment.return_value = 0.0
 
-        sentiment = self.agent.analyze_sentiment()
-        self.assertEqual(sentiment, "negative")
-        mock_send_message.assert_called_once_with(
-            {'agent': 'market_sentiment_agent', 'sentiment': 'negative'}
-        )
+        sentiment, details = await self.agent.analyze_sentiment()
+        # -1.0 * 0.4 = -0.4
+        self.assertAlmostEqual(sentiment, -0.4)
 
 class TestMacroeconomicAnalysisAgent(unittest.TestCase):
     def setUp(self):

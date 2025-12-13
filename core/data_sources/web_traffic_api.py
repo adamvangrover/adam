@@ -16,3 +16,6 @@ class SimulatedWebTrafficAPI:
             A dictionary containing the web traffic data.
         """
         return {"url": url, "traffic": 1000}
+
+    def get_web_traffic_sentiment(self):
+        return 0.5

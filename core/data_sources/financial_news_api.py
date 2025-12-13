@@ -39,7 +39,7 @@ class FinancialNewsAPI:
                 logging.error("Reuters API key not found. Cannot fetch headlines from Reuters.")
         
         #... (add more news sources)
-        return headlines
+        return headlines, 0.0
 
     def get_historical_news(self, source="bloomberg", keywords=None, start_date=None, end_date=None):
         historical_news = [] # Initialize to empty list
@@ -72,10 +72,12 @@ class FinancialNewsAPI:
 class SimulatedFinancialNewsAPI(FinancialNewsAPI):
     def get_headlines(self, source="bloomberg", keywords=None, sentiment=None):
         logging.info(f"Fetching SIMULATED headlines from {source}. Keywords: {keywords}, Sentiment: {sentiment}")
-        return [
+        headlines = [
             {"source": source, "title": f"Simulated positive news about {keywords or 'the market'}", "sentiment_score": 0.8},
             {"source": source, "title": f"Simulated negative news about {keywords or 'the market'}", "sentiment_score": -0.8},
         ]
+        avg_sentiment = sum(h["sentiment_score"] for h in headlines) / len(headlines) if headlines else 0.0
+        return headlines, avg_sentiment
 
     def get_historical_news(self, source="bloomberg", keywords=None, start_date=None, end_date=None):
         logging.info(f"Fetching SIMULATED historical news from {source}. Keywords: {keywords}, Start: {start_date}, End: {end_date}")

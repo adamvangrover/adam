@@ -7,3 +7,7 @@ class SimulatedPredictionMarketAPI:
         return [
             {"market": f"Market for {keywords or 'an event'}", "probability": 0.6},
         ]
+
+    def get_market_sentiment(self):
+        logging.info("Fetching SIMULATED prediction market sentiment.")
+        return 0.6
