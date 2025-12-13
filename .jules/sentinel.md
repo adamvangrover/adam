@@ -7,3 +7,8 @@
 **Vulnerability:** The Flask API was configured with `CORS(app)` without arguments, which defaults to allowing all origins (`*`) and reflecting the origin header. This exposes the API to Cross-Site Request Forgery (CSRF) and data exfiltration from malicious sites.
 **Learning:** `flask-cors` is permissive by default ("Allow All") to simplify development, but this is dangerous if not explicitly restricted.
 **Prevention:** Always configure `resources` with a specific list of `origins` in `CORS()`, preferably loaded from environment variables to allow flexibility across environments (dev vs prod).
+
+## 2024-05-23 - API Log Leakage
+**Vulnerability:** The `/api/state` endpoint exposed the last 50 raw server log entries to unauthenticated users. This could leak sensitive data like API keys, PII, or internal system paths logged at INFO level.
+**Learning:** In-memory log buffers exposed via API are a high-risk pattern. Developers often add them for "easy debugging" in UI, forgetting that logs often contain secrets.
+**Prevention:** Never expose raw server logs via public APIs. Use proper observability tools (ELK, Splunk, CloudWatch) with access controls. If UI needs logs, stream them via authenticated WebSockets and sanitize them.
