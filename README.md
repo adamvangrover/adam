@@ -6,7 +6,7 @@
 [![FinanceBench](https://img.shields.io/badge/FinanceBench-99%25-green)](https://arxiv.org/abs/2311.11944)
 [![Docker Image](https://img.shields.io/badge/docker-ready-blue)](https://hub.docker.com/)
 
-> **Adam v23.5 is not a chatbot. It is a Neuro-Symbolic "System 2" Cognitive Engine designed to replace junior analytical labor in high-stakes financial environments.**
+> **Adam v23.5 operates as a Neuro-Symbolic 'System 2' cognitive engine, upgrading financial AI from a hallucinating chatbot to a fiduciary architect. We fuse deep fundamental analysis with stochastic risk modeling to automate the rigorous diligence of an institutional team, delivering calculated conviction rather than conversational filler. Stop chatting with your data; start engineering your alpha..**
 
 ---
 
