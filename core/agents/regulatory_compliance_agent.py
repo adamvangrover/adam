@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup  # Web scraping
 from neo4j import GraphDatabase  # Knowledge graph interaction
 
 from core.llm_plugin import LLMPlugin
+from core.data_sources.political_landscape import PoliticalLandscapeLoader
 
 # ... (import other relevant libraries, e.g., for ML, time-series analysis, sentiment analysis)
 
@@ -132,19 +133,21 @@ class RegulatoryComplianceAgent:
             A dictionary containing information on political leaders,
             party affiliations, key policies, and recent developments.
         """
-        # TODO: Implement data loading from political news sources,
-        # government websites, and legislative databases
-        # Placeholder political landscape (replace with actual data)
-        landscape = {
-            "US": {
-                "president": "Joe Biden",
-                "party": "Democrat",
-                "key_policies": ["Financial regulation", "Climate change"],
-                "recent_developments": ["New infrastructure bill passed"]
+        try:
+            loader = PoliticalLandscapeLoader()
+            landscape = loader.load_landscape()
+            return landscape
+        except Exception as e:
+            print(f"Error loading political landscape: {e}")
+            # Return a minimal valid structure to prevent crashes
+            return {
+                "US": {
+                    "president": "Joe Biden",
+                    "party": "Democrat",
+                    "key_policies": ["Unknown"],
+                    "recent_developments": ["Data unavailable"]
+                }
             }
-            # ... add data for other countries
-        }
-        return landscape
 
     def _analyze_transaction(self, transaction: Dict) -> Dict:
         """

@@ -1,6 +1,14 @@
 from __future__ import annotations
-import yfinance as yf
-import pandas as pd
+try:
+    import yfinance as yf
+except ImportError:
+    yf = None
+
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
+
 import time
 from typing import Dict, List, Any, Optional
 from core.utils.logging_utils import get_logger
