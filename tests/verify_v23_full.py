@@ -21,11 +21,13 @@ def verify_planner():
     print(f"Query: {query}")
     
     # 1. Discover Plan
-    plan = planner.discover_plan(query)
+    # Updated to match actual method signature: discover_plan(start_node, target_node)
+    result = planner.discover_plan(start_node="Apple Inc.", target_node="Credit Default")
+    plan = result.get("raw_path", [])
     if plan:
         print("\nSymbolic Plan Discovered:")
         for step in plan:
-            print(f"  ({step['source']}) --[{step['relation']}]--> ({step['target']}) [Prov: {step['provenance']}]")
+            print(f"  ({step['source']}) --[{step['relation']}]--> ({step['target']})")
             
         # 2. Compile to Graph
         app = planner.to_executable_graph(plan)

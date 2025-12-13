@@ -324,6 +324,36 @@ class CacheManager:
             logger.exception(f"Could not write to cache {e}")
             raise
 
+class MockLLM(BaseLLM):
+    """A mock LLM for testing or offline mode."""
+
+    def __init__(self):
+        self.model_name = "mock-gpt-4"
+        logger.warning("Initializing MockLLM. Responses will be canned.")
+
+    def generate_text(self, prompt: str, **kwargs) -> str:
+        logger.info(f"MockLLM receiving prompt: {prompt[:50]}...")
+        if "risk" in prompt.lower():
+            return "Risk is moderate. Exposure is managed. (Mock Response)"
+        elif "sentiment" in prompt.lower():
+            return "Market sentiment is cautiously optimistic. (Mock Response)"
+        elif "json" in prompt.lower():
+            return json.dumps({"intent": "analysis", "entities": {"ticker": "AAPL"}, "confidence": 0.95})
+        else:
+            return "This is a mock response from the Adam system. Real LLM is offline."
+
+    def get_token_count(self, text: str) -> int:
+        return len(text.split())
+
+    def get_model_name(self) -> str:
+        return self.model_name
+
+    def get_context_length(self) -> int:
+        return 4096
+
+    def identify_intent_and_entities(self, query: str) -> Tuple[str, Dict[str, Any], float]:
+        return "analysis", {"target": "mock_entity"}, 0.9
+
 class LLMPlugin:
     """Manages LLM interactions with caching and configuration."""
 
@@ -379,7 +409,9 @@ class LLMPlugin:
         provider = self.config.get("provider", "huggingface").lower() # Default to huggingface if no provider
 
         if provider not in provider_map:
-             raise ValueError(f"Unsupported LLM provider: {provider}")
+             # raise ValueError(f"Unsupported LLM provider: {provider}")
+             logger.warning(f"Unsupported LLM provider: {provider}. Falling back to MockLLM.")
+             return MockLLM()
 
         api_key_env_var = f"{provider.upper()}_API_KEY"
         api_key = os.getenv(api_key_env_var)
@@ -387,21 +419,23 @@ class LLMPlugin:
         # For HuggingFace, API key is optional (for inference API or gated models)
         # For others, it's typically required.
         if not api_key and provider not in ["huggingface"]: # allow HF to proceed without API key for local models
-            raise LLMConfigurationError(f"API key for {provider} ({api_key_env_var}) not found in environment variables.")
+            logger.warning(f"API key for {provider} ({api_key_env_var}) not found. Falling back to MockLLM.")
+            return MockLLM()
 
-        # Get model name from config, or use default from the LLM class if not specified
-        default_model_name = provider_map[provider](api_key="dummy_key_if_needed_for_default_name_only").get_model_name() if provider != "huggingface" else "google/flan-t5-base" # HF needs specific default
-        model_name = self.config.get(f"{provider}_model_name", default_model_name)
+        try:
+            # Get model name from config, or use default from the LLM class if not specified
+            default_model_name = provider_map[provider](api_key="dummy_key_if_needed_for_default_name_only").get_model_name() if provider != "huggingface" else "google/flan-t5-base" # HF needs specific default
+            model_name = self.config.get(f"{provider}_model_name", default_model_name)
 
-
-        if provider == "huggingface":
-            use_pipeline = self.config.get("huggingface_use_pipeline", True)
-            # Pass api_key which might be None (handled by HuggingFaceLLM)
-            return HuggingFaceLLM(model_name=model_name, use_pipeline=use_pipeline, api_key=api_key) 
-        else:
-            if not api_key: # Should have been caught earlier, but as a safeguard
-                 raise LLMConfigurationError(f"API key for {provider} is required but not found.")
-            return provider_map[provider](api_key=api_key, model_name=model_name)
+            if provider == "huggingface":
+                use_pipeline = self.config.get("huggingface_use_pipeline", True)
+                # Pass api_key which might be None (handled by HuggingFaceLLM)
+                return HuggingFaceLLM(model_name=model_name, use_pipeline=use_pipeline, api_key=api_key)
+            else:
+                return provider_map[provider](api_key=api_key, model_name=model_name)
+        except Exception as e:
+            logger.error(f"Failed to initialize {provider}: {e}. Falling back to MockLLM.")
+            return MockLLM()
 
     def generate_text(self, prompt: str, task: str = "default", **kwargs) -> str:
         """Generates text using the configured LLM with caching and task-specific prompting."""

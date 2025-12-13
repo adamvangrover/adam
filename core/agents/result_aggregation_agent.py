@@ -1,6 +1,7 @@
 # core/agents/result_aggregation_agent.py
 
 import logging
+from typing import Dict, Any, List
 from core.agents.agent_base import AgentBase
 from core.utils.config_utils import load_config
 
@@ -14,10 +15,13 @@ class ResultAggregationAgent(AgentBase):
     but is designed for future LLM integration.
     """
 
-    def __init__(self, config_path="config/agents.yaml"):
-        super().__init__()
-        self.config = load_config(config_path)
-        agent_config = self.config.get('agents', {}).get('ResultAggregationAgent', {})
+    def __init__(self, config: Dict[str, Any], **kwargs):
+        """
+        Initializes the ResultAggregationAgent.
+        """
+        super().__init__(config, **kwargs)
+        # self.config is already set by super().__init__
+        agent_config = config
 
         if not agent_config:
             logging.error("ResultAggregationAgent configuration not found.")

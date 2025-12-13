@@ -60,29 +60,62 @@ from financial_digital_twin.nexus_agent import NexusAgent
 # Dictionary mapping agent names to their module paths for dynamic loading
 AGENT_CLASSES = {
     "MarketSentimentAgent": "core.agents.market_sentiment_agent",
+    "market_sentiment_agent": "core.agents.market_sentiment_agent",
     "MacroeconomicAnalysisAgent": "core.agents.macroeconomic_analysis_agent",
+    "macroeconomic_analysis_agent": "core.agents.macroeconomic_analysis_agent",
     "GeopoliticalRiskAgent": "core.agents.geopolitical_risk_agent",
+    "geopolitical_risk_agent": "core.agents.geopolitical_risk_agent",
     "IndustrySpecialistAgent": "core.agents.industry_specialist_agent",
+    "industry_specialist_agent": "core.agents.industry_specialist_agent",
     "FundamentalAnalystAgent": "core.agents.fundamental_analyst_agent",
+    "fundamental_analyst_agent": "core.agents.fundamental_analyst_agent",
     "TechnicalAnalystAgent": "core.agents.technical_analyst_agent",
+    "technical_analyst_agent": "core.agents.technical_analyst_agent",
     "RiskAssessmentAgent": "core.agents.risk_assessment_agent",
+    "risk_assessment_agent": "core.agents.risk_assessment_agent",
     "NewsletterLayoutSpecialistAgent": "core.agents.newsletter_layout_specialist_agent",
+    "newsletter_layout_specialist_agent": "core.agents.newsletter_layout_specialist_agent",
     "DataVerificationAgent": "core.agents.data_verification_agent",
+    "data_verification_agent": "core.agents.data_verification_agent",
     "LexicaAgent": "core.agents.lexica_agent",
+    "lexica_agent": "core.agents.lexica_agent",
     "ArchiveManagerAgent": "core.agents.archive_manager_agent",
+    "archive_manager_agent": "core.agents.archive_manager_agent",
     "AgentForge": "core.agents.agent_forge",
+    "agent_forge": "core.agents.agent_forge",
     "PromptTuner": "core.agents.prompt_tuner",
+    "prompt_tuner": "core.agents.prompt_tuner",
     "CodeAlchemist": "core.agents.code_alchemist",
+    "code_alchemist": "core.agents.code_alchemist",
     "LinguaMaestro": "core.agents.lingua_maestro",
+    "lingua_maestro": "core.agents.lingua_maestro",
     "SenseWeaver": "core.agents.sense_weaver",
+    "sense_weaver": "core.agents.sense_weaver",
     "QueryUnderstandingAgent": "core.agents.query_understanding_agent",
     "DataRetrievalAgent": "core.agents.data_retrieval_agent",
     "ResultAggregationAgent": "core.agents.result_aggregation_agent",
     "ReportGeneratorAgent": "core.agents.report_generator_agent",
     "SNCAnalystAgent": "core.agents.snc_analyst_agent", # Added snc_analyst_agent
+    "snc_analyst_agent": "core.agents.snc_analyst_agent",
     "BehavioralEconomicsAgent": "core.agents.behavioral_economics_agent",
+    "behavioral_economics_agent": "core.agents.behavioral_economics_agent",
     "MetaCognitiveAgent": "core.agents.meta_cognitive_agent",
+    "meta_cognitive_agent": "core.agents.meta_cognitive_agent",
     "NewsBotAgent": "core.agents.news_bot",
+    "news_bot_agent": "core.agents.news_bot",
+    "echo_agent": "core.agents.echo_agent",
+    "portfolio_optimization_agent": "core.agents.portfolio_optimization_agent",
+    "data_visualization_agent": "core.agents.data_visualization_agent",
+    "natural_language_generation_agent": "core.agents.natural_language_generation_agent",
+    "machine_learning_model_training_agent": "core.agents.machine_learning_model_training_agent",
+    "legal_agent": "core.agents.legal_agent",
+    "financial_modeling_agent": "core.agents.financial_modeling_agent",
+    "supply_chain_risk_agent": "core.agents.supply_chain_risk_agent",
+    "algo_trading_agent": "core.agents.algo_trading_agent",
+    "discussion_chair_agent": "core.agents.discussion_chair_agent",
+    "anomaly_detection_agent": "core.agents.anomaly_detection_agent",
+    "regulatory_compliance_agent": "core.agents.regulatory_compliance_agent",
+    "credit_sentry_agents": "core.agents.credit_sentry_agents",
     "NexusAgent": NexusAgent,
     "IngestionAgent": AgentBase, # Using AgentBase as a placeholder
     "AuditorAgent": AgentBase, # Using AgentBase as a placeholder
@@ -262,11 +295,28 @@ class AgentOrchestrator:
                             logging.error(f"Failed to decode JSON from constitution file for {agent_name} at {constitution_path}")
 
                     # Pass agent_config, constitution, and kernel to the agent
-                    self.agents[agent_name] = agent_class(
-                        config=agent_config,
-                        constitution=constitution,
-                        kernel=self.sk_kernel
-                    )
+                    # Adaptive instantiation based on introspection or try-except
+                    try:
+                         # Attempt standard v2 signature
+                         self.agents[agent_name] = agent_class(
+                             config=agent_config,
+                             constitution=constitution,
+                             kernel=self.sk_kernel
+                         )
+                    except TypeError:
+                         try:
+                             # Fallback for v1 agents (no constitution/kernel)
+                             self.agents[agent_name] = agent_class(
+                                 config=agent_config
+                             )
+                         except TypeError:
+                             # Fallback for v0 agents (no args or just config via load_config)
+                             try:
+                                 self.agents[agent_name] = agent_class()
+                             except Exception as e:
+                                 logging.error(f"Could not instantiate {agent_name} with any known signature.")
+                                 raise e
+
                     logging.info(f"Agent loaded: {agent_name}")
                 else:
                     logging.warning(f"Agent class not found for: {agent_name}")

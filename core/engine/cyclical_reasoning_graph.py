@@ -115,7 +115,8 @@ def map_dra_to_raa(financials: Dict[str, Any]) -> tuple[Dict, Dict]:
 
 data_retriever = V23DataRetriever()
 try:
-    risk_assessor = RiskAssessmentAgent() if RiskAssessmentAgent else None
+    # Patch: Provide default config to avoid TypeError
+    risk_assessor = RiskAssessmentAgent(config={"mode": "standard"}) if RiskAssessmentAgent else None
 except Exception as e:
     logger.error(f"Error init RAA: {e}")
     risk_assessor = None
