@@ -103,7 +103,12 @@ const Terminal: React.FC = () => {
           zIndex: 5
       }}></div>
 
-      <div style={{ flexGrow: 1, overflowY: 'auto', marginBottom: '10px', position: 'relative', zIndex: 1 }}>
+      <div
+        style={{ flexGrow: 1, overflowY: 'auto', marginBottom: '10px', position: 'relative', zIndex: 1 }}
+        role="log"
+        aria-live="polite"
+        aria-label="Terminal Output"
+      >
         {history.map((line, i) => (
             <div key={i} style={{
                 marginBottom: '4px',
@@ -120,6 +125,9 @@ const Terminal: React.FC = () => {
           ref={inputRef}
           type="text"
           value={input}
+          aria-label="Terminal Command Input"
+          placeholder="Type 'help' for commands..."
+          spellCheck={false}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleCommand(input)}
           style={{

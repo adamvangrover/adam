@@ -7,3 +7,7 @@
 ## 2024-05-22 - [Singleton Graph Loading]
 **Learning:** `UnifiedKnowledgeGraph` re-parses JSON and rebuilds the graph on every instantiation. Since `NeuroSymbolicPlanner` instantiates it in `__init__` and is often transient (or at least could be), this is a major bottleneck.
 **Action:** Implement a module-level cache for the graph structure to avoid redundant I/O and graph construction.
+
+## 2024-05-24 - [Unused Components & Testing]
+**Learning:** Found `KnowledgeGraphVisualizer` was unused and untestable via the app. `react-force-graph-2d` requires mocking in JSDOM.
+**Action:** Always check if a component is mounted before trying to verify it visually. Use unit tests with mocks for library-heavy components.
