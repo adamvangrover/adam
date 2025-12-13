@@ -142,10 +142,15 @@ class RegulatoryComplianceAgent:
             # Return a minimal valid structure to prevent crashes
             return {
                 "US": {
-                    "president": "Joe Biden",
-                    "party": "Democrat",
+                    "president": "Donald Trump",
+                    "party": "Republican",
                     "key_policies": ["Unknown"],
-                    "recent_developments": ["Data unavailable"]
+                    "recent_developments": ["Data unavailable"],
+                    "context_layering": {
+                        "historical_context": {"president": "Joe Biden"},
+                        "policy_shifts": {}
+                    },
+                    "geopolitical_dynamics": {}
                 }
             }
 

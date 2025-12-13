@@ -2,7 +2,7 @@
 Political Landscape Loader
 
 This module provides functionality to load political landscape data from various sources.
-It is designed to be used by the RegulatoryComplianceAgent.
+It is designed to be used by the RegulatoryComplianceAgent and other reasoning engines.
 """
 import requests
 from bs4 import BeautifulSoup
@@ -17,6 +17,7 @@ class PoliticalLandscapeLoader:
     """
     Loads political landscape data from external sources.
     Uses a combination of scraping and predefined data structures.
+    Supports 'Context Layering' for historical and dynamic geopolitical analysis.
     """
 
     def __init__(self):
@@ -26,59 +27,146 @@ class PoliticalLandscapeLoader:
         }
         # Fallback data in case of connection errors
         self.fallback_data = {
-            "US": {
-                "president": "Joe Biden",
-                "party": "Democrat",
-                "key_policies": [
-                    "Infrastructure Investment and Jobs Act",
-                    "Inflation Reduction Act",
-                    "CHIPS and Science Act"
-                ],
-                "recent_developments": [
-                    "Ongoing implementation of climate policies.",
-                    "Discussions on federal budget and debt ceiling."
-                ]
-            }
+            "US": self._get_us_data_structure()
         }
 
     def load_landscape(self) -> Dict:
         """
         Loads the political landscape.
-        Currently focuses on US data, but can be extended.
+        Returns a rich object with current state, history, and cascading dynamics.
         """
         landscape = {
             "US": self._load_us_landscape()
         }
         return landscape
 
+    def _get_us_data_structure(self) -> Dict:
+        """
+        Returns the structured data for the US political landscape.
+        """
+        return {
+            # --- Layer 1: Current Administration (Surface Reality) ---
+            "president": "Donald Trump",
+            "party": "Republican",
+            "term": "2025-2029",
+            "key_policies": [
+                "Tax Cuts and Jobs Act extensions",
+                "Deregulation of Energy Sector",
+                "Border Security and Immigration Enforcement",
+                "Trade Tariffs (Universal Baseline Tariff)",
+                "Energy Independence ('Drill, Baby, Drill')",
+                "Dismantling of 'Deep State' bureaucracy"
+            ],
+            "recent_developments": [
+                "Executive orders on energy production.",
+                "Discussions on trade agreements and tariffs.",
+                "Appointments of key cabinet positions."
+            ],
+
+            # --- Layer 2: Context Layering (Historical & Alternative) ---
+            "context_layering": {
+                "historical_context": {
+                    "previous_administration": {
+                        "president": "Joe Biden",
+                        "party": "Democrat",
+                        "term": "2021-2025",
+                        "legacy_policies": [
+                            "Infrastructure Investment and Jobs Act",
+                            "Inflation Reduction Act",
+                            "CHIPS and Science Act"
+                        ]
+                    },
+                    "policy_shifts": {
+                        "Energy": "Shift from Green Transition (IRA) to Fossil Fuel Maximization.",
+                        "Trade": "Shift from Multilateral Frameworks to Bilateral Transactionalism.",
+                        "Regulation": "Shift from ESG-focus to Deregulation."
+                    }
+                },
+                "legislative_landscape": {
+                    "senate_control": "Republican",
+                    "house_control": "Republican",
+                    "implication": "High probability of passing legislative agenda without gridlock."
+                }
+            },
+
+            # --- Layer 3: Geopolitical Inter-Dynamics & Cascading Impacts ---
+            # Used for Logic Reasoning and Critique Frameworks
+            "geopolitical_dynamics": {
+                "US_China_Decoupling": {
+                    "trigger": "Universal Baseline Tariff & Revocation of PNTR",
+                    "impact_ledger": {
+                        "first_order": [
+                            "Immediate increase in cost of goods sold (COGS) for electronics/retail.",
+                            "Retaliatory tariffs on US agriculture (soybeans, corn)."
+                        ],
+                        "second_order": [
+                            "Supply chain migration to Vietnam/India/Mexico (Nearshoring acceleration).",
+                            "Inflationary pressure on US consumer durable goods (+2-4%).",
+                            "Margin compression for US multinationals with high China revenue exposure."
+                        ],
+                        "third_order": [
+                            "Bifurcation of global technology standards (6G, AI).",
+                            "Potential selling of US Treasuries by China (Yield curve steepening).",
+                            "Geopolitical flashpoints in Taiwan Strait due to economic pressure."
+                        ]
+                    }
+                },
+                "Energy_Dominance_Strategy": {
+                    "trigger": "Unrestricted LNG Exports & Leasing on Federal Lands",
+                    "impact_ledger": {
+                        "first_order": [
+                            "Decrease in global oil/gas prices due to US supply flood.",
+                            "Increased revenue for US midstream and E&P companies."
+                        ],
+                        "second_order": [
+                            "Fiscal strain on petrostates (Russia, Iran, Venezuela).",
+                            "Reduced viability for green hydrogen/renewables projects without subsidies.",
+                            "Lower input costs for US heavy industry (steel, chemicals)."
+                        ],
+                        "third_order": [
+                            "Shift in EU energy security dependence from Russia/Middle East to US LNG.",
+                            "Potential weakening of OPEC+ cohesion.",
+                            "Long-term climate risk acceleration ( externalities not priced in)."
+                        ]
+                    }
+                },
+                "Regulatory_Deconstruction": {
+                    "trigger": "Reinstatement of Schedule F & Agency Budget Cuts",
+                    "impact_ledger": {
+                        "first_order": [
+                            "Immediate freeze on new federal regulations.",
+                            "Reduction in compliance costs for financial/industrial sectors."
+                        ],
+                        "second_order": [
+                            "Erosion of institutional memory and technical expertise in agencies.",
+                            "Legal challenges from blue states (California effect).",
+                            "Potential boost in short-term corporate profitability."
+                        ],
+                        "third_order": [
+                            "Increased systemic risk due to weakened oversight (e.g., banking, aviation).",
+                            "Fragmented regulatory landscape (State vs Federal conflict).",
+                            "Privatization of previously public data/services."
+                        ]
+                    }
+                }
+            }
+        }
+
     def _load_us_landscape(self) -> Dict:
         """
         Loads US political landscape data.
         """
-        # Start with base knowledge (could be moved to a config or separate file)
-        us_data = {
-            "president": "Joe Biden",
-            "party": "Democrat",
-            "key_policies": [
-                "Infrastructure Investment and Jobs Act",
-                "Inflation Reduction Act",
-                "CHIPS and Science Act",
-                "Student Loan Relief efforts",
-                "Support for Ukraine"
-            ],
-            "recent_developments": []
-        }
+        us_data = self._get_us_data_structure()
 
         # Try to fetch recent developments
         try:
             recent_devs = self._fetch_recent_developments()
             if recent_devs:
                 us_data["recent_developments"] = recent_devs
-            else:
-                 us_data["recent_developments"] = self.fallback_data["US"]["recent_developments"]
         except Exception as e:
             logger.error(f"Failed to fetch recent developments: {e}")
-            us_data["recent_developments"] = self.fallback_data["US"]["recent_developments"]
+            # Keep default/fallback developments
+            pass
 
         return us_data
 

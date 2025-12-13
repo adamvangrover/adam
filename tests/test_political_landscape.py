@@ -45,7 +45,22 @@ class TestPoliticalLandscapeLoader(unittest.TestCase):
         landscape = loader.load_landscape()
 
         self.assertIn("US", landscape)
-        self.assertEqual(landscape["US"]["president"], "Joe Biden")
+        self.assertEqual(landscape["US"]["president"], "Donald Trump")
+        self.assertEqual(landscape["US"]["party"], "Republican")
+
+        # Verify Context Layering
+        self.assertIn("context_layering", landscape["US"])
+        self.assertEqual(landscape["US"]["context_layering"]["historical_context"]["previous_administration"]["president"], "Joe Biden")
+
+        # Verify Geopolitical Dynamics
+        self.assertIn("geopolitical_dynamics", landscape["US"])
+        self.assertIn("US_China_Decoupling", landscape["US"]["geopolitical_dynamics"])
+
+        # Verify Impact Ledger
+        ledger = landscape["US"]["geopolitical_dynamics"]["US_China_Decoupling"]["impact_ledger"]
+        self.assertIn("first_order", ledger)
+        self.assertIn("second_order", ledger)
+        self.assertIn("third_order", ledger)
 
         # Check if developments were scraped
         developments = landscape["US"]["recent_developments"]
@@ -64,7 +79,7 @@ class TestPoliticalLandscapeLoader(unittest.TestCase):
 
         self.assertIn("US", landscape)
         # Should fall back to default data
-        self.assertIn("Ongoing implementation of climate policies.", landscape["US"]["recent_developments"][0])
+        self.assertIn("Executive orders on energy production.", landscape["US"]["recent_developments"][0])
 
 class TestRegulatoryComplianceAgentIntegration(unittest.TestCase):
     @patch('core.agents.regulatory_compliance_agent.GraphDatabase')
