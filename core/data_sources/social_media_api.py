@@ -92,6 +92,9 @@ class SocialMediaAPI:
 
     #... (add similar methods for YouTube, Discord, WeChat, etc.)
 
+    def get_social_media_sentiment(self):
+        return 0.0
+
 class SimulatedSocialMediaAPI(SocialMediaAPI):
     def get_tweets(self, query, count=100, sentiment=None):
         logging.info(f"Fetching SIMULATED tweets. Query: {query}")
@@ -100,3 +103,7 @@ class SimulatedSocialMediaAPI(SocialMediaAPI):
     def get_facebook_posts(self, query, count=100, sentiment=None):
         logging.info(f"Fetching SIMULATED facebook posts. Query: {query}")
         return [{"text": f"Simulated facebook post about {query}", "sentiment": 0.2}]
+
+    def get_social_media_sentiment(self):
+        logging.info("Fetching SIMULATED social media sentiment.")
+        return 0.5

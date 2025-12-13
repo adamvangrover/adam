@@ -24,9 +24,9 @@ class MarketSentimentAgent(AgentBase):
 
         # Initialize sources
         # In a real system, these might be injected or configured
-        self.news_api = SimulatedFinancialNewsAPI()
+        self.news_api = SimulatedFinancialNewsAPI(self.config)
         self.prediction_market_api = SimulatedPredictionMarketAPI()
-        self.social_media_api = SimulatedSocialMediaAPI()
+        self.social_media_api = SimulatedSocialMediaAPI(self.config)
         self.web_traffic_api = SimulatedWebTrafficAPI()
 
     async def execute(self, **kwargs) -> Dict[str, Any]:

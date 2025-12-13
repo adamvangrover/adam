@@ -99,3 +99,6 @@ class HNASPState(BaseModel):
     context_stream: ContextStream
 
     model_config = ConfigDict(populate_by_name=True)
+
+# Alias for backward compatibility
+HNASP = HNASPState
