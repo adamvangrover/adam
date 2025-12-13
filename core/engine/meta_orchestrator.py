@@ -59,7 +59,7 @@ class MetaOrchestrator:
         
         result = None
         if complexity == "DEEP_DIVE":
-            result = await self._run_deep_dive_flow(query)
+            result = await self._run_deep_dive_flow(query, context)
         elif complexity == "RED_TEAM":
             result = await self._run_red_team_flow(query)
         elif complexity == "CRISIS":
@@ -190,12 +190,14 @@ class MetaOrchestrator:
         # v21 is best for simple lookups
         return "LOW"
 
-    async def _run_deep_dive_flow(self, query: str):
+    async def _run_deep_dive_flow(self, query: str, context: Dict[str, Any] = None):
         """
         Primary execution method for Deep Dive.
         Tries the v23 Graph first, falls back to Manual Orchestration.
         """
         logger.info("Engaging v23.5 Deep Dive Protocol...")
+        if context and "system_prompt" in context:
+            logger.info("Deep Dive: System Prompt Context Active")
 
         # Mock Ticker Extraction
         ticker = "AAPL"
