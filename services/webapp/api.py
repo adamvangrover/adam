@@ -9,10 +9,22 @@ import sys
 import os
 import logging
 import json
+import functools
 import asyncio
 from datetime import datetime, timezone
 from .config import config
 from .celery import celery
+
+# ---------------------------------------------------------------------------- #
+# Helpers
+# ---------------------------------------------------------------------------- #
+
+@functools.lru_cache(maxsize=1)
+def _get_allowed_simulations():
+    simulations_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'core', 'simulations')
+    if not os.path.exists(simulations_dir):
+        return []
+    return [os.path.splitext(f)[0] for f in os.listdir(simulations_dir) if f.endswith('.py') and not f.startswith('__')]
 
 # ---------------------------------------------------------------------------- #
 # Initialize Extensions
@@ -361,9 +373,7 @@ def create_app(config_name='default'):
         """
         Returns a list of available simulations.
         """
-        simulations_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'core', 'simulations')
-        simulations = [f.replace('.py', '') for f in os.listdir(simulations_dir) if f.endswith('.py') and not f.startswith('__')]
-        return jsonify(simulations)
+        return jsonify(_get_allowed_simulations())
 
     @app.route('/api/simulations/history', methods=['GET'])
     @jwt_required()
@@ -387,6 +397,11 @@ def create_app(config_name='default'):
         Runs a specific simulation.
         """
         current_user_id = get_jwt_identity()
+
+        # 🛡️ Sentinel: Validate simulation name to prevent arbitrary code execution
+        if simulation_name not in _get_allowed_simulations():
+             return jsonify({'error': 'Invalid simulation name'}), 400
+
         task = run_simulation_task.delay(simulation_name, current_user_id)
         return jsonify({'task_id': task.id})
 

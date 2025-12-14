@@ -12,3 +12,8 @@
 **Vulnerability:** The `/api/state` endpoint exposed the last 50 raw server log entries to unauthenticated users. This could leak sensitive data like API keys, PII, or internal system paths logged at INFO level.
 **Learning:** In-memory log buffers exposed via API are a high-risk pattern. Developers often add them for "easy debugging" in UI, forgetting that logs often contain secrets.
 **Prevention:** Never expose raw server logs via public APIs. Use proper observability tools (ELK, Splunk, CloudWatch) with access controls. If UI needs logs, stream them via authenticated WebSockets and sanitize them.
+
+## 2025-12-14 - Dynamic Import RCE Risk
+**Vulnerability:** The `/api/simulations/<name>` endpoint passed the `name` parameter directly to `importlib.import_module()`, allowing potential Arbitrary Code Execution if a user could invoke a module with side-effects on import.
+**Learning:** Dynamic imports based on user input are dangerous. Relying on "it's just an import" is insufficient security.
+**Prevention:** Whitelist allowed modules using a strict check against the file system or a configuration list before importing.
