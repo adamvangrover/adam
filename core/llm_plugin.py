@@ -10,6 +10,7 @@ import json
 import time
 import hashlib
 
+# --- Graceful Import Fallbacks ---
 try:
     import tiktoken
 except ImportError:
@@ -20,7 +21,6 @@ try:
 except ImportError:
     BaseModel = None
 
-
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -28,6 +28,7 @@ logger = logging.getLogger(__name__)
 # Load environment variables from .env file
 load_dotenv()
 
+# --- Exceptions ---
 class LLMPluginError(Exception):
     """Base class for LLM plugin exceptions."""
     pass
@@ -40,6 +41,7 @@ class LLMAPIError(LLMPluginError):
     """Raised for errors during API calls."""
     pass
 
+# --- Base Interface ---
 class BaseLLM(ABC):
     """Abstract base class for LLM integrations."""
 
@@ -72,6 +74,13 @@ class BaseLLM(ABC):
         """Returns the LLM's context length (token limit)."""
         pass
 
+    # Optional interface for intent detection (can be overridden by specific models)
+    def identify_intent_and_entities(self, query: str) -> Tuple[str, Dict[str, Any], float]:
+        """Optional method for specialized intent detection."""
+        raise NotImplementedError("This model does not support native intent detection.")
+
+
+# --- Implementations ---
 
 class MockLLM(BaseLLM):
     """Mock LLM for testing and development without API costs."""
@@ -84,10 +93,6 @@ class MockLLM(BaseLLM):
     def generate_structured(self, prompt: str, response_schema: Any, tools: Optional[List[Any]] = None, **kwargs) -> Tuple[Any, Dict[str, Any]]:
         """Mock structured generation that attempts to return a dummy instance of the schema."""
         try:
-            # Attempt to instantiate the Pydantic model with dummy data
-            # This is a naive mock; mostly works if all fields are optional or have defaults
-            # For complex schemas, we might need a recursive mock generator
-
             # Simple recursive mock helper
             def mock_instance(model_class):
                 if not hasattr(model_class, "model_fields"):
@@ -102,7 +107,6 @@ class MockLLM(BaseLLM):
                     if origin is Literal:
                          init_data[name] = args[0]
                     elif origin is list or origin is List:
-                         # Create a list with one mocked item of the inner type
                          if args:
                              inner_type = args[0]
                              if hasattr(inner_type, "model_fields"):
@@ -126,7 +130,6 @@ class MockLLM(BaseLLM):
                     elif hasattr(annotation, "model_fields"):
                          init_data[name] = mock_instance(annotation)
                     else:
-                         # Best effort fallback
                          init_data[name] = None
 
                 # Try to create
@@ -144,7 +147,6 @@ class MockLLM(BaseLLM):
 
         except Exception as e:
             logger.warning(f"Mock structured generation failed to instantiate schema: {e}")
-            # Return raw dict if instantiation fails
             return {"mock_error": str(e)}, {"thought_signature": "error_sig"}
 
     def get_token_count(self, text: str) -> int:
@@ -188,7 +190,6 @@ class GeminiLLM(BaseLLM):
             # Handle parameters like thinking_level
             generation_config = {}
             if "thinking_level" in kwargs:
-                # Assuming API accepts this in generation_config or equivalent
                 generation_config["thinking_level"] = kwargs["thinking_level"]
 
             response = model.generate_content(prompt, generation_config=generation_config)
@@ -208,55 +209,37 @@ class GeminiLLM(BaseLLM):
             logger.info(f"Gemini Mock: generating structured {response_schema.__name__} (Thinking: {thinking_level})")
             if thought_signature:
                 logger.info(f"Gemini Mock: Resuming from thought signature: {thought_signature[:10]}...")
-            if tools:
-                logger.info(f"Gemini Mock: Tools provided: {[t.__name__ if hasattr(t, '__name__') else str(t) for t in tools]}")
-
-            # Use the MockLLM logic for schema instantiation
+            
             mock_delegate = MockLLM()
             return mock_delegate.generate_structured(prompt, response_schema, tools=tools)
 
         try:
-            # Real API Implementation (Hypothetical v3 Syntax)
-            # Pass tools to GenerativeModel constructor or generate_content
-            # v1beta: GenerativeModel(tools=...)
-            # We assume tools are converted to FunctionDeclaration or similar
+            # Real API Implementation
             model = self.genai.GenerativeModel(self.model_name, tools=tools)
 
             generation_config = {
                 "response_mime_type": "application/json",
-                "response_schema": response_schema, # Pass Pydantic class directly
+                "response_schema": response_schema, 
                 "thinking_level": thinking_level
             }
 
-            # If we have a thought signature, we might need to pass it in a specific way
-            # E.g., as part of the context or a special parameter.
-            # Hypothetically:
             if thought_signature:
                 generation_config["thought_signature"] = thought_signature
 
             response = model.generate_content(prompt, generation_config=generation_config)
 
-            # Parse result
-            # Assuming SDK returns a parsed object if response_schema is set
-            # Or we have to parse the JSON text.
-            # Let's assume we need to parse text for now to be safe, or use response.parsed
-
+            # Parse result (Hypothetical SDK support)
             try:
-                # Hypothetical: response.parsed is the object
                 result_obj = response.parsed
             except:
-                # Fallback: parse JSON
                 json_data = json.loads(response.text)
                 result_obj = response_schema(**json_data)
 
-            # Extract new thought signature
-            # Hypothetically in response.candidates[0].citation_metadata or similar
-            # or response.thought_signature
             new_signature = getattr(response, "thought_signature", "simulated_new_signature")
 
             metadata = {
                 "thought_signature": new_signature,
-                "usage": response.usage_metadata
+                "usage": response.usage_metadata if hasattr(response, 'usage_metadata') else {}
             }
 
             return result_obj, metadata
@@ -264,11 +247,9 @@ class GeminiLLM(BaseLLM):
         except Exception as e:
             raise LLMAPIError(f"Gemini Structured Generation Error: {e}") from e
 
-
     def get_token_count(self, text: str) -> int:
         if self.genai == "MOCK":
             return len(text.split())
-        # Use API count_tokens
         try:
             model = self.genai.GenerativeModel(self.model_name)
             return model.count_tokens(text).total_tokens
@@ -318,9 +299,7 @@ class OpenAILLM(BaseLLM):
 
     def generate_structured(self, prompt: str, response_schema: Any, tools: Optional[List[Any]] = None, **kwargs) -> Tuple[Any, Dict[str, Any]]:
         """Implementation using OpenAI Structured Outputs (json_object or function calling)."""
-        # Simplified implementation
         try:
-            # Assuming Pydantic schema
             json_schema = response_schema.model_json_schema()
 
             response = self.openai.chat.completions.create(
@@ -334,34 +313,32 @@ class OpenAILLM(BaseLLM):
             )
             content = response.choices[0].message.content
             obj = response_schema.model_validate_json(content)
-            return obj, {"thought_signature": None} # OpenAI doesn't support thought signature
+            return obj, {"thought_signature": None} 
         except Exception as e:
             raise LLMAPIError(f"OpenAI Structured Error: {e}")
 
     def get_token_count(self, text: str) -> int:
         if tiktoken is None:
-            logger.warning("tiktoken not installed. Using whitespace splitting for token counting. Install with 'pip install tiktoken'.")
+            logger.warning("tiktoken not installed. Using whitespace splitting for token counting.")
             return len(text.split())
         try:
             encoding = tiktoken.encoding_for_model(self.model_name)
             return len(encoding.encode(text))
         except KeyError:
-            logger.warning(f"Model {self.model_name} not found, using 'cl100k_base' for token count.")
-            return self.get_token_count_generic(text)  # Fallback
+            logger.warning(f"Model {self.model_name} not found, using 'cl100k_base'.")
+            return self.get_token_count_generic(text)
         except Exception as e:
             logger.exception(f"Error counting tokens: {e}")
             raise
 
     def get_token_count_generic(self, text: str) -> int:
-        """Fallback token counting if model-specific encoding is unavailable."""
         if tiktoken is None:
-            return len(text.split()) #basic fallback.
+            return len(text.split())
         try:
             encoding = tiktoken.get_encoding("cl100k_base")
             return len(encoding.encode(text))
         except Exception as e:
-            logger.exception("Error: Could not perform fallback token count")
-            raise
+            raise LLMAPIError("Error: Could not perform fallback token count") from e
 
     def get_model_name(self) -> str:
         return self.model_name
@@ -372,7 +349,8 @@ class OpenAILLM(BaseLLM):
             "gpt-4": 8192,
             "gpt-4-32k": 32768,
         }
-        return context_lengths.get(self.model_name, 4096)  # Default to 4096
+        return context_lengths.get(self.model_name, 4096)
+
 
 class HuggingFaceLLM(BaseLLM):
     """Integration for Hugging Face models, supports local and API-based inference."""
@@ -386,6 +364,7 @@ class HuggingFaceLLM(BaseLLM):
         self.api_key = api_key
         if self.api_key:
             os.environ["HF_API_TOKEN"] = self.api_key
+
     @property
     def tokenizer(self):
         if self._tokenizer is None:
@@ -393,7 +372,7 @@ class HuggingFaceLLM(BaseLLM):
                 from transformers import AutoTokenizer
                 self._tokenizer = AutoTokenizer.from_pretrained(self.model_name)
             except ImportError:
-                raise LLMConfigurationError("Transformers library not installed. Run 'pip install transformers[torch]' or 'pip install transformers[tf]'.")
+                raise LLMConfigurationError("Transformers library not installed.")
             except Exception as e:
                 raise LLMConfigurationError(f"Could not load tokenizer for {self.model_name}: {e}")
         return self._tokenizer
@@ -407,12 +386,12 @@ class HuggingFaceLLM(BaseLLM):
                     self._model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name)
                 except:
                     self._model = AutoModelForCausalLM.from_pretrained(self.model_name)
-
             except ImportError:
-                raise LLMConfigurationError("Transformers library not installed. Run 'pip install transformers[torch]' or 'pip install transformers[tf]'.")
+                raise LLMConfigurationError("Transformers library not installed.")
             except Exception as e:
                 raise LLMConfigurationError(f"Could not load model for {self.model_name}: {e}")
         return self._model
+
     @property
     def pipeline(self):
         if self._pipeline is None:
@@ -422,6 +401,7 @@ class HuggingFaceLLM(BaseLLM):
             except Exception as e:
                 raise LLMConfigurationError(f"Could not load pipeline {e}")
         return self._pipeline
+
     def generate_text(self, prompt: str, **kwargs) -> str:
         try:
             if self.use_pipeline:
@@ -431,12 +411,11 @@ class HuggingFaceLLM(BaseLLM):
                 inputs = self.tokenizer(prompt, return_tensors="pt") 
                 outputs = self.model.generate(**inputs, **kwargs)
                 return self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-
         except Exception as e:
             logger.exception(f"Hugging Face generation error: {e}")
             raise LLMAPIError(f"Hugging Face Generation Error: {e}") from e
 
-    def generate_structured(self, prompt: str, response_schema: Any, **kwargs) -> Tuple[Any, Dict[str, Any]]:
+    def generate_structured(self, prompt: str, response_schema: Any, tools: Optional[List[Any]] = None, **kwargs) -> Tuple[Any, Dict[str, Any]]:
         raise NotImplementedError("HuggingFace structured generation not yet implemented.")
 
     def get_token_count(self, text: str) -> int:
@@ -448,11 +427,7 @@ class HuggingFaceLLM(BaseLLM):
     def get_context_length(self) -> int:
         if hasattr(self.tokenizer, "model_max_length"):
             return self.tokenizer.model_max_length
-        context_lengths = {
-            "google/flan-t5-base": 512,
-            "bigscience/bloom": 1024,
-        }
-        return context_lengths.get(self.model_name, 512)
+        return 512
 
 
 class CohereLLM(BaseLLM):
@@ -484,7 +459,7 @@ class CohereLLM(BaseLLM):
             logger.exception(f"Cohere API error: {e}")
             raise LLMAPIError(f"Cohere API Error: {e}") from e
 
-    def generate_structured(self, prompt: str, response_schema: Any, **kwargs) -> Tuple[Any, Dict[str, Any]]:
+    def generate_structured(self, prompt: str, response_schema: Any, tools: Optional[List[Any]] = None, **kwargs) -> Tuple[Any, Dict[str, Any]]:
         raise NotImplementedError("Cohere structured generation not yet implemented.")
 
     def get_token_count(self, text: str) -> int:
@@ -498,12 +473,10 @@ class CohereLLM(BaseLLM):
         return self.model_name
 
     def get_context_length(self) -> int:
-        context_lengths = {
-            "command": 4096,
-            "command-light":4096,
-            "command-xlarge-nightly": 4096
-        }
-        return context_lengths.get(self.model_name, 4096)
+        return 4096
+
+
+# --- Utilities ---
 
 class PromptTemplate:
     """Handles dynamic prompt generation."""
@@ -532,11 +505,8 @@ class CacheManager:
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
-
     def get_cache_key(self, prompt: str, model_name: str) -> str:
-        """
-        Generates a unique cache key based on the prompt and model name.
-        """
+        """Generates a unique cache key based on the prompt and model name."""
         prompt_hash = hashlib.sha256(prompt.encode()).hexdigest()
         return f"{model_name}_{prompt_hash}.json"
 
@@ -575,8 +545,11 @@ class CacheManager:
             logger.exception(f"Could not write to cache {e}")
             raise
 
+
+# --- Main Plugin Class ---
+
 class LLMPlugin:
-    """Manages LLM interactions with caching and configuration."""
+    """Manages LLM interactions with caching, configuration, SLM routing, and intent detection."""
 
     def __init__(self, config_path: str = "config/llm_plugin.yaml", use_cache: bool = True, config: Optional[Dict[str, Any]] = None):
         """
@@ -605,9 +578,8 @@ class LLMPlugin:
         try:
             model_name = self.config.get("slm_model_name", "microsoft/phi-2")
             if slm_provider == "huggingface":
-                # Ensure we use pipeline or appropriate method
                 return HuggingFaceLLM(model_name=model_name, use_pipeline=True)
-            # Add other providers if needed
+            # Future SLM providers can be added here
         except Exception as e:
             logger.warning(f"Failed to initialize SLM: {e}")
         return None
@@ -619,8 +591,6 @@ class LLMPlugin:
                 return yaml.safe_load(f)
         except FileNotFoundError:
             logger.error(f"LLM configuration file not found: {config_path}")
-            # Fallback to a default configuration or raise specific error
-            # For now, returning a default that might allow basic (e.g. HuggingFace local) to work
             logger.warning("Returning default LLM config as llm_plugin.yaml was not found.")
             return {"provider": "huggingface", "huggingface_model_name": "google/flan-t5-base", "huggingface_use_pipeline": True}
         except yaml.YAMLError as e:
@@ -636,10 +606,9 @@ class LLMPlugin:
             "gemini": GeminiLLM,
             "mock": lambda **kwargs: MockLLM(**kwargs)
         }
-        provider = self.config.get("provider", "huggingface").lower() # Default to huggingface if no provider
+        provider = self.config.get("provider", "huggingface").lower()
 
         if provider not in provider_map:
-             # Basic support for unknown provider for testing
              if provider == "mock":
                  return MockLLM()
              raise ValueError(f"Unsupported LLM provider: {provider}")
@@ -647,25 +616,23 @@ class LLMPlugin:
         api_key_env_var = f"{provider.upper()}_API_KEY"
         api_key = os.getenv(api_key_env_var)
         
-        # For HuggingFace and Mock, API key is optional. For others, it's typically required.
+        # Validation for keys
         if not api_key and provider not in ["huggingface", "mock", "gemini"]:
-            # Note: Gemini also allows optional key if we are mocking inside it, but let's enforce if we want real
-            # For now, we allow Gemini without key if it falls back to mock internally, but cleaner to check.
-            # But my GeminiLLM mock logic is internal.
-            pass
-            # raise LLMConfigurationError(f"API key for {provider} ({api_key_env_var}) not found in environment variables.")
+            # Gemini allows "MOCK" behavior internally without key, others might fail
+             raise LLMConfigurationError(f"API key for {provider} ({api_key_env_var}) not found in environment variables.")
 
-        # Get model name from config, or use default from the LLM class if not specified
+        # Get model name defaults
         default_model_name = "default-model"
         if provider == "huggingface":
             default_model_name = "google/flan-t5-base"
-        elif provider in ["openai", "cohere"]:
-            # Use safe strings for defaults to avoid premature instantiation
-            default_model_name = "gpt-3.5-turbo" if provider == "openai" else "command"
-        elif provider == "mock":
-            default_model_name = "mock-model"
+        elif provider == "openai":
+            default_model_name = "gpt-3.5-turbo"
+        elif provider == "cohere":
+            default_model_name = "command"
         elif provider == "gemini":
             default_model_name = "gemini-3-pro"
+        elif provider == "mock":
+            default_model_name = "mock-model"
 
         model_name = self.config.get(f"{provider}_model_name", default_model_name)
 
@@ -675,6 +642,7 @@ class LLMPlugin:
         elif provider == "mock":
             return MockLLM(model_name=model_name)
         elif provider == "gemini":
+             # Pass "mock_key" if not present so init doesn't fail before mock logic triggers
             return GeminiLLM(api_key=api_key or "mock_key", model_name=model_name)
         else:
             return provider_map[provider](api_key=api_key, model_name=model_name)
@@ -682,7 +650,7 @@ class LLMPlugin:
     def generate_text(self, prompt: str, task: str = "default", **kwargs) -> str:
         """Generates text using the configured LLM with caching and task-specific prompting."""
 
-        # Router Logic for SLM
+        # Router Logic for SLM (Graceful expansion)
         model = self.llm
         if self.slm and task in ["financial_extraction", "summarization"]:
             model = self.slm
@@ -721,35 +689,99 @@ class LLMPlugin:
     def get_model_name(self) -> str:
         """Returns the current LLM model name."""
         return self.llm.get_model_name()
+    
+    def get_context_length(self) -> int:
+        """Returns the context length of the current LLM model."""
+        return self.llm.get_context_length()
 
     def identify_intent_and_entities(self, query: str) -> Tuple[str, Dict[str, Any], float]:
         """Identifies the intent and entities in a user query using the configured LLM."""
         if self.llm:
-            # Check if the specific LLM instance implements this method
+            # Check if the specific LLM instance implements this method natively
             if hasattr(self.llm, 'identify_intent_and_entities') and callable(getattr(self.llm, 'identify_intent_and_entities')):
-                return self.llm.identify_intent_and_entities(query)
-            else:
-                # Fallback or generic implementation if the specific LLM class doesn't have it
-                logger.warning(f"The current LLM '{self.get_model_name()}' does not have a specific 'identify_intent_and_entities' method. Using fallback.")
-                # Basic fallback: try to format a prompt and parse. This is highly dependent on LLM capability.
-                prompt = f"Identify the intent and entities in the following query: \"{query}\". Respond in JSON format with keys 'intent', 'entities' (dictionary), and 'confidence' (float)."
-                response_text = self.generate_text(prompt, task="default") # Using default task for direct prompting
                 try:
-                    response_json = json.loads(response_text)
-                    intent = response_json.get("intent", "unknown")
-                    entities = response_json.get("entities", {})
-                    confidence = float(response_json.get("confidence", 0.0))
-                    return intent, entities, confidence
-                except json.JSONDecodeError:
-                    logger.error(f"Fallback intent/entity identification failed: Invalid JSON response: {response_text}")
-                    return "unknown", {}, 0.0
-                except Exception as e:
-                    logger.error(f"Fallback intent/entity identification failed: {e}")
-                    return "unknown", {}, 0.0
+                    return self.llm.identify_intent_and_entities(query)
+                except NotImplementedError:
+                    pass # Fall through to fallback
+
+            # Graceful Fallback: prompt engineering
+            logger.info(f"Using generic fallback for intent identification with '{self.get_model_name()}'.")
+            prompt = (
+                f"Identify the intent and entities in the following query: \"{query}\". "
+                f"Respond in JSON format with keys 'intent', 'entities' (dictionary), and 'confidence' (float)."
+            )
+            # Use default task for direct prompting to avoid recursion loop
+            response_text = self.generate_text(prompt, task="default") 
+            try:
+                # Attempt to parse JSON from text (handles markdown code blocks if LLM adds them)
+                clean_text = response_text.replace("```json", "").replace("```", "").strip()
+                response_json = json.loads(clean_text)
+                
+                intent = response_json.get("intent", "unknown")
+                entities = response_json.get("entities", {})
+                confidence = float(response_json.get("confidence", 0.0))
+                return intent, entities, confidence
+            except json.JSONDecodeError:
+                logger.error(f"Fallback intent/entity identification failed: Invalid JSON response: {response_text}")
+                return "unknown", {}, 0.0
+            except Exception as e:
+                logger.error(f"Fallback intent/entity identification failed: {e}")
+                return "unknown", {}, 0.0
         else:
             logger.error("LLM not initialized.")
             return "unknown", {}, 0.0
 
-    def get_context_length(self) -> int:
-        """Returns the context length of the current LLM model."""
-        return self.llm.get_context_length()
+# --- Test / Execution Block ---
+if __name__ == "__main__":
+    try:
+        # Test 1: HuggingFace via file config (simulated)
+        dummy_config_content = {
+            "provider": "huggingface", 
+            "huggingface_model_name": "google/flan-t5-base",
+            "huggingface_use_pipeline": True
+        }
+        # Ensure config directory exists
+        if not os.path.exists("config"):
+            os.makedirs("config")
+        with open("config/llm_plugin.yaml", "w") as f:
+            yaml.dump(dummy_config_content, f)
+        
+        print("--- Testing HuggingFace (Simulated Config File) ---")
+        plugin = LLMPlugin(config_path="config/llm_plugin.yaml")
+
+        prompt = "What is the capital of France?"
+        generated_text = plugin.generate_text(prompt, max_length=50) # HuggingFace uses max_length
+        print(f"Generated text for '{prompt}': {generated_text}")
+
+        summarization_prompt = "Artificial intelligence is transforming many industries. Large language models are a key component of this transformation."
+        summary = plugin.generate_text(summarization_prompt, task="summarization", max_length=50)
+        print(f"Summary: {summary}")
+        
+        token_count = plugin.get_token_count(prompt)
+        print(f"Token count for '{prompt}': {token_count}")
+        print(f"Context Length: {plugin.get_context_length()}")
+
+        # Test 2: Mock Provider via Direct Config Injection
+        print("\n--- Testing Mock Provider (Direct Config) ---")
+        mock_config = {
+            "provider": "mock",
+            "mock_model_name": "test-mock-v1"
+        }
+        mock_plugin = LLMPlugin(config=mock_config, use_cache=False)
+        print(f"Model Name: {mock_plugin.get_model_name()}")
+        print(f"Mock Response: {mock_plugin.generate_text('Hello mock world')}")
+        
+        # Test 3: Intent Identification Fallback
+        print("\n--- Testing Intent Identification Fallback ---")
+        # Note: MockLLM text generation will likely fail the JSON parse, 
+        # checking graceful handling of the JSON error.
+        intent, entities, conf = mock_plugin.identify_intent_and_entities("Book a flight to NY")
+        print(f"Intent (Mock/Fallback): {intent}, Entities: {entities}, Conf: {conf}")
+
+    except LLMPluginError as e:
+        print(f"LLM Plugin Error: {e}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+    finally:
+        if os.path.exists("config/llm_plugin.yaml"):
+            os.remove("config/llm_plugin.yaml")
