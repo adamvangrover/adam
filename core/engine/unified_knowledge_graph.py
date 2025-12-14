@@ -27,15 +27,26 @@ from typing import List, Dict, Any, Optional
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Shared instance for Singleton pattern
+_SHARED_GRAPH_INSTANCE = None
+
 class UnifiedKnowledgeGraph:
     def __init__(self):
         """
         Initializes the in-memory Knowledge Graph.
+        Uses a Singleton pattern to avoid re-parsing the seed file on every instantiation.
         """
-        self.graph = nx.DiGraph()
-        self._ingest_fibo_ontology()
-        self._ingest_provenance_data()
-        self._ingest_seed_data()
+        global _SHARED_GRAPH_INSTANCE
+        if _SHARED_GRAPH_INSTANCE is None:
+            logger.info("Initializing Shared Knowledge Graph...")
+            self.graph = nx.DiGraph()
+            self._ingest_fibo_ontology()
+            self._ingest_provenance_data()
+            self._ingest_seed_data()
+            _SHARED_GRAPH_INSTANCE = self.graph
+        else:
+            # Reuse the shared graph instance
+            self.graph = _SHARED_GRAPH_INSTANCE
         
     def _ingest_fibo_ontology(self):
         """

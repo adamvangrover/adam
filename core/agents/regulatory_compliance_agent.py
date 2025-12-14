@@ -9,6 +9,9 @@ import requests  # API interaction
 from bs4 import BeautifulSoup  # Web scraping
 from neo4j import GraphDatabase  # Knowledge graph interaction
 
+from core.llm_plugin import LLMPlugin
+from core.data_sources.political_landscape import PoliticalLandscapeLoader
+
 # ... (import other relevant libraries, e.g., for ML, time-series analysis, sentiment analysis)
 
 class RegulatoryComplianceAgent:
@@ -46,6 +49,7 @@ class RegulatoryComplianceAgent:
         self.regulatory_knowledge = self._load_regulatory_knowledge()
         self.nlp_toolkit = self._initialize_nlp_toolkit()
         self.political_landscape = self._load_political_landscape()
+        self.llm = LLMPlugin(config=self.config.get("llm_config"))
 
     def _load_regulatory_knowledge(self) -> Dict:
         """
@@ -129,19 +133,26 @@ class RegulatoryComplianceAgent:
             A dictionary containing information on political leaders,
             party affiliations, key policies, and recent developments.
         """
-        # TODO: Implement data loading from political news sources,
-        # government websites, and legislative databases
-        # Placeholder political landscape (replace with actual data)
-        landscape = {
-            "US": {
-                "president": "Joe Biden",
-                "party": "Democrat",
-                "key_policies": ["Financial regulation", "Climate change"],
-                "recent_developments": ["New infrastructure bill passed"]
+        try:
+            loader = PoliticalLandscapeLoader()
+            landscape = loader.load_landscape()
+            return landscape
+        except Exception as e:
+            print(f"Error loading political landscape: {e}")
+            # Return a minimal valid structure to prevent crashes
+            return {
+                "US": {
+                    "president": "Donald Trump",
+                    "party": "Republican",
+                    "key_policies": ["Unknown"],
+                    "recent_developments": ["Data unavailable"],
+                    "context_layering": {
+                        "historical_context": {"president": "Joe Biden"},
+                        "policy_shifts": {}
+                    },
+                    "geopolitical_dynamics": {}
+                }
             }
-            # ... add data for other countries
-        }
-        return landscape
 
     def _analyze_transaction(self, transaction: Dict) -> Dict:
         """
@@ -162,7 +173,7 @@ class RegulatoryComplianceAgent:
         # ... (Implementation for NLP-based analysis)
 
         # 3. Apply Rule-based analysis
-        violated_rules =
+        violated_rules = []
         if transaction['amount'] > 10000:
             violated_rules.append("Transaction amount exceeds threshold")
         # ... (Add more rules based on regulatory knowledge)
@@ -208,7 +219,7 @@ class RegulatoryComplianceAgent:
             A list of tuples, where each tuple contains the source,
             title, and summary of a regulatory update.
         """
-        updates =
+        updates = []
 
         # 1. Scrape regulatory websites
         # Example: Scraping FINRA website for KYC updates
@@ -276,11 +287,23 @@ class RegulatoryComplianceAgent:
         Returns:
             A string containing the guidance.
         """
-        # TODO: Implement guidance generation based on regulatory knowledge,
-        # political landscape, and best practices
-        # Placeholder guidance (replace with actual logic)
-        guidance = "Please consult with a compliance expert for further assistance."
-        return guidance
+        prompt = (
+            "You are a Regulatory Compliance Expert. Provide guidance on the following compliance matter.\n\n"
+            f"User Question: {user_question}\n\n"
+            "Context (Regulatory Knowledge):\n"
+            f"{self.regulatory_knowledge}\n\n"
+            "Context (Political Landscape):\n"
+            f"{self.political_landscape}\n\n"
+            "Guidance:"
+        )
+
+        try:
+            guidance = self.llm.generate_text(prompt, task="regulatory_guidance")
+            return guidance
+        except Exception as e:
+            # Fallback if LLM fails
+            print(f"LLM generation failed: {e}")
+            return "Please consult with a compliance expert for further assistance."
 
     async def run(self, transactions: List[Dict]):
         """

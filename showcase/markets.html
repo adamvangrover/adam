@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markets | ADAM v23.5</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/terminal_core.css">
+</head>
+<body>
+    <main style="padding: 2rem; max-width: 1200px; margin: 0 auto;">
+        <div class="panel">
+            <h2 class="mono">MARKET INTELLIGENCE</h2>
+            <hr style="border: 0; border-top: 1px solid #333; margin: 1rem 0;">
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                <!-- Indices will be injected here -->
+                <div id="indices-container" style="display: contents;">Loading Market Data...</div>
+            </div>
+
+            <h3 class="mono" style="margin-top: 2rem;">WATCHLIST & CONVICTION</h3>
+            <div style="margin-top: 1rem; overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid #333; color: var(--text-muted); font-size: 0.8rem;">
+                            <th style="padding: 10px;">TICKER</th>
+                            <th style="padding: 10px;">RATING</th>
+                            <th style="padding: 10px;">TARGET</th>
+                            <th style="padding: 10px;">SENTIMENT</th>
+                        </tr>
+                    </thead>
+                    <tbody id="watchlist-body" class="mono">
+                        <!-- Watchlist rows injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initLayout } from './js/layout_manager.js';
+        import { DataLoader } from './js/data_loader.js';
+
+        initLayout();
+
+        async function loadMarkets() {
+            const data = await DataLoader.getMarketSnapshot();
+            
+            if (data) {
+                // Indices
+                const indicesContainer = document.getElementById('indices-container');
+                indicesContainer.innerHTML = data.indices.map(idx => `
+                    <div style="background: #1a1a1a; padding: 1rem; border-radius: 4px;">
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">${idx.ticker}</div>
+                        <div class="mono" style="font-size: 1.2rem; font-weight: 700; margin: 5px 0;">${idx.price.toLocaleString()}</div>
+                        <div class="mono" style="font-size: 0.9rem; color: ${idx.change >= 0 ? 'var(--signal-green)' : 'var(--signal-red)'}">
+                            ${idx.change > 0 ? '+' : ''}${idx.change} (${idx.pct_change}%)
+                        </div>
+                    </div>
+                `).join('');
+
+                // Watchlist
+                const watchlistBody = document.getElementById('watchlist-body');
+                watchlistBody.innerHTML = data.watchlist.map(item => `
+                    <tr style="border-bottom: 1px solid #222;">
+                        <td style="padding: 10px; font-weight: 700; color: var(--accent-blue);">${item.ticker}</td>
+                        <td style="padding: 10px;">${item.rating}</td>
+                        <td style="padding: 10px;">$${item.target.toFixed(2)}</td>
+                        <td style="padding: 10px; color: ${getSentimentColor(item.sentiment)}">${item.sentiment}</td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        function getSentimentColor(sentiment) {
+            if (sentiment === 'BULLISH') return 'var(--signal-green)';
+            if (sentiment === 'BEARISH') return 'var(--signal-red)';
+            return 'var(--accent-gold)';
+        }
+
+        loadMarkets();
+    </script>
+
+    <!-- Adam Global Nav -->
+    <script src="../showcase/js/nav.js" data-root=".."></script>
+</body>
+</html>

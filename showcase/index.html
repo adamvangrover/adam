@@ -3,269 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM System | Mission Control</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>ADAM v23.5 :: ARCHIVE</title>
     <link rel="stylesheet" href="css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #00f3ff;
+            --accent-color: #0aff60;
+            --bg-color: #050b14;
+            --panel-bg: rgba(5, 11, 20, 0.8);
+            --text-primary: #e0e0e0;
+            --text-muted: #888;
+            --panel-border: #333;
+        }
+        body { margin: 0; background: var(--bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Header Styling */
+        .cyber-header {
+            height: 60px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; border-bottom: 1px solid var(--primary-color);
+            background: rgba(5, 11, 20, 0.95); position: sticky; top: 0; z-index: 100;
+        }
+        
+        /* Effects */
+        .scan-line { position: fixed; top: 0; left: 0; width: 100%; height: 2px; background: rgba(0, 243, 255, 0.1); animation: scan 3s linear infinite; pointer-events: none; z-index: 999; }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+
+        a { text-decoration: none; color: inherit; transition: color 0.2s; }
+        a:hover { color: var(--primary-color); }
+
+        /* Components */
+        .mode-badge { padding: 4px 8px; border: 1px solid #ffa500; color: #ffa500; font-size: 0.75rem; border-radius: 4px; font-weight: bold; white-space: nowrap; }
+        
+        .cyber-btn {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            padding: 6px 12px;
+            border: 1px solid #444;
+            color: var(--text-primary);
+            background: rgba(0,0,0,0.3);
+            border-radius: 2px;
+            text-transform: uppercase;
+        }
+        .cyber-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--panel-border);
+            backdrop-filter: blur(5px);
+        }
+    </style>
 </head>
-<body class="h-screen flex flex-col grid-bg overflow-hidden">
+<body>
     <div class="scan-line"></div>
-    <div class="scan-glow"></div>
 
-    <!-- Main Content -->
-    <main class="flex-1 p-6 grid grid-cols-12 gap-6 overflow-y-auto custom-scrollbar">
+    <header class="cyber-header">
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <h1 class="mono" style="margin: 0; font-size: 1.5rem; color: var(--primary-color); letter-spacing: 2px;">ADAM v23.5</h1>
+            <div class="mono" style="font-size: 0.8rem; color: #666; border-left: 1px solid #333; padding-left: 10px;">UNIFIED FINANCIAL OS</div>
+        </div>
 
-        <!-- Welcome Banner -->
-        <div class="col-span-12 cyber-card p-6 rounded-lg border-l-4 border-cyan-500 relative overflow-hidden group">
-            <div class="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-cyan-500/10 to-transparent pointer-events-none"></div>
-            <h2 class="text-3xl font-bold text-white mb-2 font-mono tracking-tight glitch-text" data-text="WELCOME BACK, OPERATOR.">WELCOME BACK, OPERATOR.</h2>
-            <p class="text-slate-400 max-w-2xl text-sm leading-relaxed relative z-10">
-                The <span class="text-cyan-400 font-bold">Adam v23.5 Adaptive System</span> is online.
-                <br>Neuro-Symbolic Core: <span class="text-emerald-400">ACTIVE</span> |
-                Message Bus: <span class="text-emerald-400">CONNECTED</span> |
-                Latency: <span class="text-cyan-400">12ms</span>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <nav style="display: flex; gap: 10px;">
+                <a href="../index.html" class="cyber-btn">&uarr; UP LEVEL</a>
+                <a href="/" class="cyber-btn">LIVE OPERATIONS</a>
+                <a href="analyst_os.html" class="cyber-btn" style="border-color: var(--accent-color); color: var(--accent-color);">LAUNCH ANALYST OS</a>
+                <a href="https://github.com/adamvangrover/adam" class="cyber-btn" target="_blank">GITHUB</a>
+            </nav>
+            <div class="mode-badge">ARCHIVE MODE</div>
+        </div>
+    </header>
+
+    <div style="display: flex; min-height: calc(100vh - 60px);">
+        <aside class="glass-panel" style="width: 260px; border-right: 1px solid var(--panel-border); padding: 20px; font-size: 0.9rem; flex-shrink: 0;">
+            <h3 class="mono" style="margin-top: 0; font-size: 0.8rem; color: var(--primary-color); border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 15px;">
+                /// DIRECTORY INDEX
+            </h3>
+            <ul style="list-style: none; padding: 0; margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">
+                <li style="margin-bottom: 8px;"><span style="margin-right:8px;">🖥️</span> <a href="analyst_os.html" style="color: var(--accent-color); font-weight: bold;">analyst_os.html</a></li>
+                <li style="margin-bottom: 8px;"><span style="margin-right:8px; opacity:0.7;">📂</span> <a href="apps/" style="color: var(--primary-color);">apps/</a></li>
+                <li style="margin-bottom: 8px;"><span style="margin-right:8px; opacity:0.7;">📂</span> <a href="css/index.html" style="color: var(--primary-color);">css/</a></li>
+                <li style="margin-bottom: 8px;"><span style="margin-right:8px; opacity:0.7;">📂</span> <a href="data/index.html" style="color: var(--primary-color);">data/</a></li>
+                <li style="margin-bottom: 8px;"><span style="margin-right:8px; opacity:0.7;">📂</span> <a href="js/index.html" style="color: var(--primary-color);">js/</a></li>
+                <li style="margin-bottom: 6px; padding-top:10px; border-top: 1px dashed #333;"><span style="margin-right:8px; opacity:0.5;">📄</span> <a href="agents.html" style="color: var(--text-muted);">agents.html</a></li>
+                <li style="margin-bottom: 6px;"><span style="margin-right:8px; opacity:0.5;">📄</span> <a href="graph.html" style="color: var(--text-muted);">graph.html</a></li>
+                <li style="margin-bottom: 6px;"><span style="margin-right:8px; opacity:0.5;">📄</span> <a href="reports.html" style="color: var(--text-muted);">reports.html</a></li>
+                <li style="margin-bottom: 6px;"><span style="margin-right:8px; opacity:0.5;">📄</span> <a href="research.html" style="color: var(--text-muted);">research.html</a></li>
+                <li style="margin-bottom: 6px;"><span style="margin-right:8px; opacity:0.5;">📄</span> <a href="trading.html" style="color: var(--text-muted);">trading.html</a></li>
+            </ul>
+        </aside>
+
+        <main style="flex-grow: 1; padding: 40px;">
+            <h2 class="mono" style="color: var(--primary-color); border-bottom: 1px solid #333; padding-bottom: 10px;">SYSTEM ARCHIVE</h2>
+            <p style="color: #ccc; max-width: 800px; line-height: 1.6; margin-bottom: 30px;">
+                Welcome to the Adam v23.5 Static Archive. This repository contains historical artifacts, agent logs, and system snapshots.
+                For real-time analysis and active agent operations, switch to <strong>LIVE MODE</strong> or launch the new Analyst OS below.
             </p>
-        </div>
 
-        <!-- System Status (Left Column) -->
-        <div class="col-span-12 lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6 h-min">
-
-            <!-- Real-time Metrics -->
-            <div class="cyber-card p-5 rounded relative">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xs font-bold text-cyan-400 uppercase tracking-widest flex items-center gap-2">
-                        <i class="fas fa-microchip"></i> System Load
-                    </h3>
-                    <span class="cyber-badge badge-green">OPTIMAL</span>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <!-- CPU Gauge -->
-                    <div class="text-center">
-                        <div class="relative w-24 h-24 mx-auto mb-2">
-                            <svg class="w-full h-full transform -rotate-90">
-                                <circle cx="48" cy="48" r="40" stroke="rgba(255,255,255,0.1)" stroke-width="8" fill="transparent"></circle>
-                                <circle id="cpu-ring" cx="48" cy="48" r="40" stroke="#06b6d4" stroke-width="8" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="251.2" class="transition-all duration-1000 ease-out"></circle>
-                            </svg>
-                            <div class="absolute inset-0 flex items-center justify-center flex-col">
-                                <span class="text-xl font-bold text-white mono" id="cpu-val">0%</span>
-                                <span class="text-[10px] text-slate-500 uppercase">CPU</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- RAM Gauge -->
-                    <div class="text-center">
-                        <div class="relative w-24 h-24 mx-auto mb-2">
-                            <svg class="w-full h-full transform -rotate-90">
-                                <circle cx="48" cy="48" r="40" stroke="rgba(255,255,255,0.1)" stroke-width="8" fill="transparent"></circle>
-                                <circle id="mem-ring" cx="48" cy="48" r="40" stroke="#8b5cf6" stroke-width="8" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="251.2" class="transition-all duration-1000 ease-out"></circle>
-                            </svg>
-                            <div class="absolute inset-0 flex items-center justify-center flex-col">
-                                <span class="text-xl font-bold text-white mono" id="mem-val">0%</span>
-                                <span class="text-[10px] text-slate-500 uppercase">MEM</span>
-                            </div>
-                        </div>
-                    </div>
+            <div class="glass-panel" style="border-radius: 4px; padding: 25px; border: 1px solid var(--accent-color); background: rgba(10, 255, 96, 0.02); margin-bottom: 40px;">
+                <h3 style="margin-top:0; color: var(--accent-color); font-family: 'JetBrains Mono';">NEW: ADAM Analyst OS</h3>
+                <p style="font-size: 0.9rem;">A Client-Side, Privacy-First Financial Workbench ("The Bloomberg Killer Lite").</p>
+                <div style="margin-top: 15px;">
+                    <a href="analyst_os.html" class="cyber-btn" style="background: rgba(10,255,96,0.1); border-color: var(--accent-color); color: var(--accent-color);">LAUNCH DESKTOP &rarr;</a>
                 </div>
             </div>
 
-            <!-- Active Task Monitor -->
-            <div class="cyber-card p-5 rounded flex flex-col justify-between">
-                <div class="flex justify-between items-center mb-2">
-                    <h3 class="text-xs font-bold text-purple-400 uppercase tracking-widest flex items-center gap-2">
-                        <i class="fas fa-tasks"></i> Agent Activity
-                    </h3>
-                    <span class="text-xs text-slate-500 font-mono">Queue: <span class="text-white">Empty</span></span>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
+                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
+                    <h3 class="mono" style="margin-top: 0; font-size: 1rem;">LATEST REPORT</h3>
+                    <p style="font-size: 0.8rem; color: #888;">NVDA_Deep_Dive_v23.json</p>
+                    <a href="reports.html" style="color: var(--primary-color); font-size: 0.8rem;">VIEW ARTIFACT &rarr;</a>
                 </div>
-                <div class="flex-1 flex items-center justify-center gap-4">
-                    <div class="text-center">
-                        <div class="text-4xl font-bold text-white mono mb-1" id="agent-count">0</div>
-                        <div class="text-xs text-slate-400 uppercase">Active Agents</div>
-                    </div>
-                    <div class="h-10 w-px bg-slate-700"></div>
-                    <div class="text-center">
-                        <div class="text-4xl font-bold text-white mono mb-1" id="ops-count">0</div>
-                        <div class="text-xs text-slate-400 uppercase">Ops / Sec</div>
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
-                        <div class="bg-purple-500 h-full w-1/3 animate-pulse"></div>
-                    </div>
+                
+                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
+                    <h3 class="mono" style="margin-top: 0; font-size: 1rem;">ACTIVE NODES</h3>
+                    <p style="font-size: 0.8rem; color: #888;">Knowledge Graph: 12,405 Entities</p>
+                    <a href="graph.html" style="color: var(--primary-color); font-size: 0.8rem;">EXPLORE MAP &rarr;</a>
                 </div>
             </div>
+        </main>
+    </div>
 
-            <!-- Module Quick Access -->
-            <div class="col-span-2 cyber-card p-6 rounded">
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                    <i class="fas fa-cubes"></i> Core Modules
-                </h3>
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-                    <a href="reports.html" class="p-4 bg-slate-800/50 hover:bg-slate-700 border border-slate-700 hover:border-blue-500 rounded transition group text-center">
-                        <i class="fas fa-file-contract text-2xl text-blue-500 mb-2 group-hover:scale-110 transition-transform"></i>
-                        <div class="text-xs font-bold text-slate-300 group-hover:text-white">Reporting Engine</div>
-                    </a>
-                    <a href="agents.html" class="p-4 bg-slate-800/50 hover:bg-slate-700 border border-slate-700 hover:border-purple-500 rounded transition group text-center">
-                        <i class="fas fa-users-cog text-2xl text-purple-500 mb-2 group-hover:scale-110 transition-transform"></i>
-                        <div class="text-xs font-bold text-slate-300 group-hover:text-white">Agent Swarm</div>
-                    </a>
-                    <a href="neural_dashboard.html" class="p-4 bg-slate-800/50 hover:bg-slate-700 border border-slate-700 hover:border-cyan-500 rounded transition group text-center">
-                        <i class="fas fa-network-wired text-2xl text-cyan-500 mb-2 group-hover:scale-110 transition-transform"></i>
-                        <div class="text-xs font-bold text-slate-300 group-hover:text-white">Neural Graph</div>
-                    </a>
-                    <a href="data.html" class="p-4 bg-slate-800/50 hover:bg-slate-700 border border-slate-700 hover:border-amber-500 rounded transition group text-center">
-                        <i class="fas fa-database text-2xl text-amber-500 mb-2 group-hover:scale-110 transition-transform"></i>
-                        <div class="text-xs font-bold text-slate-300 group-hover:text-white">Data Vault</div>
-                    </a>
-                    <a href="deployment.html" class="p-4 bg-slate-800/50 hover:bg-slate-700 border border-slate-700 hover:border-teal-500 rounded transition group text-center">
-                        <i class="fas fa-rocket text-2xl text-teal-500 mb-2 group-hover:scale-110 transition-transform"></i>
-                        <div class="text-xs font-bold text-slate-300 group-hover:text-white">App Deploy</div>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Terminal / Logs (Right Column) -->
-        <div class="col-span-12 lg:col-span-4 flex flex-col gap-6 h-full">
-            <div class="cyber-card p-0 rounded flex flex-col h-full overflow-hidden border-t-2 border-emerald-500">
-                <div class="p-3 bg-slate-900/80 border-b border-slate-700 flex justify-between items-center">
-                    <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-widest"><i class="fas fa-terminal mr-2"></i>System Log</h3>
-                    <div class="flex gap-2">
-                        <div class="w-2 h-2 rounded-full bg-red-500"></div>
-                        <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
-                        <div class="w-2 h-2 rounded-full bg-green-500"></div>
-                    </div>
-                </div>
-                <div id="logs" class="flex-1 p-4 font-mono text-[10px] md:text-xs overflow-y-auto space-y-2 bg-[#050b14] text-slate-300 custom-scrollbar">
-                    <div class="text-slate-500">Initializing Adam v23.5 Kernel...</div>
-                    <div class="text-emerald-500">>> SYSTEM READY.</div>
-                </div>
-                <div class="p-2 bg-slate-900 border-t border-slate-700">
-                    <div class="flex items-center text-xs font-mono text-cyan-500">
-                        <span class="mr-2">user@adam:~$</span>
-                        <span class="typing-effect w-1 h-4 bg-cyan-500 inline-block align-middle ml-1 animate-pulse"></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <script src="js/mock_data.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/nav.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const logs = document.getElementById('logs');
-            const cpuRing = document.getElementById('cpu-ring');
-            const memRing = document.getElementById('mem-ring');
-
-            // Log Helper
-            const logMsg = (msg, type='INFO') => {
-                const div = document.createElement('div');
-                div.className = "fade-in";
-                const time = new Date().toLocaleTimeString('en-US', {hour12: false});
-
-                let color = 'text-cyan-400';
-                let icon = '>';
-                if(type === 'WARN') { color = 'text-amber-400'; icon = '!'; }
-                if(type === 'ERROR') { color = 'text-red-400'; icon = 'x'; }
-                if(type === 'SUCCESS') { color = 'text-emerald-400'; icon = '✓'; }
-
-                div.innerHTML = `<span class="text-slate-600 mr-2">[${time}]</span> <span class="${color} font-bold mr-1">${icon}</span> <span class="text-slate-300">${msg}</span>`;
-                logs.appendChild(div);
-                logs.scrollTop = logs.scrollHeight;
-
-                // Keep log size manageable
-                if (logs.children.length > 50) logs.removeChild(logs.firstChild);
-            };
-
-            await window.dataManager.init();
-
-            if (window.dataManager.useApi) {
-                logMsg("Connected to Live Backend API.", "SUCCESS");
-            } else {
-                logMsg("Backend offline. Loaded static mock dataset.", "WARN");
-            }
-
-            // Update Logic
-            const setGauge = (element, value, max=100) => {
-                const circumference = 251.2; // 2 * pi * 40
-                const offset = circumference - (value / max) * circumference;
-                element.style.strokeDashoffset = offset;
-            };
-
-            const updateStats = async () => {
-                // Base Randomness for Visual Liveliness
-                const baseCpu = 12;
-                const baseMem = 34;
-                const cpu = Math.min(100, Math.max(5, baseCpu + Math.floor(Math.random() * 20) - 10));
-                const mem = Math.min(100, Math.max(10, baseMem + Math.floor(Math.random() * 5)));
-                const agents = 8 + Math.floor(Math.random() * 3);
-                const ops = 240 + Math.floor(Math.random() * 50);
-
-                // Live Data Override
-                if (window.dataManager.useApi) {
-                    try {
-                        const response = await fetch('/api/state');
-                        if (response.ok) {
-                            const state = await response.json();
-
-                            // Process Logs
-                            if (state.logs && state.logs.length > 0) {
-                                // We'll just clear and redraw for simplicity or check last ID
-                                // For now, simple clear/redraw to stay in sync
-                                logs.innerHTML = '';
-                                state.logs.forEach(l => {
-                                    const div = document.createElement('div');
-                                    div.className = "text-[10px] md:text-xs font-mono text-slate-300 mb-1";
-                                    // Syntax highlighting
-                                    if(l.includes('ERROR')) div.classList.add('text-red-400');
-                                    else if(l.includes('WARNING')) div.classList.add('text-amber-400');
-                                    else if(l.includes('INFO')) div.classList.add('text-cyan-400');
-
-                                    div.innerText = l;
-                                    logs.appendChild(div);
-                                });
-                                logs.scrollTop = logs.scrollHeight;
-                            }
-                        }
-                    } catch(e) { console.error("Poll Error", e); }
-                } else {
-                    // Fallback Random Logs
-                    const mockActions = [
-                        "SNC_Analyst_Agent polling credit_sentry_queue...",
-                        "Market_Sentiment_Agent parsing Bloomberg feed...",
-                        "Risk_Assessment_Agent calculating VaR (99% CI)...",
-                        "Knowledge Graph: Ingesting 10-K filing...",
-                        "Garbage collection cycle initiated.",
-                        "Optimizing query execution plan...",
-                        "Neural Link: Synapse connection stable.",
-                        "Alert: Volatility spike detected in Sector X."
-                    ];
-
-                    if(Math.random() > 0.6) {
-                        const msg = mockActions[Math.floor(Math.random() * mockActions.length)];
-                        logMsg(msg, "INFO");
-                    }
-                }
-
-                // Update Gauges (keep animated)
-                document.getElementById('cpu-val').textContent = `${cpu}%`;
-                setGauge(cpuRing, cpu);
-
-                document.getElementById('mem-val').textContent = `${mem}%`;
-                setGauge(memRing, mem);
-
-                document.getElementById('agent-count').textContent = agents;
-                document.getElementById('ops-count').textContent = ops;
-            };
-
-            updateStats();
-            setInterval(updateStats, 2000);
-        });
-    </script>
+    <!-- Adam Global Nav -->
+    <script src="../showcase/js/nav.js" data-root=".."></script>
 </body>
 </html>

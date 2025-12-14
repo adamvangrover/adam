@@ -15,7 +15,7 @@ Architect Notes:
 """
 
 from dataclasses import dataclass
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Any, Optional
 from enum import Enum
 import json
 
@@ -75,9 +75,26 @@ class RoboAdvisor:
         self.w_capacity = 0.60
         self.w_tolerance = 0.40
 
-    def generate_recommendation(self, answers: Dict[str, any]) -> Dict:
+    def analyze_market_context(self, market_data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Analyzes market data (Intra-Year and Long-Term) to adjust risk profile.
+        This framework method allows advanced functionality to be plugged in.
+
+        Args:
+            market_data: A dictionary containing 'long_term' and 'intra_year' data keys,
+                         following the Gold Standard format.
+        """
+        # Framework placeholder for advanced market analysis
+        # Could implement moving averages, volatility calculations, etc.
+        return {
+            "status": "Analysis Not Implemented",
+            "modifier": 0.0
+        }
+
+    def generate_recommendation(self, answers: Dict[str, any], market_context: Optional[Dict] = None) -> Dict:
         """
         Main entry point for advisory logic.
+        Accepts optional market_context to refine recommendation.
         """
         profile = IntakeForm.calculate_score(answers)
 

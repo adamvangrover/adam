@@ -4,7 +4,6 @@ import logging
 import asyncio
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
-from collections import deque
 
 # Ensure root is in path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
@@ -21,7 +20,18 @@ except ImportError as e:
     AgentOrchestrator = None
 
 app = Flask(__name__)
-CORS(app)
+
+# Security: Configure CORS
+# Default to localhost for development. In production, set ALLOWED_ORIGINS env var.
+# Example: ALLOWED_ORIGINS="https://mydomain.com,https://api.mydomain.com"
+allowed_origins_str = os.environ.get(
+    "ALLOWED_ORIGINS",
+    "http://localhost:3000,http://localhost:5000,"
+    "http://127.0.0.1:3000,http://127.0.0.1:5000"
+)
+allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",")]
+
+CORS(app, resources={r"/*": {"origins": allowed_origins}})
 
 # Configuration
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -29,23 +39,13 @@ SHOWCASE_DIR = os.path.join(BASE_DIR, 'showcase')
 
 # Global State
 meta_orchestrator = None
-LOG_BUFFER = deque(maxlen=50)
-
-class ListHandler(logging.Handler):
-    def emit(self, record):
-        try:
-            log_entry = self.format(record)
-            LOG_BUFFER.append(log_entry)
-        except Exception:
-            self.handleError(record)
+# LOG_BUFFER removed to prevent sensitive data exposure
+# LOG_BUFFER = deque(maxlen=50)
 
 def setup_log_capture():
-    handler = ListHandler()
-    formatter = logging.Formatter('[%(levelname)s] %(message)s') # Simplified format for UI
-    handler.setFormatter(formatter)
-    logging.getLogger().addHandler(handler)
-    # Ensure we capture 'core' logs
-    logging.getLogger('core').setLevel(logging.INFO)
+    # Logging to memory buffer removed to prevent sensitive data exposure via API
+    # Standard stdout/file logging is sufficient and safer
+    pass
 
 def init_orchestrator():
     global meta_orchestrator
@@ -88,7 +88,7 @@ def get_state():
         "version": "v23.5-Adaptive",
         "mode": "Live Runtime" if meta_orchestrator else "Lightweight Mode (No AI)",
         "orchestrator": "MetaOrchestrator (Active)" if meta_orchestrator else "Offline",
-        "logs": list(LOG_BUFFER)
+        # "logs": [] # Logs removed to prevent information leakage
     })
 
 @app.route('/api/chat', methods=['POST'])
@@ -127,5 +127,7 @@ if __name__ == '__main__':
     setup_log_capture()
     init_orchestrator()
     print(f"Serving Adam v23.5 from {SHOWCASE_DIR}")
-    print(f"Access the Live Interface at http://localhost:5000")
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    host = os.environ.get('HOST', '127.0.0.1')
+    port = int(os.environ.get('PORT', 5000))
+    print(f"Access the Live Interface at http://{host}:{port}")
+    app.run(host=host, port=port, debug=False)

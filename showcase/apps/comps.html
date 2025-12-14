@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Comps Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-dark: #020408;
+            --panel-glass: rgba(10, 15, 30, 0.7);
+            --blue-glow: #3b82f6;
+            --grid-line: rgba(59, 130, 246, 0.05);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 30px 30px;
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: var(--panel-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        input[type="number"], input[type="text"] {
+            background: #050a14;
+            border: 1px solid #1e293b;
+            color: var(--blue-glow);
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+            font-size: 0.75rem;
+            padding: 4px;
+            width: 100%;
+        }
+        input:focus {
+            border-color: var(--blue-glow);
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+            outline: none;
+        }
+
+        button { transition: all 0.2s; }
+        button:active { transform: scale(0.95); }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--blue-glow); }
+
+        table { border-collapse: separate; border-spacing: 0; width: 100%; }
+        th { background: rgba(59, 130, 246, 0.05); color: var(--blue-glow); font-weight: normal; text-transform: uppercase; letter-spacing: 1px; padding: 8px; font-size: 10px; }
+        td { border-bottom: 1px solid #1e293b; padding: 4px; }
+        .calculated { color: #94a3b8; pointer-events: none; background: rgba(255,255,255,0.02); }
+    </style>
+</head>
+<body class="h-screen flex flex-col p-4 text-xs">
+
+    <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2">
+        <h1 class="text-lg font-bold text-white tracking-widest flex items-center">
+            <i data-lucide="scale" class="w-5 h-5 mr-2 text-blue-400"></i>
+            COMPS ANALYSIS
+        </h1>
+        <div class="flex gap-2">
+            <button onclick="exportCSV()" class="px-3 py-1 bg-blue-900/20 border border-blue-500/30 text-blue-400 rounded hover:bg-blue-500/30 text-[10px] font-bold flex items-center gap-1">
+                <i data-lucide="download" class="w-3 h-3"></i> EXPORT CSV
+            </button>
+            <div class="text-[10px] text-gray-500 self-center">LOCAL_MODE</div>
+        </div>
+    </div>
+
+    <div class="flex flex-col gap-4 flex-grow overflow-hidden">
+
+        <!-- Summary Stats -->
+        <div class="grid grid-cols-4 gap-4 h-20 flex-shrink-0">
+            <div class="glass-panel p-2 rounded flex flex-col justify-center items-center">
+                <div class="text-[10px] text-gray-500 uppercase">Mean EV/EBITDA</div>
+                <div class="text-xl font-bold text-white mt-1 font-mono" id="mean-ev-ebitda">-</div>
+            </div>
+            <div class="glass-panel p-2 rounded flex flex-col justify-center items-center">
+                <div class="text-[10px] text-gray-500 uppercase">Median EV/EBITDA</div>
+                <div class="text-xl font-bold text-white mt-1 font-mono" id="median-ev-ebitda">-</div>
+            </div>
+            <div class="glass-panel p-2 rounded flex flex-col justify-center items-center">
+                <div class="text-[10px] text-gray-500 uppercase">Mean P/E</div>
+                <div class="text-xl font-bold text-white mt-1 font-mono" id="mean-pe">-</div>
+            </div>
+            <div class="glass-panel p-2 rounded flex flex-col justify-center items-center">
+                <div class="text-[10px] text-gray-500 uppercase">Median P/E</div>
+                <div class="text-xl font-bold text-white mt-1 font-mono" id="median-pe">-</div>
+            </div>
+        </div>
+
+        <!-- Main Table -->
+        <div class="glass-panel rounded flex-grow overflow-auto relative p-0">
+            <table class="w-full text-xs font-mono">
+                <thead class="sticky top-0 bg-[#020408] z-10 shadow-sm">
+                    <tr>
+                        <th class="w-16">Action</th>
+                        <th class="text-left w-24">Ticker</th>
+                        <th class="text-right">Price</th>
+                        <th class="text-right">Shares (M)</th>
+                        <th class="text-right">Net Debt (M)</th>
+                        <th class="text-right">EBITDA (M)</th>
+                        <th class="text-right">EPS</th>
+                        <th class="text-right calculated">Mkt Cap</th>
+                        <th class="text-right calculated">EV</th>
+                        <th class="text-right calculated text-blue-400">EV/EBITDA</th>
+                        <th class="text-right calculated text-blue-400">P/E</th>
+                    </tr>
+                </thead>
+                <tbody id="comps-body">
+                    <!-- Rows injected here -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Controls -->
+        <div class="h-10 flex-shrink-0 flex gap-2 justify-end">
+            <button onclick="addRow()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded flex items-center gap-2">
+                <i data-lucide="plus" class="w-4 h-4"></i> Add Ticker
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        let comps = [
+            { id: 1, ticker: 'COMP A', price: 50.0, shares: 100, netDebt: 500, ebitda: 600, eps: 4.5 },
+            { id: 2, ticker: 'COMP B', price: 120.0, shares: 50, netDebt: 200, ebitda: 400, eps: 8.0 },
+            { id: 3, ticker: 'COMP C', price: 25.0, shares: 200, netDebt: 1000, ebitda: 800, eps: 2.0 },
+        ];
+        let nextId = 4;
+
+        function fmtMoney(n) { return n.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1}); }
+        function fmtMult(n) { return isFinite(n) ? n.toFixed(1) + 'x' : '-'; }
+
+        function render() {
+            const tbody = document.getElementById('comps-body');
+            tbody.innerHTML = '';
+
+            let evEbitdas = [];
+            let pes = [];
+
+            comps.forEach(c => {
+                const mktCap = c.price * c.shares;
+                const ev = mktCap + c.netDebt;
+                const evEbitda = c.ebitda ? ev / c.ebitda : 0;
+                const pe = c.eps ? c.price / c.eps : 0;
+
+                if(c.ebitda > 0) evEbitdas.push(evEbitda);
+                if(c.eps > 0) pes.push(pe);
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="text-center">
+                        <button onclick="deleteRow(${c.id})" class="text-red-500 hover:text-red-400"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                    </td>
+                    <td><input type="text" value="${c.ticker}" onchange="updateRow(${c.id}, 'ticker', this.value)" class="bg-transparent border-none text-white font-bold focus:ring-0"></td>
+                    <td><input type="number" value="${c.price}" onchange="updateRow(${c.id}, 'price', this.value)" class="text-right"></td>
+                    <td><input type="number" value="${c.shares}" onchange="updateRow(${c.id}, 'shares', this.value)" class="text-right"></td>
+                    <td><input type="number" value="${c.netDebt}" onchange="updateRow(${c.id}, 'netDebt', this.value)" class="text-right"></td>
+                    <td><input type="number" value="${c.ebitda}" onchange="updateRow(${c.id}, 'ebitda', this.value)" class="text-right"></td>
+                    <td><input type="number" value="${c.eps}" onchange="updateRow(${c.id}, 'eps', this.value)" class="text-right"></td>
+                    <td class="text-right calculated">${fmtMoney(mktCap)}</td>
+                    <td class="text-right calculated">${fmtMoney(ev)}</td>
+                    <td class="text-right calculated font-bold text-blue-400">${fmtMult(evEbitda)}</td>
+                    <td class="text-right calculated font-bold text-blue-400">${fmtMult(pe)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Summary Stats
+            const calcMean = (arr) => arr.length ? (arr.reduce((a,b)=>a+b,0)/arr.length) : 0;
+            const calcMedian = (arr) => {
+                if(!arr.length) return 0;
+                const s = [...arr].sort((a,b)=>a-b);
+                const mid = Math.floor(s.length/2);
+                return s.length%2 ? s[mid] : (s[mid-1]+s[mid])/2;
+            };
+
+            document.getElementById('mean-ev-ebitda').innerText = fmtMult(calcMean(evEbitdas));
+            document.getElementById('median-ev-ebitda').innerText = fmtMult(calcMedian(evEbitdas));
+            document.getElementById('mean-pe').innerText = fmtMult(calcMean(pes));
+            document.getElementById('median-pe').innerText = fmtMult(calcMedian(pes));
+
+            lucide.createIcons();
+        }
+
+        function addRow() {
+            comps.push({ id: nextId++, ticker: 'NEW', price: 10, shares: 100, netDebt: 0, ebitda: 50, eps: 1 });
+            render();
+        }
+
+        function deleteRow(id) {
+            comps = comps.filter(c => c.id !== id);
+            render();
+        }
+
+        function updateRow(id, field, val) {
+            const idx = comps.findIndex(c => c.id === id);
+            if(idx > -1) {
+                if(field === 'ticker') comps[idx][field] = val;
+                else comps[idx][field] = parseFloat(val) || 0;
+            }
+            render();
+        }
+
+        function exportCSV() {
+            let csv = "Ticker,Price,Shares,Net Debt,EBITDA,EPS,Market Cap,EV,EV/EBITDA,P/E\n";
+            comps.forEach(c => {
+                const mktCap = c.price * c.shares;
+                const ev = mktCap + c.netDebt;
+                const evEbitda = c.ebitda ? ev / c.ebitda : 0;
+                const pe = c.eps ? c.price / c.eps : 0;
+                csv += `"${c.ticker}",${c.price},${c.shares},${c.netDebt},${c.ebitda},${c.eps},${mktCap},${ev},${evEbitda},${pe}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'comps_analysis.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        window.onload = function() {
+            render();
+        };
+    </script>
+
+    <!-- Adam Global Nav -->
+    <script src="../../showcase/js/nav.js" data-root="../.."></script>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Black-Scholes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-dark: #020408;
+            --panel-glass: rgba(10, 15, 30, 0.7);
+            --red-glow: #f43f5e;
+            --grid-line: rgba(244, 63, 94, 0.05);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 30px 30px;
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: var(--panel-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(244, 63, 94, 0.1);
+        }
+
+        input[type="number"] {
+            background: #050a14;
+            border: 1px solid #1e293b;
+            color: var(--red-glow);
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+            font-size: 0.75rem;
+            padding: 4px;
+            width: 100%;
+        }
+        input:focus {
+            border-color: var(--red-glow);
+            box-shadow: 0 0 8px rgba(244, 63, 94, 0.3);
+            outline: none;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--red-glow); }
+
+        .greek-box {
+            display: flex; justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 4px 0;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col p-4 text-xs">
+
+    <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2">
+        <h1 class="text-lg font-bold text-white tracking-widest flex items-center">
+            <i data-lucide="sigma" class="w-5 h-5 mr-2 text-rose-400"></i>
+            OPTION PRICING
+        </h1>
+        <div class="flex gap-2">
+            <button onclick="exportCSV()" class="px-3 py-1 bg-rose-900/20 border border-rose-500/30 text-rose-400 rounded hover:bg-rose-500/30 text-[10px] font-bold flex items-center gap-1">
+                <i data-lucide="download" class="w-3 h-3"></i> EXPORT CSV
+            </button>
+            <div class="text-[10px] text-gray-500 self-center">LOCAL_MODE</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-12 gap-4 flex-grow overflow-hidden">
+
+        <!-- Sidebar -->
+        <aside class="col-span-4 lg:col-span-3 flex flex-col gap-3">
+            <div class="glass-panel p-3 rounded">
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold">Parameters</div>
+                <div class="space-y-2">
+                    <div><label class="block text-gray-400 text-[10px]">Stock Price (S)</label><input type="number" id="S" value="100" step="0.5"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Strike Price (K)</label><input type="number" id="K" value="105" step="0.5"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Time to Exp (T - Yrs)</label><input type="number" id="T" value="0.5" step="0.1"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Risk-Free Rate (r %)</label><input type="number" id="r" value="5" step="0.1"></div>
+                    <div><label class="block text-gray-400 text-[10px]">Volatility (σ %)</label><input type="number" id="v" value="20" step="1"></div>
+                </div>
+            </div>
+
+             <div class="glass-panel p-3 rounded flex-grow">
+                 <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold">Price Output</div>
+                 <div class="grid grid-cols-2 gap-2 mb-4">
+                     <div class="bg-gray-900 p-2 rounded text-center">
+                         <div class="text-gray-400 text-[10px]">CALL</div>
+                         <div class="text-green-400 font-bold text-lg font-mono" id="call-price">0.00</div>
+                     </div>
+                     <div class="bg-gray-900 p-2 rounded text-center">
+                         <div class="text-gray-400 text-[10px]">PUT</div>
+                         <div class="text-rose-400 font-bold text-lg font-mono" id="put-price">0.00</div>
+                     </div>
+                 </div>
+
+                 <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold">The Greeks (Call)</div>
+                 <div class="space-y-1 font-mono text-xs">
+                     <div class="greek-box"><span>Delta</span><span id="delta" class="text-white">0.00</span></div>
+                     <div class="greek-box"><span>Gamma</span><span id="gamma" class="text-white">0.00</span></div>
+                     <div class="greek-box"><span>Theta</span><span id="theta" class="text-white">0.00</span></div>
+                     <div class="greek-box"><span>Vega</span><span id="vega" class="text-white">0.00</span></div>
+                     <div class="greek-box"><span>Rho</span><span id="rho" class="text-white">0.00</span></div>
+                 </div>
+            </div>
+        </aside>
+
+        <!-- Main Chart -->
+        <main class="col-span-8 lg:col-span-9 flex flex-col gap-4">
+            <div class="glass-panel p-4 rounded flex-grow relative w-full h-full flex flex-col">
+                <h3 class="text-xs font-bold text-rose-400 mb-2">Option Value vs. Stock Price</h3>
+                 <div class="flex-grow relative">
+                     <canvas id="bs-chart"></canvas>
+                 </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let chartInstance = null;
+
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(i => i.addEventListener('change', runModel));
+
+        function pdf(x) {
+            return Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
+        }
+
+        function cdf(x) {
+            var k = 1 / (1 + 0.2316419 * Math.abs(x));
+            var w = 1 - 1 / Math.sqrt(2 * Math.PI) * Math.exp(-x * x / 2) * (0.319381530 * k + -0.356563782 * k * k + 1.781477937 * k * k * k + -1.821255978 * k * k * k * k + 1.330274429 * k * k * k * k * k);
+            return (x < 0) ? 1.0 - w : w;
+        }
+
+        function runModel() {
+            const S = parseFloat(document.getElementById('S').value);
+            const K = parseFloat(document.getElementById('K').value);
+            const T = parseFloat(document.getElementById('T').value);
+            const r = parseFloat(document.getElementById('r').value) / 100;
+            const v = parseFloat(document.getElementById('v').value) / 100;
+
+            const d1 = (Math.log(S/K) + (r + v*v/2)*T) / (v * Math.sqrt(T));
+            const d2 = d1 - v * Math.sqrt(T);
+
+            const call = S * cdf(d1) - K * Math.exp(-r*T) * cdf(d2);
+            const put = K * Math.exp(-r*T) * cdf(-d2) - S * cdf(-d1);
+
+            // Greeks (Call)
+            const delta = cdf(d1);
+            const gamma = pdf(d1) / (S * v * Math.sqrt(T));
+            const theta = (- (S * pdf(d1) * v) / (2 * Math.sqrt(T)) - r * K * Math.exp(-r*T) * cdf(d2)) / 365; // Daily
+            const vega = S * pdf(d1) * Math.sqrt(T) / 100; // Per 1% vol change
+            const rho = K * T * Math.exp(-r*T) * cdf(d2) / 100; // Per 1% rate change
+
+            // Update UI
+            document.getElementById('call-price').innerText = call.toFixed(2);
+            document.getElementById('put-price').innerText = put.toFixed(2);
+            document.getElementById('delta').innerText = delta.toFixed(3);
+            document.getElementById('gamma').innerText = gamma.toFixed(4);
+            document.getElementById('theta').innerText = theta.toFixed(3);
+            document.getElementById('vega').innerText = vega.toFixed(3);
+            document.getElementById('rho').innerText = rho.toFixed(3);
+
+            updateChart(K, T, r, v);
+
+            // Store for export
+            window.lastData = { S, K, T, r, v, call, put, delta, gamma, theta, vega, rho };
+        }
+
+        function updateChart(K, T, r, v) {
+            const range = 50;
+            const center = parseFloat(document.getElementById('S').value);
+            const start = Math.max(0, center - range/2);
+
+            let labels = [];
+            let calls = [];
+            let puts = [];
+
+            for(let i=0; i<=range; i++) {
+                let s = start + i;
+                let d1 = (Math.log(s/K) + (r + v*v/2)*T) / (v * Math.sqrt(T));
+                let d2 = d1 - v * Math.sqrt(T);
+                let c = s * cdf(d1) - K * Math.exp(-r*T) * cdf(d2);
+                let p = K * Math.exp(-r*T) * cdf(-d2) - s * cdf(-d1);
+
+                labels.push(s);
+                calls.push(c);
+                puts.push(p);
+            }
+
+            if(chartInstance) chartInstance.destroy();
+            const ctx = document.getElementById('bs-chart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Call Value', data: calls, borderColor: '#10b981', borderWidth: 2, pointRadius: 0 },
+                        { label: 'Put Value', data: puts, borderColor: '#f43f5e', borderWidth: 2, pointRadius: 0 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        y: { grid: { color: '#1e293b' }, title: { display: true, text: 'Option Price' } },
+                        x: { grid: { display: false }, title: { display: true, text: 'Stock Price' } }
+                    },
+                    plugins: { legend: { labels: { color: '#cbd5e1' } } }
+                }
+            });
+        }
+
+        function exportCSV() {
+            if(!window.lastData) return;
+            const d = window.lastData;
+            let csv = "Metric,Value\n";
+            csv += `Stock Price,${d.S}\nStrike Price,${d.K}\nTime (Yrs),${d.T}\nRisk-Free Rate,${d.r}\nVolatility,${d.v}\n`;
+            csv += `Call Price,${d.call}\nPut Price,${d.put}\n`;
+            csv += `Delta,${d.delta}\nGamma,${d.gamma}\nTheta,${d.theta}\nVega,${d.vega}\nRho,${d.rho}\n`;
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'option_pricing.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        window.onload = function() {
+            lucide.createIcons();
+            runModel();
+        };
+    </script>
+
+    <!-- Adam Global Nav -->
+    <script src="../../showcase/js/nav.js" data-root="../.."></script>
+</body>
+</html>

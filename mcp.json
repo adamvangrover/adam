@@ -1,0 +1,34 @@
+{
+  "manifestVersion": "1.0",
+  "name": "ADAM Financial Engine",
+  "description": "Comprehensive Agentic Intelligence Engine for Finance.",
+  "version": "23.5.0",
+  "homepage": "https://github.com/adamvangrover/adam",
+  "servers": [
+    {
+      "id": "adam-financial-core",
+      "name": "Adam Financial Core",
+      "type": "stdio",
+      "command": "python",
+      "args": ["server/mcp_server.py"],
+      "env": { "PYTHONPATH": "." }
+    }
+  ],
+  "capabilities": {
+    "tools": [
+      { "name": "run_quantum_simulation", "description": "Run Quantum Monte Carlo (Merton Model)." },
+      { "name": "generate_market_scenarios", "description": "Generate GAN-based market stress scenarios." },
+      { "name": "analyze_snc_credit", "description": "Perform Shared National Credit (SNC) rating analysis." },
+      { "name": "analyze_covenants", "description": "Analyze covenant breach risk." },
+      { "name": "compare_peers", "description": "Compare valuation multiples." },
+      { "name": "plan_workflow", "description": "Generate Neuro-Symbolic reasoning plan." },
+      { "name": "ingest_file", "description": "Ingest document into Knowledge Base." },
+      { "name": "retrieve_market_data", "description": "Get real-time market data." },
+      { "name": "execute_python_sandbox", "description": "Run Python code." }
+    ],
+    "resources": [
+      { "uri": "adam://project/manifest", "description": "Project capabilities manifest." },
+      { "uri": "adam://docs/{filename}", "description": "Dynamic documentation access." }
+    ]
+  }
+}

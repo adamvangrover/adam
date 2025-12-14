@@ -1,0 +1,102 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam System :: core/engine</title>
+    <link rel="stylesheet" href="../../showcase/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .readme-content { padding: 20px; }
+        .readme-content h1 { font-size: 1.5rem; margin-bottom: 1rem; color: var(--primary-color); }
+        .readme-content h2 { font-size: 1.25rem; margin-top: 1.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--panel-border); padding-bottom: 0.25rem; }
+        .readme-content p { margin-bottom: 1rem; line-height: 1.6; color: var(--text-secondary); }
+        .readme-content pre { background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 4px; overflow-x: auto; border: 1px solid var(--panel-border); }
+        .readme-content code { font-family: var(--font-mono); color: var(--accent-color); }
+
+        .file-icon { display: inline-block; width: 20px; text-align: center; margin-right: 8px; color: var(--text-muted); }
+        .dir-icon { color: var(--primary-color); }
+    </style>
+</head>
+<body>
+    <div class="scan-line"></div>
+    <div class="scan-glow"></div>
+
+    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+
+        <!-- Header -->
+        <header style="margin-bottom: 40px; border-bottom: 1px solid var(--panel-border); padding-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 class="glitch-text" data-text="ADAM v23.5" style="font-size: 2rem; margin: 0; color: var(--primary-color);">ADAM v23.5</h1>
+                <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">
+                    PATH: <span style="color: var(--text-primary);">/core/engine</span>
+                </div>
+            </div>
+            <div style="text-align: right;">
+                <div class="cyber-badge badge-cyan">SYSTEM ONLINE</div>
+                <div style="margin-top: 5px; font-size: 0.7rem; color: var(--text-muted);">Mode: SHOWCASE</div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav style="margin-bottom: 30px; display: flex; gap: 10px;">
+            <a href="../index.html" class="cyber-btn">&uarr; UP LEVEL</a>
+            <a href="../../index.html" class="cyber-btn">ROOT</a>
+            <button onclick="toggleRuntime()" class="cyber-btn">LIVE RUNTIME</button>
+            <a href="https://github.com/adamvangrover/adam" class="cyber-btn" target="_blank">GITHUB</a>
+        </nav>
+
+        <div style="display: grid; grid-template-columns: 250px 1fr; gap: 20px;">
+
+            <!-- Sidebar / File Explorer -->
+            <aside class="glass-panel" style="padding: 20px; border-radius: 4px; height: fit-content;">
+                <h3 style="margin-top: 0; font-size: 0.9rem; text-transform: uppercase; color: var(--text-secondary); border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 15px;">
+                    Directory Contents
+                </h3>
+                <ul style="list-style: none; padding: 0; margin: 0; font-family: var(--font-mono); font-size: 0.85rem;">
+                    <li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="__init__.py" style="color: var(--text-secondary);">__init__.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="agent_adapters.py" style="color: var(--text-secondary);">agent_adapters.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="autonomous_self_improvement.py" style="color: var(--text-secondary);">autonomous_self_improvement.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="crisis_simulation_graph.py" style="color: var(--text-secondary);">crisis_simulation_graph.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="cyclical_reasoning_graph.py" style="color: var(--text-secondary);">cyclical_reasoning_graph.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="deep_dive_graph.py" style="color: var(--text-secondary);">deep_dive_graph.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="entity_utils.py" style="color: var(--text-secondary);">entity_utils.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="esg_graph.py" style="color: var(--text-secondary);">esg_graph.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="hil_validation_node.py" style="color: var(--text-secondary);">hil_validation_node.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="market_sentiment_graph.py" style="color: var(--text-secondary);">market_sentiment_graph.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="meta_orchestrator.py" style="color: var(--text-secondary);">meta_orchestrator.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="neuro_symbolic_planner.py" style="color: var(--text-secondary);">neuro_symbolic_planner.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="planner.py" style="color: var(--text-secondary);">planner.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="red_team_graph.py" style="color: var(--text-secondary);">red_team_graph.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="reflector_graph.py" style="color: var(--text-secondary);">reflector_graph.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="regulatory_compliance_graph.py" style="color: var(--text-secondary);">regulatory_compliance_graph.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="snc_graph.py" style="color: var(--text-secondary);">snc_graph.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="snc_utils.py" style="color: var(--text-secondary);">snc_utils.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="states.py" style="color: var(--text-secondary);">states.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="strategy_utils.py" style="color: var(--text-secondary);">strategy_utils.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="unified_knowledge_graph.py" style="color: var(--text-secondary);">unified_knowledge_graph.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="valuation_utils.py" style="color: var(--text-secondary);">valuation_utils.py</a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main>
+                <!-- Runtime Overlay (Hidden by default) -->
+                <div id="runtime-panel" class="glass-panel fade-in" style="display: none; padding: 20px; margin-bottom: 20px; border-color: var(--success-color);">
+                    <h3 style="color: var(--success-color); margin-top: 0;">Live System Interface</h3>
+                    <p style="font-size: 0.9rem;">Connecting to Orchestrator at localhost:5001...</p>
+                    <div style="background: black; padding: 10px; border-radius: 4px; font-family: var(--font-mono); height: 100px; overflow-y: auto; font-size: 0.8rem; color: #0f0;">
+                        > Connecting...<br>
+                        > Error: API Unreachable (Mock Mode Active)<br>
+                        > System Status: STANDBY
+                    </div>
+                </div>
+
+                <!-- Readme Content -->
+                <div class="glass-panel" style="border-radius: 4px;">
+                    <div class="readme-content" style="text-align: center; color: var(--text-muted); padding: 40px;">No README found in this directory.</div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Footer -->
+        <footer style="margin-top: 50px; border-top: 1px solid var(--panel-border); padding-top: 20px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">
+            ADAM AUTO-GENERATED SHOWCASE | <span class="mono">REF: core/engine</span>
+        </footer>
+    </div>
+
+    <script>
+        function toggleRuntime() {
+            const panel = document.getElementById('runtime-panel');
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+    </script>
+
+    <!-- Adam Global Nav -->
+    <script src="../../showcase/js/nav.js" data-root="../.."></script>
+</body>
+</html>

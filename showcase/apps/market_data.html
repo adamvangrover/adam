@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Market Data Scrubber</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-dark: #020408;
+            --panel-glass: rgba(10, 15, 30, 0.7);
+            --green-glow: #10b981;
+            --grid-line: rgba(16, 185, 129, 0.05);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 30px 30px;
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: var(--panel-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(16, 185, 129, 0.1);
+        }
+
+        textarea {
+            background: #050a14;
+            border: 1px solid #1e293b;
+            color: var(--green-glow);
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+            font-size: 0.75rem;
+            resize: none;
+        }
+        textarea:focus {
+            border-color: var(--green-glow);
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+            outline: none;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--green-glow); }
+
+        table { border-collapse: separate; border-spacing: 0; width: 100%; }
+        th { background: rgba(16, 185, 129, 0.05); color: var(--green-glow); font-weight: normal; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
+        td { border-bottom: 1px solid #1e293b; }
+        tr:hover td { background: rgba(16, 185, 129, 0.05); }
+    </style>
+</head>
+<body class="h-screen flex flex-col p-4 text-xs">
+
+    <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2">
+        <h1 class="text-lg font-bold text-white tracking-widest flex items-center">
+            <i data-lucide="database" class="w-5 h-5 mr-2 text-green-400"></i>
+            MARKET DATA SCRUBBER
+        </h1>
+        <div class="flex gap-2">
+            <button onclick="exportCSV()" class="px-3 py-1 bg-green-900/20 border border-green-500/30 text-green-400 rounded hover:bg-green-500/30 text-[10px] font-bold flex items-center gap-1">
+                <i data-lucide="download" class="w-3 h-3"></i> EXPORT CSV
+            </button>
+            <div class="text-[10px] text-gray-500 self-center">LOCAL_VAULT_SECURE</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-12 gap-4 flex-grow overflow-hidden">
+        <!-- Sidebar Inputs -->
+        <aside class="col-span-4 lg:col-span-3 flex flex-col gap-3 overflow-hidden">
+
+            <div class="glass-panel p-3 rounded flex-grow flex flex-col">
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold flex justify-between">
+                    <span>Input Data (CSV)</span>
+                    <button onclick="loadSample()" class="text-green-500 hover:text-white">Load Sample</button>
+                </div>
+                <textarea id="csvInput" class="w-full flex-grow p-2 rounded" placeholder="Ticker, Price, PE_Ratio&#10;AAPL, 150.00, 28.5&#10;GOOG, 2800.00, 25.0"></textarea>
+                <button onclick="parseData()" class="mt-2 w-full py-2 bg-green-900/20 border border-green-500/30 text-green-400 rounded hover:bg-green-500/30 font-bold">
+                    INGEST DATA
+                </button>
+            </div>
+
+            <div class="glass-panel p-3 rounded">
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold">Vault Status</div>
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-gray-400">Records</span>
+                    <span class="text-white font-mono" id="stat-records">0</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-400">Last Update</span>
+                    <span class="text-white font-mono" id="stat-update">-</span>
+                </div>
+                <button onclick="clearData()" class="mt-2 text-[10px] text-red-500 hover:text-red-400 w-full text-right">Clear Vault</button>
+            </div>
+
+        </aside>
+
+        <!-- Main Output -->
+        <main class="col-span-8 lg:col-span-9 flex flex-col gap-4 overflow-hidden">
+
+            <div class="glass-panel p-4 rounded h-1/2 relative w-full">
+                 <canvas id="chart-market"></canvas>
+            </div>
+
+            <div class="glass-panel p-0 rounded flex-grow overflow-auto relative">
+                <table class="w-full text-xs font-mono">
+                    <thead class="sticky top-0 bg-[#020408] shadow-sm z-10">
+                        <tr class="text-gray-500 border-b border-gray-700" id="table-head">
+                            <th class="text-left py-2 px-3">Ticker</th>
+                            <th class="text-right py-2 px-3">Price</th>
+                            <th class="text-right py-2 px-3">Ratio</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <tr><td colspan="3" class="text-center py-4 text-gray-600">No Data Ingested</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let chartInstance = null;
+        let marketData = [];
+
+        function loadSample() {
+            const sample = "Ticker, Price, PE\nAAPL, 175.50, 28.5\nMSFT, 320.10, 32.1\nGOOGL, 135.20, 24.8\nAMZN, 128.90, 45.2\nNVDA, 460.15, 65.0\nTSLA, 245.50, 70.2\nJPM, 145.20, 10.5\nBAC, 28.50, 8.9";
+            document.getElementById('csvInput').value = sample;
+        }
+
+        function parseData() {
+            const raw = document.getElementById('csvInput').value.trim();
+            if(!raw) return;
+
+            const lines = raw.split('\n');
+            const headers = lines[0].split(',').map(h => h.trim());
+
+            // Heuristic: Assume Col 0 = Ticker, Col 1 = Price, Col 2 = Value/Ratio
+            // If only 2 cols, Col 1 is Value
+
+            marketData = [];
+
+            for(let i=1; i<lines.length; i++) {
+                const cols = lines[i].split(',').map(c => c.trim());
+                if(cols.length < 2) continue;
+
+                let item = {
+                    ticker: cols[0], // Keep as string, sanitize on render
+                    price: parseFloat(cols[1]) || 0,
+                    val: parseFloat(cols[2]) || parseFloat(cols[1]) || 0 // Fallback if no 3rd col
+                };
+                marketData.push(item);
+            }
+
+            renderTable(headers);
+            renderChart(headers);
+            saveVault();
+            updateStats();
+        }
+
+        function createCell(text, className) {
+            const td = document.createElement('td');
+            td.className = className;
+            td.textContent = text;
+            return td;
+        }
+
+        function createHeader(text, className) {
+            const th = document.createElement('th');
+            th.className = className;
+            th.textContent = text;
+            return th;
+        }
+
+        function renderTable(headers) {
+            const theadRow = document.getElementById('table-head');
+            theadRow.innerHTML = ''; // Clear existing
+
+            const h1 = headers[0] || 'Ticker';
+            const h2 = headers[1] || 'Value';
+            const h3 = headers[2] || 'Metric';
+
+            theadRow.appendChild(createHeader(h1, "text-left py-2 px-3"));
+            theadRow.appendChild(createHeader(h2, "text-right py-2 px-3"));
+            theadRow.appendChild(createHeader(h3, "text-right py-2 px-3"));
+
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = ''; // Clear existing
+
+            marketData.forEach(d => {
+                const tr = document.createElement('tr');
+
+                tr.appendChild(createCell(d.ticker, "py-2 px-3 text-white font-bold"));
+                tr.appendChild(createCell(d.price.toFixed(2), "py-2 px-3 text-right text-gray-300"));
+                tr.appendChild(createCell(d.val.toFixed(2), "py-2 px-3 text-right text-green-400"));
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderChart(headers) {
+            if(chartInstance) chartInstance.destroy();
+
+            const ctx = document.getElementById('chart-market').getContext('2d');
+            // Safely get metric name
+            const metricName = headers[2] || headers[1] || 'Value';
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    // Use textContent implicitly handled by Chart.js canvas rendering, but good to be aware
+                    labels: marketData.map(d => d.ticker),
+                    datasets: [{
+                        label: metricName,
+                        data: marketData.map(d => d.val),
+                        backgroundColor: '#10b981',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { y: { grid: { color: '#1e293b' } }, x: { grid: { display: false } } },
+                    plugins: { legend: { labels: { color: '#cbd5e1' } } }
+                }
+            });
+        }
+
+        function saveVault() {
+            localStorage.setItem('adam_market_vault', JSON.stringify(marketData));
+        }
+
+        function loadVault() {
+            const data = localStorage.getItem('adam_market_vault');
+            if(data) {
+                try {
+                    marketData = JSON.parse(data);
+                    if(marketData.length > 0) {
+                         // Mock headers since we didn't save them, usually would save schema too
+                         renderTable(['Ticker', 'Price', 'Metric']);
+                         renderChart(['Ticker', 'Price', 'Metric']);
+                         updateStats();
+                    }
+                } catch(e) {
+                    console.error("Vault corruption detected:", e);
+                    clearData();
+                }
+            }
+        }
+
+        function clearData() {
+            localStorage.removeItem('adam_market_vault');
+            marketData = [];
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+            const tr = document.createElement('tr');
+            const td = document.createElement('td');
+            td.colSpan = 3;
+            td.className = "text-center py-4 text-gray-600";
+            td.textContent = "Vault Cleared";
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+
+            if(chartInstance) chartInstance.destroy();
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('stat-records').innerText = marketData.length;
+            const now = new Date();
+            document.getElementById('stat-update').innerText = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+        }
+
+        function exportCSV() {
+            if(!marketData.length) return;
+            let csv = "Ticker,Price,Value\n";
+            marketData.forEach(d => {
+                csv += `"${d.ticker}",${d.price},${d.val}\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'market_data_scrubber.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        window.onload = function() {
+            lucide.createIcons();
+            loadVault();
+        };
+    </script>
+
+    <!-- Adam Global Nav -->
+    <script src="../../showcase/js/nav.js" data-root="../.."></script>
+</body>
+</html>

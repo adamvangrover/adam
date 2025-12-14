@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Odyssey Credit Risk Entity",
+  "description": "Schema for a legal entity within the Odyssey Unified Financial Knowledge Graph.",
+  "type": "object",
+  "properties": {
+    "@id": {
+      "type": "string",
+      "description": "Unique URI for the entity (e.g., urn:fibo:be-le-cb:Corporation:US-5493006M3X2VSP4J6K22)"
+    },
+    "@type": {
+      "type": "string",
+      "enum": ["fibo-be-le-cb:Corporation", "fibo-be-le-lp:LimitedPartnership", "fibo-be-le-tr:Trust", "lending:UnrestrictedSubsidiary"]
+    },
+    "legalName": {
+      "type": "string"
+    },
+    "hasCreditFacility": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/CreditFacility"
+      }
+    },
+    "financials": {
+        "$ref": "#/definitions/FinancialStatement"
+    },
+    "riskProfile": {
+        "$ref": "#/definitions/RiskProfile"
+    }
+  },
+  "definitions": {
+    "CreditFacility": {
+      "type": "object",
+      "properties": {
+        "@id": { "type": "string" },
+        "facilityType": { "type": "string", "enum": ["Term Loan B", "Revolver", "DIP Financing"] },
+        "hasJCrewBlocker": { "type": "boolean", "description": "Lending Core extension: Prohibits IP transfer to unrestricted subs." },
+        "interestCoverageRatio": { "type": "number" }
+      },
+      "required": ["@id", "facilityType"]
+    },
+    "FinancialStatement": {
+        "type": "object",
+        "properties": {
+            "ebitda_reported": { "type": "number" },
+            "ebitda_adjustments": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "type": { "enum": ["SynergyAddback", "RestructuringCharge", "ManagementFeeAddback"] },
+                        "amount": { "type": "number" }
+                    }
+                }
+            }
+        }
+    },
+    "RiskProfile": {
+        "type": "object",
+        "properties": {
+            "probabilityOfDefault": { "type": "number" },
+            "lossGivenDefault": { "type": "number" },
+            "rating": { "type": "string" }
+        }
+    }
+  },
+  "required": ["@id", "@type", "legalName"]
+}

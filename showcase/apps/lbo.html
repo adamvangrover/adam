@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | LBO Modeler Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-dark: #020408;
+            --panel-glass: rgba(10, 15, 30, 0.7);
+            --purple-glow: #bc13fe;
+            --grid-line: rgba(188, 19, 254, 0.05);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 30px 30px;
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: var(--panel-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(188, 19, 254, 0.1);
+        }
+
+        input[type="number"] {
+            background: #050a14;
+            border: 1px solid #1e293b;
+            color: var(--purple-glow);
+            font-family: 'Courier New', monospace;
+            transition: all 0.3s ease;
+            font-size: 0.75rem;
+        }
+        input[type="number"]:focus {
+            border-color: var(--purple-glow);
+            box-shadow: 0 0 8px rgba(188, 19, 254, 0.3);
+            outline: none;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--purple-glow); }
+
+        table { border-collapse: separate; border-spacing: 0; width: 100%; }
+        th { background: rgba(188, 19, 254, 0.05); color: var(--purple-glow); font-weight: normal; text-transform: uppercase; letter-spacing: 1px; }
+        td { border-bottom: 1px solid #1e293b; padding: 4px; }
+
+        /* Sensitivity Table Styling */
+        .sens-cell { text-align: center; font-size: 0.7rem; }
+        .sens-header { font-weight: bold; color: #94a3b8; }
+        .sens-highlight { background: rgba(188, 19, 254, 0.15); font-weight: bold; color: white; border: 1px solid var(--purple-glow); }
+    </style>
+</head>
+<body class="h-screen flex flex-col p-4 text-xs">
+
+    <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2 flex-shrink-0">
+        <h1 class="text-lg font-bold text-white tracking-widest flex items-center">
+            <i data-lucide="layers" class="w-5 h-5 mr-2 text-purple-400"></i>
+            LBO MODELER <span class="text-[10px] ml-2 px-2 py-0.5 border border-purple-500/50 rounded text-purple-300">PRO</span>
+        </h1>
+        <div class="flex gap-2">
+            <button onclick="exportCSV()" class="px-3 py-1 bg-purple-900/20 border border-purple-500/30 text-purple-400 rounded hover:bg-purple-500/30 text-[10px] font-bold flex items-center gap-1">
+                <i data-lucide="download" class="w-3 h-3"></i> EXPORT
+            </button>
+            <div class="text-[10px] text-gray-500 self-center">LOCAL_MODE</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-12 gap-4 flex-grow overflow-hidden">
+        <!-- Sidebar Inputs -->
+        <aside class="col-span-3 space-y-3 overflow-y-auto pr-2 custom-scroll">
+
+            <div class="glass-panel p-3 rounded">
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold flex justify-between">
+                    <span>1. Entry & Uses</span>
+                    <i data-lucide="log-in" class="w-3 h-3"></i>
+                </div>
+                <div class="space-y-2">
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">LTM EBITDA ($M)</label>
+                        <input type="number" id="ltmEbitda" value="50" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Entry Multiple (x)</label>
+                        <input type="number" id="entryMult" value="10.0" step="0.5" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Transaction Fees ($M)</label>
+                        <input type="number" id="fees" value="10" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Min Cash ($M)</label>
+                        <input type="number" id="minCash" value="5" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-3 rounded">
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold flex justify-between">
+                    <span>2. Sources (Debt)</span>
+                    <i data-lucide="coins" class="w-3 h-3"></i>
+                </div>
+                <div class="space-y-2">
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Senior Debt ($M)</label>
+                        <input type="number" id="seniorDebt" value="200" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Senior Rate %</label>
+                        <input type="number" id="seniorRate" value="7.5" step="0.1" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Sub Debt ($M)</label>
+                        <input type="number" id="subDebt" value="50" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                    <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Sub Rate % (PIK)</label>
+                        <input type="number" id="subRate" value="12.0" step="0.1" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-3 rounded">
+                <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold flex justify-between">
+                    <span>3. Operations & Exit</span>
+                    <i data-lucide="log-out" class="w-3 h-3"></i>
+                </div>
+                <div class="space-y-2">
+                     <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">EBITDA Growth %</label>
+                        <input type="number" id="growth" value="5.0" step="0.5" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                     <div>
+                        <label class="block text-gray-400 text-[10px] mb-1">Capex % Rev (Proxy)</label>
+                        <input type="number" id="capex" value="3.0" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                    <div>
+                         <label class="block text-gray-400 text-[10px] mb-1">Exit Multiple (x)</label>
+                         <input type="number" id="exitMult" value="10.0" step="0.5" class="w-full px-2 py-1 rounded" onchange="runModel()">
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- Main Output -->
+        <main class="col-span-9 flex flex-col gap-3 overflow-y-auto pr-2 custom-scroll">
+
+            <!-- Sources and Uses Summary -->
+            <div class="glass-panel p-3 rounded">
+                <h3 class="text-xs font-bold text-gray-400 mb-2 uppercase">Transaction Summary (Entry)</h3>
+                <div class="grid grid-cols-2 gap-4">
+                     <!-- Uses -->
+                     <div>
+                        <table class="w-full text-[10px]">
+                            <tr class="border-b border-gray-700"><th class="text-left pb-1">Uses of Funds</th><th class="text-right pb-1">Amount</th><th class="text-right pb-1">%</th></tr>
+                            <tr><td class="text-gray-400 py-1">Purchase Price</td><td class="text-right" id="use-pp">$0</td><td class="text-right text-gray-500" id="use-pp-pct">0%</td></tr>
+                            <tr><td class="text-gray-400 py-1">Fees & Expenses</td><td class="text-right" id="use-fees">$0</td><td class="text-right text-gray-500" id="use-fees-pct">0%</td></tr>
+                            <tr><td class="text-gray-400 py-1">Min Cash to B/S</td><td class="text-right" id="use-cash">$0</td><td class="text-right text-gray-500" id="use-cash-pct">0%</td></tr>
+                            <tr class="font-bold border-t border-gray-700"><td class="text-white py-1">Total Uses</td><td class="text-right" id="use-total">$0</td><td class="text-right">100%</td></tr>
+                        </table>
+                     </div>
+                     <!-- Sources -->
+                     <div>
+                        <table class="w-full text-[10px]">
+                            <tr class="border-b border-gray-700"><th class="text-left pb-1">Sources of Funds</th><th class="text-right pb-1">Amount</th><th class="text-right pb-1">%</th></tr>
+                            <tr><td class="text-gray-400 py-1">Senior Debt</td><td class="text-right" id="src-senior">$0</td><td class="text-right text-gray-500" id="src-senior-pct">0%</td></tr>
+                            <tr><td class="text-gray-400 py-1">Sub Debt</td><td class="text-right" id="src-sub">$0</td><td class="text-right text-gray-500" id="src-sub-pct">0%</td></tr>
+                            <tr><td class="text-purple-400 font-bold py-1">Sponsor Equity</td><td class="text-right text-purple-400 font-bold" id="src-equity">$0</td><td class="text-right text-purple-400 font-bold" id="src-equity-pct">0%</td></tr>
+                            <tr class="font-bold border-t border-gray-700"><td class="text-white py-1">Total Sources</td><td class="text-right" id="src-total">$0</td><td class="text-right">100%</td></tr>
+                        </table>
+                     </div>
+                </div>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="glass-panel p-3 rounded flex items-center justify-between">
+                    <div>
+                        <div class="text-[10px] text-gray-500 uppercase">Sponsor IRR</div>
+                        <div class="text-2xl font-bold text-white mt-1 font-mono" id="kpi-irr">0.0%</div>
+                    </div>
+                    <div class="text-right">
+                         <div class="text-[10px] text-gray-500 uppercase">MOIC</div>
+                         <div class="text-xl font-bold text-purple-400 mt-1 font-mono" id="kpi-moic">0.0x</div>
+                    </div>
+                </div>
+                <div class="glass-panel p-3 rounded relative h-24">
+                     <canvas id="chart-lbo"></canvas>
+                </div>
+            </div>
+
+            <div class="glass-panel p-4 rounded">
+                <h3 class="text-xs font-bold text-purple-400 mb-3 flex items-center gap-2">
+                    <i data-lucide="table" class="w-3 h-3"></i> Returns & Deleveraging Schedule
+                </h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs font-mono">
+                        <thead>
+                            <tr class="text-gray-500 border-b border-gray-700">
+                                <th class="text-left py-2">Metric ($M)</th>
+                                <th class="text-right">Entry</th><th class="text-right">Y1</th><th class="text-right">Y2</th><th class="text-right">Y3</th><th class="text-right">Y4</th><th class="text-right">Exit</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lbo-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sensitivity -->
+            <div class="glass-panel p-3 rounded overflow-hidden flex flex-col h-48">
+                 <h3 class="text-xs font-bold text-gray-400 mb-2 flex items-center gap-2">
+                    <i data-lucide="grid" class="w-3 h-3"></i> Sensitivity: IRR
+                    <span class="text-[9px] text-gray-600 ml-auto">(Entry vs Exit Multiple)</span>
+                </h3>
+                <div class="flex-grow flex justify-center items-center">
+                    <div id="sensitivity-container" class="w-full h-full flex items-center justify-center">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let chartInstance = null;
+        let lastProj = [];
+
+        const getVal = (id) => parseFloat(document.getElementById(id).value) || 0;
+        const fmtMoney = (n) => `$${n.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1})}`;
+        const fmtPct = (n) => `${(n*100).toFixed(1)}%`;
+        const fmtX = (n) => `${n.toFixed(2)}x`;
+
+        function calculateLBO(entryMult, exitMult, inputs) {
+             const ev = inputs.ebitda * entryMult;
+             const totalUses = ev + inputs.fees + inputs.minCash;
+
+             const totalDebt = inputs.seniorDebt + inputs.subDebt;
+             const sponsorEquity = totalUses - totalDebt;
+
+             // Projections
+             let proj = [];
+             let currEbitda = inputs.ebitda;
+             let currSenior = inputs.seniorDebt;
+             let currSub = inputs.subDebt;
+
+             // Entry
+             proj.push({ year: 0, ebitda: currEbitda, senior: currSenior, sub: currSub, equity: sponsorEquity });
+
+             for(let i=1; i<=5; i++) {
+                 currEbitda *= (1 + inputs.growth);
+
+                 // Cash Flow Proxy
+                 // Assume EBITDA to FCF conversion is roughly 60% pre-interest
+                 let proxyFcf = currEbitda * 0.6;
+
+                 let srInt = currSenior * inputs.seniorRate;
+                 let subInt = currSub * inputs.subRate; // PIK
+
+                 let cashAvailable = proxyFcf - srInt; // Pay cash interest
+
+                 // Cash Sweep to Senior
+                 let paydown = Math.max(0, cashAvailable);
+                 currSenior = Math.max(0, currSenior - paydown);
+                 currSub += subInt; // PIK Accrual
+
+                 let netDebt = currSenior + currSub;
+                 // Mark to Market Equity (using Exit Mult as proxy)
+                 let currVal = currEbitda * exitMult;
+                 let currEq = currVal - netDebt;
+
+                 proj.push({ year: i, ebitda: currEbitda, senior: currSenior, sub: currSub, equity: currEq, fcf: cashAvailable });
+             }
+
+             // Returns
+             const exitVal = proj[5].ebitda * exitMult;
+             const exitNetDebt = proj[5].senior + proj[5].sub;
+             const exitEquity = exitVal - exitNetDebt;
+
+             const moic = exitEquity / sponsorEquity;
+             const irr = Math.pow(moic, 1/5) - 1;
+
+             return { irr, moic, proj, sponsorEquity, totalUses, ev };
+        }
+
+        function runModel() {
+            // Inputs
+            const ebitda = getVal('ltmEbitda');
+            const entryMult = getVal('entryMult');
+            const fees = getVal('fees');
+            const minCash = getVal('minCash');
+            const seniorDebt = getVal('seniorDebt');
+            const subDebt = getVal('subDebt');
+            const seniorRate = getVal('seniorRate') / 100;
+            const subRate = getVal('subRate') / 100;
+            const exitMult = getVal('exitMult');
+            const growth = getVal('growth') / 100;
+
+            const inputs = { ebitda, fees, minCash, seniorDebt, subDebt, seniorRate, subRate, growth };
+
+            // Run Base
+            const res = calculateLBO(entryMult, exitMult, inputs);
+            lastProj = res.proj;
+
+            // Render Sources & Uses
+            const totalDebt = seniorDebt + subDebt;
+            document.getElementById('use-pp').innerText = fmtMoney(res.ev);
+            document.getElementById('use-fees').innerText = fmtMoney(fees);
+            document.getElementById('use-cash').innerText = fmtMoney(minCash);
+            document.getElementById('use-total').innerText = fmtMoney(res.totalUses);
+
+            document.getElementById('use-pp-pct').innerText = fmtPct(res.ev/res.totalUses);
+            document.getElementById('use-fees-pct').innerText = fmtPct(fees/res.totalUses);
+            document.getElementById('use-cash-pct').innerText = fmtPct(minCash/res.totalUses);
+
+            document.getElementById('src-senior').innerText = fmtMoney(seniorDebt);
+            document.getElementById('src-sub').innerText = fmtMoney(subDebt);
+            document.getElementById('src-equity').innerText = fmtMoney(res.sponsorEquity);
+            document.getElementById('src-total').innerText = fmtMoney(res.totalUses);
+
+            document.getElementById('src-senior-pct').innerText = fmtPct(seniorDebt/res.totalUses);
+            document.getElementById('src-sub-pct').innerText = fmtPct(subDebt/res.totalUses);
+            document.getElementById('src-equity-pct').innerText = fmtPct(res.sponsorEquity/res.totalUses);
+
+            // KPIs
+            document.getElementById('kpi-irr').innerText = fmtPct(res.irr);
+            document.getElementById('kpi-moic').innerText = fmtX(res.moic);
+
+            // Table
+            const tbody = document.getElementById('lbo-body');
+            tbody.innerHTML = `
+                <tr><td>EBITDA</td>${lastProj.map(p=>`<td class="text-right text-gray-400">${fmtMoney(p.ebitda)}</td>`).join('')}</tr>
+                <tr><td>Senior Debt</td>${lastProj.map(p=>`<td class="text-right text-red-300">${fmtMoney(p.senior)}</td>`).join('')}</tr>
+                <tr><td>Sub Debt (PIK)</td>${lastProj.map(p=>`<td class="text-right text-red-400">${fmtMoney(p.sub)}</td>`).join('')}</tr>
+                <tr class="font-bold text-purple-400"><td>Equity Val</td>${lastProj.map(p=>`<td class="text-right">${fmtMoney(p.equity)}</td>`).join('')}</tr>
+            `;
+
+            // Chart
+            updateChart(lastProj);
+
+            // Sensitivity
+            renderSensitivity(entryMult, exitMult, inputs);
+        }
+
+        function updateChart(proj) {
+            if(chartInstance) chartInstance.destroy();
+            const ctx = document.getElementById('chart-lbo').getContext('2d');
+
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Entry', 'Y1', 'Y2', 'Y3', 'Y4', 'Exit'],
+                    datasets: [
+                        { label: 'Senior', data: proj.map(p=>p.senior), backgroundColor: '#f87171' },
+                        { label: 'Sub', data: proj.map(p=>p.sub), backgroundColor: '#dc2626' },
+                        { label: 'Equity', data: proj.map(p=>p.equity), backgroundColor: '#bc13fe' }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { y: { stacked: true, display: false }, x: { stacked: true, grid: { display: false }, ticks: { color: '#64748b', font: {size: 9} } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function renderSensitivity(baseEntry, baseExit, inputs) {
+            const container = document.getElementById('sensitivity-container');
+            let html = '<table class="w-full h-full border-collapse">';
+
+            // Header Row (Exit)
+            html += '<tr><td class="sens-header text-right pr-2">Entry \\ Exit</td>';
+            for(let c=-2; c<=2; c++) {
+                const e = baseExit + (c * 0.5);
+                html += `<td class="sens-header sens-cell">${fmtX(e)}</td>`;
+            }
+            html += '</tr>';
+
+            // Rows (Entry)
+            for(let r=-2; r<=2; r++) {
+                const en = baseEntry + (r * 0.5);
+                html += `<tr><td class="sens-header text-right pr-2">${fmtX(en)}</td>`;
+
+                for(let c=-2; c<=2; c++) {
+                    const ex = baseExit + (c * 0.5);
+                    const res = calculateLBO(en, ex, inputs);
+
+                    const isCenter = (r===0 && c===0);
+                    const cls = isCenter ? 'sens-highlight rounded' : (res.irr > 0.20 ? 'text-green-400' : (res.irr > 0.15 ? 'text-yellow-400' : 'text-red-400'));
+
+                    html += `<td class="sens-cell ${cls} p-1">${fmtPct(res.irr)}</td>`;
+                }
+                html += '</tr>';
+            }
+
+            html += '</table>';
+            container.innerHTML = html;
+        }
+
+        window.onload = function() {
+            lucide.createIcons();
+            runModel();
+        };
+
+        function exportCSV() {
+            if(!lastProj.length) return;
+            let csv = "Year,EBITDA,Senior Debt,Sub Debt,Equity Value\n";
+            lastProj.forEach(p => {
+                csv += `${p.year},${p.ebitda.toFixed(2)},${p.senior.toFixed(2)},${p.sub.toFixed(2)},${p.equity.toFixed(2)}\n`;
+            });
+            const irr = document.getElementById('kpi-irr').innerText;
+            const moic = document.getElementById('kpi-moic').innerText;
+            csv += `\nIRR,${irr}\nMOIC,${moic}\n`;
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.setAttribute('hidden', '');
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'lbo_model_pro.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+
+    <!-- Adam Global Nav -->
+    <script src="../../showcase/js/nav.js" data-root="../.."></script>
+</body>
+</html>

@@ -53,14 +53,14 @@ class ApiTestCase(unittest.TestCase):
 
     @patch('services.webapp.api.agent_orchestrator')
     def test_invoke_agent(self, mock_agent_orchestrator):
-        mock_agent_orchestrator.run_agent.return_value = {'result': 'success'}
+        mock_agent_orchestrator.execute_agent.return_value = {'result': 'success'}
         response = self.client.post('/api/agents/some_agent/invoke',
                                  data=json.dumps({'some': 'data'}),
                                  content_type='application/json')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         self.assertEqual(data, {'result': 'success'})
-        mock_agent_orchestrator.run_agent.assert_called_with('some_agent', {'some': 'data'})
+        mock_agent_orchestrator.execute_agent.assert_called_with('some_agent', {'some': 'data'})
 
     def test_portfolio_endpoints(self):
         # Create a test user and login
@@ -113,6 +113,16 @@ class ApiTestCase(unittest.TestCase):
         # Delete the portfolio
         response = self.client.delete(f'/api/portfolios/{portfolio_id}', headers=headers)
         self.assertEqual(response.status_code, 200)
+
+    def test_security_headers(self):
+        response = self.client.get('/api/hello')
+        headers = response.headers
+        self.assertIn('X-Content-Type-Options', headers)
+        self.assertEqual(headers['X-Content-Type-Options'], 'nosniff')
+        self.assertIn('X-Frame-Options', headers)
+        self.assertEqual(headers['X-Frame-Options'], 'SAMEORIGIN')
+        self.assertIn('Strict-Transport-Security', headers)
+        self.assertIn('max-age=31536000', headers['Strict-Transport-Security'])
 
 
 if __name__ == '__main__':

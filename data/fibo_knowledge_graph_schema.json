@@ -1,0 +1,138 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Adam 'Odyssey' FIBO-based Credit Risk Schema",
+  "description": "Formal ontology for the Odyssey Credit Risk System, aligned with FIBO (Financial Industry Business Ontology) for Legal Entities, Loans, and Covenants.",
+  "version": "1.0.0",
+  "type": "object",
+  "properties": {
+    "node_labels": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": { "type": "string" },
+          "description": { "type": "string" },
+          "fibo_mapping": { "type": "string", "description": "The corresponding FIBO class URI" },
+          "properties": { "type": "object" }
+        },
+        "required": ["label", "properties"]
+      },
+      "examples": [
+        {
+          "label": "LegalEntity",
+          "description": "Any entity which can incur legal obligation or who can have a right or power.",
+          "fibo_mapping": "fibo-be-le-lp:LegalEntity",
+          "properties": {
+            "legal_name": { "type": "string" },
+            "lei": { "type": "string", "description": "Legal Entity Identifier" },
+            "jurisdiction": { "type": "string" }
+          }
+        },
+        {
+          "label": "CreditFacility",
+          "description": "A formal financial assistance program offered by a lending institution.",
+          "fibo_mapping": "fibo-loan-ln-ln:CreditFacility",
+          "properties": {
+            "facility_name": { "type": "string" },
+            "total_commitment": { "type": "number" },
+            "currency": { "type": "string" }
+          }
+        },
+        {
+          "label": "Tranche",
+          "description": "A specific portion or class of a security or loan.",
+          "fibo_mapping": "fibo-sec-dbt-dbt:Tranche",
+          "properties": {
+            "tranche_type": { "type": "string", "enum": ["Revolver", "Term Loan A", "Term Loan B"] },
+            "amount": { "type": "number" },
+            "interest_rate_margin": { "type": "number" }
+          }
+        },
+        {
+          "label": "Covenant",
+          "description": "A clause in a loan agreement that requires the borrower to do or refrain from doing certain things.",
+          "fibo_mapping": "fibo-fnd-agr-ctr:Covenant",
+          "properties": {
+            "name": { "type": "string" },
+            "threshold": { "type": "number" },
+            "operator": { "type": "string", "enum": [">", "<", ">=", "<="] },
+            "type": { "type": "string", "enum": ["Maintenance", "Incurrence", "Affirmative", "Negative"] }
+          }
+        },
+        {
+          "label": "FinancialReport",
+          "description": "A point-in-time snapshot of the entity's financial health (Balance Sheet/Income Statement).",
+          "fibo_mapping": "fibo-fnd-acc-cur:FinancialReport",
+          "properties": {
+            "fiscal_period": { "type": "string" },
+            "report_date": { "type": "string", "format": "date" },
+            "ebitda": { "type": "number" },
+            "total_debt": { "type": "number" },
+            "cash": { "type": "number" },
+            "leverage_ratio": { "type": "number" }
+          }
+        },
+        {
+          "label": "RiskModel",
+          "description": "An output of the Odyssey Risk Engine.",
+          "properties": {
+            "model_version": { "type": "string" },
+            "run_date": { "type": "string", "format": "date-time" },
+            "recommendation": { "type": "string" },
+            "confidence_score": { "type": "number" }
+          }
+        }
+      ]
+    },
+    "relationship_types": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string" },
+          "description": { "type": "string" },
+          "fibo_mapping": { "type": "string" },
+          "properties": { "type": "object" }
+        },
+        "required": ["type"]
+      },
+      "examples": [
+        {
+          "type": "BORROWS",
+          "description": "The relationship between a Legal Entity and a Credit Facility.",
+          "fibo_mapping": "fibo-loan-ln-ln:hasBorrower",
+          "properties": {}
+        },
+        {
+          "type": "INCLUDES_TRANCHE",
+          "description": "A Facility includes one or more Tranches.",
+          "properties": {}
+        },
+        {
+          "type": "GOVERNED_BY",
+          "description": "A Tranche is governed by specific Covenants.",
+          "fibo_mapping": "fibo-fnd-agr-ctr:isGovernedBy",
+          "properties": {}
+        },
+        {
+          "type": "REPORTED",
+          "description": "A Legal Entity reported a Financial Report.",
+          "properties": {}
+        },
+        {
+          "type": "HAS_RISK_MODEL",
+          "description": "A Legal Entity is analyzed by a Risk Model.",
+          "properties": {}
+        },
+        {
+          "type": "VIOLATES",
+          "description": "A Financial Report indicates a violation of a Covenant.",
+          "properties": {
+            "margin": { "type": "number", "description": "The amount by which the covenant was missed." }
+          }
+        }
+      ]
+    }
+  },
+  "required": ["node_labels", "relationship_types"]
+}
