@@ -3,36 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v23.5 | Financial Engine</title>
+    <title>ADAM v25.0 | Financial Quantum Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
     <style>
         /* --- CORE THEME: ADAM TERMINAL --- */
         :root {
             --bg-dark: #050b14;
-            --panel-glass: rgba(15, 23, 42, 0.6);
+            --panel-glass: rgba(15, 23, 42, 0.7);
             --cyan-glow: #06b6d4;
             --purple-glow: #8b5cf6;
             --green-glow: #10b981;
             --red-glow: #ef4444;
+            --gold-glow: #f59e0b;
         }
 
-        body { 
-            background-color: var(--bg-dark); 
-            color: #e2e8f0; 
-            font-family: 'Courier New', Courier, monospace; 
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
             overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(6, 182, 212, 0.05) 0%, transparent 25%), 
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.05) 0%, transparent 25%);
         }
 
         /* Glassmorphism Panel */
-        .glass-panel { 
-            background: var(--panel-glass); 
-            backdrop-filter: blur(12px); 
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(148, 163, 184, 0.1); 
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        .glass-panel {
+            background: var(--panel-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
         }
 
         /* CRT Scanline Effect */
@@ -47,33 +52,38 @@
         }
 
         /* Custom Inputs */
-        input[type="number"], select { 
-            background: #0f172a; 
-            border: 1px solid #334155; 
-            color: #fff; 
+        input[type="number"], select {
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #fff;
             font-family: 'Courier New', monospace;
             transition: all 0.3s ease;
+            font-size: 0.75rem;
         }
-        input[type="number"]:focus, select:focus { 
-            border-color: var(--cyan-glow); 
-            box-shadow: 0 0 10px rgba(6, 182, 212, 0.2); 
-            outline: none; 
+        input[type="number"]:focus, select:focus {
+            border-color: var(--cyan-glow);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+            outline: none;
         }
 
         /* Range Slider Styling */
         input[type=range] {
-            -webkit-appearance: none; 
-            width: 100%; 
+            -webkit-appearance: none;
+            width: 100%;
             background: transparent;
         }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 16px; width: 16px;
+            height: 14px; width: 14px;
             border-radius: 50%;
             background: var(--cyan-glow);
             cursor: pointer;
-            margin-top: -6px;
+            margin-top: -5px;
             box-shadow: 0 0 10px var(--cyan-glow);
+            transition: transform 0.1s;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
         }
         input[type=range]::-webkit-slider-runnable-track {
             width: 100%; height: 4px;
@@ -83,125 +93,215 @@
         }
 
         /* KPI Cards */
-        .cyber-card { 
-            border-left: 4px solid var(--cyan-glow); 
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        .cyber-card {
+            border-left: 4px solid var(--cyan-glow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
-        .cyber-card:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.15); 
+        .cyber-card::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; bottom: 0; left: 0;
+            background: linear-gradient(135deg, transparent 90%, rgba(255,255,255,0.05) 100%);
+            z-index: 1;
+        }
+        .cyber-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 25px rgba(6, 182, 212, 0.2);
         }
         .cyber-card.alert { border-left-color: var(--red-glow); }
-        
+        .cyber-card.gold { border-left-color: var(--gold-glow); }
+
         /* Animations */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        .animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+
+        @keyframes ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .ticker-wrap {
+            overflow: hidden;
+            white-space: nowrap;
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .ticker-move { display: inline-block; animation: ticker 30s linear infinite; }
+        .ticker-item { display: inline-block; padding: 0 2rem; font-size: 10px; color: var(--cyan-glow); }
 
         /* Scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #020617; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
+        .tab-btn {
+            position: relative;
+            overflow: hidden;
+        }
+        .tab-btn::before {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; width: 0%; height: 2px;
+            background: var(--cyan-glow);
+            transition: width 0.3s ease;
+        }
+        .tab-btn:hover::before { width: 100%; }
         .tab-btn.active {
             color: var(--cyan-glow);
-            border-bottom: 2px solid var(--cyan-glow);
+            background: rgba(6, 182, 212, 0.05);
             text-shadow: 0 0 8px rgba(6, 182, 212, 0.4);
         }
+        .tab-btn.active::before { width: 100%; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col p-4 md:p-6">
-    
+<body class="min-h-screen flex flex-col p-2 md:p-4">
+
     <div class="scanlines"></div>
 
-    <header class="max-w-[1600px] mx-auto w-full mb-6 flex flex-col md:flex-row justify-between items-center border-b border-gray-800 pb-4 relative z-10">
-        <div class="flex items-center space-x-4 mb-4 md:mb-0">
-            <div class="h-10 w-10 bg-cyan-900/20 border border-cyan-500 rounded flex items-center justify-center text-cyan-400 font-bold text-xl">A</div>
+    <div class="ticker-wrap mb-4 rounded border border-gray-800 relative z-20">
+        <div class="ticker-move">
+            <span class="ticker-item">BTC/USD: $98,420 (+2.1%)</span>
+            <span class="ticker-item">SOFR: 4.85%</span>
+            <span class="ticker-item">US 10Y: 4.12%</span>
+            <span class="ticker-item">HIGH YIELD SPREAD: 385bps</span>
+            <span class="ticker-item">SYSTEM STATUS: OPTIMAL</span>
+            <span class="ticker-item">QUANTUM CORE: STABLE</span>
+            <span class="ticker-item">AI MODEL: ADAM v25.0</span>
+            <span class="ticker-item">DATE: 2025-12-14</span>
+        </div>
+    </div>
+
+    <header class="max-w-[1800px] mx-auto w-full mb-6 flex flex-col md:flex-row justify-between items-center border-b border-gray-800 pb-4 relative z-10">
+        <div class="flex items-center space-x-4 mb-4 md:mb-0 group">
+            <div class="h-12 w-12 bg-cyan-950/40 border border-cyan-500 rounded flex items-center justify-center text-cyan-400 font-bold text-2xl shadow-[0_0_15px_rgba(6,182,212,0.3)] group-hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] transition-all duration-300">A</div>
             <div>
-                <h1 class="text-2xl font-bold text-white tracking-widest uppercase">ADAM <span class="text-cyan-400">ENGINE</span></h1>
-                <p class="text-[10px] text-gray-500 tracking-[0.2em] uppercase">Financial Intelligence Unit v24.0</p>
+                <h1 class="text-2xl font-bold text-white tracking-widest uppercase flex items-center gap-2">
+                    ADAM <span class="text-cyan-400">QUANTUM</span>
+                    <span class="text-[10px] px-1 py-0.5 bg-cyan-900/50 rounded text-cyan-300 border border-cyan-700">v25.0</span>
+                </h1>
+                <p class="text-[10px] text-gray-500 tracking-[0.3em] uppercase">Advanced Financial Engineering Unit</p>
             </div>
         </div>
         <div class="flex items-center gap-3">
-            <button onclick="saveScenario()" class="px-3 py-1 text-xs border border-gray-700 rounded hover:border-cyan-500 hover:text-cyan-400 transition">SAVE STATE</button>
-            <button onclick="loadScenario()" class="px-3 py-1 text-xs border border-gray-700 rounded hover:border-cyan-500 hover:text-cyan-400 transition">LOAD LAST</button>
-            <button onclick="exportReport()" class="px-3 py-1 text-xs bg-cyan-900/30 border border-cyan-500/50 rounded text-cyan-400 hover:bg-cyan-500 hover:text-white transition">EXPORT PDF</button>
+            <button onclick="saveScenario()" class="px-3 py-1.5 text-xs border border-gray-700 bg-gray-900/50 rounded hover:border-cyan-500 hover:text-cyan-400 transition hover:shadow-[0_0_10px_rgba(6,182,212,0.2)]">SAVE STATE</button>
+            <button onclick="loadScenario()" class="px-3 py-1.5 text-xs border border-gray-700 bg-gray-900/50 rounded hover:border-cyan-500 hover:text-cyan-400 transition hover:shadow-[0_0_10px_rgba(6,182,212,0.2)]">LOAD LAST</button>
+            <button onclick="exportReport()" class="px-3 py-1.5 text-xs bg-cyan-900/20 border border-cyan-500/50 rounded text-cyan-400 hover:bg-cyan-500 hover:text-white transition hover:shadow-[0_0_15px_rgba(6,182,212,0.4)] flex items-center gap-2">
+                <span>EXPORT PDF</span>
+            </button>
             <div class="ml-4 pl-4 border-l border-gray-800 text-right hidden md:block">
-                <div class="text-[10px] text-green-500 font-mono animate-pulse">● SYSTEM ONLINE</div>
-                <div class="text-[10px] text-gray-600">LATENCY: 12ms</div>
+                <div class="text-[10px] text-green-500 font-mono animate-pulse flex items-center gap-1 justify-end">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> ONLINE
+                </div>
+                <div class="text-[10px] text-gray-600 font-mono" id="latency-disp">LATENCY: 12ms</div>
             </div>
         </div>
     </header>
 
-    <div class="max-w-[1600px] mx-auto w-full grid grid-cols-12 gap-6 relative z-10 flex-grow">
-        
-        <aside class="col-span-12 lg:col-span-3 space-y-6">
+    <div class="max-w-[1800px] mx-auto w-full grid grid-cols-12 gap-6 relative z-10 flex-grow">
+
+        <aside class="col-span-12 lg:col-span-3 space-y-4">
             
-            <div class="glass-panel p-5 rounded-lg border-t-2 border-t-cyan-500/50">
-                <h3 class="text-xs font-bold text-cyan-400 mb-4 uppercase tracking-wider flex justify-between">
-                    1. Financial Inputs <span class="text-gray-600">LTM</span>
+            <div class="glass-panel p-5 rounded-lg border-t-2 border-t-cyan-500/50 hover:border-t-cyan-400 transition-colors">
+                <h3 class="text-xs font-bold text-cyan-400 mb-4 uppercase tracking-wider flex justify-between items-center">
+                    <span>1. Financial Inputs</span>
+                    <span class="text-[9px] bg-cyan-950 px-1 rounded text-cyan-200">LTM</span>
                 </h3>
                 <div class="space-y-3">
                     <div>
                         <label class="flex justify-between text-[10px] text-gray-400 mb-1">
                             <span>LTM EBITDA</span>
-                            <span class="text-cyan-600" id="disp-ebitda">-</span>
+                            <span class="text-cyan-600 font-mono" id="disp-ebitda">-</span>
                         </label>
-                        <input type="number" id="ebitda" value="50000000" class="w-full px-2 py-1 rounded bg-slate-900 focus:ring-1 focus:ring-cyan-500" onchange="calculate()">
+                        <input type="number" id="ebitda" value="50000000" class="w-full px-2 py-1.5 rounded bg-slate-900 focus:ring-1 focus:ring-cyan-500" onchange="calculate()">
                     </div>
                     <div>
                         <label class="flex justify-between text-[10px] text-gray-400 mb-1">
                             <span>CAGR Growth</span>
-                            <span class="text-cyan-600" id="disp-growth">5%</span>
+                            <span class="text-cyan-600 font-mono" id="disp-growth">5%</span>
                         </label>
                         <input type="range" id="growth" min="-5" max="30" step="0.5" value="5" oninput="calculate()">
                     </div>
                     <div>
                         <label class="block text-[10px] text-gray-400 mb-1">Total Debt ($)</label>
-                        <input type="number" id="debt" value="200000000" class="w-full px-2 py-1 rounded bg-slate-900" onchange="calculate()">
+                        <input type="number" id="debt" value="200000000" class="w-full px-2 py-1.5 rounded bg-slate-900" onchange="calculate()">
                     </div>
                     <div>
                         <label class="block text-[10px] text-gray-400 mb-1">Annual Interest ($)</label>
-                        <input type="number" id="interest" value="18000000" class="w-full px-2 py-1 rounded bg-slate-900" onchange="calculate()">
+                        <input type="number" id="interest" value="18000000" class="w-full px-2 py-1.5 rounded bg-slate-900" onchange="calculate()">
+                    </div>
+                    <div class="pt-2 border-t border-gray-800 mt-2">
+                        <label class="flex justify-between text-[10px] text-gray-500 mb-1">
+                            <span>Tax Rate</span>
+                            <span class="text-gray-400" id="disp-tax">21%</span>
+                        </label>
+                        <input type="range" id="taxRate" min="0" max="40" value="21" class="h-1 opacity-50 hover:opacity-100" oninput="calculate()">
                     </div>
                 </div>
             </div>
 
-            <div class="glass-panel p-5 rounded-lg border-t-2 border-t-purple-500/50">
-                <h3 class="text-xs font-bold text-purple-400 mb-4 uppercase tracking-wider">2. Capital Structure</h3>
+            <div class="glass-panel p-5 rounded-lg border-t-2 border-t-purple-500/50 hover:border-t-purple-400 transition-colors">
+                <h3 class="text-xs font-bold text-purple-400 mb-4 uppercase tracking-wider flex justify-between">
+                    <span>2. Structuring</span>
+                    <i class="text-[9px] not-italic text-gray-500">WACC</i>
+                </h3>
                 <div class="space-y-3">
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <label class="block text-[10px] text-gray-400 mb-1">Entry Mult (x)</label>
-                            <input type="number" id="entryMult" value="10.0" step="0.1" class="w-full px-2 py-1 rounded bg-slate-900" onchange="calculate()">
+                            <input type="number" id="entryMult" value="10.0" step="0.1" class="w-full px-2 py-1.5 rounded bg-slate-900" onchange="calculate()">
                         </div>
                         <div>
                             <label class="block text-[10px] text-gray-400 mb-1">Cost Debt (%)</label>
-                            <input type="number" id="costDebt" value="8.5" step="0.1" class="w-full px-2 py-1 rounded bg-slate-900" onchange="calculate()">
+                            <input type="number" id="costDebt" value="8.5" step="0.1" class="w-full px-2 py-1.5 rounded bg-slate-900" onchange="calculate()">
                         </div>
                     </div>
                     <div>
                         <label class="flex justify-between text-[10px] text-gray-400 mb-1">
                             <span>Equity Contribution</span>
-                            <span class="text-purple-600" id="disp-equity">40%</span>
+                            <span class="text-purple-600 font-mono" id="disp-equity">40%</span>
                         </label>
                         <input type="range" id="equityPct" min="10" max="100" value="40" oninput="calculate()">
+                    </div>
+                    
+                    <div class="pt-2 border-t border-gray-800">
+                         <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-[9px] text-gray-500 mb-1">Risk Free (%)</label>
+                                <input type="number" id="riskFree" value="4.25" step="0.05" class="w-full px-1 py-1 rounded bg-slate-900/50 text-[10px]" onchange="calculate()">
+                            </div>
+                            <div>
+                                <label class="block text-[9px] text-gray-500 mb-1">Term. Growth (%)</label>
+                                <input type="number" id="termGrowth" value="2.0" step="0.1" class="w-full px-1 py-1 rounded bg-slate-900/50 text-[10px]" onchange="calculate()">
+                            </div>
+                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="glass-panel p-5 rounded-lg border-t-2 border-t-green-500/50">
-                <h3 class="text-xs font-bold text-green-400 mb-4 uppercase tracking-wider">3. Risk Simulation</h3>
+            <div class="glass-panel p-5 rounded-lg border-t-2 border-t-green-500/50 hover:border-t-green-400 transition-colors">
+                <h3 class="text-xs font-bold text-green-400 mb-4 uppercase tracking-wider">3. Risk Engine</h3>
                 <div class="space-y-3">
                     <div>
                         <label class="flex justify-between text-[10px] text-gray-400 mb-1">
                             <span>Volatility (σ)</span>
-                            <span class="text-green-600" id="disp-vol">15%</span>
+                            <span class="text-green-600 font-mono" id="disp-vol">15%</span>
                         </label>
                         <input type="range" id="volatility" min="5" max="60" value="15" oninput="document.getElementById('disp-vol').innerText = this.value + '%'">
                     </div>
-                    <button onclick="runMonteCarlo()" class="w-full py-2 bg-green-900/20 border border-green-500/30 text-green-400 text-xs font-bold rounded hover:bg-green-500/20 transition">RUN MONTE CARLO</button>
+                    <button onclick="runMonteCarlo()" class="w-full py-2 bg-green-900/20 border border-green-500/30 text-green-400 text-xs font-bold rounded hover:bg-green-500/20 hover:text-white transition shadow-[0_0_10px_rgba(16,185,129,0.1)] hover:shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+                        INITIATE MONTE CARLO
+                    </button>
                 </div>
+            </div>
+            
+            <div class="glass-panel p-3 rounded-lg border-t border-gray-700 h-32 overflow-hidden flex flex-col">
+                 <div class="text-[9px] text-gray-500 uppercase mb-1 border-b border-gray-800 pb-1">System Log</div>
+                 <div id="sys-log" class="flex-grow font-mono text-[9px] text-cyan-700 overflow-y-auto space-y-1">
+                     <div>> System initialized.</div>
+                 </div>
             </div>
         </aside>
 
@@ -210,37 +310,40 @@
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="glass-panel p-4 rounded-lg cyber-card">
                     <div class="text-[10px] text-gray-500 uppercase tracking-widest">Enterprise Value</div>
-                    <div class="text-2xl md:text-3xl font-bold text-white mt-1 font-mono" id="kpi-ev">-</div>
-                    <div class="text-[10px] text-cyan-600 mt-1">DCF Implied</div>
+                    <div class="text-2xl md:text-3xl font-bold text-white mt-1 font-mono tracking-tight" id="kpi-ev">-</div>
+                    <div class="text-[10px] text-cyan-600 mt-1 flex justify-between">
+                        <span>DCF Implied</span>
+                        <span id="ev-delta" class="text-gray-600">--</span>
+                    </div>
                 </div>
                 <div class="glass-panel p-4 rounded-lg cyber-card">
                     <div class="text-[10px] text-gray-500 uppercase tracking-widest">WACC</div>
-                    <div class="text-2xl md:text-3xl font-bold text-white mt-1 font-mono" id="kpi-wacc">-</div>
+                    <div class="text-2xl md:text-3xl font-bold text-white mt-1 font-mono tracking-tight" id="kpi-wacc">-</div>
                     <div class="text-[10px] text-gray-600 mt-1">Discount Rate</div>
                 </div>
                 <div class="glass-panel p-4 rounded-lg cyber-card" id="card-rating">
                     <div class="text-[10px] text-gray-500 uppercase tracking-widest">Reg Rating</div>
-                    <div class="text-2xl md:text-3xl font-bold text-white mt-1 font-mono" id="kpi-rating">-</div>
+                    <div class="text-2xl md:text-3xl font-bold text-white mt-1 font-mono tracking-tight" id="kpi-rating">-</div>
                     <div class="text-[10px] text-gray-600 mt-1">Base Case</div>
                 </div>
                 <div class="glass-panel p-4 rounded-lg cyber-card" id="card-snc">
                     <div class="text-[10px] text-gray-500 uppercase tracking-widest">SNC Status</div>
-                    <div class="text-2xl md:text-3xl font-bold text-white mt-1 font-mono" id="kpi-snc">-</div>
+                    <div class="text-2xl md:text-3xl font-bold text-white mt-1 font-mono tracking-tight" id="kpi-snc">-</div>
                     <div class="text-[10px] text-gray-600 mt-1">Shared National Credit</div>
                 </div>
             </div>
 
-            <div class="glass-panel rounded-lg flex-grow flex flex-col overflow-hidden min-h-[500px]">
+            <div class="glass-panel rounded-lg flex-grow flex flex-col overflow-hidden min-h-[550px] relative">
                 
-                <div class="flex border-b border-gray-800 bg-gray-900/50">
-                    <button onclick="switchTab('dcf')" id="btn-dcf" class="tab-btn active flex-1 py-3 text-xs font-bold uppercase tracking-wider text-gray-400 hover:bg-white/5 transition">DCF Model</button>
-                    <button onclick="switchTab('credit')" id="btn-credit" class="tab-btn flex-1 py-3 text-xs font-bold uppercase tracking-wider text-gray-400 hover:bg-white/5 transition">Credit Risk</button>
-                    <button onclick="switchTab('sponsor')" id="btn-sponsor" class="tab-btn flex-1 py-3 text-xs font-bold uppercase tracking-wider text-gray-400 hover:bg-white/5 transition">Sponsor/LBO</button>
-                    <button onclick="switchTab('sensitivity')" id="btn-sensitivity" class="tab-btn flex-1 py-3 text-xs font-bold uppercase tracking-wider text-gray-400 hover:bg-white/5 transition">Heatmap</button>
-                    <button onclick="switchTab('mc')" id="btn-mc" class="tab-btn flex-1 py-3 text-xs font-bold uppercase tracking-wider text-gray-400 hover:bg-white/5 transition">Monte Carlo</button>
+                <div class="flex border-b border-gray-800 bg-gray-900/50 overflow-x-auto">
+                    <button onclick="switchTab('dcf')" id="btn-dcf" class="tab-btn active flex-1 py-3 px-4 min-w-[100px] text-xs font-bold uppercase tracking-wider text-gray-400 hover:bg-white/5 transition">DCF Model</button>
+                    <button onclick="switchTab('credit')" id="btn-credit" class="tab-btn flex-1 py-3 px-4 min-w-[100px] text-xs font-bold uppercase tracking-wider text-gray-400 hover:bg-white/5 transition">Credit Risk</button>
+                    <button onclick="switchTab('sponsor')" id="btn-sponsor" class="tab-btn flex-1 py-3 px-4 min-w-[100px] text-xs font-bold uppercase tracking-wider text-gray-400 hover:bg-white/5 transition">Sponsor/LBO</button>
+                    <button onclick="switchTab('sensitivity')" id="btn-sensitivity" class="tab-btn flex-1 py-3 px-4 min-w-[100px] text-xs font-bold uppercase tracking-wider text-gray-400 hover:bg-white/5 transition">Heatmap</button>
+                    <button onclick="switchTab('mc')" id="btn-mc" class="tab-btn flex-1 py-3 px-4 min-w-[100px] text-xs font-bold uppercase tracking-wider text-gray-400 hover:bg-white/5 transition">Monte Carlo</button>
                 </div>
 
-                <div id="tab-dcf" class="tab-content p-6 animate-fade-in flex flex-col h-full">
+                <div id="tab-dcf" class="tab-content p-4 md:p-6 animate-fade-in flex flex-col h-full">
                     <div class="h-64 mb-6 relative w-full">
                         <canvas id="dcfChart"></canvas>
                     </div>
@@ -260,8 +363,11 @@
                     </div>
                 </div>
 
-                <div id="tab-credit" class="tab-content hidden p-6 animate-fade-in">
-                    <h4 class="text-sm font-bold text-white mb-4">Downside Stress Test</h4>
+                <div id="tab-credit" class="tab-content hidden p-4 md:p-6 animate-fade-in">
+                    <h4 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                        <span class="w-1 h-4 bg-red-500 inline-block"></span>
+                        Downside Stress Test
+                    </h4>
                     <div class="overflow-x-auto rounded border border-gray-800 mb-6">
                         <table class="w-full text-left text-sm text-gray-300">
                             <thead class="bg-gray-900/80 text-[10px] uppercase text-gray-500">
@@ -277,14 +383,17 @@
                         </table>
                     </div>
                     <div class="p-4 bg-red-900/10 border border-red-900/30 rounded text-xs text-gray-400">
-                        <strong>Note:</strong> Ratings are derived from internal logic mapping Leverage and Fixed Charge Coverage Ratio (FCCR) to regulatory pass grades. SNC status triggers if Debt > $100M.
+                        <strong class="text-red-400">Compliance Check:</strong> Ratings are derived from internal logic mapping Leverage and Fixed Charge Coverage Ratio (FCCR) to regulatory pass grades. SNC status triggers automatically if Debt > $100M.
                     </div>
                 </div>
 
-                <div id="tab-sponsor" class="tab-content hidden p-6 animate-fade-in">
+                <div id="tab-sponsor" class="tab-content hidden p-4 md:p-6 animate-fade-in">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 h-full">
-                        <div>
-                            <h4 class="text-sm font-bold text-white mb-4 border-b border-gray-800 pb-2">Exit Assumptions (Year 5)</h4>
+                        <div class="flex flex-col h-full">
+                            <h4 class="text-sm font-bold text-white mb-4 border-b border-gray-800 pb-2 flex justify-between items-center">
+                                <span>Exit Assumptions (Year 5)</span>
+                                <span class="text-[10px] text-purple-400">LBO MODEL</span>
+                            </h4>
                             <div class="mb-6">
                                 <label class="flex justify-between text-xs text-gray-400 mb-2">
                                     <span>Exit Multiple</span>
@@ -292,68 +401,82 @@
                                 </label>
                                 <input type="range" id="exitMult" min="4" max="20" step="0.5" value="10.0" oninput="calculate()">
                             </div>
-                            
-                            <div class="glass-panel p-4 rounded bg-gray-800/30 space-y-3 font-mono text-xs">
+
+                            <div class="glass-panel p-4 rounded bg-gray-900/40 space-y-3 font-mono text-xs border border-purple-500/20">
                                 <div class="flex justify-between">
                                     <span class="text-gray-500">Projected Exit EBITDA</span>
                                     <span class="text-white" id="sponsor-ebitda">$0</span>
                                 </div>
                                 <div class="flex justify-between">
-                                    <span class="text-gray-500">Net Debt at Exit (w/ Sweep)</span>
+                                    <span class="text-gray-500">Gross Debt (Entry)</span>
+                                    <span class="text-gray-400" id="sponsor-entrydebt">$0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Cash Sweep (Paydown)</span>
+                                    <span class="text-green-400" id="sponsor-paydown">$0</span>
+                                </div>
+                                <div class="flex justify-between border-t border-gray-700 pt-2">
+                                    <span class="text-gray-300">Net Debt at Exit</span>
                                     <span class="text-red-400" id="sponsor-netdebt">$0</span>
                                 </div>
-                                <div class="border-t border-gray-700 pt-2 flex justify-between">
-                                    <span class="text-purple-400 font-bold">Exit Equity Value</span>
-                                    <span class="text-purple-400 font-bold" id="sponsor-exitequity">$0</span>
+                                <div class="flex justify-between border-t border-gray-700 pt-2 mt-2 bg-purple-900/10 p-2 rounded">
+                                    <span class="text-purple-300 font-bold uppercase">Exit Equity Value</span>
+                                    <span class="text-purple-300 font-bold" id="sponsor-exitequity">$0</span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="flex flex-col justify-center space-y-4">
-                            <div class="glass-panel p-6 rounded text-center border border-gray-700 relative overflow-hidden">
-                                <div class="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
-                                <div class="text-[10px] text-gray-400 uppercase tracking-widest">MOIC (Multiple of Money)</div>
-                                <div class="text-5xl font-bold text-white mt-2 mb-1 tracking-tighter" id="sponsor-moic">-</div>
+                            <div class="glass-panel p-6 rounded text-center border border-gray-700 relative overflow-hidden group">
+                                <div class="absolute top-0 left-0 w-1 h-full bg-purple-500 group-hover:w-2 transition-all"></div>
+                                <div class="absolute right-0 top-0 opacity-10 text-9xl font-bold text-white -mt-4 -mr-4">M</div>
+                                <div class="text-[10px] text-gray-400 uppercase tracking-widest relative z-10">MOIC (Multiple of Money)</div>
+                                <div class="text-5xl font-bold text-white mt-2 mb-1 tracking-tighter relative z-10" id="sponsor-moic">-</div>
                             </div>
-                            <div class="glass-panel p-6 rounded text-center border border-gray-700 relative overflow-hidden">
-                                <div class="absolute top-0 left-0 w-1 h-full bg-cyan-500"></div>
-                                <div class="text-[10px] text-gray-400 uppercase tracking-widest">Internal Rate of Return (IRR)</div>
-                                <div class="text-5xl font-bold text-cyan-400 mt-2 mb-1 tracking-tighter" id="sponsor-irr">-</div>
+                            <div class="glass-panel p-6 rounded text-center border border-gray-700 relative overflow-hidden group">
+                                <div class="absolute top-0 left-0 w-1 h-full bg-cyan-500 group-hover:w-2 transition-all"></div>
+                                <div class="absolute right-0 top-0 opacity-10 text-9xl font-bold text-white -mt-4 -mr-4">%</div>
+                                <div class="text-[10px] text-gray-400 uppercase tracking-widest relative z-10">Internal Rate of Return (IRR)</div>
+                                <div class="text-5xl font-bold text-cyan-400 mt-2 mb-1 tracking-tighter relative z-10" id="sponsor-irr">-</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div id="tab-sensitivity" class="tab-content hidden p-6 animate-fade-in flex flex-col items-center justify-center">
-                    <h4 class="text-sm font-bold text-white mb-2">IRR Heatmap: Growth vs. Exit Multiple</h4>
+                <div id="tab-sensitivity" class="tab-content hidden p-4 md:p-6 animate-fade-in flex flex-col items-center justify-center">
+                    <h4 class="text-sm font-bold text-white mb-2 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                        IRR Heatmap: Growth vs. Exit Multiple
+                    </h4>
                     <p class="text-[10px] text-gray-500 mb-6">Values represent Sponsor IRR (%)</p>
                     <div class="overflow-x-auto w-full flex justify-center">
-                        <table class="text-center text-xs border-collapse" id="sens-table">
-                            </table>
+                        <table class="text-center text-xs border-collapse" id="sens-table"></table>
                     </div>
                 </div>
 
-                <div id="tab-mc" class="tab-content hidden p-6 animate-fade-in relative h-full flex flex-col">
+                <div id="tab-mc" class="tab-content hidden p-4 md:p-6 animate-fade-in relative h-full flex flex-col">
                     <div class="grid grid-cols-3 gap-4 mb-4">
-                        <div class="glass-panel p-3 text-center">
+                        <div class="glass-panel p-3 text-center border-b-2 border-green-500/50">
                             <div class="text-[10px] text-gray-500 uppercase">Mean EV</div>
                             <div class="text-lg font-bold text-green-400 font-mono" id="mc-mean">-</div>
                         </div>
-                        <div class="glass-panel p-3 text-center">
+                        <div class="glass-panel p-3 text-center border-b-2 border-red-500/50">
                             <div class="text-[10px] text-gray-500 uppercase">VaR (95%)</div>
                             <div class="text-lg font-bold text-red-400 font-mono" id="mc-var">-</div>
                         </div>
-                        <div class="glass-panel p-3 text-center">
+                        <div class="glass-panel p-3 text-center border-b-2 border-cyan-500/50">
                             <div class="text-[10px] text-gray-500 uppercase">Solvency Prob</div>
                             <div class="text-lg font-bold text-cyan-400 font-mono" id="mc-prob">-</div>
                         </div>
                     </div>
-                    <div class="flex-grow relative w-full">
+                    <div class="flex-grow relative w-full min-h-[300px]">
                         <canvas id="mcChart"></canvas>
-                        <div id="mc-loading" class="absolute inset-0 flex items-center justify-center bg-gray-900/90 backdrop-blur hidden z-20">
+                        
+                        <div id="mc-loading" class="absolute inset-0 flex items-center justify-center bg-gray-900/90 backdrop-blur-sm hidden z-20 rounded-lg">
                             <div class="text-center">
+                                <div class="inline-block w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-4"></div>
                                 <div class="text-green-500 font-mono text-xl animate-pulse">COMPUTING SCENARIOS...</div>
-                                <div class="text-xs text-gray-500 mt-2">Geometric Brownian Motion (N=5000)</div>
+                                <div class="text-xs text-gray-500 mt-2">Geometric Brownian Motion (N=10,000)</div>
                             </div>
                         </div>
                     </div>
@@ -366,10 +489,7 @@
     <script>
         // --- CONSTANTS & CONFIG ---
         const CONFIG = {
-            TAX_RATE: 0.21,
-            RISK_FREE: 0.0425,
             MRP: 0.06,
-            TERMINAL_GROWTH: 0.02,
             BETA: 1.2,
             YEARS: 5
         };
@@ -382,25 +502,40 @@
 
         // --- STATE & CHARTS ---
         let charts = { dcf: null, mc: null };
-        let state = { projections: [] };
+        let state = { projections: [], inputs: {} };
 
         // --- UTILS ---
         const fmtMoney = (n) => {
-            if (n >= 1e9) return "$" + (n/1e9).toFixed(1) + "B";
+            if (n >= 1e9) return "$" + (n/1e9).toFixed(2) + "B";
             if (n >= 1e6) return "$" + (n/1e6).toFixed(1) + "M";
             return "$" + n.toLocaleString(undefined, {maximumFractionDigits:0});
         };
-        const fmtPct = (n) => (n*100).toFixed(1) + "%";
+        
+        const log = (msg) => {
+            const el = document.getElementById('sys-log');
+            const time = new Date().toLocaleTimeString().split(' ')[0];
+            el.innerHTML += `<div><span class="text-gray-600">[${time}]</span> ${msg}</div>`;
+            el.scrollTop = el.scrollHeight;
+        };
+
+        // --- LATENCY SIMULATOR ---
+        setInterval(() => {
+            const ms = Math.floor(Math.random() * 15) + 5;
+            document.getElementById('latency-disp').innerText = `LATENCY: ${ms}ms`;
+        }, 2000);
 
         // --- DOM CONTROLLER ---
         function switchTab(id) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(`tab-${id}`).classList.remove('hidden');
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active', 'text-cyan-400', 'border-b-2', 'border-cyan-400'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             const btn = document.getElementById(`btn-${id}`);
             if(btn) btn.classList.add('active');
             
+            log(`Switched to module: ${id.toUpperCase()}`);
+
             if(id === 'sensitivity') renderSensitivityTable();
+            if(id === 'dcf') updateDCFChart(); // redraw to fix sizing issues
         }
 
         // --- MAIN CALCULATION ENGINE ---
@@ -414,18 +549,24 @@
                 entryMult: parseFloat(document.getElementById('entryMult').value),
                 costDebt: parseFloat(document.getElementById('costDebt').value) / 100,
                 equityPct: parseFloat(document.getElementById('equityPct').value) / 100,
-                exitMult: parseFloat(document.getElementById('exitMult').value)
+                exitMult: parseFloat(document.getElementById('exitMult').value),
+                taxRate: parseFloat(document.getElementById('taxRate').value) / 100,
+                riskFree: parseFloat(document.getElementById('riskFree').value) / 100,
+                termGrowth: parseFloat(document.getElementById('termGrowth').value) / 100
             };
+            state.inputs = inputs;
 
             // Update Input Displays
             document.getElementById('disp-ebitda').innerText = fmtMoney(inputs.ebitda);
             document.getElementById('disp-growth').innerText = (inputs.growth*100).toFixed(1) + "%";
             document.getElementById('disp-equity').innerText = (inputs.equityPct*100).toFixed(0) + "%";
             document.getElementById('disp-exitMult').innerText = inputs.exitMult.toFixed(1) + "x";
+            document.getElementById('disp-tax').innerText = (inputs.taxRate*100).toFixed(0) + "%";
+            document.getElementById('disp-vol').innerText = document.getElementById('volatility').value + "%";
 
             // 2. WACC Calc
-            const ke = CONFIG.RISK_FREE + CONFIG.BETA * CONFIG.MRP;
-            const wacc = (inputs.equityPct * ke) + ((1 - inputs.equityPct) * inputs.costDebt * (1 - CONFIG.TAX_RATE));
+            const ke = inputs.riskFree + CONFIG.BETA * CONFIG.MRP;
+            const wacc = (inputs.equityPct * ke) + ((1 - inputs.equityPct) * inputs.costDebt * (1 - inputs.taxRate));
 
             // 3. DCF Projection Loop
             let currentEbitda = inputs.ebitda;
@@ -435,7 +576,7 @@
 
             for (let i = 1; i <= CONFIG.YEARS; i++) {
                 currentEbitda *= (1 + inputs.growth);
-                const tax = currentEbitda * CONFIG.TAX_RATE;
+                const tax = currentEbitda * inputs.taxRate;
                 const capex = currentEbitda * 0.05; // Proxy 5%
                 const nwc = currentEbitda * 0.02;   // Proxy 2%
                 const fcf = currentEbitda - tax - capex - nwc;
@@ -450,8 +591,8 @@
             }
 
             // 4. Terminal Value
-            const finalFcf = state.projections[CONFIG.YEARS-1].fcf * (1 + CONFIG.TERMINAL_GROWTH);
-            const tv = finalFcf / (wacc - CONFIG.TERMINAL_GROWTH);
+            const finalFcf = state.projections[CONFIG.YEARS-1].fcf * (1 + inputs.termGrowth);
+            const tv = finalFcf / (wacc - inputs.termGrowth);
             const pvTv = tv / Math.pow((1 + wacc), CONFIG.YEARS);
             const ev = pvFcfSum + pvTv;
 
@@ -484,6 +625,13 @@
             document.getElementById('kpi-wacc').innerText = (wacc*100).toFixed(2) + "%";
             document.getElementById('kpi-rating').innerText = rating;
             
+            // Delta indicator for EV
+            const entryEv = inputs.ebitda * inputs.entryMult;
+            const delta = ((ev - entryEv)/entryEv)*100;
+            const deltaEl = document.getElementById('ev-delta');
+            deltaEl.innerText = (delta > 0 ? "+" : "") + delta.toFixed(1) + "% vs Entry";
+            deltaEl.className = delta > 0 ? "text-green-500 text-[10px]" : "text-red-500 text-[10px]";
+
             const sncEl = document.getElementById('kpi-snc');
             sncEl.innerText = isSnc ? "YES (Review)" : "NO";
             sncEl.className = isSnc ? "text-2xl md:text-3xl font-bold text-red-400 mt-1 font-mono" : "text-2xl md:text-3xl font-bold text-white mt-1 font-mono";
@@ -505,12 +653,18 @@
 
             // Update Sponsor Tab
             document.getElementById('sponsor-ebitda').innerText = fmtMoney(futureEbitda);
+            document.getElementById('sponsor-entrydebt').innerText = fmtMoney(inputs.debt);
+            document.getElementById('sponsor-paydown').innerText = "(-" + fmtMoney(cashSweep) + ")";
             document.getElementById('sponsor-netdebt').innerText = fmtMoney(remainingDebt);
             document.getElementById('sponsor-exitequity').innerText = fmtMoney(exitEquity);
-            document.getElementById('sponsor-moic').innerText = moic.toFixed(2) + "x";
+            
+            const moicEl = document.getElementById('sponsor-moic');
+            moicEl.innerText = moic.toFixed(2) + "x";
+            moicEl.className = (moic >= 2.0) ? "text-5xl font-bold text-green-400 mt-2 mb-1 tracking-tighter relative z-10" : "text-5xl font-bold text-white mt-2 mb-1 tracking-tighter relative z-10";
+
             const irrEl = document.getElementById('sponsor-irr');
             irrEl.innerText = isNaN(irr) ? "N/A" : (irr*100).toFixed(1) + "%";
-            irrEl.className = (irr > 0.20) ? "text-5xl font-bold text-green-400 mt-2 mb-1 tracking-tighter" : "text-5xl font-bold text-cyan-400 mt-2 mb-1 tracking-tighter";
+            irrEl.className = (irr > 0.20) ? "text-5xl font-bold text-green-400 mt-2 mb-1 tracking-tighter relative z-10" : "text-5xl font-bold text-cyan-400 mt-2 mb-1 tracking-tighter relative z-10";
 
             // Update Credit Stress Table
             const creditBody = document.getElementById('creditTableBody');
@@ -537,13 +691,22 @@
             const ctx = document.getElementById('dcfChart').getContext('2d');
             if (charts.dcf) charts.dcf.destroy();
             
+            // Gradient
+            const gradEbitda = ctx.createLinearGradient(0, 0, 0, 400);
+            gradEbitda.addColorStop(0, '#334155');
+            gradEbitda.addColorStop(1, '#0f172a');
+
+            const gradFcf = ctx.createLinearGradient(0, 0, 0, 400);
+            gradFcf.addColorStop(0, '#06b6d4');
+            gradFcf.addColorStop(1, '#0891b2');
+
             charts.dcf = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: state.projections.map(d => `Yr ${d.year}`),
                     datasets: [
-                        { label: 'EBITDA', data: state.projections.map(d => d.ebitda), backgroundColor: '#334155', borderRadius: 4 },
-                        { label: 'FCF', data: state.projections.map(d => d.fcf), backgroundColor: '#06b6d4', borderRadius: 4 }
+                        { label: 'EBITDA', data: state.projections.map(d => d.ebitda), backgroundColor: gradEbitda, borderRadius: 4, barPercentage: 0.6 },
+                        { label: 'FCF', data: state.projections.map(d => d.fcf), backgroundColor: gradFcf, borderRadius: 4, barPercentage: 0.6 }
                     ]
                 },
                 options: {
@@ -551,26 +714,27 @@
                     maintainAspectRatio: false,
                     scales: {
                         y: { display: false, grid: { display: false } },
-                        x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: {family: 'Courier New'} } }
                     },
-                    plugins: { legend: { display: true, labels: { color: '#cbd5e1' } } }
+                    plugins: { 
+                        legend: { display: true, labels: { color: '#cbd5e1', font: {family: 'Courier New'} } },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleColor: '#fff',
+                            bodyColor: '#cbd5e1',
+                            borderColor: '#334155',
+                            borderWidth: 1
+                        }
+                    }
                 }
             });
         }
 
         // --- SENSITIVITY ---
         function renderSensitivityTable() {
-            const inputs = {
-                ebitda: parseFloat(document.getElementById('ebitda').value),
-                debt: parseFloat(document.getElementById('debt').value),
-                entryMult: parseFloat(document.getElementById('entryMult').value),
-                equityPct: parseFloat(document.getElementById('equityPct').value) / 100,
-                baseGrowth: parseFloat(document.getElementById('growth').value),
-                baseExit: parseFloat(document.getElementById('exitMult').value)
-            };
-
-            const growthSteps = [-2, -1, 0, 1, 2].map(s => inputs.baseGrowth + s);
-            const exitSteps = [-2, -1, 0, 1, 2].map(s => inputs.baseExit + s);
+            const inputs = state.inputs;
+            const growthSteps = [-2, -1, 0, 1, 2].map(s => inputs.growth*100 + s); // Use raw input percentage
+            const exitSteps = [-2, -1, 0, 1, 2].map(s => inputs.exitMult + s);
 
             const table = document.getElementById('sens-table');
             let html = `<thead><tr><th class="p-2 text-gray-500 bg-gray-900 border border-gray-800">Exit \\ Growth</th>`;
@@ -585,9 +749,9 @@
                     const futEbitda = inputs.ebitda * Math.pow(1+gPct, CONFIG.YEARS);
                     const initEq = (inputs.ebitda * inputs.entryMult) * inputs.equityPct;
                     
-                    // Approx Sweep
-                    const approxCumFcf = (futEbitda * 0.6) * CONFIG.YEARS; // Rough proxy
-                    const remDebt = Math.max(0, inputs.debt - approxCumFcf*0.5);
+                    // Approx Sweep (using current cash sweep ratio)
+                    const approxCumFcf = (futEbitda * 0.6) * CONFIG.YEARS; // Rough proxy based on logic
+                    const remDebt = Math.max(0, inputs.debt - approxCumFcf*0.6); // 60% sweep
                     
                     const exEq = (futEbitda * e) - remDebt;
                     const moic = exEq / initEq;
@@ -599,7 +763,7 @@
                     else if (irr >= 0.20) { color = "text-green-200"; bg = "bg-green-900/10"; }
                     else if (irr < 0.10) { color = "text-red-400"; bg = "bg-red-900/20"; }
 
-                    html += `<td class="p-3 border border-gray-800 ${color} ${bg}">${(irr*100).toFixed(1)}%</td>`;
+                    html += `<td class="p-3 border border-gray-800 ${color} ${bg} hover:bg-white/5 transition cursor-default" title="MOIC: ${moic.toFixed(2)}x">${(irr*100).toFixed(1)}%</td>`;
                 });
                 html += `</tr>`;
             });
@@ -609,15 +773,16 @@
 
         // --- MONTE CARLO ---
         function runMonteCarlo() {
+            log("Initializing Monte Carlo Sequence...");
             document.getElementById('mc-loading').classList.remove('hidden');
             
             setTimeout(() => {
-                const sims = 5000;
+                const sims = 10000;
                 const vol = document.getElementById('volatility').value / 100;
-                const startEbitda = parseFloat(document.getElementById('ebitda').value);
-                const debt = parseFloat(document.getElementById('debt').value);
-                const growth = parseFloat(document.getElementById('growth').value) / 100;
-                const exitMult = parseFloat(document.getElementById('exitMult').value);
+                const startEbitda = state.inputs.ebitda;
+                const debt = state.inputs.debt;
+                const growth = state.inputs.growth;
+                const exitMult = state.inputs.exitMult;
 
                 const results = [];
                 let debtCovered = 0;
@@ -627,7 +792,7 @@
                 const sqrtT = Math.sqrt(CONFIG.YEARS);
 
                 for(let i=0; i<sims; i++) {
-                    // Box-Muller transform for standard normal Z
+                    // Box-Muller transform
                     const u = 1 - Math.random();
                     const v = Math.random();
                     const z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
@@ -651,6 +816,7 @@
 
                 renderMcChart(results);
                 document.getElementById('mc-loading').classList.add('hidden');
+                log("Monte Carlo Complete. N=10,000.");
             }, 100);
         }
 
@@ -659,7 +825,7 @@
             if(charts.mc) charts.mc.destroy();
 
             // Create Bins
-            const binCount = 30;
+            const binCount = 40;
             const min = data[0];
             const max = data[data.length-1];
             const step = (max-min)/binCount;
@@ -667,20 +833,25 @@
             const labels = [];
 
             for(let i=0; i<binCount; i++) {
-                labels.push(fmtMoney(min + (i*step)));
+                const val = min + (i*step);
+                labels.push(fmtMoney(val));
                 const limit = min + ((i+1)*step);
-                // Simple frequency count
-                bins[i] = data.filter(v => v >= (min + i*step) && v < limit).length;
+                bins[i] = data.filter(v => v >= val && v < limit).length;
             }
+
+            // Gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(16, 185, 129, 0.8)');
+            gradient.addColorStop(1, 'rgba(6, 182, 212, 0.2)');
 
             charts.mc = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Distribution',
+                        label: 'Frequency',
                         data: bins,
-                        backgroundColor: '#10b981',
+                        backgroundColor: gradient,
                         barPercentage: 1.0,
                         categoryPercentage: 1.0
                     }]
@@ -702,7 +873,8 @@
             const data = {};
             document.querySelectorAll('input').forEach(el => data[el.id] = el.value);
             localStorage.setItem('adam_state', JSON.stringify(data));
-            alert("System State Saved to Neural Memory.");
+            log("System state saved to LocalStorage.");
+            alert("System State Saved.");
         }
 
         function loadScenario() {
@@ -712,14 +884,17 @@
                 const el = document.getElementById(k);
                 if(el) el.value = data[k];
             });
+            log("System state restored.");
             calculate();
         }
 
         async function exportReport() {
+            log("Generating PDF Report...");
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             doc.setFont("courier");
             
+            // Dark Theme PDF Background
             doc.setFillColor(5, 11, 20);
             doc.rect(0, 0, 210, 297, 'F');
             doc.setTextColor(6, 182, 212);
@@ -740,29 +915,46 @@
                 y += 10;
             };
 
+            doc.setFontSize(12);
+            doc.setTextColor(6, 182, 212);
+            doc.text("1. CORE VALUATION", 20, y);
+            y += 10;
+            doc.setFontSize(10);
+            doc.setTextColor(200, 200, 200);
+
             addLine("LTM EBITDA", document.getElementById('disp-ebitda').innerText);
             addLine("IMPLIED EV (DCF)", document.getElementById('kpi-ev').innerText);
             addLine("WACC", document.getElementById('kpi-wacc').innerText);
             addLine("CREDIT RATING", document.getElementById('kpi-rating').innerText);
             
             y += 10;
+            doc.setFontSize(12);
             doc.setTextColor(6, 182, 212);
-            doc.text("SPONSOR RETURNS", 20, y);
+            doc.text("2. SPONSOR RETURNS", 20, y);
             y += 10;
+            doc.setFontSize(10);
             doc.setTextColor(200, 200, 200);
             addLine("EXIT MULTIPLE", document.getElementById('disp-exitMult').innerText);
             addLine("MOIC", document.getElementById('sponsor-moic').innerText);
             addLine("IRR", document.getElementById('sponsor-irr').innerText);
+            addLine("NET DEBT (EXIT)", document.getElementById('sponsor-netdebt').innerText);
+
+            // Add Disclaimer
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            doc.text("Generated by ADAM v25.0 Financial Quantum Engine. For simulation purposes only.", 20, 280);
 
             doc.save('Adam_Quantum_Report.pdf');
+            log("PDF Downloaded.");
         }
 
         // Init
-        window.onload = calculate;
+        window.onload = () => {
+            log("System Boot Sequence Initiated...");
+            calculate();
+            log("Calculations complete. Ready.");
+        };
 
     </script>
-
-    <!-- Adam Global Nav -->
-    <script src="../showcase/js/nav.js" data-root=".."></script>
 </body>
 </html>
