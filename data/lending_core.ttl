@@ -1,0 +1,31 @@
+@prefix lending: <http://adam-financial.com/ontologies/lending_core#> .
+@prefix fibo-loan-ln-ln: <https://spec.edmcouncil.org/fibo/ontology/LOAN/Loans/Loans/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+lending:UnrestrictedSubsidiary a rdfs:Class ;
+    rdfs:label "Unrestricted Subsidiary" ;
+    rdfs:comment "Entities designated outside the restricted credit group." .
+
+lending:hasJCrewBlocker a rdf:Property ;
+    rdfs:label "Has J.Crew Blocker" ;
+    rdfs:domain fibo-loan-ln-ln:Loan ;
+    rdfs:range xsd:boolean ;
+    rdfs:comment "If true, prohibits transfer of material IP to unrestricted subsidiaries." .
+
+lending:EBITDA_Adjustment a rdfs:Class ;
+    rdfs:label "EBITDA Adjustment" ;
+    rdfs:comment "Component of Adjusted EBITDA." .
+
+lending:SynergyAddback a rdfs:Class ;
+    rdfs:subClassOf lending:EBITDA_Adjustment ;
+    rdfs:label "Synergy Addback" .
+
+lending:RestructuringCharge a rdfs:Class ;
+    rdfs:subClassOf lending:EBITDA_Adjustment ;
+    rdfs:label "Restructuring Charge" .
+
+lending:ManagementFeeAddback a rdfs:Class ;
+    rdfs:subClassOf lending:EBITDA_Adjustment ;
+    rdfs:label "Management Fee Addback" .
