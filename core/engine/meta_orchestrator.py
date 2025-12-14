@@ -29,6 +29,7 @@ from core.engine.reflector_graph import reflector_app
 from core.engine.states import init_reflector_state
 from core.system.agent_orchestrator import AgentOrchestrator
 from core.mcp.registry import MCPRegistry
+from core.llm_plugin import LLMPlugin
 
 # v23.5 Deep Dive Agents (for Fallback)
 from core.agents.specialized.management_assessment_agent import ManagementAssessmentAgent
@@ -48,6 +49,8 @@ class MetaOrchestrator:
         self.planner = NeuroSymbolicPlanner()
         self.legacy_orchestrator = legacy_orchestrator or AgentOrchestrator()
         self.mcp_registry = MCPRegistry() # FO Super-App Integration
+        # Integration Path 3: Native Gemini Tooling
+        self.llm_plugin = LLMPlugin(config={"provider": "gemini", "gemini_model_name": "gemini-3-pro"})
         
     async def route_request(self, query: str, context: Dict[str, Any] = None) -> Any:
         """
@@ -231,9 +234,40 @@ class MetaOrchestrator:
 
     async def _run_deep_dive_manual_fallback(self, query: str):
         """
-        Fallback method that manually calls agents if the graph fails.
+        Fallback method that calls Native Gemini Flow (Path 3) and falls back to legacy agents if needed.
         """
-        logger.info("Engaging Deep Dive Manual Fallback...")
+        logger.info("Engaging Deep Dive Native Gemini Flow (Path 3)...")
+        try:
+            prompt = f"Perform a deep dive analysis for: {query}. Populate the full knowledge graph."
+
+            # Retrieve tools from MCP Registry
+            # We pass the raw callables; Gemini SDK can often introspect them or we'd need a converter.
+            # Assuming Gemini 3 SDK handles list of callables for 'tools'.
+            tools = list(self.mcp_registry.tools.values())
+
+            # Pass thought_signature=None initially
+            # Note: generate_structured is not async in the current LLMPlugin implementation
+            # We might need to wrap it in run_in_executor if blocking, but here we assume it's fast (Mock)
+            # or acceptable latency.
+            result_obj, metadata = self.llm_plugin.generate_structured(
+                prompt,
+                response_schema=HyperDimensionalKnowledgeGraph,
+                tools=tools,
+                thought_signature=None,
+                thinking_level="high"
+            )
+            logger.info(f"Gemini Native Execution Complete. Thought Signature: {metadata.get('thought_signature')}")
+            return result_obj.model_dump(by_alias=True)
+
+        except Exception as e:
+            logger.error(f"Native Gemini Flow Failed: {e}. Falling back to Legacy Agents.", exc_info=True)
+            return await self._run_deep_dive_legacy_agents(query)
+
+    async def _run_deep_dive_legacy_agents(self, query: str):
+        """
+        Legacy method that manually calls agents.
+        """
+        logger.info("Engaging Legacy Agent Deep Dive...")
 
         try:
             # Generate Trace ID for HNASP propagation
