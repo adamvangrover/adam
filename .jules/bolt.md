@@ -11,3 +11,7 @@
 ## 2024-05-24 - [Unused Components & Testing]
 **Learning:** Found `KnowledgeGraphVisualizer` was unused and untestable via the app. `react-force-graph-2d` requires mocking in JSDOM.
 **Action:** Always check if a component is mounted before trying to verify it visually. Use unit tests with mocks for library-heavy components.
+
+## 2025-05-18 - React Re-render Patterns
+**Learning:** In interactive components like Terminals, keeping the large list state (history) in the same component as the high-frequency input state (typing) causes massive re-renders.
+**Action:** Always separate "Display State" (slow changing) from "Input State" (fast changing) into separate components, or use `React.memo` on the Display component.
