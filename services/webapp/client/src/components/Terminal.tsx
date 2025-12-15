@@ -1,5 +1,30 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import { dataManager } from '../utils/DataManager';
+
+// Bolt: Memoized component for history rendering.
+// This prevents the entire history list (potentially hundreds of DOM nodes)
+// from re-rendering on every keystroke in the input field.
+const TerminalHistory = memo(({ history }: { history: string[] }) => {
+    const endRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        endRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [history]);
+
+    return (
+        <>
+            {history.map((line, i) => (
+                <div key={i} style={{
+                    marginBottom: '4px',
+                    color: line.startsWith('ERROR') ? '#f00' : (line.includes('[INFO]') ? '#0ff' : '#0f0')
+                }}>
+                    {line}
+                </div>
+            ))}
+            <div ref={endRef} />
+        </>
+    );
+});
 
 const Terminal: React.FC = () => {
   const [history, setHistory] = useState<string[]>([
@@ -8,7 +33,6 @@ const Terminal: React.FC = () => {
       '> TYPE "help" FOR COMMANDS'
   ]);
   const [input, setInput] = useState('');
-  const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleCommand = async (cmd: string) => {
@@ -83,10 +107,6 @@ const Terminal: React.FC = () => {
     setInput('');
   };
 
-  useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [history]);
-
   const focusInput = () => {
       inputRef.current?.focus();
   }
@@ -109,15 +129,7 @@ const Terminal: React.FC = () => {
         aria-live="polite"
         aria-label="Terminal Output"
       >
-        {history.map((line, i) => (
-            <div key={i} style={{
-                marginBottom: '4px',
-                color: line.startsWith('ERROR') ? '#f00' : (line.includes('[INFO]') ? '#0ff' : '#0f0')
-            }}>
-                {line}
-            </div>
-        ))}
-        <div ref={endRef} />
+        <TerminalHistory history={history} />
       </div>
       <div style={{ display: 'flex', borderTop: '1px solid #333', paddingTop: '10px', alignItems: 'center', position: 'relative', zIndex: 1 }}>
         <span style={{ color: '#f7d51d', marginRight: '10px' }}>$</span>
