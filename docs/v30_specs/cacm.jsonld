@@ -1,0 +1,25 @@
+{
+  "@context": "https://ontology.adam-financial.com/cacm/v1",
+  "@type": "CreditAnalysisCapabilityModule",
+  "id": "cacm:solvency_check_v1",
+  "semanticSignature": {
+    "verb": "Assess",
+    "subject": "Solvency"
+  },
+  "inputSchema": {
+    "required": ["financial_statements"],
+    "properties": {
+      "financial_statements": { "type": "credit:FinancialReport", "format": "XBRL" }
+    }
+  },
+  "computeLogic": {
+    "steps": [
+        {"id": "calc_debt_to_equity", "op": "div", "args": ["total_liabilities", "total_equity"]},
+        {"id": "calc_interest_coverage", "op": "div", "args": ["ebit", "interest_expense"]}
+    ]
+  },
+  "validationRules": [
+      {"rule": "debt_to_equity < 3.0", "severity": "warning"},
+      {"rule": "interest_coverage > 1.5", "severity": "critical"}
+  ]
+}
