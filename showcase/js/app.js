@@ -164,6 +164,15 @@ class GlobalSearch {
             }
         });
 
+        // Repo Files
+        if (window.REPO_DATA && window.REPO_DATA.nodes) {
+             window.REPO_DATA.nodes.forEach(node => {
+                if (node.label.toLowerCase().includes(query)) {
+                    results.push({ type: 'File', title: node.label, subtitle: node.path, link: 'data.html?file=' + encodeURIComponent(node.path) });
+                }
+             });
+        }
+
         return results.slice(0, 10); // Limit results
     }
 }
