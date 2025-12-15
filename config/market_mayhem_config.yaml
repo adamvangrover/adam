@@ -1,0 +1,26 @@
+# Adam v23.5 Simulation Config
+# Use this configuration to tune the simulation engine for the "Great Divergence" scenario.
+
+global_settings:
+  regime: "Stagflationary_Divergence"
+  base_currency: "USD"
+  risk_free_rate: 0.0485 # 4.85% 10Y Treasury
+
+scenarios:
+  black_swan:
+    - name: "Geopolitical_Escalation"
+      probability: 0.35
+      asset_impact:
+        energy: 1.45
+        consumer_discretionary: -0.20
+    - name: "Credit_Event_Shadow_Bank"
+      probability: 0.15
+      asset_impact:
+        private_credit_liquidity: -0.40
+        gold: 1.15
+
+demographic_stress_testing:
+  enabled: true
+  variables:
+    - "delinquency_spread_by_tract"
+    - "excess_savings_depletion_rate"
