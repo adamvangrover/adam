@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const menuItems = [
         { name: 'Mission Control', icon: 'fa-tachometer-alt', link: 'index.html' },
         { name: 'Chat Portal', icon: 'fa-comments', link: 'chat.html' },
+        { name: 'Terminal', icon: 'fa-terminal', link: 'terminal.html' },
         { type: 'divider' },
         { name: 'Trading Platform', icon: 'fa-chart-line', link: 'trading.html' },
         { name: 'Robo Advisor', icon: 'fa-robot', link: 'robo_advisor.html' },
@@ -27,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { type: 'divider' },
         { name: 'Reports Library', icon: 'fa-file-alt', link: 'reports.html' },
         { name: 'Data Vault', icon: 'fa-database', link: 'data.html' },
+        { name: 'App Deploy', icon: 'fa-rocket', link: 'deployment.html' },
     ];
 
     // 4. Build HTML
