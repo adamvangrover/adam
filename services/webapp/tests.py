@@ -165,5 +165,46 @@ class ApiTestCase(unittest.TestCase):
         self.assertIn('Invalid simulation name format', response.get_json()['error'])
 
 
+class SecurityTestCase(unittest.TestCase):
+    def setUp(self):
+        # We need CORE_INTEGRATION=True to reach the vulnerable code path
+        self.app = create_app('testing')
+        self.app.config['CORE_INTEGRATION'] = True
+        self.app_context = self.app.app_context()
+        self.app_context.push()
+        db.create_all()
+        self.client = self.app.test_client()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+        self.app_context.pop()
+
+    @patch('services.webapp.api.meta_orchestrator')
+    def test_analyze_error_leak(self, mock_meta):
+        # Setup the mock to raise a sensitive error
+        sensitive_info = "DB_PASSWORD=secret123"
+        mock_meta.route_request.side_effect = Exception(f"Connection failed: {sensitive_info}")
+
+        # Inject the mock into the api module
+        import services.webapp.api as api
+        original_meta = api.meta_orchestrator
+        api.meta_orchestrator = mock_meta
+
+        try:
+            response = self.client.post('/api/v23/analyze',
+                                     data=json.dumps({'query': 'test query'}),
+                                     content_type='application/json')
+
+            self.assertEqual(response.status_code, 500)
+            data = json.loads(response.data)
+
+            # Verify no leak
+            self.assertNotIn(sensitive_info, data['error'])
+            self.assertEqual(data['error'], 'An internal error occurred during analysis.')
+        finally:
+            api.meta_orchestrator = original_meta
+
+
 if __name__ == '__main__':
     unittest.main()
