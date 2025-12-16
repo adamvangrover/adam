@@ -1,0 +1,924 @@
+{
+  "market_baseline": {
+    "version": "23.5",
+    "version_notes": {
+      "19.1": "Initial baseline data structure, focused on modularity and future expansion. Includes synthetic global economic indicators and sample asset class data.",
+      "19.2": "Reserved for: Integration of real-time market data feeds, enhanced algorithmic trading simulations, and detailed human trading pattern analysis.",
+      "19.3": "Reserved for: Expansion of loan and asset valuation models, incorporation of quantum-inspired trading strategies, and refinement of machine learning data generation.",
+      "23.5": "Updated to Dec 2025. Includes NVDA 'Apex Paradox' scenario data, DeepSeek shock impact, and high-rate environment."
+    },
+    "simulation_metadata": {
+      "simulation_name": "Adam Market Baseline",
+      "creation_date": "2025-12-14T10:00:00Z",
+      "description": "Modular baseline market simulation data for Adam, designed for future expansion and integration with real-time data and advanced algorithms.",
+      "time_granularity": "daily",
+      "time_range": {
+        "start_date": "2020-01-01",
+        "end_date": "2025-12-14"
+      },
+      "random_seed": 12345
+    },
+    "data_modules": {
+      "global_economic_indicators": {
+        "module_version": "1.1",
+        "module_notes": "Updated with 2025 data reflecting 'DeepSeek Shock' and higher rates.",
+        "gdp_growth": [
+          {"date": "2020-01-01", "us": 0.02, "eu": 0.01, "china": 0.06},
+          {"date": "2021-01-01", "us": 0.04, "eu": 0.03, "china": 0.08},
+          {"date": "2022-01-01", "us": 0.025, "eu": 0.02, "china": 0.05},
+          {"date": "2023-01-01", "us": 0.01, "eu": 0.005, "china": 0.04},
+          {"date": "2024-01-01", "us": 0.02, "eu": 0.015, "china": 0.045},
+          {"date": "2025-01-01", "us": 0.018, "eu": 0.01, "china": 0.042},
+          {"date": "2025-12-01", "us": 0.015, "eu": 0.008, "china": 0.040}
+        ],
+        "inflation_rate": [
+          {"date": "2020-01-01", "us": 0.02, "eu": 0.01, "china": 0.03},
+          {"date": "2021-01-01", "us": 0.025, "eu": 0.015, "china": 0.028},
+          {"date": "2022-01-01", "us": 0.07, "eu": 0.06, "china": 0.02},
+          {"date": "2023-01-01", "us": 0.04, "eu": 0.03, "china": 0.01},
+          {"date": "2024-01-01", "us": 0.03, "eu": 0.025, "china": 0.015},
+          {"date": "2025-01-01", "us": 0.028, "eu": 0.022, "china": 0.018},
+          {"date": "2025-12-01", "us": 0.025, "eu": 0.020, "china": 0.016}
+        ],
+        "interest_rates": {
+          "federal_funds_rate": [
+            {"date": "2020-01-01", "rate": 0.0175},
+            {"date": "2022-03-16", "rate": 0.0050},
+            {"date": "2022-12-14", "rate": 0.0450},
+            {"date": "2024-07-26", "rate": 0.0550},
+            {"date": "2025-06-01", "rate": 0.0525},
+            {"date": "2025-12-01", "rate": 0.0500}
+          ],
+          "treasury_yield_curve": [
+            {"date": "2020-01-01", "1M": 0.015, "10Y": 0.028},
+            {"date": "2022-01-01", "1M": 0.005, "10Y": 0.032},
+            {"date": "2024-01-01", "1M": 0.045, "10Y": 0.06},
+            {"date": "2025-12-01", "1M": 0.042, "10Y": 0.058}
+          ]
+        },
+        "market_sentiment": [
+          {"date": "2020-01-01", "sentiment_score": 0.8},
+          {"date": "2020-03-15", "sentiment_score": 0.3},
+          {"date": "2021-01-01", "sentiment_score": 0.9},
+          {"date": "2022-01-01", "sentiment_score": 0.6},
+          {"date": "2023-01-01", "sentiment_score": 0.7},
+          {"date": "2024-01-01", "sentiment_score": 0.75},
+          {"date": "2025-01-25", "sentiment_score": 0.4, "note": "DeepSeek Shock"},
+          {"date": "2025-12-14", "sentiment_score": 0.6}
+        ]
+      },
+      "asset_classes": {
+        "module_version": "1.1",
+        "module_notes": "Added NVDA and updated indices to 2025.",
+        "equities": {
+          "stock_indices": {
+            "sp500": {
+              "historical_prices": [
+                {"date": "2020-01-01", "price": 3200},
+                {"date": "2020-03-23", "price": 2300},
+                {"date": "2021-01-01", "price": 3800},
+                {"date": "2022-01-01", "price": 4700},
+                {"date": "2023-01-01", "price": 3900},
+                {"date": "2024-01-01", "price": 4800},
+                {"date": "2025-01-01", "price": 5500},
+                {"date": "2025-12-14", "price": 5800}
+              ],
+              "volatility": [
+                {"date": "2020-01-01", "volatility": 0.15},
+                {"date": "2020-03-23", "volatility": 0.30},
+                {"date": "2021-01-01", "volatility": 0.12},
+                {"date": "2022-01-01", "volatility": 0.18},
+                {"date": "2023-01-01", "volatility": 0.22},
+                {"date": "2024-01-01", "volatility": 0.16},
+                {"date": "2025-01-25", "volatility": 0.35, "note": "Tech volatility spike"},
+                {"date": "2025-12-14", "volatility": 0.18}
+              ],
+              "trading_volume": [
+                {"date": "2020-01-01", "volume": 1000000000},
+                {"date": "2020-03-23", "volume": 1500000000},
+                {"date": "2021-01-01", "volume": 1200000000},
+                {"date": "2022-01-01", "volume": 1100000000},
+                {"date": "2023-01-01", "volume": 1300000000},
+                {"date": "2024-01-01", "volume": 1150000000},
+                {"date": "2025-12-14", "volume": 1200000000}
+              ]
+            }
+          },
+          "individual_stocks": {
+            "NVDA": {
+              "historical_prices": [
+                {"date": "2024-01-01", "price": 48.00, "split_adjusted": true},
+                {"date": "2025-01-01", "price": 135.00},
+                {"date": "2025-01-25", "price": 112.00, "note": "DeepSeek Shock low"},
+                {"date": "2025-12-14", "price": 175.00}
+              ],
+              "volatility": [
+                {"date": "2025-12-14", "volatility": 0.45}
+              ],
+              "fundamental_data": {
+                 "market_cap": 4400000000000,
+                 "pe_ratio": 41.2,
+                 "sector": "Semiconductors"
+              }
+            }
+          }
+        },
+        "fixed_income": {
+          "module_version": "0.1",
+          "module_notes": "Placeholder module.",
+          "government_bonds": [
+            {"date": "2020-01-01", "10Y_yield": 0.028, "10Y_price": 100.00},
+            {"date": "2022-01-01", "10Y_yield": 0.032, "10Y_price": 98.00},
+            {"date": "2024-01-01", "10Y_yield": 0.06, "10Y_price": 90.00},
+            {"date": "2025-12-14", "10Y_yield": 0.058, "10Y_price": 92.00}
+          ],
+          "corporate_bonds": [
+            {"date": "2020-01-01", "AAA_yield_spread": 0.005, "AAA_price": 102.00},
+            {"date": "2022-01-01", "AAA_yield_spread": 0.007, "AAA_price": 101.00},
+            {"date": "2024-01-01", "AAA_yield_spread": 0.01, "AAA_price": 95.00},
+            {"date": "2025-12-14", "AAA_yield_spread": 0.008, "AAA_price": 97.00}
+          ]
+        },
+        "derivatives": {
+          "module_version": "0.1",
+          "module_notes": "Placeholder module.",
+          "options": [
+            {
+              "date": "2020-01-01",
+              "asset": "sp500",
+              "type": "call",
+              "strike_price": 3250,
+              "expiry_date": "2020-03-31",
+              "premium": 100
+            },
+            {
+              "date": "2022-01-01",
+              "asset": "sp500",
+              "type": "put",
+              "strike_price": 4600,
+              "expiry_date": "2022-03-31",
+              "premium": 150
+            },
+            {
+              "date": "2025-12-14",
+              "asset": "NVDA",
+              "type": "put",
+              "strike_price": 145,
+              "expiry_date": "2026-03-31",
+              "premium": 8.50,
+              "note": "Hedging downside to intrinsic value"
+            }
+          ],
+          "futures": [
+            {
+              "date": "2020-01-01",
+              "asset": "crude_oil",
+              "contract_size": 1000,
+              "expiry_date": "2020-03-31",
+              "price": 60
+            },
+             {
+              "date": "2024-01-01",
+              "asset": "crude_oil",
+              "contract_size": 1000,
+              "expiry_date": "2024-03-31",
+              "price": 80
+            }
+          ]
+        },
+        "foreign_exchange": {
+          "module_version": "0.1",
+          "module_notes": "Placeholder module.",
+          "exchange_rates": [
+            {"date": "2020-01-01", "USD_EUR": 0.90, "USD_JPY": 109.00},
+            {"date": "2022-01-01", "USD_EUR": 0.88, "USD_JPY": 115.00},
+            {"date": "2024-01-01", "USD_EUR": 0.92, "USD_JPY": 145.00},
+            {"date": "2025-12-14", "USD_EUR": 0.94, "USD_JPY": 138.00}
+          ],
+          "currency_volatility": [
+            {"date": "2020-01-01", "EUR_USD_vol": 0.05, "JPY_USD_vol": 0.06},
+            {"date": "2022-01-01", "EUR_USD_vol": 0.07, "JPY_USD_vol": 0.08},
+            {"date": "2024-01-01", "EUR_USD_vol": 0.10, "JPY_USD_vol": 0.12},
+            {"date": "2025-12-14", "EUR_USD_vol": 0.09, "JPY_USD_vol": 0.11}
+          ]
+        },
+        "alternative_investments": {
+          "module_version": "0.1",
+          "module_notes": "Placeholder module.",
+          "commodities": [
+            {"date": "2020-01-01", "gold_price": 1550, "crude_oil_price": 60},
+            {"date": "2022-01-01", "gold_price": 1800, "crude_oil_price": 75},
+            {"date": "2024-01-01", "gold_price": 2000, "crude_oil_price": 80},
+            {"date": "2025-12-14", "gold_price": 2450, "crude_oil_price": 72}
+          ],
+          "real_estate": [
+            {"date": "2020-01-01", "us_housing_index": 220, "london_commercial_index": 180},
+            {"date": "2022-01-01", "us_housing_index": 250, "london_commercial_index": 190},
+            {"date": "2024-01-01", "us_housing_index": 240, "london_commercial_index": 185},
+            {"date": "2025-12-14", "us_housing_index": 255, "london_commercial_index": 188}
+          ]
+        }
+      },
+      "trading_strategies": {
+        "module_version": "1.1",
+        "module_notes": "Updated with 2025 trades.",
+        "algorithmic_trading": [
+          {
+            "strategy_id": "momentum_1",
+            "strategy_type": "momentum",
+            "parameters": {
+              "lookback_period": 20
+            },
+            "simulated_trades": [
+              {"date": "2020-01-02", "trade": "buy", "asset": "sp500", "price": 3210},
+              {"date": "2020-03-24", "trade": "sell", "asset": "sp500", "price": 2400},
+              {"date": "2021-01-02", "trade": "buy", "asset": "sp500", "price": 3850},
+              {"date": "2022-01-02", "trade": "buy", "asset": "sp500", "price": 4750},
+              {"date": "2023-01-02", "trade": "sell", "asset": "sp500", "price": 3950},
+              {"date": "2024-01-02", "trade": "buy", "asset": "sp500", "price": 4850},
+              {"date": "2025-01-26", "trade": "sell", "asset": "NVDA", "price": 115.00, "note": "Stop loss triggered after DeepSeek Shock"}
+            ]
+          },
+          {
+            "strategy_id": "mean_reversion_1",
+            "strategy_type": "mean_reversion",
+            "parameters": {
+              "lookback_period": 30,
+              "std_dev_threshold": 2
+            },
+            "simulated_trades": [
+                {"date": "2022-04-01", "trade":"buy", "asset": "sp500", "price":4400},
+                {"date": "2022-06-01", "trade":"sell", "asset": "sp500", "price":4600}
+            ]
+          }
+        ],
+        "human_trading_patterns": {
+          "module_version": "0.1",
+          "module_notes": "Sentiment placeholder.",
+          "sentiment_analysis": [
+            {"date": "2020-03-15", "positive_tweets": 1000, "negative_tweets": 5000},
+            {"date": "2021-01-01", "positive_tweets": 8000, "negative_tweets": 1000},
+            {"date": "2022-01-01", "positive_tweets": 4000, "negative_tweets": 3000},
+            {"date": "2025-01-25", "positive_tweets": 2000, "negative_tweets": 15000, "topic": "DeepSeek/NVDA"}
+          ],
+          "order_book_analysis": [
+            {"date": "2020-03-23", "buy_orders": 1000000000, "sell_orders": 1500000000},
+            {"date": "2021-01-01", "buy_orders": 1200000000, "sell_orders": 1000000000},
+            {"date": "2024-01-01", "buy_orders": 1150000000, "sell_orders": 1000000000},
+            {"date": "2025-12-14", "buy_orders": 1100000000, "sell_orders": 1300000000}
+          ]
+        }
+      },
+      "loan_asset_valuation": {
+        "module_version": "0.1",
+        "module_notes": "Placeholder module.",
+        "loan_portfolios": []
+      },
+      "machine_learning_data": {
+        "module_version": "0.1",
+        "module_notes": "Placeholder module.",
+        "training_data": [],
+        "feature_definitions": {}
+      }
+    }
+  }
+}
+
+{
+  "market_baseline": {
+    "version": "23.6",
+    "version_notes": {
+      "19.1": "Initial baseline data structure.",
+      "19.2": "Integration of real-time market data feeds.",
+      "19.3": "Expansion of loan and asset valuation models.",
+      "23.5": "Updated to Dec 2025. Includes NVDA 'Apex Paradox' scenario data.",
+      "23.6": "Comprehensive expansion. Added granular fixed income (SOFR/spreads), detailed crypto correlation, volatility surface data (VIX/MOVE), and leveraged loan indices. Refined 'DeepSeek Shock' transmission vectors across asset classes."
+    },
+    "simulation_metadata": {
+      "simulation_name": "Adam Market Baseline - Extended",
+      "creation_date": "2025-12-15T20:30:00Z",
+      "description": "Comprehensive multi-asset baseline simulation. Calibrated for high-rate regime (Fed Funds >5%) and AI-sector structural volatility.",
+      "time_granularity": "daily",
+      "time_range": {
+        "start_date": "2020-01-01",
+        "end_date": "2025-12-15"
+      },
+      "random_seed": 88291,
+      "scenarios_active": ["deepseek_shock_recovery", "nvda_apex_paradox", "higher_for_longer"]
+    },
+    "data_modules": {
+      "global_economic_indicators": {
+        "module_version": "2.0",
+        "module_notes": "Reflects sticky services inflation in US/EU and deflationary pressure in China.",
+        "gdp_growth": [
+          {"date": "2023-01-01", "us": 0.025, "eu": 0.005, "china": 0.052},
+          {"date": "2024-01-01", "us": 0.029, "eu": 0.010, "china": 0.048},
+          {"date": "2025-01-01", "us": 0.018, "eu": 0.008, "china": 0.045, "note": "Post-AI capex slowdown"},
+          {"date": "2025-06-01", "us": 0.012, "eu": 0.005, "china": 0.042},
+          {"date": "2025-12-01", "us": 0.019, "eu": 0.009, "china": 0.040}
+        ],
+        "inflation_rate_cpi_yoy": [
+          {"date": "2023-01-01", "us": 0.064, "eu": 0.085, "china": 0.021},
+          {"date": "2024-01-01", "us": 0.034, "eu": 0.031, "china": -0.008},
+          {"date": "2025-01-01", "us": 0.031, "eu": 0.028, "china": 0.005},
+          {"date": "2025-06-01", "us": 0.035, "eu": 0.029, "china": 0.010, "note": "Energy price spike"},
+          {"date": "2025-12-01", "us": 0.029, "eu": 0.024, "china": 0.015}
+        ],
+        "interest_rates": {
+          "federal_funds_rate": [
+            {"date": "2023-07-26", "rate": 0.0550},
+            {"date": "2024-09-18", "rate": 0.0525},
+            {"date": "2025-01-28", "rate": 0.0525, "note": "Fed holds due to DeepSeek market instability"},
+            {"date": "2025-06-15", "rate": 0.0500},
+            {"date": "2025-12-14", "rate": 0.0475}
+          ],
+          "sofr_rates": [
+            {"date": "2024-01-01", "1M": 0.0535, "3M": 0.0540},
+            {"date": "2025-01-25", "1M": 0.0545, "3M": 0.0560, "note": "Liquidity premium spike"},
+            {"date": "2025-12-14", "1M": 0.0480, "3M": 0.0495}
+          ],
+          "treasury_yield_curve": [
+            {"date": "2024-01-01", "2Y": 0.0425, "10Y": 0.0388, "30Y": 0.0405, "curve": "inverted"},
+            {"date": "2025-01-25", "2Y": 0.0410, "10Y": 0.0375, "30Y": 0.0415, "curve": "bull_steepening_flight_to_safety"},
+            {"date": "2025-12-14", "2Y": 0.0405, "10Y": 0.0425, "30Y": 0.0460, "curve": "normalizing"}
+          ]
+        },
+        "market_sentiment_indices": {
+          "fear_greed_index": [
+             {"date": "2024-12-01", "score": 75, "label": "Greed"},
+             {"date": "2025-01-25", "score": 12, "label": "Extreme Fear", "note": "DeepSeek shock"},
+             {"date": "2025-06-01", "score": 55, "label": "Neutral"},
+             {"date": "2025-12-14", "score": 62, "label": "Greed"}
+          ],
+          "move_index": [
+             {"date": "2025-01-25", "score": 145.0, "note": "Bond volatility spike"},
+             {"date": "2025-12-14", "score": 105.0}
+          ]
+        }
+      },
+      "asset_classes": {
+        "module_version": "2.1",
+        "module_notes": "Added Crypto, Expanded Equities Sectors.",
+        "equities": {
+          "stock_indices": {
+            "sp500": {
+              "historical_prices": [
+                {"date": "2024-01-01", "price": 4769.83},
+                {"date": "2025-01-01", "price": 5850.20},
+                {"date": "2025-01-25", "price": 5120.50, "note": "-12.5% drawdown (DeepSeek)"},
+                {"date": "2025-06-01", "price": 5600.00},
+                {"date": "2025-12-14", "price": 6050.00}
+              ],
+              "vix_index": [
+                {"date": "2024-01-01", "value": 13.5},
+                {"date": "2025-01-25", "value": 38.5, "note": "Panic threshold breached"},
+                {"date": "2025-12-14", "value": 16.2}
+              ]
+            },
+            "nasdaq_100": {
+               "historical_prices": [
+                {"date": "2024-01-01", "price": 16825},
+                {"date": "2025-01-01", "price": 21500},
+                {"date": "2025-01-25", "price": 17800, "note": "-17% Tech Rout"},
+                {"date": "2025-12-14", "price": 22400}
+               ]
+            },
+            "russell_2000": {
+               "historical_prices": [
+                {"date": "2025-01-01", "price": 2300},
+                {"date": "2025-12-14", "price": 2550, "note": "Broadening rally"}
+               ]
+            }
+          },
+          "individual_stocks": {
+            "NVDA": {
+              "prices": [
+                {"date": "2024-12-31", "price": 145.00},
+                {"date": "2025-01-25", "price": 108.50, "note": "DeepSeek Efficiency Shock"},
+                {"date": "2025-08-15", "price": 165.00, "note": "Recovery"},
+                {"date": "2025-11-20", "price": 195.00, "note": "Q3 Earnings Beat"},
+                {"date": "2025-12-14", "price": 175.00, "note": "Apex Paradox: Guidance cut despite record rev"}
+              ],
+              "beta": 1.45
+            },
+            "MSFT": {
+              "prices": [
+                 {"date": "2025-01-25", "price": 395.00},
+                 {"date": "2025-12-14", "price": 485.00}
+              ]
+            }
+          }
+        },
+        "fixed_income": {
+          "module_version": "2.0",
+          "module_notes": "Granular credit spreads and leveraged loan data.",
+          "credit_spreads_bps": [
+            {
+              "date": "2024-01-01",
+              "ig_spread": 105,
+              "hy_spread": 320
+            },
+            {
+              "date": "2025-01-25",
+              "ig_spread": 145,
+              "hy_spread": 480,
+              "note": "Risk-off widening"
+            },
+            {
+              "date": "2025-12-14",
+              "ig_spread": 115,
+              "hy_spread": 340
+            }
+          ],
+          "leveraged_loans": {
+            "index_name": "Morningstar LSTA US Leveraged Loan Index",
+            "data": [
+              {"date": "2025-01-01", "price": 96.50, "yield_to_maturity": 0.088},
+              {"date": "2025-01-25", "price": 92.10, "yield_to_maturity": 0.095},
+              {"date": "2025-12-14", "price": 95.80, "yield_to_maturity": 0.082}
+            ],
+            "default_rate_tm": 0.035
+          }
+        },
+        "cryptocurrency": {
+           "module_version": "1.0",
+           "module_notes": "Included for volatility correlation.",
+           "bitcoin": [
+             {"date": "2024-01-01", "price": 42500},
+             {"date": "2024-12-31", "price": 98000},
+             {"date": "2025-01-25", "price": 72000, "note": "Liquidation cascade"},
+             {"date": "2025-12-14", "price": 115000}
+           ],
+           "ethereum": [
+             {"date": "2025-12-14", "price": 4200}
+           ]
+        },
+        "derivatives": {
+          "options_chain_snapshot": {
+            "date": "2025-12-14",
+            "asset": "SPX",
+            "contracts": [
+              {"type": "put", "strike": 5500, "expiry": "2026-01-16", "iv": 0.18, "delta": -0.15},
+              {"type": "call", "strike": 6200, "expiry": "2026-01-16", "iv": 0.14, "delta": 0.25}
+            ]
+          },
+          "0dte_volume_ratio": 0.52
+        },
+        "foreign_exchange": {
+          "pairs": [
+            {"date": "2025-01-25", "USDJPY": 139.50, "EURUSD": 1.05, "note": "Yen carry unwind fear"},
+            {"date": "2025-12-14", "USDJPY": 142.00, "EURUSD": 1.09}
+          ]
+        },
+        "alternative_investments": {
+          "commodities": [
+            {"date": "2025-01-25", "gold": 2650, "oil_wti": 68.00},
+            {"date": "2025-12-14", "gold": 2800, "oil_wti": 75.50}
+          ]
+        }
+      },
+      "trading_strategies": {
+        "module_version": "2.0",
+        "module_notes": "Added Volatility Targeting and Risk Parity simulations.",
+        "algorithmic_trading": [
+          {
+            "strategy_id": "vol_target_1",
+            "strategy_type": "volatility_targeting",
+            "parameters": {"target_vol": 0.12, "rebalance_freq": "daily"},
+            "simulated_trades": [
+              {"date": "2025-01-20", "action": "reduce_exposure", "asset": "sp500", "reason": "VIX breakout > 20"},
+              {"date": "2025-02-15", "action": "increase_exposure", "asset": "sp500", "reason": "VIX mean reversion"}
+            ]
+          },
+          {
+             "strategy_id": "stat_arb_tech",
+             "strategy_type": "pairs_trading",
+             "parameters": {"pair": ["NVDA", "AMD"], "z_score_entry": 2.0},
+             "simulated_trades": [
+                {"date": "2025-12-10", "action": "short_A_long_B", "asset_A": "NVDA", "asset_B": "AMD", "note": "NVDA valuation divergence"}
+             ]
+          }
+        ],
+        "human_trading_patterns": {
+           "retail_sentiment": [
+             {"date": "2025-01-25", "sentiment": "panic_selling", "flow_data": "-$15B equity fund outflows"},
+             {"date": "2025-12-14", "sentiment": "fomo", "flow_data": "+$8B equity fund inflows"}
+           ]
+        }
+      },
+      "loan_asset_valuation": {
+        "module_version": "1.0",
+        "module_notes": "SNC and LBO portfolio simulations.",
+        "loan_portfolios": [
+          {
+             "portfolio_id": "tech_lbo_2024_vintage",
+             "total_par": 500000000,
+             "weighted_avg_spread": 450,
+             "weighted_avg_rating": "B-",
+             "valuation_history": [
+                {"date": "2025-01-01", "mark": 98.5},
+                {"date": "2025-01-25", "mark": 88.0, "note": "Tech valuation reset impact"},
+                {"date": "2025-12-14", "mark": 94.5}
+             ]
+          },
+          {
+             "portfolio_id": "shared_national_credits_snc",
+             "sector_exposure": {"energy": 0.3, "retail": 0.2, "healthcare": 0.5},
+             "non_accrual_rate": [
+                {"date": "2025-01-01", "rate": 0.012},
+                {"date": "2025-12-14", "rate": 0.021, "note": "Retail sector stress"}
+             ]
+          }
+        ]
+      }
+    }
+  }
+}
+
+{
+  "market_baseline": {
+    "version": "24.0",
+    "status": "LIVE_PRODUCTION",
+    "version_notes": {
+      "23.5": "User Provided: Hypothetical baseline.",
+      "24.0": "Verified History: integrated Jan 27 '25 DeepSeek crash data, Dec '25 Fed Cut (3.50-3.75%), and 'Apex Paradox' volatility surface."
+    },
+    "simulation_metadata": {
+      "simulation_name": "Adam_v24_Credit_Master",
+      "current_date": "2025-12-15T16:00:00Z",
+      "market_regime": "Late_Cycle_Disinflationary",
+      "active_narratives": [
+        "DeepSeek_Efficiency_Shock (Recovery Phase)",
+        "NVDA_Apex_Paradox (Active)",
+        "Private_Credit_Liquidity_Squeeze"
+      ]
+    },
+    "data_modules": {
+      "macro_environment": {
+        "rates_and_central_bank": {
+          "federal_funds_rate": {
+            "current_target": "3.50-3.75%",
+            "last_move": "-25bps (Dec 10, 2025)",
+            "history": [
+              {"date": "2024-09-18", "rate": 5.00, "action": "cut_50bps"},
+              {"date": "2025-01-29", "rate": 4.50, "action": "cut_25bps", "note": "Response to DeepSeek Shock"},
+              {"date": "2025-12-10", "rate": 3.625, "action": "cut_25bps"}
+            ]
+          },
+          "sofr_curve": {
+            "overnight": 3.63,
+            "1M": 3.58,
+            "3M": 3.45,
+            "6M": 3.35,
+            "note": "Inverted front-end signaling further cuts in Q1 2026"
+          },
+          "treasury_yields": {
+            "2Y": 3.15,
+            "10Y": 3.45,
+            "30Y": 3.85,
+            "10Y_2Y_spread": 0.30,
+            "curve_shape": "Bull Steepener"
+          }
+        },
+        "economic_indicators": {
+          "gdp_growth_yoy": {
+            "US": 1.7,
+            "Eurozone": 0.8,
+            "China": 4.1,
+            "note": "US slowing from 2.8% (2024) to 1.7% (2025) due to capex hesitation"
+          },
+          "inflation_pce_core": 2.4,
+          "unemployment_rate": 4.5
+        }
+      },
+      "equities_and_sectors": {
+        "indices": {
+          "SPX": {
+            "price": 5920.50,
+            "ytd_return": 0.12,
+            "vix": 18.5,
+            "vix_term_structure": "Contango"
+          },
+          "NDX": {
+            "price": 20450.00,
+            "note": "Underperforming SPX due to semi weight"
+          }
+        },
+        "mag7_detailed": {
+          "NVDA": {
+            "price": 138.50,
+            "market_cap": "3.4T",
+            "pe_ratio_ttm": 32.5,
+            "events": {
+              "deepseek_shock": {
+                "date": "2025-01-27",
+                "drop": "-17.0%",
+                "low_price": 118.50,
+                "reason": "R1 model proved training efficiency, questioning H100 demand"
+              },
+              "apex_paradox": {
+                "date": "2025-12-14",
+                "status": "active",
+                "divergence": "Revenue +8% QoQ vs Stock -4% MoM",
+                "narrative": "Market pricing in peak margins; 'Good news is bad news'"
+              }
+            }
+          },
+          "MSFT": {
+            "price": 445.00,
+            "note": "Defensive rotation beneficiary; Azure-DeepSeek integration announced Feb '25"
+          }
+        },
+        "sector_performance_ytd": {
+          "Technology": 0.08,
+          "Utilities": 0.18,
+          "Financials": 0.15,
+          "Real_Estate": 0.14,
+          "note": "Defensive/Yield sectors outperforming Tech post-Jan shock"
+        }
+      },
+      "credit_markets": {
+        "spreads_bps": {
+          "IG_CDX": 58.0,
+          "HY_CDX": 345.0,
+          "AAA_Muni": 2.85,
+          "note": "Spreads tight despite slowing growth; 'priced for perfection'"
+        },
+        "leveraged_loans": {
+          "benchmark": "Morningstar LSTA US LL Index",
+          "price": 96.20,
+          "distress_ratio": 4.2,
+          "default_rate_LTM": 3.1,
+          "watch_list_sectors": ["Software (B- rated)", "Telehealth", "Legacy Media"],
+          "clo_equity_arbitrage": {
+            "status": "Compressed",
+            "arb_gap": 180,
+            "note": "Loan prices high, liability spreads tight. Equity returns squeezed."
+          }
+        },
+        "private_credit": {
+          "dry_powder": "1.4T",
+          "avg_yield_senior_secured": 9.5,
+          "covenant_lite_ratio": 0.85,
+          "stress_event": {
+            "date": "2025-10-17",
+            "description": "Blackstone/Apollo markdowns on 'Software-as-a-Service' collateral",
+            "impact": "NAV write-downs of 3-5% across BDCs"
+          }
+        }
+      },
+      "crypto_assets": {
+        "correlation_matrix": {
+          "BTC_to_NVDA": 0.65,
+          "BTC_to_M2_Supply": 0.82
+        },
+        "assets": {
+          "BTC": {
+            "price": 98500.00,
+            "dominance": 0.58,
+            "narrative": "Sovereign adoption vs. Tech beta"
+          },
+          "ETH": {
+            "price": 3850.00,
+            "gas_fees_gwei": 12
+          }
+        }
+      },
+      "derivatives_and_volatility": {
+        "volatility_surface": {
+          "SPX_ATM_IV": 14.2,
+          "NVDA_ATM_IV": 48.0,
+          "skew": "Steep Put Skew (Downside protection expensive)",
+          "0DTE_volume_share": 0.55
+        },
+        "swaps": {
+          "2Y_SOFR_Swap": 3.12,
+          "10Y_SOFR_Swap": 3.40,
+          "spread_to_treasury": -5.0
+        }
+      },
+      "market_plumbing": {
+        "reverse_repo_facility": {
+          "volume": "150B",
+          "trend": "Draining rapidly",
+          "implication": "Liquidity returning to bank reserves"
+        },
+        "fail_to_deliver": {
+          "symbol": "NVDA",
+          "count": 450000,
+          "date": "2025-12-14",
+          "note": "Elevated fails suggesting naked shorting pressure"
+        }
+      }
+    }
+  }
+}
+
+{
+  "market_baseline": {
+    "version": "25.0",
+    "status": "LIVE_PRODUCTION",
+    "last_updated": "2025-12-15T21:45:00Z",
+    "simulation_metadata": {
+      "simulation_id": "ADAM_Omnibus_v25",
+      "market_regime": "Disinflationary_Tech_Correction",
+      "active_narratives": [
+        "NVDA_Apex_Paradox (Growth Deceleration)",
+        "Post_DeepSeek_Capex_Review",
+        "Sovereign_Debt_Re-pricing",
+        "Agentic_AI_Productivity_Jcurve"
+      ],
+      "risk_indices": {
+        "geopolitical_risk_index_gpr": 145.2,
+        "financial_stress_index_fsi": 0.85,
+        "supply_chain_pressure_index": -0.40
+      }
+    },
+    "data_modules": {
+      "global_macro": {
+        "central_banks": {
+          "federal_reserve": {
+            "target_rate": "3.50-3.75%",
+            "policy_stance": "Accommodative",
+            "next_meeting": "2026-01-27",
+            "dot_plot_median_2026": 3.00,
+            "balance_sheet_reduction": "Paused"
+          },
+          "ecb": {
+            "deposit_facility_rate": 2.50,
+            "policy_stance": "Neutral",
+            "note": "Lagging Fed cuts due to sticky German wage growth"
+          },
+          "boj": {
+            "policy_rate": 0.75,
+            "policy_stance": "Tightening",
+            "yield_curve_control": "Abandoned",
+            "note": "Gradual normalization causing Yen volatility"
+          },
+          "pboc": {
+            "1y_lpr": 3.10,
+            "policy_stance": "Stimulative",
+            "note": "Deflation fighting mode; liquidity injections active"
+          }
+        },
+        "economic_calendar_events": {
+          "recent_actuals": [
+            {"date": "2025-12-10", "event": "FOMC Rate Decision", "actual": "-25bps", "consensus": "-25bps"},
+            {"date": "2025-12-05", "event": "US Non-Farm Payrolls", "actual": "145k", "consensus": "160k"}
+          ],
+          "upcoming_risks": [
+            {"date": "2025-12-21", "event": "Chile Presidential Election (Runoff)", "risk_level": "Medium", "impact_sector": "Lithium/Copper"},
+            {"date": "2025-12-28", "event": "Myanmar General Election", "risk_level": "High", "impact_sector": "Rare Earth Elements Supply"},
+            {"date": "2026-01-15", "event": "TSMC Q4 Earnings", "risk_level": "Critical", "impact_sector": "Global Tech"}
+          ]
+        }
+      },
+      "equities_and_sectors": {
+        "indices_performance_ytd": {
+          "SPX": 0.08,
+          "NDX": 0.04,
+          "RUT": 0.14,
+          "FTSE100": 0.06,
+          "N225": -0.02,
+          "CSI300": 0.12
+        },
+        "mag7_detailed": {
+          "NVDA": {
+             "price": 138.50, "pe_fw": 28.4, "peg_ratio": 1.8, "narrative": "Apex Paradox: Record cash flow, but growth rate halving."
+          },
+          "MSFT": {
+             "price": 445.00, "pe_fw": 31.0, "narrative": "Safe haven; Azure AI growing 45% YoY."
+          },
+          "AAPL": {
+             "price": 242.00, "pe_fw": 29.5, "narrative": "iPhone 17 'Super Cycle' driven by edge-AI features."
+          },
+          "AMZN": {
+             "price": 210.00, "narrative": "Kuiper satellite internet revenue beginning to scale."
+          }
+        },
+        "sector_watch": {
+          "quantum_computing": {
+            "index_ticker": "QTUM",
+            "ytd": 0.35,
+            "constituents": [
+              {"ticker": "IONQ", "price": 28.50, "note": "Partnered with Dell for hybrid racks"},
+              {"ticker": "RGTI", "price": 12.40, "note": "Rigetti 128-qubit chip commercialized"},
+              {"name": "Anyon Systems", "status": "Private", "note": "$23M CAD grant Dec 15 '25 for fault-tolerance"}
+            ]
+          },
+          "semiconductors": {
+            "index_ticker": "SOXX",
+            "ytd": -0.05,
+            "note": "weighed down by 'DeepSeek Efficiency' fears lowering total TAM"
+          }
+        },
+        "ipo_vintage_2025": {
+          "recent_listings": [
+            {"ticker": "NBIS", "name": "Nebius Group", "ipo_date": "2025-10-15", "return_since_ipo": -0.07, "sector": "Neo-Cloud"},
+            {"ticker": "CRWV", "name": "CoreWeave", "ipo_date": "2025-03-20", "return_since_ipo": 2.10, "note": "Volatile; short-seller target"},
+            {"ticker": "OMDA", "name": "Omada Health", "ipo_date": "2025-06-06", "return_since_ipo": 0.21}
+          ],
+          "pipeline_watch": [
+            {"name": "Stripe", "est_valuation": "65B", "status": "Filed Confidential", "expected": "Q1 2026"},
+            {"name": "Databricks", "est_valuation": "43B", "status": "Pre-IPO Roadshow", "expected": "Q1 2026"},
+            {"name": "Reliance Jio", "est_valuation": "120B", "exchange": "NSE/BSE", "expected": "Q2 2026"}
+          ]
+        }
+      },
+      "credit_markets": {
+        "sovereign_curves": {
+          "US": {"3M": 3.45, "2Y": 3.15, "10Y": 3.45, "30Y": 3.85},
+          "DE": {"2Y": 2.10, "10Y": 2.45},
+          "JP": {"2Y": 0.45, "10Y": 1.15},
+          "UK": {"2Y": 3.80, "10Y": 4.10}
+        },
+        "corporate_credit": {
+          "investment_grade": {
+            "index_yield": 4.65,
+            "spread_to_tsy": 120,
+            "issuance_volume_ytd": "1.4T",
+            "top_issuer": "JPMorgan Chase"
+          },
+          "high_yield": {
+            "index_yield": 7.10,
+            "spread_to_tsy": 365,
+            "default_rate": 0.028,
+            "distress_ratio": 0.05
+          }
+        },
+        "private_credit_direct_lending": {
+          "market_size": "1.9T",
+          "benchmark_rate": "SOFR + 575bps",
+          "senior_secured_yield": 9.38,
+          "sectors_under_stress": ["SaaS (Churn > 15%)", "Healthcare Services (Wage inflation)"],
+          "recent_event": {
+             "date": "2025-10-17",
+             "event": "Project 'Apex' Write-down",
+             "details": "Major BDC marks down loan to Vista-backed software co by 12%."
+          }
+        }
+      },
+      "alternative_investments": {
+        "digital_assets": {
+          "bitcoin": {"price": 98500, "dominance": 0.58, "institutional_ownership": 0.22},
+          "ethereum": {"price": 3850, "staking_yield": 0.032},
+          "defi_tvl": "145B",
+          "tokenized_rwa": {
+             "total_aum": "12B",
+             "leaders": ["BlackRock BUIDL", "Franklin Templeton FOBXX", "Ondo OUSG"],
+             "trend": "T-Bills on chain seeing outflows as yields drop."
+          }
+        },
+        "commodities": {
+          "energy": {
+             "wti_crude": 68.50,
+             "brent_crude": 72.10,
+             "nat_gas_henry_hub": 3.45,
+             "uranium_u3o8": 82.00, "note": "Nuclear renaissance thesis intact"
+          },
+          "metals": {
+             "gold": 2750.00,
+             "copper": 4.45,
+             "lithium_carbonate": 14500, "note": "Stabilizing after 2024 crash"
+          }
+        },
+        "real_estate": {
+          "commercial_office_us": {"vacancy_rate": 0.22, "price_index_yoy": -0.08},
+          "data_centers": {"vacancy_rate": 0.02, "rental_growth_yoy": 0.15, "note": "AI constraint bottleneck"}
+        }
+      },
+      "alternative_data_feeds": {
+        "satellite_intelligence": {
+          "china_industrial_activity": {"index": 48.5, "trend": "Contracting"},
+          "us_retail_parking_lots": {"index": 98.0, "trend": "Flat YoY (Holiday Season)"}
+        },
+        "sentiment_analysis": {
+          "news_sentiment": {
+             "tech": -0.4, "reason": "Regulation & saturation fears",
+             "energy": 0.6, "reason": "Geopolitical premiums"
+          },
+          "retail_investor_flow": {
+             "direction": "Outflow",
+             "magnitude": "Moderate",
+             "destination": "Money Market Funds (locking in 3.5%)"
+          }
+        }
+      },
+      "risk_management": {
+        "volatility_surface": {
+          "vix": 16.5,
+          "move_index": 105.0,
+          "skew_index": 135.0, "note": "Tail risk hedging is expensive"
+        },
+        "var_99_1day": {
+          "sp500_portfolio": 0.018,
+          "60_40_portfolio": 0.012,
+          "crypto_portfolio": 0.055
+        },
+        "correlation_regime": {
+           "stock_bond": 0.35, "note": "Positive correlation breaking down as inflation cools"
+        }
+      }
+    }
+  }
+}

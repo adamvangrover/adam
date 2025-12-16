@@ -96,6 +96,10 @@ class TestMacroeconomicAnalysisAgent(unittest.TestCase):
 
         insights = self.agent.analyze_macroeconomic_data()
         self.assertEqual(insights['GDP_growth_trend'], 'positive')  # Check if GDP growth trend is positive
+        
+        # In tests/test_agents.py inside TestMacroeconomicAnalysisAgent
+        self.agent.data_sources['government_stats_api'].get_gdp.return_value = {'value': 2.5} 
+        self.agent.data_sources['government_stats_api'].get_inflation.return_value = {'value': 3.1}
 
 
 class TestGeopoliticalRiskAgent(unittest.TestCase):
