@@ -2,7 +2,7 @@ from typing import Dict, Any, Callable
 from core.pricing_engine import PricingEngine
 from core.market_data import MarketDataService
 from core.execution_router import ExecutionRouter
-from core.risk_engine import RiskEngine
+from core.product.risk_engine import RiskEngine
 from core.strategy import StrategyManager
 from core.memory import MemoryEngine
 from core.family_office import FamilyOfficeService
