@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v23.5 :: Institutional Radar</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .radar-card { background: rgba(5, 11, 20, 0.6); border: 1px solid #333; padding: 20px; border-radius: 4px; }
+        .radar-metric { font-size: 2rem; color: var(--accent-color); font-weight: bold; font-family: 'JetBrains Mono'; }
+        .radar-label { font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        .flow-positive { color: #0aff60; }
+        .flow-negative { color: #ff3333; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th { text-align: left; border-bottom: 1px solid #444; padding: 10px; color: #888; font-weight: normal; font-family: 'JetBrains Mono'; font-size: 0.8rem; }
+        td { padding: 10px; border-bottom: 1px solid #222; }
+    </style>
+</head>
+<body>
+    <div class="scan-line"></div>
+
+    <header class="cyber-header">
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <h1 class="mono" style="margin: 0; font-size: 1.5rem; color: var(--primary-color); letter-spacing: 2px;">INSTITUTIONAL RADAR</h1>
+            <div class="mono" style="font-size: 0.8rem; color: #666; border-left: 1px solid #333; padding-left: 10px;">13F TREND MONITOR</div>
+        </div>
+        <nav style="display: flex; gap: 10px;">
+            <a href="index.html" class="cyber-btn">&larr; DASHBOARD</a>
+            <button class="cyber-btn" onclick="runAnalysis()">RUN ANALYSIS</button>
+        </nav>
+    </header>
+
+    <div style="display: flex; min-height: calc(100vh - 60px);">
+        <!-- Sidebar -->
+        <aside class="glass-panel" style="width: 260px; border-right: 1px solid var(--panel-border); padding: 20px; flex-shrink: 0;">
+            <h3 class="mono" style="color: var(--primary-color); border-bottom: 1px solid #333; padding-bottom: 10px; margin-top:0;">/// CONTROL PANEL</h3>
+
+            <div style="margin-bottom: 20px;">
+                <label class="radar-label">Target Quarter</label>
+                <select id="quarter-select" style="width: 100%; background: #000; color: #fff; border: 1px solid #444; padding: 5px; margin-top: 5px;">
+                    <option value="2025-Q3">Q3 2025 (Simulated)</option>
+                    <option value="2025-Q2">Q2 2025</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label class="radar-label">Fund Universe</label>
+                <div style="margin-top: 5px;">
+                    <label style="display: block; color: #ccc;"><input type="checkbox" checked> Tiger Cubs</label>
+                    <label style="display: block; color: #ccc;"><input type="checkbox" checked> Family Offices</label>
+                    <label style="display: block; color: #ccc;"><input type="checkbox"> Pod Shops (Noise)</label>
+                </div>
+            </div>
+
+            <div style="margin-top: 40px;">
+                <h4 class="radar-label">SYSTEM STATUS</h4>
+                <div style="font-size: 0.8rem; color: #666; margin-top: 5px;">
+                    <div>• EDGAR Link: <span style="color: #0aff60;">ACTIVE</span></div>
+                    <div>• Parser Engine: <span style="color: #0aff60;">READY</span></div>
+                    <div>• LLM Synthesis: <span style="color: #0aff60;">READY</span></div>
+                </div>
+            </div>
+        </aside>
+
+        <main style="flex-grow: 1; padding: 40px; overflow-y: auto;">
+
+            <!-- Executive Summary -->
+            <div class="glass-panel" style="padding: 25px; margin-bottom: 30px; border: 1px solid var(--primary-color);">
+                <h2 class="mono" style="margin-top: 0; color: var(--primary-color);">EXECUTIVE SYNTHESIS</h2>
+                <div id="narrative-output" style="color: #ddd; line-height: 1.6; max-width: 900px;">
+                    <p><em>Initialize analysis to generate report...</em></p>
+                </div>
+            </div>
+
+            <!-- Dashboard Grid -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+
+                <!-- Sector Rotation -->
+                <div class="radar-card">
+                    <h3 class="mono" style="margin-top: 0; color: #ccc;">SECTOR FLOW VELOCITY</h3>
+                    <table id="sector-table">
+                        <thead>
+                            <tr>
+                                <th>SECTOR</th>
+                                <th>NET FLOW ($B)</th>
+                                <th>Z-SCORE</th>
+                                <th>TOP ACTOR</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Cluster Buys -->
+                <div class="radar-card">
+                    <h3 class="mono" style="margin-top: 0; color: #ccc;">HIGH CONVICTION CLUSTERS</h3>
+                    <table id="cluster-table">
+                        <thead>
+                            <tr>
+                                <th>TICKER</th>
+                                <th>SECTOR</th>
+                                <th>NEW ENTRANTS</th>
+                                <th>CONVICTION</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Crowding -->
+            <div class="radar-card">
+                <h3 class="mono" style="margin-top: 0; color: #ccc;">CROWDING RISK MONITOR</h3>
+                <p class="radar-label" style="margin-bottom: 15px;">Top 5 Most Crowded Trades (Liquidity Risk)</p>
+                <div id="crowding-bars" style="display: flex; flex-direction: column; gap: 10px;">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // Simulated output for the "Simulated Case Study"
+        const SIMULATION_DATA = {
+            narrative: "The third quarter of 2025 will be remembered as the quarter the 'intangible premium' evaporated. Our Trend Monitor has detected a structural break in capital flows, characterized by the most aggressive rotation out of Technology and into Industrials and Energy since Q1 2021. This is not a tactical trade; it is a fundamental re-rating of the cost of capital. With 10-year yields stabilizing at elevated levels, the Smart Money cohort—led by Duquesne and Appaloosa—has aggressively trimmed long-duration software exposure in favor of cash-flow-generative tangible assets.",
+            sectors: [
+                { sector: "Industrials", flow: "+12.4", z: "+2.8", actor: "Appaloosa" },
+                { sector: "Energy", flow: "+8.1", z: "+2.1", actor: "Duquesne" },
+                { sector: "Utilities", flow: "+4.2", z: "+1.9", actor: "Viking Global" },
+                { sector: "Technology", flow: "-15.3", z: "-2.4", actor: "Tiger Global (Sell)" },
+                { sector: "Cons. Disc.", flow: "-3.1", z: "-0.5", actor: "Point72" }
+            ],
+            clusters: [
+                { ticker: "CCJ", sector: "Energy", count: 5, conviction: "High" },
+                { ticker: "BWXT", sector: "Industrials", count: 4, conviction: "High" },
+                { ticker: "GE", sector: "Industrials", count: 3, conviction: "Medium" }
+            ],
+            crowding: [
+                { ticker: "NVDA", score: 92 },
+                { ticker: "MSFT", score: 88 },
+                { ticker: "META", score: 85 },
+                { ticker: "LLY", score: 78 },
+                { ticker: "AVGO", score: 75 }
+            ]
+        };
+
+        function runAnalysis() {
+            const btn = document.querySelector('button');
+            btn.innerText = "PROCESSING...";
+            btn.disabled = true;
+
+            // Simulate API delay
+            setTimeout(() => {
+                renderData(SIMULATION_DATA);
+                btn.innerText = "RUN ANALYSIS";
+                btn.disabled = false;
+            }, 1500);
+        }
+
+        function renderData(data) {
+            // Narrative
+            document.getElementById('narrative-output').innerHTML = `<p>${data.narrative}</p>`;
+
+            // Sectors
+            const sectorTbody = document.querySelector('#sector-table tbody');
+            sectorTbody.innerHTML = data.sectors.map(s => `
+                <tr>
+                    <td>${s.sector}</td>
+                    <td class="${s.flow.startsWith('+') ? 'flow-positive' : 'flow-negative'}">${s.flow}</td>
+                    <td class="${s.z.startsWith('+') ? 'flow-positive' : 'flow-negative'}">${s.z}</td>
+                    <td>${s.actor}</td>
+                </tr>
+            `).join('');
+
+            // Clusters
+            const clusterTbody = document.querySelector('#cluster-table tbody');
+            clusterTbody.innerHTML = data.clusters.map(c => `
+                <tr>
+                    <td><span style="color: var(--primary-color); font-weight: bold;">${c.ticker}</span></td>
+                    <td>${c.sector}</td>
+                    <td>${c.count} Funds</td>
+                    <td>${c.conviction}</td>
+                </tr>
+            `).join('');
+
+            // Crowding
+            const crowdingContainer = document.getElementById('crowding-bars');
+            crowdingContainer.innerHTML = data.crowding.map(c => `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 50px; font-family: 'JetBrains Mono'; font-weight: bold;">${c.ticker}</div>
+                    <div style="flex-grow: 1; background: #222; height: 8px; border-radius: 4px; overflow: hidden;">
+                        <div style="width: ${c.score}%; background: ${c.score > 90 ? '#ff3333' : '#ffa500'}; height: 100%;"></div>
+                    </div>
+                    <div style="width: 40px; text-align: right; color: #888;">${c.score}</div>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
