@@ -72,6 +72,8 @@ def entity_resolution_node(state: OmniscientState) -> Dict[str, Any]:
     comp = assess_competitive_position(ticker, "Technology") # Assume tech for now
 
     # Update State
+    legal_entity["sector"] = "Technology" # Default or extracted
+
     state["v23_knowledge_graph"]["nodes"]["entity_ecosystem"] = {
         "legal_entity": legal_entity,
         "management_assessment": mgmt,
@@ -107,11 +109,25 @@ def deep_fundamental_node(state: OmniscientState) -> Dict[str, Any]:
         "ebitda_margin_trend": "Expanding"
     }
 
+    # Adapter for DCF
+    dcf_res_adapter = {
+        "wacc_assumption": f"{dcf_res.get('wacc', 0.08):.1%}",
+        "terminal_growth": f"{dcf_res.get('terminal_growth', 0.02):.1%}",
+        "intrinsic_value_estimate": dcf_res.get('intrinsic_share_price', 0.0) if 'intrinsic_share_price' in dcf_res else dcf_res.get('intrinsic_value', 0.0)
+    }
+
+    # Adapter for Multiples
+    mult_res_adapter = {
+        "current_ev_ebitda": mult_res.get("current_ev_ebitda", 0.0),
+        "peer_median_ev_ebitda": mult_res.get("peer_median_ev_ebitda", 0.0),
+        "verdict": "Undervalued" # Mock logic or derived
+    }
+
     state["v23_knowledge_graph"]["nodes"]["equity_analysis"] = {
         "fundamentals": fund_summary,
         "valuation_engine": {
-            "dcf_model": dcf_res,
-            "multiples_analysis": mult_res,
+            "dcf_model": dcf_res_adapter,
+            "multiples_analysis": mult_res_adapter,
             "price_targets": targets
         }
     }
@@ -134,26 +150,26 @@ def credit_snc_node(state: OmniscientState) -> Dict[str, Any]:
 
     rating = map_financials_to_rating(leverage, liquidity, fin["total_debt"])
 
-    facilities_data = []
-    for fac in data["syndicate_data"]["facilities"]:
-        facilities_data.append({
-            "id": fac["id"],
-            "amount": str(fac["amount"]),
-            "regulatory_rating": rating, # Apply blanket rating for mock
-            "collateral_coverage": "1.2x",
-            "covenant_headroom": "15%"
-        })
+    # Primary Facility Logic
+    primary_fac = data["syndicate_data"]["facilities"][0] if data["syndicate_data"]["facilities"] else {"id": "N/A", "amount": 0}
+
+    primary_facility_assessment = {
+        "facility_type": primary_fac.get("id", "Term Loan"),
+        "collateral_coverage": "Strong", # Mock
+        "repayment_capacity": "High" if rating == "Pass" else "Low"
+    }
 
     snc_model = {
         "overall_borrower_rating": rating,
-        "facilities": facilities_data
+        "rationale": "Strong coverage ratios support rating.",
+        "primary_facility_assessment": primary_facility_assessment
     }
 
     covenant_risk = {
         "primary_constraint": "Max Net Leverage 4.5x",
         "current_level": leverage,
         "breach_threshold": 4.5,
-        "risk_assessment": "High" if leverage > 4.0 else "Low"
+        "headroom_assessment": "Low" if leverage > 4.0 else "High"
     }
 
     state["v23_knowledge_graph"]["nodes"]["credit_analysis"] = {
@@ -182,14 +198,19 @@ def risk_simulation_node(state: OmniscientState) -> Dict[str, Any]:
 
     quantum_scenarios = []
     for s in scenarios:
+        prob = "Low"
+        if s.probability_weight > 0.4: prob = "High"
+        elif s.probability_weight > 0.1: prob = "Med"
+
         quantum_scenarios.append({
-            "name": s.description,
-            "probability": s.probability_weight,
+            "scenario_name": s.description,
+            "probability": prob,
+            "impact_severity": "High",
             "estimated_impact_ev": "-15%" # Simplified
         })
 
     simulation_engine = {
-        "monte_carlo_default_prob": 0.025, # Mock 2.5% PD
+        "monte_carlo_default_prob": "2.5%",
         "quantum_scenarios": quantum_scenarios,
         "trading_dynamics": {
             "short_interest": "3.2%",
@@ -215,7 +236,16 @@ def strategic_synthesis_node(state: OmniscientState) -> Dict[str, Any]:
     # Extract inputs for synthesis
     val_verdict = kg["equity_analysis"]["valuation_engine"]["multiples_analysis"]
     credit_rating = kg["credit_analysis"]["snc_rating_model"]["overall_borrower_rating"]
-    pd = kg["simulation_engine"]["monte_carlo_default_prob"]
+    pd_str = kg["simulation_engine"]["monte_carlo_default_prob"]
+
+    # Parse PD string "2.5%" -> 0.025
+    try:
+        if isinstance(pd_str, str):
+            pd = float(pd_str.replace("%", "")) / 100.0
+        else:
+            pd = float(pd_str)
+    except:
+        pd = 0.05 # Default if parsing fails
 
     # 1. M&A Posture
     ma_posture = determine_ma_posture(data["fundamentals"], data["market_data"])

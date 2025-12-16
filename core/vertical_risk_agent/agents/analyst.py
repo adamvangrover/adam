@@ -14,13 +14,49 @@ class QuantAgent:
         """
         print("--- Quant Agent: Analyzing Financials ---")
 
-        # In a real implementation, this would use tools to parse Excel/XBRL
+        # Extract data from state or use defaults (from XBRLHandler mock if empty)
+        bs = state.get("balance_sheet") or {}
+        pnl = state.get("income_statement") or {}
+
+        # Robust retrieval with defaults
+        cash = bs.get("cash_equivalents", 0.0)
+        debt = bs.get("total_debt", 0.0)
+
+        revenue = pnl.get("revenue", 0.0)
+        op_inc = pnl.get("operating_income", 0.0)
+        da = pnl.get("depreciation_amortization", 0.0)
+        interest = pnl.get("interest_expense", 1.0) # Avoid div/0
+        if interest == 0: interest = 1.0
+
+        # Calculate EBITDA
+        ebitda = pnl.get("consolidated_ebitda")
+        if not ebitda:
+            ebitda = op_inc + da
+
+        # Ratios
+        leverage = debt / ebitda if ebitda else 0.0
+        net_leverage = (debt - cash) / ebitda if ebitda else 0.0
+        coverage = ebitda / interest
+
+        margin = ebitda / revenue if revenue else 0.0
+
+        # Stress Test (Scenario: -20% EBITDA)
+        stressed_ebitda = ebitda * 0.8
+        stressed_leverage = debt / stressed_ebitda if stressed_ebitda else 0.0
+
+        analysis_text = (
+            f"Financial Analysis:\n"
+            f"- EBITDA: ${ebitda:,.2f} (Margin: {margin:.1%})\n"
+            f"- Leverage (Gross): {leverage:.2f}x\n"
+            f"- Leverage (Net): {net_leverage:.2f}x\n"
+            f"- Interest Coverage: {coverage:.2f}x\n"
+            f"\nStress Test (-20% EBITDA):\n"
+            f"- Stressed Leverage: {stressed_leverage:.2f}x"
+        )
+
         return {
-            "quant_analysis": "Calculated Debt/EBITDA is 3.2x based on extracted 10-K data. Revenue grew 5% YoY.",
-            "balance_sheet": {
-                "cash_equivalents": 100000000.0,
-                "total_debt": 320000000.0,
-                "consolidated_ebitda": 100000000.0
-            },
-            "messages": ["Quant: Financial analysis complete."]
+            "quant_analysis": analysis_text,
+            "balance_sheet": bs,
+            "income_statement": pnl, # Pass through
+            "messages": ["Quant: Financial analysis and stress testing complete."]
         }

@@ -36,5 +36,5 @@ async def test_deep_dive_pipeline():
         assert "strategic_synthesis" in nodes
 
         # Check specific deep dive values (mocked)
-        assert nodes["simulation_engine"]["monte_carlo_default_prob"] >= 0.0
+        assert isinstance(nodes["simulation_engine"]["monte_carlo_default_prob"], str)
         assert nodes["strategic_synthesis"]["final_verdict"]["conviction_level"] >= 1

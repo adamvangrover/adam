@@ -39,7 +39,7 @@ class QuantumScenarioAgent(AgentBase):
 
         # Initialize Engines if available
         self.qmc_engine = QuantumMonteCarloEngine() if QMC_AVAILABLE else None
-        self.gre_engine = GenerativeRiskEngine(mode="inference") if GRE_AVAILABLE else None
+        self.gre_engine = GenerativeRiskEngine() if GRE_AVAILABLE else None
 
     async def execute(self, **kwargs) -> List[QuantumScenario]:
         """
@@ -80,10 +80,10 @@ class QuantumScenarioAgent(AgentBase):
                 # Convert QMC result to a Scenario
                 pd = qmc_result.get('probability_of_default', 0.0)
                 scenarios.append(QuantumScenario(
-                    name="QMC: Structural Default Path",
-                    probability=pd,
-                    estimated_impact_ev="100% Equity Wipeout",
-                    description=f"Quantum Amplitude Estimation predicts {pd:.2%} default probability based on asset volatility of {volatility:.0%}."
+                    scenario_name="QMC: Structural Default Path",
+                    probability="High" if pd > 0.1 else "Low",
+                    impact_severity="Critical",
+                    estimated_impact_ev="100% Equity Wipeout"
                 ))
             except Exception as e:
                 logger.error(f"QMC Engine failed: {e}")
@@ -101,10 +101,10 @@ class QuantumScenarioAgent(AgentBase):
                 # Convert CrisisScenario to QuantumScenario (mapping fields)
                 for gs in gre_scenarios:
                     scenarios.append(QuantumScenario(
-                        name=f"GRE: {gs.name}",
-                        probability=gs.probability,
-                        estimated_impact_ev=f"-{gs.severity_score*100:.0f}%",
-                        description=gs.description
+                        scenario_name=f"GRE: {gs.name}",
+                        probability="Med",
+                        impact_severity="High",
+                        estimated_impact_ev=f"-{gs.severity_score*100:.0f}%"
                     ))
             except Exception as e:
                  logger.warning(f"GRE Engine generation failed or schema mismatch: {e}")
@@ -124,15 +124,15 @@ class QuantumScenarioAgent(AgentBase):
         """
         return [
             QuantumScenario(
-                name="Geopolitical Flashpoint (Taiwan Straits)",
-                probability=0.042, # Specific non-normal prob
-                estimated_impact_ev="-40%",
-                description=f"Supply chain blockade affecting {ticker} sourcing and logistics."
+                scenario_name="Geopolitical Flashpoint (Taiwan Straits)",
+                probability="Low",
+                impact_severity="Critical",
+                estimated_impact_ev="-40%"
             ),
             QuantumScenario(
-                name="Technological Singularity (AGI)",
-                probability=0.08,
-                estimated_impact_ev="+200%",
-                description=f"Rapid automation of {ticker}'s core business processes leading to hyper-scaling."
+                scenario_name="Technological Singularity (AGI)",
+                probability="Low",
+                impact_severity="High",
+                estimated_impact_ev="+200%"
             )
         ]

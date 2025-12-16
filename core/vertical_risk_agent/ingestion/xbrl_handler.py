@@ -20,7 +20,8 @@ class XBRLHandler:
             "{http://fasb.org/us-gaap/2023}Revenues": "revenue",
             "{http://fasb.org/us-gaap/2023}OperatingIncomeLoss": "operating_income",
             "{http://fasb.org/us-gaap/2023}NetIncomeLoss": "net_income",
-            "{http://fasb.org/us-gaap/2023}DepreciationDepletionAndAmortization": "depreciation_amortization"
+            "{http://fasb.org/us-gaap/2023}DepreciationDepletionAndAmortization": "depreciation_amortization",
+            "{http://fasb.org/us-gaap/2023}InterestExpense": "interest_expense"
         }
 
     def parse_filing(self, file_path: str) -> Dict[str, Any]:
@@ -93,7 +94,8 @@ class XBRLHandler:
                     "revenue": 200000000.0,
                     "operating_income": 30000000.0,
                     "net_income": 20000000.0,
-                    "depreciation_amortization": 5000000.0
+                    "depreciation_amortization": 5000000.0,
+                    "interest_expense": 10000000.0
                 }
             }
 
