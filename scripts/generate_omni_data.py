@@ -83,9 +83,6 @@ def scan_agents(root_dir):
             for file in files:
                 if file.endswith('.py') and file != '__init__.py':
                     agents.extend(parse_agent_file(os.path.join(root, file), root_dir))
-    
-    # Also parse AGENTS.md for high-level status if not found in code
-    # (Simplified logic: just return what we found in code, maybe augment later)
     return agents
 
 def get_knowledge_graph_data(root_dir):
@@ -164,28 +161,43 @@ def get_financial_data(root_dir):
 
     return market_data
 
-def get_vault_content(root_dir):
-    vault = {
-        'reports': [],
-        'prompts': [],
-        'code_docs': []
-    }
-    
-    # Reports
+def get_reports(root_dir):
+    reports = []
     report_dir = os.path.join(root_dir, 'core/libraries_and_archives/reports')
     if os.path.exists(report_dir):
-        for f in glob.glob(os.path.join(report_dir, '*.json')):
+        # Look for both .json and .jsonl
+        files = glob.glob(os.path.join(report_dir, '*.json')) + glob.glob(os.path.join(report_dir, '*.jsonl'))
+        for f in files:
             try:
                 with open(f, 'r') as file:
-                    data = json.load(file)
-                    vault['reports'].append({
-                        'title': data.get('title', os.path.basename(f)),
+                    # Handle jsonl by reading just the first line if it's not a list
+                    content_str = file.read().strip()
+                    if f.endswith('.jsonl'):
+                        # Try to read line by line, but for reports usually it's one big object or list of objects
+                        # If first char is '{', it might be one object per line.
+                        # For now, let's assume valid JSON or single line JSONL
+                        try:
+                            data = json.loads(content_str)
+                        except json.JSONDecodeError:
+                            # Try first line
+                            data = json.loads(content_str.split('\n')[0])
+                    else:
+                        data = json.loads(content_str)
+
+                    reports.append({
+                        'title': data.get('title', data.get('company_name', os.path.basename(f))),
                         'path': os.path.relpath(f, root_dir),
+                        'date': data.get('date', data.get('assessment_date', 'Unknown')),
+                        'executive_summary': data.get('executive_summary', data.get('summary', '')),
                         'content': data
                     })
-            except: pass
+            except Exception as e:
+                print(f"Error parsing {f}: {e}")
+                pass
+    return reports
 
-    # Prompts
+def get_prompts(root_dir):
+    prompts = []
     prompt_dir = os.path.join(root_dir, 'prompt_library')
     if os.path.exists(prompt_dir):
         for root, _, files in os.walk(prompt_dir):
@@ -194,49 +206,44 @@ def get_vault_content(root_dir):
                     path = os.path.join(root, f)
                     try:
                         with open(path, 'r', encoding='utf-8') as file:
-                            vault['prompts'].append({
+                            prompts.append({
                                 'name': f,
                                 'path': os.path.relpath(path, root_dir),
                                 'content': file.read()
                             })
                     except: pass
-    
-    return vault
+    return prompts
 
 def main():
     root_dir = os.path.abspath('.')
     print(f"Scanning {root_dir} for OMNI data...")
 
     data = {
-        'generated_at': time.time(),
-        'system_info': {
+        'stats': {
             'version': '23.5',
             'status': 'HYBRID_ONLINE',
             'cpu_load': 12,
-            'memory_usage': 34
+            'memory_usage': 34,
+            'active_tasks': 4
         },
         'files': get_file_tree(root_dir),
         'agents': scan_agents(root_dir),
+        'reports': get_reports(root_dir),
+        'prompts': get_prompts(root_dir),
+        'strategies': [],
+        'training_sets': [],
         'knowledge_graph': get_knowledge_graph_data(root_dir),
-        'financial_data': get_financial_data(root_dir),
-        'vault': get_vault_content(root_dir)
+        'financial_data': get_financial_data(root_dir)
     }
 
     # Inject specific source code if requested (e.g. robo_advisor)
-    robo_path = os.path.join(root_dir, 'core/advisory/robo_advisor.py')
-    if os.path.exists(robo_path):
-        with open(robo_path, 'r') as f:
-            data['vault']['code_docs'].append({
-                'name': 'robo_advisor.py',
-                'content': f.read(),
-                'language': 'python'
-            })
+    # We can add a 'code_docs' section if needed, but app.js doesn't seem to explicitly look for it in top level
 
     output_path = os.path.join(root_dir, 'showcase/js/mock_data.js')
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     
     with open(output_path, 'w', encoding='utf-8') as f:
-        f.write(f"window.ADAM_STATE = {json.dumps(data, indent=2)};")
+        f.write(f"window.MOCK_DATA = {json.dumps(data, indent=2)};")
     
     print(f"OMNI State written to {output_path}")
 
