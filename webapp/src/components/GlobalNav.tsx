@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Wifi, Server, Database, FileText, User } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Search, Wifi, Server, Database, FileText, User, X } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { dataManager } from '../utils/DataManager';
 
@@ -11,9 +11,26 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ isOffline }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [manifest, setManifest] = useState<any>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     dataManager.getManifest().then(setManifest);
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+      if (e.key === 'Escape' && document.activeElement === searchInputRef.current) {
+        setSearchTerm('');
+        searchInputRef.current?.blur();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   useEffect(() => {
@@ -55,12 +72,26 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ isOffline }) => {
             <Search className="h-4 w-4 text-cyber-cyan/50 group-hover:text-cyber-cyan transition-colors" />
           </div>
           <input
+            ref={searchInputRef}
             type="text"
-            className="block w-full pl-10 pr-3 py-2 border border-cyber-slate/50 rounded-sm leading-5 bg-cyber-slate/30 text-cyber-text placeholder-cyber-text/30 focus:outline-none focus:bg-cyber-slate/50 focus:border-cyber-cyan/50 focus:ring-1 focus:ring-cyber-cyan/30 sm:text-sm font-mono transition-all"
+            className="block w-full pl-10 pr-10 py-2 border border-cyber-slate/50 rounded-sm leading-5 bg-cyber-slate/30 text-cyber-text placeholder-cyber-text/30 focus:outline-none focus:bg-cyber-slate/50 focus:border-cyber-cyan/50 focus:ring-1 focus:ring-cyber-cyan/30 sm:text-sm font-mono transition-all"
             placeholder="SEARCH SYSTEM KNOWLEDGE [CTRL+K]..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            aria-label="Search system knowledge"
           />
+          {searchTerm && (
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                searchInputRef.current?.focus();
+              }}
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-cyber-cyan/50 hover:text-cyber-cyan transition-colors"
+              aria-label="Clear search"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
         </div>
 
         {/* Search Results Dropdown */}
