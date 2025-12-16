@@ -79,18 +79,52 @@ class GoldStandardScrubber:
         return min(score, 1.0)
 
     @staticmethod
+    def is_high_impact(content: str, artifact_type: str) -> bool:
+        """Determines if the content is 'high impact' and warrants a deeper scan."""
+        # Check first 2KB for keywords
+        head = content[:2048].lower()
+        high_impact_keywords = [
+            "confidential", "proprietary", "strategy", "roadmap",
+            "quarterly report", "financial statement", "10-k", "10-q",
+            "risk assessment", "audit", "compliance"
+        ]
+
+        if any(kw in head for kw in high_impact_keywords):
+            return True
+
+        if artifact_type in ["report", "newsletter"]:
+            return True
+
+        return False
+
+    @staticmethod
     def extract_metadata(content: Any, artifact_type: str) -> Dict[str, Any]:
-        """Extracts useful metadata for indexing."""
+        """Extracts useful metadata for indexing using an adaptive scan strategy."""
         metadata = {
             "processed_at": str(datetime.now()),
-            "scrubber_version": "1.1"
+            "scrubber_version": "1.2",
+            "scan_strategy": "QUICK"
         }
 
         if isinstance(content, str):
-            metadata['length'] = len(content)
+            length = len(content)
+            metadata['length'] = length
             metadata['lines'] = content.count('\n') + 1
-            # Extract simple entities (Capitalized words - naive)
-            words = re.findall(r'\b[A-Z][a-z]+\b', content)
+
+            # Adaptive Scan Strategy
+            scan_limit = 10000 # Default QUICK scan
+
+            if GoldStandardScrubber.is_high_impact(content, artifact_type):
+                scan_limit = 100000 # DEEP scan for high impact docs
+                metadata['scan_strategy'] = "DEEP"
+
+            # Flag massive files for human review
+            if length > 5 * 1024 * 1024: # > 5MB
+                metadata['review_required'] = True
+                metadata['review_reason'] = "LARGE_FILE_SIZE"
+
+            # Extract entities with adaptive limit
+            words = re.findall(r'\b[A-Z][a-z]+\b', content[:scan_limit])
             if words:
                 metadata['potential_entities'] = list(set(words))[:10]
 
