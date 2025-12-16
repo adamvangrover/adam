@@ -1,6 +1,4 @@
-Based on the comprehensive critique and plan you provided, here is the unified, consolidated `README.md` for Adam v23.5. This version merges the "System 2" architectural vision with the specific capabilities of the Family Office and Credit Risk modules, establishing a single source of truth for the platform.
 
-````markdown
 # Adam v23.5: The Neuro-Symbolic Financial Sovereign
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/) [![Docker Image](https://img.shields.io/badge/docker-ready-blue)](https://hub.docker.com/) [![FinanceBench](https://img.shields.io/badge/FinanceBench-99%25-green)](https://arxiv.org/abs/2311.11944)
