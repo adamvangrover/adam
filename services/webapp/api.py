@@ -175,7 +175,8 @@ def create_app(config_name='default'):
 
                  return jsonify(result)
              except Exception as e:
-                 return jsonify({'error': str(e)}), 500
+                 app.logger.error(f"Error in v23 analysis: {e}", exc_info=True)
+                 return jsonify({'error': 'An internal error occurred during analysis.'}), 500
         else:
              return jsonify({'status': 'Mock Result', 'analysis': 'Core not integrated or MetaOrchestrator not ready.'})
 
@@ -305,7 +306,8 @@ def create_app(config_name='default'):
         except FileNotFoundError:
             return jsonify({'error': 'File not found'}), 404
         except Exception as e:
-            return jsonify({'error': str(e)}), 500
+            app.logger.error(f"Error serving data file {filename}: {e}", exc_info=True)
+            return jsonify({'error': 'An internal error occurred.'}), 500
 
     # ---------------------------------------------------------------------------- #
     # WebSocket Endpoints
