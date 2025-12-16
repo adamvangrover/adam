@@ -315,7 +315,14 @@
                         html += `<ul class="list-disc list-inside space-y-1 text-slate-300 pl-2">`;
                         value.forEach(item => {
                             if (typeof item === 'object') {
-                                html += `<li class="mb-2"><span class="font-bold text-cyan-400">${item.name || item.metric || ''}</span>: ${item.description || item.value || JSON.stringify(item)}</li>`;
+                                if (item.title && item.content) {
+                                    html += `<li class="mb-4">
+                                        <div class="font-bold text-cyan-400 mb-1">${item.title}</div>
+                                        <div class="text-slate-300 text-xs whitespace-pre-wrap pl-2 border-l border-slate-700">${typeof item.content === 'string' ? item.content : JSON.stringify(item.content, null, 2)}</div>
+                                    </li>`;
+                                } else {
+                                    html += `<li class="mb-2"><span class="font-bold text-cyan-400">${item.name || item.metric || ''}</span>: ${item.description || item.value || JSON.stringify(item)}</li>`;
+                                }
                             } else {
                                 html += `<li>${item}</li>`;
                             }
