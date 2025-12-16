@@ -11,6 +11,7 @@ import logging
 import json
 import functools
 import asyncio
+import re
 from datetime import datetime, timezone
 from .config import config
 from .celery import celery
@@ -166,6 +167,12 @@ def create_app(config_name='default'):
         query = data.get('query')
         if not query:
              return jsonify({'error': 'No query provided'}), 400
+
+        # 🛡️ Sentinel: Validate query length and type
+        if not isinstance(query, str):
+             return jsonify({'error': 'Query must be a string'}), 400
+        if len(query) > 5000:
+             return jsonify({'error': 'Query too long (max 5000 chars)'}), 400
 
         if app.config['CORE_INTEGRATION'] and meta_orchestrator:
              import asyncio
@@ -398,7 +405,11 @@ def create_app(config_name='default'):
         """
         current_user_id = get_jwt_identity()
 
-        # 🛡️ Sentinel: Validate simulation name to prevent arbitrary code execution
+        # 🛡️ Sentinel: Validate simulation name format
+        if not re.match(r'^[a-zA-Z0-9_]+$', simulation_name):
+             return jsonify({'error': 'Invalid simulation name format'}), 400
+
+        # 🛡️ Sentinel: Validate simulation name against allowlist
         if simulation_name not in _get_allowed_simulations():
              return jsonify({'error': 'Invalid simulation name'}), 400
 
@@ -427,8 +438,10 @@ def create_app(config_name='default'):
 
         uri = os.environ.get('NEO4J_URI', 'bolt://neo4j:7687')
         user = os.environ.get('NEO4J_USER', 'neo4j')
-        password = os.environ.get('NEO4J_PASSWORD', 'password')
-        driver = GraphDatabase.driver(uri, auth=(user, password))
+        password = os.environ.get('NEO4J_PASSWORD') # 🛡️ Sentinel: No hardcoded default password
+
+        auth = (user, password) if password else None
+        driver = GraphDatabase.driver(uri, auth=auth)
         with driver.session() as session:
             result = session.run(cypher_query, params)
             nodes = {}

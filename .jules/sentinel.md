@@ -17,3 +17,13 @@
 **Vulnerability:** The `/api/simulations/<name>` endpoint passed the `name` parameter directly to `importlib.import_module()`, allowing potential Arbitrary Code Execution if a user could invoke a module with side-effects on import.
 **Learning:** Dynamic imports based on user input are dangerous. Relying on "it's just an import" is insufficient security.
 **Prevention:** Whitelist allowed modules using a strict check against the file system or a configuration list before importing.
+
+## 2025-05-20 - Insecure Deserialization via Pickle
+**Vulnerability:** The `TechnicalAnalyst` class in `core/analysis/technical_analysis.py` uses `pickle.load()` to load ML models from paths defined in configuration. If the config or the file is compromised, this leads to RCE.
+**Learning:** Usage of `pickle` for model loading is pervasive in Data Science code but insecure for production systems handling untrusted data.
+**Prevention:** Use safer alternatives like `skops` for scikit-learn models, or ensuring strict integrity checks (checksums/signatures) on model files before loading.
+
+## 2025-05-20 - Weak Default Secrets in Code
+**Vulnerability:** The Neo4j connection logic defaulted to the password "password" if the environment variable was missing.
+**Learning:** Hardcoded fallbacks for secrets, even if intended for "dev convenience," often leak into production environments where env vars might be missed during deployment.
+**Prevention:** Remove default values for sensitive credentials. Fail fast (raise Error) or default to `None` to force explicit configuration.

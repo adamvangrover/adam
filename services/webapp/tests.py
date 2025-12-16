@@ -124,6 +124,46 @@ class ApiTestCase(unittest.TestCase):
         self.assertIn('Strict-Transport-Security', headers)
         self.assertIn('max-age=31536000', headers['Strict-Transport-Security'])
 
+    def test_v23_analysis_validation(self):
+        # Valid query
+        response = self.client.post('/api/v23/analyze',
+                                 data=json.dumps({'query': 'analyze AAPL'}),
+                                 content_type='application/json')
+        # Expect 200 (mock result) or 500 depending on config, but NOT 400 for validation
+        self.assertNotEqual(response.status_code, 400)
+
+        # Invalid type
+        response = self.client.post('/api/v23/analyze',
+                                 data=json.dumps({'query': 12345}),
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('Query must be a string', response.get_json()['error'])
+
+        # Too long
+        response = self.client.post('/api/v23/analyze',
+                                 data=json.dumps({'query': 'A' * 5001}),
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('Query too long', response.get_json()['error'])
+
+    def test_run_simulation_validation(self):
+        # We need to be logged in
+        user = User(username='simuser', role='user')
+        user.set_password('password')
+        db.session.add(user)
+        db.session.commit()
+        response = self.client.post('/api/login',
+                                 data=json.dumps({'username': 'simuser', 'password': 'password'}),
+                                 content_type='application/json')
+        access_token = json.loads(response.data)['access_token']
+        headers = {'Authorization': f'Bearer {access_token}'}
+
+        # Invalid characters
+        response = self.client.post('/api/simulations/invalid-name!',
+                                 headers=headers)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('Invalid simulation name format', response.get_json()['error'])
+
 
 if __name__ == '__main__':
     unittest.main()
