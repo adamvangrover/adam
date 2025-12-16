@@ -19,6 +19,7 @@ class IncomeStatement(BaseModel):
     operating_income: float = Field(..., description="Operating Income")
     net_income: float = Field(..., description="Net Income")
     depreciation_amortization: float = Field(..., description="D&A")
+    interest_expense: float = Field(..., description="Interest Expense")
     consolidated_ebitda: Optional[float] = Field(None, description="Calculated EBITDA")
 
 class CovenantDefinition(BaseModel):

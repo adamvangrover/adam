@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, Any, List, Optional
 from core.agents.agent_base import AgentBase
-from core.schemas.v23_5_schema import SNCRatingModel, Facility
+from core.schemas.v23_5_schema import SNCRatingModel, PrimaryFacilityAssessment
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -76,49 +76,34 @@ class SNCRatingAgent(AgentBase):
         else:
             borrower_rating = "Doubtful"
 
-        # 4. Facility-Level Analysis (waterfall for collateral coverage)
-        rated_facilities = []
-        cumulative_debt = 0.0
+        # 4. Facility-Level Analysis (Focus on Primary Facility)
 
         # Sort capital structure by priority (1 = Senior Secured)
         sorted_cap_structure = sorted(capital_structure, key=lambda x: x.get('priority', 99))
 
-        for debt in sorted_cap_structure:
-            facility_name = debt.get('name', 'Unknown Facility')
-            amount = float(debt.get('amount', 0.0))
-            cumulative_debt += amount
+        # Select Primary Facility (Largest or Senior)
+        primary_facility = sorted_cap_structure[0] if sorted_cap_structure else {'name': 'General Facility', 'amount': total_debt}
 
-            # Calculate Collateral Coverage (EV / Cumulative Debt through this tranche)
-            # If EV covers the debt fully, it supports a better rating even if cash flow is weak.
-            collateral_coverage_ratio = enterprise_value / cumulative_debt if cumulative_debt > 0 else 0.0
+        facility_name = primary_facility.get('name', 'Unknown Facility')
+        cumulative_debt = float(primary_facility.get('amount', 0.0)) # Simplified for primary only logic
 
-            facility_rating = borrower_rating
+        # Calculate Collateral Coverage (EV / Cumulative Debt through this tranche)
+        collateral_coverage_ratio = enterprise_value / cumulative_debt if cumulative_debt > 0 else 0.0
 
-            # Notching Up logic: If collateral coverage is strong (>1.0x) explicitly for this tranche,
-            # we can notch up a "Substandard" borrower to a "Pass" or "Special Mention" facility.
-            # This reflects "Asset-Based" lending principles.
-            if collateral_coverage_ratio >= 1.2 and borrower_rating in ["Substandard", "Doubtful"]:
-                facility_rating = "Special Mention"
-                logger.debug(f"Notched up {facility_name} due to strong collateral ({collateral_coverage_ratio:.2f}x)")
-
-            # Formatting for Schema
-            collateral_str = f"{collateral_coverage_ratio:.2f}x EV Coverage"
-            covenant_headroom = self._estimate_covenant_headroom(leverage_ratio, borrower_rating)
-
-            rated_facilities.append(
-                Facility(
-                    id=facility_name,
-                    amount=f"${amount:,.2f}M",
-                    regulatory_rating=facility_rating,
-                    collateral_coverage=collateral_str,
-                    covenant_headroom=covenant_headroom
-                )
-            )
+        # Determine Collateral Bucket
+        collateral_bucket = "Weak"
+        if collateral_coverage_ratio > 1.5: collateral_bucket = "Strong"
+        elif collateral_coverage_ratio > 1.0: collateral_bucket = "Adequate"
 
         # 5. Construct Final Output
         result = SNCRatingModel(
             overall_borrower_rating=borrower_rating,
-            facilities=rated_facilities
+            rationale=f"Leverage: {leverage_ratio:.1f}x, Coverage: {interest_coverage:.1f}x",
+            primary_facility_assessment=PrimaryFacilityAssessment(
+                facility_type=facility_name,
+                collateral_coverage=collateral_bucket,
+                repayment_capacity="High" if borrower_rating == "Pass" else "Low"
+            )
         )
 
         logger.info(f"SNC Simulation Complete. Borrower Rating: {borrower_rating}")

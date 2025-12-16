@@ -33,6 +33,12 @@ class PortfolioManagerAgent(AgentBase):
             conviction = 3
             rec = "Hold"
 
+        # Normalize recommendation to new schema
+        if rec == "Long": rec = "Buy"
+        if rec == "Short": rec = "Sell"
+        if rec not in ["Strong Buy", "Buy", "Hold", "Sell", "Strong Sell"]:
+             rec = "Hold"
+
         return StrategicSynthesis(
             m_and_a_posture="Neutral",
             final_verdict=FinalVerdict(
@@ -46,6 +52,5 @@ class PortfolioManagerAgent(AgentBase):
                     "Credit risk is contained (Pass rating).",
                     "Monte Carlo shows <2% default probability."
                 ]
-            ),
-            activist_risk="Low"
+            )
         )

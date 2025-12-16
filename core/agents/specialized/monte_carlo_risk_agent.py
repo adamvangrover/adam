@@ -101,23 +101,31 @@ class MonteCarloRiskAgent(AgentBase):
         else:
             impact = "Debt Restructuring Likely"
 
+        # Helper for probability buckets
+        def get_prob_bucket(p):
+            if p < 0.1: return "Low"
+            if p < 0.4: return "Med"
+            return "High"
+
         output = SimulationEngine(
-            monte_carlo_default_prob=float(pd_ratio),
+            monte_carlo_default_prob=f"{pd_ratio:.1%}",
             quantum_scenarios=[
                 QuantumScenario(
-                    name="Base Case (Monte Carlo)",
-                    probability=1.0 - pd_ratio,
+                    scenario_name="Base Case (Monte Carlo)",
+                    probability=get_prob_bucket(1.0 - pd_ratio),
+                    impact_severity="Moderate",
                     estimated_impact_ev="Neutral"
                 ),
                 QuantumScenario(
-                    name="Tail Risk (Default)",
-                    probability=pd_ratio,
+                    scenario_name="Tail Risk (Default)",
+                    probability=get_prob_bucket(pd_ratio),
+                    impact_severity="Critical",
                     estimated_impact_ev=impact
                 )
             ],
             trading_dynamics=TradingDynamics(
                 short_interest="See Market Data", # To be filled by MarketDataAgent
-                liquidity_risk=f"Modeled Volatility: {sigma:.1%}"
+                liquidity_risk="High" if sigma > 0.3 else "Low"
             )
         )
 
