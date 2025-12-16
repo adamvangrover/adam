@@ -9,8 +9,7 @@ from datetime import datetime
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from core.agents.sub_agents.data_ingestion_agent import DataIngestionAgent
-# Assuming DataFetcher is available for discovery logic
-from core.data_sources.data_fetcher import DataFetcher 
+from core.data_sources.data_fetcher import DataFetcher
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("AutonomousUpdater")
@@ -50,14 +49,14 @@ class AutonomousUpdater:
     async def run_ingestion(self):
         tickers = self.get_all_tickers()
         defaults = self.config.get("configurations", {})
-        
+
         logger.info(f"Loaded {len(tickers)} tickers from template.")
-        
+
         # 1. Ingest Daily History
         logger.info("--- Phase 1: Historical Data Ingestion ---")
         await self.agent.execute(
-            "ingest_daily", 
-            tickers=tickers, 
+            "ingest_daily",
+            tickers=tickers,
             period=defaults.get("default_period", "1mo"),
             interval=defaults.get("default_interval", "1d")
         )
@@ -72,21 +71,21 @@ class AutonomousUpdater:
             return
 
         logger.info("--- Phase 3: Autonomous Discovery ---")
-        
+
         # Example Logic: Fetch a sector ETF's top holdings or similar
-        # For this example, we mock a 'trending' discovery 
+        # For this example, we mock a 'trending' discovery
         # In a real scenario, you could use self.fetcher to scan volume gainers
-        
+
         # Mock: Let's say we discovered 'COIN' is trending
-        discovered_ticker = "COIN" 
-        
+        discovered_ticker = "COIN"
+
         current_watch = self.config["universe"].get("watch_list", [])
         if discovered_ticker not in current_watch:
             logger.info(f"Discovered new trending asset: {discovered_ticker}")
             current_watch.append(discovered_ticker)
             self.config["universe"]["watch_list"] = current_watch
             self._save_template()
-            
+
             # Immediately ingest the new find
             await self.agent.execute("ingest_daily", tickers=[discovered_ticker], period="1mo")
 

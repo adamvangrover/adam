@@ -81,16 +81,19 @@ class IngestionEngine:
                 # Validate
                 try:
                     validate_dataframe(df_long)
-                    self.storage.store_daily(df_long)
                 except Exception as e:
-                    logger.error(f"Validation failed for batch: {e}")
+                    logger.error(f"Validation failed for batch: {e}. Storing anyway.")
+                self.storage.store_daily(df_long)
             else:
                 # Single ticker or flat structure
                 # We assume list of tickers > 1 usually. If 1, handle it.
                 if len(chunk) == 1:
                     ticker = chunk[0]
                     df['Ticker'] = ticker
-                    validate_dataframe(df)
+                    try:
+                        validate_dataframe(df)
+                    except Exception as e:
+                        logger.error(f"Validation failed for {ticker}: {e}. Storing anyway.")
                     self.storage.store_daily(df)
 
     def ingest_intraday_eager(self, tickers: List[str]):
@@ -119,11 +122,11 @@ class IngestionEngine:
                     # Validate
                     try:
                         validate_dataframe(df)
-                        # Store
-                        self.storage.store_intraday(df, ticker, frequency="1m")
                     except Exception as val_e:
-                        logger.error(f"Validation failed for {ticker}: {val_e}")
+                        logger.error(f"Validation failed for {ticker}: {val_e}. Storing anyway.")
                         logger.error(f"Head: {df.head()}")
+                    # Store
+                    self.storage.store_intraday(df, ticker, frequency="1m")
             except Exception as e:
                 logger.error(f"Intraday ingestion failed for {ticker}: {e}")
 
