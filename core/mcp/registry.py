@@ -10,12 +10,15 @@ from core.memory.engine import MemoryEngine
 from core.family_office import FamilyOfficeService
 
 # New Tools
-from src.core_valuation import ValuationEngine as CoreValuationEngine
-from src.config import DEFAULT_ASSUMPTIONS
+from core.product.core_valuation import FinancialEngineeringEngine
 from core.memory.provo_graph import ProvoGraph
-from core.data_processing.universal_ingestor_v2 import UniversalIngestor
+from core.data_processing.universal_ingestor import UniversalIngestor
 from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner
+from core.tools.universal_ingestor_mcp import UniversalIngestorMCP
+from core.data_access.lakehouse_connector import LakehouseConnector
 import requests
+import json
+import os
 
 class MCPRegistry:
     """
@@ -36,6 +39,8 @@ class MCPRegistry:
         self.provo = ProvoGraph()
         self.ingestor = UniversalIngestor()
         self.planner = NeuroSymbolicPlanner()
+        self.ingestor_mcp = UniversalIngestorMCP()
+        self.lakehouse = LakehouseConnector()
 
         self.tools = self._register_tools()
 
@@ -56,7 +61,13 @@ class MCPRegistry:
 
             # Optimized AWO Tools
             "universal_ingestor_scrub": self.ingest_url,
+            "azure_ai_search": self.ingestor_mcp.execute,
             "financial_engineering_dcf": self.run_dcf,
+            "financial_engineering_wacc": self.run_wacc,
+            "financial_engineering_beta": self.run_beta,
+            "financial_engineering_sharpe": self.run_sharpe,
+            "microsoft_fabric_run_sql": self.lakehouse.execute,
+            "get_asset_history": self.get_historical_data,
             "query_universal_memory": self.provo.get_ips,
             "log_provenance": self.provo.log_activity,
             "submit_workflow_plan": self.submit_plan
@@ -85,9 +96,9 @@ class MCPRegistry:
             text = response.text
 
             # Use Ingestor's scrubber
-            from core.data_processing.universal_ingestor_v2 import GoldStandardScrubber
+            from core.data_processing.universal_ingestor import GoldStandardScrubber
             clean_text = GoldStandardScrubber.clean_text(text)
-            metadata = GoldStandardScrubber.extract_metadata(clean_text)
+            metadata = GoldStandardScrubber.extract_metadata(clean_text, "html")
             conviction = GoldStandardScrubber.assess_conviction(clean_text, "html")
 
             return {
@@ -100,27 +111,43 @@ class MCPRegistry:
         except Exception as e:
             return {"error": f"Ingestion failed: {e}"}
 
-    def run_dcf(self, ebitda: float, capex_pct: float = 0.05, growth_rates: list = None) -> Dict[str, Any]:
-        """Runs the Rust/Python Valuation Engine."""
-        if growth_rates is None:
-            growth_rates = [0.05, 0.04, 0.03, 0.02, 0.02]
-
+    def run_dcf(self, free_cash_flows: list, discount_rate: float, terminal_value: float) -> Dict[str, Any]:
+        """Runs the Financial Engineering Engine DCF."""
         try:
-            engine = CoreValuationEngine(
-                ebitda_base=ebitda,
-                capex_percent=capex_pct,
-                nwc_percent=0.02,
-                debt_cost=0.06,
-                equity_percent=0.7
-            )
-            df, ev, wacc = engine.run_dcf(growth_rates)
-            return {
-                "enterprise_value": ev,
-                "wacc": wacc,
-                "projections": df.to_dict(orient="records")
-            }
+            val = FinancialEngineeringEngine.calculate_dcf(free_cash_flows, discount_rate, terminal_value)
+            return {"present_value": val}
         except Exception as e:
-            return {"error": f"Valuation failed: {e}"}
+            return {"error": f"DCF Calculation failed: {e}"}
+
+    def run_wacc(self, market_cap: float, total_debt: float, cost_of_equity: float, cost_of_debt: float, tax_rate: float) -> Dict[str, Any]:
+        """Runs the Financial Engineering Engine WACC."""
+        try:
+            val = FinancialEngineeringEngine.calculate_wacc(market_cap, total_debt, cost_of_equity, cost_of_debt, tax_rate)
+            return {"wacc": val}
+        except Exception as e:
+            return {"error": f"WACC Calculation failed: {e}"}
+
+    def run_beta(self, asset_returns: list, market_returns: list) -> Dict[str, Any]:
+        """Runs the Financial Engineering Engine Beta."""
+        try:
+            val = FinancialEngineeringEngine.calculate_beta(asset_returns, market_returns)
+            return {"beta": val}
+        except Exception as e:
+            return {"error": f"Beta failed: {e}"}
+
+    def run_sharpe(self, returns: list, risk_free_rate: float) -> Dict[str, Any]:
+        """Runs the Financial Engineering Engine Sharpe Ratio."""
+        try:
+            val = FinancialEngineeringEngine.calculate_sharpe_ratio(returns, risk_free_rate)
+            return {"sharpe_ratio": val}
+        except Exception as e:
+            return {"error": f"Sharpe failed: {e}"}
+
+    def get_historical_data(self, ticker: str, start_year: int = 2020) -> str:
+        """Convenience wrapper for Lakehouse history."""
+        # Note: lakehouse.execute returns JSON string
+        query = f"SELECT * FROM financials WHERE ticker = '{ticker}' AND year >= {start_year}"
+        return self.lakehouse.execute(query)
 
     def submit_plan(self, plan_text: str) -> Dict[str, Any]:
         """Parses and logs a natural language plan."""
@@ -128,11 +155,19 @@ class MCPRegistry:
 
     def get_tool_definitions(self):
         """Return schema definitions (placeholder for loading tools.json)."""
-        import json
-        import os
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        path = os.path.join(base_dir, "tools.json")
-        if os.path.exists(path):
-            with open(path, "r") as f:
-                return json.load(f)
-        return {}
+        # Return schemas for new tools
+        return {
+            "azure_ai_search": self.ingestor_mcp.get_schema(),
+            "microsoft_fabric_run_sql": self.lakehouse.get_schema(),
+            "financial_engineering_dcf": {
+                "name": "financial_engineering_dcf",
+                 "parameters": {
+                     "type": "object",
+                     "properties": {
+                         "free_cash_flows": {"type": "array"},
+                         "discount_rate": {"type": "number"},
+                         "terminal_value": {"type": "number"}
+                     }
+                 }
+            }
+        }
