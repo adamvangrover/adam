@@ -66,7 +66,15 @@ const Terminal: React.FC = () => {
         </div>
 
         <div className="h-full flex flex-col">
-            <div className="flex-1 overflow-y-auto space-y-1 text-green-400 p-2" ref={scrollRef}>
+            <div
+                className="flex-1 overflow-y-auto space-y-1 text-green-400 p-2 focus:outline-none focus:ring-1 focus:ring-cyber-cyan/30"
+                ref={scrollRef}
+                role="log"
+                aria-live="polite"
+                aria-atomic="false"
+                aria-label="Terminal Output"
+                tabIndex={0}
+            >
                 {output.map((line, i) => (
                     <div key={i} className="break-all">{line}</div>
                 ))}
@@ -78,8 +86,9 @@ const Terminal: React.FC = () => {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={onKeyDown}
-                    className="flex-1 bg-transparent border-none outline-none text-cyber-cyan focus:ring-0 placeholder-cyber-cyan/30 w-full"
+                    className="flex-1 bg-transparent border-none outline-none text-cyber-cyan focus:ring-0 placeholder-cyber-cyan/50 w-full"
                     placeholder="ENTER COMMAND..."
+                    aria-label="Terminal Command Input"
                     autoFocus
                 />
             </div>
