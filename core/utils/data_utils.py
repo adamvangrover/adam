@@ -5,7 +5,10 @@ import json
 import pandas as pd
 import numpy as np
 from datetime import datetime
-import pika
+try:
+    import pika
+except ImportError:
+    pika = None
 import csv
 import logging
 import yaml #if needed
@@ -184,6 +187,10 @@ def send_message(message, queue=RABBITMQ_QUEUE):
         message (dict): The message to send (will be serialized to JSON).
         queue (str, optional): The name of the queue. Defaults to RABBITMQ_QUEUE.
     """
+    if pika is None:
+        print(f"[Mock] Sent message to queue '{queue}': {message}")
+        return
+
     try:
         connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_HOST))
         channel = connection.channel()
@@ -204,6 +211,10 @@ def receive_messages(queue=RABBITMQ_QUEUE, callback=None):
         callback (function, optional): A function to call when a message is received.
                                         Defaults to None (prints the message).
     """
+    if pika is None:
+        print(f"[Mock] Waiting for messages from queue '{queue}'... (Pika not installed)")
+        return
+
     try:
         connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_HOST))
         channel = connection.channel()

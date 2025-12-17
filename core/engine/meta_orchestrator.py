@@ -47,7 +47,11 @@ logger = logging.getLogger(__name__)
 class MetaOrchestrator:
     def __init__(self, legacy_orchestrator: AgentOrchestrator = None):
         self.planner = NeuroSymbolicPlanner()
-        self.legacy_orchestrator = legacy_orchestrator or AgentOrchestrator()
+        try:
+            self.legacy_orchestrator = legacy_orchestrator or AgentOrchestrator()
+        except Exception as e:
+            logger.error(f"Failed to initialize AgentOrchestrator in MetaOrchestrator: {e}")
+            self.legacy_orchestrator = None
         self.mcp_registry = MCPRegistry() # FO Super-App Integration
         # Integration Path 3: Native Gemini Tooling
         self.llm_plugin = LLMPlugin(config={"provider": "gemini", "gemini_model_name": "gemini-3-pro"})
@@ -84,12 +88,20 @@ class MetaOrchestrator:
         elif complexity == "MEDIUM":
             # Route to legacy workflow (Async v22 style via AgentOrchestrator)
             logger.info("Routing to Legacy/Async Workflow...")
-            result = await self.legacy_orchestrator.execute_workflow("test_workflow", initial_context={"user_query": query})
+            if self.legacy_orchestrator:
+                result = await self.legacy_orchestrator.execute_workflow("test_workflow", initial_context={"user_query": query})
+            else:
+                logger.warning("Legacy Orchestrator not available. Falling back to simple echo.")
+                result = {"status": "Legacy Orchestrator Unavailable", "query": query}
         else:
             # Low complexity -> Legacy Single Agent Execution
             logger.info("Routing to Legacy Single Agent...")
-            self.legacy_orchestrator.execute_agent("QueryUnderstandingAgent", context={"user_query": query})
-            result = {"status": "Dispatched to Message Broker", "query": query}
+            if self.legacy_orchestrator:
+                self.legacy_orchestrator.execute_agent("QueryUnderstandingAgent", context={"user_query": query})
+                result = {"status": "Dispatched to Message Broker", "query": query}
+            else:
+                logger.warning("Legacy Orchestrator not available. Falling back to simple echo.")
+                result = {"status": "Legacy Orchestrator Unavailable", "query": query}
 
         # Optional: Reflection Step for high-value outputs
         if complexity in ["DEEP_DIVE", "HIGH", "CRISIS", "RED_TEAM"]:
