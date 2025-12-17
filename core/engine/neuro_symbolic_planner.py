@@ -111,33 +111,84 @@ class NeuroSymbolicPlanner:
     def parse_natural_language_plan(self, text: str) -> Dict[str, Any]:
         """
         Parses a numbered list of tasks from LLM output (AWO Phase 1).
-        Example input:
-        1. Ingest data.
-        2. Calculate risk.
+        Supports flexible markdown formats and dependency extraction.
+        Reorders steps based on dependencies.
         """
         steps = []
-        # Regex to capture "1. Task description"
-        pattern = re.compile(r"^\s*(\d+)\.\s+(.+)$", re.MULTILINE)
+        # Regex to capture "1. Task description" handling potential markdown like "**1.**" or "1)"
+        pattern = re.compile(r"^\s*[\*]*(\d+)[\*\.\)]+\s+(.+)$", re.MULTILINE)
 
         matches = pattern.findall(text)
+        if not matches:
+             # Try fallback pattern if the first one missed
+             pattern = re.compile(r"^\s*Step\s+(\d+)\s*[:\.]\s+(.+)$", re.MULTILINE | re.IGNORECASE)
+             matches = pattern.findall(text)
+
         if not matches:
              logger.warning("No numbered steps found in text. Returning empty plan.")
              return {"symbolic_plan": "Manual Plan", "steps": []}
 
         for i, (num, desc) in enumerate(matches):
+            desc = desc.strip()
+            # Naive dependency extraction (looking for "after step X", "depends on task Y")
+            dependencies = []
+            dep_matches = re.findall(r"(?:step|task)\s+(\d+)", desc.lower())
+            dependencies = list(set(dep_matches))
+
             steps.append({
                 "task_id": str(num),
                 "agent": "GeneralAgent", # Or infer from description
-                "description": desc.strip(),
+                "description": desc,
+                "dependencies": dependencies,
                 "cypher_fragment": None
             })
 
-        logger.info(f"[NeuroSymbolicPlanner] Parsed {len(steps)} steps from natural language.")
+        # Topological Sort
+        sorted_steps = self._topological_sort(steps)
+        logger.info(f"[NeuroSymbolicPlanner] Parsed & Sorted {len(sorted_steps)} steps from natural language.")
+
         return {
-            "symbolic_plan": "Natural Language Plan",
-            "steps": steps,
+            "symbolic_plan": "Natural Language Plan (Sorted)",
+            "steps": sorted_steps,
             "raw_path": []
         }
+
+    def _topological_sort(self, steps: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """
+        Sorts steps based on dependencies using simple DFS.
+        """
+        id_to_step = {s['task_id']: s for s in steps}
+        graph = {s['task_id']: set() for s in steps}
+
+        for s in steps:
+            for dep in s.get('dependencies', []):
+                if dep in id_to_step:
+                    graph[s['task_id']].add(dep)
+
+        visited = set()
+        temp_marks = set()
+        sorted_steps = []
+
+        def visit(node_id):
+            if node_id in temp_marks:
+                return # Cycle detected (DAG violation), allow it but warn? For now ignore.
+            if node_id in visited:
+                return
+
+            temp_marks.add(node_id)
+            for dep in graph.get(node_id, []):
+                visit(dep)
+
+            temp_marks.remove(node_id)
+            visited.add(node_id)
+            sorted_steps.append(id_to_step[node_id])
+
+        # Visit all nodes
+        for s in steps:
+            if s['task_id'] not in visited:
+                visit(s['task_id'])
+
+        return sorted_steps
 
     def execute_step(self, state: GraphState) -> Dict[str, Any]:
         """
