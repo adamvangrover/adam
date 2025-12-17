@@ -42,6 +42,7 @@ class SystemController:
             if user_input.startswith("!"):
                 self.process_command(user_input)
             else:
+                pass
                 # ... handle other types of input
 
     def process_command(self, command):

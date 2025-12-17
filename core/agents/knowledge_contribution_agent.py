@@ -22,7 +22,7 @@ class KnowledgeContributionAgent(AgentBase):
         Extracts key findings from a report and formats them as structured data.
         """
         # Create a prompt for the LLM to extract key findings
-        prompt_for_llm = f\"\"\"
+        prompt_for_llm = f"""
 You are a data extraction and structuring expert. Your task is to analyze a financial report and extract the key findings.
 
 The financial report is:
@@ -44,7 +44,7 @@ Please extract the key findings from this report and format them as a JSON objec
 }}
 
 The output should be a single JSON object.
-\"\"\"
+"""
 
         # Use the LLM to generate the structured data
         structured_data_str = await self.llm_engine.generate_response(prompt=prompt_for_llm)

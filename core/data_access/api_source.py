@@ -33,4 +33,6 @@ class ApiSource(BaseDataSource):
 
 
     def get_historical_prices(self, company_id: str, start_date: str, end_date: str) -> Optional[Dict[str, Any]]:
-        """Simulates
+        """Simulates fetching historical prices."""
+        logging.warning("Simulated API call: get_historical_prices")
+        return None

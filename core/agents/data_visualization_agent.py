@@ -72,8 +72,8 @@ class DataVisualizationAgent:
 if __name__ == "__main__":
     # Sample data
     data = {
-        "x":,
-        "y":
+        "x": [],
+        "y": []
     }
 
     # Create a DataVisualizationAgent instance
