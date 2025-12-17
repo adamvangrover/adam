@@ -136,6 +136,45 @@ class UnifiedKnowledgeGraph:
 
         logger.info(f"Ingested Risk State for {ticker}. Graph nodes: {self.graph.number_of_nodes()}")
 
+    def ingest_regulatory_data(self, regulations: List[Dict[str, Any]]):
+        """Ingests regulatory updates as Regulation nodes."""
+        for reg in regulations:
+            # unique ID based on source and title
+            node_id = f"Regulation::{reg.get('source')}::{reg.get('title')}"
+            self.graph.add_node(
+                node_id,
+                type="Regulation",
+                source=reg.get("source"),
+                title=reg.get("title"),
+                summary=reg.get("summary")
+            )
+            logger.info(f"Ingested Regulation: {node_id}")
+
+    def ingest_compliance_event(self, event: Dict[str, Any]):
+        """Ingests a compliance event (e.g. violation) linked to an entity."""
+        # event: {transaction_id, compliance_status, violated_rules, risk_score, entity_id/ticker}
+        t_id = event.get('transaction_id') or "Unknown"
+        event_id = f"ComplianceEvent::{t_id}"
+
+        self.graph.add_node(
+            event_id,
+            type="ComplianceEvent",
+            status=event.get("compliance_status"),
+            risk_score=event.get("risk_score"),
+            violated_rules=event.get("violated_rules")
+        )
+
+        # Link to Entity if provided
+        entity_id = event.get("entity_id") or event.get("ticker")
+        if entity_id:
+             # Auto-create entity node if missing to ensure linkage
+             if not self.graph.has_node(entity_id):
+                 self.graph.add_node(entity_id, type="LegalEntity")
+
+             self.graph.add_edge(entity_id, event_id, relation="HAS_COMPLIANCE_EVENT")
+
+        logger.info(f"Ingested Compliance Event: {event_id}")
+
     def query_graph(self, query: str) -> List[Dict[str, Any]]:
         # Placeholder for graph traversal/search
         # For now, return neighbors of a node if query matches a node ID
