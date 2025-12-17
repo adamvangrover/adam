@@ -926,3 +926,19 @@ This document provides a comprehensive catalog of all the agents in the ADAM sys
 *   **Tools and Hooks:** Uses Semantic Kernel or LLM.
 *   **Compute and Resource Requirements:** Low.
 *   **Dependencies:** `semantic_kernel` (optional).
+
+---
+
+## `institutional_trend_agent`
+
+*   **File:** `core/agents/specialized/institutional_trend_agent.py`
+*   **Description:** This agent implements the "Institutional 13F Analyst" framework. It analyzes quarterly 13F filings from major institutional allocators (Cohorts: Old Guard, Quant Leviathans, Pod Shops) to construct a narrative about market structure and investment themes.
+*   **Configuration:** `config/agents.yaml`
+    *   `prompt_path`: Path to the system prompt (`prompt_library/AOPL-v1.0/professional_outcomes/LIB-PRO-010_quarterly_trend_monitor.md`).
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.AgentBase`.
+*   **Agent Forge and Lifecycle:** Created on demand (e.g., quarterly) or by a scheduler.
+*   **Model Context Protocol (MCP):** Stateless report generation.
+*   **Tools and Hooks:** None currently.
+*   **Compute and Resource Requirements:** Low to Medium (LLM context window for 13F data).
+*   **Dependencies:** `semantic_kernel` (optional).
+*   **Developer Notes:** This agent relies on "Prompt-as-Code" via `LIB-PRO-010`.
