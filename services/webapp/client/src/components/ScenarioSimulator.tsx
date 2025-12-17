@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface ScenarioSimulatorProps {
     onSimulate: (params: { volatility: number; stress: number }) => void;
@@ -7,17 +7,30 @@ interface ScenarioSimulatorProps {
 export const ScenarioSimulator: React.FC<ScenarioSimulatorProps> = ({ onSimulate }) => {
     const [volatility, setVolatility] = useState(0.20);
     const [stress, setStress] = useState(0); // 0-100
+    const isMounted = useRef(false);
+
+    // Bolt: Debounce simulation triggers to prevent Monte Carlo engine spam during slider dragging
+    useEffect(() => {
+        // Skip the initial render effect to match original behavior (no simulation on load)
+        if (!isMounted.current) {
+            isMounted.current = true;
+            return;
+        }
+
+        const timer = setTimeout(() => {
+            onSimulate({ volatility, stress });
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [volatility, stress, onSimulate]);
 
     const handleVolChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = parseFloat(e.target.value);
         setVolatility(val);
-        onSimulate({ volatility: val, stress });
     };
 
     const handleStressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = parseInt(e.target.value, 10);
         setStress(val);
-        onSimulate({ volatility, stress: val });
     };
 
     return (
