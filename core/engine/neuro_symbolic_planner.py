@@ -190,7 +190,7 @@ class NeuroSymbolicPlanner:
 
         return sorted_steps
 
-    def execute_step(self, state: GraphState) -> Dict[str, Any]:
+    async def execute_step(self, state: GraphState) -> Dict[str, Any]:
         """
         Executes a single step from the plan.
         """
@@ -206,15 +206,47 @@ class NeuroSymbolicPlanner:
 
         step = steps[index]
         description = step.get("description", "Unknown Task")
+        agent_name = step.get("agent")
         logger.info(f"[Planner] Executing Step {index + 1}: {description}")
 
         # Execute Agent Logic
-        # In a real system, we would route to the specific agent in step['agent']
-        # Here we simulate/use the default agent
         result_text = f"Executed: {description}"
-        if self.default_agent:
-             # Just a mock call for now to avoid side effects
-             pass
+
+        if self.default_agent and agent_name == "RiskAssessmentAgent":
+            try:
+                # Attempt to extract entity from description (simple heuristic for graph traversal steps)
+                # e.g. "Verify relationship: Apple Inc. -[SUPPLIER]-> Foxconn"
+                target_entity = "Unknown"
+                match = re.search(r"Verify relationship: (.*?) -", description)
+                if match:
+                    target_entity = match.group(1).strip()
+                else:
+                    # Fallback to request analysis
+                    match_req = re.search(r"Analyze (.*?) ", state.get("request", ""), re.IGNORECASE)
+                    if match_req:
+                        target_entity = match_req.group(1).strip()
+
+                logger.info(f"[Planner] Delegating to RiskAssessmentAgent for {target_entity}...")
+
+                # Execute Async
+                # We mock the payload as RiskAssessmentAgent expects specific keys
+                target_data = {
+                    "company_name": target_entity,
+                    "financial_data": {"industry": "Technology"}, # Mock context
+                    "market_data": {}
+                }
+
+                agent_result = await self.default_agent.execute(
+                    target_data=target_data,
+                    context={"user_intent": description}
+                )
+
+                score = agent_result.get("overall_risk_score", "N/A")
+                result_text += f" | Risk Score: {score}"
+
+            except Exception as e:
+                logger.error(f"[Planner] Agent execution failed: {e}")
+                result_text += f" (Agent Error: {e})"
 
         # Update assessment
         current_assessment = state.get("assessment") or {}
