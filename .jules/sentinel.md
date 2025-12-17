@@ -27,3 +27,8 @@
 **Vulnerability:** The Neo4j connection logic defaulted to the password "password" if the environment variable was missing.
 **Learning:** Hardcoded fallbacks for secrets, even if intended for "dev convenience," often leak into production environments where env vars might be missed during deployment.
 **Prevention:** Remove default values for sensitive credentials. Fail fast (raise Error) or default to `None` to force explicit configuration.
+
+## 2025-12-16 - Hardcoded Flask Secret Key Fallback
+**Vulnerability:** The Flask application used the common tutorial pattern `SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard-to-guess-string'`. This means the application would run with a publicly known secret key if the environment variable was omitted in production, enabling session forgery.
+**Learning:** Copy-pasting configuration code from tutorials often introduces insecure defaults. The `or 'value'` idiom is dangerous for secrets.
+**Prevention:** Remove default values for secrets in configuration classes. Implement an `init_app` check that explicitly raises a `RuntimeError` if the secret is missing in a non-development environment.
