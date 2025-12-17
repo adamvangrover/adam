@@ -1,4 +1,3 @@
-```python
 # core/simulations/Merger_Acquisition_Simulation.py
 
 import json
@@ -207,4 +206,3 @@ class MergerAcquisitionSimulation:
         # Example: Save report to file
         with open(f"libraries_and_archives/simulation_results/{acquirer_name}_{target_name}_ma_report.txt", 'w') as f:
             f.write(report)
-```

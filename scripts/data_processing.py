@@ -2,6 +2,7 @@
 
 import pandas as pd
 import numpy as np
+import re
 
 def clean_financial_data(data):
     """
@@ -74,7 +75,7 @@ def preprocess_social_media_data(data):
       list of dict: The preprocessed social media data.
     """
 
-    processed_data =
+    processed_data = []
     for item in data:
         text = item['text']
         # 1. Clean Text (example: remove URLs and special characters)

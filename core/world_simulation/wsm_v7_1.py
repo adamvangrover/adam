@@ -77,21 +77,21 @@ class WorldSimulationModel(Model):
 
         # --- Market Conditions ---
         self.stock_prices = {
-            'AAPL':,
-            'MSFT':,
-            'GOOG':
+            'AAPL': [150.0],
+            'MSFT': [250.0],
+            'GOOG': [120.0]
             # --- Development Node: Add more stocks ---
         }
         self.economic_indicators = {
-            'GDP_growth':,
-            'inflation':,
-            'interest_rates':
+            'GDP_growth': [2.5],
+            'inflation': [2.0],
+            'interest_rates': [3.0]
             # --- Development Node: Add more economic indicators ---
             # Examples: unemployment, consumer confidence, manufacturing output
         }
         self.geopolitical_risks = {
-            'political_stability':,
-            'trade_war_risk':
+            'political_stability': [0.8],
+            'trade_war_risk': [0.2]
             # --- Development Node: Add more geopolitical risks ---
             # Examples: conflict risk, regulatory changes, natural disasters
         }

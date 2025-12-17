@@ -1,17 +1,29 @@
-.PHONY: install test lint run clean docker-build docker-up
+.PHONY: install test lint security types check-all run clean docker-build docker-up setup-ops
 
 install:
+	pip install -r requirements.txt
 	pip install -e .
 
+setup-ops:
+	bash ops/setup.sh
+
+check-all: setup-ops
+	python ops/run_checks.py
+
 test:
-	pytest tests/
+	python ops/checks/check_tests.py
+
+lint:
+	python ops/checks/check_lint.py
+
+security:
+	python ops/checks/check_security.py
+
+types:
+	python ops/checks/check_types.py
 
 test-frontend:
 	cd services/webapp/client && npm test -- --watchAll=false
-
-lint:
-	flake8 core/ services/ scripts/
-	# black --check core/ services/ scripts/
 
 run:
 	python scripts/run_adam.py

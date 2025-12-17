@@ -6,7 +6,6 @@ import pandas as pd
 
 # Developer Note: This skill provides an interface to the hybrid forecasting
 # capabilities of the system. Agents can use this skill to generate
--
 # robust time-series forecasts.
 
 class HybridForecastingSkill:
