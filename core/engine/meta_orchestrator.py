@@ -14,6 +14,7 @@ a user query should take:
 
 import logging
 import asyncio
+import re
 from typing import Dict, Any, Optional
 
 import uuid
@@ -156,53 +157,29 @@ class MetaOrchestrator:
         query_lower = query.lower()
         context = context or {}
 
-        # v23.5 Deep Dive Trigger
-        if "deep dive" in query_lower or context.get("simulation_depth") == "Deep":
+        # Context-based override
+        if context.get("simulation_depth") == "Deep":
             return "DEEP_DIVE"
 
-        # Deep Dive / v23.5
-        if any(x in query_lower for x in ["deep dive", "full analysis", "partner", "valuation", "covenant"]):
-            return "DEEP_DIVE"
+        # Heuristic Mapping
+        triggers = {
+            "DEEP_DIVE": ["deep dive", "full analysis", "partner", "valuation", "covenant"],
+            "RED_TEAM": ["attack", "adversarial"],
+            "CRISIS": ["simulation", "simulate", "crisis", "shock", "stress test", "scenario"],
+            "ESG": ["esg", "environmental", "sustainability", "carbon", "green", "social impact"],
+            "COMPLIANCE": ["compliance", "kyc", "aml", "regulation", "violation", "dodd-frank", "basel"],
+            "FO_WEALTH": ["ips", "trust", "estate", "wealth", "goal", "governance"],
+            "FO_DEAL": ["deal", "private equity", "venture", "screening", "multiple"],
+            "FO_EXECUTION": ["buy", "sell", "execute trade", "place order"],
+            "FO_MARKET": ["price", "quote", "ticker", "market data"],
+            "HIGH": ["analyze", "risk", "plan", "strategy", "report"],
+            "MEDIUM": ["monitor", "alert", "watch", "notify"]
+        }
 
-        # Red Team / Adversarial
-        if any(x in query_lower for x in ["attack", "adversarial"]):
-            return "RED_TEAM"
+        for category, keywords in triggers.items():
+            if any(k in query_lower for k in keywords):
+                return category
 
-        # Crisis / Simulation
-        if any(x in query_lower for x in ["simulation", "simulate", "crisis", "shock", "stress test", "scenario"]):
-            return "CRISIS"
-
-        # ESG
-        if any(x in query_lower for x in ["esg", "environmental", "sustainability", "carbon", "green", "social impact"]):
-            return "ESG"
-
-        # Compliance
-        if any(x in query_lower for x in ["compliance", "kyc", "aml", "regulation", "violation", "dodd-frank", "basel"]):
-            return "COMPLIANCE"
-
-        # FO Super-App: Wealth & Governance
-        if any(x in query_lower for x in ["ips", "trust", "estate", "wealth", "goal", "governance"]):
-            return "FO_WEALTH"
-
-        # FO Super-App: Deal Flow
-        if any(x in query_lower for x in ["deal", "private equity", "venture", "screening", "multiple"]):
-            return "FO_DEAL"
-
-        # FO Super-App: Execution
-        if any(x in query_lower for x in ["buy", "sell", "execute trade", "place order"]):
-            return "FO_EXECUTION"
-
-        # FO Super-App: Market Data
-        if any(x in query_lower for x in ["price", "quote", "ticker", "market data"]):
-            return "FO_MARKET"
-
-        # v23 is best for analysis, planning, and risk
-        if any(x in query_lower for x in ["analyze", "risk", "plan", "strategy", "report"]):
-            return "HIGH"
-        # v22 is best for monitoring, alerts, background tasks
-        elif any(x in query_lower for x in ["monitor", "alert", "watch", "notify"]):
-            return "MEDIUM"
-        # v21 is best for simple lookups
         return "LOW"
 
     async def _run_deep_dive_flow(self, query: str, context: Dict[str, Any] = None):
@@ -253,14 +230,9 @@ class MetaOrchestrator:
             prompt = f"Perform a deep dive analysis for: {query}. Populate the full knowledge graph."
 
             # Retrieve tools from MCP Registry
-            # We pass the raw callables; Gemini SDK can often introspect them or we'd need a converter.
-            # Assuming Gemini 3 SDK handles list of callables for 'tools'.
             tools = list(self.mcp_registry.tools.values())
 
-            # Pass thought_signature=None initially
-            # Note: generate_structured is not async in the current LLMPlugin implementation
-            # We might need to wrap it in run_in_executor if blocking, but here we assume it's fast (Mock)
-            # or acceptable latency.
+            # Native Gemini Execution
             result_obj, metadata = self.llm_plugin.generate_structured(
                 prompt,
                 response_schema=HyperDimensionalKnowledgeGraph,
@@ -277,7 +249,7 @@ class MetaOrchestrator:
 
     async def _run_deep_dive_legacy_agents(self, query: str):
         """
-        Legacy method that manually calls agents.
+        Legacy method that manually calls agents in a sequential waterfall.
         """
         logger.info("Engaging Legacy Agent Deep Dive...")
 
@@ -286,7 +258,7 @@ class MetaOrchestrator:
             trace_id = str(uuid.uuid4())
             common_config = {"trace_id": trace_id}
 
-            # Initialize Agents with Trace ID
+            # Initialize Agents
             mgmt_agent = ManagementAssessmentAgent(config=common_config)
             fund_agent = FundamentalAnalystAgent(config=common_config)
             peer_agent = PeerComparisonAgent(config=common_config)
@@ -297,29 +269,41 @@ class MetaOrchestrator:
 
             # Phase 1: Entity & Management
             logger.info("Fallback Phase 1: Entity & Management")
-            company_name_extraction = query.replace("Perform a deep dive analysis on", "").strip() or query
+            # Extract company name using regex or simple strip
+            company_match = re.search(r"analysis for (.*)", query, re.IGNORECASE)
+            company_name_extraction = company_match.group(1).strip(" .") if company_match else query.replace("Perform a deep dive analysis on", "").strip()
             entity_eco = await mgmt_agent.execute({"company_name": company_name_extraction})
 
-            # Phase 2: Deep Fundamental
-            logger.info("Fallback Phase 2: Deep Fundamental")
+            # Determine correct Company ID/Name from Phase 1 result if possible
             company_id = company_name_extraction
+            if hasattr(entity_eco, 'legal_entity') and entity_eco.legal_entity.name:
+                company_id = entity_eco.legal_entity.name
+
+            # Phase 2: Deep Fundamental
+            logger.info(f"Fallback Phase 2: Deep Fundamental for {company_id}")
             fund_data = await fund_agent.execute(company_id)
 
-            # Map fund_data
+            # Extract metrics from fund_data (using new raw_metrics field if available)
             dcf_val = 0.0
+            raw_metrics = {}
             if isinstance(fund_data, dict):
                  dcf_val = fund_data.get("dcf_valuation", 0.0)
+                 raw_metrics = fund_data.get("raw_metrics", {})
+
+            ebitda = raw_metrics.get("ebitda", 100.0)
+            total_debt = raw_metrics.get("total_debt", 300.0)
+            leverage = total_debt / ebitda if ebitda else 3.0
 
             # Safe Fallback for Peer Agent
             multiples = {}
             try:
                 multiples = await peer_agent.execute({"company_id": company_id})
-            except:
+            except Exception as e:
+                logger.warning(f"Peer Agent failed: {e}. Using defaults.")
                 multiples = {}
 
             # Normalize Multiples
-            if not isinstance(multiples, dict):
-                 multiples = {}
+            if not isinstance(multiples, dict): multiples = {}
             multiples.setdefault("current_ev_ebitda", 10.0)
             multiples.setdefault("peer_median_ev_ebitda", 10.0)
             multiples.setdefault("verdict", "Fair")
@@ -328,7 +312,7 @@ class MetaOrchestrator:
 
             equity_analysis = EquityAnalysis(
                 fundamentals=Fundamentals(
-                    revenue_cagr_3yr="5%",
+                    revenue_cagr_3yr="5%", # Placeholder
                     ebitda_margin_trend="Expanding"
                 ),
                 valuation_engine=ValuationEngine(
@@ -345,12 +329,12 @@ class MetaOrchestrator:
             # Phase 3: Credit
             logger.info("Fallback Phase 3: Credit")
             credit_input = {
-                "facilities": [{"id": "TLB", "amount": "500M", "ltv": 0.5}],
-                "current_leverage": 3.0
+                "facilities": [{"id": "TLB", "amount": f"{total_debt}M", "ltv": 0.5}],
+                "current_leverage": leverage
             }
             snc_model = await snc_agent.execute(credit_input)
 
-            # Manually construct CreditAnalysis (since snc_agent only returns the model)
+            # Manually construct CreditAnalysis
             from core.schemas.v23_5_schema import CreditAnalysis, CovenantRiskAnalysis
 
             credit_analysis = CreditAnalysis(
@@ -358,22 +342,21 @@ class MetaOrchestrator:
                 cds_market_implied_rating="BBB-",
                 covenant_risk_analysis=CovenantRiskAnalysis(
                     primary_constraint="Net Leverage",
-                    current_level=3.5,
+                    current_level=leverage,
                     breach_threshold=4.5,
-                    headroom_assessment="Adequate"
+                    headroom_assessment="Adequate" if leverage < 4.5 else "Tight"
                 )
             )
 
             # Phase 4: Risk
             logger.info("Fallback Phase 4: Risk")
-            ebitda = 100.0
-            debt = 300.0
-            sim_engine = await mc_agent.execute({"ebitda": ebitda, "debt": debt, "volatility": 0.2})
+            sim_engine = await mc_agent.execute({"ebitda": ebitda, "debt": total_debt, "volatility": 0.2})
 
             try:
                 scenarios = await quant_agent.execute({})
                 sim_engine.quantum_scenarios = scenarios
-            except:
+            except Exception as e:
+                logger.warning(f"Quantum Agent failed: {e}. Proceeding without quantum scenarios.")
                 pass
 
             # Phase 5: Synthesis
@@ -409,15 +392,37 @@ class MetaOrchestrator:
     async def _run_adaptive_flow(self, query: str):
         logger.info("Engaging v23 Neuro-Symbolic Planner...")
         
-        # 0. Entity Extraction (Simple Heuristic)
-        start_node = "Apple Inc."
-        if "tesla" in query.lower(): start_node = "Tesla Inc."
-        elif "microsoft" in query.lower(): start_node = "Microsoft Corp"
+        # 0. Entity Extraction (Regex-Enhanced)
+        start_node = "Unknown Entity"
+
+        # Attempt to find capitalized words (simple NER)
+        entity_match = re.search(r"((?:[A-Z][a-z0-9]+\s?)+)", query)
+        if entity_match:
+            candidate = entity_match.group(1).strip()
+            # Filter out common keywords that might be capitalized at start of sentence
+            ignored_words = {"Analyze", "Perform", "The", "A", "An", "What", "How", "Why", "Risk"}
+
+            parts = candidate.split()
+            while parts and parts[0] in ignored_words:
+                parts.pop(0)
+            candidate = " ".join(parts)
+
+            if candidate and len(candidate) > 2:
+                start_node = candidate
+
+        # Heuristic Fallback
+        if start_node == "Unknown Entity":
+            if "apple" in query.lower(): start_node = "Apple Inc."
+            elif "tesla" in query.lower(): start_node = "Tesla Inc."
+            elif "microsoft" in query.lower(): start_node = "Microsoft Corp"
+            elif "google" in query.lower(): start_node = "Alphabet Inc."
+            elif "amazon" in query.lower(): start_node = "Amazon.com Inc."
 
         target_node = "CreditRating"
         if "esg" in query.lower(): target_node = "ESGScore"
         elif "risk" in query.lower(): target_node = "RiskScore"
         elif "sentiment" in query.lower(): target_node = "Sentiment"
+        elif "compliance" in query.lower(): target_node = "ComplianceStatus"
 
         # 1. Discover Plan
         try:
