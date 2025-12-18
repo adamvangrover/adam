@@ -58,6 +58,8 @@ class VerticalRiskGraphState(TypedDict):
     quant_analysis: Optional[str]
     legal_analysis: Optional[str]
     market_research: Optional[str]
+    # v23.5 Additions
+    risk_simulation_results: Optional[List[Dict[str, Any]]]  # Output from StochasticRiskEngine (Merton/Cholesky)
 
     # Draft
     draft_memo: Optional[Dict[str, Any]] # Serialized InvestmentMemo
