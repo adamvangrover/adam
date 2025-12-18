@@ -1,6 +1,7 @@
 from typing import Dict, Any, Optional
 import logging
 import xml.etree.ElementTree as ET
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -8,20 +9,26 @@ class XBRLHandler:
     """
     Handles parsing of XBRL (eXtensible Business Reporting Language) files
     from SEC EDGAR filings. This is the 'Gold Standard' for financial data extraction.
+
+    Architecture Note:
+    We use a flexible tag matching strategy to handle the versioning hell of US-GAAP taxonomies
+    (e.g., us-gaap/2021 vs us-gaap/2023).
     """
 
     def __init__(self):
-        # Mapping of common US-GAAP tags to our internal schema keys
+        # Mapping of common US-GAAP tag names (stripped of namespace) to our internal schema keys
         self.tag_map = {
-            "{http://fasb.org/us-gaap/2023}CashAndCashEquivalentsAtCarryingValue": "cash_equivalents",
-            "{http://fasb.org/us-gaap/2023}Assets": "total_assets",
-            "{http://fasb.org/us-gaap/2023}DebtInstrumentCarryingAmount": "total_debt",
-            "{http://fasb.org/us-gaap/2023}StockholdersEquity": "equity",
-            "{http://fasb.org/us-gaap/2023}Revenues": "revenue",
-            "{http://fasb.org/us-gaap/2023}OperatingIncomeLoss": "operating_income",
-            "{http://fasb.org/us-gaap/2023}NetIncomeLoss": "net_income",
-            "{http://fasb.org/us-gaap/2023}DepreciationDepletionAndAmortization": "depreciation_amortization",
-            "{http://fasb.org/us-gaap/2023}InterestExpense": "interest_expense"
+            "CashAndCashEquivalentsAtCarryingValue": "cash_equivalents",
+            "Assets": "total_assets",
+            "DebtInstrumentCarryingAmount": "total_debt",
+            "LongTermDebt": "total_debt", # Alternative tag
+            "StockholdersEquity": "equity",
+            "Revenues": "revenue",
+            "RevenueFromContractWithCustomerExcludingAssessedTax": "revenue", # Modern tag
+            "OperatingIncomeLoss": "operating_income",
+            "NetIncomeLoss": "net_income",
+            "DepreciationDepletionAndAmortization": "depreciation_amortization",
+            "InterestExpense": "interest_expense"
         }
 
     def parse_filing(self, file_path: str) -> Dict[str, Any]:
@@ -33,6 +40,9 @@ class XBRLHandler:
 
         Returns:
             Dictionary containing Balance Sheet and Income Statement data.
+
+        Financial Context:
+        These values drive the 'Fundamental Analysis' node in the Deep Dive graph.
         """
         logger.info(f"Attempting to parse XBRL file: {file_path}")
 
@@ -42,46 +52,51 @@ class XBRLHandler:
 
             # Initialize data buckets
             data = {
-                "balance_sheet": {"fiscal_year": 2024}, # Default for demo
+                "balance_sheet": {"fiscal_year": 2024}, # Default, normally extracted from ContextRef
                 "income_statement": {}
             }
 
             # Iterate through all elements in the XML
             for child in root:
                 tag = child.tag
-                # Remove namespaces if they vary or match dynamically
-                # For this demo, we use the map with namespaces or strip them
+                # Extract the tag name without the namespace
+                # Format: {http://...}TagName
+                match = re.search(r"}(.+)$", tag)
+                if match:
+                    clean_tag = match.group(1)
+                else:
+                    clean_tag = tag
 
                 # Check if tag is in our map
-                # A simple way to check ends-with if namespace versions vary
-                clean_tag = tag.split('}')[-1] # strip namespace
+                if clean_tag in self.tag_map:
+                    internal_key = self.tag_map[clean_tag]
 
-                # We need to be careful, as different namespaces might have same tag names
-                # But for this simple parser, we look for matches
-
-                mapped_key = None
-                for full_tag, key in self.tag_map.items():
-                    if full_tag == tag or full_tag.endswith(clean_tag):
-                        mapped_key = key
-                        break
-
-                if mapped_key:
                     try:
-                        value = float(child.text)
+                        # Defensive parsing: Handles empty or 'nil' tags
+                        if child.text:
+                            value = float(child.text)
 
-                        # Assign to appropriate bucket
-                        if mapped_key in ["cash_equivalents", "total_assets", "total_debt", "equity"]:
-                            data["balance_sheet"][mapped_key] = value
-                        else:
-                            data["income_statement"][mapped_key] = value
+                            # Logic: If key exists, summing might be dangerous (duplicates),
+                            # but usually contextRef distinguishes periods.
+                            # For this simplified parser, we take the largest value (heuristic for 'Total' vs 'segment')
+                            # or just overwrite.
+
+                            bucket = "balance_sheet" if internal_key in ["cash_equivalents", "total_assets", "total_debt", "equity"] else "income_statement"
+
+                            # Simple heuristic: Assume max value is the consolidated total (ignoring segments)
+                            current_val = data[bucket].get(internal_key, 0.0)
+                            if value > current_val:
+                                data[bucket][internal_key] = value
+
                     except (ValueError, TypeError):
-                        pass
+                        logger.debug(f"Could not parse value for {clean_tag}: {child.text}")
 
             return data
 
         except Exception as e:
             logger.error(f"Failed to parse XBRL: {e}")
             # Fallback to mock if parsing fails (e.g. file not found in demo)
+            logger.warning("Using Mock XBRL Data due to parsing failure.")
             return {
                 "balance_sheet": {
                     "cash_equivalents": 50000000.0,

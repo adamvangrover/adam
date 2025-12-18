@@ -3,6 +3,7 @@
 import logging
 import networkx as nx
 import re
+import asyncio
 from typing import List, Dict, Any, Optional, Set
 from langgraph.graph import StateGraph, END, START
 
@@ -32,6 +33,49 @@ class NeuroSymbolicPlanner:
             logger.info("RiskAssessmentAgent loaded successfully.")
         except ImportError:
             logger.warning("RiskAssessmentAgent not found. Planner running in 'Simulated Execution' mode.")
+
+    def create_plan(self, request: str) -> Dict[str, Any]:
+        """
+        Orchestrates the planning process (High-Level API):
+        1. Parse Request
+        2. Extract Entities
+        3. Discover Symbolic Path
+        4. Fallback to LLM Planning
+        """
+        logger.info(f"[Planner] Creating plan for request: '{request}'")
+
+        # 1. Entity Extraction (Heuristic/Regex)
+        # Try to find "Analyze [Entity] [Intent]" or just "Analyze [Entity]"
+        # Regex: Analyze (Group 1: Entity) (Optional Group 2: Intent)
+        entity_match = re.search(r"Analyze\s+([A-Za-z0-9\s\.]+?)(?:\s+(?:credit|market|esg|risk|rating).*)?$", request, re.IGNORECASE)
+
+        if entity_match:
+            start_node = entity_match.group(1).strip()
+            # Clean up common suffixes for graph matching if needed,
+            # but keeping it raw is often safer for fuzzy matching in KG
+
+            # Intent mapping (simple keyword search in the whole request)
+            request_lower = request.lower()
+            target_node = "Investment_Decision" # Default generic target
+            if "credit" in request_lower: target_node = "Credit_Default"
+            elif "market" in request_lower: target_node = "Market_Crash"
+            elif "esg" in request_lower: target_node = "ESG_Controversy"
+            elif "liquidity" in request_lower: target_node = "Liquidity_Crisis"
+
+            logger.info(f"[Planner] Extracted Entity: '{start_node}', Inferred Target: '{target_node}'")
+
+            # 2. Symbolic Discovery
+            # We try to find a path from Entity -> Risk
+            plan = self.discover_plan(start_node, target_node)
+
+            # If discovery found a path (even if it's a fallback), use it.
+            # But if it returned a Generic Fallback because of no path, we might want to try NLP parsing
+            # if we had a real LLM connected. Here we stick to the plan returned.
+            return plan
+
+        # 3. Fallback to NLP Parsing logic (simulated here via simple regex on numbered lists)
+        logger.info("[Planner] Entity extraction failed. Falling back to NLP parsing.")
+        return self.parse_natural_language_plan(request)
 
     # -------------------------------------------------------------------------
     # 1. SYMBOLIC DISCOVERY (Graph Traversal)
@@ -110,7 +154,16 @@ class NeuroSymbolicPlanner:
 
         if not matches:
             logger.warning("No numbered steps found in text. Returning Empty Plan.")
-            return {"symbolic_plan": "Manual/Empty", "steps": []}
+            # If no steps found, create a single generic step
+            return {
+                "symbolic_plan": "Manual/One-Shot",
+                "steps": [{
+                    "task_id": "1",
+                    "agent": "GeneralAgent",
+                    "description": text.strip() or "Execute Request",
+                    "dependencies": []
+                }]
+            }
 
         for num, desc in matches:
             desc = desc.strip()
@@ -139,7 +192,7 @@ class NeuroSymbolicPlanner:
     def _topological_sort(self, steps: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
         Sorts tasks such that if A depends on B, B comes first.
-        Uses Depth-First Search (DFS).
+        Uses Depth-First Search (DFS) with Robust Cycle Breaking.
         """
         id_to_step = {s['task_id']: s for s in steps}
         adj_list = {s['task_id']: set() for s in steps}
@@ -149,6 +202,8 @@ class NeuroSymbolicPlanner:
             for dep in s.get('dependencies', []):
                 if dep in id_to_step:
                     adj_list[s['task_id']].add(dep)
+                else:
+                    logger.debug(f"Task {s['task_id']} depends on missing task {dep}. Ignoring dependency.")
 
         visited = set()
         temp_mark = set() # To detect cycles
@@ -158,16 +213,20 @@ class NeuroSymbolicPlanner:
             if node_id in temp_mark:
                 # Cycle detected (e.g., A depends on B, B depends on A).
                 # We break the cycle by returning immediately (soft fail).
-                logger.warning(f"Cycle detected at step {node_id}. Breaking dependency chain.")
+                # This treats the current edge as non-existent for the purpose of sorting.
+                logger.warning(f"Cycle detected at step {node_id}. Breaking dependency chain to ensure execution.")
                 return
             if node_id in visited:
                 return
 
             temp_mark.add(node_id)
-            for dep_id in adj_list[node_id]:
-                visit(dep_id)
+            try:
+                # Iterate over a copy to allow modification if needed (though we don't modify here)
+                for dep_id in list(adj_list[node_id]):
+                    visit(dep_id)
+            finally:
+                temp_mark.remove(node_id)
             
-            temp_mark.remove(node_id)
             visited.add(node_id)
             sorted_output.append(id_to_step[node_id])
 
@@ -205,7 +264,7 @@ class NeuroSymbolicPlanner:
         # Default result text
         result_text = f"Executed: {description}"
 
-        if self.default_agent and agent_name == "RiskAssessmentAgent":
+        if self.default_agent and (agent_name == "RiskAssessmentAgent" or agent_name == "GeneralAgent"):
             try:
                 # Attempt to extract entity from description (simple heuristic for graph traversal steps)
                 # e.g. "Verify relationship: Apple Inc. -[SUPPLIER]-> Foxconn"
@@ -216,10 +275,13 @@ class NeuroSymbolicPlanner:
                 if match:
                     target_entity = match.group(1).strip()
                 else:
-                    # Regex 2: General analysis pattern
-                    match_req = re.search(r"Analyze (.*?) ", state.get("request", ""), re.IGNORECASE)
+                    # Regex 2: General analysis pattern (Analyze X...)
+                    match_req = re.search(r"Analyze (.*?) ", description, re.IGNORECASE)
                     if match_req:
                         target_entity = match_req.group(1).strip()
+                    else:
+                        # Fallback: Check the state for a global target
+                        target_entity = state.get("target", state.get("ticker", "Unknown"))
 
                 logger.info(f"[Planner] Delegating to RiskAssessmentAgent for {target_entity}...")
 
@@ -232,17 +294,25 @@ class NeuroSymbolicPlanner:
                     "market_data": {}
                 }
 
-                agent_result = await self.default_agent.execute(
-                    target_data=target_data,
-                    context={"user_intent": description}
-                )
+                # Check if execute is async
+                if asyncio.iscoroutinefunction(self.default_agent.execute):
+                    agent_result = await self.default_agent.execute(
+                        target_data=target_data,
+                        context={"user_intent": description}
+                    )
+                else:
+                    # Sync fallback
+                    agent_result = self.default_agent.execute(
+                        target_data=target_data,
+                        context={"user_intent": description}
+                    )
 
                 score = agent_result.get("overall_risk_score", "N/A")
                 factors = list(agent_result.get("risk_factors", {}).keys())
                 result_text = f"Risk Analysis for {target_entity}: Score {score}. Factors Analyzed: {factors}"
 
             except Exception as e:
-                logger.error(f"[Planner] Agent execution failed: {e}")
+                logger.error(f"[Planner] Agent execution failed: {e}", exc_info=True)
                 result_text += f" (Agent Error: {e})"
         else:
             # Simulated execution for other agents or if agent not loaded
@@ -250,9 +320,14 @@ class NeuroSymbolicPlanner:
 
         # Update State
         current_assessment = state.get("assessment") or {}
+        # Ensure content is a string
         content = current_assessment.get("content", "")
+        if not isinstance(content, str):
+            content = str(content)
+
         content += f"\n- [Step {index+1}] {result_text}"
 
+        # Return minimal update
         return {
             "assessment": {"content": content},
             "current_task_index": index + 1
