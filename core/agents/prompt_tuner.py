@@ -7,9 +7,18 @@ except ImportError:
 from core.utils.data_utils import send_message, receive_messages
 from typing import List, Dict
 import re
-from textblob import TextBlob  # Example NLP library
-import spacy  # Another example NLP library
+import logging
 import json #knowledge base
+
+try:
+    from textblob import TextBlob
+except ImportError:
+    TextBlob = None
+
+try:
+    import spacy
+except ImportError:
+    spacy = None
 
 # ... (import other necessary libraries, e.g., for knowledge base interaction)
 
@@ -25,8 +34,16 @@ class PromptTuner:
         self.orchestrator = orchestrator
         self.user_feedback_enabled = config.get('user_feedback_enabled', False)
         self.hallucination_detection_enabled = config.get('hallucination_detection_enabled', False)
-        self.nlp = spacy.load("en_core_web_sm")  # Load spaCy NLP model
         self.knowledge_base = knowledge_base
+        self.nlp = None
+
+        if spacy:
+            try:
+                self.nlp = spacy.load("en_core_web_sm")  # Load spaCy NLP model
+            except Exception as e:
+                 logging.warning(f"Failed to load spacy model 'en_core_web_sm': {e}. NLP features disabled.")
+        else:
+            logging.warning("Spacy not installed. NLP features disabled.")
 
     def analyze_prompt(self, prompt: str, **kwargs) -> Dict:
         """
@@ -61,6 +78,8 @@ class PromptTuner:
         Returns:
             A string representing the clarity level (e.g., 'high', 'medium', 'low').
         """
+        if not self.nlp:
+            return 'medium'
 
         # Check for ambiguity, use of jargon, complex sentence structures
         # ... (Implement more sophisticated clarity analysis using NLP techniques)
@@ -126,6 +145,8 @@ class PromptTuner:
         Returns:
             A string representing the sentiment (e.g., 'positive', 'negative', 'neutral').
         """
+        if not TextBlob:
+            return 'neutral'
 
         # Use TextBlob for sentiment analysis
         blob = TextBlob(prompt)
@@ -146,6 +167,9 @@ class PromptTuner:
         Returns:
             A list of keywords.
         """
+        if not self.nlp:
+            # Fallback: simple split
+            return list(set(prompt.split()))
 
         # Use spaCy for keyword extraction
         doc = self.nlp(prompt)
@@ -162,6 +186,8 @@ class PromptTuner:
         Returns:
             A list of entities.
         """
+        if not self.nlp:
+            return []
 
         # Use spaCy for entity recognition
         doc = self.nlp(prompt)
