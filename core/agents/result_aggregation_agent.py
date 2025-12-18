@@ -1,6 +1,7 @@
 # core/agents/result_aggregation_agent.py
 
 import logging
+from typing import Dict, Any, List, Optional
 from core.agents.agent_base import AgentBase
 from core.utils.config_utils import load_config
 
@@ -14,22 +15,20 @@ class ResultAggregationAgent(AgentBase):
     but is designed for future LLM integration.
     """
 
-    def __init__(self, config_path="config/agents.yaml"):
-        super().__init__()
-        self.config = load_config(config_path)
-        agent_config = self.config.get('agents', {}).get('ResultAggregationAgent', {})
+    def __init__(self, config: Dict[str, Any], **kwargs):
+        """
+        Initializes the ResultAggregationAgent.
+        """
+        super().__init__(config, **kwargs)
 
-        if not agent_config:
-            logging.error("ResultAggregationAgent configuration not found.")
-            raise ValueError("ResultAggregationAgent configuration not found.")
-
-        self.persona = agent_config.get('persona', "Result Aggregation Agent")
-        self.description = agent_config.get('description', "Combines results from multiple agents.")
-        self.expertise = agent_config.get('expertise', ["data aggregation", "result summarization"])
+        # Access config directly, assuming it's already loaded by Orchestrator
+        self.persona = self.config.get('persona', "Result Aggregation Agent")
+        self.description = self.config.get('description', "Combines results from multiple agents.")
+        self.expertise = self.config.get('expertise', ["data aggregation", "result summarization"])
         # self.prompt_template = agent_config.get('prompt_template', "...") # Placeholder for later
 
 
-    def execute(self, results: list) -> str:
+    async def execute(self, results: list) -> str:
         """
         Combines results from multiple agents.
 

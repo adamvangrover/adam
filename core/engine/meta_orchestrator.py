@@ -10,6 +10,7 @@ a user query should take:
 3. Adaptive Path (v23): Neuro-Symbolic Planner (e.g. "Analyze complex credit risk").
 4. Specialized Paths: ESG, Compliance, Red Team.
 5. Deep Dive Path (v23.5): 5-Phase autonomous financial analysis.
+6. Code Gen Path: Autonomous coding and refactoring.
 """
 
 import logging
@@ -30,6 +31,7 @@ from core.engine.states import init_reflector_state
 from core.system.agent_orchestrator import AgentOrchestrator
 from core.mcp.registry import MCPRegistry
 from core.llm_plugin import LLMPlugin
+from core.engine.autonomous_self_improvement import CodeAlchemist
 
 # v23.5 Deep Dive Agents (for Fallback)
 from core.agents.specialized.management_assessment_agent import ManagementAssessmentAgent
@@ -55,7 +57,8 @@ class MetaOrchestrator:
         self.mcp_registry = MCPRegistry() # FO Super-App Integration
         # Integration Path 3: Native Gemini Tooling
         self.llm_plugin = LLMPlugin(config={"provider": "gemini", "gemini_model_name": "gemini-3-pro"})
-        
+        self.code_alchemist = CodeAlchemist()
+
     async def route_request(self, query: str, context: Dict[str, Any] = None) -> Any:
         """
         Analyzes the query complexity and routes to the best engine.
@@ -67,6 +70,8 @@ class MetaOrchestrator:
         result = None
         if complexity == "DEEP_DIVE":
             result = await self._run_deep_dive_flow(query, context)
+        elif complexity == "CODE_GEN":
+            result = await self._run_code_gen_flow(query)
         elif complexity == "RED_TEAM":
             result = await self._run_red_team_flow(query)
         elif complexity == "CRISIS":
@@ -104,7 +109,7 @@ class MetaOrchestrator:
                 result = {"status": "Legacy Orchestrator Unavailable", "query": query}
 
         # Optional: Reflection Step for high-value outputs
-        if complexity in ["DEEP_DIVE", "HIGH", "CRISIS", "RED_TEAM"]:
+        if complexity in ["DEEP_DIVE", "HIGH", "CRISIS", "RED_TEAM", "CODE_GEN"]:
              result = await self._reflect_on_result(result, query)
 
         return result
@@ -156,6 +161,10 @@ class MetaOrchestrator:
         query_lower = query.lower()
         context = context or {}
 
+        # Code Generation / Refactoring
+        if any(x in query_lower for x in ["generate code", "write a function", "implement", "refactor", "code agent"]):
+            return "CODE_GEN"
+
         # v23.5 Deep Dive Trigger
         if "deep dive" in query_lower or context.get("simulation_depth") == "Deep":
             return "DEEP_DIVE"
@@ -204,6 +213,21 @@ class MetaOrchestrator:
             return "MEDIUM"
         # v21 is best for simple lookups
         return "LOW"
+
+    async def _run_code_gen_flow(self, query: str):
+        logger.info("Engaging Code Alchemist for Autonomous Coding...")
+        try:
+            # Basic prompt extraction
+            prompt = query.replace("generate code", "").replace("write a function", "").strip()
+
+            result = self.code_alchemist.generate_code(prompt)
+            return {
+                "status": "Code Generation Complete",
+                "result": result
+            }
+        except Exception as e:
+            logger.error(f"Code Generation Failed: {e}", exc_info=True)
+            return {"error": str(e)}
 
     async def _run_deep_dive_flow(self, query: str, context: Dict[str, Any] = None):
         """

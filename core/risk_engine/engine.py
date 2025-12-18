@@ -38,6 +38,16 @@ class RiskEngine:
     # 1. VALUE AT RISK (VaR) & CVaR
     # -------------------------------------------------------------------------
 
+    def calculate_portfolio_risk(self, **kwargs) -> Dict[str, Any]:
+        """
+        Alias for calculate_parametric_var to support MCP Registry interface.
+        """
+        return self.calculate_parametric_var(
+            portfolio=kwargs.get("portfolio", []),
+            confidence_level=kwargs.get("confidence_level", 0.95),
+            correlation_matrix=kwargs.get("correlation_matrix", None)
+        )
+
     def calculate_parametric_var(self, 
                                  portfolio: List[Dict[str, Any]], 
                                  confidence_level: float = 0.95, 
