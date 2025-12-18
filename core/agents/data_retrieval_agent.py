@@ -21,8 +21,8 @@ class DataRetrievalAgent(AgentBase):
     Now integrates with DataFetcher for live market data.
     """
 
-    def __init__(self, config: Dict[str, Any], kernel: Optional[Kernel] = None):
-        super().__init__(config, kernel)
+    def __init__(self, config: Dict[str, Any], **kwargs):
+        super().__init__(config, **kwargs)
         self.persona = self.config.get('persona', "Data Retrieval Specialist")
         self.description = self.config.get('description', "Retrieves data from various configured sources based on structured requests.")
         self.expertise = self.config.get('expertise', ["data access", "file retrieval", "knowledge base query"])
@@ -382,7 +382,7 @@ if __name__ == '__main__':
     with open(dummy_agent_config['market_baseline_file_path'], 'w') as f:
         json.dump(dummy_market_data, f)
 
-    dra_agent = DataRetrievalAgent(config=dummy_agent_config, kernel=None)
+    dra_agent = DataRetrievalAgent(config=dummy_agent_config)
 
     async def main_test():
         # Test 1: ABC_TEST (Mock)

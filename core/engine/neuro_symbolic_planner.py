@@ -268,10 +268,18 @@ class NeuroSymbolicPlanner:
             return "continue"
         return "end"
 
-    def to_executable_graph(self) -> StateGraph:
+    def to_executable_graph(self, plan_data: Optional[Dict[str, Any]] = None) -> StateGraph:
         """
         Compiles the planner logic into a deployable LangGraph workflow.
+
+        Args:
+            plan_data: Optional dictionary containing plan details.
+                       Currently used for validation/logging, but can be used
+                       to dynamically structure the graph (e.g., adding parallel branches).
         """
+        if plan_data:
+            logger.info(f"Compiling executable graph for plan with {len(plan_data.get('steps', []))} steps.")
+
         workflow = StateGraph(GraphState)
         
         workflow.add_node("executor", self.execute_step)
