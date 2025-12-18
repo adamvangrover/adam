@@ -181,9 +181,10 @@ class NeuroSymbolicPlanner:
     # 3. EXECUTION RUNTIME (LangGraph Integration)
     # -------------------------------------------------------------------------
 
-    def execute_step(self, state: GraphState) -> Dict[str, Any]:
+    async def execute_step(self, state: GraphState) -> Dict[str, Any]:
         """
         Worker node for LangGraph. Executes the current step in the plan.
+        Merged Logic: Prioritizes Async execution with fallback.
         """
         plan = state.get("plan")
         if not plan:
@@ -197,17 +198,55 @@ class NeuroSymbolicPlanner:
 
         step = steps[index]
         description = step.get("description", "Unknown Task")
-        logger.info(f"[Runtime] Executing Step {index+1}/{len(steps)}: {description}")
-
-        # --- REAL AGENT EXECUTION HOOK ---
-        # In a production environment, this is where we yield to the Agent
-        result_text = f"Simulated Success: {description}"
+        agent_name = step.get("agent")
         
-        if self.default_agent:
-            # Placeholder for actual async invocation
-            # response = await self.default_agent.ainvoke(step)
-            # result_text = response.output
-            pass
+        logger.info(f"[Planner] Executing Step {index + 1}/{len(steps)}: {description}")
+
+        # Default result text
+        result_text = f"Executed: {description}"
+
+        if self.default_agent and agent_name == "RiskAssessmentAgent":
+            try:
+                # Attempt to extract entity from description (simple heuristic for graph traversal steps)
+                # e.g. "Verify relationship: Apple Inc. -[SUPPLIER]-> Foxconn"
+                target_entity = "Unknown"
+                
+                # Regex 1: Relationship verification pattern
+                match = re.search(r"Verify relationship: (.*?) [-–]", description)
+                if match:
+                    target_entity = match.group(1).strip()
+                else:
+                    # Regex 2: General analysis pattern
+                    match_req = re.search(r"Analyze (.*?) ", state.get("request", ""), re.IGNORECASE)
+                    if match_req:
+                        target_entity = match_req.group(1).strip()
+
+                logger.info(f"[Planner] Delegating to RiskAssessmentAgent for {target_entity}...")
+
+                # Execute Async
+                # We mock the payload as RiskAssessmentAgent expects specific keys.
+                # In a full system, this would fetch real data from a Data Retrieval Agent.
+                target_data = {
+                    "company_name": target_entity,
+                    "financial_data": {"industry": "Technology"}, # Contextual mock
+                    "market_data": {}
+                }
+
+                agent_result = await self.default_agent.execute(
+                    target_data=target_data,
+                    context={"user_intent": description}
+                )
+
+                score = agent_result.get("overall_risk_score", "N/A")
+                factors = list(agent_result.get("risk_factors", {}).keys())
+                result_text = f"Risk Analysis for {target_entity}: Score {score}. Factors Analyzed: {factors}"
+
+            except Exception as e:
+                logger.error(f"[Planner] Agent execution failed: {e}")
+                result_text += f" (Agent Error: {e})"
+        else:
+            # Simulated execution for other agents or if agent not loaded
+            result_text = f"Simulated Success: {description}"
 
         # Update State
         current_assessment = state.get("assessment") or {}
