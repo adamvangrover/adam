@@ -1,44 +1,117 @@
 # core/agents/macroeconomic_analysis_agent.py
 
+from __future__ import annotations
+from typing import Any, Dict, List, Optional
+import logging
+from core.agents.agent_base import AgentBase
 from core.utils.data_utils import send_message
 
-class MacroeconomicAnalysisAgent:
-    def __init__(self, config):
-        self.data_sources = config['data_sources']
-        self.indicators = config['indicators']
+class MacroeconomicAnalysisAgent(AgentBase):
+    """
+    Agent responsible for analyzing macroeconomic indicators (GDP, Inflation, etc.)
+    to provide a broad market context.
 
-    def analyze_macroeconomic_data(self):
-        print("Analyzing macroeconomic data...")
+    Refactored for v23 Architecture (Path A).
+    """
 
-        # Fetch macroeconomic data
-        gdp_growth = self.data_sources['government_stats_api'].get_gdp(country="US", period="quarterly")
-        inflation_rate = self.data_sources['government_stats_api'].get_inflation(country="US", period="monthly")
-        #... (fetch other relevant indicators)
+    def __init__(self, config: Dict[str, Any], **kwargs):
+        """
+        Initializes the MacroeconomicAnalysisAgent.
 
-        # Analyze trends and relationships (example)
-        gdp_trend = self.analyze_gdp_trend(gdp_growth)
-        inflation_outlook = self.analyze_inflation_outlook(inflation_rate)
-        #... (add more analysis)
+        Args:
+            config: Configuration dictionary containing data sources and indicators.
+            **kwargs: Additional arguments for AgentBase (e.g., kernel).
+        """
+        super().__init__(config, **kwargs)
+        # Defensive access to config
+        self.data_sources = config.get('data_sources', {})
+        self.indicators = config.get('indicators', ['GDP', 'inflation']) # Default indicators
+
+    async def execute(self, **kwargs) -> Dict[str, Any]:
+        """
+        Executes the macroeconomic analysis workflow.
+
+        Args:
+            **kwargs: Context arguments (e.g. specific country or period).
+
+        Returns:
+            Dict[str, Any]: A dictionary containing insights and trend analysis.
+        """
+        logging.info(f"MacroeconomicAnalysisAgent executing with context: {kwargs.keys()}")
+
+        # Delegate to the core analysis logic
+        # In a real async world, data fetching should be awaited.
+        # For now, we wrap the synchronous method.
+        insights = self.analyze_macroeconomic_data()
+
+        return insights
+
+    def analyze_macroeconomic_data(self) -> Dict[str, Any]:
+        """
+        Performs the analysis of macroeconomic data.
+
+        Returns:
+            Dict[str, Any]: Analysis results.
+        """
+        logging.info("Analyzing macroeconomic data...")
+
+        insights = {}
+
+        # Fetch and analyze GDP
+        # Check if data source exists (Defensive Coding)
+        stats_api = self.data_sources.get('government_stats_api')
+
+        gdp_trend = "neutral"
+        inflation_outlook = "stable"
+
+        if stats_api:
+            try:
+                # Fetch macroeconomic data
+                # Assuming these methods exist on the API object
+                gdp_growth = stats_api.get_gdp(country="US", period="quarterly")
+                inflation_rate = stats_api.get_inflation(country="US", period="monthly")
+
+                # Analyze trends
+                gdp_trend = self.analyze_gdp_trend(gdp_growth)
+                inflation_outlook = self.analyze_inflation_outlook(inflation_rate)
+            except Exception as e:
+                logging.error(f"Error fetching/analyzing stats: {e}")
+        else:
+            logging.warning("government_stats_api not configured. Using default/mock values.")
 
         # Generate insights
         insights = {
             'GDP_growth_trend': gdp_trend,
             'inflation_outlook': inflation_outlook,
-            #... (add more insights)
+            'timestamp': "2024-Q1" # Placeholder
         }
 
-        # Send insights to message queue
-        message = {'agent': 'macroeconomic_analysis_agent', 'insights': insights}
-        send_message(message)
+        # Send insights to message queue (Legacy support)
+        # In v23, the return value is used by the orchestrator/graph.
+        try:
+            message = {'agent': 'macroeconomic_analysis_agent', 'insights': insights}
+            send_message(message)
+        except Exception as e:
+            logging.warning(f"Legacy send_message failed: {e}")
 
         return insights
 
-    def analyze_gdp_trend(self, gdp_growth):
-        #... (implement logic to analyze GDP trend)
-        return "positive"  # Example
+    def analyze_gdp_trend(self, gdp_growth: Any) -> str:
+        """
+        Analyzes the trend of GDP growth.
+        """
+        # Placeholder logic
+        if not gdp_growth: return "neutral"
+        # If gdp_growth is a dict with 'value' (as in test mocks)
+        if isinstance(gdp_growth, dict) and 'value' in gdp_growth:
+            val = gdp_growth['value']
+            if val > 2.0: return "positive"
+            if val < 0.0: return "negative"
+        return "stable"
 
-    def analyze_inflation_outlook(self, inflation_rate):
-        #... (implement logic to analyze inflation outlook)
-        return "stable"  # Example
-
-    #... (add other analysis functions as needed)
+    def analyze_inflation_outlook(self, inflation_rate: Any) -> str:
+        """
+        Analyzes the inflation outlook.
+        """
+        # Placeholder logic
+        return "stable"

@@ -168,8 +168,6 @@ class MetaOrchestrator:
 
         # v23.5 Deep Dive Trigger
         if "deep dive" in query_lower or context.get("simulation_depth") == "Deep":
-        # Context-based override
-        if context.get("simulation_depth") == "Deep":
             return "DEEP_DIVE"
 
         # Heuristic Mapping
