@@ -32,3 +32,8 @@
 **Vulnerability:** The Flask application used the common tutorial pattern `SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard-to-guess-string'`. This means the application would run with a publicly known secret key if the environment variable was omitted in production, enabling session forgery.
 **Learning:** Copy-pasting configuration code from tutorials often introduces insecure defaults. The `or 'value'` idiom is dangerous for secrets.
 **Prevention:** Remove default values for secrets in configuration classes. Implement an `init_app` check that explicitly raises a `RuntimeError` if the secret is missing in a non-development environment.
+
+## 2025-12-17 - Unauthenticated Agent Execution
+**Vulnerability:** The `/api/agents/<agent_name>/invoke` endpoint allowed any unauthenticated user to execute potentially resource-intensive or sensitive agents.
+**Learning:** Endpoints that bridge HTTP to internal command/agent execution patterns are critical high-risk targets that often bypass standard resource access controls.
+**Prevention:** Strictly enforce authentication on all "command" or "action" style endpoints.
