@@ -71,10 +71,18 @@ class AdamNavigator {
         const dataRoot = scriptTag ? scriptTag.getAttribute('data-root') : null;
         
         this.rootPath = dataRoot || '.';
+        // Clean trailing slash
         const cleanRoot = this.rootPath.replace(/\/$/, '');
-        this.showcasePath = `${cleanRoot}/showcase`;
         
-        console.log(`[AdamNavigator] Environment: ${this.isGitHub ? 'GITHUB' : 'LOCAL'} | Root: ${this.rootPath}`);
+        // If we are already in 'showcase' (detected via URL or data-root being '..')
+        // Then showcasePath is '.'
+        if (cleanRoot === '..') {
+            this.showcasePath = '.';
+        } else {
+            this.showcasePath = `${cleanRoot}/showcase`;
+        }
+
+        console.log(`[AdamNavigator] Environment: ${this.isGitHub ? 'GITHUB' : 'LOCAL'} | Root: ${this.rootPath} | Showcase: ${this.showcasePath}`);
     }
 
     /**
@@ -154,17 +162,23 @@ class AdamNavigator {
     _renderNavigation() {
         const nav = document.createElement('nav');
         nav.id = 'side-nav';
-        nav.className = 'fixed top-0 left-0 h-full w-64 bg-[#0f172a] border-r border-slate-700/50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-40 flex flex-col glass-panel';
+        nav.className = 'fixed top-0 left-0 h-full w-64 bg-[#0f172a] border-r border-slate-700/50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col glass-panel shadow-2xl';
 
         // --- Header & Search ---
         let html = `
-            <div class="p-4 border-b border-slate-700/50">
+            <div class="p-4 border-b border-slate-700/50 relative">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-lg font-bold tracking-tight text-white mono">ADAM <span class="text-cyan-400">v23.5</span></h2>
                     <button id="nav-close" class="text-slate-400 hover:text-white md:hidden">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
+
+                <!-- Connection Status Indicator -->
+                <div id="nav-status-indicator" class="absolute top-5 right-12 text-[10px] font-mono text-emerald-400 flex items-center gap-1 opacity-80">
+                   <i class="fas fa-circle text-[8px] animate-pulse"></i> ONLINE
+                </div>
+
                 <div class="relative group">
                     <input type="text" id="global-search" placeholder="Search Agents, Docs..."
                         class="w-full bg-slate-900/50 border border-slate-700 rounded px-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors font-mono">
@@ -225,10 +239,10 @@ class AdamNavigator {
         html += `
                 </ul>
             </div>
-            <div class="p-4 border-t border-slate-700/50 bg-slate-900/20">
+            <div class="p-4 border-t border-slate-700/50 bg-slate-900/50 backdrop-blur-sm">
                 <div class="flex items-center justify-between text-xs mb-3">
                     <span class="text-slate-400">Environment</span>
-                    <span class="text-cyan-400 font-mono">${envText}</span>
+                    <span class="text-cyan-400 font-mono font-bold">${envText}</span>
                 </div>
                 <div class="flex items-center justify-between text-xs mb-3">
                     <span class="text-slate-400">Theme</span>
@@ -236,12 +250,12 @@ class AdamNavigator {
                 </div>
                 <div class="flex items-center justify-between text-xs">
                     <span class="text-slate-400">Data Source</span>
-                    <button id="api-toggle" class="font-bold ${isLive ? 'text-emerald-400' : 'text-slate-500'} hover:text-white transition font-mono border border-slate-700 px-2 py-0.5 rounded">${isLive ? 'LIVE' : 'MOCK'}</button>
+                    <button id="api-toggle" class="font-bold ${isLive ? 'text-emerald-400 border-emerald-500' : 'text-amber-500 border-amber-500'} hover:text-white transition font-mono border bg-slate-800 px-2 py-0.5 rounded text-[10px] tracking-wider">${isLive ? 'LIVE API' : 'SIMULATION'}</button>
                 </div>
-                <div class="mt-4 flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg shadow-cyan-500/20 flex items-center justify-center text-xs font-bold text-white font-mono">OP</div>
+                <div class="mt-4 flex items-center gap-3 pt-3 border-t border-slate-800/50">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg shadow-cyan-500/20 flex items-center justify-center text-xs font-bold text-white font-mono border border-white/20">OP</div>
                     <div>
-                        <div class="text-sm font-bold text-white">Operator</div>
+                        <div class="text-sm font-bold text-white leading-tight">Operator</div>
                         <div class="text-[10px] text-emerald-400 font-mono">Security Clearance: L4</div>
                     </div>
                 </div>
@@ -261,10 +275,11 @@ class AdamNavigator {
             @media (min-width: 768px) {
                 body.has-global-nav { padding-left: 16rem; }
             }
-            .glass-panel {
-                backdrop-filter: blur(12px);
-                background: rgba(15, 23, 42, 0.95);
-            }
+            /* Scrollbar Polish */
+            .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+            .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+            .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
         `;
         document.head.appendChild(style);
         document.body.classList.add('has-global-nav');
@@ -277,13 +292,13 @@ class AdamNavigator {
         // 1. Mobile Toggle & Overlay
         const overlay = document.createElement('div');
         overlay.id = 'nav-overlay';
-        overlay.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm z-30 opacity-0 pointer-events-none transition-opacity duration-300 md:hidden';
+        overlay.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm z-40 opacity-0 pointer-events-none transition-opacity duration-300 md:hidden';
         document.body.appendChild(overlay);
 
         if (!document.getElementById('nav-toggle')) {
             const toggleBtn = document.createElement('button');
             toggleBtn.id = 'nav-toggle';
-            toggleBtn.className = 'fixed top-4 left-4 z-50 p-2 bg-slate-800 text-white rounded md:hidden border border-slate-700 shadow-lg';
+            toggleBtn.className = 'fixed top-4 left-4 z-50 p-2 bg-slate-800 text-white rounded md:hidden border border-slate-700 shadow-lg hover:bg-slate-700 transition';
             toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
             document.body.appendChild(toggleBtn);
         }

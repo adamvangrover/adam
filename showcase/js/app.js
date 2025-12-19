@@ -1,9 +1,79 @@
+class SimulationEngine {
+    constructor(dataManager) {
+        this.dm = dataManager;
+        this.active = false;
+        this.intervals = [];
+    }
+
+    start() {
+        if (this.active) return;
+        this.active = true;
+        console.log("/// ADAM SIMULATION ENGINE: ONLINE ///");
+
+        // 1. System Vital Signs (CPU/Mem)
+        this.intervals.push(setInterval(() => this.simulateVitals(), 2000));
+
+        // 2. Market Ticker Simulation
+        this.intervals.push(setInterval(() => this.simulateMarket(), 5000));
+
+        // 3. Agent Log Activity
+        this.intervals.push(setInterval(() => this.simulateAgentLog(), 8000));
+    }
+
+    stop() {
+        this.active = false;
+        this.intervals.forEach(clearInterval);
+        this.intervals = [];
+        console.log("/// ADAM SIMULATION ENGINE: OFFLINE ///");
+    }
+
+    simulateVitals() {
+        if (!this.dm.data || !this.dm.data.stats) return;
+
+        const cpu = 15 + Math.random() * 30; // 15-45%
+        const mem = 40 + Math.random() * 10; // 40-50%
+
+        this.dm.data.stats.cpu_usage = cpu.toFixed(1);
+        this.dm.data.stats.memory_usage = mem.toFixed(1);
+
+        // Dispatch event for UI updates
+        window.dispatchEvent(new CustomEvent('adam-vitals-update', {
+            detail: { cpu, mem }
+        }));
+    }
+
+    simulateMarket() {
+        // Broadcast a fake market tick event
+        const tickers = ['AAPL', 'MSFT', 'GOOGL', 'BTC', 'ETH'];
+        const ticker = tickers[Math.floor(Math.random() * tickers.length)];
+        const change = (Math.random() * 2 - 1).toFixed(2);
+
+        window.dispatchEvent(new CustomEvent('adam-market-tick', {
+            detail: { ticker, change }
+        }));
+    }
+
+    simulateAgentLog() {
+        const agents = ["RiskAssessmentAgent", "MarketSentimentAgent", "FundamentalAnalyst", "SentinelAgent"];
+        const actions = ["Ingesting 10-K", "Calculating IV", "Scanning News Wire", "Updating Knowledge Graph", "Running Monte Carlo"];
+
+        const agent = agents[Math.floor(Math.random() * agents.length)];
+        const action = actions[Math.floor(Math.random() * actions.length)];
+        const message = `[${agent}] ${action} - ${new Date().toISOString().split('T')[1].slice(0,8)}`;
+
+        window.dispatchEvent(new CustomEvent('adam-log-update', {
+            detail: { message }
+        }));
+    }
+}
+
 class DataManager {
     constructor() {
         this.useApi = localStorage.getItem('adam_live_mode') === 'true';
         this.apiBase = '/api';
         this.staticBase = 'js/mock_data.js';
         this.data = null;
+        this.simulation = new SimulationEngine(this);
     }
 
     async init() {
@@ -22,6 +92,7 @@ class DataManager {
                         this.data.stats.version = status.version;
                         this.data.stats.orchestrator = status.orchestrator;
                     }
+                    this.simulation.stop(); // No simulation in live mode
                 } else {
                     console.warn("API Error, falling back to mock.");
                     this.useApi = false;
@@ -41,6 +112,8 @@ class DataManager {
         if (window.MOCK_DATA) {
             this.data = window.MOCK_DATA;
             console.log("Loaded data from window.MOCK_DATA");
+            // Start simulation to make the static site feel alive
+            this.simulation.start();
         } else {
             this.data = this.getEmptyState();
         }
