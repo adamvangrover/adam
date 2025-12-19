@@ -51,10 +51,28 @@ class ApiTestCase(unittest.TestCase):
         data = json.loads(response.data)
         self.assertIn('error', data)
 
+    def test_invoke_agent_unauthorized(self):
+        response = self.client.post('/api/agents/some_agent/invoke',
+                                 data=json.dumps({'some': 'data'}),
+                                 content_type='application/json')
+        self.assertEqual(response.status_code, 401)
+
     @patch('services.webapp.api.agent_orchestrator')
     def test_invoke_agent(self, mock_agent_orchestrator):
+        # Authenticate first
+        user = User(username='agentuser')
+        user.set_password('password')
+        db.session.add(user)
+        db.session.commit()
+        response = self.client.post('/api/login',
+                                 data=json.dumps({'username': 'agentuser', 'password': 'password'}),
+                                 content_type='application/json')
+        access_token = json.loads(response.data)['access_token']
+        headers = {'Authorization': f'Bearer {access_token}'}
+
         mock_agent_orchestrator.execute_agent.return_value = {'result': 'success'}
         response = self.client.post('/api/agents/some_agent/invoke',
+                                 headers=headers,
                                  data=json.dumps({'some': 'data'}),
                                  content_type='application/json')
         self.assertEqual(response.status_code, 200)

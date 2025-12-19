@@ -219,6 +219,7 @@ def create_app(config_name='default'):
 
 
     @app.route('/api/agents/<agent_name>/invoke', methods=['POST'])
+    @jwt_required()
     def invoke_agent(agent_name):
         """
         Invokes a specific agent with the given arguments.
