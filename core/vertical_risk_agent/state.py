@@ -30,6 +30,27 @@ class CovenantDefinition(BaseModel):
     definition_text: str = Field(..., description="Exact legal text defining the covenant")
     add_backs: List[str] = Field(default_factory=list, description="List of permitted add-backs")
 
+class RiskFactor(BaseModel):
+    """Defines a single dimension of the market risk hypercube."""
+    name: str
+    current_value: float
+    volatility: float  # Annualized volatility
+    mean_reversion: float = 0.0  # Ornstein-Uhlenbeck parameter (kappa)
+
+class MarketScenario(BaseModel):
+    """
+    Represents a generated market scenario for stress testing.
+    A single point in the high-dimensional risk manifold.
+    """
+    scenario_id: str
+    description: str
+    # Core macroeconomic indicators
+    risk_factors: Dict[str, float] = Field(..., description="Key risk indicators (e.g., 'inflation', 'unemployment')")
+    # Meta-data
+    probability_weight: float = Field(1.0, description="The likelihood of this scenario occurring relative to the batch")
+    is_tail_event: bool = Field(False, description="Whether this represents a statistical outlier (>3 sigma)")
+    regime_label: str = Field("normal", description="The market regime this scenario belongs to")
+
 class InvestmentMemo(BaseModel):
     """The Final Output."""
     executive_summary: str
@@ -58,8 +79,13 @@ class VerticalRiskGraphState(TypedDict):
     quant_analysis: Optional[str]
     legal_analysis: Optional[str]
     market_research: Optional[str]
-    # v23.5 Additions
-    risk_simulation_results: Optional[List[Dict[str, Any]]]  # Output from StochasticRiskEngine (Merton/Cholesky)
+    
+    # --- Merged Simulation State ---
+    # Stores the definitions of scenarios (inputs to the engine)
+    stress_scenarios: Optional[List[Dict[str, Any]]] 
+    
+    # Stores the quantitative results of the simulation (outputs from the engine)
+    risk_simulation_results: Optional[List[Dict[str, Any]]]
 
     # Draft
     draft_memo: Optional[Dict[str, Any]] # Serialized InvestmentMemo

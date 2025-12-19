@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import Terminal from './components/Terminal';
@@ -16,7 +16,6 @@ import SimulationTools from './pages/SimulationTools';
 
 const App: React.FC = () => {
   return (
-    <Router>
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
@@ -31,7 +30,6 @@ const App: React.FC = () => {
           <Route path="simulation-tools" element={<SimulationTools />} />
         </Route>
       </Routes>
-    </Router>
   );
 };
 

@@ -1,9 +1,37 @@
+"""
+THE ADAM v23 "APEX" GENERATIVE RISK ENGINE
+------------------------------------------
+"We do not predict the future; we simulate its infinite variations to survive it."
+
+This module implements a hybrid Classical/Generative-AI engine for Credit Risk Stress Testing.
+It evolves beyond simple historical simulation (VaR) to Generative Adversarial Networks (GANs)
+and Variational Autoencoders (VAEs), allowing for the exploration of "Unknown Unknowns" and
+Tail Risk events that have no historical precedent.
+
+ARCHITECTURAL EVOLUTION (v23.5):
+1. Added `CovarianceMatrix` logic for correlated risk factors (Inflation, Rates, GDP).
+2. Implemented Cholesky Decomposition for mathematically rigorous scenario generation.
+3. Introduced `ConditionalVAE` with regime-conditioned latent space sampling.
+4. Added `ReverseStressTest` logic using Simulated Quantum Annealing (SQA) optimization.
+5. Implemented `HybridRiskEngine` fusing generative macro-scenarios with stochastic jump-diffusion.
+
+Ref: 'The Quantum-AI Convergence in Credit Risk' (2025) - Section 4.2: Generative Stress Testing.
+"""
+
 from __future__ import annotations
 import numpy as np
 import logging
 import asyncio
-from typing import List, Dict, Any, Optional
+import time
+from typing import List, Dict, Any, Optional, Union, Tuple
 from pydantic import BaseModel, Field
+from dataclasses import dataclass, field
+
+# Internal imports (if available in the environment)
+try:
+    from core.vertical_risk_agent.state import RiskFactor
+except ImportError:
+    pass # Handle gracefully if run standalone
 
 # Defensive imports for Heavy ML Libraries
 try:
@@ -14,7 +42,12 @@ try:
 except ImportError:
     TORCH_AVAILABLE = False
 
+# Configure robust logging
 logger = logging.getLogger(__name__)
+
+# -----------------------------------------------------------------------------
+# DATA MODELS
+# -----------------------------------------------------------------------------
 
 class MarketScenario(BaseModel):
     """
@@ -46,6 +79,10 @@ class JumpDiffusionParams(BaseModel):
     mu_j: float = Field(..., description="Mean of jump size (log-normal).")
     sigma_j: float = Field(..., description="Standard deviation of jump size.")
 
+# -----------------------------------------------------------------------------
+# CORE ENGINES
+# -----------------------------------------------------------------------------
+
 class StatisticalEngine:
     """
     The 'Bedrock' of the simulation, utilizing matrix decomposition techniques
@@ -72,7 +109,7 @@ class StatisticalEngine:
             L = np.linalg.cholesky(correlation_matrix)
             return L
         except np.linalg.LinAlgError:
-            logger.error("Correlation matrix is not positive definite. Falling back to Nearest Correlation Matrix or Identity...")
+            logger.error("Correlation matrix is not positive definite. Falling back to Identity matrix.")
             # Fallback: Return Identity (Uncorrelated) - Safe failure mode
             return np.eye(n_vars)
 
@@ -119,7 +156,7 @@ class ConditionalVAE:
     def decode(self, z: np.ndarray, condition_val: float) -> np.ndarray:
         """
         Decodes latent vectors z conditioned on the regime.
-
+        
         Args:
             z: Latent vector [batch_size, latent_dim]
             condition_val: Float representing regime (0=Normal, 1=Stress, 2=Crash)
@@ -153,8 +190,9 @@ class GenerativeRiskEngine:
     def __init__(self, model_path: str = None):
         self.stats_engine = StatisticalEngine()
         self.vae = ConditionalVAE(model_path)
+        # 0: Inflation, 1: Unemployment, 2: GDP
         self.regimes = {
-            "normal": {"mean": np.array([2.0, 4.0, 2.5]), "std": np.array([1.0, 1.0, 1.5]), "cond": 0.0}, # Inf, Unemp, GDP
+            "normal": {"mean": np.array([2.0, 4.0, 2.5]), "std": np.array([1.0, 1.0, 1.5]), "cond": 0.0},
             "stress": {"mean": np.array([5.0, 6.0, -1.0]), "std": np.array([2.0, 1.5, 2.0]), "cond": 1.0},
             "crash": {"mean": np.array([8.0, 9.0, -4.0]), "std": np.array([3.0, 2.0, 3.0]), "cond": 2.0}
         }
@@ -166,7 +204,6 @@ class GenerativeRiskEngine:
         """
         # Base correlation (Inflation, Unemployment, GDP)
         # Note: Unemployment usually negatively correlated with GDP (Okun's Law)
-        # Inflation and Unemployment usually negatively correlated (Phillips Curve), though stagflation breaks this.
         base_corr = np.array([
             [1.0, -0.3, -0.2], # Inflation
             [-0.3, 1.0, -0.6], # Unemployment
@@ -181,7 +218,7 @@ class GenerativeRiskEngine:
             stress_corr[0, 1] = 0.5 # Stagflation risk increases
             return stress_corr
         elif regime == "crash":
-            # Panic Correlation: C_crash = I + 0.5 * (J - I)
+            # Panic Correlation: C_crash = I + 0.8 * (J - I)
             # "In a crash, correlations go to 1"
             J = np.ones_like(base_corr)
             I = np.eye(base_corr.shape[0])
@@ -222,12 +259,10 @@ class GenerativeRiskEngine:
             unemp = unemp_c + neural_perturbation[i, 1]
             gdp = gdp_c + neural_perturbation[i, 2]
 
-            # C-VAE latent space injection logic end
-
             is_tail = gdp < -3.0 or inf > 9.0
 
             scenarios.append(MarketScenario(
-                scenario_id=f"{regime}_{i}",
+                scenario_id=f"{regime}_{int(time.time())}_{i}",
                 description=f"APEX {regime} Scenario",
                 risk_factors={"inflation": float(inf), "unemployment": float(unemp), "gdp_growth": float(gdp)},
                 probability_weight=1.0/n_samples,
@@ -235,6 +270,7 @@ class GenerativeRiskEngine:
                 volatility_regime=regime
             ))
 
+        logger.info(f"Generated {len(scenarios)} scenarios for regime '{regime}'.")
         return scenarios
 
     def reverse_stress_test(self, target_loss_threshold: float, current_portfolio_value: float) -> List[MarketScenario]:
@@ -245,7 +281,7 @@ class GenerativeRiskEngine:
         Instead of asking "What is the loss in this scenario?", we ask "What scenario causes this loss?"
         This is an optimization problem: Maximize Loss subject to 'Plausibility'.
         """
-        logger.info(f"Starting SQA Reverse Stress Test for Loss > {target_loss_threshold}")
+        logger.info(f"Starting SQA Reverse Stress Test for Loss > {target_loss_threshold:,.2f}")
 
         # Initialize search in Crash regime (most likely place to find breaches)
         current_state = np.array([8.0, 9.0, -4.0]) # Start at mean of crash
@@ -285,7 +321,7 @@ class GenerativeRiskEngine:
             if current_loss > target_loss_threshold:
                  critical_scenarios.append(MarketScenario(
                     scenario_id=f"SQA_BREACH_{step}",
-                    description=f"SQA Discovered Breach (Loss: {current_loss:.2f})",
+                    description=f"SQA Discovered Breach (Loss: ${current_loss:,.0f})",
                     risk_factors={
                         "inflation": float(current_state[0]),
                         "unemployment": float(current_state[1]),
@@ -449,7 +485,7 @@ class HybridRiskEngine(StochasticRiskEngine):
 
 # Example usage
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - [APEX] - %(message)s')
     engine = HybridRiskEngine()
 
     print("\n--- Generating Normal Scenarios ---")
@@ -458,7 +494,7 @@ if __name__ == "__main__":
         print(f"ID: {s.scenario_id} | GDP: {s.risk_factors['gdp_growth']:.2f}% | Tail: {s.is_tail_event}")
 
     print("\n--- Running SQA Reverse Stress Test ---")
-    breaches = engine.reverse_stress_test(target_loss_threshold=5000000, current_portfolio_value=10000000) # 50% loss
+    breaches = engine.reverse_stress_test(target_loss_threshold=5_000_000, current_portfolio_value=10_000_000) # 50% loss
     if breaches:
         print(f"Found {len(breaches)} breaches. Top 1: {breaches[0].description}")
 
