@@ -18,9 +18,16 @@ lint:
 
 security:
 	python ops/checks/check_security.py
+	python ops/security/audit_config.py
 
 types:
 	python ops/checks/check_types.py
+
+pulse:
+	python scripts/launch_system_pulse.py
+
+verify-pulse:
+	timeout 10s python scripts/launch_system_pulse.py || true
 
 test-frontend:
 	cd services/webapp/client && npm test -- --watchAll=false

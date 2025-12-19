@@ -1,105 +1,70 @@
-provider: huggingface
-huggingface_model_name: google/flan-t5-small
+# ==============================================================================
+# ADAM v23.5 - LLM PLUGIN CONFIGURATION (ENTERPRISE GRADE)
+# ==============================================================================
+# "The Engine Room of Cognition"
+#
+# INSTRUCTIONS FOR HUMANS:
+# 1. Select your 'provider' (uncomment one active provider).
+# 2. Ensure API keys are set in your .env file (NEVER COMMIT KEYS HERE).
+# 3. Adjust 'machine_parameters' for throughput vs. latency.
+# 4. Review 'security_policies' for compliance.
+#
+# ==============================================================================
+
+# --- ACTIVE PROVIDER SELECTION ---
+# Options: 'openai', 'anthropic', 'cohere', 'gemini', 'huggingface', 'mock'
+provider: mock  # Default to Safe Mode
+
+# --- PROVIDER CONFIGURATIONS (FLAT NAMESPACE FOR COMPATIBILITY) ---
+
+# 1. OpenAI (Industry Standard)
+# Requires: OPENAI_API_KEY, OPENAI_ORG_ID (Optional)
+openai_model_name: "gpt-4-turbo-preview"
+openai_temperature: 0.7
+openai_max_tokens: 4096
+
+# 2. Anthropic (High Context)
+# Requires: ANTHROPIC_API_KEY
+anthropic_model_name: "claude-3-opus-20240229"
+
+# 3. Google Gemini (Multimodal)
+# Requires: GEMINI_API_KEY
+gemini_model_name: "gemini-1.5-pro-latest"
+
+# 4. Cohere (Enterprise RAG)
+# Requires: COHERE_API_KEY
+cohere_model_name: "command-r-plus"
+
+# 5. HuggingFace (Open Source / Local)
+# Requires: HF_API_TOKEN (Optional for local)
+huggingface_model_name: "google/flan-t5-large"
 huggingface_use_pipeline: True
+huggingface_device_map: "auto"
 
+# 6. Mock (Dev/Test/CI)
+mock_model_name: "apex-architect-mock-v1"
+mock_latency_ms: 50 # Simulate network lag
 
+# --- SECURITY POLICIES (MACHINE ENFORCEMENT) ---
+security_policies:
+  enforce_https: True
+  mask_pii: True         # Placeholder for future PII scrubbing
+  log_prompts: False     # Disable for production privacy
+  max_cost_per_day: 50.0 # USD Soft Cap
+  alert_on_key_exposure: True
 
-# config/llm_plugin.yaml
-provider: openai  # Or "anthropic"
-#openai_api_key: "YOUR_OPENAI_API_KEY" #API KEY SHOULD BE IN .env
-openai_model_name: "gpt-3.5-turbo"  # Or "gpt-4"
+# --- HUMAN OVERSIGHT (APPROVAL GATES) ---
+human_oversight:
+  require_approval_for:
+    - "execute_trade"
+    - "publish_report"
+    - "wire_transfer"
+  notification_channel: "slack-ops"
+  escalation_contact: "ciso@adam-finance.net"
 
-#anthropic_api_key: "YOUR_ANTHROPIC_API_KEY" #API KEY SHOULD BE IN.env
-#anthropic_model_name: "claude-2"
-
-# config/llm_plugin.yaml
-provider: huggingface
-huggingface_model_name: google/flan-t5-base
-huggingface_use_pipeline: True  # Or False
-huggingface_use_api: True  # Use HF API (requires HF_API_TOKEN)
-
-provider: cohere
-cohere_model_name: command
-
-# LLM Plugin Configuration
-# 
-# This configuration file allows users to set up and manage the LLM plugin for the Adam system.
-# The plugin supports OpenAI by default, but can be easily extended to use other LLM providers by
-# modifying the engine-specific settings below. 
-
-# Default settings for the LLM plugin (can be overridden in the Python code if needed).
-llm_plugin:
-  enabled: true  # Set to 'false' to disable the LLM plugin.
-  
-  # Select the LLM engine to use. Currently supported: "openai", "huggingface", etc.
-  engine: "openai"  # Choose between different LLM providers like 'openai', 'huggingface', 'cohere', etc.
-
-  # API Settings for OpenAI (default engine)
-  openai:
-    api_key: "your-openai-api-key"  # Replace with your OpenAI API key
-    model: "gpt-4"  # Default model (can be set to 'gpt-3.5', 'gpt-4', 'davinci', etc.)
-    temperature: 0.7  # Controls randomness in responses: 0.0 (deterministic) to 1.0 (more random)
-    max_tokens: 150  # Maximum number of tokens to generate per request
-    top_p: 1.0  # Controls diversity via nucleus sampling: 0.0 to 1.0
-    frequency_penalty: 0.0  # Penalizes new tokens based on their frequency in the text so far
-    presence_penalty: 0.0  # Penalizes new tokens based on whether they appear in the text so far
-    timeout: 30  # Timeout in seconds for API requests
-
-  # API Settings for Hugging Face (alternative LLM engine example)
-  huggingface:
-    api_key: "your-huggingface-api-key"  # Replace with your Hugging Face API key (if using Hugging Face's models)
-    model: "gpt2"  # Default model (can be set to 'gpt2', 'distilgpt2', 'bert', etc.)
-    temperature: 0.7
-    max_tokens: 150
-    top_p: 1.0
-    timeout: 30
-
-  # API Settings for Cohere (another alternative engine example)
-  cohere:
-    api_key: "your-cohere-api-key"  # Replace with your Cohere API key
-    model: "xlarge"  # Cohere's model size, e.g., 'small', 'medium', 'xlarge'
-    temperature: 0.7
-    max_tokens: 150
-    timeout: 30
-
-  # Configuration for using a custom LLM (self-hosted, fine-tuned models, etc.)
-  custom:
-    enabled: false  # Set to 'true' if you are using a custom or self-hosted LLM model
-    url: "http://localhost:5000"  # URL to your self-hosted model API endpoint
-    headers:
-      "Authorization": "Bearer your-token"  # Optional headers for authentication
-    model: "custom_model_v1"  # Custom model name or identifier
-
-# Optional advanced settings:
-advanced_settings:
-  # Caching settings for LLM responses (useful for reducing API calls for repeated queries)
-  caching:
-    enabled: true  # Enable or disable caching
-    cache_dir: "cache/llm_responses"  # Directory to store cached responses
-    expiration_time: 86400  # Time in seconds to keep a cache before refreshing (default is 24 hours)
-    use_memory: true  # Optionally store responses in memory for faster retrieval (useful for short-term session caching)
-
-  # Logging settings for debugging LLM interactions
-  logging:
-    enabled: true  # Enable or disable logging of LLM requests and responses
-    log_dir: "logs/llm_plugin"  # Directory to store logs
-    log_level: "INFO"  # Log levels: DEBUG, INFO, WARN, ERROR
-    log_requests: true  # Log request details for debugging
-    log_responses: true  # Log responses for debugging (be cautious about logging sensitive data)
-
-# Example configuration for using different engines dynamically.
-# The user can add more LLM engine configurations as required.
-# To enable a different engine, just set the 'engine' field at the top to one of the following:
-#   - "openai"
-#   - "huggingface"
-#   - "cohere"
-#   - "custom"
-
-# Note for Developers:
-# 1. To add support for additional LLM engines, just extend the configuration above with the new engine's specific settings.
-#    - For example, you can add support for LLaMA, GPT-Neo, or any other open-source or proprietary models.
-#    - Make sure to create new sections similar to the 'openai' and 'huggingface' blocks above.
-# 2. The 'custom' section is useful for integrating locally hosted or fine-tuned models. 
-#    - The 'url' should point to your API endpoint, and you may need to configure the request body format based on your setup.
-# 3. Ensure that sensitive information (like API keys) is stored securely and not hardcoded in version-controlled files. 
-#    - Consider using environment variables or secret management systems.
+# --- MACHINE PARAMETERS (PERFORMANCE) ---
+machine_parameters:
+  max_retries: 3
+  timeout_seconds: 60
+  cache_ttl_seconds: 3600
+  circuit_breaker_threshold: 5
