@@ -7,137 +7,147 @@
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary-color: #00f3ff;
-            --accent-color: #0aff60;
-            --bg-color: #050b14;
-            --panel-bg: rgba(5, 11, 20, 0.8);
-            --text-primary: #e0e0e0;
-            --text-muted: #888;
-            --panel-border: #333;
-        }
-        body { margin: 0; background: var(--bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        .mono { font-family: 'JetBrains Mono', monospace; }
-        
-        /* Header Styling */
-        .cyber-header {
-            height: 60px; display: flex; align-items: center; justify-content: space-between;
-            padding: 0 20px; border-bottom: 1px solid var(--primary-color);
-            background: rgba(5, 11, 20, 0.95); position: sticky; top: 0; z-index: 100;
-        }
-        
-        /* Effects */
-        .scan-line { position: fixed; top: 0; left: 0; width: 100%; height: 2px; background: rgba(0, 243, 255, 0.1); animation: scan 3s linear infinite; pointer-events: none; z-index: 999; }
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
-
-        a { text-decoration: none; color: inherit; transition: color 0.2s; }
-        a:hover { color: var(--primary-color); }
-
-        /* Components */
-        .mode-badge { padding: 4px 8px; border: 1px solid #ffa500; color: #ffa500; font-size: 0.75rem; border-radius: 4px; font-weight: bold; white-space: nowrap; }
-        
-        .cyber-btn {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            padding: 6px 12px;
-            border: 1px solid #444;
-            color: var(--text-primary);
-            background: rgba(0,0,0,0.3);
-            border-radius: 2px;
-            text-transform: uppercase;
-        }
-        .cyber-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
-        
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--panel-border);
-            backdrop-filter: blur(5px);
-        }
+        /* Specific override for index landing if needed */
+        body { overflow-y: auto; }
     </style>
 </head>
-<body>
+<body class="grid-bg">
     <div class="scan-line"></div>
+    <div class="scan-glow"></div>
 
-    <header class="cyber-header">
-        <div style="display: flex; align-items: center; gap: 20px;">
-            <h1 class="mono" style="margin: 0; font-size: 1.5rem; color: var(--primary-color); letter-spacing: 2px;">ADAM v23.5</h1>
-            <div class="mono" style="font-size: 0.8rem; color: #666; border-left: 1px solid #333; padding-left: 10px;">UNIFIED FINANCIAL OS</div>
+    <!-- Main Content Area -->
+    <main style="padding: 40px; margin-left: 0; transition: margin-left 0.3s;" id="main-content">
+
+        <!-- Header Banner -->
+        <div class="flex items-center justify-between mb-8 border-b border-slate-700/50 pb-4">
+            <div>
+                <h1 class="text-3xl font-bold tracking-tight mono text-white">SYSTEM ARCHIVE <span class="text-cyan-400">v23.5</span></h1>
+                <p class="text-slate-400 mt-1 font-mono text-sm">/// STATIC REPOSITORY SNAPSHOT ///</p>
+            </div>
+            <div class="flex gap-3">
+                 <a href="../index.html" class="cyber-btn flex items-center gap-2">
+                    <i class="fas fa-arrow-up"></i> Up Level
+                </a>
+                <a href="analyst_os.html" class="cyber-btn flex items-center gap-2 border-emerald-500 text-emerald-400 hover:bg-emerald-500/10 hover:text-white hover:border-emerald-400">
+                    <i class="fas fa-rocket"></i> Launch OS
+                </a>
+            </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <nav style="display: flex; gap: 10px;">
-                <a href="../index.html" class="cyber-btn">&uarr; UP LEVEL</a>
-                <a href="../index.html" class="cyber-btn">LIVE OPERATIONS</a>
-                <a href="analyst_os.html" class="cyber-btn" style="border-color: var(--accent-color); color: var(--accent-color);">LAUNCH ANALYST OS</a>
-                <a href="https://github.com/adamvangrover/adam" class="cyber-btn" target="_blank">GITHUB</a>
-            </nav>
-            <div class="mode-badge">ARCHIVE MODE</div>
-        </div>
-    </header>
-
-    <div style="display: flex; min-height: calc(100vh - 60px);">
-        <aside class="glass-panel" style="width: 260px; border-right: 1px solid var(--panel-border); padding: 20px; font-size: 0.9rem; flex-shrink: 0;">
-            <h3 class="mono" style="margin-top: 0; font-size: 0.8rem; color: var(--primary-color); border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 15px;">
-                /// DIRECTORY INDEX
-            </h3>
-            <ul style="list-style: none; padding: 0; margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">
-                <li style="margin-bottom: 8px;"><span style="margin-right:8px;">🖥️</span> <a href="analyst_os.html" style="color: var(--accent-color); font-weight: bold;">analyst_os.html</a></li>
-                <li style="margin-bottom: 8px;"><span style="margin-right:8px; opacity:0.7;">📂</span> <a href="apps/" style="color: var(--primary-color);">apps/</a></li>
-                <li style="margin-bottom: 8px;"><span style="margin-right:8px; opacity:0.7;">📂</span> <a href="css/index.html" style="color: var(--primary-color);">css/</a></li>
-                <li style="margin-bottom: 8px;"><span style="margin-right:8px; opacity:0.7;">📂</span> <a href="data/index.html" style="color: var(--primary-color);">data/</a></li>
-                <li style="margin-bottom: 8px;"><span style="margin-right:8px; opacity:0.7;">📂</span> <a href="js/index.html" style="color: var(--primary-color);">js/</a></li>
-                <li style="margin-bottom: 6px; padding-top:10px; border-top: 1px dashed #333;"><span style="margin-right:8px; opacity:0.5;">📄</span> <a href="agents.html" style="color: var(--text-muted);">agents.html</a></li>
-                <li style="margin-bottom: 6px;"><span style="margin-right:8px; opacity:0.5;">📄</span> <a href="graph.html" style="color: var(--text-muted);">graph.html</a></li>
-                <li style="margin-bottom: 6px;"><span style="margin-right:8px; opacity:0.5;">📄</span> <a href="reports.html" style="color: var(--text-muted);">reports.html</a></li>
-                <li style="margin-bottom: 6px;"><span style="margin-right:8px; opacity:0.5;">📄</span> <a href="research.html" style="color: var(--text-muted);">research.html</a></li>
-                <li style="margin-bottom: 6px;"><span style="margin-right:8px; opacity:0.5;">📄</span> <a href="trading.html" style="color: var(--text-muted);">trading.html</a></li>
-            </ul>
-        </aside>
-
-        <main style="flex-grow: 1; padding: 40px;">
-            <h2 class="mono" style="color: var(--primary-color); border-bottom: 1px solid #333; padding-bottom: 10px;">SYSTEM ARCHIVE</h2>
-            <p style="color: #ccc; max-width: 800px; line-height: 1.6; margin-bottom: 30px;">
-                Welcome to the Adam v23.5 Static Archive. This repository contains historical artifacts, agent logs, and system snapshots.
-                For real-time analysis and active agent operations, switch to <strong>LIVE MODE</strong> or launch the new Analyst OS below.
+        <!-- Introduction Block -->
+        <div class="glass-panel p-6 rounded mb-8 border-l-4 border-cyan-500">
+            <h3 class="text-xl font-bold text-white mb-2 mono">WELCOME TO THE HIVE</h3>
+            <p class="text-slate-300 leading-relaxed mb-4">
+                You are viewing the static artifact repository of the Adam v23.5 Autonomous Financial System.
+                This interface provides read-only access to agent logs, generated reports, and system documentation.
             </p>
+            <div class="flex items-center gap-4 text-xs font-mono text-slate-500">
+                <span><i class="fas fa-circle text-emerald-500"></i> SYSTEM: ONLINE (SIMULATION)</span>
+                <span><i class="fas fa-database text-cyan-500"></i> DATA: LOCAL SNAPSHOT</span>
+                <span><i class="fas fa-lock text-amber-500"></i> MODE: READ-ONLY</span>
+            </div>
+        </div>
 
-            <div class="glass-panel" style="border-radius: 4px; padding: 25px; border: 1px solid var(--accent-color); background: rgba(10, 255, 96, 0.02); margin-bottom: 40px;">
-                <h3 style="margin-top:0; color: var(--accent-color); font-family: 'JetBrains Mono';">NEW: ADAM Analyst OS</h3>
-                <p style="font-size: 0.9rem;">A Client-Side, Privacy-First Financial Workbench ("The Bloomberg Killer Lite").</p>
-                <div style="margin-top: 15px;">
-                    <a href="analyst_os.html" class="cyber-btn" style="background: rgba(10,255,96,0.1); border-color: var(--accent-color); color: var(--accent-color);">LAUNCH DESKTOP &rarr;</a>
+        <!-- Dashboard Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+
+            <!-- Card 1 -->
+            <a href="mission_control.html" class="cyber-card p-6 block group">
+                <div class="flex justify-between items-start mb-4">
+                    <i class="fas fa-tachometer-alt text-2xl text-cyan-400 group-hover:text-white transition"></i>
+                    <span class="cyber-badge badge-cyan">DASHBOARD</span>
                 </div>
+                <h3 class="text-lg font-bold text-white mb-1 group-hover:text-cyan-400 transition">Mission Control</h3>
+                <p class="text-sm text-slate-400">Real-time system telemetry and agent status monitoring.</p>
+            </a>
+
+            <!-- Card 2 -->
+            <a href="deep_dive.html" class="cyber-card p-6 block group">
+                <div class="flex justify-between items-start mb-4">
+                    <i class="fas fa-search-dollar text-2xl text-emerald-400 group-hover:text-white transition"></i>
+                    <span class="cyber-badge badge-green">ANALYSIS</span>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-1 group-hover:text-emerald-400 transition">Deep Dive Analyst</h3>
+                <p class="text-sm text-slate-400">Interactive financial modeling and valuation engine.</p>
+            </a>
+
+            <!-- Card 3 -->
+            <a href="graph.html" class="cyber-card p-6 block group">
+                <div class="flex justify-between items-start mb-4">
+                    <i class="fas fa-project-diagram text-2xl text-purple-400 group-hover:text-white transition"></i>
+                    <span class="cyber-badge badge-blue">KNOWLEDGE</span>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-1 group-hover:text-purple-400 transition">Knowledge Graph</h3>
+                <p class="text-sm text-slate-400">Explore the 12,000+ node semantic network.</p>
+            </a>
+
+            <!-- Card 4 -->
+            <a href="trading.html" class="cyber-card p-6 block group">
+                <div class="flex justify-between items-start mb-4">
+                    <i class="fas fa-chart-line text-2xl text-amber-400 group-hover:text-white transition"></i>
+                    <span class="cyber-badge badge-amber">MARKETS</span>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-1 group-hover:text-amber-400 transition">Trading Terminal</h3>
+                <p class="text-sm text-slate-400">Live order flow simulation and execution interface.</p>
+            </a>
+        </div>
+
+        <!-- Secondary Grid -->
+         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <div class="cyber-card p-6">
+                <h3 class="mono text-sm text-slate-400 uppercase mb-4 border-b border-slate-700 pb-2">Recent Intelligence</h3>
+                <ul class="space-y-3">
+                    <li>
+                        <a href="newsletter_market_mayhem.html" class="flex items-center gap-3 hover:bg-slate-800/50 p-2 rounded transition">
+                            <span class="text-red-400 text-xs font-bold font-mono">CRIT</span>
+                            <span class="text-sm text-white">Market Mayhem: Dec 2025</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="reports.html" class="flex items-center gap-3 hover:bg-slate-800/50 p-2 rounded transition">
+                            <span class="text-cyan-400 text-xs font-bold font-mono">RPRT</span>
+                            <span class="text-sm text-white">Institutional Conviction Q3</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="institutional_radar.html" class="flex items-center gap-3 hover:bg-slate-800/50 p-2 rounded transition">
+                            <span class="text-purple-400 text-xs font-bold font-mono">13F</span>
+                            <span class="text-sm text-white">Hedge Fund Flow Radar</span>
+                        </a>
+                    </li>
+                </ul>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: #cc0000;">MARKET MAYHEM</h3>
-                    <p style="font-size: 0.8rem; color: #ccc;">Dec 2025: The Great Divergence</p>
-                    <a href="newsletter_market_mayhem.html" style="color: var(--primary-color); font-size: 0.8rem;">READ TRANSMISSION &rarr;</a>
-                </div>
-
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem;">LATEST ARTIFACT</h3>
-                    <p style="font-size: 0.8rem; color: #888;">market_mayhem_dec_2025.json</p>
-                    <a href="data/market_mayhem_dec_2025.json" target="_blank" style="color: var(--primary-color); font-size: 0.8rem;">VIEW JSON &rarr;</a>
-                </div>
-                
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem;">ACTIVE NODES</h3>
-                    <p style="font-size: 0.8rem; color: #888;">Knowledge Graph: 12,405 Entities</p>
-                    <a href="graph.html" style="color: var(--primary-color); font-size: 0.8rem;">EXPLORE MAP &rarr;</a>
-                </div>
-
-                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
-                    <h3 class="mono" style="margin-top: 0; font-size: 1rem;">INSTITUTIONAL RADAR</h3>
-                    <p style="font-size: 0.8rem; color: #888;">13F Trend Monitor & Synthesis</p>
-                    <a href="institutional_radar.html" style="color: var(--primary-color); font-size: 0.8rem;">LAUNCH RADAR &rarr;</a>
-                </div>
+            <div class="cyber-card p-6">
+                 <h3 class="mono text-sm text-slate-400 uppercase mb-4 border-b border-slate-700 pb-2">System Resources</h3>
+                  <ul class="space-y-3 text-sm">
+                    <li><a href="agents.html" class="text-slate-300 hover:text-cyan-400 transition"><i class="fas fa-users-cog w-5"></i> Agent Registry</a></li>
+                    <li><a href="data.html" class="text-slate-300 hover:text-cyan-400 transition"><i class="fas fa-database w-5"></i> Data Vault</a></li>
+                    <li><a href="deployment.html" class="text-slate-300 hover:text-cyan-400 transition"><i class="fas fa-terminal w-5"></i> Deployment Console</a></li>
+                </ul>
             </div>
-        </main>
-    </div>
+
+            <div class="cyber-card p-6 flex flex-col justify-center items-center text-center">
+                <i class="fab fa-github text-4xl text-white mb-4"></i>
+                <h3 class="text-white font-bold mb-2">Open Source Core</h3>
+                <p class="text-slate-400 text-sm mb-4">Review the architecture and contribute to the evolution of Adam.</p>
+                <a href="https://github.com/adamvangrover/adam" target="_blank" class="cyber-btn w-full">View on GitHub</a>
+            </div>
+
+        </div>
+
+    </main>
 
     <!-- Adam Global Nav -->
     <script src="../showcase/js/nav.js" data-root=".."></script>
+    <script>
+        // Adjust main content margin when nav loads
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.innerWidth >= 768) {
+                document.getElementById('main-content').style.marginLeft = '16rem';
+            }
+        });
+    </script>
 </body>
 </html>
