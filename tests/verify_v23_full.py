@@ -1,6 +1,8 @@
 import sys
 import os
 import logging
+import json
+import asyncio
 
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -13,7 +15,7 @@ from core.engine.states import init_risk_state
 # Configure logging to see the flow
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 
-def verify_planner():
+async def verify_planner():
     print("\n=== Phase 2: Neuro-Symbolic Planner Verification ===")
     planner = NeuroSymbolicPlanner()
     
@@ -21,23 +23,34 @@ def verify_planner():
     print(f"Query: {query}")
     
     # 1. Discover Plan
-    plan = planner.discover_plan(query)
-    if plan:
+    # Uses new high-level API
+    if hasattr(planner, 'create_plan'):
+        plan_data = planner.create_plan(query)
+    else:
+        # Fallback/Legacy test
+        plan_data = planner.discover_plan("Apple Inc.", "Credit Risk")
+
+    if plan_data and "steps" in plan_data:
         print("\nSymbolic Plan Discovered:")
-        for step in plan:
-            print(f"  ({step['source']}) --[{step['relation']}]--> ({step['target']}) [Prov: {step['provenance']}]")
+        for step in plan_data["steps"]:
+            print(f"  [Step {step['task_id']}] {step['description']}")
             
         # 2. Compile to Graph
-        app = planner.to_executable_graph(plan)
+        app = planner.to_executable_graph(plan_data)
         if app:
-            print("\nExecuting Compiled Graph:")
+            print("\nExecuting Compiled Graph (Async):")
             state = init_risk_state("AAPL", query)
             try:
                 # The generated graph nodes accept 'state' but might ignore it in this scaffolding
-                result = app.invoke(state)
+                # Pass explicit inputs to ensuring checking
+                state['plan'] = plan_data
+                result = await app.ainvoke(state)
                 print("Execution Complete.")
+                print("Result Content:", result.get("assessment", {}).get("content", "No content"))
             except Exception as e:
                 print(f"Execution Error: {e}")
+                import traceback
+                traceback.print_exc()
     else:
         print("Failed to discover plan.")
 
@@ -87,10 +100,10 @@ def verify_cyclical_graph():
     except Exception as e:
         print(f"Graph Execution Failed: {e}")
 
-def main():
+async def main():
     verify_cyclical_graph()
-    verify_planner()
+    await verify_planner()
     verify_self_improvement()
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

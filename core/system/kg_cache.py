@@ -1,6 +1,9 @@
 # core/system/kg_cache.py
 
-import redis
+try:
+    import redis
+except ImportError:
+    redis = None
 
 class KGCache:
     """
@@ -17,8 +20,15 @@ class KGCache:
             db: The Redis database.
             ttl: The Time-To-Live for cache entries in seconds.
         """
-        self.redis = redis.Redis(host=host, port=port, db=db)
         self.ttl = ttl
+        self.mock_cache = {}
+        self.redis = None
+        if redis:
+            try:
+                self.redis = redis.Redis(host=host, port=port, db=db)
+                self.redis.ping() # Check connection
+            except Exception:
+                self.redis = None # Fallback to mock
 
     def get(self, query: str) -> str:
         """
@@ -30,7 +40,12 @@ class KGCache:
         Returns:
             The cached result, or None if not found.
         """
-        return self.redis.get(query)
+        if self.redis:
+            try:
+                return self.redis.get(query)
+            except Exception:
+                pass
+        return self.mock_cache.get(query)
 
     def set(self, query: str, result: str):
         """
@@ -40,4 +55,9 @@ class KGCache:
             query: The SPARQL query.
             result: The result of the query.
         """
-        self.redis.setex(query, self.ttl, result)
+        if self.redis:
+            try:
+                self.redis.setex(query, self.ttl, result)
+            except Exception:
+                pass
+        self.mock_cache[query] = result

@@ -107,6 +107,7 @@ class FundamentalAnalystAgent(AgentBase):
             comps_valuation = self.calculate_comps_valuation(company_data) # Placeholder
             enterprise_value_result = self.calculate_enterprise_value(company_data)
             financial_health = self.assess_financial_health(financial_ratios)
+            raw_metrics = self.extract_raw_metrics(company_data)
             
             analysis_summary = await self.generate_analysis_summary(
                 company_id, 
@@ -128,6 +129,7 @@ class FundamentalAnalystAgent(AgentBase):
             result_package = {
                 "company_id": company_id,
                 "financial_ratios": financial_ratios,
+                "raw_metrics": raw_metrics,
                 "dcf_valuation": dcf_valuation_result,
                 "comps_valuation": comps_valuation,
                 "enterprise_value": enterprise_value_result,
@@ -163,6 +165,40 @@ class FundamentalAnalystAgent(AgentBase):
         else:
             logging.error("DataRetrievalAgent not found in peer agents. Cannot retrieve company data.")
             return None
+
+    def extract_raw_metrics(self, company_data: Dict[str, Any]) -> Dict[str, float]:
+        """
+        Extracts raw financial metrics (EBITDA, Debt, Cash, Revenue) for downstream agents.
+        """
+        metrics = {}
+        try:
+            financial_details = company_data.get('financial_data_detailed', {})
+            income_statement = financial_details.get('income_statement', {})
+            balance_sheet = financial_details.get('balance_sheet', {})
+
+            ebitda_list = income_statement.get("ebitda", [])
+            metrics["ebitda"] = float(ebitda_list[-1]) if ebitda_list else 0.0
+
+            revenue_list = income_statement.get("revenue", [])
+            metrics["revenue"] = float(revenue_list[-1]) if revenue_list else 0.0
+
+            short_term_debt_values = balance_sheet.get('short_term_debt', [0])
+            long_term_debt_values = balance_sheet.get('long_term_debt', [0])
+            st_debt = float(short_term_debt_values[-1]) if short_term_debt_values else 0.0
+            lt_debt = float(long_term_debt_values[-1]) if long_term_debt_values else 0.0
+            metrics["total_debt"] = st_debt + lt_debt
+
+            cash_values = balance_sheet.get('cash_and_equivalents', [0])
+            metrics["cash"] = float(cash_values[-1]) if cash_values else 0.0
+
+            assets_values = balance_sheet.get('total_assets', [0])
+            metrics["total_assets"] = float(assets_values[-1]) if assets_values else 0.0
+
+        except Exception as e:
+            logging.warning(f"Failed to extract raw metrics: {e}")
+            metrics = {"ebitda": 0.0, "revenue": 0.0, "total_debt": 0.0, "cash": 0.0, "total_assets": 0.0}
+
+        return metrics
 
     def calculate_financial_ratios(self, company_data: Dict[str, Any]) -> Dict[str, float]:
         """

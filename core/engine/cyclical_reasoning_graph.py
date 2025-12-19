@@ -21,6 +21,12 @@ from langgraph.checkpoint.memory import MemorySaver
 from core.engine.states import RiskAssessmentState, ResearchArtifact
 from core.utils.logging_utils import get_logger
 
+# v23.5 Integration: APEX Generative Risk Engine
+try:
+    from core.vertical_risk_agent.generative_risk import GenerativeRiskEngine, MarketScenario
+except ImportError:
+    GenerativeRiskEngine = None
+
 logger = get_logger(__name__)
 
 # Import RiskAssessmentAgent (Math-heavy, no complex dependencies)
@@ -118,11 +124,17 @@ def map_dra_to_raa(financials: Dict[str, Any]) -> tuple[Dict, Dict]:
 
 data_retriever = V23DataRetriever()
 try:
-    # Fix: Pass required config to Agent
     risk_assessor = RiskAssessmentAgent(config={"name": "CyclicalRiskAgent"}) if RiskAssessmentAgent else None
 except Exception as e:
     logger.error(f"Error init RAA: {e}")
     risk_assessor = None
+
+# APEX Engine Init
+try:
+    apex_engine = GenerativeRiskEngine() if GenerativeRiskEngine else None
+except Exception as e:
+    logger.error(f"Error init APEX Engine: {e}")
+    apex_engine = None
 
 # --- Nodes ---
 
@@ -203,9 +215,9 @@ def generate_draft_node(state: RiskAssessmentState) -> Dict[str, Any]:
 
 def critique_node(state: RiskAssessmentState) -> Dict[str, Any]:
     """
-    Node: Critique
+    Node: Critique (Enhanced with APEX Engine)
     """
-    logger.info("--- Node: Critique ---")
+    logger.info("--- Node: Critique (System 2 Verification) ---")
     draft = state.get("draft_analysis", "")
     iteration = state["iteration_count"]
     
@@ -213,30 +225,54 @@ def critique_node(state: RiskAssessmentState) -> Dict[str, Any]:
     quality_score = 0.0
     needs_correction = False
     
-    # Showcase Logic: Simulate a tough critic
+    # 1. Structural Checks
     if "Error" in draft:
         critique_notes.append("Analysis failed due to system error.")
         quality_score = 0.1
         needs_correction = True
-    elif iteration < 2:
+        return {
+            "critique_notes": critique_notes,
+            "quality_score": quality_score,
+            "needs_correction": needs_correction,
+            "human_readable_status": "Critique failed due to errors."
+        }
+
+    # 2. APEX Engine Verification (Tail Risk Check)
+    if apex_engine:
+        logger.info("Invoking APEX Generative Risk Engine for Validation...")
+        # Simulate Reverse Stress Test to find "Kill Shot" scenarios
+        # Using a dummy portfolio value for now
+        breaches = apex_engine.reverse_stress_test(
+            target_loss_threshold=5000000,
+            current_portfolio_value=10000000
+        )
+
+        if breaches:
+            # If APEX finds a breach, check if the draft mentions "Tail Risk" or "Crash"
+            draft_lower = draft.lower()
+            if "tail risk" not in draft_lower and "crash" not in draft_lower:
+                breach_desc = breaches[0].description
+                critique_notes.append(f"APEX Engine Warning: Identified critical Tail Risk scenario '{breach_desc}' that is absent from the draft.")
+                needs_correction = True
+
+    # 3. Iterative Refinement Logic
+    if iteration < 2:
         critique_notes.append("Analysis lacks depth on 'Liquidity Risk'. Please expand.")
-        critique_notes.append("Verify Debt-to-Equity ratio against industry benchmarks.")
         quality_score = 0.65
         needs_correction = True
-    elif iteration < 3:
+    elif iteration < 3 and needs_correction: # Only add this if we are still refining
         critique_notes.append("Consider macroeconomic headwinds (inflation).")
         quality_score = 0.75
-        needs_correction = True
     else:
-        critique_notes.append("Assessment is comprehensive and robust.")
-        quality_score = 0.95
-        needs_correction = False
-        
+        if not needs_correction: # If APEX didn't flag anything and iterations are done
+            critique_notes.append("Assessment is comprehensive and robust.")
+            quality_score = 0.95
+
     return {
         "critique_notes": critique_notes,
         "quality_score": quality_score,
         "needs_correction": needs_correction,
-        "human_readable_status": f"Critique complete. Score: {quality_score}"
+        "human_readable_status": f"Critique complete. Score: {quality_score:.2f}"
     }
 
 def correction_node(state: RiskAssessmentState) -> Dict[str, Any]:
@@ -273,7 +309,7 @@ def should_continue(state: RiskAssessmentState) -> Literal["correct_analysis", "
     iteration = state["iteration_count"]
     needs_correction = state["needs_correction"]
     
-    if not needs_correction or quality >= 0.90:
+    if not needs_correction and quality >= 0.90:
         return "END"
     
     if iteration >= 5:

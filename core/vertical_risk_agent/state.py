@@ -79,7 +79,13 @@ class VerticalRiskGraphState(TypedDict):
     quant_analysis: Optional[str]
     legal_analysis: Optional[str]
     market_research: Optional[str]
-    stress_scenarios: Optional[List[Dict[str, Any]]] # Serialized MarketScenario objects
+    
+    # --- Merged Simulation State ---
+    # Stores the definitions of scenarios (inputs to the engine)
+    stress_scenarios: Optional[List[Dict[str, Any]]] 
+    
+    # Stores the quantitative results of the simulation (outputs from the engine)
+    risk_simulation_results: Optional[List[Dict[str, Any]]]
 
     # Draft
     draft_memo: Optional[Dict[str, Any]] # Serialized InvestmentMemo

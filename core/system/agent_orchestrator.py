@@ -45,8 +45,13 @@ from core.system.message_broker import MessageBroker
 # from core.system.brokers.rabbitmq_client import RabbitMQClient
 
 # Semantic Kernel imports
-from semantic_kernel import Kernel
-from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion
+try:
+    from semantic_kernel import Kernel
+    from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion
+except ImportError:
+    Kernel = None
+    OpenAIChatCompletion = None
+    logging.warning("Semantic Kernel not installed. Skipping SK integration.")
 # from semantic_kernel.connectors.ai.azure_open_ai import AzureChatCompletion # Example for later
 # from semantic_kernel.connectors.ai.hugging_face import HuggingFaceTextCompletion # Example for later
 
@@ -135,64 +140,67 @@ class AgentOrchestrator:
             self.register_agent_skills()  # Register agent skills with MCP
 
         # Initialize Semantic Kernel
-        try:
-            sk_settings_config = load_config('config/semantic_kernel_settings.yaml')
-            if not sk_settings_config or 'semantic_kernel_settings' not in sk_settings_config:
-                logging.error("Semantic Kernel settings not found or empty in config/semantic_kernel_settings.yaml. SK will not be available.")
-                # self.sk_kernel remains None
-            else:
-                sk_settings = sk_settings_config['semantic_kernel_settings']
-                default_service_id = sk_settings.get('default_completion_service_id')
-                completion_services = sk_settings.get('completion_services')
-
-                if not default_service_id or not completion_services:
-                    logging.error("Default service ID or completion_services not defined in Semantic Kernel settings. SK will not be available.")
+        if Kernel is not None:
+            try:
+                sk_settings_config = load_config('config/semantic_kernel_settings.yaml')
+                if not sk_settings_config or 'semantic_kernel_settings' not in sk_settings_config:
+                    logging.error("Semantic Kernel settings not found or empty in config/semantic_kernel_settings.yaml. SK will not be available.")
                     # self.sk_kernel remains None
                 else:
-                    service_config = completion_services.get(default_service_id)
-                    if not service_config:
-                        logging.error(f"Configuration for default service ID '{default_service_id}' not found in completion_services. SK will not be available.")
+                    sk_settings = sk_settings_config['semantic_kernel_settings']
+                    default_service_id = sk_settings.get('default_completion_service_id')
+                    completion_services = sk_settings.get('completion_services')
+
+                    if not default_service_id or not completion_services:
+                        logging.error("Default service ID or completion_services not defined in Semantic Kernel settings. SK will not be available.")
                         # self.sk_kernel remains None
                     else:
-                        kernel_instance = Kernel()
-                        service_type = service_config.get('service_type')
-                        model_id = service_config.get('model_id')
-
-                        if service_type == "OpenAI":
-                            api_key = get_api_key('OPENAI_API_KEY')
-                            # Optional: Fetch org_id if specified in sk_settings for this service
-                            # org_id_env_var = service_config.get('org_id_env_var')
-                            # org_id = get_api_key(org_id_env_var) if org_id_env_var else None
-                            org_id = get_api_key('OPENAI_ORG_ID') # Simpler: always try OPENAI_ORG_ID
-
-                            if api_key and model_id:
-                                try:
-                                    service_instance = OpenAIChatCompletion(
-                                        model_id=model_id,
-                                        api_key=api_key,
-                                        org_id=org_id if org_id else None
-                                    )
-                                    kernel_instance.add_chat_service("default_completion", service_instance)
-                                    self.sk_kernel = kernel_instance # Assign successfully configured kernel
-                                    logging.info(f"Semantic Kernel initialized with OpenAI service '{default_service_id}' (model: {model_id}).")
-                                except Exception as e:
-                                    logging.error(f"Failed to initialize and add OpenAI service to Semantic Kernel: {e}")
-                                    # self.sk_kernel remains None as it was before this block
-                            else:
-                                logging.error("OpenAI API key or model_id missing. Cannot configure OpenAI service for Semantic Kernel. SK will not be available.")
-                                # self.sk_kernel remains None
-                        # elif service_type == "AzureOpenAI":
-                            # Placeholder for Azure OpenAI configuration
-                            # logging.info("AzureOpenAI service type found, implementation pending.")
-                        # elif service_type == "HuggingFace":
-                            # Placeholder for HuggingFace configuration
-                            # logging.info("HuggingFace service type found, implementation pending.")
-                        else:
-                            logging.error(f"Unsupported Semantic Kernel service type: {service_type}. SK will not be available.")
+                        service_config = completion_services.get(default_service_id)
+                        if not service_config:
+                            logging.error(f"Configuration for default service ID '{default_service_id}' not found in completion_services. SK will not be available.")
                             # self.sk_kernel remains None
-        except Exception as e:
-            logging.error(f"An unexpected error occurred during Semantic Kernel initialization: {e}")
-            self.sk_kernel = None # Ensure it's None on any exception during init
+                        else:
+                            kernel_instance = Kernel()
+                            service_type = service_config.get('service_type')
+                            model_id = service_config.get('model_id')
+
+                            if service_type == "OpenAI":
+                                api_key = get_api_key('OPENAI_API_KEY')
+                                # Optional: Fetch org_id if specified in sk_settings for this service
+                                # org_id_env_var = service_config.get('org_id_env_var')
+                                # org_id = get_api_key(org_id_env_var) if org_id_env_var else None
+                                org_id = get_api_key('OPENAI_ORG_ID') # Simpler: always try OPENAI_ORG_ID
+
+                                if api_key and model_id:
+                                    try:
+                                        service_instance = OpenAIChatCompletion(
+                                            model_id=model_id,
+                                            api_key=api_key,
+                                            org_id=org_id if org_id else None
+                                        )
+                                        kernel_instance.add_chat_service("default_completion", service_instance)
+                                        self.sk_kernel = kernel_instance # Assign successfully configured kernel
+                                        logging.info(f"Semantic Kernel initialized with OpenAI service '{default_service_id}' (model: {model_id}).")
+                                    except Exception as e:
+                                        logging.error(f"Failed to initialize and add OpenAI service to Semantic Kernel: {e}")
+                                        # self.sk_kernel remains None as it was before this block
+                                else:
+                                    logging.error("OpenAI API key or model_id missing. Cannot configure OpenAI service for Semantic Kernel. SK will not be available.")
+                                    # self.sk_kernel remains None
+                            # elif service_type == "AzureOpenAI":
+                                # Placeholder for Azure OpenAI configuration
+                                # logging.info("AzureOpenAI service type found, implementation pending.")
+                            # elif service_type == "HuggingFace":
+                                # Placeholder for HuggingFace configuration
+                                # logging.info("HuggingFace service type found, implementation pending.")
+                            else:
+                                logging.error(f"Unsupported Semantic Kernel service type: {service_type}. SK will not be available.")
+                                # self.sk_kernel remains None
+            except Exception as e:
+                logging.error(f"An unexpected error occurred during Semantic Kernel initialization: {e}")
+                self.sk_kernel = None # Ensure it's None on any exception during init
+        else:
+            self.sk_kernel = None
 
         # Load Semantic Kernel skills if kernel was initialized
         if self.sk_kernel:
