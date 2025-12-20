@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+import logging
 from core.system.agent_orchestrator import AgentOrchestrator
 from core.system.echo import Echo
 from core.utils.api_utils import (
@@ -48,7 +49,10 @@ def api_endpoint():
         return jsonify({"results": results}), 200
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        # 🛡️ Sentinel: Log the full error securely, but return a generic message to the user
+        # to prevent leaking sensitive system details (stack traces, paths, etc.)
+        logging.error(f"Error processing request: {e}", exc_info=True)
+        return jsonify({"error": "An internal error occurred."}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)
