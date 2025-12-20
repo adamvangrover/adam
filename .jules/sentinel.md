@@ -37,3 +37,8 @@
 **Vulnerability:** The `/api/agents/<agent_name>/invoke` endpoint allowed any unauthenticated user to execute potentially resource-intensive or sensitive agents.
 **Learning:** Endpoints that bridge HTTP to internal command/agent execution patterns are critical high-risk targets that often bypass standard resource access controls.
 **Prevention:** Strictly enforce authentication on all "command" or "action" style endpoints.
+
+## 2025-12-18 - Legacy File Shadowing & Error Leakage
+**Vulnerability:** `core/api.py` (legacy Flask app) was shadowed by `core.api` (FastAPI package) but remained executable and vulnerable to information leakage via unhandled exceptions.
+**Learning:** Naming conflicts between files (`api.py`) and packages (`api/`) can hide legacy code from standard testing/linting tools while leaving it exposed on the filesystem.
+**Prevention:** Audit codebase for file/directory name collisions and explicitly deprecate or remove legacy files that are shadowed.
