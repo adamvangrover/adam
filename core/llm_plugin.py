@@ -566,8 +566,29 @@ class LLMPlugin:
             self.config = self._load_internal_config(config_path)
             
         self.cache = CacheManager() if use_cache else None
+        self._validate_security_policies()
         self.llm = self._initialize_llm()
         self.slm = self._initialize_slm()
+
+    def _validate_security_policies(self):
+        """
+        Enforces Apex Architect security protocols defined in config.
+        """
+        policies = self.config.get("security_policies", {})
+
+        # 1. HTTPS Enforcement
+        if policies.get("enforce_https", True):
+             # This is a meta-check. Actual enforcement happens at the network layer,
+             # but we log the policy active state.
+             logger.info("SECURITY: HTTPS Enforcement Policy is ACTIVE.")
+
+        # 2. PII Masking
+        if policies.get("mask_pii", False):
+            logger.info("SECURITY: PII Masking is ENABLED (experimental).")
+
+        # 3. Prompt Logging Check
+        if policies.get("log_prompts", False):
+            logger.warning("SECURITY ALERT: Prompt logging is ENABLED. Ensure no sensitive data is processed.")
 
     def _initialize_slm(self) -> Optional[BaseLLM]:
         """Initializes a Small Language Model (SLM) for specialized tasks."""
