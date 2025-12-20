@@ -19,3 +19,7 @@
 ## 2025-05-22 - Debouncing High-Frequency Simulation Inputs
 **Learning:** The `ScenarioSimulator` component was triggering a "Monte Carlo" simulation on every `input` change event from a range slider. In React, range inputs fire `onChange` continuously during a drag. This causes massive calculation overhead (O(N) * updates) for what should be a terminal state calculation.
 **Action:** Always debounce inputs that trigger heavy calculations, especially range sliders or text search fields. Used a standard `useEffect` debounce pattern with a `useRef` mount check to decouple UI state (instant) from simulation state (delayed).
+
+## 2024-05-21 - [Costly Database Connections in Request Handlers]
+**Learning:** Initializing database drivers (like Neo4j) inside request handlers creates a new connection pool for every request, leading to severe performance degradation under load.
+**Action:** Always verify database driver initialization scope. Move to singleton or app-level context.
