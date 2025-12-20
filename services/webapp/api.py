@@ -12,6 +12,7 @@ import json
 import functools
 import asyncio
 import re
+import threading
 from datetime import datetime, timezone
 from .config import config
 from .celery import celery
@@ -36,6 +37,39 @@ socketio = SocketIO()
 jwt = JWTManager()
 agent_orchestrator = None
 meta_orchestrator = None
+_neo4j_driver = None
+_neo4j_lock = threading.Lock()
+
+def get_neo4j_driver():
+    """
+    ⚡ Bolt Optimization: Singleton pattern for Neo4j driver.
+    Prevents creating a new connection pool on every request.
+    Uses double-checked locking for thread safety.
+    """
+    global _neo4j_driver
+    
+    if _neo4j_driver:
+        return _neo4j_driver
+
+    with _neo4j_lock:
+        if _neo4j_driver:
+            return _neo4j_driver
+        
+        try:
+            from neo4j import GraphDatabase
+            uri = os.environ.get('NEO4J_URI', 'bolt://neo4j:7687')
+            user = os.environ.get('NEO4J_USER', 'neo4j')
+            password = os.environ.get('NEO4J_PASSWORD') # 🛡️ Sentinel: No hardcoded default password
+            auth = (user, password) if password else None
+            
+            _neo4j_driver = GraphDatabase.driver(uri, auth=auth)
+            return _neo4j_driver
+        except ImportError:
+            logging.getLogger(__name__).warning("Neo4j driver could not be imported.")
+            return None
+        except Exception as e:
+            logging.getLogger(__name__).error(f"Failed to initialize Neo4j driver: {e}")
+            return None
 
 
 # ---------------------------------------------------------------------------- #
@@ -429,7 +463,10 @@ def create_app(config_name='default'):
         Returns the knowledge graph data from Neo4j.
         Accepts a 'query' parameter to search for a starting node.
         """
-        from neo4j import GraphDatabase
+        driver = get_neo4j_driver()
+        if not driver:
+            return jsonify({'error': 'Graph database connection unavailable'}), 503
+
         query = request.args.get('query')
         cypher_query = "MATCH (n)-[r]->(m) RETURN n, r, m LIMIT 25"
         params = {}
@@ -438,37 +475,34 @@ def create_app(config_name='default'):
             cypher_query = "MATCH (n)-[r]->(m) WHERE n.name CONTAINS $query RETURN n, r, m LIMIT 100"
             params = {'query': query}
 
+        try:
+            with driver.session() as session:
+                result = session.run(cypher_query, params)
+                nodes = {}
+                links = []
+                for record in result:
+                    source_node = record["n"]
+                    target_node = record["m"]
 
-        uri = os.environ.get('NEO4J_URI', 'bolt://neo4j:7687')
-        user = os.environ.get('NEO4J_USER', 'neo4j')
-        password = os.environ.get('NEO4J_PASSWORD') # 🛡️ Sentinel: No hardcoded default password
+                    source_id = source_node.id
+                    target_id = target_node.id
 
-        auth = (user, password) if password else None
-        driver = GraphDatabase.driver(uri, auth=auth)
-        with driver.session() as session:
-            result = session.run(cypher_query, params)
-            nodes = {}
-            links = []
-            for record in result:
-                source_node = record["n"]
-                target_node = record["m"]
+                    if source_id not in nodes:
+                        nodes[source_id] = {"id": source_node.get('name'), "labels": list(source_node.labels), "properties": dict(source_node)}
+                    if target_id not in nodes:
+                        nodes[target_id] = {"id": target_node.get('name'), "labels": list(target_node.labels), "properties": dict(target_node)}
 
-                source_id = source_node.id
-                target_id = target_node.id
+                    links.append({
+                        "source": source_node.get('name'),
+                        "target": target_node.get('name'),
+                        "type": type(record["r"]).__name__,
+                        "properties": dict(record["r"])
+                    })
 
-                if source_id not in nodes:
-                    nodes[source_id] = {"id": source_node.get('name'), "labels": list(source_node.labels), "properties": dict(source_node)}
-                if target_id not in nodes:
-                    nodes[target_id] = {"id": target_node.get('name'), "labels": list(target_node.labels), "properties": dict(target_node)}
-
-                links.append({
-                    "source": source_node.get('name'),
-                    "target": target_node.get('name'),
-                    "type": type(record["r"]).__name__,
-                    "properties": dict(record["r"])
-                })
-
-            return jsonify({"nodes": list(nodes.values()), "links": links})
+                return jsonify({"nodes": list(nodes.values()), "links": links})
+        except Exception as e:
+            app.logger.error(f"Error querying Neo4j: {e}")
+            return jsonify({'error': 'Error querying knowledge graph'}), 500
 
     # ---------------------------------------------------------------------------- #
     # Task Endpoints
