@@ -23,27 +23,56 @@ const Reports: React.FC = () => {
         <FileText className="h-6 w-6" />
         INTELLIGENCE ARCHIVES
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {reports.length === 0 ? (
+        <div
+          className="glass-panel p-12 flex flex-col items-center justify-center text-center space-y-4 rounded border-dashed border-2 border-cyber-cyan/20"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="p-4 bg-cyber-cyan/5 rounded-full ring-1 ring-cyber-cyan/20">
+            <FileText className="h-12 w-12 text-cyber-cyan/50" />
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-xl font-bold text-cyber-cyan tracking-wide">NO ARTIFACTS FOUND</h3>
+            <p className="text-cyber-text/60 max-w-md font-mono text-sm leading-relaxed">
+              The intelligence vault is currently empty. Generated reports and analyzed documents will appear here automatically.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {reports.map((report, idx) => (
-              <div key={idx} className="glass-panel p-6 rounded border border-cyber-cyan/10 hover:border-cyber-cyan transition-all group cursor-pointer relative overflow-hidden">
-                  <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-30 transition-opacity">
-                    <FileText className="h-24 w-24 text-cyber-cyan" />
-                  </div>
-                  <h3 className="text-lg font-bold text-cyber-cyan group-hover:text-cyber-neon mb-2 truncate font-mono" title={report.title}>
-                      {report.title || 'UNTITLED_ARTIFACT'}
-                  </h3>
-                  <div className="text-[10px] text-cyber-text/60 font-mono mb-4 bg-cyber-black/50 p-1 rounded inline-block">
-                    {report.path}
-                  </div>
-                  <div className="text-sm text-cyber-text/80 line-clamp-4 font-mono leading-relaxed">
-                      {typeof report.content === 'string' ? report.content : "STRUCTURED DATA OBJECT"}
-                  </div>
-                  <button className="mt-4 text-xs bg-cyber-cyan/10 text-cyber-cyan px-3 py-1 rounded hover:bg-cyber-cyan hover:text-black transition-colors uppercase font-bold tracking-wider">
-                    Access Data
-                  </button>
+            <div
+              key={idx}
+              className="glass-panel p-6 rounded border border-cyber-cyan/10 hover:border-cyber-cyan transition-all group cursor-pointer relative overflow-hidden focus-visible:ring-2 focus-visible:ring-cyber-cyan focus-visible:outline-none"
+              tabIndex={0}
+              role="article"
+              aria-label={`Report: ${report.title || 'Untitled Artifact'}`}
+            >
+              <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-30 transition-opacity">
+                <FileText className="h-24 w-24 text-cyber-cyan" />
               </div>
+              <h3
+                className="text-lg font-bold text-cyber-cyan group-hover:text-cyber-neon mb-2 truncate font-mono"
+                title={report.title}
+              >
+                {report.title || 'UNTITLED_ARTIFACT'}
+              </h3>
+              <div className="text-[10px] text-cyber-text/60 font-mono mb-4 bg-cyber-black/50 p-1 rounded inline-block">
+                {report.path}
+              </div>
+              <div className="text-sm text-cyber-text/80 line-clamp-4 font-mono leading-relaxed">
+                {typeof report.content === 'string'
+                  ? report.content
+                  : 'STRUCTURED DATA OBJECT'}
+              </div>
+              <button className="mt-4 text-xs bg-cyber-cyan/10 text-cyber-cyan px-3 py-1 rounded hover:bg-cyber-cyan hover:text-black transition-colors uppercase font-bold tracking-wider focus-visible:ring-2 focus-visible:ring-cyber-neon focus-visible:outline-none">
+                Access Data
+              </button>
+            </div>
           ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -15,3 +15,7 @@
 ## 2024-05-22 - Combobox Accessibility
 **Learning:** Custom search dropdowns (comboboxes) are often completely inaccessible to keyboard users. Adding `aria-activedescendant` combined with `ArrowUp`/`ArrowDown` handlers allows screen readers to announce the currently selected item without moving focus, maintaining the typing context.
 **Action:** Always implement `role="combobox"` pattern with `aria-activedescendant` for autocomplete/search inputs.
+
+## 2025-12-18 - Empty States in Dashboards
+**Learning:** Dashboards often initialize with empty arrays. Without a dedicated empty state, the UI looks broken or invisible to the user.
+**Action:** Always check array length and render a helpful, styled 'empty' component with `role="status"`.
