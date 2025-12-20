@@ -60,7 +60,7 @@ class MetaOrchestrator:
         self.llm_plugin = LLMPlugin(config={"provider": "gemini", "gemini_model_name": "gemini-3-pro"})
         self.code_alchemist = CodeAlchemist()
 
-    async def route_request(self, query: str, context: Dict[str, Any] = None) -> Any:
+    async def route_request(self, query: str, context: Optional[Dict[str, Any]] = None) -> Any:
         """
         Analyzes the query complexity and routes to the best engine.
         Now Async!
@@ -206,7 +206,7 @@ class MetaOrchestrator:
             logger.error(f"Code Generation Failed: {e}", exc_info=True)
             return {"error": str(e)}
 
-    async def _run_deep_dive_flow(self, query: str, context: Dict[str, Any] = None):
+    async def _run_deep_dive_flow(self, query: str, context: Optional[Dict[str, Any]] = None):
         """
         Primary execution method for Deep Dive.
         Tries the v23 Graph first, falls back to Manual Orchestration.
@@ -319,7 +319,7 @@ class MetaOrchestrator:
             leverage = total_debt / ebitda if ebitda else 3.0
 
             # Safe Fallback for Peer Agent
-            multiples = {}
+            multiples: Dict[str, Any] = {}
             try:
                 multiples = await peer_agent.execute({"company_id": company_id})
             except Exception as e:
@@ -352,11 +352,19 @@ class MetaOrchestrator:
 
             # Phase 3: Credit
             logger.info("Fallback Phase 3: Credit")
-            credit_input = {
-                "facilities": [{"id": "TLB", "amount": f"{total_debt}M", "ltv": 0.5}],
-                "current_leverage": leverage
+            financials_input = {
+                "ebitda": float(ebitda),
+                "total_debt": float(total_debt),
+                "interest_expense": float(ebitda / 4.0) if ebitda else 1.0 # Assume 4x coverage default
             }
-            snc_model = await snc_agent.execute(credit_input)
+            capital_structure_input = [
+                {"name": "Term Loan B", "amount": float(total_debt), "priority": 1}
+            ]
+            snc_model = await snc_agent.execute(
+                financials=financials_input,
+                capital_structure=capital_structure_input,
+                enterprise_value=float(dcf_val)
+            )
 
             # Manually construct CreditAnalysis
             from core.schemas.v23_5_schema import CreditAnalysis, CovenantRiskAnalysis
@@ -374,10 +382,14 @@ class MetaOrchestrator:
 
             # Phase 4: Risk
             logger.info("Fallback Phase 4: Risk")
-            sim_engine = await mc_agent.execute({"ebitda": ebitda, "debt": total_debt, "volatility": 0.2})
+            sim_engine = await mc_agent.execute(
+                current_ebitda=ebitda,
+                ebitda_volatility=0.2,
+                interest_expense=financials_input["interest_expense"]
+            )
 
             try:
-                scenarios = await quant_agent.execute({})
+                scenarios = await quant_agent.execute(params={"financials": financials_input})
                 sim_engine.quantum_scenarios = scenarios
             except Exception as e:
                 logger.warning(f"Quantum Agent failed: {e}. Proceeding without quantum scenarios.")
@@ -385,7 +397,7 @@ class MetaOrchestrator:
 
             # Phase 5: Synthesis
             logger.info("Fallback Phase 5: Synthesis")
-            synthesis = await pm_agent.execute({
+            synthesis = await pm_agent.execute(params={
                 "phase1": entity_eco,
                 "phase2": equity_analysis,
                 "phase3": credit_analysis,
