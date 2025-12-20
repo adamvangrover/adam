@@ -102,7 +102,8 @@ class QueryUnderstandingAgent(AgentBase):
             return None
 
         # Use the LLM Plugin to get the agent selection
-        llm_result: Optional[str] = await self.llm_plugin.get_completion(prompt)
+        # Note: LLMPlugin methods are currently synchronous
+        llm_result: Optional[str] = self.llm_plugin.generate_text(prompt)
 
         if llm_result:
             try:
