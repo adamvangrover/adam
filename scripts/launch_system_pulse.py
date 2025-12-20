@@ -12,14 +12,20 @@ from core.system.temporal_engine import TemporalEngine
 from core.procedures.autonomous_update import RoutineMaintenance
 from core.system.agent_orchestrator import AgentOrchestrator
 
+# Ensure logs directory exists
+log_dir = "logs"
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+
 # Configure structured logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - [%(levelname)s] - %(message)s',
     handlers=[
-        logging.FileHandler("logs/adam_pulse.log"),
+        logging.FileHandler(os.path.join(log_dir, "adam_pulse.log")),
         logging.StreamHandler()
-    ]
+    ],
+    force=True
 )
 logger = logging.getLogger("AdamPulse")
 
@@ -28,7 +34,12 @@ async def main():
 
     # 1. Initialize Core Systems
     # Orchestrator is loaded to ensure Agents are prepped and caches are hot
-    orchestrator = AgentOrchestrator()
+    # We wrap it in try-except to prevent startup failure if config is missing,
+    # allowing the Pulse to run with degraded capabilities if necessary.
+    try:
+        orchestrator = AgentOrchestrator()
+    except Exception as e:
+        logger.error(f"AgentOrchestrator initialization failed: {e}. Continuing with degraded capabilities.")
 
     # 2. Initialize the Temporal Engine (Async Scheduler)
     temporal_engine = TemporalEngine()
