@@ -19,3 +19,7 @@
 ## 2025-12-18 - Empty States in Dashboards
 **Learning:** Dashboards often initialize with empty arrays. Without a dedicated empty state, the UI looks broken or invisible to the user.
 **Action:** Always check array length and render a helpful, styled 'empty' component with `role="status"`.
+
+## 2025-05-20 - Accessible Tabs Implementation
+**Learning:** Native `button` elements in a row are not sufficient for a "Tabs" pattern. Accessibility standards (WAI-ARIA) require `role="tablist"`/`tab` and *arrow key* navigation, not just Tab key (which should move focus *out* of the tab list).
+**Action:** When implementing tabs, always handle `onKeyDown` for ArrowLeft/Right/Home/End and manage `tabIndex` so only the active tab is focusable (or all are, depending on roving tabindex preference).
