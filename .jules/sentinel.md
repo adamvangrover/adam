@@ -42,3 +42,8 @@
 **Vulnerability:** `core/api.py` (legacy Flask app) was shadowed by `core.api` (FastAPI package) but remained executable and vulnerable to information leakage via unhandled exceptions.
 **Learning:** Naming conflicts between files (`api.py`) and packages (`api/`) can hide legacy code from standard testing/linting tools while leaving it exposed on the filesystem.
 **Prevention:** Audit codebase for file/directory name collisions and explicitly deprecate or remove legacy files that are shadowed.
+
+## 2025-12-19 - SQLite SQL Injection & Excessive Exposure
+**Vulnerability:** A "SQL Query" tool designed for LLM agents allowed arbitrary `SELECT` queries (including `UNION`-based injection) against the entire database, exposing sensitive tables like `secrets` if they existed.
+**Learning:** Checking for `startswith("SELECT")` is insufficient to prevent SQL injection or excessive data exposure. LLM tools that execute code or queries are inherently high-risk.
+**Prevention:** Use `sqlite3.set_authorizer` to implement a strict whitelist of allowed tables and actions at the connection level. Combine with URI read-only mode (`?mode=ro`) for defense-in-depth.
