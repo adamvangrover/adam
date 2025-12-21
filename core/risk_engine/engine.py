@@ -52,7 +52,7 @@ class RiskEngine:
                                  portfolio: List[Dict[str, Any]], 
                                  confidence_level: float = 0.95, 
                                  correlation_matrix: Optional[List[List[float]]] = None) -> Dict[str, Any]:
-        """
+        r"""
         Calculates Parametric Value at Risk using Variance-Covariance Method.
         
         Logic:

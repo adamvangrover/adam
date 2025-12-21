@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Union
 import logging
 from core.agents.agent_base import AgentBase
 from core.engine.states import init_reflector_state
@@ -23,10 +23,13 @@ class ReflectorAgent(AgentBase):
     v23 Update: Wraps `ReflectorGraph` for iterative self-correction.
     """
 
-    async def execute(self, content_to_analyze: str, context: Dict[str, Any] = None) -> Dict[str, Any]:
+    async def execute(self, content_to_analyze: Union[str, Dict[str, Any]], context: Dict[str, Any] = None) -> Dict[str, Any]:
         """
         Analyzes the provided content (reasoning trace, report, etc.) and provides a critique.
         """
+        if isinstance(content_to_analyze, dict):
+             content_to_analyze = content_to_analyze.get("content") or content_to_analyze.get("payload") or str(content_to_analyze)
+
         logger.info("ReflectorAgent: Analyzing content for self-correction...")
 
         # --- v23 Path: Reflector Graph ---

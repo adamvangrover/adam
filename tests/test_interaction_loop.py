@@ -37,7 +37,7 @@ class TestInteractionLoop(unittest.TestCase):
         }.get(x)
 
     @patch('core.utils.config_utils.load_config')
-    @patch('core.system.agent_orchestrator.AgentOrchestrator', return_value=MagicMock(spec=AgentOrchestrator))
+    @patch('core.system.agent_orchestrator.AgentOrchestrator')
     def test_process_input_risk_query(self, mock_orchestrator, mock_config):
         mock_config.return_value = self.mock_config
         loop = InteractionLoop(config=self.mock_config, knowledge_base = self.mock_kb) #Pass Knowledge Base
@@ -55,7 +55,7 @@ class TestInteractionLoop(unittest.TestCase):
         self.mock_result_agent.execute.assert_called_once_with(["low"]) # Result agent called with data agent result
 
     @patch('core.utils.config_utils.load_config')
-    @patch('core.system.agent_orchestrator.AgentOrchestrator', return_value=MagicMock(spec=AgentOrchestrator))
+    @patch('core.system.agent_orchestrator.AgentOrchestrator')
     def test_process_input_kb_query(self, mock_orchestrator, mock_config):
         mock_config.return_value = self.mock_config
         loop = InteractionLoop(config=self.mock_config, knowledge_base = self.mock_kb)
@@ -73,7 +73,7 @@ class TestInteractionLoop(unittest.TestCase):
         self.mock_result_agent.execute.assert_called_once_with(["Positive"])
 
     @patch('core.utils.config_utils.load_config')
-    @patch('core.system.agent_orchestrator.AgentOrchestrator', return_value=MagicMock(spec=AgentOrchestrator))
+    @patch('core.system.agent_orchestrator.AgentOrchestrator')
     def test_process_input_updatekb(self, mock_orchestrator, mock_config):
         mock_config.return_value = self.mock_config
         loop = InteractionLoop(config=self.mock_config, knowledge_base=self.mock_kb)
@@ -84,7 +84,7 @@ class TestInteractionLoop(unittest.TestCase):
         self.mock_kb.update.assert_called_once_with("test_key", "test_value")
 
     @patch('core.utils.config_utils.load_config')
-    @patch('core.system.agent_orchestrator.AgentOrchestrator', return_value=MagicMock(spec=AgentOrchestrator))
+    @patch('core.system.agent_orchestrator.AgentOrchestrator')
     def test_process_input_invalid_command(self, mock_orchestrator, mock_config):
         mock_config.return_value = self.mock_config
         loop = InteractionLoop(config=self.mock_config, knowledge_base = self.mock_kb)
@@ -98,7 +98,7 @@ class TestInteractionLoop(unittest.TestCase):
 
 
     @patch('core.utils.config_utils.load_config')
-    @patch('core.system.agent_orchestrator.AgentOrchestrator', return_value=MagicMock(spec=AgentOrchestrator))
+    @patch('core.system.agent_orchestrator.AgentOrchestrator')
     def test_process_input_agent_not_found(self, mock_orchestrator, mock_config):
         mock_config.return_value = self.mock_config
         loop = InteractionLoop(config=self.mock_config, knowledge_base = self.mock_kb)
@@ -110,7 +110,7 @@ class TestInteractionLoop(unittest.TestCase):
         self.assertEqual(context.exception.code, 102)
 
     @patch('core.utils.config_utils.load_config')
-    @patch('core.system.agent_orchestrator.AgentOrchestrator', return_value=MagicMock(spec=AgentOrchestrator))
+    @patch('core.system.agent_orchestrator.AgentOrchestrator')
     def test_process_input_data_not_found(self, mock_orchestrator, mock_config):
         mock_config.return_value = self.mock_config
         loop = InteractionLoop(config=self.mock_config, knowledge_base=self.mock_kb)
@@ -121,7 +121,7 @@ class TestInteractionLoop(unittest.TestCase):
         self.assertEqual(context.exception.code, 101)
 
     @patch('core.utils.config_utils.load_config')
-    @patch('core.system.agent_orchestrator.AgentOrchestrator', return_value=MagicMock(spec=AgentOrchestrator))
+    @patch('core.system.agent_orchestrator.AgentOrchestrator')
     def test_process_input_multiple_agents(self, mock_orchestrator, mock_config):
         mock_config.return_value = self.mock_config
         loop = InteractionLoop(config=self.mock_config, knowledge_base = self.mock_kb)

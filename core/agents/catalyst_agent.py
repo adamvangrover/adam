@@ -46,7 +46,7 @@ class CatalystAgent:
 
     def fetch_data(self, url, params=None):
         try:
-            response = requests.get(url, params=params)
+            response = requests.get(url, params=params, timeout=10)
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:

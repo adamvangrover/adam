@@ -1,4 +1,6 @@
+import httpx
 import requests
+import asyncio
 import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
 from collections import defaultdict
@@ -22,8 +24,13 @@ from core.agents.agent_base import AgentBase
 # For get_api_key if needed later, but not for this step
 # from core.utils.secrets_utils import get_api_key
 
-import torch # Added import
-from transformers import AutoTokenizer, AutoModelForSequenceClassification # Added import
+try:
+    import torch
+    from transformers import AutoTokenizer, AutoModelForSequenceClassification, AutoModelForSeq2SeqLM
+    TORCH_AVAILABLE = True
+except ImportError:
+    torch = None
+    TORCH_AVAILABLE = False
 
 # Initialize NLTK sentiment analyzer - REMOVED
 # try:
@@ -33,7 +40,6 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification # Add
 # sia = SentimentIntensityAnalyzer() - REMOVED
 
 import nltk # Added import for sentence tokenization in summarizer fallback
-from transformers import AutoModelForSeq2SeqLM # Added import for summarization model
 
 # Define the "NewsBot" class, now inheriting from AgentBase
 class NewsBot(AgentBase):
@@ -72,28 +78,35 @@ class NewsBot(AgentBase):
         self.seen_alert_urls = set() # For tracking alerted articles in the current session
 
         # Load FinBERT model and tokenizer
-        try:
-            model_name_finbert = "ProsusAI/finbert"
-            self.finbert_tokenizer = AutoTokenizer.from_pretrained(model_name_finbert)
-            self.finbert_model = AutoModelForSequenceClassification.from_pretrained(model_name_finbert)
-            print(f"FinBERT model ({model_name_finbert}) loaded successfully.")
-        except Exception as e:
-            print(f"Error loading FinBERT model: {e}. Sentiment analysis will be impacted.")
+        if TORCH_AVAILABLE:
+            try:
+                model_name_finbert = "ProsusAI/finbert"
+                self.finbert_tokenizer = AutoTokenizer.from_pretrained(model_name_finbert)
+                self.finbert_model = AutoModelForSequenceClassification.from_pretrained(model_name_finbert)
+                print(f"FinBERT model ({model_name_finbert}) loaded successfully.")
+            except Exception as e:
+                print(f"Error loading FinBERT model: {e}. Sentiment analysis will be impacted.")
+        else:
+            print("Torch not available. Skipping FinBERT model loading.")
 
         # Load Summarization model and tokenizer
-        try:
-            model_name_summarizer = "sshleifer/distilbart-cnn-12-6" # Using a smaller model due to space constraints
-            self.summarizer_tokenizer = AutoTokenizer.from_pretrained(model_name_summarizer)
-            self.summarizer_model = AutoModelForSeq2SeqLM.from_pretrained(model_name_summarizer)
-            print(f"Summarization model ({model_name_summarizer}) loaded successfully.")
-        except Exception as e:
-            print(f"Error loading Summarization model: {e}. Summarization will use fallback.")
-            # Ensure NLTK's punkt is available for fallback
+        if TORCH_AVAILABLE:
             try:
-                nltk.data.find('tokenizers/punkt')
-            except nltk.downloader.DownloadError:
-                print("NLTK 'punkt' not found. Downloading...")
-                nltk.download('punkt', quiet=True) # quiet=True to avoid verbose output if already there or successful
+                model_name_summarizer = "sshleifer/distilbart-cnn-12-6" # Using a smaller model due to space constraints
+                self.summarizer_tokenizer = AutoTokenizer.from_pretrained(model_name_summarizer)
+                self.summarizer_model = AutoModelForSeq2SeqLM.from_pretrained(model_name_summarizer)
+                print(f"Summarization model ({model_name_summarizer}) loaded successfully.")
+            except Exception as e:
+                print(f"Error loading Summarization model: {e}. Summarization will use fallback.")
+        else:
+            print("Torch not available. Skipping Summarization model loading.")
+
+        # Ensure NLTK's punkt is available for fallback
+        try:
+            nltk.data.find('tokenizers/punkt')
+        except (LookupError, nltk.downloader.DownloadError):
+            print("NLTK 'punkt' not found. Downloading...")
+            nltk.download('punkt', quiet=True) # quiet=True to avoid verbose output if already there or successful
 
     def load_custom_sources(self) -> Dict[str, str]:
         """Load custom news APIs provided by the user."""
@@ -102,7 +115,7 @@ class NewsBot(AgentBase):
             custom_sources[source['name']] = source['url']
         return custom_sources
 
-    def aggregate_news(self) -> List[Dict[str, Any]]: # Added return type hint
+    async def aggregate_news(self) -> List[Dict[str, Any]]: # Added return type hint
         """
         Aggregates news articles from various sources (including custom user sources).
         
@@ -110,49 +123,56 @@ class NewsBot(AgentBase):
             list: Aggregated news articles
         """
         all_news: List[Dict[str, Any]] = [] # Added type hint
+        tasks = []
 
         # Collect crypto-related news
         if 'crypto' in self.user_preferences.get('topics', []): # Safe get
-            all_news.extend(self.get_crypto_news())
+            tasks.append(self.get_crypto_news())
 
         # Collect financial market-related news
         if 'finance' in self.user_preferences.get('topics', []): # Safe get
-            all_news.extend(self.get_finance_news())
+            tasks.append(self.get_finance_news())
 
         # Collect stock market news
         if 'stocks' in self.user_preferences.get('topics', []): # Safe get
-            all_news.extend(self.get_stock_news())
+            tasks.append(self.get_stock_news())
 
         # Collect commodities and treasury news
         if 'commodities' in self.user_preferences.get('topics', []): # Safe get
-            all_news.extend(self.get_commodities_news())
+            tasks.append(self.get_commodities_news())
 
         if 'treasuries' in self.user_preferences.get('topics', []): # Safe get
-            all_news.extend(self.get_treasuries_news())
+            tasks.append(self.get_treasuries_news())
 
         # Collect FX news
         if 'forex' in self.user_preferences.get('topics', []): # Safe get
-            all_news.extend(self.get_forex_news())
+            tasks.append(self.get_forex_news())
 
         # Add Reuters Business News RSS
-        all_news.extend(self.get_reuters_business_news_rss())
+        tasks.append(self.get_reuters_business_news_rss())
 
         # Integrate custom sources (user-defined)
         for source_name, source_url in self.custom_news_sources.items():
-            all_news.extend(self.get_custom_news(source_url))
+            tasks.append(self.get_custom_news(source_url))
+
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+
+        for res in results:
+            if isinstance(res, list):
+                all_news.extend(res)
+            elif isinstance(res, Exception):
+                print(f"Error during news aggregation: {res}")
 
         # Filter news based on user's portfolio
         filtered_news = self.filter_news_by_portfolio(all_news)
 
         return filtered_news
 
-    def get_crypto_news(self) -> List[Dict[str, Any]]: # Added return type hint
+    async def get_crypto_news(self) -> List[Dict[str, Any]]: # Added return type hint
         """Fetch cryptocurrency news using the CoinGeckoAPI."""
         try:
-            # Assuming get_trending_searches returns a list of dicts or similar
-            # The original pycoingecko might return a more complex structure.
-            # This is a simplification.
-            trending_searches = self.cg.get_trending_searches() # Removed language='en' as it's not a standard param
+            # Run blocking call in thread
+            trending_searches = await asyncio.to_thread(self.cg.get_trending_searches)
             # Convert trending searches to a news-like format if necessary
             news_items = []
             if isinstance(trending_searches, dict) and 'coins' in trending_searches:
@@ -170,7 +190,7 @@ class NewsBot(AgentBase):
             return []
 
 
-    def get_finance_news(self) -> List[Dict[str, Any]]: # Added return type hint
+    async def get_finance_news(self) -> List[Dict[str, Any]]: # Added return type hint
         """Fetch general finance news using NewsAPI."""
         if not self.news_api_key: return []
         url = "https://newsapi.org/v2/everything"
@@ -181,14 +201,18 @@ class NewsBot(AgentBase):
             'sortBy': 'relevancy'
         }
         try:
-            response = requests.get(url, params=params)
-            response.raise_for_status() # Raise an exception for HTTP errors
-            return response.json().get('articles', [])
-        except requests.exceptions.RequestException as e:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(url, params=params, timeout=10.0)
+                response.raise_for_status() # Raise an exception for HTTP errors
+                return response.json().get('articles', [])
+        except httpx.RequestError as e:
             print(f"Error fetching finance news from NewsAPI: {e}")
             return []
+        except httpx.HTTPStatusError as e:
+            print(f"HTTP error fetching finance news from NewsAPI: {e}")
+            return []
 
-    def get_stock_news(self) -> List[Dict[str, Any]]: # Added return type hint
+    async def get_stock_news(self) -> List[Dict[str, Any]]: # Added return type hint
         """Fetch stock-related news using an API or data source."""
         if not self.news_api_key: return []
         url = "https://newsapi.org/v2/everything"
@@ -199,14 +223,15 @@ class NewsBot(AgentBase):
             'sortBy': 'relevancy'
         }
         try:
-            response = requests.get(url, params=params)
-            response.raise_for_status()
-            return response.json().get('articles', [])
-        except requests.exceptions.RequestException as e:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(url, params=params, timeout=10.0)
+                response.raise_for_status()
+                return response.json().get('articles', [])
+        except (httpx.RequestError, httpx.HTTPStatusError) as e:
             print(f"Error fetching stock news from NewsAPI: {e}")
             return []
 
-    def get_commodities_news(self) -> List[Dict[str, Any]]: # Added return type hint
+    async def get_commodities_news(self) -> List[Dict[str, Any]]: # Added return type hint
         """Fetch commodities-related news (gold, oil, etc.)."""
         if not self.news_api_key: return []
         url = "https://newsapi.org/v2/everything"
@@ -217,14 +242,15 @@ class NewsBot(AgentBase):
             'sortBy': 'relevancy'
         }
         try:
-            response = requests.get(url, params=params)
-            response.raise_for_status()
-            return response.json().get('articles', [])
-        except requests.exceptions.RequestException as e:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(url, params=params, timeout=10.0)
+                response.raise_for_status()
+                return response.json().get('articles', [])
+        except (httpx.RequestError, httpx.HTTPStatusError) as e:
             print(f"Error fetching commodities news from NewsAPI: {e}")
             return []
 
-    def get_treasuries_news(self) -> List[Dict[str, Any]]: # Added return type hint
+    async def get_treasuries_news(self) -> List[Dict[str, Any]]: # Added return type hint
         """Fetch treasury bond-related news."""
         if not self.news_api_key: return []
         url = "https://newsapi.org/v2/everything"
@@ -235,14 +261,15 @@ class NewsBot(AgentBase):
             'sortBy': 'relevancy'
         }
         try:
-            response = requests.get(url, params=params)
-            response.raise_for_status()
-            return response.json().get('articles', [])
-        except requests.exceptions.RequestException as e:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(url, params=params, timeout=10.0)
+                response.raise_for_status()
+                return response.json().get('articles', [])
+        except (httpx.RequestError, httpx.HTTPStatusError) as e:
             print(f"Error fetching treasuries news from NewsAPI: {e}")
             return []
 
-    def get_forex_news(self) -> List[Dict[str, Any]]: # Added return type hint
+    async def get_forex_news(self) -> List[Dict[str, Any]]: # Added return type hint
         """Fetch foreign exchange news."""
         if not self.news_api_key: return []
         url = "https://newsapi.org/v2/everything"
@@ -253,32 +280,35 @@ class NewsBot(AgentBase):
             'sortBy': 'relevancy'
         }
         try:
-            response = requests.get(url, params=params)
-            response.raise_for_status()
-            return response.json().get('articles', [])
-        except requests.exceptions.RequestException as e:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(url, params=params, timeout=10.0)
+                response.raise_for_status()
+                return response.json().get('articles', [])
+        except (httpx.RequestError, httpx.HTTPStatusError) as e:
             print(f"Error fetching forex news from NewsAPI: {e}")
             return []
 
-    def get_custom_news(self, api_url: str) -> List[Dict[str, Any]]: # Added type hints
+    async def get_custom_news(self, api_url: str) -> List[Dict[str, Any]]: # Added type hints
         """Fetch custom news from user-provided sources."""
         try:
-            response = requests.get(api_url)
-            response.raise_for_status()
-            return response.json().get('articles', [])
-        except requests.exceptions.RequestException as e:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(api_url, timeout=10.0)
+                response.raise_for_status()
+                return response.json().get('articles', [])
+        except (httpx.RequestError, httpx.HTTPStatusError) as e:
             print(f"Error fetching custom news from {api_url}: {e}")
             return []
         except json.JSONDecodeError as e:
             print(f"Error decoding JSON from {api_url}: {e}")
             return []
 
-    def get_reuters_business_news_rss(self) -> List[Dict[str, Any]]:
+    async def get_reuters_business_news_rss(self) -> List[Dict[str, Any]]:
         """Fetches and parses Reuters Business News RSS feed."""
         feed_url = "http://feeds.reuters.com/reuters/businessNews"
         news_items: List[Dict[str, Any]] = []
         try:
-            feed = feedparser.parse(feed_url)
+            # feedparser.parse can take a URL, but it blocks. Run in thread.
+            feed = await asyncio.to_thread(feedparser.parse, feed_url)
             for entry in feed.entries:
                 # Ensure published_parsed is available and convert to ISO format
                 published_at = None
@@ -313,13 +343,22 @@ class NewsBot(AgentBase):
             list: Filtered list of news articles.
         """
         filtered_news: List[Dict[str, Any]] = [] # Added type hint
+
+        portfolio_symbols = []
+        if isinstance(self.portfolio, list):
+            portfolio_symbols = self.portfolio
+        elif isinstance(self.portfolio, dict):
+            for symbols in self.portfolio.values():
+                if isinstance(symbols, list):
+                    portfolio_symbols.extend(symbols)
+
         for article in news_articles:
             title = article.get('title', '')
             description = article.get('description', '')
             if not title and not description: # Skip if no content to check
                 continue
-            for symbol in self.portfolio:
-                if symbol.lower() in title.lower() or symbol.lower() in description.lower():
+            for symbol in portfolio_symbols:
+                if str(symbol).lower() in title.lower() or str(symbol).lower() in description.lower():
                     filtered_news.append(article)
                     break
         return filtered_news
@@ -330,7 +369,7 @@ class NewsBot(AgentBase):
         if not text.strip():
             return 0.0
 
-        if not self.finbert_tokenizer or not self.finbert_model:
+        if not self.finbert_tokenizer or not self.finbert_model or not TORCH_AVAILABLE:
             print("FinBERT model not available. Skipping sentiment analysis.")
             return 0.0 # Neutral score if model isn't loaded
 
@@ -469,7 +508,7 @@ class NewsBot(AgentBase):
         """
         print(f"NewsBot executing cycle at {datetime.now(timezone.utc).isoformat()}")
 
-        news_articles = self.aggregate_news()
+        news_articles = await self.aggregate_news()
         personalized_feed = self.personalize_feed(news_articles)
 
         self.send_alerts(personalized_feed)
@@ -575,7 +614,7 @@ class NewsBot(AgentBase):
                     # Ensure 'punkt' is downloaded for nltk.sent_tokenize
                     # This check is also in __init__, but good to have here if that failed silently.
                     nltk.data.find('tokenizers/punkt')
-                except nltk.downloader.DownloadError:
+                except LookupError:
                     print("NLTK 'punkt' not found. Cannot perform fallback summarization.")
                     return "Summarization fallback failed: NLTK 'punkt' missing."
 
@@ -792,7 +831,7 @@ class NewsBot(AgentBase):
                 original_topics = self.user_preferences.get('topics', [])
                 self.user_preferences['topics'] = [topic] # Temporarily override
 
-                news_articles = self.aggregate_news()
+                news_articles = await self.aggregate_news()
                 personalized_feed = self.personalize_feed(news_articles)
 
                 self.user_preferences['topics'] = original_topics # Restore

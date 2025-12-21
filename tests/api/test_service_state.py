@@ -1,7 +1,8 @@
 import pytest
 from fastapi.testclient import TestClient
 from unittest.mock import MagicMock, patch
-import torch
+import pytest
+torch = pytest.importorskip("torch")
 
 from src.adam.api.main import app, state_manager
 from src.adam.api.auth import get_current_user
