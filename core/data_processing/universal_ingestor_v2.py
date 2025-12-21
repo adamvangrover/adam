@@ -62,7 +62,7 @@ class UniversalIngestor:
         try:
             if ext == '.parquet':
                 raw_text = None
-                current_hash = hashlib.md5(filepath.encode()).hexdigest()
+                current_hash = hashlib.sha256(filepath.encode()).hexdigest()
             else:
                 with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                     raw_text = f.read()
