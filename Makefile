@@ -1,42 +1,25 @@
-.PHONY: install test lint security types check-all run clean docker-build docker-up setup-ops
+.PHONY: install check test lint format clean docker-build docker-up setup-dev
 
 install:
 	pip install -r requirements.txt
-	pip install -e .
+	pip install -r ops/requirements.txt
 
-setup-ops:
-	bash ops/setup.sh
-
-check-all: setup-ops
+check:
 	python ops/run_checks.py
 
 test:
-	python ops/checks/check_tests.py
+	pytest tests/
 
 lint:
-	python ops/checks/check_lint.py
+	flake8 core/ services/
+	mypy core/ services/
 
-security:
-	python ops/checks/check_security.py
-	python ops/security/audit_config.py
-
-types:
-	python ops/checks/check_types.py
-
-pulse:
-	python scripts/launch_system_pulse.py
-
-verify-pulse:
-	timeout 10s python scripts/launch_system_pulse.py || true
-
-test-frontend:
-	cd services/webapp/client && npm test -- --watchAll=false
-
-run:
-	python scripts/run_adam.py
+format:
+	autopep8 --in-place --recursive core/ services/ tests/
 
 clean:
-	rm -rf build/ dist/ *.egg-info
+	rm -rf build/ dist/ *.egg-info .pytest_cache .mypy_cache
+	rm -f check_results.txt tests_output.txt
 	find . -name "*.pyc" -delete
 	find . -name "__pycache__" -delete
 
@@ -49,4 +32,5 @@ docker-up:
 setup-dev:
 	pip install -r requirements.txt
 	pip install -e .
+	bash ops/setup.sh
 	pre-commit install
