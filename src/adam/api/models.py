@@ -1,5 +1,7 @@
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List, Optional, Union
+from typing import List, Optional
+
+from pydantic import BaseModel, ConfigDict, Field
+
 
 class OptimizerConfig(BaseModel):
     algorithm: str = Field(..., description="Optimizer name (adamw, lion, adam-mini)")

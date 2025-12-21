@@ -8,15 +8,13 @@ except ImportError:
         def tool(self): return lambda f: f
         def run(self): print("MCP Server Mock Run")
 
-import sys
 import os
-import asyncio
-from typing import List
+import sys
 
 # Ensure core is importable
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../..")))
 
-from core.vertical_risk_agent.tools.agent_tools import AgentTools, FinancialRatio
+from core.vertical_risk_agent.tools.agent_tools import AgentTools
 
 # Initialize Tools
 agent_tools = AgentTools()

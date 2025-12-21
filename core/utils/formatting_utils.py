@@ -2,6 +2,7 @@
 
 from flask import jsonify
 
+
 def format_data(data, format="json"):
   """
   Formats data into the specified format (default: JSON).

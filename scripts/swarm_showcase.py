@@ -1,7 +1,7 @@
-import os
-import sys
-import json
 import argparse
+import json
+import os
+
 
 class ShowcaseGenerator:
     def __init__(self):
@@ -37,10 +37,10 @@ class ShowcaseGenerator:
         main_content = ""
         readme_path = os.path.join(directory, "README.md")
         if os.path.exists(readme_path):
-            main_content += f'<div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">'
-            main_content += f'<h3 style="margin-top:0;">📜 README.md Detected</h3>'
-            main_content += f'<p>Documentation available. <button class="cyber-btn" onclick="alert(\'Markdown rendering simulated\')">VIEW DOCS</button></p>'
-            main_content += f'</div>'
+            main_content += '<div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 4px; margin-bottom: 1rem;">'
+            main_content += '<h3 style="margin-top:0;">📜 README.md Detected</h3>'
+            main_content += '<p>Documentation available. <button class="cyber-btn" onclick="alert(\'Markdown rendering simulated\')">VIEW DOCS</button></p>'
+            main_content += '</div>'
 
         # Generic File Table
         main_content += '<table class="cyber-table"><thead><tr><th>Type</th><th>Name</th><th>Size</th></tr></thead><tbody>'

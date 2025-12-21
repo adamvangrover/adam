@@ -12,12 +12,11 @@ Agent Notes:
 """
 
 import logging
-from typing import List, Dict, Optional, Any, Union
-from pydantic import BaseModel, Field, ValidationError
-import numpy as np
+from typing import Any, Dict, List
+
+from pydantic import BaseModel
 
 # Absolute imports as per standard
-from core.utils.logging_utils import get_logger # Assuming existence, falling back to standard if needed
 
 # Configure Logging
 logger = logging.getLogger("Adam_Integrity_Monitor")

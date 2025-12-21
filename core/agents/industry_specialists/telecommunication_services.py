@@ -1,7 +1,7 @@
 # core/agents/industry_specialists/telecommunication_services.py
 
-import pandas as pd
 from textblob import TextBlob
+
 
 class TelecommunicationServicesSpecialist:
     def __init__(self, config):

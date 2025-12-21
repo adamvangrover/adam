@@ -1,7 +1,10 @@
 from __future__ import annotations
+
 import re
+
 from core.prompting.base_prompt_plugin import BasePromptPlugin
 from core.schemas.financial_truth import FinancialTruthInput, FinancialTruthOutput
+
 
 class FinancialTruthPlugin(BasePromptPlugin[FinancialTruthOutput]):
     """

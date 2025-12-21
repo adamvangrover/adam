@@ -2,7 +2,9 @@
 
 import unittest
 from unittest.mock import patch
+
 from core.data_sources.data_sources import DataSources
+
 
 class TestDataSources(unittest.TestCase):
     def setUp(self):

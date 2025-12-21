@@ -1,14 +1,15 @@
-import json
-import sys
-import os
 import asyncio
+import json
+import os
+import sys
 
 # Add repo root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.v22_quantum_pipeline.quantum_source import QuantumMarketGenerator
-from core.v22_quantum_pipeline.data_expander import expand_data
 from core.v22_quantum_pipeline.async_loader import main as async_loader_main
+from core.v22_quantum_pipeline.data_expander import expand_data
+from core.v22_quantum_pipeline.quantum_source import QuantumMarketGenerator
+
 
 def run_pipeline():
     print("--- Starting Adam v22.0 Quantum-Enhanced Pipeline ---")

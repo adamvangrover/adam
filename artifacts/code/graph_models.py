@@ -1,7 +1,9 @@
 from __future__ import annotations
+
+from typing import Any, Dict, List
+
 from pydantic import BaseModel, Field, validator
-from typing import List, Optional, Dict, Any
-from datetime import date
+
 
 class DebtInstrument(BaseModel):
     name: str = Field(..., description="Official name of the facility, e.g., 'Term Loan B'")

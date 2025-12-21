@@ -1,11 +1,8 @@
 # core/agents/prediction_market_agent.py
 
 import json
-import numpy as np
-import pandas as pd
-from sklearn.linear_model import LinearRegression
+
 from web3 import Web3
-import statsmodels.api as sm
 
 # Placeholder for external libraries (replace with actual imports)
 # from defi_api import DeFiAPI

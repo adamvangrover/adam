@@ -1,8 +1,5 @@
 # scripts/report_generation.py
 
-import pandas as pd
-from fpdf import FPDF
-import matplotlib.pyplot as plt
 
 def generate_portfolio_performance_report(portfolio_data):
     """

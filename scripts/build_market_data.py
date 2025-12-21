@@ -1,13 +1,12 @@
 import argparse
 import sys
-import logging
 from pathlib import Path
 
 # Add project root to path
 sys.path.append(str(Path(__file__).parent.parent))
 
-from core.utils.logging_utils import setup_logging, get_logger
-from core.financial_data import MarketDiscoveryAgent, DataLakehouse
+from core.financial_data import DataLakehouse, MarketDiscoveryAgent
+from core.utils.logging_utils import get_logger, setup_logging
 
 logger = get_logger("market_data_builder")
 

@@ -1,16 +1,15 @@
 # core/procedures/autonomous_update.py
 
-import logging
 import json
+import logging
 import os
-import asyncio
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 # Leveraging existing robust components
 from core.agents.sub_agents.data_ingestion_agent import DataIngestionAgent
+
 # Assuming DataFetcher path based on context, though mostly managed by the agent now
-from core.data_sources.data_fetcher import DataFetcher
 
 logger = logging.getLogger("adam.core.procedures.autonomous_update")
 

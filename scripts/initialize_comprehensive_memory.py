@@ -5,8 +5,8 @@ import sys
 # Ensure repo root is in path
 sys.path.append(os.getcwd())
 
-from core.system.memory_consolidator import MemoryConsolidator
 from core.learning.fine_tuning_driver import FineTuningDriver
+from core.system.memory_consolidator import MemoryConsolidator
 
 logging.basicConfig(level=logging.INFO)
 

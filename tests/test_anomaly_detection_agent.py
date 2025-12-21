@@ -1,15 +1,15 @@
-import unittest
-import pandas as pd
-import numpy as np
-import sys
 import os
+import sys
+import unittest
 from unittest.mock import MagicMock, patch
+
+import pandas as pd
 
 # Ensure core can be imported
 sys.path.append(os.getcwd())
 
 from core.agents.anomaly_detection_agent import AnomalyDetectionAgent
-from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
+
 
 class TestAnomalyDetectionAgent(unittest.TestCase):
     def setUp(self):

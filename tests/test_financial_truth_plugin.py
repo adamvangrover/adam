@@ -1,9 +1,11 @@
 from __future__ import annotations
-import os
+
 import unittest
-from core.prompting.plugins.financial_truth_plugin import FinancialTruthPlugin
+
 from core.prompting.base_prompt_plugin import PromptMetadata
 from core.prompting.loader import PromptLoader
+from core.prompting.plugins.financial_truth_plugin import FinancialTruthPlugin
+
 
 class TestFinancialTruthPlugin(unittest.TestCase):
     def setUp(self):

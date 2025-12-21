@@ -1,7 +1,7 @@
 # core/agents/industry_specialists/financials.py
 
-import pandas as pd
 from textblob import TextBlob
+
 
 class FinancialsSpecialist:
     def __init__(self, config):

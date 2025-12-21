@@ -1,13 +1,15 @@
-import unittest
 import time
+import unittest
 from unittest.mock import MagicMock, Mock
+
+from core.agents.orchestrators.credit_risk_orchestrator import CreditRiskOrchestrator
+from core.agents.orchestrators.parallel_orchestrator import ParallelOrchestrator
+from core.agents.orchestrators.task import Task
+from core.agents.orchestrators.workflow import Workflow
 
 # Import the classes to be tested
 from core.agents.orchestrators.workflow_manager import WorkflowManager
-from core.agents.orchestrators.workflow import Workflow
-from core.agents.orchestrators.task import Task
-from core.agents.orchestrators.parallel_orchestrator import ParallelOrchestrator
-from core.agents.orchestrators.credit_risk_orchestrator import CreditRiskOrchestrator
+
 
 class TestWorkflowSystem(unittest.TestCase):
 

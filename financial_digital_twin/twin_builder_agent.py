@@ -1,5 +1,7 @@
 import json
+
 from .agent_base import AgentBase
+
 
 class TwinBuilderAgent(AgentBase):
     """

@@ -1,8 +1,8 @@
 # scripts/setup_agent.py
 
-import os
 import platform
 import subprocess
+
 
 class SetupAgent:
     def __init__(self):

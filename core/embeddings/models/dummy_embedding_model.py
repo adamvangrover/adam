@@ -1,6 +1,8 @@
 import logging
 from typing import List
+
 from core.embeddings.base_embedding_model import BaseEmbeddingModel
+
 
 class DummyEmbeddingModel(BaseEmbeddingModel):
     """

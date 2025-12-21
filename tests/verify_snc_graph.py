@@ -1,8 +1,9 @@
 # tests/verify_snc_graph.py
 
+
 from core.engine.snc_graph import snc_graph_app
 from core.engine.states import init_snc_state
-import json
+
 
 def test_snc_graph():
     print("Running SNC Graph Verification...")

@@ -1,11 +1,12 @@
-from typing import Any, Dict, Optional
 import asyncio
 import logging
+from typing import Any, Dict, Optional
+
 from core.agents.agent_base import AgentBase
-from core.hnasp.state_manager import HNASPStateManager
 from core.hnasp.lakehouse import ObservationLakehouse
 from core.hnasp.logic_engine import LogicEngine
 from core.hnasp.personality import BayesACTEngine
+from core.hnasp.state_manager import HNASPStateManager
 
 logger = logging.getLogger(__name__)
 

@@ -1,8 +1,8 @@
 #core/utils/agent_utils.py
 
-import pika
 import json
-from core.utils.data_utils import send_message, receive_messages
+
+from core.utils.data_utils import send_message
 
 # RabbitMQ connection parameters (same as in data_utils.py)
 RABBITMQ_HOST = 'localhost'

@@ -1,6 +1,5 @@
 # core/system/error_handler.py
 
-from core.utils.config_utils import load_error_codes # Import the function
 
 class AdamError(Exception):
     """
@@ -98,7 +97,7 @@ class LLMPluginError(AdamError):
      """
      def __init__(self, message: str = "Workflow execution error"):
         code = 108
-        message = f"Error in LLM Plugin"
+        message = "Error in LLM Plugin"
         message += f": {message}"
         super().__init__(code, message)
 

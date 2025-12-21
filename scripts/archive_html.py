@@ -1,7 +1,6 @@
+import json
 import os
 import shutil
-import json
-from pathlib import Path
 from datetime import datetime
 
 # Configuration
@@ -65,7 +64,7 @@ def scan_and_copy_html_files():
     with open(manifest_path, 'w') as f:
         json.dump(manifest, f, indent=4)
     
-    print(f"--- Archive Complete ---")
+    print("--- Archive Complete ---")
     print(f"Total files archived: {len(manifest['files'])}")
     print(f"Manifest written to: {manifest_path}")
 

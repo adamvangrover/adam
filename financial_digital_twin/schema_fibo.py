@@ -10,8 +10,8 @@ The classes are designed to be used as code-based references for data ingestion,
 query generation, and validation against the FIBO standard.
 """
 
-from dataclasses import dataclass, field
-from typing import List, Optional
+from dataclasses import dataclass
+from typing import Optional
 
 # --- Core Nodes (Entities) - FIBO Aligned ---
 # The class names and attributes are chosen to reflect their FIBO counterparts.

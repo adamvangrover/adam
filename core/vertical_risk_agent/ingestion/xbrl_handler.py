@@ -1,7 +1,7 @@
-from typing import Dict, Any, Optional
 import logging
-import xml.etree.ElementTree as ET
 import re
+import xml.etree.ElementTree as ET
+from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)
 

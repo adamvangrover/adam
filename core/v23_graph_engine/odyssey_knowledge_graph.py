@@ -1,8 +1,10 @@
-import logging
 import json
+import logging
 import os
+from typing import Any, Dict, List
+
 import networkx as nx
-from typing import Dict, Any, List
+
 try:
     import jsonschema
 except ImportError:

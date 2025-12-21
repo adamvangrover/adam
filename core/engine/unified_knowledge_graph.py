@@ -17,11 +17,12 @@ Key Components:
   FIBO and PROV-O simultaneously, creating a fully verifiable reasoning chain.
 """
 
-import networkx as nx
-import logging
 import json
+import logging
 import os
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List, Optional
+
+import networkx as nx
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

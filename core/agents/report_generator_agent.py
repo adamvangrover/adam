@@ -3,8 +3,10 @@
 import logging
 from typing import Any, Dict, Optional
 
-from core.agents.agent_base import AgentBase
 from semantic_kernel import Kernel
+
+from core.agents.agent_base import AgentBase
+
 
 class ReportGeneratorAgent(AgentBase):
     """

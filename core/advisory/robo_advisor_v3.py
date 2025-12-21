@@ -5,7 +5,8 @@ Architecture: Constraints-Based Advisory System
 Objective: Map client profiles to "Gold Standard" portfolio variants.
 """
 
-from typing import Dict, Any, Union, List
+from typing import Any, Dict, List
+
 
 class IntakeForm:
     """

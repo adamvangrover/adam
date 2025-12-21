@@ -14,10 +14,11 @@ Architect Notes:
     required by fiduciary standards.
 """
 
-from dataclasses import dataclass
-from typing import List, Dict, Tuple, Any, Optional
-from enum import Enum
 import json
+from dataclasses import dataclass
+from enum import Enum
+from typing import Any, Dict, Optional
+
 
 class RiskBand(Enum):
     CONSERVATIVE = "CONSERVATIVE"

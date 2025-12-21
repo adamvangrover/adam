@@ -1,7 +1,8 @@
+import json
 import os
 import shutil
-import json
 from pathlib import Path
+
 
 def archive_ui_artifacts():
     repo_root = Path(".")

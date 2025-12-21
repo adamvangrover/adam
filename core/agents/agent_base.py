@@ -1,14 +1,23 @@
-from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional
-import logging
-import json
 import asyncio
+import json
+import logging
 import uuid
-import warnings
+from abc import ABC, abstractmethod
 from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 # HNASP Imports
-from core.schemas.hnasp import HNASPState, Meta, PersonaState, LogicLayer, ContextStream, PersonaDynamics, SecurityContext, PersonaIdentities, Identity, EPAVector
+from core.schemas.hnasp import (
+    ContextStream,
+    EPAVector,
+    HNASPState,
+    Identity,
+    LogicLayer,
+    Meta,
+    PersonaIdentities,
+    PersonaState,
+    SecurityContext,
+)
 
 # JsonLogic
 try:
@@ -38,10 +47,12 @@ class AgentBase(ABC):
     """
 
     def __init__(self, config: Dict[str, Any], constitution: Optional[Dict[str, Any]] = None, kernel: Optional[Kernel] = None):
-        """
-        Initializes the AgentBase. Subclasses should call super().__init__(config, kernel)
-        to ensure proper initialization. The config dictionary provides agent-specific
-        configuration parameters, and kernel is an optional Semantic Kernel instance.
+        """Initializes the AgentBase.
+
+        Args:
+            config (Dict[str, Any]): Configuration parameters for the agent.
+            constitution (Optional[Dict[str, Any]]): The agent's guiding constitution.
+            kernel (Optional[Kernel]): The Semantic Kernel instance for skill execution.
         """
         self.config = config
         self.constitution = constitution
@@ -147,7 +158,7 @@ class AgentBase(ABC):
             if not active_rules:
                 return
 
-            from core.schemas.hnasp import ExecutionTrace # Import locally to avoid circulars if any
+            from core.schemas.hnasp import ExecutionTrace  # Import locally to avoid circulars if any
 
             results: List[ExecutionTrace] = []
             for rule_id, rule in active_rules.items():
@@ -170,22 +181,9 @@ class AgentBase(ABC):
                     ))
 
             if logic_layer.execution_trace is None:
-                # Initialize logic_layer.execution_trace if None, but ExecutionTrace is a single object in schema?
-                # Schema says: execution_trace: Optional[ExecutionTrace] = None
-                # ExecutionTrace has step_by_step: List[Dict]
-                # Wait, logic in read_file output said: logic_layer.execution_trace.extend(results)
-                # This implies execution_trace is a list.
-                # In schema: class LogicLayer... execution_trace: Optional[ExecutionTrace]
-                # ExecutionTrace class has result: Any, step_by_step: List...
-                # So logic_layer.execution_trace.extend is WRONG if execution_trace is None or not a list.
-                # I will fix this logic.
-                pass
+                logic_layer.execution_trace = []
 
-            # Fix for execution_trace schema mismatch
-            # We will ignore storing trace in the pydantic model for now to avoid crashes if schema is rigid
-            # Or assume we want to store it in a list field if schema allowed.
-            # Given schema: execution_trace is ExecutionTrace object.
-            # I will skip saving to execution_trace to avoid crash.
+            logic_layer.execution_trace.extend(results)
 
         except Exception as e:
             logging.error(f"Critical error in evaluate_logic_layer: {e}")

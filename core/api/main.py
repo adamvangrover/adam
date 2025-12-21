@@ -1,6 +1,9 @@
-from fastapi import FastAPI
-from core.api.routers import agents
 from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+
+from core.api.routers import agents
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

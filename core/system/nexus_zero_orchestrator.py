@@ -1,10 +1,9 @@
 import logging
-import asyncio
-from typing import Dict, Any, List
+from typing import Any, Dict
 
-from core.agents.specialized.sentinel_agent import SentinelAgent
-from core.agents.specialized.credit_sentry_agent import CreditSentryAgent
 from core.agents.meta_agents.odyssey_meta_agent import OdysseyMetaAgent
+from core.agents.specialized.credit_sentry_agent import CreditSentryAgent
+from core.agents.specialized.sentinel_agent import SentinelAgent
 from core.v23_graph_engine.odyssey_knowledge_graph import OdysseyKnowledgeGraph
 
 logger = logging.getLogger(__name__)

@@ -1,7 +1,6 @@
 # src/credit_risk.py
-import pandas as pd
-import numpy as np
 from .config import RATING_MAP
+
 
 class CreditSponsorModel:
     def __init__(self, enterprise_value, total_debt, ebitda, interest_expense):

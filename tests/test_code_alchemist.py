@@ -1,14 +1,14 @@
-import sys
 import os
+import sys
 import unittest
-from unittest.mock import MagicMock, patch, AsyncMock
-import json
+from unittest.mock import AsyncMock, patch
 
 # Add project root to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Import module under test to ensure it's loaded before patching
 from core.agents.code_alchemist import CodeAlchemist
+
 
 class TestCodeAlchemist(unittest.IsolatedAsyncioTestCase):
     def setUp(self):

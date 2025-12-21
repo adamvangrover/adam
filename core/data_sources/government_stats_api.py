@@ -1,9 +1,11 @@
 # core/data_sources/government_stats_api.py
 
+import logging  # Added import
+
 import requests
-import pandas as pd
-import logging # Added import
-from core.utils.secrets_utils import get_api_key # Added import
+
+from core.utils.secrets_utils import get_api_key  # Added import
+
 
 class GovernmentStatsAPI:
     def __init__(self, config):

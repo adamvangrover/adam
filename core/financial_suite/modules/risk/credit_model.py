@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.stats import norm
+
 from core.financial_suite.schemas.workstream_context import WorkstreamContext
+
 
 class CreditEngine:
     @staticmethod

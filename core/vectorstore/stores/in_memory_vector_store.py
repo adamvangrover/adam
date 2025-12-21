@@ -1,8 +1,10 @@
 import logging
 from typing import List, Tuple
+
 import numpy as np
 
 from core.vectorstore.base_vector_store import BaseVectorStore
+
 
 class InMemoryVectorStore(BaseVectorStore):
     """

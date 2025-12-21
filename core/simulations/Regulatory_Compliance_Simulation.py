@@ -1,10 +1,13 @@
 # core/simulations/Regulatory_Compliance_Simulation.py
 
 import json
+
 from utils.api_communication import APICommunication
-from core.agents.snc_analyst_agent import SNCAnalystAgent
-from core.agents.regulatory_compliance_agent import RegulatoryComplianceAgent
+
 from core.agents.legal_agent import LegalAgent
+from core.agents.regulatory_compliance_agent import RegulatoryComplianceAgent
+from core.agents.snc_analyst_agent import SNCAnalystAgent
+
 
 class RegulatoryComplianceSimulation:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):

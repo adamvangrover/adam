@@ -1,6 +1,7 @@
 # core/agents/skills/counterfactual_reasoning_skill.py
 
-from semantic_kernel.skill_definition import sk_function, sk_description
+from semantic_kernel.skill_definition import sk_function
+
 from core.analysis.counterfactual_engine import CounterfactualEngine
 
 # Developer Note: This skill provides an interface to the counterfactual

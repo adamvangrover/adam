@@ -1,9 +1,9 @@
 # core/agents/result_aggregation_agent.py
 
 import logging
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict
+
 from core.agents.agent_base import AgentBase
-from core.utils.config_utils import load_config
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

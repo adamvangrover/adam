@@ -1,8 +1,9 @@
 import ast
-import os
-import networkx as nx
 import logging
-from typing import Dict, Any, List
+import os
+from typing import Any, Dict
+
+import networkx as nx
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +50,7 @@ class RepoGraphBuilder:
                 elif isinstance(node, ast.FunctionDef):
                     self._process_function(node, rel_path)
 
-        except Exception as e:
+        except Exception:
             # logger.warning(f"Failed to process {file_path}: {e}")
             pass
 

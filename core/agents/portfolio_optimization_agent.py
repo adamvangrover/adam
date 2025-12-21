@@ -1,14 +1,17 @@
 # core/agents/portfolio_optimization_agent.py
 
+from typing import Any, Dict
+
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from typing import List, Dict, Any
-from .agent_base import AgentBase
 from utils.data_validation import validate_portfolio_data
 from utils.visualization_tools import generate_portfolio_visualization
+
+from .agent_base import AgentBase
+
 
 class LSTMModel(nn.Module):
     def __init__(self):

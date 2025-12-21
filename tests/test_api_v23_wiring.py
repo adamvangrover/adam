@@ -1,8 +1,8 @@
-import sys
-import os
-import unittest
-from unittest.mock import MagicMock, patch, AsyncMock
 import json
+import os
+import sys
+import unittest
+from unittest.mock import AsyncMock, MagicMock, patch
 
 # Add root to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -43,8 +43,8 @@ class TestAdaptiveAPIReal(unittest.TestCase):
 
                 # Import api inside the patch context
                 try:
-                    from services.webapp.api import create_app
                     import services.webapp.api as api_module
+                    from services.webapp.api import create_app
                 except ImportError as e:
                     self.fail(f"Import failed: {e}")
 

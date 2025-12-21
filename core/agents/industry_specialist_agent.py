@@ -1,7 +1,9 @@
 # core/agents/industry_specialist_agent.py
 
 import importlib
+
 from core.utils.data_utils import send_message
+
 
 class IndustrySpecialistAgent:
     def __init__(self, config):

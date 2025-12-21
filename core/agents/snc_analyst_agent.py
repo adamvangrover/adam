@@ -1,6 +1,7 @@
 # core/agents/snc_analyst_agent.py
-import sys
 import os
+import sys
+
 # Add the project root to sys.path to allow imports like 'from core...'
 # when running this script directly for its __main__ block.
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -8,16 +9,17 @@ PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..')) # core/agen
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-import logging
-import json 
-import os # For os.path.exists and os.remove
 import asyncio
+import json
+import logging
+import os  # For os.path.exists and os.remove
 from enum import Enum
-from typing import Dict, Any, Optional, Tuple
-from unittest.mock import patch 
+from typing import Any, Dict, Optional, Tuple
+from unittest.mock import patch
+
+from semantic_kernel import Kernel
 
 from core.agents.agent_base import AgentBase
-from semantic_kernel import Kernel 
 
 # Note: Initial basicConfig is removed as it will be handled in __main__
 

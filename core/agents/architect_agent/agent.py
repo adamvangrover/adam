@@ -1,5 +1,7 @@
 import os
+
 from openai import OpenAI
+
 
 class ArchitectAgent:
     """

@@ -1,5 +1,5 @@
-from core.schemas.v23_5_schema import HyperDimensionalKnowledgeGraph, V23KnowledgeGraph
-import json
+from core.schemas.v23_5_schema import HyperDimensionalKnowledgeGraph
+
 
 def test_schema_validity():
     # Basic instantiation test

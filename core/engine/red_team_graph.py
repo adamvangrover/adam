@@ -1,9 +1,10 @@
 
 import logging
 import random
-from typing import Dict, Any, Literal
+from typing import Any, Dict, Literal
 
-from langgraph.graph import StateGraph, END
+from langgraph.graph import END, StateGraph
+
 from core.engine.states import RedTeamState
 
 logger = logging.getLogger(__name__)

@@ -1,6 +1,7 @@
-import unittest
-import sys
 import os
+import sys
+import unittest
+
 import pandas as pd
 
 # Add root to sys.path to import src
@@ -8,7 +9,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.core_valuation import ValuationEngine
 from src.credit_risk import CreditSponsorModel
-from src.config import DEFAULT_ASSUMPTIONS
+
 
 class TestFinancialPlatform(unittest.TestCase):
     def test_valuation_engine(self):

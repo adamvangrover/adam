@@ -1,6 +1,8 @@
 # core/system/v23_graph_engine/cyclical_graph_poc.py
-from typing import TypedDict, List
-from langgraph.graph import StateGraph, END
+from typing import TypedDict
+
+from langgraph.graph import END, StateGraph
+
 
 class GraphState(TypedDict):
     """

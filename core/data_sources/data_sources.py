@@ -1,10 +1,11 @@
 # core/data_sources/data_sources.py
 
-import requests
-from textblob import TextBlob
+import logging  # Added import
+
 import tweepy
-import logging # Added import
-from core.utils.secrets_utils import get_api_key # Added import
+
+from core.utils.secrets_utils import get_api_key  # Added import
+
 #... (import other necessary libraries)
 
 class DataSources:

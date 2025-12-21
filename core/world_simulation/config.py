@@ -1,8 +1,10 @@
 # core/world_simulation/config.py
 
-import yaml
 from dataclasses import dataclass, field
-from typing import List, Dict
+from typing import List
+
+import yaml
+
 
 @dataclass
 class LLMConfig:

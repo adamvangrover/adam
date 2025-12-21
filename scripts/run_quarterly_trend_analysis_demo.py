@@ -1,5 +1,6 @@
 import asyncio
 import logging
+
 from core.agents.specialized.institutional_trend_agent import InstitutionalTrendAgent
 
 # Configure logging

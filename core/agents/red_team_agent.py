@@ -1,12 +1,13 @@
 from __future__ import annotations
-from typing import Any, Dict, List, Optional, Literal
+
 import logging
 import random
-import asyncio
+from typing import Any, Dict, Literal
+
+from langgraph.graph import END, StateGraph
 
 from core.agents.agent_base import AgentBase
-from langgraph.graph import StateGraph, END
-from core.engine.states import RedTeamState, GraphState
+from core.engine.states import RedTeamState
 
 logger = logging.getLogger(__name__)
 

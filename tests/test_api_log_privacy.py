@@ -1,9 +1,9 @@
-import sys
-import os
-import unittest
-import logging
 import json
-from unittest.mock import MagicMock, patch
+import logging
+import os
+import sys
+import unittest
+from unittest.mock import MagicMock
 
 # Adjust path to find core
 sys.path.append(os.path.abspath(os.getcwd()))
@@ -32,6 +32,7 @@ sys.modules['core.schemas.v23_5_schema'] = MagicMock()
 
 # Import app. setup_log_capture exists but does nothing now.
 from core.api.server import app, setup_log_capture
+
 
 class TestLogLeak(unittest.TestCase):
     def setUp(self):

@@ -3,12 +3,11 @@
 try:
     from langchain.prompts import PromptTemplate
 except ImportError:
-    from langchain_core.prompts import PromptTemplate
-from core.utils.data_utils import send_message, receive_messages
-from typing import List, Dict
-import re
+    pass
+import json  #knowledge base
 import logging
-import json #knowledge base
+import re
+from typing import Dict, List
 
 try:
     from textblob import TextBlob

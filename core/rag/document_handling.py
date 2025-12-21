@@ -1,6 +1,7 @@
 import logging
 from typing import List, Optional
 
+
 class Document:
     """
     Represents a document to be processed and ingested into the RAG system.
@@ -96,13 +97,13 @@ if __name__ == "__main__":
     for i, chunk in enumerate(chunks_large_overlap):
         print(f"Chunk {i+1} (len {len(chunk)}): '{chunk}'")
 
-    print(f"\n--- Edge Case: Chunk size equals overlap (should be prevented by checks) ---")
+    print("\n--- Edge Case: Chunk size equals overlap (should be prevented by checks) ---")
     try:
         chunk_text(sample_text_long, 50, 50)
     except ValueError as e:
         print(f"Caught expected error: {e}")
 
-    print(f"\n--- Edge Case: Empty Text ---")
+    print("\n--- Edge Case: Empty Text ---")
     chunks_empty = chunk_text("", chunk_size, chunk_overlap)
     print(f"Chunks from empty: {chunks_empty}")
 

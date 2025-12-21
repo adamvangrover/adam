@@ -1,7 +1,9 @@
 import logging
 import logging.config
 import os
+
 import yaml
+
 
 def setup_logging(config=None, default_path='config/logging.yaml', default_level=logging.INFO, env_key='LOG_CFG'):
     """

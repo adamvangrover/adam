@@ -1,8 +1,10 @@
 # core/world_simulation/data_manager.py
 
 import json
+from typing import Dict, List
+
 import pandas as pd
-from typing import List, Dict
+
 
 class DataManager:
     def __init__(self, output_dir: str = "data/world_simulation"):

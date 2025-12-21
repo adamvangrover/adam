@@ -1,7 +1,7 @@
 # core/agents/industry_specialists/healthcare.py
 
-import pandas as pd
 from textblob import TextBlob
+
 
 class HealthcareSpecialist:
     def __init__(self, config):

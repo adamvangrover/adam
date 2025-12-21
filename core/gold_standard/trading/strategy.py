@@ -2,8 +2,9 @@
 Mean Reversion Strategy for Intra-Day Trading.
 """
 
-import pandas as pd
 import numpy as np
+import pandas as pd
+
 
 class MeanReversionStrategy:
     def __init__(self, window: int = 20, z_threshold: float = 2.0):

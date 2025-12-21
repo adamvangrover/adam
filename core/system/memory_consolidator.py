@@ -1,9 +1,10 @@
+import logging
+
+import networkx as nx
+
+from core.system.memory_manager import VectorMemoryManager
 from core.system.repo_graph import RepoGraphBuilder
 from core.v23_graph_engine.unified_knowledge_graph import UnifiedKnowledgeGraph
-from core.system.memory_manager import VectorMemoryManager
-import logging
-import json
-import networkx as nx
 
 logger = logging.getLogger(__name__)
 
@@ -51,8 +52,8 @@ class MemoryConsolidator:
             ntype = node.get('type', 'Unknown')
             node_types[ntype] = node_types.get(ntype, 0) + 1
 
-        manifest = f"# System Manifest\n\n"
-        manifest += f"## Knowledge Graph Stats\n"
+        manifest = "# System Manifest\n\n"
+        manifest += "## Knowledge Graph Stats\n"
         manifest += f"- Total Nodes: {len(graph_data['nodes'])}\n"
         edges = graph_data.get('links', graph_data.get('edges', []))
         manifest += f"- Total Edges: {len(edges)}\n"

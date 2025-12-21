@@ -1,7 +1,7 @@
-import sys
-import os
 import asyncio
 import logging
+import os
+import sys
 
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -11,6 +11,7 @@ logging.basicConfig(level=logging.INFO)
 
 from core.engine.deep_dive_graph import deep_dive_app
 from core.engine.states import init_omniscient_state
+
 
 async def main():
     print("Starting Deep Dive Graph Verification...")

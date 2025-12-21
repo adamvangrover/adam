@@ -1,5 +1,7 @@
+from typing import Tuple
+
 import torch
-from typing import Optional, Tuple
+
 
 class KVCache:
     """

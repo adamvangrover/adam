@@ -15,14 +15,13 @@ Run this module directly to simulate the trading loop.
 """
 
 import asyncio
+import collections
+import math
 import random
 import time
-import math
-import collections
 from dataclasses import dataclass
-from typing import List, Dict, Deque
 from enum import Enum
-import functools
+from typing import Deque, Dict, List
 
 # Try to import uvloop for performance
 try:

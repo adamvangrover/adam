@@ -16,10 +16,11 @@ Portfolio Variants:
 - **Standard Dragon**: Balanced 5-Pillar Approach.
 """
 
-from dataclasses import dataclass
-from typing import List, Dict, Optional, Tuple
-from enum import Enum
 import json
+from dataclasses import dataclass
+from enum import Enum
+from typing import Dict, Tuple
+
 
 class PortfolioVariant(Enum):
     DEFENSIVE_DRAGON = "Defensive Dragon"

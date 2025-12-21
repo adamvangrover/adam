@@ -1,7 +1,8 @@
 # core/data_access/base_data_source.py
 
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
+
 
 class BaseDataSource(ABC):
     """

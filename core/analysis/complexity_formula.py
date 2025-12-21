@@ -3,9 +3,9 @@ Equation of the Infinite: A Unified Field Theory of Complexity
 Implements the mathematical framework for calculating Systemic Complexity (C_omega).
 """
 
-import math
 from dataclasses import dataclass
-from typing import List, Dict, Union
+from typing import Dict, List
+
 
 @dataclass
 class ComplexityComponents:

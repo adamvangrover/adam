@@ -1,7 +1,9 @@
-from typing import List, Dict, Any
-from core.financial_suite.schemas.workstream_context import WorkstreamContext
+from typing import Any, Dict
+
 from core.financial_suite.engines.dcf import DCFEngine
 from core.financial_suite.modules.risk.credit_model import CreditEngine
+from core.financial_suite.schemas.workstream_context import WorkstreamContext
+
 
 class ReportGenerator:
     @staticmethod
@@ -124,21 +126,21 @@ class ReportGenerator:
         # Actually desc is not easily retrievable from id without the map.
         # I'll just use the ID.
 
-        report = f"# ADAM Financial Workstream Report\n\n"
-        report += f"## Executive Summary\n"
+        report = "# ADAM Financial Workstream Report\n\n"
+        report += "## Executive Summary\n"
         report += f"- **Enterprise Value:** ${ev:,.2f}\n"
         report += f"- **Equity Value:** ${equity_val:,.2f}\n"
         report += f"- **Regulatory Rating:** {rating}\n"
         report += f"- **WACC:** {solver_result['metrics']['wacc']*100:.2f}%\n"
         report += f"- **PD:** {solver_result['metrics']['pd']*100:.2f}%\n\n"
 
-        report += f"## Sensitivity Analysis\n"
-        report += f"### 1. Expected PD Matrix (Operating Drift)\n"
+        report += "## Sensitivity Analysis\n"
+        report += "### 1. Expected PD Matrix (Operating Drift)\n"
         report += ReportGenerator.generate_expected_pd_matrix(ctx)
-        report += f"\n"
+        report += "\n"
 
-        report += f"### 2. Downside PD Sensitivity (Credit Challenge)\n"
+        report += "### 2. Downside PD Sensitivity (Credit Challenge)\n"
         report += ReportGenerator.generate_downside_pd_table(ctx)
-        report += f"\n"
+        report += "\n"
 
         return report

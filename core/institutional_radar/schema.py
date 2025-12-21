@@ -1,8 +1,11 @@
 from __future__ import annotations
+
 from datetime import date
-from typing import Optional, Literal
+from typing import Literal, Optional
 from uuid import UUID
+
 from pydantic import BaseModel, ConfigDict, Field
+
 
 class FundMaster(BaseModel):
     cik: str = Field(..., max_length=10, description="The unique Central Index Key")

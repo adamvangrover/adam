@@ -1,11 +1,11 @@
 # core/analysis/forecasting/hybrid_model.py
 
 import pandas as pd
-import numpy as np
-from statsmodels.tsa.arima.model import ARIMA
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from statsmodels.tsa.arima.model import ARIMA
+
 
 class LSTMResidualModel(nn.Module):
     def __init__(self, units):

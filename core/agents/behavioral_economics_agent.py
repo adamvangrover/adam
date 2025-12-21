@@ -1,8 +1,11 @@
 # core/agents/behavioral_economics_agent.py
-from core.agents.agent_base import AgentBase
-from typing import Any, Dict, List, Optional
 import logging
+from typing import Any, Dict, List, Optional
+
 from transformers import pipeline
+
+from core.agents.agent_base import AgentBase
+
 
 class BehavioralEconomicsAgent(AgentBase):
     """

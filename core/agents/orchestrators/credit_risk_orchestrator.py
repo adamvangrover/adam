@@ -1,7 +1,9 @@
 from core.agents.agent_base import AgentBase
-from .workflow_manager import WorkflowManager
-from .workflow import Workflow
+
 from .task import Task
+from .workflow import Workflow
+from .workflow_manager import WorkflowManager
+
 
 class CreditRiskOrchestrator(AgentBase):
     def __init__(self, config):

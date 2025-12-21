@@ -1,21 +1,23 @@
 from __future__ import annotations
-from flask import Flask, jsonify, request
-from flask_socketio import SocketIO, emit
-from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, JWTManager, get_jwt_identity, get_jwt
-from werkzeug.exceptions import HTTPException
-from werkzeug.security import generate_password_hash, check_password_hash
-import sys
-import os
-import logging
-import json
+
 import functools
-import asyncio
+import json
+import logging
+import os
 import re
+import sys
 import threading
 from datetime import datetime, timezone
-from .config import config
+
+from flask import Flask, jsonify, request
+from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, get_jwt, get_jwt_identity, jwt_required
+from flask_socketio import SocketIO, emit
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.exceptions import HTTPException
+from werkzeug.security import check_password_hash, generate_password_hash
+
 from .celery import celery
+from .config import config
 
 # ---------------------------------------------------------------------------- #
 # Helpers
@@ -164,11 +166,9 @@ def create_app(config_name='default'):
     global meta_orchestrator
     if app.config['CORE_INTEGRATION']:
         sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-        from core.utils.config_utils import load_app_config
-        from core.system.agent_orchestrator import AgentOrchestrator
-        from core.system.knowledge_base import KnowledgeBase
-        from core.system.data_manager import DataManager
         from core.engine.meta_orchestrator import MetaOrchestrator
+        from core.system.agent_orchestrator import AgentOrchestrator
+        from core.utils.config_utils import load_app_config
 
         core_config = load_app_config()
         # knowledge_base and data_manager are not used by AgentOrchestrator v2

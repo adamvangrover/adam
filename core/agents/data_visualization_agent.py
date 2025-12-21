@@ -1,8 +1,5 @@
 #core/agents/data_visualization_agent.py
 
-import matplotlib.pyplot as plt
-import seaborn as sns
-import plotly.express as px
 
 class DataVisualizationAgent:
     def __init__(self, config):

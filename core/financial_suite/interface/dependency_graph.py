@@ -1,5 +1,7 @@
-from typing import Callable, Dict, List, Set
+from typing import Dict, Set
+
 from core.financial_suite.context_manager import ContextManager
+
 
 class DependencyGraph:
     """

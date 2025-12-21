@@ -20,12 +20,12 @@ The script looks for log messages starting with specific prefixes defined in the
 XAI_LOG_PATTERNS list (e.g., "SNC_ANALYSIS_EXECUTE_INPUT:", "SNC_XAI:SK_INPUT:", 
 "SNC_RATING_RULE_TRIGGERED:", etc.).
 """
-import re
-import json
 import argparse
 import ast
+import json
 import logging
-from typing import List, Dict, Any, Optional
+import re
+from typing import Any, Dict, List
 
 # Configure basic logging for the script itself (e.g., for errors during script execution)
 # This is separate from the agent logs being parsed.

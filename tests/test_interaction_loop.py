@@ -1,14 +1,15 @@
 # tests/test_interaction_loop.py
 
 import unittest
-from unittest.mock import patch, MagicMock, AsyncMock
-from core.system.interaction_loop import InteractionLoop
-from core.system.agent_orchestrator import AgentOrchestrator
-from core.agents.query_understanding_agent import QueryUnderstandingAgent
+from unittest.mock import AsyncMock, MagicMock, patch
+
 from core.agents.data_retrieval_agent import DataRetrievalAgent
+from core.agents.query_understanding_agent import QueryUnderstandingAgent
 from core.agents.result_aggregation_agent import ResultAggregationAgent
-from core.system.error_handler import InvalidInputError, AgentNotFoundError, DataNotFoundError
+from core.system.error_handler import AgentNotFoundError, DataNotFoundError, InvalidInputError
+from core.system.interaction_loop import InteractionLoop
 from core.system.knowledge_base import KnowledgeBase
+
 
 class TestInteractionLoop(unittest.TestCase):
 

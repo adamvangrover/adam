@@ -1,5 +1,7 @@
-from typing import Tuple, Dict, Any
+from typing import Any, Dict, Tuple
+
 from core.financial_suite.schemas.workstream_context import WorkstreamContext
+
 
 class RegulatoryEngine:
     @staticmethod

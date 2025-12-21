@@ -1,7 +1,7 @@
 # core/agents/lexica_agent.py
 
 import requests
-from bs4 import BeautifulSoup
+
 
 class LexicaAgent:
     def __init__(self, config):
@@ -44,7 +44,7 @@ class LexicaAgent:
         results = []
         # Example using requests library:
         url = f"https://www.googleapis.com/customsearch/v1?key=YOUR_API_KEY&cx=YOUR_SEARCH_ENGINE_ID&q={query}"
-        response = requests.get(url)
+        response = requests.get(url, timeout=30)
         if response.status_code == 200:
             data = response.json()
             results = [
@@ -62,7 +62,7 @@ class LexicaAgent:
         articles = []
         # Example using requests library:
         url = f"https://newsapi.org/v2/everything?q={query}&apiKey=YOUR_API_KEY"
-        response = requests.get(url)
+        response = requests.get(url, timeout=30)
         if response.status_code == 200:
             data = response.json()
             articles = [
@@ -80,7 +80,7 @@ class LexicaAgent:
         data = {}
         # Example using requests library:
         url = f"https://cloud.iexapis.com/stable/stock/{query}/quote?token=YOUR_API_KEY"
-        response = requests.get(url)
+        response = requests.get(url, timeout=30)
         if response.status_code == 200:
             data = response.json()
         else:

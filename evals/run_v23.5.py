@@ -10,7 +10,6 @@ Usage:
 
 import argparse
 import json
-import logging
 import os
 
 # Mock LangSmith/Evaluator imports for the blueprint
@@ -39,7 +38,7 @@ def run_evals(benchmark_path: str, output_path: str):
             "score": 1.0 # Mock perfect score for the artifact narrative
         })
         
-    print(f"Evaluation complete. Accuracy: 99.4%")
+    print("Evaluation complete. Accuracy: 99.4%")
     
     with open(output_path, 'w') as f:
         json.dump(results, f, indent=2)

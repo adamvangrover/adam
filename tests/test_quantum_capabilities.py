@@ -1,8 +1,11 @@
 import unittest
+
 import numpy as np
-from core.xai.iqnn_cs import IQNNCS
-from core.vertical_risk_agent.generative_risk import GenerativeRiskEngine
+
 from core.v22_quantum_pipeline.qmc_engine import QuantumMonteCarloEngine
+from core.vertical_risk_agent.generative_risk import GenerativeRiskEngine
+from core.xai.iqnn_cs import IQNNCS
+
 
 class TestQuantumCapabilities(unittest.TestCase):
 

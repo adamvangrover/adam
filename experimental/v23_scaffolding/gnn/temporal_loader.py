@@ -1,6 +1,3 @@
-import pandas as pd
-import torch
-from torch_geometric_temporal.signal import StaticGraphTemporalSignal
 
 # Placeholder for the actual implementation
 def load_temporal_graph_data():

@@ -1,7 +1,6 @@
-from typing import Dict, List, Any, Optional, Union
-import math
 import logging
-import statistics
+import math
+from typing import Any, Dict, List, Optional
 
 # -------------------------------------------------------------------------
 # DEPENDENCY MANAGEMENT

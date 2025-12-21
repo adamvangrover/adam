@@ -1,6 +1,8 @@
 import logging
-from typing import List, Optional
+from typing import List
+
 import yfinance as yf
+
 from .schema import MarketTicker
 
 logger = logging.getLogger(__name__)

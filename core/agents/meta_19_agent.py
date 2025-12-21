@@ -1,8 +1,10 @@
 # core/agents/meta_19_agent.py
-from core.agents.agent_base import AgentBase
-from typing import Any, Dict, List, Optional
 import logging
 import re
+from typing import Any, Dict, List
+
+from core.agents.agent_base import AgentBase
+
 
 class Meta19Agent(AgentBase):
     """

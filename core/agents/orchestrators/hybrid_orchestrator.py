@@ -2,10 +2,12 @@
 import asyncio
 from typing import Any, Dict, Union
 
-from .workflow import Workflow
-from core.system.v22_async.workflow import AsyncWorkflow
-from .workflow_manager import WorkflowManager
 from core.system.v22_async.async_workflow_manager import AsyncWorkflowManager
+from core.system.v22_async.workflow import AsyncWorkflow
+
+from .workflow import Workflow
+from .workflow_manager import WorkflowManager
+
 
 class HybridOrchestrator:
     def __init__(self):

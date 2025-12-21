@@ -1,12 +1,15 @@
 from __future__ import annotations
-from typing import Any, Dict, Tuple, Optional
-import logging
+
 import asyncio
+import logging
+from typing import Any, Dict, Tuple
+
 from core.agents.agent_base import AgentBase
 from core.data_sources.financial_news_api import SimulatedFinancialNewsAPI
 from core.data_sources.prediction_market_api import SimulatedPredictionMarketAPI
 from core.data_sources.social_media_api import SimulatedSocialMediaAPI
 from core.data_sources.web_traffic_api import SimulatedWebTrafficAPI
+
 
 class MarketSentimentAgent(AgentBase):
     """

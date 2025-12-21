@@ -7,15 +7,15 @@ logger = logging.getLogger(__name__)
 
 # Core components
 from core.agents.agent_base import Agent
-from core.llm.engines.dummy_llm_engine import DummyLLMEngine
 from core.embeddings.models.dummy_embedding_model import DummyEmbeddingModel
-from core.vectorstore.stores.in_memory_vector_store import InMemoryVectorStore
+from core.llm.engines.dummy_llm_engine import DummyLLMEngine
 from core.rag.document_handling import Document
+from core.vectorstore.stores.in_memory_vector_store import InMemoryVectorStore
 
 # Semantic Kernel (optional, for advanced use)
 try:
     from semantic_kernel import Kernel
-    from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion # Example connector
+    from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion  # Example connector
     # Note: Using SK requires actual LLM service configuration for most features.
     # The DummyLLMEngine is not directly usable by SK's standard connectors.
     # For this example, SK part will be mostly conceptual unless a real service is configured.

@@ -1,7 +1,6 @@
 import os
-import sys
+
 import markdown
-from pathlib import Path
 
 # --- Configuration ---
 ROOT_DIR = os.path.abspath(".")

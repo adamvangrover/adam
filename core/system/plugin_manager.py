@@ -2,7 +2,9 @@
 
 import importlib
 import os
+
 from core.utils.config_utils import load_config
+
 
 class PluginManager:
     def __init__(self, plugin_dir="plugins"):

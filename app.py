@@ -1,8 +1,9 @@
 # app.py
-import streamlit as st
+import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
+import streamlit as st
+
 from src.core_valuation import ValuationEngine
 from src.credit_risk import CreditSponsorModel
 

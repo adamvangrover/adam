@@ -1,7 +1,7 @@
-import time
 import logging
-from functools import wraps
 import random
+import time
+from functools import wraps
 
 logger = logging.getLogger(__name__)
 

@@ -2,10 +2,10 @@
 
 import json
 import logging
-from typing import Optional
 from pathlib import Path
-from core.system.kg_cache import KGCache
+from typing import Optional
 
+from core.system.kg_cache import KGCache
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

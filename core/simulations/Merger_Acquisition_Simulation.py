@@ -1,11 +1,14 @@
 # core/simulations/Merger_Acquisition_Simulation.py
 
 import json
+
 from utils.api_communication import APICommunication
+
 from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
 from core.agents.industry_specialist_agent import IndustrySpecialistAgent
-from core.agents.risk_assessment_agent import RiskAssessmentAgent
 from core.agents.legal_agent import LegalAgent
+from core.agents.risk_assessment_agent import RiskAssessmentAgent
+
 
 class MergerAcquisitionSimulation:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):

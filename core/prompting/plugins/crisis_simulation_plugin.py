@@ -1,7 +1,10 @@
 from __future__ import annotations
+
 import json
+
 from core.prompting.base_prompt_plugin import BasePromptPlugin
 from core.schemas.crisis_simulation import CrisisSimulationInput, CrisisSimulationOutput
+
 
 class CrisisSimulationPlugin(BasePromptPlugin[CrisisSimulationOutput]):
     """

@@ -1,14 +1,16 @@
 # core/analysis/technical_analysis.py
 
-import pandas as pd
+from typing import Any, Dict, Tuple
+
 import numpy as np
+import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
-from ta.trend import SMAIndicator, MACD, ADXIndicator
-from .trading_logic import sma_crossover_strategy
 from ta.momentum import RSIIndicator, StochasticOscillator
+from ta.trend import MACD, ADXIndicator, SMAIndicator
 from ta.volatility import BollingerBands
 from ta.volume import OnBalanceVolumeIndicator
-from typing import Dict, Any, Tuple
+
+from .trading_logic import sma_crossover_strategy
 
 # ... (import other necessary libraries for technical indicators, patterns, and CDS spread analysis)
 

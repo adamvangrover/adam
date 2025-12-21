@@ -1,6 +1,5 @@
-import unittest
 import os
-import logging
+import unittest
 from unittest.mock import patch
 
 # Add the project root to the Python path to allow direct import of core modules
@@ -9,6 +8,7 @@ from unittest.mock import patch
 # or the test runner (e.g., 'python -m unittest discover') handles discovery.
 # For now, assuming the execution environment can find 'core'.
 from core.utils.secrets_utils import get_api_key
+
 
 class TestSecretsUtils(unittest.TestCase):
 

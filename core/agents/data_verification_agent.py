@@ -1,7 +1,8 @@
 # core/agents/data_verification_agent.py
 
-import pandas as pd
 import numpy as np
+import pandas as pd
+
 
 class DataVerificationAgent:
     def __init__(self, config):

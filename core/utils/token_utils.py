@@ -1,7 +1,8 @@
 # core/utils/token_utils.py
 
-import tiktoken  # Use tiktoken for accurate token counting
 import logging
+
+import tiktoken  # Use tiktoken for accurate token counting
 
 # Configure logging (consider moving to a central location)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

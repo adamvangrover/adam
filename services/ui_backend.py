@@ -1,8 +1,9 @@
-import os
 import json
-import time
+import os
 import random
-from flask import Flask, send_from_directory, jsonify, request
+import time
+
+from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 
 # Define the showcase directory relative to this script
@@ -59,4 +60,4 @@ def get_agents():
 if __name__ == '__main__':
     print(f"Serving UI from {SHOWCASE_DIR}")
     # Host 0.0.0.0 is important for some environments
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)

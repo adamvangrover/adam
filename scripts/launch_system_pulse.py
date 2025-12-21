@@ -8,9 +8,9 @@ import sys
 # Ensure repo root is in path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from core.system.temporal_engine import TemporalEngine
 from core.procedures.autonomous_update import RoutineMaintenance
 from core.system.agent_orchestrator import AgentOrchestrator
+from core.system.temporal_engine import TemporalEngine
 
 # Ensure logs directory exists
 log_dir = "logs"

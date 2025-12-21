@@ -1,7 +1,8 @@
-from .governance import GovernanceEngine
-from .wealth_manager import WealthManager
 from .deal_flow import DealFlowEngine
+from .governance import GovernanceEngine
 from .portfolio import PortfolioAggregator
+from .wealth_manager import WealthManager
+
 
 class FamilyOfficeService:
     """

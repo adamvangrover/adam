@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 try:
     import yfinance as yf
 except ImportError:
@@ -10,7 +11,8 @@ except ImportError:
     pd = None
 
 import time
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List
+
 from core.utils.logging_utils import get_logger
 from core.utils.retry_utils import retry_with_backoff
 

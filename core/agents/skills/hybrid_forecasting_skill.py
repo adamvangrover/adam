@@ -1,8 +1,8 @@
 # core/agents/skills/hybrid_forecasting_skill.py
 
-from semantic_kernel.skill_definition import sk_function, sk_description
-from core.analysis.forecasting.hybrid_forecaster import HybridForecaster
 import pandas as pd
+from core.analysis.forecasting.hybrid_forecaster import HybridForecaster
+from semantic_kernel.skill_definition import sk_function
 
 # Developer Note: This skill provides an interface to the hybrid forecasting
 # capabilities of the system. Agents can use this skill to generate

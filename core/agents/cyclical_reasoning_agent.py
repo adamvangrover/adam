@@ -1,5 +1,4 @@
 # core/agents/cyclical_reasoning_agent.py
-import json
 import logging
 from typing import Any, Dict
 

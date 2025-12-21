@@ -1,8 +1,10 @@
 # tests/test_result_aggregation_agent.py
 
 import unittest
+
 from core.agents.result_aggregation_agent import ResultAggregationAgent
 from core.system.error_handler import AdamError
+
 
 class TestResultAggregationAgent(unittest.TestCase):
 

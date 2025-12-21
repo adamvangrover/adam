@@ -2,6 +2,7 @@
 
 import shap
 
+
 class SHAPExplainer:
     """
     An implementation of the SHAP (SHapley Additive exPlanations) algorithm.

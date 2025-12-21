@@ -1,10 +1,12 @@
-import unittest
-from unittest.mock import patch, MagicMock
-import pandas as pd
 import os
 import shutil
+import unittest
+from unittest.mock import patch
+
+import pandas as pd
+
 from core.market_data.historical_loader import HistoricalLoader
-from core.schemas.market_data_schema import MarketDataSchema
+
 
 class TestHistoricalLoader(unittest.TestCase):
     def setUp(self):

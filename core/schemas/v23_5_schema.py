@@ -1,6 +1,8 @@
 from __future__ import annotations
-from typing import List, Literal, Optional
-from pydantic import BaseModel, Field, ConfigDict
+
+from typing import List, Literal
+
+from pydantic import BaseModel, ConfigDict, Field
 
 # --- Core Definitions ---
 

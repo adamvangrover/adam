@@ -1,7 +1,9 @@
 # tests/test_token_utils.py
 
 import unittest
-from core.utils.token_utils import count_tokens, check_token_limit
+
+from core.utils.token_utils import check_token_limit, count_tokens
+
 
 class TestTokenUtils(unittest.TestCase):
 

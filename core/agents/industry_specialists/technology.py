@@ -1,7 +1,7 @@
 # core/agents/industry_specialists/technology.py
 
-import pandas as pd
 from textblob import TextBlob
+
 
 class TechnologySpecialist:
     def __init__(self, config):

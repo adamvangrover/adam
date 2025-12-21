@@ -1,11 +1,11 @@
-import tensorflow as tf
-from tensorflow.keras.layers import Input, Dense, LSTM, Reshape, Concatenate, Embedding
-from tensorflow.keras.models import Model
 import json
-from sklearn.preprocessing import MinMaxScaler
+import os
+
 import numpy as np
 import pandas as pd
-import os
+from sklearn.preprocessing import MinMaxScaler
+from tensorflow.keras.layers import LSTM, Concatenate, Dense, Embedding, Input, Reshape
+from tensorflow.keras.models import Model
 
 # --- 1. Define Parameters ---
 SEQ_LENGTH = 4  # Reduced to work with limited data

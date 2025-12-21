@@ -1,6 +1,7 @@
-import streamlit as st
 import json
 import os
+
+import streamlit as st
 
 # Set page config
 st.set_page_config(page_title="Adam: Adaptive Financial System", layout="wide")

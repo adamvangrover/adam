@@ -1,5 +1,6 @@
 from playwright.sync_api import sync_playwright
 
+
 def test_showcase(page):
     page.goto("http://localhost:8000/showcase/index.html")
     page.wait_for_selector("body")

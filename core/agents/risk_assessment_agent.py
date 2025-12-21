@@ -1,10 +1,11 @@
 from __future__ import annotations
-from typing import Any, Dict, Optional, List, Union
-import logging
+
 import json
+import logging
+from typing import Any, Dict, List, Optional
+
 import numpy as np
-import datetime
-import asyncio
+
 from core.agents.agent_base import AgentBase
 
 # Quantitative Rigor: Import Scipy for probability distributions
@@ -151,7 +152,7 @@ class RiskAssessmentAgent(AgentBase):
         """
         Assesses the risk associated with a loan.
         """
-        logger.info(f"Assessing loan risk...")
+        logger.info("Assessing loan risk...")
         risk_factors = {}
 
         risk_factors["credit_risk"] = self._calculate_credit_risk(borrower_data)
@@ -171,7 +172,7 @@ class RiskAssessmentAgent(AgentBase):
         """
         Assesses the risk associated with a project.
         """
-        logger.info(f"Assessing project risk...")
+        logger.info("Assessing project risk...")
         risk_factors = {}
 
         risk_factors["project_management_risk"] = self._assess_project_management_risk(project_details)

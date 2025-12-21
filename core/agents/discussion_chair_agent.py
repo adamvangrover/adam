@@ -2,6 +2,7 @@
 
 import json
 
+
 class DiscussionChairAgent:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):
         """
@@ -170,8 +171,8 @@ class DiscussionChairAgent:
 
 #WIP /////////////////////////////////////////////////////
 
-import json
 import logging
+
 
 class DiscussionChairAgent:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):
@@ -286,12 +287,12 @@ class DiscussionChairAgent:
         if valuation == "Overvalued" and overall_risk == "High":
             decision = "Reject"
             rationale = (
-                f"The company is overvalued and presents high risk, which does not meet our investment criteria."
+                "The company is overvalued and presents high risk, which does not meet our investment criteria."
             )
         elif valuation == "Undervalued" and overall_risk == "Low":
             decision = "Approve"
             rationale = (
-                f"The company is undervalued and presents low risk, making it a promising investment opportunity."
+                "The company is undervalued and presents low risk, making it a promising investment opportunity."
             )
         elif valuation == "Fair" and overall_risk == "Medium":
             decision = "Hold"
@@ -321,7 +322,6 @@ class DiscussionChairAgent:
 
 #WIP /////////////////////////////////////////////
 
-import json
 
 class DiscussionChairAgent:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):

@@ -3,18 +3,19 @@ Ingestion Engine for the Gold Standard Toolkit.
 Handles reliable data fetching from yfinance with rate limit management.
 """
 
-import time
 import logging
+import time
+from typing import Any, Dict, List
+
 import pandas as pd
-from typing import List, Dict, Optional, Any
 
 try:
     import yfinance as yf
 except ImportError:
     yf = None
 
-from .storage import StorageEngine
 from .qa import validate_dataframe
+from .storage import StorageEngine
 
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,5 @@
-import os
 import subprocess
+
 
 def startup_helper():
     """

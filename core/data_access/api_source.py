@@ -1,7 +1,8 @@
 # core/data_access/api_source.py
 
 import logging
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
+
 from core.data_access.base_data_source import BaseDataSource
 
 # Configure logging

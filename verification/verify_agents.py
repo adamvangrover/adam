@@ -1,6 +1,8 @@
 
-from playwright.sync_api import sync_playwright
 import os
+
+from playwright.sync_api import sync_playwright
+
 
 def run():
     # Start a simple HTTP server to serve the static files

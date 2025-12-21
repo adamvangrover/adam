@@ -1,7 +1,8 @@
 import logging
-from typing import Dict, Any, List
+from typing import Any, Dict
+
 from core.agents.agent_base import AgentBase
-from core.schemas.v23_5_schema import ManagementAssessment, EntityEcosystem, LegalEntity, CompetitivePositioning
+from core.schemas.v23_5_schema import CompetitivePositioning, EntityEcosystem, LegalEntity, ManagementAssessment
 
 logger = logging.getLogger(__name__)
 

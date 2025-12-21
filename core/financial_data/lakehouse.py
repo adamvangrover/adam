@@ -1,10 +1,11 @@
 import logging
-import os
+import uuid
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import List, Union
+
 import pandas as pd
 import yfinance as yf
-import uuid
+
 from .schema import MarketTicker
 
 logger = logging.getLogger(__name__)

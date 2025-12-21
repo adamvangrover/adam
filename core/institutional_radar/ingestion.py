@@ -1,15 +1,15 @@
-import requests
-import pandas as pd
 import time
-import logging
 import uuid
-from io import BytesIO
+from datetime import date, datetime
+from typing import List, Optional
+
+import pandas as pd
+import requests
 from bs4 import BeautifulSoup
-from typing import List, Optional, Dict
+
+from core.institutional_radar.database import FilingEventDB, HoldingDetailDB, SessionLocal, init_db
+from core.institutional_radar.schema import HoldingDetail
 from core.utils.logging_utils import get_logger
-from core.institutional_radar.schema import HoldingDetail, FilingEvent
-from core.institutional_radar.database import SessionLocal, FilingEventDB, HoldingDetailDB, FundMasterDB, init_db
-from datetime import datetime, date
 
 logger = get_logger("institutional_radar.ingestion")
 

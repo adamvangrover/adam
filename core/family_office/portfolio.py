@@ -1,5 +1,6 @@
 import logging
-from typing import Dict, Any, List
+from typing import Any, Dict, List
+
 from core.risk_engine import RiskEngine
 
 logger = logging.getLogger(__name__)

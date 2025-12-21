@@ -1,15 +1,17 @@
 # core/engine/neuro_symbolic_planner.py
 
-import logging
-import networkx as nx
-import re
 import asyncio
-from typing import List, Dict, Any, Optional, Set
-from langgraph.graph import StateGraph, END, START
+import logging
+import re
+from typing import Any, Dict, List, Optional
+
+import networkx as nx
+from langgraph.graph import END, StateGraph
+
+from core.engine.states import GraphState
 
 # Internal imports
 from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
-from core.engine.states import GraphState
 
 logger = logging.getLogger(__name__)
 

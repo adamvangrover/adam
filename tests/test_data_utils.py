@@ -1,13 +1,16 @@
 # tests/test_data_utils.py
 
-import unittest
-import tempfile
-import os
-import json
 import csv
+import json
+import os
+import tempfile
+import unittest
+
 import yaml
-from core.utils.data_utils import load_data
+
 from core.system.error_handler import FileReadError, InvalidInputError
+from core.utils.data_utils import load_data
+
 
 class TestDataUtils(unittest.TestCase):
 

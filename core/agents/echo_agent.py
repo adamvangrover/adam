@@ -1,10 +1,12 @@
 # core/agents/echo_agent.py
 
-import os
 import json
 import logging
-from core.utils.data_utils import send_message, receive_messages
+import os
+
 from core.utils.api_utils import get_knowledge_graph_data
+from core.utils.data_utils import receive_messages, send_message
+
 
 class EchoAgent:
     def __init__(self, config):

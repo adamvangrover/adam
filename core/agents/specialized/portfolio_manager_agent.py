@@ -1,7 +1,8 @@
 import logging
-from typing import Dict, Any, List
+from typing import Any, Dict
+
 from core.agents.agent_base import AgentBase
-from core.schemas.v23_5_schema import StrategicSynthesis, FinalVerdict
+from core.schemas.v23_5_schema import FinalVerdict, StrategicSynthesis
 
 logger = logging.getLogger(__name__)
 

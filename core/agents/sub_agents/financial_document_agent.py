@@ -1,9 +1,10 @@
 # core/agents/sub_agents/financial_document_agent.py
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from core.agents.agent_base import AgentBase
+
 # Assume the existence of an OCR tool and a data parsing utility
 # from core.tools.ocr_tool import OCREngine
 # from core.utils.parsing_utils import FinancialDataParser

@@ -1,54 +1,59 @@
 {
-  "session_id": "JULES_SESSION_ID",
-  "status": "IN_PROGRESS",
-  "diagnostic_summary": {
-    "total_checks": 5,
-    "passed_checks": 1,
-    "failed_checks": 4,
-    "test_suite": {
-      "collected": 184,
-      "passed": 94,
-      "failed": 88,
-      "errors": 2
-    }
-  },
-  "critical_blockers_resolved": [
-    "Missing system dependencies (flask, pydantic, torch, etc.) installed.",
-    "core/v23_graph_engine/data_pipeline/graph.py created (was missing).",
-    "core/agents/agent_base.py refactored for async loop safety and imports.",
-    "core/system/interaction_loop.py refactored for async compatibility and exception handling.",
-    "tests/test_interaction_loop.py fixed (mocking logic and async support)."
+  "phase": "Phase 2: Surgical Intervention",
+  "priority_order": [
+    "Security",
+    "Types",
+    "Lint",
+    "Tests"
   ],
-  "prioritized_remediation_tasks": [
+  "tasks": [
     {
-      "priority": "HIGH",
-      "module": "tests/test_agents.py",
-      "issue": "Multiple agent execution failures (Sentiment, Macro, etc.) likely due to MockLLM/JsonLogic integration.",
-      "action": "Audit specific agent 'execute' methods for sync/async mismatches."
+      "category": "Security",
+      "severity": "High",
+      "description": "Fix weak hashing (MD5) in core/data_processing/universal_ingestor_v2.py and utils.py",
+      "action": "Replace hashlib.md5 with hashlib.sha256 or use usedforsecurity=False"
     },
     {
-      "priority": "HIGH",
-      "module": "tests/api/test_service_state.py",
-      "issue": "Adam-mini optimization endpoint returning 500 error.",
-      "action": "Debug src/adam/core/optimizers.py AdamMini implementation for runtime errors."
+      "category": "Security",
+      "severity": "High",
+      "description": "Fix Jinja2 autoescape disabled in core/newsletter_layout/generator.py",
+      "action": "Enable autoescape=True in Environment constructor"
     },
     {
-      "priority": "MEDIUM",
-      "module": "core/utils/config_utils.py",
-      "issue": "Configuration loading tests failing (file not found/empty).",
-      "action": "Robustify config loading to handle missing files with defaults."
+      "category": "Security",
+      "severity": "High",
+      "description": "Disable Flask debug mode in services/ui_backend.py",
+      "action": "Set debug=False or use environment variable"
     },
     {
-      "priority": "MEDIUM",
-      "module": "core/api/server.py",
-      "issue": "MyPy errors regarding type assignment and flask_sqlalchemy.",
-      "action": "Add type stubs or ignore directives for dynamic Flask attributes."
+      "category": "Security",
+      "severity": "Medium",
+      "description": "Add timeouts to requests calls",
+      "action": "Add timeout=30 to all requests.get/post calls identified by Bandit"
     },
     {
-      "priority": "LOW",
-      "module": "core/agents/*.py",
-      "issue": "Missing docstrings and type hints.",
-      "action": "Apply Google-style docstrings to all Agent classes."
+      "category": "Types",
+      "severity": "Medium",
+      "description": "Fix TypedDict missing keys in core/engine/states.py",
+      "action": "Add missing keys or use total=False"
+    },
+    {
+      "category": "Types",
+      "severity": "Medium",
+      "description": "Fix return type mismatch in core/agents/rag_agent.py",
+      "action": "Ensure all paths return valid HNASPState or dict"
+    },
+    {
+      "category": "Lint",
+      "severity": "Low",
+      "description": "Fix PEP8 violations",
+      "action": "Run ruff check --fix ."
+    },
+    {
+      "category": "Tests",
+      "severity": "Medium",
+      "description": "Fix failing tests due to imports",
+      "action": "Verify tests pass after dependency installation and code fixes"
     }
   ]
 }

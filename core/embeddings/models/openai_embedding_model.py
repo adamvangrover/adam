@@ -1,6 +1,6 @@
 import logging
-from typing import List, Optional
 import os
+from typing import List, Optional
 
 from core.embeddings.base_embedding_model import BaseEmbeddingModel
 

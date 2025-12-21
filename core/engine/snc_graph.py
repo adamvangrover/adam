@@ -9,16 +9,13 @@ It leverages the v23 LangGraph architecture.
 """
 
 import logging
-from typing import Literal, Dict, Any
-from langgraph.graph import StateGraph, END, START
-from langgraph.checkpoint.memory import MemorySaver
+from typing import Any, Dict, Literal
 
+from langgraph.checkpoint.memory import MemorySaver
+from langgraph.graph import END, START, StateGraph
+
+from core.engine.snc_utils import analyze_syndicate_structure, calculate_leverage, map_financials_to_rating
 from core.engine.states import SNCAnalysisState
-from core.engine.snc_utils import (
-    calculate_leverage,
-    map_financials_to_rating,
-    analyze_syndicate_structure
-)
 
 logger = logging.getLogger(__name__)
 

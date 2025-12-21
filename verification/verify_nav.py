@@ -1,6 +1,6 @@
-from playwright.sync_api import sync_playwright, expect
-import os
-import time
+
+from playwright.sync_api import sync_playwright
+
 
 def verify_nav():
     with sync_playwright() as p:

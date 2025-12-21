@@ -1,5 +1,5 @@
-from typing import TypedDict, Optional, Any, Dict, List
-from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, TypedDict
+
 
 class DataIngestionState(TypedDict):
     """

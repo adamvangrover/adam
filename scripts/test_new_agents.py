@@ -1,13 +1,15 @@
 # scripts/test_new_agents.py
 import asyncio
-import yaml
-import sys
 import os
+import sys
+
+import yaml
 
 # Add the root directory to the Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from core.system.agent_orchestrator import AgentOrchestrator
+
 
 async def main():
     """

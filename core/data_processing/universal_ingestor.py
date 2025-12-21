@@ -1,12 +1,12 @@
-import os
-import json
-import uuid
-import glob
 import ast
-from typing import List, Dict, Any, Optional
-from enum import Enum
-from datetime import datetime
+import json
+import os
 import re
+import uuid
+from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List
+
 
 # --- EMBEDDED SCRUBBER (Merged for stability) ---
 class GoldStandardScrubber:
@@ -232,7 +232,7 @@ class UniversalIngestor:
                 self._process_text(filepath)
             elif filepath.endswith('.py'):
                 self._process_python(filepath)
-        except Exception as e:
+        except Exception:
             # print(f"Error processing {filepath}: {e}")
             pass
 
@@ -369,7 +369,7 @@ class UniversalIngestor:
             )
             self.artifacts.append(artifact)
 
-        except Exception as e:
+        except Exception:
             # Parse error or other issue
             pass
 

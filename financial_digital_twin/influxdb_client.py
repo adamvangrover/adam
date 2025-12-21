@@ -1,7 +1,8 @@
 from datetime import datetime
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 from core.timeseries.base_tsdb import BaseTSDBClient
+
 
 class InfluxDBClient(BaseTSDBClient):
     """

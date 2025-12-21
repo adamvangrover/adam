@@ -1,9 +1,11 @@
 import json
-from core.financial_suite.schemas.workstream_context import WorkstreamContext
+
 from core.financial_suite.engines.solver import IterativeSolver
 from core.financial_suite.modules.reporting.generator import ReportGenerator
-from core.financial_suite.modules.vc.waterfall import WaterfallEngine
 from core.financial_suite.modules.vc.return_metrics import ReturnMetrics
+from core.financial_suite.modules.vc.waterfall import WaterfallEngine
+from core.financial_suite.schemas.workstream_context import WorkstreamContext
+
 
 class ContextManager:
     def __init__(self, context_path: str = None, context_obj: WorkstreamContext = None):

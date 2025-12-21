@@ -1,15 +1,16 @@
 # tests/test_config_utils.py
 
-import unittest
-import tempfile
 import os
-import yaml
-import logging
 import shutil
+import tempfile
+import unittest
 from unittest.mock import patch
 
+import yaml
+
 # Updated import: removed load_error_codes and ConfigurationError
-from core.utils.config_utils import load_config, load_app_config
+from core.utils.config_utils import load_app_config, load_config
+
 
 class TestConfigUtils(unittest.TestCase):
 

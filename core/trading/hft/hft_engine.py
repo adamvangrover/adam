@@ -20,9 +20,9 @@ Run this module directly to simulate the trading loop.
 import asyncio
 import random
 import time
-from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Type
+from dataclasses import dataclass
 from enum import Enum
+from typing import Dict, List, Type
 
 # --- Constants & Configuration ---
 MAX_LATENCY_MS = 50

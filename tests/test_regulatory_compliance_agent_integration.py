@@ -1,8 +1,8 @@
-import unittest
 import asyncio
-from unittest.mock import MagicMock, patch, AsyncMock
-import sys
 import os
+import sys
+import unittest
+from unittest.mock import AsyncMock, MagicMock, patch
 
 sys.path.append(os.getcwd())
 
@@ -18,8 +18,8 @@ sys.modules["core.data_sources.political_landscape"] = MagicMock()
 # We need to import RegulatoryComplianceAgent.
 # Note: In the codebase, it might not yet inherit from AgentBase, so checking inheritance might fail initially.
 try:
-    from core.agents.regulatory_compliance_agent import RegulatoryComplianceAgent
     from core.agents.agent_base import AgentBase
+    from core.agents.regulatory_compliance_agent import RegulatoryComplianceAgent
 except ImportError as e:
     print(f"Import failed: {e}")
     RegulatoryComplianceAgent = None

@@ -1,9 +1,9 @@
 
 import unittest
-from unittest.mock import MagicMock, patch, AsyncMock
-import json
+from unittest.mock import MagicMock, patch
+
 from core.agents.specialized.credit_conformance_agent import CreditConformanceAgent
-from core.schemas.credit_conformance import CreditConformanceReport
+
 
 class TestCreditConformanceAgent(unittest.IsolatedAsyncioTestCase):
 

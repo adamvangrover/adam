@@ -1,12 +1,12 @@
 # tests/test_agent_orchestrator.py
 
-import sys
 import unittest
-from unittest.mock import patch, MagicMock
-from core.system.agent_orchestrator import AgentOrchestrator
+from unittest.mock import MagicMock, patch
+
 from core.agents.agent_base import AgentBase
-from core.system.error_handler import AgentNotFoundError
 from core.system import agent_orchestrator as ao_module
+from core.system.agent_orchestrator import AgentOrchestrator
+
 
 class MockAgent(AgentBase):  # Define a mock agent for testing
     async def execute(self, *args, **kwargs):

@@ -1,5 +1,6 @@
-import talib
 import numpy as np
+import talib
+
 
 def sma_crossover_strategy(data, short_window=40, long_window=100):
     """

@@ -1,6 +1,7 @@
-import sys
 import compileall
 import os
+import sys
+
 
 def check_syntax(paths):
     print(f"Checking syntax for: {paths}")

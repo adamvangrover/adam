@@ -1,10 +1,12 @@
 # scripts/run_llm_driven_simulation.py
 
 import argparse
+
 from core.llm.engines.openai_llm_engine import OpenAILLMEngine
 from core.world_simulation.config import load_config
-from core.world_simulation.llm_driven_sim import LLMDrivenSim
 from core.world_simulation.data_manager import DataManager
+from core.world_simulation.llm_driven_sim import LLMDrivenSim
+
 
 def main():
     parser = argparse.ArgumentParser(description="Run the LLM-driven world simulation.")

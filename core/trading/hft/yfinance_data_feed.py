@@ -1,10 +1,11 @@
 
 import asyncio
+import logging
 import time
 from typing import List
-from core.trading.hft.hft_engine import MarketTick
+
 from core.data_sources.yfinance_market_data import YFinanceMarketData
-import logging
+from core.trading.hft.hft_engine import MarketTick
 
 logger = logging.getLogger(__name__)
 

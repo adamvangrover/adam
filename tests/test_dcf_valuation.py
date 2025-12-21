@@ -1,12 +1,13 @@
 
-import unittest
-import sys
 import os
+import sys
+import unittest
 
 # Add root to pythonpath
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from core.engine.valuation_utils import calculate_dcf, calculate_multiples, get_price_targets
+from core.engine.valuation_utils import calculate_dcf, calculate_multiples
+
 
 class TestDCFValuation(unittest.TestCase):
 

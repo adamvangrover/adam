@@ -1,9 +1,11 @@
-from fastapi import FastAPI, Depends, HTTPException
 from contextlib import asynccontextmanager
+
 import torch
-from src.adam.api.models import OptimizationRequest, OptimizationResponse
+from fastapi import Depends, FastAPI, HTTPException
+
 from src.adam.api.auth import get_current_user
-from src.adam.core.optimizers import AdamW, Lion, AdamMini
+from src.adam.api.models import OptimizationRequest, OptimizationResponse
+from src.adam.core.optimizers import AdamMini, AdamW, Lion
 from src.adam.core.state_manager import StateManager
 
 # Initialize State Manager (tries Redis, falls back to memory)

@@ -1,5 +1,5 @@
-from typing import List, Dict
-import networkx as nx
+from typing import Dict, List
+
 
 class NeuroSymbolicPlanner:
     """

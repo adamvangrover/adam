@@ -1,10 +1,11 @@
-import unittest
 import asyncio
 import os
+import unittest
+from unittest.mock import MagicMock
+
 from core.engine.meta_orchestrator import MetaOrchestrator
 from core.memory.engine import MemoryEngine
 
-from unittest.mock import MagicMock
 
 class TestFOSuperAppIntegration(unittest.TestCase):
 

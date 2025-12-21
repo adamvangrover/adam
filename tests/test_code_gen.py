@@ -1,7 +1,9 @@
+from unittest.mock import patch
+
 import pytest
-import asyncio
-from unittest.mock import MagicMock, patch
+
 from core.engine.meta_orchestrator import MetaOrchestrator
+
 
 @pytest.mark.asyncio
 async def test_code_gen_pipeline():

@@ -3,6 +3,7 @@
 import pandas as pd
 from dowhy import CausalModel
 
+
 class CounterfactualEngine:
     """
     A module for performing counterfactual reasoning.

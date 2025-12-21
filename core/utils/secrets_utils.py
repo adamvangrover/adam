@@ -1,5 +1,5 @@
-import os
 import logging
+import os
 from typing import Optional
 
 # Configure basic logging if not already configured elsewhere
@@ -40,21 +40,21 @@ if __name__ == '__main__':
     logging.info("Attempting to fetch 'TEST_API_KEY_EXISTS'...")
     key1 = get_api_key("TEST_API_KEY_EXISTS")
     if key1:
-        logging.info(f"TEST_API_KEY_EXISTS: Found (value hidden for security)")
+        logging.info("TEST_API_KEY_EXISTS: Found (value hidden for security)")
     else:
         logging.info("TEST_API_KEY_EXISTS: Not found or invalid.")
 
     logging.info("Attempting to fetch 'TEST_API_KEY_NONEXISTENT'...")
     key2 = get_api_key("TEST_API_KEY_NONEXISTENT")
     if key2:
-        logging.info(f"TEST_API_KEY_NONEXISTENT: Found (value hidden for security)")
+        logging.info("TEST_API_KEY_NONEXISTENT: Found (value hidden for security)")
     else:
         logging.info("TEST_API_KEY_NONEXISTENT: Not found or invalid.")
 
     logging.info("Attempting to fetch 'TEST_API_KEY_EMPTY'...")
     key3 = get_api_key("TEST_API_KEY_EMPTY")
     if key3:
-        logging.info(f"TEST_API_KEY_EMPTY: Found (value hidden for security)")
+        logging.info("TEST_API_KEY_EMPTY: Found (value hidden for security)")
     else:
         logging.info("TEST_API_KEY_EMPTY: Not found or invalid.")
     

@@ -1,6 +1,7 @@
-import tinker
-import os
 import json
+import os
+
+import tinker
 from dotenv import load_dotenv
 
 load_dotenv()

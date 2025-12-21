@@ -1,5 +1,6 @@
-from typing import TypedDict, List, Optional, Annotated, Dict, Any, Literal
 import operator
+from typing import Annotated, Any, Dict, List, Literal, Optional, TypedDict
+
 from pydantic import BaseModel, Field
 
 # --- Data Schemas (Pydantic) ---

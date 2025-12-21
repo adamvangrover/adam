@@ -1,13 +1,16 @@
 # core/simulations/Portfolio_Optimization_Simulation.py
 
 import json
+
 from utils.api_communication import APICommunication
-from core.agents.risk_assessment_agent import RiskAssessmentAgent
+
+from core.agents.alternative_data_agent import AlternativeDataAgent
 from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
-from core.agents.technical_analyst_agent import TechnicalAnalystAgent
 from core.agents.market_sentiment_agent import MarketSentimentAgent
 from core.agents.prediction_market_agent import PredictionMarketAgent
-from core.agents.alternative_data_agent import AlternativeDataAgent
+from core.agents.risk_assessment_agent import RiskAssessmentAgent
+from core.agents.technical_analyst_agent import TechnicalAnalystAgent
+
 
 class PortfolioOptimizationSimulation:
 

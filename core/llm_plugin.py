@@ -1,14 +1,15 @@
 # core/llm_plugin.py
-import os
-import logging
-from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional, Tuple, List, Union, Literal, get_args, get_origin
-from dotenv import load_dotenv
-import yaml
-from pathlib import Path
-import json
-import time
 import hashlib
+import json
+import logging
+import os
+import time
+from abc import ABC, abstractmethod
+from pathlib import Path
+from typing import Any, Dict, List, Literal, Optional, Tuple, get_args, get_origin
+
+import yaml
+from dotenv import load_dotenv
 
 # --- Graceful Import Fallbacks ---
 try:
@@ -381,7 +382,7 @@ class HuggingFaceLLM(BaseLLM):
     def model(self):
         if self._model is None:
             try:
-                from transformers import AutoModelForSeq2SeqLM, AutoModelForCausalLM
+                from transformers import AutoModelForCausalLM, AutoModelForSeq2SeqLM
                 try:
                     self._model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name)
                 except:
@@ -719,7 +720,7 @@ class LLMPlugin:
         """Identifies the intent and entities in a user query using the configured LLM."""
         if self.llm:
             # Check if the specific LLM instance implements this method natively
-            if hasattr(self.llm, 'identify_intent_and_entities') and callable(getattr(self.llm, 'identify_intent_and_entities')):
+            if hasattr(self.llm, 'identify_intent_and_entities') and callable(self.llm.identify_intent_and_entities):
                 try:
                     return self.llm.identify_intent_and_entities(query)
                 except NotImplementedError:

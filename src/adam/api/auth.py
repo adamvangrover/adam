@@ -1,9 +1,11 @@
+from typing import Annotated
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from typing import Annotated
+
 # Conditional import to allow file to exist even if deps missing (for checking)
 try:
-    from authlib.jose import jwt, JoseError
+    from authlib.jose import JoseError, jwt
 except ImportError:
     jwt = None
 

@@ -1,10 +1,11 @@
-import sys
 import os
+import sys
 
 # Add root to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from core.v23_graph_engine.unified_knowledge_graph import UnifiedKnowledgeGraph
+
 
 def test_odyssey_graph_integration():
     ukg = UnifiedKnowledgeGraph()

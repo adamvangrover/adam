@@ -1,10 +1,9 @@
 import logging
-import asyncio
-from typing import Any, Dict, Optional, List, Tuple
+from typing import Any, Dict, Optional
 
 from core.agents.agent_base import AgentBase
-from core.llm.base_llm_engine import BaseLLMEngine
 from core.embeddings.base_embedding_model import BaseEmbeddingModel
+from core.llm.base_llm_engine import BaseLLMEngine
 from core.vectorstore.base_vector_store import BaseVectorStore
 
 try:
@@ -83,7 +82,7 @@ class RAGAgent(AgentBase):
 
         # 1. Generate query embedding
         query_embedding = await self.embedding_model.generate_embedding(query)
-        logging.debug(f"RAG Agent generated query embedding.")
+        logging.debug("RAG Agent generated query embedding.")
 
         # 2. Search for relevant documents in the vector store
         retrieved_docs = await self.vector_store.search(query_embedding, top_k=3)
@@ -100,7 +99,7 @@ class RAGAgent(AgentBase):
 
         # 4. Generate response using LLM with query and context
         response = await self.llm_engine.generate_response(prompt=query, context=context)
-        logging.info(f"RAG Agent generated response.")
+        logging.info("RAG Agent generated response.")
 
         self.state = "idle"
         return response
@@ -169,7 +168,7 @@ class RAGAgent(AgentBase):
         Enhances a query using a Semantic Kernel skill.
         """
         if not self.kernel:
-            logging.warning(f"RAG Agent: Semantic Kernel not available. Returning original query.")
+            logging.warning("RAG Agent: Semantic Kernel not available. Returning original query.")
             return query
 
         skill_name = "QueryEnhancerSkill"
@@ -197,11 +196,11 @@ class RAGAgent(AgentBase):
         Registers a tool with the agent's Semantic Kernel instance.
         """
         if not self.kernel:
-            logging.warning(f"RAG Agent: Cannot register tool, Semantic Kernel not available.")
+            logging.warning("RAG Agent: Cannot register tool, Semantic Kernel not available.")
             return
 
         if not hasattr(tool_instance, "name"):
-            logging.error(f"RAG Agent: Tool instance does not have a 'name' attribute.")
+            logging.error("RAG Agent: Tool instance does not have a 'name' attribute.")
             return
 
         tool_name = plugin_name or tool_instance.name
@@ -220,7 +219,7 @@ class RAGAgent(AgentBase):
         Invokes a registered tool's function via Semantic Kernel.
         """
         if not self.kernel:
-            logging.warning(f"RAG Agent: Cannot invoke tool, Semantic Kernel not available.")
+            logging.warning("RAG Agent: Cannot invoke tool, Semantic Kernel not available.")
             return None
 
         try:
@@ -231,6 +230,7 @@ class RAGAgent(AgentBase):
         except Exception as e:
             logging.error(f"RAG Agent: Error invoking tool '{plugin_name}.{function_name}': {e}")
             return None
+        return None
 
     async def search_web_if_needed(self, query: str, direct_url: Optional[str] = None) -> Optional[str]:
         """

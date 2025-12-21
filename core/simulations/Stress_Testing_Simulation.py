@@ -1,11 +1,14 @@
 # core/simulations/Stress_Testing_Simulation.py
 
 import json
+
 from utils.api_communication import APICommunication
-from core.agents.risk_assessment_agent import RiskAssessmentAgent
-from core.agents.macroeconomic_analysis_agent import MacroeconomicAnalysisAgent
+
 from core.agents.geopolitical_risk_agent import GeopoliticalRiskAgent
 from core.agents.industry_specialist_agent import IndustrySpecialistAgent
+from core.agents.macroeconomic_analysis_agent import MacroeconomicAnalysisAgent
+from core.agents.risk_assessment_agent import RiskAssessmentAgent
+
 
 class StressTestingSimulation:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):

@@ -7,7 +7,8 @@ Encapsulates pure functions for financial calculations, vote counting,
 and regulatory classification rules.
 """
 
-from typing import Dict, Any, List
+from typing import Any, Dict, List
+
 
 def calculate_leverage(debt: float, ebitda: float) -> float:
     """Calculates Debt/EBITDA leverage ratio."""

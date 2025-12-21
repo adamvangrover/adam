@@ -8,8 +8,9 @@ It serves as the 'Iron Core' for the Neuro-Symbolic architecture.
 In production, these functions bind to the Rust backend for performance.
 """
 
-from typing import List, Dict, Optional, Union
 import math
+from typing import Dict, List
+
 
 class FinancialEngineeringEngine:
 

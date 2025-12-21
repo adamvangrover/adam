@@ -1,9 +1,12 @@
 from __future__ import annotations
-from typing import List, Dict, Any
-import uuid
-import random
+
 import inspect
-from experimental.nexus_aurora.engine import AgentInstruction, AuroraCompiler, speculative_execution, QuantumState
+import random
+import uuid
+from typing import Any, Dict, List
+
+from experimental.nexus_aurora.engine import AgentInstruction, AuroraCompiler, QuantumState, speculative_execution
+
 
 class AgentAlpha:
     """

@@ -1,4 +1,5 @@
-from typing import Callable, List, Dict, Any
+from typing import Any, Callable, Dict, List
+
 
 class Task:
     def __init__(self, name: str, action: Callable, dependencies: List[str] = None, **kwargs):

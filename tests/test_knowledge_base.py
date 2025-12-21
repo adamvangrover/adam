@@ -1,7 +1,9 @@
 # tests/test_knowledge_base.py
 
 import unittest
+
 from core.system.knowledge_base import KnowledgeBase
+
 
 class TestKnowledgeBase(unittest.TestCase):
 

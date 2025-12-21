@@ -1,7 +1,8 @@
 # scripts/run_simple_simulation.py
 import logging
-from core.system.interaction_loop import InteractionLoop
+
 from core.system.agent_orchestrator import get_orchestrator
+from core.system.interaction_loop import InteractionLoop
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

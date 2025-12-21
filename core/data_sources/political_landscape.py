@@ -4,11 +4,11 @@ Political Landscape Loader
 This module provides functionality to load political landscape data from various sources.
 It is designed to be used by the RegulatoryComplianceAgent and other reasoning engines.
 """
+import logging
+from typing import Dict, List
+
 import requests
 from bs4 import BeautifulSoup
-from typing import Dict, List, Optional
-import datetime
-import logging
 
 # Configure logger
 logger = logging.getLogger(__name__)

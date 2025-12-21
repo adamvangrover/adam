@@ -1,7 +1,8 @@
-import networkx as nx
-import logging
 import json
-from typing import Dict, Any, List, Optional
+import logging
+from typing import Any, Dict, List
+
+import networkx as nx
 
 logger = logging.getLogger(__name__)
 

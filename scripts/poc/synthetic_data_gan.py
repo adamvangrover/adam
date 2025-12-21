@@ -1,9 +1,9 @@
-import tensorflow as tf
-from tensorflow.keras.layers import Input, Dense, LSTM, Reshape
-from tensorflow.keras.models import Model
+import os
+
 import numpy as np
 import pandas as pd
-import os
+from tensorflow.keras.layers import LSTM, Dense, Input, Reshape
+from tensorflow.keras.models import Model
 
 # --- 1. Define Parameters ---
 SEQ_LENGTH = 30  # Number of time steps in a sequence

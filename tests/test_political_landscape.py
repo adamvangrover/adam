@@ -1,8 +1,10 @@
 
 import unittest
 from unittest.mock import MagicMock, patch
-from core.data_sources.political_landscape import PoliticalLandscapeLoader
+
 from core.agents.regulatory_compliance_agent import RegulatoryComplianceAgent
+from core.data_sources.political_landscape import PoliticalLandscapeLoader
+
 
 class TestPoliticalLandscapeLoader(unittest.TestCase):
 

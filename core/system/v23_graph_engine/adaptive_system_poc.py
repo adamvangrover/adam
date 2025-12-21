@@ -1,8 +1,9 @@
 # core/engine/adaptive_system_poc.py
 
 import logging
-from typing import TypedDict, List, Dict, Any, Optional
-from langgraph.graph import StateGraph, END
+from typing import Any, Dict, List, Optional, TypedDict
+
+from langgraph.graph import END, StateGraph
 
 # --- Pre-computation: Configure Logging ---
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

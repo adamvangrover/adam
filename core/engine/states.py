@@ -1,6 +1,7 @@
-from typing import TypedDict, List, Optional, Annotated, Dict, Any, Literal
 import operator
 from datetime import datetime
+from typing import Annotated, Any, Dict, List, Literal, Optional, TypedDict
+
 
 class ResearchArtifact(TypedDict):
     title: str
@@ -232,26 +233,26 @@ class ReflectorState(TypedDict):
 
 # --- Omniscient State (v23.5) ---
 
-class EntityEcosystem(TypedDict):
+class EntityEcosystem(TypedDict, total=False):
     legal_entity: Dict[str, str]
     management_assessment: Dict[str, Any]
     competitive_positioning: Dict[str, str]
 
-class EquityAnalysis(TypedDict):
+class EquityAnalysis(TypedDict, total=False):
     fundamentals: Dict[str, str]
     valuation_engine: Dict[str, Any]
 
-class CreditAnalysis(TypedDict):
+class CreditAnalysis(TypedDict, total=False):
     snc_rating_model: Dict[str, Any]
     cds_market_implied_rating: str
     covenant_risk_analysis: Dict[str, Any]
 
-class SimulationEngine(TypedDict):
+class SimulationEngine(TypedDict, total=False):
     monte_carlo_default_prob: float
     quantum_scenarios: List[Dict[str, Any]]
     trading_dynamics: Dict[str, str]
 
-class StrategicSynthesis(TypedDict):
+class StrategicSynthesis(TypedDict, total=False):
     m_and_a_posture: str
     final_verdict: Dict[str, Any]
 

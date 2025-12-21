@@ -1,5 +1,6 @@
 import logging
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
+
 from core.agents.agent_base import AgentBase
 from core.v23_graph_engine.odyssey_knowledge_graph import OdysseyKnowledgeGraph
 

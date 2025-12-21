@@ -1,13 +1,12 @@
 #core/agents/regulatory_compliance_agent.py
 
 from __future__ import annotations
-import re
-import logging
+
 import json
+import logging
 import os
 from datetime import datetime
-from typing import Dict, List, Tuple, Any, Optional
-import asyncio
+from typing import Any, Dict, List, Tuple
 
 # Import libraries for NLP, knowledge graph interaction, and regulatory data access
 import nltk
@@ -15,9 +14,9 @@ import requests
 from bs4 import BeautifulSoup
 from neo4j import GraphDatabase
 
-from core.llm_plugin import LLMPlugin
-from core.data_sources.political_landscape import PoliticalLandscapeLoader
 from core.agents.agent_base import AgentBase
+from core.data_sources.political_landscape import PoliticalLandscapeLoader
+from core.llm_plugin import LLMPlugin
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -206,7 +205,7 @@ class RegulatoryComplianceAgent(AgentBase):
         try:
             tokens = nltk.word_tokenize(transaction_text)
             lemmas = [self.nlp_toolkit.lemmatize(token) for token in tokens]
-        except Exception as e:
+        except Exception:
             # logger.warning(f"NLP processing failed: {e}")
             lemmas = []
 

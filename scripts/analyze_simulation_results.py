@@ -1,9 +1,12 @@
 # scripts/analyze_simulation_results.py
 
 import argparse
-import pandas as pd
+
 import matplotlib.pyplot as plt
+import pandas as pd
+
 from core.world_simulation.data_manager import DataManager
+
 
 def main():
     parser = argparse.ArgumentParser(description="Analyze the results of the world simulation.")

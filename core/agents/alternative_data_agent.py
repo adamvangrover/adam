@@ -1,12 +1,12 @@
 # core/agents/alternative_data_agent.py
 
 import json
-import nltk
+
+import googlemaps
 from nltk.sentiment import SentimentIntensityAnalyzer
 from textblob import TextBlob
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer as VaderSentiment
-import yfinance as yf
-import googlemaps
+
 # Placeholder for external libraries (replace with actual imports)
 # from social_media_api import SocialMediaAPI
 # from web_traffic_api import WebTrafficAPI

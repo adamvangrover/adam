@@ -4,7 +4,6 @@ try:
     from langchain.utilities import GoogleSearchAPIWrapper
 except ImportError:
     from langchain_community.utilities import GoogleSearchAPIWrapper
-from transformers import pipeline
 #... (import other necessary libraries for multi-modal processing)
 
 class SenseWeaver:

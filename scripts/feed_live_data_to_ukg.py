@@ -1,9 +1,10 @@
 
-import sys
-import os
 import json
-import networkx as nx
+import os
+import sys
 from datetime import datetime
+
+import networkx as nx
 
 # Add root to pythonpath
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))

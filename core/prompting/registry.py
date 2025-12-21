@@ -1,6 +1,8 @@
 from typing import Dict, Type
+
 from .base_prompt_plugin import BasePromptPlugin
 from .plugins.financial_truth_plugin import FinancialTruthPlugin
+
 
 class PromptRegistry:
     """

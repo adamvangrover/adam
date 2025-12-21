@@ -1,7 +1,9 @@
-from typing import Any, Dict, List, Optional
 import logging
+from typing import Any, Dict, List, Optional
+
 from core.agents.agent_base import AgentBase
 from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
+
 try:
     from semantic_kernel import Kernel
 except ImportError:
@@ -94,7 +96,6 @@ class NexusAgent(AgentBase):
                 # Assuming kernel has a default completion service or similar
                 # For v1.0, we might need to construct a function
                 # This is a simplified call pattern
-                from semantic_kernel.functions import KernelArguments
                 # We would typically use a registered plugin/function here.
                 # Since we don't have the exact plugin registry, we'll return a formatted string
                 # pretending to be the LLM for safety, or try to run if configured.

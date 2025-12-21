@@ -1,14 +1,15 @@
-import unittest
-import pandas as pd
-import numpy as np
-import sys
 import os
+import sys
+import unittest
+
+import pandas as pd
 
 # Ensure importability
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from core.gold_standard.trading.strategy import MeanReversionStrategy
 from core.gold_standard.qa import validate_dataframe
+from core.gold_standard.trading.strategy import MeanReversionStrategy
+
 
 class TestGoldStandard(unittest.TestCase):
     def test_mean_reversion(self):

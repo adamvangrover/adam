@@ -1,15 +1,17 @@
 # scripts/test_new_agents_isolated.py
 import asyncio
-import yaml
-import sys
 import os
+import sys
+
+import yaml
 
 # Add the root directory to the Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from core.utils.config_utils import load_config
 from core.agents.behavioral_economics_agent import BehavioralEconomicsAgent
 from core.agents.meta_cognitive_agent import MetaCognitiveAgent
+from core.utils.config_utils import load_config
+
 
 async def main():
     """

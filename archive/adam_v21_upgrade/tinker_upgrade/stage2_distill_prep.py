@@ -1,5 +1,3 @@
-import os
-import sys
 
 def run_distillation():
     print("--- Stage 2: Prompt Distillation (DEPRECATED) ---")

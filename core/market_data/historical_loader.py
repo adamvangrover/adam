@@ -1,9 +1,10 @@
-import yfinance as yf
+import os
+from typing import List
+
 import pandas as pd
 import pandera as pa
-import os
-import logging
-from typing import List, Optional
+import yfinance as yf
+
 from core.schemas.market_data_schema import MarketDataSchema
 from core.utils.logging_utils import get_logger
 

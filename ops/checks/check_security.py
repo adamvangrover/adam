@@ -1,6 +1,7 @@
+import shutil
 import subprocess
 import sys
-import shutil
+
 
 def run_security(paths):
     bandit_cmd = shutil.which("bandit")

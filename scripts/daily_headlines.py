@@ -1,12 +1,13 @@
-import requests
-import feedparser
 import logging
-from datetime import datetime
-import smtplib
-from email.mime.text import MIMEText
 import os
-from time import sleep
+import smtplib
 import time
+from datetime import datetime
+from email.mime.text import MIMEText
+from time import sleep
+
+import feedparser
+import requests
 
 # --- Developer Notes ---
 # This script fetches headlines from various RSS feeds and sends them in a daily email.

@@ -1,6 +1,7 @@
+import shutil
 import subprocess
 import sys
-import shutil
+
 
 def run_types(paths):
     mypy_cmd = shutil.which("mypy")

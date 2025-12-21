@@ -5,14 +5,11 @@ This script fine-tunes the base model using the "Shadow Database" of user correc
 captured during "Copilot Quest" and regular analyst workflow.
 """
 
-import os
-import torch
 import logging
-from typing import Optional
 
 # Check for uv/modern stack
 try:
-    from transformers import TrainingArguments, AutoModelForCausalLM
+    from transformers import AutoModelForCausalLM, TrainingArguments
     from trl import DPOTrainer
 except ImportError:
     logging.warning("Modern stack not found. Install via `uv sync`.")

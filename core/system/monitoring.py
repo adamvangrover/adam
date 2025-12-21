@@ -1,5 +1,7 @@
 import time
+
 from core.utils.data_utils import send_alert
+
 
 class Monitoring:
     def __init__(self, config):

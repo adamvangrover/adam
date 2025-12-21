@@ -1,12 +1,15 @@
 # core/agents/event_driven_risk_agent.py
 
 import datetime
-import requests
 import json
-from typing import List, Dict
-from .base_agent import BaseAgent
+from typing import Dict, List
+
+import requests
 from utils.data_validation import validate_event_data
 from utils.visualization_tools import generate_event_impact_chart
+
+from .base_agent import BaseAgent
+
 
 class EventDrivenRiskAgent(BaseAgent):
     """
@@ -41,7 +44,7 @@ class EventDrivenRiskAgent(BaseAgent):
                 "pageSize": 100, #max
             }
             try:
-                response = requests.get(self.news_api_url, params=params)
+                response = requests.get(self.news_api_url, params=params, timeout=30)
                 response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
                 data = response.json()
                 if data["status"] == "ok" and data["articles"]:

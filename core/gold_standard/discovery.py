@@ -3,12 +3,11 @@ Discovery Layer for the Gold Standard Toolkit.
 Implements Real Search Pull and Dynamic Universe Discovery.
 """
 
-import os
 import json
 import logging
-from typing import List, Dict, Optional
+import os
 from datetime import datetime
-import pandas as pd
+from typing import Dict, List
 
 try:
     import yfinance as yf

@@ -1,12 +1,13 @@
-import unittest
-import json
 import asyncio
+import unittest
 from datetime import datetime
-from core.schemas.hnasp import HNASP, Meta, PersonaState, LogicLayer, ContextStream, Turn
+
+from core.agents.hnasp_agent import HNASPAgent
 from core.hnasp.logic_engine import LogicEngine
 from core.hnasp.personality import BayesACTEngine
-from core.agents.hnasp_agent import HNASPAgent
 from core.hnasp.state_manager import HNASPStateManager
+from core.schemas.hnasp import HNASP, ContextStream, LogicLayer, Meta, PersonaState
+
 
 class TestHNASP(unittest.TestCase):
     def test_logic_engine(self):

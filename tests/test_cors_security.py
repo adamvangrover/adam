@@ -1,11 +1,13 @@
-import pytest
-import sys
 import os
+import sys
+
+import pytest
 
 # Ensure core is in path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 
 from core.api.server import app
+
 
 @pytest.fixture
 def client():

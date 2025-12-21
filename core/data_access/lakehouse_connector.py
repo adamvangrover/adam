@@ -1,8 +1,10 @@
-from core.tools.base_tool import BaseTool
-from typing import Any
 import json
 import os
+
 import pandas as pd
+
+from core.tools.base_tool import BaseTool
+
 
 class LakehouseConnector(BaseTool):
     name = "microsoft_fabric_run_sql"
@@ -26,7 +28,7 @@ class LakehouseConnector(BaseTool):
                     df.to_parquet(os.path.join(self.local_lake_path, "financials.parquet"))
                 except ImportError:
                     df.to_json(os.path.join(self.local_lake_path, "financials.json"), orient="records")
-            except Exception as e:
+            except Exception:
                 pass
 
     def execute(self, sql_query: str) -> str:

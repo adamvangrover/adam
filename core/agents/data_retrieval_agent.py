@@ -1,16 +1,15 @@
 # core/agents/data_retrieval_agent.py
-import logging
-import json
-import os
 import asyncio
-from typing import Optional, Union, List, Dict, Any
+import json
+import logging
+import os
+from typing import Any, Dict, Optional
 
 from core.agents.agent_base import AgentBase
-from core.utils.data_utils import load_data
-from core.system.knowledge_base import KnowledgeBase
-from core.system.error_handler import DataNotFoundError, FileReadError 
-from semantic_kernel import Kernel
 from core.data_sources.data_fetcher import DataFetcher
+from core.system.error_handler import FileReadError
+from core.system.knowledge_base import KnowledgeBase
+from core.utils.data_utils import load_data
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

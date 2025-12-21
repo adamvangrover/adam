@@ -1,6 +1,6 @@
-import os
-import json
 import ast
+import json
+import os
 
 EXCLUDE_DIRS = {
     '.git', '__pycache__', 'node_modules', 'venv', '.idea', '.vscode',
@@ -54,7 +54,7 @@ def get_file_info(filepath):
             "imports": imports,
             "content": content
         }
-    except Exception as e:
+    except Exception:
         return {"size": 0, "lines": 0, "imports": [], "content": None}
 
 def scan_repo(root_dir):

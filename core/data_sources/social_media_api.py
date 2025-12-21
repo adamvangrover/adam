@@ -2,12 +2,15 @@
 
 import tweepy
 from textblob import TextBlob
+
 try:
     from facebook_scraper import get_posts
 except ImportError:
     get_posts = None
-import logging # Added import
-from core.utils.secrets_utils import get_api_key # Added import
+import logging  # Added import
+
+from core.utils.secrets_utils import get_api_key  # Added import
+
 #... (import other necessary libraries for Instagram, TikTok, etc.)
 
 class SocialMediaAPI:

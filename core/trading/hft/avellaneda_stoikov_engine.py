@@ -28,17 +28,18 @@ Parameters:
 import asyncio
 import math
 import time
-import random
-from dataclasses import dataclass, field
-from typing import List, Dict, Optional
-from enum import Enum
+
 import numpy as np
 
 # Reuse basic structures from hft_engine
 from core.trading.hft.hft_engine import (
-    Order, OrderSide, OrderStatus, MarketTick, CircuitBreaker,
-    MarketDataHandler, OrderManager
+    CircuitBreaker,
+    MarketDataHandler,
+    Order,
+    OrderManager,
+    OrderSide,
 )
+
 
 class AvellanedaStoikovStrategy:
     def __init__(

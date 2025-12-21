@@ -1,6 +1,7 @@
 import json
 import logging
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
 from core.system.memory_manager import VectorMemoryManager
 
 logger = logging.getLogger(__name__)

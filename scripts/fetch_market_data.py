@@ -1,9 +1,10 @@
 
-from core.data_sources.yfinance_market_data import YFinanceMarketData
-from core.utils.market_data_utils import format_market_data_gold_standard
 import json
 import os
 import sys
+
+from core.data_sources.yfinance_market_data import YFinanceMarketData
+from core.utils.market_data_utils import format_market_data_gold_standard
 
 # Add project root to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))

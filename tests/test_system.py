@@ -1,10 +1,9 @@
 # tests/test_system.py
 
-import unittest
-import yaml
-import sys
 import asyncio
-from unittest.mock import patch, Mock, AsyncMock, MagicMock
+import sys
+import unittest
+from unittest.mock import AsyncMock, MagicMock, patch
 
 # Patch heavy dependencies globally to avoid import-time costs/errors
 sys.modules['spacy'] = MagicMock()
@@ -33,6 +32,7 @@ sys.modules['financial_digital_twin'] = MagicMock()
 sys.modules['financial_digital_twin.nexus_agent'] = MagicMock()
 
 from core.system.agent_orchestrator import AgentOrchestrator
+
 
 class TestAgentOrchestrator(unittest.TestCase):
     def setUp(self):

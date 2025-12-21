@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 
+
 class FinancialTruthInput(BaseModel):
     """
     Input schema for the Financial Truth TAO-CoT prompt.

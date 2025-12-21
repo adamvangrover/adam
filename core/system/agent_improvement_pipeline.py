@@ -1,10 +1,10 @@
 # core/system/agent_improvement_pipeline.py
 
-import os
 import json
 import logging
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 

@@ -2,6 +2,7 @@
 
 import json
 
+
 def get_knowledge_graph_data(module, concept):
     """
     Retrieves data from the knowledge graph for the specified module and concept.

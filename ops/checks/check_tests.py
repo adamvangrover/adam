@@ -1,6 +1,7 @@
+import shutil
 import subprocess
 import sys
-import shutil
+
 
 def run_tests(paths):
     pytest_cmd = shutil.which("pytest")

@@ -6,10 +6,10 @@ Provides a clean interface layer (Adapter Pattern) between the new v23 Graph Eng
 and the legacy v21/v22 Agents. This ensures dependency isolation and backward compatibility.
 """
 
-import json
 import logging
+from typing import Any, Dict, Optional
+
 import numpy as np
-from typing import Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 

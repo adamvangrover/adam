@@ -1,10 +1,12 @@
 # core/simulations/Credit_Rating_Assessment_Simulation.py
 
 import json
-from core.agents.snc_analyst_agent import SNCAnalystAgent
+
+from core.agents.discussion_chair_agent import DiscussionChairAgent  # Import the Discussion Chair Agent
 from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
 from core.agents.industry_specialist_agent import IndustrySpecialistAgent
-from core.agents.discussion_chair_agent import DiscussionChairAgent  # Import the Discussion Chair Agent
+from core.agents.snc_analyst_agent import SNCAnalystAgent
+
 
 class CreditRatingAssessmentSimulation:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):

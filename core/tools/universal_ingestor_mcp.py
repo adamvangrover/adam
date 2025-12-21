@@ -1,8 +1,9 @@
-from core.tools.base_tool import BaseTool
-from core.data_processing.universal_ingestor import UniversalIngestor, ArtifactType
-from typing import Any, Dict
 import json
 import os
+
+from core.data_processing.universal_ingestor import UniversalIngestor
+from core.tools.base_tool import BaseTool
+
 
 class UniversalIngestorMCP(BaseTool):
     name = "azure_ai_search"

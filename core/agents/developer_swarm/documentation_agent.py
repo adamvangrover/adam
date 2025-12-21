@@ -5,7 +5,9 @@ writing and updating documentation related to code changes.
 """
 
 from typing import Any, Dict
+
 from core.agents.agent_base import AgentBase
+
 
 class DocumentationAgent(AgentBase):
     """

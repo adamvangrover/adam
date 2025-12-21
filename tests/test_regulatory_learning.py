@@ -1,13 +1,13 @@
-import unittest
-from unittest.mock import MagicMock, patch, mock_open
-import sys
 import os
-import json
+import sys
+import unittest
+from unittest.mock import mock_open, patch
 
 # Adjust path to import core
 sys.path.append(os.getcwd())
 
 from core.agents.regulatory_compliance_agent import RegulatoryComplianceAgent
+
 
 class TestRegulatoryComplianceAgentLearning(unittest.TestCase):
     def setUp(self):

@@ -9,16 +9,37 @@ suitable for the v23 graph architecture.
 """
 
 import json
-import logging
 import random
+
 try:
     import numpy as np
 except ImportError:
     np = None
-from typing import Literal, Dict, Any, List, Optional
-from langgraph.graph import StateGraph, END, START
-from langgraph.checkpoint.memory import MemorySaver
-from core.engine.states import RiskAssessmentState, ResearchArtifact
+from typing import Any, Dict, Literal, Optional
+
+try:
+    from langgraph.checkpoint.memory import MemorySaver
+    from langgraph.graph import END, START, StateGraph
+except ImportError:
+    # Fallback for environments without langgraph
+    class StateGraph:
+        def __init__(self, state_schema): pass
+        def add_node(self, name, func): pass
+        def add_edge(self, start, end): pass
+        def add_conditional_edges(self, source, router, map): pass
+        def compile(self, checkpointer=None): return MockCompiledGraph()
+
+    class MemorySaver: pass
+    END = "END"
+    START = "START"
+
+    class MockCompiledGraph:
+        def invoke(self, state, config=None):
+            # Return a minimal valid state to prevent crashes
+            state["human_readable_status"] = "Graph execution skipped (Mock Mode)"
+            return state
+
+from core.engine.states import ResearchArtifact, RiskAssessmentState
 from core.utils.logging_utils import get_logger
 
 # v23.5 Integration: APEX Generative Risk Engine

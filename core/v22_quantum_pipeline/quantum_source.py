@@ -1,7 +1,7 @@
 try:
+    import numpy as np
     import pennylane as qml
     import torch
-    import numpy as np
 except ImportError:
     qml = None
     torch = None

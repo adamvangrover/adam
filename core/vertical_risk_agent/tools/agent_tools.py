@@ -1,17 +1,19 @@
 from __future__ import annotations
-import sqlite3
-import pandas as pd
-import sys
+
 import os
-from typing import List, Optional, Dict, Any, Union
+import sqlite3
+import sys
+from typing import Any, Dict, List, Union
+
+import pandas as pd
 from pydantic import BaseModel, Field
 
 # Ensure core is importable
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../..")))
 
 try:
-    from core.vertical_risk_agent.generative_risk import GenerativeRiskEngine
     from core.v22_quantum_pipeline.qmc_engine import QuantumMonteCarloEngine
+    from core.vertical_risk_agent.generative_risk import GenerativeRiskEngine
 except ImportError:
     GenerativeRiskEngine = None
     QuantumMonteCarloEngine = None

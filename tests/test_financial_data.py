@@ -1,10 +1,13 @@
-import unittest
-from unittest.mock import MagicMock, patch
-import pandas as pd
 import shutil
 import tempfile
+import unittest
 from pathlib import Path
-from core.financial_data import MarketDiscoveryAgent, DataLakehouse, MarketTicker
+from unittest.mock import MagicMock, patch
+
+import pandas as pd
+
+from core.financial_data import DataLakehouse, MarketDiscoveryAgent, MarketTicker
+
 
 class TestFinancialData(unittest.TestCase):
 

@@ -1,6 +1,7 @@
-import unittest
-from core.data_sources.data_fetcher import DataFetcher
 import logging
+import unittest
+
+from core.data_sources.data_fetcher import DataFetcher
 
 # Configure logging to see output
 logging.basicConfig(level=logging.INFO)

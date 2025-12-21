@@ -1,8 +1,8 @@
 
-import yfinance as yf
-import pandas as pd
 import logging
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List
+
+import yfinance as yf
 
 logger = logging.getLogger(__name__)
 

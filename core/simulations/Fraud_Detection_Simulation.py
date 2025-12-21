@@ -1,10 +1,13 @@
 # core/simulations/Fraud_Detection_Simulation.py
 
 import json
+
 from utils.api_communication import APICommunication
+
+from core.agents.alternative_data_agent import AlternativeDataAgent
 from core.agents.anomaly_detection_agent import AnomalyDetectionAgent
 from core.agents.machine_learning_model_training_agent import MachineLearningModelTrainingAgent
-from core.agents.alternative_data_agent import AlternativeDataAgent
+
 
 class FraudDetectionSimulation:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):

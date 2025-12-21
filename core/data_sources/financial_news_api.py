@@ -1,9 +1,9 @@
 # core/data_sources/financial_news_api.py
 
-import requests
-from textblob import TextBlob
-import logging # Added import
-from core.utils.secrets_utils import get_api_key # Added import
+import logging  # Added import
+
+from core.utils.secrets_utils import get_api_key  # Added import
+
 
 class FinancialNewsAPI:
     def __init__(self, config):

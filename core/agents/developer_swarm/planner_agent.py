@@ -4,8 +4,10 @@ This module defines the PlannerAgent, a specialized agent responsible for
 decomposing high-level tasks into detailed, actionable plans.
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
+
 from core.agents.agent_base import AgentBase
+
 
 class PlannerAgent(AgentBase):
     """

@@ -1,10 +1,12 @@
 #core/agents/supply_chain_risk_agent.py
 
-import requests
 import logging
-from bs4 import BeautifulSoup
+
 import folium
+import requests
+from bs4 import BeautifulSoup
 from geopy.geocoders import Nominatim
+
 
 class SupplyChainRiskAgent:
     def __init__(self, news_api_key, supplier_data, transportation_routes, geopolitical_data, web_scraping_urls=None):
@@ -32,7 +34,7 @@ class SupplyChainRiskAgent:
             'apiKey': self.news_api_key
         }
 
-        response = requests.get(self.base_url, params=params)
+        response = requests.get(self.base_url, params=params, timeout=30)
         if response.status_code == 200:
             return response.json()['articles']
         else:
@@ -46,7 +48,7 @@ class SupplyChainRiskAgent:
         """
         scraped_data = []
         for url in self.web_scraping_urls:
-            response = requests.get(url)
+            response = requests.get(url, timeout=30)
             if response.status_code == 200:
                 soup = BeautifulSoup(response.content, 'html.parser')
                 paragraphs = soup.find_all('p')

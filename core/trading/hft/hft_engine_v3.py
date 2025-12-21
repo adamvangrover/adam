@@ -13,13 +13,12 @@ See "Master Architect" prompt output for details.
 """
 
 import asyncio
-import time
 import logging
-import json
 import random
-from dataclasses import dataclass, field
+import time
+from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Optional, List
+from typing import List
 
 # Architect Note: Using dataclasses reduces memory overhead compared to dictionaries.
 # 'slots=True' (in Python 3.10+) would further optimize attribute access speed.

@@ -1,16 +1,16 @@
-import os
-import json
-import time
-import sys
 import ast
 import glob
+import json
+import os
+import sys
+import time
 
 # Ensure core modules are accessible
 sys.path.append(os.getcwd())
 
 # Mock Ingestor if not available
 try:
-    from core.data_processing.universal_ingestor import UniversalIngestor, ArtifactType
+    from core.data_processing.universal_ingestor import ArtifactType, UniversalIngestor
 except ImportError:
     UniversalIngestor = None
 

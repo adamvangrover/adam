@@ -1,6 +1,8 @@
 # core/system/v22_async/workflow.py
-from typing import Dict, List
+from typing import Dict
+
 from .async_task import AsyncTask
+
 
 class AsyncWorkflow:
     def __init__(self, name: str):

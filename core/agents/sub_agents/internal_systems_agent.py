@@ -4,6 +4,7 @@ from typing import Any, Dict
 
 from core.agents.agent_base import AgentBase
 
+
 class InternalSystemsAgent(AgentBase):
     """
     The Internal Systems Agent serves as the secure and reliable conduit to the

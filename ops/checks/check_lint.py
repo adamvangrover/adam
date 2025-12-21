@@ -1,6 +1,7 @@
+import shutil
 import subprocess
 import sys
-import shutil
+
 
 def run_lint(paths):
     flake8_cmd = shutil.which("flake8")

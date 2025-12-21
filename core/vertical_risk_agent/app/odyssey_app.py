@@ -1,8 +1,9 @@
-import streamlit as st
+import asyncio
 import json
 import os
-import asyncio
 import sys
+
+import streamlit as st
 
 # Ensure core is in path if run from subdirectory
 current_dir = os.path.dirname(os.path.abspath(__file__))

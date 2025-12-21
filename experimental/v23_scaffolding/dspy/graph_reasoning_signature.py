@@ -1,5 +1,6 @@
 import dspy
 
+
 class GraphReasoningSignature(dspy.Signature):
     """
     Given a user query, generate a Cypher query to retrieve the answer from a Neo4j graph.

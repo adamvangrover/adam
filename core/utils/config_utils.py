@@ -1,10 +1,10 @@
 # core/utils/config_utils.py
 
-import yaml
-import os # Import the 'os' module
 import logging
-from typing import Dict, Any, Optional
+import os  # Import the 'os' module
+from typing import Any, Dict, Optional
 
+import yaml
 
 # Configure logging (consider moving to a central location)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

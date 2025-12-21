@@ -1,7 +1,7 @@
+import os
+import sys
 import unittest
 from unittest.mock import MagicMock, patch
-import sys
-import os
 
 # Add repo root to path
 sys.path.append(os.getcwd())
@@ -34,7 +34,7 @@ class TestInteractionLoopFixes(unittest.TestCase):
             self.assertIsNotNone(loop)
         except NameError as e:
             self.fail(f"Initialization failed with NameError: {e}")
-        except Exception as e:
+        except Exception:
             # Other exceptions are acceptable as long as it's not NameError related to KnowledgeBase
             pass
 

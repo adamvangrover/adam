@@ -1,32 +1,28 @@
-import httpx
-import requests
 import asyncio
-import nltk
-from nltk.sentiment import SentimentIntensityAnalyzer
-from collections import defaultdict
-import time
-from pycoingecko import CoinGeckoAPI
 import json
-import numpy as np
-from sklearn.cluster import KMeans
-from datetime import datetime
 import random
-from sklearn.metrics import pairwise_distances_argmin_min
+import time
+from collections import defaultdict
+from datetime import (
+    datetime,
+    timezone,  # For timezone aware datetime objects
+)
+from typing import Any, Dict, List, Optional
 
-from typing import Dict, Any, Optional, List
-import feedparser # Added import
-import time # For parsing published_at if needed
-from datetime import timezone # For timezone aware datetime objects
-
+import feedparser  # Added import
+import httpx
+import nltk
+from pycoingecko import CoinGeckoAPI
 from semantic_kernel import Kernel
 
 from core.agents.agent_base import AgentBase
+
 # For get_api_key if needed later, but not for this step
 # from core.utils.secrets_utils import get_api_key
 
 try:
     import torch
-    from transformers import AutoTokenizer, AutoModelForSequenceClassification, AutoModelForSeq2SeqLM
+    from transformers import AutoModelForSeq2SeqLM, AutoModelForSequenceClassification, AutoTokenizer
     TORCH_AVAILABLE = True
 except ImportError:
     torch = None
@@ -39,7 +35,6 @@ except ImportError:
 #     nltk.download('vader_lexicon')
 # sia = SentimentIntensityAnalyzer() - REMOVED
 
-import nltk # Added import for sentence tokenization in summarizer fallback
 
 # Define the "NewsBot" class, now inheriting from AgentBase
 class NewsBot(AgentBase):
@@ -843,8 +838,8 @@ class NewsBot(AgentBase):
 
 if __name__ == "__main__":
     import argparse
-    import json
     import asyncio
+    import json
     import os
 
     def load_json_arg(arg_value: str, arg_name: str) -> Any:

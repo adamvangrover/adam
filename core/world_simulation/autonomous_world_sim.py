@@ -1,10 +1,11 @@
 # core/world_simulation/autonomous_world_sim.py
 
 import random
-import numpy as np
+
 from mesa import Agent, Model
-from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
+from mesa.time import RandomActivation
+
 
 class MarketAgent(Agent):
     def __init__(self, unique_id, model, volatility, risk_aversion):

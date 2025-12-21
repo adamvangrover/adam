@@ -11,10 +11,12 @@ Description:
 """
 
 from __future__ import annotations
-import numpy as np
+
 import logging
 import math
-from typing import Dict, Any, Optional, List, Union
+from typing import Any, Dict, Optional
+
+import numpy as np
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -24,9 +26,9 @@ logger = logging.getLogger(__name__)
 # -----------------------------------------------------------------------------
 QISKIT_AVAILABLE = False
 try:
-    from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister
-    from qiskit.primitives import Sampler
+    from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
     from qiskit.circuit.library import RYGate
+    from qiskit.primitives import Sampler
     # Note: Modern Qiskit (>1.0) flow
     QISKIT_AVAILABLE = True
 except ImportError:

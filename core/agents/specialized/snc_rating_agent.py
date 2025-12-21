@@ -1,7 +1,8 @@
 import logging
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List
+
 from core.agents.agent_base import AgentBase
-from core.schemas.v23_5_schema import SNCRatingModel, PrimaryFacilityAssessment
+from core.schemas.v23_5_schema import PrimaryFacilityAssessment, SNCRatingModel
 
 # Configure logging
 logger = logging.getLogger(__name__)

@@ -4,11 +4,12 @@ Integrates market views with market equilibrium for robust portfolio constructio
 """
 
 import logging
-import pandas as pd
 from typing import Dict, Optional
 
+import pandas as pd
+
 try:
-    from pypfopt import black_litterman, BlackLittermanModel, risk_models
+    from pypfopt import BlackLittermanModel, black_litterman, risk_models
 except ImportError:
     black_litterman = None
     BlackLittermanModel = None

@@ -1,7 +1,9 @@
 from __future__ import annotations
-import numpy as np
+
 import logging
-from typing import List, Dict, Any, Optional
+from typing import Dict, List
+
+import numpy as np
 
 # Configure logging
 logger = logging.getLogger(__name__)

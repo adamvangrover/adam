@@ -15,12 +15,9 @@ Usage:
 import argparse
 import json
 import random
-import time
-import os
 from datetime import datetime, timedelta
-import math
-from typing import List, Dict, Any
 from enum import Enum
+from typing import Dict, List
 
 # Constants
 OUTPUT_JSONL = "data/snapshots/market_snapshot_v1.jsonl"

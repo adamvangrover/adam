@@ -5,7 +5,9 @@ merging code, tests, and documentation into the main branch.
 """
 
 from typing import Any, Dict
+
 from core.agents.agent_base import AgentBase
+
 
 class IntegrationAgent(AgentBase):
     """

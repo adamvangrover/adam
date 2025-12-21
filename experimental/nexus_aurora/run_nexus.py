@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-import sys
 import json
+import sys
 import time
+
 from experimental.nexus_aurora.simulation import NexusOrchestrator
+
 
 def main():
     print("🚀 NEXUS-ZERO: MAXIMUM-CAPACITY EXECUTION INITIATED")

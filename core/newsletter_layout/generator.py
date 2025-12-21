@@ -1,10 +1,11 @@
 
-import os
-import json
 import glob
+import json
+import os
 from datetime import datetime
+from typing import Any, Dict
+
 from jinja2 import Environment, FileSystemLoader
-from typing import Dict, Any, List
 
 from core.utils.logging_utils import get_logger
 
@@ -17,7 +18,7 @@ class NewsletterGenerator:
     Adaptive Newsletter Generator using Jinja2 templates.
     """
     def __init__(self, template_dir: str = TEMPLATE_DIR):
-        self.env = Environment(loader=FileSystemLoader(template_dir))
+        self.env = Environment(loader=FileSystemLoader(template_dir), autoescape=True)
         self.snapshot_dir = "data/snapshots"
 
     def load_latest_snapshot(self) -> Dict[str, Any]:

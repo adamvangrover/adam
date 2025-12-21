@@ -1,7 +1,7 @@
+import os
+import sys
 import unittest
 from unittest.mock import MagicMock, patch
-import sys
-import os
 
 # Set python path
 sys.path.append(os.getcwd())
@@ -16,6 +16,7 @@ sys.modules["core.llm_plugin"] = MagicMock()
 
 # Now import the class
 from core.agents.regulatory_compliance_agent import RegulatoryComplianceAgent
+
 
 class TestRegulatoryComplianceAgent(unittest.TestCase):
     def setUp(self):

@@ -1,9 +1,8 @@
 # ops/security/audit_config.py
 
+import logging
 import os
 import re
-import yaml
-import logging
 import sys
 
 # Configure logging

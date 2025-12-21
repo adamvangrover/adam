@@ -2,7 +2,7 @@
 
 import json
 import os
-import sys
+
 
 class ClientSimulationBuilder:
     def __init__(self, seed_path: str = "data/v23_ukg_seed.json", output_path: str = "services/webapp/client/public/data/client_state.json"):

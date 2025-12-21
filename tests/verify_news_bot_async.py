@@ -1,13 +1,13 @@
-import asyncio
-import unittest
-from unittest.mock import MagicMock, patch, AsyncMock
-import sys
 import os
+import sys
+import unittest
+from unittest.mock import AsyncMock, MagicMock, patch
 
 # Ensure core is in path
 sys.path.append(os.getcwd())
 
 from core.agents.news_bot import NewsBot
+
 
 class TestNewsBotAsync(unittest.IsolatedAsyncioTestCase):
     async def test_aggregate_news_async(self):

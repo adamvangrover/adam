@@ -2,6 +2,7 @@
 
 from core.utils.data_utils import send_message
 
+
 class GeopoliticalRiskAgent:
     def __init__(self, config):
         self.data_sources = config.get('data_sources', {})

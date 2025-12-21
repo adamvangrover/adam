@@ -1,9 +1,11 @@
 # core/agents/knowledge_contribution_agent.py
 
+import json
+from typing import Any, Dict
+
 from core.agents.agent_base import AgentBase
 from core.llm.base_llm_engine import BaseLLMEngine
-from typing import Any, Dict
-import json
+
 
 class KnowledgeContributionAgent(AgentBase):
     """

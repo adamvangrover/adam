@@ -1,9 +1,7 @@
-from typing import Dict, Any, List, Optional
 import logging
 import xml.etree.ElementTree as ET
+
 import pandas as pd
-import requests
-from datetime import datetime
 
 logger = logging.getLogger(__name__)
 

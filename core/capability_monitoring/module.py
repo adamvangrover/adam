@@ -1,9 +1,9 @@
 # core/capability_monitoring/module.py
 
-import uuid
-from datetime import datetime
-from collections import defaultdict
 import json
+import uuid
+from collections import defaultdict
+from datetime import datetime
 
 # Configuration thresholds (would be externalized in a real system)
 CONFIG = {
@@ -128,10 +128,10 @@ class MockEventBus:
             callback(event_type, event_data)
 
 def mock_agent_forge_trigger(gap_report):
-    print(f"\n---!!! Agent Forge Triggered !!!---")
+    print("\n---!!! Agent Forge Triggered !!!---")
     print(f"Received Gap Report ID: {gap_report['report_id']}")
-    print(f"The Agent Forge would now parse this report and generate a new agent proposal.")
-    print(f"---!!!---------------------------!!!---")
+    print("The Agent Forge would now parse this report and generate a new agent proposal.")
+    print("---!!!---------------------------!!!---")
 
 # --- Example Usage ---
 

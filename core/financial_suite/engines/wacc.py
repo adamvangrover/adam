@@ -1,5 +1,6 @@
 from core.financial_suite.schemas.workstream_context import ValuationContext
 
+
 class WACCCalculator:
     @staticmethod
     def calculate_cost_of_equity(ctx: ValuationContext) -> float:

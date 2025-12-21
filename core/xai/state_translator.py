@@ -1,5 +1,6 @@
 from core.engine.states import RiskAssessmentState
 
+
 class ExplainableStateTranslator:
     @staticmethod
     def generate_user_update(state: RiskAssessmentState) -> str:

@@ -1,18 +1,20 @@
 #core/agents/anomaly_detection_agent.py
 
+import logging
+import random
+from typing import Dict, List
+
 import numpy as np
 import pandas as pd
 from scipy import stats
+from sklearn.cluster import KMeans
 from sklearn.ensemble import IsolationForest
 from sklearn.neighbors import LocalOutlierFactor
-from sklearn.svm import OneClassSVM
-from sklearn.cluster import KMeans
-from statsmodels.tsa.seasonal import seasonal_decompose
-from statsmodels.tsa.arima.model import ARIMA
 from sklearn.preprocessing import StandardScaler
-from typing import Dict, List
-import logging
-import random
+from sklearn.svm import OneClassSVM
+from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.seasonal import seasonal_decompose
+
 from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
 
 # ... (import other necessary libraries for data retrieval, knowledge base interaction, XAI, etc.)

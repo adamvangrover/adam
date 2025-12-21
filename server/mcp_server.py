@@ -1,16 +1,15 @@
-import sys
-import os
 import json
 import logging
-from typing import Dict, Any, List, Optional
-import glob
+import os
+import sys
+from typing import Any, Dict, List
 
 # Ensure we can import from core
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # --- Dependency Handling & Mocking ---
 try:
-    from mcp.server.fastmcp import FastMCP, Context, Image
+    from mcp.server.fastmcp import Context, FastMCP, Image
 except ImportError:
     # Fallback for environments without MCP installed (Mock implementation)
     logging.warning("MCP library not found. Using Mock FastMCP.")
@@ -292,9 +291,10 @@ def execute_python_sandbox(code: str) -> str:
     Executes arbitrary Python code in a sandboxed environment.
     """
     import io
-    from contextlib import redirect_stdout, redirect_stderr
-    import pandas as pd
+    from contextlib import redirect_stderr, redirect_stdout
+
     import numpy as np
+    import pandas as pd
     
     stdout = io.StringIO()
     stderr = io.StringIO()

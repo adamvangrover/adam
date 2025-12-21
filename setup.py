@@ -1,5 +1,7 @@
-from setuptools import setup, find_packages
 import os
+
+from setuptools import find_packages, setup
+
 
 def parse_requirements(filename):
     """

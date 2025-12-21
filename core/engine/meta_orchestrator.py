@@ -14,36 +14,48 @@ a user query should take:
 """
 
 import logging
-import asyncio
 import re
-from typing import Dict, Any, Optional
-
 import uuid
-from core.schemas.hnasp import HNASPState, Meta as HNASPMeta, PersonaState, LogicLayer, ContextStream
-from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner
-from core.engine.states import init_risk_state, init_esg_state, init_compliance_state, init_crisis_state, init_omniscient_state
-from core.engine.red_team_graph import red_team_app
-from core.engine.esg_graph import esg_graph_app
-from core.engine.regulatory_compliance_graph import compliance_graph_app
-from core.engine.crisis_simulation_graph import crisis_simulation_app
-from core.engine.deep_dive_graph import deep_dive_app
-from core.engine.reflector_graph import reflector_app
-from core.engine.states import init_reflector_state
-from core.system.agent_orchestrator import AgentOrchestrator
-from core.mcp.registry import MCPRegistry
-from core.llm_plugin import LLMPlugin
-from core.engine.autonomous_self_improvement import CodeAlchemist
+from typing import Any, Dict, Optional
+
+from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
 
 # v23.5 Deep Dive Agents (for Fallback)
 from core.agents.specialized.management_assessment_agent import ManagementAssessmentAgent
-from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
-from core.agents.specialized.peer_comparison_agent import PeerComparisonAgent
-from core.agents.specialized.snc_rating_agent import SNCRatingAgent
-from core.agents.specialized.covenant_analyst_agent import CovenantAnalystAgent
 from core.agents.specialized.monte_carlo_risk_agent import MonteCarloRiskAgent
-from core.agents.specialized.quantum_scenario_agent import QuantumScenarioAgent
+from core.agents.specialized.peer_comparison_agent import PeerComparisonAgent
 from core.agents.specialized.portfolio_manager_agent import PortfolioManagerAgent
-from core.schemas.v23_5_schema import V23KnowledgeGraph, Meta, Nodes, HyperDimensionalKnowledgeGraph, EquityAnalysis, Fundamentals, ValuationEngine, DCFModel, PriceTargets
+from core.agents.specialized.quantum_scenario_agent import QuantumScenarioAgent
+from core.agents.specialized.snc_rating_agent import SNCRatingAgent
+from core.engine.autonomous_self_improvement import CodeAlchemist
+from core.engine.crisis_simulation_graph import crisis_simulation_app
+from core.engine.deep_dive_graph import deep_dive_app
+from core.engine.esg_graph import esg_graph_app
+from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner
+from core.engine.red_team_graph import red_team_app
+from core.engine.reflector_graph import reflector_app
+from core.engine.regulatory_compliance_graph import compliance_graph_app
+from core.engine.states import (
+    init_compliance_state,
+    init_crisis_state,
+    init_esg_state,
+    init_omniscient_state,
+    init_reflector_state,
+)
+from core.llm_plugin import LLMPlugin
+from core.mcp.registry import MCPRegistry
+from core.schemas.v23_5_schema import (
+    DCFModel,
+    EquityAnalysis,
+    Fundamentals,
+    HyperDimensionalKnowledgeGraph,
+    Meta,
+    Nodes,
+    PriceTargets,
+    V23KnowledgeGraph,
+    ValuationEngine,
+)
+from core.system.agent_orchestrator import AgentOrchestrator
 
 logger = logging.getLogger(__name__)
 
@@ -367,7 +379,7 @@ class MetaOrchestrator:
             )
 
             # Manually construct CreditAnalysis
-            from core.schemas.v23_5_schema import CreditAnalysis, CovenantRiskAnalysis
+            from core.schemas.v23_5_schema import CovenantRiskAnalysis, CreditAnalysis
 
             credit_analysis = CreditAnalysis(
                 snc_rating_model=snc_model,

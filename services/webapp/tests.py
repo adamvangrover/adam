@@ -1,7 +1,9 @@
-import unittest
 import json
+import unittest
 from unittest.mock import patch
-from .api import create_app, db, User
+
+from .api import User, create_app, db
+
 
 class ApiTestCase(unittest.TestCase):
     def setUp(self):

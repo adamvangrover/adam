@@ -1,19 +1,13 @@
-import os
 import json
 import logging
-import hashlib
+import os
 from datetime import datetime
-from typing import Dict, Any, TypedDict, Optional, List
-from langgraph.graph import StateGraph, END
-from dataclasses import asdict
+from typing import Any, Dict, List, Optional, TypedDict
+
+from langgraph.graph import END, StateGraph
 
 # Import common utilities
-from core.data_processing.utils import (
-    GoldStandardArtifact,
-    GoldStandardScrubber,
-    FileHandlers,
-    ArtifactType
-)
+from core.data_processing.utils import FileHandlers, GoldStandardScrubber
 
 logger = logging.getLogger("SequentialPipeline")
 

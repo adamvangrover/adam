@@ -1,8 +1,11 @@
 from __future__ import annotations
-import unittest
+
 import asyncio
+import unittest
+
 from core.agents.meta_agents.crisis_simulation_agent import CrisisSimulationMetaAgent
 from core.schemas.crisis_simulation import CrisisSimulationInput, RiskEntity
+
 
 class TestCrisisSimulationMetaAgent(unittest.TestCase):
 

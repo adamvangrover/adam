@@ -9,8 +9,8 @@ The schema is intended to be used as a code-based reference for data ingestion,
 query generation, and validation.
 """
 
-from dataclasses import dataclass, field
-from typing import List, Optional
+from dataclasses import dataclass
+from typing import Optional
 
 # --- Core Nodes (Entities) ---
 

@@ -1,7 +1,7 @@
-import os
-from typing import Dict, Any
-from .xbrl_handler import XBRLHandler
 import logging
+from typing import Any, Dict
+
+from .xbrl_handler import XBRLHandler
 
 logger = logging.getLogger(__name__)
 

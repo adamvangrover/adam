@@ -1,24 +1,24 @@
 # core/agents/crypto_agent.py
 
-import json
 import datetime
-import requests
+import json
+
+import nltk
 import numpy as np
+from nltk.sentiment import SentimentIntensityAnalyzer
+from sklearn.linear_model import LinearRegression
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
-from sklearn.linear_model import LinearRegression
-import nltk
-from nltk.sentiment import SentimentIntensityAnalyzer
+
 try:
     import talib
     TALIB_AVAILABLE = True
 except ImportError:
     TALIB_AVAILABLE = False
+from collections import deque
+
 import ccxt
 from pycoingecko import CoinGeckoAPI
-import time
-import os
-from collections import deque
 
 # Download NLTK resources if not already downloaded
 nltk.download('vader_lexicon')

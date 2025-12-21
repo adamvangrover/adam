@@ -1,6 +1,8 @@
 import pytest
+
 torch = pytest.importorskip("torch")
 from src.adam.core.optimizers import AdamW, Lion
+
 
 @pytest.mark.parametrize("optimizer_class", [AdamW, Lion])
 def test_optimizer_basic_step(optimizer_class):

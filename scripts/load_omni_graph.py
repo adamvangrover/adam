@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 import json
 import logging
-import networkx as nx
 from pathlib import Path
-from typing import Dict, Any, Optional, List, Union
+from typing import Dict, List, Optional, Union
+
+import networkx as nx
 
 # Configure structured logging
 logging.basicConfig(

@@ -1,11 +1,9 @@
 import unittest
-import os
-import shutil
-import asyncio
-from core.institutional_radar.ingestion import SECEdgarScraper
+
 from core.institutional_radar.analytics import InstitutionalRadarAnalytics
-from core.institutional_radar.database import init_db, SessionLocal, FundMasterDB, SecurityMasterDB, engine
-from core.institutional_radar.schema import HoldingDetail
+from core.institutional_radar.database import FundMasterDB, SecurityMasterDB, SessionLocal, init_db
+from core.institutional_radar.ingestion import SECEdgarScraper
+
 
 class TestInstitutionalRadar(unittest.TestCase):
     def setUp(self):
@@ -46,9 +44,10 @@ class TestInstitutionalRadar(unittest.TestCase):
         # Let's manually insert a holding for testing analytics.
 
         # We need a filing first
-        from core.institutional_radar.database import FilingEventDB, HoldingDetailDB
-        from datetime import date
         import uuid
+        from datetime import date
+
+        from core.institutional_radar.database import FilingEventDB, HoldingDetailDB
 
         filing_id = uuid.uuid4()
         fe = FilingEventDB(

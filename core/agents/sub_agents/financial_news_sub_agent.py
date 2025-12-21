@@ -1,5 +1,7 @@
 import requests
+
 from core.agents.agent_base import AgentBase
+
 
 class FinancialNewsSubAgent(AgentBase):
     def __init__(self, config):
@@ -13,7 +15,7 @@ class FinancialNewsSubAgent(AgentBase):
             "apiKey": self.api_key,
         }
         try:
-            response = requests.get(self.base_url, params=params)
+            response = requests.get(self.base_url, params=params, timeout=30)
             response.raise_for_status()  # Raise an exception for bad status codes
             data = response.json()
             return self._to_structured_output(data)

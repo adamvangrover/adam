@@ -1,5 +1,7 @@
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
 from core.financial_suite.schemas.workstream_context import WorkstreamContext
+
 
 class DCFEngine:
     @staticmethod

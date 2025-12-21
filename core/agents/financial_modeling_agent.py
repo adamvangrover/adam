@@ -1,12 +1,11 @@
 #core/agents/financial_modeling_agent.py
 
+import logging
+from typing import Any, Dict, List, Tuple
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from scipy import stats
-import logging
-from typing import Dict, Any, Tuple, List
-import openpyxl
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

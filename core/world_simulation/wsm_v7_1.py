@@ -1,10 +1,10 @@
 # core/world_simulation/wsm_v7_1.py
 
 import random
-import numpy as np
+
 from mesa import Agent, Model
-from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
+from mesa.time import RandomActivation
 
 # --- Agent Definitions ---
 

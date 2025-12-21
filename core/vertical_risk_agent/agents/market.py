@@ -1,5 +1,7 @@
-from typing import Dict, Any
+from typing import Any, Dict
+
 from ..state import VerticalRiskGraphState
+
 
 class MarketAgent:
     """

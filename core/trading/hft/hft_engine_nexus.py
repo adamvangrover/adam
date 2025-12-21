@@ -39,13 +39,12 @@ Performance Targets:
 import asyncio
 import logging
 import math
+import random
 import struct
 import time
-import random
-import sys
-from dataclasses import dataclass
 from collections import deque
-from typing import Optional, Deque, Tuple, List
+from dataclasses import dataclass
+from typing import Deque, Tuple
 
 # --- OPTIMIZATION: ACCELERATOR LOADING ---
 try:

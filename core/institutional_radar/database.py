@@ -1,10 +1,13 @@
 from __future__ import annotations
+
 import uuid
-from typing import Optional
 from datetime import date
-from sqlalchemy import Column, String, Boolean, Date, Integer, BigInteger, ForeignKey, create_engine
+from typing import Optional
+
+from sqlalchemy import BigInteger, Boolean, Date, ForeignKey, String, create_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, sessionmaker
-from sqlalchemy.types import TypeDecorator, CHAR
+from sqlalchemy.types import CHAR, TypeDecorator
+
 
 # SQLite compatible UUID type
 class GUID(TypeDecorator):

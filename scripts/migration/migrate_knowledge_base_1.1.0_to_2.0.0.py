@@ -1,5 +1,6 @@
 import json
 
+
 def migrate_knowledge_base():
     """
     Migrates the knowledge_base.json file from version 1.1.0 to 2.0.0.

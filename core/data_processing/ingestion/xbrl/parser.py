@@ -8,7 +8,8 @@ It prioritizes accuracy over speed, ensuring "Gold Standard" data ingestion.
 """
 
 import xml.etree.ElementTree as ET
-from typing import Dict, Any, Optional
+from typing import Any, Dict
+
 
 class XBRLParser:
     def __init__(self):

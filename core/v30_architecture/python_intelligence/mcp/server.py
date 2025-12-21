@@ -1,7 +1,7 @@
 import json
 import logging
 import time
-from typing import Dict, Any, Callable
+from typing import Any, Callable, Dict
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

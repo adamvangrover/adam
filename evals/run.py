@@ -1,7 +1,7 @@
+import argparse
 import json
 import logging
-import argparse
-from typing import List, Dict
+from typing import Dict, List
 
 try:
     from .graders.llm_judge import grade_answer

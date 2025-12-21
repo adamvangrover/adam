@@ -1,8 +1,10 @@
 # core/system/system_controller.py
 
+from agents import *  # Import all agents
 from plugin_manager import PluginManager
-from agents import * # Import all agents
-from core.utils.config_utils import load_app_config # Added import
+
+from core.utils.config_utils import load_app_config  # Added import
+
 
 class SystemController:
     def __init__(self, config: dict):

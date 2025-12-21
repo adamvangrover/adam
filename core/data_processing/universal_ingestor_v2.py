@@ -1,19 +1,13 @@
-import os
-import json
-import logging
 import argparse
 import hashlib
-from typing import List, Dict, Callable, Optional
-from datetime import datetime
+import json
+import logging
+import os
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from typing import Callable, Dict, List, Optional
 
 # Import common utilities
-from core.data_processing.utils import (
-    GoldStandardArtifact,
-    GoldStandardScrubber,
-    FileHandlers,
-    ArtifactType
-)
+from core.data_processing.utils import FileHandlers, GoldStandardArtifact, GoldStandardScrubber
 
 # --- CONFIGURATION & LOGGING ---
 logging.basicConfig(
@@ -60,7 +54,7 @@ class UniversalIngestor:
         try:
             if ext == '.parquet':
                 raw_text = None
-                current_hash = hashlib.md5(filepath.encode()).hexdigest()
+                current_hash = hashlib.sha256(filepath.encode()).hexdigest()
             else:
                 with open(filepath, 'r', encoding='utf-8', errors='ignore') as f:
                     raw_text = f.read()

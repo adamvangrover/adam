@@ -1,7 +1,9 @@
 # core/system/brokers/rabbitmq_client.py
 
 import pika
+
 from core.system.message_broker import MessageBroker
+
 
 class RabbitMQClient(MessageBroker):
     """

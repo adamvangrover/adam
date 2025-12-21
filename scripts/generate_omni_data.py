@@ -1,18 +1,17 @@
-import os
-import json
-import time
-import random
-import sys
 import ast
 import glob
+import json
+import os
+import random
 import re
+import sys
 
 # Ensure core modules are accessible
 sys.path.append(os.getcwd())
 
 # Attempt imports, handle missing dependencies gracefully
 try:
-    from core.data_processing.universal_ingestor import UniversalIngestor, ArtifactType
+    from core.data_processing.universal_ingestor import ArtifactType, UniversalIngestor
 except ImportError:
     UniversalIngestor = None
 
@@ -72,7 +71,7 @@ def parse_agent_file(filepath, root_dir):
                     'bases': [b.id for b in cls.bases if isinstance(b, ast.Name)]
                 })
         return agent_info
-    except Exception as e:
+    except Exception:
         return []
 
 def scan_agents(root_dir):

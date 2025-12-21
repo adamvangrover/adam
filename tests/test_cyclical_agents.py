@@ -1,10 +1,11 @@
 # tests/test_cyclical_agents.py
-import unittest
 import asyncio
-from unittest.mock import Mock, patch, call
+import unittest
+from unittest.mock import patch
 
 from core.agents.cyclical_reasoning_agent import CyclicalReasoningAgent
 from core.agents.reflector_agent import ReflectorAgent
+
 
 class TestCyclicalAgents(unittest.TestCase):
     def test_reflector_agent(self):

@@ -3,19 +3,20 @@ POC Script for the Gold Standard Financial Toolkit.
 Demonstrates the storage, retrieval, and analysis pipeline using mock data.
 """
 
-import sys
 import os
-import pandas as pd
+import sys
+
 import numpy as np
+import pandas as pd
 
 # Ensure core is importable
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 try:
-    from core.gold_standard.storage import StorageEngine
-    from core.gold_standard.trading.strategy import MeanReversionStrategy
     from core.gold_standard.advisory.mpt import PortfolioOptimizer
     from core.gold_standard.qa import validate_dataframe
+    from core.gold_standard.storage import StorageEngine
+    from core.gold_standard.trading.strategy import MeanReversionStrategy
 except ImportError as e:
     print(f"Import failed: {e}")
     sys.exit(1)
