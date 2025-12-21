@@ -101,26 +101,27 @@ class UnifiedKnowledgeGraph:
 
         # 3. Covenants
         covenants = risk_state.get("covenants", [])
-        for cov in covenants:
-            cov_name = cov.get("name", "Unknown Covenant")
-            cov_id = f"Covenant::{ticker}::{cov_name}"
 
-            self.graph.add_node(
-                cov_id,
-                type="Covenant",
-                name=cov_name,
-                threshold=cov.get("threshold"),
-                operator=cov.get("operator")
-            )
-            # In a real graph, we'd link to the Facility. Here we link to Entity via a "governed_by" proxy or direct
-            # Using the schema: LegalEntity -> BORROWS -> Facility -> GOVERNED_BY -> Covenant
-            # We'll create a synthetic facility for now
+        # Bolt Optimization: Hoist facility creation out of loop to avoid N redundant checks
+        if covenants:
             facility_id = f"CreditFacility::{ticker}::General"
             if not self.graph.has_node(facility_id):
                 self.graph.add_node(facility_id, type="CreditFacility", name="General Facility")
                 self.graph.add_edge(entity_id, facility_id, relation="BORROWS")
 
-            self.graph.add_edge(facility_id, cov_id, relation="GOVERNED_BY")
+            for cov in covenants:
+                cov_name = cov.get("name", "Unknown Covenant")
+                cov_id = f"Covenant::{ticker}::{cov_name}"
+
+                self.graph.add_node(
+                    cov_id,
+                    type="Covenant",
+                    name=cov_name,
+                    threshold=cov.get("threshold"),
+                    operator=cov.get("operator")
+                )
+
+                self.graph.add_edge(facility_id, cov_id, relation="GOVERNED_BY")
 
         # 4. Risk Model Output
         if risk_state.get("draft_memo"):
