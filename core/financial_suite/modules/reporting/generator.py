@@ -18,7 +18,7 @@ class ReportGenerator:
         sofrs = [0.03, 0.04, 0.05, 0.06, 0.07]
         sofr_labels = ["3.0%", "4.0%", "5.0%", "6.0%", "7.0%"]
 
-        markdown = "| Margin \ SOFR | " + " | ".join(sofr_labels) + " |\n"
+        markdown = r"| Margin \ SOFR | " + " | ".join(sofr_labels) + " |\n"
         markdown += "|---|---" + "|---" * len(sofrs) + "|\n"
 
         for i, m in enumerate(margins):
@@ -79,7 +79,7 @@ class ReportGenerator:
         volatilities = [0.30, 0.45, 0.60, 0.75]
         vol_labels = ["Low (30%)", "Med (45%)", "High (60%)", "Severe (75%)"]
 
-        markdown = "| Rev Contraction \ Volatility | " + " | ".join(vol_labels) + " |\n"
+        markdown = r"| Rev Contraction \ Volatility | " + " | ".join(vol_labels) + " |\n"
         markdown += "|---|---" + "|---" * len(volatilities) + "|\n"
 
         for i, r_change in enumerate(rev_contractions):

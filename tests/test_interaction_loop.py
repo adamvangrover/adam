@@ -46,7 +46,11 @@ class TestInteractionLoop(unittest.TestCase):
             "ResultAggregationAgent": self.mock_result_agent,
         }.get(x)
 
-        loop = InteractionLoop(config=self.mock_config, knowledge_base=self.mock_kb)
+    @patch('core.utils.config_utils.load_config')
+    @patch('core.system.agent_orchestrator.AgentOrchestrator')
+    def test_process_input_risk_query(self, mock_orchestrator, mock_config):
+        mock_config.return_value = self.mock_config
+        loop = InteractionLoop(config=self.mock_config, knowledge_base = self.mock_kb) #Pass Knowledge Base
 
         self.mock_query_agent.execute.return_value = ["DataRetrievalAgent"]
         self.mock_data_agent.execute.return_value = "low"
@@ -61,8 +65,8 @@ class TestInteractionLoop(unittest.TestCase):
         self.mock_result_agent.execute.assert_called_once_with(["low"])
 
     @patch('core.utils.config_utils.load_config')
-    @patch('core.system.interaction_loop.AgentOrchestrator')
-    def test_process_input_kb_query(self, mock_orchestrator_cls, mock_config):
+    @patch('core.system.agent_orchestrator.AgentOrchestrator')
+    def test_process_input_kb_query(self, mock_orchestrator, mock_config):
         mock_config.return_value = self.mock_config
         mock_orchestrator_instance = mock_orchestrator_cls.return_value
         mock_orchestrator_instance.get_agent.side_effect = lambda x: {
@@ -83,8 +87,8 @@ class TestInteractionLoop(unittest.TestCase):
         self.mock_result_agent.execute.assert_called_once_with(["Positive"])
 
     @patch('core.utils.config_utils.load_config')
-    @patch('core.system.interaction_loop.AgentOrchestrator')
-    def test_process_input_updatekb(self, mock_orchestrator_cls, mock_config):
+    @patch('core.system.agent_orchestrator.AgentOrchestrator')
+    def test_process_input_updatekb(self, mock_orchestrator, mock_config):
         mock_config.return_value = self.mock_config
         mock_orchestrator_instance = mock_orchestrator_cls.return_value
         mock_orchestrator_instance.get_agent.side_effect = lambda x: {
@@ -115,8 +119,8 @@ class TestInteractionLoop(unittest.TestCase):
         pass
 
     @patch('core.utils.config_utils.load_config')
-    @patch('core.system.interaction_loop.AgentOrchestrator')
-    def test_process_input_invalid_command(self, mock_orchestrator_cls, mock_config):
+    @patch('core.system.agent_orchestrator.AgentOrchestrator')
+    def test_process_input_invalid_command(self, mock_orchestrator, mock_config):
         mock_config.return_value = self.mock_config
         mock_orchestrator_instance = mock_orchestrator_cls.return_value
         mock_orchestrator_instance.get_agent.return_value = self.mock_query_agent
@@ -130,8 +134,8 @@ class TestInteractionLoop(unittest.TestCase):
         self.mock_query_agent.execute.assert_called_once_with("invalid command")
 
     @patch('core.utils.config_utils.load_config')
-    @patch('core.system.interaction_loop.AgentOrchestrator')
-    def test_process_input_agent_not_found(self, mock_orchestrator_cls, mock_config):
+    @patch('core.system.agent_orchestrator.AgentOrchestrator')
+    def test_process_input_agent_not_found(self, mock_orchestrator, mock_config):
         mock_config.return_value = self.mock_config
         mock_orchestrator_instance = mock_orchestrator_cls.return_value
         mock_orchestrator_instance.get_agent.side_effect = lambda x: {
@@ -146,8 +150,8 @@ class TestInteractionLoop(unittest.TestCase):
         self.assertEqual(context.exception.code, 102)
 
     @patch('core.utils.config_utils.load_config')
-    @patch('core.system.interaction_loop.AgentOrchestrator')
-    def test_process_input_data_not_found(self, mock_orchestrator_cls, mock_config):
+    @patch('core.system.agent_orchestrator.AgentOrchestrator')
+    def test_process_input_data_not_found(self, mock_orchestrator, mock_config):
         mock_config.return_value = self.mock_config
         mock_orchestrator_instance = mock_orchestrator_cls.return_value
         mock_orchestrator_instance.get_agent.return_value = self.mock_query_agent
@@ -168,8 +172,8 @@ class TestInteractionLoop(unittest.TestCase):
         self.assertEqual(context.exception.code, 101)
 
     @patch('core.utils.config_utils.load_config')
-    @patch('core.system.interaction_loop.AgentOrchestrator')
-    def test_process_input_multiple_agents(self, mock_orchestrator_cls, mock_config):
+    @patch('core.system.agent_orchestrator.AgentOrchestrator')
+    def test_process_input_multiple_agents(self, mock_orchestrator, mock_config):
         mock_config.return_value = self.mock_config
         mock_orchestrator_instance = mock_orchestrator_cls.return_value
 

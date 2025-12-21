@@ -66,12 +66,35 @@ class AgentTools:
     def query_sql(self, query: str) -> str:
         """
         Executes a read-only SQL query against the local financial database.
+        Restricted to specific tables for security.
         """
         if not query.strip().upper().startswith("SELECT"):
             raise ValueError("Only SELECT queries are allowed.")
 
+        # Whitelist of allowed tables to prevent accessing secrets or system tables
+        ALLOWED_TABLES = {'financials', 'sqlite_sequence'}
+
+        def authorizer(action, arg1, arg2, dbname, source):
+            # Allow SELECT statements
+            if action == sqlite3.SQLITE_SELECT:
+                return sqlite3.SQLITE_OK
+            # Allow READ on whitelisted tables
+            if action == sqlite3.SQLITE_READ:
+                if arg1 in ALLOWED_TABLES:
+                    return sqlite3.SQLITE_OK
+                return sqlite3.SQLITE_DENY
+            # Allow standard SQL functions
+            if action == sqlite3.SQLITE_FUNCTION:
+                return sqlite3.SQLITE_OK
+            # Deny everything else (INSERT, UPDATE, DELETE, PRAGMA, etc.)
+            return sqlite3.SQLITE_DENY
+
         try:
-            conn = sqlite3.connect(self.db_path)
+            # Use read-only URI mode as an extra layer of defense
+            uri_path = f"file:{os.path.abspath(self.db_path)}?mode=ro"
+            conn = sqlite3.connect(uri_path, uri=True)
+            conn.set_authorizer(authorizer)
+
             # Use chunks or limit to prevent OOM on large datasets in a real scenario
             df = pd.read_sql_query(query, conn)
             conn.close()

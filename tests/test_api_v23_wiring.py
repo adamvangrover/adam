@@ -75,7 +75,7 @@ class TestAdaptiveAPIReal(unittest.TestCase):
                 # Mock route_request
                 api_module.meta_orchestrator.route_request = AsyncMock(return_value={"status": "Mock Success"})
 
-                resp = client.post('/api/adaptive/query',
+                resp = client.post('/api/v23/analyze',
                                    data=json.dumps({"query": "test"}),
                                    content_type='application/json')
 

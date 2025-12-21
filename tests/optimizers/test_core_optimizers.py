@@ -1,5 +1,5 @@
 import pytest
-import torch
+torch = pytest.importorskip("torch")
 from src.adam.core.optimizers import AdamW, Lion
 
 

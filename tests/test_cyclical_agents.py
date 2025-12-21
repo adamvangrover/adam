@@ -24,7 +24,8 @@ class TestCyclicalAgents(unittest.TestCase):
                 result = await agent.execute(task)
 
                 # Assert the result
-                self.assertEqual(result, task)
+                self.assertIn("quality_score", result)
+                self.assertIn("critique_notes", result)
 
         # Run the async test
         asyncio.run(run_test())

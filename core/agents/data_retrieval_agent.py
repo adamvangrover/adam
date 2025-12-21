@@ -31,12 +31,15 @@ class DataRetrievalAgent(AgentBase):
 
         self.risk_ratings_path = self.config.get('risk_ratings_file_path', 'data/risk_rating_mapping.json')
         self.market_baseline_path = self.config.get('market_baseline_file_path', 'data/adam_market_baseline.json')
-
-        try:
-            self.knowledge_base = KnowledgeBase()
-        except Exception as e:
-            logging.error(f"Failed to initialize KnowledgeBase in DataRetrievalAgent: {e}")
-            self.knowledge_base = None
+        
+        if 'knowledge_base' in self.config:
+            self.knowledge_base = self.config['knowledge_base']
+        else:
+            try:
+                self.knowledge_base = KnowledgeBase()
+            except Exception as e:
+                logging.error(f"Failed to initialize KnowledgeBase in DataRetrievalAgent: {e}")
+                self.knowledge_base = None
 
         # Initialize the Live Data Connector
         self.data_fetcher = DataFetcher()

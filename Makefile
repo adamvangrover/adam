@@ -1,4 +1,4 @@
-.PHONY: install check test lint format clean
+.PHONY: install check test lint format clean docker-build docker-up setup-dev
 
 install:
 	pip install -r requirements.txt
@@ -18,7 +18,19 @@ format:
 	autopep8 --in-place --recursive core/ services/ tests/
 
 clean:
-	rm -rf __pycache__
-	rm -rf .pytest_cache
-	rm -rf .mypy_cache
+	rm -rf build/ dist/ *.egg-info .pytest_cache .mypy_cache
 	rm -f check_results.txt tests_output.txt
+	find . -name "*.pyc" -delete
+	find . -name "__pycache__" -delete
+
+docker-build:
+	docker-compose build
+
+docker-up:
+	docker-compose up
+
+setup-dev:
+	pip install -r requirements.txt
+	pip install -e .
+	bash ops/setup.sh
+	pre-commit install
