@@ -1,55 +1,76 @@
-# Async Swarm Workflow Documentation
+# Async Swarm Workflow (v22 Architecture)
 
 ## Overview
 
-The Async Swarm Workflow represents the v22 architecture shift in the ADAM system, moving from a purely synchronous, orchestrator-led model to an asynchronous, message-driven "swarm" of agents. This architecture enables higher concurrency, improved resilience, and more complex emergent behaviors.
+The Adam v22 architecture introduces a hybrid model that combines the synchronous, centrally-orchestrated workflows of v21 with a new asynchronous, message-driven "swarm" system. This allows for parallel execution, improved scalability, and non-blocking agent interactions.
 
-## Key Components
+## Core Components
 
-### 1. Message Broker (`core/system/message_broker.py`)
-The central nervous system of the swarm. It handles:
-- **Asynchronous Messaging:** Agents publish and subscribe to topics.
-- **Event-Driven Execution:** Tasks are triggered by events rather than direct function calls.
-- **Decoupling:** Agents do not need to know about each other's existence, only the message schemas.
+### 1. Hybrid Orchestrator
+The `HybridOrchestrator` acts as the bridge between the synchronous and asynchronous worlds. It inspects incoming tasks and routes them to the appropriate subsystem:
+- **Synchronous Tasks:** Routed to the legacy `AgentOrchestrator`.
+- **Asynchronous Tasks:** Routed to the `MessageBroker` for distribution to the swarm.
 
-### 2. Async Agent Base (`core/system/v22_async/async_agent_base.py`)
-The base class for all swarm agents. Features include:
-- **Non-blocking I/O:** Built on `asyncio` for efficient resource usage.
-- **State Management:** Local state handling independent of the global orchestrator.
-- **Lifecycle Management:** Start, stop, and pause capabilities.
+### 2. Message Broker
+Located at `core/system/message_broker.py`, the Message Broker is the central nervous system of the v22 architecture. It supports:
+- **Event-Driven Communication:** Agents publish messages to topics/channels.
+- **Decoupling:** Senders do not need to know who the receivers are.
+- **Scalability:** Supports multiple consumers for parallel processing.
 
-### 3. Hybrid Orchestrator (`core/system/hybrid_orchestrator.py`)
-Bridges the v21 synchronous world with the v22 swarm. It:
-- **Routes Tasks:** Decides whether a task requires a linear plan (v21) or a swarm solution (v22).
-- **Aggregates Results:** Collects outputs from asynchronous agents for final reporting.
+### 3. Async Agent Base
+The `AsyncAgentBase` (in `core/system/v22_async/async_agent_base.py`) extends the standard agent capabilities to support:
+- **Non-blocking Execution:** `async/await` patterns for I/O operations.
+- **Message Listening:** Automatically subscribes to relevant topics.
+- **State Management:** Handles asynchronous state updates.
 
 ## Workflow Lifecycle
 
-1.  **Task Ingestion:** A high-level goal is received by the `MetaOrchestrator`.
-2.  **Decomposition:** If suitable for the swarm, the task is broken down into independent sub-tasks.
-3.  **Broadcast:** Sub-tasks are published to the message broker.
-4.  **Swarm Activation:** Idle agents subscribed to relevant topics pick up tasks.
-5.  **Execution & Collaboration:** Agents execute tasks, potentially generating new sub-tasks or requesting help via the broker.
-6.  **Convergence:** Results are published back to a result topic.
-7.  **Synthesis:** The `HybridOrchestrator` gathers results and formulates the final response.
+1.  **Task Ingestion:** A task is received by the `MetaOrchestrator` or `HybridOrchestrator`.
+2.  **Routing:** If identified as an async task (e.g., "high-throughput data gathering"), it is published to the `task_queue`.
+3.  **Swarm Activation:** Available agents subscribed to `task_queue` pick up the message.
+4.  **Parallel Execution:** Multiple agents process sub-tasks simultaneously.
+5.  **Result Aggregation:** Agents publish results to a `results_queue`.
+6.  **Synthesis:** A specialized aggregator agent or the orchestrator collects results and formulates the final response.
 
 ## Benefits
 
-- **Scalability:** Add more agent instances to handle increased load without architectural changes.
-- **Robustness:** Failure of a single agent does not halt the entire process; the task can be retried or picked up by another agent.
-- **Real-Time Responsiveness:** The system can react to incoming data streams (e.g., market ticks) immediately.
+- **Performance:** Significantly reduces latency for I/O-bound tasks (e.g., fetching data from multiple APIs).
+- **Resilience:** If one agent fails, others can continue processing.
+- **Extensibility:** New agents can be added to the swarm without modifying the orchestrator logic.
+
+## Diagram
+
+```mermaid
+graph TD
+    User[User Request] --> Orchestrator[Hybrid Orchestrator]
+    Orchestrator -->|Sync Task| v21[v21 Legacy Orchestrator]
+    Orchestrator -->|Async Task| Broker[Message Broker]
+
+    subgraph "Async Swarm"
+        Broker -->|Topic: Data| AgentA[Data Agent 1]
+        Broker -->|Topic: Data| AgentB[Data Agent 2]
+        Broker -->|Topic: Analysis| AgentC[Analyst Agent]
+
+        AgentA -->|Result| Broker
+        AgentB -->|Result| Broker
+        AgentC -->|Result| Broker
+    end
+
+    Broker -->|Aggregated Results| Orchestrator
+    v21 -->|Result| Orchestrator
+    Orchestrator --> User
+```
 
 ## Developer Guide
 
-To create a new async agent:
+To implement a new async agent:
 1.  Inherit from `AsyncAgentBase`.
 2.  Implement the `process_message` method.
-3.  Register the agent with the `MessageBroker` and subscribe to topics.
+3.  Register the agent with the `MessageBroker` in your configuration.
 
 ```python
-class MySwarmAgent(AsyncAgentBase):
-    async def process_message(self, message: Message):
-        # Process logic
-        result = await self.do_work(message.payload)
-        await self.publish("result_topic", result)
+class MyAsyncAgent(AsyncAgentBase):
+    async def process_message(self, message):
+        # Async logic here
+        await self.send_message("results_queue", {"data": "processed"})
 ```
