@@ -1,4 +1,4 @@
-#coder_agent.py
+# coder_agent.py
 """
 This module defines the CoderAgent, a specialized agent responsible for
 writing code to implement a single, well-defined task.
@@ -6,6 +6,7 @@ writing code to implement a single, well-defined task.
 
 from typing import Any, Dict
 from core.agents.agent_base import AgentBase
+
 
 class CoderAgent(AgentBase):
     """
@@ -65,7 +66,7 @@ def new_function():
     \"\"\"This is a new function.\"\"\"
     pass
 """
-        
+
         # 4. Return the generated code and the path to write it to
         return {
             "file_path": file_path,

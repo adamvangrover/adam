@@ -10,6 +10,7 @@ from core.engine.states import RedTeamState, GraphState
 
 logger = logging.getLogger(__name__)
 
+
 class RedTeamAgent(AgentBase):
     """
     The Red Team Agent acts as an adversary to the system.
@@ -32,13 +33,13 @@ class RedTeamAgent(AgentBase):
         # Determine target from input state
         target_entity = "General Portfolio"
         if isinstance(state, dict):
-             # Handle GraphState input (from AdaptiveSystemGraph)
-             if "request" in state:
-                 # Extract target from request (simplified)
-                 target_entity = state.get("request", "Unknown Target")
-             # Handle direct dictionary input (legacy)
-             elif "target_portfolio_id" in state:
-                 target_entity = state["target_portfolio_id"]
+            # Handle GraphState input (from AdaptiveSystemGraph)
+            if "request" in state:
+                # Extract target from request (simplified)
+                target_entity = state.get("request", "Unknown Target")
+            # Handle direct dictionary input (legacy)
+            elif "target_portfolio_id" in state:
+                target_entity = state["target_portfolio_id"]
 
         # Initialize RedTeamState
         initial_state: RedTeamState = {
@@ -46,7 +47,7 @@ class RedTeamAgent(AgentBase):
             "scenario_type": "Macro",
             "current_scenario_description": "",
             "simulated_impact_score": 0.0,
-            "severity_threshold": 7.5, # Target high severity
+            "severity_threshold": 7.5,  # Target high severity
             "critique_notes": [],
             "iteration_count": 0,
             "is_sufficiently_severe": False,
@@ -159,7 +160,7 @@ class RedTeamAgent(AgentBase):
     def _should_continue(self, state: RedTeamState) -> Literal["escalate", "finalize"]:
         if state["is_sufficiently_severe"]:
             return "finalize"
-        if state["iteration_count"] >= 3: # Max retries
+        if state["iteration_count"] >= 3:  # Max retries
             return "finalize"
         return "escalate"
 

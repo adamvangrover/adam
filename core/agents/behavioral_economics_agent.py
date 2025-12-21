@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional
 import logging
 from transformers import pipeline
 
+
 class BehavioralEconomicsAgent(AgentBase):
     """
     Analyzes market data and user interactions for signs of cognitive biases and irrational behavior.
@@ -15,7 +16,8 @@ class BehavioralEconomicsAgent(AgentBase):
         self.bias_patterns = self.config.get("bias_patterns", {})
         logging.info(f"BehavioralEconomicsAgent initialized with {len(self.bias_patterns)} bias patterns.")
         # Load a pre-trained sentiment analysis model
-        self.sentiment_analyzer = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
+        self.sentiment_analyzer = pipeline(
+            "sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
 
     async def execute(self, analysis_content: str, user_query_history: Optional[List[str]] = None) -> Dict[str, Any]:
         """
@@ -46,7 +48,8 @@ class BehavioralEconomicsAgent(AgentBase):
         # 3. Generate insights based on findings
         results["insights"] = self._generate_insights(results)
 
-        logging.info(f"Behavioral economics analysis complete. Found {len(results['market_biases'])} market biases and {len(results['user_biases'])} user biases.")
+        logging.info(
+            f"Behavioral economics analysis complete. Found {len(results['market_biases'])} market biases and {len(results['user_biases'])} user biases.")
         return results
 
     def _identify_market_biases(self, content: str) -> List[Dict[str, str]]:

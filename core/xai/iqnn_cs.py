@@ -6,6 +6,7 @@ from typing import List, Dict, Any, Optional
 # Configure logging
 logger = logging.getLogger(__name__)
 
+
 class IQNNCS:
     """
     Interpretable Quantum Neural Network for Credit Scoring (IQNN-CS).
@@ -40,7 +41,7 @@ class IQNNCS:
             attribution_vector (np.ndarray): Feature importance scores (e.g., from SHAP or Gradient).
         """
         if predicted_class not in self.attribution_history:
-             self.attribution_history[predicted_class] = []
+            self.attribution_history[predicted_class] = []
 
         self.attribution_history[predicted_class].append(attribution_vector)
         logger.debug(f"Recorded prediction for class {predicted_class}.")
@@ -97,11 +98,13 @@ class IQNNCS:
         report_lines.append(f"Global Model Interpretability Score: {avg_score:.4f}")
 
         if avg_score > 0.75:
-             report_lines.append("CONCLUSION: The model demonstrates consistent economic logic across predictions.")
+            report_lines.append("CONCLUSION: The model demonstrates consistent economic logic across predictions.")
         else:
-             report_lines.append("CONCLUSION: Warning - The model may be overfitting to noise or using inconsistent reasoning.")
+            report_lines.append(
+                "CONCLUSION: Warning - The model may be overfitting to noise or using inconsistent reasoning.")
 
         return "\n".join(report_lines)
+
 
 # Example usage/Test block
 if __name__ == "__main__":

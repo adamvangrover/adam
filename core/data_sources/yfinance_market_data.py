@@ -6,6 +6,7 @@ from typing import Dict, List, Optional, Any
 
 logger = logging.getLogger(__name__)
 
+
 class YFinanceMarketData:
     """
     A data source wrapper for fetching market data via yfinance.
@@ -25,8 +26,8 @@ class YFinanceMarketData:
             info = ticker.info
             # Provide a safe fallback if info is empty or keys are missing
             if not info:
-                 logger.warning(f"No info found for symbol {symbol}")
-                 return {}
+                logger.warning(f"No info found for symbol {symbol}")
+                return {}
 
             snapshot = {
                 "symbol": symbol,

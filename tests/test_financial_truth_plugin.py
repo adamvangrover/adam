@@ -5,6 +5,7 @@ from core.prompting.plugins.financial_truth_plugin import FinancialTruthPlugin
 from core.prompting.base_prompt_plugin import PromptMetadata
 from core.prompting.loader import PromptLoader
 
+
 class TestFinancialTruthPlugin(unittest.TestCase):
     def setUp(self):
         # Load the prompt template content
@@ -23,7 +24,7 @@ class TestFinancialTruthPlugin(unittest.TestCase):
             prompt_id="LIB-PRO-009",
             version="1.0",
             author="Adam v23.5",
-            model_config={"temperature": 0.0} # Low temp for auditing
+            model_config={"temperature": 0.0}  # Low temp for auditing
         )
 
         self.plugin = FinancialTruthPlugin(
@@ -43,7 +44,8 @@ class TestFinancialTruthPlugin(unittest.TestCase):
         self.assertIn("Apple Inc. reported revenue of $80 billion", messages[0]["content"])
         self.assertIn("What was Apple's revenue?", messages[0]["content"])
         # Matched casing to actual prompt text
-        self.assertIn("Your goal is to answer the User's Question based **SOLELY** on the provided", messages[0]["content"])
+        self.assertIn("Your goal is to answer the User's Question based **SOLELY** on the provided",
+                      messages[0]["content"])
 
     def test_response_parsing(self):
         # Simulate a valid LLM response
@@ -71,6 +73,7 @@ class TestFinancialTruthPlugin(unittest.TestCase):
         output = self.plugin.parse_response(raw_response)
 
         self.assertIn("Parse Error", output.answer)
+
 
 if __name__ == "__main__":
     unittest.main()

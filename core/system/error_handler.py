@@ -1,6 +1,7 @@
 # core/system/error_handler.py
 
-from core.utils.config_utils import load_error_codes # Import the function
+from core.utils.config_utils import load_error_codes  # Import the function
+
 
 class AdamError(Exception):
     """
@@ -10,6 +11,7 @@ class AdamError(Exception):
         code (int):  An integer error code (see config/errors.yaml).
         message (str):  A human-readable error message.
     """
+
     def __init__(self, code: int, message: str):
         super().__init__(message)  # Initialize the base Exception class
         self.code = code
@@ -23,6 +25,7 @@ class DataNotFoundError(AdamError):
     """
     Raised when requested data is not found (e.g., in a file, knowledge base, etc.).
     """
+
     def __init__(self, data_identifier: str = "", source: str = ""):
         code = 101  # Or get from config/errors.yaml if available
         message = f"Data not found: '{data_identifier}'"
@@ -35,6 +38,7 @@ class AgentNotFoundError(AdamError):
     """
     Raised when a requested agent is not found or cannot be loaded.
     """
+
     def __init__(self, agent_name: str = ""):
         code = 102
         message = f"Agent not found: '{agent_name}'"
@@ -45,6 +49,7 @@ class InvalidInputError(AdamError):
     """
     Raised when user input is invalid, incomplete, or cannot be parsed.
     """
+
     def __init__(self, input_string: str = "", reason: str = ""):
         code = 103
         message = f"Invalid input: '{input_string}'"
@@ -58,24 +63,29 @@ class ConfigurationError(AdamError):
     Raised when there is an error in a configuration file (e.g., YAML parsing error,
     missing required settings).
     """
+
     def __init__(self, config_file: str = "", message: str = "Configuration error"):
         code = 104
         message = f"Configuration error in '{config_file}': {message}" if config_file else message
         super().__init__(code, message)
 
+
 class FileReadError(AdamError):
     """
     Raised when there's an error reading a file (e.g., FileNotFoundError, PermissionError).
     """
+
     def __init__(self, file_path: str, message: str = "File read error"):
         code = 105
         message = f"Error reading file '{file_path}': {message}"
         super().__init__(code, message)
 
+
 class WorkflowExecutionError(AdamError):
     """
     Raised when an error occurs during the execution of a workflow.
     """
+
     def __init__(self, workflow_name: str = "", step: int = -1, message: str = "Workflow execution error"):
         code = 106
         message = f"Error in workflow '{workflow_name}'"
@@ -83,26 +93,33 @@ class WorkflowExecutionError(AdamError):
             message += f" at step {step}"
         message += f": {message}"
         super().__init__(code, message)
+
+
 class AgentExecutionError(AdamError):
-     """
-     Raised by an agent if it has a problem with it's execute method.
-     """
-     def __init__(self, agent_name: str = "", message: str = "Workflow execution error"):
+    """
+    Raised by an agent if it has a problem with it's execute method.
+    """
+
+    def __init__(self, agent_name: str = "", message: str = "Workflow execution error"):
         code = 107
         message = f"Error in agent '{agent_name}'"
         message += f": {message}"
         super().__init__(code, message)
+
+
 class LLMPluginError(AdamError):
-     """
-     Raised if there is an issue when attempting to use the LLM.
-     """
-     def __init__(self, message: str = "Workflow execution error"):
+    """
+    Raised if there is an issue when attempting to use the LLM.
+    """
+
+    def __init__(self, message: str = "Workflow execution error"):
         code = 108
         message = f"Error in LLM Plugin"
         message += f": {message}"
         super().__init__(code, message)
 
 # --- Utility Function (Optional, but Recommended) ---
+
 
 def get_error_message(code: int, default_message: str = "An unknown error occurred.") -> str:
     """

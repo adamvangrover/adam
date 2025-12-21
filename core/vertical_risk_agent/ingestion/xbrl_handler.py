@@ -5,6 +5,7 @@ import re
 
 logger = logging.getLogger(__name__)
 
+
 class XBRLHandler:
     """
     Handles parsing of XBRL (eXtensible Business Reporting Language) files
@@ -21,10 +22,10 @@ class XBRLHandler:
             "CashAndCashEquivalentsAtCarryingValue": "cash_equivalents",
             "Assets": "total_assets",
             "DebtInstrumentCarryingAmount": "total_debt",
-            "LongTermDebt": "total_debt", # Alternative tag
+            "LongTermDebt": "total_debt",  # Alternative tag
             "StockholdersEquity": "equity",
             "Revenues": "revenue",
-            "RevenueFromContractWithCustomerExcludingAssessedTax": "revenue", # Modern tag
+            "RevenueFromContractWithCustomerExcludingAssessedTax": "revenue",  # Modern tag
             "OperatingIncomeLoss": "operating_income",
             "NetIncomeLoss": "net_income",
             "DepreciationDepletionAndAmortization": "depreciation_amortization",
@@ -52,7 +53,7 @@ class XBRLHandler:
 
             # Initialize data buckets
             data = {
-                "balance_sheet": {"fiscal_year": 2024}, # Default, normally extracted from ContextRef
+                "balance_sheet": {"fiscal_year": 2024},  # Default, normally extracted from ContextRef
                 "income_statement": {}
             }
 
@@ -81,7 +82,8 @@ class XBRLHandler:
                             # For this simplified parser, we take the largest value (heuristic for 'Total' vs 'segment')
                             # or just overwrite.
 
-                            bucket = "balance_sheet" if internal_key in ["cash_equivalents", "total_assets", "total_debt", "equity"] else "income_statement"
+                            bucket = "balance_sheet" if internal_key in [
+                                "cash_equivalents", "total_assets", "total_debt", "equity"] else "income_statement"
 
                             # Simple heuristic: Assume max value is the consolidated total (ignoring segments)
                             current_val = data[bucket].get(internal_key, 0.0)

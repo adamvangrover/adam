@@ -18,11 +18,13 @@ from .qa import validate_dataframe
 
 logger = logging.getLogger(__name__)
 
+
 class DataFetcher:
     """
     DataFetcher Class Architecture.
     Primary interface for external market data using yfinance.
     """
+
     def __init__(self, storage: StorageEngine):
         self.storage = storage
 
@@ -78,9 +80,9 @@ class DataFetcher:
                 # Usually Long format is better: Date, Ticker, Open...
 
                 # Let's stack.
-                df_long = df.stack(level=0) # Moves Ticker to index
+                df_long = df.stack(level=0)  # Moves Ticker to index
                 df_long.index.names = ['Date', 'Ticker']
-                df_long = df_long.reset_index(level='Ticker') # Ticker is now a column
+                df_long = df_long.reset_index(level='Ticker')  # Ticker is now a column
 
                 # Validate
                 try:
@@ -116,7 +118,7 @@ class DataFetcher:
                             df = df.xs(ticker, axis=1, level=0)
                         # Fallback: just use the last level (Price) if single level extraction failed or structure differs
                         elif isinstance(df.columns, pd.MultiIndex):
-                             df.columns = df.columns.get_level_values(-1)
+                            df.columns = df.columns.get_level_values(-1)
 
                     # Validate
                     try:
@@ -132,7 +134,8 @@ class DataFetcher:
         """
         Uses Ticker.fast_info for low-latency L1 data.
         """
-        if yf is None: return {}
+        if yf is None:
+            return {}
 
         try:
             t = yf.Ticker(ticker)

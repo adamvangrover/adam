@@ -7,10 +7,12 @@ import networkx as nx
 
 logger = logging.getLogger(__name__)
 
+
 class MemoryConsolidator:
     """
     Orchestrates the creation of the Comprehensive Memory.
     """
+
     def __init__(self):
         self.ukg = UnifiedKnowledgeGraph()
         self.memory_manager = VectorMemoryManager()

@@ -12,6 +12,7 @@ from core.agents.specialized.covenant_analyst_agent import CovenantAnalystAgent
 
 logger = logging.getLogger(__name__)
 
+
 class DeepDiveGraph:
     """
     v23.5 'Deep Dive' Protocol.
@@ -145,7 +146,7 @@ class DeepDiveGraph:
             capex_maintenance=10.0
         )
 
-        nodes["simulation_engine"] = result # SimulationEngine schema matches agent output
+        nodes["simulation_engine"] = result  # SimulationEngine schema matches agent output
 
         return {
             "v23_knowledge_graph": {
@@ -169,14 +170,14 @@ class DeepDiveGraph:
         # In Pydantic model 'SimulationEngine', 'quantum_scenarios' is a list.
         # 'result' is a list of QuantumScenario objects.
         if sim_engine:
-             # If sim_engine is a Pydantic object (from previous step), we can use .quantum_scenarios
-             # If it's a dict (from JSON serialization), we access via key.
-             if hasattr(sim_engine, "quantum_scenarios"):
-                 sim_engine.quantum_scenarios.extend(result)
-             elif isinstance(sim_engine, dict):
-                 if "quantum_scenarios" not in sim_engine:
-                     sim_engine["quantum_scenarios"] = []
-                 sim_engine["quantum_scenarios"].extend(result)
+            # If sim_engine is a Pydantic object (from previous step), we can use .quantum_scenarios
+            # If it's a dict (from JSON serialization), we access via key.
+            if hasattr(sim_engine, "quantum_scenarios"):
+                sim_engine.quantum_scenarios.extend(result)
+            elif isinstance(sim_engine, dict):
+                if "quantum_scenarios" not in sim_engine:
+                    sim_engine["quantum_scenarios"] = []
+                sim_engine["quantum_scenarios"].extend(result)
 
         nodes["simulation_engine"] = sim_engine
 

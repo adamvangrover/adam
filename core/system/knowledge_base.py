@@ -10,6 +10,7 @@ from core.system.kg_cache import KGCache
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+
 class KnowledgeBase:
     """
     A simple knowledge base that loads data from a JSON file.

@@ -5,6 +5,7 @@ from core.financial_suite.modules.reporting.generator import ReportGenerator
 from core.financial_suite.modules.vc.waterfall import WaterfallEngine
 from core.financial_suite.modules.vc.return_metrics import ReturnMetrics
 
+
 class ContextManager:
     def __init__(self, context_path: str = None, context_obj: WorkstreamContext = None):
         if context_path:
@@ -41,8 +42,10 @@ class ContextManager:
 
         # Metrics
         # Assume common equity investment sum
-        common_invested = sum(s.investment or 0 for s in self.context.capital_structure.securities if s.security_type == "COMMON")
-        common_returned = sum(v for k, v in waterfall.items() if "Common" in k or "Sponsor" in k) # Naive matching or need better ID
+        common_invested = sum(
+            s.investment or 0 for s in self.context.capital_structure.securities if s.security_type == "COMMON")
+        # Naive matching or need better ID
+        common_returned = sum(v for k, v in waterfall.items() if "Common" in k or "Sponsor" in k)
         # Better: iterate context securities again to match names
         common_returned = 0.0
         for sec in self.context.capital_structure.securities:

@@ -30,6 +30,7 @@ logger = logging.getLogger(__name__)
 # Shared instance for Singleton pattern
 _SHARED_GRAPH_INSTANCE = None
 
+
 class UnifiedKnowledgeGraph:
     def __init__(self):
         """
@@ -47,7 +48,7 @@ class UnifiedKnowledgeGraph:
         else:
             # Reuse the shared graph instance
             self.graph = _SHARED_GRAPH_INSTANCE
-        
+
     def _ingest_fibo_ontology(self):
         """
         Mocks the ingestion of FIBO ontology nodes and edges.
@@ -173,10 +174,10 @@ class UnifiedKnowledgeGraph:
                 tgt = lei_to_name.get(rel.get("target_lei"))
                 if src and tgt:
                     self.graph.add_edge(src, tgt,
-                                      relation=rel.get("relationship_type", "connected_to"),
-                                      type="supply_chain",
-                                      criticality=rel.get("criticality_score"),
-                                      desc=rel.get("dependency_description"))
+                                        relation=rel.get("relationship_type", "connected_to"),
+                                        type="supply_chain",
+                                        criticality=rel.get("criticality_score"),
+                                        desc=rel.get("dependency_description"))
 
             # 3. Macro Indicators
             for macro in nodes_data.get("macro_indicators", []):
@@ -186,12 +187,12 @@ class UnifiedKnowledgeGraph:
                     impacts = macro.get("impact_map", {})
                     for sector, impact_type in impacts.items():
                         if sector not in self.graph:
-                             self.graph.add_edge(sector, "MarketSector", relation="is_a", type="fibo")
+                            self.graph.add_edge(sector, "MarketSector", relation="is_a", type="fibo")
 
                         self.graph.add_edge(name, sector,
-                                          relation="impacts",
-                                          impact_type=impact_type,
-                                          type="macro_impact")
+                                            relation="impacts",
+                                            impact_type=impact_type,
+                                            type="macro_impact")
 
             # 4. Crisis Scenarios
             sim_params = ukg_root.get("simulation_parameters", {})
@@ -208,7 +209,7 @@ class UnifiedKnowledgeGraph:
                     for affected_id in scenario.get("affected_nodes", []):
                         target_name = node_id_to_name.get(affected_id)
                         if target_name:
-                             self.graph.add_edge(name, target_name, relation="affects", type="scenario_impact")
+                            self.graph.add_edge(name, target_name, relation="affects", type="scenario_impact")
 
             # 5. Regulatory Rules
             reg_rules = ukg_root.get("regulatory_rules", {})

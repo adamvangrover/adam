@@ -103,13 +103,13 @@ END PROMPT COMPONENT 4
 
         # 1. Decompose the query into a plan using the LLM.
         prompt = f"{self.META_PROMPT}\n\n---\n\nUser Query: \"{user_query}\"\n\nBased on the user query and the protocols, generate a JSON object representing the execution plan. The plan should have a 'stages' key, containing an array of stages. Each stage should be an array of steps that can be executed in parallel."
-        
+
         try:
             plan_response = await self.llm_engine.generate_response(prompt)
             logging.info(f"Generated execution plan: {plan_response}")
-            
+
             plan = json.loads(plan_response)
-            
+
             # 2. Execute the plan.
             results = {}
             for stage in plan['stages']:
@@ -117,7 +117,7 @@ END PROMPT COMPONENT 4
                 for step in stage:
                     agent_name = step['agent']
                     inputs = step['inputs']
-                    
+
                     # Resolve inputs from previous steps.
                     resolved_inputs = {}
                     for key, value in inputs.items():
@@ -127,13 +127,13 @@ END PROMPT COMPONENT 4
                             resolved_inputs[key] = results[ref_step][ref_key]
                         else:
                             resolved_inputs[key] = value
-                    
+
                     agent = self.agents.get(agent_name)
                     if not agent:
                         raise ValueError(f"Agent '{agent_name}' not found.")
-                    
+
                     tasks.append(agent.execute(**resolved_inputs))
-                
+
                 stage_results = await asyncio.gather(*tasks)
 
                 for i, step in enumerate(stage):

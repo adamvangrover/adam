@@ -5,10 +5,12 @@ from core.system.memory_manager import VectorMemoryManager
 
 logger = logging.getLogger(__name__)
 
+
 class FineTuningDriver:
     """
     Extracts high-quality interaction pairs from memory for model fine-tuning.
     """
+
     def __init__(self, output_file: str = "data/training/finetune_dataset.jsonl"):
         self.memory_manager = VectorMemoryManager()
         self.output_file = output_file

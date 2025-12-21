@@ -7,6 +7,7 @@ from core.analysis.counterfactual_engine import CounterfactualEngine
 # reasoning capabilities of the system. Agents can use this skill to ask
 # "what-if" questions, which allows for a deeper level of analysis.
 
+
 class CounterfactualReasoningSkill:
     """
     A Semantic Kernel skill for counterfactual reasoning.

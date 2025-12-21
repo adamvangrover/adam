@@ -3,6 +3,7 @@ import re
 from core.prompting.base_prompt_plugin import BasePromptPlugin
 from core.schemas.financial_truth import FinancialTruthInput, FinancialTruthOutput
 
+
 class FinancialTruthPlugin(BasePromptPlugin[FinancialTruthOutput]):
     """
     A prompt plugin that implements the FinanceBench/TAO "System 2" reasoning framework

@@ -24,6 +24,7 @@ except ImportError as e:
     print(f"Import failed: {e}")
     RegulatoryComplianceAgent = None
 
+
 class TestRegulatoryComplianceIntegration(unittest.TestCase):
     def setUp(self):
         if RegulatoryComplianceAgent is None:
@@ -47,10 +48,10 @@ class TestRegulatoryComplianceIntegration(unittest.TestCase):
     async def _test_integration_logic_async(self):
         # We mock LLMPlugin specifically where it is imported in the agent module
         with patch("core.agents.regulatory_compliance_agent.LLMPlugin"), \
-             patch("core.agents.regulatory_compliance_agent.PoliticalLandscapeLoader"), \
-             patch.object(RegulatoryComplianceAgent, '_initialize_nlp_toolkit', return_value=MagicMock()), \
-             patch.object(RegulatoryComplianceAgent, '_load_regulatory_knowledge', return_value={}), \
-             patch.object(RegulatoryComplianceAgent, '_load_political_landscape', return_value={}):
+                patch("core.agents.regulatory_compliance_agent.PoliticalLandscapeLoader"), \
+                patch.object(RegulatoryComplianceAgent, '_initialize_nlp_toolkit', return_value=MagicMock()), \
+                patch.object(RegulatoryComplianceAgent, '_load_regulatory_knowledge', return_value={}), \
+                patch.object(RegulatoryComplianceAgent, '_load_political_landscape', return_value={}):
 
             # Initialize agent
             agent = RegulatoryComplianceAgent(self.config)
@@ -73,7 +74,7 @@ class TestRegulatoryComplianceIntegration(unittest.TestCase):
 
             # Execute
             if not hasattr(agent, 'execute'):
-                 self.fail("Agent does not have execute method")
+                self.fail("Agent does not have execute method")
 
             result = await agent.execute(transactions=transactions)
 
@@ -99,6 +100,7 @@ class TestRegulatoryComplianceIntegration(unittest.TestCase):
             # Verify Knowledge Base Integration called
             agent._integrate_knowledge.assert_called()
             agent._continuous_learning.assert_called()
+
 
 if __name__ == "__main__":
     unittest.main()

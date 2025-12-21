@@ -1,3 +1,4 @@
+from core.agents.code_alchemist import CodeAlchemist
 import sys
 import os
 import unittest
@@ -8,7 +9,7 @@ import json
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Import module under test to ensure it's loaded before patching
-from core.agents.code_alchemist import CodeAlchemist
+
 
 class TestCodeAlchemist(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
@@ -39,7 +40,7 @@ class TestCodeAlchemist(unittest.IsolatedAsyncioTestCase):
         agent = CodeAlchemist(self.config)
         # Mock system prompt template if not loaded (for environment consistency)
         if not agent.system_prompt_template:
-             agent.system_prompt_template = "Intent: {{intent}} Context: {{context}} Constraints: {{constraints}} Knowledge: {{relevant_knowledge}}"
+            agent.system_prompt_template = "Intent: {{intent}} Context: {{context}} Constraints: {{constraints}} Knowledge: {{relevant_knowledge}}"
 
         prompt = agent.construct_generation_prompt(
             intent="Test Intent",
@@ -51,7 +52,7 @@ class TestCodeAlchemist(unittest.IsolatedAsyncioTestCase):
 
         # Verify JSON dumping if template is loaded
         if "LIB-META-008" in (agent.system_prompt_template or ""):
-             self.assertIn('"fast": true', prompt) # Check JSON representation
+            self.assertIn('"fast": true', prompt)  # Check JSON representation
 
     @patch('core.agents.code_alchemist.LLMPlugin')
     async def test_validate_code_semantics(self, MockLLMPlugin):
@@ -131,6 +132,7 @@ class TestCodeAlchemist(unittest.IsolatedAsyncioTestCase):
         agent = CodeAlchemist(self.config)
         success = await agent.deploy_to_cloud_function("print('hello')", function_name="test-func")
         self.assertTrue(success)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -16,6 +16,7 @@ from core.utils.retry_utils import retry_with_backoff
 
 logger = get_logger(__name__)
 
+
 class DataFetcher:
     """
     A robust data fetcher that retrieves live market data using yfinance.
@@ -181,7 +182,7 @@ class DataFetcher:
                 canonical_url = content.get("canonicalUrl")
                 link = (click_through_url.get("url") if click_through_url else None) or \
                        (canonical_url.get("url") if canonical_url else None) or \
-                       content.get("link")
+                    content.get("link")
 
                 # Time extraction
                 pub_date = content.get("pubDate") or content.get("providerPublishTime")
@@ -305,13 +306,14 @@ class DataFetcher:
             logger.info(f"Fetching calendar for {ticker_symbol}...")
             ticker = yf.Ticker(ticker_symbol)
             cal = ticker.calendar
-            if cal is None: return {}
+            if cal is None:
+                return {}
 
             if isinstance(cal, pd.DataFrame):
-                 # Transpose to make it json friendly {Event: [Date]} or {0: {Earnings Date: ...}}
-                 return cal.to_dict()
+                # Transpose to make it json friendly {Event: [Date]} or {0: {Earnings Date: ...}}
+                return cal.to_dict()
             elif isinstance(cal, dict):
-                 return cal
+                return cal
             return {}
         except Exception as e:
             logger.error(f"Error fetching calendar: {e}")

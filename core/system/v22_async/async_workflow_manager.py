@@ -8,6 +8,7 @@ from typing import Dict, Any, Optional
 from core.system.message_broker import MessageBroker
 from .workflow import AsyncWorkflow
 
+
 class AsyncWorkflowManager:
     _instance: Optional['AsyncWorkflowManager'] = None
     _lock = RLock()

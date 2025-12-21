@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 # --- Nodes ---
 
+
 def analyze_structure_node(state: SNCAnalysisState) -> Dict[str, Any]:
     """
     Node: Analyze Structure
@@ -38,6 +39,7 @@ def analyze_structure_node(state: SNCAnalysisState) -> Dict[str, Any]:
         "structure_analysis": analysis,
         "human_readable_status": "Analyzed syndicate structure."
     }
+
 
 def assess_credit_node(state: SNCAnalysisState) -> Dict[str, Any]:
     """
@@ -69,6 +71,7 @@ def assess_credit_node(state: SNCAnalysisState) -> Dict[str, Any]:
         "human_readable_status": f"Drafted rating: {rating}."
     }
 
+
 def critique_snc_node(state: SNCAnalysisState) -> Dict[str, Any]:
     """
     Node: Critique SNC Analysis
@@ -84,7 +87,8 @@ def critique_snc_node(state: SNCAnalysisState) -> Dict[str, Any]:
 
     # Logic: Check for contradictions or missing context
     if rating == "Pass" and "Concentration Risk" in (state["structure_analysis"] or ""):
-        critique_notes.append("Rating is Pass, but structural concentration risk was noted. Justify why this doesn't warrant Special Mention.")
+        critique_notes.append(
+            "Rating is Pass, but structural concentration risk was noted. Justify why this doesn't warrant Special Mention.")
         needs_revision = True
 
     if iteration < 1:
@@ -98,6 +102,7 @@ def critique_snc_node(state: SNCAnalysisState) -> Dict[str, Any]:
         "iteration_count": iteration + 1,
         "human_readable_status": "Critiqued analysis."
     }
+
 
 def revise_snc_node(state: SNCAnalysisState) -> Dict[str, Any]:
     """
@@ -115,15 +120,17 @@ def revise_snc_node(state: SNCAnalysisState) -> Dict[str, Any]:
 
     return {
         "rationale": new_rationale,
-        "needs_revision": False, # Assume fixed
+        "needs_revision": False,  # Assume fixed
         "human_readable_status": "Revised rationale."
     }
+
 
 def human_approval_node(state: SNCAnalysisState) -> Dict[str, Any]:
     print("--- Node: Human Approval ---")
     return {"human_readable_status": "Awaiting Final Sign-off."}
 
 # --- Conditional Logic ---
+
 
 def should_continue_snc(state: SNCAnalysisState) -> Literal["revise_snc", "human_approval", "END"]:
     if state["needs_revision"] and state["iteration_count"] < 3:
@@ -136,6 +143,7 @@ def should_continue_snc(state: SNCAnalysisState) -> Literal["revise_snc", "human
     return "END"
 
 # --- Graph Construction ---
+
 
 def build_snc_graph():
     workflow = StateGraph(SNCAnalysisState)
@@ -165,5 +173,6 @@ def build_snc_graph():
 
     checkpointer = MemorySaver()
     return workflow.compile(checkpointer=checkpointer)
+
 
 snc_graph_app = build_snc_graph()

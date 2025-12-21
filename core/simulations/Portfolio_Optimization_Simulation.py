@@ -9,6 +9,7 @@ from core.agents.market_sentiment_agent import MarketSentimentAgent
 from core.agents.prediction_market_agent import PredictionMarketAgent
 from core.agents.alternative_data_agent import AlternativeDataAgent
 
+
 class PortfolioOptimizationSimulation:
 
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):
@@ -64,7 +65,8 @@ class PortfolioOptimizationSimulation:
         fundamental_analysis = self.fundamental_analyst.analyze_portfolio(portfolio_data)
         technical_analysis = self.technical_analyst.analyze_portfolio_trends(portfolio_data)
         market_sentiment = self.market_sentiment_agent.analyze_sentiment()
-        prediction_market_data = self.prediction_market_agent.gather_prediction_market_data_for_portfolio(portfolio_data)
+        prediction_market_data = self.prediction_market_agent.gather_prediction_market_data_for_portfolio(
+            portfolio_data)
         alternative_data = self.alternative_data_agent.gather_alternative_data_for_portfolio(portfolio_data)
 
         # 3. Optimization

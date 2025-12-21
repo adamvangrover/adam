@@ -1,4 +1,4 @@
-#test_agent.py
+# test_agent.py
 """
 This module defines the TestAgent, a specialized agent responsible for
 writing and running tests for a given piece of code.
@@ -6,6 +6,7 @@ writing and running tests for a given piece of code.
 
 from typing import Any, Dict
 from core.agents.agent_base import AgentBase
+
 
 class TestAgent(AgentBase):
     """
@@ -58,12 +59,12 @@ def test_placeholder_function():
     \"\"\"This is a placeholder test.\"\"\"
     assert True, "This test should be replaced with a real one."
 """
-        
+
         # 4. Simulate writing the test file and running the tests
         # In a real implementation, this would use file I/O and subprocess tools.
         # self.tools.write_file(test_file_path, generated_test_code)
         # test_run_result = self.tools.run_command(f"pytest {test_file_path}")
-        
+
         test_run_result = {
             "status": "success",
             "message": f"All tests in {test_file_path} passed.",
@@ -82,7 +83,8 @@ def test_placeholder_function():
                 "name": "write_and_run_tests",
                 "description": "Writes and runs unit tests for a given code artifact.",
                 "parameters": [
-                    {"name": "code_artifact", "type": "dict", "description": "A dictionary containing the file_path and code to test."}
+                    {"name": "code_artifact", "type": "dict",
+                        "description": "A dictionary containing the file_path and code to test."}
                 ]
             }
         )

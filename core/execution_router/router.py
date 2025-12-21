@@ -1,5 +1,6 @@
 from typing import Dict, Any
 
+
 class ExecutionRouter:
     """
     Smart Order Router (SOR) and Execution Management System.
@@ -25,7 +26,7 @@ class ExecutionRouter:
             "order_id": "ORD-12345",
             "status": "FILLED",
             "filled_qty": order.get("qty", 0),
-            "avg_price": 100.00, # Mock execution price
+            "avg_price": 100.00,  # Mock execution price
             "venue": "SIMULATOR"
         }
 

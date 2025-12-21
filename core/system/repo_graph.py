@@ -6,11 +6,13 @@ from typing import Dict, Any, List
 
 logger = logging.getLogger(__name__)
 
+
 class RepoGraphBuilder:
     """
     Parses the repository codebase to build a semantic graph of Agents, Classes, and dependencies.
     Provides 'Self-Awareness' to the system.
     """
+
     def __init__(self, root_dir: str = "."):
         self.root_dir = root_dir
         self.graph = nx.DiGraph()

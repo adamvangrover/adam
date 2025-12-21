@@ -14,6 +14,7 @@ from core.data_sources.data_fetcher import DataFetcher
 
 logger = logging.getLogger("adam.core.procedures.autonomous_update")
 
+
 class RoutineMaintenance:
     """
     Encapsulates standard maintenance procedures for the Adam Financial OS.
@@ -62,7 +63,7 @@ class RoutineMaintenance:
         # Here we would expand to actually check "trending" lists via an API
         # For now, we maintain the mock logic but documented as a placeholder for expansion
 
-        discovered_ticker = "COIN" # Placeholder from original script
+        discovered_ticker = "COIN"  # Placeholder from original script
 
         universe_data = self._load_universe()
         watch_list = universe_data.get("universe", {}).get("watch_list", [])
@@ -72,7 +73,8 @@ class RoutineMaintenance:
             watch_list.append(discovered_ticker)
 
             # Update the file safely
-            if "universe" not in universe_data: universe_data["universe"] = {}
+            if "universe" not in universe_data:
+                universe_data["universe"] = {}
             universe_data["universe"]["watch_list"] = watch_list
             universe_data["metadata"]["last_updated"] = datetime.now().isoformat()
 

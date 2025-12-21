@@ -8,6 +8,7 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
+
 class AgentImprovementPipeline:
     """
     A module to manage the process of improving an agent.
@@ -80,13 +81,14 @@ class AgentImprovementPipeline:
                 for parquet_file in year_dir.glob("*.parquet"):
                     try:
                         df = pd.read_parquet(parquet_file)
-                        if df.empty: continue
+                        if df.empty:
+                            continue
 
                         # Ensure timestamp index sorted
                         if not isinstance(df.index, pd.DatetimeIndex):
-                             if 'timestamp' in df.columns:
-                                 df['timestamp'] = pd.to_datetime(df['timestamp'])
-                                 df.set_index('timestamp', inplace=True)
+                            if 'timestamp' in df.columns:
+                                df['timestamp'] = pd.to_datetime(df['timestamp'])
+                                df.set_index('timestamp', inplace=True)
 
                         df.sort_index(inplace=True)
 

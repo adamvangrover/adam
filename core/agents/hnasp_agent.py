@@ -9,10 +9,12 @@ from core.hnasp.personality import BayesACTEngine
 
 logger = logging.getLogger(__name__)
 
+
 class MockLLMClient:
     """
     A simple mock LLM that pretends to follow HNASP.
     """
+
     def generate(self, system_prompt: str, user_input: str) -> Dict[str, Any]:
         logger.info(f"MockLLM received prompt length: {len(system_prompt)}")
         logger.info(f"MockLLM received user input: {user_input}")
@@ -22,7 +24,7 @@ class MockLLMClient:
             return {
                 "execution_trace": {
                     "rule_id": "loan_approval_policy",
-                    "result": False, # Mock rejection
+                    "result": False,  # Mock rejection
                     "step_by_step": [{"step": "checked amount", "value": "high"}]
                 },
                 "response_text": "I cannot approve this loan based on current policy."
@@ -36,6 +38,7 @@ class MockLLMClient:
             "response_text": f"I processed your request: {user_input}"
         }
 
+
 class HNASPAgent(AgentBase):
     """
     An agent that implements the Hybrid Neurosymbolic Agent State Protocol (HNASP).
@@ -45,10 +48,10 @@ class HNASPAgent(AgentBase):
         super().__init__(config, constitution, kernel)
 
         # Initialize HNASP Components
-        self.lakehouse = ObservationLakehouse() # Default path
+        self.lakehouse = ObservationLakehouse()  # Default path
         self.logic_engine = LogicEngine()
         self.personality_engine = BayesACTEngine()
-        self.llm_client = MockLLMClient() # In real system, this would be an OpenAI client wrapper
+        self.llm_client = MockLLMClient()  # In real system, this would be an OpenAI client wrapper
 
         self.state_manager = HNASPStateManager(
             lakehouse=self.lakehouse,

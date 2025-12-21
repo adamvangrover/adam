@@ -4,6 +4,7 @@ from typing import Dict, Any
 
 logger = logging.getLogger(__name__)
 
+
 class DealFlowEngine:
     """
     Investment Banking capability for the Family Office.
@@ -22,30 +23,35 @@ class DealFlowEngine:
 
         # Scoring Logic
         if multiple < 10:
-             score += 30 # Value
+            score += 30  # Value
         elif multiple < 15:
-             score += 15
+            score += 15
 
         if sector in ["Technology", "Healthcare"]:
-             score += 20
+            score += 20
 
         # Mocking Deep Dive integration (conceptually)
         recommendation = "Pass"
         if score > 40:
-             recommendation = "Proceed to Deep Dive"
+            recommendation = "Proceed to Deep Dive"
         elif score > 20:
-             recommendation = "Watchlist"
+            recommendation = "Watchlist"
 
         # AI Due Diligence Simulation
         red_flags = []
         green_lights = []
 
-        if multiple > 20: red_flags.append("Valuation Outlier (>20x)")
-        if ebitda < 0: red_flags.append("Negative EBITDA")
-        if sector == "Retail": red_flags.append("Structural Headwinds")
+        if multiple > 20:
+            red_flags.append("Valuation Outlier (>20x)")
+        if ebitda < 0:
+            red_flags.append("Negative EBITDA")
+        if sector == "Retail":
+            red_flags.append("Structural Headwinds")
 
-        if ebitda > 50: green_lights.append("Strong Cash Flow Base")
-        if sector == "AI": green_lights.append("Secular Tailwind")
+        if ebitda > 50:
+            green_lights.append("Strong Cash Flow Base")
+        if sector == "AI":
+            green_lights.append("Secular Tailwind")
 
         # Random "Data Room" finding
         if random.random() > 0.8:

@@ -6,6 +6,7 @@ import logging
 from core.agents.agent_base import AgentBase
 from core.utils.data_utils import send_message
 
+
 class MacroeconomicAnalysisAgent(AgentBase):
     """
     Agent responsible for analyzing macroeconomic indicators (GDP, Inflation, etc.)
@@ -25,7 +26,7 @@ class MacroeconomicAnalysisAgent(AgentBase):
         super().__init__(config, **kwargs)
         # Defensive access to config
         self.data_sources = config.get('data_sources', {})
-        self.indicators = config.get('indicators', ['GDP', 'inflation']) # Default indicators
+        self.indicators = config.get('indicators', ['GDP', 'inflation'])  # Default indicators
 
     async def execute(self, **kwargs) -> Dict[str, Any]:
         """
@@ -83,7 +84,7 @@ class MacroeconomicAnalysisAgent(AgentBase):
         insights = {
             'GDP_growth_trend': gdp_trend,
             'inflation_outlook': inflation_outlook,
-            'timestamp': "2024-Q1" # Placeholder
+            'timestamp': "2024-Q1"  # Placeholder
         }
 
         # Send insights to message queue (Legacy support)
@@ -101,12 +102,15 @@ class MacroeconomicAnalysisAgent(AgentBase):
         Analyzes the trend of GDP growth.
         """
         # Placeholder logic
-        if not gdp_growth: return "neutral"
+        if not gdp_growth:
+            return "neutral"
         # If gdp_growth is a dict with 'value' (as in test mocks)
         if isinstance(gdp_growth, dict) and 'value' in gdp_growth:
             val = gdp_growth['value']
-            if val > 2.0: return "positive"
-            if val < 0.0: return "negative"
+            if val > 2.0:
+                return "positive"
+            if val < 0.0:
+                return "negative"
         return "stable"
 
     def analyze_inflation_outlook(self, inflation_rate: Any) -> str:

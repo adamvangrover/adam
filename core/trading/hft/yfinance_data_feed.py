@@ -8,12 +8,14 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class YFinanceMarketDataHandler:
     """
     Real-time market data feed using yfinance snapshots.
     Since yfinance is not a WebSocket, this polls periodically.
     Suitable for 'Snapshot' trading or slower HFT.
     """
+
     def __init__(self, symbols: List[str], queue: asyncio.Queue, poll_interval: float = 5.0):
         self.symbols = symbols
         self.queue = queue

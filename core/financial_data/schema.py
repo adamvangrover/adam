@@ -3,6 +3,7 @@ from typing import Optional, List, Any
 from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
 
+
 class MarketTicker(BaseModel):
     """
     Represents a financial instrument discovered in the market.
@@ -23,8 +24,10 @@ class MarketTicker(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True)
 
+
 class TickerList(BaseModel):
     tickers: List[MarketTicker]
+
 
 class HistoricalPrice(BaseModel):
     """

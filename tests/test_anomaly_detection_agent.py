@@ -1,3 +1,5 @@
+from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
+from core.agents.anomaly_detection_agent import AnomalyDetectionAgent
 import unittest
 import pandas as pd
 import numpy as np
@@ -8,13 +10,11 @@ from unittest.mock import MagicMock, patch
 # Ensure core can be imported
 sys.path.append(os.getcwd())
 
-from core.agents.anomaly_detection_agent import AnomalyDetectionAgent
-from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
 
 class TestAnomalyDetectionAgent(unittest.TestCase):
     def setUp(self):
         # Combined config: Ticker is required for KG integration tests
-        self.config = {"ticker": "AAPL"} 
+        self.config = {"ticker": "AAPL"}
         self.agent = AnomalyDetectionAgent(self.config)
 
     # --- Integration Tests (Knowledge Graph) ---
@@ -36,7 +36,7 @@ class TestAnomalyDetectionAgent(unittest.TestCase):
         # Based on seed AAPL (580B market cap), revenue should be much higher.
         first_revenue = df['revenue'].iloc[0]
         self.assertNotEqual(first_revenue, 1000000)
-        self.assertGreater(first_revenue, 10000000) 
+        self.assertGreater(first_revenue, 10000000)
 
     @patch('core.agents.anomaly_detection_agent.UnifiedKnowledgeGraph')
     def test_load_company_data_fallback(self, mock_ukg_cls):
@@ -45,7 +45,7 @@ class TestAnomalyDetectionAgent(unittest.TestCase):
         """
         # Mock KG to return empty graph or raise error
         mock_kg = MagicMock()
-        mock_kg.graph.nodes.return_value = [] # Empty iterator
+        mock_kg.graph.nodes.return_value = []  # Empty iterator
         mock_ukg_cls.return_value = mock_kg
 
         agent = AnomalyDetectionAgent({"ticker": "UNKNOWN_CORP"})
@@ -103,6 +103,7 @@ class TestAnomalyDetectionAgent(unittest.TestCase):
 
         found = any('debt_to_equity_anomaly' in a['type'] for a in anomalies)
         self.assertTrue(found, "Should detect debt_to_equity anomaly")
+
 
 if __name__ == '__main__':
     unittest.main()

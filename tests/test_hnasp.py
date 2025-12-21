@@ -8,6 +8,7 @@ from core.hnasp.personality import BayesACTEngine
 from core.agents.hnasp_agent import HNASPAgent
 from core.hnasp.state_manager import HNASPStateManager
 
+
 class TestHNASP(unittest.TestCase):
     def test_logic_engine(self):
         engine = LogicEngine()
@@ -24,7 +25,8 @@ class TestHNASP(unittest.TestCase):
     def test_bayes_act_engine(self):
         engine = BayesACTEngine()
         state = HNASP(
-            meta=Meta(agent_id="test", trace_id="1", timestamp=datetime.now(), model_config={"model": "test"}, security_context={"user_id": "u", "clearance": "low"}),
+            meta=Meta(agent_id="test", trace_id="1", timestamp=datetime.now(), model_config={
+                      "model": "test"}, security_context={"user_id": "u", "clearance": "low"}),
             persona_state=PersonaState(
                 identities={
                     "self": {"label": "test", "fundamental_epa": {"E": 1, "P": 1, "A": 1}},
@@ -57,6 +59,7 @@ class TestHNASP(unittest.TestCase):
         response = asyncio.run(run_test())
         self.assertIsInstance(response, str)
         self.assertIn("cannot approve", response.lower())
+
 
 if __name__ == "__main__":
     unittest.main()

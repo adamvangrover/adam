@@ -13,6 +13,7 @@ app = Flask(__name__)
 agent_orchestrator = AgentOrchestrator()
 echo_system = Echo()
 
+
 @app.route("/", methods=["POST"])
 def api_endpoint():
     """
@@ -54,5 +55,8 @@ def api_endpoint():
         logging.error(f"Error processing request: {e}", exc_info=True)
         return jsonify({"error": "An internal error occurred."}), 500
 
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    import os
+    debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ("true", "1", "t")
+    app.run(debug=debug_mode)

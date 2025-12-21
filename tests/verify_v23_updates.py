@@ -8,18 +8,20 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 logging.basicConfig(level=logging.INFO)
 
+
 async def test_reflector_agent():
     print("\n--- Testing ReflectorAgent ---")
     from core.agents.reflector_agent import ReflectorAgent
 
     agent = ReflectorAgent({})
-    content = "This is a very short text." # Should trigger critique
+    content = "This is a very short text."  # Should trigger critique
 
     result = await agent.execute(content)
     print(f"Reflector Result: {result}")
 
     assert "critique_notes" in result
     assert "verification_status" in result
+
 
 async def test_crisis_agent():
     print("\n--- Testing CrisisSimulationMetaAgent ---")
@@ -46,6 +48,7 @@ async def test_crisis_agent():
     except Exception as e:
         print(f"Crisis Agent Failed (Expected if mock/graph issues): {e}")
 
+
 async def test_risk_agent():
     print("\n--- Testing RiskAssessmentAgent ---")
     from core.agents.risk_assessment_agent import RiskAssessmentAgent
@@ -62,6 +65,7 @@ async def test_risk_agent():
     else:
         print("Fallback to v21 Logic.")
 
+
 def main():
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
@@ -71,6 +75,7 @@ def main():
     loop.run_until_complete(test_risk_agent())
 
     loop.close()
+
 
 if __name__ == "__main__":
     main()

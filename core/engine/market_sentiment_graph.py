@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 # --- Mock Data Generators ---
 
+
 def _mock_fetch_news(ticker: str) -> List[Dict[str, Any]]:
     """Simulates fetching news from an API."""
     templates = [
@@ -37,6 +38,7 @@ def _mock_fetch_news(ticker: str) -> List[Dict[str, Any]]:
     return random.sample(templates, k=random.randint(1, 3))
 
 # --- Nodes ---
+
 
 def ingest_news_node(state: MarketSentimentState) -> Dict[str, Any]:
     """
@@ -54,6 +56,7 @@ def ingest_news_node(state: MarketSentimentState) -> Dict[str, Any]:
         "human_readable_status": f"Ingested {len(articles)} new articles."
     }
 
+
 def analyze_sentiment_node(state: MarketSentimentState) -> Dict[str, Any]:
     """
     Node: Analyze Sentiment
@@ -69,9 +72,12 @@ def analyze_sentiment_node(state: MarketSentimentState) -> Dict[str, Any]:
     avg_score = total_score / len(feed)
 
     # Determine Trend
-    if avg_score > 0.3: trend = "bullish"
-    elif avg_score < -0.3: trend = "bearish"
-    else: trend = "neutral"
+    if avg_score > 0.3:
+        trend = "bullish"
+    elif avg_score < -0.3:
+        trend = "bearish"
+    else:
+        trend = "neutral"
 
     # Extract drivers
     drivers = list(set(a["driver"] for a in feed))
@@ -82,6 +88,7 @@ def analyze_sentiment_node(state: MarketSentimentState) -> Dict[str, Any]:
         "key_drivers": drivers,
         "human_readable_status": f"Sentiment is {trend} ({avg_score:.2f})."
     }
+
 
 def kg_cross_reference_node(state: MarketSentimentState) -> Dict[str, Any]:
     """
@@ -107,6 +114,7 @@ def kg_cross_reference_node(state: MarketSentimentState) -> Dict[str, Any]:
         "related_entities": related,
         "human_readable_status": f"Identified {len(related)} related entities in KG."
     }
+
 
 def draft_alert_node(state: MarketSentimentState) -> Dict[str, Any]:
     """
@@ -143,6 +151,7 @@ def draft_alert_node(state: MarketSentimentState) -> Dict[str, Any]:
 
 # --- Conditional Logic ---
 
+
 def should_continue(state: MarketSentimentState) -> Literal["ingest_news", "END"]:
     # Mock Loop: If we have "HIGH" alert but haven't checked 2 iterations, check news again for updates
     if state["alert_level"] == "HIGH" and state["iteration_count"] < 2:
@@ -150,6 +159,7 @@ def should_continue(state: MarketSentimentState) -> Literal["ingest_news", "END"
     return "END"
 
 # --- Graph Construction ---
+
 
 def build_sentiment_graph():
     workflow = StateGraph(MarketSentimentState)
@@ -175,5 +185,6 @@ def build_sentiment_graph():
 
     checkpointer = MemorySaver()
     return workflow.compile(checkpointer=checkpointer)
+
 
 sentiment_graph_app = build_sentiment_graph()

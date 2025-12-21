@@ -2,6 +2,7 @@ import json
 import os
 import sys
 
+
 def validate_ukg_seed():
     filepath = 'data/v23_ukg_seed.json'
     if not os.path.exists(filepath):
@@ -46,6 +47,7 @@ def validate_ukg_seed():
     except Exception as e:
         print(f"Unexpected error: {e}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     validate_ukg_seed()

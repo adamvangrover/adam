@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from core.api.routers import agents
 from contextlib import asynccontextmanager
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: Initialize things if needed
@@ -19,13 +20,16 @@ app = FastAPI(
 
 app.include_router(agents.router, prefix="/api/v1/agents", tags=["agents"])
 
+
 @app.get("/")
 async def root():
     return {"message": "Welcome to Adam Core API. Use /docs for Swagger UI."}
 
+
 def start():
     import uvicorn
     uvicorn.run("core.api.main:app", host="0.0.0.0", port=8000, reload=False)
+
 
 if __name__ == "__main__":
     start()

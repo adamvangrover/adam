@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 # --- Nodes ---
 
+
 def generate_attack_node(state: RedTeamState) -> Dict[str, Any]:
     """
     Node: Generates or refines an adversarial scenario.
@@ -38,6 +39,7 @@ def generate_attack_node(state: RedTeamState) -> Dict[str, Any]:
         "human_readable_status": f"Drafting scenario: {scenario_type} (Iter {iteration})"
     }
 
+
 def simulate_impact_node(state: RedTeamState) -> Dict[str, Any]:
     """
     Node: Simulates the impact of the scenario on the target.
@@ -56,6 +58,7 @@ def simulate_impact_node(state: RedTeamState) -> Dict[str, Any]:
         "simulated_impact_score": total_impact,
         "human_readable_status": f"Simulating impact... Score: {total_impact:.1f}"
     }
+
 
 def critique_node(state: RedTeamState) -> Dict[str, Any]:
     """
@@ -80,6 +83,7 @@ def critique_node(state: RedTeamState) -> Dict[str, Any]:
 
 # --- Conditional Logic ---
 
+
 def should_continue(state: RedTeamState) -> Literal["escalate", "finalize"]:
     if state["is_sufficiently_severe"]:
         return "finalize"
@@ -90,12 +94,14 @@ def should_continue(state: RedTeamState) -> Literal["escalate", "finalize"]:
 
     return "escalate"
 
+
 def finalize_node(state: RedTeamState) -> Dict[str, Any]:
     return {
         "human_readable_status": "Red Team scenario finalized."
     }
 
 # --- Graph Construction ---
+
 
 def build_red_team_graph():
     workflow = StateGraph(RedTeamState)
@@ -122,5 +128,6 @@ def build_red_team_graph():
     workflow.add_edge("finalize", END)
 
     return workflow.compile()
+
 
 red_team_app = build_red_team_graph()

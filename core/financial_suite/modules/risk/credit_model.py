@@ -2,6 +2,7 @@ import numpy as np
 from scipy.stats import norm
 from core.financial_suite.schemas.workstream_context import WorkstreamContext
 
+
 class CreditEngine:
     @staticmethod
     def calculate_merton_pd(ev: float, total_debt: float, volatility: float, risk_free_rate: float, time_horizon: float = 1.0) -> float:
@@ -9,7 +10,7 @@ class CreditEngine:
         Calculates Probability of Default (PD) using Merton Structural Model.
         """
         if total_debt <= 0:
-            return 0.0001 # Non-zero small probability
+            return 0.0001  # Non-zero small probability
         if ev <= 0:
             return 1.0
 
@@ -35,7 +36,7 @@ class CreditEngine:
         # Feature Engineering
         leverage = total_debt / ebitda if ebitda > 0 else 100.0
         ltv = total_debt / ev if ev > 0 else 1.0
-        interest_coverage = ebitda / (total_debt * 0.08) # Approximation if interest not available locally
+        interest_coverage = ebitda / (total_debt * 0.08)  # Approximation if interest not available locally
 
         # Coefficients (Mock calibrated)
         intercept = -3.5
@@ -54,7 +55,8 @@ class CreditEngine:
         Router for PD calculation based on context configuration.
         """
         # Sum of debt
-        total_debt = sum(s.balance for s in ctx.capital_structure.securities if s.security_type in ["REVOLVER", "TERM_LOAN", "MEZZANINE"])
+        total_debt = sum(s.balance for s in ctx.capital_structure.securities if s.security_type in [
+                         "REVOLVER", "TERM_LOAN", "MEZZANINE"])
 
         if ctx.credit_challenge.pd_method == "MERTON_STRUCTURAL":
             vol = ctx.credit_challenge.asset_volatility or 0.30
@@ -70,7 +72,7 @@ class CreditEngine:
             return CreditEngine.calculate_logistic_pd(ctx, ev, total_debt, ebitda)
 
         else:
-            return 0.05 # Default fallback
+            return 0.05  # Default fallback
 
     @staticmethod
     def calculate_lgd(ctx: WorkstreamContext) -> float:
@@ -78,7 +80,7 @@ class CreditEngine:
         Calculates Weighted LGD based on collateral mix.
         """
         if not ctx.collateral:
-            return 0.45 # Default LGD
+            return 0.45  # Default LGD
 
         c = ctx.collateral
         total_assets = c.cash_equivalents + c.accounts_receivable + c.inventory + c.ppe + c.intangibles
@@ -107,8 +109,9 @@ class CreditEngine:
         """
         # EAD = Drawn Balance + (Unused * LEQ)
         # Simplified: Sum of all debt
-        total_debt = sum(s.balance for s in ctx.capital_structure.securities if s.security_type in ["REVOLVER", "TERM_LOAN", "MEZZANINE"])
-        ead = total_debt # Assuming fully drawn for simplicity
+        total_debt = sum(s.balance for s in ctx.capital_structure.securities if s.security_type in [
+                         "REVOLVER", "TERM_LOAN", "MEZZANINE"])
+        ead = total_debt  # Assuming fully drawn for simplicity
 
         lgd = CreditEngine.calculate_lgd(ctx)
 

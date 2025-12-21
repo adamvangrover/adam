@@ -9,6 +9,7 @@ from .schema import MarketTicker
 
 logger = logging.getLogger(__name__)
 
+
 class DataLakehouse:
     """
     Manages the 'Gold Standard' static repository of market data.

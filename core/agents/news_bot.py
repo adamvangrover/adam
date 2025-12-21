@@ -12,9 +12,9 @@ import random
 from sklearn.metrics import pairwise_distances_argmin_min
 
 from typing import Dict, Any, Optional, List
-import feedparser # Added import
-import time # For parsing published_at if needed
-from datetime import timezone # For timezone aware datetime objects
+import feedparser  # Added import
+import time  # For parsing published_at if needed
+from datetime import timezone  # For timezone aware datetime objects
 
 from semantic_kernel import Kernel
 
@@ -22,8 +22,8 @@ from core.agents.agent_base import AgentBase
 # For get_api_key if needed later, but not for this step
 # from core.utils.secrets_utils import get_api_key
 
-import torch # Added import
-from transformers import AutoTokenizer, AutoModelForSequenceClassification # Added import
+import torch  # Added import
+from transformers import AutoTokenizer, AutoModelForSequenceClassification  # Added import
 
 # Initialize NLTK sentiment analyzer - REMOVED
 # try:
@@ -32,28 +32,30 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification # Add
 #     nltk.download('vader_lexicon')
 # sia = SentimentIntensityAnalyzer() - REMOVED
 
-import nltk # Added import for sentence tokenization in summarizer fallback
-from transformers import AutoModelForSeq2SeqLM # Added import for summarization model
+import nltk  # Added import for sentence tokenization in summarizer fallback
+from transformers import AutoModelForSeq2SeqLM  # Added import for summarization model
 
 # Define the "NewsBot" class, now inheriting from AgentBase
+
+
 class NewsBot(AgentBase):
     def __init__(self, config: Dict[str, Any], kernel: Optional[Kernel] = None):
         """
         Initializes the NewsBot Agent.
-        
+
         Args:
             config (Dict[str, Any]): Agent configuration.
             kernel (Optional[Kernel]): Semantic Kernel instance.
         """
         super().__init__(config, kernel)
-        
+
         # Extract configurations from self.config (set by AgentBase)
         self.user_preferences = self.config.get('user_preferences', {})
         self.news_api_key = self.config.get('news_api_key', None)
-        self.search_api_key = self.config.get('search_api_key', None) # Added search_api_key
+        self.search_api_key = self.config.get('search_api_key', None)  # Added search_api_key
         self.portfolio = self.config.get('portfolio', {})
         self.user_api_sources = self.config.get('user_api_sources', [])
-        
+
         if not self.news_api_key:
             print("Warning: news_api_key is not configured for NewsBot.")
         if not self.search_api_key:
@@ -69,7 +71,7 @@ class NewsBot(AgentBase):
         self.finbert_model = None
         self.summarizer_tokenizer = None
         self.summarizer_model = None
-        self.seen_alert_urls = set() # For tracking alerted articles in the current session
+        self.seen_alert_urls = set()  # For tracking alerted articles in the current session
 
         # Load FinBERT model and tokenizer
         try:
@@ -82,7 +84,7 @@ class NewsBot(AgentBase):
 
         # Load Summarization model and tokenizer
         try:
-            model_name_summarizer = "sshleifer/distilbart-cnn-12-6" # Using a smaller model due to space constraints
+            model_name_summarizer = "sshleifer/distilbart-cnn-12-6"  # Using a smaller model due to space constraints
             self.summarizer_tokenizer = AutoTokenizer.from_pretrained(model_name_summarizer)
             self.summarizer_model = AutoModelForSeq2SeqLM.from_pretrained(model_name_summarizer)
             print(f"Summarization model ({model_name_summarizer}) loaded successfully.")
@@ -93,7 +95,7 @@ class NewsBot(AgentBase):
                 nltk.data.find('tokenizers/punkt')
             except nltk.downloader.DownloadError:
                 print("NLTK 'punkt' not found. Downloading...")
-                nltk.download('punkt', quiet=True) # quiet=True to avoid verbose output if already there or successful
+                nltk.download('punkt', quiet=True)  # quiet=True to avoid verbose output if already there or successful
 
     def load_custom_sources(self) -> Dict[str, str]:
         """Load custom news APIs provided by the user."""
@@ -102,36 +104,36 @@ class NewsBot(AgentBase):
             custom_sources[source['name']] = source['url']
         return custom_sources
 
-    def aggregate_news(self) -> List[Dict[str, Any]]: # Added return type hint
+    def aggregate_news(self) -> List[Dict[str, Any]]:  # Added return type hint
         """
         Aggregates news articles from various sources (including custom user sources).
-        
+
         Returns:
             list: Aggregated news articles
         """
-        all_news: List[Dict[str, Any]] = [] # Added type hint
+        all_news: List[Dict[str, Any]] = []  # Added type hint
 
         # Collect crypto-related news
-        if 'crypto' in self.user_preferences.get('topics', []): # Safe get
+        if 'crypto' in self.user_preferences.get('topics', []):  # Safe get
             all_news.extend(self.get_crypto_news())
 
         # Collect financial market-related news
-        if 'finance' in self.user_preferences.get('topics', []): # Safe get
+        if 'finance' in self.user_preferences.get('topics', []):  # Safe get
             all_news.extend(self.get_finance_news())
 
         # Collect stock market news
-        if 'stocks' in self.user_preferences.get('topics', []): # Safe get
+        if 'stocks' in self.user_preferences.get('topics', []):  # Safe get
             all_news.extend(self.get_stock_news())
 
         # Collect commodities and treasury news
-        if 'commodities' in self.user_preferences.get('topics', []): # Safe get
+        if 'commodities' in self.user_preferences.get('topics', []):  # Safe get
             all_news.extend(self.get_commodities_news())
 
-        if 'treasuries' in self.user_preferences.get('topics', []): # Safe get
+        if 'treasuries' in self.user_preferences.get('topics', []):  # Safe get
             all_news.extend(self.get_treasuries_news())
 
         # Collect FX news
-        if 'forex' in self.user_preferences.get('topics', []): # Safe get
+        if 'forex' in self.user_preferences.get('topics', []):  # Safe get
             all_news.extend(self.get_forex_news())
 
         # Add Reuters Business News RSS
@@ -146,13 +148,13 @@ class NewsBot(AgentBase):
 
         return filtered_news
 
-    def get_crypto_news(self) -> List[Dict[str, Any]]: # Added return type hint
+    def get_crypto_news(self) -> List[Dict[str, Any]]:  # Added return type hint
         """Fetch cryptocurrency news using the CoinGeckoAPI."""
         try:
             # Assuming get_trending_searches returns a list of dicts or similar
             # The original pycoingecko might return a more complex structure.
             # This is a simplification.
-            trending_searches = self.cg.get_trending_searches() # Removed language='en' as it's not a standard param
+            trending_searches = self.cg.get_trending_searches()  # Removed language='en' as it's not a standard param
             # Convert trending searches to a news-like format if necessary
             news_items = []
             if isinstance(trending_searches, dict) and 'coins' in trending_searches:
@@ -169,10 +171,10 @@ class NewsBot(AgentBase):
             print(f"Error fetching crypto news from CoinGecko: {e}")
             return []
 
-
-    def get_finance_news(self) -> List[Dict[str, Any]]: # Added return type hint
+    def get_finance_news(self) -> List[Dict[str, Any]]:  # Added return type hint
         """Fetch general finance news using NewsAPI."""
-        if not self.news_api_key: return []
+        if not self.news_api_key:
+            return []
         url = "https://newsapi.org/v2/everything"
         params = {
             'q': 'finance',
@@ -182,15 +184,16 @@ class NewsBot(AgentBase):
         }
         try:
             response = requests.get(url, params=params)
-            response.raise_for_status() # Raise an exception for HTTP errors
+            response.raise_for_status()  # Raise an exception for HTTP errors
             return response.json().get('articles', [])
         except requests.exceptions.RequestException as e:
             print(f"Error fetching finance news from NewsAPI: {e}")
             return []
 
-    def get_stock_news(self) -> List[Dict[str, Any]]: # Added return type hint
+    def get_stock_news(self) -> List[Dict[str, Any]]:  # Added return type hint
         """Fetch stock-related news using an API or data source."""
-        if not self.news_api_key: return []
+        if not self.news_api_key:
+            return []
         url = "https://newsapi.org/v2/everything"
         params = {
             'q': 'stocks',
@@ -206,9 +209,10 @@ class NewsBot(AgentBase):
             print(f"Error fetching stock news from NewsAPI: {e}")
             return []
 
-    def get_commodities_news(self) -> List[Dict[str, Any]]: # Added return type hint
+    def get_commodities_news(self) -> List[Dict[str, Any]]:  # Added return type hint
         """Fetch commodities-related news (gold, oil, etc.)."""
-        if not self.news_api_key: return []
+        if not self.news_api_key:
+            return []
         url = "https://newsapi.org/v2/everything"
         params = {
             'q': 'commodities',
@@ -224,9 +228,10 @@ class NewsBot(AgentBase):
             print(f"Error fetching commodities news from NewsAPI: {e}")
             return []
 
-    def get_treasuries_news(self) -> List[Dict[str, Any]]: # Added return type hint
+    def get_treasuries_news(self) -> List[Dict[str, Any]]:  # Added return type hint
         """Fetch treasury bond-related news."""
-        if not self.news_api_key: return []
+        if not self.news_api_key:
+            return []
         url = "https://newsapi.org/v2/everything"
         params = {
             'q': 'treasury bonds',
@@ -242,9 +247,10 @@ class NewsBot(AgentBase):
             print(f"Error fetching treasuries news from NewsAPI: {e}")
             return []
 
-    def get_forex_news(self) -> List[Dict[str, Any]]: # Added return type hint
+    def get_forex_news(self) -> List[Dict[str, Any]]:  # Added return type hint
         """Fetch foreign exchange news."""
-        if not self.news_api_key: return []
+        if not self.news_api_key:
+            return []
         url = "https://newsapi.org/v2/everything"
         params = {
             'q': 'forex',
@@ -260,7 +266,7 @@ class NewsBot(AgentBase):
             print(f"Error fetching forex news from NewsAPI: {e}")
             return []
 
-    def get_custom_news(self, api_url: str) -> List[Dict[str, Any]]: # Added type hints
+    def get_custom_news(self, api_url: str) -> List[Dict[str, Any]]:  # Added type hints
         """Fetch custom news from user-provided sources."""
         try:
             response = requests.get(api_url)
@@ -286,7 +292,7 @@ class NewsBot(AgentBase):
                     # Create a datetime object, assuming UTC if no timezone info
                     dt_object = datetime.fromtimestamp(time.mktime(entry.published_parsed), tz=timezone.utc)
                     published_at = dt_object.isoformat()
-                elif hasattr(entry, 'updated_parsed') and entry.updated_parsed: # Fallback to updated
+                elif hasattr(entry, 'updated_parsed') and entry.updated_parsed:  # Fallback to updated
                     dt_object = datetime.fromtimestamp(time.mktime(entry.updated_parsed), tz=timezone.utc)
                     published_at = dt_object.isoformat()
 
@@ -302,21 +308,21 @@ class NewsBot(AgentBase):
             # Optionally, log the error more formally or raise it depending on desired handling
         return news_items
 
-    def filter_news_by_portfolio(self, news_articles: List[Dict[str, Any]]) -> List[Dict[str, Any]]: # Added type hints
+    def filter_news_by_portfolio(self, news_articles: List[Dict[str, Any]]) -> List[Dict[str, Any]]:  # Added type hints
         """
         Filters news articles based on portfolio holdings (stocks, crypto, etc.).
-        
+
         Args:
             news_articles (list): List of news articles.
-        
+
         Returns:
             list: Filtered list of news articles.
         """
-        filtered_news: List[Dict[str, Any]] = [] # Added type hint
+        filtered_news: List[Dict[str, Any]] = []  # Added type hint
         for article in news_articles:
             title = article.get('title', '')
             description = article.get('description', '')
-            if not title and not description: # Skip if no content to check
+            if not title and not description:  # Skip if no content to check
                 continue
             for symbol in self.portfolio:
                 if symbol.lower() in title.lower() or symbol.lower() in description.lower():
@@ -332,12 +338,12 @@ class NewsBot(AgentBase):
 
         if not self.finbert_tokenizer or not self.finbert_model:
             print("FinBERT model not available. Skipping sentiment analysis.")
-            return 0.0 # Neutral score if model isn't loaded
+            return 0.0  # Neutral score if model isn't loaded
 
         try:
             inputs = self.finbert_tokenizer(text, return_tensors="pt", truncation=True, max_length=512, padding=True)
 
-            with torch.no_grad(): # Disable gradient calculations for inference
+            with torch.no_grad():  # Disable gradient calculations for inference
                 outputs = self.finbert_model(**inputs)
 
             probs = torch.softmax(outputs.logits, dim=-1)
@@ -356,21 +362,21 @@ class NewsBot(AgentBase):
             if positive_prob > negative_prob and positive_prob > neutral_prob:
                 return 1.0  # Positive
             elif negative_prob > positive_prob and negative_prob > neutral_prob:
-                return -1.0 # Negative
+                return -1.0  # Negative
             else:
                 return 0.0  # Neutral
 
         except Exception as e:
             print(f"Error during FinBERT sentiment analysis: {e}")
-            return 0.0 # Return neutral on error
+            return 0.0  # Return neutral on error
 
     def analyze_impact(self, article: Dict[str, Any]) -> float:
         """
         Calculates an 'impact score' based on sentiment, portfolio relevance, and topic.
-        
+
         Args:
             article (dict): The news article to evaluate.
-        
+
         Returns:
             float: The impact score of the article.
         """
@@ -383,28 +389,28 @@ class NewsBot(AgentBase):
         for symbol in self.portfolio:
             if symbol.lower() in title.lower() or symbol.lower() in description.lower():
                 portfolio_relevance += 1
-        
+
         # Normalize the score
-        impact_score = sentiment_score * (1 + portfolio_relevance) # Add 1 to give base sentiment some weight
+        impact_score = sentiment_score * (1 + portfolio_relevance)  # Add 1 to give base sentiment some weight
         return impact_score
 
-    def personalize_feed(self, articles: List[Dict[str, Any]]) -> List[Dict[str, Any]]: # Added type hints
+    def personalize_feed(self, articles: List[Dict[str, Any]]) -> List[Dict[str, Any]]:  # Added type hints
         """
         Personalizes the news feed based on user preferences and sentiment analysis.
-        
+
         Args:
             articles (list): List of news articles to personalize.
-        
+
         Returns:
             list: Personalized and ranked news articles.
         """
-        personalized_articles: List[Dict[str, Any]] = [] # Added type hint
+        personalized_articles: List[Dict[str, Any]] = []  # Added type hint
 
         # Rank articles based on sentiment analysis and impact score
         for article in articles:
             impact_score = self.analyze_impact(article)
-            article['impact_score'] = impact_score # Storing it in the article dict
-            article['sentiment_score'] = self.analyze_sentiment(article) # Storing it
+            article['impact_score'] = impact_score  # Storing it in the article dict
+            article['sentiment_score'] = self.analyze_sentiment(article)  # Storing it
             personalized_articles.append(article)
 
         # Sort articles by impact score (highest to lowest)
@@ -416,7 +422,7 @@ class NewsBot(AgentBase):
         """
         Identifies articles meeting alert criteria, prints alerts for new ones,
         and returns all articles that met criteria in this batch.
-        
+
         Args:
             articles (list): List of personalized news articles.
 
@@ -432,7 +438,7 @@ class NewsBot(AgentBase):
         for article in articles:
             impact_score = article.get('impact_score', 0)
             title = article.get('title', 'No Title')
-            article_url = article.get('link', article.get('url')) # Prefer 'link', fallback to 'url'
+            article_url = article.get('link', article.get('url'))  # Prefer 'link', fallback to 'url'
 
             is_alert_worthy = False
             alert_type = ""
@@ -451,14 +457,13 @@ class NewsBot(AgentBase):
                     if article_url not in self.seen_alert_urls:
                         print(f"ALERT: {alert_type} - {title}\nScore: {impact_score:.2f}\nLink: {article_url}")
                         self.seen_alert_urls.add(article_url)
-                else: # If no valid URL, alert based on title (might lead to duplicates if titles aren't unique)
+                else:  # If no valid URL, alert based on title (might lead to duplicates if titles aren't unique)
                     temp_article_id = title
                     if temp_article_id not in self.seen_alert_urls:
-                         print(f"ALERT (no URL): {alert_type} - {title}\nScore: {impact_score:.2f}")
-                         self.seen_alert_urls.add(temp_article_id)
+                        print(f"ALERT (no URL): {alert_type} - {title}\nScore: {impact_score:.2f}")
+                        self.seen_alert_urls.add(temp_article_id)
 
         return alert_worthy_articles_in_batch
-
 
     # --- AgentBase Methods Implementation ---
 
@@ -482,7 +487,8 @@ class NewsBot(AgentBase):
             summary = await self.summarize_articles(personalized_feed[:5])
             critical_analysis = self.perform_critical_analysis(personalized_feed[:10])
             actionable_insights = self.draw_conclusions(critical_analysis)
-            analysis_report = self.generate_report(personalized_feed[:5], summary, critical_analysis, actionable_insights)
+            analysis_report = self.generate_report(
+                personalized_feed[:5], summary, critical_analysis, actionable_insights)
             # Removed automatic printing of report from here to avoid clutter during monitoring.
             # It will be printed by the standalone runner if requested.
         return {
@@ -502,7 +508,7 @@ class NewsBot(AgentBase):
         while loop.time() < end_time:
             print(f"Monitoring... running news check at {datetime.now(timezone.utc).isoformat()}")
 
-            results_dict = await self.execute() # This already calls send_alerts internally
+            results_dict = await self.execute()  # This already calls send_alerts internally
 
             # Identify articles that meet alerting criteria from the current batch
             alerting_thresholds = self.config.get('alerting_thresholds', {})
@@ -511,11 +517,12 @@ class NewsBot(AgentBase):
 
             if results_dict.get('personalized_feed'):
                 for article in results_dict['personalized_feed']:
-                    impact_score = article.get('impact_score', 0.0) # Default to 0.0 if not present
+                    impact_score = article.get('impact_score', 0.0)  # Default to 0.0 if not present
                     if impact_score > positive_threshold or impact_score < negative_threshold:
                         article_url = article.get('link', article.get('url'))
                         # Ensure URL is valid and prefer it as key for uniqueness
-                        unique_key = article_url if (article_url and isinstance(article_url, str) and article_url.strip()) else article.get('title', str(random.random())) # Fallback key
+                        unique_key = article_url if (article_url and isinstance(article_url, str) and article_url.strip()) else article.get(
+                            'title', str(random.random()))  # Fallback key
 
                         if unique_key not in all_critical_news_session:
                             all_critical_news_session[unique_key] = article
@@ -524,14 +531,13 @@ class NewsBot(AgentBase):
             if remaining_time > interval_seconds:
                 print(f"Monitoring... next check in {interval_seconds}s.")
                 await asyncio.sleep(interval_seconds)
-            elif remaining_time > 0: # Sleep for the remaining time if less than interval
+            elif remaining_time > 0:  # Sleep for the remaining time if less than interval
                 await asyncio.sleep(remaining_time)
-            else: # No time left
+            else:  # No time left
                 break
 
         print("Monitoring finished.")
         return list(all_critical_news_session.values())
-
 
     async def summarize_articles(self, articles: List[Dict[str, Any]]) -> str:
         """Generates a summary from a list of articles."""
@@ -550,14 +556,14 @@ class NewsBot(AgentBase):
                 inputs = self.summarizer_tokenizer(
                     text_to_summarize,
                     return_tensors="pt",
-                    max_length=1024, # Max input length for BART models
+                    max_length=1024,  # Max input length for BART models
                     truncation=True,
                     padding="longest"
                 )
                 summary_ids = self.summarizer_model.generate(
                     inputs.input_ids,
                     num_beams=4,
-                    max_length=150, # Desired summary length
+                    max_length=150,  # Desired summary length
                     early_stopping=True
                 )
                 summary = self.summarizer_tokenizer.decode(summary_ids[0], skip_special_tokens=True)
@@ -568,7 +574,7 @@ class NewsBot(AgentBase):
         # Fallback to basic summarization (first sentence of top N articles)
         print("Warning: Summarization model not available or failed. Using fallback (first sentence concatenation).")
         summary_parts = []
-        for i, article in enumerate(articles[:3]): # Top 3 articles for fallback summary
+        for i, article in enumerate(articles[:3]):  # Top 3 articles for fallback summary
             text = article.get('description', article.get('title', ''))
             if text:
                 try:
@@ -595,9 +601,10 @@ class NewsBot(AgentBase):
         # 1. Conflicting sentiment for portfolio items
         # Simplified: Check if any article about a portfolio item has strong pos/neg sentiment
         # A more advanced version would track sentiment per item across articles.
-        portfolio_symbols = [str(s).lower() for s in self.portfolio.get('stocks', []) + self.portfolio.get('crypto', [])]
+        portfolio_symbols = [str(s).lower() for s in self.portfolio.get(
+            'stocks', []) + self.portfolio.get('crypto', [])]
 
-        conflicting_sentiments = {} # stock_symbol: [sentiments]
+        conflicting_sentiments = {}  # stock_symbol: [sentiments]
 
         for article in articles:
             title = article.get('title', '').lower()
@@ -615,7 +622,8 @@ class NewsBot(AgentBase):
             has_positive = any(s > 0.5 for s in sentiments)
             has_negative = any(s < -0.5 for s in sentiments)
             if has_positive and has_negative:
-                analysis_points.append(f"Conflicting sentiment found for portfolio item: {symbol.upper()}. Articles show both positive and negative views.")
+                analysis_points.append(
+                    f"Conflicting sentiment found for portfolio item: {symbol.upper()}. Articles show both positive and negative views.")
 
         # 2. Predefined risk/opportunity keywords
         risk_keywords = ["warning", "concern", "risk", "volatile", "downturn", "bubble"]
@@ -636,7 +644,8 @@ class NewsBot(AgentBase):
         if found_risks:
             analysis_points.append(f"Potential risks indicated by keywords: {', '.join(list(found_risks))}.")
         if found_opportunities:
-            analysis_points.append(f"Potential opportunities indicated by keywords: {', '.join(list(found_opportunities))}.")
+            analysis_points.append(
+                f"Potential opportunities indicated by keywords: {', '.join(list(found_opportunities))}.")
 
         return "\n- ".join(analysis_points) if analysis_points else "No specific critical points identified from the top articles."
 
@@ -670,13 +679,13 @@ class NewsBot(AgentBase):
             "\nOverall Summary:",
             summary,
             "\nCritical Analysis:",
-            f"- {critical_analysis}", # Assuming critical_analysis is already formatted with newlines or is a single block
+            f"- {critical_analysis}",  # Assuming critical_analysis is already formatted with newlines or is a single block
             "\nActionable Insights:",
-            f"- {actionable_insights}", # Same assumption for actionable_insights
+            f"- {actionable_insights}",  # Same assumption for actionable_insights
             "\nSources (Top Articles Used for Summary/Analysis):"
         ]
 
-        for i, article in enumerate(articles[:5]): # List sources for top 5 articles
+        for i, article in enumerate(articles[:5]):  # List sources for top 5 articles
             title = article.get('title', 'N/A')
             link = article.get('link', article.get('url', 'N/A'))
             sentiment = article.get('sentiment_score', 0.0)
@@ -692,13 +701,14 @@ class NewsBot(AgentBase):
         """
         Defines the NewsBot's skills for MCP.
         """
-        schema = super().get_skill_schema() # Get base schema
-        schema["description"] = self.config.get("description", "Monitors news, aggregates, personalizes, and alerts on relevant events.")
+        schema = super().get_skill_schema()  # Get base schema
+        schema["description"] = self.config.get(
+            "description", "Monitors news, aggregates, personalizes, and alerts on relevant events.")
         schema["skills"] = [
             {
                 "name": "get_latest_news",
                 "description": "Retrieves the latest personalized news articles.",
-                "parameters": [] # No specific input parameters for this general fetch
+                "parameters": []  # No specific input parameters for this general fetch
             },
             {
                 "name": "get_news_for_topic",
@@ -710,7 +720,7 @@ class NewsBot(AgentBase):
             {
                 "name": "web_search",
                 "description": "Performs a web search for a given query and returns relevant articles.",
-                "parameters": [ # Changed from 'inputs' to 'parameters' for consistency with other skills
+                "parameters": [  # Changed from 'inputs' to 'parameters' for consistency with other skills
                     {"name": "query", "type": "string", "description": "The search query."}
                 ],
                 # "outputs" key is not standard for my current get_skill_schema structure.
@@ -718,7 +728,7 @@ class NewsBot(AgentBase):
             {
                 "name": "generate_news_analysis_report",
                 "description": "Generates a news analysis report with summary, critical analysis, and actionable insights from the latest personalized news.",
-                "parameters": [], # Uses internally aggregated news
+                "parameters": [],  # Uses internally aggregated news
                 # "outputs": [
                 #     {"name": "report", "type": "string", "description": "The generated news analysis report."}
                 # ]
@@ -727,8 +737,10 @@ class NewsBot(AgentBase):
                 "name": "start_news_monitoring",
                 "description": "Starts monitoring for critical news updates for a specified duration and interval.",
                 "parameters": [
-                    {"name": "duration_minutes", "type": "integer", "description": "Duration to monitor in minutes.", "optional": True, "default": 5},
-                    {"name": "interval_seconds", "type": "integer", "description": "Interval between checks in seconds.", "optional": True, "default": 60}
+                    {"name": "duration_minutes", "type": "integer",
+                        "description": "Duration to monitor in minutes.", "optional": True, "default": 5},
+                    {"name": "interval_seconds", "type": "integer",
+                        "description": "Interval between checks in seconds.", "optional": True, "default": 60}
                 ],
                 # "outputs": [ # If we were to define outputs for schema
                 #     {"name": "critical_articles", "type": "list", "description": "A list of unique critical articles found during the monitoring session."}
@@ -773,7 +785,7 @@ class NewsBot(AgentBase):
             # await asyncio.sleep(0.1)
         except Exception as e:
             print(f"Error during placeholder web search for '{query}': {e}")
-            return [] # Return empty list on error
+            return []  # Return empty list on error
 
         return mock_results
 
@@ -790,17 +802,18 @@ class NewsBot(AgentBase):
                 # Simplified: re-run aggregation focusing on this topic.
                 # A more advanced implementation would filter existing news or fetch specifically.
                 original_topics = self.user_preferences.get('topics', [])
-                self.user_preferences['topics'] = [topic] # Temporarily override
+                self.user_preferences['topics'] = [topic]  # Temporarily override
 
                 news_articles = self.aggregate_news()
                 personalized_feed = self.personalize_feed(news_articles)
 
-                self.user_preferences['topics'] = original_topics # Restore
-                return {"status": "success", "articles": personalized_feed[:10]} # Return top 10
+                self.user_preferences['topics'] = original_topics  # Restore
+                return {"status": "success", "articles": personalized_feed[:10]}  # Return top 10
             else:
                 return {"status": "error", "message": "Topic not provided"}
 
-        return await super().receive_message(sender_agent, message) # Default handling
+        return await super().receive_message(sender_agent, message)  # Default handling
+
 
 if __name__ == "__main__":
     import argparse
@@ -893,7 +906,6 @@ if __name__ == "__main__":
         print("NLTK 'punkt' not found for standalone runner. Downloading...")
         nltk.download('punkt', quiet=True)
 
-
     user_preferences_data = load_json_arg(args.user_preferences, "user-preferences")
     portfolio_data = load_json_arg(args.portfolio, "portfolio")
     custom_api_sources_data = load_json_arg(args.custom_api_sources, "custom-api-sources")
@@ -905,7 +917,7 @@ if __name__ == "__main__":
         "expertise": ["news aggregation", "event detection", "information filtering", "sentiment analysis", "web search"],
         "user_preferences": user_preferences_data,
         "news_api_key": args.news_api_key,
-        "search_api_key": args.search_api_key, # Added search_api_key to config
+        "search_api_key": args.search_api_key,  # Added search_api_key to config
         "portfolio": portfolio_data,
         "user_api_sources": custom_api_sources_data,
         "alerting_thresholds": {
@@ -919,9 +931,10 @@ if __name__ == "__main__":
     if args.monitor_news:
         # Make sure monitor_news is mutually exclusive with search and regular execute for CLI simplicity
         if args.search_query or args.generate_report:
-             print("Error: --monitor-news cannot be used with --search-query or --generate-report in this standalone runner.")
-             exit(1)
-        print(f"\n--- Starting News Monitoring (Duration: {args.monitor_duration}m, Interval: {args.monitor_interval}s) ---")
+            print("Error: --monitor-news cannot be used with --search-query or --generate-report in this standalone runner.")
+            exit(1)
+        print(
+            f"\n--- Starting News Monitoring (Duration: {args.monitor_duration}m, Interval: {args.monitor_interval}s) ---")
         try:
             critical_articles_found = asyncio.run(
                 news_bot.monitor_for_critical_news(
@@ -939,7 +952,7 @@ if __name__ == "__main__":
                     print(f"  Published At: {article_item.get('published_at', 'N/A')}")
                     sentiment_score = article_item.get('sentiment_score', 0.0)
                     impact_score = article_item.get('impact_score', 0.0)
-                    print(f"  Sentiment Score: {float(sentiment_score):.2f}") # Ensure float for formatting
+                    print(f"  Sentiment Score: {float(sentiment_score):.2f}")  # Ensure float for formatting
                     print(f"  Impact Score: {float(impact_score):.2f}")   # Ensure float for formatting
             else:
                 print("No new critical articles identified during the monitoring session.")
@@ -947,7 +960,7 @@ if __name__ == "__main__":
             print(f"An error occurred during news monitoring: {e}")
 
     elif args.search_query:
-        if args.generate_report: # Ensure search and report are not combined if not desired
+        if args.generate_report:  # Ensure search and report are not combined if not desired
             print("Error: --search-query and --generate-report are mutually exclusive in this runner if not monitoring.")
             exit(1)
         print(f"\n--- Performing Web Search for: \"{args.search_query}\" ---")
@@ -966,7 +979,7 @@ if __name__ == "__main__":
                 print("No search results returned or search_api_key not provided.")
         except Exception as e:
             print(f"An error occurred during web search: {e}")
-    else: # Default to aggregation/personalization and optional report (if not monitoring or searching)
+    else:  # Default to aggregation/personalization and optional report (if not monitoring or searching)
         run_mode_message = "\n--- Running Full NewsBot Aggregation, Personalization"
         if args.generate_report:
             run_mode_message += " & Reporting"
@@ -982,7 +995,7 @@ if __name__ == "__main__":
                 if analysis_report_result:
                     print("\n--- Analysis Report ---")
                     print(analysis_report_result)
-                else: # Should only happen if personalized_feed was empty
+                else:  # Should only happen if personalized_feed was empty
                     print("\nNo analysis report was generated (e.g., no articles to analyze).")
             else:
                 print("\n--- Personalized News Feed (Top Articles) ---")
@@ -1007,4 +1020,3 @@ if __name__ == "__main__":
             exit(1)
 
     print("\nNewsBot standalone execution finished.")
-

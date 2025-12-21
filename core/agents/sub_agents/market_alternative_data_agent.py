@@ -4,6 +4,7 @@ from typing import Any, Dict
 
 from core.agents.agent_base import AgentBase
 
+
 class MarketAlternativeDataAgent(AgentBase):
     """
     To build a truly comprehensive and forward-looking risk profile, the system must

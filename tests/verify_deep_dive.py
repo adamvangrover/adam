@@ -1,3 +1,5 @@
+from core.engine.states import init_omniscient_state
+from core.engine.deep_dive_graph import deep_dive_app
 import sys
 import os
 import asyncio
@@ -9,8 +11,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
-from core.engine.deep_dive_graph import deep_dive_app
-from core.engine.states import init_omniscient_state
 
 async def main():
     print("Starting Deep Dive Graph Verification...")
@@ -34,7 +34,8 @@ async def main():
 
         print("\n--- Knowledge Graph Nodes ---")
         print(f"Entity: {kg.get('entity_ecosystem', {}).get('legal_entity', {}).get('name')}")
-        print(f"Valuation: {kg.get('equity_analysis', {}).get('valuation_engine', {}).get('dcf_model', {}).get('intrinsic_share_price')}")
+        print(
+            f"Valuation: {kg.get('equity_analysis', {}).get('valuation_engine', {}).get('dcf_model', {}).get('intrinsic_share_price')}")
         print(f"Credit: {kg.get('credit_analysis', {}).get('snc_rating_model', {}).get('overall_borrower_rating')}")
         print(f"Recommendation: {kg.get('strategic_synthesis', {}).get('final_verdict', {}).get('recommendation')}")
 

@@ -10,6 +10,7 @@ It prioritizes accuracy over speed, ensuring "Gold Standard" data ingestion.
 import xml.etree.ElementTree as ET
 from typing import Dict, Any, Optional
 
+
 class XBRLParser:
     def __init__(self):
         self.taxonomy_map = self._load_taxonomy()
@@ -32,15 +33,15 @@ class XBRLParser:
         """
         tree = ET.parse(file_path)
         root = tree.getroot()
-        
+
         financial_data = {}
-        
+
         # Naive implementation for demonstration
         # Real XBRL parsing requires handling contexts, units, and periods
         for child in root:
-            tag = child.tag.split('}')[-1] # Remove namespace
-            full_tag = f"us-gaap:{tag}" # Simplified
-            
+            tag = child.tag.split('}')[-1]  # Remove namespace
+            full_tag = f"us-gaap:{tag}"  # Simplified
+
             if full_tag in self.taxonomy_map:
                 fibo_key = self.taxonomy_map[full_tag]
                 try:
@@ -48,7 +49,7 @@ class XBRLParser:
                     financial_data[fibo_key] = value
                 except (ValueError, TypeError):
                     continue
-                    
+
         return financial_data
 
     def validate_schema(self, data: Dict[str, Any]) -> bool:
@@ -58,6 +59,7 @@ class XBRLParser:
         # from core.schemas.financials import BalanceSheet
         # BalanceSheet(**data)
         return True
+
 
 if __name__ == "__main__":
     parser = XBRLParser()

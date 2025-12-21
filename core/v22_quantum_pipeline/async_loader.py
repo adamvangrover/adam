@@ -7,6 +7,7 @@ try:
 except ImportError:
     _load_dataset_lib = None
 
+
 async def load_structured_repository(file_path):
     print(f'Loading Future-Aligned Data from {file_path}...')
 
@@ -22,8 +23,8 @@ async def load_structured_repository(file_path):
                 # Yield control to event loop
                 await asyncio.sleep(0)
         except Exception as e:
-             print(f"Error using datasets library: {e}. Falling back to manual read.")
-             use_lib = None # Force fallback
+            print(f"Error using datasets library: {e}. Falling back to manual read.")
+            use_lib = None  # Force fallback
 
     if not use_lib:
         print("Using Manual JSONL loader.")
@@ -41,6 +42,7 @@ async def load_structured_repository(file_path):
         else:
             print(f"File {file_path} not found.")
 
+
 def format_for_lora(example):
     # Formats JSONL into Tokenizer-ready string
     if 'messages' in example and len(example['messages']) >= 3:
@@ -49,6 +51,7 @@ def format_for_lora(example):
             'target_text': example['messages'][2]['content']
         }
     return example
+
 
 async def main():
     # Check if file exists, if not warn

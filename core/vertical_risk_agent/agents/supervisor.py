@@ -31,7 +31,9 @@ except ImportError:
             }
 
     END = "END"
-    class MemorySaver: pass
+
+    class MemorySaver:
+        pass
 
     # If mocking, modify StateGraph to return the CompiledGraphMock on compile
     StateGraph.compile = lambda self, checkpointer=None, interrupt_before=None: CompiledGraphMock()
@@ -46,6 +48,7 @@ from .market import MarketAgent
 quant_agent = QuantAgent(model=None)
 legal_agent = LegalAgent(model=None)
 market_agent = MarketAgent(model=None)
+
 
 def supervisor_node(state: VerticalRiskGraphState):
     """
@@ -63,6 +66,7 @@ def supervisor_node(state: VerticalRiskGraphState):
 
     return {"next_step": "deciding"}
 
+
 def route_supervisor(state: VerticalRiskGraphState) -> Literal["quant", "legal", "market", "critique", "human_approval"]:
     """
     Conditional logic to determine the next node.
@@ -79,6 +83,7 @@ def route_supervisor(state: VerticalRiskGraphState) -> Literal["quant", "legal",
 
     return "human_approval"
 
+
 def critique_node(state: VerticalRiskGraphState):
     """
     Checks for consistency between Quant and Legal.
@@ -90,6 +95,7 @@ def critique_node(state: VerticalRiskGraphState):
         "messages": ["Critiquer: Logic consistent."]
     }
 
+
 def human_approval_node(state: VerticalRiskGraphState):
     """
     Pauses for human sign-off.
@@ -98,6 +104,7 @@ def human_approval_node(state: VerticalRiskGraphState):
     return {"status": "Waiting for approval"}
 
 # --- Build the Graph ---
+
 
 workflow = StateGraph(VerticalRiskGraphState)
 

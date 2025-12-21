@@ -9,6 +9,7 @@ from core.agents.orchestrators.task import Task
 from core.agents.orchestrators.parallel_orchestrator import ParallelOrchestrator
 from core.agents.orchestrators.credit_risk_orchestrator import CreditRiskOrchestrator
 
+
 class TestWorkflowSystem(unittest.TestCase):
 
     def test_parallel_orchestrator(self):
@@ -81,6 +82,7 @@ class TestWorkflowSystem(unittest.TestCase):
         self.assertIn("fetch_news", final_result["data"])
         self.assertIn("analyze_sentiment", final_result["data"])
         self.assertEqual(final_result["data"]["analyze_sentiment"], {"sentiment": "negative"})
+
 
 if __name__ == '__main__':
     unittest.main()

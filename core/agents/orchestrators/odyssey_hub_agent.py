@@ -7,6 +7,7 @@ from core.v23_graph_engine.unified_knowledge_graph import UnifiedKnowledgeGraph
 
 logger = logging.getLogger(__name__)
 
+
 class OdysseyHubAgent(AgentBase):
     """
     Adam v25.5 (Odyssey Orchestrator)

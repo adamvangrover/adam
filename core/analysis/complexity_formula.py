@@ -7,6 +7,7 @@ import math
 from dataclasses import dataclass
 from typing import List, Dict, Union
 
+
 @dataclass
 class ComplexityComponents:
     generative_capability: float  # A_gen
@@ -14,6 +15,7 @@ class ComplexityComponents:
     narrative_depth: float        # N_depth
     systemic_fragility: float     # R_fragility
     energy_cost: float           # E_energy
+
 
 class ComplexityFieldTheory:
     """
@@ -49,8 +51,8 @@ class ComplexityFieldTheory:
         return numerator / denominator
 
     def simulate_trajectory(self,
-                          initial_state: ComplexityComponents,
-                          scenarios: Dict[str, float]) -> List[float]:
+                            initial_state: ComplexityComponents,
+                            scenarios: Dict[str, float]) -> List[float]:
         """
         Simulates the complexity trajectory over time given growth/decay scenarios for each component.
         """
@@ -81,6 +83,7 @@ class ComplexityFieldTheory:
             integral += 0.5 * (trajectory[i] + trajectory[i+1]) * self.dt
         return integral
 
+
 def run_simulation():
     """
     Runs a sample simulation of the Complexity Field Theory.
@@ -110,7 +113,7 @@ def run_simulation():
         'A_gen_growth': 0.05,       # 5% growth per step
         'Q_speedup_growth': 0.01,   # 1% growth per step
         'N_depth_growth': 0.02,     # 2% growth per step
-        'R_fragility_growth': 0.01, # 1% increase in fragility
+        'R_fragility_growth': 0.01,  # 1% increase in fragility
         'E_energy_growth': 0.04     # 4% increase in energy cost
     }
 
@@ -129,6 +132,7 @@ def run_simulation():
         print("Note: Numerator growth (A_gen * Q * N) is outpacing Denominator drag (Fragility * Energy).")
     else:
         print("System complexity is collapsing due to thermodynamic or fragility constraints.")
+
 
 if __name__ == "__main__":
     run_simulation()

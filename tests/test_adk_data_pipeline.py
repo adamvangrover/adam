@@ -3,6 +3,7 @@ import os
 import json
 from core.v23_graph_engine.data_pipeline.graph import create_sequential_data_pipeline
 
+
 class TestADKDataPipeline(unittest.TestCase):
     def setUp(self):
         self.pipeline = create_sequential_data_pipeline()
@@ -65,6 +66,7 @@ class TestADKDataPipeline(unittest.TestCase):
         finally:
             if os.path.exists(bad_report):
                 os.remove(bad_report)
+
 
 if __name__ == "__main__":
     unittest.main()

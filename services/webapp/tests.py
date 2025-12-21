@@ -3,6 +3,7 @@ import json
 from unittest.mock import patch
 from .api import create_app, db, User
 
+
 class ApiTestCase(unittest.TestCase):
     def setUp(self):
         self.app = create_app('testing')
@@ -27,7 +28,6 @@ class ApiTestCase(unittest.TestCase):
         data = json.loads(response.data)
         self.assertEqual(data, [])
 
-
     def test_login(self):
         # Create a test user
         user = User(username='testuser')
@@ -37,24 +37,24 @@ class ApiTestCase(unittest.TestCase):
 
         # Test successful login
         response = self.client.post('/api/login',
-                                 data=json.dumps({'username': 'testuser', 'password': 'password'}),
-                                 content_type='application/json')
+                                    data=json.dumps({'username': 'testuser', 'password': 'password'}),
+                                    content_type='application/json')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         self.assertIn('access_token', data)
 
         # Test failed login
         response = self.client.post('/api/login',
-                                 data=json.dumps({'username': 'testuser', 'password': 'wrongpassword'}),
-                                 content_type='application/json')
+                                    data=json.dumps({'username': 'testuser', 'password': 'wrongpassword'}),
+                                    content_type='application/json')
         self.assertEqual(response.status_code, 401)
         data = json.loads(response.data)
         self.assertIn('error', data)
 
     def test_invoke_agent_unauthorized(self):
         response = self.client.post('/api/agents/some_agent/invoke',
-                                 data=json.dumps({'some': 'data'}),
-                                 content_type='application/json')
+                                    data=json.dumps({'some': 'data'}),
+                                    content_type='application/json')
         self.assertEqual(response.status_code, 401)
 
     @patch('services.webapp.api.agent_orchestrator')
@@ -65,16 +65,16 @@ class ApiTestCase(unittest.TestCase):
         db.session.add(user)
         db.session.commit()
         response = self.client.post('/api/login',
-                                 data=json.dumps({'username': 'agentuser', 'password': 'password'}),
-                                 content_type='application/json')
+                                    data=json.dumps({'username': 'agentuser', 'password': 'password'}),
+                                    content_type='application/json')
         access_token = json.loads(response.data)['access_token']
         headers = {'Authorization': f'Bearer {access_token}'}
 
         mock_agent_orchestrator.execute_agent.return_value = {'result': 'success'}
         response = self.client.post('/api/agents/some_agent/invoke',
-                                 headers=headers,
-                                 data=json.dumps({'some': 'data'}),
-                                 content_type='application/json')
+                                    headers=headers,
+                                    data=json.dumps({'some': 'data'}),
+                                    content_type='application/json')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         self.assertEqual(data, {'result': 'success'})
@@ -87,24 +87,24 @@ class ApiTestCase(unittest.TestCase):
         db.session.add(user)
         db.session.commit()
         response = self.client.post('/api/login',
-                                 data=json.dumps({'username': 'testuser', 'password': 'password'}),
-                                 content_type='application/json')
+                                    data=json.dumps({'username': 'testuser', 'password': 'password'}),
+                                    content_type='application/json')
         access_token = json.loads(response.data)['access_token']
         headers = {'Authorization': f'Bearer {access_token}'}
 
         # Create a portfolio
         response = self.client.post('/api/portfolios',
-                                  headers=headers,
-                                  data=json.dumps({'name': 'My Test Portfolio'}),
-                                  content_type='application/json')
+                                    headers=headers,
+                                    data=json.dumps({'name': 'My Test Portfolio'}),
+                                    content_type='application/json')
         self.assertEqual(response.status_code, 200)
         portfolio_id = json.loads(response.data)['id']
 
         # Add an asset
         response = self.client.post(f'/api/portfolios/{portfolio_id}/assets',
-                                  headers=headers,
-                                  data=json.dumps({'symbol': 'AAPL', 'quantity': 10, 'purchase_price': 150.0}),
-                                  content_type='application/json')
+                                    headers=headers,
+                                    data=json.dumps({'symbol': 'AAPL', 'quantity': 10, 'purchase_price': 150.0}),
+                                    content_type='application/json')
         self.assertEqual(response.status_code, 200)
         asset_id = json.loads(response.data)['id']
 
@@ -117,9 +117,9 @@ class ApiTestCase(unittest.TestCase):
 
         # Update the asset
         response = self.client.put(f'/api/portfolios/{portfolio_id}/assets/{asset_id}',
-                                 headers=headers,
-                                 data=json.dumps({'symbol': 'AAPL', 'quantity': 15, 'purchase_price': 155.0}),
-                                 content_type='application/json')
+                                   headers=headers,
+                                   data=json.dumps({'symbol': 'AAPL', 'quantity': 15, 'purchase_price': 155.0}),
+                                   content_type='application/json')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         self.assertEqual(data['quantity'], 15)
@@ -145,22 +145,22 @@ class ApiTestCase(unittest.TestCase):
     def test_v23_analysis_validation(self):
         # Valid query
         response = self.client.post('/api/v23/analyze',
-                                 data=json.dumps({'query': 'analyze AAPL'}),
-                                 content_type='application/json')
+                                    data=json.dumps({'query': 'analyze AAPL'}),
+                                    content_type='application/json')
         # Expect 200 (mock result) or 500 depending on config, but NOT 400 for validation
         self.assertNotEqual(response.status_code, 400)
 
         # Invalid type
         response = self.client.post('/api/v23/analyze',
-                                 data=json.dumps({'query': 12345}),
-                                 content_type='application/json')
+                                    data=json.dumps({'query': 12345}),
+                                    content_type='application/json')
         self.assertEqual(response.status_code, 400)
         self.assertIn('Query must be a string', response.get_json()['error'])
 
         # Too long
         response = self.client.post('/api/v23/analyze',
-                                 data=json.dumps({'query': 'A' * 5001}),
-                                 content_type='application/json')
+                                    data=json.dumps({'query': 'A' * 5001}),
+                                    content_type='application/json')
         self.assertEqual(response.status_code, 400)
         self.assertIn('Query too long', response.get_json()['error'])
 
@@ -171,14 +171,14 @@ class ApiTestCase(unittest.TestCase):
         db.session.add(user)
         db.session.commit()
         response = self.client.post('/api/login',
-                                 data=json.dumps({'username': 'simuser', 'password': 'password'}),
-                                 content_type='application/json')
+                                    data=json.dumps({'username': 'simuser', 'password': 'password'}),
+                                    content_type='application/json')
         access_token = json.loads(response.data)['access_token']
         headers = {'Authorization': f'Bearer {access_token}'}
 
         # Invalid characters
         response = self.client.post('/api/simulations/invalid-name!',
-                                 headers=headers)
+                                    headers=headers)
         self.assertEqual(response.status_code, 400)
         self.assertIn('Invalid simulation name format', response.get_json()['error'])
 
@@ -211,8 +211,8 @@ class SecurityTestCase(unittest.TestCase):
 
         try:
             response = self.client.post('/api/v23/analyze',
-                                     data=json.dumps({'query': 'test query'}),
-                                     content_type='application/json')
+                                        data=json.dumps({'query': 'test query'}),
+                                        content_type='application/json')
 
             self.assertEqual(response.status_code, 500)
             data = json.loads(response.data)

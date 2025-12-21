@@ -10,6 +10,7 @@ from core.agents.result_aggregation_agent import ResultAggregationAgent
 from core.system.error_handler import InvalidInputError, AgentNotFoundError, DataNotFoundError
 from core.system.knowledge_base import KnowledgeBase
 
+
 class TestInteractionLoop(unittest.TestCase):
 
     def setUp(self):
@@ -17,7 +18,7 @@ class TestInteractionLoop(unittest.TestCase):
             "interaction_loop": {
                 "max_iterations": 5,
                 "reprompt_strategy": "retry"
-             },
+            },
             "agents": {
                 "QueryUnderstandingAgent": {}, "DataRetrievalAgent": {}, "ResultAggregationAgent": {}
             }
@@ -45,7 +46,7 @@ class TestInteractionLoop(unittest.TestCase):
             "ResultAggregationAgent": self.mock_result_agent,
         }.get(x)
 
-        loop = InteractionLoop(config=self.mock_config, knowledge_base = self.mock_kb)
+        loop = InteractionLoop(config=self.mock_config, knowledge_base=self.mock_kb)
 
         self.mock_query_agent.execute.return_value = ["DataRetrievalAgent"]
         self.mock_data_agent.execute.return_value = "low"
@@ -56,7 +57,7 @@ class TestInteractionLoop(unittest.TestCase):
         result = loop.process_input("risk ABC")
         self.assertEqual(result, "The risk rating is low.")
         self.mock_query_agent.execute.assert_called_once_with("risk ABC")
-        self.mock_data_agent.execute.assert_called_once_with("risk ABC") # Passed user input
+        self.mock_data_agent.execute.assert_called_once_with("risk ABC")  # Passed user input
         self.mock_result_agent.execute.assert_called_once_with(["low"])
 
     @patch('core.utils.config_utils.load_config')
@@ -70,7 +71,7 @@ class TestInteractionLoop(unittest.TestCase):
             "ResultAggregationAgent": self.mock_result_agent,
         }.get(x)
 
-        loop = InteractionLoop(config=self.mock_config, knowledge_base = self.mock_kb)
+        loop = InteractionLoop(config=self.mock_config, knowledge_base=self.mock_kb)
 
         self.mock_query_agent.execute.return_value = ["DataRetrievalAgent"]
         self.mock_data_agent.execute.return_value = "Positive"
@@ -91,7 +92,7 @@ class TestInteractionLoop(unittest.TestCase):
         }.get(x)
 
         loop = InteractionLoop(config=self.mock_config, knowledge_base=self.mock_kb)
-        self.mock_query_agent.execute.return_value = [] # No agents needed
+        self.mock_query_agent.execute.return_value = []  # No agents needed
 
         # updatekb command logic is probably handled inside agents now or specific command processor?
         # Looking at original test, it expected "Knowledge base updated."
@@ -120,7 +121,7 @@ class TestInteractionLoop(unittest.TestCase):
         mock_orchestrator_instance = mock_orchestrator_cls.return_value
         mock_orchestrator_instance.get_agent.return_value = self.mock_query_agent
 
-        loop = InteractionLoop(config=self.mock_config, knowledge_base = self.mock_kb)
+        loop = InteractionLoop(config=self.mock_config, knowledge_base=self.mock_kb)
         self.mock_query_agent.execute.side_effect = InvalidInputError("invalid", "Test Reason")
 
         with self.assertRaises(InvalidInputError) as context:
@@ -135,9 +136,9 @@ class TestInteractionLoop(unittest.TestCase):
         mock_orchestrator_instance = mock_orchestrator_cls.return_value
         mock_orchestrator_instance.get_agent.side_effect = lambda x: {
             "QueryUnderstandingAgent": self.mock_query_agent
-        }.get(x) # Returns None for NonexistentAgent
+        }.get(x)  # Returns None for NonexistentAgent
 
-        loop = InteractionLoop(config=self.mock_config, knowledge_base = self.mock_kb)
+        loop = InteractionLoop(config=self.mock_config, knowledge_base=self.mock_kb)
         self.mock_query_agent.execute.return_value = ["NonexistentAgent"]
 
         with self.assertRaises(AgentNotFoundError) as context:
@@ -184,7 +185,7 @@ class TestInteractionLoop(unittest.TestCase):
             "ResultAggregationAgent": self.mock_result_agent
         }.get(x)
 
-        loop = InteractionLoop(config=self.mock_config, knowledge_base = self.mock_kb)
+        loop = InteractionLoop(config=self.mock_config, knowledge_base=self.mock_kb)
         self.mock_query_agent.execute.return_value = ["Agent1", "Agent2"]
         self.mock_result_agent.execute.return_value = "Combined Result"
 
@@ -192,6 +193,7 @@ class TestInteractionLoop(unittest.TestCase):
         self.assertEqual(result, "Combined Result")
         self.assertEqual(mock_agent1.execute.call_count, 1)
         self.assertEqual(mock_agent2.execute.call_count, 1)
+
 
 if __name__ == '__main__':
     unittest.main()

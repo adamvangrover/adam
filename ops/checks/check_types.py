@@ -8,7 +8,8 @@ def run_types(paths):
         print("mypy not found. Please install it with 'pip install mypy'.")
         return False
 
-    cmd = [mypy_cmd, "--ignore-missing-imports", "--follow-imports=skip", "--install-types", "--non-interactive"] + paths
+    # Use --no-incremental to avoid generating .mypy_cache artifacts that clutter the repo
+    cmd = [mypy_cmd, "--ignore-missing-imports", "--follow-imports=skip", "--install-types", "--non-interactive", "--no-incremental"] + paths
     print(f"Running type check: {' '.join(cmd)}")
     result = subprocess.run(cmd)
     return result.returncode == 0

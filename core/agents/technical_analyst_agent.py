@@ -2,7 +2,8 @@ import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-#... (import other necessary libraries)
+# ... (import other necessary libraries)
+
 
 class TechnicalAnalystAgent:
     def __init__(self, config, constitution=None, kernel=None):
@@ -23,7 +24,7 @@ class TechnicalAnalystAgent:
         df['SMA_50'] = df['close'].rolling(window=50).mean()
         df['SMA_200'] = df['close'].rolling(window=200).mean()
         df['RSI'] = self.calculate_rsi(df['close'])
-        #... (calculate other technical indicators and features)
+        # ... (calculate other technical indicators and features)
 
         # 2. ML Model Training (if requested)
         if train_model:
@@ -42,22 +43,22 @@ class TechnicalAnalystAgent:
             print("No trained model available. Defaulting to 'hold'.")
 
         # 4. Technical Indicator Analysis
-        #... (analyze technical indicators and patterns)
+        # ... (analyze technical indicators and patterns)
 
         return signal
 
     def calculate_rsi(self, prices, period=14):
-        #... (calculate RSI)
+        # ... (calculate RSI)
         return rsi
 
     def prepare_training_data(self, df):
-        #... (prepare features and labels for training)
+        # ... (prepare features and labels for training)
         return features, labels
 
     def load_model(self, model_path):
-        #... (load model from file)
+        # ... (load model from file)
         return model
 
     def save_model(self, model, model_path):
-        #... (save model to file)
+        # ... (save model to file)
         return

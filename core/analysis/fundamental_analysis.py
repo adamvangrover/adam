@@ -7,6 +7,8 @@ from langchain.tools.python.tool import PythonAstREPLTool
 
 # Define a REPL tool for advanced analysis
 python_repl = PythonAstREPLTool()
+
+
 @tool
 def python_repl_ast(query: str) -> str:
     """A Python shell that can handle any instructions provided in the prompt.
@@ -18,17 +20,20 @@ def python_repl_ast(query: str) -> str:
     This is a powerful and versatile tool that can be used for a wide range of tasks."""
     return python_repl.run(query)
 
+
 # Define a list of tools for the agent
 tools = [
     python_repl_ast,
     # ... (add other tools as needed)
 ]
 
+
 class FundamentalAnalyst:
     """
     Agent specialized in fundamental analysis of companies.
     Capable of performing various financial analyses, valuations, and risk assessments.
     """
+
     def __init__(self, config):
         """
         Initializes the FundamentalAnalyst agent with necessary configurations and tools.
@@ -66,9 +71,11 @@ class FundamentalAnalyst:
         if analysis_modules is None or 'dcf_valuation' in analysis_modules:
             analysis_results['dcf_valuation'] = self.calculate_dcf_valuation(company_data, **kwargs)
         if analysis_modules is None or 'comparable_company_analysis' in analysis_modules:
-            analysis_results['comparable_company_analysis'] = self.perform_comparable_company_analysis(company_data, **kwargs)
+            analysis_results['comparable_company_analysis'] = self.perform_comparable_company_analysis(
+                company_data, **kwargs)
         if analysis_modules is None or 'precedent_transaction_analysis' in analysis_modules:
-            analysis_results['precedent_transaction_analysis'] = self.perform_precedent_transaction_analysis(company_data, **kwargs)
+            analysis_results['precedent_transaction_analysis'] = self.perform_precedent_transaction_analysis(
+                company_data, **kwargs)
         # ... (add more analysis modules)
 
         return analysis_results
@@ -249,7 +256,8 @@ class FundamentalAnalyst:
         # Apply average multiples to target company
         valuation_results = {}
         for multiple in valuation_multiples:
-            valuation_results[multiple] = self.apply_valuation_multiple(multiple, company_data, average_multiples[multiple])
+            valuation_results[multiple] = self.apply_valuation_multiple(
+                multiple, company_data, average_multiples[multiple])
 
         return valuation_results
 
@@ -281,12 +289,14 @@ class FundamentalAnalyst:
         # Calculate average valuation multiples
         average_multiples = {}
         for multiple in valuation_multiples:
-            average_multiples[multiple] = np.mean([transaction_multiples[transaction][multiple] for transaction in transaction_data])
+            average_multiples[multiple] = np.mean(
+                [transaction_multiples[transaction][multiple] for transaction in transaction_data])
 
         # Apply average multiples to target company
         valuation_results = {}
         for multiple in valuation_multiples:
-            valuation_results[multiple] = self.apply_valuation_multiple(multiple, company_data, average_multiples[multiple])
+            valuation_results[multiple] = self.apply_valuation_multiple(
+                multiple, company_data, average_multiples[multiple])
 
         return valuation_results
 

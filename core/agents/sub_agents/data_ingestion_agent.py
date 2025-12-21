@@ -6,11 +6,12 @@ from core.gold_standard.storage import StorageEngine
 
 logger = logging.getLogger(__name__)
 
+
 class DataIngestionAgent(AgentBase):
     """
     Agent responsible for data ingestion tasks using the Gold Standard Toolkit.
     Handles daily history downloads, intraday snapshots, and schema validation.
-    
+
     Version: Adam v24 (Sprint 1: Sensory Layer)
     """
 
@@ -21,7 +22,7 @@ class DataIngestionAgent(AgentBase):
         # Default to 'data' directory if not specified in config
         storage_path = self.config.get("storage_path", "data")
         self.storage = StorageEngine(base_path=storage_path)
-        
+
         # Using IngestionEngine (Sprint 1 Standard)
         self.ingestion_engine = IngestionEngine(self.storage)
         logger.info(f"DataIngestionAgent initialized with storage path: {storage_path}")

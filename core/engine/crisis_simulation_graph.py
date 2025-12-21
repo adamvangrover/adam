@@ -24,23 +24,25 @@ logger = logging.getLogger(__name__)
 
 # --- Mock Logic (To be replaced by CrisisSimulationPlugin / LLM) ---
 
+
 def mock_decompose_scenario(scenario: str) -> Dict[str, float]:
     """Parses natural language scenario into quantitative shocks."""
     variables = {}
     scenario_lower = scenario.lower()
 
     if "rate" in scenario_lower:
-        variables["interest_rate_bps"] = 50.0 # +50 bps
+        variables["interest_rate_bps"] = 50.0  # +50 bps
     if "recession" in scenario_lower or "gdp" in scenario_lower:
-        variables["gdp_growth"] = -2.5 # -2.5%
+        variables["gdp_growth"] = -2.5  # -2.5%
     if "inflation" in scenario_lower:
-        variables["cpi_inflation"] = 8.0 # 8%
+        variables["cpi_inflation"] = 8.0  # 8%
 
     # Default if empty
     if not variables:
         variables["market_volatility_vix"] = 35.0
 
     return variables
+
 
 def mock_simulate_impact(portfolio: Dict, macro_vars: Dict) -> tuple[List[str], float]:
     """Calculates direct hits."""
@@ -49,12 +51,13 @@ def mock_simulate_impact(portfolio: Dict, macro_vars: Dict) -> tuple[List[str], 
 
     if "interest_rate_bps" in macro_vars:
         impacts.append("Cost of debt increases for leveraged assets.")
-        loss += 1.5 # Mock $M
+        loss += 1.5  # Mock $M
     if "gdp_growth" in macro_vars:
         impacts.append("Revenue forecast downgrade across cyclical sectors.")
         loss += 3.2
 
     return impacts, loss
+
 
 def mock_simulate_cascade(first_order: List[str]) -> List[str]:
     """Calculates knock-on effects."""
@@ -69,6 +72,7 @@ def mock_simulate_cascade(first_order: List[str]) -> List[str]:
 
 # --- Nodes ---
 
+
 def decompose_node(state: CrisisSimulationState) -> Dict[str, Any]:
     print("--- Node: Decompose Scenario ---")
     vars = mock_decompose_scenario(state["scenario_description"])
@@ -76,6 +80,7 @@ def decompose_node(state: CrisisSimulationState) -> Dict[str, Any]:
         "macro_variables": vars,
         "human_readable_status": f"Decomposed scenario into {len(vars)} macro variables."
     }
+
 
 def simulate_direct_node(state: CrisisSimulationState) -> Dict[str, Any]:
     print("--- Node: Simulate Direct Impact ---")
@@ -85,6 +90,7 @@ def simulate_direct_node(state: CrisisSimulationState) -> Dict[str, Any]:
         "estimated_loss": loss,
         "human_readable_status": f"Simulated direct impacts. Loss estimate: ${loss}M"
     }
+
 
 def simulate_cascade_node(state: CrisisSimulationState) -> Dict[str, Any]:
     print("--- Node: Simulate Cascade ---")
@@ -99,6 +105,7 @@ def simulate_cascade_node(state: CrisisSimulationState) -> Dict[str, Any]:
         "estimated_loss": total_loss,
         "human_readable_status": f"Simulated cascading effects. Total Risk: ${total_loss}M"
     }
+
 
 def critique_simulation_node(state: CrisisSimulationState) -> Dict[str, Any]:
     print("--- Node: Critique Simulation ---")
@@ -128,6 +135,7 @@ def critique_simulation_node(state: CrisisSimulationState) -> Dict[str, Any]:
         "human_readable_status": "Critiqued simulation realism."
     }
 
+
 def refine_node(state: CrisisSimulationState) -> Dict[str, Any]:
     print("--- Node: Refine/Intensify ---")
     # Intensify logic
@@ -135,13 +143,14 @@ def refine_node(state: CrisisSimulationState) -> Dict[str, Any]:
     new_vars = current_vars.copy()
 
     for k, v in new_vars.items():
-        new_vars[k] = v * 1.5 # Increase shock by 50%
+        new_vars[k] = v * 1.5  # Increase shock by 50%
 
     return {
         "macro_variables": new_vars,
-        "needs_refinement": False, # Reset flag
+        "needs_refinement": False,  # Reset flag
         "human_readable_status": "Intensified scenario parameters."
     }
+
 
 def generate_report_node(state: CrisisSimulationState) -> Dict[str, Any]:
     print("--- Node: Generate Crisis Report ---")
@@ -164,12 +173,14 @@ def generate_report_node(state: CrisisSimulationState) -> Dict[str, Any]:
 
 # --- Conditional Logic ---
 
+
 def should_continue_crisis(state: CrisisSimulationState) -> Literal["refine", "finalize"]:
     if state["needs_refinement"] and state["iteration_count"] < 3:
         return "refine"
     return "finalize"
 
 # --- Graph Construction ---
+
 
 def build_crisis_graph():
     workflow = StateGraph(CrisisSimulationState)
@@ -195,10 +206,11 @@ def build_crisis_graph():
         }
     )
 
-    workflow.add_edge("refine", "simulate_direct") # Loop back to simulation
+    workflow.add_edge("refine", "simulate_direct")  # Loop back to simulation
     workflow.add_edge("generate_report", END)
 
     checkpointer = MemorySaver()
     return workflow.compile(checkpointer=checkpointer)
+
 
 crisis_simulation_app = build_crisis_graph()

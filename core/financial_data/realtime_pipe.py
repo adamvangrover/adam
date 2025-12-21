@@ -8,6 +8,7 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
+
 class RealTimePipe(abc.ABC):
     """
     Abstract base class for real-time data ingestion.
@@ -47,35 +48,35 @@ class RealTimePipe(abc.ABC):
 
         # Partitioning logic
         if 'symbol' not in df.columns:
-             logger.warning("No symbol in buffer, skipping flush.")
-             self.buffer = []
-             return
+            logger.warning("No symbol in buffer, skipping flush.")
+            self.buffer = []
+            return
 
         # Heuristic for region if not present
         if 'region' not in df.columns:
-             df['region'] = df['symbol'].apply(self._get_region)
+            df['region'] = df['symbol'].apply(self._get_region)
 
         df['year'] = df.index.year
 
         # Group by partition keys to write appropriate files
         for (region, year), group in df.groupby(['region', 'year']):
-             partition_dir = self.lakehouse_path / f"region={region}" / f"year={year}"
-             partition_dir.mkdir(parents=True, exist_ok=True)
+            partition_dir = self.lakehouse_path / f"region={region}" / f"year={year}"
+            partition_dir.mkdir(parents=True, exist_ok=True)
 
-             file_name = f"{uuid.uuid4()}.parquet"
-             file_path = partition_dir / file_name
+            file_name = f"{uuid.uuid4()}.parquet"
+            file_path = partition_dir / file_name
 
-             # Clean up columns: remove partition keys if they are not needed in the file
-             # Usually in Hive style, they are implicit, but keeping them doesn't hurt.
-             # Lakehouse implementation dropped 'year' but kept 'symbol'.
-             # We will drop 'year' and 'region'.
-             group_to_save = group.drop(columns=['year', 'region'])
+            # Clean up columns: remove partition keys if they are not needed in the file
+            # Usually in Hive style, they are implicit, but keeping them doesn't hurt.
+            # Lakehouse implementation dropped 'year' but kept 'symbol'.
+            # We will drop 'year' and 'region'.
+            group_to_save = group.drop(columns=['year', 'region'])
 
-             try:
-                 group_to_save.to_parquet(file_path, compression='snappy')
-                 logger.info(f"Flushed {len(group)} records to {file_path}")
-             except Exception as e:
-                 logger.error(f"Failed to flush to {file_path}: {e}")
+            try:
+                group_to_save.to_parquet(file_path, compression='snappy')
+                logger.info(f"Flushed {len(group)} records to {file_path}")
+            except Exception as e:
+                logger.error(f"Failed to flush to {file_path}: {e}")
 
         self.buffer = []
 
@@ -95,6 +96,7 @@ class MockRealTimePipe(RealTimePipe):
     """
     Simulates a real-time feed for testing.
     """
+
     def listen(self):
         # In a real scenario, this would loop forever.
         import random
@@ -124,4 +126,4 @@ class MockRealTimePipe(RealTimePipe):
             }
             self.push_tick(tick)
 
-        self.flush() # Flush remaining
+        self.flush()  # Flush remaining

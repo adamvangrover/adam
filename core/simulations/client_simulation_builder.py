@@ -4,6 +4,7 @@ import json
 import os
 import sys
 
+
 class ClientSimulationBuilder:
     def __init__(self, seed_path: str = "data/v23_ukg_seed.json", output_path: str = "services/webapp/client/public/data/client_state.json"):
         self.seed_path = seed_path
@@ -13,8 +14,8 @@ class ClientSimulationBuilder:
         print(f"Building client simulation from {self.seed_path}...")
 
         if not os.path.exists(self.seed_path):
-             print(f"Seed file {self.seed_path} not found. Skipping.")
-             return
+            print(f"Seed file {self.seed_path} not found. Skipping.")
+            return
 
         try:
             with open(self.seed_path, 'r') as f:
@@ -44,6 +45,7 @@ class ClientSimulationBuilder:
             json.dump(client_state, f, indent=2)
 
         print(f"Client simulation state saved to {self.output_path}")
+
 
 if __name__ == "__main__":
     ClientSimulationBuilder().build()

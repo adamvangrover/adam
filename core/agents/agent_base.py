@@ -45,13 +45,13 @@ class AgentBase(ABC):
         """
         self.config = config
         self.constitution = constitution
-        self.kernel = kernel # Store the Semantic Kernel instance
-        self._loop = None # Capture event loop
+        self.kernel = kernel  # Store the Semantic Kernel instance
+        self._loop = None  # Capture event loop
 
         try:
             self._loop = asyncio.get_running_loop()
         except RuntimeError:
-            pass # No loop running yet
+            pass  # No loop running yet
 
         # HNASP State Initialization
         # Replace self.context = {} with self.state: HNASPState
@@ -63,7 +63,8 @@ class AgentBase(ABC):
             ),
             persona_state=PersonaState(
                 identities=PersonaIdentities(
-                    self=Identity(label=config.get("agent_id", "agent"), fundamental_epa=EPAVector(E=0.0, P=0.0, A=0.0)),
+                    self=Identity(label=config.get("agent_id", "agent"),
+                                  fundamental_epa=EPAVector(E=0.0, P=0.0, A=0.0)),
                     user=Identity(label="user", fundamental_epa=EPAVector(E=0.0, P=0.0, A=0.0))
                 )
             ),
@@ -75,7 +76,7 @@ class AgentBase(ABC):
         self.context: Dict[str, Any] = {}
 
         self.peer_agents: Dict[str, AgentBase] = {}  # For A2A
-        self.pending_requests: Dict[str, asyncio.Future] = {} # For Async A2A responses
+        self.pending_requests: Dict[str, asyncio.Future] = {}  # For Async A2A responses
 
         # Updated log message to reflect potential kernel presence
         log_message = f"Agent {type(self).__name__} initialized with config: {config}"
@@ -107,8 +108,7 @@ class AgentBase(ABC):
             # Execute original logic
             return await self._original_execute(*args, **kwargs)
 
-        self.execute = wrapped_execute # Bind wrapper to instance
-
+        self.execute = wrapped_execute  # Bind wrapper to instance
 
     def set_context(self, context: Dict[str, Any]):
         """
@@ -192,7 +192,7 @@ class AgentBase(ABC):
             # Ideally this uses a sentiment analysis library
             # Access user identity via dot notation for Pydantic model
             if not self.state.persona_state.identities.user.fundamental_epa:
-                 return
+                return
 
             fundamental = self.state.persona_state.identities.user.fundamental_epa
 
@@ -242,10 +242,10 @@ class AgentBase(ABC):
 
         try:
             if not hasattr(self, 'message_broker') or not self.message_broker:
-                 logging.warning(f"Agent {type(self).__name__} has no message broker attached. Cannot send message.")
-                 # Cleanup
-                 del self.pending_requests[correlation_id]
-                 return None
+                logging.warning(f"Agent {type(self).__name__} has no message broker attached. Cannot send message.")
+                # Cleanup
+                del self.pending_requests[correlation_id]
+                return None
 
             self.message_broker.publish(target_agent, json.dumps(message))
             logging.info(f"Agent {type(self).__name__} sent message to {target_agent} (ID: {correlation_id})")
@@ -276,7 +276,7 @@ class AgentBase(ABC):
         Subscribes the agent to its dedicated topic on the message broker
         and processes incoming messages via a callback.
         """
-        self.message_broker = message_broker # Store broker reference
+        self.message_broker = message_broker  # Store broker reference
         topic = type(self).__name__
 
         # Capture loop if not already captured
@@ -342,9 +342,8 @@ class AgentBase(ABC):
             logging.error(f"Error processing incoming request in agent {type(self).__name__}: {e}")
             # Optionally send error back
             if reply_to and hasattr(self, 'message_broker') and correlation_id:
-                 error_msg = {"error": str(e), "correlation_id": correlation_id}
-                 self.message_broker.publish(reply_to, json.dumps(error_msg))
-
+                error_msg = {"error": str(e), "correlation_id": correlation_id}
+                self.message_broker.publish(reply_to, json.dumps(error_msg))
 
     def get_skill_schema(self) -> Dict[str, Any]:
         """
@@ -365,7 +364,6 @@ class AgentBase(ABC):
         logging.info(f"Agent {self.config.get('agent_id')} received message from {sender_agent}: {message}")
         return None  # Default: No response
 
-
     async def run_semantic_kernel_skill(self, skill_collection_name: str, skill_name: str, input_vars: Dict[str, str]) -> str:
         """
         Executes a Semantic Kernel skill. Standardized for clearer error handling.
@@ -384,9 +382,9 @@ class AgentBase(ABC):
 
             # Support Older SK (Skills)
             if hasattr(self.kernel, 'skills') and hasattr(self.kernel.skills, 'get_function'):
-                 function = self.kernel.skills.get_function(skill_collection_name, skill_name)
-                 result = await self.kernel.run_async(function, input_vars=input_vars)
-                 return str(result)
+                function = self.kernel.skills.get_function(skill_collection_name, skill_name)
+                result = await self.kernel.run_async(function, input_vars=input_vars)
+                return str(result)
 
             # If we reach here, we couldn't find the skill
             raise ValueError(f"Skill '{skill_name}' in collection '{skill_collection_name}' not found in Kernel.")

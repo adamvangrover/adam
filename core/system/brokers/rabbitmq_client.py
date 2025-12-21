@@ -3,6 +3,7 @@
 import pika
 from core.system.message_broker import MessageBroker
 
+
 class RabbitMQClient(MessageBroker):
     """
     An implementation of the MessageBroker for RabbitMQ.

@@ -6,14 +6,15 @@ try:
     from facebook_scraper import get_posts
 except ImportError:
     get_posts = None
-import logging # Added import
-from core.utils.secrets_utils import get_api_key # Added import
-#... (import other necessary libraries for Instagram, TikTok, etc.)
+import logging  # Added import
+from core.utils.secrets_utils import get_api_key  # Added import
+# ... (import other necessary libraries for Instagram, TikTok, etc.)
+
 
 class SocialMediaAPI:
     def __init__(self, config):
         # self.api_keys = config.get('api_keys', {}) # Removed API key loading from config
-        self.config = config # Retain config for other potential uses
+        self.config = config  # Retain config for other potential uses
 
         consumer_key = get_api_key('TWITTER_CONSUMER_KEY')
         consumer_secret = get_api_key('TWITTER_CONSUMER_SECRET')
@@ -21,12 +22,14 @@ class SocialMediaAPI:
         access_token_secret = get_api_key('TWITTER_ACCESS_TOKEN_SECRET')
 
         if all([consumer_key, consumer_secret, access_token, access_token_secret]):
-            self.twitter_client = self.authenticate_twitter(consumer_key, consumer_secret, access_token, access_token_secret)
+            self.twitter_client = self.authenticate_twitter(
+                consumer_key, consumer_secret, access_token, access_token_secret)
         else:
-            logging.error("Missing one or more Twitter API keys from environment variables. Twitter client will not be initialized.")
+            logging.error(
+                "Missing one or more Twitter API keys from environment variables. Twitter client will not be initialized.")
             self.twitter_client = None
-        
-        #... (initialize clients for Facebook, Instagram, TikTok, etc.)
+
+        # ... (initialize clients for Facebook, Instagram, TikTok, etc.)
 
     def authenticate_twitter(self, consumer_key, consumer_secret, access_token, access_token_secret):
         try:
@@ -44,15 +47,15 @@ class SocialMediaAPI:
             return None
 
     def get_tweets(self, query, count=100, sentiment=None):
-        #... (implementation for fetching tweets from Twitter)
+        # ... (implementation for fetching tweets from Twitter)
         pass
 
     def get_trending_topics(self, location=None):
-        #... (implementation for getting trending topics from Twitter)
+        # ... (implementation for getting trending topics from Twitter)
         pass
 
     def identify_influencers(self, topic):
-        #... (implementation for identifying influencers on Twitter)
+        # ... (implementation for identifying influencers on Twitter)
         pass
 
     def get_facebook_posts(self, query, count=100, sentiment=None):
@@ -79,21 +82,22 @@ class SocialMediaAPI:
         return posts
 
     def get_instagram_posts(self, query, count=100, sentiment=None):
-        #... (implementation for fetching posts from Instagram)
-        #... (apply sentiment analysis)
-        #... (filter posts based on sentiment)
+        # ... (implementation for fetching posts from Instagram)
+        # ... (apply sentiment analysis)
+        # ... (filter posts based on sentiment)
         pass  # Placeholder for actual implementation
 
     def get_tiktok_videos(self, query, count=100, sentiment=None):
-        #... (implementation for fetching videos from TikTok)
-        #... (apply sentiment analysis - may require different techniques for video content)
-        #... (filter videos based on sentiment)
+        # ... (implementation for fetching videos from TikTok)
+        # ... (apply sentiment analysis - may require different techniques for video content)
+        # ... (filter videos based on sentiment)
         pass  # Placeholder for actual implementation
 
-    #... (add similar methods for YouTube, Discord, WeChat, etc.)
+    # ... (add similar methods for YouTube, Discord, WeChat, etc.)
 
     def get_social_media_sentiment(self):
         return 0.0
+
 
 class SimulatedSocialMediaAPI(SocialMediaAPI):
     def get_tweets(self, query, count=100, sentiment=None):

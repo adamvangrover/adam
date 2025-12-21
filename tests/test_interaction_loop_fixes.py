@@ -21,6 +21,7 @@ except ImportError as e:
     print(f"Import Error: {e}")
     InteractionLoop = None
 
+
 class TestInteractionLoopFixes(unittest.TestCase):
     def test_initialization_import_fix(self):
         """
@@ -48,7 +49,7 @@ class TestInteractionLoopFixes(unittest.TestCase):
         try:
             loop = InteractionLoop()
         except Exception:
-            return # Skip if init fails for other reasons
+            return  # Skip if init fails for other reasons
 
         # Mock process_input to avoid side effects
         loop.process_input = MagicMock(return_value="Response")
@@ -59,7 +60,8 @@ class TestInteractionLoopFixes(unittest.TestCase):
             except EOFError:
                 self.fail("InteractionLoop.run() crashed on EOFError!")
             except Exception:
-                pass # Other errors are fine, we just want to ensure EOF doesn't crash it
+                pass  # Other errors are fine, we just want to ensure EOF doesn't crash it
+
 
 if __name__ == '__main__':
     unittest.main()

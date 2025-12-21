@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional
 import logging
 import re
 
+
 class Meta19Agent(AgentBase):
     """
     Monitors the reasoning and outputs of other agents to ensure logical consistency,
@@ -46,13 +47,13 @@ class Meta19Agent(AgentBase):
             fallacies = self._detect_logical_fallacies(agent_output_text)
             if fallacies:
                 results["logical_fallacies"].extend(fallacies)
-                results["confidence_score"] -= 0.1 * len(fallacies) # Penalize confidence
+                results["confidence_score"] -= 0.1 * len(fallacies)  # Penalize confidence
 
         # 2. Cross-validate outputs between different agents
         inconsistencies = self._cross_validate_outputs(analysis_chain)
         if inconsistencies:
             results["inconsistencies"].extend(inconsistencies)
-            results["confidence_score"] -= 0.2 * len(inconsistencies) # Penalize confidence more for inconsistencies
+            results["confidence_score"] -= 0.2 * len(inconsistencies)  # Penalize confidence more for inconsistencies
 
         # Ensure confidence is not below 0
         results["confidence_score"] = max(0.0, results["confidence_score"])
@@ -83,12 +84,13 @@ class Meta19Agent(AgentBase):
         """
         inconsistencies = []
         outputs_text = " ".join([str(step.get("output", "")) for step in analysis_chain]).lower()
-        
+
         has_positive = any(re.search(keyword, outputs_text, re.IGNORECASE) for keyword in self.positive_keywords)
         has_negative = any(re.search(keyword, outputs_text, re.IGNORECASE) for keyword in self.negative_keywords)
 
         if has_positive and has_negative:
-            inconsistencies.append("Inconsistency detected: The analysis contains conflicting positive and negative statements.")
+            inconsistencies.append(
+                "Inconsistency detected: The analysis contains conflicting positive and negative statements.")
 
         return inconsistencies
 
@@ -105,5 +107,5 @@ class Meta19Agent(AgentBase):
         if analysis_results["logical_fallacies"]:
             summary_text += "- Potential logical fallacies detected: "
             summary_text += ", ".join(list(set([f["fallacy"] for f in analysis_results["logical_fallacies"]]))) + ".\n"
-            
+
         return summary_text

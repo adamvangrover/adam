@@ -8,6 +8,7 @@ from .base_agent import BaseAgent
 from utils.data_validation import validate_event_data
 from utils.visualization_tools import generate_event_impact_chart
 
+
 class EventDrivenRiskAgent(BaseAgent):
     """
     Agent that tracks and assesses the market impact of events.
@@ -16,7 +17,7 @@ class EventDrivenRiskAgent(BaseAgent):
     def __init__(self, name: str = "EventDrivenRiskAgent"):
         super().__init__(name)
         self.event_data = {}  # Store event data
-        self.api_key = "YOUR_NEWS_API_KEY" #replace with working api key
+        self.api_key = "YOUR_NEWS_API_KEY"  # replace with working api key
         self.news_api_url = "https://newsapi.org/v2/everything"
 
     def fetch_events(self, keywords: List[str], from_date: datetime.date, to_date: datetime.date) -> List[Dict]:
@@ -38,7 +39,7 @@ class EventDrivenRiskAgent(BaseAgent):
                 "from": from_date.isoformat(),
                 "to": to_date.isoformat(),
                 "apiKey": self.api_key,
-                "pageSize": 100, #max
+                "pageSize": 100,  # max
             }
             try:
                 response = requests.get(self.news_api_url, params=params)
@@ -52,17 +53,17 @@ class EventDrivenRiskAgent(BaseAgent):
                             "publishedAt": article["publishedAt"],
                             "url": article["url"],
                             "source": article["source"]["name"],
-                            "keyword": keyword, # store the keyword used to find this article
+                            "keyword": keyword,  # store the keyword used to find this article
                         }
                         if validate_event_data(event):
                             events.append(event)
 
             except requests.exceptions.RequestException as e:
                 print(f"Error fetching news: {e}")
-                return [] #return empty list on error
+                return []  # return empty list on error
             except json.JSONDecodeError as e:
                 print(f"Error decoding JSON: {e}")
-                return [] #return empty list on error
+                return []  # return empty list on error
         return events
 
     def analyze_event_impact(self, events: List[Dict]) -> Dict:
@@ -79,7 +80,7 @@ class EventDrivenRiskAgent(BaseAgent):
         for event in events:
             # Placeholder for impact analysis logic (e.g., sentiment analysis, historical correlation)
             # This is where more sophistacted analysis will be placed.
-            impact_score = self.simulate_impact_analysis(event) #replace with actual analysis
+            impact_score = self.simulate_impact_analysis(event)  # replace with actual analysis
             impacts[event["title"]] = {
                 "impact_score": impact_score,
                 "publishedAt": event["publishedAt"],
@@ -117,9 +118,9 @@ class EventDrivenRiskAgent(BaseAgent):
         Will be replaced with actual analysis.
         """
         # Placeholder for more sophisticated logic
-        return hash(event["title"]) % 100 / 100.0 #returns a float between 0 and 1
+        return hash(event["title"]) % 100 / 100.0  # returns a float between 0 and 1
 
-    def generate_event_visualization(self, event_impacts:Dict):
+    def generate_event_visualization(self, event_impacts: Dict):
         """Generates a visualization of event impacts"""
         generate_event_impact_chart(event_impacts)
 
@@ -134,15 +135,17 @@ class EventDrivenRiskAgent(BaseAgent):
         """
 
         events = self.fetch_events(keywords, from_date, to_date)
-        if not events: #handle error from fetch_events
-          return
+        if not events:  # handle error from fetch_events
+            return
         impacts = self.analyze_event_impact(events)
         alerts = self.generate_risk_alerts(impacts)
         self.generate_event_visualization(impacts)
         return {"impacts": impacts, "alerts": alerts}
 
+
 # Example usage (replace with actual dates and keywords)
 if __name__ == "__main__":
     agent = EventDrivenRiskAgent()
-    results = agent.run(keywords=["inflation", "interest rates"], from_date=datetime.date(2024, 1, 1), to_date=datetime.date(2024, 1, 31))
+    results = agent.run(keywords=["inflation", "interest rates"],
+                        from_date=datetime.date(2024, 1, 1), to_date=datetime.date(2024, 1, 31))
     print(json.dumps(results, indent=2))

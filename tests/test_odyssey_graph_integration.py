@@ -1,10 +1,10 @@
+from core.v23_graph_engine.unified_knowledge_graph import UnifiedKnowledgeGraph
 import sys
 import os
 
 # Add root to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from core.v23_graph_engine.unified_knowledge_graph import UnifiedKnowledgeGraph
 
 def test_odyssey_graph_integration():
     ukg = UnifiedKnowledgeGraph()
@@ -73,6 +73,7 @@ def test_odyssey_graph_integration():
     assert abs(report_data['leverage_ratio'] - expected_lev) < 0.001
 
     print("Verification Successful!")
+
 
 if __name__ == "__main__":
     test_odyssey_graph_integration()

@@ -18,6 +18,7 @@ from .qa import validate_dataframe
 
 logger = logging.getLogger(__name__)
 
+
 class IngestionEngine:
     def __init__(self, storage: StorageEngine):
         self.storage = storage
@@ -74,9 +75,9 @@ class IngestionEngine:
                 # Usually Long format is better: Date, Ticker, Open...
 
                 # Let's stack.
-                df_long = df.stack(level=0) # Moves Ticker to index
+                df_long = df.stack(level=0)  # Moves Ticker to index
                 df_long.index.names = ['Date', 'Ticker']
-                df_long = df_long.reset_index(level='Ticker') # Ticker is now a column
+                df_long = df_long.reset_index(level='Ticker')  # Ticker is now a column
 
                 # Validate
                 try:
@@ -134,7 +135,8 @@ class IngestionEngine:
         """
         Uses Ticker.fast_info for low-latency L1 data.
         """
-        if yf is None: return {}
+        if yf is None:
+            return {}
 
         try:
             t = yf.Ticker(ticker)

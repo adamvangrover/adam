@@ -1,13 +1,14 @@
 # core/utils/config_utils.py
 
 import yaml
-import os # Import the 'os' module
+import os  # Import the 'os' module
 import logging
 from typing import Dict, Any, Optional
 
 
 # Configure logging (consider moving to a central location)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 def load_config(file_path: str) -> Optional[Dict[str, Any]]:
     """
@@ -22,9 +23,9 @@ def load_config(file_path: str) -> Optional[Dict[str, Any]]:
     try:
         with open(file_path, 'r') as f:
             config = yaml.safe_load(f)
-            if config is None: # Handle empty YAML files
+            if config is None:  # Handle empty YAML files
                 logging.warning(f"Configuration file is empty: {file_path}")
-                return {} # Return empty dict
+                return {}  # Return empty dict
             return config
     except FileNotFoundError:
         logging.error(f"Config file not found: {file_path}")
@@ -35,6 +36,7 @@ def load_config(file_path: str) -> Optional[Dict[str, Any]]:
     except Exception as e:
         logging.exception(f"Error loading config from {file_path}: {e}")
         return None
+
 
 def load_app_config() -> Dict[str, Any]:
     """
@@ -51,7 +53,7 @@ def load_app_config() -> Dict[str, Any]:
         "config/reporting.yaml",
         "config/logging.yaml",
         "config/system.yaml",
-        "config/settings.yaml", # agents.yaml will be added after this
+        "config/settings.yaml",  # agents.yaml will be added after this
         "config/workflow.yaml",
         "config/api_keys.yaml",
         "config/cacm-adk-config.yaml",
@@ -66,12 +68,12 @@ def load_app_config() -> Dict[str, Any]:
     # Find index of settings.yaml and insert agents.yaml after it
     try:
         settings_index = config_files_base.index("config/settings.yaml")
-        config_files_ordered = config_files_base[:settings_index+1] + ["config/agents.yaml"] + config_files_base[settings_index+1:]
+        config_files_ordered = config_files_base[:settings_index+1] + \
+            ["config/agents.yaml"] + config_files_base[settings_index+1:]
     except ValueError:
         # Fallback if settings.yaml is not in the list for some reason, just append agents.yaml
         logging.warning("config/settings.yaml not found in base config list, appending config/agents.yaml at the end.")
         config_files_ordered = config_files_base + ["config/agents.yaml"]
-
 
     combined_config: Dict[str, Any] = {}
     for file_path in config_files_ordered:
@@ -83,8 +85,9 @@ def load_app_config() -> Dict[str, Any]:
             combined_config.update(loaded_content)
         else:
             logging.warning(f"Configuration file {file_path} could not be loaded. Skipping.")
-    
+
     return combined_config
+
 
 def load_error_codes() -> Dict[str, Any]:
     """
@@ -98,6 +101,7 @@ def load_error_codes() -> Dict[str, Any]:
         return error_config['errors']
     logging.warning("Could not load error codes from config/errors.yaml.")
     return {}
+
 
 def save_config(config: Dict[str, Any], file_path: str) -> bool:
     """
@@ -117,6 +121,7 @@ def save_config(config: Dict[str, Any], file_path: str) -> bool:
     except Exception as e:
         logging.error(f"Error saving config to {file_path}: {e}")
         return False
+
 
 # Example Usage (you can remove this when you integrate it into your project)
 if __name__ == '__main__':
@@ -141,7 +146,7 @@ if __name__ == '__main__':
 
     # Test with an empty yaml file
     with open("empty.yaml", "w") as f:
-        pass # Creates an empty file
+        pass  # Creates an empty file
     config = load_config("empty.yaml")
     print(f"Loaded config (empty YAML): {config}")
 

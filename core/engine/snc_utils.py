@@ -9,11 +9,13 @@ and regulatory classification rules.
 
 from typing import Dict, Any, List
 
+
 def calculate_leverage(debt: float, ebitda: float) -> float:
     """Calculates Debt/EBITDA leverage ratio."""
     if ebitda == 0:
-        return 999.9 # Avoid div by zero
+        return 999.9  # Avoid div by zero
     return debt / ebitda
+
 
 def check_covenant_compliance(current_metric: float, covenant_limit: float, metric_type: str = "max") -> bool:
     """
@@ -26,6 +28,7 @@ def check_covenant_compliance(current_metric: float, covenant_limit: float, metr
         return current_metric >= covenant_limit
     return False
 
+
 def determine_vote_outcome(banks: List[Dict[str, Any]], required_threshold: float = 0.51) -> str:
     """
     Determines if a syndicate vote passes based on pro-rata shares.
@@ -33,6 +36,7 @@ def determine_vote_outcome(banks: List[Dict[str, Any]], required_threshold: floa
     """
     yes_votes = sum(b['share'] for b in banks if b.get('vote') == 'Yes')
     return "Pass" if yes_votes >= required_threshold else "Fail"
+
 
 def map_financials_to_rating(leverage: float, liquidity: float, debt: float) -> str:
     """
@@ -45,6 +49,7 @@ def map_financials_to_rating(leverage: float, liquidity: float, debt: float) -> 
         return "Special Mention"
     else:
         return "Pass"
+
 
 def analyze_syndicate_structure(syndicate_data: Dict[str, Any]) -> str:
     """

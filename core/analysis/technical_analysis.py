@@ -12,11 +12,12 @@ from typing import Dict, Any, Tuple
 
 # ... (import other necessary libraries for technical indicators, patterns, and CDS spread analysis)
 
+
 class TechnicalAnalyst:
     """
     Advanced technical analysis module for analyzing price data, CDS spreads,
     and other market signals, generating trading signals across various asset classes.
-    
+
     This module integrates with Adam's agent framework to access data from various sources
     and collaborates with other agents like the CDSSpreadAgent for a comprehensive analysis.
 
@@ -35,6 +36,7 @@ class TechnicalAnalyst:
         - Develop more sophisticated ML models (e.g., deep learning)
         - Add risk management and position sizing strategies
     """
+
     def __init__(self, config: Dict[str, Any]):
         """
         Initializes the TechnicalAnalyst with configuration parameters.
@@ -99,7 +101,8 @@ class TechnicalAnalyst:
             df['BB_low'] = BollingerBands(close=df['close'], window=20, window_dev=2).bollinger_lband()
             df['OBV'] = OnBalanceVolumeIndicator(close=df['close'], volume=df['volume']).on_balance_volume()
             df['ADX'] = ADXIndicator(high=df['high'], low=df['low'], close=df['close'], window=14).adx()
-            df['Stochastic_K'] = StochasticOscillator(high=df['high'], low=df['low'], close=df['close'], window=14).stoch()
+            df['Stochastic_K'] = StochasticOscillator(
+                high=df['high'], low=df['low'], close=df['close'], window=14).stoch()
             df['Stochastic_D'] = SMAIndicator(close=df['Stochastic_K'], window=3).sma_indicator()
 
             # ML Model Training (if requested)
@@ -128,7 +131,6 @@ class TechnicalAnalyst:
                 signal = 'buy'
             elif crossover_signals['position'][-1] == -1:
                 signal = 'sell'
-
 
         # 2. CDS Spread Analysis (if available)
         if 'identifier' in asset_data and self.cds_spread_agent:

@@ -7,6 +7,7 @@ from core.utils.logging_utils import get_logger
 
 logger = get_logger("institutional_radar.reporting")
 
+
 class InstitutionalRadarReporter:
     def __init__(self, llm_plugin: LLMPlugin = None):
         self.llm = llm_plugin or LLMPlugin()

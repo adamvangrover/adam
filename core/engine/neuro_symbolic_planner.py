@@ -13,10 +13,11 @@ from core.engine.states import GraphState
 
 logger = logging.getLogger(__name__)
 
+
 class NeuroSymbolicPlanner:
     """
     Implements the Plan-on-Graph (PoG) framework for verifiable, grounded planning.
-    
+
     Bridge Pattern:
     - Symbolic Side: Uses NetworkX/Neo4j to find valid reasoning paths.
     - Neural Side: Uses LLMs to parse unstructured requests into directed graphs.
@@ -25,7 +26,7 @@ class NeuroSymbolicPlanner:
     def __init__(self):
         self.kg = UnifiedKnowledgeGraph()
         self.default_agent = None
-        
+
         # Lazy load the executor agent to avoid circular imports during init
         try:
             from core.agents.risk_assessment_agent import RiskAssessmentAgent
@@ -47,7 +48,8 @@ class NeuroSymbolicPlanner:
         # 1. Entity Extraction (Heuristic/Regex)
         # Try to find "Analyze [Entity] [Intent]" or just "Analyze [Entity]"
         # Regex: Analyze (Group 1: Entity) (Optional Group 2: Intent)
-        entity_match = re.search(r"Analyze\s+([A-Za-z0-9\s\.]+?)(?:\s+(?:credit|market|esg|risk|rating).*)?$", request, re.IGNORECASE)
+        entity_match = re.search(
+            r"Analyze\s+([A-Za-z0-9\s\.]+?)(?:\s+(?:credit|market|esg|risk|rating).*)?$", request, re.IGNORECASE)
 
         if entity_match:
             start_node = entity_match.group(1).strip()
@@ -56,11 +58,15 @@ class NeuroSymbolicPlanner:
 
             # Intent mapping (simple keyword search in the whole request)
             request_lower = request.lower()
-            target_node = "Investment_Decision" # Default generic target
-            if "credit" in request_lower: target_node = "Credit_Default"
-            elif "market" in request_lower: target_node = "Market_Crash"
-            elif "esg" in request_lower: target_node = "ESG_Controversy"
-            elif "liquidity" in request_lower: target_node = "Liquidity_Crisis"
+            target_node = "Investment_Decision"  # Default generic target
+            if "credit" in request_lower:
+                target_node = "Credit_Default"
+            elif "market" in request_lower:
+                target_node = "Market_Crash"
+            elif "esg" in request_lower:
+                target_node = "ESG_Controversy"
+            elif "liquidity" in request_lower:
+                target_node = "Liquidity_Crisis"
 
             logger.info(f"[Planner] Extracted Entity: '{start_node}', Inferred Target: '{target_node}'")
 
@@ -84,14 +90,14 @@ class NeuroSymbolicPlanner:
     def discover_plan(self, start_node: str, target_node: str) -> Dict[str, Any]:
         """
         Discovers a grounded reasoning path in the KG.
-        
+
         Algorithm: Unweighted Shortest Path (BFS/Dijkstra).
         Why: Ensures the shortest logical distance between a company and a risk factor.
         """
         logger.info(f"[PoG] Discovering path: '{start_node}' -> '{target_node}'")
-        
+
         graph = self.kg.graph
-        
+
         # 1. Pathfinding
         try:
             path_nodes = nx.shortest_path(graph, source=start_node, target=target_node)
@@ -107,7 +113,7 @@ class NeuroSymbolicPlanner:
         for i in range(len(path_nodes) - 1):
             u = path_nodes[i]
             v = path_nodes[i+1]
-            
+
             # Robust edge retrieval (handle multigraphs if necessary)
             edge_data = graph.get_edge_data(u, v) or {}
             relation = edge_data.get("relation", "RELATED_TO")
@@ -126,7 +132,7 @@ class NeuroSymbolicPlanner:
             })
 
         cypher_query = "MATCH path = " + "".join(match_clauses) + " RETURN path"
-        
+
         return {
             "symbolic_plan": cypher_query,
             "steps": steps,
@@ -144,12 +150,12 @@ class NeuroSymbolicPlanner:
         Includes Topological Sorting to resolve dependencies.
         """
         steps = []
-        
+
         # Regex for "1. [Task]" or "Step 1: [Task]"
         # Captures numbered lists common in CoT (Chain of Thought) outputs
         pattern_std = re.compile(r"^\s*[\*]*(\d+)[\*\.\)]+\s+(.+)$", re.MULTILINE)
         pattern_alt = re.compile(r"^\s*Step\s+(\d+)\s*[:\.]\s+(.+)$", re.MULTILINE | re.IGNORECASE)
-        
+
         matches = pattern_std.findall(text) or pattern_alt.findall(text)
 
         if not matches:
@@ -173,7 +179,7 @@ class NeuroSymbolicPlanner:
 
             steps.append({
                 "task_id": str(num),
-                "agent": "GeneralAgent", # Default, can be refined by NLP classifier
+                "agent": "GeneralAgent",  # Default, can be refined by NLP classifier
                 "description": desc,
                 "dependencies": dependencies,
                 "cypher_fragment": None
@@ -181,7 +187,7 @@ class NeuroSymbolicPlanner:
 
         # CRITICAL: Reorder steps based on dependencies
         sorted_steps = self._topological_sort(steps)
-        
+
         return {
             "symbolic_plan": "Natural Language Parsed",
             "steps": sorted_steps,
@@ -206,7 +212,7 @@ class NeuroSymbolicPlanner:
                     logger.debug(f"Task {s['task_id']} depends on missing task {dep}. Ignoring dependency.")
 
         visited = set()
-        temp_mark = set() # To detect cycles
+        temp_mark = set()  # To detect cycles
         sorted_output = []
 
         def visit(node_id):
@@ -226,7 +232,7 @@ class NeuroSymbolicPlanner:
                     visit(dep_id)
             finally:
                 temp_mark.remove(node_id)
-            
+
             visited.add(node_id)
             sorted_output.append(id_to_step[node_id])
 
@@ -258,7 +264,7 @@ class NeuroSymbolicPlanner:
         step = steps[index]
         description = step.get("description", "Unknown Task")
         agent_name = step.get("agent")
-        
+
         logger.info(f"[Planner] Executing Step {index + 1}/{len(steps)}: {description}")
 
         # Default result text
@@ -269,7 +275,7 @@ class NeuroSymbolicPlanner:
                 # Attempt to extract entity from description (simple heuristic for graph traversal steps)
                 # e.g. "Verify relationship: Apple Inc. -[SUPPLIER]-> Foxconn"
                 target_entity = "Unknown"
-                
+
                 # Regex 1: Relationship verification pattern
                 match = re.search(r"Verify relationship: (.*?) [-–]", description)
                 if match:
@@ -290,7 +296,7 @@ class NeuroSymbolicPlanner:
                 # In a full system, this would fetch real data from a Data Retrieval Agent.
                 target_data = {
                     "company_name": target_entity,
-                    "financial_data": {"industry": "Technology"}, # Contextual mock
+                    "financial_data": {"industry": "Technology"},  # Contextual mock
                     "market_data": {}
                 }
 
@@ -338,7 +344,7 @@ class NeuroSymbolicPlanner:
         plan = state.get("plan")
         index = state.get("current_task_index", 0)
         steps = plan.get("steps", [])
-        
+
         if index < len(steps):
             return "continue"
         return "end"
@@ -356,10 +362,10 @@ class NeuroSymbolicPlanner:
             logger.info(f"Compiling executable graph for plan with {len(plan_data.get('steps', []))} steps.")
 
         workflow = StateGraph(GraphState)
-        
+
         workflow.add_node("executor", self.execute_step)
         workflow.set_entry_point("executor")
-        
+
         workflow.add_conditional_edges(
             "executor",
             self.should_continue,
@@ -368,7 +374,7 @@ class NeuroSymbolicPlanner:
                 "end": END
             }
         )
-        
+
         return workflow.compile()
 
     # -------------------------------------------------------------------------

@@ -1,17 +1,20 @@
 import logging
 from typing import List, Optional
 
+
 class Document:
     """
     Represents a document to be processed and ingested into the RAG system.
     """
+
     def __init__(self, content: str, id: Optional[str] = None, metadata: Optional[dict] = None):
-        self.id = id or str(hash(content)) # Simple ID generation if not provided
+        self.id = id or str(hash(content))  # Simple ID generation if not provided
         self.content = content
         self.metadata = metadata or {}
 
     def __repr__(self) -> str:
         return f"Document(id='{self.id}', metadata={self.metadata}, content_length={len(self.content)})"
+
 
 def chunk_text(text: str, chunk_size: int, chunk_overlap: int = 0) -> List[str]:
     """
@@ -36,12 +39,12 @@ def chunk_text(text: str, chunk_size: int, chunk_overlap: int = 0) -> List[str]:
         end_idx = idx + chunk_size
         chunks.append(text[idx:end_idx])
         idx += (chunk_size - chunk_overlap)
-        if idx >= text_length and end_idx < text_length: # Ensure last piece is captured if overlap causes step over
-             # This condition might be tricky. The goal is to avoid missing the tail end of the text.
-             # If the step `chunk_size - chunk_overlap` is small, this might not be an issue.
-             # A simpler way is to just ensure the last chunk goes to text_length if it's the final iteration.
-             # The loop condition `idx < text_length` and `text[idx:end_idx]` should handle it mostly.
-             pass # Current loop structure should handle this by taking text[idx:text_length] in the last iteration.
+        if idx >= text_length and end_idx < text_length:  # Ensure last piece is captured if overlap causes step over
+            # This condition might be tricky. The goal is to avoid missing the tail end of the text.
+            # If the step `chunk_size - chunk_overlap` is small, this might not be an issue.
+            # A simpler way is to just ensure the last chunk goes to text_length if it's the final iteration.
+            # The loop condition `idx < text_length` and `text[idx:end_idx]` should handle it mostly.
+            pass  # Current loop structure should handle this by taking text[idx:text_length] in the last iteration.
 
     # Final check: if the last chunk taken was short and there's more text,
     # or if the loop terminates slightly early due to overlap math.
@@ -57,15 +60,17 @@ def chunk_text(text: str, chunk_size: int, chunk_overlap: int = 0) -> List[str]:
         chunks.append(chunk)
 
         next_start_position = current_position + chunk_size - chunk_overlap
-        if next_start_position <= current_position : # Avoid infinite loop if step is not positive
-            logging.warning(f"Chunking step is not positive ({chunk_size - chunk_overlap}). Advancing by 1 to prevent loop.")
+        if next_start_position <= current_position:  # Avoid infinite loop if step is not positive
+            logging.warning(
+                f"Chunking step is not positive ({chunk_size - chunk_overlap}). Advancing by 1 to prevent loop.")
             current_position += 1
-        elif next_start_position >= len(text): # If next step is beyond text, we are done
+        elif next_start_position >= len(text):  # If next step is beyond text, we are done
             break
         else:
             current_position = next_start_position
 
-    return [c for c in chunks if c] # Ensure no empty string chunks from edge cases
+    return [c for c in chunks if c]  # Ensure no empty string chunks from edge cases
+
 
 # Example Usage:
 if __name__ == "__main__":

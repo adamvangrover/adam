@@ -19,6 +19,7 @@ logger = logging.getLogger("SequentialPipeline")
 
 # --- STATE DEFINITION ---
 
+
 class PipelineState(TypedDict):
     """
     The state passing through the sequential pipeline.
@@ -26,19 +27,21 @@ class PipelineState(TypedDict):
     """
     filepath: str
     raw_content: Optional[str]
-    artifact: Optional[Dict[str, Any]] # Serialized GoldStandardArtifact
-    verification_status: str # "PENDING", "VERIFIED", "FAILED", "SKIPPED"
+    artifact: Optional[Dict[str, Any]]  # Serialized GoldStandardArtifact
+    verification_status: str  # "PENDING", "VERIFIED", "FAILED", "SKIPPED"
     verification_notes: List[str]
     formatted_output: Optional[Dict[str, Any]]
     errors: List[str]
 
 # --- AGENT NODES ---
 
+
 class ScrubberAgent:
     """
     Agent A: Ingests raw file and outputs cleaned text/artifact.
     Uses GoldStandardScrubber and FileHandlers.
     """
+
     def __call__(self, state: PipelineState) -> PipelineState:
         filepath = state["filepath"]
         logger.info(f"ScrubberAgent processing: {filepath}")
@@ -78,11 +81,13 @@ class ScrubberAgent:
 
         return state
 
+
 class VerifierAgent:
     """
     Agent B: Cross-references claims.
     Simulates checking against SEC filings or external sources.
     """
+
     def __call__(self, state: PipelineState) -> PipelineState:
         if state["errors"] or not state["artifact"]:
             state["verification_status"] = "SKIPPED"
@@ -108,18 +113,20 @@ class VerifierAgent:
 
         # Simulate SEC 8-K check
         if artifact.get("artifact_type") == "report":
-             verification_notes.append("Simulated SEC 8-K cross-reference: MATCH.")
+            verification_notes.append("Simulated SEC 8-K cross-reference: MATCH.")
 
         state["verification_notes"] = verification_notes
         state["verification_status"] = "VERIFIED" if is_verified else "FLAGGED"
 
         return state
 
+
 class FormatterAgent:
     """
     Agent C: Converts verified data into strictly typed output format.
     Ensures the final JSONL structure is valid.
     """
+
     def __call__(self, state: PipelineState) -> PipelineState:
         if state["errors"]:
             return state
@@ -146,6 +153,7 @@ class FormatterAgent:
         return state
 
 # --- PIPELINE CONSTRUCTION ---
+
 
 class SequentialIngestionPipeline:
     def __init__(self):
@@ -182,6 +190,7 @@ class SequentialIngestionPipeline:
         )
 
         return self.app.invoke(initial_state)
+
 
 if __name__ == "__main__":
     # Quick Test

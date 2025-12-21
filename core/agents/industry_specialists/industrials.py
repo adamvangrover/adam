@@ -3,6 +3,7 @@
 import pandas as pd
 from textblob import TextBlob
 
+
 class IndustrialsSpecialist:
     def __init__(self, config):
         self.data_sources = config.get('data_sources', {})
@@ -26,14 +27,14 @@ class IndustrialsSpecialist:
         # Analyze sentiment and trends
         sentiment_scores = [TextBlob(headline['text']).sentiment.polarity for headline in news_headlines]
         avg_sentiment = sum(sentiment_scores) / len(sentiment_scores) if sentiment_scores else 0
-        #... (analyze social media sentiment and trends)
+        # ... (analyze social media sentiment and trends)
 
         trends = {
             'manufacturing_activity': self.analyze_manufacturing_activity(news_headlines, social_media_posts),
             'supply_chain_resilience': self.analyze_supply_chain_resilience(news_headlines, social_media_posts),
             'infrastructure_investment': self.analyze_infrastructure_investment(news_headlines, social_media_posts),
             'overall_sentiment': avg_sentiment,
-            #... (add more trends and insights)
+            # ... (add more trends and insights)
         }
         return trends
 
@@ -57,28 +58,28 @@ class IndustrialsSpecialist:
         efficiency_score = capacity_utilization / 100  # Example calculation
 
         # 3. Analyze order backlog
-        #... (analyze company's order backlog and future demand)
+        # ... (analyze company's order backlog and future demand)
 
         analysis_results = {
             'financial_health': financial_health,
             'operational_efficiency': efficiency_score,
             'order_backlog': 'strong',  # Placeholder
-            #... (add more analysis results)
+            # ... (add more analysis results)
         }
         return analysis_results
 
     def analyze_manufacturing_activity(self, news_headlines, social_media_posts):
-        #... (analyze news and social media data to assess manufacturing activity trends)
+        # ... (analyze news and social media data to assess manufacturing activity trends)
         return "expanding"  # Example
 
     def analyze_supply_chain_resilience(self, news_headlines, social_media_posts):
-        #... (analyze news and social media data to assess supply chain resilience trends)
+        # ... (analyze news and social media data to assess supply chain resilience trends)
         return "improving"  # Example
 
     def analyze_infrastructure_investment(self, news_headlines, social_media_posts):
-        #... (analyze news and social media data to assess infrastructure investment trends)
+        # ... (analyze news and social media data to assess infrastructure investment trends)
         return "increasing"  # Example
 
     def analyze_financial_health(self, financial_statements):
-        #... (analyze financial data to assess financial health)
+        # ... (analyze financial data to assess financial health)
         return "stable"  # Example

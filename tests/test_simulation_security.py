@@ -2,6 +2,7 @@ import unittest
 import json
 from services.webapp.api import create_app, db, User
 
+
 class SimulationSecurityTestCase(unittest.TestCase):
     def setUp(self):
         self.app = create_app('testing')
@@ -16,8 +17,8 @@ class SimulationSecurityTestCase(unittest.TestCase):
         db.session.add(user)
         db.session.commit()
         response = self.client.post('/api/login',
-                                 data=json.dumps({'username': 'testuser', 'password': 'password'}),
-                                 content_type='application/json')
+                                    data=json.dumps({'username': 'testuser', 'password': 'password'}),
+                                    content_type='application/json')
         self.access_token = json.loads(response.data)['access_token']
         self.headers = {'Authorization': f'Bearer {self.access_token}'}
 
@@ -31,11 +32,11 @@ class SimulationSecurityTestCase(unittest.TestCase):
         # It might return 200 (if queued) or 500 (if celery connection fails)
         # But it MUST NOT return 400 (Invalid simulation name)
         response = self.client.post('/api/simulations/Credit_Rating_Assessment_Simulation',
-                                  headers=self.headers)
+                                    headers=self.headers)
         self.assertNotEqual(response.status_code, 400)
 
     def test_run_invalid_simulation(self):
         # This currently returns 200 (Vulnerability) or 500, but we want 400 (Fixed)
         response = self.client.post('/api/simulations/Malicious_Simulation',
-                                  headers=self.headers)
+                                    headers=self.headers)
         self.assertEqual(response.status_code, 400)

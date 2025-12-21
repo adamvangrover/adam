@@ -14,6 +14,7 @@ except ImportError:
     GRAPH_AVAILABLE = False
     reflector_app = None
 
+
 class ReflectorAgent(AgentBase):
     """
     The Reflector Agent performs meta-cognition.
@@ -45,7 +46,7 @@ class ReflectorAgent(AgentBase):
                 return {
                     "original_content_snippet": content_to_analyze[:100] + "...",
                     "critique_notes": result.get("critique_notes", []),
-                    "quality_score": result.get("score", 0.0) * 10, # Scale 0-1 to 0-10
+                    "quality_score": result.get("score", 0.0) * 10,  # Scale 0-1 to 0-10
                     "verification_status": "PASS" if result.get("is_valid") else "NEEDS_REVISION",
                     "refined_content": result.get("refined_content")
                 }

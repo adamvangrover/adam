@@ -1,3 +1,4 @@
+from core.system.nexus_zero_orchestrator import NexusZeroOrchestrator
 import streamlit as st
 import json
 import os
@@ -10,7 +11,6 @@ repo_root = os.path.abspath(os.path.join(current_dir, "../../../"))
 if repo_root not in sys.path:
     sys.path.append(repo_root)
 
-from core.system.nexus_zero_orchestrator import NexusZeroOrchestrator
 
 # Page Config
 st.set_page_config(page_title="Odyssey: CRO Copilot", layout="wide", initial_sidebar_state="expanded")

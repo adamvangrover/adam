@@ -8,6 +8,7 @@ from core.system.error_handler import FileReadError, InvalidInputError
 
 logger = logging.getLogger(__name__)
 
+
 class JsonFileSource(BaseDataSource):
     """Data source for loading data from JSON files."""
 
@@ -32,7 +33,6 @@ class JsonFileSource(BaseDataSource):
             logging.exception(f"Error Loading Data:{e}")
             return None
 
-
     def get_financial_statements(self, company_id: str) -> Optional[Dict[str, Any]]:
         """Retrieves financial statements for a company from a JSON file."""
         file_path = self.base_path / f"{company_id}_financials.json"  # Example file naming
@@ -45,7 +45,7 @@ class JsonFileSource(BaseDataSource):
         data = self._load_json(file_path)  # Load all price data.
 
         if data is None:  # Handle cases where data might be None
-          return None
+            return None
 
         if not isinstance(data, dict) or "prices" not in data or not isinstance(data["prices"], list):
             logger.error(f"Invalid data format in {file_path}")
@@ -55,11 +55,10 @@ class JsonFileSource(BaseDataSource):
         # This assumes a format like: {"prices": [{"date": "2023-01-01", "price": 150}, ... ]}
         filtered_prices = {}
         for item in data["prices"]:
-          if item["date"] >= start_date and item["date"] <= end_date:
-            filtered_prices[item["date"]] = item["price"]
+            if item["date"] >= start_date and item["date"] <= end_date:
+                filtered_prices[item["date"]] = item["price"]
 
         return filtered_prices
-
 
     def get_market_data(self) -> Optional[Dict[str, Any]]:
         """Retrieves general market data."""

@@ -1,6 +1,7 @@
 import pandas as pd
 from core.utils.data_utils import validate_data
 
+
 class DataManager:
     def __init__(self, config):
         self.data_sources = config.get('data_sources', {})

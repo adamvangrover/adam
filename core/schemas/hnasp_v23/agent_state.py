@@ -3,11 +3,13 @@ from typing import List, Optional, Dict, Any
 from uuid import UUID, uuid4
 from datetime import datetime
 
+
 class LogicLayer(BaseModel):
     """Deterministic Business Logic (JsonLogic AST)."""
     engine: str = "JsonLogic"
     active_rules: Dict[str, Any] = Field(..., description="AST of governance rules")
     state_variables: Dict[str, Any] = Field(..., description="Current variables for rule eval")
+
 
 class EPAVector(BaseModel):
     """BayesACT Emotional State Vector."""
@@ -15,12 +17,14 @@ class EPAVector(BaseModel):
     potency: float = Field(..., ge=-4.3, le=4.3)
     activity: float = Field(..., ge=-4.3, le=4.3)
 
+
 class PersonaState(BaseModel):
     """Probabilistic Personality Definition."""
     model: str = "BayesACT"
     fundamental_identity: EPAVector
     transient_impression: EPAVector
     deflection: float
+
 
 class AgentState(BaseModel):
     """The HNASP Envelope: The Single Source of Truth."""

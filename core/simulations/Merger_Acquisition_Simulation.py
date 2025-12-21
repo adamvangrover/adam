@@ -7,6 +7,7 @@ from core.agents.industry_specialist_agent import IndustrySpecialistAgent
 from core.agents.risk_assessment_agent import RiskAssessmentAgent
 from core.agents.legal_agent import LegalAgent
 
+
 class MergerAcquisitionSimulation:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):
         """
@@ -63,7 +64,8 @@ class MergerAcquisitionSimulation:
 
         # 3. Valuation and Deal Structuring
         valuation = self.perform_valuation(acquirer_data, target_data, fundamental_analysis, industry_analysis)
-        deal_structure = self.propose_deal_structure(acquirer_data, target_data, valuation, risk_assessment, legal_considerations)
+        deal_structure = self.propose_deal_structure(
+            acquirer_data, target_data, valuation, risk_assessment, legal_considerations)
 
         # 4. Generate Report
         report = self.generate_report(

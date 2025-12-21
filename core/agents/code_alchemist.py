@@ -356,8 +356,8 @@ Output: Python code block with architectural notes.
             return False
 
     def _write_file_sync(self, file_path: str, code: str):
-         with open(file_path, "w", encoding="utf-8") as f:
-                f.write(code)
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(code)
 
     async def deploy_to_api_endpoint(self, code: str, api_endpoint: str) -> bool:
         headers = {"Content-Type": "application/json"}

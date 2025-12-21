@@ -3,6 +3,7 @@ from .workflow_manager import WorkflowManager
 from .workflow import Workflow
 from .task import Task
 
+
 class CreditRiskOrchestrator(AgentBase):
     def __init__(self, config):
         super().__init__(config)

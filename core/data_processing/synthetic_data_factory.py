@@ -2,6 +2,7 @@ import time
 import random
 import datetime
 
+
 class DataFactory:
     @staticmethod
     def generate_deep_dive(ticker="AAPL", scenario="neutral"):
@@ -78,7 +79,8 @@ class DataFactory:
                         "snc_rating_model": {
                             "overall_borrower_rating": "Pass",
                             "facilities": [
-                                {"id": "Revolver", "amount": "$5B", "regulatory_rating": "Pass", "collateral_coverage": "Unsecured", "covenant_headroom": ">50%"}
+                                {"id": "Revolver", "amount": "$5B", "regulatory_rating": "Pass",
+                                    "collateral_coverage": "Unsecured", "covenant_headroom": ">50%"}
                             ]
                         },
                         "cds_market_implied_rating": "AA",

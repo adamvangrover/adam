@@ -1,6 +1,7 @@
-#core/agents/natural_language_generation_agent.py
+# core/agents/natural_language_generation_agent.py
 
 from transformers import pipeline
+
 
 class NaturalLanguageGenerationAgent:
     def __init__(self, config):
@@ -32,13 +33,13 @@ class NaturalLanguageGenerationAgent:
         """
         if report_type == "market_sentiment":
             # Generate a market sentiment report
-            #...
+            # ...
             pass  # Placeholder for implementation
         elif report_type == "financial_analysis":
             # Generate a financial analysis report
-            #...
+            # ...
             pass  # Placeholder for implementation
-        #... (Add other report types)
+        # ... (Add other report types)
 
     def run(self, data, output_type, **kwargs):
         """
@@ -55,6 +56,7 @@ class NaturalLanguageGenerationAgent:
                 return {"error": "Invalid output type."}
         except Exception as e:
             return {"error": str(e)}
+
 
 # Example usage
 if __name__ == "__main__":

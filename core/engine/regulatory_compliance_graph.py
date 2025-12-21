@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 # --- Mock Utilities ---
 
+
 def mock_get_regulations(jurisdiction: str) -> list[str]:
     regs = ["KYC - Know Your Customer", "AML - Anti-Money Laundering"]
     if jurisdiction.upper() == "US":
@@ -27,6 +28,7 @@ def mock_get_regulations(jurisdiction: str) -> list[str]:
         regs.extend(["Basel III", "GDPR", "MiFID II"])
     return regs
 
+
 def mock_check_violation_logic(entity: str, reg: str) -> bool:
     # Randomly simulate a violation for "Crypto" entities
     if "Crypto" in entity and "AML" in reg:
@@ -34,6 +36,7 @@ def mock_check_violation_logic(entity: str, reg: str) -> bool:
     return False
 
 # --- Nodes ---
+
 
 def identify_jurisdiction_node(state: ComplianceState) -> Dict[str, Any]:
     print("--- Node: Identify Jurisdiction ---")
@@ -44,6 +47,7 @@ def identify_jurisdiction_node(state: ComplianceState) -> Dict[str, Any]:
         "human_readable_status": f"identified jurisdiction: {jur}"
     }
 
+
 def fetch_regulations_node(state: ComplianceState) -> Dict[str, Any]:
     print("--- Node: Fetch Regulations ---")
     regs = mock_get_regulations(state["jurisdiction"])
@@ -51,6 +55,7 @@ def fetch_regulations_node(state: ComplianceState) -> Dict[str, Any]:
         "applicable_regulations": regs,
         "human_readable_status": f"Fetched {len(regs)} applicable regulations."
     }
+
 
 def check_compliance_node(state: ComplianceState) -> Dict[str, Any]:
     print("--- Node: Check Compliance ---")
@@ -70,6 +75,7 @@ def check_compliance_node(state: ComplianceState) -> Dict[str, Any]:
         "human_readable_status": f"Compliance check complete. Risk Level: {risk}"
     }
 
+
 def generate_report_node(state: ComplianceState) -> Dict[str, Any]:
     print("--- Node: Generate Compliance Report ---")
     report = f"Compliance Report for {state['entity_id']}\n"
@@ -87,6 +93,7 @@ def generate_report_node(state: ComplianceState) -> Dict[str, Any]:
         "final_report": report,
         "human_readable_status": "Generated final report."
     }
+
 
 def critique_compliance_node(state: ComplianceState) -> Dict[str, Any]:
     print("--- Node: Critique Compliance ---")
@@ -111,6 +118,7 @@ def critique_compliance_node(state: ComplianceState) -> Dict[str, Any]:
         "human_readable_status": "Critiqued compliance findings."
     }
 
+
 def revise_compliance_node(state: ComplianceState) -> Dict[str, Any]:
     print("--- Node: Revise Compliance ---")
     report = state["final_report"]
@@ -128,12 +136,14 @@ def revise_compliance_node(state: ComplianceState) -> Dict[str, Any]:
 
 # --- Conditional Logic ---
 
+
 def should_continue_compliance(state: ComplianceState) -> Literal["revise_compliance", "END"]:
     if state["needs_revision"] and state["iteration_count"] < 3:
         return "revise_compliance"
     return "END"
 
 # --- Graph Construction ---
+
 
 def build_compliance_graph():
     workflow = StateGraph(ComplianceState)
@@ -164,5 +174,6 @@ def build_compliance_graph():
 
     checkpointer = MemorySaver()
     return workflow.compile(checkpointer=checkpointer)
+
 
 compliance_graph_app = build_compliance_graph()

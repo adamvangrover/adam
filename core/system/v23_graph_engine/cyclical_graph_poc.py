@@ -2,6 +2,7 @@
 from typing import TypedDict, List
 from langgraph.graph import StateGraph, END
 
+
 class GraphState(TypedDict):
     """
     Represents the state of our graph.
@@ -15,6 +16,7 @@ class GraphState(TypedDict):
     critique: str
     iteration: int
 
+
 def drafting_node(state: GraphState) -> dict:
     """
     Generates a draft of the text.
@@ -24,9 +26,10 @@ def drafting_node(state: GraphState) -> dict:
         draft = "This is the first draft."
     else:
         draft = state["draft"] + " (revised)"
-    
+
     print(f"Drafting (Iteration {iteration}): {draft}")
     return {"draft": draft, "iteration": iteration + 1}
+
 
 def critique_node(state: GraphState) -> dict:
     """
@@ -37,6 +40,7 @@ def critique_node(state: GraphState) -> dict:
     print(f"Critiquing: {critique}")
     return {"critique": critique}
 
+
 def should_continue(state: GraphState) -> str:
     """
     Determines whether to continue the loop.
@@ -45,6 +49,7 @@ def should_continue(state: GraphState) -> str:
         return "end"
     else:
         return "continue"
+
 
 # Set up the graph
 graph = StateGraph(GraphState)

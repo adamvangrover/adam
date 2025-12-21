@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, patch
 from core.data_sources.political_landscape import PoliticalLandscapeLoader
 from core.agents.regulatory_compliance_agent import RegulatoryComplianceAgent
 
+
 class TestPoliticalLandscapeLoader(unittest.TestCase):
 
     @patch('core.data_sources.political_landscape.requests.get')
@@ -50,7 +51,8 @@ class TestPoliticalLandscapeLoader(unittest.TestCase):
 
         # Verify Context Layering
         self.assertIn("context_layering", landscape["US"])
-        self.assertEqual(landscape["US"]["context_layering"]["historical_context"]["previous_administration"]["president"], "Joe Biden")
+        self.assertEqual(landscape["US"]["context_layering"]["historical_context"]
+                         ["previous_administration"]["president"], "Joe Biden")
 
         # Verify Geopolitical Dynamics
         self.assertIn("geopolitical_dynamics", landscape["US"])
@@ -81,6 +83,7 @@ class TestPoliticalLandscapeLoader(unittest.TestCase):
         # Should fall back to default data
         self.assertIn("Executive orders on energy production.", landscape["US"]["recent_developments"][0])
 
+
 class TestRegulatoryComplianceAgentIntegration(unittest.TestCase):
     @patch('core.agents.regulatory_compliance_agent.GraphDatabase')
     @patch('core.agents.regulatory_compliance_agent.LLMPlugin')
@@ -95,6 +98,7 @@ class TestRegulatoryComplianceAgentIntegration(unittest.TestCase):
         # Check if political landscape is loaded
         self.assertIn("US", agent.political_landscape)
         self.assertIsNotNone(agent.political_landscape["US"].get("president"))
+
 
 if __name__ == '__main__':
     unittest.main()

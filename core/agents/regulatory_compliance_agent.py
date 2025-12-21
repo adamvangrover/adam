@@ -1,4 +1,4 @@
-#core/agents/regulatory_compliance_agent.py
+# core/agents/regulatory_compliance_agent.py
 
 from __future__ import annotations
 import re
@@ -21,6 +21,7 @@ from core.agents.agent_base import AgentBase
 
 # Configure logger
 logger = logging.getLogger(__name__)
+
 
 class RegulatoryComplianceAgent(AgentBase):
     """
@@ -234,9 +235,9 @@ class RegulatoryComplianceAgent(AgentBase):
 
         if isinstance(developments, list):
             for dev in developments:
-                 if isinstance(dev, str) and any(kw in dev.lower() for kw in ["instability", "sanction", "crisis", "war", "conflict"]):
-                     geo_risk += geo_risk_weight
-                     violated_rules.append(f"Geopolitical Risk Warning: {dev}")
+                if isinstance(dev, str) and any(kw in dev.lower() for kw in ["instability", "sanction", "crisis", "war", "conflict"]):
+                    geo_risk += geo_risk_weight
+                    violated_rules.append(f"Geopolitical Risk Warning: {dev}")
 
         # 4. Calculate risk score
         risk_score = 0.0
@@ -254,8 +255,8 @@ class RegulatoryComplianceAgent(AgentBase):
             modifier = self.learned_params.get("entity_risk_modifiers", {}).get(entity_id, 0.0)
             risk_score += modifier
 
-        risk_score = min(risk_score, 1.0) # Cap at 1.0
-        risk_score = max(risk_score, 0.0) # Ensure non-negative
+        risk_score = min(risk_score, 1.0)  # Cap at 1.0
+        risk_score = max(risk_score, 0.0)  # Ensure non-negative
 
         analysis = {
             "transaction_id": transaction.get("id"),
@@ -486,17 +487,17 @@ class RegulatoryComplianceAgent(AgentBase):
         # Send significant findings to RiskAssessmentAgent
         if compliance_report:
             risk_data = {
-                 "source": "RegulatoryComplianceAgent",
-                 "report": compliance_report,
-                 "risk_type": "compliance",
-                 "regulatory_updates": len(regulatory_updates),
-                 "violation_count": sum(1 for r in analysis_results if r['violated_rules'])
+                "source": "RegulatoryComplianceAgent",
+                "report": compliance_report,
+                "risk_type": "compliance",
+                "regulatory_updates": len(regulatory_updates),
+                "violation_count": sum(1 for r in analysis_results if r['violated_rules'])
             }
             logger.info("Sending compliance data to RiskAssessmentAgent...")
             await self.send_message("RiskAssessmentAgent", risk_data)
 
         # Knowledge Base Integration
-        knowledge_graph = kwargs.get("knowledge_graph") # Expecting UnifiedKnowledgeGraph instance
+        knowledge_graph = kwargs.get("knowledge_graph")  # Expecting UnifiedKnowledgeGraph instance
         self._integrate_knowledge(regulatory_updates, knowledge_graph)
 
         # Ingest Compliance Events into Graph

@@ -2,11 +2,13 @@ from typing import TypedDict, List, Optional, Annotated, Dict, Any, Literal
 import operator
 from datetime import datetime
 
+
 class ResearchArtifact(TypedDict):
     title: str
     content: str
     source: str
     credibility_score: float
+
 
 class PlanOnGraph(TypedDict):
     """A symbolic scaffold representing the causal links and logical steps."""
@@ -14,6 +16,7 @@ class PlanOnGraph(TypedDict):
     steps: List[Dict[str, Any]]
     is_complete: bool
     cypher_query: Optional[str]
+
 
 class GraphState(TypedDict):
     """
@@ -29,6 +32,7 @@ class GraphState(TypedDict):
     iteration: int
     max_iterations: int
 
+
 class RiskAssessmentState(TypedDict):
     """
     The 'Memory' of a v23 Reasoning Loop. 
@@ -37,19 +41,20 @@ class RiskAssessmentState(TypedDict):
     # Input
     ticker: str
     user_intent: str
-    
+
     # Internal Reasoning State
-    research_data: Annotated[List[ResearchArtifact], operator.add] # Append-only log
+    research_data: Annotated[List[ResearchArtifact], operator.add]  # Append-only log
     draft_analysis: Optional[str]
     critique_notes: List[str]
     iteration_count: int
-    
+
     # Control Flow
     quality_score: float
     needs_correction: bool
-    
+
     # Explainability
-    human_readable_status: str # "I am currently verifying the debt ratio..."
+    human_readable_status: str  # "I am currently verifying the debt ratio..."
+
 
 class SNCAnalysisState(TypedDict):
     """
@@ -57,12 +62,12 @@ class SNCAnalysisState(TypedDict):
     """
     # Input
     obligor_id: str
-    syndicate_data: Dict[str, Any] # Banks, vote shares, etc.
+    syndicate_data: Dict[str, Any]  # Banks, vote shares, etc.
     financials: Dict[str, Any]
 
     # Internal Reasoning State
-    structure_analysis: Optional[str] # Analysis of the syndicate structure
-    regulatory_rating: Optional[str] # Pass, SM, SS, D, L
+    structure_analysis: Optional[str]  # Analysis of the syndicate structure
+    regulatory_rating: Optional[str]  # Pass, SM, SS, D, L
     rationale: Optional[str]
     critique_notes: List[str]
     iteration_count: int
@@ -73,6 +78,7 @@ class SNCAnalysisState(TypedDict):
 
     # Explainability
     human_readable_status: str
+
 
 class MarketSentimentState(TypedDict):
     """
@@ -101,14 +107,15 @@ class MarketSentimentState(TypedDict):
     # Explainability
     human_readable_status: str
 
+
 class RedTeamState(TypedDict):
     """
     State for the Adversarial Red Team Loop.
     """
     target_entity: str
-    scenario_type: str # e.g. "Cyber", "Macro", "Regulatory"
+    scenario_type: str  # e.g. "Cyber", "Macro", "Regulatory"
     current_scenario_description: str
-    simulated_impact_score: float # 0.0 to 10.0
+    simulated_impact_score: float  # 0.0 to 10.0
     severity_threshold: float
 
     # Internal
@@ -118,6 +125,7 @@ class RedTeamState(TypedDict):
 
     # Explainability
     human_readable_status: str
+
 
 class ESGAnalysisState(TypedDict):
     """
@@ -144,6 +152,7 @@ class ESGAnalysisState(TypedDict):
     human_readable_status: str
     final_report: Optional[str]
 
+
 class ComplianceState(TypedDict):
     """
     State for the Regulatory Compliance Graph.
@@ -167,6 +176,7 @@ class ComplianceState(TypedDict):
     human_readable_status: str
     final_report: Optional[str]
 
+
 class QuantumRiskState(TypedDict):
     """
     State for the Quantum-Enhanced Risk Graph.
@@ -178,28 +188,29 @@ class QuantumRiskState(TypedDict):
 
     # Internal Reasoning
     simulation_type: Literal["QMC_MERTON", "HYBRID_QNN", "GENERATIVE_STRESS"]
-    simulation_results: Dict[str, Any] # e.g. PD, VaR, Asset Value
+    simulation_results: Dict[str, Any]  # e.g. PD, VaR, Asset Value
     quantum_execution_time: float
     classical_fallback_triggered: bool
 
     # Explainability
-    icaa_score: float # Inter-Class Attribution Alignment
+    icaa_score: float  # Inter-Class Attribution Alignment
     human_readable_status: str
     final_report: Optional[str]
 
     # Control Flow
     iteration_count: int
 
+
 class CrisisSimulationState(TypedDict):
     """
     State for the Macro-Economic Crisis Simulation Graph.
     """
     # Input
-    scenario_description: str # "Interest rates +5%"
+    scenario_description: str  # "Interest rates +5%"
     portfolio_data: Dict[str, Any]
 
     # Internal Reasoning
-    macro_variables: Dict[str, float] # { "rates": 0.08, "gdp": -0.02 }
+    macro_variables: Dict[str, float]  # { "rates": 0.08, "gdp": -0.02 }
     first_order_impacts: List[str]
     second_order_impacts: List[str]
     estimated_loss: float
@@ -214,6 +225,7 @@ class CrisisSimulationState(TypedDict):
     # Explainability
     human_readable_status: str
     final_report: Optional[str]
+
 
 class ReflectorState(TypedDict):
     """
@@ -232,28 +244,34 @@ class ReflectorState(TypedDict):
 
 # --- Omniscient State (v23.5) ---
 
+
 class EntityEcosystem(TypedDict):
     legal_entity: Dict[str, str]
     management_assessment: Dict[str, Any]
     competitive_positioning: Dict[str, str]
 
+
 class EquityAnalysis(TypedDict):
     fundamentals: Dict[str, str]
     valuation_engine: Dict[str, Any]
+
 
 class CreditAnalysis(TypedDict):
     snc_rating_model: Dict[str, Any]
     cds_market_implied_rating: str
     covenant_risk_analysis: Dict[str, Any]
 
+
 class SimulationEngine(TypedDict):
     monte_carlo_default_prob: float
     quantum_scenarios: List[Dict[str, Any]]
     trading_dynamics: Dict[str, str]
 
+
 class StrategicSynthesis(TypedDict):
     m_and_a_posture: str
     final_verdict: Dict[str, Any]
+
 
 class OmniscientNodes(TypedDict):
     entity_ecosystem: EntityEcosystem
@@ -262,24 +280,28 @@ class OmniscientNodes(TypedDict):
     simulation_engine: SimulationEngine
     strategic_synthesis: StrategicSynthesis
 
+
 class OmniscientMeta(TypedDict):
     target: str
     generated_at: str
     model_version: str
 
+
 class OmniscientKnowledgeGraph(TypedDict):
     meta: OmniscientMeta
     nodes: OmniscientNodes
+
 
 class OmniscientState(TypedDict):
     """
     State for the v23.5 'AI Partner' Omniscient Workflow.
     """
-    ticker: str # Input
-    v23_knowledge_graph: OmniscientKnowledgeGraph # Output
+    ticker: str  # Input
+    v23_knowledge_graph: OmniscientKnowledgeGraph  # Output
     human_readable_status: str
 
 # --- Initializers ---
+
 
 def init_risk_state(ticker: str, intent: str) -> RiskAssessmentState:
     return {
@@ -293,6 +315,7 @@ def init_risk_state(ticker: str, intent: str) -> RiskAssessmentState:
         "needs_correction": False,
         "human_readable_status": "Initializing analysis..."
     }
+
 
 def init_snc_state(obligor_id: str, syndicate_data: Dict, financials: Dict) -> SNCAnalysisState:
     return {
@@ -309,6 +332,7 @@ def init_snc_state(obligor_id: str, syndicate_data: Dict, financials: Dict) -> S
         "human_readable_status": "Initializing SNC analysis..."
     }
 
+
 def init_sentiment_state(ticker: str, sector: str) -> MarketSentimentState:
     return {
         "ticker": ticker,
@@ -323,6 +347,7 @@ def init_sentiment_state(ticker: str, sector: str) -> MarketSentimentState:
         "iteration_count": 0,
         "human_readable_status": "Initializing Sentiment Monitor..."
     }
+
 
 def init_esg_state(company: str, sector: str) -> ESGAnalysisState:
     return {
@@ -340,6 +365,7 @@ def init_esg_state(company: str, sector: str) -> ESGAnalysisState:
         "final_report": None
     }
 
+
 def init_compliance_state(entity: str, jurisdiction: str) -> ComplianceState:
     return {
         "entity_id": entity,
@@ -354,6 +380,7 @@ def init_compliance_state(entity: str, jurisdiction: str) -> ComplianceState:
         "final_report": None
     }
 
+
 def init_quantum_state(portfolio_id: str, risk_factors: Dict) -> QuantumRiskState:
     return {
         "portfolio_id": portfolio_id,
@@ -367,6 +394,7 @@ def init_quantum_state(portfolio_id: str, risk_factors: Dict) -> QuantumRiskStat
         "final_report": None,
         "iteration_count": 0
     }
+
 
 def init_crisis_state(scenario: str, portfolio: Dict) -> CrisisSimulationState:
     return {
@@ -384,6 +412,7 @@ def init_crisis_state(scenario: str, portfolio: Dict) -> CrisisSimulationState:
         "final_report": None
     }
 
+
 def init_reflector_state(content: str, context: Dict = None) -> ReflectorState:
     return {
         "input_content": content,
@@ -395,6 +424,7 @@ def init_reflector_state(content: str, context: Dict = None) -> ReflectorState:
         "iteration_count": 0,
         "human_readable_status": "Initializing Reflection..."
     }
+
 
 def init_omniscient_state(ticker: str) -> OmniscientState:
     empty_nodes: OmniscientNodes = {

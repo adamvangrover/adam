@@ -27,7 +27,6 @@ class ResultAggregationAgent(AgentBase):
         self.expertise = self.config.get('expertise', ["data aggregation", "result summarization"])
         # self.prompt_template = agent_config.get('prompt_template', "...") # Placeholder for later
 
-
     async def execute(self, results: list) -> str:
         """
         Combines results from multiple agents.
@@ -54,7 +53,7 @@ class ResultAggregationAgent(AgentBase):
         """
         Concatenates results with separators (basic implementation).
         """
-        return "\n\n".join([str(r) for r in results]) # Handles mixed data types
+        return "\n\n".join([str(r) for r in results])  # Handles mixed data types
 
     # --- Placeholder methods for future LLM integration ---
     # def _build_llm_prompt(self, results: list, context: str = "") -> str:

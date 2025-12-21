@@ -24,6 +24,7 @@ from typing import Dict, Optional, List
 # Architect Note: Using dataclasses reduces memory overhead compared to dictionaries.
 # 'slots=True' (in Python 3.10+) would further optimize attribute access speed.
 
+
 @dataclass
 class Tick:
     symbol: str
@@ -31,16 +32,19 @@ class Tick:
     ask: float
     timestamp: int  # Unix timestamp in milliseconds
 
+
 class SystemState(Enum):
     RUNNING = 1
     HALTED_LATENCY = 2
     HALTED_DRAWDOWN = 3
     HALTED_MANUAL = 4
 
+
 class CircuitBreaker:
     """
     The Risk Gate: Monitors system health metrics synchronously on the critical path.
     """
+
     def __init__(self, max_latency_ms: int = 50, max_drawdown_pct: float = 0.02):
         self.max_latency_ms = max_latency_ms
         self.max_drawdown = max_drawdown_pct
@@ -61,10 +65,10 @@ class CircuitBreaker:
         # Update High-Water Mark
         if current_equity > self.peak_equity:
             self.peak_equity = current_equity
-        
+
         self.current_equity = current_equity
         drawdown = (self.peak_equity - self.current_equity) / self.peak_equity
-        
+
         if drawdown > self.max_drawdown:
             self.state = SystemState.HALTED_DRAWDOWN
             self.logger.critical(f"HALT: Max Drawdown breached. DD: {drawdown:.2%}, Limit: {self.max_drawdown:.2%}")
@@ -79,16 +83,19 @@ class CircuitBreaker:
 
         local_ts_ms = int(time.time() * 1000)
         latency = local_ts_ms - exchange_ts_ms
-        
+
         if latency > self.max_latency_ms:
             self.state = SystemState.HALTED_LATENCY
-            self.logger.critical(f"HALT: Latency threshold exceeded. Delta: {latency}ms, Limit: {self.max_latency_ms}ms")
+            self.logger.critical(
+                f"HALT: Latency threshold exceeded. Delta: {latency}ms, Limit: {self.max_latency_ms}ms")
             raise SystemExit("Risk Limit Breached: Latency")
+
 
 class MarketDataHandler:
     """
     Asynchronous WebSocket consumer using the Producer pattern.
     """
+
     def __init__(self, uri: str, queue: asyncio.Queue, symbols: List[str]):
         self.uri = uri
         self.queue = queue
@@ -103,15 +110,15 @@ class MarketDataHandler:
                 # In production: async with websockets.connect(self.uri) as ws:
                 # await ws.send(json.dumps({"op": "subscribe", "args": self.symbols}))
                 # async for message in ws:
-                
+
                 # SIMULATION OF TICK ARRIVAL
-                await asyncio.sleep(0.01) # Simulate 100 ticks/sec
-                
+                await asyncio.sleep(0.01)  # Simulate 100 ticks/sec
+
                 now_ms = int(time.time() * 1000)
                 # Simulate a random latency spike occasionally
                 if random.random() > 0.99:
-                    jitter = random.randint(50, 100) # Introduce artificial lag
-                    now_ms -= jitter 
+                    jitter = random.randint(50, 100)  # Introduce artificial lag
+                    now_ms -= jitter
 
                 tick = Tick(
                     symbol="BTC-USD",
@@ -119,22 +126,24 @@ class MarketDataHandler:
                     ask=50005.00,
                     timestamp=now_ms
                 )
-                
+
                 # Non-blocking put to the queue
                 # If queue is full, this would block (backpressure), signaling strategy is too slow.
                 await self.queue.put(tick)
-                
+
             except Exception as e:
                 self.logger.error(f"WebSocket Connection Error: {e}")
-                await asyncio.sleep(5) # Exponential backoff in real impl
+                await asyncio.sleep(5)  # Exponential backoff in real impl
+
 
 class OrderManager:
     """
     Manages the lifecycle of orders (Place, Modify, Cancel).
     Abstracts the API complexity from the strategy.
     """
+
     def __init__(self):
-        self.open_orders = {} # Map
+        self.open_orders = {}  # Map
         self.inventory = 0.0
         self.logger = logging.getLogger("OrderManager")
 
@@ -157,48 +166,50 @@ class OrderManager:
         # In production: await exchange_api.batch_cancel(self.open_orders.keys())
         self.open_orders.clear()
 
+
 class MarketMakerStrategy:
     """
     The Core Logic Consumer.
     """
+
     def __init__(self, queue: asyncio.Queue, risk_gate: CircuitBreaker, om: OrderManager):
         self.queue = queue
         self.risk_gate = risk_gate
         self.om = om
         self.spread_bps = 5  # 5 basis points target spread
-        self.position_limit = 1.0 # Max 1 BTC
-        
+        self.position_limit = 1.0  # Max 1 BTC
+
     async def run(self):
         self.risk_gate.logger.info("Strategy Engine Active")
         while True:
             # 1. Wait for Tick (Yields control to Event Loop if empty)
             tick = await self.queue.get()
-            
+
             try:
                 # 2. Synchronous Risk Check (Critical Path)
                 self.risk_gate.check_latency(tick.timestamp)
-                
-                # In a real system, we would also update PnL here based on 
+
+                # In a real system, we would also update PnL here based on
                 # a separate execution feed or account balance stream.
                 # self.risk_gate.update_pnl(current_nav)
 
                 # 3. Strategy Logic
                 mid_price = (tick.bid + tick.ask) / 2.0
-                
+
                 # Calculate Spread Width
                 half_spread = mid_price * (self.spread_bps / 10000.0)
-                
+
                 # Basic Inventory Skew Logic
                 # If we are long, skew prices down to sell. If short, skew up to buy.
                 skew = - (self.om.inventory / self.position_limit) * half_spread
-                
+
                 bid_price = mid_price - half_spread + skew
                 ask_price = mid_price + half_spread + skew
-                
+
                 # 4. Execution Logic
                 # Cancel previous orders (Simplified: usually we modify/replace)
                 await self.om.cancel_all()
-                
+
                 # Place new ladder
                 # Use asyncio.gather to send both requests concurrently
                 await asyncio.gather(
@@ -210,28 +221,30 @@ class MarketMakerStrategy:
                 # Graceful shutdown on Risk Trip
                 await self.om.cancel_all()
                 self.risk_gate.logger.critical("SYSTEM HALTED BY CIRCUIT BREAKER")
-                return # Exit the loop
-            
+                return  # Exit the loop
+
             except Exception as e:
                 self.risk_gate.logger.error(f"Strategy Error: {e}")
-            
+
             finally:
                 self.queue.task_done()
 
 # --- SYSTEM ENTRY POINT ---
+
+
 async def main():
     # Setup Logging
     logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(name)s] %(message)s')
-    
+
     # Initialize Channels
-    event_queue = asyncio.Queue(maxsize=1000) # Maxsize prevents memory overflow if consumer dies
-    
+    event_queue = asyncio.Queue(maxsize=1000)  # Maxsize prevents memory overflow if consumer dies
+
     # Initialize Modules
     risk_gate = CircuitBreaker(max_latency_ms=50, max_drawdown_pct=0.02)
     order_manager = OrderManager()
     md_handler = MarketDataHandler("wss://api.exchange.com/stream", event_queue, ["BTC-USD"])
     strategy = MarketMakerStrategy(event_queue, risk_gate, order_manager)
-    
+
     # Run the Reactor
     # gather() runs the producer and consumer concurrently
     await asyncio.gather(

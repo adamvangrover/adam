@@ -3,6 +3,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def determine_ma_posture(financials: Dict[str, Any], market_data: Dict[str, Any]) -> Literal["Buyer", "Seller", "Neutral"]:
     """
     Determines if the entity is likely an Acquirer or a Target.
@@ -15,22 +16,23 @@ def determine_ma_posture(financials: Dict[str, Any], market_data: Dict[str, Any]
     leverage = debt / financials.get("ebitda", 1) if financials.get("ebitda") else 0
 
     if cash_to_mcap > 0.15 and leverage < 2.0:
-        return "Buyer" # Cash rich, low debt
-    elif market_cap < 5000 and leverage < 3.0: # Small cap, reasonable debt
+        return "Buyer"  # Cash rich, low debt
+    elif market_cap < 5000 and leverage < 3.0:  # Small cap, reasonable debt
         return "Target"
     else:
         return "Neutral"
 
+
 def synthesize_verdict(
     valuation: Dict[str, Any],
     credit_rating: str,
-    risk_score: float, # 0-10, 10 is high risk
+    risk_score: float,  # 0-10, 10 is high risk
     ma_posture: str
 ) -> Dict[str, Any]:
     """
     Synthesizes all analyses into a final conviction level and recommendation.
     """
-    score = 5 # Neutral start
+    score = 5  # Neutral start
 
     # 1. Valuation Impact
     if valuation.get("verdict") == "Undervalued":
@@ -52,7 +54,7 @@ def synthesize_verdict(
 
     # 4. M&A Catalyst
     if ma_posture == "Target":
-        score += 1 # Speculative premium
+        score += 1  # Speculative premium
 
     # Normalize 1-10
     score = max(1, min(10, score))

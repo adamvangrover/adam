@@ -2,6 +2,7 @@
 from typing import Dict, List
 from .async_task import AsyncTask
 
+
 class AsyncWorkflow:
     def __init__(self, name: str):
         self.name = name

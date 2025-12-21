@@ -8,10 +8,12 @@ from mesa.datacollection import DataCollector
 
 # --- Agent Definitions ---
 
+
 class MarketAgent(Agent):
     """
     An agent representing a market participant with a specific risk aversion level.
     """
+
     def __init__(self, unique_id, model, risk_aversion):
         super().__init__(unique_id, model)
         self.risk_aversion = risk_aversion
@@ -69,6 +71,7 @@ class WorldSimulationModel(Model):
     """
     A model representing a simplified world with agents and market dynamics.
     """
+
     def __init__(self, config):
         super().__init__()
         self.data_sources = config.get('data_sources', {})
@@ -128,9 +131,11 @@ class WorldSimulationModel(Model):
         for symbol in self.stock_prices:
             self.stock_prices[symbol].append(self.stock_prices[symbol][-1] * (1 + random.uniform(-0.05, 0.05)))
         for indicator in self.economic_indicators:
-            self.economic_indicators[indicator].append(self.economic_indicators[indicator][-1] + random.uniform(-0.1, 0.1))
+            self.economic_indicators[indicator].append(
+                self.economic_indicators[indicator][-1] + random.uniform(-0.1, 0.1))
         for risk in self.geopolitical_risks:
-            self.geopolitical_risks[risk].append(max(0, min(1, self.geopolitical_risks[risk][-1] + random.uniform(-0.1, 0.1))))
+            self.geopolitical_risks[risk].append(
+                max(0, min(1, self.geopolitical_risks[risk][-1] + random.uniform(-0.1, 0.1))))
 
         # --- Development Node: Add more sophisticated market update mechanisms ---
         # Examples:
@@ -142,6 +147,7 @@ class WorldSimulationModel(Model):
         self.datacollector.collect(self)
 
 # --- Standalone Execution ---
+
 
 if __name__ == "__main__":
     # --- Development Node: Add configuration options for standalone execution ---

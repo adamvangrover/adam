@@ -29,19 +29,25 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 
 # --- Exceptions ---
+
+
 class LLMPluginError(Exception):
     """Base class for LLM plugin exceptions."""
     pass
 
+
 class LLMConfigurationError(LLMPluginError):
     """Raised for configuration issues."""
     pass
+
 
 class LLMAPIError(LLMPluginError):
     """Raised for errors during API calls."""
     pass
 
 # --- Base Interface ---
+
+
 class BaseLLM(ABC):
     """Abstract base class for LLM integrations."""
 
@@ -84,12 +90,13 @@ class BaseLLM(ABC):
 
 class MockLLM(BaseLLM):
     """Mock LLM for testing and development without API costs."""
+
     def __init__(self, model_name="mock-model", **kwargs):
         self.model_name = model_name
-    
+
     def generate_text(self, prompt: str, **kwargs) -> str:
         return f"Mock response to: {prompt[:20]}..."
-    
+
     def generate_structured(self, prompt: str, response_schema: Any, tools: Optional[List[Any]] = None, **kwargs) -> Tuple[Any, Dict[str, Any]]:
         """Mock structured generation that attempts to return a dummy instance of the schema."""
         try:
@@ -105,16 +112,16 @@ class MockLLM(BaseLLM):
                     args = get_args(annotation)
 
                     if origin is Literal:
-                         init_data[name] = args[0]
+                        init_data[name] = args[0]
                     elif origin is list or origin is List:
-                         if args:
-                             inner_type = args[0]
-                             if hasattr(inner_type, "model_fields"):
-                                 init_data[name] = [mock_instance(inner_type)]
-                             else:
-                                 init_data[name] = ["MockItem"]
-                         else:
-                             init_data[name] = []
+                        if args:
+                            inner_type = args[0]
+                            if hasattr(inner_type, "model_fields"):
+                                init_data[name] = [mock_instance(inner_type)]
+                            else:
+                                init_data[name] = ["MockItem"]
+                        else:
+                            init_data[name] = []
                     elif annotation == str:
                         init_data[name] = "MockString"
                     elif annotation == int:
@@ -128,9 +135,9 @@ class MockLLM(BaseLLM):
                     elif annotation == bool:
                         init_data[name] = True
                     elif hasattr(annotation, "model_fields"):
-                         init_data[name] = mock_instance(annotation)
+                        init_data[name] = mock_instance(annotation)
                     else:
-                         init_data[name] = None
+                        init_data[name] = None
 
                 # Try to create
                 try:
@@ -151,10 +158,10 @@ class MockLLM(BaseLLM):
 
     def get_token_count(self, text: str) -> int:
         return len(text.split())
-    
+
     def get_model_name(self) -> str:
         return self.model_name
-    
+
     def get_context_length(self) -> int:
         return 2048
 
@@ -165,7 +172,7 @@ class GeminiLLM(BaseLLM):
     def __init__(self, api_key: str, model_name: str = "gemini-3-pro"):
         self.api_key = api_key
         self.model_name = model_name
-        self._genai = None # Lazy init
+        self._genai = None  # Lazy init
 
     @property
     def genai(self):
@@ -183,7 +190,7 @@ class GeminiLLM(BaseLLM):
 
     def generate_text(self, prompt: str, **kwargs) -> str:
         if self.genai == "MOCK":
-             return f"[Gemini Mock] Response to: {prompt[:30]}"
+            return f"[Gemini Mock] Response to: {prompt[:30]}"
 
         try:
             model = self.genai.GenerativeModel(self.model_name)
@@ -209,7 +216,7 @@ class GeminiLLM(BaseLLM):
             logger.info(f"Gemini Mock: generating structured {response_schema.__name__} (Thinking: {thinking_level})")
             if thought_signature:
                 logger.info(f"Gemini Mock: Resuming from thought signature: {thought_signature[:10]}...")
-            
+
             mock_delegate = MockLLM()
             return mock_delegate.generate_structured(prompt, response_schema, tools=tools)
 
@@ -219,7 +226,7 @@ class GeminiLLM(BaseLLM):
 
             generation_config = {
                 "response_mime_type": "application/json",
-                "response_schema": response_schema, 
+                "response_schema": response_schema,
                 "thinking_level": thinking_level
             }
 
@@ -260,7 +267,7 @@ class GeminiLLM(BaseLLM):
         return self.model_name
 
     def get_context_length(self) -> int:
-        return 1000000 # Gemini has huge context
+        return 1000000  # Gemini has huge context
 
 
 class OpenAILLM(BaseLLM):
@@ -305,7 +312,8 @@ class OpenAILLM(BaseLLM):
             response = self.openai.chat.completions.create(
                 model=self.model_name,
                 messages=[
-                    {"role": "system", "content": f"You must output JSON confirming to this schema: {json.dumps(json_schema)}"},
+                    {"role": "system",
+                        "content": f"You must output JSON confirming to this schema: {json.dumps(json_schema)}"},
                     {"role": "user", "content": prompt}
                 ],
                 response_format={"type": "json_object"},
@@ -313,7 +321,7 @@ class OpenAILLM(BaseLLM):
             )
             content = response.choices[0].message.content
             obj = response_schema.model_validate_json(content)
-            return obj, {"thought_signature": None} 
+            return obj, {"thought_signature": None}
         except Exception as e:
             raise LLMAPIError(f"OpenAI Structured Error: {e}")
 
@@ -355,9 +363,9 @@ class OpenAILLM(BaseLLM):
 class HuggingFaceLLM(BaseLLM):
     """Integration for Hugging Face models, supports local and API-based inference."""
 
-    def __init__(self, model_name: str = "google/flan-t5-base", use_pipeline: bool = True, api_key:str = None):
+    def __init__(self, model_name: str = "google/flan-t5-base", use_pipeline: bool = True, api_key: str = None):
         self.model_name = model_name
-        self.use_pipeline = use_pipeline 
+        self.use_pipeline = use_pipeline
         self._tokenizer = None
         self._model = None
         self._pipeline = None
@@ -408,7 +416,7 @@ class HuggingFaceLLM(BaseLLM):
                 result = self.pipeline(prompt, **kwargs)
                 return result[0]["generated_text"]
             else:
-                inputs = self.tokenizer(prompt, return_tensors="pt") 
+                inputs = self.tokenizer(prompt, return_tensors="pt")
                 outputs = self.model.generate(**inputs, **kwargs)
                 return self.tokenizer.decode(outputs[0], skip_special_tokens=True)
         except Exception as e:
@@ -483,7 +491,7 @@ class PromptTemplate:
     templates = {
         "qa": "Context: {context}\nQuestion: {question}\nAnswer:",
         "summarization": "Summarize the following:\n{input}",
-        "default": "{input}" 
+        "default": "{input}"
     }
 
     @classmethod
@@ -492,11 +500,12 @@ class PromptTemplate:
             template = cls.templates.get(template_name, cls.templates["default"])
             return template.format(**kwargs)
         except KeyError as e:
-             logger.exception(f"Missing key in kwargs for prompt formatting: {e}")
-             raise
+            logger.exception(f"Missing key in kwargs for prompt formatting: {e}")
+            raise
         except Exception as e:
             logger.exception(f"Error with prompt {e}")
             raise
+
 
 class CacheManager:
     """Caches API responses using a file-based cache."""
@@ -517,15 +526,15 @@ class CacheManager:
             try:
                 with open(cache_file, "r") as f:
                     data = json.load(f)
-                    if time.time() - data["timestamp"] < data.get("ttl", 86400): 
+                    if time.time() - data["timestamp"] < data.get("ttl", 86400):
                         logger.info(f"Cache hit: {key}")
                         return data["response"]
                     else:
                         logger.info(f"Cache expired: {key}")
-                        cache_file.unlink() 
+                        cache_file.unlink()
             except (FileNotFoundError, json.JSONDecodeError, KeyError) as e:
                 logger.warning(f"Error reading from cache: {e}. Deleting {cache_file}")
-                cache_file.unlink(missing_ok=True) 
+                cache_file.unlink(missing_ok=True)
         return None
 
     def set(self, prompt: str, model_name: str, response: str, ttl: int = 86400) -> None:
@@ -536,7 +545,7 @@ class CacheManager:
                 "prompt": prompt,
                 "response": response,
                 "timestamp": time.time(),
-                "ttl": ttl 
+                "ttl": ttl
             }
             with open(cache_file, "w") as f:
                 json.dump(data, f)
@@ -554,7 +563,7 @@ class LLMPlugin:
     def __init__(self, config_path: str = "config/llm_plugin.yaml", use_cache: bool = True, config: Optional[Dict[str, Any]] = None):
         """
         Initialize LLMPlugin.
-        
+
         Args:
             config_path: Path to YAML config file.
             use_cache: Whether to use caching.
@@ -564,7 +573,7 @@ class LLMPlugin:
             self.config = config
         else:
             self.config = self._load_internal_config(config_path)
-            
+
         self.cache = CacheManager() if use_cache else None
         self._validate_security_policies()
         self.llm = self._initialize_llm()
@@ -578,9 +587,9 @@ class LLMPlugin:
 
         # 1. HTTPS Enforcement
         if policies.get("enforce_https", True):
-             # This is a meta-check. Actual enforcement happens at the network layer,
-             # but we log the policy active state.
-             logger.info("SECURITY: HTTPS Enforcement Policy is ACTIVE.")
+            # This is a meta-check. Actual enforcement happens at the network layer,
+            # but we log the policy active state.
+            logger.info("SECURITY: HTTPS Enforcement Policy is ACTIVE.")
 
         # 2. PII Masking
         if policies.get("mask_pii", False):
@@ -630,17 +639,18 @@ class LLMPlugin:
         provider = self.config.get("provider", "huggingface").lower()
 
         if provider not in provider_map:
-             if provider == "mock":
-                 return MockLLM()
-             raise ValueError(f"Unsupported LLM provider: {provider}")
+            if provider == "mock":
+                return MockLLM()
+            raise ValueError(f"Unsupported LLM provider: {provider}")
 
         api_key_env_var = f"{provider.upper()}_API_KEY"
         api_key = os.getenv(api_key_env_var)
-        
+
         # Validation for keys
         if not api_key and provider not in ["huggingface", "mock", "gemini"]:
             # Gemini allows "MOCK" behavior internally without key, others might fail
-             raise LLMConfigurationError(f"API key for {provider} ({api_key_env_var}) not found in environment variables.")
+            raise LLMConfigurationError(
+                f"API key for {provider} ({api_key_env_var}) not found in environment variables.")
 
         # Get model name defaults
         default_model_name = "default-model"
@@ -659,11 +669,11 @@ class LLMPlugin:
 
         if provider == "huggingface":
             use_pipeline = self.config.get("huggingface_use_pipeline", True)
-            return HuggingFaceLLM(model_name=model_name, use_pipeline=use_pipeline, api_key=api_key) 
+            return HuggingFaceLLM(model_name=model_name, use_pipeline=use_pipeline, api_key=api_key)
         elif provider == "mock":
             return MockLLM(model_name=model_name)
         elif provider == "gemini":
-             # Pass "mock_key" if not present so init doesn't fail before mock logic triggers
+            # Pass "mock_key" if not present so init doesn't fail before mock logic triggers
             return GeminiLLM(api_key=api_key or "mock_key", model_name=model_name)
         else:
             return provider_map[provider](api_key=api_key, model_name=model_name)
@@ -685,7 +695,7 @@ class LLMPlugin:
                 return cached_response
 
         response = model.generate_text(formatted_prompt, **kwargs)
-        
+
         if self.cache:
             self.cache.set(formatted_prompt, model.get_model_name(), response)
 
@@ -710,7 +720,7 @@ class LLMPlugin:
     def get_model_name(self) -> str:
         """Returns the current LLM model name."""
         return self.llm.get_model_name()
-    
+
     def get_context_length(self) -> int:
         """Returns the context length of the current LLM model."""
         return self.llm.get_context_length()
@@ -723,7 +733,7 @@ class LLMPlugin:
                 try:
                     return self.llm.identify_intent_and_entities(query)
                 except NotImplementedError:
-                    pass # Fall through to fallback
+                    pass  # Fall through to fallback
 
             # Graceful Fallback: prompt engineering
             logger.info(f"Using generic fallback for intent identification with '{self.get_model_name()}'.")
@@ -732,12 +742,12 @@ class LLMPlugin:
                 f"Respond in JSON format with keys 'intent', 'entities' (dictionary), and 'confidence' (float)."
             )
             # Use default task for direct prompting to avoid recursion loop
-            response_text = self.generate_text(prompt, task="default") 
+            response_text = self.generate_text(prompt, task="default")
             try:
                 # Attempt to parse JSON from text (handles markdown code blocks if LLM adds them)
                 clean_text = response_text.replace("```json", "").replace("```", "").strip()
                 response_json = json.loads(clean_text)
-                
+
                 intent = response_json.get("intent", "unknown")
                 entities = response_json.get("entities", {})
                 confidence = float(response_json.get("confidence", 0.0))
@@ -752,12 +762,13 @@ class LLMPlugin:
             logger.error("LLM not initialized.")
             return "unknown", {}, 0.0
 
+
 # --- Test / Execution Block ---
 if __name__ == "__main__":
     try:
         # Test 1: HuggingFace via file config (simulated)
         dummy_config_content = {
-            "provider": "huggingface", 
+            "provider": "huggingface",
             "huggingface_model_name": "google/flan-t5-base",
             "huggingface_use_pipeline": True
         }
@@ -766,18 +777,18 @@ if __name__ == "__main__":
             os.makedirs("config")
         with open("config/llm_plugin.yaml", "w") as f:
             yaml.dump(dummy_config_content, f)
-        
+
         print("--- Testing HuggingFace (Simulated Config File) ---")
         plugin = LLMPlugin(config_path="config/llm_plugin.yaml")
 
         prompt = "What is the capital of France?"
-        generated_text = plugin.generate_text(prompt, max_length=50) # HuggingFace uses max_length
+        generated_text = plugin.generate_text(prompt, max_length=50)  # HuggingFace uses max_length
         print(f"Generated text for '{prompt}': {generated_text}")
 
         summarization_prompt = "Artificial intelligence is transforming many industries. Large language models are a key component of this transformation."
         summary = plugin.generate_text(summarization_prompt, task="summarization", max_length=50)
         print(f"Summary: {summary}")
-        
+
         token_count = plugin.get_token_count(prompt)
         print(f"Token count for '{prompt}': {token_count}")
         print(f"Context Length: {plugin.get_context_length()}")
@@ -791,10 +802,10 @@ if __name__ == "__main__":
         mock_plugin = LLMPlugin(config=mock_config, use_cache=False)
         print(f"Model Name: {mock_plugin.get_model_name()}")
         print(f"Mock Response: {mock_plugin.generate_text('Hello mock world')}")
-        
+
         # Test 3: Intent Identification Fallback
         print("\n--- Testing Intent Identification Fallback ---")
-        # Note: MockLLM text generation will likely fail the JSON parse, 
+        # Note: MockLLM text generation will likely fail the JSON parse,
         # checking graceful handling of the JSON error.
         intent, entities, conf = mock_plugin.identify_intent_and_entities("Book a flight to NY")
         print(f"Intent (Mock/Fallback): {intent}, Entities: {entities}, Conf: {conf}")

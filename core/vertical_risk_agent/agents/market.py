@@ -1,10 +1,12 @@
 from typing import Dict, Any
 from ..state import VerticalRiskGraphState
 
+
 class MarketAgent:
     """
     Specialized in web search and competitor analysis.
     """
+
     def __init__(self, model):
         self.model = model
 

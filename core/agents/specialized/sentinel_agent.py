@@ -5,11 +5,13 @@ from core.v23_graph_engine.odyssey_knowledge_graph import OdysseyKnowledgeGraph
 
 logger = logging.getLogger(__name__)
 
+
 class SentinelAgent(AgentBase):
     """
     The Data Integrity Guardian.
     Responsibility: Ingestion, Extraction, Validation against FIBO Schema.
     """
+
     def __init__(self, config: Dict[str, Any], kernel: Optional[Any] = None, graph: Optional[OdysseyKnowledgeGraph] = None):
         super().__init__(config, kernel=kernel)
         self.graph = graph or OdysseyKnowledgeGraph()

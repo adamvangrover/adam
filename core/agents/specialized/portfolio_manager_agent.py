@@ -5,11 +5,13 @@ from core.schemas.v23_5_schema import StrategicSynthesis, FinalVerdict
 
 logger = logging.getLogger(__name__)
 
+
 class PortfolioManagerAgent(AgentBase):
     """
     Phase 5: Synthesis & Conviction.
     The 'Conviction Engine' that weighs all previous phases.
     """
+
     def __init__(self, config: Dict[str, Any]):
         super().__init__(config)
         self.persona = "CIO"
@@ -23,7 +25,7 @@ class PortfolioManagerAgent(AgentBase):
         # In production, this would implement a weighted scoring algorithm
         # based on the outputs of the other agents.
 
-        equity_bullish = True # Simplified
+        equity_bullish = True  # Simplified
         credit_stable = True
 
         conviction = 8
@@ -34,10 +36,12 @@ class PortfolioManagerAgent(AgentBase):
             rec = "Hold"
 
         # Normalize recommendation to new schema
-        if rec == "Long": rec = "Buy"
-        if rec == "Short": rec = "Sell"
+        if rec == "Long":
+            rec = "Buy"
+        if rec == "Short":
+            rec = "Sell"
         if rec not in ["Strong Buy", "Buy", "Hold", "Sell", "Strong Sell"]:
-             rec = "Hold"
+            rec = "Hold"
 
         return StrategicSynthesis(
             m_and_a_posture="Neutral",

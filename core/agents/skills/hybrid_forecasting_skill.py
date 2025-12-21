@@ -8,6 +8,7 @@ import pandas as pd
 # capabilities of the system. Agents can use this skill to generate
 # robust time-series forecasts.
 
+
 class HybridForecastingSkill:
     """
     A Semantic Kernel skill for hybrid time-series forecasting.

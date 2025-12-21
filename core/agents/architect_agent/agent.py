@@ -1,11 +1,13 @@
 import os
 from openai import OpenAI
 
+
 class ArchitectAgent:
     """
     The Architect Agent is responsible for maintaining, optimizing, and evolving
     the system infrastructure and reasoning logic.
     """
+
     def __init__(self):
         with open("core/agents/architect_agent/prompts/system_prompt.txt", "r") as f:
             self.system_prompt = f.read()
@@ -31,6 +33,7 @@ class ArchitectAgent:
         )
 
         print(completion.choices[0].message.content)
+
 
 if __name__ == "__main__":
     # This agent will now raise a ValueError if the OPENAI_API_KEY is not set.

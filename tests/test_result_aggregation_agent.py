@@ -4,6 +4,7 @@ import unittest
 from core.agents.result_aggregation_agent import ResultAggregationAgent
 from core.system.error_handler import AdamError
 
+
 class TestResultAggregationAgent(unittest.TestCase):
 
     def setUp(self):
@@ -30,6 +31,7 @@ class TestResultAggregationAgent(unittest.TestCase):
     def test_execute_mixed_types(self):
         result = self.agent.execute(["Result 1", 123, {"key": "value"}])
         self.assertEqual(result, "Result 1\n123\n{'key': 'value'}")
+
 
 if __name__ == '__main__':
     unittest.main()

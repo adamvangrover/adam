@@ -1,6 +1,7 @@
 import talib
 import numpy as np
 
+
 def sma_crossover_strategy(data, short_window=40, long_window=100):
     """
     Generates trading signals based on a simple moving average (SMA) crossover strategy.
@@ -21,7 +22,8 @@ def sma_crossover_strategy(data, short_window=40, long_window=100):
 
     # Generate trading signals
     signals['signal'] = 0.0
-    signals['signal'][short_window:] = np.where(signals['short_mavg'][short_window:] > signals['long_mavg'][short_window:], 1.0, 0.0)
+    signals['signal'][short_window:] = np.where(
+        signals['short_mavg'][short_window:] > signals['long_mavg'][short_window:], 1.0, 0.0)
 
     # Generate trading positions
     signals['position'] = signals['signal'].diff()

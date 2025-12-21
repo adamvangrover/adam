@@ -20,6 +20,7 @@ import requests
 import json
 import os
 
+
 class MCPRegistry:
     """
     Registry for FO Super-App MCP tools.
@@ -32,7 +33,7 @@ class MCPRegistry:
         self.execution = ExecutionRouter(mode="simulated")
         self.risk = RiskEngine()
         self.strategy = StrategyManager()
-        self.memory = MemoryEngine() # Persists to data/personal_memory.db
+        self.memory = MemoryEngine()  # Persists to data/personal_memory.db
         self.fo_service = FamilyOfficeService()
 
         # New Neuro-Symbolic Tools
@@ -103,7 +104,7 @@ class MCPRegistry:
 
             return {
                 "url": url,
-                "content": clean_text[:10000], # Truncate for now
+                "content": clean_text[:10000],  # Truncate for now
                 "metadata": metadata,
                 "conviction": conviction,
                 "status": "Verified"
@@ -122,7 +123,8 @@ class MCPRegistry:
     def run_wacc(self, market_cap: float, total_debt: float, cost_of_equity: float, cost_of_debt: float, tax_rate: float) -> Dict[str, Any]:
         """Runs the Financial Engineering Engine WACC."""
         try:
-            val = FinancialEngineeringEngine.calculate_wacc(market_cap, total_debt, cost_of_equity, cost_of_debt, tax_rate)
+            val = FinancialEngineeringEngine.calculate_wacc(
+                market_cap, total_debt, cost_of_equity, cost_of_debt, tax_rate)
             return {"wacc": val}
         except Exception as e:
             return {"error": f"WACC Calculation failed: {e}"}
@@ -161,13 +163,13 @@ class MCPRegistry:
             "microsoft_fabric_run_sql": self.lakehouse.get_schema(),
             "financial_engineering_dcf": {
                 "name": "financial_engineering_dcf",
-                 "parameters": {
-                     "type": "object",
-                     "properties": {
-                         "free_cash_flows": {"type": "array"},
-                         "discount_rate": {"type": "number"},
-                         "terminal_value": {"type": "number"}
-                     }
-                 }
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "free_cash_flows": {"type": "array"},
+                        "discount_rate": {"type": "number"},
+                        "terminal_value": {"type": "number"}
+                    }
+                }
             }
         }

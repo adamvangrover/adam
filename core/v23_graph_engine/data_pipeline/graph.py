@@ -4,12 +4,13 @@ from .state import DataIngestionState
 import json
 import os
 
+
 def ingest_file(state: DataIngestionState) -> DataIngestionState:
     file_path = state["file_path"]
     if not os.path.exists(file_path):
-         state["pipeline_status"] = "failed"
-         state["error_message"] = f"File not found: {file_path}"
-         return state
+        state["pipeline_status"] = "failed"
+        state["error_message"] = f"File not found: {file_path}"
+        return state
 
     # Check extension
     _, ext = os.path.splitext(file_path)
@@ -28,6 +29,7 @@ def ingest_file(state: DataIngestionState) -> DataIngestionState:
 
     return state
 
+
 def process_file(state: DataIngestionState) -> DataIngestionState:
     if state.get("pipeline_status") == "failed":
         return state
@@ -36,17 +38,18 @@ def process_file(state: DataIngestionState) -> DataIngestionState:
     try:
         # Simple JSON parsing
         if state["file_path"].endswith(".json"):
-             data = json.loads(raw)
-             state["cleaned_content"] = data
-             state["artifact_type"] = data.get("type", "unknown")
+            data = json.loads(raw)
+            state["cleaned_content"] = data
+            state["artifact_type"] = data.get("type", "unknown")
         else:
-             state["cleaned_content"] = raw
-             state["artifact_type"] = "text"
+            state["cleaned_content"] = raw
+            state["artifact_type"] = "text"
     except json.JSONDecodeError:
         state["pipeline_status"] = "failed"
         state["error_message"] = "Invalid JSON"
 
     return state
+
 
 def verify_artifact(state: DataIngestionState) -> DataIngestionState:
     if state.get("pipeline_status") == "failed":
@@ -63,6 +66,7 @@ def verify_artifact(state: DataIngestionState) -> DataIngestionState:
     state["verification_status"] = "verified"
     return state
 
+
 def format_artifact(state: DataIngestionState) -> DataIngestionState:
     if state.get("pipeline_status") == "failed":
         return state
@@ -70,6 +74,7 @@ def format_artifact(state: DataIngestionState) -> DataIngestionState:
     state["formatted_artifact"] = state["cleaned_content"]
     state["pipeline_status"] = "success"
     return state
+
 
 def create_sequential_data_pipeline():
     workflow = StateGraph(DataIngestionState)

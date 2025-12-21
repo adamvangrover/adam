@@ -4,6 +4,7 @@ from typing import Any, Dict
 
 from core.agents.agent_base import AgentBase
 
+
 class NarrativeSummarizationAgent(AgentBase):
     """
     This agent functions as the system's dedicated writer, editor, and communicator.

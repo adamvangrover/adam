@@ -1,3 +1,5 @@
+from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner
+from core.engine.meta_orchestrator import MetaOrchestrator
 import unittest
 import asyncio
 from unittest.mock import MagicMock, patch
@@ -13,19 +15,20 @@ for mod in ["neo4j", "tensorflow", "torch", "transformers", "spacy", "pandas", "
             "semantic_kernel.connectors.ai.open_ai", "pika", "redis", "boto3", "google.cloud", "tiktoken",
             "textblob", "shap", "lime", "dowhy", "matplotlib", "seaborn", "matplotlib.pyplot",
             "tweepy", "scipy", "scipy.stats", "sklearn", "sklearn.ensemble", "sklearn.model_selection", "sklearn.metrics",
-             "ta", "talib", "bs4", "reportlab", "reportlab.lib.pagesizes", "reportlab.pdfgen", "fpdf",
-             "aiohttp", "feedparser", "mesa", "psycopg2", "rdflib", "prometheus_client", "flask", "flask_socketio",
-             "langchain.utilities", "langchain_community", "langchain_community.utilities"]:
+            "ta", "talib", "bs4", "reportlab", "reportlab.lib.pagesizes", "reportlab.pdfgen", "fpdf",
+            "aiohttp", "feedparser", "mesa", "psycopg2", "rdflib", "prometheus_client", "flask", "flask_socketio",
+            "langchain.utilities", "langchain_community", "langchain_community.utilities"]:
     sys.modules[mod] = MagicMock()
 
-from core.engine.meta_orchestrator import MetaOrchestrator
-from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner
 # from core.engine.states import GraphState, PlanOnGraph # Imports might trigger dependencies, relying on mocks inside classes
 
 # Helper for async mocks
+
+
 class AsyncMock(MagicMock):
     async def __call__(self, *args, **kwargs):
         return super(AsyncMock, self).__call__(*args, **kwargs)
+
 
 class TestV23Architect(unittest.TestCase):
     def setUp(self):
@@ -54,7 +57,7 @@ class TestV23Architect(unittest.TestCase):
                 plan = planner.discover_plan("StartNode", "EndNode")
 
             self.assertIsNotNone(plan)
-            self.assertEqual(len(plan["steps"]), 2) # 2 edges
+            self.assertEqual(len(plan["steps"]), 2)  # 2 edges
             self.assertIn("MATCH path =", plan["symbolic_plan"])
 
     def test_meta_orchestrator_routing_high(self):
@@ -86,6 +89,7 @@ class TestV23Architect(unittest.TestCase):
                 mock_reflect.assert_called()
 
         asyncio.run(run_test())
+
 
 if __name__ == '__main__':
     unittest.main()
