@@ -5,6 +5,7 @@ from typing import Dict, Any, List, Optional
 
 logger = logging.getLogger(__name__)
 
+
 class UnifiedKnowledgeGraph:
     """
     The central brain of the system.
@@ -13,6 +14,7 @@ class UnifiedKnowledgeGraph:
     2. System Entities (Agents, Tools - via RepoGraph)
     3. Memory Artifacts (Past Analysis)
     """
+
     def __init__(self):
         self.graph = nx.DiGraph()
 
@@ -27,7 +29,8 @@ class UnifiedKnowledgeGraph:
         """Ingests financial entities."""
         for company in companies:
             node_id = company.get("symbol") or company.get("company_id")
-            if not node_id: continue
+            if not node_id:
+                continue
 
             self.graph.add_node(
                 node_id,
@@ -72,7 +75,7 @@ class UnifiedKnowledgeGraph:
             entity_id,
             type="LegalEntity",
             ticker=ticker,
-            label=ticker # For display
+            label=ticker  # For display
         )
 
         # 2. Financial Report (Snapshot)
@@ -126,7 +129,7 @@ class UnifiedKnowledgeGraph:
         # 4. Risk Model Output
         if risk_state.get("draft_memo"):
             memo = risk_state["draft_memo"]
-            model_id = f"RiskModel::{ticker}::{self.graph.number_of_nodes()}" # Unique ID
+            model_id = f"RiskModel::{ticker}::{self.graph.number_of_nodes()}"  # Unique ID
             self.graph.add_node(
                 model_id,
                 type="RiskModel",
@@ -168,11 +171,11 @@ class UnifiedKnowledgeGraph:
         # Link to Entity if provided
         entity_id = event.get("entity_id") or event.get("ticker")
         if entity_id:
-             # Auto-create entity node if missing to ensure linkage
-             if not self.graph.has_node(entity_id):
-                 self.graph.add_node(entity_id, type="LegalEntity")
+            # Auto-create entity node if missing to ensure linkage
+            if not self.graph.has_node(entity_id):
+                self.graph.add_node(entity_id, type="LegalEntity")
 
-             self.graph.add_edge(entity_id, event_id, relation="HAS_COMPLIANCE_EVENT")
+            self.graph.add_edge(entity_id, event_id, relation="HAS_COMPLIANCE_EVENT")
 
         logger.info(f"Ingested Compliance Event: {event_id}")
 

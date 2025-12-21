@@ -7,6 +7,7 @@ from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
+
 class Sec13FHandler:
     """
     Handles fetching and parsing of SEC 13F filings to track institutional holdings.
@@ -18,7 +19,7 @@ class Sec13FHandler:
         }
         # Mock data for demonstration purposes (Q3 2025 context)
         self.mock_data = {
-            "0001067983": { # Berkshire Hathaway
+            "0001067983": {  # Berkshire Hathaway
                 "2025-Q3": [
                     {"ticker": "AAPL", "value": 80000000000, "shares": 350000000, "action": "REDUCE"},
                     {"ticker": "GOOGL", "value": 4300000000, "shares": 17850000, "action": "NEW"},
@@ -28,7 +29,7 @@ class Sec13FHandler:
                     {"ticker": "AAPL", "value": 140000000000, "shares": 600000000, "action": "HOLD"}
                 ]
             },
-            "0001037389": { # Renaissance Technologies
+            "0001037389": {  # Renaissance Technologies
                 "2025-Q3": [
                     {"ticker": "PLTR", "value": 0, "shares": 0, "action": "EXIT"},
                     {"ticker": "GOOGL", "value": 633000000, "shares": 3500000, "action": "ADD"},
@@ -96,7 +97,7 @@ class Sec13FHandler:
                 rows.append({
                     "issuer": issuer,
                     "cusip": cusip,
-                    "value": float(value) * 1000 if value else 0, # Usually in thousands
+                    "value": float(value) * 1000 if value else 0,  # Usually in thousands
                     "shares": float(shares) if shares else 0
                 })
 
@@ -132,7 +133,8 @@ class Sec13FHandler:
         merged['shares_curr'] = merged['shares_curr'].fillna(0)
         merged['shares_prev'] = merged['shares_prev'].fillna(0)
         merged['share_change'] = merged['shares_curr'] - merged['shares_prev']
-        merged['pct_change'] = (merged['share_change'] / merged['shares_prev']).replace([float('inf'), -float('inf')], 0).fillna(0)
+        merged['pct_change'] = (merged['share_change'] / merged['shares_prev']
+                                ).replace([float('inf'), -float('inf')], 0).fillna(0)
 
         def determine_action(row):
             if row['shares_prev'] == 0 and row['shares_curr'] > 0:

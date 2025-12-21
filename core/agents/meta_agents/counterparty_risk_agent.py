@@ -4,6 +4,7 @@ from typing import Any, Dict
 
 from core.agents.agent_base import AgentBase
 
+
 class CounterpartyRiskAgent(AgentBase):
     """
     For clients engaging in derivative transactions (e.g., interest rate swaps,

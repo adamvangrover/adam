@@ -11,6 +11,7 @@ from jinja2 import Template
 # Define a generic type for the output schema
 OutputT = TypeVar("OutputT", bound=BaseModel)
 
+
 class PromptMetadata(BaseModel):
     """Metadata for tracking prompt lineage and configuration."""
     model_config = ConfigDict(populate_by_name=True)
@@ -24,6 +25,7 @@ class PromptMetadata(BaseModel):
         alias="model_config"
     )
     tags: List[str] = []
+
 
 class BasePromptPlugin(ABC, Generic[OutputT]):
     """

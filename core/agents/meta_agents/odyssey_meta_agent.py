@@ -4,11 +4,13 @@ from core.agents.agent_base import AgentBase
 
 logger = logging.getLogger(__name__)
 
+
 class OdysseyMetaAgent(AgentBase):
     """
     Strategic Synthesis Agent.
     Aggregates inputs from Sentinel, CreditSentry, Argus, etc. to produce final XML decision.
     """
+
     def __init__(self, config: Dict[str, Any], kernel: Optional[Any] = None):
         super().__init__(config, kernel=kernel)
 

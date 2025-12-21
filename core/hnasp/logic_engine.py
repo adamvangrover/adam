@@ -3,6 +3,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class LogicEngine:
     def __init__(self):
         pass
@@ -83,8 +84,8 @@ class LogicEngine:
                 return args[1]
             return args[2] if len(args) > 2 else None
         else:
-             # Unknown operator
-             return None
+            # Unknown operator
+            return None
 
     def validate_rule(self, rule: Dict[str, Any], data: Dict[str, Any]) -> Any:
         """

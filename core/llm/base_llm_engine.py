@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+
 class BaseLLMEngine(ABC):
     @abstractmethod
     async def generate_response(self, prompt: str, context: str = None) -> str:

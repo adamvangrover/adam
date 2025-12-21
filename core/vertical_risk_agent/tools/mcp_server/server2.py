@@ -1,5 +1,6 @@
 try:
-    from mcp.server.fastmcp import FastMCP
+from core.vertical_risk_agent.tools.agent_tools import AgentTools, FinancialRatio
+from mcp.server.fastmcp import FastMCP
 except ImportError:
     # Fallback for environments without MCP installed
     class FastMCP:
@@ -16,13 +17,13 @@ from typing import List
 # Ensure core is importable
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../..")))
 
-from core.vertical_risk_agent.tools.agent_tools import AgentTools, FinancialRatio
 
 # Initialize Tools
 agent_tools = AgentTools()
 
 # Initialize the MCP Server
 mcp = FastMCP("Financial Data Room")
+
 
 @mcp.resource("finance://{ticker}/{year}/10k")
 def get_10k_filing(ticker: str, year: str) -> str:
@@ -31,6 +32,7 @@ def get_10k_filing(ticker: str, year: str) -> str:
     Resource URI: finance://AAPL/2023/10k
     """
     return agent_tools.get_10k_filing(ticker, year)
+
 
 @mcp.resource("finance://{ticker}/ratios")
 def get_financial_ratios(ticker: str) -> str:
@@ -42,6 +44,7 @@ def get_financial_ratios(ticker: str) -> str:
     # Convert list of models to string for simple MCP consumption
     return "\n".join([f"{r.name},{r.value}" for r in ratios])
 
+
 @mcp.tool()
 def query_sql(query: str) -> str:
     """
@@ -50,12 +53,14 @@ def query_sql(query: str) -> str:
     """
     return agent_tools.query_sql(query)
 
+
 @mcp.tool()
 def get_covenant_definitions(doc_id: str) -> str:
     """
     Retrieves the legal definitions of financial covenants from a specific credit agreement.
     """
     return agent_tools.get_covenant_definitions(doc_id)
+
 
 @mcp.tool()
 def simulate_quantum_merton_model(asset_value: float, debt: float, volatility: float, horizon: float) -> str:
@@ -65,6 +70,7 @@ def simulate_quantum_merton_model(asset_value: float, debt: float, volatility: f
     """
     result = agent_tools.simulate_quantum_merton_model(asset_value, debt, volatility, horizon)
     return str(result)
+
 
 @mcp.tool()
 def generate_stress_scenarios(regime: str = "stress", n_samples: int = 5) -> str:
@@ -76,6 +82,7 @@ def generate_stress_scenarios(regime: str = "stress", n_samples: int = 5) -> str
     if isinstance(result, list):
         return "\n".join([str(s) for s in result])
     return str(result)
+
 
 @mcp.tool()
 async def run_deep_dive_analysis(query: str) -> str:

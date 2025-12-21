@@ -1,10 +1,11 @@
-#core/agents/supply_chain_risk_agent.py
+# core/agents/supply_chain_risk_agent.py
 
 import requests
 import logging
 from bs4 import BeautifulSoup
 import folium
 from geopy.geocoders import Nominatim
+
 
 class SupplyChainRiskAgent:
     def __init__(self, news_api_key, supplier_data, transportation_routes, geopolitical_data, web_scraping_urls=None):
@@ -178,6 +179,7 @@ class SupplyChainRiskAgent:
             else:
                 self.logger.info(f"\nNo {risk_type.replace('_', ' ')} detected.")
 
+
 if __name__ == "__main__":
     # Example of usage
     API_KEY = 'YOUR_NEWS_API_KEY'  # Replace with your NewsAPI key
@@ -197,7 +199,7 @@ if __name__ == "__main__":
         'https://www.example.com/supply-chain-news',  # Replace with actual URLs to scrape data
         'https://www.example.com/transportation-issues'
     ]
-    
+
     # Instantiate the Supply Chain Risk Agent
     agent = SupplyChainRiskAgent(
         news_api_key=API_KEY,

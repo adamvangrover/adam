@@ -8,6 +8,7 @@ from core.agents.agent_base import AgentBase
 # from core.tools.ocr_tool import OCREngine
 # from core.utils.parsing_utils import FinancialDataParser
 
+
 class FinancialDocumentAgent(AgentBase):
     """
     The Financial Document Agent is designed to eliminate one of the most time-consuming

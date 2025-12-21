@@ -4,6 +4,7 @@ from typing import Any, Dict
 
 from core.agents.agent_base import AgentBase
 
+
 class ComplianceKYCAgent(AgentBase):
     """
     Operating as a critical gatekeeper for regulatory adherence, the Compliance & KYC

@@ -1,4 +1,4 @@
-#core/utils/data_utils.py
+# core/utils/data_utils.py
 
 import re
 import json
@@ -11,7 +11,7 @@ except ImportError:
     pika = None
 import csv
 import logging
-import yaml #if needed
+import yaml  # if needed
 from pathlib import Path
 from typing import Dict, Any, Optional, Union, List
 from core.system.error_handler import FileReadError, InvalidInputError, DataNotFoundError
@@ -80,7 +80,7 @@ def clean_numerical_data(data):
     """
     # Handle missing values (replace with mean, median, etc.)
     # Identify and handle outliers (e.g., remove, transform)
-    #... (Implementation for cleaning numerical data)
+    # ... (Implementation for cleaning numerical data)
     return data  # Placeholder for actual implementation
 
 
@@ -97,7 +97,7 @@ def clean_time_series_data(data):
     # Handle missing values (interpolation, forward/backward fill, etc.)
     # Smooth the data (moving average, exponential smoothing, etc.)
     # Detrend the data (differencing, time series decomposition, etc.)
-    #... (Implementation for cleaning time series data)
+    # ... (Implementation for cleaning time series data)
     return data  # Placeholder for actual implementation
 
 
@@ -123,7 +123,7 @@ def validate_data(data, data_type, constraints):
         # Check if data matches a specific pattern (e.g., email format)
         if "pattern" in constraints and not re.match(constraints["pattern"], data):
             return False
-    #... (Add more validation checks for other data types)
+    # ... (Add more validation checks for other data types)
     return True
 
 
@@ -283,7 +283,7 @@ def load_data(source_config: Dict[str, Any], cache: bool = True) -> Optional[Uni
                 if cache:
                     _data_cache[cache_key] = data
                 return data
-        elif data_type == 'yaml': #Adding yaml
+        elif data_type == 'yaml':  # Adding yaml
             with file_path.open('r') as f:
                 data = yaml.safe_load(f)
                 if cache:
@@ -296,9 +296,10 @@ def load_data(source_config: Dict[str, Any], cache: bool = True) -> Optional[Uni
     except (json.JSONDecodeError, FileNotFoundError, IOError, yaml.YAMLError) as e:
         logging.exception(f"Error loading data from {file_path}: {e}")
         raise FileReadError(str(file_path), str(e)) from e
-    except Exception as e: #catch any unexpected errors
+    except Exception as e:  # catch any unexpected errors
         logging.exception(f"Unexpected error loading data from {file_path}: {e}")
         raise FileReadError(str(file_path), str(e)) from e
+
 
 def _get_api_placeholder_data(source_config: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
@@ -307,7 +308,7 @@ def _get_api_placeholder_data(source_config: Dict[str, Any]) -> Optional[Dict[st
     This function simulates the responses you might get from different API providers.
     """
     provider = source_config.get("provider")
-    #TODO: Include a comprehensive list of all possible data requests, and appropriate formatting to ensure correct responses.
+    # TODO: Include a comprehensive list of all possible data requests, and appropriate formatting to ensure correct responses.
     if provider == "example_financial_data_api":  # Replace with a real provider name
         # Simulate fetching financial statements
         return {
@@ -324,15 +325,14 @@ def _get_api_placeholder_data(source_config: Dict[str, Any]) -> Optional[Dict[st
             }
         }
     elif provider == "example_market_data_api":
-          return{
-             "market_trends":[
-                {"sector": "healthcare", "trend": "neutral"},
+        return {
+            "market_trends": [
+               {"sector": "healthcare", "trend": "neutral"},
                 {"sector": "energy", "trend": "downward"}
-              ]
-          }
+            ]
+        }
 
     # Add more providers and data as needed
     else:
         logging.warning(f"Unknown API provider: {provider}")
         return None
-

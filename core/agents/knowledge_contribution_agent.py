@@ -5,6 +5,7 @@ from core.llm.base_llm_engine import BaseLLMEngine
 from typing import Any, Dict
 import json
 
+
 class KnowledgeContributionAgent(AgentBase):
     """
     An agent that extracts key findings from a report and formats them as structured data.

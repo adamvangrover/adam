@@ -1,25 +1,26 @@
 # core/agents/snc_analyst_agent.py
+from semantic_kernel import Kernel
+from unittest.mock import patch
+import json
+from core.agents.agent_base import AgentBase
+from typing import Dict, Any, Optional, Tuple
+from enum import Enum
+import asyncio
+import os  # For os.path.exists and os.remove
+import logging
 import sys
 import os
 # Add the project root to sys.path to allow imports like 'from core...'
 # when running this script directly for its __main__ block.
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..')) # core/agents/snc_analyst_agent.py -> core/agents -> core -> /app
+# core/agents/snc_analyst_agent.py -> core/agents -> core -> /app
+PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..'))
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-import logging
-import json 
-import os # For os.path.exists and os.remove
-import asyncio
-from enum import Enum
-from typing import Dict, Any, Optional, Tuple
-from unittest.mock import patch 
-
-from core.agents.agent_base import AgentBase
-from semantic_kernel import Kernel 
 
 # Note: Initial basicConfig is removed as it will be handled in __main__
+
 
 class SNCRating(Enum):
     PASS = "Pass"
@@ -27,6 +28,7 @@ class SNCRating(Enum):
     SUBSTANDARD = "Substandard"
     DOUBTFUL = "Doubtful"
     LOSS = "Loss"
+
 
 class SNCAnalystAgent(AgentBase):
     """
@@ -38,13 +40,15 @@ class SNCAnalystAgent(AgentBase):
     def __init__(self, config: Dict[str, Any], kernel: Optional[Kernel] = None):
         super().__init__(config, kernel)
         self.persona = self.config.get('persona', "SNC Analyst Examiner")
-        self.description = self.config.get('description', "Analyzes Shared National Credits based on regulatory guidelines by retrieving data via A2A and using Semantic Kernel skills.")
-        self.expertise = self.config.get('expertise', ["SNC analysis", "regulatory compliance", "credit risk assessment"])
+        self.description = self.config.get(
+            'description', "Analyzes Shared National Credits based on regulatory guidelines by retrieving data via A2A and using Semantic Kernel skills.")
+        self.expertise = self.config.get(
+            'expertise', ["SNC analysis", "regulatory compliance", "credit risk assessment"])
 
         self.comptrollers_handbook_snc = self.config.get('comptrollers_handbook_SNC', {})
         if not self.comptrollers_handbook_snc:
             logging.warning("Comptroller's Handbook SNC guidelines not found in agent configuration.")
-        
+
         self.occ_guidelines_snc = self.config.get('occ_guidelines_SNC', {})
         if not self.occ_guidelines_snc:
             logging.warning("OCC Guidelines SNC not found in agent configuration.")
@@ -63,7 +67,7 @@ class SNCAnalystAgent(AgentBase):
             error_msg = "DataRetrievalAgent not found in peer agents for snc_analyst_agent."
             logging.error(error_msg)
             return None, error_msg
-        
+
         dra_request = {'data_type': 'get_company_financials', 'company_id': company_id}
         logging.debug(f"SNC_ANALYSIS_A2A_REQUEST: Requesting data from DataRetrievalAgent: {dra_request}")
         company_data_package = await self.send_message('DataRetrievalAgent', dra_request)
@@ -80,30 +84,32 @@ class SNCAnalystAgent(AgentBase):
         industry_data_context = company_data_package.get('industry_data_context', {})
         economic_data_context = company_data_package.get('economic_data_context', {})
         collateral_and_debt_details = company_data_package.get('collateral_and_debt_details', {})
-        
+
         logging.debug(f"SNC_ANALYSIS_DATA_EXTRACTED: CompanyInfo: {list(company_info.keys())}, FinancialDetailed: {list(financial_data_detailed.keys())}, Qualitative: {list(qualitative_company_info.keys())}, Industry: {list(industry_data_context.keys())}, Economic: {list(economic_data_context.keys())}, Collateral: {list(collateral_and_debt_details.keys())}")
 
         financial_analysis_inputs_for_sk = self._prepare_financial_inputs_for_sk(financial_data_detailed)
         qualitative_analysis_inputs_for_sk = self._prepare_qualitative_inputs_for_sk(qualitative_company_info)
-        
-        financial_analysis_result = self._perform_financial_analysis(financial_data_detailed, financial_analysis_inputs_for_sk)
+
+        financial_analysis_result = self._perform_financial_analysis(
+            financial_data_detailed, financial_analysis_inputs_for_sk)
         qualitative_analysis_result = self._perform_qualitative_analysis(
-            company_info.get('name', company_id), 
-            qualitative_company_info, 
-            industry_data_context, 
+            company_info.get('name', company_id),
+            qualitative_company_info,
+            industry_data_context,
             economic_data_context,
-            qualitative_analysis_inputs_for_sk 
+            qualitative_analysis_inputs_for_sk
         )
         credit_risk_mitigation_info = self._evaluate_credit_risk_mitigation(collateral_and_debt_details)
-        
-        rating, rationale = await self._determine_rating( 
-            company_info.get('name', company_id), 
-            financial_analysis_result, 
-            qualitative_analysis_result, 
-            credit_risk_mitigation_info, 
+
+        rating, rationale = await self._determine_rating(
+            company_info.get('name', company_id),
+            financial_analysis_result,
+            qualitative_analysis_result,
+            credit_risk_mitigation_info,
             economic_data_context
         )
-        logging.debug(f"SNC_ANALYSIS_EXECUTE_OUTPUT: Rating='{rating.value if rating else 'N/A'}', Rationale='{rationale}'")
+        logging.debug(
+            f"SNC_ANALYSIS_EXECUTE_OUTPUT: Rating='{rating.value if rating else 'N/A'}', Rationale='{rationale}'")
         return rating, rationale
 
     def _prepare_financial_inputs_for_sk(self, financial_data_detailed: Dict[str, Any]) -> Dict[str, str]:
@@ -111,16 +117,16 @@ class SNCAnalystAgent(AgentBase):
         cash_flow_statement = financial_data_detailed.get("cash_flow_statement", {})
         key_ratios = financial_data_detailed.get("key_ratios", {})
         market_data = financial_data_detailed.get("market_data", {})
-        dcf_assumptions = financial_data_detailed.get("dcf_assumptions", {}) 
+        dcf_assumptions = financial_data_detailed.get("dcf_assumptions", {})
 
         return {
             "historical_fcf_str": str(cash_flow_statement.get('free_cash_flow', ["N/A"])),
             "historical_cfo_str": str(cash_flow_statement.get('cash_flow_from_operations', ["N/A"])),
-            "annual_debt_service_str": str(market_data.get("annual_debt_service_placeholder", "Not Available")), 
+            "annual_debt_service_str": str(market_data.get("annual_debt_service_placeholder", "Not Available")),
             "ratios_summary_str": json.dumps(key_ratios) if key_ratios else "Not available",
-            "projected_fcf_str": str(dcf_assumptions.get("projected_fcf_placeholder", "Not Available")), 
-            "payment_history_status_str": str(market_data.get("payment_history_placeholder", "Current")), 
-            "interest_capitalization_status_str": str(market_data.get("interest_capitalization_placeholder", "No")) 
+            "projected_fcf_str": str(dcf_assumptions.get("projected_fcf_placeholder", "Not Available")),
+            "payment_history_status_str": str(market_data.get("payment_history_placeholder", "Current")),
+            "interest_capitalization_status_str": str(market_data.get("interest_capitalization_placeholder", "No"))
         }
 
     def _prepare_qualitative_inputs_for_sk(self, qualitative_company_info: Dict[str, Any]) -> Dict[str, str]:
@@ -131,26 +137,28 @@ class SNCAnalystAgent(AgentBase):
         }
 
     def _perform_financial_analysis(self, financial_data_detailed: Dict[str, Any], sk_financial_inputs: Dict[str, str]) -> Dict[str, Any]:
-        logging.debug(f"SNC_FIN_ANALYSIS_INPUT: financial_data_detailed keys: {list(financial_data_detailed.keys())}, sk_inputs keys: {list(sk_financial_inputs.keys())}")
+        logging.debug(
+            f"SNC_FIN_ANALYSIS_INPUT: financial_data_detailed keys: {list(financial_data_detailed.keys())}, sk_inputs keys: {list(sk_financial_inputs.keys())}")
         key_ratios = financial_data_detailed.get("key_ratios", {})
-        
+
         analysis_result = {
             "debt_to_equity": key_ratios.get("debt_to_equity_ratio"),
             "profitability": key_ratios.get("net_profit_margin"),
             "liquidity_ratio": key_ratios.get("current_ratio"),
             "interest_coverage": key_ratios.get("interest_coverage_ratio"),
-            **sk_financial_inputs 
+            **sk_financial_inputs
         }
         logging.debug(f"SNC_FIN_ANALYSIS_OUTPUT: {analysis_result}")
         return analysis_result
 
-    def _perform_qualitative_analysis(self, 
-                                      company_name: str, 
-                                      qualitative_company_info: Dict[str, Any], 
-                                      industry_data_context: Dict[str, Any], 
+    def _perform_qualitative_analysis(self,
+                                      company_name: str,
+                                      qualitative_company_info: Dict[str, Any],
+                                      industry_data_context: Dict[str, Any],
                                       economic_data_context: Dict[str, Any],
                                       sk_qualitative_inputs: Dict[str, str]) -> Dict[str, Any]:
-        logging.debug(f"SNC_QUAL_ANALYSIS_INPUT: company_name='{company_name}', qualitative_info_keys={list(qualitative_company_info.keys())}, industry_keys={list(industry_data_context.keys())}, economic_keys={list(economic_data_context.keys())}, sk_qual_inputs keys: {list(sk_qualitative_inputs.keys())}")
+        logging.debug(
+            f"SNC_QUAL_ANALYSIS_INPUT: company_name='{company_name}', qualitative_info_keys={list(qualitative_company_info.keys())}, industry_keys={list(industry_data_context.keys())}, economic_keys={list(economic_data_context.keys())}, sk_qual_inputs keys: {list(sk_qualitative_inputs.keys())}")
         qualitative_result = {
             "management_quality": qualitative_company_info.get("management_assessment", "Not Assessed"),
             "industry_outlook": industry_data_context.get("outlook", "Neutral"),
@@ -163,18 +171,22 @@ class SNCAnalystAgent(AgentBase):
         return qualitative_result
 
     def _evaluate_credit_risk_mitigation(self, collateral_and_debt_details: Dict[str, Any]) -> Dict[str, Any]:
-        logging.debug(f"SNC_CREDIT_MITIGATION_INPUT: collateral_and_debt_details_keys={list(collateral_and_debt_details.keys())}")
+        logging.debug(
+            f"SNC_CREDIT_MITIGATION_INPUT: collateral_and_debt_details_keys={list(collateral_and_debt_details.keys())}")
         ltv = collateral_and_debt_details.get("loan_to_value_ratio")
-        collateral_quality_assessment = "Low" 
+        collateral_quality_assessment = "Low"
         if ltv is not None:
             try:
                 ltv_float = float(ltv)
-                if ltv_float < 0.5: collateral_quality_assessment = "High"
-                elif ltv_float < 0.75: collateral_quality_assessment = "Medium"
-            except ValueError: logging.warning(f"Could not parse LTV ratio '{ltv}' as float.")
-        
+                if ltv_float < 0.5:
+                    collateral_quality_assessment = "High"
+                elif ltv_float < 0.75:
+                    collateral_quality_assessment = "Medium"
+            except ValueError:
+                logging.warning(f"Could not parse LTV ratio '{ltv}' as float.")
+
         mitigation_result = {
-            "collateral_quality_fallback": collateral_quality_assessment, 
+            "collateral_quality_fallback": collateral_quality_assessment,
             "collateral_summary_for_sk": collateral_and_debt_details.get("collateral_type", "Not specified."),
             "loan_to_value_ratio": str(ltv) if ltv is not None else "Not specified.",
             "collateral_notes_for_sk": collateral_and_debt_details.get("other_credit_enhancements", "None."),
@@ -190,11 +202,11 @@ class SNCAnalystAgent(AgentBase):
             return SNCRating.LOSS, "Repayment capacity is assessed as unsustainable."
         if nonaccrual_assessment == "Non-Accrual Warranted" and repayment_assessment == "Weak":
             return SNCRating.LOSS, "Non-accrual status is warranted alongside weak repayment capacity."
-        
+
         if repayment_assessment == "Weak":
             return SNCRating.DOUBTFUL, "Repayment capacity is weak, casting doubt on the ability to service debt."
         if collateral_assessment == "Substandard" and repayment_assessment == "Adequate":
-             return SNCRating.DOUBTFUL, "Collateral is substandard, and repayment capacity is only adequate, not strong."
+            return SNCRating.DOUBTFUL, "Collateral is substandard, and repayment capacity is only adequate, not strong."
 
         if nonaccrual_assessment == "Non-Accrual Warranted":
             return SNCRating.SUBSTANDARD, "Non-accrual status is warranted, indicating significant financial distress."
@@ -227,53 +239,61 @@ class SNCAnalystAgent(AgentBase):
             return SNCRating.SUBSTANDARD, "Fallback: Insufficient liquidity (< 1.0) and interest coverage (< 1.0)."
         if credit_risk_mitigation.get("collateral_quality_fallback") == "Low" and qualitative_analysis.get("management_quality") == "Weak":
             return SNCRating.SPECIAL_MENTION, "Fallback: Combination of low-quality collateral and weak management."
-        
+
         return SNCRating.PASS, "Fallback: Financial metrics do not meet any adverse classification triggers."
 
-    def _synthesize_rationale(self, company_name: str, rating: SNCRating, sk_rationale_summary: str, 
+    def _synthesize_rationale(self, company_name: str, rating: SNCRating, sk_rationale_summary: str,
                               financial_analysis: Dict[str, Any], qualitative_analysis: Dict[str, Any], credit_risk_mitigation: Dict[str, Any],
                               repayment_assessment: Optional[str], collateral_assessment: Optional[str], nonaccrual_assessment: Optional[str]) -> str:
         """Constructs a coherent, narrative rationale for the final rating."""
-        
+
         header = f"Executive Summary for {company_name}: The credit has been assigned a rating of {rating.value}."
-        
+
         sk_section_header = "Primary Justification (AI Skill-Based Analysis):"
         sk_section_body = sk_rationale_summary
-        
+
         sk_details = []
-        if repayment_assessment: sk_details.append(f"- Repayment Capacity Assessment: {repayment_assessment}")
-        if collateral_assessment: sk_details.append(f"- Collateral Risk Assessment: {collateral_assessment}")
-        if nonaccrual_assessment: sk_details.append(f"- Non-Accrual Status Assessment: {nonaccrual_assessment}")
+        if repayment_assessment:
+            sk_details.append(f"- Repayment Capacity Assessment: {repayment_assessment}")
+        if collateral_assessment:
+            sk_details.append(f"- Collateral Risk Assessment: {collateral_assessment}")
+        if nonaccrual_assessment:
+            sk_details.append(f"- Non-Accrual Status Assessment: {nonaccrual_assessment}")
         sk_section_details = "\n".join(sk_details)
 
         supporting_factors_header = "Supporting Quantitative and Qualitative Factors:"
-        
+
         factors = []
         d_to_e = financial_analysis.get('debt_to_equity')
         profit = financial_analysis.get('profitability')
         mgmt_quality = qualitative_analysis.get('management_quality')
         econ_outlook = qualitative_analysis.get('economic_conditions')
 
-        if d_to_e is not None: factors.append(f"- Debt/Equity Ratio: {d_to_e:.2f}")
-        if profit is not None: factors.append(f"- Profit Margin: {profit:.2%}")
-        if mgmt_quality: factors.append(f"- Management Quality: {mgmt_quality}")
-        if econ_outlook: factors.append(f"- Economic Outlook: {econ_outlook}")
-        
+        if d_to_e is not None:
+            factors.append(f"- Debt/Equity Ratio: {d_to_e:.2f}")
+        if profit is not None:
+            factors.append(f"- Profit Margin: {profit:.2%}")
+        if mgmt_quality:
+            factors.append(f"- Management Quality: {mgmt_quality}")
+        if econ_outlook:
+            factors.append(f"- Economic Outlook: {econ_outlook}")
+
         supporting_factors_body = "\n".join(factors)
 
         footer = f"Regulatory guidance considered: Comptroller's Handbook SNC v{self.comptrollers_handbook_snc.get('version', 'N/A')}, OCC Guidelines v{self.occ_guidelines_snc.get('version', 'N/A')}."
 
-        full_rationale = "\n\n".join([header, sk_section_header, sk_section_body, sk_section_details, supporting_factors_header, supporting_factors_body, footer])
+        full_rationale = "\n\n".join([header, sk_section_header, sk_section_body,
+                                     sk_section_details, supporting_factors_header, supporting_factors_body, footer])
         return full_rationale
 
-    async def _determine_rating(self, company_name: str, 
-                               financial_analysis: Dict[str, Any], 
-                               qualitative_analysis: Dict[str, Any], 
-                               credit_risk_mitigation: Dict[str, Any],
-                               economic_data_context: Dict[str, Any]
-                               ) -> Tuple[Optional[SNCRating], str]:
+    async def _determine_rating(self, company_name: str,
+                                financial_analysis: Dict[str, Any],
+                                qualitative_analysis: Dict[str, Any],
+                                credit_risk_mitigation: Dict[str, Any],
+                                economic_data_context: Dict[str, Any]
+                                ) -> Tuple[Optional[SNCRating], str]:
         logging.debug(f"SNC_DETERMINE_RATING_INPUT: company='{company_name}'")
-        
+
         collateral_sk_assessment_str, repayment_sk_assessment_str, nonaccrual_sk_assessment_str = None, None, None
         collateral_sk_justification, repayment_sk_justification, nonaccrual_sk_justification = "", "", ""
         repayment_sk_concerns = ""
@@ -292,10 +312,15 @@ class SNCAnalystAgent(AgentBase):
                 sk_response_collateral = await self.run_semantic_kernel_skill("SNCRatingAssistSkill", "CollateralRiskAssessment", sk_input_vars_collateral)
                 lines = sk_response_collateral.strip().splitlines()
                 if lines:
-                    if "Assessment:" in lines[0]: collateral_sk_assessment_str = lines[0].split("Assessment:", 1)[1].strip().replace('[','').replace(']','')
-                    if len(lines) > 1 and "Justification:" in lines[1]: collateral_sk_justification = lines[1].split("Justification:", 1)[1].strip()
-                logging.debug(f"SNC_XAI:SK_OUTPUT:AssessCollateralRisk: Assessment='{collateral_sk_assessment_str}', Justification='{collateral_sk_justification}'")
-            except Exception as e: logging.error(f"Error in CollateralRiskAssessment SK skill for {company_name}: {e}")
+                    if "Assessment:" in lines[0]:
+                        collateral_sk_assessment_str = lines[0].split(
+                            "Assessment:", 1)[1].strip().replace('[', '').replace(']', '')
+                    if len(lines) > 1 and "Justification:" in lines[1]:
+                        collateral_sk_justification = lines[1].split("Justification:", 1)[1].strip()
+                logging.debug(
+                    f"SNC_XAI:SK_OUTPUT:AssessCollateralRisk: Assessment='{collateral_sk_assessment_str}', Justification='{collateral_sk_justification}'")
+            except Exception as e:
+                logging.error(f"Error in CollateralRiskAssessment SK skill for {company_name}: {e}")
 
             # 2. AssessRepaymentCapacity
             try:
@@ -314,11 +339,17 @@ class SNCAnalystAgent(AgentBase):
                 sk_response_repayment = await self.run_semantic_kernel_skill("SNCRatingAssistSkill", "AssessRepaymentCapacity", sk_input_vars_repayment)
                 lines = sk_response_repayment.strip().splitlines()
                 if lines:
-                    if "Assessment:" in lines[0]: repayment_sk_assessment_str = lines[0].split("Assessment:",1)[1].strip().replace('[','').replace(']','')
-                    if len(lines) > 1 and "Justification:" in lines[1]: repayment_sk_justification = lines[1].split("Justification:",1)[1].strip()
-                    if len(lines) > 2 and "Concerns:" in lines[2]: repayment_sk_concerns = lines[2].split("Concerns:",1)[1].strip()
-                logging.debug(f"SNC_XAI:SK_OUTPUT:AssessRepaymentCapacity: Assessment='{repayment_sk_assessment_str}', Justification='{repayment_sk_justification}', Concerns='{repayment_sk_concerns}'")
-            except Exception as e: logging.error(f"Error in AssessRepaymentCapacity SK skill for {company_name}: {e}")
+                    if "Assessment:" in lines[0]:
+                        repayment_sk_assessment_str = lines[0].split(
+                            "Assessment:", 1)[1].strip().replace('[', '').replace(']', '')
+                    if len(lines) > 1 and "Justification:" in lines[1]:
+                        repayment_sk_justification = lines[1].split("Justification:", 1)[1].strip()
+                    if len(lines) > 2 and "Concerns:" in lines[2]:
+                        repayment_sk_concerns = lines[2].split("Concerns:", 1)[1].strip()
+                logging.debug(
+                    f"SNC_XAI:SK_OUTPUT:AssessRepaymentCapacity: Assessment='{repayment_sk_assessment_str}', Justification='{repayment_sk_justification}', Concerns='{repayment_sk_concerns}'")
+            except Exception as e:
+                logging.error(f"Error in AssessRepaymentCapacity SK skill for {company_name}: {e}")
 
             # 3. AssessNonAccrualStatusIndication
             try:
@@ -327,7 +358,7 @@ class SNCAnalystAgent(AgentBase):
                     "guideline_interest_capitalization": self.occ_guidelines_snc.get('capitalization_of_interest', "Default interest cap..."),
                     "payment_history_status": financial_analysis.get('payment_history_status_str', "Current"),
                     "relevant_ratios": financial_analysis.get('ratios_summary_str', "Not available"),
-                    "repayment_capacity_assessment": repayment_sk_assessment_str if repayment_sk_assessment_str else "Adequate", 
+                    "repayment_capacity_assessment": repayment_sk_assessment_str if repayment_sk_assessment_str else "Adequate",
                     "notes_financial_deterioration": qualitative_analysis.get('notes_financial_deterioration_str', "None noted."),
                     "interest_capitalization_status": financial_analysis.get('interest_capitalization_status_str', "No")
                 }
@@ -335,10 +366,15 @@ class SNCAnalystAgent(AgentBase):
                 sk_response_nonaccrual = await self.run_semantic_kernel_skill("SNCRatingAssistSkill", "AssessNonAccrualStatusIndication", sk_input_vars_nonaccrual)
                 lines = sk_response_nonaccrual.strip().splitlines()
                 if lines:
-                    if "Assessment:" in lines[0]: nonaccrual_sk_assessment_str = lines[0].split("Assessment:",1)[1].strip().replace('[','').replace(']','')
-                    if len(lines) > 1 and "Justification:" in lines[1]: nonaccrual_sk_justification = lines[1].split("Justification:",1)[1].strip()
-                logging.debug(f"SNC_XAI:SK_OUTPUT:AssessNonAccrualStatusIndication: Assessment='{nonaccrual_sk_assessment_str}', Justification='{nonaccrual_sk_justification}'")
-            except Exception as e: logging.error(f"Error in AssessNonAccrualStatusIndication SK skill for {company_name}: {e}")
+                    if "Assessment:" in lines[0]:
+                        nonaccrual_sk_assessment_str = lines[0].split(
+                            "Assessment:", 1)[1].strip().replace('[', '').replace(']', '')
+                    if len(lines) > 1 and "Justification:" in lines[1]:
+                        nonaccrual_sk_justification = lines[1].split("Justification:", 1)[1].strip()
+                logging.debug(
+                    f"SNC_XAI:SK_OUTPUT:AssessNonAccrualStatusIndication: Assessment='{nonaccrual_sk_assessment_str}', Justification='{nonaccrual_sk_justification}'")
+            except Exception as e:
+                logging.error(f"Error in AssessNonAccrualStatusIndication SK skill for {company_name}: {e}")
 
         # Primary rating path: Use SK skill outputs
         rating, sk_rationale = self._rate_from_sk_assessments(
@@ -370,28 +406,30 @@ class SNCAnalystAgent(AgentBase):
                 nonaccrual_assessment=nonaccrual_sk_assessment_str
             )
 
-        logging.debug(f"SNC_DETERMINE_RATING_OUTPUT: Final Rating='{rating.value if rating else 'Undetermined'}', Rationale='{final_rationale}'")
+        logging.debug(
+            f"SNC_DETERMINE_RATING_OUTPUT: Final Rating='{rating.value if rating else 'Undetermined'}', Rationale='{final_rationale}'")
         logging.info(f"SNC rating for {company_name}: {rating.value if rating else 'Undetermined'}.")
         return rating, final_rationale
+
 
 if __name__ == '__main__':
     # Configure file logging for XAI trace at the START of the __main__ block
     log_file_name = 'snc_xai_test_run.log'
-    if os.path.exists(log_file_name): 
+    if os.path.exists(log_file_name):
         os.remove(log_file_name)
-    
+
     # Setup basic logging
     root_logger = logging.getLogger()
     if root_logger.hasHandlers():
         for handler in root_logger.handlers[:]:
             root_logger.removeHandler(handler)
             handler.close()
-    
-    logging.basicConfig(level=logging.DEBUG, 
-                        filename=log_file_name, 
+
+    logging.basicConfig(level=logging.DEBUG,
+                        filename=log_file_name,
                         filemode='w',
                         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    
+
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
     console_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
@@ -414,14 +452,14 @@ if __name__ == '__main__':
             "nonaccrual_status": "Loan is on cash basis due to financial deterioration...",
             "capitalization_of_interest": "Permissible only if borrower is creditworthy..."
         },
-        'peers': ['DataRetrievalAgent'] 
+        'peers': ['DataRetrievalAgent']
     }
 
     mock_data_package_template = {
         "company_info": {"name": "TestCompany Corp"},
         "financial_data_detailed": {
             "key_ratios": {"debt_to_equity_ratio": 1.5, "net_profit_margin": 0.15, "current_ratio": 1.8, "interest_coverage_ratio": 3.0},
-            "cash_flow_statement": {"free_cash_flow": [100,110,120], "cash_flow_from_operations": [150,160,170]},
+            "cash_flow_statement": {"free_cash_flow": [100, 110, 120], "cash_flow_from_operations": [150, 160, 170]},
             "market_data": {"annual_debt_service_placeholder": "60", "payment_history_placeholder": "Current", "interest_capitalization_placeholder": "No"},
             "dcf_assumptions": {}
         },
@@ -433,7 +471,7 @@ if __name__ == '__main__':
 
     async def mock_send_message(target_agent_name, message):
         company_id = message.get('company_id')
-        data = json.loads(json.dumps(mock_data_package_template)) 
+        data = json.loads(json.dumps(mock_data_package_template))
         data["company_info"]["name"] = f"{company_id} Corp"
         if company_id == "TEST_COMPANY_REPAY_WEAK":
             data["financial_data_detailed"]["key_ratios"]["interest_coverage_ratio"] = 0.8
@@ -441,7 +479,7 @@ if __name__ == '__main__':
             data["financial_data_detailed"]["market_data"]["payment_history_placeholder"] = "90 days past due"
         elif company_id == "TEST_COMPANY_FALLBACK":
             # Data that will cause SK to return None, to test fallback
-            pass # Use default template
+            pass  # Use default template
         return data
 
     class MockSKFunction:
@@ -449,13 +487,13 @@ if __name__ == '__main__':
             self.skill_name = skill_name
             self.test_case_id = test_case_id
 
-        async def invoke(self, variables=None): 
+        async def invoke(self, variables=None):
             class MockSKResult:
                 def __init__(self, value_str): self._value = value_str
                 def __str__(self): return self._value
 
             if self.test_case_id == "TEST_COMPANY_FALLBACK":
-                return MockSKResult("Assessment: \nJustification: ") # Empty response
+                return MockSKResult("Assessment: \nJustification: ")  # Empty response
 
             if self.skill_name == "CollateralRiskAssessment":
                 assessment, justification = "Pass", "Collateral LTV is acceptable."
@@ -497,16 +535,17 @@ if __name__ == '__main__':
     class MockSKSkillsCollection:
         def __init__(self, test_case_id):
             self.test_case_id = test_case_id
+
         def get_function(self, skill_collection_name, skill_name):
             if skill_collection_name == "SNCRatingAssistSkill":
-                return MockSKFunction(skill_name, self.test_case_id) 
+                return MockSKFunction(skill_name, self.test_case_id)
             return None
-        
+
     class MockKernel(Kernel):
         def __init__(self, test_case_id="default"):
             self.test_case_id = test_case_id
             self._skills = MockSKSkillsCollection(test_case_id)
-        
+
         @property
         def skills(self):
             return self._skills
@@ -529,7 +568,7 @@ if __name__ == '__main__':
         agent_good.peer_agents['DataRetrievalAgent'] = object()
         # Patch the agent's own A2A and SK methods for this test
         with patch.object(agent_good, 'send_message', new=mock_send_message), \
-             patch.object(agent_good, 'run_semantic_kernel_skill', new=mock_kernel_good.run_semantic_kernel_skill):
+                patch.object(agent_good, 'run_semantic_kernel_skill', new=mock_kernel_good.run_semantic_kernel_skill):
             rating, rationale = await agent_good.execute(company_id="TEST_COMPANY_GOOD")
             print(f"Rating: {rating.value if rating else 'N/A'}")
             print(f"Rationale:\n{rationale}")
@@ -542,7 +581,7 @@ if __name__ == '__main__':
         agent_weak = SNCAnalystAgent(config=dummy_snc_agent_config, kernel=mock_kernel_weak)
         agent_weak.peer_agents['DataRetrievalAgent'] = object()
         with patch.object(agent_weak, 'send_message', new=mock_send_message), \
-             patch.object(agent_weak, 'run_semantic_kernel_skill', new=mock_kernel_weak.run_semantic_kernel_skill):
+                patch.object(agent_weak, 'run_semantic_kernel_skill', new=mock_kernel_weak.run_semantic_kernel_skill):
             rating, rationale = await agent_weak.execute(company_id="TEST_COMPANY_REPAY_WEAK")
             print(f"Rating: {rating.value if rating else 'N/A'}")
             print(f"Rationale:\n{rationale}")
@@ -555,26 +594,26 @@ if __name__ == '__main__':
         agent_fallback = SNCAnalystAgent(config=dummy_snc_agent_config, kernel=mock_kernel_fallback)
         agent_fallback.peer_agents['DataRetrievalAgent'] = object()
         with patch.object(agent_fallback, 'send_message', new=mock_send_message), \
-             patch.object(agent_fallback, 'run_semantic_kernel_skill', new=mock_kernel_fallback.run_semantic_kernel_skill):
+                patch.object(agent_fallback, 'run_semantic_kernel_skill', new=mock_kernel_fallback.run_semantic_kernel_skill):
             # Modify data to trigger a specific fallback rule (e.g., Substandard)
             global mock_data_package_template
             original_data = json.loads(json.dumps(mock_data_package_template))
             mock_data_package_template["financial_data_detailed"]["key_ratios"]["liquidity_ratio"] = 0.8
             mock_data_package_template["financial_data_detailed"]["key_ratios"]["interest_coverage_ratio"] = 0.5
-            
+
             rating, rationale = await agent_fallback.execute(company_id="TEST_COMPANY_FALLBACK")
             print(f"Rating: {rating.value if rating else 'N/A'}")
             print(f"Rationale:\n{rationale}")
             assert rating == SNCRating.SUBSTANDARD
             assert "Fallback: Insufficient liquidity" in rationale
-            
+
             # Restore original data for any subsequent tests
             mock_data_package_template = original_data
 
         # --- Test Case 4: Missing Company ID ---
         print("\n--- Test Case 4: Missing Company ID ---")
         agent_missing_id = SNCAnalystAgent(config=dummy_snc_agent_config, kernel=MockKernel())
-        rating, rationale = await agent_missing_id.execute() # No company_id
+        rating, rationale = await agent_missing_id.execute()  # No company_id
         print(f"Rating: {'N/A'}, Rationale: {rationale}")
         assert rating is None
 

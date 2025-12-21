@@ -1,6 +1,7 @@
 # core/system/v22_async/async_task.py
 from typing import List, Callable, Any, Dict
 
+
 class AsyncTask:
     def __init__(self, name: str, dependencies: List[str], execute_func: Callable):
         self.name = name

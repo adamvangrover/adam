@@ -1,6 +1,7 @@
 from typing import List, Dict, Any
 from core.financial_suite.schemas.workstream_context import WorkstreamContext
 
+
 class DCFEngine:
     @staticmethod
     def calculate_fcff(ctx: WorkstreamContext) -> Dict[str, List[float]]:
@@ -23,7 +24,7 @@ class DCFEngine:
         fcff = []
 
         current_rev = fin.current_year_revenue
-        prev_nwc = current_rev * fin.nwc_percent_revenue # Simplified starting NWC
+        prev_nwc = current_rev * fin.nwc_percent_revenue  # Simplified starting NWC
 
         tax_rate = ctx.valuation_context.tax_rate
 
@@ -34,7 +35,8 @@ class DCFEngine:
             revenue.append(rev)
 
             # EBITDA
-            margin = fin.projected_ebitda_margin[i] if i < len(fin.projected_ebitda_margin) else fin.projected_ebitda_margin[-1]
+            margin = fin.projected_ebitda_margin[i] if i < len(
+                fin.projected_ebitda_margin) else fin.projected_ebitda_margin[-1]
             ebitda_val = rev * margin
             ebitda.append(ebitda_val)
 
@@ -92,8 +94,8 @@ class DCFEngine:
 
         # Sanity Check: g cannot be >= WACC
         if g >= wacc:
-             # Fallback to slightly less than WACC to avoid division by zero or negative
-             g = wacc - 0.001
+            # Fallback to slightly less than WACC to avoid division by zero or negative
+            g = wacc - 0.001
 
         tv_perpetuity = (final_fcff * (1 + g)) / (wacc - g)
 
@@ -104,7 +106,7 @@ class DCFEngine:
         # Let's adjust signature or logic.
         # Ideally calculate_terminal_value should be part of a larger flow that has access to EBITDA.
         # I'll modify the signature to accept final_ebitda.
-        return {"tv_perpetuity": tv_perpetuity, "tv_multiple": 0.0} # Placeholder until fixed
+        return {"tv_perpetuity": tv_perpetuity, "tv_multiple": 0.0}  # Placeholder until fixed
 
     @staticmethod
     def calculate_valuation(ctx: WorkstreamContext, wacc: float) -> Dict[str, Any]:
@@ -123,7 +125,8 @@ class DCFEngine:
         # Terminal Value
         # A: Perpetuity
         g = val_ctx.growth_rate_perpetuity
-        if g >= wacc: g = wacc - 0.001
+        if g >= wacc:
+            g = wacc - 0.001
         tv_perpetuity = (final_fcff * (1 + g)) / (wacc - g)
 
         # B: Exit Multiple
@@ -137,14 +140,14 @@ class DCFEngine:
             tv_final = tv_perpetuity
         elif val_ctx.terminal_method == "EXIT_MULTIPLE":
             tv_final = tv_multiple
-        else: # DUAL_WEIGHTED
+        else:  # DUAL_WEIGHTED
             tv_final = (tv_perpetuity * weight_perp) + (tv_multiple * weight_mult)
 
         # Discounting
         pv_fcff = 0.0
         discount_factors = []
         for i, cash_flow in enumerate(fcff_stream):
-            t = i + 1 # Year 1, 2, ...
+            t = i + 1  # Year 1, 2, ...
             df = 1 / ((1 + wacc) ** t)
             discount_factors.append(df)
             pv_fcff += cash_flow * df
@@ -165,6 +168,7 @@ class DCFEngine:
             "pv_fcff": pv_fcff,
             "pv_tv": pv_tv,
             "enterprise_value": enterprise_value,
-            "implied_growth": (tv_multiple * (wacc - g) / final_fcff) - 1 if final_fcff else 0, # Reverse engineer g from multiple
-            "implied_multiple": tv_perpetuity / final_ebitda if final_ebitda else 0 # Reverse engineer multiple from perpetuity
+            # Reverse engineer g from multiple
+            "implied_growth": (tv_multiple * (wacc - g) / final_fcff) - 1 if final_fcff else 0,
+            "implied_multiple": tv_perpetuity / final_ebitda if final_ebitda else 0  # Reverse engineer multiple from perpetuity
         }

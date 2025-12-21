@@ -3,6 +3,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def calculate_dcf(financials: Dict[str, Any], risk_free_rate: float = 0.04, scenario: Dict[str, Any] = None) -> Dict[str, Any]:
     """
     Performs a simplified Discounted Cash Flow (DCF) analysis.
@@ -75,6 +76,7 @@ def calculate_dcf(financials: Dict[str, Any], risk_free_rate: float = 0.04, scen
         "method": "5-Year DCF / Gordon Growth"
     }
 
+
 def calculate_multiples(financials: Dict[str, Any], peer_group: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
     Performs Relative Valuation using trading multiples.
@@ -98,6 +100,7 @@ def calculate_multiples(financials: Dict[str, Any], peer_group: List[Dict[str, A
         "premium_discount_pct": round(premium_discount * 100, 2),
         "verdict": "Overvalued" if premium_discount > 0.1 else "Undervalued" if premium_discount < -0.1 else "Fairly Valued"
     }
+
 
 def get_price_targets(intrinsic_price: float, volatility: float) -> Dict[str, float]:
     """

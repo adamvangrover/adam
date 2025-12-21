@@ -1,6 +1,7 @@
-#core/utils/api_utils.py
+# core/utils/api_utils.py
 
 import json
+
 
 def get_knowledge_graph_data(module, concept):
     """

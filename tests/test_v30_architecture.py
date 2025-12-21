@@ -1,3 +1,7 @@
+from core.v30_architecture.python_intelligence.agents.code_weaver import CodeWeaverAgent
+from core.v30_architecture.python_intelligence.agents.news_bot import NewsBotAgent
+from core.v30_architecture.python_intelligence.orchestrator.v30_orchestrator import orchestrator
+from core.v30_architecture.python_intelligence.mcp.server import mcp_server
 import unittest
 import sys
 import os
@@ -5,10 +9,6 @@ import os
 # Add repo root to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from core.v30_architecture.python_intelligence.mcp.server import mcp_server
-from core.v30_architecture.python_intelligence.orchestrator.v30_orchestrator import orchestrator
-from core.v30_architecture.python_intelligence.agents.news_bot import NewsBotAgent
-from core.v30_architecture.python_intelligence.agents.code_weaver import CodeWeaverAgent
 
 class TestV30Architecture(unittest.TestCase):
 
@@ -44,6 +44,7 @@ class TestV30Architecture(unittest.TestCase):
         weaver = CodeWeaverAgent(repo_path="core/v30_architecture/python_intelligence")
         issues = weaver.scan_for_debt()
         self.assertIsInstance(issues, list)
+
 
 if __name__ == '__main__':
     unittest.main()

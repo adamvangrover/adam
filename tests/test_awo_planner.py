@@ -1,3 +1,4 @@
+from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner
 import unittest
 import sys
 import os
@@ -5,7 +6,6 @@ import os
 # Ensure root is in path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner
 
 class TestAWOPlanner(unittest.TestCase):
     def setUp(self):
@@ -34,6 +34,7 @@ class TestAWOPlanner(unittest.TestCase):
         text = "No steps here."
         plan = self.planner.parse_natural_language_plan(text)
         self.assertEqual(len(plan['steps']), 0)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -7,6 +7,7 @@ from core.analysis.xai.explainer import Explainer
 # of the system. Agents can use this skill to request explanations for
 # activities, which helps to build a more transparent and auditable system.
 
+
 class XAISkill:
     """
     A Semantic Kernel skill for eXplainable AI.

@@ -2,6 +2,7 @@
 
 from core.utils.data_utils import send_message
 
+
 class GeopoliticalRiskAgent:
     def __init__(self, config):
         self.data_sources = config.get('data_sources', {})
@@ -10,18 +11,18 @@ class GeopoliticalRiskAgent:
         print("Assessing geopolitical risks...")
 
         # Fetch data from relevant sources (e.g., news articles, political databases)
-        #... (use self.data_sources to access data sources)
+        # ... (use self.data_sources to access data sources)
 
         # Analyze geopolitical events and trends (example)
         risk_index = self.calculate_political_risk_index()
         key_risks = self.identify_key_risks()
-        #... (add more analysis)
+        # ... (add more analysis)
 
         # Generate risk assessments
         risk_assessments = {
             'political_risk_index': risk_index,
             'key_risks': key_risks,
-            #... (add more risk assessments)
+            # ... (add more risk assessments)
         }
 
         # Send risk assessments to message queue
@@ -31,11 +32,11 @@ class GeopoliticalRiskAgent:
         return risk_assessments
 
     def calculate_political_risk_index(self):
-        #... (implement logic to calculate political risk index)
+        # ... (implement logic to calculate political risk index)
         return 75  # Example
 
     def identify_key_risks(self):
-        #... (implement logic to identify key risks)
+        # ... (implement logic to identify key risks)
         return ['trade_war', 'regional_conflict']  # Example
 
-    #... (add other analysis functions as needed)
+    # ... (add other analysis functions as needed)

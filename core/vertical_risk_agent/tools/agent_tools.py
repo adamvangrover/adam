@@ -21,20 +21,23 @@ try:
 except ImportError:
     MetaOrchestrator = None
 
+
 class FinancialRatio(BaseModel):
     name: str
     value: str
 
+
 class SimulationResult(BaseModel):
     pd: float = Field(..., description="Probability of Default")
     asset_value_stats: Dict[str, float] = Field(..., description="Statistics of asset value distribution")
+
 
 class AgentTools:
     """
     Centralized tool definitions for the Vertical Risk Agent.
     Implements strict typing and error handling.
     """
-    
+
     def __init__(self, db_path: str = "finance_data.db"):
         self.db_path = db_path
         self._orchestrator = None

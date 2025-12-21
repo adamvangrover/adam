@@ -29,14 +29,17 @@ MAX_LATENCY_MS = 50
 MAX_DRAWDOWN_PCT = 0.02
 RISK_WINDOW_SECONDS = 300  # 5 minutes
 
+
 class OrderSide(Enum):
     BUY = "BUY"
     SELL = "SELL"
+
 
 class OrderStatus(Enum):
     OPEN = "OPEN"
     FILLED = "FILLED"
     CANCELLED = "CANCELLED"
+
 
 @dataclass
 class Order:
@@ -48,6 +51,7 @@ class Order:
     timestamp: float
     status: OrderStatus = OrderStatus.OPEN
 
+
 @dataclass
 class MarketTick:
     symbol: str
@@ -57,11 +61,13 @@ class MarketTick:
 
 # --- Components ---
 
+
 class CircuitBreaker:
     """
     Critical Risk Component.
     Monitors system health and PnL. Halts trading if thresholds are breached.
     """
+
     def __init__(self, initial_balance: float):
         self.initial_balance = initial_balance
         self.current_balance = initial_balance
@@ -86,11 +92,13 @@ class CircuitBreaker:
     def can_trade(self) -> bool:
         return not self.is_tripped
 
+
 class MarketDataHandler:
     """
     Simulates WebSocket ingestion.
     In production, this would wrap `websockets` or `aiohttp` to connect to an exchange.
     """
+
     def __init__(self, symbols: List[str], queue: asyncio.Queue):
         self.symbols = symbols
         self.queue = queue
@@ -105,7 +113,7 @@ class MarketDataHandler:
 
             # Generate synthetic tick
             symbol = random.choice(self.symbols)
-            mid_price = 100.0 + random.uniform(-1, 1) # Random walk around 100
+            mid_price = 100.0 + random.uniform(-1, 1)  # Random walk around 100
             spread = 0.05
 
             tick = MarketTick(
@@ -120,10 +128,12 @@ class MarketDataHandler:
     def stop(self):
         self.running = False
 
+
 class OrderManager:
     """
     Manages order state.
     """
+
     def __init__(self):
         self.orders: Dict[str, Order] = {}
         self.fills: List[Order] = []
@@ -147,6 +157,7 @@ class OrderManager:
             del self.orders[order_id]
 
 # --- Main Strategy Engine ---
+
 
 class HFTStrategy:
     def __init__(self, symbol: str, balance: float, data_handler_cls: Type = MarketDataHandler):
@@ -234,7 +245,7 @@ class HFTStrategy:
                     self.order_manager.simulate_fill(oid)
                     # Update PnL (Mock)
                     # Assume we capture the spread on every round trip
-                    self.cash += random.uniform(-5, 15) # Random PnL swing
+                    self.cash += random.uniform(-5, 15)  # Random PnL swing
                     self.risk_gate.update_pnl(self.cash)
 
                 # Simulate processing time
@@ -245,6 +256,7 @@ class HFTStrategy:
         finally:
             feed_task.cancel()
             print("HFT Engine Shutdown.")
+
 
 if __name__ == "__main__":
     # Entry point

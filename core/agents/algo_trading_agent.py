@@ -1,9 +1,10 @@
-#core/agents/algo_trading_agent.py
+# core/agents/algo_trading_agent.py
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import random
+
 
 class AlgoTradingAgent:
     def __init__(self, data, strategies=None, initial_balance=10000):

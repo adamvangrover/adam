@@ -10,6 +10,7 @@ from core.system.memory_manager import VectorMemoryManager
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
+
 async def run_integration_test():
     print("--- Starting Memory Integration Test (Stable) ---")
 
@@ -49,14 +50,15 @@ async def run_integration_test():
     # Test Vector Search
     print("Testing Vector Search...")
     # Add a dummy entry for another company
-    faa.memory_manager.save_analysis("XYZ_TEST", "Analysis of ABC_TEST competitor. Very similar financials. Tech sector.", {})
+    faa.memory_manager.save_analysis(
+        "XYZ_TEST", "Analysis of ABC_TEST competitor. Very similar financials. Tech sector.", {})
 
     # Search similar to ABC_TEST
     # Note: TF-IDF might need more data or distinctive words to match well, but exact words should match.
     similar = faa.memory_manager.search_similar("ABC_TEST analysis", limit=5)
     print(f"Similar found: {len(similar)}")
     if similar:
-         print(f"Top match: {similar[0]['company_id']} score: {similar[0].get('similarity_score')}")
+        print(f"Top match: {similar[0]['company_id']} score: {similar[0].get('similarity_score')}")
 
     # Should find at least something (ABC_TEST entries themselves match perfectly)
     assert len(similar) > 0

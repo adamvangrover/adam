@@ -2,6 +2,7 @@ import concurrent.futures
 from threading import RLock
 from .workflow import Workflow
 
+
 class WorkflowManager:
     def __init__(self, max_workers=10):
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=max_workers)

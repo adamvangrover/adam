@@ -7,6 +7,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+
 class LSTMResidualModel(nn.Module):
     def __init__(self, units):
         super(LSTMResidualModel, self).__init__()
@@ -16,9 +17,10 @@ class LSTMResidualModel(nn.Module):
     def forward(self, x):
         # x: (batch, seq, feature)
         out, _ = self.lstm(x)
-        out = out[:, -1, :] # Last time step
+        out = out[:, -1, :]  # Last time step
         out = self.fc(out)
         return out
+
 
 class HybridModel:
     """
@@ -73,10 +75,10 @@ class HybridModel:
         # Use last n_periods residuals as input to predict 'correction'
         last_resid = self.arima_model.resid[-n_periods:]
         if len(last_resid) < n_periods:
-             # Handle case where we don't have enough history
-             # Pad or use what we have.
-             # For simplicity, just use last available
-             pass
+            # Handle case where we don't have enough history
+            # Pad or use what we have.
+            # For simplicity, just use last available
+            pass
 
         # Reshape for LSTM
         last_resid_values = last_resid.values.reshape(-1, 1, 1)
@@ -84,7 +86,7 @@ class HybridModel:
 
         self.lstm_model.eval()
         with torch.no_grad():
-             lstm_pred = self.lstm_model(input_tensor).numpy().flatten()
+            lstm_pred = self.lstm_model(input_tensor).numpy().flatten()
 
         lstm_forecast_series = pd.Series(lstm_pred, index=arima_forecast.index)
 

@@ -2,6 +2,7 @@ import pytest
 torch = pytest.importorskip("torch")
 from src.adam.core.optimizers import AdamW, Lion
 
+
 @pytest.mark.parametrize("optimizer_class", [AdamW, Lion])
 def test_optimizer_basic_step(optimizer_class):
     """
@@ -34,6 +35,7 @@ def test_optimizer_basic_step(optimizer_class):
     assert params[0] > -2.0
     assert params[1] > -2.0
 
+
 def test_adamw_weight_decay():
     """
     Test decoupled weight decay mechanism.
@@ -53,6 +55,7 @@ def test_adamw_weight_decay():
     # Expected: 10 * (1 - 0.1 * 0.1) = 10 * 0.99 = 9.9
     expected = 10.0 * (1.0 - lr * wd)
     assert torch.isclose(params, torch.tensor([expected]), atol=1e-5)
+
 
 def test_lion_sign_update():
     """

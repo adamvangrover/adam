@@ -11,6 +11,7 @@ In production, these functions bind to the Rust backend for performance.
 from typing import List, Dict, Optional, Union
 import math
 
+
 class FinancialEngineeringEngine:
 
     @staticmethod
@@ -101,22 +102,25 @@ class FinancialEngineeringEngine:
         Calculates Black-Scholes Greeks (Delta, Gamma, Theta, Vega, Rho).
         """
         if time_to_maturity <= 0:
-             return {"delta": 0, "gamma": 0, "theta": 0, "vega": 0, "rho": 0}
+            return {"delta": 0, "gamma": 0, "theta": 0, "vega": 0, "rho": 0}
 
-        d1 = (math.log(spot_price / strike_price) + (risk_free_rate + 0.5 * volatility ** 2) * time_to_maturity) / (volatility * math.sqrt(time_to_maturity))
+        d1 = (math.log(spot_price / strike_price) + (risk_free_rate + 0.5 * volatility ** 2)
+              * time_to_maturity) / (volatility * math.sqrt(time_to_maturity))
         d2 = d1 - volatility * math.sqrt(time_to_maturity)
 
-        norm_pdf = lambda x: (1.0 / math.sqrt(2.0 * math.pi)) * math.exp(-0.5 * x * x)
-        norm_cdf = lambda x: 0.5 * (1.0 + math.erf(x / math.sqrt(2.0)))
+        def norm_pdf(x): return (1.0 / math.sqrt(2.0 * math.pi)) * math.exp(-0.5 * x * x)
+        def norm_cdf(x): return 0.5 * (1.0 + math.erf(x / math.sqrt(2.0)))
 
         if option_type == "call":
             delta = norm_cdf(d1)
             rho = strike_price * time_to_maturity * math.exp(-risk_free_rate * time_to_maturity) * norm_cdf(d2) / 100
-            theta = (- (spot_price * norm_pdf(d1) * volatility) / (2 * math.sqrt(time_to_maturity)) - risk_free_rate * strike_price * math.exp(-risk_free_rate * time_to_maturity) * norm_cdf(d2)) / 365
+            theta = (- (spot_price * norm_pdf(d1) * volatility) / (2 * math.sqrt(time_to_maturity)) -
+                     risk_free_rate * strike_price * math.exp(-risk_free_rate * time_to_maturity) * norm_cdf(d2)) / 365
         else:
             delta = norm_cdf(d1) - 1
             rho = -strike_price * time_to_maturity * math.exp(-risk_free_rate * time_to_maturity) * norm_cdf(-d2) / 100
-            theta = (- (spot_price * norm_pdf(d1) * volatility) / (2 * math.sqrt(time_to_maturity)) + risk_free_rate * strike_price * math.exp(-risk_free_rate * time_to_maturity) * norm_cdf(-d2)) / 365
+            theta = (- (spot_price * norm_pdf(d1) * volatility) / (2 * math.sqrt(time_to_maturity)) +
+                     risk_free_rate * strike_price * math.exp(-risk_free_rate * time_to_maturity) * norm_cdf(-d2)) / 365
 
         gamma = norm_pdf(d1) / (spot_price * volatility * math.sqrt(time_to_maturity))
         vega = spot_price * math.sqrt(time_to_maturity) * norm_pdf(d1) / 100
@@ -178,7 +182,8 @@ class FinancialEngineeringEngine:
         avg_asset = sum(asset_returns) / n
         avg_market = sum(market_returns) / n
 
-        covariance = sum([(asset_returns[i] - avg_asset) * (market_returns[i] - avg_market) for i in range(n)]) / (n - 1)
+        covariance = sum([(asset_returns[i] - avg_asset) * (market_returns[i] - avg_market)
+                         for i in range(n)]) / (n - 1)
         market_variance = sum([(x - avg_market) ** 2 for x in market_returns]) / (n - 1)
 
         if market_variance == 0:

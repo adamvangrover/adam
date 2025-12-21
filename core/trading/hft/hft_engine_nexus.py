@@ -61,6 +61,8 @@ TICK_STRUCT = struct.Struct("!d d q")
 TICK_SIZE = TICK_STRUCT.size
 
 # --- CONFIGURATION ---
+
+
 @dataclass(slots=True)
 class NexusConfig:
     gamma: float = 0.1      # Risk aversion
@@ -70,6 +72,7 @@ class NexusConfig:
     max_inventory: int = 10
     latency_warn_threshold_us: float = 100.0
 
+
 @dataclass(slots=True)
 class MarketState:
     mid_price: float = 100.0
@@ -77,10 +80,12 @@ class MarketState:
     cash: float = 1_000_000.0
     last_ts: int = 0
 
+
 class AvellanedaStoikovStrategy:
     """
     JIT-friendly implementation of the Avellaneda-Stoikov pricing model.
     """
+
     def __init__(self, config: NexusConfig):
         self.gamma = config.gamma
         self.sigma_sq = config.sigma ** 2
@@ -116,10 +121,12 @@ class AvellanedaStoikovStrategy:
 
         return bid, ask
 
+
 class NexusEngine:
     """
     The High-Performance Reactor.
     """
+
     def __init__(self, config: NexusConfig):
         self.config = config
         self.strategy = AvellanedaStoikovStrategy(config)
@@ -161,7 +168,7 @@ class NexusEngine:
             # This logic would be more complex in production
             pass
         else:
-            self.orders_placed += 2 # Updating both sides
+            self.orders_placed += 2  # Updating both sides
 
         # 5. Telemetry
         t1 = time.perf_counter()
@@ -195,7 +202,7 @@ class NexusEngine:
             # Spread
             bid = current_price - 0.01
             ask = current_price + 0.01
-            ts += 10 # 10ms increments
+            ts += 10  # 10ms increments
 
             # Execute
             process_tick(bid, ask, ts)
@@ -223,6 +230,7 @@ class NexusEngine:
         print(f"Latency (P99):  {p99_lat:.2f} us")
         print(f"Inventory End:  {self.state.inventory}")
         print("="*40 + "\n")
+
 
 if __name__ == "__main__":
     # Setup Logging

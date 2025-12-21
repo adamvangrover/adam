@@ -1,4 +1,4 @@
-#documentation_agent.py
+# documentation_agent.py
 """
 This module defines the DocumentationAgent, a specialized agent responsible for
 writing and updating documentation related to code changes.
@@ -6,6 +6,7 @@ writing and updating documentation related to code changes.
 
 from typing import Any, Dict
 from core.agents.agent_base import AgentBase
+
 
 class DocumentationAgent(AgentBase):
     """
@@ -26,7 +27,7 @@ class DocumentationAgent(AgentBase):
         """
         source_code = code_artifact.get("code")
         file_path = code_artifact.get("file_path")
-        
+
         # 1. Determine the path for the documentation file (simplified assumption)
         doc_path = file_path.replace("core/", "docs/").replace(".py", ".md")
 

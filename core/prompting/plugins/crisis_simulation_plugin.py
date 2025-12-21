@@ -3,6 +3,7 @@ import json
 from core.prompting.base_prompt_plugin import BasePromptPlugin
 from core.schemas.crisis_simulation import CrisisSimulationInput, CrisisSimulationOutput
 
+
 class CrisisSimulationPlugin(BasePromptPlugin[CrisisSimulationOutput]):
     """
     A prompt plugin for running enterprise-grade crisis simulations based on a
@@ -24,7 +25,8 @@ class CrisisSimulationPlugin(BasePromptPlugin[CrisisSimulationOutput]):
         validated_data = self.get_input_schema()(**data)
 
         # Convert the Pydantic models to JSON strings for injection
-        risk_portfolio_json = json.dumps([risk.model_dump(by_alias=True) for risk in validated_data.risk_portfolio], indent=4)
+        risk_portfolio_json = json.dumps([risk.model_dump(by_alias=True)
+                                         for risk in validated_data.risk_portfolio], indent=4)
 
         # Render the user template (which contains the full XML structure)
         user_content = self.user_engine.render(

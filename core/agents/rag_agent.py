@@ -15,6 +15,7 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+
 class RAGAgent(AgentBase):
     """
     An agent that implements a Retrieval-Augmented Generation (RAG) pipeline.
@@ -35,7 +36,7 @@ class RAGAgent(AgentBase):
         Initializes the RAGAgent.
         """
         super().__init__(config, constitution, kernel)
-        
+
         self.llm_engine = llm_engine
         self.embedding_model = embedding_model
         self.vector_store = vector_store
@@ -59,14 +60,14 @@ class RAGAgent(AgentBase):
             if not query:
                 return {"error": "Query not provided for process_rag_query skill."}
             return await self.process_query(query)
-            
+
         elif skill_name == 'ingest_document':
             doc_input = kwargs.get('document')
             if not doc_input:
                 return {"error": "Document not provided for ingest_document skill."}
             await self.ingest_document(doc_input)
             return {"status": "ingestion_complete"}
-            
+
         else:
             logging.warning(f"Unknown skill '{skill_name}' requested from RAGAgent.")
             return None
@@ -92,7 +93,7 @@ class RAGAgent(AgentBase):
         # 3. Format context from retrieved documents
         # Assuming retrieved_docs is a list of tuples (content, score) or similar
         context = "\n".join([doc[0] for doc in retrieved_docs]) if retrieved_docs else ""
-        
+
         if not context:
             logging.warning(f"RAG Agent found no relevant context for query: {query}")
 
@@ -119,6 +120,7 @@ class RAGAgent(AgentBase):
         except ImportError:
             # Fallback if module missing
             logging.warning("core.rag.document_handling not found, using simple string handling.")
+
             class Document:
                 def __init__(self, content, metadata=None):
                     self.content = content
@@ -155,7 +157,8 @@ class RAGAgent(AgentBase):
 
             if documents_to_add:
                 await self.vector_store.add_documents(documents_to_add)
-                logging.info(f"RAG Agent: Finished embedding and adding {len(documents_to_add)} chunks for document {doc.id}.")
+                logging.info(
+                    f"RAG Agent: Finished embedding and adding {len(documents_to_add)} chunks for document {doc.id}.")
             else:
                 logging.info(f"RAG Agent: No document chunks were added to vector store for doc {doc.id}.")
 
@@ -178,8 +181,8 @@ class RAGAgent(AgentBase):
         try:
             # Check if plugin exists, if not try to load (mock path logic preserved from original)
             if hasattr(self.kernel, 'plugins') and skill_name not in self.kernel.plugins:
-                 # Logic to load would go here, omitting specific path assumptions for now
-                 pass
+                # Logic to load would go here, omitting specific path assumptions for now
+                pass
 
             if hasattr(self.kernel, 'plugins') and skill_name in self.kernel.plugins:
                 enhancer_function = self.kernel.plugins[skill_name][function_name]
@@ -224,7 +227,7 @@ class RAGAgent(AgentBase):
             return None
 
         try:
-             if hasattr(self.kernel, 'plugins') and plugin_name in self.kernel.plugins:
+            if hasattr(self.kernel, 'plugins') and plugin_name in self.kernel.plugins:
                 target_function = self.kernel.plugins[plugin_name][function_name]
                 result = await self.kernel.invoke(target_function, **kwargs)
                 return str(result)

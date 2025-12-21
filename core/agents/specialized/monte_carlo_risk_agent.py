@@ -7,6 +7,7 @@ from core.schemas.v23_5_schema import SimulationEngine, TradingDynamics, Quantum
 # Configure logging
 logger = logging.getLogger(__name__)
 
+
 class MonteCarloRiskAgent(AgentBase):
     """
     Quantitative Risk Agent using Monte Carlo simulations.
@@ -69,7 +70,7 @@ class MonteCarloRiskAgent(AgentBase):
         # Time horizon: 1 year (T=1), Steps=12 (Monthly)
         T = 1.0
         # dt = T / 12 # Unused in simple terminal value calc
-        mu = 0.02 # Assume modest 2% drift/growth in base case
+        mu = 0.02  # Assume modest 2% drift/growth in base case
         sigma = ebitda_volatility
 
         # Generate random shocks: (Iterations, Steps)
@@ -103,8 +104,10 @@ class MonteCarloRiskAgent(AgentBase):
 
         # Helper for probability buckets
         def get_prob_bucket(p):
-            if p < 0.1: return "Low"
-            if p < 0.4: return "Med"
+            if p < 0.1:
+                return "Low"
+            if p < 0.4:
+                return "Med"
             return "High"
 
         output = SimulationEngine(
@@ -124,7 +127,7 @@ class MonteCarloRiskAgent(AgentBase):
                 )
             ],
             trading_dynamics=TradingDynamics(
-                short_interest="See Market Data", # To be filled by MarketDataAgent
+                short_interest="See Market Data",  # To be filled by MarketDataAgent
                 liquidity_risk="High" if sigma > 0.3 else "Low"
             )
         )

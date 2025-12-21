@@ -9,6 +9,7 @@ import json
 # capabilities of the system. Agents can use this skill to generate
 # robust time-series forecasts and apply qualitative adjustments.
 
+
 class HybridForecastingSkill:
     """
     A Semantic Kernel skill for hybrid time-series forecasting (ARIMA + LSTM)

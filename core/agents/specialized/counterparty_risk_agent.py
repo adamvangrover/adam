@@ -5,10 +5,12 @@ from core.v23_graph_engine.odyssey_knowledge_graph import OdysseyKnowledgeGraph
 
 logger = logging.getLogger(__name__)
 
+
 class CounterpartyRiskAgent(AgentBase):
     """
     Responsibility: PFE, Wrong-Way Risk (WWR).
     """
+
     def __init__(self, config: Dict[str, Any], kernel: Optional[Any] = None, graph: Optional[OdysseyKnowledgeGraph] = None):
         super().__init__(config, kernel=kernel)
         self.graph = graph or OdysseyKnowledgeGraph()

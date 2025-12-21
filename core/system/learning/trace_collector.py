@@ -21,20 +21,24 @@ from enum import Enum
 DATA_DIR = os.path.join("data", "artisanal_training_sets")
 os.makedirs(DATA_DIR, exist_ok=True)
 
+
 class TraceType(Enum):
     SUCCESS = "success"
     FAILURE = "failure"
     CORRECTION = "correction"  # Valuable for DPO (Negative -> Positive)
 
+
 class ReasoningStep(BaseModel):
     timestamp: float
     agent_id: str
-    step_type: str # 'thought', 'tool_use', 'output'
+    step_type: str  # 'thought', 'tool_use', 'output'
     content: Any
     metadata: Dict[str, Any] = {}
 
+
 class AgentTrace:
     """Represents a full session or task execution."""
+
     def __init__(self, trace_id: Optional[str] = None, task_description: str = ""):
         self.trace_id = trace_id or str(uuid.uuid4())
         self.task_description = task_description
@@ -58,10 +62,12 @@ class AgentTrace:
         self.trace_type = TraceType.SUCCESS if success else TraceType.FAILURE
         self.feedback_score = score
 
+
 class TraceCollector:
     """
     Global singleton-like class to manage the collection and saving of traces.
     """
+
     def __init__(self):
         self.active_traces: Dict[str, AgentTrace] = {}
 
@@ -84,11 +90,11 @@ class TraceCollector:
 
     def _export_trace(self, trace: AgentTrace):
         """Exports the trace to the appropriate JSONL file based on type."""
-        
+
         # Construct the conversational format
         messages = [{"role": "system", "content": "You are Adam, an advanced AI financial architect."}]
         messages.append({"role": "user", "content": trace.task_description})
-        
+
         # Compress steps into a coherent assistant response chain
         # This logic can be expanded to support multi-turn. For now, we flatten.
         thought_chain = ""
@@ -118,6 +124,7 @@ class TraceCollector:
                 f.write(json.dumps(entry) + "\n")
         except Exception as e:
             print(f"CRITICAL: Failed to save training data: {e}")
+
 
 # Example Usage
 if __name__ == "__main__":

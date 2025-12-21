@@ -16,6 +16,7 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+
 class RiskAssessmentAgent(AgentBase):
     """
     Agent responsible for assessing various types of investment risks,
@@ -108,7 +109,8 @@ class RiskAssessmentAgent(AgentBase):
         # Note: We run these synchronously as they are CPU bound math operations,
         # but in a real system we might offload to a thread pool if they get heavy.
         if risk_type == "investment":
-            result = self.assess_investment_risk(target_data.get("company_name"), target_data.get("financial_data", {}), target_data.get("market_data", {}))
+            result = self.assess_investment_risk(target_data.get("company_name"), target_data.get(
+                "financial_data", {}), target_data.get("market_data", {}))
         elif risk_type == "loan":
             result = self.assess_loan_risk(target_data.get("loan_details", {}), target_data.get("borrower_data", {}))
         elif risk_type == "project":
@@ -192,7 +194,7 @@ class RiskAssessmentAgent(AgentBase):
         Calculates market risk using Volatility or Parametric VaR (Value at Risk).
         """
         if "price_data" in market_data:
-            prices = np.array(market_data["price_data"]) # Ensure numpy array
+            prices = np.array(market_data["price_data"])  # Ensure numpy array
             if len(prices) > 1:
                 returns = np.log(prices[1:] / prices[:-1])
                 std_dev = np.std(returns)
@@ -230,18 +232,19 @@ class RiskAssessmentAgent(AgentBase):
 
     def _assess_liquidity(self, trading_volume: int) -> float:
         # Logarithmic scaling for better differentiation at low volumes
-        if trading_volume <= 0: return 1.0
+        if trading_volume <= 0:
+            return 1.0
 
         # Assume 1M is "High Liquidity" (Risk = 0.1)
         # Assume 10k is "Low Liquidity" (Risk = 0.9)
         # Risk = 1 / log10(volume) roughly
 
         log_vol = np.log10(trading_volume)
-        if log_vol >= 6: # 1M
+        if log_vol >= 6:  # 1M
             return 0.1
-        elif log_vol >= 5: # 100k
+        elif log_vol >= 5:  # 100k
             return 0.2
-        elif log_vol >= 4: # 10k
+        elif log_vol >= 4:  # 10k
             return 0.5
         else:
             return 0.8
@@ -277,11 +280,11 @@ class RiskAssessmentAgent(AgentBase):
                 numeric_score = float(score)
             elif isinstance(score, str):
                 if score == "Low":
-                  numeric_score = 0.1
+                    numeric_score = 0.1
                 elif score == "Medium":
-                  numeric_score = 0.5
+                    numeric_score = 0.5
                 elif score == "High":
-                  numeric_score = 0.9
+                    numeric_score = 0.9
             elif isinstance(score, list):
                 # Heuristic: List implies presence of risk factors
                 numeric_score = 0.5 if len(score) > 0 else 0.1
@@ -299,7 +302,8 @@ class RiskAssessmentAgent(AgentBase):
 
     def _assess_economic_risk(self) -> float:
         economic_data = self.knowledge_base.get("economic_data", {})
-        if not economic_data: return 0.5
+        if not economic_data:
+            return 0.5
         usa_data = economic_data.get("USA", {})
         gdp_growth = usa_data.get("GDP_growth", 0)
         inflation = usa_data.get("inflation", 0)
@@ -312,16 +316,18 @@ class RiskAssessmentAgent(AgentBase):
 
     def _assess_volatility_risk(self) -> float:
         volatility_indices = self.knowledge_base.get("volatility_indices", {})
-        if not volatility_indices: return 0.5
+        if not volatility_indices:
+            return 0.5
         vix = volatility_indices.get("VIX", {}).get("value", 20) / 40
         vxn = volatility_indices.get("VXN", {}).get("value", 25) / 40
         return min(1.0, (vix + vxn) / 2)
 
     def _assess_currency_risk(self) -> float:
         currency_par_values = self.knowledge_base.get("currency_par_values", {})
-        if not currency_par_values: return 0.5
+        if not currency_par_values:
+            return 0.5
         usd_eur = abs(1 - currency_par_values.get("USD/EUR", 0.85))
-        usd_jpy = abs(1 - currency_par_values.get("USD/JPY", 145) / 145 )
+        usd_jpy = abs(1 - currency_par_values.get("USD/JPY", 145) / 145)
         return min(1.0, (usd_eur + usd_jpy) / 2)
 
     def _assess_borrower_liquidity(self, borrower_data: Dict) -> float:

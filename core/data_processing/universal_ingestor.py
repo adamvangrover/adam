@@ -9,6 +9,8 @@ from datetime import datetime
 import re
 
 # --- EMBEDDED SCRUBBER (Merged for stability) ---
+
+
 class GoldStandardScrubber:
     """
     Implements the 'Gold Standard' review process:
@@ -36,7 +38,7 @@ class GoldStandardScrubber:
         """
         Calculates a 'Conviction Score' (0.0 - 1.0) based on quality heuristics.
         """
-        score = 0.5 # Baseline
+        score = 0.5  # Baseline
 
         if not content:
             return 0.0
@@ -44,9 +46,12 @@ class GoldStandardScrubber:
         if isinstance(content, dict):
             # JSON Data
             keys = content.keys()
-            if 'title' in keys or 'name' in keys: score += 0.1
-            if 'metadata' in keys or 'meta' in keys: score += 0.1
-            if len(keys) > 5: score += 0.1
+            if 'title' in keys or 'name' in keys:
+                score += 0.1
+            if 'metadata' in keys or 'meta' in keys:
+                score += 0.1
+            if len(keys) > 5:
+                score += 0.1
 
             # Check for depth
             if any(isinstance(v, (dict, list)) for v in content.values()):
@@ -58,22 +63,29 @@ class GoldStandardScrubber:
                 score += 0.1
                 if isinstance(content[0], dict):
                     score += 0.1
-            if len(content) > 10: score += 0.1
+            if len(content) > 10:
+                score += 0.1
 
         elif isinstance(content, str):
             # Text/Markdown
             length = len(content)
-            if length > 100: score += 0.1
-            if length > 1000: score += 0.1
+            if length > 100:
+                score += 0.1
+            if length > 1000:
+                score += 0.1
 
             # Structure
-            if '# ' in content: score += 0.1 # Has headings
-            if '```' in content: score += 0.1 # Has code blocks
+            if '# ' in content:
+                score += 0.1  # Has headings
+            if '```' in content:
+                score += 0.1  # Has code blocks
 
             # Python Docstrings
             if artifact_type == "code_doc":
-                if "Args:" in content or "Returns:" in content: score += 0.2
-                if "class " in content: score += 0.1
+                if "Args:" in content or "Returns:" in content:
+                    score += 0.2
+                if "class " in content:
+                    score += 0.1
 
         # Cap at 1.0
         return min(score, 1.0)
@@ -112,14 +124,14 @@ class GoldStandardScrubber:
             metadata['lines'] = content.count('\n') + 1
 
             # Adaptive Scan Strategy
-            scan_limit = 10000 # Default QUICK scan
+            scan_limit = 10000  # Default QUICK scan
 
             if GoldStandardScrubber.is_high_impact(content, artifact_type):
-                scan_limit = 100000 # DEEP scan for high impact docs
+                scan_limit = 100000  # DEEP scan for high impact docs
                 metadata['scan_strategy'] = "DEEP"
 
             # Flag massive files for human review
-            if length > 5 * 1024 * 1024: # > 5MB
+            if length > 5 * 1024 * 1024:  # > 5MB
                 metadata['review_required'] = True
                 metadata['review_reason'] = "LARGE_FILE_SIZE"
 
@@ -135,6 +147,7 @@ class GoldStandardScrubber:
 
 # --- MAIN INGESTOR ---
 
+
 class ArtifactType(Enum):
     REPORT = "report"
     NEWSLETTER = "newsletter"
@@ -142,6 +155,7 @@ class ArtifactType(Enum):
     DATA = "data"
     CODE_DOC = "code_doc"
     UNKNOWN = "unknown"
+
 
 class GoldStandardArtifact:
     def __init__(self,
@@ -178,11 +192,13 @@ class GoldStandardArtifact:
             "ingestion_timestamp": self.ingestion_timestamp
         }
 
+
 class UniversalIngestor:
     """
     The Gold Standard Scrubbing Process.
     Ingests data from various sources, standardizes it, and assesses conviction.
     """
+
     def __init__(self):
         self.artifacts: List[GoldStandardArtifact] = []
 
@@ -215,7 +231,7 @@ class UniversalIngestor:
 
         # Skip init files unless we are specifically targeting them? No, usually skip.
         if filename == "__init__.py":
-            pass # We might want to read init for package docs, but let's skip for now.
+            pass  # We might want to read init for package docs, but let's skip for now.
 
         # Skip this file itself and generated files to avoid loops
         if "gold_standard" in filepath or "ui_data.json" in filepath:
@@ -243,7 +259,7 @@ class UniversalIngestor:
                 clean_content = GoldStandardScrubber.clean_text(content)
                 data = json.loads(clean_content)
             except json.JSONDecodeError:
-                return # Skip invalid JSON
+                return  # Skip invalid JSON
 
         # Determine type based on path or content
         artifact_type = ArtifactType.DATA
@@ -258,7 +274,7 @@ class UniversalIngestor:
         # Extract metadata
         metadata = GoldStandardScrubber.extract_metadata(data, artifact_type.value)
         if "original_keys" not in metadata:
-             metadata["original_keys"] = list(data.keys()) if isinstance(data, dict) else []
+            metadata["original_keys"] = list(data.keys()) if isinstance(data, dict) else []
 
         # Create artifact
         artifact = GoldStandardArtifact(
@@ -383,10 +399,11 @@ class UniversalIngestor:
     def get_artifacts_by_type(self, artifact_type: ArtifactType) -> List[Dict]:
         return [a.to_dict() for a in self.artifacts if a.type == artifact_type.value]
 
+
 if __name__ == "__main__":
     # Example usage
     ingestor = UniversalIngestor()
-    ingestor.scan_directory("core") # Scan core for code docs
+    ingestor.scan_directory("core")  # Scan core for code docs
     ingestor.scan_directory("prompt_library")
     ingestor.scan_directory("data")
     ingestor.scan_directory("docs")

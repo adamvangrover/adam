@@ -3,6 +3,7 @@
 import pandas as pd
 from textblob import TextBlob
 
+
 class UtilitiesSpecialist:
     def __init__(self, config):
         self.data_sources = config.get('data_sources', {})
@@ -26,14 +27,14 @@ class UtilitiesSpecialist:
         # Analyze sentiment and trends
         sentiment_scores = [TextBlob(headline['text']).sentiment.polarity for headline in news_headlines]
         avg_sentiment = sum(sentiment_scores) / len(sentiment_scores) if sentiment_scores else 0
-        #... (analyze social media sentiment and trends)
+        # ... (analyze social media sentiment and trends)
 
         trends = {
             'renewable_energy_adoption': self.analyze_renewable_adoption(news_headlines, social_media_posts),
             'regulatory_environment': self.analyze_regulatory_environment(news_headlines, social_media_posts),
             'demand_growth': self.analyze_demand_growth(news_headlines, social_media_posts),
             'overall_sentiment': avg_sentiment,
-            #... (add more trends and insights)
+            # ... (add more trends and insights)
         }
         return trends
 
@@ -57,32 +58,32 @@ class UtilitiesSpecialist:
         renewable_percentage = self.calculate_renewable_percentage(generation_mix)
 
         # 3. Analyze regulatory compliance
-        #... (analyze company's compliance with environmental regulations)
+        # ... (analyze company's compliance with environmental regulations)
 
         analysis_results = {
             'financial_health': financial_health,
             'renewable_energy_percentage': renewable_percentage,
             'regulatory_compliance': 'good',  # Placeholder
-            #... (add more analysis results)
+            # ... (add more analysis results)
         }
         return analysis_results
 
     def analyze_renewable_adoption(self, news_headlines, social_media_posts):
-        #... (analyze news and social media data to assess renewable energy adoption trends)
+        # ... (analyze news and social media data to assess renewable energy adoption trends)
         return "increasing"  # Example
 
     def analyze_regulatory_environment(self, news_headlines, social_media_posts):
-        #... (analyze news and social media data to assess regulatory environment trends)
+        # ... (analyze news and social media data to assess regulatory environment trends)
         return "evolving"  # Example
 
     def analyze_demand_growth(self, news_headlines, social_media_posts):
-        #... (analyze news and social media data to assess demand growth trends)
+        # ... (analyze news and social media data to assess demand growth trends)
         return "stable"  # Example
 
     def analyze_financial_health(self, financial_statements):
-        #... (analyze financial data to assess financial health)
+        # ... (analyze financial data to assess financial health)
         return "stable"  # Example
 
     def calculate_renewable_percentage(self, generation_mix):
-        #... (calculate the percentage of renewable energy in the generation mix)
+        # ... (calculate the percentage of renewable energy in the generation mix)
         return 30  # Example

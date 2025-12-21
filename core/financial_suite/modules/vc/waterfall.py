@@ -1,6 +1,7 @@
 from typing import Dict, List
 from core.financial_suite.schemas.workstream_context import WorkstreamContext, Security
 
+
 class WaterfallEngine:
     @staticmethod
     def calculate_exit_waterfall(ctx: WorkstreamContext, exit_enterprise_value: float) -> Dict[str, float]:

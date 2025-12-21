@@ -1,14 +1,15 @@
-#core/agents/data_visualization_agent.py
+# core/agents/data_visualization_agent.py
 
 import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.express as px
 
+
 class DataVisualizationAgent:
     def __init__(self, config):
         self.config = config
         # Initialize visualization libraries and settings
-        #...
+        # ...
 
     def create_chart(self, data, chart_type, **kwargs):
         """
@@ -16,13 +17,13 @@ class DataVisualizationAgent:
         """
         if chart_type == "line":
             # Create a line chart
-            #...
+            # ...
             pass  # Placeholder for implementation
         elif chart_type == "bar":
             # Create a bar chart
-            #...
+            # ...
             pass  # Placeholder for implementation
-        #... (Add other chart types)
+        # ... (Add other chart types)
 
     def create_graph(self, data, graph_type, **kwargs):
         """
@@ -30,13 +31,13 @@ class DataVisualizationAgent:
         """
         if graph_type == "network":
             # Create a network graph
-            #...
+            # ...
             pass  # Placeholder for implementation
         elif graph_type == "treemap":
             # Create a treemap
-            #...
+            # ...
             pass  # Placeholder for implementation
-        #... (Add other graph types)
+        # ... (Add other graph types)
 
     def create_map(self, data, map_type, **kwargs):
         """
@@ -44,13 +45,13 @@ class DataVisualizationAgent:
         """
         if map_type == "choropleth":
             # Create a choropleth map
-            #...
+            # ...
             pass  # Placeholder for implementation
         elif map_type == "heatmap":
             # Create a heatmap
-            #...
+            # ...
             pass  # Placeholder for implementation
-        #... (Add other map types)
+        # ... (Add other map types)
 
     def run(self, data, visualization_type, **kwargs):
         """
@@ -68,6 +69,7 @@ class DataVisualizationAgent:
         except Exception as e:
             return {"error": str(e)}
 
+
 # Example usage
 if __name__ == "__main__":
     # Sample data
@@ -83,4 +85,4 @@ if __name__ == "__main__":
     chart = agent.run(data, "chart", chart_type="line")
 
     # Display the chart (if applicable)
-    #...
+    # ...

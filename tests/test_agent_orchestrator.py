@@ -8,9 +8,11 @@ from core.agents.agent_base import AgentBase
 from core.system.error_handler import AgentNotFoundError
 from core.system import agent_orchestrator as ao_module
 
+
 class MockAgent(AgentBase):  # Define a mock agent for testing
     async def execute(self, *args, **kwargs):
         return "Mock Agent Result"
+
 
 class TestAgentOrchestrator(unittest.TestCase):
 
@@ -26,11 +28,11 @@ class TestAgentOrchestrator(unittest.TestCase):
             "agents": {
                 "MockAgent": {
                     "class": "tests.test_agent_orchestrator.MockAgent",  # Use the full path
-                    "arguments": {"config": {}} # Pass in the required arguments
+                    "arguments": {"config": {}}  # Pass in the required arguments
                 }
             }
         }
-        self.test_config = {"test":"test"}
+        self.test_config = {"test": "test"}
 
     def tearDown(self):
         self.llm_patcher.stop()
@@ -49,10 +51,10 @@ class TestAgentOrchestrator(unittest.TestCase):
     @patch('core.utils.config_utils.load_config')
     def test_load_agents_invalid_class(self, mock_load_config):
         mock_load_config.return_value = {
-            "agents": { "InvalidAgent": {"class": "nonexistent.module.Class", "arguments": {}} }
+            "agents": {"InvalidAgent": {"class": "nonexistent.module.Class", "arguments": {}}}
         }
         orchestrator = AgentOrchestrator()
-        orchestrator.config = {"agents": { "InvalidAgent": {"class": "nonexistent.module.Class", "arguments": {}} }}
+        orchestrator.config = {"agents": {"InvalidAgent": {"class": "nonexistent.module.Class", "arguments": {}}}}
         # AgentOrchestrator handles load errors by logging, it does NOT raise ImportError usually.
         # But let's check implementation.
         # try: ... except Exception as e: logging.error(...)
@@ -60,7 +62,6 @@ class TestAgentOrchestrator(unittest.TestCase):
         # We should check that it is NOT loaded.
         orchestrator.load_agents()
         self.assertNotIn("InvalidAgent", orchestrator.agents)
-
 
     @patch('core.utils.config_utils.load_config')
     def test_get_agent_found(self, mock_load_config):
@@ -94,7 +95,6 @@ class TestAgentOrchestrator(unittest.TestCase):
         self.assertIsNone(result)
         orchestrator.message_broker.publish.assert_called_once()
 
-
     @patch('core.utils.config_utils.load_config')
     def test_execute_agent_not_found(self, mock_load_config):
         mock_load_config.return_value = self.mock_config
@@ -107,6 +107,7 @@ class TestAgentOrchestrator(unittest.TestCase):
         # Should log error, but return None.
 
     # Remove test_execute_agent_exception as execute_agent catches exceptions and logs them
+
 
 if __name__ == '__main__':
     unittest.main()

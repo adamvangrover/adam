@@ -15,6 +15,7 @@ logger = logging.getLogger("DataUtils")
 
 # --- DATA STRUCTURES ---
 
+
 class ArtifactType(Enum):
     REPORT = "report"
     NEWSLETTER = "newsletter"
@@ -23,6 +24,7 @@ class ArtifactType(Enum):
     CODE_DOC = "code_doc"
     CONFIG = "config"
     UNKNOWN = "unknown"
+
 
 @dataclass
 class GoldStandardArtifact:
@@ -41,6 +43,7 @@ class GoldStandardArtifact:
         return asdict(self)
 
 # --- SCORING & CLEANING ENGINE ---
+
 
 class GoldStandardScrubber:
     """
@@ -66,7 +69,8 @@ class GoldStandardScrubber:
 
     @staticmethod
     def clean_text(text: str) -> str:
-        if not text: return ""
+        if not text:
+            return ""
         # Normalize line endings and strip nulls
         text = text.replace('\r\n', '\n').replace('\r', '\n').replace('\x00', '')
         # Remove excessive whitespace while preserving paragraph structure
@@ -79,22 +83,26 @@ class GoldStandardScrubber:
         # 1. Dictionary/JSON Heuristics
         if isinstance(content, dict):
             keys = content.keys()
-            if len(keys) > 4: score += cls.WEIGHTS['metadata_richness']
-            if 'metadata' in keys or 'meta' in keys: score += 0.1
+            if len(keys) > 4:
+                score += cls.WEIGHTS['metadata_richness']
+            if 'metadata' in keys or 'meta' in keys:
+                score += 0.1
             # Check for nesting depth (complexity)
             if any(isinstance(v, (dict, list)) for v in content.values()):
                 score += cls.WEIGHTS['structural_depth']
 
         # 2. List/JSONL Heuristics
         elif isinstance(content, list):
-            if len(content) > 5: score += 0.1
+            if len(content) > 5:
+                score += 0.1
             if len(content) > 0 and isinstance(content[0], dict):
                 score += cls.WEIGHTS['structural_depth']
 
         # 3. Text/Markdown/Code Heuristics
         elif isinstance(content, str):
             length = len(content)
-            if length > 500: score += cls.WEIGHTS['text_length_bonus']
+            if length > 500:
+                score += cls.WEIGHTS['text_length_bonus']
 
             # Markdown Structure
             if '# ' in content or '## ' in content:
@@ -102,8 +110,10 @@ class GoldStandardScrubber:
 
             # Code Documentation specific
             if artifact_type == ArtifactType.CODE_DOC.value:
-                if "Args:" in content or "Returns:" in content: score += 0.2
-                if "class " in content: score += 0.1
+                if "Args:" in content or "Returns:" in content:
+                    score += 0.2
+                if "class " in content:
+                    score += 0.1
 
         return min(round(score, 2), 1.0)
 
@@ -126,6 +136,7 @@ class GoldStandardScrubber:
         return meta
 
 # --- FILE HANDLERS (STRATEGY PATTERN) ---
+
 
 class FileHandlers:
     """Encapsulates logic for parsing specific file types."""
@@ -161,10 +172,13 @@ class FileHandlers:
         data = []
         for line in raw_text.splitlines():
             try:
-                if line.strip(): data.append(json.loads(line))
-            except: continue
+                if line.strip():
+                    data.append(json.loads(line))
+            except:
+                continue
 
-        if not data: return None
+        if not data:
+            return None
 
         return GoldStandardArtifact(
             source_path=filepath,
@@ -186,8 +200,10 @@ class FileHandlers:
             title = match.group(1).strip()
 
         a_type = ArtifactType.CODE_DOC
-        if "prompt" in filepath.lower(): a_type = ArtifactType.PROMPT
-        elif "newsletter" in filepath.lower(): a_type = ArtifactType.NEWSLETTER
+        if "prompt" in filepath.lower():
+            a_type = ArtifactType.PROMPT
+        elif "newsletter" in filepath.lower():
+            a_type = ArtifactType.NEWSLETTER
 
         return GoldStandardArtifact(
             source_path=filepath,
@@ -212,7 +228,8 @@ class FileHandlers:
             complexity = raw_text.count('if ') + raw_text.count('for ') + raw_text.count('while ')
 
             summary = f"Module: {os.path.basename(filepath)}\n"
-            if docstring: summary += f"Docstring: {docstring}\n"
+            if docstring:
+                summary += f"Docstring: {docstring}\n"
             summary += f"Classes: {', '.join(classes)}\nFunctions: {', '.join(functions)}"
 
             meta = {

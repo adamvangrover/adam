@@ -7,11 +7,13 @@ from typing import Dict, Any, Callable
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("MCPServer")
 
+
 class MCPServer:
     """
     Model Context Protocol (MCP) Server for Adam v30.0.
     Acts as the nervous system connecting AI agents to the Core.
     """
+
     def __init__(self):
         self.tools: Dict[str, Callable] = {}
         self.resources: Dict[str, Any] = {}
@@ -67,6 +69,7 @@ class MCPServer:
 
 # --- Example Core Tools Implemented in Python for the Intelligence Layer ---
 
+
 def execute_trade(symbol: str, side: str, quantity: int, price: float = None):
     """
     Simulates sending an order to the Rust Core via ZMQ/IPC.
@@ -75,11 +78,13 @@ def execute_trade(symbol: str, side: str, quantity: int, price: float = None):
     logger.info(f"Sending Order to Rust Core: {side} {quantity} {symbol} @ {price if price else 'MKT'}")
     return {"order_id": order_id, "status": "Working"}
 
+
 def get_market_data(symbol: str):
     """
     Fetches market data from the Time-Series DB (simulated).
     """
     return {"symbol": symbol, "price": 150.00, "bid": 149.95, "ask": 150.05}
+
 
 # Server Instance (Singleton pattern)
 mcp_server = MCPServer()

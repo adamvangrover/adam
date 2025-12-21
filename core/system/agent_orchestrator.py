@@ -1,5 +1,6 @@
 # core/system/agent_orchestrator.py
 
+from financial_digital_twin.nexus_agent import NexusAgent
 import logging
 import yaml
 import os
@@ -32,7 +33,7 @@ from core.agents.prompt_tuner import PromptTuner
 from core.agents.code_alchemist import CodeAlchemist
 from core.agents.lingua_maestro import LinguaMaestro
 from core.agents.sense_weaver import SenseWeaver
-from core.agents.snc_analyst_agent import SNCAnalystAgent # Added import
+from core.agents.snc_analyst_agent import SNCAnalystAgent  # Added import
 from core.agents.behavioral_economics_agent import BehavioralEconomicsAgent
 from core.agents.meta_cognitive_agent import MetaCognitiveAgent
 
@@ -40,7 +41,7 @@ from pydantic import ValidationError
 from core.schemas.config_schema import AgentsYamlConfig
 
 from core.utils.config_utils import load_config
-from core.utils.secrets_utils import get_api_key # Added import
+from core.utils.secrets_utils import get_api_key  # Added import
 from core.system.message_broker import MessageBroker
 # from core.system.brokers.rabbitmq_client import RabbitMQClient
 
@@ -61,7 +62,6 @@ except ImportError:
 # this line might be redundant or could be adjusted. For now, keeping it.
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
-from financial_digital_twin.nexus_agent import NexusAgent
 # Dictionary mapping agent names to their module paths for dynamic loading
 AGENT_CLASSES = {
     "MarketSentimentAgent": "core.agents.market_sentiment_agent",
@@ -84,13 +84,13 @@ AGENT_CLASSES = {
     "DataRetrievalAgent": "core.agents.data_retrieval_agent",
     "ResultAggregationAgent": "core.agents.result_aggregation_agent",
     "ReportGeneratorAgent": "core.agents.report_generator_agent",
-    "SNCAnalystAgent": "core.agents.snc_analyst_agent", # Added snc_analyst_agent
+    "SNCAnalystAgent": "core.agents.snc_analyst_agent",  # Added snc_analyst_agent
     "BehavioralEconomicsAgent": "core.agents.behavioral_economics_agent",
     "MetaCognitiveAgent": "core.agents.meta_cognitive_agent",
     "NewsBotAgent": "core.agents.news_bot",
     "NexusAgent": NexusAgent,
-    "IngestionAgent": AgentBase, # Using AgentBase as a placeholder
-    "AuditorAgent": AgentBase, # Using AgentBase as a placeholder
+    "IngestionAgent": AgentBase,  # Using AgentBase as a placeholder
+    "AuditorAgent": AgentBase,  # Using AgentBase as a placeholder
 }
 
 
@@ -103,7 +103,7 @@ class AgentOrchestrator:
     def __init__(self):
         self.agents: Dict[str, AgentBase] = {}
         self.config = load_config("config/config.yaml") or {}
-        
+
         # Load agents.yaml if config.yaml is empty or missing agents
         if 'agents' not in self.config:
             agents_cfg = load_config("config/agents.yaml")
@@ -127,7 +127,7 @@ class AgentOrchestrator:
         self.mcp_service_registry: Dict[
             str, Dict[str, Any]
         ] = {}  # MCP service registry
-        self.sk_kernel: Optional[Kernel] = None # Initialize Semantic Kernel instance to None
+        self.sk_kernel: Optional[Kernel] = None  # Initialize Semantic Kernel instance to None
         # Use In-Memory Broker for default/showcase (RabbitMQ requires external service)
         self.message_broker = MessageBroker.get_instance()
         self.message_broker.connect()
@@ -144,7 +144,8 @@ class AgentOrchestrator:
             try:
                 sk_settings_config = load_config('config/semantic_kernel_settings.yaml')
                 if not sk_settings_config or 'semantic_kernel_settings' not in sk_settings_config:
-                    logging.error("Semantic Kernel settings not found or empty in config/semantic_kernel_settings.yaml. SK will not be available.")
+                    logging.error(
+                        "Semantic Kernel settings not found or empty in config/semantic_kernel_settings.yaml. SK will not be available.")
                     # self.sk_kernel remains None
                 else:
                     sk_settings = sk_settings_config['semantic_kernel_settings']
@@ -152,12 +153,14 @@ class AgentOrchestrator:
                     completion_services = sk_settings.get('completion_services')
 
                     if not default_service_id or not completion_services:
-                        logging.error("Default service ID or completion_services not defined in Semantic Kernel settings. SK will not be available.")
+                        logging.error(
+                            "Default service ID or completion_services not defined in Semantic Kernel settings. SK will not be available.")
                         # self.sk_kernel remains None
                     else:
                         service_config = completion_services.get(default_service_id)
                         if not service_config:
-                            logging.error(f"Configuration for default service ID '{default_service_id}' not found in completion_services. SK will not be available.")
+                            logging.error(
+                                f"Configuration for default service ID '{default_service_id}' not found in completion_services. SK will not be available.")
                             # self.sk_kernel remains None
                         else:
                             kernel_instance = Kernel()
@@ -169,7 +172,7 @@ class AgentOrchestrator:
                                 # Optional: Fetch org_id if specified in sk_settings for this service
                                 # org_id_env_var = service_config.get('org_id_env_var')
                                 # org_id = get_api_key(org_id_env_var) if org_id_env_var else None
-                                org_id = get_api_key('OPENAI_ORG_ID') # Simpler: always try OPENAI_ORG_ID
+                                org_id = get_api_key('OPENAI_ORG_ID')  # Simpler: always try OPENAI_ORG_ID
 
                                 if api_key and model_id:
                                     try:
@@ -179,13 +182,16 @@ class AgentOrchestrator:
                                             org_id=org_id if org_id else None
                                         )
                                         kernel_instance.add_chat_service("default_completion", service_instance)
-                                        self.sk_kernel = kernel_instance # Assign successfully configured kernel
-                                        logging.info(f"Semantic Kernel initialized with OpenAI service '{default_service_id}' (model: {model_id}).")
+                                        self.sk_kernel = kernel_instance  # Assign successfully configured kernel
+                                        logging.info(
+                                            f"Semantic Kernel initialized with OpenAI service '{default_service_id}' (model: {model_id}).")
                                     except Exception as e:
-                                        logging.error(f"Failed to initialize and add OpenAI service to Semantic Kernel: {e}")
+                                        logging.error(
+                                            f"Failed to initialize and add OpenAI service to Semantic Kernel: {e}")
                                         # self.sk_kernel remains None as it was before this block
                                 else:
-                                    logging.error("OpenAI API key or model_id missing. Cannot configure OpenAI service for Semantic Kernel. SK will not be available.")
+                                    logging.error(
+                                        "OpenAI API key or model_id missing. Cannot configure OpenAI service for Semantic Kernel. SK will not be available.")
                                     # self.sk_kernel remains None
                             # elif service_type == "AzureOpenAI":
                                 # Placeholder for Azure OpenAI configuration
@@ -194,11 +200,12 @@ class AgentOrchestrator:
                                 # Placeholder for HuggingFace configuration
                                 # logging.info("HuggingFace service type found, implementation pending.")
                             else:
-                                logging.error(f"Unsupported Semantic Kernel service type: {service_type}. SK will not be available.")
+                                logging.error(
+                                    f"Unsupported Semantic Kernel service type: {service_type}. SK will not be available.")
                                 # self.sk_kernel remains None
             except Exception as e:
                 logging.error(f"An unexpected error occurred during Semantic Kernel initialization: {e}")
-                self.sk_kernel = None # Ensure it's None on any exception during init
+                self.sk_kernel = None  # Ensure it's None on any exception during init
         else:
             self.sk_kernel = None
 
@@ -210,7 +217,8 @@ class AgentOrchestrator:
                     skill_collection_path = os.path.join(skills_directory, skill_collection_name)
                     if os.path.isdir(skill_collection_path):
                         try:
-                            logging.info(f"Importing SK skill collection: {skill_collection_name} from {skill_collection_path}")
+                            logging.info(
+                                f"Importing SK skill collection: {skill_collection_name} from {skill_collection_path}")
                             # For SK v0.x Python: kernel.import_skill(skill_instance, skill_name) or for directory:
                             # kernel.import_semantic_skill_from_directory(parent_directory, skill_directory_name)
                             # or kernel.import_skill_from_directory (newer pre-v1)
@@ -230,7 +238,6 @@ class AgentOrchestrator:
             else:
                 logging.warning(f"Skills directory '{skills_directory}' not found. No SK skills loaded.")
 
-
     def load_agents(self):
         """Loads agents based on the new configuration structure."""
         if not self.config or 'agents' not in self.config:
@@ -238,17 +245,18 @@ class AgentOrchestrator:
             return
 
         agents_data = self.config.get('agents', [])
-        
+
         # Normalize dict to list-like iteration
         iterator = []
         if isinstance(agents_data, dict):
             for name, cfg in agents_data.items():
-                if cfg is None: cfg = {}
-                cfg['name'] = name # Inject name from key
+                if cfg is None:
+                    cfg = {}
+                cfg['name'] = name  # Inject name from key
                 iterator.append(cfg)
         elif isinstance(agents_data, list):
             iterator = agents_data
-            
+
         for agent_config in iterator:
             agent_name = agent_config.get('name')
             if not agent_name:
@@ -267,7 +275,8 @@ class AgentOrchestrator:
                         except FileNotFoundError:
                             logging.error(f"Constitution file not found for {agent_name} at {constitution_path}")
                         except json.JSONDecodeError:
-                            logging.error(f"Failed to decode JSON from constitution file for {agent_name} at {constitution_path}")
+                            logging.error(
+                                f"Failed to decode JSON from constitution file for {agent_name} at {constitution_path}")
 
                     # Pass agent_config, constitution, and kernel to the agent
                     self.agents[agent_name] = agent_class(
@@ -573,7 +582,7 @@ class AgentOrchestrator:
         for agent_name, agent in self.agents.items():
             # Get peer agent names from the current agent's configuration
             peer_agent_names = agent.config.get('peers', [])
-            
+
             if isinstance(peer_agent_names, list):
                 for peer_name in peer_agent_names:
                     peer_agent_instance = self.get_agent(peer_name)
@@ -591,12 +600,11 @@ class AgentOrchestrator:
                         logging.warning(
                             f"Peer agent '{peer_name}' listed in config for '{agent.config.get('persona', agent_name)}' not found."
                         )
-            elif peer_agent_names: # If 'peers' exists but is not a list
-                 logging.warning(
+            elif peer_agent_names:  # If 'peers' exists but is not a list
+                logging.warning(
                     f"Invalid 'peers' configuration for agent '{agent.config.get('persona', agent_name)}': "
                     f"'peers' should be a list, but found type {type(peer_agent_names)}."
                 )
-
 
     def register_agent_skills(self) -> None:
         """Registers agent skills in the MCP service registry."""

@@ -8,16 +8,18 @@ import json
 
 logger = logging.getLogger(__name__)
 
+
 class ProvoGraph:
     """
     Implements a PROV-O compliant Knowledge Graph for audit trails.
     Tracks entities, activities, and agents.
     """
+
     def __init__(self, storage_file="data/provo_graph.json"):
         self.storage_file = storage_file
         self.nodes = {}
         self.edges = []
-        self.ips = {} # Investment Policy Statement
+        self.ips = {}  # Investment Policy Statement
         self._load()
 
     def _load(self):
@@ -89,11 +91,11 @@ class ProvoGraph:
         self.nodes[entity_id] = node
 
         if generated_by:
-             self.edges.append({
-                    "source": entity_id,
-                    "target": generated_by,
-                    "relation": "prov:wasGeneratedBy"
-                })
+            self.edges.append({
+                "source": entity_id,
+                "target": generated_by,
+                "relation": "prov:wasGeneratedBy"
+            })
         self._save()
         return entity_id
 

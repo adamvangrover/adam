@@ -37,12 +37,15 @@ except ImportError as e:
     RiskAssessmentAgent = None
 
 # Refactored Data Retrieval Logic (Decoupled from Semantic Kernel)
+
+
 class V23DataRetriever:
     """
     A lightweight, v23-compliant data retriever that mirrors the logic
     of the legacy DataRetrievalAgent but without heavy dependencies.
     Includes rich mock data for showcase purposes.
     """
+
     def __init__(self):
         self.mock_db = {
             "AAPL": self._create_mock_data("Apple Inc.", "Technology", 180.0, 0.5),
@@ -94,17 +97,18 @@ class V23DataRetriever:
 
 # --- Adapters & Helpers ---
 
+
 def map_dra_to_raa(financials: Dict[str, Any]) -> tuple[Dict, Dict]:
     """
     Maps DataRetrievalAgent output to RiskAssessmentAgent input.
     """
     fin_details = financials.get("financial_data_detailed", {})
-    
+
     mapped_fin = {
         "industry": financials.get("company_info", {}).get("industry_sector", "Unknown"),
-        "credit_rating": "BBB", # Placeholder
+        "credit_rating": "BBB",  # Placeholder
     }
-    
+
     current_price = fin_details.get("market_data", {}).get("share_price", 100)
     vol_factor = fin_details.get("market_data", {}).get("volatility_factor", 0.5)
 
@@ -117,10 +121,11 @@ def map_dra_to_raa(financials: Dict[str, Any]) -> tuple[Dict, Dict]:
     mapped_market = {
         "price_data": np.array(prices)
     }
-    
+
     return mapped_fin, mapped_market
 
 # --- Initialization ---
+
 
 data_retriever = V23DataRetriever()
 try:
@@ -138,6 +143,7 @@ except Exception as e:
 
 # --- Nodes ---
 
+
 def retrieve_data_node(state: RiskAssessmentState) -> Dict[str, Any]:
     """
     Node: Retrieve Data
@@ -145,7 +151,7 @@ def retrieve_data_node(state: RiskAssessmentState) -> Dict[str, Any]:
     """
     logger.info(f"--- Node: Retrieve Data for {state['ticker']} ---")
     ticker = state["ticker"]
-    
+
     artifacts = []
     financials = data_retriever.get_financials(ticker)
 
@@ -166,13 +172,14 @@ def retrieve_data_node(state: RiskAssessmentState) -> Dict[str, Any]:
         "human_readable_status": status
     }
 
+
 def generate_draft_node(state: RiskAssessmentState) -> Dict[str, Any]:
     """
     Node: Generate Draft
     Calls RiskAssessmentAgent to calculate risk.
     """
     logger.info("--- Node: Generate Draft ---")
-    
+
     financial_data_raw = {}
     for art in state["research_data"]:
         if "Financial Data" in art["title"]:
@@ -180,9 +187,9 @@ def generate_draft_node(state: RiskAssessmentState) -> Dict[str, Any]:
                 financial_data_raw = json.loads(art["content"])
             except:
                 pass
-    
+
     financials, market = map_dra_to_raa(financial_data_raw)
-    
+
     try:
         if risk_assessor:
             result = risk_assessor.assess_investment_risk(
@@ -196,13 +203,13 @@ def generate_draft_node(state: RiskAssessmentState) -> Dict[str, Any]:
             # Fallback if RAA is missing
             score = 75.0
             factors = {"Market Risk": "Moderate", "Liquidity Risk": "Low"}
-        
+
         draft = f"RISK ASSESSMENT REPORT FOR {state['ticker']}\n"
         draft += f"Overall Risk Score: {score:.2f} / 100\n\n"
         draft += "Risk Factors Analysis:\n"
         for k, v in factors.items():
             draft += f"- {k}: {v}\n"
-            
+
     except Exception as e:
         logger.error(f"Error in risk assessment: {e}")
         draft = f"Error during assessment: {e}"
@@ -213,6 +220,7 @@ def generate_draft_node(state: RiskAssessmentState) -> Dict[str, Any]:
         "iteration_count": state["iteration_count"] + 1
     }
 
+
 def critique_node(state: RiskAssessmentState) -> Dict[str, Any]:
     """
     Node: Critique (Enhanced with APEX Engine)
@@ -220,11 +228,11 @@ def critique_node(state: RiskAssessmentState) -> Dict[str, Any]:
     logger.info("--- Node: Critique (System 2 Verification) ---")
     draft = state.get("draft_analysis", "")
     iteration = state["iteration_count"]
-    
+
     critique_notes = []
     quality_score = 0.0
     needs_correction = False
-    
+
     # 1. Structural Checks
     if "Error" in draft:
         critique_notes.append("Analysis failed due to system error.")
@@ -252,7 +260,8 @@ def critique_node(state: RiskAssessmentState) -> Dict[str, Any]:
             draft_lower = draft.lower()
             if "tail risk" not in draft_lower and "crash" not in draft_lower:
                 breach_desc = breaches[0].description
-                critique_notes.append(f"APEX Engine Warning: Identified critical Tail Risk scenario '{breach_desc}' that is absent from the draft.")
+                critique_notes.append(
+                    f"APEX Engine Warning: Identified critical Tail Risk scenario '{breach_desc}' that is absent from the draft.")
                 needs_correction = True
 
     # 3. Iterative Refinement Logic
@@ -260,11 +269,11 @@ def critique_node(state: RiskAssessmentState) -> Dict[str, Any]:
         critique_notes.append("Analysis lacks depth on 'Liquidity Risk'. Please expand.")
         quality_score = 0.65
         needs_correction = True
-    elif iteration < 3 and needs_correction: # Only add this if we are still refining
+    elif iteration < 3 and needs_correction:  # Only add this if we are still refining
         critique_notes.append("Consider macroeconomic headwinds (inflation).")
         quality_score = 0.75
     else:
-        if not needs_correction: # If APEX didn't flag anything and iterations are done
+        if not needs_correction:  # If APEX didn't flag anything and iterations are done
             critique_notes.append("Assessment is comprehensive and robust.")
             quality_score = 0.95
 
@@ -275,6 +284,7 @@ def critique_node(state: RiskAssessmentState) -> Dict[str, Any]:
         "human_readable_status": f"Critique complete. Score: {quality_score:.2f}"
     }
 
+
 def correction_node(state: RiskAssessmentState) -> Dict[str, Any]:
     """
     Node: Correction
@@ -282,19 +292,20 @@ def correction_node(state: RiskAssessmentState) -> Dict[str, Any]:
     logger.info("--- Node: Correction ---")
     draft = state["draft_analysis"]
     notes = state["critique_notes"]
-    
+
     correction_text = f"\n\n--- REVISION v{state['iteration_count']} ---\n"
     correction_text += "Addressing Feedback:\n"
     for note in notes:
         correction_text += f" * [Resolved] {note}\n"
 
     new_draft = draft + correction_text
-    
+
     return {
         "draft_analysis": new_draft,
         "human_readable_status": "Applied expert corrections.",
         "iteration_count": state["iteration_count"] + 1
     }
+
 
 def human_review_node(state: RiskAssessmentState) -> Dict[str, Any]:
     logger.info("--- Node: Human Review ---")
@@ -304,34 +315,36 @@ def human_review_node(state: RiskAssessmentState) -> Dict[str, Any]:
 
 # --- Conditional Logic ---
 
+
 def should_continue(state: RiskAssessmentState) -> Literal["correct_analysis", "human_review", "END"]:
     quality = state["quality_score"]
     iteration = state["iteration_count"]
     needs_correction = state["needs_correction"]
-    
+
     if not needs_correction and quality >= 0.90:
         return "END"
-    
+
     if iteration >= 5:
         return "human_review"
-        
+
     return "correct_analysis"
 
 # --- Graph Construction ---
 
+
 def build_cyclical_reasoning_graph():
     workflow = StateGraph(RiskAssessmentState)
-    
+
     workflow.add_node("retrieve_data", retrieve_data_node)
     workflow.add_node("generate_draft", generate_draft_node)
     workflow.add_node("critique_analysis", critique_node)
     workflow.add_node("correct_analysis", correction_node)
     workflow.add_node("human_review", human_review_node)
-    
+
     workflow.add_edge(START, "retrieve_data")
     workflow.add_edge("retrieve_data", "generate_draft")
     workflow.add_edge("generate_draft", "critique_analysis")
-    
+
     workflow.add_conditional_edges(
         "critique_analysis",
         should_continue,
@@ -341,11 +354,12 @@ def build_cyclical_reasoning_graph():
             "END": END
         }
     )
-    
+
     workflow.add_edge("correct_analysis", "critique_analysis")
     workflow.add_edge("human_review", END)
-    
+
     checkpointer = MemorySaver()
     return workflow.compile(checkpointer=checkpointer)
+
 
 cyclical_reasoning_app = build_cyclical_reasoning_graph()

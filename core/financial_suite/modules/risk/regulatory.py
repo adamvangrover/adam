@@ -1,6 +1,7 @@
 from typing import Tuple, Dict, Any
 from core.financial_suite.schemas.workstream_context import WorkstreamContext
 
+
 class RegulatoryEngine:
     @staticmethod
     def get_rating_from_metrics(pd: float, fccr: float, ltv: float) -> Tuple[int, str]:
@@ -9,30 +10,50 @@ class RegulatoryEngine:
         Uses the 'Most Severe' logic (max rating number).
         """
         # PD Rating
-        if pd < 0.005: pd_rating = 3
-        elif pd < 0.012: pd_rating = 4
-        elif pd < 0.025: pd_rating = 5
-        elif pd < 0.050: pd_rating = 6
-        elif pd < 0.150: pd_rating = 7
-        elif pd < 0.500: pd_rating = 8
-        else: pd_rating = 9
+        if pd < 0.005:
+            pd_rating = 3
+        elif pd < 0.012:
+            pd_rating = 4
+        elif pd < 0.025:
+            pd_rating = 5
+        elif pd < 0.050:
+            pd_rating = 6
+        elif pd < 0.150:
+            pd_rating = 7
+        elif pd < 0.500:
+            pd_rating = 8
+        else:
+            pd_rating = 9
 
         # FCCR Rating
-        if fccr > 2.0: fccr_rating = 3
-        elif fccr > 1.5: fccr_rating = 4
-        elif fccr > 1.25: fccr_rating = 5
-        elif fccr > 1.10: fccr_rating = 6
-        elif fccr > 1.00: fccr_rating = 7 # Implicit, < 1.1
-        elif fccr > 0: fccr_rating = 8
-        else: fccr_rating = 9
+        if fccr > 2.0:
+            fccr_rating = 3
+        elif fccr > 1.5:
+            fccr_rating = 4
+        elif fccr > 1.25:
+            fccr_rating = 5
+        elif fccr > 1.10:
+            fccr_rating = 6
+        elif fccr > 1.00:
+            fccr_rating = 7  # Implicit, < 1.1
+        elif fccr > 0:
+            fccr_rating = 8
+        else:
+            fccr_rating = 9
 
         # LTV Rating
-        if ltv < 0.40: ltv_rating = 3
-        elif ltv < 0.55: ltv_rating = 4
-        elif ltv < 0.65: ltv_rating = 5
-        elif ltv < 0.80: ltv_rating = 6
-        elif ltv < 1.00: ltv_rating = 7 # > 80%
-        else: ltv_rating = 8 # > 100%
+        if ltv < 0.40:
+            ltv_rating = 3
+        elif ltv < 0.55:
+            ltv_rating = 4
+        elif ltv < 0.65:
+            ltv_rating = 5
+        elif ltv < 0.80:
+            ltv_rating = 6
+        elif ltv < 1.00:
+            ltv_rating = 7  # > 80%
+        else:
+            ltv_rating = 8  # > 100%
 
         final_rating = max(pd_rating, fccr_rating, ltv_rating)
 
@@ -53,11 +74,13 @@ class RegulatoryEngine:
         """
         Performs full SNC regulatory analysis.
         """
-        total_debt = sum(s.balance for s in ctx.capital_structure.securities if s.security_type in ["REVOLVER", "TERM_LOAN", "MEZZANINE"])
+        total_debt = sum(s.balance for s in ctx.capital_structure.securities if s.security_type in [
+                         "REVOLVER", "TERM_LOAN", "MEZZANINE"])
         interest_expense = sum(s.balance * s.interest_rate for s in ctx.capital_structure.securities)
 
         # Assuming 5% mandatory amortization for Term Loans
-        mandatory_principal = sum(s.balance * 0.05 for s in ctx.capital_structure.securities if s.security_type == "TERM_LOAN")
+        mandatory_principal = sum(
+            s.balance * 0.05 for s in ctx.capital_structure.securities if s.security_type == "TERM_LOAN")
 
         fixed_charges = interest_expense + mandatory_principal
         fccr = ebitda / fixed_charges if fixed_charges > 0 else 99.0
@@ -69,7 +92,7 @@ class RegulatoryEngine:
         # If Rating >= 6 (Special Mention), spread widens
         spread_adjustment = 0.0
         if rating >= 6:
-            spread_adjustment = 0.0400 # +400 bps
+            spread_adjustment = 0.0400  # +400 bps
 
         return {
             "rating": rating,

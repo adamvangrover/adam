@@ -1,6 +1,7 @@
 from typing import List, Dict
 from .task import Task
 
+
 class Workflow:
     def __init__(self, name: str, tasks: List[Task]):
         self.name = name

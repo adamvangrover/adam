@@ -5,7 +5,7 @@ from core.system.echo import Echo  # Assuming Echo is used for final output
 from core.system.knowledge_base import KnowledgeBase
 from core.utils.config_utils import load_config  # For loading configurations
 from core.utils.token_utils import check_token_limit, count_tokens  # Import token utilities
-from core.system.error_handler import AgentNotFoundError, DataNotFoundError, InvalidInputError # Import exceptions
+from core.system.error_handler import AgentNotFoundError, DataNotFoundError, InvalidInputError  # Import exceptions
 import logging  # Import the logging module
 import asyncio
 
@@ -31,7 +31,6 @@ class InteractionLoop:
         self.token_limit = self.config.get("token_limit", 4096)  # Default to 4096 if not specified
         self.knowledge_base = knowledge_base if knowledge_base is not None else KnowledgeBase()
         logging.info(f"InteractionLoop initialized with token limit: {self.token_limit}")
-
 
     def process_input(self, user_input: str) -> str:
         """
@@ -59,7 +58,7 @@ class InteractionLoop:
             raise AgentNotFoundError(query_agent_name)
 
         try:
-             # Check and log token count before calling the agent
+            # Check and log token count before calling the agent
             input_tokens = count_tokens(user_input)
             logging.info(f"Input token count: {input_tokens}")
 
@@ -81,7 +80,6 @@ class InteractionLoop:
             response_tokens = count_tokens(str(agent_names))
             logging.info(f"QueryUnderstandingAgent response: {agent_names}, Token count: {response_tokens}")
 
-
         except Exception as e:
             if isinstance(e, (AgentNotFoundError, DataNotFoundError, InvalidInputError)):
                 raise
@@ -89,15 +87,14 @@ class InteractionLoop:
             logging.exception(error_message)  # Log the full traceback
             # Raise exception if it's an AdamError, otherwise return error message?
             # Test expects InvalidInputError to bubble up
-            if hasattr(e, 'code'): # AdamError
-                 raise
+            if hasattr(e, 'code'):  # AdamError
+                raise
             return error_message
 
         if not isinstance(agent_names, list):
             error_message = "QueryUnderstandingAgent did not return a list of agent names."
             logging.error(error_message)
             return error_message
-
 
         # 3. Agent Execution Loop
         results = []
@@ -123,7 +120,6 @@ class InteractionLoop:
                 result_tokens = count_tokens(str(agent_result))
                 logging.info(f"Agent '{agent_name}' response: {agent_result}, Token count: {result_tokens}")
 
-
                 results.append(agent_result)
             except Exception as e:
                 if isinstance(e, (AgentNotFoundError, DataNotFoundError, InvalidInputError)):
@@ -133,14 +129,14 @@ class InteractionLoop:
                 # But if it's a critical error (like DataNotFoundError from the agent), we might want to stop.
                 # The test expects DataNotFoundError to bubble up.
                 if hasattr(e, 'code'):
-                     raise
+                    raise
                 continue
 
         # 4. Result Aggregation (using ResultAggregationAgent)
         aggregation_agent_name = "ResultAggregationAgent"  # Hardcoded
         aggregation_agent = self.agent_orchestrator.get_agent(aggregation_agent_name)
         if aggregation_agent is None:
-             raise AgentNotFoundError(aggregation_agent_name)
+            raise AgentNotFoundError(aggregation_agent_name)
 
         try:
             try:
@@ -163,7 +159,6 @@ class InteractionLoop:
         # 5. Output (using Echo - for now, just return the string)
         #    In a real application, Echo might format the output, send it to a UI, etc.
         return final_result
-
 
     def run(self):
         """

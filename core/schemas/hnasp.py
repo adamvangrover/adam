@@ -7,10 +7,12 @@ from pydantic import BaseModel, Field, ConfigDict
 
 # --- Meta Namespace ---
 
+
 class ModelConfig(BaseModel):
     model: str
     temperature: float = 0.7
     max_tokens: Optional[int] = None
+
 
 class SecurityContext(BaseModel):
     """
@@ -19,6 +21,7 @@ class SecurityContext(BaseModel):
     clearance: str = "public"
     user_id: str
     roles: List[str] = Field(default_factory=list)
+
 
 class Meta(BaseModel):
     agent_id: str
@@ -32,6 +35,7 @@ class Meta(BaseModel):
 
 # --- Persona State Namespace (BayesACT) ---
 
+
 class EPAVector(BaseModel):
     """
     Fundamental unit for Affect Control Theory.
@@ -40,20 +44,24 @@ class EPAVector(BaseModel):
     P: float = Field(..., description="Potency: Powerful (positive) vs Powerless (negative)")
     A: float = Field(..., description="Activity: Active (positive) vs Passive (negative)")
 
+
 class Identity(BaseModel):
     label: str
     fundamental_epa: Optional[EPAVector] = None
     transient_epa: Optional[EPAVector] = None
-    uncertainty_covariance: Optional[List[float]] = None 
+    uncertainty_covariance: Optional[List[float]] = None
     confidence: Optional[float] = None
+
 
 class PersonaIdentities(BaseModel):
     self: Identity
     user: Identity
 
+
 class PersonaDynamics(BaseModel):
     current_deflection: float = 0.0
     target_behavior_epa: Optional[EPAVector] = None
+
 
 class PersonaState(BaseModel):
     model_type: Literal["BayesACT"] = "BayesACT"
@@ -62,12 +70,14 @@ class PersonaState(BaseModel):
 
 # --- Logic Layer Namespace (JsonLogic) ---
 
+
 class ExecutionTrace(BaseModel):
     rule_id: str
     result: Any
     step_by_step: Optional[List[Dict[str, Any]]] = None
     timestamp: Optional[datetime] = None
     error: Optional[str] = None
+
 
 class LogicLayer(BaseModel):
     engine: Literal["JsonLogic"] = "JsonLogic"
@@ -78,6 +88,7 @@ class LogicLayer(BaseModel):
 
 # --- Context Stream Namespace ---
 
+
 class Turn(BaseModel):
     # MERGE NOTE: Adopted the richer role set from 'main'
     role: Literal["user", "assistant", "agent_thought", "system"]
@@ -85,14 +96,16 @@ class Turn(BaseModel):
     content: Optional[str] = None
     intent: Optional[str] = None
     sentiment_vector: Optional[List[float]] = None
-    logic_eval: Optional[Dict[str, Any]] = None # Specific to 'agent_thought'
+    logic_eval: Optional[Dict[str, Any]] = None  # Specific to 'agent_thought'
     internal_monologue: Optional[str] = None    # Specific to 'agent_thought'
+
 
 class ContextStream(BaseModel):
     window_id: int = 0
     turns: List[Turn] = Field(default_factory=list)
 
 # --- Root HNASP Schema ---
+
 
 class HNASPState(BaseModel):
     meta: Meta
@@ -101,6 +114,7 @@ class HNASPState(BaseModel):
     context_stream: ContextStream
 
     model_config = ConfigDict(populate_by_name=True)
+
 
 # Alias for backward compatibility
 HNASP = HNASPState

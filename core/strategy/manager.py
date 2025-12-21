@@ -1,5 +1,6 @@
 from typing import List, Dict, Any
 
+
 class StrategyManager:
     """
     Manages the lifecycle of trading strategies: Generation, Backtesting, and Optimization.

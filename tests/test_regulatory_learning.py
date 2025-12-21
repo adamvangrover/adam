@@ -1,3 +1,4 @@
+from core.agents.regulatory_compliance_agent import RegulatoryComplianceAgent
 import unittest
 from unittest.mock import MagicMock, patch, mock_open
 import sys
@@ -7,7 +8,6 @@ import json
 # Adjust path to import core
 sys.path.append(os.getcwd())
 
-from core.agents.regulatory_compliance_agent import RegulatoryComplianceAgent
 
 class TestRegulatoryComplianceAgentLearning(unittest.TestCase):
     def setUp(self):
@@ -26,7 +26,8 @@ class TestRegulatoryComplianceAgentLearning(unittest.TestCase):
         self.mock_loader = patch('core.agents.regulatory_compliance_agent.PoliticalLandscapeLoader').start()
 
         # Setup mock return values
-        self.mock_loader.return_value.load_landscape.return_value = {"US": {"president": "Mock", "recent_developments": []}}
+        self.mock_loader.return_value.load_landscape.return_value = {
+            "US": {"president": "Mock", "recent_developments": []}}
 
         # Instantiate agent
         # We mock open inside load_learned_profile to start with clean state
@@ -93,6 +94,7 @@ class TestRegulatoryComplianceAgentLearning(unittest.TestCase):
 
         new_weight = self.agent.learned_params["rule_weights"][rule_name]
         self.assertLess(new_weight, initial_weight)
+
 
 if __name__ == '__main__':
     unittest.main()

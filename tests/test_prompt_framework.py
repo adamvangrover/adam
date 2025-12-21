@@ -1,3 +1,5 @@
+from core.prompting.registry import PromptRegistry
+from core.prompting.base_prompt_plugin import BasePromptPlugin, PromptMetadata
 import sys
 import os
 import json
@@ -10,19 +12,20 @@ from pydantic import BaseModel
 # Add repository root to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from core.prompting.base_prompt_plugin import BasePromptPlugin, PromptMetadata
-from core.prompting.registry import PromptRegistry
 
 # --- Plugin Implementation ---
+
 
 class AnalysisInput(BaseModel):
     company_name: str
     required_metrics: List[str]
     transcript_segment: str
 
+
 class AnalysisOutput(BaseModel):
     EBITDA: str
     Revenue: str
+
 
 class FinancialAnalysisPlugin(BasePromptPlugin[AnalysisOutput]):
     def get_input_schema(self) -> type[BaseModel]:
@@ -32,6 +35,7 @@ class FinancialAnalysisPlugin(BasePromptPlugin[AnalysisOutput]):
         return AnalysisOutput
 
 # --- Verification Logic ---
+
 
 def test_framework():
     print("Testing Prompt-as-Code Framework...")
@@ -141,6 +145,7 @@ template_body: "Analyze {{ company_name }}"
         print("[OK] from_yaml Verification Passed")
     finally:
         os.remove(tmp_path)
+
 
 if __name__ == "__main__":
     test_framework()

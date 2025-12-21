@@ -1,5 +1,6 @@
 # tests/test_system.py
 
+from core.system.agent_orchestrator import AgentOrchestrator
 import unittest
 import yaml
 import sys
@@ -32,7 +33,6 @@ for agent in agents:
 sys.modules['financial_digital_twin'] = MagicMock()
 sys.modules['financial_digital_twin.nexus_agent'] = MagicMock()
 
-from core.system.agent_orchestrator import AgentOrchestrator
 
 class TestAgentOrchestrator(unittest.TestCase):
     def setUp(self):
@@ -117,12 +117,14 @@ class TestAgentOrchestrator(unittest.TestCase):
             }
         }
 
-        asyncio.run(self.orchestrator.execute_workflow("perform_company_analysis", initial_context={'company_data': {'name': 'Example Corp'}}))
+        asyncio.run(self.orchestrator.execute_workflow("perform_company_analysis",
+                    initial_context={'company_data': {'name': 'Example Corp'}}))
 
         mock_risk.execute.assert_called_once()
         call_kwargs = mock_risk.execute.call_args.kwargs
         self.assertIn('FundamentalAnalystAgent', call_kwargs)
         self.assertEqual(call_kwargs['FundamentalAnalystAgent'], {'some_data': 'some_value'})
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -5,6 +5,7 @@ from typing import Dict, Any
 from core.llm.base_llm_engine import BaseLLMEngine
 from core.world_simulation.config import WorldSimulationConfig
 
+
 class LLMDrivenSim:
     def __init__(self, config: WorldSimulationConfig, llm_engine: BaseLLMEngine):
         self.config = config
@@ -69,7 +70,7 @@ class LLMDrivenSim:
         for _ in range(self.config.simulation.steps):
             prompt = self.prompt.format(current_state=json.dumps(current_state, indent=2))
             response = self.llm_engine.generate(prompt)
-            
+
             try:
                 response_json = json.loads(response)
                 next_state = response_json["next_state"]
@@ -88,6 +89,5 @@ class LLMDrivenSim:
                 # Decide how to handle the error: e.g., retry, use last known state, or stop.
                 # For now, we'll just stop the simulation for this run.
                 break
-
 
         return history

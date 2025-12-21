@@ -3,10 +3,12 @@ import time
 
 logger = logging.getLogger("NewsBot")
 
+
 class NewsBotAgent:
     """
     Appendix B: NewsBot Sentiment Analysis Pipeline
     """
+
     def __init__(self):
         self.watchlist = ["AAPL", "TSLA", "MSFT"]
 
@@ -35,19 +37,23 @@ class NewsBotAgent:
                 if sym in self.watchlist:
                     logger.info(f"NewsBot: Processed {sym} sentiment: {sentiment}")
                     if sentiment < -0.6:
-                         # 5. Action
-                         logger.warning(f"ALERT: High Negative Sentiment for {sym}: {item['title']}")
-                         processed_items.append({"symbol": sym, "sentiment": sentiment, "alert": True})
+                        # 5. Action
+                        logger.warning(f"ALERT: High Negative Sentiment for {sym}: {item['title']}")
+                        processed_items.append({"symbol": sym, "sentiment": sentiment, "alert": True})
 
         return processed_items
 
     def _mock_finbert(self, text):
-        if "delay" in text.lower(): return -0.75
-        if "release" in text.lower(): return 0.8
+        if "delay" in text.lower():
+            return -0.75
+        if "release" in text.lower():
+            return 0.8
         return 0.0
 
     def _extract_symbols(self, text):
         symbols = []
-        if "Apple" in text: symbols.append("AAPL")
-        if "Tesla" in text: symbols.append("TSLA")
+        if "Apple" in text:
+            symbols.append("AAPL")
+        if "Tesla" in text:
+            symbols.append("TSLA")
         return symbols

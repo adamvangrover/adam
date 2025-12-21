@@ -1,11 +1,13 @@
 from pydantic import BaseModel, Field
 
+
 class FinancialTruthInput(BaseModel):
     """
     Input schema for the Financial Truth TAO-CoT prompt.
     """
     context: str = Field(..., description="The financial context (e.g., retrieval chunks) to analyze.")
     question: str = Field(..., description="The specific financial question to answer.")
+
 
 class FinancialTruthOutput(BaseModel):
     """

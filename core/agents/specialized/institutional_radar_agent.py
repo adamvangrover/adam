@@ -9,18 +9,19 @@ from core.utils.logging_utils import get_logger
 
 logger = get_logger("agents.institutional_radar")
 
+
 class InstitutionalRadarAgent(AgentBase):
     """
     Agent responsible for executing the Institutional Radar blueprint:
     Ingesting 13F data, analyzing trends, and generating narrative reports.
     """
 
-    def __init__(self, config: Dict[str, Any], constitution: Dict[str, Any] = None, kernel = None):
+    def __init__(self, config: Dict[str, Any], constitution: Dict[str, Any] = None, kernel=None):
         super().__init__(config, constitution=constitution, kernel=kernel)
         self.mock_mode = config.get("mock_mode", False)
         self.scraper = SECEdgarScraper(mock_mode=self.mock_mode)
-        self.analytics = InstitutionalRadarAnalytics() # Manages its own session
-        self.reporter = InstitutionalRadarReporter() # Manages its own LLM
+        self.analytics = InstitutionalRadarAnalytics()  # Manages its own session
+        self.reporter = InstitutionalRadarReporter()  # Manages its own LLM
 
     async def execute(self, year: int = None, quarter: int = None, ciks: List[str] = None, **kwargs) -> Dict[str, Any]:
         """

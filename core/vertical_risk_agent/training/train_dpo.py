@@ -8,6 +8,7 @@ import argparse
 
 logger = logging.getLogger(__name__)
 
+
 def train_dpo(dataset_path: str, model_name: str = "meta-llama/Llama-3-8B-Instruct"):
     """
     Fine-tunes a model using Direct Preference Optimization (DPO) based on
@@ -42,6 +43,7 @@ def train_dpo(dataset_path: str, model_name: str = "meta-llama/Llama-3-8B-Instru
 
     print(f"--- Training Simulation Complete for {model_name} ---")
     print("Model saved to ./dpo_results")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

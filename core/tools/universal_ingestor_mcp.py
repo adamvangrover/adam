@@ -4,6 +4,7 @@ from typing import Any, Dict
 import json
 import os
 
+
 class UniversalIngestorMCP(BaseTool):
     name = "azure_ai_search"
     description = "Retrieves indexed regulatory filings and unstructured documents. Can ingest new data from paths."
@@ -12,7 +13,7 @@ class UniversalIngestorMCP(BaseTool):
         self.ingestor = UniversalIngestor()
         # Ensure we have some data
         if os.path.exists("data/gold_standard"):
-             pass # We would load index here in a real system
+            pass  # We would load index here in a real system
 
     def execute(self, query: str, filter: str = "") -> str:
         """
@@ -22,10 +23,10 @@ class UniversalIngestorMCP(BaseTool):
         """
         # 1. Ingestion Mode
         if os.path.exists(query) or query.startswith("http"):
-             # For URLs, we would need a downloader. For now, assume local path.
-             if os.path.exists(query):
-                 self.ingestor.process_file(query)
-                 return json.dumps({"status": "Ingested", "path": query, "conviction": "High"})
+            # For URLs, we would need a downloader. For now, assume local path.
+            if os.path.exists(query):
+                self.ingestor.process_file(query)
+                return json.dumps({"status": "Ingested", "path": query, "conviction": "High"})
 
         # 2. Search Mode (Mock)
         # In a real system, this would query Azure AI Search.

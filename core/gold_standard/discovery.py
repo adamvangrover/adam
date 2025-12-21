@@ -17,6 +17,7 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+
 class DiscoveryAgent:
     def __init__(self, storage_path: str = "data/universe"):
         self.storage_path = storage_path
@@ -45,7 +46,8 @@ class DiscoveryAgent:
         Retrieves top companies/ETFs for a given sector.
         Note: This relies on yfinance Sector module.
         """
-        if yf is None: return []
+        if yf is None:
+            return []
 
         try:
             sector = yf.Sector(sector_key)
@@ -60,7 +62,8 @@ class DiscoveryAgent:
         """
         Retrieves companies for a specific industry.
         """
-        if yf is None: return []
+        if yf is None:
+            return []
 
         try:
             industry = yf.Industry(industry_key)

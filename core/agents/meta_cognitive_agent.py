@@ -2,6 +2,7 @@
 
 from core.agents.agent_base import AgentBase
 
+
 class MetaCognitiveAgent(AgentBase):
     """
     The Meta-Cognitive Agent monitors the performance of other agents.

@@ -14,6 +14,7 @@ except ImportError:
     GRAPH_AVAILABLE = False
     crisis_simulation_app = None
 
+
 class CrisisSimulationMetaAgent(AgentBase):
     """
     A meta-agent that conducts dynamic, enterprise-grade crisis simulations.
@@ -116,7 +117,7 @@ class CrisisSimulationMetaAgent(AgentBase):
         if self.kernel:
             # This is where the actual LLM call would be made.
             logging.info("Semantic Kernel is available, would make a real LLM call here.")
-            llm_response_str = self._mock_llm_call(messages) # Keep mock for now to not break tests
+            llm_response_str = self._mock_llm_call(messages)  # Keep mock for now to not break tests
         else:
             logging.warning("Semantic Kernel not available. Using mocked LLM call for crisis simulation.")
             llm_response_str = self._mock_llm_call(messages)

@@ -5,6 +5,7 @@ import json
 from core.agents.specialized.credit_conformance_agent import CreditConformanceAgent
 from core.schemas.credit_conformance import CreditConformanceReport
 
+
 class TestCreditConformanceAgent(unittest.IsolatedAsyncioTestCase):
 
     def setUp(self):
@@ -90,6 +91,7 @@ class TestCreditConformanceAgent(unittest.IsolatedAsyncioTestCase):
         # Verify error handling
         self.assertIn("error", result)
         self.assertEqual(result["error"], "Failed to generate valid report")
+
 
 if __name__ == '__main__':
     unittest.main()

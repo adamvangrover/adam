@@ -1,6 +1,7 @@
 from core.agents.agent_base import AgentBase
 from textblob import TextBlob
 
+
 class SentimentAnalysisMetaAgent(AgentBase):
     def __init__(self, config):
         super().__init__(config)

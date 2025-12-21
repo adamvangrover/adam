@@ -20,12 +20,12 @@ logger = logging.getLogger("RiskEngine_Unified")
 class RiskEngine:
     """
     RiskEngine v3.0 (Unified)
-    
+
     A comprehensive risk management engine capable of:
     1. Parametric VaR (Variance-Covariance & Simplified).
     2. Historical Simulation VaR & Expected Shortfall (CVaR).
     3. Option Greeks (Analytical Black-Scholes with Scipy/Math fallbacks).
-    
+
     "Risk varies inversely with knowledge."
     """
 
@@ -48,16 +48,16 @@ class RiskEngine:
             correlation_matrix=kwargs.get("correlation_matrix", None)
         )
 
-    def calculate_parametric_var(self, 
-                                 portfolio: List[Dict[str, Any]], 
-                                 confidence_level: float = 0.95, 
+    def calculate_parametric_var(self,
+                                 portfolio: List[Dict[str, Any]],
+                                 confidence_level: float = 0.95,
                                  correlation_matrix: Optional[List[List[float]]] = None) -> Dict[str, Any]:
         r"""
         Calculates Parametric Value at Risk using Variance-Covariance Method.
-        
+
         Logic:
         $$ \sigma_p^2 = w^T \cdot \Sigma \cdot w $$
-        
+
         If correlation_matrix is None, it defaults to a 'Simplified' mode (Sum of VaRs),
         which assumes Correlation = 1.0 (The most conservative 'worst-case' correlation).
         """
@@ -83,14 +83,14 @@ class RiskEngine:
                     # Cov_ij = vol_i * vol_j * rho_ij
                     cov_ij = vols[i] * vols[j] * correlation_matrix[i][j]
                     portfolio_variance += (weights[i] * weights[j] * cov_ij)
-            
+
             portfolio_std = math.sqrt(portfolio_variance)
             method_tag = "Variance-Covariance (Matrix)"
-            
+
         # --- BRANCH: SIMPLIFIED / HEURISTIC (Fallback) ---
         else:
             # Fallback 1: Weighted sum of vols (assumes correlation = 1.0)
-            # This effectively matches the logic of the simple engine 
+            # This effectively matches the logic of the simple engine
             # but creates a comparable 'portfolio_std' metric.
             portfolio_std = sum(w * v for w, v in zip(weights, vols))
             method_tag = "Parametric (Sum of Parts / Corr=1.0)"
@@ -107,9 +107,9 @@ class RiskEngine:
             "Method": method_tag
         }
 
-    def calculate_historical_var(self, 
-                                 portfolio_returns: List[float], 
-                                 portfolio_value: float, 
+    def calculate_historical_var(self,
+                                 portfolio_returns: List[float],
+                                 portfolio_value: float,
                                  confidence_level: float = 0.95) -> Dict[str, float]:
         """
         Calculates VaR and CVaR (Expected Shortfall) using Historical Simulation.
@@ -120,7 +120,7 @@ class RiskEngine:
 
         # Sort returns from worst (negative) to best
         sorted_returns = sorted(portfolio_returns)
-        
+
         # Calculate index for cutoff
         # e.g., for 95%, we find the 5th percentile worst return
         cutoff_index = int((1 - confidence_level) * len(sorted_returns))
@@ -187,7 +187,7 @@ class RiskEngine:
             delta = cdf_d1
             theta = (- (S * sigma * pdf_d1) / (2 * sqrt_T) - r * K * math.exp(-r * T) * cdf_d2)
             rho = K * T * math.exp(-r * T) * cdf_d2
-        else: # Put
+        else:  # Put
             delta = cdf_d1 - 1
             theta = (- (S * sigma * pdf_d1) / (2 * sqrt_T) + r * K * math.exp(-r * T) * norm.cdf(-d2))
             rho = -K * T * math.exp(-r * T) * norm.cdf(-d2)
@@ -222,7 +222,7 @@ class RiskEngine:
             theta_part2 = -r * K * math.exp(-r * T) * cdf_d2
             theta = theta_part1 + theta_part2
             rho = K * T * math.exp(-r * T) * cdf_d2
-        else: # Put
+        else:  # Put
             delta = cdf_d1 - 1.0
             cdf_neg_d2 = self._norm_cdf(-d2)
             theta_part1 = -(S * pdf_d1 * sigma) / (2 * sqrt_T)

@@ -3,6 +3,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def assess_management(ticker: str) -> Dict[str, Any]:
     """
     Mock assessment of management quality.
@@ -14,13 +15,14 @@ def assess_management(ticker: str) -> Dict[str, Any]:
         "key_person_risk": "Med"
     }
 
+
 def assess_competitive_position(ticker: str, sector: str) -> Dict[str, Any]:
     """
     Mock assessment of Moat and Tech Risk.
     """
     moat = "Narrow"
     if sector == "Technology":
-        moat = "Wide" # Generic assumption for demo
+        moat = "Wide"  # Generic assumption for demo
 
     return {
         "moat_status": moat,

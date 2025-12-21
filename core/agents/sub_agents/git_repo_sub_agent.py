@@ -2,6 +2,7 @@ import subprocess
 import os
 from core.agents.agent_base import AgentBase
 
+
 class GitRepoSubAgent(AgentBase):
     def __init__(self, config):
         super().__init__(config)

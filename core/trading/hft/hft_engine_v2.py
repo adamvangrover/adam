@@ -42,14 +42,17 @@ DEFAULT_KAPPA = 1.5  # Liquidity parameter
 CIRCUIT_FAILURE_THRESHOLD = 5
 CIRCUIT_RECOVERY_TIMEOUT = 5.0  # seconds (short for simulation)
 
+
 class OrderSide(Enum):
     BUY = "BUY"
     SELL = "SELL"
+
 
 class OrderStatus(Enum):
     OPEN = "OPEN"
     FILLED = "FILLED"
     CANCELLED = "CANCELLED"
+
 
 @dataclass
 class Order:
@@ -61,6 +64,7 @@ class Order:
     timestamp: float
     status: OrderStatus = OrderStatus.OPEN
 
+
 @dataclass
 class MarketTick:
     symbol: str
@@ -70,11 +74,13 @@ class MarketTick:
 
 # --- 1.0 Zero-Copy Networking Protocol ---
 
+
 class HFTRawProtocol(asyncio.Protocol):
     """
     Implements a zero-copy network protocol.
     Parses incoming bytes directly from the socket buffer.
     """
+
     def connection_made(self, transport):
         self.transport = transport
         # print("[Network] Connection established.")
@@ -94,13 +100,16 @@ class HFTRawProtocol(asyncio.Protocol):
 
 # --- 3.0 System Resilience: Circuit Breaker ---
 
+
 class CircuitBreakerOpenException(Exception):
     pass
+
 
 class CircuitBreakerState(Enum):
     CLOSED = "CLOSED"      # Normal operation
     OPEN = "OPEN"          # Failure threshold reached, blocking calls
-    HALF_OPEN = "HALF_OPEN" # Testing recovery
+    HALF_OPEN = "HALF_OPEN"  # Testing recovery
+
 
 class CircuitBreaker:
     def __init__(self, failure_threshold: int, recovery_timeout: float):
@@ -135,10 +144,12 @@ class CircuitBreaker:
 
 # --- 2.0 Algorithmic Core: Avellaneda-Stoikov ---
 
+
 class MarketMakerStrategy:
     """
     Implements the Avellaneda-Stoikov logic for inventory risk management.
     """
+
     def __init__(self, gamma: float = DEFAULT_GAMMA, kappa: float = DEFAULT_KAPPA):
         self.gamma = gamma  # Risk aversion
         self.kappa = kappa  # Liquidity parameter
@@ -149,8 +160,8 @@ class MarketMakerStrategy:
 
     def calculate_volatility(self) -> float:
         if len(self.mid_prices) < 2:
-            return 0.01 # Default fallback
-        
+            return 0.01  # Default fallback
+
         # Simple standard deviation of returns
         # In prod, optimize this to be incremental O(1)
         prices = list(self.mid_prices)
@@ -175,10 +186,10 @@ class MarketMakerStrategy:
         # delta = (2 / gamma) * ln(1 + (gamma / kappa))
         # Note: We apply the volatility/time scaling often used in practice.
         # But keeping to the simplified formula from the blueprint text implies using gamma/kappa.
-        
+
         # Spread calculation based on Avellaneda-Stoikov 2008 approx
         spread = (2 / self.gamma) * math.log(1 + (self.gamma / self.kappa))
-        
+
         # Ensure minimum spread (tick size)
         spread = max(spread, 0.01)
 
@@ -195,6 +206,7 @@ class MarketMakerStrategy:
 
 # --- Core Engine Components ---
 
+
 class MarketDataHandler:
     def __init__(self, symbols: List[str], queue: asyncio.Queue, circuit: CircuitBreaker):
         self.symbols = symbols
@@ -206,10 +218,10 @@ class MarketDataHandler:
         # 5% failure rate
         if random.random() < 0.05:
             raise TimeoutError("Network Timeout")
-        
+
         # Simulate Network Latency
         await asyncio.sleep(random.uniform(0.001, 0.01))
-        
+
         symbol = random.choice(self.symbols)
         base = 100.0
         # Add some trend and noise
@@ -233,23 +245,24 @@ class MarketDataHandler:
                 await asyncio.sleep(1.0)
             except Exception as e:
                 print(f"[System] Error: {e}")
-            
+
             # Reduce sleep to simulate HFT
             await asyncio.sleep(0.001)
 
     def stop(self):
         self.running = False
 
+
 class OrderManager:
     def __init__(self, circuit: CircuitBreaker):
         self.orders: Dict[str, Order] = {}
         self.circuit = circuit
-    
+
     async def place_order(self, order: Order):
         try:
             self.circuit.check_state()
             # Simulate Network IO
-            await asyncio.sleep(0.002) 
+            await asyncio.sleep(0.002)
             self.orders[order.id] = order
             self.circuit.record_success()
         except CircuitBreakerOpenException:
@@ -263,23 +276,24 @@ class OrderManager:
         print("[OrderManager] Cancelling ALL orders...")
         self.orders.clear()
 
+
 class HFTExecutionEngine:
     def __init__(self, symbol: str, start_balance: float):
         self.symbol = symbol
         self.balance = start_balance
         self.inventory = 0
         self.market_queue = asyncio.Queue()
-        
+
         # Components
         self.circuit = CircuitBreaker(failure_threshold=5, recovery_timeout=5.0)
         self.md_handler = MarketDataHandler([symbol], self.market_queue, self.circuit)
         self.order_manager = OrderManager(self.circuit)
-        self.strategy = MarketMakerStrategy(gamma=0.5, kappa=2.0) # High gamma = hate inventory
+        self.strategy = MarketMakerStrategy(gamma=0.5, kappa=2.0)  # High gamma = hate inventory
 
     async def run(self):
         feed_task = asyncio.create_task(self.md_handler.start())
         print(f"[HFT] Engine Online. {self.symbol} | Bal: {self.balance}")
-        
+
         tick_count = 0
 
         try:
@@ -297,34 +311,34 @@ class HFTExecutionEngine:
                 # 2. Strategy Update
                 mid = (tick.bid + tick.ask) / 2
                 self.strategy.update_price(mid)
-                
+
                 # 3. Calculate Quotes (Avellaneda-Stoikov)
                 # Normalize inventory for the formula
                 # T-t is constant 1.0 for perpetual operation
                 quotes = self.strategy.calculate_quotes(mid, self.inventory, T_minus_t=1.0)
-                
+
                 bid = quotes['bid']
                 ask = quotes['ask']
                 r_price = quotes['r']
-                
+
                 # 4. Inventory Gate (Hard Constraint)
                 if abs(self.inventory) >= MAX_INVENTORY:
                     if tick_count % 50 == 0:
                         print(f"[Risk] Max Inventory ({self.inventory}) Reached. Entering Reduce-Only.")
-                    
+
                     # Logic to only place orders that reduce inventory
                     # We widen the spread on the entry side to discourage fills
                     if self.inventory > 0:
-                        bid -= 1.0 # Lower bid to stop buying
-                        ask -= 0.5 # Lower ask to encourage selling
+                        bid -= 1.0  # Lower bid to stop buying
+                        ask -= 0.5  # Lower ask to encourage selling
                     else:
                         bid += 0.5
                         ask += 1.0
-                
+
                 # 5. Execution (Simulate)
                 # Clear old orders (simplification for simulation)
                 self.order_manager.orders.clear()
-                
+
                 await self.order_manager.place_order(Order(
                     id=f"B-{int(time.time()*1e6)}", symbol=self.symbol, side=OrderSide.BUY,
                     price=bid, quantity=1, timestamp=time.time()
@@ -344,15 +358,17 @@ class HFTExecutionEngine:
                     self.inventory -= 1
                     self.balance += ask
                     # print(f"<- FILLED SELL @ {ask:.2f} | Inv: {self.inventory}")
-                
+
                 if tick_count % 100 == 0:
-                     print(f"[Stats] Inv: {self.inventory} | Mid: {mid:.2f} | r: {r_price:.2f} | PnL (Unrealized): {self.balance + (self.inventory * mid) - 100000:.2f}")
+                    print(
+                        f"[Stats] Inv: {self.inventory} | Mid: {mid:.2f} | r: {r_price:.2f} | PnL (Unrealized): {self.balance + (self.inventory * mid) - 100000:.2f}")
 
         except KeyboardInterrupt:
             pass
         finally:
             self.md_handler.stop()
             print("Engine Shutdown.")
+
 
 if __name__ == "__main__":
     engine = HFTExecutionEngine("BTC-USD", 100000.0)

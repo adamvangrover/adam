@@ -3,6 +3,7 @@
 import pandas as pd
 from textblob import TextBlob
 
+
 class FinancialsSpecialist:
     def __init__(self, config):
         self.data_sources = config.get('data_sources', {})
@@ -26,14 +27,14 @@ class FinancialsSpecialist:
         # Analyze sentiment and trends
         sentiment_scores = [TextBlob(headline['text']).sentiment.polarity for headline in news_headlines]
         avg_sentiment = sum(sentiment_scores) / len(sentiment_scores) if sentiment_scores else 0
-        #... (analyze social media sentiment and trends)
+        # ... (analyze social media sentiment and trends)
 
         trends = {
             'interest_rate_environment': self.analyze_interest_rate_environment(news_headlines, social_media_posts),
             'regulatory_scrutiny': self.analyze_regulatory_scrutiny(news_headlines, social_media_posts),
             'fintech_disruption': self.analyze_fintech_disruption(news_headlines, social_media_posts),
             'overall_sentiment': avg_sentiment,
-            #... (add more trends and insights)
+            # ... (add more trends and insights)
         }
         return trends
 
@@ -56,32 +57,32 @@ class FinancialsSpecialist:
         capital_adequacy_ratio = self.calculate_capital_adequacy_ratio(company_data['financial_statements'])
 
         # 3. Analyze asset quality
-        #... (analyze company's loan portfolio and asset quality)
+        # ... (analyze company's loan portfolio and asset quality)
 
         analysis_results = {
             'financial_health': financial_health,
             'capital_adequacy_ratio': capital_adequacy_ratio,
             'asset_quality': 'good',  # Placeholder
-            #... (add more analysis results)
+            # ... (add more analysis results)
         }
         return analysis_results
 
     def analyze_interest_rate_environment(self, news_headlines, social_media_posts):
-        #... (analyze news and social media data to assess interest rate environment trends)
+        # ... (analyze news and social media data to assess interest rate environment trends)
         return "rising"  # Example
 
     def analyze_regulatory_scrutiny(self, news_headlines, social_media_posts):
-        #... (analyze news and social media data to assess regulatory scrutiny trends)
+        # ... (analyze news and social media data to assess regulatory scrutiny trends)
         return "increasing"  # Example
 
     def analyze_fintech_disruption(self, news_headlines, social_media_posts):
-        #... (analyze news and social media data to assess fintech disruption trends)
+        # ... (analyze news and social media data to assess fintech disruption trends)
         return "accelerating"  # Example
 
     def analyze_financial_health(self, financial_statements):
-        #... (analyze financial data to assess financial health)
+        # ... (analyze financial data to assess financial health)
         return "stable"  # Example
 
     def calculate_capital_adequacy_ratio(self, financial_statements):
-        #... (calculate the capital adequacy ratio)
+        # ... (calculate the capital adequacy ratio)
         return 0.15  # Example

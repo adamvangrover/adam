@@ -23,6 +23,7 @@ from collections import deque
 # Download NLTK resources if not already downloaded
 nltk.download('vader_lexicon')
 
+
 class CryptoAgent:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json", web3_provider_uri=None, exchange='binance', wallet_address=None, wallet_private_key=None, price_history_length=100):
         """
@@ -51,11 +52,11 @@ class CryptoAgent:
                 self.web3.middleware_stack.inject(geth_poa_middleware, layer=0)
         else:
             print("Web3 not connected")
-        
+
         # Wallet setup
         if self.wallet_address and self.wallet_private_key:
             self.account = self.web3.eth.account.privateKeyToAccount(self.wallet_private_key)
-        
+
         # Initialize Sentiment Analysis
         self.sentiment_analyzer = SentimentIntensityAnalyzer()
 
@@ -380,7 +381,5 @@ class CryptoAgent:
 
         signed_txn = self.web3.eth.account.sign_transaction(transaction, self.wallet_private_key)
         tx_hash = self.web3.eth.sendRawTransaction(signed_txn.rawTransaction)
-        
+
         return f"Transaction Hash: {tx_hash.hex()}"
-
-

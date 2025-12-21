@@ -6,6 +6,7 @@ from core.memory.engine import MemoryEngine
 
 from unittest.mock import MagicMock
 
+
 class TestFOSuperAppIntegration(unittest.TestCase):
 
     def setUp(self):
@@ -93,6 +94,7 @@ class TestFOSuperAppIntegration(unittest.TestCase):
         res = pa.aggregate_risk([{"name": "Fund A", "aum": 1000000}])
         self.assertIn("stress_tests", res)
         self.assertIn("daily_var_95", res)
+
 
 if __name__ == '__main__':
     unittest.main()

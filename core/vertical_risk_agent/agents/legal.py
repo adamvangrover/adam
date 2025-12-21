@@ -1,10 +1,12 @@
 from typing import Dict, Any, List
 from ..state import VerticalRiskGraphState
 
+
 class LegalAgent:
     """
     Specialized in RAG over long-context legal documents (Credit Agreements, Indentures).
     """
+
     def __init__(self, model):
         self.model = model
 

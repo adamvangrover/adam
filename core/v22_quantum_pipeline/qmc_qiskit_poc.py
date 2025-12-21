@@ -35,6 +35,8 @@ except ImportError:
 # -----------------------------------------------------------------------------
 # Core Class: QuantumRiskEngine
 # -----------------------------------------------------------------------------
+
+
 class QuantumRiskEngine:
     """
     Orchestrates Quantum Monte Carlo simulations for credit risk.
@@ -156,6 +158,7 @@ class QuantumRiskEngine:
             "speedup_factor": "Quadratic (Heisenberg Limit)",
             "context": "Quantum Amplitude Estimation (QAE) vs Monte Carlo"
         }
+
 
 if __name__ == "__main__":
     # Self-Test / Proof of Concept Execution

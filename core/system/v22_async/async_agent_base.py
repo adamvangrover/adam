@@ -10,6 +10,7 @@ from core.system.message_broker import MessageBroker
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+
 class AsyncAgentBase(ABC):
     """
     Abstract base class for asynchronous agents in the v22 system.

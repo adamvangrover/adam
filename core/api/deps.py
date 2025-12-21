@@ -2,6 +2,7 @@ from core.engine.meta_orchestrator import MetaOrchestrator
 
 _orchestrator = None
 
+
 def get_orchestrator() -> MetaOrchestrator:
     """
     Returns a singleton instance of the MetaOrchestrator.

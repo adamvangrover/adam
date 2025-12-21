@@ -18,6 +18,7 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+
 class StorageEngine:
     def __init__(self, base_path: str = "data"):
         self.base_path = base_path

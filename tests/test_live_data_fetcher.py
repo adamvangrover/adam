@@ -5,6 +5,7 @@ import logging
 # Configure logging to see output
 logging.basicConfig(level=logging.INFO)
 
+
 class TestDataFetcher(unittest.TestCase):
     def setUp(self):
         self.fetcher = DataFetcher()
@@ -54,6 +55,7 @@ class TestDataFetcher(unittest.TestCase):
         # Strict check: news should exist for SPY
         self.assertTrue(news, "News returned empty list")
         self.assertIn("title", news[0])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -9,6 +9,7 @@ from core.engine.meta_orchestrator import MetaOrchestrator
 from core.system.agent_orchestrator import AgentOrchestrator
 from core.settings import settings
 
+
 async def async_main():
     """
     Main execution logic for Adam v23.0 (Adaptive System).
@@ -41,7 +42,7 @@ async def async_main():
             legacy_orchestrator = AgentOrchestrator()
         except Exception as e:
             logger.error(f"Failed to initialize AgentOrchestrator: {e}")
-            legacy_orchestrator = None # Fallback
+            legacy_orchestrator = None  # Fallback
 
         # Initialize Meta Orchestrator (v23 Brain)
         meta_orchestrator = MetaOrchestrator(legacy_orchestrator=legacy_orchestrator)
@@ -103,9 +104,11 @@ async def async_main():
     except Exception as e:
         print(f"Fatal Error: {e}")
 
+
 def main():
     """Synchronous entry point for console_scripts."""
     asyncio.run(async_main())
+
 
 if __name__ == "__main__":
     main()

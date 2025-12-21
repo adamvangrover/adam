@@ -5,6 +5,7 @@ import requests
 from datetime import datetime
 import logging
 
+
 class CatalystAgent:
     def __init__(self, config_path="catalyst_config.json"):
         self.config = self.load_config(config_path)
@@ -109,7 +110,8 @@ class CatalystAgent:
 
     def get_client_connections(self):
         # Placeholder: Call Knowledge Graph to get client connections
-        connections = self.fetch_data(self.knowledge_graph_url + "/connections", params={"client_id": self.client_data.get("client_id")})
+        connections = self.fetch_data(self.knowledge_graph_url + "/connections",
+                                      params={"client_id": self.client_data.get("client_id")})
         if connections:
             return connections
         else:
@@ -178,6 +180,7 @@ class CatalystAgent:
         else:
             return {"message": "No opportunities identified."}
 
+
 if __name__ == "__main__":
     agent = CatalystAgent()
     result = agent.run("client123", "company456", "tech")
@@ -185,7 +188,7 @@ print(json.dumps(result, indent=4))
 
 # """
 # #json
-# 
+#
 # {
 #     "client_data_url": "http://client-data-service/clients",
 #     "market_data_url": "http://market-data-service/market",

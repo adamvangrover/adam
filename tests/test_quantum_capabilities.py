@@ -4,6 +4,7 @@ from core.xai.iqnn_cs import IQNNCS
 from core.vertical_risk_agent.generative_risk import GenerativeRiskEngine
 from core.v22_quantum_pipeline.qmc_engine import QuantumMonteCarloEngine
 
+
 class TestQuantumCapabilities(unittest.TestCase):
 
     def test_iqnn_cs_functionality(self):
@@ -43,6 +44,7 @@ class TestQuantumCapabilities(unittest.TestCase):
         self.assertIn("probability_of_default", result)
         self.assertIn("quantum_error_bound_theoretical", result)
         self.assertTrue(0 <= result["probability_of_default"] <= 1)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -4,6 +4,7 @@ from core.risk_engine import RiskEngine
 
 logger = logging.getLogger(__name__)
 
+
 class PortfolioAggregator:
     """
     Asset Management capability.
@@ -31,7 +32,7 @@ class PortfolioAggregator:
             master_positions.append({
                 "symbol": p.get("name", "Unknown Fund"),
                 "market_value": p.get("aum", 0),
-                "volatility": p.get("implied_vol", 0.15) # Default 15% vol
+                "volatility": p.get("implied_vol", 0.15)  # Default 15% vol
             })
 
         # Calculate VaR
@@ -39,14 +40,14 @@ class PortfolioAggregator:
 
         # Stress Tests
         stress_tests = {
-            "Equity Crash (-20%)": total_aum * -0.20 * 0.6, # Assuming 0.6 Beta
-            "Rates Up (+100bps)": total_aum * -0.05 # Bond exposure proxy
+            "Equity Crash (-20%)": total_aum * -0.20 * 0.6,  # Assuming 0.6 Beta
+            "Rates Up (+100bps)": total_aum * -0.05  # Bond exposure proxy
         }
 
         return {
             "total_aum": total_aum,
             "entities_count": len(portfolios),
-            "aggregated_risk_score": risk_metrics.get("ImpliedVol", 0) * 100, # Scaled 0-100
+            "aggregated_risk_score": risk_metrics.get("ImpliedVol", 0) * 100,  # Scaled 0-100
             "daily_var_95": risk_metrics.get("VaR_Daily", 0),
             "top_exposures": [p.get("name") for p in portfolios],
             "stress_tests": stress_tests

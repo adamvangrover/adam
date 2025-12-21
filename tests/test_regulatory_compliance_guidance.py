@@ -1,3 +1,4 @@
+from core.agents.regulatory_compliance_agent import RegulatoryComplianceAgent
 import unittest
 from unittest.mock import MagicMock, patch
 import sys
@@ -15,7 +16,7 @@ sys.modules["bs4"] = MagicMock()
 sys.modules["core.llm_plugin"] = MagicMock()
 
 # Now import the class
-from core.agents.regulatory_compliance_agent import RegulatoryComplianceAgent
+
 
 class TestRegulatoryComplianceAgent(unittest.TestCase):
     def setUp(self):
@@ -24,8 +25,8 @@ class TestRegulatoryComplianceAgent(unittest.TestCase):
     def test_provide_guidance_calls_llm(self):
         # We need to mock methods called in __init__
         with patch.object(RegulatoryComplianceAgent, '_initialize_nlp_toolkit'), \
-             patch.object(RegulatoryComplianceAgent, '_load_regulatory_knowledge', return_value={"Rule1": "Must be compliant"}), \
-             patch.object(RegulatoryComplianceAgent, '_load_political_landscape', return_value={"Politics": "Stable"}):
+                patch.object(RegulatoryComplianceAgent, '_load_regulatory_knowledge', return_value={"Rule1": "Must be compliant"}), \
+                patch.object(RegulatoryComplianceAgent, '_load_political_landscape', return_value={"Politics": "Stable"}):
 
             agent = RegulatoryComplianceAgent(self.config)
 
@@ -46,6 +47,7 @@ class TestRegulatoryComplianceAgent(unittest.TestCase):
             self.assertIn("How to comply?", prompt)
             self.assertIn("Rule1", prompt)
             self.assertIn("Politics", prompt)
+
 
 if __name__ == '__main__':
     unittest.main()

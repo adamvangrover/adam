@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Union
 
+
 def jsonLogic(tests: Any, data: Any = None) -> Any:
     """
     Safe implementation of JsonLogic compatible with Python 3.12.
@@ -27,7 +28,8 @@ def jsonLogic(tests: Any, data: Any = None) -> Any:
     # 3. Operators
     if op == "var":
         # var logic
-        key = values[0] if isinstance(values, list) and len(values) > 0 else (values if not isinstance(values, list) else None)
+        key = values[0] if isinstance(values, list) and len(values) > 0 else (
+            values if not isinstance(values, list) else None)
         default = values[1] if isinstance(values, list) and len(values) > 1 else None
 
         if key is None or key == "":
@@ -60,7 +62,8 @@ def jsonLogic(tests: Any, data: Any = None) -> Any:
 
     if op == "if":
         # values should be a list
-        if not isinstance(values, list): values = [values]
+        if not isinstance(values, list):
+            values = [values]
 
         # [cond, true, false]
         # [cond, true, cond, true, ..., false]
@@ -82,32 +85,49 @@ def jsonLogic(tests: Any, data: Any = None) -> Any:
         args = [evaluate(values)]
 
     # Comparison
-    if op == "==": return args[0] == args[1]
-    if op == "===": return args[0] == args[1]
-    if op == "!=": return args[0] != args[1]
-    if op == "!==": return args[0] != args[1]
-    if op == ">": return args[0] > args[1]
-    if op == ">=": return args[0] >= args[1]
-    if op == "<": return args[0] < args[1]
-    if op == "<=": return args[0] <= args[1]
+    if op == "==":
+        return args[0] == args[1]
+    if op == "===":
+        return args[0] == args[1]
+    if op == "!=":
+        return args[0] != args[1]
+    if op == "!==":
+        return args[0] != args[1]
+    if op == ">":
+        return args[0] > args[1]
+    if op == ">=":
+        return args[0] >= args[1]
+    if op == "<":
+        return args[0] < args[1]
+    if op == "<=":
+        return args[0] <= args[1]
 
     # Logic
-    if op == "!": return not args[0]
-    if op == "!!": return bool(args[0])
-    if op == "or": return any(args)
-    if op == "and": return all(args)
+    if op == "!":
+        return not args[0]
+    if op == "!!":
+        return bool(args[0])
+    if op == "or":
+        return any(args)
+    if op == "and":
+        return all(args)
 
     # Arithmetic
-    if op == "+": return sum(float(x or 0) for x in args)
+    if op == "+":
+        return sum(float(x or 0) for x in args)
     if op == "*":
         res = 1.0
-        for x in args: res *= float(x or 0)
+        for x in args:
+            res *= float(x or 0)
         return res
     if op == "-":
-        if len(args) == 1: return -args[0]
+        if len(args) == 1:
+            return -args[0]
         return args[0] - args[1]
-    if op == "/": return args[0] / args[1]
-    if op == "%": return args[0] % args[1]
+    if op == "/":
+        return args[0] / args[1]
+    if op == "%":
+        return args[0] % args[1]
 
     # Default fallback: return primitive
     return tests

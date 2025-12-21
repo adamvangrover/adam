@@ -10,6 +10,7 @@ from core.utils.logging_utils import get_logger
 
 logger = get_logger("institutional_radar.analytics")
 
+
 class InstitutionalRadarAnalytics:
     def __init__(self, session=None):
         self.session = session or SessionLocal()
@@ -27,9 +28,9 @@ class InstitutionalRadarAnalytics:
         q_end_month = quarter * 3
         report_date = date(year, q_end_month, 30)
         if q_end_month in [3, 12]:
-             report_date = date(year, q_end_month, 31)
+            report_date = date(year, q_end_month, 31)
         elif q_end_month in [6, 9]:
-             report_date = date(year, q_end_month, 30)
+            report_date = date(year, q_end_month, 30)
 
         # Allow some wiggle room or select exact
         stmt = (
@@ -46,7 +47,7 @@ class InstitutionalRadarAnalytics:
             .join(FundMasterDB, FilingEventDB.cik == FundMasterDB.cik)
             .outerjoin(SecurityMasterDB, HoldingDetailDB.cusip == SecurityMasterDB.cusip)
             .filter(FilingEventDB.report_period == report_date)
-            .filter(HoldingDetailDB.put_call == None) # Long Only
+            .filter(HoldingDetailDB.put_call == None)  # Long Only
         )
 
         df = pd.read_sql(stmt.statement, self.session.bind)
@@ -82,8 +83,9 @@ class InstitutionalRadarAnalytics:
 
         # Normalize metrics (0-100 scale or Z-score)
         metrics['N_score'] = (metrics['N'] - metrics['N'].min()) / (metrics['N'].max() - metrics['N'].min())
-        metrics['C_score'] = (metrics['C_raw'] - metrics['C_raw'].min()) / (metrics['C_raw'].max() - metrics['C_raw'].min())
-        metrics['L_score'] = 0.5 # Placeholder
+        metrics['C_score'] = (metrics['C_raw'] - metrics['C_raw'].min()) / \
+            (metrics['C_raw'].max() - metrics['C_raw'].min())
+        metrics['L_score'] = 0.5  # Placeholder
 
         w1, w2, w3 = 0.4, 0.4, 0.2
         metrics['crowding_score'] = (w1 * metrics['N_score'] + w2 * metrics['C_score'] + w3 * metrics['L_score']) * 100

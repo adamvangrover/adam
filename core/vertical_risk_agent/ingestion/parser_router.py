@@ -5,6 +5,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class ParserRouter:
     """
     Routes parsing requests to the most appropriate engine:
@@ -39,13 +40,13 @@ class ParserRouter:
         # Mock return
         return {
             "balance_sheet": {
-                "cash_equivalents": 48000000.0, # Slightly worse accuracy simulated
+                "cash_equivalents": 48000000.0,  # Slightly worse accuracy simulated
                 "total_assets": 120000000.0,
                 "total_debt": 40000000.0,
                 "equity": 80000000.0,
                 "fiscal_year": 2024
             },
-             "income_statement": {
+            "income_statement": {
                 "revenue": 200000000.0,
                 "operating_income": 30000000.0,
                 "net_income": 20000000.0,

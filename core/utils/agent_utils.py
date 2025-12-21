@@ -1,4 +1,4 @@
-#core/utils/agent_utils.py
+# core/utils/agent_utils.py
 
 import pika
 import json
@@ -66,7 +66,7 @@ def monitor_agent_performance(agent_name, metric, value):
     """
     # Store the performance metrics (e.g., in a database or log file)
     # Analyze the metrics to identify trends or potential issues
-    #... (Implementation for monitoring agent performance)
+    # ... (Implementation for monitoring agent performance)
     pass  # Placeholder for actual implementation
 
 
@@ -122,7 +122,7 @@ def log_agent_action(agent_name, action, details):
     """
     # Record the log entry (e.g., in a log file or database)
     # Include timestamp, agent name, action, and details
-    #... (Implementation for logging agent actions)
+    # ... (Implementation for logging agent actions)
     pass  # Placeholder for actual implementation
 
 # Add more agent utility functions as needed

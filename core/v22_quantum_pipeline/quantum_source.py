@@ -14,6 +14,7 @@ except ImportError:
 if np is None:
     class MockNumpy:
         pi = 3.14159
+
         class random:
             @staticmethod
             def rand(rows, cols):

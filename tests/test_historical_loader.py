@@ -6,6 +6,7 @@ import shutil
 from core.market_data.historical_loader import HistoricalLoader
 from core.schemas.market_data_schema import MarketDataSchema
 
+
 class TestHistoricalLoader(unittest.TestCase):
     def setUp(self):
         self.test_dir = "tests/temp_market_data"
@@ -60,7 +61,7 @@ class TestHistoricalLoader(unittest.TestCase):
         self.assertIn('Ticker', df.columns)
         self.assertIn('AAPL', df['Ticker'].unique())
         self.assertIn('MSFT', df['Ticker'].unique())
-        self.assertEqual(len(df), 4) # 2 dates * 2 tickers
+        self.assertEqual(len(df), 4)  # 2 dates * 2 tickers
 
     def test_validate_data(self):
         # Create valid dataframe
@@ -91,6 +92,7 @@ class TestHistoricalLoader(unittest.TestCase):
         self.loader.save_to_parquet(df, filename="test.parquet")
 
         self.assertTrue(os.path.exists(os.path.join(self.test_dir, "test.parquet")))
+
 
 if __name__ == '__main__':
     unittest.main()

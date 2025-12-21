@@ -15,11 +15,13 @@ except ImportError:
     SKLEARN_AVAILABLE = False
     logger.warning("scikit-learn not installed. Vector search capabilities disabled.")
 
+
 class MemoryManager:
     """
     Manages the long-term memory of the system using a local JSON store.
     Stores analysis history to allow agents to recall past insights.
     """
+
     def __init__(self, storage_file: str = "data/memory/analysis_history.json"):
         self.storage_file = storage_file
         self.ensure_storage_exists()
@@ -89,6 +91,7 @@ class VectorMemoryManager(MemoryManager):
     """
     Enhanced Memory Manager with Vector Search capabilities.
     """
+
     def __init__(self, storage_file: str = "data/memory/analysis_history.json"):
         super().__init__(storage_file)
         self.vectorizer = None
@@ -100,7 +103,8 @@ class VectorMemoryManager(MemoryManager):
             self._refresh_vectors()
 
     def _refresh_vectors(self):
-        if not SKLEARN_AVAILABLE: return
+        if not SKLEARN_AVAILABLE:
+            return
 
         self.history_cache = self.load_history()
         corpus = [h.get("analysis_summary", "") for h in self.history_cache]
@@ -140,7 +144,7 @@ class VectorMemoryManager(MemoryManager):
             for i in related_docs_indices:
                 if i < len(self.history_cache):
                     score = float(cosine_similarities[i])
-                    if score > 0.1: # Minimum similarity threshold
+                    if score > 0.1:  # Minimum similarity threshold
                         entry = self.history_cache[i].copy()
                         entry['similarity_score'] = score
                         results.append(entry)

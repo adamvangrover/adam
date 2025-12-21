@@ -10,6 +10,7 @@ from unittest.mock import patch
 # For now, assuming the execution environment can find 'core'.
 from core.utils.secrets_utils import get_api_key
 
+
 class TestSecretsUtils(unittest.TestCase):
 
     @patch.dict(os.environ, {'TEST_API_KEY_EXISTS': 'test_value_123'}, clear=True)
@@ -17,7 +18,7 @@ class TestSecretsUtils(unittest.TestCase):
         """Test that get_api_key returns the value if the environment variable exists."""
         self.assertEqual(get_api_key('TEST_API_KEY_EXISTS'), 'test_value_123')
 
-    @patch.dict(os.environ, {}, clear=True) # Ensure the key is not set
+    @patch.dict(os.environ, {}, clear=True)  # Ensure the key is not set
     def test_get_api_key_not_exists(self):
         """Test that get_api_key returns None and logs a warning if the key does not exist."""
         # Ensure 'TEST_API_KEY_NOT_EXISTS' is not in os.environ (covered by patch.dict with clear=True)
@@ -27,9 +28,9 @@ class TestSecretsUtils(unittest.TestCase):
         # If it does `logging.warning()`, it's the root logger.
         # The current implementation of secrets_utils.py uses `logging.warning`,
         # so we capture from the root logger.
-        with self.assertLogs(logger=None, level='WARNING') as cm: # logger=None captures root logger
+        with self.assertLogs(logger=None, level='WARNING') as cm:  # logger=None captures root logger
             result = get_api_key('TEST_API_KEY_NOT_EXISTS')
-        
+
         self.assertIsNone(result)
         self.assertIn("API key 'TEST_API_KEY_NOT_EXISTS' not found in environment variables.", cm.output[0])
 
@@ -38,9 +39,10 @@ class TestSecretsUtils(unittest.TestCase):
         """Test that get_api_key returns None and logs a warning for an empty string value."""
         with self.assertLogs(logger=None, level='WARNING') as cm:
             result = get_api_key('TEST_API_KEY_EMPTY')
-            
+
         self.assertIsNone(result)
-        self.assertIn("API key 'TEST_API_KEY_EMPTY' found in environment variables but is empty or whitespace.", cm.output[0])
+        self.assertIn(
+            "API key 'TEST_API_KEY_EMPTY' found in environment variables but is empty or whitespace.", cm.output[0])
 
     @patch.dict(os.environ, {'TEST_API_KEY_WHITESPACE': '   '}, clear=True)
     def test_get_api_key_whitespace_value(self):
@@ -49,7 +51,9 @@ class TestSecretsUtils(unittest.TestCase):
             result = get_api_key('TEST_API_KEY_WHITESPACE')
 
         self.assertIsNone(result)
-        self.assertIn("API key 'TEST_API_KEY_WHITESPACE' found in environment variables but is empty or whitespace.", cm.output[0])
+        self.assertIn(
+            "API key 'TEST_API_KEY_WHITESPACE' found in environment variables but is empty or whitespace.", cm.output[0])
+
 
 if __name__ == '__main__':
     unittest.main()

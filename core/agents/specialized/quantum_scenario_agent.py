@@ -19,6 +19,7 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+
 class QuantumScenarioAgent(AgentBase):
     """
     Phase 4 Helper: Quantum Scenario Generation.
@@ -33,6 +34,7 @@ class QuantumScenarioAgent(AgentBase):
     to use classical approximations (numpy-based QMC simulation) and heuristic-based
     generative models.
     """
+
     def __init__(self, config: Dict[str, Any]):
         super().__init__(config)
         self.persona = "Quantum Risk Physicist"
@@ -94,7 +96,8 @@ class QuantumScenarioAgent(AgentBase):
             try:
                 # We need a mock 'MacroEvent' to trigger the generator
                 from core.schemas.v23_5_schema import MacroEvent
-                trigger = MacroEvent(name="Rate Shock", type="inflation", description="Unexpected 50bps hike", impact_score=0.8)
+                trigger = MacroEvent(name="Rate Shock", type="inflation",
+                                     description="Unexpected 50bps hike", impact_score=0.8)
 
                 gre_scenarios = self.gre_engine.generate_stress_scenario(trigger, n_scenarios=2)
 
@@ -107,7 +110,7 @@ class QuantumScenarioAgent(AgentBase):
                         estimated_impact_ev=f"-{gs.severity_score*100:.0f}%"
                     ))
             except Exception as e:
-                 logger.warning(f"GRE Engine generation failed or schema mismatch: {e}")
+                logger.warning(f"GRE Engine generation failed or schema mismatch: {e}")
 
         # 3. Fallback / Augmentation Logic
         # --------------------------------

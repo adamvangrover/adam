@@ -5,6 +5,7 @@ from core.engine.meta_orchestrator import MetaOrchestrator
 
 router = APIRouter()
 
+
 @router.post("/analyze", response_model=AnalysisResponse)
 async def analyze_task(
     request: AnalysisRequest,
@@ -17,6 +18,7 @@ async def analyze_task(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.get("/status")
 async def get_status():

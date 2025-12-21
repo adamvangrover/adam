@@ -2,6 +2,7 @@ import numpy as np
 from typing import Dict, Any, List, Optional
 from core.schemas.hnasp import EPAVector, Identity, PersonaState
 
+
 class BayesACTEngine:
     def __init__(self):
         # Placeholder for EPA dictionary
@@ -77,7 +78,7 @@ class BayesACTEngine:
             # If attacked, transient moves to Low E.
             # We mock this by "blending" the interaction EPA into the self transient
             if state.identities.self.transient_epa is None:
-                 state.identities.self.transient_epa = state.identities.self.fundamental_epa
+                state.identities.self.transient_epa = state.identities.self.fundamental_epa
 
             # Update dynamics
             f_vec = state.identities.self.fundamental_epa

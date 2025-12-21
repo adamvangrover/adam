@@ -1,3 +1,5 @@
+from core.advisory.robo_advisor import RoboAdvisor
+from core.trading.hft.hft_engine import HFTStrategy
 import sys
 import os
 import json
@@ -6,8 +8,6 @@ import asyncio
 # Add project root to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from core.trading.hft.hft_engine import HFTStrategy
-from core.advisory.robo_advisor import RoboAdvisor
 
 def test_hft_init():
     print("[TEST] Initializing HFT Engine...")
@@ -18,6 +18,7 @@ def test_hft_init():
     except Exception as e:
         print(f"FAIL: HFT Engine init failed: {e}")
         sys.exit(1)
+
 
 def test_robo_advisor():
     print("[TEST] Running Robo-Advisor Logic...")
@@ -41,6 +42,7 @@ def test_robo_advisor():
         print(f"FAIL: Robo-Advisor failed: {e}")
         sys.exit(1)
 
+
 def test_portfolio_json():
     print("[TEST] Verifying Gold Standard JSON...")
     path = "data/strategies/gold_standard_portfolio.json"
@@ -54,6 +56,7 @@ def test_portfolio_json():
     except Exception as e:
         print(f"FAIL: JSON verification failed: {e}")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     test_hft_init()

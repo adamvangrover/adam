@@ -8,11 +8,14 @@ from langgraph.graph import StateGraph, END
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # --- Pillar 1 & 3: Define the Graph State & Plan ---
+
+
 class PlanOnGraph(TypedDict):
     """A symbolic scaffold representing the causal links and logical steps."""
     id: str
     steps: List[Dict[str, Any]]
     is_complete: bool
+
 
 class GraphState(TypedDict):
     """Represents the state of our adaptive reasoning graph."""
@@ -26,21 +29,28 @@ class GraphState(TypedDict):
     max_iterations: int
 
 # --- Pillar 2, 3, & 4: Implement Agent Skeletons ---
+
+
 class NeuroSymbolicPlanner:
     def execute(self, state: GraphState) -> Dict[str, Any]:
         logging.info("[NeuroSymbolicPlanner] Generating Plan-on-Graph (PoG)...")
         plan: PlanOnGraph = {
             "id": "plan-001",
             "steps": [
-                {"task_id": "1", "agent": "RiskAssessmentAgent", "description": "Generate initial credit risk assessment for Obligor X."},
-                {"task_id": "2", "agent": "RedTeamAgent", "description": "Critique the initial assessment for logical fallacies and missing data."},
-                {"task_id": "3", "agent": "MixtureOfAgents", "description": "Perform deep-dive on market comparables using a specialist sub-team."},
+                {"task_id": "1", "agent": "RiskAssessmentAgent",
+                    "description": "Generate initial credit risk assessment for Obligor X."},
+                {"task_id": "2", "agent": "RedTeamAgent",
+                    "description": "Critique the initial assessment for logical fallacies and missing data."},
+                {"task_id": "3", "agent": "MixtureOfAgents",
+                    "description": "Perform deep-dive on market comparables using a specialist sub-team."},
                 {"task_id": "4", "agent": "HumanInTheLoop", "description": "Request final sign-off from a human analyst."},
-                {"task_id": "5", "agent": "RiskAssessmentAgent", "description": "Generate final report incorporating all feedback."},
+                {"task_id": "5", "agent": "RiskAssessmentAgent",
+                    "description": "Generate final report incorporating all feedback."},
             ],
             "is_complete": False,
         }
         return {"plan": plan, "current_task_index": 0}
+
 
 class RiskAssessmentAgent:
     def execute(self, state: GraphState) -> Dict[str, Any]:
@@ -53,6 +63,7 @@ class RiskAssessmentAgent:
         logging.info(f"Generated assessment (v{iteration}): {new_assessment_text}")
         return {"assessment": assessment, "iteration": iteration + 1}
 
+
 class RedTeamAgent:
     def execute(self, state: GraphState) -> Dict[str, Any]:
         iteration = state["iteration"]
@@ -62,6 +73,7 @@ class RedTeamAgent:
         logging.info(f"Critique (v{iteration}): Meets Standards? {meets_standards}")
         return {"critique": critique}
 
+
 class MixtureOfAgents:
     def execute(self, state: GraphState) -> Dict[str, Any]:
         task = state["plan"]["steps"][state["current_task_index"]]
@@ -70,6 +82,7 @@ class MixtureOfAgents:
         assessment = state["assessment"]
         assessment["content"] += f"\\n\\nMoA Analysis:\\n{aggregated_result}"
         return {"assessment": assessment, "current_task_index": state["current_task_index"] + 1}
+
 
 class HumanInTheLoop:
     def execute(self, state: GraphState) -> Dict[str, Any]:
@@ -83,6 +96,8 @@ class HumanInTheLoop:
         return {"human_feedback": human_feedback, "current_task_index": state["current_task_index"] + 1}
 
 # --- Pillar 1: Implement the Core Cyclical Graph ---
+
+
 class AdaptiveSystemGraph:
     def __init__(self):
         self.planner = NeuroSymbolicPlanner()
@@ -122,25 +137,26 @@ class AdaptiveSystemGraph:
     def compile(self) -> Any:
         return self.graph.compile()
 
+
 # --- Runnable Entry Point ---
 if __name__ == "__main__":
     logging.info("--- Initializing Adam v23 Adaptive System Proof-of-Concept ---")
-    
+
     # Instantiate and compile the graph
     adaptive_system = AdaptiveSystemGraph()
     app = adaptive_system.compile()
-    
+
     # Define the initial state for the run
     initial_state = {
         "request": "Analyze the credit risk for Obligor X.",
-        "iteration": 1, # Start iteration at 1 for clarity in logs
-        "max_iterations": 2, # Configure the loop to run twice before succeeding
+        "iteration": 1,  # Start iteration at 1 for clarity in logs
+        "max_iterations": 2,  # Configure the loop to run twice before succeeding
     }
-    
+
     print("\\n--- Starting Graph Execution ---")
     # Execute the graph
     final_state = app.invoke(initial_state)
-    
+
     print("\\n--- Graph Execution Complete ---")
     print("\\nFinal State:")
     print(final_state)

@@ -1,4 +1,4 @@
-#core/agents/financial_modeling_agent.py
+# core/agents/financial_modeling_agent.py
 
 import numpy as np
 import pandas as pd
@@ -10,6 +10,7 @@ import openpyxl
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 
 class FinancialModelingAgent:
     """
@@ -113,7 +114,8 @@ class FinancialModelingAgent:
         if self.terminal_value is None:
             self.calculate_terminal_value()
 
-        npv = np.sum(self.discounted_cash_flows) + self.terminal_value / (1 + self.discount_rate) ** len(self.discounted_cash_flows)
+        npv = np.sum(self.discounted_cash_flows) + self.terminal_value / \
+            (1 + self.discount_rate) ** len(self.discounted_cash_flows)
         self.npv = npv
         return self.npv
 
@@ -280,17 +282,22 @@ class FinancialModelingAgent:
         """
         historical_df = pd.DataFrame(historical_data)
         forecast_df = pd.DataFrame()
-        forecast_df['revenue'] = historical_df['revenue'].iloc[-1] * (1 + np.array(forecast_data['revenue_growth']).cumprod())
+        forecast_df['revenue'] = historical_df['revenue'].iloc[-1] * \
+            (1 + np.array(forecast_data['revenue_growth']).cumprod())
         forecast_df['ebitda'] = forecast_df['revenue'] * np.array(forecast_data['ebitda_margin'])
         forecast_df['capex'] = forecast_df['revenue'] * np.array(forecast_data['capex_percent_revenue'])
-        forecast_df['working_capital_change'] = forecast_df['revenue'] * np.array(forecast_data['working_capital_percent_revenue'])
-        forecast_df['free_cash_flow'] = forecast_df['ebitda'] - forecast_df['capex'] - forecast_df['working_capital_change']
+        forecast_df['working_capital_change'] = forecast_df['revenue'] * \
+            np.array(forecast_data['working_capital_percent_revenue'])
+        forecast_df['free_cash_flow'] = forecast_df['ebitda'] - \
+            forecast_df['capex'] - forecast_df['working_capital_change']
         return forecast_df
+
 
 # Example usage:
 if __name__ == "__main__":
     # Initialize the agent with some initial values
-    config = {'forecast_years': 10, 'industry_multiples': {'EBITDA': 8.0, 'Revenue': 1.5}, 'terminal_valuation_method': 'Exit Multiple'}
+    config = {'forecast_years': 10, 'industry_multiples': {'EBITDA': 8.0,
+                                                           'Revenue': 1.5}, 'terminal_valuation_method': 'Exit Multiple'}
     agent = FinancialModelingAgent(initial_cash_flow=1500000, discount_rate=0.08, growth_rate=0.04, config=config)
 
     # Generate cash flows and calculate NPV
@@ -356,7 +363,8 @@ if __name__ == "__main__":
             discounted_fcf.append(fcf * discount_factor)
 
         if self.terminal_valuation_method == 'Gordon Growth':
-            terminal_value = fcf_projections[self.forecast_years - 1] * (1 + self.terminal_growth_rate) / (self.discount_rate - self.terminal_growth_rate)
+            terminal_value = fcf_projections[self.forecast_years - 1] * \
+                (1 + self.terminal_growth_rate) / (self.discount_rate - self.terminal_growth_rate)
         elif self.terminal_valuation_method == 'Exit Multiple':
             terminal_value = fcf_projections[self.forecast_years - 1] * self.industry_multiples.get("EBITDA", 10)
         else:
@@ -377,7 +385,6 @@ if __name__ == "__main__":
         }
         return intrinsic_value, detailed_calculations
 
-
     def calculate_wacc(self, equity_market_value, debt_market_value, cost_of_equity, cost_of_debt, tax_rate):
         """Calculates the Weighted Average Cost of Capital (WACC)."""
         total_value = equity_market_value + debt_market_value
@@ -390,17 +397,20 @@ if __name__ == "__main__":
         """Generates forecast financial statements."""
         historical_df = pd.DataFrame(historical_data)
         forecast_df = pd.DataFrame()
-        forecast_df['revenue'] = historical_df['revenue'].iloc[-1] * (1 + np.array(forecast_data['revenue_growth']).cumprod())
+        forecast_df['revenue'] = historical_df['revenue'].iloc[-1] * \
+            (1 + np.array(forecast_data['revenue_growth']).cumprod())
         forecast_df['ebitda'] = forecast_df['revenue'] * np.array(forecast_data['ebitda_margin'])
-        forecast_df['depreciation'] = forecast_df['ebitda'] * 0.1 #example depreciation
+        forecast_df['depreciation'] = forecast_df['ebitda'] * 0.1  # example depreciation
         forecast_df['ebit'] = forecast_df['ebitda'] - forecast_df['depreciation']
-        forecast_df['interest_expense'] = 10 #example interest expense
+        forecast_df['interest_expense'] = 10  # example interest expense
         forecast_df['pretax_income'] = forecast_df['ebit'] - forecast_df['interest_expense']
-        forecast_df['tax_expense'] = forecast_df['pretax_income'] * 0.25 #example tax rate
+        forecast_df['tax_expense'] = forecast_df['pretax_income'] * 0.25  # example tax rate
         forecast_df['net_income'] = forecast_df['pretax_income'] - forecast_df['tax_expense']
         forecast_df['capex'] = forecast_df['revenue'] * np.array(forecast_data['capex_percent_revenue'])
-        forecast_df['working_capital_change'] = forecast_df['revenue'] * np.array(forecast_data['working_capital_percent_revenue'])
-        forecast_df['free_cash_flow'] = forecast_df['net_income'] + forecast_df['depreciation'] - forecast_df['capex'] - forecast_df['working_capital_change']
+        forecast_df['working_capital_change'] = forecast_df['revenue'] * \
+            np.array(forecast_data['working_capital_percent_revenue'])
+        forecast_df['free_cash_flow'] = forecast_df['net_income'] + forecast_df['depreciation'] - \
+            forecast_df['capex'] - forecast_df['working_capital_change']
         return forecast_df
 
     # ... (other methods)
@@ -410,5 +420,5 @@ if __name__ == "__main__":
     # ... (previous example usage)
     agent = FinancialModelingAgent(initial_cash_flow=1500000, discount_rate=0.08, growth_rate=0.04, config=config)
     # ... (the rest of the example)
-    wacc = agent.calculate_wacc(1000,500,0.1,0.06,0.25)
+    wacc = agent.calculate_wacc(1000, 500, 0.1, 0.06, 0.25)
     print(f"WACC: {wacc:.2f}")

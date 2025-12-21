@@ -4,6 +4,7 @@ from typing import Any, Dict
 
 from core.agents.agent_base import AgentBase
 
+
 class PortfolioMonitoringEWSAgent(AgentBase):
     """
     This agent is the system's vigilant sentinel, responsible for continuous,

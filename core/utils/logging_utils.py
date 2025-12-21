@@ -3,6 +3,7 @@ import logging.config
 import os
 import yaml
 
+
 def setup_logging(config=None, default_path='config/logging.yaml', default_level=logging.INFO, env_key='LOG_CFG'):
     """
     Setup logging configuration
@@ -24,6 +25,7 @@ def setup_logging(config=None, default_path='config/logging.yaml', default_level
     else:
         logging.basicConfig(level=default_level)
         logging.info("Logging configured with default basicConfig")
+
 
 def get_logger(name: str) -> logging.Logger:
     """

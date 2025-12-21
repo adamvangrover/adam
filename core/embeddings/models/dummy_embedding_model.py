@@ -2,11 +2,13 @@ import logging
 from typing import List
 from core.embeddings.base_embedding_model import BaseEmbeddingModel
 
+
 class DummyEmbeddingModel(BaseEmbeddingModel):
     """
     A dummy embedding model for testing and demonstration.
     Generates non-semantic, deterministic embeddings.
     """
+
     def __init__(self, model_name: str = "dummy-embedding-v1", embedding_dim: int = 128):
         self.model_name = model_name
         self.embedding_dim = embedding_dim
@@ -18,7 +20,8 @@ class DummyEmbeddingModel(BaseEmbeddingModel):
             return [0.0] * self.embedding_dim
 
         # Simple deterministic embedding based on char codes, scaled
-        embedding = [(ord(char) % 128) / 128.0 - 0.5 for char in text[:self.embedding_dim*2]] # Use more chars for variability
+        # Use more chars for variability
+        embedding = [(ord(char) % 128) / 128.0 - 0.5 for char in text[:self.embedding_dim*2]]
 
         # Ensure fixed dimension
         if len(embedding) < self.embedding_dim:
@@ -27,6 +30,7 @@ class DummyEmbeddingModel(BaseEmbeddingModel):
             embedding = embedding[:self.embedding_dim]
 
         return embedding
+
 
 if __name__ == "__main__":
     async def main():

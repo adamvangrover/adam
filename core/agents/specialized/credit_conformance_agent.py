@@ -15,6 +15,7 @@ try:
 except ImportError:
     Kernel = Any
 
+
 class CreditConformanceAgent(AgentBase):
     """
     Tier-2 Generative AI Agent for Credit Risk Conformance.

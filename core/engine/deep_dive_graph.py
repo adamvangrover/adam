@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 # --- Mock Data Fetcher ---
 
+
 def fetch_financial_context(ticker: str) -> Dict[str, Any]:
     """
     Simulates fetching diverse datasets from a data lake (SNC, Market, Fundamentals).
@@ -54,6 +55,7 @@ def fetch_financial_context(ticker: str) -> Dict[str, Any]:
 
 # --- Nodes ---
 
+
 def entity_resolution_node(state: OmniscientState) -> Dict[str, Any]:
     """
     Phase 1: Entity, Ecosystem & Management.
@@ -64,15 +66,15 @@ def entity_resolution_node(state: OmniscientState) -> Dict[str, Any]:
     # In reality, verify legal entity hierarchy here.
     legal_entity = {
         "name": f"{ticker} Global Holdings Inc.",
-        "lei": "5493006MHB84DD0ZWV18", # Mock LEI
+        "lei": "5493006MHB84DD0ZWV18",  # Mock LEI
         "jurisdiction": "Delaware, USA"
     }
 
     mgmt = assess_management(ticker)
-    comp = assess_competitive_position(ticker, "Technology") # Assume tech for now
+    comp = assess_competitive_position(ticker, "Technology")  # Assume tech for now
 
     # Update State
-    legal_entity["sector"] = "Technology" # Default or extracted
+    legal_entity["sector"] = "Technology"  # Default or extracted
 
     state["v23_knowledge_graph"]["nodes"]["entity_ecosystem"] = {
         "legal_entity": legal_entity,
@@ -84,6 +86,7 @@ def entity_resolution_node(state: OmniscientState) -> Dict[str, Any]:
         "v23_knowledge_graph": state["v23_knowledge_graph"],
         "human_readable_status": "Phase 1 Complete: Entity & Management Assessed."
     }
+
 
 def deep_fundamental_node(state: OmniscientState) -> Dict[str, Any]:
     """
@@ -120,7 +123,7 @@ def deep_fundamental_node(state: OmniscientState) -> Dict[str, Any]:
     mult_res_adapter = {
         "current_ev_ebitda": mult_res.get("current_ev_ebitda", 0.0),
         "peer_median_ev_ebitda": mult_res.get("peer_median_ev_ebitda", 0.0),
-        "verdict": "Undervalued" # Mock logic or derived
+        "verdict": "Undervalued"  # Mock logic or derived
     }
 
     state["v23_knowledge_graph"]["nodes"]["equity_analysis"] = {
@@ -137,6 +140,7 @@ def deep_fundamental_node(state: OmniscientState) -> Dict[str, Any]:
         "human_readable_status": "Phase 2 Complete: Valuation Models Run."
     }
 
+
 def credit_snc_node(state: OmniscientState) -> Dict[str, Any]:
     """
     Phase 3: Credit, Covenants & SNC Ratings.
@@ -151,11 +155,12 @@ def credit_snc_node(state: OmniscientState) -> Dict[str, Any]:
     rating = map_financials_to_rating(leverage, liquidity, fin["total_debt"])
 
     # Primary Facility Logic
-    primary_fac = data["syndicate_data"]["facilities"][0] if data["syndicate_data"]["facilities"] else {"id": "N/A", "amount": 0}
+    primary_fac = data["syndicate_data"]["facilities"][0] if data["syndicate_data"]["facilities"] else {
+        "id": "N/A", "amount": 0}
 
     primary_facility_assessment = {
         "facility_type": primary_fac.get("id", "Term Loan"),
-        "collateral_coverage": "Strong", # Mock
+        "collateral_coverage": "Strong",  # Mock
         "repayment_capacity": "High" if rating == "Pass" else "Low"
     }
 
@@ -174,7 +179,7 @@ def credit_snc_node(state: OmniscientState) -> Dict[str, Any]:
 
     state["v23_knowledge_graph"]["nodes"]["credit_analysis"] = {
         "snc_rating_model": snc_model,
-        "cds_market_implied_rating": "BB-", # Mock
+        "cds_market_implied_rating": "BB-",  # Mock
         "covenant_risk_analysis": covenant_risk
     }
 
@@ -182,6 +187,7 @@ def credit_snc_node(state: OmniscientState) -> Dict[str, Any]:
         "v23_knowledge_graph": state["v23_knowledge_graph"],
         "human_readable_status": "Phase 3 Complete: Credit Rating Assigned."
     }
+
 
 def risk_simulation_node(state: OmniscientState) -> Dict[str, Any]:
     """
@@ -199,14 +205,16 @@ def risk_simulation_node(state: OmniscientState) -> Dict[str, Any]:
     quantum_scenarios = []
     for s in scenarios:
         prob = "Low"
-        if s.probability_weight > 0.4: prob = "High"
-        elif s.probability_weight > 0.1: prob = "Med"
+        if s.probability_weight > 0.4:
+            prob = "High"
+        elif s.probability_weight > 0.1:
+            prob = "Med"
 
         quantum_scenarios.append({
             "scenario_name": s.description,
             "probability": prob,
             "impact_severity": "High",
-            "estimated_impact_ev": "-15%" # Simplified
+            "estimated_impact_ev": "-15%"  # Simplified
         })
 
     simulation_engine = {
@@ -224,6 +232,7 @@ def risk_simulation_node(state: OmniscientState) -> Dict[str, Any]:
         "v23_knowledge_graph": state["v23_knowledge_graph"],
         "human_readable_status": "Phase 4 Complete: Stress Tests Run."
     }
+
 
 def strategic_synthesis_node(state: OmniscientState) -> Dict[str, Any]:
     """
@@ -245,7 +254,7 @@ def strategic_synthesis_node(state: OmniscientState) -> Dict[str, Any]:
         else:
             pd = float(pd_str)
     except:
-        pd = 0.05 # Default if parsing fails
+        pd = 0.05  # Default if parsing fails
 
     # 1. M&A Posture
     ma_posture = determine_ma_posture(data["fundamentals"], data["market_data"])
@@ -275,6 +284,7 @@ def strategic_synthesis_node(state: OmniscientState) -> Dict[str, Any]:
 
 # --- Graph Construction ---
 
+
 def build_deep_dive_graph():
     workflow = StateGraph(OmniscientState)
 
@@ -295,5 +305,6 @@ def build_deep_dive_graph():
 
     checkpointer = MemorySaver()
     return workflow.compile(checkpointer=checkpointer)
+
 
 deep_dive_app = build_deep_dive_graph()

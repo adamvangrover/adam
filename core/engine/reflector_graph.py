@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 # --- Mock Logic for Nodes ---
 
+
 def mock_analyze_content(content: str) -> Dict[str, Any]:
     notes = []
     score = 1.0
@@ -24,10 +25,12 @@ def mock_analyze_content(content: str) -> Dict[str, Any]:
 
     return notes, score
 
+
 def mock_refine_content(content: str, notes: list) -> str:
     return content + "\n\n[Refined based on feedback: " + "; ".join(notes) + "]"
 
 # --- Nodes ---
+
 
 def analyze_node(state: ReflectorState) -> Dict[str, Any]:
     logger.info("--- Node: Analyze Content ---")
@@ -42,6 +45,7 @@ def analyze_node(state: ReflectorState) -> Dict[str, Any]:
         "human_readable_status": f"Analyzed content. Score: {score}"
     }
 
+
 def refine_node(state: ReflectorState) -> Dict[str, Any]:
     logger.info("--- Node: Refine Content ---")
     current_content = state.get("refined_content") or state["input_content"]
@@ -55,12 +59,14 @@ def refine_node(state: ReflectorState) -> Dict[str, Any]:
 
 # --- Conditional ---
 
+
 def should_continue_reflection(state: ReflectorState) -> Literal["refine", "finalize"]:
     if not state["is_valid"] and state["iteration_count"] < 3:
         return "refine"
     return "finalize"
 
 # --- Graph ---
+
 
 def build_reflector_graph():
     workflow = StateGraph(ReflectorState)
@@ -83,5 +89,6 @@ def build_reflector_graph():
 
     checkpointer = MemorySaver()
     return workflow.compile(checkpointer=checkpointer)
+
 
 reflector_app = build_reflector_graph()
