@@ -49,4 +49,5 @@ docker-up:
 setup-dev:
 	pip install -r requirements.txt
 	pip install -e .
+	bash ops/setup.sh
 	pre-commit install

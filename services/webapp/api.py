@@ -171,9 +171,10 @@ def create_app(config_name='default'):
         from core.engine.meta_orchestrator import MetaOrchestrator
 
         core_config = load_app_config()
-        knowledge_base = KnowledgeBase(core_config)
-        data_manager = DataManager(core_config)
-        agent_orchestrator = AgentOrchestrator(core_config, knowledge_base, data_manager)
+        # knowledge_base and data_manager are not used by AgentOrchestrator v2
+        # knowledge_base = KnowledgeBase(core_config)
+        # data_manager = DataManager(core_config)
+        agent_orchestrator = AgentOrchestrator()
         meta_orchestrator = MetaOrchestrator(legacy_orchestrator=agent_orchestrator)
 
     # ---------------------------------------------------------------------------- #
@@ -658,4 +659,5 @@ if __name__ == '__main__':
     app = create_app(os.getenv('FLASK_CONFIG') or 'default')
     with app.app_context():
         db.create_all()
-    socketio.run(app, debug=True, port=5001)
+    # 🛡️ Sentinel: Debug mode disabled for production safety
+    socketio.run(app, debug=False, port=5001)
