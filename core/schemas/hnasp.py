@@ -66,13 +66,15 @@ class ExecutionTrace(BaseModel):
     rule_id: str
     result: Any
     step_by_step: Optional[List[Dict[str, Any]]] = None
+    timestamp: Optional[datetime] = None
+    error: Optional[str] = None
 
 class LogicLayer(BaseModel):
     engine: Literal["JsonLogic"] = "JsonLogic"
     version: str = "2.0"
     state_variables: Dict[str, Any] = Field(default_factory=dict)
     active_rules: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
-    execution_trace: Optional[ExecutionTrace] = None
+    execution_trace: List[ExecutionTrace] = Field(default_factory=list)
 
 # --- Context Stream Namespace ---
 

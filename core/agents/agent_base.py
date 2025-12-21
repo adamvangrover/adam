@@ -15,7 +15,7 @@ try:
     from json_logic import jsonLogic
 except ImportError:
     # Fallback
-    def jsonLogic(rules, data):
+    def jsonLogic(rules: Any, data: Any) -> Any:
         logging.warning("Using fallback jsonLogic (always True)")
         return True
 
@@ -23,7 +23,7 @@ except ImportError:
 try:
     from semantic_kernel import Kernel
 except ImportError:
-    Kernel = Any  # Fallback for type hinting if package is missing
+    Kernel = Any  # type: ignore # Fallback for type hinting if package is missing
 
 
 # Configure logging (you could also have a central logging config)
@@ -90,7 +90,7 @@ class AgentBase(ABC):
         # Monkey-patch execute to enforce logic layer evaluation (Guardrails)
         self._original_execute = self.execute
 
-        async def wrapped_execute(*args, **kwargs):
+        async def wrapped_execute(*args: Any, **kwargs: Any) -> Any:
             # Update state variables from inputs if applicable
             if kwargs:
                 self.state.logic_layer.state_variables.update(kwargs)
@@ -107,7 +107,11 @@ class AgentBase(ABC):
             # Execute original logic
             return await self._original_execute(*args, **kwargs)
 
-        self.execute = wrapped_execute # Bind wrapper to instance
+        self.execute = wrapped_execute # type: ignore[method-assign] # Bind wrapper to instance
+
+    @property
+    def name(self) -> str:
+        return self.config.get("agent_id", type(self).__name__)
 
 
     def set_context(self, context: Dict[str, Any]):
@@ -143,24 +147,27 @@ class AgentBase(ABC):
             if not active_rules:
                 return
 
-            results = []
+            from core.schemas.hnasp import ExecutionTrace # Import locally to avoid circulars if any
+
+            results: List[ExecutionTrace] = []
             for rule_id, rule in active_rules.items():
                 try:
                     result = jsonLogic(rule, state_vars)
-                    results.append({
-                        "rule_id": rule_id,
-                        "result": result,
-                        "timestamp": datetime.utcnow().isoformat()
-                    })
+                    results.append(ExecutionTrace(
+                        rule_id=rule_id,
+                        result=result,
+                        timestamp=datetime.utcnow()
+                    ))
                     # Implicit guardrail: if result is explicitly False, maybe warn?
                     # For now we strictly log.
                 except Exception as e:
                     logging.error(f"Error evaluating HNASP rule {rule_id}: {e}")
-                    results.append({
-                        "rule_id": rule_id,
-                        "error": str(e),
-                        "timestamp": datetime.utcnow().isoformat()
-                    })
+                    results.append(ExecutionTrace(
+                        rule_id=rule_id,
+                        result=None,
+                        error=str(e),
+                        timestamp=datetime.utcnow()
+                    ))
 
             if logic_layer.execution_trace is None:
                 # Initialize logic_layer.execution_trace if None, but ExecutionTrace is a single object in schema?
@@ -195,6 +202,9 @@ class AgentBase(ABC):
                  return
 
             fundamental = self.state.persona_state.identities.user.fundamental_epa
+
+            if not fundamental:
+                return
 
             # Let's dump to list [E, P, A] for calculation
             f_vec = [fundamental.E, fundamental.P, fundamental.A]
