@@ -15,14 +15,15 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+
 class BlackLittermanEngine:
     def __init__(self, prices: pd.DataFrame):
         self.prices = prices
 
     def optimize_bl(self,
-                   market_caps: Dict[str, float],
-                   absolute_views: Dict[str, float],
-                   view_confidences: Optional[Dict[str, float]] = None) -> Dict[str, float]:
+                    market_caps: Dict[str, float],
+                    absolute_views: Dict[str, float],
+                    view_confidences: Optional[Dict[str, float]] = None) -> Dict[str, float]:
         """
         Runs Black-Litterman optimization.
 
@@ -42,7 +43,7 @@ class BlackLittermanEngine:
         # For simplicity, we approximate Delta or default to 2.5
         # pypfopt has market_implied_risk_aversion usually taking market prices.
         # Here we assume S&P500 history is not strictly required if we set a fixed delta or use the method carefully.
-        delta = 2.5 # Common default
+        delta = 2.5  # Common default
 
         # 3. Market Implied Prior Returns (Pi)
         market_prior = black_litterman.market_implied_prior_returns(market_caps, delta, S)
@@ -52,7 +53,7 @@ class BlackLittermanEngine:
         # If confidences are provided, use Idzorek's method
         omega = None
         if view_confidences:
-             omega = black_litterman.idzorek_method(view_confidences, S, market_prior)
+            omega = black_litterman.idzorek_method(view_confidences, S, market_prior)
 
         bl = BlackLittermanModel(S, pi=market_prior, absolute_views=absolute_views, omega=omega, delta=delta)
 

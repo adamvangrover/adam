@@ -1,4 +1,5 @@
 
+from core.engine.valuation_utils import calculate_dcf, calculate_multiples, get_price_targets
 import unittest
 import sys
 import os
@@ -6,7 +7,6 @@ import os
 # Add root to pythonpath
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from core.engine.valuation_utils import calculate_dcf, calculate_multiples, get_price_targets
 
 class TestDCFValuation(unittest.TestCase):
 
@@ -56,7 +56,7 @@ class TestDCFValuation(unittest.TestCase):
         """Test comprehensive scenario injection (recession)."""
         # Scenario: Recession (High Risk Premium, Low Growth)
         recession_scenario = {
-            "market_risk_premium": 0.08, # Default 0.05
+            "market_risk_premium": 0.08,  # Default 0.05
             "growth_rate": 0.01,         # Default 0.05
             "risk_free_rate": 0.02       # Rate cut
         }
@@ -68,17 +68,18 @@ class TestDCFValuation(unittest.TestCase):
         self.assertLess(result_recession["intrinsic_share_price"], result_base["intrinsic_share_price"])
 
     def test_calculate_multiples(self):
-        financials = {"enterprise_value": 50000, "ebitda": 2500} # EV/EBITDA = 20x
-        peers = [{"ev_ebitda": 15.0}, {"ev_ebitda": 25.0}] # Median = 20x
+        financials = {"enterprise_value": 50000, "ebitda": 2500}  # EV/EBITDA = 20x
+        peers = [{"ev_ebitda": 15.0}, {"ev_ebitda": 25.0}]  # Median = 20x
 
         result = calculate_multiples(financials, peers)
         self.assertEqual(result["current_ev_ebitda"], 20.0)
         self.assertEqual(result["verdict"], "Fairly Valued")
 
         # Test Overvalued
-        financials_expensive = {"enterprise_value": 75000, "ebitda": 2500} # 30x
+        financials_expensive = {"enterprise_value": 75000, "ebitda": 2500}  # 30x
         result_exp = calculate_multiples(financials_expensive, peers)
         self.assertEqual(result_exp["verdict"], "Overvalued")
+
 
 if __name__ == "__main__":
     unittest.main()

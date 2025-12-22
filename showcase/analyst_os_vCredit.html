@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM Analyst OS | Corporate Credit & Valuation Engine</title>
+    
+    <!-- Core Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Export Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #050b14;
+            --panel-bg: #0f172a;
+            --cyan-glow: #06b6d4;
+            --green-glow: #10b981;
+            --red-glow: #ef4444;
+            --purple-glow: #8b5cf6;
+            --border-color: rgba(148, 163, 184, 0.1);
+            --glass: rgba(15, 23, 42, 0.95);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            overflow: hidden; /* App-like feel */
+        }
+
+        /* Scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--cyan-glow); }
+
+        /* Utility Classes */
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .input-group {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 8px;
+            margin-bottom: 8px;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+
+        .num-input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-family: 'JetBrains Mono', monospace;
+            width: 100%;
+            font-size: 0.85rem;
+            outline: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+        .num-input:focus { border-bottom-color: var(--cyan-glow); }
+
+        .tab-btn {
+            padding: 10px 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #94a3b8;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover { color: #cbd5e1; }
+        .tab-btn.active {
+            color: var(--cyan-glow);
+            border-bottom-color: var(--cyan-glow);
+            background: rgba(6, 182, 212, 0.05);
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: 140px repeat(10, 1fr);
+            gap: 1px;
+            background: #334155; /* Grid line color */
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            overflow-x: auto;
+        }
+        .grid-cell {
+            background: var(--panel-bg);
+            padding: 6px 8px;
+            text-align: right;
+            white-space: nowrap;
+        }
+        .grid-header {
+            background: #1e293b;
+            font-weight: bold;
+            color: var(--cyan-glow);
+            text-align: center;
+        }
+        .grid-label {
+            text-align: left;
+            font-weight: 600;
+            color: #cbd5e1;
+            position: sticky;
+            left: 0;
+            z-index: 10;
+            border-right: 1px solid #334155;
+        }
+
+        .rating-badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.75rem;
+            text-align: center;
+            display: inline-block;
+        }
+        .rating-green { background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .rating-yellow { background: rgba(234, 179, 8, 0.1); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.3); }
+        .rating-red { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+        /* Animation */
+        @keyframes scanline {
+            0% { transform: translateY(-100%); opacity: 0; }
+            50% { opacity: 0.5; }
+            100% { transform: translateY(100vh); opacity: 0; }
+        }
+        .scan-line {
+            position: fixed; top: 0; left: 0; width: 100%; height: 2px;
+            background: var(--cyan-glow);
+            box-shadow: 0 0 10px var(--cyan-glow);
+            animation: scanline 8s linear infinite;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.3;
+        }
+
+        .section-header {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+
+    <div class="scan-line"></div>
+
+    <!-- Header -->
+    <header class="h-12 bg-[#020408] border-b border-white/10 flex items-center justify-between px-4 z-50 shrink-0">
+        <div class="flex items-center gap-3">
+            <i data-lucide="activity" class="text-cyan-400 w-5 h-5"></i>
+            <div>
+                <h1 class="font-bold text-sm tracking-widest text-gray-200">ADAM <span class="text-cyan-400">ANALYST OS</span></h1>
+                <div class="text-[10px] text-gray-500 tracking-wide">CORPORATE CREDIT MODULE v25.5</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <div id="status-indicator" class="flex items-center gap-2 px-3 py-1 bg-green-900/10 border border-green-500/20 rounded text-xs text-green-400">
+                <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                SYSTEM READY
+            </div>
+            <button onclick="exportReport()" class="flex items-center gap-2 px-3 py-1 bg-cyan-900/20 hover:bg-cyan-900/40 border border-cyan-500/30 rounded text-xs text-cyan-400 transition hover:shadow-[0_0_10px_rgba(6,182,212,0.3)]">
+                <i data-lucide="download" class="w-3 h-3"></i> EXPORT DOSSIER
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="flex-1 flex overflow-hidden">
+        
+        <!-- Sidebar: Inputs -->
+        <aside class="w-80 bg-[#020408] border-r border-white/5 flex flex-col overflow-y-auto shrink-0 custom-scroll">
+            
+            <!-- Target Entity -->
+            <div class="p-4 border-b border-white/5">
+                <h2 class="section-header"><i data-lucide="target" class="w-3 h-3"></i> Target Entity</h2>
+                <div class="input-group">
+                    <label class="input-label">Company Name</label>
+                    <input type="text" id="companyName" value="Orion Dynamics Inc." class="num-input text-sm font-semibold">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="input-group">
+                        <label class="input-label">Ticker</label>
+                        <input type="text" id="ticker" value="ORION" class="num-input">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Currency</label>
+                        <input type="text" id="currency" value="USD ($)" class="num-input">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Historical Data (3 Years) -->
+            <div class="p-4 border-b border-white/5">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="section-header mb-0"><i data-lucide="history" class="w-3 h-3"></i> Historical Basis</h2>
+                    <span class="text-[10px] text-cyan-400 cursor-pointer hover:underline hover:text-cyan-300 transition" onclick="loadDemoData()">Load Demo</span>
+                </div>
+                
+                <div class="grid grid-cols-4 gap-1 text-[10px] text-gray-500 text-center mb-1">
+                    <div class="text-left pl-1">Metric</div>
+                    <div>FY-2</div>
+                    <div>FY-1</div>
+                    <div class="text-cyan-400 font-bold">LTM</div>
+                </div>
+
+                <!-- Revenue Rows -->
+                <div class="grid grid-cols-4 gap-1 mb-2 items-center">
+                    <div class="text-[10px] text-gray-400 pl-1">Revenue</div>
+                    <input type="number" id="rev_2" value="4200" class="bg-transparent border-b border-white/10 text-right text-xs text-gray-400 w-full outline-none focus:border-cyan-400" oninput="runModel()">
+                    <input type="number" id="rev_1" value="4600" class="bg-transparent border-b border-white/10 text-right text-xs text-gray-400 w-full outline-none focus:border-cyan-400" oninput="runModel()">
+                    <input type="number" id="rev_0" value="5000" class="bg-transparent border-b border-white/10 text-right text-xs text-white font-bold w-full outline-none focus:border-cyan-400" oninput="runModel()">
+                </div>
+                <!-- EBITDA Rows -->
+                <div class="grid grid-cols-4 gap-1 mb-2 items-center">
+                    <div class="text-[10px] text-gray-400 pl-1">EBITDA</div>
+                    <input type="number" id="ebitda_2" value="950" class="bg-transparent border-b border-white/10 text-right text-xs text-gray-400 w-full outline-none focus:border-cyan-400" oninput="runModel()">
+                    <input type="number" id="ebitda_1" value="1050" class="bg-transparent border-b border-white/10 text-right text-xs text-gray-400 w-full outline-none focus:border-cyan-400" oninput="runModel()">
+                    <input type="number" id="ebitda_0" value="1200" class="bg-transparent border-b border-white/10 text-right text-xs text-white font-bold w-full outline-none focus:border-cyan-400" oninput="runModel()">
+                </div>
+                <!-- Debt Rows (Total) -->
+                <div class="grid grid-cols-4 gap-1 mb-4 items-center">
+                    <div class="text-[10px] text-gray-400 pl-1">Tot. Debt</div>
+                    <input type="number" id="debt_2" value="3800" class="bg-transparent border-b border-white/10 text-right text-xs text-gray-400 w-full outline-none focus:border-cyan-400" oninput="runModel()">
+                    <input type="number" id="debt_1" value="4200" class="bg-transparent border-b border-white/10 text-right text-xs text-gray-400 w-full outline-none focus:border-cyan-400" oninput="runModel()">
+                    <div class="text-right text-xs text-gray-500 italic" id="debt_0_display">--</div> <!-- Calc from below -->
+                </div>
+
+                <div class="space-y-2 mt-4 pt-4 border-t border-white/5">
+                    <div class="input-group">
+                        <label class="input-label">LTM CapEx</label>
+                        <input type="number" id="ltm_capex" value="250" class="num-input" oninput="runModel()">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Cash & Equivalents</label>
+                        <input type="number" id="cash" value="150" class="num-input" oninput="runModel()">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Shares Outstanding (mm)</label>
+                        <input type="number" id="shares" value="50" class="num-input" oninput="runModel()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Capital Structure (Detailed) -->
+            <div class="p-4 border-b border-white/5">
+                 <h2 class="section-header"><i data-lucide="layers" class="w-3 h-3"></i> Capital Structure (LTM)</h2>
+                 <div class="space-y-2">
+                    <div class="input-group border-l-2 border-l-green-500">
+                        <label class="input-label text-green-400">Senior Secured Debt</label>
+                        <input type="number" id="debt_secured" value="3000" class="num-input" oninput="runModel()">
+                    </div>
+                    <div class="input-group border-l-2 border-l-yellow-500">
+                        <label class="input-label text-yellow-400">Unsecured / Senior Notes</label>
+                        <input type="number" id="debt_unsecured" value="1000" class="num-input" oninput="runModel()">
+                    </div>
+                    <div class="input-group border-l-2 border-l-red-500">
+                        <label class="input-label text-red-400">Subordinated / Mezzanine</label>
+                        <input type="number" id="debt_sub" value="500" class="num-input" oninput="runModel()">
+                    </div>
+                 </div>
+                 <div class="mt-2 text-right text-xs text-gray-400">
+                     Total Debt: <span id="total_debt_calc" class="text-white font-bold">$4,500</span>
+                 </div>
+            </div>
+
+            <!-- Assumptions -->
+            <div class="p-4 border-b border-white/5">
+                <h2 class="section-header"><i data-lucide="settings-2" class="w-3 h-3"></i> Projection Drivers</h2>
+                <div class="space-y-2">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="input-group">
+                            <label class="input-label">Rev Growth (%)</label>
+                            <input type="number" id="growth_rate" value="4.0" step="0.1" class="num-input" oninput="runModel()">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">EBITDA Mrg (%)</label>
+                            <input type="number" id="ebitda_margin" value="24.0" step="0.1" class="num-input" oninput="runModel()">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="input-group">
+                            <label class="input-label">Tax Rate (%)</label>
+                            <input type="number" id="tax_rate" value="21.0" class="num-input" oninput="runModel()">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">WACC (%)</label>
+                            <input type="number" id="wacc" value="9.0" step="0.1" class="num-input" oninput="runModel()">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Terminal Multiple (x)</label>
+                        <input type="number" id="term_mult" value="7.5" step="0.5" class="num-input" oninput="runModel()">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Avg. Int. Rate (%)</label>
+                        <input type="number" id="int_rate" value="7.5" step="0.1" class="num-input" oninput="runModel()">
+                    </div>
+                     <div class="input-group">
+                        <label class="input-label">Mandatory Amort (% of Debt)</label>
+                        <input type="number" id="amort_rate" value="1.0" step="0.5" class="num-input" oninput="runModel()">
+                    </div>
+                </div>
+            </div>
+            
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 bg-[#050b14] flex flex-col min-w-0">
+            
+            <!-- Tab Navigation -->
+            <div class="flex items-center border-b border-white/5 bg-[#0f172a] px-2">
+                <div class="tab-btn active" onclick="switchTab('dashboard')">Mission Control</div>
+                <div class="tab-btn" onclick="switchTab('dcf')">DCF & Forecast</div>
+                <div class="tab-btn" onclick="switchTab('credit')">Credit & Ratings</div>
+                <div class="tab-btn" onclick="switchTab('sensitivity')">Sensitivity</div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-6 custom-scroll" id="workspace">
+                
+                <!-- TAB: DASHBOARD -->
+                <div id="tab-dashboard" class="space-y-6 animate-fade-in">
+                    <!-- Key Metrics Cards -->
+                    <div class="grid grid-cols-4 gap-4">
+                        <div class="glass-panel p-4 border-t-2 border-t-cyan-500">
+                            <div class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Enterprise Value</div>
+                            <div class="text-2xl font-bold text-white mt-2 font-mono" id="dash-ev">---</div>
+                            <div class="text-[10px] text-gray-500 mt-1">Implied Value</div>
+                        </div>
+                        <div class="glass-panel p-4 border-t-2 border-t-green-500">
+                            <div class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Equity Value / Share</div>
+                            <div class="text-2xl font-bold text-green-400 mt-2 font-mono" id="dash-pps">---</div>
+                            <div class="text-[10px] text-gray-500 mt-1">Intrinsic Target</div>
+                        </div>
+                        <div class="glass-panel p-4 border-t-2 border-t-yellow-500">
+                            <div class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Net Leverage (LTM)</div>
+                            <div class="text-2xl font-bold text-yellow-400 mt-2 font-mono" id="dash-lev">---</div>
+                            <div class="text-[10px] text-gray-500 mt-1">Total Debt / EBITDA</div>
+                        </div>
+                        <div class="glass-panel p-4 border-t-2 border-t-purple-500">
+                            <div class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Accrual Status</div>
+                            <div class="text-xl font-bold text-white mt-2" id="dash-accrual">---</div>
+                            <div class="text-[10px] text-gray-500 mt-1">EV Coverage Check</div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row -->
+                    <div class="grid grid-cols-2 gap-6 h-80">
+                        <div class="glass-panel p-4 flex flex-col">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-xs font-bold text-gray-400 uppercase">Revenue & EBITDA Trajectory</h3>
+                                <div class="flex gap-2 text-[10px]">
+                                    <span class="text-cyan-400">● Revenue</span>
+                                    <span class="text-green-400">● EBITDA</span>
+                                </div>
+                            </div>
+                            <div class="flex-1 relative">
+                                <canvas id="chart-rev"></canvas>
+                            </div>
+                        </div>
+                        <div class="glass-panel p-4 flex flex-col">
+                            <h3 class="text-xs font-bold text-gray-400 uppercase mb-4">Free Cash Flow Profile</h3>
+                            <div class="flex-1 relative">
+                                <canvas id="chart-fcf"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summary Text -->
+                    <div class="glass-panel p-6">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase mb-4 flex items-center gap-2">
+                            <i data-lucide="file-text" class="w-4 h-4 text-cyan-400"></i> Automated Credit Memo
+                        </h3>
+                        <div id="credit-memo-text" class="text-sm text-gray-300 leading-relaxed font-mono whitespace-pre-wrap bg-black/20 p-4 rounded border border-white/5">
+                            Generating analysis...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: DCF MODEL -->
+                <div id="tab-dcf" class="hidden space-y-6">
+                    <div class="glass-panel p-1 overflow-hidden">
+                        <div class="p-3 bg-gray-900 border-b border-gray-800 flex justify-between items-center">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="table" class="w-4 h-4 text-cyan-400"></i>
+                                <span class="text-xs font-bold text-gray-200">FINANCIAL PROJECTION MODEL (10-YEAR SPREAD)</span>
+                            </div>
+                            <span class="text-[10px] text-gray-500">All figures in millions (USD)</span>
+                        </div>
+                        <div id="dcf-grid-container" class="data-grid">
+                            <!-- Grid Content Injected via JS -->
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="glass-panel p-4">
+                            <h3 class="text-xs font-bold text-gray-400 uppercase mb-3 border-b border-white/5 pb-2">Valuation Bridge</h3>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between p-2 hover:bg-white/5 rounded">
+                                    <span>Cumulative PV of FCF (7yr)</span>
+                                    <span class="font-mono text-cyan-400" id="val-pv-fcf">---</span>
+                                </div>
+                                <div class="flex justify-between p-2 hover:bg-white/5 rounded">
+                                    <span>Terminal Value (PV)</span>
+                                    <span class="font-mono text-cyan-400" id="val-pv-term">---</span>
+                                </div>
+                                <div class="flex justify-between p-2 bg-white/5 font-bold rounded mt-1">
+                                    <span>Implied Enterprise Value</span>
+                                    <span class="font-mono text-white" id="val-ev">---</span>
+                                </div>
+                                <div class="flex justify-between p-2 text-gray-400 text-xs">
+                                    <span class="pl-4">Less: Senior Secured</span>
+                                    <span class="font-mono" id="val-less-secured">---</span>
+                                </div>
+                                <div class="flex justify-between p-2 text-gray-400 text-xs">
+                                    <span class="pl-4">Less: Unsecured/Sub</span>
+                                    <span class="font-mono" id="val-less-unsecured">---</span>
+                                </div>
+                                 <div class="flex justify-between p-2 text-gray-400 text-xs border-b border-white/5">
+                                    <span class="pl-4">Plus: Cash</span>
+                                    <span class="font-mono text-green-400" id="val-plus-cash">---</span>
+                                </div>
+                                <div class="flex justify-between p-2 font-bold text-green-400 text-lg">
+                                    <span>Implied Equity Value</span>
+                                    <span class="font-mono" id="val-eq">---</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-panel p-4">
+                            <h3 class="text-xs font-bold text-gray-400 uppercase mb-3 border-b border-white/5 pb-2">Deleveraging Capacity</h3>
+                            <p class="text-xs text-gray-500 mb-4">Cumulative Free Cash Flow available for debt repayment vs. Total Debt load.</p>
+                            
+                            <div class="flex justify-between items-end h-32 px-4 gap-8">
+                                <div class="w-24 flex flex-col items-center gap-2 group">
+                                    <div class="text-xs font-bold text-red-400 group-hover:-translate-y-1 transition">$<span id="chart-bar-debt-val">---</span></div>
+                                    <div class="w-full bg-red-900/40 border border-red-500 rounded-t h-full relative overflow-hidden">
+                                        <div class="absolute bottom-0 w-full bg-red-500/20 h-full animate-pulse"></div>
+                                    </div>
+                                    <div class="text-[10px] text-gray-500 uppercase">Total Debt</div>
+                                </div>
+                                <div class="flex-1 flex flex-col justify-end h-full">
+                                    <div class="text-center text-xs text-gray-400 mb-2 font-mono">COVERAGE RATIO: <span id="fcf-cov-ratio" class="text-white font-bold text-lg">--%</span></div>
+                                    <div class="w-full h-1 bg-gray-800 rounded">
+                                        <div id="coverage-bar-line" class="h-full bg-gradient-to-r from-red-500 to-green-500 transition-all duration-1000" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div class="w-24 flex flex-col items-center gap-2 group">
+                                    <div class="text-xs font-bold text-green-400 group-hover:-translate-y-1 transition">$<span id="chart-bar-fcf-val">---</span></div>
+                                    <div id="chart-bar-fcf" class="w-full bg-green-900/40 border border-green-500 rounded-t transition-all duration-1000" style="height: 0%"></div>
+                                    <div class="text-[10px] text-gray-500 uppercase">Cumul. FCF</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: CREDIT & RISK -->
+                <div id="tab-credit" class="hidden space-y-6">
+                    <div class="grid grid-cols-2 gap-6">
+                        <!-- Ratings Card -->
+                        <div class="glass-panel p-6">
+                            <h3 class="text-xs font-bold text-gray-400 uppercase mb-4 border-b border-white/5 pb-2">Risk Rating Synthesis</h3>
+                            
+                            <div class="space-y-6">
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-gray-400">Probability of Default (PD)</span>
+                                        <span class="font-bold font-mono" id="rating-pd">---</span>
+                                    </div>
+                                    <div class="h-2 w-full bg-gray-800 rounded-full overflow-hidden">
+                                        <div id="bar-pd" class="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-red-500 w-0 transition-all duration-1000 relative">
+                                            <div class="absolute right-0 top-0 bottom-0 w-0.5 bg-white shadow-[0_0_5px_white]"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-between text-[10px] text-gray-600 mt-1">
+                                        <span>0%</span>
+                                        <span id="pd-trend-text">Trend: --</span>
+                                        <span>20%</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span class="text-gray-400">Loss Given Default (LGD)</span>
+                                        <span class="font-bold font-mono" id="rating-lgd">---</span>
+                                    </div>
+                                    <div class="h-2 w-full bg-gray-800 rounded-full overflow-hidden">
+                                        <div id="bar-lgd" class="h-full bg-blue-500 w-0 transition-all duration-1000"></div>
+                                    </div>
+                                    <div class="text-[10px] text-gray-600 mt-1">Weighted by capital structure seniority.</div>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4 pt-2">
+                                    <div class="p-3 bg-white/5 rounded border border-white/10">
+                                        <div class="text-[10px] text-gray-500 uppercase mb-1">Regulatory Rating</div>
+                                        <div class="text-base font-bold" id="reg-rating">CALCULATING...</div>
+                                        <div class="text-[10px] text-gray-400 mt-1" id="reg-rationale">---</div>
+                                    </div>
+                                    <div class="p-3 bg-white/5 rounded border border-white/10">
+                                        <div class="text-[10px] text-gray-500 uppercase mb-1">Accrual Status</div>
+                                        <div class="text-base font-bold" id="accrual-status">---</div>
+                                        <div class="text-[10px] text-gray-400 mt-1" id="accrual-rationale">---</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Covenants & Metrics -->
+                        <div class="glass-panel p-6">
+                            <h3 class="text-xs font-bold text-gray-400 uppercase mb-4 border-b border-white/5 pb-2">Credit Metrics Dashboard</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm text-left">
+                                    <thead>
+                                        <tr class="text-[10px] text-gray-500 uppercase border-b border-gray-700">
+                                            <th class="pb-2">Metric</th>
+                                            <th class="pb-2 text-right">LTM</th>
+                                            <th class="pb-2 text-right">Proj Y1</th>
+                                            <th class="pb-2 text-right">Proj Y2</th>
+                                            <th class="pb-2 text-right">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="credit-metrics-body" class="font-mono text-xs">
+                                        <!-- Rows JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="mt-4 p-3 bg-blue-900/10 border border-blue-500/20 rounded text-xs text-blue-200">
+                                <i data-lucide="info" class="w-3 h-3 inline mr-1"></i>
+                                Fixed Charge Coverage Ratio (FCCR) includes interest + mandatory amortization.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Capital Structure Visual -->
+                    <div class="glass-panel p-6">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase mb-4 border-b border-white/5 pb-2">Enterprise Value Waterfall</h3>
+                        <div class="relative h-24 bg-gray-900 rounded border border-gray-700 flex items-center overflow-hidden">
+                            <!-- Injected widths -->
+                            <div id="wf-secured" class="h-full bg-green-800/60 border-r border-green-500/30 flex items-center justify-center text-[10px] text-green-300 font-bold whitespace-nowrap overflow-hidden px-1">SECURED</div>
+                            <div id="wf-unsecured" class="h-full bg-yellow-800/60 border-r border-yellow-500/30 flex items-center justify-center text-[10px] text-yellow-300 font-bold whitespace-nowrap overflow-hidden px-1">UNSECURED</div>
+                            <div id="wf-sub" class="h-full bg-red-800/60 border-r border-red-500/30 flex items-center justify-center text-[10px] text-red-300 font-bold whitespace-nowrap overflow-hidden px-1">SUB</div>
+                            <div id="wf-equity" class="h-full bg-blue-900/40 flex items-center justify-center text-xs text-blue-300 font-bold whitespace-nowrap overflow-hidden px-1">EQUITY CUSHION</div>
+                        </div>
+                        <div class="flex justify-between text-xs text-gray-500 mt-2 font-mono">
+                            <span>EV Coverage: <span id="asset-coverage" class="text-white">---</span>x</span>
+                            <span>Secured LTV: <span id="secured-ltv" class="text-white">---</span>%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB: SENSITIVITY -->
+                <div id="tab-sensitivity" class="hidden">
+                    <div class="glass-panel p-6">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase mb-6 border-b border-white/5 pb-2">Sensitivity Analysis: Enterprise Value</h3>
+                        <div class="flex flex-col items-center">
+                            <div class="text-xs text-gray-500 mb-2 font-bold">WACC (%) vs. Terminal Multiple (x)</div>
+                            <div id="sens-table-container"></div>
+                        </div>
+                        <div class="mt-8 text-xs text-gray-400 text-center max-w-2xl mx-auto">
+                            The table above displays the sensitivity of Enterprise Value (in millions) to changes in the Weighted Average Cost of Capital (vertical axis) and Terminal EBITDA Multiple (horizontal axis).
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Logic Script -->
+    <script>
+        lucide.createIcons();
+        
+        // --- State Management ---
+        const state = {
+            inputs: {},
+            projections: [],
+            dcf: {},
+            credit: {},
+            history: []
+        };
+
+        // --- Core Logic ---
+        
+        function calculateModel() {
+            // 1. Gather Inputs
+            const ids = [
+                'rev_2', 'rev_1', 'rev_0',
+                'ebitda_2', 'ebitda_1', 'ebitda_0',
+                'debt_2', 'debt_1',
+                'debt_secured', 'debt_unsecured', 'debt_sub',
+                'ltm_capex', 'cash', 'shares',
+                'growth_rate', 'ebitda_margin', 'tax_rate', 'wacc', 'term_mult',
+                'int_rate', 'amort_rate'
+            ];
+            
+            const inp = {};
+            ids.forEach(id => inp[id] = parseFloat(document.getElementById(id).value) || 0);
+
+            // Calc Total Debt LTM
+            inp.debt_0 = inp.debt_secured + inp.debt_unsecured + inp.debt_sub;
+            document.getElementById('total_debt_calc').innerText = '$' + inp.debt_0.toLocaleString();
+            document.getElementById('debt_0_display').innerText = inp.debt_0.toLocaleString();
+            
+            // 2. Trend Analysis (Historical)
+            const lev_2 = inp.debt_2 / (inp.ebitda_2 || 1);
+            const lev_1 = inp.debt_1 / (inp.ebitda_1 || 1);
+            const lev_0 = inp.debt_0 / (inp.ebitda_0 || 1);
+            
+            let trendScore = 0; // Higher is worse
+            if (lev_0 > lev_1) trendScore += 1;
+            if (lev_1 > lev_2) trendScore += 1;
+            
+            let trendText = "Stable";
+            if(trendScore === 2) trendText = "Deteriorating";
+            if(lev_0 < lev_1 && lev_1 < lev_2) trendText = "Improving";
+
+            // 3. Projections (7 Years)
+            state.projections = [];
+            let currentRev = inp.rev_0;
+
+            for (let i = 1; i <= 7; i++) {
+                currentRev = currentRev * (1 + inp.growth_rate / 100);
+                const ebitda = currentRev * (inp.ebitda_margin / 100);
+                const da = inp.ltm_capex; // Simplified D&A
+                const ebit = ebitda - da;
+                const taxes = Math.max(0, ebit * (inp.tax_rate / 100));
+                
+                // Change in NWC (Simplified as % of delta Rev)
+                const revPrev = currentRev / (1 + inp.growth_rate / 100);
+                const nwcChange = (currentRev - revPrev) * 0.10; // 10% of growth needed for NWC
+                
+                const fcf = ebitda - taxes - inp.ltm_capex - nwcChange;
+
+                state.projections.push({
+                    year: i, rev: currentRev, ebitda: ebitda, fcf: fcf, taxes: taxes
+                });
+            }
+
+            // 4. DCF Valuation
+            let pvFCF = 0;
+            const discountFactor = (1 + inp.wacc / 100);
+            
+            state.projections.forEach(p => {
+                p.pv = p.fcf / Math.pow(discountFactor, p.year);
+                pvFCF += p.pv;
+            });
+
+            const terminalEBITDA = state.projections[6].ebitda;
+            const termVal = terminalEBITDA * inp.term_mult;
+            const pvTerm = termVal / Math.pow(discountFactor, 7);
+            
+            const ev = pvFCF + pvTerm;
+            const netDebt = inp.debt_0 - inp.cash;
+            const eqVal = ev - netDebt;
+            const pps = eqVal / inp.shares;
+
+            // Store calculated total debt in state for UI access
+            state.dcf = { ev, pvFCF, pvTerm, eqVal, pps, netDebt, totalDebt: inp.debt_0 };
+
+            // 5. Advanced Credit Logic
+            const interestExpense = inp.debt_0 * (inp.int_rate / 100);
+            const amortExpense = inp.debt_0 * (inp.amort_rate / 100);
+            const fixedCharges = interestExpense + amortExpense;
+            
+            // Ratios
+            const lev = lev_0;
+            const intCov = inp.ebitda_0 / (interestExpense || 1);
+            const fccr = (inp.ebitda_0 - inp.ltm_capex - (inp.ebitda_0-inp.ltm_capex)*0.21) / (fixedCharges || 1); // EBITDA-Capex-Tax / Charges
+
+            // Repayment Capacity
+            const sumFCF = state.projections.reduce((a,b) => a + b.fcf, 0);
+            const repaymentCap = sumFCF / inp.debt_0;
+            
+            // Regulatory Rating (Heuristic)
+            let regRating = "Pass";
+            let regRationale = "Strong repayment capacity & leverage.";
+            let regColor = "text-green-400";
+            
+            if (lev > 6.0 || repaymentCap < 0.5 || fccr < 1.0) {
+                regRating = "Substandard";
+                regRationale = "High leverage > 6x, weak FCCR < 1.0x.";
+                regColor = "text-red-400";
+            } else if (lev > 4.5 || repaymentCap < 0.85 || trendText === "Deteriorating") {
+                regRating = "Special Mention";
+                regRationale = "Elevated leverage or deteriorating trend.";
+                regColor = "text-yellow-400";
+            }
+
+            // Probability of Default (PD)
+            // Base PD mapped to Leverage, adjusted by trend
+            let pdBase = lev > 6 ? 12.0 : (lev > 4 ? 4.0 : 0.5);
+            if (trendText === "Deteriorating") pdBase *= 1.5;
+            if (trendText === "Improving") pdBase *= 0.8;
+            pdBase = Math.min(pdBase, 99.9);
+
+            // Loss Given Default (LGD)
+            // Weighted avg: Secured (20%), Unsecured (60%), Sub (90%)
+            const wSecured = inp.debt_secured / inp.debt_0;
+            const wUnsecured = inp.debt_unsecured / inp.debt_0;
+            const wSub = inp.debt_sub / inp.debt_0;
+            
+            const lgd = (wSecured * 20) + (wUnsecured * 60) + (wSub * 90);
+            
+            // Accrual Status
+            // Check if EV covers Debt
+            const isSolvent = ev > inp.debt_0;
+            const accrualStatus = isSolvent ? "ACCRUING" : "NON-ACCRUING";
+            const accrualRationale = isSolvent ? `EV ($${ev.toFixed(0)}m) > Debt ($${inp.debt_0.toLocaleString()})` : "Enterprise Value insufficient to cover debt.";
+            const accrualColor = isSolvent ? "text-green-400" : "text-red-500";
+
+            state.credit = { 
+                lev, intCov, fccr, repaymentCap, 
+                regRating, regRationale, regColor, 
+                pd: pdBase.toFixed(1), lgd: lgd.toFixed(1),
+                trendText,
+                accrualStatus, accrualRationale, accrualColor,
+                wSecured, wUnsecured, wSub
+            };
+            
+            updateUI();
+        }
+
+        function updateUI() {
+            const fmt = (n) => n.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1});
+            const fmtC = (n) => '$' + fmt(n);
+            const inp = (id) => parseFloat(document.getElementById(id).value);
+
+            // Dashboard
+            document.getElementById('dash-ev').innerText = fmtC(state.dcf.ev);
+            document.getElementById('dash-pps').innerText = fmtC(state.dcf.pps);
+            document.getElementById('dash-lev').innerText = fmt(state.credit.lev) + 'x';
+            document.getElementById('dash-accrual').innerText = state.credit.accrualStatus;
+            document.getElementById('dash-accrual').className = `text-xl font-bold mt-2 ${state.credit.accrualColor}`;
+
+            // DCF Tab
+            document.getElementById('val-pv-fcf').innerText = fmtC(state.dcf.pvFCF);
+            document.getElementById('val-pv-term').innerText = fmtC(state.dcf.pvTerm);
+            document.getElementById('val-ev').innerText = fmtC(state.dcf.ev);
+            document.getElementById('val-less-secured').innerText = '(' + fmtC(inp('debt_secured')) + ')';
+            document.getElementById('val-less-unsecured').innerText = '(' + fmtC(inp('debt_unsecured') + inp('debt_sub')) + ')';
+            document.getElementById('val-plus-cash').innerText = fmtC(inp('cash'));
+            document.getElementById('val-eq').innerText = fmtC(state.dcf.eqVal);
+
+            // Deleveraging Chart
+            document.getElementById('chart-bar-debt-val').innerText = state.dcf.totalDebt.toLocaleString();
+            const sumFCF = state.projections.reduce((a,b)=>a+b.fcf,0);
+            document.getElementById('chart-bar-fcf-val').innerText = sumFCF.toFixed(0);
+            
+            const maxVal = Math.max(state.dcf.totalDebt, sumFCF) * 1.2;
+            document.getElementById('chart-bar-fcf').style.height = (sumFCF/maxVal*100) + '%';
+            document.getElementById('fcf-cov-ratio').innerText = (state.credit.repaymentCap * 100).toFixed(0) + '%';
+            document.getElementById('coverage-bar-line').style.width = Math.min(state.credit.repaymentCap * 100, 100) + '%';
+
+            renderGrid();
+
+            // Credit Tab
+            document.getElementById('rating-pd').innerText = state.credit.pd + '%';
+            document.getElementById('bar-pd').style.width = Math.min(state.credit.pd * 4, 100) + '%'; // Scale roughly
+            document.getElementById('pd-trend-text').innerText = "Trend: " + state.credit.trendText;
+            
+            document.getElementById('rating-lgd').innerText = state.credit.lgd + '%';
+            document.getElementById('bar-lgd').style.width = state.credit.lgd + '%';
+            
+            document.getElementById('reg-rating').innerText = state.credit.regRating;
+            document.getElementById('reg-rating').className = `text-base font-bold ${state.credit.regColor}`;
+            document.getElementById('reg-rationale').innerText = state.credit.regRationale;
+
+            document.getElementById('accrual-status').innerText = state.credit.accrualStatus;
+            document.getElementById('accrual-status').className = `text-base font-bold ${state.credit.accrualColor}`;
+            document.getElementById('accrual-rationale').innerText = state.credit.accrualRationale;
+
+            renderCreditMetrics();
+            
+            // Waterfall Visual
+            const totalStack = state.dcf.ev;
+            const debt = state.dcf.totalDebt;
+            const sec = inp('debt_secured');
+            const unsec = inp('debt_unsecured');
+            const sub = inp('debt_sub');
+            
+            const pSec = (sec / totalStack) * 100;
+            const pUnsec = (unsec / totalStack) * 100;
+            const pSub = (sub / totalStack) * 100;
+            const pEq = Math.max(0, 100 - pSec - pUnsec - pSub);
+            
+            document.getElementById('wf-secured').style.width = pSec + '%';
+            document.getElementById('wf-unsecured').style.width = pUnsec + '%';
+            document.getElementById('wf-sub').style.width = pSub + '%';
+            document.getElementById('wf-equity').style.width = pEq + '%';
+            
+            document.getElementById('asset-coverage').innerText = (state.dcf.ev / debt).toFixed(2);
+            document.getElementById('secured-ltv').innerText = ((sec / state.dcf.ev) * 100).toFixed(0);
+
+            // Charts & Reports
+            updateCharts();
+            generateMemo();
+            renderSensitivity();
+        }
+
+        function renderGrid() {
+            const container = document.getElementById('dcf-grid-container');
+            let html = `<div class="grid-cell grid-label">Year</div>`;
+            for(let i=0; i<7; i++) html += `<div class="grid-cell grid-header">FY${i+1}</div>`;
+            for(let i=0; i<3; i++) html += `<div class="grid-cell" style="background:#0f172a"></div>`;
+            
+            const rows = [
+                {label: 'Revenue', key: 'rev'},
+                {label: 'EBITDA', key: 'ebitda'},
+                {label: 'Taxes', key: 'taxes'},
+                {label: 'FCF', key: 'fcf'},
+            ];
+
+            rows.forEach(r => {
+                html += `<div class="grid-cell grid-label">${r.label}</div>`;
+                state.projections.forEach(p => {
+                    html += `<div class="grid-cell text-gray-300">${p[r.key].toFixed(1)}</div>`;
+                });
+                html += `<div class="grid-cell"></div><div class="grid-cell"></div><div class="grid-cell"></div>`;
+            });
+            container.innerHTML = html;
+        }
+        
+        function renderCreditMetrics() {
+             const tbody = document.getElementById('credit-metrics-body');
+             
+             // Future Leverage (Year 1)
+             const debt = state.dcf.totalDebt;
+             const levY1 = debt / state.projections[0].ebitda;
+             const levY2 = debt / state.projections[1].ebitda;
+             
+             tbody.innerHTML = `
+                <tr class="border-b border-gray-800">
+                    <td class="py-2 text-gray-400">Total Leverage (x)</td>
+                    <td class="text-right ${state.credit.lev > 5 ? 'text-red-400' : 'text-white'}">${state.credit.lev.toFixed(2)}x</td>
+                    <td class="text-right text-gray-400">${levY1.toFixed(2)}x</td>
+                    <td class="text-right text-gray-400">${levY2.toFixed(2)}x</td>
+                    <td class="text-right"><span class="rating-badge ${state.credit.lev < 4.5 ? 'rating-green' : 'rating-red'}">${state.credit.lev < 4.5 ? 'PASS' : 'WATCH'}</span></td>
+                </tr>
+                 <tr class="border-b border-gray-800">
+                    <td class="py-2 text-gray-400">Fixed Chg Cov (x)</td>
+                    <td class="text-right ${state.credit.fccr < 1.1 ? 'text-red-400' : 'text-white'}">${state.credit.fccr.toFixed(2)}x</td>
+                    <td class="text-right text-gray-400">--</td>
+                    <td class="text-right text-gray-400">--</td>
+                    <td class="text-right"><span class="rating-badge ${state.credit.fccr > 1.2 ? 'rating-green' : 'rating-red'}">${state.credit.fccr > 1.2 ? 'PASS' : 'FAIL'}</span></td>
+                </tr>
+             `;
+        }
+
+        function renderSensitivity() {
+            const container = document.getElementById('sens-table-container');
+            const waccBase = parseFloat(document.getElementById('wacc').value);
+            const multBase = parseFloat(document.getElementById('term_mult').value);
+            
+            let html = '<table class="text-xs font-mono w-full text-center border-collapse">';
+            html += '<tr><td class="text-gray-500 font-bold p-2"></td>'; // corner
+            [-1, -0.5, 0, 0.5, 1].forEach(m => html += `<td class="text-cyan-400 font-bold p-1">${(multBase + m).toFixed(1)}x</td>`);
+            html += '</tr>';
+            
+            [-1, -0.5, 0, 0.5, 1].forEach(w => {
+                const wVal = waccBase + w;
+                html += `<tr><td class="text-green-400 font-bold p-1 text-right pr-2">${wVal.toFixed(1)}%</td>`;
+                [-1, -0.5, 0, 0.5, 1].forEach(m => {
+                    const mVal = multBase + m;
+                    const discountFactor = (1 + wVal / 100);
+                    let pvFCF = 0;
+                    state.projections.forEach(p => pvFCF += p.fcf / Math.pow(discountFactor, p.year));
+                    const termVal = state.projections[6].ebitda * mVal;
+                    const pvTerm = termVal / Math.pow(discountFactor, 7);
+                    const ev = (pvFCF + pvTerm).toFixed(0);
+                    const opacity = Math.min(Math.max((ev - state.dcf.ev)/state.dcf.ev + 0.5, 0.1), 0.9);
+                    html += `<td class="text-gray-300 p-1 border border-white/5" style="background:rgba(6, 182, 212, ${opacity * 0.15})">${ev}</td>`;
+                });
+                html += '</tr>';
+            });
+            html += '</table>';
+            container.innerHTML = html;
+        }
+
+        function generateMemo() {
+            const co = document.getElementById('companyName').value;
+            const lev = state.credit.lev.toFixed(1);
+            const ev = state.dcf.ev.toFixed(0);
+            
+            const txt = `DATE: ${new Date().toLocaleDateString()}
+SUBJECT: CREDIT REVIEW - ${co.toUpperCase()}
+
+1. RATING RECOMMENDATION
+We recommend a Regulatory Rating of ${state.credit.regRating.toUpperCase()}. The company is ${state.credit.accrualStatus} with an estimated PD of ${state.credit.pd}% and LGD of ${state.credit.lgd}%.
+
+2. FINANCIAL PROFILE
+LTM Leverage is ${lev}x. Fixed Charge Coverage Ratio (FCCR) stands at ${state.credit.fccr.toFixed(2)}x.
+Repayment capacity over the 7-year forecast covers ${(state.credit.repaymentCap*100).toFixed(0)}% of total debt.
+
+3. VALUATION & RECOVERY
+Enterprise Value is estimated at $${ev}m.
+The value breaks down to cover:
+- 100% of Senior Secured Debt
+- ${(state.credit.wUnsecured > 0 ? '100%' : 'N/A')} of Unsecured Debt
+- Implied Equity Cushion: ${(100 * (state.dcf.eqVal/state.dcf.ev)).toFixed(1)}%
+`;
+            document.getElementById('credit-memo-text').innerText = txt;
+        }
+
+        // --- Charts ---
+        let chartRev = null, chartFCF = null;
+
+        function updateCharts() {
+            const ctxRev = document.getElementById('chart-rev').getContext('2d');
+            const ctxFCF = document.getElementById('chart-fcf').getContext('2d');
+            const labels = ['FY1', 'FY2', 'FY3', 'FY4', 'FY5', 'FY6', 'FY7'];
+            const dataRev = state.projections.map(p => p.rev);
+            const dataEbitda = state.projections.map(p => p.ebitda);
+            const dataFCF = state.projections.map(p => p.fcf);
+
+            if(chartRev) chartRev.destroy();
+            chartRev = new Chart(ctxRev, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Revenue', data: dataRev, borderColor: '#06b6d4', tension: 0.4 },
+                        { label: 'EBITDA', data: dataEbitda, borderColor: '#10b981', tension: 0.4 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: {legend: {display:false}}, scales:{y:{grid:{color:'#334155'}, ticks:{color:'#64748b'}}, x:{grid:{display:false}, ticks:{color:'#64748b'}}} }
+            });
+
+            if(chartFCF) chartFCF.destroy();
+            chartFCF = new Chart(ctxFCF, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{ label: 'FCF', data: dataFCF, backgroundColor: '#8b5cf6' }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: {legend: {display:false}}, scales:{y:{grid:{color:'#334155'}, ticks:{color:'#64748b'}}, x:{grid:{display:false}, ticks:{color:'#64748b'}}} }
+            });
+        }
+
+        function switchTab(id) {
+            document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${id}`).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function runModel() { calculateModel(); }
+        
+        function loadDemoData() {
+            const sets = {
+                'rev_2': 4200, 'rev_1': 4600, 'rev_0': 5000,
+                'ebitda_2': 950, 'ebitda_1': 1050, 'ebitda_0': 1200,
+                'debt_2': 3800, 'debt_1': 4200,
+                'debt_secured': 3000, 'debt_unsecured': 1000, 'debt_sub': 500,
+                'ltm_capex': 250, 'cash': 150, 'shares': 50,
+                'growth_rate': 4.0, 'ebitda_margin': 24.0
+            };
+            for(let k in sets) document.getElementById(k).value = sets[k];
+            runModel();
+        }
+
+        function exportReport() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const co = document.getElementById('companyName').value;
+            
+            doc.setFillColor(5, 11, 20); doc.rect(0, 0, 210, 297, 'F'); // Dark Bg
+            doc.setTextColor(255, 255, 255);
+            
+            doc.setFontSize(18); doc.text(`CREDIT DOSSIER: ${co.toUpperCase()}`, 10, 20);
+            doc.setFontSize(10); doc.setTextColor(6, 182, 212); doc.text(`ADAM ANALYST OS v25.5 | Generated: ${new Date().toLocaleDateString()}`, 10, 26);
+            
+            doc.setTextColor(200, 200, 200);
+            const memo = document.getElementById('credit-memo-text').innerText;
+            const lines = doc.splitTextToSize(memo, 180);
+            doc.text(lines, 10, 40);
+            
+            doc.autoTable({
+                startY: 100,
+                head: [['Year', 'Revenue', 'EBITDA', 'FCF']],
+                body: state.projections.map(p => [`FY${p.year}`, p.rev.toFixed(1), p.ebitda.toFixed(1), p.fcf.toFixed(1)]),
+                theme: 'grid',
+                headStyles: { fillColor: [30, 41, 59], textColor: [6, 182, 212] },
+                bodyStyles: { fillColor: [15, 23, 42], textColor: [255, 255, 255] }
+            });
+            
+            doc.save(`${co}_Credit_Report.pdf`);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => { runModel(); });
+
+    </script>
+    <script src="../showcase/js/nav.js" data-root=".."></script>
+</body>
+</html>

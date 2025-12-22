@@ -8,6 +8,7 @@ from core.data_sources.prediction_market_api import SimulatedPredictionMarketAPI
 from core.data_sources.social_media_api import SimulatedSocialMediaAPI
 from core.data_sources.web_traffic_api import SimulatedWebTrafficAPI
 
+
 class MarketSentimentAgent(AgentBase):
     """
     Agent responsible for gauging market sentiment from a variety of sources,
@@ -48,7 +49,7 @@ class MarketSentimentAgent(AgentBase):
 
         # Optionally send to message broker if configured
         if hasattr(self, 'message_broker') and self.message_broker:
-            await self.send_message("system_monitor", result) # Example target
+            await self.send_message("system_monitor", result)  # Example target
 
         return result
 
@@ -121,8 +122,10 @@ class MarketSentimentAgent(AgentBase):
 
         # Ensure inputs are floats (mock APIs might return None or ints)
         def clean(val):
-            if val is None: return 0.0
-            if isinstance(val, (int, float)): return float(val)
+            if val is None:
+                return 0.0
+            if isinstance(val, (int, float)):
+                return float(val)
             return 0.0
 
         score = (
@@ -132,6 +135,7 @@ class MarketSentimentAgent(AgentBase):
             clean(web) * weights['web']
         )
         return score
+
 
 if __name__ == "__main__":
     # Test harness

@@ -19,17 +19,20 @@ from typing import List, Dict, Tuple, Any, Optional
 from enum import Enum
 import json
 
+
 class RiskBand(Enum):
     CONSERVATIVE = "CONSERVATIVE"
     MODERATE = "MODERATE"
     AGGRESSIVE = "AGGRESSIVE"
 
+
 @dataclass
 class ClientProfile:
     time_horizon_years: int
     liquidity_needs: str  # 'High', 'Medium', 'Low'
-    risk_capacity_score: int # 0-100
-    risk_tolerance_score: int # 0-100
+    risk_capacity_score: int  # 0-100
+    risk_tolerance_score: int  # 0-100
+
 
 class IntakeForm:
     """
@@ -44,7 +47,7 @@ class IntakeForm:
         years = answers.get('time_horizon', 5)
 
         # Q2: How much of this investment might you need to withdraw in < 2 years?
-        liquidity = answers.get('liquidity_needs', 'Low') # High, Medium, Low
+        liquidity = answers.get('liquidity_needs', 'Low')  # High, Medium, Low
 
         # Logic:
         # > 15 years = 100 capacity
@@ -67,6 +70,7 @@ class IntakeForm:
             risk_capacity_score=int(capacity_score),
             risk_tolerance_score=int(reaction_score)
         )
+
 
 class RoboAdvisor:
     def __init__(self, base_portfolio_path: str):
@@ -115,7 +119,7 @@ class RoboAdvisor:
             modifier = {"equities": 0.20, "fixed_income": 0.60, "alternatives": 0.20}
         elif final_score < 75:
             band = RiskBand.MODERATE
-            modifier = {"equities": 0.40, "fixed_income": 0.40, "alternatives": 0.20} # The Base "Gold Standard"
+            modifier = {"equities": 0.40, "fixed_income": 0.40, "alternatives": 0.20}  # The Base "Gold Standard"
         else:
             band = RiskBand.AGGRESSIVE
             modifier = {"equities": 0.70, "fixed_income": 0.20, "alternatives": 0.10}
@@ -132,6 +136,7 @@ class RoboAdvisor:
                 "warning": warning
             }
         }
+
 
 # --- Example Usage Logic ---
 if __name__ == "__main__":

@@ -1,3 +1,4 @@
+from core.api.server import app, setup_log_capture
 import sys
 import os
 import unittest
@@ -31,7 +32,7 @@ sys.modules['core.agents.specialized.portfolio_manager_agent'] = MagicMock()
 sys.modules['core.schemas.v23_5_schema'] = MagicMock()
 
 # Import app. setup_log_capture exists but does nothing now.
-from core.api.server import app, setup_log_capture
+
 
 class TestLogLeak(unittest.TestCase):
     def setUp(self):
@@ -61,6 +62,7 @@ class TestLogLeak(unittest.TestCase):
                     found = True
                     break
             self.assertFalse(found, "Secret found in logs!")
+
 
 if __name__ == '__main__':
     unittest.main()

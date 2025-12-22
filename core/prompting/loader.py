@@ -12,6 +12,7 @@ logger = get_logger(__name__)
 # core/prompting/loader.py -> ../../prompt_library
 PROMPT_LIB_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../prompt_library'))
 
+
 def load_prompt(prompt_name: str, type: str = "text") -> Any:
     """
     Loads a prompt from the library by name.
@@ -46,7 +47,8 @@ def load_prompt(prompt_name: str, type: str = "text") -> Any:
                 if f"{prompt_name}{ext}" in files:
                     found_path = os.path.join(root, f"{prompt_name}{ext}")
                     break
-            if found_path: break
+            if found_path:
+                break
 
     if not found_path:
         raise FileNotFoundError(f"Prompt '{prompt_name}' not found in {PROMPT_LIB_PATH}")
@@ -69,6 +71,7 @@ def load_prompt(prompt_name: str, type: str = "text") -> Any:
             return content
 
     return content
+
 
 class PromptLoader:
     """Class wrapper for convenience."""

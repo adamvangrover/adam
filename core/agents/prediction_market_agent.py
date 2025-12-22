@@ -15,6 +15,7 @@ import statsmodels.api as sm
 # from sports_data_api import SportsDataAPI
 # from political_data_api import PoliticalDataAPI
 
+
 class PredictionMarketAgent:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json", web3_provider_uri=None):
         """

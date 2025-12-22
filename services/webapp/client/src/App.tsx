@@ -1,37 +1,44 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { Suspense, lazy } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
-import Dashboard from './pages/Dashboard';
-import Terminal from './components/Terminal';
-import Vault from './pages/Vault';
-import AgentStatus from './pages/AgentStatus';
-import KnowledgeGraph from './pages/KnowledgeGraph';
-import DeepDive from './pages/DeepDive';
+import Loading from './components/common/Loading';
 
-// Placeholder imports for remaining pages
-import MarketData from './pages/MarketData';
-import AnalysisTools from './pages/AnalysisTools';
-import PortfolioManagement from './pages/PortfolioManagement';
-import SimulationTools from './pages/SimulationTools';
+// Eager load Dashboard for LCP
+import Dashboard from './pages/Dashboard';
+
+// Bolt: Lazy load heavy route components to split bundle and improve initial load time
+const Terminal = lazy(() => import('./components/Terminal'));
+const Vault = lazy(() => import('./pages/Vault'));
+const AgentStatus = lazy(() => import('./pages/AgentStatus'));
+const KnowledgeGraph = lazy(() => import('./pages/KnowledgeGraph'));
+const DeepDive = lazy(() => import('./pages/DeepDive'));
+
+// Lazy load placeholders/secondary pages
+const MarketData = lazy(() => import('./pages/MarketData'));
+const AnalysisTools = lazy(() => import('./pages/AnalysisTools'));
+const PortfolioManagement = lazy(() => import('./pages/PortfolioManagement'));
+const SimulationTools = lazy(() => import('./pages/SimulationTools'));
 
 const App: React.FC = () => {
   return (
-    <Router>
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
-          <Route path="terminal" element={<div style={{height: '80vh'}}><Terminal /></div>} />
-          <Route path="market-data" element={<MarketData />} />
-          <Route path="analysis-tools" element={<AnalysisTools />} />
-          <Route path="knowledge-graph" element={<KnowledgeGraph />} />
-          <Route path="agents" element={<AgentStatus />} />
-          <Route path="vault" element={<Vault />} />
-          <Route path="deep-dive/:id" element={<DeepDive />} />
-          <Route path="portfolio-management" element={<PortfolioManagement />} />
-          <Route path="simulation-tools" element={<SimulationTools />} />
+          <Route path="terminal" element={
+            <Suspense fallback={<Loading />}>
+              <div style={{height: '80vh'}}><Terminal /></div>
+            </Suspense>
+          } />
+          <Route path="market-data" element={<Suspense fallback={<Loading />}><MarketData /></Suspense>} />
+          <Route path="analysis-tools" element={<Suspense fallback={<Loading />}><AnalysisTools /></Suspense>} />
+          <Route path="knowledge-graph" element={<Suspense fallback={<Loading />}><KnowledgeGraph /></Suspense>} />
+          <Route path="agents" element={<Suspense fallback={<Loading />}><AgentStatus /></Suspense>} />
+          <Route path="vault" element={<Suspense fallback={<Loading />}><Vault /></Suspense>} />
+          <Route path="deep-dive/:id" element={<Suspense fallback={<Loading />}><DeepDive /></Suspense>} />
+          <Route path="portfolio-management" element={<Suspense fallback={<Loading />}><PortfolioManagement /></Suspense>} />
+          <Route path="simulation-tools" element={<Suspense fallback={<Loading />}><SimulationTools /></Suspense>} />
         </Route>
       </Routes>
-    </Router>
   );
 };
 

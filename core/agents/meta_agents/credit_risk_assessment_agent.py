@@ -4,6 +4,7 @@ from typing import Any, Dict
 
 from core.agents.agent_base import AgentBase
 
+
 class CreditRiskAssessmentAgent(AgentBase):
     """
     This agent is the central analytical engine of the system, responsible for

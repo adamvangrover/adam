@@ -13,16 +13,27 @@ DATA_FILE = os.path.join(SHOWCASE_DIR, 'data', 'ui_data.json')
 app = Flask(__name__, static_folder=SHOWCASE_DIR)
 CORS(app)
 
+
 @app.route('/')
 def serve_index():
+    """Serves the main index.html file."""
     return send_from_directory(SHOWCASE_DIR, 'index.html')
+
 
 @app.route('/<path:path>')
 def serve_static(path):
+    """Serves static files from the showcase directory."""
     return send_from_directory(SHOWCASE_DIR, path)
+
 
 @app.route('/api/state')
 def get_state():
+    """
+    Retrieves the current system state.
+
+    Simulates real-time updates by reading generated data and adding noise
+    to system statistics.
+    """
     # Simulate real-time updates by reading the generated data and adding some noise
     try:
         with open(DATA_FILE, 'r') as f:
@@ -38,8 +49,10 @@ def get_state():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @app.route('/api/files')
 def get_files():
+    """Retrieves the file structure of the repository."""
     try:
         with open(DATA_FILE, 'r') as f:
             data = json.load(f)
@@ -47,8 +60,10 @@ def get_files():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @app.route('/api/agents')
 def get_agents():
+    """Retrieves the list of active agents."""
     try:
         with open(DATA_FILE, 'r') as f:
             data = json.load(f)
@@ -56,7 +71,8 @@ def get_agents():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 if __name__ == '__main__':
     print(f"Serving UI from {SHOWCASE_DIR}")
     # Host 0.0.0.0 is important for some environments
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)

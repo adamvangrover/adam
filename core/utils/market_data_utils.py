@@ -4,6 +4,7 @@ import pandas as pd
 import json
 from datetime import datetime
 
+
 def convert_to_python_types(data):
     """
     Recursively converts numpy types and pandas timestamps to standard Python types.
@@ -24,6 +25,7 @@ def convert_to_python_types(data):
         return data.isoformat()
     else:
         return data
+
 
 def format_market_data_gold_standard(symbol: str, snapshot: dict, intraday: list, intra_year: list, long_term: list) -> dict:
     """

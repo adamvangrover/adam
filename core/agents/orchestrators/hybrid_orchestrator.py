@@ -7,6 +7,7 @@ from core.system.v22_async.workflow import AsyncWorkflow
 from .workflow_manager import WorkflowManager
 from core.system.v22_async.async_workflow_manager import AsyncWorkflowManager
 
+
 class HybridOrchestrator:
     def __init__(self):
         self.sync_manager = WorkflowManager()

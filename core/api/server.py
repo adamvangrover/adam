@@ -1,3 +1,4 @@
+from core.utils.logging_utils import setup_logging
 import os
 import sys
 import logging
@@ -8,7 +9,6 @@ from flask_cors import CORS
 # Ensure root is in path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
-from core.utils.logging_utils import setup_logging
 
 # Safe Import for Orchestrators
 try:
@@ -42,10 +42,12 @@ meta_orchestrator = None
 # LOG_BUFFER removed to prevent sensitive data exposure
 # LOG_BUFFER = deque(maxlen=50)
 
+
 def setup_log_capture():
     # Logging to memory buffer removed to prevent sensitive data exposure via API
     # Standard stdout/file logging is sufficient and safer
     pass
+
 
 def init_orchestrator():
     global meta_orchestrator
@@ -72,13 +74,16 @@ def init_orchestrator():
     except Exception as e:
         logger.fatal(f"Failed to initialize MetaOrchestrator: {e}")
 
+
 @app.route('/')
 def serve_index():
     return send_from_directory(SHOWCASE_DIR, 'index.html')
 
+
 @app.route('/<path:path>')
 def serve_static(path):
     return send_from_directory(SHOWCASE_DIR, path)
+
 
 @app.route('/api/state', methods=['GET'])
 def get_state():
@@ -91,13 +96,14 @@ def get_state():
         # "logs": [] # Logs removed to prevent information leakage
     })
 
+
 @app.route('/api/chat', methods=['POST'])
 async def chat():
     if not meta_orchestrator:
         return jsonify({
             "error": "Orchestrator is offline (Lightweight Mode)",
             "human_readable_status": "**System Notice:** The AI Engine is currently offline (dependencies missing). Please install full requirements to enable Deep Dive analysis."
-        }), 200 # Return 200 so UI handles it gracefully as a message
+        }), 200  # Return 200 so UI handles it gracefully as a message
 
     data = request.json
     query = data.get('query', '')
@@ -113,9 +119,9 @@ async def chat():
 
         # Ensure result is JSON serializable
         if hasattr(result, 'dict'):
-             result = result.dict()
+            result = result.dict()
         elif hasattr(result, 'model_dump'):
-             result = result.model_dump()
+            result = result.model_dump()
 
         return jsonify(result)
     except Exception as e:

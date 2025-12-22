@@ -4,6 +4,7 @@ import json
 import os
 import pandas as pd
 
+
 class LakehouseConnector(BaseTool):
     name = "microsoft_fabric_run_sql"
     description = "Executes read-only T-SQL queries against the Data Lakehouse."
@@ -42,7 +43,7 @@ class LakehouseConnector(BaseTool):
         try:
             return self._query_local_lake(sql_query)
         except Exception as e:
-             return json.dumps({"error": f"Fallback failed: {e}"})
+            return json.dumps({"error": f"Fallback failed: {e}"})
 
     def _query_local_lake(self, query: str) -> str:
         # Very simple SQL-like parsing for fallback

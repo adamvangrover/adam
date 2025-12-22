@@ -4,6 +4,7 @@ import asyncio
 from core.agents.meta_agents.crisis_simulation_agent import CrisisSimulationMetaAgent
 from core.schemas.crisis_simulation import CrisisSimulationInput, RiskEntity
 
+
 class TestCrisisSimulationMetaAgent(unittest.TestCase):
 
     def test_crisis_simulation_execution(self):
@@ -68,6 +69,7 @@ class TestCrisisSimulationMetaAgent(unittest.TestCase):
         self.assertEqual(result.crisis_simulation_log[0].risk_id_cited, "R-CYB-01")
         self.assertEqual(result.crisis_simulation_log[3].risk_id_cited, "R-FIN-01")
         self.assertIn("Cyber Incident Response Team", result.recommendations)
+
 
 if __name__ == '__main__':
     unittest.main()

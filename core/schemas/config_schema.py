@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Dict, List, Optional, Any
 from pydantic import BaseModel, ConfigDict, Field
 
+
 class AgentConfig(BaseModel):
     """
     Configuration for a single agent.
@@ -14,6 +15,7 @@ class AgentConfig(BaseModel):
     # Allow arbitrary other fields for specific agents (e.g., 'alerting_thresholds')
     model_config = ConfigDict(extra='allow', populate_by_name=True)
 
+
 class AgentsYamlConfig(BaseModel):
     """
     Schema for config/agents.yaml
@@ -24,6 +26,7 @@ class AgentsYamlConfig(BaseModel):
     # Allow other top-level keys like 'skills', 'alerting', etc.
     model_config = ConfigDict(extra='allow')
 
+
 class WorkflowConfig(BaseModel):
     """
     Schema for config/workflows.yaml
@@ -31,6 +34,7 @@ class WorkflowConfig(BaseModel):
     agents: List[str]
     dependencies: Dict[str, List[str]] = Field(default_factory=dict)
     model_config = ConfigDict(extra='allow')
+
 
 class WorkflowsYamlConfig(BaseModel):
     """

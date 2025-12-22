@@ -1,4 +1,4 @@
-#integration_agent.py
+# integration_agent.py
 """
 This module defines the IntegrationAgent, a specialized agent responsible for
 merging code, tests, and documentation into the main branch.
@@ -6,6 +6,7 @@ merging code, tests, and documentation into the main branch.
 
 from typing import Any, Dict
 from core.agents.agent_base import AgentBase
+
 
 class IntegrationAgent(AgentBase):
     """
@@ -28,26 +29,26 @@ class IntegrationAgent(AgentBase):
         # In a real implementation, this would use git tools.
         # 1. Checkout the target branch
         # self.tools.run_command(f"git checkout {target_branch}")
-        
+
         # 2. Pull the latest changes
         # self.tools.run_command(f"git pull origin {target_branch}")
-        
+
         # 3. Merge the feature branch
         # merge_result = self.tools.run_command(f"git merge {branch_name}")
-        
+
         # 4. Handle conflicts
         # if "conflict" in merge_result.lower():
         #     return {
         #         "status": "conflict",
         #         "message": f"Merge conflict detected when merging {branch_name} into {target_branch}. Needs human intervention."
         #     }
-            
+
         # 5. Push the changes
         # self.tools.run_command(f"git push origin {target_branch}")
 
         # Placeholder response
         print(f"Simulating merge of '{branch_name}' into '{target_branch}'.")
-        
+
         return {
             "status": "success",
             "message": f"Branch '{branch_name}' successfully merged into '{target_branch}' and pushed."

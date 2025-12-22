@@ -4,6 +4,7 @@ import json
 import pandas as pd
 from typing import List, Dict
 
+
 class DataManager:
     def __init__(self, output_dir: str = "data/world_simulation"):
         self.output_dir = output_dir

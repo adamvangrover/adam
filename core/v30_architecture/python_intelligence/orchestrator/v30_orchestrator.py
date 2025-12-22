@@ -13,18 +13,20 @@ try:
 except ImportError:
     class MockMCPServer:
         """Fallback mock for standalone testing."""
+
         def call_tool(self, tool: str, args: Dict):
             return {"status": "success", "source": "MockMCP", "tool": tool, "args": args}
     mcp_server = MockMCPServer()
 
 # Configure Logging
 logging.basicConfig(
-    format='%(asctime)s - [%(name)s] - %(levelname)s - %(message)s', 
+    format='%(asctime)s - [%(name)s] - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 logger = logging.getLogger("EACI_Orchestrator")
 
 # --- Data Structures ---
+
 
 @dataclass
 class PlanStep:
@@ -35,6 +37,7 @@ class PlanStep:
     step_id: int
     dependencies: List[int] = field(default_factory=list)
 
+
 @dataclass
 class ExecutionResult:
     """Standardized result object for orchestrator executions."""
@@ -44,10 +47,11 @@ class ExecutionResult:
 
 # --- Core Orchestrator ---
 
+
 class EACIOrchestrator:
     """
     Enterprise Adaptive Core Interface (EACI) v2.1 Orchestrator.
-    
+
     Manages the lifecycle of high-level intents to low-level MCP tool calls.
     Features:
     - Asynchronous execution pipeline.
@@ -55,7 +59,7 @@ class EACIOrchestrator:
     - Internal Agent registration & routing.
     - Enhanced Regex-based intent decomposition.
     """
-    
+
     def __init__(self):
         self.active_agents: Dict[str, Any] = {}
         self.request_history: List[Dict[str, Any]] = []
@@ -92,10 +96,10 @@ class EACIOrchestrator:
             results = []
             for step in plan:
                 logger.info(f"Executing Step {step.step_id}: {step.description}")
-                
+
                 # Execute step (routes to MCP or Internal Agent)
                 step_result = await self._execute_step(step)
-                
+
                 results.append({
                     "step_id": step.step_id,
                     "description": step.description,
@@ -133,7 +137,7 @@ class EACIOrchestrator:
 
     async def _execute_step(self, step: PlanStep) -> Any:
         """Routes execution to Internal Agents or the MCP Server."""
-        
+
         # Branch 1: Internal Agent Call
         if step.tool == "internal_agent_call":
             agent_name = step.args.get("agent")
@@ -154,7 +158,7 @@ class EACIOrchestrator:
         # Branch 2: MCP Server Call (External Tools)
         try:
             # Simulate slight async network delay for realism if needed
-            # await asyncio.sleep(0.01) 
+            # await asyncio.sleep(0.01)
             return mcp_server.call_tool(step.tool, step.args)
         except Exception as e:
             return {"error": f"MCP Tool Call Failed: {str(e)}"}
@@ -177,7 +181,7 @@ class EACIOrchestrator:
         if buy_match:
             quantity, symbol = buy_match.groups()
             symbol = symbol.upper()
-            
+
             # Step 1: Market Data
             plan.append(PlanStep(
                 step_id=step_id,
@@ -186,7 +190,7 @@ class EACIOrchestrator:
                 args={"symbol": symbol}
             ))
             step_id += 1
-            
+
             # Step 2: Execute Trade (Dependent on Step 1)
             plan.append(PlanStep(
                 step_id=step_id,
@@ -202,9 +206,9 @@ class EACIOrchestrator:
         if "analyze" in intent_lower:
             # Simple heuristic to find ticker
             words = intent_lower.split()
-            symbol = "TSLA" # Default mock if not found
+            symbol = "TSLA"  # Default mock if not found
             known_tickers = ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "TSLA", "JPM"]
-            
+
             for word in words:
                 clean_word = word.strip(".,!?").upper()
                 if clean_word in known_tickers:
@@ -225,8 +229,8 @@ class EACIOrchestrator:
                 description=f"Run Risk Analysis for {symbol}",
                 tool="internal_agent_call",
                 args={
-                    "agent": "credit_analyst", 
-                    "method": "analyze_risk", 
+                    "agent": "credit_analyst",
+                    "method": "analyze_risk",
                     "kwargs": {"ticker": symbol}
                 },
                 dependencies=[step_id - 1]
@@ -239,19 +243,21 @@ class EACIOrchestrator:
         """Fallback logic for when asyncio.run fails (e.g. nested loops)."""
         plan_steps = self._decompose_enhanced(intent)
         results = []
-        
+
         for step in plan_steps:
             # We cannot await here, so we only support sync MCP calls in fallback
             if step.tool == "internal_agent_call":
-                 # Simplified sync support for fallback
-                 results.append({"step": step.description, "output": "Sync Fallback: Internal Agents not fully supported in fallback mode."})
+                # Simplified sync support for fallback
+                results.append({"step": step.description,
+                               "output": "Sync Fallback: Internal Agents not fully supported in fallback mode."})
             else:
                 res = mcp_server.call_tool(step.tool, step.args)
                 results.append({"step": step.description, "output": res})
-        
+
         return {"status": "completed_fallback", "trace": results}
 
 # --- Singleton Instance ---
+
 
 orchestrator = EACIOrchestrator()
 

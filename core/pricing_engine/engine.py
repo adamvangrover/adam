@@ -2,6 +2,7 @@ import math
 import random
 from typing import Dict, Any, List
 
+
 class PricingEngine:
     """
     Institutional-grade pricing engine.
@@ -26,7 +27,8 @@ class PricingEngine:
 
         # Simulate a random walk step from the base
         shock = random.gauss(0, 1)
-        price_change = base_price * math.exp((self.mu - 0.5 * self.sigma**2) * self.dt + self.sigma * math.sqrt(self.dt) * shock)
+        price_change = base_price * math.exp((self.mu - 0.5 * self.sigma**2) *
+                                             self.dt + self.sigma * math.sqrt(self.dt) * shock)
 
         # Apply market impact based on size (Square root law approximation)
         market_impact = 0.1 * math.sqrt(size / 10000) if size > 0 else 0
@@ -50,7 +52,7 @@ class PricingEngine:
             "side": side,
             "price": round(final_price, 4),
             "spread": round(spread, 4),
-            "confidence": 0.95 + (0.04 * random.random()), # 0.95-0.99
+            "confidence": 0.95 + (0.04 * random.random()),  # 0.95-0.99
             "source": "PricingEngine_GBM_v1"
         }
 

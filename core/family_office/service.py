@@ -3,11 +3,13 @@ from .wealth_manager import WealthManager
 from .deal_flow import DealFlowEngine
 from .portfolio import PortfolioAggregator
 
+
 class FamilyOfficeService:
     """
     The Unified Family Office Service.
     Acts as the central nexus for Governance, Wealth Management, Deal Flow, and Portfolio Aggregation.
     """
+
     def __init__(self):
         self.governance = GovernanceEngine()
         self.wealth = WealthManager()

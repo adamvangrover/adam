@@ -9,6 +9,7 @@ from core.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
+
 class HistoricalLoader:
     """
     Handles the bulk ingestion, validation, and storage of historical market data.
@@ -42,7 +43,8 @@ class HistoricalLoader:
             # group_by='ticker' makes it easier to stack later, or 'column'
             # auto_adjust=False ensures we get 'Adj Close' separate or we can use auto_adjust=True for OHLC adjusted.
             # Usually raw OHLC + Adj Close is preferred.
-            df = yf.download(tickers, start=start_date, end=end_date, group_by='ticker', threads=True, auto_adjust=False)
+            df = yf.download(tickers, start=start_date, end=end_date,
+                             group_by='ticker', threads=True, auto_adjust=False)
 
             if df.empty:
                 logger.warning("Downloaded data is empty.")
@@ -90,8 +92,8 @@ class HistoricalLoader:
             # Let's return the original df but log heavily.
             return df
         except Exception as e:
-             logger.error(f"Validation failed: {e}")
-             return df
+            logger.error(f"Validation failed: {e}")
+            return df
 
     def save_to_parquet(self, df: pd.DataFrame, filename: str = "historical_data.parquet", compression: str = "snappy"):
         """

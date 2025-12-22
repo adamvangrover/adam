@@ -10,6 +10,7 @@ from .agent_base import AgentBase
 from utils.data_validation import validate_portfolio_data
 from utils.visualization_tools import generate_portfolio_visualization
 
+
 class LSTMModel(nn.Module):
     def __init__(self):
         super(LSTMModel, self).__init__()
@@ -35,6 +36,7 @@ class LSTMModel(nn.Module):
         x = self.fc(x)
         return x
 
+
 class AIPoweredPortfolioOptimizationAgent(AgentBase):
     """
     Agent that uses AI (PyTorch) to optimize investment portfolios.
@@ -54,7 +56,7 @@ class AIPoweredPortfolioOptimizationAgent(AgentBase):
         # Example execution logic wrapper
         data = kwargs.get('data')
         if data is not None:
-             return self.run(data)
+            return self.run(data)
         return {"error": "No data provided"}
 
     def preprocess_data(self, data: pd.DataFrame) -> np.ndarray:
@@ -84,7 +86,8 @@ class AIPoweredPortfolioOptimizationAgent(AgentBase):
                 batch_x = dataset[indices]
                 batch_y = target[indices]
 
-                if batch_x.size(0) == 0: continue
+                if batch_x.size(0) == 0:
+                    continue
 
                 self.optimizer.zero_grad()
                 outputs = self.model(batch_x)
@@ -142,13 +145,14 @@ class AIPoweredPortfolioOptimizationAgent(AgentBase):
             if not validate_portfolio_data(data):
                 return {"error": "Invalid portfolio data."}
         except NameError:
-             pass # validate_portfolio_data might be missing
+            pass  # validate_portfolio_data might be missing
 
         self.train_model(data, epochs, batch_size)
         optimized_weights = self.optimize_portfolio(data)
         report = self.generate_portfolio_report(data, optimized_weights)
         self.generate_portfolio_visualization(data, optimized_weights)
         return report
+
 
 # Example usage
 if __name__ == "__main__":

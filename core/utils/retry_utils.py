@@ -5,6 +5,7 @@ import random
 
 logger = logging.getLogger(__name__)
 
+
 def retry_with_backoff(retries=3, backoff_in_seconds=1):
     def decorator(func):
         @wraps(func)

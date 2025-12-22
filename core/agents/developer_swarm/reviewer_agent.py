@@ -1,4 +1,4 @@
-#reviewer_agent.py
+# reviewer_agent.py
 """
 This module defines the ReviewerAgent, a specialized agent responsible for
 performing static analysis on code to ensure quality and consistency.
@@ -6,6 +6,7 @@ performing static analysis on code to ensure quality and consistency.
 
 from typing import Any, Dict
 from core.agents.agent_base import AgentBase
+
 
 class ReviewerAgent(AgentBase):
     """
@@ -29,7 +30,7 @@ class ReviewerAgent(AgentBase):
         # 1. Simulate running a linter (e.g., ruff)
         # In a real implementation, this would use a subprocess to run the linter.
         # lint_result = self.tools.run_command(f"ruff check --output-format=json {file_path}")
-        lint_result = {"status": "success", "errors": []} # Placeholder
+        lint_result = {"status": "success", "errors": []}  # Placeholder
 
         # 2. Construct a prompt for a qualitative review by an LLM
         prompt = f"""

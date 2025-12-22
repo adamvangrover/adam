@@ -3,15 +3,18 @@ from typing import List, Optional, Literal, Dict, Any
 from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
 
+
 class Meta(BaseModel):
     version: str = "2.1.0"
     author: str
     timestamp: datetime = Field(default_factory=datetime.now)
 
+
 class Config(BaseModel):
     mode: Literal["VC_SPONSOR", "CORP_FINANCE", "DISTRESSED"]
     calc_engine: Literal["ITERATIVE", "ANALYTIC"]
     regulatory_standard: str = "SNC_2025"
+
 
 class ValuationContext(BaseModel):
     wacc_method: Literal["CAPM_STANDARD", "CAPM_SIZE_ADJUSTED", "BUILD_UP"]
@@ -33,10 +36,11 @@ class ValuationContext(BaseModel):
     pre_tax_cost_of_debt: float
     tax_rate: float
 
+
 class Security(BaseModel):
     name: str
     security_type: Literal["REVOLVER", "TERM_LOAN", "MEZZANINE", "PREFERRED", "COMMON"]
-    priority: int # 1 = Highest
+    priority: int  # 1 = Highest
     balance: float
     interest_rate: float
     is_pik: bool = False
@@ -49,10 +53,12 @@ class Security(BaseModel):
     conversion_ratio: Optional[float] = 1.0
 
     # Metadata
-    sofr_spread: Optional[float] = None # For dynamic repricing
+    sofr_spread: Optional[float] = None  # For dynamic repricing
+
 
 class CapitalStructure(BaseModel):
     securities: List[Security]
+
 
 class CreditChallenge(BaseModel):
     stress_test_active: bool
@@ -67,7 +73,8 @@ class CreditChallenge(BaseModel):
     # PD Params
     sofr_base_rate: Optional[float] = 0.04
     asset_volatility: Optional[float] = 0.30
-    default_point_leverage: Optional[float] = None # Optional override
+    default_point_leverage: Optional[float] = None  # Optional override
+
 
 class Collateral(BaseModel):
     cash_equivalents: float
@@ -75,6 +82,7 @@ class Collateral(BaseModel):
     inventory: float
     ppe: float
     intangibles: float
+
 
 class Financials(BaseModel):
     """Simplified Financials for DCF"""
@@ -87,6 +95,7 @@ class Financials(BaseModel):
     depreciation_percent_revenue: float
 
     current_year_revenue: float
+
 
 class WorkstreamContext(BaseModel):
     meta: Meta

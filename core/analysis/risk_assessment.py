@@ -6,12 +6,14 @@ import pandas as pd  # For data manipulation
 from typing import Dict, Any, Tuple, List  # For type hinting
 from datetime import datetime
 
+
 class RiskAssessor:
     """
     Comprehensive risk assessment tool for investments, integrated with 
     Adam v19.1's agent framework and knowledge graph. Includes Monte Carlo 
     simulation for scenario analysis.
     """
+
     def __init__(self, config: Dict[str, Any]):
         """
         Initializes the RiskAssessor with configuration parameters.
@@ -19,9 +21,9 @@ class RiskAssessor:
         self.data_sources = config.get('data_sources', {})
         self.geopolitical_risk_agent = config.get('geopolitical_risk_agent', None)
         self.industry_specialist_agent = config.get('industry_specialist_agent', None)
-        self.prediction_market_agent = config.get('prediction_market_agent', None) 
+        self.prediction_market_agent = config.get('prediction_market_agent', None)
         self.macroeconomic_analysis_agent = config.get('macroeconomic_analysis_agent', None)
-        self.alternative_data_agent = config.get('alternative_data_agent', None)  
+        self.alternative_data_agent = config.get('alternative_data_agent', None)
         self.risk_weights = config.get('risk_weights', {
             'market_risk': 0.2,
             'credit_risk': 0.3,
@@ -156,7 +158,7 @@ class RiskAssessor:
         scenarios = []
         macro_scenarios = self.macroeconomic_analysis_agent.generate_scenarios() if self.macroeconomic_analysis_agent else []
         geopolitical_risks = self.geopolitical_risk_agent.assess_geopolitical_risks() if self.geopolitical_risk_agent else []
-        
+
         for macro_scenario in macro_scenarios:
             for risk in geopolitical_risks:
                 scenario_description = f"{macro_scenario} with {risk}"
@@ -209,11 +211,12 @@ class RiskAssessor:
                 - `other_metrics`: Other relevant risk metrics derived from the simulation.
         """
         print(f"Running Monte Carlo simulation for {investment.get('name', 'Unknown Investment')}...")
-        
+
         # 1. Extract relevant data from the investment
         # Example: Assuming investment has 'initial_value' and 'volatility'
         initial_value = investment.get('initial_value', 100)
-        volatility = investment['market_risk']['volatility'] if 'market_risk' in investment else 0.2  # Use calculated volatility or a default value
+        # Use calculated volatility or a default value
+        volatility = investment['market_risk']['volatility'] if 'market_risk' in investment else 0.2
         time_horizon = investment.get('time_horizon', 1)  # Assuming a time horizon of 1 year for now
 
         # 2. Generate random scenarios

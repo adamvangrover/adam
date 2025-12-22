@@ -1,11 +1,13 @@
 from typing import Callable, Dict, List, Set
 from core.financial_suite.context_manager import ContextManager
 
+
 class DependencyGraph:
     """
     Manages dependencies between financial inputs and calculated outputs.
     Ensures efficient recalculation when inputs change.
     """
+
     def __init__(self, manager: ContextManager):
         self.manager = manager
         # Adjacency list: Input -> Set[Downstream Nodes]

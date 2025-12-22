@@ -5,6 +5,7 @@ from .schema import MarketTicker
 
 logger = logging.getLogger(__name__)
 
+
 class MarketDiscoveryAgent:
     """
     Agent responsible for the 'Discovery Layer' of the Financial Framework.

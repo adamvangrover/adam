@@ -12,11 +12,13 @@ CONFIG = {
     "time_window_hours": 24
 }
 
+
 class CapabilityMonitoringModule:
     """
     Monitors the performance and interactions of agents to self-diagnose analytical gaps.
     This is the initial codebase as per the Phase 1 deliverable for Adam v20.0.
     """
+
     def __init__(self, event_bus, agent_forge_trigger):
         """
         Initializes the CMM.
@@ -121,11 +123,14 @@ class CapabilityMonitoringModule:
 class MockEventBus:
     def __init__(self):
         self.subscribers = defaultdict(list)
+
     def subscribe(self, event_type, callback):
         self.subscribers[event_type].append(callback)
+
     def publish(self, event_type, event_data):
         for callback in self.subscribers[event_type]:
             callback(event_type, event_data)
+
 
 def mock_agent_forge_trigger(gap_report):
     print(f"\n---!!! Agent Forge Triggered !!!---")
@@ -134,6 +139,7 @@ def mock_agent_forge_trigger(gap_report):
     print(f"---!!!---------------------------!!!---")
 
 # --- Example Usage ---
+
 
 if __name__ == "__main__":
     # 1. Setup

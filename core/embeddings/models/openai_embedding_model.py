@@ -6,6 +6,7 @@ from core.embeddings.base_embedding_model import BaseEmbeddingModel
 
 # Conceptual: import openai
 
+
 class OpenAIEmbeddingModel(BaseEmbeddingModel):
     """
     An embedding model using OpenAI's embedding endpoints (e.g., text-embedding-ada-002).
@@ -14,7 +15,7 @@ class OpenAIEmbeddingModel(BaseEmbeddingModel):
     DEFAULT_MODEL = "text-embedding-ada-002"
     DIMENSIONS = {
         "text-embedding-ada-002": 1536,
-        "text-embedding-3-small": 1536, # Can also be 512 or 1536 based on 'dimensions' param
+        "text-embedding-3-small": 1536,  # Can also be 512 or 1536 based on 'dimensions' param
         "text-embedding-3-large": 3072  # Can also be 256 or 1024 based on 'dimensions' param
     }
 
@@ -35,7 +36,7 @@ class OpenAIEmbeddingModel(BaseEmbeddingModel):
             logging.warning("OpenAI API key not configured. Returning zero vector for embedding.")
             return [0.0] * self.embedding_dim
 
-        if not text: # OpenAI API might error or return specific value for empty string
+        if not text:  # OpenAI API might error or return specific value for empty string
             logging.debug("Input text is empty. Returning zero vector.")
             return [0.0] * self.embedding_dim
 
@@ -51,17 +52,18 @@ class OpenAIEmbeddingModel(BaseEmbeddingModel):
             logging.info(f"OpenAIEmbeddingModel: Returning simulated embedding for model {self.model_name}.")
             text_len_factor = len(text) / 1000.0
             simulated_embedding = [text_len_factor + (i * 0.001) for i in range(self.embedding_dim)]
-            simulated_embedding = [max(min(val, 1.0), -1.0) for val in simulated_embedding] # Basic normalization
+            simulated_embedding = [max(min(val, 1.0), -1.0) for val in simulated_embedding]  # Basic normalization
             return simulated_embedding[:self.embedding_dim]
 
         except Exception as e:
             logging.error(f"OpenAIEmbeddingModel: Error during conceptual API call for {self.model_name}: {e}")
-            return [0.0] * self.embedding_dim # Return zero vector on error
+            return [0.0] * self.embedding_dim  # Return zero vector on error
+
 
 if __name__ == "__main__":
     async def main():
         # Needs OPENAI_API_KEY for real calls
-        openai_embedder = OpenAIEmbeddingModel() # Default: text-embedding-ada-002
+        openai_embedder = OpenAIEmbeddingModel()  # Default: text-embedding-ada-002
 
         text1 = "The quick brown fox jumps over the lazy dog."
         emb1 = await openai_embedder.generate_embedding(text1)

@@ -3,6 +3,7 @@
 import pandas as pd
 from textblob import TextBlob
 
+
 class TechnologySpecialist:
     def __init__(self, config):
         self.data_sources = config.get('data_sources', {})
@@ -26,14 +27,14 @@ class TechnologySpecialist:
         # 2. Analyze sentiment and trends
         sentiment_scores = [TextBlob(headline['text']).sentiment.polarity for headline in news_headlines]
         avg_sentiment = sum(sentiment_scores) / len(sentiment_scores) if sentiment_scores else 0
-        #... (analyze social media sentiment and trends)
+        # ... (analyze social media sentiment and trends)
 
         trends = {
             'AI adoption': self.analyze_ai_adoption(news_headlines, social_media_posts),
             'cloud_computing_market': self.analyze_cloud_market(news_headlines, social_media_posts),
             'semiconductor_shortage': self.analyze_semiconductor_shortage(news_headlines, social_media_posts),
             'overall_sentiment': avg_sentiment,
-            #... (add more trends and insights)
+            # ... (add more trends and insights)
         }
         return trends
 
@@ -62,26 +63,26 @@ class TechnologySpecialist:
             'financial_health': financial_health,
             'innovation_score': innovation_score,
             'competitive_advantage': competitive_advantage,
-            #... (add more analysis results)
+            # ... (add more analysis results)
         }
         return analysis_results
 
     def analyze_ai_adoption(self, news_headlines, social_media_posts):
-        #... (analyze news and social media data to assess AI adoption trends)
+        # ... (analyze news and social media data to assess AI adoption trends)
         return "increasing"  # Example
 
     def analyze_cloud_market(self, news_headlines, social_media_posts):
-        #... (analyze news and social media data to assess cloud market trends)
+        # ... (analyze news and social media data to assess cloud market trends)
         return "consolidating"  # Example
 
     def analyze_semiconductor_shortage(self, news_headlines, social_media_posts):
-        #... (analyze news and social media data to assess semiconductor shortage trends)
+        # ... (analyze news and social media data to assess semiconductor shortage trends)
         return "easing"  # Example
 
     def analyze_financial_health(self, financial_statements):
-        #... (analyze financial data to assess financial health)
+        # ... (analyze financial data to assess financial health)
         return "stable"  # Example
 
     def analyze_competitive_landscape(self, company_data, data_sources):
-        #... (analyze news and social media sentiment about the company and its competitors)
+        # ... (analyze news and social media sentiment about the company and its competitors)
         return "strong"  # Example

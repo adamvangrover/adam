@@ -4,6 +4,7 @@ from typing import Any, Dict
 
 from core.agents.agent_base import AgentBase
 
+
 class PersonaCommunicationAgent(AgentBase):
     """
     The Persona & Communication Agent is the final layer in the output chain,

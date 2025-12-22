@@ -4,6 +4,7 @@ from core.engine.snc_graph import snc_graph_app
 from core.engine.states import init_snc_state
 import json
 
+
 def test_snc_graph():
     print("Running SNC Graph Verification...")
 
@@ -38,6 +39,7 @@ def test_snc_graph():
     assert final_state['regulatory_rating'] in ["Pass", "Special Mention", "Substandard"]
     assert final_state['iteration_count'] >= 1
     print("\nVerification Passed!")
+
 
 if __name__ == "__main__":
     test_snc_graph()

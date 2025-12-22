@@ -2,6 +2,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional, List
 import os
 
+
 class Settings(BaseSettings):
     """
     Centralized configuration management using Pydantic Settings.
@@ -38,6 +39,7 @@ class Settings(BaseSettings):
         extra="ignore",
         case_sensitive=False
     )
+
 
 # Global settings instance
 settings = Settings()

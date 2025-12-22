@@ -7,6 +7,8 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship,
 from sqlalchemy.types import TypeDecorator, CHAR
 
 # SQLite compatible UUID type
+
+
 class GUID(TypeDecorator):
     """Platform-independent GUID type.
     Uses CHAR(36) on generic platforms (SQLite).
@@ -35,19 +37,22 @@ class GUID(TypeDecorator):
                 value = uuid.UUID(value)
             return value
 
+
 class Base(DeclarativeBase):
     pass
+
 
 class FundMasterDB(Base):
     __tablename__ = 'fund_master'
 
     cik: Mapped[str] = mapped_column(String(10), primary_key=True)
     fund_name: Mapped[str] = mapped_column(String(255))
-    fund_style: Mapped[str] = mapped_column(String(50)) # 'Hedge Fund', 'Family Office', etc.
+    fund_style: Mapped[str] = mapped_column(String(50))  # 'Hedge Fund', 'Family Office', etc.
     manager_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     whitelist_status: Mapped[bool] = mapped_column(Boolean, default=False)
 
     filings: Mapped[list["FilingEventDB"]] = relationship(back_populates="fund")
+
 
 class FilingEventDB(Base):
     __tablename__ = 'filing_event'
@@ -62,6 +67,7 @@ class FilingEventDB(Base):
     fund: Mapped["FundMasterDB"] = relationship(back_populates="filings")
     holdings: Mapped[list["HoldingDetailDB"]] = relationship(back_populates="filing")
 
+
 class HoldingDetailDB(Base):
     __tablename__ = 'holdings_detail'
 
@@ -70,11 +76,12 @@ class HoldingDetailDB(Base):
     cusip: Mapped[str] = mapped_column(String(9))
     ticker: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
     shares: Mapped[int] = mapped_column(BigInteger)
-    value: Mapped[int] = mapped_column(BigInteger) # In thousands
-    put_call: Mapped[Optional[str]] = mapped_column(String(4), nullable=True) # 'PUT', 'CALL', or None
+    value: Mapped[int] = mapped_column(BigInteger)  # In thousands
+    put_call: Mapped[Optional[str]] = mapped_column(String(4), nullable=True)  # 'PUT', 'CALL', or None
     vote_sole: Mapped[int] = mapped_column(BigInteger, default=0)
 
     filing: Mapped["FilingEventDB"] = relationship(back_populates="holdings")
+
 
 class SecurityMasterDB(Base):
     __tablename__ = 'securities_master'
@@ -85,10 +92,13 @@ class SecurityMasterDB(Base):
     sector: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     industry: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
 
+
 # Database Setup
 engine = create_engine("sqlite:///core/institutional_radar/radar.db", echo=False)
 
+
 def init_db():
     Base.metadata.create_all(engine)
+
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

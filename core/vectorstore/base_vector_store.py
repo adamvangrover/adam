@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Tuple
 
+
 class BaseVectorStore(ABC):
     @abstractmethod
     async def add_documents(self, documents: List[Tuple[str, List[float]]]):

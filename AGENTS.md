@@ -145,6 +145,7 @@ Please follow these guidelines when contributing to the ADAM project:
     *   `langgraph` and `tiktoken` are required for v23 functionality.
 *   **Logging:** A new `core/utils/logging_utils.py` module has been added to standardize logging configuration.
 *   **Missing Files:** If you encounter `Knowledge base file not found` errors, ensure `data/risk_rating_mapping.json` exists. A default one is created if missing in some tests, but should be present in `data/` for production.
+*   **Testing:** Always run tests using `python3 -m pytest` to ensure the correct virtual environment is used.
 
 ## Quantum-AI Convergence (New Capabilities)
 

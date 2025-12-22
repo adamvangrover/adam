@@ -6,6 +6,7 @@ from mesa import Agent, Model
 from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
 
+
 class MarketAgent(Agent):
     def __init__(self, unique_id, model, volatility, risk_aversion):
         super().__init__(unique_id, model)
@@ -40,9 +41,9 @@ class MarketAgent(Agent):
         if len(self.memory) > 10:
             recent_outcomes = [m['portfolio']['cash'] for m in self.memory[-10:]]
             if recent_outcomes[-1] > recent_outcomes[0]:
-                self.risk_aversion = max(0, self.risk_aversion - 0.01) #Less risk averse if doing well.
+                self.risk_aversion = max(0, self.risk_aversion - 0.01)  # Less risk averse if doing well.
             else:
-                self.risk_aversion = min(1, self.risk_aversion + 0.01) #More risk averse if doing poorly.
+                self.risk_aversion = min(1, self.risk_aversion + 0.01)  # More risk averse if doing poorly.
 
     def buy_stock(self, symbol, quantity):
         price = self.model.stock_prices[symbol][-1]
@@ -60,6 +61,7 @@ class MarketAgent(Agent):
         self.portfolio[symbol] -= quantity
         self.model.stock_prices[symbol][-1] = price * (1 - (quantity / 10000) * self.volatility)
 
+
 class EconomicAgent(Agent):
     def __init__(self, unique_id, model, volatility):
         super().__init__(unique_id, model)
@@ -69,6 +71,7 @@ class EconomicAgent(Agent):
         for indicator in self.model.economic_indicators:
             change = random.uniform(-0.1 * self.volatility, 0.1 * self.volatility)
             self.model.economic_indicators[indicator].append(self.model.economic_indicators[indicator][-1] + change)
+
 
 class PoliticalAgent(Agent):
     def __init__(self, unique_id, model, volatility):
@@ -80,6 +83,7 @@ class PoliticalAgent(Agent):
             change = random.uniform(-0.1 * self.volatility, 0.1 * self.volatility)
             self.model.geopolitical_risks[risk].append(max(0, min(1, self.model.geopolitical_risks[risk][-1] + change)))
 
+
 class WorldSimulationModel(Model):
     def __init__(self, config):
         super().__init__()
@@ -88,9 +92,12 @@ class WorldSimulationModel(Model):
         self.num_political_agents = config.get('num_political_agents', 3)
         self.schedule = RandomActivation(self)
         self.volatility = config.get('volatility', 0.05)
-        self.stock_prices = {symbol: [random.uniform(100, 200)] for symbol in config.get('stock_symbols', ['AAPL', 'MSFT', 'GOOG'])}
-        self.economic_indicators = {indicator: [random.uniform(0, 10)] for indicator in config.get('economic_indicators', ['GDP_growth', 'inflation', 'interest_rates'])}
-        self.geopolitical_risks = {risk: [random.uniform(0, 1)] for risk in config.get('geopolitical_risks', ['political_stability', 'trade_war_risk'])}
+        self.stock_prices = {symbol: [random.uniform(100, 200)]
+                             for symbol in config.get('stock_symbols', ['AAPL', 'MSFT', 'GOOG'])}
+        self.economic_indicators = {indicator: [random.uniform(0, 10)] for indicator in config.get(
+            'economic_indicators', ['GDP_growth', 'inflation', 'interest_rates'])}
+        self.geopolitical_risks = {risk: [random.uniform(0, 1)] for risk in config.get(
+            'geopolitical_risks', ['political_stability', 'trade_war_risk'])}
 
         for i in range(self.num_market_agents):
             risk_aversion = random.uniform(0, 1)
@@ -122,12 +129,14 @@ class WorldSimulationModel(Model):
         if 'stock_prices' in adam_data:
             self.stock_prices = {symbol: [price] for symbol, price in adam_data['stock_prices'].items()}
         if 'economic_indicators' in adam_data:
-            self.economic_indicators = {indicator: [value] for indicator, value in adam_data['economic_indicators'].items()}
+            self.economic_indicators = {indicator: [value]
+                                        for indicator, value in adam_data['economic_indicators'].items()}
         if 'geopolitical_risks' in adam_data:
             self.geopolitical_risks = {risk: [value] for risk, value in adam_data['geopolitical_risks'].items()}
         # Add more data integration as needed.
 
 # --- Standalone Execution ---
+
 
 if __name__ == "__main__":
     config = {
@@ -136,8 +145,10 @@ if __name__ == "__main__":
         'num_political_agents': 3,
         'volatility': 0.1,  # Adjust volatility as needed
         'stock_symbols': ['AAPL', 'MSFT', 'GOOG', 'AMZN', 'TSLA'],  # Add more stock symbols
-        'economic_indicators': ['GDP_growth', 'inflation', 'interest_rates', 'unemployment'],  # Add more economic indicators
-        'geopolitical_risks': ['political_stability', 'trade_war_risk', 'regulatory_changes']  # Add more geopolitical risks
+        # Add more economic indicators
+        'economic_indicators': ['GDP_growth', 'inflation', 'interest_rates', 'unemployment'],
+        # Add more geopolitical risks
+        'geopolitical_risks': ['political_stability', 'trade_war_risk', 'regulatory_changes']
     }
     model = WorldSimulationModel(config)
 

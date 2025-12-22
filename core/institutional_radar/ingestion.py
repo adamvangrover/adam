@@ -13,6 +13,7 @@ from datetime import datetime, date
 
 logger = get_logger("institutional_radar.ingestion")
 
+
 class SECEdgarScraper:
     BASE_URL = "https://www.sec.gov/Archives"
     HEADERS = {"User-Agent": "Adam-Bot/1.0 (internal@adam.finance)"}
@@ -28,7 +29,7 @@ class SECEdgarScraper:
             resp._content = b""
             return resp
 
-        time.sleep(0.1) # Rate limit compliance (10 req/sec max)
+        time.sleep(0.1)  # Rate limit compliance (10 req/sec max)
         logger.info(f"Fetching {url}")
         try:
             resp = requests.get(url, headers=self.HEADERS, timeout=10)
@@ -166,25 +167,25 @@ class SECEdgarScraper:
                 vote_tag = table.find('votingAuthority') or table.find('ns1:votingAuthority')
                 vote_sole = 0
                 if vote_tag:
-                    sole_tag = vote_tag.find('Sole') or vote_tag.find('ns1:Sole') # Case sensitive? usually Sole
+                    sole_tag = vote_tag.find('Sole') or vote_tag.find('ns1:Sole')  # Case sensitive? usually Sole
                     if not sole_tag:
-                         sole_tag = vote_tag.find('sole')
+                        sole_tag = vote_tag.find('sole')
                     if sole_tag and sole_tag.text:
                         vote_sole = int(sole_tag.text)
 
                 if cusip and shares > 0:
-                     # Create HoldingDetail object (Pydantic)
-                     h = HoldingDetail(
-                         holding_id=uuid.uuid4(),
-                         filing_id=uuid.uuid4(), # Temporary placeholder
-                         cusip=cusip.upper(),
-                         ticker=None, # Needs mapping
-                         shares=shares,
-                         value=value,
-                         put_call=put_call if put_call in ['PUT', 'CALL'] else None,
-                         vote_sole=vote_sole
-                     )
-                     holdings.append(h)
+                    # Create HoldingDetail object (Pydantic)
+                    h = HoldingDetail(
+                        holding_id=uuid.uuid4(),
+                        filing_id=uuid.uuid4(),  # Temporary placeholder
+                        cusip=cusip.upper(),
+                        ticker=None,  # Needs mapping
+                        shares=shares,
+                        value=value,
+                        put_call=put_call if put_call in ['PUT', 'CALL'] else None,
+                        vote_sole=vote_sole
+                    )
+                    holdings.append(h)
             except Exception as e:
                 logger.warning(f"Failed to parse a row in 13F XML: {e}")
                 continue
@@ -233,7 +234,7 @@ class SECEdgarScraper:
 
                 # Download and Parse
                 if self.mock_mode:
-                    xml_content = b"<xml>...</xml>" # Dummy
+                    xml_content = b"<xml>...</xml>"  # Dummy
                     parsed_holdings = []
                 else:
                     xml_resp = self._get(xml_url)
@@ -242,13 +243,13 @@ class SECEdgarScraper:
                 # Save to DB
                 filing_db = FilingEventDB(
                     cik=cik,
-                    report_period=date(year, quarter*3, 30), # Approximation
+                    report_period=date(year, quarter*3, 30),  # Approximation
                     filing_date=datetime.strptime(date_filed, '%Y-%m-%d').date(),
                     accession_number=filename.split('/')[-1].replace('.txt', ''),
                     is_amendment=False
                 )
                 session.add(filing_db)
-                session.flush() # Generate ID
+                session.flush()  # Generate ID
 
                 for h in parsed_holdings:
                     h_db = HoldingDetailDB(

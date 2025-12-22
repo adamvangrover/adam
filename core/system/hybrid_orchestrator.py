@@ -4,15 +4,17 @@ from core.system.v22_async.async_workflow_manager import AsyncWorkflowManager
 # Assuming v23 graph engine is implemented in a module named 'cyclical_graph'
 # from core.engine.cyclical_reasoning_graph import CyclicalReasoningGraph
 
+
 class HybridOrchestrator:
     """
     Enterprise-grade orchestrator that bridges v22 asynchronous execution 
     with v23 synchronous/cyclical reasoning.
     """
+
     def __init__(self):
         self.async_manager = AsyncWorkflowManager.get_instance()
-        self.graph_engine = None # Lazy load v23 engine to allow v22 fallback
-        self.mode = "adaptive" # default to adaptive hybrid mode
+        self.graph_engine = None  # Lazy load v23 engine to allow v22 fallback
+        self.mode = "adaptive"  # default to adaptive hybrid mode
 
     async def route_request(self, query: str, complexity_score: float) -> Dict[str, Any]:
         """

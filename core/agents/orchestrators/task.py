@@ -1,5 +1,6 @@
 from typing import Callable, List, Dict, Any
 
+
 class Task:
     def __init__(self, name: str, action: Callable, dependencies: List[str] = None, **kwargs):
         self.name = name
@@ -11,7 +12,7 @@ class Task:
         # The result of the task execution.
         self.result = None
         # The state of the task.
-        self.state = "pending" # pending, running, completed, failed
+        self.state = "pending"  # pending, running, completed, failed
 
     def execute(self, dependency_results: Dict[str, Any]):
         """

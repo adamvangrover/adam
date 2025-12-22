@@ -6,6 +6,7 @@ from typing import Any, Dict, Optional
 from core.agents.agent_base import AgentBase
 from semantic_kernel import Kernel
 
+
 class ReportGeneratorAgent(AgentBase):
     """
     An agent responsible for generating final reports by synthesizing
@@ -30,9 +31,9 @@ class ReportGeneratorAgent(AgentBase):
         }
         """
         logging.info("Executing ReportGeneratorAgent...")
-        
+
         report_parts = []
-        
+
         # 1. Add a title based on the user query
         user_query = kwargs.get('user_query', 'Analysis Report')
         report_parts.append(f"# Report for: {user_query}\n")
@@ -51,12 +52,11 @@ class ReportGeneratorAgent(AgentBase):
             else:
                 report_parts.append(f"## {analysis_type.replace('_', ' ').title()}\n{analysis_result}\n")
 
-
         # 3. Join the parts into a single report string
         final_report = "\n".join(report_parts)
-        
+
         logging.info(f"Generated report:\n{final_report}")
-        
+
         # For now, we return the report as a string.
         # In the future, this could return a file path or a more structured object.
         return final_report

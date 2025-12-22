@@ -3,6 +3,7 @@ import struct
 import asyncio
 from core.trading.hft.hft_engine_nexus import NexusEngine, NexusConfig, AvellanedaStoikovStrategy
 
+
 class TestAvellanedaStoikov(unittest.TestCase):
     def setUp(self):
         self.config = NexusConfig(
@@ -64,6 +65,7 @@ class TestAvellanedaStoikov(unittest.TestCase):
 
         self.assertAlmostEqual(spread, expected_spread, places=5)
 
+
 class TestNexusEngine(unittest.TestCase):
     def setUp(self):
         self.config = NexusConfig()
@@ -84,6 +86,7 @@ class TestNexusEngine(unittest.TestCase):
         # Just ensure it doesn't crash
         asyncio.run(self.engine.run_benchmark(num_ticks=100))
         self.assertEqual(len(self.engine.latency_stats), 100)
+
 
 if __name__ == '__main__':
     unittest.main()

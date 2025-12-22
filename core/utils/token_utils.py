@@ -6,6 +6,7 @@ import logging
 # Configure logging (consider moving to a central location)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+
 def count_tokens(text: str, encoding_name: str = "cl100k_base") -> int:
     """
     Counts the number of tokens in a string using tiktoken.
@@ -24,7 +25,7 @@ def count_tokens(text: str, encoding_name: str = "cl100k_base") -> int:
         return num_tokens
     except KeyError:
         logging.warning(f"Encoding '{encoding_name}' not found, using 'cl100k_base' as fallback.")
-        encoding = tiktoken.get_encoding("cl100k_base") # Default to cl100k_base
+        encoding = tiktoken.get_encoding("cl100k_base")  # Default to cl100k_base
         num_tokens = len(encoding.encode(text))
         return num_tokens
     except Exception as e:
@@ -72,7 +73,6 @@ if __name__ == '__main__':
     with open("test_config.yaml", "w") as f:
         yaml.dump(dummy_config, f)
     test_config = load_config("test_config.yaml")
-
 
     test_string = "This is a test string to count tokens."
     print(f"'{test_string}' has {count_tokens(test_string)} tokens.")

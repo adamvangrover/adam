@@ -1,8 +1,9 @@
 # core/system/system_controller.py
 
 from plugin_manager import PluginManager
-from agents import * # Import all agents
-from core.utils.config_utils import load_app_config # Added import
+from agents import *  # Import all agents
+from core.utils.config_utils import load_app_config  # Added import
+
 
 class SystemController:
     def __init__(self, config: dict):
@@ -28,7 +29,6 @@ class SystemController:
                 else:
                     # Optionally log a warning if an agent class is not found
                     print(f"Warning: Agent class '{agent_name}' not found.")
-
 
     def run(self):
         """
@@ -81,6 +81,7 @@ class SystemController:
         # Run the simulation
         # ...
 
+
 # Example usage
 if __name__ == "__main__":
     app_config = load_app_config()
@@ -88,7 +89,7 @@ if __name__ == "__main__":
     # load_app_config should provide it if agents.yaml is loaded.
     if "agents" not in app_config:
         print("Warning: 'agents' key not found in loaded app_config. SystemController might not initialize agents correctly.")
-        app_config["agents"] = {} # Provide a default empty dict for agents
+        app_config["agents"] = {}  # Provide a default empty dict for agents
 
     controller = SystemController(config=app_config)
     controller.run()

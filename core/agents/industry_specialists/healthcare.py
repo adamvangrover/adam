@@ -3,6 +3,7 @@
 import pandas as pd
 from textblob import TextBlob
 
+
 class HealthcareSpecialist:
     def __init__(self, config):
         self.data_sources = config.get('data_sources', {})
@@ -26,14 +27,14 @@ class HealthcareSpecialist:
         # Analyze sentiment and trends
         sentiment_scores = [TextBlob(headline['text']).sentiment.polarity for headline in news_headlines]
         avg_sentiment = sum(sentiment_scores) / len(sentiment_scores) if sentiment_scores else 0
-        #... (analyze social media sentiment and trends)
+        # ... (analyze social media sentiment and trends)
 
         trends = {
             'telemedicine_adoption': self.analyze_telemedicine_adoption(news_headlines, social_media_posts),
             'drug_pricing_pressure': self.analyze_drug_pricing_pressure(news_headlines, social_media_posts),
             'aging_population': self.analyze_aging_population_impact(news_headlines, social_media_posts),
             'overall_sentiment': avg_sentiment,
-            #... (add more trends and insights)
+            # ... (add more trends and insights)
         }
         return trends
 
@@ -57,32 +58,32 @@ class HealthcareSpecialist:
         success_rate = self.calculate_clinical_trial_success_rate(clinical_trials)
 
         # 3. Analyze regulatory risk
-        #... (analyze news and regulatory filings for potential risks)
+        # ... (analyze news and regulatory filings for potential risks)
 
         analysis_results = {
             'financial_health': financial_health,
             'research_pipeline_outlook': success_rate,
             'regulatory_risk': 'moderate',  # Placeholder
-            #... (add more analysis results)
+            # ... (add more analysis results)
         }
         return analysis_results
 
     def analyze_telemedicine_adoption(self, news_headlines, social_media_posts):
-        #... (analyze news and social media data to assess telemedicine adoption trends)
+        # ... (analyze news and social media data to assess telemedicine adoption trends)
         return "increasing"  # Example
 
     def analyze_drug_pricing_pressure(self, news_headlines, social_media_posts):
-        #... (analyze news and social media data to assess drug pricing pressure trends)
+        # ... (analyze news and social media data to assess drug pricing pressure trends)
         return "high"  # Example
 
     def analyze_aging_population_impact(self, news_headlines, social_media_posts):
-        #... (analyze news and social media data to assess the impact of the aging population)
+        # ... (analyze news and social media data to assess the impact of the aging population)
         return "significant"  # Example
 
     def analyze_financial_health(self, financial_statements):
-        #... (analyze financial data to assess financial health)
+        # ... (analyze financial data to assess financial health)
         return "stable"  # Example
 
     def calculate_clinical_trial_success_rate(self, clinical_trials):
-        #... (calculate the success rate of clinical trials)
+        # ... (calculate the success rate of clinical trials)
         return 0.75  # Example

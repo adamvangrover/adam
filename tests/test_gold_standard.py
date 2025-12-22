@@ -1,3 +1,5 @@
+from core.gold_standard.qa import validate_dataframe
+from core.gold_standard.trading.strategy import MeanReversionStrategy
 import unittest
 import pandas as pd
 import numpy as np
@@ -7,14 +9,12 @@ import os
 # Ensure importability
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from core.gold_standard.trading.strategy import MeanReversionStrategy
-from core.gold_standard.qa import validate_dataframe
 
 class TestGoldStandard(unittest.TestCase):
     def test_mean_reversion(self):
         # Create enough data for a window of 5
         data = [100] * 20
-        data[10] = 110 # Spike
+        data[10] = 110  # Spike
         df = pd.DataFrame({'Close': data})
 
         strat = MeanReversionStrategy(window=5, z_threshold=1.5)
@@ -51,10 +51,11 @@ class TestGoldStandard(unittest.TestCase):
 
         # Should fail (negative price)
         bad_df = df.copy()
-        bad_df.iloc[0, 0] = -5.0 # Open
+        bad_df.iloc[0, 0] = -5.0  # Open
 
         with self.assertRaises(Exception):
             validate_dataframe(bad_df)
+
 
 if __name__ == '__main__':
     unittest.main()

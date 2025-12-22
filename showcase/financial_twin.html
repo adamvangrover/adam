@@ -3,292 +3,461 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM | Digital Twin</title>
+    <title>ADAM | Financial Digital Twin v24.0</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
-    <link rel="stylesheet" href="css/style.css">
 
     <style>
-        .entity-panel { background: rgba(15, 23, 42, 0.9); border-left: 1px solid #334155; }
-        .node-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #94a3b8; }
+        /* Cyberpunk / Fintech Theme Base */
+        :root {
+            --bg-dark: #020408;
+            --panel-bg: rgba(15, 23, 42, 0.95);
+            --border-color: #334155;
+            --accent-cyan: #22d3ee;
+            --accent-red: #ef4444;
+            --accent-green: #10b981;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+
+        /* CRT Scanline Effect */
+        .scan-line {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        /* Grid Background */
+        .grid-bg {
+            background-image: 
+                linear-gradient(rgba(30, 41, 59, 0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(30, 41, 59, 0.3) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        /* Utility Classes */
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan); }
+
+        /* Animation for Inspector */
+        .slide-enter { transform: translateX(100%); }
+        .slide-enter-active { transform: translateX(0); }
     </style>
 </head>
-<body class="h-screen flex flex-col grid-bg overflow-hidden text-slate-200">
+<body class="h-screen flex flex-col grid-bg">
     <div class="scan-line"></div>
 
     <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 shrink-0">
         <div class="flex items-center gap-4">
-            <a href="index.html" class="text-slate-400 hover:text-white transition"><i class="fas fa-arrow-left"></i></a>
-            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-cyan-400">v23.5</span> <span class="text-slate-500 font-normal">| Financial Digital Twin</span></h1>
+            <div class="w-8 h-8 bg-cyan-900/50 rounded flex items-center justify-center border border-cyan-500/30">
+                <i class="fas fa-network-wired text-cyan-400"></i>
+            </div>
+            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-cyan-400">v24.0</span> <span class="text-slate-500 font-normal">| Risk Topography</span></h1>
         </div>
+        
         <div class="flex items-center gap-4 text-xs font-mono">
             <div class="bg-slate-800 border border-slate-700 rounded px-3 py-1 flex items-center gap-2">
-                <span class="text-slate-400">ENTITY:</span>
+                <span class="text-slate-400">TARGET:</span>
                 <span class="text-white font-bold">JPMORGAN CHASE & CO.</span>
+                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse ml-2"></span>
             </div>
-            <button class="bg-cyan-900/30 hover:bg-cyan-600 text-cyan-400 hover:text-white border border-cyan-800/50 rounded px-3 py-1 transition" onclick="runSimulation()">
-                <i class="fas fa-play mr-1"></i> Simulate Shock
+            <button id="btn-simulate" class="bg-red-900/20 hover:bg-red-900/40 text-red-400 hover:text-white border border-red-800/50 rounded px-4 py-1.5 transition flex items-center gap-2 group">
+                <i class="fas fa-biohazard group-hover:rotate-12 transition-transform"></i> Inject Stress
+            </button>
+            <button id="btn-reset" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-600 rounded px-4 py-1.5 transition hidden">
+                <i class="fas fa-undo mr-1"></i> Reset
             </button>
         </div>
     </header>
 
     <main class="flex-1 flex overflow-hidden relative">
-
-        <!-- Graph Area -->
+        
         <div id="twin-network" class="flex-1 bg-gradient-to-b from-[#0f172a] to-[#050b14]"></div>
 
-        <!-- Entity Inspector -->
-        <aside class="w-80 entity-panel absolute right-0 top-0 h-full transform transition-transform duration-300 translate-x-full z-20 flex flex-col shadow-2xl" id="inspector">
-            <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/50">
-                <h3 class="font-bold text-white font-mono flex items-center gap-2">
-                    <i class="fas fa-cube text-cyan-400"></i>
-                    <span id="insp-title">Node Details</span>
+        <aside id="inspector" class="w-80 glass-panel absolute right-0 top-0 h-full transform transition-transform duration-300 translate-x-full z-30 flex flex-col shadow-2xl border-l border-slate-700">
+            <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-900/50">
+                <h3 class="font-bold text-white mono flex items-center gap-2">
+                    <i class="fas fa-microchip text-cyan-400"></i>
+                    <span id="insp-title">Node Inspector</span>
                 </h3>
-                <button onclick="closeInspector()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+                <button onclick="app.closeInspector()" class="text-slate-400 hover:text-white transition"><i class="fas fa-times"></i></button>
             </div>
             
-            <div class="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-6">
-                
-                <!-- Metrics -->
-                <div>
-                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 border-b border-slate-700 pb-1">Core Metrics</h4>
-                    <div class="grid grid-cols-2 gap-3" id="insp-metrics">
-                        <!-- Injected -->
+            <div class="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-6" id="insp-content">
+                </div>
+
+            <div class="p-4 border-t border-slate-700 bg-slate-900/50">
+                <div class="text-[10px] text-slate-500 mono mb-2">SYSTEM STATUS</div>
+                <div class="flex items-center gap-2">
+                    <div class="h-1 flex-1 bg-slate-700 rounded-full overflow-hidden">
+                        <div class="h-full bg-cyan-400 w-[78%]"></div>
                     </div>
+                    <span class="text-xs text-cyan-400 font-bold">78%</span>
                 </div>
-
-                <!-- Exposure -->
-                <div>
-                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 border-b border-slate-700 pb-1">Risk Exposure</h4>
-                    <div class="space-y-3" id="insp-risks">
-                        <!-- Injected -->
-                    </div>
-                </div>
-
-                <!-- Relationships -->
-                <div>
-                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 border-b border-slate-700 pb-1">Dependencies</h4>
-                    <ul class="text-xs text-slate-300 space-y-2 font-mono" id="insp-deps">
-                        <!-- Injected -->
-                    </ul>
-                </div>
-
-            </div>
-
-            <div class="p-4 border-t border-slate-700 bg-slate-800/50">
-                <button class="w-full bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold py-2 rounded border border-slate-600 transition">
-                    View Full Dossier
-                </button>
             </div>
         </aside>
 
-        <!-- Controls -->
-        <div class="absolute bottom-6 left-6 flex flex-col gap-2 z-10">
-            <div class="bg-slate-900/80 backdrop-blur border border-slate-700 rounded-lg p-3 w-64">
-                <h4 class="text-xs font-bold text-slate-400 mb-2">Filters</h4>
-                <div class="flex flex-wrap gap-2">
-                    <button class="text-[10px] bg-blue-900/30 text-blue-300 border border-blue-800 rounded px-2 py-1 hover:bg-blue-800/50 transition">Subsidiaries</button>
-                    <button class="text-[10px] bg-red-900/30 text-red-300 border border-red-800 rounded px-2 py-1 hover:bg-red-800/50 transition">Risks</button>
-                    <button class="text-[10px] bg-green-900/30 text-green-300 border border-green-800 rounded px-2 py-1 hover:bg-green-800/50 transition">Assets</button>
+        <div class="absolute bottom-6 left-6 z-20 flex flex-col gap-3">
+            <div class="glass-panel rounded-lg p-3 w-64 border border-slate-700">
+                <h4 class="text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wider mono">Visual Filters</h4>
+                <div class="flex flex-wrap gap-2" id="filter-controls">
+                    <button data-group="sub" class="filter-btn text-[10px] bg-blue-900/20 text-blue-300 border border-blue-800 rounded px-2 py-1 hover:bg-blue-800/40 transition active">Subsidiaries</button>
+                    <button data-group="risk" class="filter-btn text-[10px] bg-red-900/20 text-red-300 border border-red-800 rounded px-2 py-1 hover:bg-red-800/40 transition active">Risks</button>
+                    <button data-group="asset" class="filter-btn text-[10px] bg-green-900/20 text-green-300 border border-green-800 rounded px-2 py-1 hover:bg-green-800/40 transition active">Assets</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute bottom-6 right-80 mr-6 z-20 w-96 pointer-events-none">
+            <div class="glass-panel rounded-lg p-2 border border-slate-700">
+                <div class="text-[10px] text-slate-500 mono mb-1 border-b border-slate-700 pb-1 flex justify-between">
+                    <span>SYSTEM CONSOLE</span>
+                    <span class="text-green-500">● LIVE</span>
+                </div>
+                <div id="console-log" class="h-24 overflow-y-auto custom-scrollbar text-[10px] mono text-slate-300 space-y-1">
+                    <div class="text-slate-500">>> System initialized...</div>
+                    <div class="text-slate-500">>> Connected to JPM Data Lake...</div>
+                    <div class="text-slate-500">>> Graph topology rendered.</div>
                 </div>
             </div>
         </div>
 
     </main>
 
-    <script src="js/nav.js"></script>
     <script>
-        let network = null;
-        let nodes = null;
-        let edges = null;
-
-        document.addEventListener('DOMContentLoaded', () => {
-            initGraph();
-        });
-
-        function initGraph() {
-            // Mock Data representing JPM Digital Twin
-            const data = {
-                nodes: [
-                    { id: 1, label: 'JPMORGAN CHASE', group: 'core', value: 50 },
-
-                    // Business Lines
-                    { id: 2, label: 'Consumer & Community', group: 'unit', value: 30 },
-                    { id: 3, label: 'Corporate & Inv. Bank', group: 'unit', value: 35 },
-                    { id: 4, label: 'Asset Management', group: 'unit', value: 25 },
-
-                    // Risks
-                    { id: 10, label: 'Credit Risk', group: 'risk', value: 20 },
-                    { id: 11, label: 'Market Risk', group: 'risk', value: 15 },
-                    { id: 12, label: 'Cyber Threat', group: 'risk', value: 10 },
-
-                    // Assets / Exposures
-                    { id: 20, label: 'CRE Loans', group: 'asset', value: 15 },
-                    { id: 21, label: 'Treasury Sec.', group: 'asset', value: 20 },
-                    { id: 22, label: 'Derivatives', group: 'asset', value: 25 },
-
-                    // Subsidiaries
-                    { id: 30, label: 'Chase Bank NA', group: 'sub', value: 20 },
-                    { id: 31, label: 'JPM Securities', group: 'sub', value: 15 }
-                ],
-                edges: [
-                    { from: 1, to: 2 }, { from: 1, to: 3 }, { from: 1, to: 4 },
-                    { from: 1, to: 30 }, { from: 1, to: 31 },
-                    { from: 3, to: 11 }, { from: 2, to: 10 }, { from: 1, to: 12 },
-                    { from: 2, to: 20 }, { from: 3, to: 22 }, { from: 4, to: 21 }
-                ]
-            };
-
-            const container = document.getElementById('twin-network');
-
-            nodes = new vis.DataSet(data.nodes);
-            edges = new vis.DataSet(data.edges);
-
-            const options = {
-                nodes: {
-                    shape: 'dot',
-                    font: { face: 'JetBrains Mono', color: '#e2e8f0', size: 12 },
-                    borderWidth: 2,
-                    shadow: true
-                },
-                edges: {
-                    width: 1,
-                    color: { color: '#475569', highlight: '#22d3ee' },
-                    smooth: { type: 'continuous' }
-                },
-                groups: {
-                    core: { color: { background: '#0f172a', border: '#22d3ee' }, size: 40 },
-                    unit: { color: { background: '#1e293b', border: '#3b82f6' } },
-                    risk: { color: { background: '#450a0a', border: '#ef4444' }, shape: 'diamond' },
-                    asset: { color: { background: '#064e3b', border: '#10b981' }, shape: 'square' },
-                    sub: { color: { background: '#334155', border: '#94a3b8' } }
-                },
-                physics: {
-                    stabilization: false,
-                    barnesHut: { gravitationalConstant: -2000, springConstant: 0.04 }
-                },
-                interaction: { hover: true }
-            };
-
-            network = new vis.Network(container, { nodes, edges }, options);
-
-            network.on("click", function (params) {
-                if (params.nodes.length > 0) {
-                    const nodeId = params.nodes[0];
-                    const node = nodes.get(nodeId);
-                    openInspector(node);
-                } else {
-                    closeInspector();
-                }
-            });
-        }
-
-        function openInspector(node) {
-            const insp = document.getElementById('inspector');
-            insp.classList.remove('translate-x-full');
-
-            document.getElementById('insp-title').innerText = node.label;
-
-            // Mock Data Generation based on node type
-            let metricsHtml = '';
-            let riskHtml = '';
-
-            if (node.group === 'unit' || node.group === 'core') {
-                metricsHtml = `
-                    <div class="bg-slate-800 p-2 rounded">
-                        <div class="text-[10px] text-slate-500 uppercase">Revenue (TTM)</div>
-                        <div class="text-sm font-bold text-white font-mono">$${(Math.random()*50).toFixed(1)}B</div>
-                    </div>
-                    <div class="bg-slate-800 p-2 rounded">
-                        <div class="text-[10px] text-slate-500 uppercase">Employees</div>
-                        <div class="text-sm font-bold text-white font-mono">${(Math.random()*100).toFixed(1)}k</div>
-                    </div>
-                `;
-            } else if (node.group === 'risk') {
-                metricsHtml = `
-                    <div class="bg-slate-800 p-2 rounded">
-                        <div class="text-[10px] text-slate-500 uppercase">VaR (99%)</div>
-                        <div class="text-sm font-bold text-red-400 font-mono">$${(Math.random()*500).toFixed(0)}M</div>
-                    </div>
-                    <div class="bg-slate-800 p-2 rounded">
-                        <div class="text-[10px] text-slate-500 uppercase">Sensitivity</div>
-                        <div class="text-sm font-bold text-white font-mono">High</div>
-                    </div>
-                `;
-            } else {
-                metricsHtml = `
-                    <div class="bg-slate-800 p-2 rounded">
-                        <div class="text-[10px] text-slate-500 uppercase">Value</div>
-                        <div class="text-sm font-bold text-white font-mono">$${(Math.random()*10).toFixed(1)}B</div>
-                    </div>
-                `;
+        /**
+         * ADAM Contagion Engine
+         * Handles the logic for propagating shockwaves through the graph.
+         */
+        class ContagionEngine {
+            constructor(nodesDataSet, edgesDataSet, networkInstance) {
+                this.nodes = nodesDataSet;
+                this.edges = edgesDataSet;
+                this.network = networkInstance;
+                this.originalState = new Map(); // Store original colors to reset later
             }
-            document.getElementById('insp-metrics').innerHTML = metricsHtml;
 
-            // Risks
-            document.getElementById('insp-risks').innerHTML = `
-                <div class="flex items-center justify-between text-xs">
-                    <span class="text-slate-400">Contagion Score</span>
-                    <div class="w-24 bg-slate-700 h-2 rounded-full overflow-hidden">
-                        <div class="bg-amber-500 h-full" style="width: ${Math.random()*100}%"></div>
-                    </div>
-                </div>
-                <div class="flex items-center justify-between text-xs">
-                    <span class="text-slate-400">Regulatory Impact</span>
-                    <span class="text-slate-300 font-mono">Medium</span>
-                </div>
-            `;
+            log(msg, type='info') {
+                const consoleEl = document.getElementById('console-log');
+                const line = document.createElement('div');
+                const timestamp = new Date().toLocaleTimeString('en-US', {hour12: false, hour: '2-digit', minute:'2-digit', second:'2-digit'});
+                
+                let colorClass = 'text-slate-300';
+                if(type === 'error') colorClass = 'text-red-400';
+                if(type === 'success') colorClass = 'text-green-400';
+                if(type === 'warn') colorClass = 'text-amber-400';
 
-            // Dependencies
-            const connectedIds = network.getConnectedNodes(node.id);
-            let depsHtml = '';
-            connectedIds.forEach(id => {
-                const n = nodes.get(id);
-                depsHtml += `
-                    <li class="flex items-center gap-2">
-                        <i class="fas fa-link text-slate-600 text-[10px]"></i>
-                        <span>${n.label}</span>
-                        <span class="text-[10px] text-slate-500 ml-auto uppercase">${n.group}</span>
-                    </li>
-                `;
-            });
-            document.getElementById('insp-deps').innerHTML = depsHtml;
-        }
+                line.className = `${colorClass}`;
+                line.innerHTML = `<span class="text-slate-600 mr-2">[${timestamp}]</span> ${msg}`;
+                consoleEl.appendChild(line);
+                consoleEl.scrollTop = consoleEl.scrollHeight;
+            }
 
-        function closeInspector() {
-            document.getElementById('inspector').classList.add('translate-x-full');
-            network.unselectAll();
-        }
+            /**
+             * Propagates a shock from a source node using BFS with decay.
+             */
+            triggerShock(startNodeId) {
+                this.log(`INITIATING STRESS EVENT AT NODE ID: ${startNodeId}`, 'error');
+                
+                // Save state if not saved
+                if(this.originalState.size === 0) {
+                    this.nodes.forEach(node => {
+                        this.originalState.set(node.id, { color: node.color, size: node.size });
+                    });
+                }
 
-        function runSimulation() {
-            // Visual shockwave
-            const nodeIds = nodes.getIds();
-            const updates = nodeIds.map(id => {
-                const isRisk = nodes.get(id).group === 'risk';
-                return {
-                    id: id,
-                    color: isRisk ? { background: '#ff0000' } : null,
-                    size: isRisk ? 30 : 20
+                const queue = [{ id: startNodeId, force: 1.0 }];
+                const visited = new Set();
+                const updates = [];
+
+                // Visual focus on start
+                this.network.focus(startNodeId, { animation: { duration: 1000, easingFunction: 'easeInOutQuad' }, scale: 1.2 });
+
+                // Simulation Loop
+                const processStep = () => {
+                    if (queue.length === 0) {
+                        this.log(`Simulation complete. ${visited.size} nodes impacted.`, 'success');
+                        document.getElementById('btn-reset').classList.remove('hidden');
+                        document.getElementById('btn-simulate').classList.add('hidden');
+                        return;
+                    }
+
+                    const currentBatch = [...queue]; // Process level by level for visual effect
+                    queue.length = 0; // Clear queue for next level
+
+                    currentBatch.forEach(item => {
+                        if (visited.has(item.id)) return;
+                        visited.add(item.id);
+
+                        // Determine visual impact based on Force (0.0 - 1.0)
+                        let newColor = null;
+                        let newSize = 25;
+
+                        if (item.force >= 0.8) {
+                            newColor = { background: '#ef4444', border: '#7f1d1d' }; // Critical (Red)
+                            newSize = 35;
+                        } else if (item.force >= 0.5) {
+                            newColor = { background: '#f97316', border: '#7c2d12' }; // High (Orange)
+                            newSize = 30;
+                        } else if (item.force >= 0.2) {
+                            newColor = { background: '#eab308', border: '#713f12' }; // Med (Yellow)
+                        }
+
+                        if (newColor) {
+                            updates.push({ id: item.id, color: newColor, size: newSize });
+                            // Only log significant hits
+                            if(item.force > 0.5) {
+                                const label = this.nodes.get(item.id).label;
+                                this.log(`>> Contagion reached ${label} (Impact: ${(item.force*100).toFixed(0)}%)`, 'warn');
+                            }
+                        }
+
+                        // Propagate to neighbors
+                        const neighbors = this.network.getConnectedNodes(item.id);
+                        neighbors.forEach(nId => {
+                            if (!visited.has(nId)) {
+                                // Decay factor: Risk travels, but loses 20% force per hop
+                                queue.push({ id: nId, force: item.force * 0.8 }); 
+                            }
+                        });
+                    });
+
+                    // Apply updates for this batch
+                    this.nodes.update(updates);
+                    
+                    // Recursive step for animation timing
+                    setTimeout(processStep, 500); 
                 };
-            });
-            nodes.update(updates);
 
-            setTimeout(() => {
-                // Revert
-                nodes.update(nodeIds.map(id => ({
-                    id: id,
-                    color: { background: nodes.get(id).group === 'risk' ? '#450a0a' : undefined },
-                    size: nodes.get(id).group === 'core' ? 40 : 20
-                })));
-                alert("Simulation Complete: Stress impact recorded in risk nodes.");
-            }, 1000);
+                processStep();
+            }
+
+            reset() {
+                this.log('Resetting simulation state...');
+                const resets = [];
+                this.originalState.forEach((val, key) => {
+                    resets.push({ id: key, color: val.color, size: val.size });
+                });
+                this.nodes.update(resets);
+                this.originalState.clear();
+                this.network.fit({ animation: true });
+                
+                document.getElementById('btn-reset').classList.add('hidden');
+                document.getElementById('btn-simulate').classList.remove('hidden');
+                this.log('System Normal.', 'success');
+            }
         }
-    </script>
 
-    <!-- Adam Global Nav -->
-    <script src="../showcase/js/nav.js" data-root=".."></script>
+        /**
+         * Main Application Logic
+         */
+        class DigitalTwinApp {
+            constructor() {
+                this.container = document.getElementById('twin-network');
+                this.nodes = new vis.DataSet(this.getInitialData().nodes);
+                this.edges = new vis.DataSet(this.getInitialData().edges);
+                this.network = null;
+                this.engine = null;
+            }
+
+            init() {
+                const data = { nodes: this.nodes, edges: this.edges };
+                const options = {
+                    nodes: {
+                        shape: 'dot',
+                        font: { face: 'JetBrains Mono', color: '#cbd5e1', size: 12, background: 'rgba(15,23,42,0.8)' },
+                        borderWidth: 2,
+                        shadow: true
+                    },
+                    edges: {
+                        width: 1,
+                        color: { color: '#475569', highlight: '#22d3ee' },
+                        smooth: { type: 'continuous' },
+                        selectionWidth: 2
+                    },
+                    groups: {
+                        core: { color: { background: '#0f172a', border: '#22d3ee' }, size: 40, font: {size: 14, color: '#fff'} },
+                        unit: { color: { background: '#1e293b', border: '#3b82f6' }, size: 25 },
+                        risk: { color: { background: '#450a0a', border: '#ef4444' }, shape: 'diamond', size: 20 },
+                        asset: { color: { background: '#064e3b', border: '#10b981' }, shape: 'square', size: 15 },
+                        sub: { color: { background: '#334155', border: '#94a3b8' }, size: 15 }
+                    },
+                    physics: {
+                        stabilization: false,
+                        barnesHut: { gravitationalConstant: -3000, springConstant: 0.04, springLength: 95 }
+                    },
+                    interaction: { hover: true, tooltipDelay: 200 }
+                };
+
+                this.network = new vis.Network(this.container, data, options);
+                this.engine = new ContagionEngine(this.nodes, this.edges, this.network);
+
+                // Event Listeners
+                this.setupEvents();
+            }
+
+            setupEvents() {
+                // Network Clicks
+                this.network.on("click", (params) => {
+                    if (params.nodes.length > 0) {
+                        const node = this.nodes.get(params.nodes[0]);
+                        this.openInspector(node);
+                    } else {
+                        this.closeInspector();
+                    }
+                });
+
+                // Simulation Buttons
+                document.getElementById('btn-simulate').addEventListener('click', () => {
+                    // Find a random risk node to trigger the shock
+                    const risks = this.nodes.get({ filter: n => n.group === 'risk' });
+                    const target = risks[Math.floor(Math.random() * risks.length)];
+                    this.engine.triggerShock(target.id);
+                });
+
+                document.getElementById('btn-reset').addEventListener('click', () => {
+                    this.engine.reset();
+                });
+
+                // Filters
+                const filterBtns = document.querySelectorAll('.filter-btn');
+                filterBtns.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.target.classList.toggle('active');
+                        e.target.classList.toggle('opacity-50');
+                        
+                        // Rebuild visibility
+                        const activeGroups = Array.from(document.querySelectorAll('.filter-btn.active')).map(b => b.dataset.group);
+                        activeGroups.push('core', 'unit'); // Always show core and business units
+
+                        const allNodes = this.nodes.get();
+                        const updates = allNodes.map(n => ({
+                            id: n.id,
+                            hidden: !activeGroups.includes(n.group)
+                        }));
+                        this.nodes.update(updates);
+                    });
+                });
+            }
+
+            openInspector(node) {
+                const insp = document.getElementById('inspector');
+                insp.classList.remove('translate-x-full');
+                document.getElementById('insp-title').innerText = node.label;
+
+                // Dynamic HTML Construction
+                let html = '';
+
+                // 1. Core Metrics
+                html += `<div class="mb-6"><h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 border-b border-slate-700 pb-1">Entity Metrics</h4>`;
+                html += `<div class="grid grid-cols-2 gap-3">`;
+                
+                if(node.group === 'core' || node.group === 'unit') {
+                    html += this.metricCard('Revenue (TTM)', `$${(Math.random()*50).toFixed(1)}B`);
+                    html += this.metricCard('RWA', `$${(Math.random()*200).toFixed(0)}B`);
+                    html += this.metricCard('Headcount', `${(Math.random()*50).toFixed(1)}k`);
+                    html += this.metricCard('Op. Risk', 'Low', 'text-green-400');
+                } else if (node.group === 'risk') {
+                    html += this.metricCard('VaR (99%)', `$${(Math.random()*500).toFixed(0)}M`, 'text-red-400');
+                    html += this.metricCard('Volatility', 'High', 'text-amber-400');
+                } else {
+                    html += this.metricCard('Fair Value', `$${(Math.random()*10).toFixed(1)}B`);
+                    html += this.metricCard('Duration', `${(Math.random()*5).toFixed(1)} Yrs`);
+                }
+                html += `</div></div>`;
+
+                // 2. Connections
+                const connected = this.network.getConnectedNodes(node.id);
+                html += `<div><h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 border-b border-slate-700 pb-1">Dependencies (${connected.length})</h4>`;
+                html += `<ul class="space-y-2 text-xs mono text-slate-300">`;
+                
+                connected.forEach(id => {
+                    const n = this.nodes.get(id);
+                    html += `<li class="flex items-center justify-between bg-slate-800/50 p-1.5 rounded border border-slate-700/50">
+                        <div class="flex items-center gap-2"><i class="fas fa-link text-slate-600 text-[10px]"></i> ${n.label}</div>
+                        <span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-700 text-slate-400 uppercase">${n.group}</span>
+                    </li>`;
+                });
+                html += `</ul></div>`;
+
+                document.getElementById('insp-content').innerHTML = html;
+            }
+
+            metricCard(label, value, colorClass = 'text-white') {
+                return `
+                <div class="bg-slate-800/50 border border-slate-700 p-2 rounded">
+                    <div class="text-[9px] text-slate-500 uppercase mb-1">${label}</div>
+                    <div class="text-sm font-bold ${colorClass} mono">${value}</div>
+                </div>`;
+            }
+
+            closeInspector() {
+                document.getElementById('inspector').classList.add('translate-x-full');
+                this.network.unselectAll();
+            }
+
+            getInitialData() {
+                return {
+                    nodes: [
+                        { id: 1, label: 'JPMORGAN CHASE', group: 'core' },
+                        // Business Units
+                        { id: 2, label: 'Consumer & Comm.', group: 'unit' },
+                        { id: 3, label: 'Corp & Inv Bank', group: 'unit' },
+                        { id: 4, label: 'Asset & Wealth', group: 'unit' },
+                        // Subsidiaries
+                        { id: 30, label: 'Chase Bank NA', group: 'sub' },
+                        { id: 31, label: 'JPM Securities', group: 'sub' },
+                        { id: 32, label: 'JPM Europe Ltd', group: 'sub' },
+                        // Risks
+                        { id: 10, label: 'CRE Exposure', group: 'risk' },
+                        { id: 11, label: 'Rates Volatility', group: 'risk' },
+                        { id: 12, label: 'Cyber Threat', group: 'risk' },
+                        { id: 13, label: 'Geo-Pol Event', group: 'risk' },
+                        // Assets
+                        { id: 20, label: 'Office Loans', group: 'asset' },
+                        { id: 21, label: 'UST Portfolio', group: 'asset' },
+                        { id: 22, label: 'Energy Derivs', group: 'asset' },
+                        { id: 23, label: 'Tech Equities', group: 'asset' }
+                    ],
+                    edges: [
+                        { from: 1, to: 2 }, { from: 1, to: 3 }, { from: 1, to: 4 },
+                        { from: 1, to: 30 }, { from: 1, to: 31 }, { from: 3, to: 32 },
+                        { from: 2, to: 10 }, { from: 4, to: 10 }, // CRE hits Consumer & Asset Mgmt
+                        { from: 3, to: 11 }, { from: 4, to: 11 }, // Rates hit CIB & Asset Mgmt
+                        { from: 1, to: 12 }, { from: 32, to: 13 }, // GeoPol hits Europe
+                        { from: 10, to: 20 }, { from: 11, to: 21 },
+                        { from: 3, to: 22 }, { from: 4, to: 23 }
+                    ]
+                };
+            }
+        }
+
+        // Initialize App
+        const app = new DigitalTwinApp();
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
 </body>
 </html>

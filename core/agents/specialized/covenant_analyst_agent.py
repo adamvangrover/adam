@@ -5,6 +5,7 @@ from core.schemas.v23_5_schema import CovenantRiskAnalysis
 
 logger = logging.getLogger(__name__)
 
+
 class CovenantAnalystAgent(AgentBase):
     """
     Phase 3 Helper: Covenant Analysis.
@@ -14,6 +15,7 @@ class CovenantAnalystAgent(AgentBase):
     It checks for Financial Maintenance Covenants (Total Net Leverage, Interest Coverage)
     and estimates the risk of a "Foot Fault" or technical default.
     """
+
     def __init__(self, config: Dict[str, Any]):
         super().__init__(config)
         self.persona = "Credit Lawyer"
@@ -55,5 +57,5 @@ class CovenantAnalystAgent(AgentBase):
             current_level=current_leverage,
             breach_threshold=covenant_threshold,
             risk_assessment=risk,
-            detailed_narrative=assessment # Assuming schema supports this or will ignore
+            detailed_narrative=assessment  # Assuming schema supports this or will ignore
         )

@@ -1,4 +1,4 @@
-#core/agents/anomaly_detection_agent.py
+# core/agents/anomaly_detection_agent.py
 
 import numpy as np
 import pandas as pd
@@ -18,6 +18,7 @@ from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
 # ... (import other necessary libraries for data retrieval, knowledge base interaction, XAI, etc.)
 
 logger = logging.getLogger(__name__)
+
 
 class AnomalyDetectionAgent:
     """
@@ -108,7 +109,7 @@ class AnomalyDetectionAgent:
                 revenues = []
                 net_incomes = []
 
-                current_rev = estimated_revenue * 0.6 # Start lower to simulate growth
+                current_rev = estimated_revenue * 0.6  # Start lower to simulate growth
                 current_ni = estimated_net_income * 0.6
 
                 for _ in range(10):
@@ -117,7 +118,7 @@ class AnomalyDetectionAgent:
                     noise = random.uniform(0.95, 1.05)
 
                     current_rev = current_rev * (1 + growth) * noise
-                    current_ni = current_rev * 0.15 * random.uniform(0.9, 1.1) # Fluctuate margin
+                    current_ni = current_rev * 0.15 * random.uniform(0.9, 1.1)  # Fluctuate margin
 
                     revenues.append(current_rev)
                     net_incomes.append(current_ni)
@@ -252,13 +253,13 @@ class AnomalyDetectionAgent:
         if len(data) < 2 * period:
             # Not enough data to perform seasonal decomposition
             return []
-        
+
         try:
             # Time series decomposition
             decomposition = seasonal_decompose(data, model='additive', period=period)
             residual = decomposition.resid.dropna()
 
-            if len(residual) < 10: # Not enough residuals to fit a model
+            if len(residual) < 10:  # Not enough residuals to fit a model
                 return []
 
             # Fit ARIMA model on the residuals
@@ -268,10 +269,10 @@ class AnomalyDetectionAgent:
 
             # Get model residuals
             model_residuals = model_fit.resid
-            
+
             # Define a threshold for outlier detection (3 standard deviations)
             threshold = 3 * np.std(model_residuals)
-            
+
             # Identify outliers
             outlier_indices = np.where(np.abs(model_residuals) > threshold)[0]
 
@@ -311,13 +312,14 @@ class AnomalyDetectionAgent:
             ratios['current_ratio'] = company_data['current_assets'] / company_data['current_liabilities']
 
         if 'current_assets' in company_data.columns and 'inventory' in company_data.columns and 'current_liabilities' in company_data.columns:
-            ratios['quick_ratio'] = (company_data['current_assets'] - company_data['inventory']) / company_data['current_liabilities']
+            ratios['quick_ratio'] = (company_data['current_assets'] - company_data['inventory']
+                                     ) / company_data['current_liabilities']
 
         # 3. Solvency/Leverage Ratios
         if 'total_debt' in company_data.columns and 'shareholders_equity' in company_data.columns:
             ratios['debt_to_equity'] = company_data['total_debt'] / company_data['shareholders_equity']
         elif 'total_liabilities' in company_data.columns and 'shareholders_equity' in company_data.columns:
-             ratios['debt_to_equity'] = company_data['total_liabilities'] / company_data['shareholders_equity']
+            ratios['debt_to_equity'] = company_data['total_liabilities'] / company_data['shareholders_equity']
 
         if 'total_debt' in company_data.columns and 'total_assets' in company_data.columns:
             ratios['debt_to_assets'] = company_data['total_debt'] / company_data['total_assets']
@@ -424,7 +426,6 @@ class AnomalyDetectionAgent:
             }
             anomalies.append(anomaly)
 
-
         return anomalies
 
     def detect_company_anomalies(self) -> List[Dict]:
@@ -453,7 +454,7 @@ class AnomalyDetectionAgent:
 
         # Analyze each ratio for outliers
         for col in ratios.columns:
-            if ratios[col].notna().any(): # Check if ratio has valid data
+            if ratios[col].notna().any():  # Check if ratio has valid data
                 # Use a slightly looser threshold for ratios as they can fluctuate
                 outlier_indices = self._detect_outliers_zscore(ratios[col].dropna(), threshold=2.5)
 
@@ -483,6 +484,7 @@ class AnomalyDetectionAgent:
         # TODO: Integrate with other agents and the knowledge base
         # TODO: Implement continuous learning and adaptation
         # ...
+
 
 # Example usage
 if __name__ == "__main__":

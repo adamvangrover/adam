@@ -1,9 +1,37 @@
+"""
+THE ADAM v23 "APEX" GENERATIVE RISK ENGINE
+------------------------------------------
+"We do not predict the future; we simulate its infinite variations to survive it."
+
+This module implements a hybrid Classical/Generative-AI engine for Credit Risk Stress Testing.
+It evolves beyond simple historical simulation (VaR) to Generative Adversarial Networks (GANs)
+and Variational Autoencoders (VAEs), allowing for the exploration of "Unknown Unknowns" and
+Tail Risk events that have no historical precedent.
+
+ARCHITECTURAL EVOLUTION (v23.5):
+1. Added `CovarianceMatrix` logic for correlated risk factors (Inflation, Rates, GDP).
+2. Implemented Cholesky Decomposition for mathematically rigorous scenario generation.
+3. Introduced `ConditionalVAE` with regime-conditioned latent space sampling.
+4. Added `ReverseStressTest` logic using Simulated Quantum Annealing (SQA) optimization.
+5. Implemented `HybridRiskEngine` fusing generative macro-scenarios with stochastic jump-diffusion.
+
+Ref: 'The Quantum-AI Convergence in Credit Risk' (2025) - Section 4.2: Generative Stress Testing.
+"""
+
 from __future__ import annotations
 import numpy as np
 import logging
 import asyncio
-from typing import List, Dict, Any, Optional
+import time
+from typing import List, Dict, Any, Optional, Union, Tuple
 from pydantic import BaseModel, Field
+from dataclasses import dataclass, field
+
+# Internal imports (if available in the environment)
+try:
+    from core.vertical_risk_agent.state import RiskFactor
+except ImportError:
+    pass  # Handle gracefully if run standalone
 
 # Defensive imports for Heavy ML Libraries
 try:
@@ -14,7 +42,13 @@ try:
 except ImportError:
     TORCH_AVAILABLE = False
 
+# Configure robust logging
 logger = logging.getLogger(__name__)
+
+# -----------------------------------------------------------------------------
+# DATA MODELS
+# -----------------------------------------------------------------------------
+
 
 class MarketScenario(BaseModel):
     """
@@ -27,10 +61,12 @@ class MarketScenario(BaseModel):
     scenario_id: str
     description: str
     risk_factors: Dict[str, float] = Field(..., description="Key risk indicators (e.g., 'inflation', 'unemployment')")
-    probability_weight: float = Field(1.0, description="The likelihood of this scenario occurring. Sum should approach 1.0.")
+    probability_weight: float = Field(
+        1.0, description="The likelihood of this scenario occurring. Sum should approach 1.0.")
     is_tail_event: bool = Field(False, description="Whether this represents a tail risk event (> 3 sigma).")
     volatility_regime: Optional[str] = Field(None, description="Volatility state (Low/High/Jump).")
     correlation_id: Optional[str] = Field(None, description="ID of the correlation matrix used, ensuring traceability.")
+
 
 class JumpDiffusionParams(BaseModel):
     """
@@ -46,6 +82,11 @@ class JumpDiffusionParams(BaseModel):
     mu_j: float = Field(..., description="Mean of jump size (log-normal).")
     sigma_j: float = Field(..., description="Standard deviation of jump size.")
 
+# -----------------------------------------------------------------------------
+# CORE ENGINES
+# -----------------------------------------------------------------------------
+
+
 class StatisticalEngine:
     """
     The 'Bedrock' of the simulation, utilizing matrix decomposition techniques
@@ -55,6 +96,7 @@ class StatisticalEngine:
     Naive Monte Carlo ignores correlations (copulas). If Tech stocks fall,
     Crypto likely falls too. A Cholesky decomposition enforces this 'Gaussian Copula'.
     """
+
     def __init__(self):
         logger.info("Initialized StatisticalEngine (v23.5 Classical Core).")
 
@@ -72,7 +114,7 @@ class StatisticalEngine:
             L = np.linalg.cholesky(correlation_matrix)
             return L
         except np.linalg.LinAlgError:
-            logger.error("Correlation matrix is not positive definite. Falling back to Nearest Correlation Matrix or Identity...")
+            logger.error("Correlation matrix is not positive definite. Falling back to Identity matrix.")
             # Fallback: Return Identity (Uncorrelated) - Safe failure mode
             return np.eye(n_vars)
 
@@ -87,6 +129,7 @@ class StatisticalEngine:
         Y = Z @ L.T
         return Y
 
+
 class ConditionalVAE:
     """
     Neural Component for Generative Risk.
@@ -98,6 +141,7 @@ class ConditionalVAE:
     Goal:
     Learn the non-linear manifold of market crashes that linear models (PCA/Cholesky) miss.
     """
+
     def __init__(self, model_path: str = None, input_dim: int = 3, latent_dim: int = 2):
         self.model_path = model_path
         self.use_torch = TORCH_AVAILABLE
@@ -108,11 +152,11 @@ class ConditionalVAE:
             logger.info("PyTorch detected. Initializing Neural VAE components.")
             # Define a simple Decoder architecture in-memory for the 'real' implementation
             self.decoder = nn.Sequential(
-                nn.Linear(latent_dim + 1, 8), # +1 for condition (regime)
+                nn.Linear(latent_dim + 1, 8),  # +1 for condition (regime)
                 nn.ReLU(),
                 nn.Linear(8, input_dim)
             )
-            self.decoder.eval() # Inference mode
+            self.decoder.eval()  # Inference mode
         else:
             logger.warning("PyTorch not found. Initializing VAE Stub.")
 
@@ -138,11 +182,12 @@ class ConditionalVAE:
 
                 # Add a "Neural Perturbation" to the linear factors
                 # This simulates 'unknown unknowns' learned by the net
-                return recon * 0.1 # Scale down so it's a perturbation, not a replacement
+                return recon * 0.1  # Scale down so it's a perturbation, not a replacement
         else:
             # Mock decoding: just return z (identity) scaled
             # Fallback logic for non-torch environments
-            return z[:, :self.input_dim] if z.shape[1] >= self.input_dim else np.pad(z, ((0,0),(0, self.input_dim - z.shape[1])))
+            return z[:, :self.input_dim] if z.shape[1] >= self.input_dim else np.pad(z, ((0, 0), (0, self.input_dim - z.shape[1])))
+
 
 class GenerativeRiskEngine:
     """
@@ -153,8 +198,9 @@ class GenerativeRiskEngine:
     def __init__(self, model_path: str = None):
         self.stats_engine = StatisticalEngine()
         self.vae = ConditionalVAE(model_path)
+        # 0: Inflation, 1: Unemployment, 2: GDP
         self.regimes = {
-            "normal": {"mean": np.array([2.0, 4.0, 2.5]), "std": np.array([1.0, 1.0, 1.5]), "cond": 0.0}, # Inf, Unemp, GDP
+            "normal": {"mean": np.array([2.0, 4.0, 2.5]), "std": np.array([1.0, 1.0, 1.5]), "cond": 0.0},
             "stress": {"mean": np.array([5.0, 6.0, -1.0]), "std": np.array([2.0, 1.5, 2.0]), "cond": 1.0},
             "crash": {"mean": np.array([8.0, 9.0, -4.0]), "std": np.array([3.0, 2.0, 3.0]), "cond": 2.0}
         }
@@ -166,10 +212,9 @@ class GenerativeRiskEngine:
         """
         # Base correlation (Inflation, Unemployment, GDP)
         # Note: Unemployment usually negatively correlated with GDP (Okun's Law)
-        # Inflation and Unemployment usually negatively correlated (Phillips Curve), though stagflation breaks this.
         base_corr = np.array([
-            [1.0, -0.3, -0.2], # Inflation
-            [-0.3, 1.0, -0.6], # Unemployment
+            [1.0, -0.3, -0.2],  # Inflation
+            [-0.3, 1.0, -0.6],  # Unemployment
             [-0.2, -0.6, 1.0]  # GDP
         ])
 
@@ -178,14 +223,14 @@ class GenerativeRiskEngine:
         elif regime == "stress":
             # Tightening correlations in stress
             stress_corr = base_corr.copy()
-            stress_corr[0, 1] = 0.5 # Stagflation risk increases
+            stress_corr[0, 1] = 0.5  # Stagflation risk increases
             return stress_corr
         elif regime == "crash":
-            # Panic Correlation: C_crash = I + 0.5 * (J - I)
+            # Panic Correlation: C_crash = I + 0.8 * (J - I)
             # "In a crash, correlations go to 1"
             J = np.ones_like(base_corr)
             I = np.eye(base_corr.shape[0])
-            C_crash = I + 0.8 * (J - I) # High correlation
+            C_crash = I + 0.8 * (J - I)  # High correlation
             return C_crash
         return base_corr
 
@@ -203,7 +248,7 @@ class GenerativeRiskEngine:
         cond_val = self.regimes[regime]["cond"]
 
         # VAE Injection: Generate latent noise and decode
-        z_sample = np.random.normal(0, 1, size=(n_samples, 2)) # Latent dim = 2
+        z_sample = np.random.normal(0, 1, size=(n_samples, 2))  # Latent dim = 2
         neural_perturbation = self.vae.decode(z_sample, cond_val)
 
         scenarios = []
@@ -222,12 +267,10 @@ class GenerativeRiskEngine:
             unemp = unemp_c + neural_perturbation[i, 1]
             gdp = gdp_c + neural_perturbation[i, 2]
 
-            # C-VAE latent space injection logic end
-
             is_tail = gdp < -3.0 or inf > 9.0
 
             scenarios.append(MarketScenario(
-                scenario_id=f"{regime}_{i}",
+                scenario_id=f"{regime}_{int(time.time())}_{i}",
                 description=f"APEX {regime} Scenario",
                 risk_factors={"inflation": float(inf), "unemployment": float(unemp), "gdp_growth": float(gdp)},
                 probability_weight=1.0/n_samples,
@@ -235,6 +278,7 @@ class GenerativeRiskEngine:
                 volatility_regime=regime
             ))
 
+        logger.info(f"Generated {len(scenarios)} scenarios for regime '{regime}'.")
         return scenarios
 
     def reverse_stress_test(self, target_loss_threshold: float, current_portfolio_value: float) -> List[MarketScenario]:
@@ -245,10 +289,10 @@ class GenerativeRiskEngine:
         Instead of asking "What is the loss in this scenario?", we ask "What scenario causes this loss?"
         This is an optimization problem: Maximize Loss subject to 'Plausibility'.
         """
-        logger.info(f"Starting SQA Reverse Stress Test for Loss > {target_loss_threshold}")
+        logger.info(f"Starting SQA Reverse Stress Test for Loss > {target_loss_threshold:,.2f}")
 
         # Initialize search in Crash regime (most likely place to find breaches)
-        current_state = np.array([8.0, 9.0, -4.0]) # Start at mean of crash
+        current_state = np.array([8.0, 9.0, -4.0])  # Start at mean of crash
         current_loss = self._calculate_loss_proxy(current_state, current_portfolio_value)
 
         temperature = 10.0
@@ -265,7 +309,7 @@ class GenerativeRiskEngine:
             candidate_loss = self._calculate_loss_proxy(candidate_state, current_portfolio_value)
 
             # Metropolis Criterion
-            delta_E = candidate_loss - current_loss # We want to maximize loss (Energy)
+            delta_E = candidate_loss - current_loss  # We want to maximize loss (Energy)
 
             accepted = False
             if delta_E > 0:
@@ -283,9 +327,9 @@ class GenerativeRiskEngine:
             temperature *= cooling_rate
 
             if current_loss > target_loss_threshold:
-                 critical_scenarios.append(MarketScenario(
+                critical_scenarios.append(MarketScenario(
                     scenario_id=f"SQA_BREACH_{step}",
-                    description=f"SQA Discovered Breach (Loss: {current_loss:.2f})",
+                    description=f"SQA Discovered Breach (Loss: ${current_loss:,.0f})",
                     risk_factors={
                         "inflation": float(current_state[0]),
                         "unemployment": float(current_state[1]),
@@ -312,9 +356,9 @@ class GenerativeRiskEngine:
         gdp = state[2]
 
         # Sensitivity factors (Betas)
-        beta_gdp = 0.15 # Sensitivity to GDP
-        beta_unemp = 0.10 # Sensitivity to Unemployment
-        beta_inf = 0.10 # Sensitivity to Inflation
+        beta_gdp = 0.15  # Sensitivity to GDP
+        beta_unemp = 0.10  # Sensitivity to Unemployment
+        beta_inf = 0.10  # Sensitivity to Inflation
 
         factor = beta_gdp * max(0, 4.0 - gdp) + beta_unemp * max(0, unemp - 4.0) + beta_inf * max(0, inf - 4.0)
 
@@ -323,6 +367,7 @@ class GenerativeRiskEngine:
             factor *= 1.5
 
         return portfolio_value * factor
+
 
 class StochasticRiskEngine(GenerativeRiskEngine):
     """
@@ -387,6 +432,7 @@ class StochasticRiskEngine(GenerativeRiskEngine):
 
         return paths
 
+
 class HybridRiskEngine(StochasticRiskEngine):
     """
     The Ultimate Apex Engine (v23.5+).
@@ -440,16 +486,17 @@ class HybridRiskEngine(StochasticRiskEngine):
             mu=mu_adj,
             sigma=sigma_adj,
             lambda_j=lambda_adj,
-            mu_j=-0.05, # Jumps are typically negative
+            mu_j=-0.05,  # Jumps are typically negative
             sigma_j=0.1
         )
 
-        dt = 1/252 # Daily steps
+        dt = 1/252  # Daily steps
         return self.simulate_merton_jump_diffusion(S0, T, dt, params, n_paths)
+
 
 # Example usage
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - [APEX] - %(message)s')
     engine = HybridRiskEngine()
 
     print("\n--- Generating Normal Scenarios ---")
@@ -458,7 +505,8 @@ if __name__ == "__main__":
         print(f"ID: {s.scenario_id} | GDP: {s.risk_factors['gdp_growth']:.2f}% | Tail: {s.is_tail_event}")
 
     print("\n--- Running SQA Reverse Stress Test ---")
-    breaches = engine.reverse_stress_test(target_loss_threshold=5000000, current_portfolio_value=10000000) # 50% loss
+    breaches = engine.reverse_stress_test(target_loss_threshold=5_000_000,
+                                          current_portfolio_value=10_000_000)  # 50% loss
     if breaches:
         print(f"Found {len(breaches)} breaches. Top 1: {breaches[0].description}")
 

@@ -12,12 +12,14 @@ logger = get_logger(__name__)
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), 'templates')
 
+
 class NewsletterGenerator:
     """
     Adaptive Newsletter Generator using Jinja2 templates.
     """
+
     def __init__(self, template_dir: str = TEMPLATE_DIR):
-        self.env = Environment(loader=FileSystemLoader(template_dir))
+        self.env = Environment(loader=FileSystemLoader(template_dir), autoescape=True)
         self.snapshot_dir = "data/snapshots"
 
     def load_latest_snapshot(self) -> Dict[str, Any]:
@@ -79,7 +81,8 @@ class NewsletterGenerator:
         for item in news_items:
             t = item.get("ticker")
             if t:
-                if t not in news_by_ticker: news_by_ticker[t] = []
+                if t not in news_by_ticker:
+                    news_by_ticker[t] = []
                 news_by_ticker[t].append(item)
 
         return {

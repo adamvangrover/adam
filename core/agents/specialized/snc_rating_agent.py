@@ -6,6 +6,7 @@ from core.schemas.v23_5_schema import SNCRatingModel, PrimaryFacilityAssessment
 # Configure logging
 logger = logging.getLogger(__name__)
 
+
 class SNCRatingAgent(AgentBase):
     """
     Specialized Agent for performing Shared National Credit (SNC) simulations.
@@ -46,10 +47,11 @@ class SNCRatingAgent(AgentBase):
         # 1. Extract Key Metrics
         ebitda = float(financials.get('ebitda', 0.0))
         total_debt = float(financials.get('total_debt', 0.0))
-        interest_expense = float(financials.get('interest_expense', 1.0)) # Avoid div/0
+        interest_expense = float(financials.get('interest_expense', 1.0))  # Avoid div/0
 
         # Validation checks
-        if interest_expense <= 0: interest_expense = 1.0
+        if interest_expense <= 0:
+            interest_expense = 1.0
 
         # 2. Calculate Borrower-Level Risk Ratios
         # Leverage: Total Debt / EBITDA
@@ -82,18 +84,21 @@ class SNCRatingAgent(AgentBase):
         sorted_cap_structure = sorted(capital_structure, key=lambda x: x.get('priority', 99))
 
         # Select Primary Facility (Largest or Senior)
-        primary_facility = sorted_cap_structure[0] if sorted_cap_structure else {'name': 'General Facility', 'amount': total_debt}
+        primary_facility = sorted_cap_structure[0] if sorted_cap_structure else {
+            'name': 'General Facility', 'amount': total_debt}
 
         facility_name = primary_facility.get('name', 'Unknown Facility')
-        cumulative_debt = float(primary_facility.get('amount', 0.0)) # Simplified for primary only logic
+        cumulative_debt = float(primary_facility.get('amount', 0.0))  # Simplified for primary only logic
 
         # Calculate Collateral Coverage (EV / Cumulative Debt through this tranche)
         collateral_coverage_ratio = enterprise_value / cumulative_debt if cumulative_debt > 0 else 0.0
 
         # Determine Collateral Bucket
         collateral_bucket = "Weak"
-        if collateral_coverage_ratio > 1.5: collateral_bucket = "Strong"
-        elif collateral_coverage_ratio > 1.0: collateral_bucket = "Adequate"
+        if collateral_coverage_ratio > 1.5:
+            collateral_bucket = "Strong"
+        elif collateral_coverage_ratio > 1.0:
+            collateral_bucket = "Adequate"
 
         # 5. Construct Final Output
         result = SNCRatingModel(
@@ -121,11 +126,11 @@ class SNCRatingAgent(AgentBase):
         # However, for stressed credits, the covenant might be fixed.
 
         if rating == "Pass":
-            implied_covenant = current_leverage * 1.35 # Healthy cushion
+            implied_covenant = current_leverage * 1.35  # Healthy cushion
         elif rating == "Special Mention":
-            implied_covenant = current_leverage * 1.15 # Tightening
+            implied_covenant = current_leverage * 1.15  # Tightening
         else:
-            implied_covenant = current_leverage * 0.95 # Likely in breach or wavering
+            implied_covenant = current_leverage * 0.95  # Likely in breach or wavering
 
         headroom_pct = (implied_covenant - current_leverage) / implied_covenant if implied_covenant > 0 else 0.0
 

@@ -15,7 +15,8 @@ from core.agents.lexica_agent import LexicaAgent
 from core.agents.archive_manager_agent import ArchiveManagerAgent
 from core.agents.echo_agent import EchoAgent
 
-#... (other imports)
+# ... (other imports)
+
 
 class TestMarketSentimentAgent(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
@@ -63,6 +64,7 @@ class TestMarketSentimentAgent(unittest.IsolatedAsyncioTestCase):
         # -1.0 * 0.4 = -0.4
         self.assertAlmostEqual(sentiment, -0.4)
 
+
 class TestMacroeconomicAnalysisAgent(unittest.TestCase):
     def setUp(self):
         """Setup method to create an instance of MacroeconomicAnalysisAgent."""
@@ -76,8 +78,8 @@ class TestMacroeconomicAnalysisAgent(unittest.TestCase):
     def test_analyze_macroeconomic_data(self, mock_send_message):
         """Test analyzing macroeconomic data."""
         # Mock the data source's responses
-        self.agent.data_sources['government_stats_api'].get_gdp.return_value = None # Completed assignment
-        self.agent.data_sources['government_stats_api'].get_inflation.return_value = None # Completed assignment
+        self.agent.data_sources['government_stats_api'].get_gdp.return_value = None  # Completed assignment
+        self.agent.data_sources['government_stats_api'].get_inflation.return_value = None  # Completed assignment
 
         insights = self.agent.analyze_macroeconomic_data()
         self.assertIsInstance(insights, dict)  # Check if insights is a dictionary
@@ -107,7 +109,7 @@ class TestGeopoliticalRiskAgent(unittest.TestCase):
     @patch('core.agents.geopolitical_risk_agent.send_message')
     def test_assess_geopolitical_risks(self, mock_send_message):
         """Test assessing geopolitical risks."""
-        #... (mock data sources and their responses)
+        # ... (mock data sources and their responses)
 
         risk_assessments = self.agent.assess_geopolitical_risks()
         self.assertIsInstance(risk_assessments, dict)
@@ -117,7 +119,8 @@ class TestGeopoliticalRiskAgent(unittest.TestCase):
             {'agent': 'geopolitical_risk_agent', 'risk_assessments': risk_assessments}
         )
 
-#... (add test classes for other agents with similar structure)
+# ... (add test classes for other agents with similar structure)
+
 
 if __name__ == '__main__':
     unittest.main()

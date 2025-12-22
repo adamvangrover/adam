@@ -3,6 +3,7 @@
 import unittest
 from core.system.knowledge_base import KnowledgeBase
 
+
 class TestKnowledgeBase(unittest.TestCase):
 
     def setUp(self):
@@ -27,6 +28,7 @@ class TestKnowledgeBase(unittest.TestCase):
         self.kb.update("TeSt_KeY", "test_value")
         result = self.kb.query("test_key")
         self.assertEqual(result, "test_value")
+
 
 if __name__ == '__main__':
     unittest.main()

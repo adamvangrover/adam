@@ -1,3 +1,5 @@
+from core.engine.cyclical_reasoning_graph import cyclical_reasoning_app
+from core.engine.states import init_risk_state
 import sys
 import os
 import unittest
@@ -6,8 +8,6 @@ from unittest.mock import MagicMock
 # Add root to path
 sys.path.append(os.getcwd())
 
-from core.engine.states import init_risk_state
-from core.engine.cyclical_reasoning_graph import cyclical_reasoning_app
 
 class TestApexGraph(unittest.TestCase):
     def test_graph_execution(self):
@@ -26,6 +26,7 @@ class TestApexGraph(unittest.TestCase):
 
         self.assertTrue(len(final_state["critique_notes"]) > 0)
         self.assertIn("Score:", final_state["human_readable_status"])
+
 
 if __name__ == "__main__":
     unittest.main()

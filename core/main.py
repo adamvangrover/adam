@@ -5,9 +5,9 @@ import logging
 import argparse
 from core.utils.config_utils import load_app_config
 from core.utils.logging_utils import setup_logging
-from core.engine.meta_orchestrator import MetaOrchestrator
-from core.system.agent_orchestrator import AgentOrchestrator
+from core.system.bootstrap import Bootstrap
 from core.settings import settings
+
 
 async def async_main():
     """
@@ -20,6 +20,11 @@ async def async_main():
     args = parser.parse_args()
 
     try:
+        # Bootstrap Environment
+        if not Bootstrap.run():
+            print("System Bootstrap Failed. See logs for details.")
+            return
+
         # Load configuration (Legacy YAML)
         try:
             config = load_app_config()
@@ -36,12 +41,16 @@ async def async_main():
         logger = logging.getLogger("core.main")
         logger.info(f"Initializing {settings.app_name}...")
 
+        # Deferred Imports to allow Bootstrap to run first
+        from core.engine.meta_orchestrator import MetaOrchestrator
+        from core.system.agent_orchestrator import AgentOrchestrator
+
         # Initialize Legacy Orchestrator (v21/v22)
         try:
             legacy_orchestrator = AgentOrchestrator()
         except Exception as e:
             logger.error(f"Failed to initialize AgentOrchestrator: {e}")
-            legacy_orchestrator = None # Fallback
+            legacy_orchestrator = None  # Fallback
 
         # Initialize Meta Orchestrator (v23 Brain)
         meta_orchestrator = MetaOrchestrator(legacy_orchestrator=legacy_orchestrator)
@@ -103,9 +112,11 @@ async def async_main():
     except Exception as e:
         print(f"Fatal Error: {e}")
 
+
 def main():
     """Synchronous entry point for console_scripts."""
     asyncio.run(async_main())
+
 
 if __name__ == "__main__":
     main()

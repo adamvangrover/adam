@@ -184,7 +184,7 @@ class AgentForge(AgentBase):
                     "inputs": {json.dumps(skill.get('inputs', []))},
                     "outputs": {json.dumps(skill.get('outputs', []))}
                 }}"""
-                                            for skill in agent_skills])
+            for skill in agent_skills])
 
         return f"""
         def get_skill_schema(self) -> Dict[str, Any]:

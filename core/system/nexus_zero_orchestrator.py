@@ -9,12 +9,14 @@ from core.v23_graph_engine.odyssey_knowledge_graph import OdysseyKnowledgeGraph
 
 logger = logging.getLogger(__name__)
 
+
 class NexusZeroOrchestrator:
     """
     Nexus-Zero Protocol Implementation.
     Orchestrates the "Deconstruct -> Query -> Simulate -> Synthesis" flow.
     Automates context loading and execution sequence.
     """
+
     def __init__(self):
         self.graph = OdysseyKnowledgeGraph()
 

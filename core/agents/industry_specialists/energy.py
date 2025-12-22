@@ -3,6 +3,7 @@
 import pandas as pd
 from textblob import TextBlob
 
+
 class EnergySpecialist:
     def __init__(self, config):
         self.data_sources = config.get('data_sources', {})
@@ -26,14 +27,14 @@ class EnergySpecialist:
         # Analyze sentiment and trends
         sentiment_scores = [TextBlob(headline['text']).sentiment.polarity for headline in news_headlines]
         avg_sentiment = sum(sentiment_scores) / len(sentiment_scores) if sentiment_scores else 0
-        #... (analyze social media sentiment and trends)
+        # ... (analyze social media sentiment and trends)
 
         trends = {
             'renewable_energy_growth': self.analyze_renewable_energy_growth(news_headlines, social_media_posts),
             'oil_price_volatility': self.analyze_oil_price_volatility(news_headlines, social_media_posts),
             'energy_transition_challenges': self.analyze_energy_transition_challenges(news_headlines, social_media_posts),
             'overall_sentiment': avg_sentiment,
-            #... (add more trends and insights)
+            # ... (add more trends and insights)
         }
         return trends
 
@@ -57,28 +58,28 @@ class EnergySpecialist:
         production_efficiency = 1 / production_cost  # Example calculation
 
         # 3. Analyze carbon footprint
-        #... (analyze company's carbon emissions and sustainability initiatives)
+        # ... (analyze company's carbon emissions and sustainability initiatives)
 
         analysis_results = {
             'financial_health': financial_health,
             'production_efficiency': production_efficiency,
             'carbon_footprint': 'improving',  # Placeholder
-            #... (add more analysis results)
+            # ... (add more analysis results)
         }
         return analysis_results
 
     def analyze_renewable_energy_growth(self, news_headlines, social_media_posts):
-        #... (analyze news and social media data to assess renewable energy growth trends)
+        # ... (analyze news and social media data to assess renewable energy growth trends)
         return "accelerating"  # Example
 
     def analyze_oil_price_volatility(self, news_headlines, social_media_posts):
-        #... (analyze news and social media data to assess oil price volatility trends)
+        # ... (analyze news and social media data to assess oil price volatility trends)
         return "high"  # Example
 
     def analyze_energy_transition_challenges(self, news_headlines, social_media_posts):
-        #... (analyze news and social media data to assess energy transition challenges)
+        # ... (analyze news and social media data to assess energy transition challenges)
         return "significant"  # Example
 
     def analyze_financial_health(self, financial_statements):
-        #... (analyze financial data to assess financial health)
+        # ... (analyze financial data to assess financial health)
         return "stable"  # Example

@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 # --- Schema Definitions ---
 
+
 def get_market_data_schema() -> 'DataFrameSchema':
     if pa is None:
         raise ImportError("Pandera is required for schema validation.")
@@ -36,6 +37,7 @@ def get_market_data_schema() -> 'DataFrameSchema':
         "Dividends": Column(float, Check.ge(0), nullable=True, required=False),
         "Stock Splits": Column(float, Check.ge(0), nullable=True, required=False),
     }, index=pa.Index(pa.DateTime, name="Date"))
+
 
 def validate_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -54,6 +56,7 @@ def validate_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
 # --- Market Calendar Logic ---
 
+
 def is_market_holiday(date: pd.Timestamp, exchange: str = 'NYSE') -> bool:
     """
     Checks if a given date is a market holiday.
@@ -66,12 +69,13 @@ def is_market_holiday(date: pd.Timestamp, exchange: str = 'NYSE') -> bool:
     schedule = nyse.schedule(start_date=date, end_date=date)
     return schedule.empty
 
+
 def get_expected_market_days(start_date: str, end_date: str, exchange: str = 'NYSE') -> pd.DatetimeIndex:
     """
     Returns a list of expected trading days between start and end.
     """
     if mcal is None:
-        return pd.date_range(start=start_date, end=end_date, freq='B') # Fallback to business days
+        return pd.date_range(start=start_date, end=end_date, freq='B')  # Fallback to business days
 
     nyse = mcal.get_calendar(exchange)
     schedule = nyse.schedule(start_date=start_date, end_date=end_date)

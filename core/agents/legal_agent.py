@@ -2,6 +2,7 @@
 
 import json
 
+
 class LegalAgent:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):
         """

@@ -1,3 +1,7 @@
+from core.engine.states import init_risk_state
+from core.engine.cyclical_reasoning_graph import cyclical_reasoning_app
+from core.engine.autonomous_self_improvement import AutonomousSelfImprovementController
+from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner
 import sys
 import os
 import logging
@@ -7,21 +11,18 @@ import asyncio
 # Add project root to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner
-from core.engine.autonomous_self_improvement import AutonomousSelfImprovementController
-from core.engine.cyclical_reasoning_graph import cyclical_reasoning_app
-from core.engine.states import init_risk_state
 
 # Configure logging to see the flow
 logging.basicConfig(level=logging.INFO, format='%(message)s')
 
+
 async def verify_planner():
     print("\n=== Phase 2: Neuro-Symbolic Planner Verification ===")
     planner = NeuroSymbolicPlanner()
-    
+
     query = "Analyze Apple Inc. Credit Rating"
     print(f"Query: {query}")
-    
+
     # 1. Discover Plan
     # Uses new high-level API
     if hasattr(planner, 'create_plan'):
@@ -34,7 +35,7 @@ async def verify_planner():
         print("\nSymbolic Plan Discovered:")
         for step in plan_data["steps"]:
             print(f"  [Step {step['task_id']}] {step['description']}")
-            
+
         # 2. Compile to Graph
         app = planner.to_executable_graph(plan_data)
         if app:
@@ -54,26 +55,28 @@ async def verify_planner():
     else:
         print("Failed to discover plan.")
 
+
 def verify_self_improvement():
     print("\n=== Phase 3: Self-Improvement Verification ===")
     controller = AutonomousSelfImprovementController()
-    
+
     agent_name = "RiskAssessmentAgent"
     print(f"Monitoring {agent_name}...")
-    
+
     # Simulate failures
     failures = [
         "Timeout waiting for market data",
         "Invalid JSON output",
         "Hallucinated financial ratio"
     ]
-    
+
     for i, error in enumerate(failures):
         print(f"Simulating failure {i+1}: {error}")
         controller.log_failure(agent_name, "Analyze AAPL", error)
-        
+
     # The controller should trigger the loop on the 3rd failure
     print("Check logs above for 'ADAPTATION LOOP' messages.")
+
 
 def verify_cyclical_graph():
     print("\n=== Phase 1: Cyclical Reasoning Graph Verification ===")
@@ -99,6 +102,7 @@ def verify_cyclical_graph():
 
     except Exception as e:
         print(f"Graph Execution Failed: {e}")
+
 
 async def main():
     verify_cyclical_graph()

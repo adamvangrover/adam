@@ -1,6 +1,7 @@
 import pandera as pa
 from pandera.typing import DataFrame, Series
 
+
 class MarketDataSchema(pa.DataFrameModel):
     """
     Pandera schema for validating historical market data.
@@ -15,5 +16,5 @@ class MarketDataSchema(pa.DataFrameModel):
     Volume: Series[pa.Float] = pa.Field(ge=0, nullable=True)  # Float because sometimes it's fractional or huge
 
     class Config:
-        strict = False # Allow extra columns like 'Adj Close'
+        strict = False  # Allow extra columns like 'Adj Close'
         coerce = True

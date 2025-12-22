@@ -4,6 +4,7 @@ import os
 import json
 import datetime
 
+
 class ArchiveManagerAgent:
     def __init__(self, config):
         self.config = config
@@ -64,7 +65,7 @@ class ArchiveManagerAgent:
         Creates a backup of the data directory.
         """
 
-        #... (implementation for data backup, e.g., using shutil.copytree)
+        # ... (implementation for data backup, e.g., using shutil.copytree)
         pass  # Placeholder for actual implementation
 
     def restore_backup(self):
@@ -72,7 +73,7 @@ class ArchiveManagerAgent:
         Restores data from a backup.
         """
 
-        #... (implementation for data restoration, e.g., using shutil.copytree)
+        # ... (implementation for data restoration, e.g., using shutil.copytree)
         pass  # Placeholder for actual implementation
 
     def check_access(self, user, data_type):
@@ -87,11 +88,11 @@ class ArchiveManagerAgent:
             bool: True if the user has access, False otherwise.
         """
 
-        #... (implementation for access control, e.g., using a dictionary of user permissions)
+        # ... (implementation for access control, e.g., using a dictionary of user permissions)
         pass  # Placeholder for actual implementation
 
     def run(self):
-        #... (fetch data storage or retrieval requests)
-        #... (store or retrieve data as requested)
-        #... (perform periodic backups and access control checks)
+        # ... (fetch data storage or retrieval requests)
+        # ... (store or retrieve data as requested)
+        # ... (perform periodic backups and access control checks)
         pass

@@ -7,6 +7,7 @@ from core.agents.macroeconomic_analysis_agent import MacroeconomicAnalysisAgent
 from core.agents.geopolitical_risk_agent import GeopoliticalRiskAgent
 from core.agents.industry_specialist_agent import IndustrySpecialistAgent
 
+
 class StressTestingSimulation:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):
         """
@@ -66,7 +67,8 @@ class StressTestingSimulation:
             industry_impacts[industry] = self.industry_specialist_agent.analyze_industry_impact(industry, scenario_data)
 
         # 3. Risk Assessment
-        risk_exposure = self.risk_assessment_agent.assess_portfolio_risk_exposure(portfolio_data, macroeconomic_impact, geopolitical_impact, industry_impacts)
+        risk_exposure = self.risk_assessment_agent.assess_portfolio_risk_exposure(
+            portfolio_data, macroeconomic_impact, geopolitical_impact, industry_impacts)
 
         # 4. Generate Report
         report = self.generate_report(portfolio_data, scenario_name, risk_exposure)

@@ -10,12 +10,13 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class HNASPStateManager:
     def __init__(self,
                  lakehouse: ObservationLakehouse,
                  logic_engine: LogicEngine,
                  personality_engine: BayesACTEngine,
-                 llm_client: Any): # generic llm client
+                 llm_client: Any):  # generic llm client
         self.lakehouse = lakehouse
         self.logic_engine = logic_engine
         self.personality_engine = personality_engine
@@ -95,7 +96,7 @@ class HNASPStateManager:
             role="user",
             timestamp=datetime.now(),
             content=user_input,
-            intent="unknown" # NLP intent classification would go here
+            intent="unknown"  # NLP intent classification would go here
         )
         current_state.context_stream.turns.append(user_turn)
 
@@ -121,9 +122,9 @@ class HNASPStateManager:
             # Heuristic: Find JSON block
             if isinstance(response_payload, str):
                 # Try to load json
-                 llm_output = json.loads(response_payload)
+                llm_output = json.loads(response_payload)
             else:
-                 llm_output = response_payload
+                llm_output = response_payload
 
             generated_trace = llm_output.get("execution_trace")
             response_text = llm_output.get("response_text")
@@ -149,8 +150,9 @@ class HNASPStateManager:
             if claimed_rule_id in backend_trace:
                 actual_result = backend_trace[claimed_rule_id]
                 # Simple equality check
-                if str(actual_result) != str(claimed_result): # Stringify for safe comparison
-                    logger.critical(f"Neurosymbolic Dissonance detected! Claimed: {claimed_result}, Actual: {actual_result}")
+                if str(actual_result) != str(claimed_result):  # Stringify for safe comparison
+                    logger.critical(
+                        f"Neurosymbolic Dissonance detected! Claimed: {claimed_result}, Actual: {actual_result}")
                     return "SYSTEM ERROR: Logic Verification Failed. Response halted."
 
         # Logic to "Inject" the backend trace into the state

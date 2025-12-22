@@ -40,6 +40,7 @@ from core.trading.hft.hft_engine import (
     MarketDataHandler, OrderManager
 )
 
+
 class AvellanedaStoikovStrategy:
     def __init__(
         self,
@@ -80,10 +81,10 @@ class AvellanedaStoikovStrategy:
 
         if len(self.price_history) > 10:
             returns = np.diff(np.log(self.price_history))
-            self.sigma = np.std(returns) * math.sqrt(252 * 24 * 3600) # Annualized?
+            self.sigma = np.std(returns) * math.sqrt(252 * 24 * 3600)  # Annualized?
             # For HFT, we usually scale to the tick frequency.
             # Let's keep it simple: raw std dev of recent ticks for now, scaled up slightly.
-            self.sigma = np.std(self.price_history) # Simplified proxy
+            self.sigma = np.std(self.price_history)  # Simplified proxy
 
     def calculate_quotes(self, s: float, t: float):
         """
@@ -95,8 +96,10 @@ class AvellanedaStoikovStrategy:
         time_left = max(0, T - t)
 
         # Avoid division by zero or log errors
-        if self.gamma <= 0: self.gamma = 0.01
-        if self.kappa <= 0: self.kappa = 0.1
+        if self.gamma <= 0:
+            self.gamma = 0.01
+        if self.kappa <= 0:
+            self.kappa = 0.1
 
         # 1. Reservation Price
         # r = s - q * gamma * sigma^2 * (T - t)
@@ -157,8 +160,10 @@ class AvellanedaStoikovStrategy:
 
                 # Place new orders
                 # Quote Filtering: Don't cross the market (unless taking liquidity, but this is a maker strategy)
-                if bid_price >= tick.ask: bid_price = tick.ask - 0.01
-                if ask_price <= tick.bid: ask_price = tick.bid + 0.01
+                if bid_price >= tick.ask:
+                    bid_price = tick.ask - 0.01
+                if ask_price <= tick.bid:
+                    ask_price = tick.bid + 0.01
 
                 # Don't quote negative spreads
                 if bid_price >= ask_price:
@@ -218,6 +223,7 @@ class AvellanedaStoikovStrategy:
             pass
         finally:
             feed_task.cancel()
+
 
 if __name__ == "__main__":
     strategy = AvellanedaStoikovStrategy(symbol="AAPL", balance=1000000.0)

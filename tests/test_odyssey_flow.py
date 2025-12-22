@@ -1,3 +1,5 @@
+from core.v23_graph_engine.odyssey_knowledge_graph import OdysseyKnowledgeGraph
+from core.system.nexus_zero_orchestrator import NexusZeroOrchestrator
 import unittest
 import asyncio
 import sys
@@ -6,8 +8,6 @@ import os
 # Ensure core is in path
 sys.path.append(os.getcwd())
 
-from core.system.nexus_zero_orchestrator import NexusZeroOrchestrator
-from core.v23_graph_engine.odyssey_knowledge_graph import OdysseyKnowledgeGraph
 
 class TestOdysseyFlow(unittest.TestCase):
     def test_graph_ingestion(self):
@@ -55,6 +55,7 @@ class TestOdysseyFlow(unittest.TestCase):
         result = asyncio.run(run())
         self.assertIn("final_decision", result)
         self.assertIn("decision_xml", result["final_decision"])
+
 
 if __name__ == "__main__":
     unittest.main()

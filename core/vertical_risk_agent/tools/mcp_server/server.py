@@ -37,6 +37,7 @@ except ImportError:
 # Global Orchestrator Singleton
 _orchestrator = None
 
+
 def get_orchestrator_instance():
     global _orchestrator
     if _orchestrator is None and MetaOrchestrator:
@@ -46,12 +47,14 @@ def get_orchestrator_instance():
             print(f"Failed to initialize MetaOrchestrator: {e}")
     return _orchestrator
 
+
 # Initialize the MCP Server
 mcp = FastMCP("Adam Financial Data Room")
 
 DB_PATH = "finance_data.db"
 
 # --- Resources ---
+
 
 @mcp.resource("financial://market/book/{symbol}")
 def get_order_book(symbol: str) -> str:
@@ -68,6 +71,7 @@ def get_order_book(symbol: str) -> str:
     }
     return json.dumps(book, indent=2)
 
+
 @mcp.resource("financial://portfolio/{id}/risk")
 def get_portfolio_risk(id: str) -> str:
     """
@@ -82,6 +86,7 @@ def get_portfolio_risk(id: str) -> str:
         "Drawdown": "0.5%"
     }, indent=2)
 
+
 @mcp.resource("finance://{ticker}/{year}/10k")
 def get_10k_filing(ticker: str, year: str) -> str:
     """
@@ -90,6 +95,7 @@ def get_10k_filing(ticker: str, year: str) -> str:
     """
     return f"Full 10-K text content for {ticker} in {year}..."
 
+
 @mcp.resource("finance://{ticker}/ratios")
 def get_financial_ratios(ticker: str) -> str:
     """
@@ -97,6 +103,7 @@ def get_financial_ratios(ticker: str) -> str:
     Resource URI: finance://AAPL/ratios
     """
     return "Ratio,Value\nDebt/EBITDA,2.5x\nInterest Coverage,5.0x\nROE,15%"
+
 
 @mcp.resource("system://repo/assessment")
 def get_repo_assessment() -> str:
@@ -110,6 +117,7 @@ def get_repo_assessment() -> str:
         return "Assessment not found."
 
 # --- Tools ---
+
 
 @mcp.tool()
 def execute_market_order(symbol: str, quantity: int, side: str) -> str:
@@ -126,6 +134,7 @@ def execute_market_order(symbol: str, quantity: int, side: str) -> str:
         "message": "Please confirm execution in the UI."
     })
 
+
 @mcp.tool()
 def run_backtest(strategy_id: str, start_date: str, end_date: str) -> str:
     """
@@ -141,6 +150,7 @@ def run_backtest(strategy_id: str, start_date: str, end_date: str) -> str:
         "report_url": f"/reports/backtest_{strategy_id}_{start_date}.html"
     })
 
+
 @mcp.tool()
 def query_memory(query: str) -> str:
     """
@@ -148,6 +158,7 @@ def query_memory(query: str) -> str:
     """
     # Mock RAG response
     return f"Based on your personal memory: You have a preference for 'Low Volatility' stocks and a restriction against 'Tobacco'. Regarding '{query}': We found 3 related emails from 2023 discussing this topic."
+
 
 @mcp.tool()
 def rebalance_portfolio(portfolio_id: str, target_allocation: str) -> str:
@@ -165,21 +176,46 @@ def rebalance_portfolio(portfolio_id: str, target_allocation: str) -> str:
         "action": "CONFIRM_REQUIRED"
     })
 
+
 @mcp.tool()
 def query_sql(query: str) -> str:
     """
     Executes a read-only SQL query against the local financial database.
+    Restricted to specific tables for security.
     """
     if not query.strip().upper().startswith("SELECT"):
         raise ValueError("Only SELECT queries are allowed.")
 
+    # Whitelist of allowed tables to prevent accessing secrets or system tables
+    ALLOWED_TABLES = {'financials', 'sqlite_sequence'}
+
+    def authorizer(action, arg1, arg2, dbname, source):
+        # Allow SELECT statements
+        if action == sqlite3.SQLITE_SELECT:
+            return sqlite3.SQLITE_OK
+        # Allow READ on whitelisted tables
+        if action == sqlite3.SQLITE_READ:
+            if arg1 in ALLOWED_TABLES:
+                return sqlite3.SQLITE_OK
+            return sqlite3.SQLITE_DENY
+        # Allow standard SQL functions
+        if action == sqlite3.SQLITE_FUNCTION:
+            return sqlite3.SQLITE_OK
+        # Deny everything else (INSERT, UPDATE, DELETE, PRAGMA, etc.)
+        return sqlite3.SQLITE_DENY
+
     try:
-        conn = sqlite3.connect(DB_PATH)
+        # Use read-only URI mode as an extra layer of defense
+        uri_path = f"file:{os.path.abspath(DB_PATH)}?mode=ro"
+        conn = sqlite3.connect(uri_path, uri=True)
+        conn.set_authorizer(authorizer)
+
         df = pd.read_sql_query(query, conn)
         conn.close()
         return df.to_markdown()
     except Exception as e:
         return f"SQL Error: {str(e)}"
+
 
 @mcp.tool()
 def get_covenant_definitions(doc_id: str) -> str:
@@ -191,6 +227,7 @@ def get_covenant_definitions(doc_id: str) -> str:
     (a) Consolidated Leverage Ratio. The Borrower shall not permit the Consolidated Leverage Ratio
         as of the end of any Fiscal Quarter to be greater than 4.50 to 1.00.
     """
+
 
 @mcp.tool()
 def simulate_quantum_merton_model(asset_value: float, debt: float, volatility: float, horizon: float) -> str:
@@ -204,6 +241,7 @@ def simulate_quantum_merton_model(asset_value: float, debt: float, volatility: f
     result = qmc.simulate_merton_model(asset_value, debt, volatility, 0.05, horizon)
     return str(result)
 
+
 @mcp.tool()
 def generate_stress_scenarios(regime: str = "stress", n_samples: int = 5) -> str:
     """
@@ -215,6 +253,7 @@ def generate_stress_scenarios(regime: str = "stress", n_samples: int = 5) -> str
     engine = GenerativeRiskEngine()
     scenarios = engine.generate_scenarios(n_samples=n_samples, regime=regime)
     return "\n".join([str(s) for s in scenarios])
+
 
 @mcp.tool()
 async def run_deep_dive_analysis(query: str) -> str:
@@ -232,6 +271,7 @@ async def run_deep_dive_analysis(query: str) -> str:
     except Exception as e:
         return f"Error running Deep Dive: {str(e)}"
 
+
 @mcp.tool()
 def get_snc_rating(borrower_id: str) -> str:
     """
@@ -247,6 +287,7 @@ def get_snc_rating(borrower_id: str) -> str:
     }
     return mock_db.get(borrower_id.upper(), "Not Rated")
 
+
 @mcp.tool()
 def get_esg_score(company: str) -> str:
     """
@@ -260,6 +301,7 @@ def get_esg_score(company: str) -> str:
         "total": 84
     })
 
+
 @mcp.tool()
 def list_active_agents() -> str:
     """
@@ -271,6 +313,7 @@ def list_active_agents() -> str:
 
     agents = list(orch.legacy_orchestrator.agents.keys())
     return f"Active Agents ({len(agents)}): {', '.join(agents)}"
+
 
 @mcp.tool()
 def get_agent_status(agent_name: str) -> str:
@@ -286,6 +329,7 @@ def get_agent_status(agent_name: str) -> str:
         return f"Agent '{agent_name}' is ACTIVE. Type: {type(agent).__name__}"
     else:
         return f"Agent '{agent_name}' is NOT FOUND."
+
 
 if __name__ == "__main__":
     # Ensure DB exists

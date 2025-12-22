@@ -1,38 +1,53 @@
 {
   "@context": "https://schema.org",
-  "@type": "Dataset",
-  "name": "Adam v23.5 - core",
-  "url": "./index.html",
+  "@type": "DataCatalog",
+  "name": "Adam v23.5 - Risk Intelligence Core Registry",
+  "description": "Federated registry of financial agent skills and tools compliant with the Model Context Protocol (MCP).",
+  "url": "./directory_manifest.jsonld",
+  "dataset": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "FundamentalAnalysisSkill",
+      "description": "Quant-grade financial analysis, including summarization and metric extraction.",
+      "applicationCategory": "Finance",
+      "url": "core/agents/skills/FundamentalAnalysisSkill/"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "SNCRatingAssistSkill",
+      "description": "Regulatory compliance and credit rating assistance for Shared National Credits (SNC).",
+      "applicationCategory": "Regulatory Compliance",
+      "url": "core/agents/skills/SNCRatingAssistSkill/"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "HybridForecastingSkill",
+      "description": "Time-series forecasting combining ARIMA/LSTM with qualitative risk adjustment.",
+      "applicationCategory": "Forecasting",
+      "url": "core/agents/skills/hybrid_forecasting_skill.py"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "CounterfactualReasoningSkill",
+      "description": "Red Team capability for scenario analysis and causal inference ('What If').",
+      "applicationCategory": "Risk Management",
+      "url": "core/agents/skills/CounterfactualReasoningSkill/"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "QueryEnhancerSkill",
+      "description": "RAG query expansion and refinement for financial domain information retrieval.",
+      "applicationCategory": "Information Retrieval",
+      "url": "core/agents/skills/rag_skills/QueryEnhancerSkill/"
+    }
+  ],
   "hasPart": [
     {
       "@type": "SoftwareSourceCode",
-      "name": "__init__.py",
-      "programmingLanguage": "Python"
-    },
-    {
-      "@type": "SoftwareSourceCode",
-      "name": "llm_plugin.py",
-      "programmingLanguage": "Python"
-    },
-    {
-      "@type": "SoftwareSourceCode",
-      "name": "main.py",
-      "programmingLanguage": "Python"
-    },
-    {
-      "@type": "SoftwareSourceCode",
-      "name": "api.py",
-      "programmingLanguage": "Python"
-    },
-    {
-      "@type": "SoftwareSourceCode",
-      "name": "settings.py",
-      "programmingLanguage": "Python"
-    },
-    {
-      "@type": "TechArticle",
-      "name": "AGENTS.md"
+      "name": "core_system",
+      "description": "Core system components including Agent Orchestrator and v22 Async Engine.",
+      "codeRepository": "core/system/"
     }
   ],
-  "variableMeasured": "Interactivity Level: Static"
+  "variableMeasured": "Interactivity Level: Agentic Runtime"
 }

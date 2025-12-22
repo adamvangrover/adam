@@ -1,4 +1,4 @@
-#core/agents/regulatory_compliance_agent.py
+# core/agents/regulatory_compliance_agent.py
 
 from __future__ import annotations
 import re
@@ -21,6 +21,7 @@ from core.agents.agent_base import AgentBase
 
 # Configure logger
 logger = logging.getLogger(__name__)
+
 
 class RegulatoryComplianceAgent(AgentBase):
     """
@@ -49,6 +50,42 @@ class RegulatoryComplianceAgent(AgentBase):
         self.political_landscape = self._load_political_landscape()
         # Initialize LLM with config from agent config
         self.llm = LLMPlugin(config=self.config.get("llm_config"))
+
+        # Load learned parameters for continuous learning
+        self.learned_params = self._load_learned_profile()
+
+    def _load_learned_profile(self) -> Dict:
+        """
+        Loads the learned compliance profile (weights, risk modifiers) from disk.
+        """
+        profile_path = "data/compliance_learned_profile.json"
+        default_profile = {
+            "rule_weights": {
+                "threshold_violation": 0.5,
+                "geopolitical_risk": 0.3
+            },
+            "entity_risk_modifiers": {},
+            "learning_rate": 0.05
+        }
+        if os.path.exists(profile_path):
+            try:
+                with open(profile_path, 'r') as f:
+                    return json.load(f)
+            except Exception as e:
+                logger.error(f"Failed to load learned profile: {e}")
+        return default_profile
+
+    def _save_learned_profile(self):
+        """
+        Saves the learned compliance profile to disk.
+        """
+        profile_path = "data/compliance_learned_profile.json"
+        try:
+            os.makedirs(os.path.dirname(profile_path), exist_ok=True)
+            with open(profile_path, 'w') as f:
+                json.dump(self.learned_params, f, indent=2)
+        except Exception as e:
+            logger.error(f"Failed to save learned profile: {e}")
 
     def _load_regulatory_knowledge(self) -> Dict:
         """
@@ -185,32 +222,48 @@ class RegulatoryComplianceAgent(AgentBase):
         if amount > 10000:
             violated_rules.append("Transaction amount exceeds threshold")
 
+        # Load weights
+        weights = self.learned_params.get("rule_weights", {})
+
         # 3. Political Context Analysis (Expanded)
         country = transaction.get("country", "US")
         country_data = self.political_landscape.get(country, {})
         developments = country_data.get("recent_developments", [])
 
         geo_risk = 0.0
+        geo_risk_weight = weights.get("geopolitical_risk", 0.3)
+
         if isinstance(developments, list):
             for dev in developments:
-                 if isinstance(dev, str) and any(kw in dev.lower() for kw in ["instability", "sanction", "crisis", "war", "conflict"]):
-                     geo_risk += 0.3
-                     violated_rules.append(f"Geopolitical Risk Warning: {dev}")
+                if isinstance(dev, str) and any(kw in dev.lower() for kw in ["instability", "sanction", "crisis", "war", "conflict"]):
+                    geo_risk += geo_risk_weight
+                    violated_rules.append(f"Geopolitical Risk Warning: {dev}")
 
         # 4. Calculate risk score
         risk_score = 0.0
-        if violated_rules:
-            risk_score = 0.5  # Base risk score for violations
+
+        # Add scores from specific rules
+        threshold_weight = weights.get("threshold_violation", 0.5)
+        if any("exceeds threshold" in r for r in violated_rules):
+            risk_score += threshold_weight
 
         risk_score += geo_risk
-        risk_score = min(risk_score, 1.0) # Cap at 1.0
+
+        # Add entity-specific risk modifier
+        entity_id = transaction.get("customer") or transaction.get("ticker")
+        if entity_id:
+            modifier = self.learned_params.get("entity_risk_modifiers", {}).get(entity_id, 0.0)
+            risk_score += modifier
+
+        risk_score = min(risk_score, 1.0)  # Cap at 1.0
+        risk_score = max(risk_score, 0.0)  # Ensure non-negative
 
         analysis = {
             "transaction_id": transaction.get("id"),
             "compliance_status": "compliant" if not violated_rules else "non-compliant",
             "violated_rules": violated_rules,
             "risk_score": risk_score,
-            "entity_id": transaction.get("customer") or transaction.get("ticker")
+            "entity_id": entity_id
         }
         return analysis
 
@@ -326,13 +379,62 @@ class RegulatoryComplianceAgent(AgentBase):
             return
 
         violation_counts = {}
+
+        # 1. Update Entity Risk Modifiers based on violation frequency
+        modifiers = self.learned_params.setdefault("entity_risk_modifiers", {})
+        learning_rate = self.learned_params.get("learning_rate", 0.05)
+
         for res in results:
             for rule in res.get('violated_rules', []):
                 violation_counts[rule] = violation_counts.get(rule, 0) + 1
 
+            entity_id = res.get("entity_id")
+            if not entity_id:
+                continue
+
+            if res.get("violated_rules"):
+                # Increase risk for repeat offenders
+                modifiers[entity_id] = modifiers.get(entity_id, 0.0) + (learning_rate * 0.1)
+                logger.info(f"Continuous Learning: Escalating risk profile for entity {entity_id}")
+            else:
+                # Decay risk for compliant entities (forgive over time)
+                current = modifiers.get(entity_id, 0.0)
+                if current > 0:
+                    modifiers[entity_id] = max(0.0, current - (learning_rate * 0.05))
+
         if violation_counts:
             logger.info(f"Continuous Learning - Observed Violation Patterns: {violation_counts}")
-            # Future expansion: Adjust risk weights based on frequent violations
+
+        self._save_learned_profile()
+
+    def process_feedback(self, feedback_data: Dict[str, Any]):
+        """
+        Processes feedback from audits or human reviewers to adjust learned parameters.
+
+        Args:
+            feedback_data: Dict containing 'transaction_id', 'correct_assessment' (bool),
+                           'rule_id' (optional), 'comment'.
+        """
+        # This allows adjusting rule weights
+        if "rule_id" in feedback_data:
+            rule = feedback_data["rule_id"]
+            correct = feedback_data.get("correct_assessment", True)
+
+            weights = self.learned_params.setdefault("rule_weights", {})
+            current_weight = weights.get(rule, 0.5)
+
+            learning_rate = self.learned_params.get("learning_rate", 0.05)
+
+            if not correct:
+                # We were wrong (False Positive), decrease weight
+                weights[rule] = max(0.1, current_weight - learning_rate)
+                logger.info(f"Feedback: Decreasing weight for rule {rule} to {weights[rule]}")
+            else:
+                # We were right (True Positive), potentially increase (reinforcement)
+                weights[rule] = min(1.0, current_weight + (learning_rate * 0.1))
+                logger.info(f"Feedback: Increasing weight for rule {rule} to {weights[rule]}")
+
+        self._save_learned_profile()
 
     def _save_audit_trail(self, results: List[Dict]):
         """
@@ -385,17 +487,17 @@ class RegulatoryComplianceAgent(AgentBase):
         # Send significant findings to RiskAssessmentAgent
         if compliance_report:
             risk_data = {
-                 "source": "RegulatoryComplianceAgent",
-                 "report": compliance_report,
-                 "risk_type": "compliance",
-                 "regulatory_updates": len(regulatory_updates),
-                 "violation_count": sum(1 for r in analysis_results if r['violated_rules'])
+                "source": "RegulatoryComplianceAgent",
+                "report": compliance_report,
+                "risk_type": "compliance",
+                "regulatory_updates": len(regulatory_updates),
+                "violation_count": sum(1 for r in analysis_results if r['violated_rules'])
             }
             logger.info("Sending compliance data to RiskAssessmentAgent...")
             await self.send_message("RiskAssessmentAgent", risk_data)
 
         # Knowledge Base Integration
-        knowledge_graph = kwargs.get("knowledge_graph") # Expecting UnifiedKnowledgeGraph instance
+        knowledge_graph = kwargs.get("knowledge_graph")  # Expecting UnifiedKnowledgeGraph instance
         self._integrate_knowledge(regulatory_updates, knowledge_graph)
 
         # Ingest Compliance Events into Graph

@@ -4,6 +4,7 @@ from core.financial_suite.engines.wacc import WACCCalculator
 from core.financial_suite.modules.risk.credit_model import CreditEngine
 from core.financial_suite.modules.risk.regulatory import RegulatoryEngine
 
+
 class IterativeSolver:
     @staticmethod
     def solve_equilibrium(ctx: WorkstreamContext, tolerance: float = 0.0001, max_iter: int = 20):
@@ -18,10 +19,11 @@ class IterativeSolver:
         solved_ctx = ctx.clone()
 
         # Initial State
-        wacc = 0.10 # Seed
+        wacc = 0.10  # Seed
 
         # Debt is constant in amount (simplified for this loop, assuming fixed capital structure)
-        total_debt = sum(s.balance for s in solved_ctx.capital_structure.securities if s.security_type != "COMMON" and s.security_type != "PREFERRED")
+        total_debt = sum(s.balance for s in solved_ctx.capital_structure.securities if s.security_type !=
+                         "COMMON" and s.security_type != "PREFERRED")
 
         # Iterate
         for i in range(max_iter):
@@ -50,10 +52,12 @@ class IterativeSolver:
 
             # Current Interest
             current_interest = sum(s.balance * s.interest_rate for s in solved_ctx.capital_structure.securities)
-            mandatory_principal = sum(s.balance * 0.05 for s in solved_ctx.capital_structure.securities if s.security_type == "TERM_LOAN")
-            ebitda = dcf_res["projections"]["ebitda"][0] # Year 1 EBITDA
+            mandatory_principal = sum(
+                s.balance * 0.05 for s in solved_ctx.capital_structure.securities if s.security_type == "TERM_LOAN")
+            ebitda = dcf_res["projections"]["ebitda"][0]  # Year 1 EBITDA
 
-            fccr = ebitda / (current_interest + mandatory_principal) if (current_interest + mandatory_principal) > 0 else 99.0
+            fccr = ebitda / (current_interest + mandatory_principal) if (current_interest +
+                                                                         mandatory_principal) > 0 else 99.0
 
             rating, desc = RegulatoryEngine.get_rating_from_metrics(pd, fccr, ltv)
 
@@ -63,9 +67,10 @@ class IterativeSolver:
             base_sofr = solved_ctx.credit_challenge.sofr_base_rate or 0.04
 
             # Simple spread mapping (Mock)
-            base_spread = 0.03 # 300 bps
+            base_spread = 0.03  # 300 bps
             rating_spread_adj = 0.0
-            if rating >= 6: rating_spread_adj = 0.04 # +400 bps
+            if rating >= 6:
+                rating_spread_adj = 0.04  # +400 bps
 
             new_kd_pretax = base_sofr + base_spread + rating_spread_adj
             solved_ctx.valuation_context.pre_tax_cost_of_debt = new_kd_pretax
@@ -73,14 +78,14 @@ class IterativeSolver:
             # Update Security Interest Rates for next loop (Consistency)
             for sec in solved_ctx.capital_structure.securities:
                 if sec.sofr_spread is not None:
-                     sec.interest_rate = base_sofr + sec.sofr_spread + rating_spread_adj
+                    sec.interest_rate = base_sofr + sec.sofr_spread + rating_spread_adj
 
             # 6. Update Cost of Equity (Hamada)
             # Beta_L = Beta_U * (1 + (1-t)*D/E)
             tax_rate = solved_ctx.valuation_context.tax_rate
-            beta_u = ctx.valuation_context.beta # Assume input is Unlevered/Asset Beta
+            beta_u = ctx.valuation_context.beta  # Assume input is Unlevered/Asset Beta
             beta_l = beta_u * (1 + (1 - tax_rate) * debt_to_equity)
-            solved_ctx.valuation_context.beta = beta_l # Update context for WACC calc
+            solved_ctx.valuation_context.beta = beta_l  # Update context for WACC calc
 
             # 7. Calculate New WACC
             new_wacc = WACCCalculator.calculate_wacc(solved_ctx.valuation_context, equity_value, total_debt)
@@ -107,14 +112,14 @@ class IterativeSolver:
 
         # If not converged
         return {
-             "context": solved_ctx,
-             "valuation": DCFEngine.calculate_valuation(solved_ctx, wacc),
-             "metrics": {
-                 "rating": rating, # Last state
-                 "pd": pd,
-                 "leverage": ltv,
-                 "wacc": wacc,
-                 "iterations": max_iter,
-                 "converged": False
-             }
+            "context": solved_ctx,
+            "valuation": DCFEngine.calculate_valuation(solved_ctx, wacc),
+            "metrics": {
+                "rating": rating,  # Last state
+                "pd": pd,
+                "leverage": ltv,
+                "wacc": wacc,
+                "iterations": max_iter,
+                "converged": False
+            }
         }

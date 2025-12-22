@@ -3,21 +3,22 @@ from core.financial_suite.schemas.workstream_context import WorkstreamContext
 from core.financial_suite.engines.dcf import DCFEngine
 from core.financial_suite.modules.risk.credit_model import CreditEngine
 
+
 class ReportGenerator:
     @staticmethod
     def generate_expected_pd_matrix(ctx: WorkstreamContext) -> str:
         """
         Generates Table 1: EBITDA Margin Variance vs SOFR Base Rate.
         """
-        base_margin = ctx.financials.projected_ebitda_margin[0] # Year 1 base
+        base_margin = ctx.financials.projected_ebitda_margin[0]  # Year 1 base
         margins = [base_margin - 0.02, base_margin - 0.01, base_margin, base_margin + 0.01, base_margin + 0.02]
         margin_labels = ["-2.0%", "-1.0%", "Base", "+1.0%", "+2.0%"]
 
-        base_sofr = 0.04 # 4.0%
+        base_sofr = 0.04  # 4.0%
         sofrs = [0.03, 0.04, 0.05, 0.06, 0.07]
         sofr_labels = ["3.0%", "4.0%", "5.0%", "6.0%", "7.0%"]
 
-        markdown = "| Margin \ SOFR | " + " | ".join(sofr_labels) + " |\n"
+        markdown = r"| Margin \ SOFR | " + " | ".join(sofr_labels) + " |\n"
         markdown += "|---|---" + "|---" * len(sofrs) + "|\n"
 
         for i, m in enumerate(margins):
@@ -51,7 +52,7 @@ class ReportGenerator:
 
                 # Run Valuation
                 # We need a WACC.
-                wacc = 0.10 + (s - 0.04) # Crude adjustment
+                wacc = 0.10 + (s - 0.04)  # Crude adjustment
                 dcf = DCFEngine.calculate_valuation(sim_ctx, wacc)
                 ev = dcf["enterprise_value"]
 
@@ -78,7 +79,7 @@ class ReportGenerator:
         volatilities = [0.30, 0.45, 0.60, 0.75]
         vol_labels = ["Low (30%)", "Med (45%)", "High (60%)", "Severe (75%)"]
 
-        markdown = "| Rev Contraction \ Volatility | " + " | ".join(vol_labels) + " |\n"
+        markdown = r"| Rev Contraction \ Volatility | " + " | ".join(vol_labels) + " |\n"
         markdown += "|---|---" + "|---" * len(volatilities) + "|\n"
 
         for i, r_change in enumerate(rev_contractions):
@@ -88,7 +89,8 @@ class ReportGenerator:
 
                 # Apply Revenue Haircut
                 # Decrease all revenue projections
-                sim_ctx.financials.projected_revenue_growth = [g + r_change for g in ctx.financials.projected_revenue_growth]
+                sim_ctx.financials.projected_revenue_growth = [
+                    g + r_change for g in ctx.financials.projected_revenue_growth]
                 # Also affect current year revenue basis?
                 # Usually contraction starts in Year 1.
 
@@ -115,12 +117,14 @@ class ReportGenerator:
         Assembles the full Markdown report.
         """
         ev = solver_result["valuation"]["enterprise_value"]
-        equity_val = max(0, ev - sum(s.balance for s in ctx.capital_structure.securities if s.security_type not in ["COMMON", "PREFERRED"]))
+        equity_val = max(
+            0, ev - sum(s.balance for s in ctx.capital_structure.securities if s.security_type not in ["COMMON", "PREFERRED"]))
         rating = solver_result["metrics"]["rating"]
         desc = "Unknown"
         # Re-derive desc or pass it
         from core.financial_suite.modules.risk.regulatory import RegulatoryEngine
-        _, desc = RegulatoryEngine.get_rating_from_metrics(solver_result["metrics"]["pd"], 1.5, 0.5) # Mock args just to get desc map?
+        _, desc = RegulatoryEngine.get_rating_from_metrics(
+            solver_result["metrics"]["pd"], 1.5, 0.5)  # Mock args just to get desc map?
         # Actually desc is not easily retrievable from id without the map.
         # I'll just use the ID.
 

@@ -6,6 +6,7 @@ import tempfile
 from pathlib import Path
 from core.financial_data import MarketDiscoveryAgent, DataLakehouse, MarketTicker
 
+
 class TestFinancialData(unittest.TestCase):
 
     def setUp(self):
@@ -93,6 +94,7 @@ class TestFinancialData(unittest.TestCase):
         df = pd.read_parquet(metadata_path)
         self.assertEqual(len(df), 1)
         self.assertEqual(df.iloc[0]['symbol'], 'AAPL')
+
 
 if __name__ == '__main__':
     unittest.main()

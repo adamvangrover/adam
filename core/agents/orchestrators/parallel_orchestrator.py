@@ -5,11 +5,14 @@ from .task import Task
 import time
 
 # A simple function to simulate a long-running task
+
+
 def dummy_task(duration, task_name):
     print(f"Starting task: {task_name}")
     time.sleep(duration)
     print(f"Finished task: {task_name}")
     return f"{task_name} completed in {duration} seconds"
+
 
 class ParallelOrchestrator(AgentBase):
     def __init__(self, config):

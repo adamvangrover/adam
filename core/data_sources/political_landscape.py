@@ -13,6 +13,7 @@ import logging
 # Configure logger
 logger = logging.getLogger(__name__)
 
+
 class PoliticalLandscapeLoader:
     """
     Loads political landscape data from external sources.
@@ -23,7 +24,7 @@ class PoliticalLandscapeLoader:
     def __init__(self):
         self.sources = {
             "whitehouse_briefing": "https://www.whitehouse.gov/briefing-room/",
-            "reuters_politics": "https://www.reuters.com/world/us/", # General US news/politics
+            "reuters_politics": "https://www.reuters.com/world/us/",  # General US news/politics
         }
         # Fallback data in case of connection errors
         self.fallback_data = {
@@ -190,12 +191,13 @@ class PoliticalLandscapeLoader:
         except Exception as e:
             logger.warning(f"White House scraping failed: {e}")
 
-        return developments[:10] # Return top 10
+        return developments[:10]  # Return top 10
 
     def _scrape_reuters(self) -> List[str]:
         """Scrapes headlines from Reuters."""
         url = self.sources["reuters_politics"]
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
 
         try:
             response = requests.get(url, headers=headers, timeout=10)
@@ -209,7 +211,7 @@ class PoliticalLandscapeLoader:
             # Look for h3 headers which usually contain article titles
             for h3 in soup.find_all('h3'):
                 text = h3.get_text().strip()
-                if len(text) > 20: # Filter out short navigations
+                if len(text) > 20:  # Filter out short navigations
                     headlines.append(f"[Reuters] {text}")
 
             return headlines
@@ -220,7 +222,8 @@ class PoliticalLandscapeLoader:
     def _scrape_whitehouse(self) -> List[str]:
         """Scrapes headlines from White House Briefing Room."""
         url = self.sources["whitehouse_briefing"]
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
 
         try:
             response = requests.get(url, headers=headers, timeout=10)
@@ -238,7 +241,7 @@ class PoliticalLandscapeLoader:
 
             # Fallback if specific class not found
             if not headlines:
-                 for h2 in soup.find_all('h2'):
+                for h2 in soup.find_all('h2'):
                     a_tag = h2.find('a')
                     if a_tag:
                         text = a_tag.get_text().strip()
@@ -249,6 +252,7 @@ class PoliticalLandscapeLoader:
         except Exception as e:
             logger.error(f"Error scraping White House: {e}")
             return []
+
 
 if __name__ == "__main__":
     loader = PoliticalLandscapeLoader()

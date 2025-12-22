@@ -47,6 +47,7 @@ from core.schemas.v23_5_schema import V23KnowledgeGraph, Meta, Nodes, HyperDimen
 
 logger = logging.getLogger(__name__)
 
+
 class MetaOrchestrator:
     def __init__(self, legacy_orchestrator: AgentOrchestrator = None):
         self.planner = NeuroSymbolicPlanner()
@@ -55,19 +56,19 @@ class MetaOrchestrator:
         except Exception as e:
             logger.error(f"Failed to initialize AgentOrchestrator in MetaOrchestrator: {e}")
             self.legacy_orchestrator = None
-        self.mcp_registry = MCPRegistry() # FO Super-App Integration
+        self.mcp_registry = MCPRegistry()  # FO Super-App Integration
         # Integration Path 3: Native Gemini Tooling
         self.llm_plugin = LLMPlugin(config={"provider": "gemini", "gemini_model_name": "gemini-3-pro"})
         self.code_alchemist = CodeAlchemist()
 
-    async def route_request(self, query: str, context: Dict[str, Any] = None) -> Any:
+    async def route_request(self, query: str, context: Optional[Dict[str, Any]] = None) -> Any:
         """
         Analyzes the query complexity and routes to the best engine.
         Now Async!
         """
         complexity = self._assess_complexity(query, context)
         logger.info(f"MetaOrchestrator: Query complexity is {complexity}")
-        
+
         result = None
         if complexity == "DEEP_DIVE":
             result = await self._run_deep_dive_flow(query, context)
@@ -111,7 +112,7 @@ class MetaOrchestrator:
 
         # Optional: Reflection Step for high-value outputs
         if complexity in ["DEEP_DIVE", "HIGH", "CRISIS", "RED_TEAM", "CODE_GEN"]:
-             result = await self._reflect_on_result(result, query)
+            result = await self._reflect_on_result(result, query)
 
         return result
 
@@ -206,7 +207,7 @@ class MetaOrchestrator:
             logger.error(f"Code Generation Failed: {e}", exc_info=True)
             return {"error": str(e)}
 
-    async def _run_deep_dive_flow(self, query: str, context: Dict[str, Any] = None):
+    async def _run_deep_dive_flow(self, query: str, context: Optional[Dict[str, Any]] = None):
         """
         Primary execution method for Deep Dive.
         Tries the v23 Graph first, falls back to Manual Orchestration.
@@ -217,9 +218,12 @@ class MetaOrchestrator:
 
         # Mock Ticker Extraction
         ticker = "AAPL"
-        if "apple" in query.lower(): ticker = "AAPL"
-        elif "tesla" in query.lower(): ticker = "TSLA"
-        elif "microsoft" in query.lower(): ticker = "MSFT"
+        if "apple" in query.lower():
+            ticker = "AAPL"
+        elif "tesla" in query.lower():
+            ticker = "TSLA"
+        elif "microsoft" in query.lower():
+            ticker = "MSFT"
 
         initial_state = init_omniscient_state(ticker)
 
@@ -295,7 +299,8 @@ class MetaOrchestrator:
             logger.info("Fallback Phase 1: Entity & Management")
             # Extract company name using regex or simple strip
             company_match = re.search(r"analysis for (.*)", query, re.IGNORECASE)
-            company_name_extraction = company_match.group(1).strip(" .") if company_match else query.replace("Perform a deep dive analysis on", "").strip()
+            company_name_extraction = company_match.group(1).strip(
+                " .") if company_match else query.replace("Perform a deep dive analysis on", "").strip()
             entity_eco = await mgmt_agent.execute({"company_name": company_name_extraction})
 
             # Determine correct Company ID/Name from Phase 1 result if possible
@@ -311,15 +316,15 @@ class MetaOrchestrator:
             dcf_val = 0.0
             raw_metrics = {}
             if isinstance(fund_data, dict):
-                 dcf_val = fund_data.get("dcf_valuation", 0.0)
-                 raw_metrics = fund_data.get("raw_metrics", {})
+                dcf_val = fund_data.get("dcf_valuation", 0.0)
+                raw_metrics = fund_data.get("raw_metrics", {})
 
             ebitda = raw_metrics.get("ebitda", 100.0)
             total_debt = raw_metrics.get("total_debt", 300.0)
             leverage = total_debt / ebitda if ebitda else 3.0
 
             # Safe Fallback for Peer Agent
-            multiples = {}
+            multiples: Dict[str, Any] = {}
             try:
                 multiples = await peer_agent.execute({"company_id": company_id})
             except Exception as e:
@@ -327,7 +332,8 @@ class MetaOrchestrator:
                 multiples = {}
 
             # Normalize Multiples
-            if not isinstance(multiples, dict): multiples = {}
+            if not isinstance(multiples, dict):
+                multiples = {}
             multiples.setdefault("current_ev_ebitda", 10.0)
             multiples.setdefault("peer_median_ev_ebitda", 10.0)
             multiples.setdefault("verdict", "Fair")
@@ -336,7 +342,7 @@ class MetaOrchestrator:
 
             equity_analysis = EquityAnalysis(
                 fundamentals=Fundamentals(
-                    revenue_cagr_3yr="5%", # Placeholder
+                    revenue_cagr_3yr="5%",  # Placeholder
                     ebitda_margin_trend="Expanding"
                 ),
                 valuation_engine=ValuationEngine(
@@ -352,11 +358,19 @@ class MetaOrchestrator:
 
             # Phase 3: Credit
             logger.info("Fallback Phase 3: Credit")
-            credit_input = {
-                "facilities": [{"id": "TLB", "amount": f"{total_debt}M", "ltv": 0.5}],
-                "current_leverage": leverage
+            financials_input = {
+                "ebitda": float(ebitda),
+                "total_debt": float(total_debt),
+                "interest_expense": float(ebitda / 4.0) if ebitda else 1.0  # Assume 4x coverage default
             }
-            snc_model = await snc_agent.execute(credit_input)
+            capital_structure_input = [
+                {"name": "Term Loan B", "amount": float(total_debt), "priority": 1}
+            ]
+            snc_model = await snc_agent.execute(
+                financials=financials_input,
+                capital_structure=capital_structure_input,
+                enterprise_value=float(dcf_val)
+            )
 
             # Manually construct CreditAnalysis
             from core.schemas.v23_5_schema import CreditAnalysis, CovenantRiskAnalysis
@@ -374,10 +388,14 @@ class MetaOrchestrator:
 
             # Phase 4: Risk
             logger.info("Fallback Phase 4: Risk")
-            sim_engine = await mc_agent.execute({"ebitda": ebitda, "debt": total_debt, "volatility": 0.2})
+            sim_engine = await mc_agent.execute(
+                current_ebitda=ebitda,
+                ebitda_volatility=0.2,
+                interest_expense=financials_input["interest_expense"]
+            )
 
             try:
-                scenarios = await quant_agent.execute({})
+                scenarios = await quant_agent.execute(params={"financials": financials_input})
                 sim_engine.quantum_scenarios = scenarios
             except Exception as e:
                 logger.warning(f"Quantum Agent failed: {e}. Proceeding without quantum scenarios.")
@@ -385,7 +403,7 @@ class MetaOrchestrator:
 
             # Phase 5: Synthesis
             logger.info("Fallback Phase 5: Synthesis")
-            synthesis = await pm_agent.execute({
+            synthesis = await pm_agent.execute(params={
                 "phase1": entity_eco,
                 "phase2": equity_analysis,
                 "phase3": credit_analysis,
@@ -415,7 +433,7 @@ class MetaOrchestrator:
 
     async def _run_adaptive_flow(self, query: str):
         logger.info("Engaging v23 Neuro-Symbolic Planner...")
-        
+
         # 0. Entity Extraction (Regex-Enhanced)
         start_node = "Unknown Entity"
 
@@ -436,17 +454,26 @@ class MetaOrchestrator:
 
         # Heuristic Fallback
         if start_node == "Unknown Entity":
-            if "apple" in query.lower(): start_node = "Apple Inc."
-            elif "tesla" in query.lower(): start_node = "Tesla Inc."
-            elif "microsoft" in query.lower(): start_node = "Microsoft Corp"
-            elif "google" in query.lower(): start_node = "Alphabet Inc."
-            elif "amazon" in query.lower(): start_node = "Amazon.com Inc."
+            if "apple" in query.lower():
+                start_node = "Apple Inc."
+            elif "tesla" in query.lower():
+                start_node = "Tesla Inc."
+            elif "microsoft" in query.lower():
+                start_node = "Microsoft Corp"
+            elif "google" in query.lower():
+                start_node = "Alphabet Inc."
+            elif "amazon" in query.lower():
+                start_node = "Amazon.com Inc."
 
         target_node = "CreditRating"
-        if "esg" in query.lower(): target_node = "ESGScore"
-        elif "risk" in query.lower(): target_node = "RiskScore"
-        elif "sentiment" in query.lower(): target_node = "Sentiment"
-        elif "compliance" in query.lower(): target_node = "ComplianceStatus"
+        if "esg" in query.lower():
+            target_node = "ESGScore"
+        elif "risk" in query.lower():
+            target_node = "RiskScore"
+        elif "sentiment" in query.lower():
+            target_node = "Sentiment"
+        elif "compliance" in query.lower():
+            target_node = "ComplianceStatus"
 
         # 1. Discover Plan
         try:
@@ -456,12 +483,12 @@ class MetaOrchestrator:
         except Exception as e:
             logger.error(f"Planner failed: {e}", exc_info=True)
             return {"error": "Planner Exception"}
-            
+
         # 2. Compile Graph
         try:
             app = self.planner.to_executable_graph(plan_data)
             if not app:
-                 return {"error": "Failed to compile graph."}
+                return {"error": "Failed to compile graph."}
         except Exception as e:
             logger.error(f"Graph compilation failed: {e}", exc_info=True)
             return {"error": "Compilation Exception"}
@@ -474,7 +501,7 @@ class MetaOrchestrator:
             "is_complete": False,
             "cypher_query": plan_data.get("symbolic_plan")
         }
-        
+
         initial_state = {
             "request": query,
             "plan": plan_struct,
@@ -485,7 +512,7 @@ class MetaOrchestrator:
             "iteration": 0,
             "max_iterations": 5
         }
-        
+
         try:
             config = {"configurable": {"thread_id": "1"}}
             if hasattr(app, 'ainvoke'):
@@ -517,7 +544,7 @@ class MetaOrchestrator:
             "scenario_type": scenario,
             "current_scenario_description": "",
             "simulated_impact_score": 0.0,
-            "severity_threshold": 8.0, # High threshold to force loops
+            "severity_threshold": 8.0,  # High threshold to force loops
             "critique_notes": [],
             "iteration_count": 0,
             "is_sufficiently_severe": False,
@@ -543,11 +570,14 @@ class MetaOrchestrator:
 
         # Mock Extraction
         company = "Acme Corp"
-        if "apple" in query.lower(): company = "Apple Inc."
-        elif "exxon" in query.lower(): company = "Exxon Mobil"
+        if "apple" in query.lower():
+            company = "Apple Inc."
+        elif "exxon" in query.lower():
+            company = "Exxon Mobil"
 
         sector = "Technology"
-        if "oil" in query.lower() or "exxon" in query.lower(): sector = "Energy"
+        if "oil" in query.lower() or "exxon" in query.lower():
+            sector = "Energy"
 
         initial_state = init_esg_state(company, sector)
 
@@ -562,8 +592,8 @@ class MetaOrchestrator:
                 "final_state": result
             }
         except Exception as e:
-             logger.error(f"ESG Execution Failed: {e}")
-             return {"error": str(e)}
+            logger.error(f"ESG Execution Failed: {e}")
+            return {"error": str(e)}
 
     async def _run_compliance_flow(self, query: str):
         logger.info("Engaging Compliance Graph...")
@@ -571,7 +601,8 @@ class MetaOrchestrator:
         # Mock Extraction
         entity = "Generic Bank"
         jurisdiction = "US"
-        if "eu" in query.lower() or "gdpr" in query.lower(): jurisdiction = "EU"
+        if "eu" in query.lower() or "gdpr" in query.lower():
+            jurisdiction = "EU"
 
         initial_state = init_compliance_state(entity, jurisdiction)
 
@@ -615,7 +646,7 @@ class MetaOrchestrator:
         logger.info("Engaging FO Super-App Market Module...")
         # Simple extraction logic
         words = query.split()
-        symbol = "AAPL" # Default
+        symbol = "AAPL"  # Default
         for w in words:
             if w.isupper() and len(w) <= 5 and w.isalpha():
                 symbol = w
@@ -638,7 +669,8 @@ class MetaOrchestrator:
         side = "buy"
         qty = 100
 
-        if "sell" in query.lower(): side = "sell"
+        if "sell" in query.lower():
+            side = "sell"
 
         for w in words:
             if w.isupper() and len(w) <= 5 and w.isalpha():
@@ -666,14 +698,18 @@ class MetaOrchestrator:
             words = query.split()
             for i, w in enumerate(words):
                 if w.isdigit():
-                    if target == 1000000.0: target = float(w)
-                    else: horizon = int(w)
+                    if target == 1000000.0:
+                        target = float(w)
+                    else:
+                        horizon = int(w)
 
-            result = self.mcp_registry.invoke("plan_wealth_goal", goal_name=goal_name, target_amount=target, horizon_years=horizon, current_savings=target*0.1)
+            result = self.mcp_registry.invoke("plan_wealth_goal", goal_name=goal_name,
+                                              target_amount=target, horizon_years=horizon, current_savings=target*0.1)
             return {"status": "Wealth Plan Generated", "plan": result}
 
         elif "ips" in query.lower() or "governance" in query.lower():
-            result = self.mcp_registry.invoke("generate_ips", family_name="Smith", risk_profile="Growth", goals=["Preserve Capital", "Growth"], constraints=["ESG"])
+            result = self.mcp_registry.invoke("generate_ips", family_name="Smith", risk_profile="Growth", goals=[
+                                              "Preserve Capital", "Growth"], constraints=["ESG"])
             return {"status": "IPS Generated", "ips": result}
 
         return {"status": "Wealth Module: Unknown Action"}
@@ -689,8 +725,11 @@ class MetaOrchestrator:
 
         words = query.split()
         nums = [float(s) for s in words if s.replace('.', '', 1).isdigit()]
-        if len(nums) >= 1: val = nums[0]
-        if len(nums) >= 2: ebitda = nums[1]
+        if len(nums) >= 1:
+            val = nums[0]
+        if len(nums) >= 2:
+            ebitda = nums[1]
 
-        result = self.mcp_registry.invoke("screen_deal", deal_name=deal_name, sector=sector, valuation=val, ebitda=ebitda)
+        result = self.mcp_registry.invoke("screen_deal", deal_name=deal_name,
+                                          sector=sector, valuation=val, ebitda=ebitda)
         return {"status": "Deal Screened", "result": result}

@@ -5,11 +5,13 @@ from core.schemas.v23_5_schema import MultiplesAnalysis
 
 logger = logging.getLogger(__name__)
 
+
 class PeerComparisonAgent(AgentBase):
     """
     Phase 2 Helper: Peer Comparison.
     Fetches and calculates relative multiples.
     """
+
     def __init__(self, config: Dict[str, Any]):
         super().__init__(config)
         self.persona = "Equity Strategist"

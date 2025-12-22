@@ -6,6 +6,7 @@ from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
 from core.agents.industry_specialist_agent import IndustrySpecialistAgent
 from core.agents.discussion_chair_agent import DiscussionChairAgent  # Import the Discussion Chair Agent
 
+
 class CreditRatingAssessmentSimulation:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):
         """
@@ -22,7 +23,6 @@ class CreditRatingAssessmentSimulation:
         self.credit_analyst_2 = IndustrySpecialistAgent(knowledge_base_path)
         self.team_lead = SNCAnalystAgent(knowledge_base_path)
         self.discussion_chair = DiscussionChairAgent(knowledge_base_path)  # Initialize the Discussion Chair Agent
-
 
     def _load_knowledge_base(self):
         """
@@ -75,39 +75,47 @@ class CreditRatingAssessmentSimulation:
         # 1. Credit Analyst 1 Analysis
         credit_metrics = self.credit_analyst_1.analyze_financial_statements(financial_data)
         dcf_forecast = self.credit_analyst_1.perform_dcf_valuation(financial_data)
-        initial_pd_rating_1, initial_regulatory_rating_1, justification_1 = self.credit_analyst_1.propose_initial_ratings(credit_metrics, dcf_forecast, shared_knowledge_graph["pd_to_regulatory_rating_mapping"])
+        initial_pd_rating_1, initial_regulatory_rating_1, justification_1 = self.credit_analyst_1.propose_initial_ratings(
+            credit_metrics, dcf_forecast, shared_knowledge_graph["pd_to_regulatory_rating_mapping"])
 
         shared_knowledge_graph["credit_metrics"] = credit_metrics
         shared_knowledge_graph["dcf_forecast"] = dcf_forecast
         shared_knowledge_graph["initial_pd_ratings"]["Credit Analyst 1"] = initial_pd_rating_1
         shared_knowledge_graph["initial_regulatory_ratings"]["Credit Analyst 1"] = initial_regulatory_rating_1
-        shared_knowledge_graph["discussion_transcript"] += f"## Credit Analyst 1:\n\n* **Initial PD Rating:** {initial_pd_rating_1}\n* **Initial Regulatory Rating:** {initial_regulatory_rating_1}\n* **Justification:** {justification_1}\n\n"
+        shared_knowledge_graph[
+            "discussion_transcript"] += f"## Credit Analyst 1:\n\n* **Initial PD Rating:** {initial_pd_rating_1}\n* **Initial Regulatory Rating:** {initial_regulatory_rating_1}\n* **Justification:** {justification_1}\n\n"
 
         # 2. Credit Analyst 2 Analysis
         industry_analysis = self.credit_analyst_2.analyze_industry(company_name)
         company_narrative = self.credit_analyst_2.evaluate_company_narrative(company_name)
-        initial_pd_rating_2, initial_regulatory_rating_2, justification_2 = self.credit_analyst_2.propose_initial_ratings(industry_analysis, company_narrative, shared_knowledge_graph["pd_to_regulatory_rating_mapping"])
+        initial_pd_rating_2, initial_regulatory_rating_2, justification_2 = self.credit_analyst_2.propose_initial_ratings(
+            industry_analysis, company_narrative, shared_knowledge_graph["pd_to_regulatory_rating_mapping"])
 
         shared_knowledge_graph["industry_analysis"] = industry_analysis
         shared_knowledge_graph["company_narrative"] = company_narrative
         shared_knowledge_graph["initial_pd_ratings"]["Credit Analyst 2"] = initial_pd_rating_2
         shared_knowledge_graph["initial_regulatory_ratings"]["Credit Analyst 2"] = initial_regulatory_rating_2
-        shared_knowledge_graph["discussion_transcript"] += f"## Credit Analyst 2:\n\n* **Initial PD Rating:** {initial_pd_rating_2}\n* **Initial Regulatory Rating:** {initial_regulatory_rating_2}\n* **Justification:** {justification_2}\n\n"
+        shared_knowledge_graph[
+            "discussion_transcript"] += f"## Credit Analyst 2:\n\n* **Initial PD Rating:** {initial_pd_rating_2}\n* **Initial Regulatory Rating:** {initial_regulatory_rating_2}\n* **Justification:** {justification_2}\n\n"
 
         # 3. Team Lead Moderation and Recommendation
-        final_pd_rating_recommendation, final_regulatory_rating_recommendation, team_lead_justification = self.team_lead.moderate_discussion(shared_knowledge_graph)
+        final_pd_rating_recommendation, final_regulatory_rating_recommendation, team_lead_justification = self.team_lead.moderate_discussion(
+            shared_knowledge_graph)
 
         shared_knowledge_graph["final_pd_rating_recommendation"] = final_pd_rating_recommendation
         shared_knowledge_graph["final_regulatory_rating_recommendation"] = final_regulatory_rating_recommendation
-        shared_knowledge_graph["discussion_transcript"] += f"## Team Lead:\n\n* **Final PD Rating Recommendation:** {final_pd_rating_recommendation}\n* **Final Regulatory Rating Recommendation:** {final_regulatory_rating_recommendation}\n* **Justification:** {team_lead_justification}\n\n"
+        shared_knowledge_graph[
+            "discussion_transcript"] += f"## Team Lead:\n\n* **Final PD Rating Recommendation:** {final_pd_rating_recommendation}\n* **Final Regulatory Rating Recommendation:** {final_regulatory_rating_recommendation}\n* **Justification:** {team_lead_justification}\n\n"
 
         # 4. Discussion Chair Decision
-        final_pd_rating_decision, final_regulatory_rating_decision, chair_justification = self.discussion_chair.make_final_decision(shared_knowledge_graph)
+        final_pd_rating_decision, final_regulatory_rating_decision, chair_justification = self.discussion_chair.make_final_decision(
+            shared_knowledge_graph)
 
         shared_knowledge_graph["final_pd_rating_decision"] = final_pd_rating_decision
         shared_knowledge_graph["final_regulatory_rating_decision"] = final_regulatory_rating_decision
         shared_knowledge_graph["justification"] = chair_justification
-        shared_knowledge_graph["discussion_transcript"] += f"## Discussion Chair:\n\n* **Final PD Rating Decision:** {final_pd_rating_decision}\n* **Final Regulatory Rating Decision:** {final_regulatory_rating_decision}\n* **Justification:** {chair_justification}\n\n"
+        shared_knowledge_graph[
+            "discussion_transcript"] += f"## Discussion Chair:\n\n* **Final PD Rating Decision:** {final_pd_rating_decision}\n* **Final Regulatory Rating Decision:** {final_regulatory_rating_decision}\n* **Justification:** {chair_justification}\n\n"
 
         # 5. Generate Output
         output = {

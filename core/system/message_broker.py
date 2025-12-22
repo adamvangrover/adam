@@ -5,6 +5,7 @@ from collections import defaultdict
 from threading import RLock
 from typing import Callable, Dict, List, Optional
 
+
 class MessageBroker:
     _instance: Optional['MessageBroker'] = None
     _lock = RLock()

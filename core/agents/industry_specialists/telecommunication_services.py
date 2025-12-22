@@ -3,6 +3,7 @@
 import pandas as pd
 from textblob import TextBlob
 
+
 class TelecommunicationServicesSpecialist:
     def __init__(self, config):
         self.data_sources = config.get('data_sources', {})
@@ -26,14 +27,14 @@ class TelecommunicationServicesSpecialist:
         # Analyze sentiment and trends
         sentiment_scores = [TextBlob(headline['text']).sentiment.polarity for headline in news_headlines]
         avg_sentiment = sum(sentiment_scores) / len(sentiment_scores) if sentiment_scores else 0
-        #... (analyze social media sentiment and trends)
+        # ... (analyze social media sentiment and trends)
 
         trends = {
             '5g_adoption': self.analyze_5g_adoption(news_headlines, social_media_posts),
             'broadband_demand': self.analyze_broadband_demand(news_headlines, social_media_posts),
             'competition': self.analyze_competition(news_headlines, social_media_posts),
             'overall_sentiment': avg_sentiment,
-            #... (add more trends and insights)
+            # ... (add more trends and insights)
         }
         return trends
 
@@ -57,32 +58,32 @@ class TelecommunicationServicesSpecialist:
         growth_rate = self.calculate_subscriber_growth_rate(subscriber_data)
 
         # 3. Analyze network coverage and quality
-        #... (analyze company's network infrastructure and service quality)
+        # ... (analyze company's network infrastructure and service quality)
 
         analysis_results = {
             'financial_health': financial_health,
             'subscriber_growth_rate': growth_rate,
             'network_quality': 'reliable',  # Placeholder
-            #... (add more analysis results)
+            # ... (add more analysis results)
         }
         return analysis_results
 
     def analyze_5g_adoption(self, news_headlines, social_media_posts):
-        #... (analyze news and social media data to assess 5G adoption trends)
+        # ... (analyze news and social media data to assess 5G adoption trends)
         return "increasing"  # Example
 
     def analyze_broadband_demand(self, news_headlines, social_media_posts):
-        #... (analyze news and social media data to assess broadband demand trends)
+        # ... (analyze news and social media data to assess broadband demand trends)
         return "strong"  # Example
 
     def analyze_competition(self, news_headlines, social_media_posts):
-        #... (analyze news and social media data to assess competition trends)
+        # ... (analyze news and social media data to assess competition trends)
         return "intense"  # Example
 
     def analyze_financial_health(self, financial_statements):
-        #... (analyze financial data to assess financial health)
+        # ... (analyze financial data to assess financial health)
         return "stable"  # Example
 
     def calculate_subscriber_growth_rate(self, subscriber_data):
-        #... (calculate the subscriber growth rate)
+        # ... (calculate the subscriber growth rate)
         return 0.05  # Example

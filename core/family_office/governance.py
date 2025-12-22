@@ -3,6 +3,7 @@ from typing import Dict, Any, List
 
 logger = logging.getLogger(__name__)
 
+
 class GovernanceEngine:
     """
     Handles Family Office Governance, Constitution, and Investment Policy Statements (IPS).

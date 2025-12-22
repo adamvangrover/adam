@@ -6,6 +6,7 @@ from typing import Dict, Any, Tuple
 # Configure logging
 logger = logging.getLogger(__name__)
 
+
 class QuantumMonteCarloEngine:
     """
     End-to-End Quantum Monte Carlo (QMC) Engine for Credit Risk.
@@ -104,6 +105,7 @@ class QuantumMonteCarloEngine:
 
         return float(risk_contribution)
 
+
 # Example usage
 if __name__ == "__main__":
     qmc = QuantumMonteCarloEngine()
@@ -112,7 +114,7 @@ if __name__ == "__main__":
     result = qmc.simulate_merton_model(
         asset_value=100.0,
         debt_face_value=80.0,
-        volatility=0.4, # High volatility
+        volatility=0.4,  # High volatility
         risk_free_rate=0.05,
         time_horizon=1.0
     )

@@ -1,6 +1,7 @@
 import copy
 import json
 
+
 def expand_data(data_payload, latent_tensors):
     """
     Expands the training data using latent quantum tensors.
@@ -31,8 +32,8 @@ def expand_data(data_payload, latent_tensors):
             try:
                 vector_str = ", ".join([f"{x:.4f}" for x in tensor_vector])
             except TypeError:
-                 # Fallback if tensor_vector is a single value or something else
-                 vector_str = str(tensor_vector)
+                # Fallback if tensor_vector is a single value or something else
+                vector_str = str(tensor_vector)
 
             # Find system message
             for msg in variation['messages']:

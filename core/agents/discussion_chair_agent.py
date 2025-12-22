@@ -1,6 +1,8 @@
 # core/agents/discussion_chair_agent.py
 
+import logging
 import json
+
 
 class DiscussionChairAgent:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):
@@ -166,12 +168,8 @@ class DiscussionChairAgent:
         return decision, rationale
 
 
+# WIP /////////////////////////////////////////////////////
 
-
-#WIP /////////////////////////////////////////////////////
-
-import json
-import logging
 
 class DiscussionChairAgent:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):
@@ -215,7 +213,7 @@ class DiscussionChairAgent:
 
         Returns:
             tuple: A tuple containing the decision and rationale.
-            
+
         Raises:
             ValueError: If the simulation type is invalid.
         """
@@ -318,10 +316,8 @@ class DiscussionChairAgent:
         logging.info(f"Rationale: {rationale}")
 
 
+# WIP /////////////////////////////////////////////
 
-#WIP /////////////////////////////////////////////
-
-import json
 
 class DiscussionChairAgent:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):
@@ -397,20 +393,20 @@ class DiscussionChairAgent:
         industry_analysis = shared_knowledge_graph["industry_analysis"]
         company_narrative = shared_knowledge_graph["company_narrative"]
         initial_pd_ratings = shared_knowledge_graph["initial_pd_ratings"]
-        
+
         # Conflict detection (example: PD ratings vs. Financial data)
         discrepancies = self._detect_conflicts(financial_data, initial_pd_ratings, industry_analysis)
-        
+
         # Weigh quantitative vs qualitative factors
         final_pd_rating = self._weigh_quantitative_and_qualitative(financial_data, credit_metrics, industry_analysis)
-        
+
         # Determine regulatory rating based on mapped PD
         final_regulatory_rating = pd_to_regulatory_rating_mapping.get(final_pd_rating, "Unknown")
-        
+
         # Justification
         justification = f"Final PD rating: {final_pd_rating}, Regulatory rating: {final_regulatory_rating}. " \
-                        f"Discrepancies identified: {discrepancies}. Analysis points to the company's strong financials, but " \
-                        "conflicting industry outlook slightly impacts the rating."
+            f"Discrepancies identified: {discrepancies}. Analysis points to the company's strong financials, but " \
+            "conflicting industry outlook slightly impacts the rating."
 
         return final_pd_rating, final_regulatory_rating, justification
 
@@ -444,16 +440,16 @@ class DiscussionChairAgent:
             "alternative_data": alternative_data,
             "crypto_exposure": crypto_exposure
         }
-        
+
         # Conflict detection (e.g., fundamental analysis vs. technical analysis)
         conflicts = self._detect_conflicts(fundamental_analysis, technical_analysis, risk_assessment)
-        
+
         # Weigh quantitative vs qualitative factors
         decision = self._weigh_quantitative_and_qualitative_for_investment(fundamental_analysis, risk_assessment)
-        
+
         # Justification
         rationale = f"Investment Decision: {decision}. Conflicts detected: {conflicts}. Further analysis suggests that the investment " \
-                    "is suitable based on fundamental analysis, but technical analysis and risk assessment show some caution."
+            "is suitable based on fundamental analysis, but technical analysis and risk assessment show some caution."
 
         return decision, rationale
 
@@ -472,7 +468,7 @@ class DiscussionChairAgent:
         if "valuation" in data_sources[0] and "valuation" in data_sources[1]:
             if data_sources[0]["valuation"] != data_sources[1]["valuation"]:
                 conflicts.append("Valuation mismatch between analyses.")
-        
+
         return conflicts
 
     def _weigh_quantitative_and_qualitative(self, financial_data, credit_metrics, industry_analysis):
@@ -510,4 +506,3 @@ class DiscussionChairAgent:
             return "Approve"
         else:
             return "Reject"
-

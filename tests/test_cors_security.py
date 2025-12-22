@@ -1,3 +1,4 @@
+from core.api.server import app
 import pytest
 import sys
 import os
@@ -5,13 +6,13 @@ import os
 # Ensure core is in path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))
 
-from core.api.server import app
 
 @pytest.fixture
 def client():
     app.config['TESTING'] = True
     with app.test_client() as client:
         yield client
+
 
 def test_cors_restricted(client):
     """
@@ -22,6 +23,7 @@ def test_cors_restricted(client):
     # Should be None or not equal to evil.com
     # Flask-Cors returns None if origin is not allowed
     assert acao != 'http://evil.com' and acao != '*', f"CORS not restricted: {acao}"
+
 
 def test_cors_allowed(client):
     """

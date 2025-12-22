@@ -5,11 +5,13 @@ from core.schemas.v23_5_schema import ManagementAssessment, EntityEcosystem, Leg
 
 logger = logging.getLogger(__name__)
 
+
 class ManagementAssessmentAgent(AgentBase):
     """
     Phase 1: Entity & Management Assessment.
     Analyzes capital allocation, insider alignment, and CEO tone.
     """
+
     def __init__(self, config: Dict[str, Any]):
         super().__init__(config)
         self.persona = "Management Consultant"
@@ -25,13 +27,13 @@ class ManagementAssessmentAgent(AgentBase):
             capital_allocation_score=8.5,
             alignment_analysis="Insiders hold >5% of float; Recent open market purchases.",
             key_person_risk="Low",
-            ceo_tone_score=0.75 # Positive sentiment
+            ceo_tone_score=0.75  # Positive sentiment
         )
 
         ecosystem = EntityEcosystem(
             legal_entity=LegalEntity(
                 name=company_name,
-                lei="5493006MNBPLZN2B8S08", # Mock LEI
+                lei="5493006MNBPLZN2B8S08",  # Mock LEI
                 jurisdiction="Delaware, USA",
                 sector="Technology",
                 industry="Consumer Electronics"

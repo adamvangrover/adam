@@ -1,5 +1,6 @@
 from typing import List, Dict, Any
 
+
 class AlphaSignalHandler:
     """
     Ingests and processes alpha signals from structured and unstructured data.
@@ -13,6 +14,6 @@ class AlphaSignalHandler:
             "signal_id": "SIG-001",
             "source": source,
             "raw_value": data,
-            "alpha_score": 0.75, # Mock score
+            "alpha_score": 0.75,  # Mock score
             "conviction": "High"
         }

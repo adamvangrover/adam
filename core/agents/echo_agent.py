@@ -6,6 +6,7 @@ import logging
 from core.utils.data_utils import send_message, receive_messages
 from core.utils.api_utils import get_knowledge_graph_data
 
+
 class EchoAgent:
     def __init__(self, config):
         self.config = config
@@ -154,4 +155,3 @@ class EchoAgent:
 
         except Exception as e:
             self.logger.error("Error running EchoAgent: %s", e)
-

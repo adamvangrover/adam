@@ -4,12 +4,14 @@ import yaml
 from dataclasses import dataclass, field
 from typing import List, Dict
 
+
 @dataclass
 class LLMConfig:
     engine: str = "openai"
     model: str = "gpt-4-turbo"
     temperature: float = 0.5
     max_tokens: int = 2048
+
 
 @dataclass
 class MarketConfig:
@@ -19,6 +21,7 @@ class MarketConfig:
     market_sentiment: float = 0.5
     liquidity: float = 0.7
     news_impact: float = 0.3
+
 
 @dataclass
 class EconomyConfig:
@@ -32,6 +35,7 @@ class EconomyConfig:
     retail_sales: float = 0.01
     cpi: float = 250.0
 
+
 @dataclass
 class GeopoliticsConfig:
     political_stability: float = 0.75
@@ -41,25 +45,30 @@ class GeopoliticsConfig:
     geopolitical_hotspots: List[str] = field(default_factory=list)
     terrorism_risk: float = 0.1
 
+
 @dataclass
 class EnvironmentConfig:
     natural_disaster_risk: float = 0.05
     climate_change_impact: float = 0.02
+
 
 @dataclass
 class DemographicsConfig:
     population_growth: float = 0.008
     aging_population_impact: float = 0.01
 
+
 @dataclass
 class TechnologyConfig:
     technological_disruption_risk: float = 0.1
     ai_adoption_rate: float = 0.05
 
+
 @dataclass
 class SimulationConfig:
     steps: int = 200
     runs: int = 50
+
 
 @dataclass
 class WorldSimulationConfig:
@@ -71,6 +80,7 @@ class WorldSimulationConfig:
     environment: EnvironmentConfig = field(default_factory=EnvironmentConfig)
     demographics: DemographicsConfig = field(default_factory=DemographicsConfig)
     technology: TechnologyConfig = field(default_factory=TechnologyConfig)
+
 
 def load_config(path: str) -> WorldSimulationConfig:
     with open(path, "r") as f:

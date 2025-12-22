@@ -12,6 +12,7 @@ import json
 import functools
 import asyncio
 import re
+import threading
 from datetime import datetime, timezone
 from .config import config
 from .celery import celery
@@ -20,9 +21,11 @@ from .celery import celery
 # Helpers
 # ---------------------------------------------------------------------------- #
 
+
 @functools.lru_cache(maxsize=1)
 def _get_allowed_simulations():
-    simulations_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'core', 'simulations')
+    simulations_dir = os.path.join(os.path.dirname(os.path.dirname(
+        os.path.dirname(os.path.abspath(__file__)))), 'core', 'simulations')
     if not os.path.exists(simulations_dir):
         return []
     return [os.path.splitext(f)[0] for f in os.listdir(simulations_dir) if f.endswith('.py') and not f.startswith('__')]
@@ -31,11 +34,46 @@ def _get_allowed_simulations():
 # Initialize Extensions
 # ---------------------------------------------------------------------------- #
 
+
 db = SQLAlchemy()
 socketio = SocketIO()
 jwt = JWTManager()
 agent_orchestrator = None
 meta_orchestrator = None
+_neo4j_driver = None
+_neo4j_lock = threading.Lock()
+
+
+def get_neo4j_driver():
+    """
+    ⚡ Bolt Optimization: Singleton pattern for Neo4j driver.
+    Prevents creating a new connection pool on every request.
+    Uses double-checked locking for thread safety.
+    """
+    global _neo4j_driver
+
+    if _neo4j_driver:
+        return _neo4j_driver
+
+    with _neo4j_lock:
+        if _neo4j_driver:
+            return _neo4j_driver
+
+        try:
+            from neo4j import GraphDatabase
+            uri = os.environ.get('NEO4J_URI', 'bolt://neo4j:7687')
+            user = os.environ.get('NEO4J_USER', 'neo4j')
+            password = os.environ.get('NEO4J_PASSWORD')  # 🛡️ Sentinel: No hardcoded default password
+            auth = (user, password) if password else None
+
+            _neo4j_driver = GraphDatabase.driver(uri, auth=auth)
+            return _neo4j_driver
+        except ImportError:
+            logging.getLogger(__name__).warning("Neo4j driver could not be imported.")
+            return None
+        except Exception as e:
+            logging.getLogger(__name__).error(f"Failed to initialize Neo4j driver: {e}")
+            return None
 
 
 # ---------------------------------------------------------------------------- #
@@ -57,6 +95,7 @@ class User(db.Model):
     def __repr__(self):
         return f'<User {self.username}>'
 
+
 class Portfolio(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120), nullable=False)
@@ -66,6 +105,7 @@ class Portfolio(db.Model):
 
     def __repr__(self):
         return f'<Portfolio {self.name}>'
+
 
 class PortfolioAsset(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -77,6 +117,7 @@ class PortfolioAsset(db.Model):
     def __repr__(self):
         return f'<PortfolioAsset {self.symbol}>'
 
+
 class SimulationResult(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     task_id = db.Column(db.String(36), unique=True, nullable=False)
@@ -85,9 +126,9 @@ class SimulationResult(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', backref=db.backref('simulation_results', lazy=True))
 
-
     def __repr__(self):
         return f'<SimulationResult {self.simulation_name}>'
+
 
 class TokenBlocklist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -97,6 +138,7 @@ class TokenBlocklist(db.Model):
 # ---------------------------------------------------------------------------- #
 # Application Factory
 # ---------------------------------------------------------------------------- #
+
 
 def create_app(config_name='default'):
     """
@@ -125,7 +167,6 @@ def create_app(config_name='default'):
 
     celery.Task = ContextTask
 
-
     # Initialize the core components
     global meta_orchestrator
     if app.config['CORE_INTEGRATION']:
@@ -137,9 +178,10 @@ def create_app(config_name='default'):
         from core.engine.meta_orchestrator import MetaOrchestrator
 
         core_config = load_app_config()
-        knowledge_base = KnowledgeBase(core_config)
-        data_manager = DataManager(core_config)
-        agent_orchestrator = AgentOrchestrator(core_config, knowledge_base, data_manager)
+        # knowledge_base and data_manager are not used by AgentOrchestrator v2
+        # knowledge_base = KnowledgeBase(core_config)
+        # data_manager = DataManager(core_config)
+        agent_orchestrator = AgentOrchestrator()
         meta_orchestrator = MetaOrchestrator(legacy_orchestrator=agent_orchestrator)
 
     # ---------------------------------------------------------------------------- #
@@ -166,38 +208,38 @@ def create_app(config_name='default'):
         data = request.get_json()
         query = data.get('query')
         if not query:
-             return jsonify({'error': 'No query provided'}), 400
+            return jsonify({'error': 'No query provided'}), 400
 
         # 🛡️ Sentinel: Validate query length and type
         if not isinstance(query, str):
-             return jsonify({'error': 'Query must be a string'}), 400
+            return jsonify({'error': 'Query must be a string'}), 400
         if len(query) > 5000:
-             return jsonify({'error': 'Query too long (max 5000 chars)'}), 400
+            return jsonify({'error': 'Query too long (max 5000 chars)'}), 400
 
         if app.config['CORE_INTEGRATION'] and meta_orchestrator:
-             import asyncio
-             try:
-                 # Ensure we have an event loop
-                 try:
-                     loop = asyncio.get_event_loop()
-                 except RuntimeError:
-                     loop = asyncio.new_event_loop()
-                     asyncio.set_event_loop(loop)
+            import asyncio
+            try:
+                # Ensure we have an event loop
+                try:
+                    loop = asyncio.get_event_loop()
+                except RuntimeError:
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
 
-                 if loop.is_running():
-                      # If we are already in a loop (e.g. uvicorn/hypercorn), handle differently
-                      # But Flask dev server is threaded.
-                      future = asyncio.run_coroutine_threadsafe(meta_orchestrator.route_request(query), loop)
-                      result = future.result()
-                 else:
-                      result = loop.run_until_complete(meta_orchestrator.route_request(query))
+                if loop.is_running():
+                    # If we are already in a loop (e.g. uvicorn/hypercorn), handle differently
+                    # But Flask dev server is threaded.
+                    future = asyncio.run_coroutine_threadsafe(meta_orchestrator.route_request(query), loop)
+                    result = future.result()
+                else:
+                    result = loop.run_until_complete(meta_orchestrator.route_request(query))
 
-                 return jsonify(result)
-             except Exception as e:
-                 app.logger.error(f"Error in v23 analysis: {e}", exc_info=True)
-                 return jsonify({'error': 'An internal error occurred during analysis.'}), 500
+                return jsonify(result)
+            except Exception as e:
+                app.logger.error(f"Error in v23 analysis: {e}", exc_info=True)
+                return jsonify({'error': 'An internal error occurred during analysis.'}), 500
         else:
-             return jsonify({'status': 'Mock Result', 'analysis': 'Core not integrated or MetaOrchestrator not ready.'})
+            return jsonify({'status': 'Mock Result', 'analysis': 'Core not integrated or MetaOrchestrator not ready.'})
 
     # ---------------------------------------------------------------------------- #
     # Agent Endpoints
@@ -217,8 +259,8 @@ def create_app(config_name='default'):
         else:
             return jsonify([])
 
-
     @app.route('/api/agents/<agent_name>/invoke', methods=['POST'])
+    @jwt_required()
     def invoke_agent(agent_name):
         """
         Invokes a specific agent with the given arguments.
@@ -242,7 +284,7 @@ def create_app(config_name='default'):
             if agent_config and 'input_schema' in agent_config:
                 return jsonify(agent_config['input_schema'])
             else:
-                return jsonify({}) # Return empty schema if not found
+                return jsonify({})  # Return empty schema if not found
         else:
             return jsonify({})
 
@@ -263,7 +305,6 @@ def create_app(config_name='default'):
         db.session.add(new_user)
         db.session.commit()
         return jsonify({'message': 'User created successfully'}), 201
-
 
     @jwt.token_in_blocklist_loader
     def check_if_token_revoked(jwt_header, jwt_payload):
@@ -398,7 +439,6 @@ def create_app(config_name='default'):
             'status': run_simulation_task.AsyncResult(r.task_id).state
         } for r in results])
 
-
     @app.route('/api/simulations/<simulation_name>', methods=['POST'])
     @jwt_required()
     def run_simulation(simulation_name):
@@ -409,11 +449,11 @@ def create_app(config_name='default'):
 
         # 🛡️ Sentinel: Validate simulation name format
         if not re.match(r'^[a-zA-Z0-9_]+$', simulation_name):
-             return jsonify({'error': 'Invalid simulation name format'}), 400
+            return jsonify({'error': 'Invalid simulation name format'}), 400
 
         # 🛡️ Sentinel: Validate simulation name against allowlist
         if simulation_name not in _get_allowed_simulations():
-             return jsonify({'error': 'Invalid simulation name'}), 400
+            return jsonify({'error': 'Invalid simulation name'}), 400
 
         task = run_simulation_task.delay(simulation_name, current_user_id)
         return jsonify({'task_id': task.id})
@@ -428,7 +468,10 @@ def create_app(config_name='default'):
         Returns the knowledge graph data from Neo4j.
         Accepts a 'query' parameter to search for a starting node.
         """
-        from neo4j import GraphDatabase
+        driver = get_neo4j_driver()
+        if not driver:
+            return jsonify({'error': 'Graph database connection unavailable'}), 503
+
         query = request.args.get('query')
         cypher_query = "MATCH (n)-[r]->(m) RETURN n, r, m LIMIT 25"
         params = {}
@@ -437,37 +480,36 @@ def create_app(config_name='default'):
             cypher_query = "MATCH (n)-[r]->(m) WHERE n.name CONTAINS $query RETURN n, r, m LIMIT 100"
             params = {'query': query}
 
+        try:
+            with driver.session() as session:
+                result = session.run(cypher_query, params)
+                nodes = {}
+                links = []
+                for record in result:
+                    source_node = record["n"]
+                    target_node = record["m"]
 
-        uri = os.environ.get('NEO4J_URI', 'bolt://neo4j:7687')
-        user = os.environ.get('NEO4J_USER', 'neo4j')
-        password = os.environ.get('NEO4J_PASSWORD') # 🛡️ Sentinel: No hardcoded default password
+                    source_id = source_node.id
+                    target_id = target_node.id
 
-        auth = (user, password) if password else None
-        driver = GraphDatabase.driver(uri, auth=auth)
-        with driver.session() as session:
-            result = session.run(cypher_query, params)
-            nodes = {}
-            links = []
-            for record in result:
-                source_node = record["n"]
-                target_node = record["m"]
+                    if source_id not in nodes:
+                        nodes[source_id] = {"id": source_node.get('name'), "labels": list(
+                            source_node.labels), "properties": dict(source_node)}
+                    if target_id not in nodes:
+                        nodes[target_id] = {"id": target_node.get('name'), "labels": list(
+                            target_node.labels), "properties": dict(target_node)}
 
-                source_id = source_node.id
-                target_id = target_node.id
+                    links.append({
+                        "source": source_node.get('name'),
+                        "target": target_node.get('name'),
+                        "type": type(record["r"]).__name__,
+                        "properties": dict(record["r"])
+                    })
 
-                if source_id not in nodes:
-                    nodes[source_id] = {"id": source_node.get('name'), "labels": list(source_node.labels), "properties": dict(source_node)}
-                if target_id not in nodes:
-                    nodes[target_id] = {"id": target_node.get('name'), "labels": list(target_node.labels), "properties": dict(target_node)}
-
-                links.append({
-                    "source": source_node.get('name'),
-                    "target": target_node.get('name'),
-                    "type": type(record["r"]).__name__,
-                    "properties": dict(record["r"])
-                })
-
-            return jsonify({"nodes": list(nodes.values()), "links": links})
+                return jsonify({"nodes": list(nodes.values()), "links": links})
+        except Exception as e:
+            app.logger.error(f"Error querying Neo4j: {e}")
+            return jsonify({'error': 'Error querying knowledge graph'}), 500
 
     # ---------------------------------------------------------------------------- #
     # Task Endpoints
@@ -539,7 +581,8 @@ def create_app(config_name='default'):
     def get_portfolio(id):
         current_user_id = get_jwt_identity()
         portfolio = Portfolio.query.filter_by(id=id, user_id=current_user_id).first_or_404()
-        assets = [{'id': asset.id, 'symbol': asset.symbol, 'quantity': asset.quantity, 'purchase_price': asset.purchase_price} for asset in portfolio.assets]
+        assets = [{'id': asset.id, 'symbol': asset.symbol, 'quantity': asset.quantity,
+                   'purchase_price': asset.purchase_price} for asset in portfolio.assets]
         return jsonify({'id': portfolio.id, 'name': portfolio.name, 'assets': assets})
 
     @app.route('/api/portfolios/<int:id>', methods=['PUT'])
@@ -600,7 +643,6 @@ def create_app(config_name='default'):
         db.session.commit()
         return jsonify({'result': True})
 
-
     # ---------------------------------------------------------------------------- #
     # Error Handlers
     # ---------------------------------------------------------------------------- #
@@ -619,8 +661,10 @@ def create_app(config_name='default'):
 
     return app
 
+
 if __name__ == '__main__':
     app = create_app(os.getenv('FLASK_CONFIG') or 'default')
     with app.app_context():
         db.create_all()
-    socketio.run(app, debug=True, port=5001)
+    debug_mode = os.getenv("FLASK_DEBUG", "False").lower() in ("true", "1", "t")
+    socketio.run(app, debug=debug_mode, port=5001)

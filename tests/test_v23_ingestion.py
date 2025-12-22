@@ -14,6 +14,7 @@ from core.data_processing.universal_ingestor_v2 import UniversalIngestor, Artifa
 # Disable logging during tests
 logging.disable(logging.CRITICAL)
 
+
 class TestV23Ingestion(unittest.TestCase):
 
     def setUp(self):
@@ -26,7 +27,7 @@ class TestV23Ingestion(unittest.TestCase):
 
     def test_realtime_pipe_mock(self):
         pipe = MockRealTimePipe(lakehouse_path=str(self.lakehouse_path), flush_threshold=10)
-        pipe.listen() # Should generate data and flush
+        pipe.listen()  # Should generate data and flush
 
         # Check files
         self.assertTrue(self.lakehouse_path.exists())
@@ -51,7 +52,7 @@ class TestV23Ingestion(unittest.TestCase):
         data = {
             'symbol': ['TEST', 'TEST'],
             'Open': [100.0, 100.0],
-            'Close': [101.0, 90.0], # 2nd day drop 10%
+            'Close': [101.0, 90.0],  # 2nd day drop 10%
             'Volume': [1000, 2000],
             'timestamp': [pd.Timestamp('2023-01-01'), pd.Timestamp('2023-01-02')]
         }
@@ -90,6 +91,7 @@ class TestV23Ingestion(unittest.TestCase):
         self.assertEqual(len(ingestor.artifacts), 1)
         self.assertEqual(ingestor.artifacts[0].artifact_type, ArtifactType.DATA.value)
         self.assertIn("col1", ingestor.artifacts[0].metadata['columns'])
+
 
 if __name__ == '__main__':
     unittest.main()

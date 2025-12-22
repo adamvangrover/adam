@@ -1,10 +1,12 @@
 from typing import Dict, Any
 from ..state import VerticalRiskGraphState
 
+
 class QuantAgent:
     """
     Specialized in extracting tabular data, running calculations, and analyzing Excel models.
     """
+
     def __init__(self, model):
         self.model = model
 
@@ -25,8 +27,9 @@ class QuantAgent:
         revenue = pnl.get("revenue", 0.0)
         op_inc = pnl.get("operating_income", 0.0)
         da = pnl.get("depreciation_amortization", 0.0)
-        interest = pnl.get("interest_expense", 1.0) # Avoid div/0
-        if interest == 0: interest = 1.0
+        interest = pnl.get("interest_expense", 1.0)  # Avoid div/0
+        if interest == 0:
+            interest = 1.0
 
         # Calculate EBITDA
         ebitda = pnl.get("consolidated_ebitda")
@@ -57,6 +60,6 @@ class QuantAgent:
         return {
             "quant_analysis": analysis_text,
             "balance_sheet": bs,
-            "income_statement": pnl, # Pass through
+            "income_statement": pnl,  # Pass through
             "messages": ["Quant: Financial analysis and stress testing complete."]
         }

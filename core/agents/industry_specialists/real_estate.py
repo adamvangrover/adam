@@ -3,6 +3,7 @@
 import pandas as pd
 from textblob import TextBlob
 
+
 class RealEstateSpecialist:
     def __init__(self, config):
         self.data_sources = config.get('data_sources', {})
@@ -26,14 +27,14 @@ class RealEstateSpecialist:
         # Analyze sentiment and trends
         sentiment_scores = [TextBlob(headline['text']).sentiment.polarity for headline in news_headlines]
         avg_sentiment = sum(sentiment_scores) / len(sentiment_scores) if sentiment_scores else 0
-        #... (analyze social media sentiment and trends)
+        # ... (analyze social media sentiment and trends)
 
         trends = {
             'housing_market_demand': self.analyze_housing_market_demand(news_headlines, social_media_posts),
             'commercial_real_estate_market': self.analyze_commercial_real_estate_market(news_headlines, social_media_posts),
             'interest_rate_impact': self.analyze_interest_rate_impact(news_headlines, social_media_posts),
             'overall_sentiment': avg_sentiment,
-            #... (add more trends and insights)
+            # ... (add more trends and insights)
         }
         return trends
 
@@ -57,32 +58,32 @@ class RealEstateSpecialist:
         avg_occupancy_rate = self.calculate_average_occupancy_rate(occupancy_rates)
 
         # 3. Analyze rental income and debt levels
-        #... (analyze company's rental income, debt levels, and financial leverage)
+        # ... (analyze company's rental income, debt levels, and financial leverage)
 
         analysis_results = {
             'financial_health': financial_health,
             'average_occupancy_rate': avg_occupancy_rate,
             'debt_to_equity_ratio': 'healthy',  # Placeholder
-            #... (add more analysis results)
+            # ... (add more analysis results)
         }
         return analysis_results
 
     def analyze_housing_market_demand(self, news_headlines, social_media_posts):
-        #... (analyze news and social media data to assess housing market demand trends)
+        # ... (analyze news and social media data to assess housing market demand trends)
         return "strong"  # Example
 
     def analyze_commercial_real_estate_market(self, news_headlines, social_media_posts):
-        #... (analyze news and social media data to assess commercial real estate market trends)
+        # ... (analyze news and social media data to assess commercial real estate market trends)
         return "stable"  # Example
 
     def analyze_interest_rate_impact(self, news_headlines, social_media_posts):
-        #... (analyze news and social media data to assess the impact of interest rates)
+        # ... (analyze news and social media data to assess the impact of interest rates)
         return "moderate"  # Example
 
     def analyze_financial_health(self, financial_statements):
-        #... (analyze financial data to assess financial health)
+        # ... (analyze financial data to assess financial health)
         return "stable"  # Example
 
     def calculate_average_occupancy_rate(self, occupancy_rates):
-        #... (calculate the average occupancy rate across properties)
+        # ... (calculate the average occupancy rate across properties)
         return 0.9  # Example

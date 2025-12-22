@@ -1,5 +1,6 @@
 import React from 'react';
 import { render } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import App from './App';
 
 // Mock child components to avoid dependency issues
@@ -16,5 +17,9 @@ jest.mock('./pages/PortfolioManagement', () => () => <div>PortfolioManagement</d
 jest.mock('./pages/SimulationTools', () => () => <div>SimulationTools</div>);
 
 test('renders app without crashing', () => {
-  render(<App />);
+  render(
+    <MemoryRouter>
+      <App />
+    </MemoryRouter>
+  );
 });

@@ -5,6 +5,7 @@ try:
 except ImportError:
     redis = None
 
+
 class KGCache:
     """
     A caching layer for SPARQL queries using Redis.
@@ -26,9 +27,9 @@ class KGCache:
         if redis:
             try:
                 self.redis = redis.Redis(host=host, port=port, db=db)
-                self.redis.ping() # Check connection
+                self.redis.ping()  # Check connection
             except Exception:
-                self.redis = None # Fallback to mock
+                self.redis = None  # Fallback to mock
 
     def get(self, query: str) -> str:
         """

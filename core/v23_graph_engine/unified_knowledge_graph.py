@@ -5,6 +5,7 @@ from typing import Dict, Any, List, Optional
 
 logger = logging.getLogger(__name__)
 
+
 class UnifiedKnowledgeGraph:
     """
     The central brain of the system.
@@ -13,6 +14,7 @@ class UnifiedKnowledgeGraph:
     2. System Entities (Agents, Tools - via RepoGraph)
     3. Memory Artifacts (Past Analysis)
     """
+
     def __init__(self):
         self.graph = nx.DiGraph()
 
@@ -27,7 +29,8 @@ class UnifiedKnowledgeGraph:
         """Ingests financial entities."""
         for company in companies:
             node_id = company.get("symbol") or company.get("company_id")
-            if not node_id: continue
+            if not node_id:
+                continue
 
             self.graph.add_node(
                 node_id,
@@ -72,7 +75,7 @@ class UnifiedKnowledgeGraph:
             entity_id,
             type="LegalEntity",
             ticker=ticker,
-            label=ticker # For display
+            label=ticker  # For display
         )
 
         # 2. Financial Report (Snapshot)
@@ -101,31 +104,32 @@ class UnifiedKnowledgeGraph:
 
         # 3. Covenants
         covenants = risk_state.get("covenants", [])
-        for cov in covenants:
-            cov_name = cov.get("name", "Unknown Covenant")
-            cov_id = f"Covenant::{ticker}::{cov_name}"
 
-            self.graph.add_node(
-                cov_id,
-                type="Covenant",
-                name=cov_name,
-                threshold=cov.get("threshold"),
-                operator=cov.get("operator")
-            )
-            # In a real graph, we'd link to the Facility. Here we link to Entity via a "governed_by" proxy or direct
-            # Using the schema: LegalEntity -> BORROWS -> Facility -> GOVERNED_BY -> Covenant
-            # We'll create a synthetic facility for now
+        # Bolt Optimization: Hoist facility creation out of loop to avoid N redundant checks
+        if covenants:
             facility_id = f"CreditFacility::{ticker}::General"
             if not self.graph.has_node(facility_id):
                 self.graph.add_node(facility_id, type="CreditFacility", name="General Facility")
                 self.graph.add_edge(entity_id, facility_id, relation="BORROWS")
 
-            self.graph.add_edge(facility_id, cov_id, relation="GOVERNED_BY")
+            for cov in covenants:
+                cov_name = cov.get("name", "Unknown Covenant")
+                cov_id = f"Covenant::{ticker}::{cov_name}"
+
+                self.graph.add_node(
+                    cov_id,
+                    type="Covenant",
+                    name=cov_name,
+                    threshold=cov.get("threshold"),
+                    operator=cov.get("operator")
+                )
+
+                self.graph.add_edge(facility_id, cov_id, relation="GOVERNED_BY")
 
         # 4. Risk Model Output
         if risk_state.get("draft_memo"):
             memo = risk_state["draft_memo"]
-            model_id = f"RiskModel::{ticker}::{self.graph.number_of_nodes()}" # Unique ID
+            model_id = f"RiskModel::{ticker}::{self.graph.number_of_nodes()}"  # Unique ID
             self.graph.add_node(
                 model_id,
                 type="RiskModel",
@@ -167,11 +171,11 @@ class UnifiedKnowledgeGraph:
         # Link to Entity if provided
         entity_id = event.get("entity_id") or event.get("ticker")
         if entity_id:
-             # Auto-create entity node if missing to ensure linkage
-             if not self.graph.has_node(entity_id):
-                 self.graph.add_node(entity_id, type="LegalEntity")
+            # Auto-create entity node if missing to ensure linkage
+            if not self.graph.has_node(entity_id):
+                self.graph.add_node(entity_id, type="LegalEntity")
 
-             self.graph.add_edge(entity_id, event_id, relation="HAS_COMPLIANCE_EVENT")
+            self.graph.add_edge(entity_id, event_id, relation="HAS_COMPLIANCE_EVENT")
 
         logger.info(f"Ingested Compliance Event: {event_id}")
 

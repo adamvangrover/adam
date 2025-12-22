@@ -8,7 +8,7 @@ from core.utils.data_utils import send_message, receive_messages
 from typing import List, Dict
 import re
 import logging
-import json #knowledge base
+import json  # knowledge base
 
 try:
     from textblob import TextBlob
@@ -22,13 +22,13 @@ except ImportError:
 
 # ... (import other necessary libraries, e.g., for knowledge base interaction)
 
+
 class PromptTuner:
 
     """
     Refines and optimizes prompts for communication and analysis within the Adam v19.2 system.
     """
 
-    
     def __init__(self, config, orchestrator, knowledge_base: Dict):
         self.config = config
         self.orchestrator = orchestrator
@@ -41,7 +41,7 @@ class PromptTuner:
             try:
                 self.nlp = spacy.load("en_core_web_sm")  # Load spaCy NLP model
             except Exception as e:
-                 logging.warning(f"Failed to load spacy model 'en_core_web_sm': {e}. NLP features disabled.")
+                logging.warning(f"Failed to load spacy model 'en_core_web_sm': {e}. NLP features disabled.")
         else:
             logging.warning("Spacy not installed. NLP features disabled.")
 

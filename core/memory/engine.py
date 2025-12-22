@@ -4,6 +4,7 @@ import sqlite3
 import datetime
 import os
 
+
 class MemoryEngine:
     """
     Personal Knowledge Graph Engine.
@@ -98,7 +99,7 @@ class MemoryEngine:
                 "category": r[1],
                 "tags": json.loads(r[2]),
                 "timestamp": r[3],
-                "score": 0.9 # Mock score
+                "score": 0.9  # Mock score
             }
             for r in rows
         ]

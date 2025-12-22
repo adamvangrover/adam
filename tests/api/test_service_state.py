@@ -1,18 +1,22 @@
 import pytest
 from fastapi.testclient import TestClient
 from unittest.mock import MagicMock, patch
-import torch
+import pytest
+torch = pytest.importorskip("torch")
 
 from src.adam.api.main import app, state_manager
 from src.adam.api.auth import get_current_user
 
 # Override dependency
+
+
 async def override_get_current_user():
     return {"sub": "test_user"}
 
 app.dependency_overrides[get_current_user] = override_get_current_user
 
 client = TestClient(app)
+
 
 def test_optimization_flow_adamw():
     """
@@ -54,7 +58,7 @@ def test_optimization_flow_adamw():
             payload = {
                 "session_id": "sess_A",
                 "config": {"algorithm": "adamw", "learning_rate": 0.1},
-                "parameters": [0.99, 0.99], # Parameters updated externally or by prev step
+                "parameters": [0.99, 0.99],  # Parameters updated externally or by prev step
                 "gradients": [0.1, 0.1]
             }
 
@@ -72,16 +76,17 @@ def test_optimization_flow_adamw():
             assert len(param_state_values) > 0
             assert param_state_values[0]['step'] == 2
 
+
 def test_adam_mini_support():
     """
     Test that Adam-mini endpoint accepts request and runs (even if mocked/approx).
     """
     with patch.object(state_manager, 'save_state'):
-         payload = {
-                "session_id": "sess_B",
-                "config": {"algorithm": "adam-mini", "learning_rate": 0.01},
-                "parameters": [1.0] * 128, # Block size 128
-                "gradients": [0.1] * 128
-            }
-         response = client.post("/optimize", json=payload)
-         assert response.status_code == 200
+        payload = {
+            "session_id": "sess_B",
+            "config": {"algorithm": "adam-mini", "learning_rate": 0.01},
+            "parameters": [1.0] * 128,  # Block size 128
+            "gradients": [0.1] * 128
+        }
+        response = client.post("/optimize", json=payload)
+        assert response.status_code == 200

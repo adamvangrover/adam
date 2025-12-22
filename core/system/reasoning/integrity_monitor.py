@@ -17,11 +17,12 @@ from pydantic import BaseModel, Field, ValidationError
 import numpy as np
 
 # Absolute imports as per standard
-from core.utils.logging_utils import get_logger # Assuming existence, falling back to standard if needed
+from core.utils.logging_utils import get_logger  # Assuming existence, falling back to standard if needed
 
 # Configure Logging
 logger = logging.getLogger("Adam_Integrity_Monitor")
 logger.setLevel(logging.INFO)
+
 
 class FinancialConstraint(BaseModel):
     """Defines a hard constraint for financial reasoning."""
@@ -30,12 +31,14 @@ class FinancialConstraint(BaseModel):
     expression: str  # Python evaluable string for flexibility in v1
     tolerance: float = 0.001
 
+
 class ValidationResult(BaseModel):
     """Standardized output for validation checks."""
     is_valid: bool
     errors: List[str] = []
     warnings: List[str] = []
     metadata: Dict[str, Any] = {}
+
 
 class IntegrityMonitor:
     """
@@ -70,27 +73,28 @@ class IntegrityMonitor:
     def validate_financial_metrics(self, metrics: Dict[str, float], context: str = "general") -> ValidationResult:
         """
         Validates a dictionary of financial metrics against known logical constraints.
-        
+
         Args:
             metrics: Key-value pair of metric names and values.
             context: The context of validation (e.g., 'risk_report', 'portfolio_opt').
         """
         errors = []
-        
+
         try:
             # Example Check 1: Probability Distributions
             prob_keys = [k for k in metrics.keys() if "probability" in k.lower()]
             if prob_keys:
                 prob_values = [metrics[k] for k in prob_keys]
                 # Only validate sum if it looks like a complete distribution (heuristic)
-                if len(prob_values) > 1: 
+                if len(prob_values) > 1:
                     if not abs(sum(prob_values) - 1.0) < 0.01:
                         errors.append(f"Probabilities {prob_keys} sum to {sum(prob_values)}, expected 1.0")
 
             # Example Check 2: Margin Logic
             if "revenue" in metrics and "net_income" in metrics:
                 if metrics["net_income"] > metrics["revenue"]:
-                    errors.append(f"Net Income ({metrics['net_income']}) exceeds Revenue ({metrics['revenue']}). Impossible.")
+                    errors.append(
+                        f"Net Income ({metrics['net_income']}) exceeds Revenue ({metrics['revenue']}). Impossible.")
 
             # Example Check 3: Volatility
             if "volatility" in metrics and metrics["volatility"] < 0:
@@ -127,7 +131,7 @@ class IntegrityMonitor:
 
         # Build Adjacency List
         graph = {n['id']: n.get('dependencies', []) for n in nodes}
-        
+
         # Check dependencies exist
         all_ids = set(graph.keys())
         for node_id, deps in graph.items():
@@ -149,27 +153,28 @@ class IntegrityMonitor:
         Ensures that specific claims in the text are grounded in the verified sources.
         This is a heuristic check for hallucination prevention.
         """
-        # Placeholder for advanced NLP grounding logic. 
+        # Placeholder for advanced NLP grounding logic.
         # In v23, this would use embeddings to check similarity.
         # For v1, we check for data citation format.
-        
+
         warnings = []
         if "According to" in text or "reported that" in text:
             found_source = any(source in text for source in verified_sources)
             if not found_source:
                 warnings.append("Text contains citation phrasing but no verified source path was matched.")
-        
+
         return ValidationResult(is_valid=True, warnings=warnings)
+
 
 if __name__ == "__main__":
     # Quick self-test
     monitor = IntegrityMonitor()
-    
+
     # Test Logic
     test_metrics = {"revenue": 100.0, "net_income": 150.0}
     result = monitor.validate_financial_metrics(test_metrics)
     print(f"Test 1 (Should Fail): {result.is_valid} - {result.errors}")
-    
+
     test_metrics_2 = {"scenario_A_probability": 0.4, "scenario_B_probability": 0.6}
     result_2 = monitor.validate_financial_metrics(test_metrics_2)
     print(f"Test 2 (Should Pass): {result_2.is_valid} - {result_2.errors}")

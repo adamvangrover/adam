@@ -3,6 +3,7 @@ from typing import Any, Dict, Optional
 import logging
 from core.agents.agent_base import AgentBase
 
+
 class PromptGenerationAgent(AgentBase):
     """
     An agent that generates a high-quality prompt from a user query.

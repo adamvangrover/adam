@@ -11,6 +11,7 @@ from J鏟J_sandbox_tools import view_text_website
 
 from semantic_kernel.functions.kernel_function_decorator import kernel_function
 
+
 class WebSearchTool(BaseTool):
     name: str = "web_search"
     description: str = "Performs a web search for a given query or fetches content from a direct URL."
@@ -31,7 +32,7 @@ class WebSearchTool(BaseTool):
         name="fetch_web_content",
         description="Fetches text content from a given URL. If URL is not provided, it can conceptually use a query (though direct URL is preferred in simulation)."
     )
-    async def execute(self, query: str = None, url: str = None) -> str: # SK will see 'query' and 'url' as parameters
+    async def execute(self, query: str = None, url: str = None) -> str:  # SK will see 'query' and 'url' as parameters
         """
         Executes a web search.
         If a URL is provided, it fetches content from that URL.
@@ -44,7 +45,7 @@ class WebSearchTool(BaseTool):
             logging.info(f"WebSearchTool: Fetching content directly from URL: {url}")
             try:
                 content = view_text_website(url)
-                return content[:2000] # Truncate for brevity
+                return content[:2000]  # Truncate for brevity
             except Exception as e:
                 logging.error(f"WebSearchTool: Error fetching URL {url}: {e}")
                 return f"Error: Could not fetch content from {url}. Details: {str(e)}"
@@ -56,7 +57,8 @@ class WebSearchTool(BaseTool):
             # For this example, we'll simulate this by requiring a URL or using a placeholder.
             # Or, if we had a way to call out to an actual search provider, we'd do it here.
             # For now, we'll just indicate that a direct URL is preferred for this simulation.
-            logging.info(f"WebSearchTool: Received query '{query}'. In a real tool, this would use a search engine API to find relevant URLs. This simulated tool prioritizes direct URL fetching.")
+            logging.info(
+                f"WebSearchTool: Received query '{query}'. In a real tool, this would use a search engine API to find relevant URLs. This simulated tool prioritizes direct URL fetching.")
             # Placeholder: if you had a way to map query to URL:
             # simulated_url = f"https://www.google.com/search?q={query.replace(' ', '+')}"
             # logging.info(f"WebSearchTool: Simulated search for '{query}', would fetch e.g. {simulated_url}")

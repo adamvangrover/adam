@@ -2,17 +2,20 @@ import logging
 from typing import List
 from core.llm.base_llm_engine import BaseLLMEngine
 
+
 class DummyLLMEngine(BaseLLMEngine):
     """
     A dummy LLM engine for testing and demonstration.
     It echoes the prompt and context.
     """
+
     def __init__(self, model_name: str = "dummy-model-v1"):
         self.model_name = model_name
         logging.info(f"DummyLLMEngine initialized with model: {self.model_name}")
 
     async def generate_response(self, prompt: str, context: str = None) -> str:
-        logging.debug(f"DummyLLMEngine.generate_response called with prompt: '{prompt[:50]}...', context: '{str(context)[:50]}...'")
+        logging.debug(
+            f"DummyLLMEngine.generate_response called with prompt: '{prompt[:50]}...', context: '{str(context)[:50]}...'")
         response = f"DummyResponse: [Prompt: {prompt}]"
         if context:
             response += f" [Context: {context}]"
@@ -31,14 +34,15 @@ class DummyLLMEngine(BaseLLMEngine):
             return []
         # Simple deterministic embedding based on char codes, scaled to be between -1 and 1
         # Max ASCII value is around 127. Let's normalize by 128.
-        embedding = [(ord(char) % 128) / 128.0 - 0.5 for char in text[:100]] # Limit length for simplicity
+        embedding = [(ord(char) % 128) / 128.0 - 0.5 for char in text[:100]]  # Limit length for simplicity
         # Ensure a fixed dimension if required by some vector stores, e.g., pad with zeros
-        fixed_dim = 128 # Arbitrary fixed dimension
+        fixed_dim = 128  # Arbitrary fixed dimension
         if len(embedding) < fixed_dim:
             embedding.extend([0.0] * (fixed_dim - len(embedding)))
         else:
             embedding = embedding[:fixed_dim]
         return embedding
+
 
 # Example Usage (conceptual)
 if __name__ == "__main__":

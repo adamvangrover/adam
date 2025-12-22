@@ -12,11 +12,13 @@ from core.v23_graph_engine.unified_knowledge_graph import UnifiedKnowledgeGraph
 
 logger = logging.getLogger(__name__)
 
+
 class OdysseyKnowledgeGraph(UnifiedKnowledgeGraph):
     """
     Odyssey-specific extension of the UnifiedKnowledgeGraph.
     Adds support for FIBO schema validation and risk detection algorithms.
     """
+
     def __init__(self):
         super().__init__()
         self.odyssey_schema = None
@@ -49,7 +51,7 @@ class OdysseyKnowledgeGraph(UnifiedKnowledgeGraph):
 
         node_id = entity_data.get("@id")
         if not node_id:
-             raise ValueError("Entity missing @id")
+            raise ValueError("Entity missing @id")
 
         self.graph.add_node(
             node_id,
@@ -96,10 +98,10 @@ class OdysseyKnowledgeGraph(UnifiedKnowledgeGraph):
 
         facilities = []
         for n in self.graph.successors(entity_id):
-             # Assuming relation is stored in edge attributes.
-             # Original UnifiedKnowledgeGraph stores relation in edge data.
-             if self.graph[entity_id][n].get("relation") == "BORROWS":
-                 facilities.append(n)
+            # Assuming relation is stored in edge attributes.
+            # Original UnifiedKnowledgeGraph stores relation in edge data.
+            if self.graph[entity_id][n].get("relation") == "BORROWS":
+                facilities.append(n)
 
         vulnerable_facilities = []
         for fac in facilities:
@@ -110,6 +112,7 @@ class OdysseyKnowledgeGraph(UnifiedKnowledgeGraph):
         if vulnerable_facilities:
             risk_report["detected"] = True
             risk_report["details"].append(f"Entity has {len(unrestricted_subs)} Unrestricted Subsidiaries.")
-            risk_report["details"].append(f"Found {len(vulnerable_facilities)} Vulnerable Facilities missing J.Crew Blockers: {vulnerable_facilities}")
+            risk_report["details"].append(
+                f"Found {len(vulnerable_facilities)} Vulnerable Facilities missing J.Crew Blockers: {vulnerable_facilities}")
 
         return risk_report

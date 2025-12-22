@@ -17,6 +17,7 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+
 class PortfolioOptimizer:
     def __init__(self, prices: pd.DataFrame):
         """
@@ -30,7 +31,8 @@ class PortfolioOptimizer:
         """
         Optimizes for Maximum Sharpe Ratio.
         """
-        if EfficientFrontier is None: return {}
+        if EfficientFrontier is None:
+            return {}
 
         # Calculate Expected Returns and Covariance
         mu = expected_returns.mean_historical_return(self.prices)

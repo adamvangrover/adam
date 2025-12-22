@@ -6,6 +6,7 @@ from core.agents.snc_analyst_agent import SNCAnalystAgent
 from core.agents.regulatory_compliance_agent import RegulatoryComplianceAgent
 from core.agents.legal_agent import LegalAgent
 
+
 class RegulatoryComplianceSimulation:
     def __init__(self, knowledge_base_path="knowledge_base/Knowledge_Graph.json"):
         """
@@ -53,12 +54,14 @@ class RegulatoryComplianceSimulation:
         regulatory_guidelines = self.knowledge_base.get("regulatory_guidelines", {})
 
         # 2. Agent Analysis
-        snc_analysis = self.snc_analyst_agent.analyze_snc(company_name, company_data)  # Assuming SNC analysis is relevant
+        snc_analysis = self.snc_analyst_agent.analyze_snc(
+            company_name, company_data)  # Assuming SNC analysis is relevant
         compliance_analysis = self.regulatory_compliance_agent.analyze_compliance(company_data, regulatory_guidelines)
         legal_analysis = self.legal_agent.analyze_legal_standing(company_name, company_data)
 
         # 3. Compliance Assessment
-        compliance_status, remediation_recommendations = self.assess_compliance(snc_analysis, compliance_analysis, legal_analysis)
+        compliance_status, remediation_recommendations = self.assess_compliance(
+            snc_analysis, compliance_analysis, legal_analysis)
 
         # 4. Generate Report
         report = self.generate_report(company_name, compliance_status, remediation_recommendations)

@@ -1,4 +1,5 @@
 
+from core.system.agent_orchestrator import AgentOrchestrator
 import unittest
 from unittest.mock import MagicMock, patch
 import sys
@@ -53,16 +54,14 @@ setattr(mock_ms_module, 'MarketSentimentAgent', mock_ms_class)
 sys.modules['financial_digital_twin.nexus_agent'] = MagicMock()
 
 
-from core.system.agent_orchestrator import AgentOrchestrator
-
 class TestAgentLoadingBug(unittest.TestCase):
     @patch('core.system.agent_orchestrator.RabbitMQClient')
     @patch('core.system.agent_orchestrator.load_config')
     @patch('core.system.agent_orchestrator.get_api_key')
-    @patch('core.system.agent_orchestrator.LLMPlugin') # Mock LLMPlugin
+    @patch('core.system.agent_orchestrator.LLMPlugin')  # Mock LLMPlugin
     def test_agent_loading_success(self, mock_llm_plugin, mock_get_api_key, mock_load_config, mock_rabbitmq):
         # Setup mocks
-        mock_load_config.return_value = {} # Empty config initially
+        mock_load_config.return_value = {}  # Empty config initially
         mock_get_api_key.return_value = "fake_key"
 
         orchestrator = AgentOrchestrator()
@@ -100,6 +99,7 @@ class TestAgentLoadingBug(unittest.TestCase):
         # However, the fix uses `globals()[agent_name]` first.
         # If AgentOrchestrator imported it, it's in its globals.
         # If the import succeeded (using our mock), then it should work.
+
 
 if __name__ == '__main__':
     unittest.main()

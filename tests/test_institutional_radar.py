@@ -7,6 +7,7 @@ from core.institutional_radar.analytics import InstitutionalRadarAnalytics
 from core.institutional_radar.database import init_db, SessionLocal, FundMasterDB, SecurityMasterDB, engine
 from core.institutional_radar.schema import HoldingDetail
 
+
 class TestInstitutionalRadar(unittest.TestCase):
     def setUp(self):
         # Initialize DB
@@ -109,6 +110,7 @@ class TestInstitutionalRadar(unittest.TestCase):
         # Net flow = 200k - 100k = 100k
         self.assertFalse(flows.empty)
         self.assertEqual(flows.iloc[0]['net_flow'], 100000)
+
 
 if __name__ == '__main__':
     unittest.main()

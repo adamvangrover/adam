@@ -32,3 +32,23 @@
 **Vulnerability:** The Flask application used the common tutorial pattern `SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard-to-guess-string'`. This means the application would run with a publicly known secret key if the environment variable was omitted in production, enabling session forgery.
 **Learning:** Copy-pasting configuration code from tutorials often introduces insecure defaults. The `or 'value'` idiom is dangerous for secrets.
 **Prevention:** Remove default values for secrets in configuration classes. Implement an `init_app` check that explicitly raises a `RuntimeError` if the secret is missing in a non-development environment.
+
+## 2025-12-17 - Unauthenticated Agent Execution
+**Vulnerability:** The `/api/agents/<agent_name>/invoke` endpoint allowed any unauthenticated user to execute potentially resource-intensive or sensitive agents.
+**Learning:** Endpoints that bridge HTTP to internal command/agent execution patterns are critical high-risk targets that often bypass standard resource access controls.
+**Prevention:** Strictly enforce authentication on all "command" or "action" style endpoints.
+
+## 2025-12-18 - Legacy File Shadowing & Error Leakage
+**Vulnerability:** `core/api.py` (legacy Flask app) was shadowed by `core.api` (FastAPI package) but remained executable and vulnerable to information leakage via unhandled exceptions.
+**Learning:** Naming conflicts between files (`api.py`) and packages (`api/`) can hide legacy code from standard testing/linting tools while leaving it exposed on the filesystem.
+**Prevention:** Audit codebase for file/directory name collisions and explicitly deprecate or remove legacy files that are shadowed.
+
+## 2025-12-19 - SQLite SQL Injection & Excessive Exposure
+**Vulnerability:** A "SQL Query" tool designed for LLM agents allowed arbitrary `SELECT` queries (including `UNION`-based injection) against the entire database, exposing sensitive tables like `secrets` if they existed.
+**Learning:** Checking for `startswith("SELECT")` is insufficient to prevent SQL injection or excessive data exposure. LLM tools that execute code or queries are inherently high-risk.
+**Prevention:** Use `sqlite3.set_authorizer` to implement a strict whitelist of allowed tables and actions at the connection level. Combine with URI read-only mode (`?mode=ro`) for defense-in-depth.
+
+## 2025-12-21 - Git Clone Path Traversal & Sync/Async Mismatch
+**Vulnerability:** The `GitRepoSubAgent` was vulnerable to path traversal (e.g., `http://example.com/..`) allowing clones outside the target directory. Additionally, the agent defined a synchronous `execute` method while the base class monkey-patched it to be async, causing runtime crashes.
+**Learning:** Naive path validation (`split('/')[-1]`) is insufficient for URL-derived paths. Also, complex architecture changes (like monkey-patching base classes for async) can silently break legacy subclasses that don't adhere to the new contract.
+**Prevention:** Use `os.path.abspath` and `startswith` (or `commonpath`) to validate paths against a safe root. Ensure subclasses verify compliance with base class contracts, especially when metaclass or `__init__` magic is involved.

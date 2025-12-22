@@ -1,6 +1,7 @@
 from core.schemas.v23_5_schema import HyperDimensionalKnowledgeGraph, V23KnowledgeGraph
 import json
 
+
 def test_schema_validity():
     # Basic instantiation test
     try:
@@ -14,7 +15,7 @@ def test_schema_validity():
                 },
                 "nodes": {
                     "entity_ecosystem": {
-                        "legal_entity": { "name": "Test Corp", "lei": "123", "jurisdiction": "US", "sector": "Tech" },
+                        "legal_entity": {"name": "Test Corp", "lei": "123", "jurisdiction": "US", "sector": "Tech"},
                         "management_assessment": {
                             "capital_allocation_score": 0.8,
                             "alignment_analysis": "Good",
@@ -69,7 +70,8 @@ def test_schema_validity():
                     "simulation_engine": {
                         "monte_carlo_default_prob": "1%",
                         "quantum_scenarios": [
-                            { "scenario_name": "War", "probability": "Low", "impact_severity": "Critical", "estimated_impact_ev": "-20%" }
+                            {"scenario_name": "War", "probability": "Low",
+                                "impact_severity": "Critical", "estimated_impact_ev": "-20%"}
                         ],
                         "trading_dynamics": {
                             "short_interest": "5%",
@@ -99,6 +101,7 @@ def test_schema_validity():
     except Exception as e:
         print(f"Schema validation failed: {e}")
         raise e
+
 
 if __name__ == "__main__":
     test_schema_validity()

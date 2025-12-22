@@ -1,0 +1,19 @@
+model_name: "meta-llama/Llama-3.2-1B"
+dataset_path: "data/artisanal_training_sets/artisanal_data_snc_v2.jsonl"
+output_dir: "experimental/slm_distillation/adapters/v1"
+lora_config:
+  r: 16
+  lora_alpha: 32
+  target_modules: ["q_proj", "v_proj"]
+  lora_dropout: 0.05
+training_args:
+  per_device_train_batch_size: 4
+  gradient_accumulation_steps: 4
+  learning_rate: 2e-4
+  num_train_epochs: 3
+  logging_steps: 10
+  save_strategy: "epoch"
+distillation:
+  teacher_model: "Qwen/Qwen2.5-72B-Instruct"
+  temperature: 2.0
+  alpha: 0.5  # Weight for distillation loss vs student loss

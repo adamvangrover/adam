@@ -10,6 +10,7 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
+
 class WealthManager:
     """
     Manages Wealth Planning, Trusts, and Beneficiary Goals.

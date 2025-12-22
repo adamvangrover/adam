@@ -1,6 +1,7 @@
 from typing import Dict
 import math
 
+
 class ReturnMetrics:
     @staticmethod
     def calculate_moic(invested_capital: float, returned_capital: float) -> float:

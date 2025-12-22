@@ -3,6 +3,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Any, Optional
 
+
 class BaseDataSource(ABC):
     """
     Abstract base class for all data sources.
@@ -23,5 +24,5 @@ class BaseDataSource(ABC):
 
     @abstractmethod
     def get_market_data(self) -> Optional[Dict[str, Any]]:
-      """Placeholder for retrieving general market data."""
-      pass
+        """Placeholder for retrieving general market data."""
+        pass

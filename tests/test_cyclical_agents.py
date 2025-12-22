@@ -6,6 +6,7 @@ from unittest.mock import Mock, patch, call
 from core.agents.cyclical_reasoning_agent import CyclicalReasoningAgent
 from core.agents.reflector_agent import ReflectorAgent
 
+
 class TestCyclicalAgents(unittest.TestCase):
     def test_reflector_agent(self):
         async def run_test():
@@ -23,7 +24,8 @@ class TestCyclicalAgents(unittest.TestCase):
                 result = await agent.execute(task)
 
                 # Assert the result
-                self.assertEqual(result, task)
+                self.assertIn("quality_score", result)
+                self.assertIn("critique_notes", result)
 
         # Run the async test
         asyncio.run(run_test())
@@ -83,6 +85,7 @@ class TestCyclicalAgents(unittest.TestCase):
 
         # Run the async test
         asyncio.run(run_test())
+
 
 if __name__ == '__main__':
     unittest.main()

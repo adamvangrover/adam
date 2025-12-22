@@ -10,14 +10,30 @@ and then critiques the findings against known controversies (greenwashing detect
 
 import logging
 from typing import Literal, Dict, Any
-from langgraph.graph import StateGraph, END, START
-from langgraph.checkpoint.memory import MemorySaver
+try:
+    from langgraph.graph import StateGraph, END, START
+    from langgraph.checkpoint.memory import MemorySaver
+    HAS_LANGGRAPH = True
+except ImportError:
+    HAS_LANGGRAPH = False
+    class StateGraph:
+         def __init__(self, *args, **kwargs): pass
+         def add_node(self, *args, **kwargs): pass
+         def add_edge(self, *args, **kwargs): pass
+         def set_entry_point(self, *args, **kwargs): pass
+         def add_conditional_edges(self, *args, **kwargs): pass
+         def compile(self, *args, **kwargs): return None
+    END = "END"
+    START = "START"
+    class MemorySaver: pass
+    logger.warning("LangGraph not installed. Graphs will be disabled.")
 
 from core.engine.states import ESGAnalysisState
 
 logger = logging.getLogger(__name__)
 
 # --- Mock Utilities (In a real system, these would be in esg_utils.py) ---
+
 
 def mock_analyze_env(company: str, sector: str) -> float:
     # Logic: Energy sector scores lower by default, Tech scores higher
@@ -28,11 +44,14 @@ def mock_analyze_env(company: str, sector: str) -> float:
         base_score = 85.0
     return base_score
 
+
 def mock_analyze_social(company: str) -> float:
-    return 75.0 # Average
+    return 75.0  # Average
+
 
 def mock_analyze_gov(company: str) -> float:
-    return 80.0 # Good governance assumed
+    return 80.0  # Good governance assumed
+
 
 def mock_check_controversies(company: str) -> list[str]:
     # Mock database lookup
@@ -42,6 +61,7 @@ def mock_check_controversies(company: str) -> list[str]:
 
 # --- Nodes ---
 
+
 def analyze_env_node(state: ESGAnalysisState) -> Dict[str, Any]:
     print("--- Node: Analyze Environmental ---")
     score = mock_analyze_env(state["company_name"], state["sector"])
@@ -49,6 +69,7 @@ def analyze_env_node(state: ESGAnalysisState) -> Dict[str, Any]:
         "env_score": score,
         "human_readable_status": f"Analyzed Environmental impact (Score: {score})."
     }
+
 
 def analyze_social_node(state: ESGAnalysisState) -> Dict[str, Any]:
     print("--- Node: Analyze Social ---")
@@ -58,6 +79,7 @@ def analyze_social_node(state: ESGAnalysisState) -> Dict[str, Any]:
         "human_readable_status": f"Analyzed Social impact (Score: {score})."
     }
 
+
 def analyze_gov_node(state: ESGAnalysisState) -> Dict[str, Any]:
     print("--- Node: Analyze Governance ---")
     score = mock_analyze_gov(state["company_name"])
@@ -65,6 +87,7 @@ def analyze_gov_node(state: ESGAnalysisState) -> Dict[str, Any]:
         "gov_score": score,
         "human_readable_status": f"Analyzed Governance structure (Score: {score})."
     }
+
 
 def aggregate_esg_node(state: ESGAnalysisState) -> Dict[str, Any]:
     print("--- Node: Aggregate ESG Score ---")
@@ -92,6 +115,7 @@ def aggregate_esg_node(state: ESGAnalysisState) -> Dict[str, Any]:
         "human_readable_status": f"Calculated Final ESG Score: {total:.2f}"
     }
 
+
 def critique_esg_node(state: ESGAnalysisState) -> Dict[str, Any]:
     print("--- Node: Critique ESG ---")
     score = state["total_esg_score"]
@@ -117,6 +141,7 @@ def critique_esg_node(state: ESGAnalysisState) -> Dict[str, Any]:
         "human_readable_status": "Critiqued ESG findings."
     }
 
+
 def revise_esg_node(state: ESGAnalysisState) -> Dict[str, Any]:
     print("--- Node: Revise ESG ---")
     report = state["final_report"]
@@ -134,6 +159,7 @@ def revise_esg_node(state: ESGAnalysisState) -> Dict[str, Any]:
 
 # --- Conditional Logic ---
 
+
 def should_continue_esg(state: ESGAnalysisState) -> Literal["revise_esg", "END"]:
     if state["needs_revision"] and state["iteration_count"] < 3:
         return "revise_esg"
@@ -141,7 +167,11 @@ def should_continue_esg(state: ESGAnalysisState) -> Literal["revise_esg", "END"]
 
 # --- Graph Construction ---
 
+
 def build_esg_graph():
+    if not HAS_LANGGRAPH:
+        return None
+
     workflow = StateGraph(ESGAnalysisState)
 
     # Add Nodes
@@ -174,5 +204,6 @@ def build_esg_graph():
 
     checkpointer = MemorySaver()
     return workflow.compile(checkpointer=checkpointer)
+
 
 esg_graph_app = build_esg_graph()

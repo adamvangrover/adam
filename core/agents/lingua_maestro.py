@@ -20,6 +20,7 @@ try:
 except ImportError:
     SentimentIntensityAnalyzer = None
 
+
 class LinguaMaestro:
     def __init__(self, config):
         self.config = config
@@ -68,8 +69,10 @@ class LinguaMaestro:
         if self.sentiment_analyzer:
             try:
                 scores = self.sentiment_analyzer.polarity_scores(text)
-                if scores['compound'] >= 0.05: return 'positive'
-                if scores['compound'] <= -0.05: return 'negative'
+                if scores['compound'] >= 0.05:
+                    return 'positive'
+                if scores['compound'] <= -0.05:
+                    return 'negative'
                 return 'neutral'
             except:
                 pass

@@ -3,6 +3,7 @@
 import requests
 from bs4 import BeautifulSoup
 
+
 class LexicaAgent:
     def __init__(self, config):
         self.data_sources = config.get('data_sources', {})
@@ -27,18 +28,18 @@ class LexicaAgent:
         # 3. Financial Data (example using a financial database API)
         financial_data = self.get_financial_data(query)
 
-        #... (add other data sources)
+        # ... (add other data sources)
 
         information = {
             'web_results': web_results,
             'news_articles': news_articles,
             'financial_data': financial_data,
-            #... (add other data)
+            # ... (add other data)
         }
         return information
 
     def search_web(self, query):
-        #... (implementation for web search using a search engine API)
+        # ... (implementation for web search using a search engine API)
         # This is a placeholder. The actual implementation would depend on the chosen search engine API.
         # Consider using the Google Search API or other search engines with API access.
         results = []
@@ -56,7 +57,7 @@ class LexicaAgent:
         return results
 
     def get_news_articles(self, query):
-        #... (implementation for fetching news articles using a news aggregator API)
+        # ... (implementation for fetching news articles using a news aggregator API)
         # This is a placeholder. The actual implementation would depend on the chosen news aggregator API.
         # Consider using the News API or other news aggregators with API access.
         articles = []
@@ -74,7 +75,7 @@ class LexicaAgent:
         return articles
 
     def get_financial_data(self, query):
-        #... (implementation for retrieving financial data from a database or API)
+        # ... (implementation for retrieving financial data from a database or API)
         # This is a placeholder. The actual implementation would depend on the chosen financial data provider.
         # Consider using the IEX Cloud API, Alpha Vantage API, or other financial data APIs.
         data = {}
@@ -87,4 +88,4 @@ class LexicaAgent:
             print(f"Error fetching financial data: {response.status_code} - {response.text}")
         return data
 
-    #... (add other data retrieval methods)
+    # ... (add other data retrieval methods)

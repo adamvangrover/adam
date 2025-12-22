@@ -3,12 +3,26 @@ import logging
 import random
 from typing import Dict, Any, Literal
 
-from langgraph.graph import StateGraph, END
+try:
+    from langgraph.graph import StateGraph, END
+    HAS_LANGGRAPH = True
+except ImportError:
+    HAS_LANGGRAPH = False
+    class StateGraph:
+         def __init__(self, *args, **kwargs): pass
+         def add_node(self, *args, **kwargs): pass
+         def add_edge(self, *args, **kwargs): pass
+         def set_entry_point(self, *args, **kwargs): pass
+         def add_conditional_edges(self, *args, **kwargs): pass
+         def compile(self, *args, **kwargs): return None
+    END = "END"
+    logger.warning("LangGraph not installed. Graphs will be disabled.")
 from core.engine.states import RedTeamState
 
 logger = logging.getLogger(__name__)
 
 # --- Nodes ---
+
 
 def generate_attack_node(state: RedTeamState) -> Dict[str, Any]:
     """
@@ -38,6 +52,7 @@ def generate_attack_node(state: RedTeamState) -> Dict[str, Any]:
         "human_readable_status": f"Drafting scenario: {scenario_type} (Iter {iteration})"
     }
 
+
 def simulate_impact_node(state: RedTeamState) -> Dict[str, Any]:
     """
     Node: Simulates the impact of the scenario on the target.
@@ -56,6 +71,7 @@ def simulate_impact_node(state: RedTeamState) -> Dict[str, Any]:
         "simulated_impact_score": total_impact,
         "human_readable_status": f"Simulating impact... Score: {total_impact:.1f}"
     }
+
 
 def critique_node(state: RedTeamState) -> Dict[str, Any]:
     """
@@ -80,6 +96,7 @@ def critique_node(state: RedTeamState) -> Dict[str, Any]:
 
 # --- Conditional Logic ---
 
+
 def should_continue(state: RedTeamState) -> Literal["escalate", "finalize"]:
     if state["is_sufficiently_severe"]:
         return "finalize"
@@ -90,6 +107,7 @@ def should_continue(state: RedTeamState) -> Literal["escalate", "finalize"]:
 
     return "escalate"
 
+
 def finalize_node(state: RedTeamState) -> Dict[str, Any]:
     return {
         "human_readable_status": "Red Team scenario finalized."
@@ -97,7 +115,11 @@ def finalize_node(state: RedTeamState) -> Dict[str, Any]:
 
 # --- Graph Construction ---
 
+
 def build_red_team_graph():
+    if not HAS_LANGGRAPH:
+        return None
+
     workflow = StateGraph(RedTeamState)
 
     workflow.add_node("generate_attack", generate_attack_node)
@@ -122,5 +144,6 @@ def build_red_team_graph():
     workflow.add_edge("finalize", END)
 
     return workflow.compile()
+
 
 red_team_app = build_red_team_graph()

@@ -4,6 +4,7 @@ from typing import Optional, Literal
 from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field
 
+
 class FundMaster(BaseModel):
     cik: str = Field(..., max_length=10, description="The unique Central Index Key")
     fund_name: str = Field(..., max_length=255)
@@ -12,6 +13,7 @@ class FundMaster(BaseModel):
     whitelist_status: bool = Field(False, description="Flag to include in high-priority trend analysis")
 
     model_config = ConfigDict(from_attributes=True)
+
 
 class FilingEvent(BaseModel):
     filing_id: UUID
@@ -22,6 +24,7 @@ class FilingEvent(BaseModel):
     is_amendment: bool = False
 
     model_config = ConfigDict(from_attributes=True)
+
 
 class HoldingDetail(BaseModel):
     holding_id: UUID
@@ -34,6 +37,7 @@ class HoldingDetail(BaseModel):
     vote_sole: int = 0
 
     model_config = ConfigDict(from_attributes=True)
+
 
 class SecurityMaster(BaseModel):
     cusip: str = Field(..., max_length=9)

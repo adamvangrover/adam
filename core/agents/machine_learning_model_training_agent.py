@@ -1,22 +1,23 @@
-#core/agents/machine_learning_model_training_agent.py
+# core/agents/machine_learning_model_training_agent.py
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
-#... (Import other necessary libraries)
+# ... (Import other necessary libraries)
+
 
 class MachineLearningModelTrainingAgent:
     def __init__(self, config):
         self.config = config
         # Initialize machine learning models and parameters
-        #...
+        # ...
 
     def load_data(self, data_sources):
         """
         Loads data from the specified sources.
         """
         # Load data from files, databases, or APIs
-        #...
+        # ...
         pass  # Placeholder for implementation
 
     def preprocess_data(self, data):
@@ -24,7 +25,7 @@ class MachineLearningModelTrainingAgent:
         Preprocesses the data for model training.
         """
         # Clean, transform, and prepare the data for training
-        #...
+        # ...
         pass  # Placeholder for implementation
 
     def train_model(self, data, model_type, **kwargs):
@@ -33,20 +34,20 @@ class MachineLearningModelTrainingAgent:
         """
         if model_type == "linear_regression":
             # Train a linear regression model
-            #...
+            # ...
             pass  # Placeholder for implementation
         elif model_type == "decision_tree":
             # Train a decision tree model
-            #...
+            # ...
             pass  # Placeholder for implementation
-        #... (Add other model types)
+        # ... (Add other model types)
 
     def evaluate_model(self, model, data):
         """
         Evaluates the performance of the trained model.
         """
         # Evaluate the model using appropriate metrics
-        #...
+        # ...
         pass  # Placeholder for implementation
 
     def save_model(self, model, model_name):
@@ -54,7 +55,7 @@ class MachineLearningModelTrainingAgent:
         Saves the trained model to a file.
         """
         # Save the model using appropriate serialization methods
-        #...
+        # ...
         pass  # Placeholder for implementation
 
     def run(self, data_sources, model_type, model_name, **kwargs):
@@ -78,6 +79,7 @@ class MachineLearningModelTrainingAgent:
             return {"status": "success", "model_name": model_name}
         except Exception as e:
             return {"error": str(e)}
+
 
 # Example usage
 if __name__ == "__main__":
