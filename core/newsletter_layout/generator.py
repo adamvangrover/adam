@@ -19,7 +19,7 @@ class NewsletterGenerator:
     """
 
     def __init__(self, template_dir: str = TEMPLATE_DIR):
-        self.env = Environment(loader=FileSystemLoader(template_dir))
+        self.env = Environment(loader=FileSystemLoader(template_dir), autoescape=True)
         self.snapshot_dir = "data/snapshots"
 
     def load_latest_snapshot(self) -> Dict[str, Any]:

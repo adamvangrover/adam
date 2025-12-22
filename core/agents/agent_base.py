@@ -194,6 +194,9 @@ class AgentBase(ABC):
     def update_persona(self, input_text: str):
         """
         Updates transient_epa vectors based on input text.
+
+        Args:
+            input_text (str): The input text to analyze for sentiment/EPA updates.
         """
         try:
             # Simple placeholder logic for EPA update
@@ -282,10 +285,13 @@ class AgentBase(ABC):
         """
         raise NotImplementedError("Subclasses must implement the execute method.")
 
-    def start_listening(self, message_broker):
+    def start_listening(self, message_broker: Any):
         """
         Subscribes the agent to its dedicated topic on the message broker
         and processes incoming messages via a callback.
+
+        Args:
+            message_broker: The message broker instance to subscribe to.
         """
         self.message_broker = message_broker  # Store broker reference
         topic = type(self).__name__
@@ -299,10 +305,16 @@ class AgentBase(ABC):
 
         message_broker.subscribe(topic, self.handle_message)
 
-    def handle_message(self, ch, method, properties, body):
+    def handle_message(self, ch: Any, method: Any, properties: Any, body: str):
         """
         Callback function to handle incoming messages.
         Dispatches to internal handler to manage async execution.
+
+        Args:
+            ch: The channel object.
+            method: The method frame.
+            properties: The properties frame.
+            body (str): The message body (JSON string).
         """
         try:
             message = json.loads(body)
@@ -331,6 +343,9 @@ class AgentBase(ABC):
     async def _process_incoming_request(self, message: Dict[str, Any]):
         """
         Internal helper to process an incoming request asynchronously.
+
+        Args:
+            message (Dict[str, Any]): The decoded message dictionary.
         """
         context = message.get("context", {})
         reply_to = message.get("reply_to")
@@ -371,6 +386,13 @@ class AgentBase(ABC):
         """
         Handles incoming A2A messages directly (alternative to broker).
         Subclasses should override this to define how they respond to messages.
+
+        Args:
+            sender_agent (str): The name/ID of the sending agent.
+            message (Dict[str, Any]): The message content.
+
+        Returns:
+            Optional[Dict[str, Any]]: A response message, or None.
         """
         logging.info(f"Agent {self.config.get('agent_id')} received message from {sender_agent}: {message}")
         return None  # Default: No response
@@ -378,6 +400,18 @@ class AgentBase(ABC):
     async def run_semantic_kernel_skill(self, skill_collection_name: str, skill_name: str, input_vars: Dict[str, str]) -> str:
         """
         Executes a Semantic Kernel skill. Standardized for clearer error handling.
+
+        Args:
+            skill_collection_name (str): The name of the skill collection (plugin).
+            skill_name (str): The name of the function to execute.
+            input_vars (Dict[str, str]): Input variables for the function.
+
+        Returns:
+            str: The result of the skill execution.
+
+        Raises:
+            AttributeError: If the kernel is not initialized.
+            ValueError: If the skill is not found.
         """
         if not hasattr(self, 'kernel') or not self.kernel:
             raise AttributeError("Agent does not have access to a Semantic Kernel instance.")

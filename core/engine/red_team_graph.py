@@ -3,7 +3,20 @@ import logging
 import random
 from typing import Dict, Any, Literal
 
-from langgraph.graph import StateGraph, END
+try:
+    from langgraph.graph import StateGraph, END
+    HAS_LANGGRAPH = True
+except ImportError:
+    HAS_LANGGRAPH = False
+    class StateGraph:
+         def __init__(self, *args, **kwargs): pass
+         def add_node(self, *args, **kwargs): pass
+         def add_edge(self, *args, **kwargs): pass
+         def set_entry_point(self, *args, **kwargs): pass
+         def add_conditional_edges(self, *args, **kwargs): pass
+         def compile(self, *args, **kwargs): return None
+    END = "END"
+    logger.warning("LangGraph not installed. Graphs will be disabled.")
 from core.engine.states import RedTeamState
 
 logger = logging.getLogger(__name__)
@@ -104,6 +117,9 @@ def finalize_node(state: RedTeamState) -> Dict[str, Any]:
 
 
 def build_red_team_graph():
+    if not HAS_LANGGRAPH:
+        return None
+
     workflow = StateGraph(RedTeamState)
 
     workflow.add_node("generate_attack", generate_attack_node)

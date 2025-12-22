@@ -24,7 +24,7 @@ class MarketDataAPI:
                 if period == "daily":
                     # Fetch daily price data from IEX Cloud API
                     url = f"https://cloud.iexapis.com/stable/stock/{symbol}/chart/1m?token={iex_key}"
-                    response = requests.get(url)
+                    response = requests.get(url, timeout=30)
                     if response.status_code == 200:
                         data = response.json()
                         price_data = [{'date': item['date'], 'open': item['open'], 'high': item['high'],
@@ -35,7 +35,7 @@ class MarketDataAPI:
                 elif period == "intraday":
                     # Fetch intraday price data from IEX Cloud API
                     url = f"https://cloud.iexapis.com/stable/stock/{symbol}/intraday-prices?token={iex_key}"
-                    response = requests.get(url)
+                    response = requests.get(url, timeout=30)
                     if response.status_code == 200:
                         data = response.json()
                         price_data = [{'date': item['date'], 'minute': item['minute'], 'open': item['open'], 'high': item['high'],
@@ -53,7 +53,7 @@ class MarketDataAPI:
                 if period == "daily":
                     # Fetch daily price data from Alpha Vantage API
                     url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={symbol}&apikey={alpha_vantage_key}"
-                    response = requests.get(url)
+                    response = requests.get(url, timeout=30)
                     if response.status_code == 200:
                         # It's good practice to check if 'Time Series (Daily)' key exists
                         data = response.json().get('Time Series (Daily)')
@@ -71,7 +71,7 @@ class MarketDataAPI:
                 elif period == "intraday":
                     # Fetch intraday price data from Alpha Vantage API
                     url = f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={symbol}&interval=5min&apikey={alpha_vantage_key}"
-                    response = requests.get(url)
+                    response = requests.get(url, timeout=30)
                     if response.status_code == 200:
                         # Similar check for 'Time Series (5min)'
                         data = response.json().get('Time Series (5min)')

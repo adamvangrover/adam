@@ -23,12 +23,12 @@ class GovernmentStatsAPI:
             if period == "annual":
                 # Fetch annual GDP data for the US (example using BEA API)
                 url = f"https://apps.bea.gov/api/data/?&UserID={bea_key}&method=GetData&datasetname=NIPA&TableName=T10101&frequency=A&year=ALL"
-                response = requests.get(url)
+                response = requests.get(url, timeout=30)
                 # ... (process the response and extract GDP data)
             elif period == "quarterly":
                 # Fetch quarterly GDP data for the US (example using BEA API)
                 url = f"https://apps.bea.gov/api/data/?&UserID={bea_key}&method=GetData&datasetname=NIPA&TableName=T10101&frequency=Q&year=ALL"
-                response = requests.get(url)
+                response = requests.get(url, timeout=30)
                 # ... (process the response and extract GDP data)
         # ... (add handling for other countries and periods)
         return gdp_data
@@ -44,7 +44,7 @@ class GovernmentStatsAPI:
             if period == "monthly":
                 # Fetch monthly CPI data for the US (example using BLS API)
                 url = f"https://api.bls.gov/publicAPI/v2/timeseries/data/?registrationkey={bls_key}&seriesid=CUUR0000SA0&startyear=2020&endyear=2025"
-                response = requests.get(url)
+                response = requests.get(url, timeout=30)
                 # ... (process the response and extract CPI data)
             elif period == "annual":
                 # Fetch annual CPI data for the US (example using BLS API)
@@ -64,7 +64,7 @@ class GovernmentStatsAPI:
             if period == "monthly":
                 # Fetch monthly PPI data for the US (example using BLS API)
                 url = f"https://api.bls.gov/publicAPI/v2/timeseries/data/?registrationkey={bls_key}&seriesid=PCU333---333---&startyear=2020&endyear=2025"
-                response = requests.get(url)
+                response = requests.get(url, timeout=30)
                 # ... (process the response and extract PPI data)
             elif period == "annual":
                 # Fetch annual PPI data for the US (example using BLS API)

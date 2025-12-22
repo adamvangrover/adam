@@ -3,14 +3,14 @@ import operator
 from datetime import datetime
 
 
-class ResearchArtifact(TypedDict):
+class ResearchArtifact(TypedDict, total=False):
     title: str
     content: str
     source: str
     credibility_score: float
 
 
-class PlanOnGraph(TypedDict):
+class PlanOnGraph(TypedDict, total=False):
     """A symbolic scaffold representing the causal links and logical steps."""
     id: str
     steps: List[Dict[str, Any]]
@@ -18,7 +18,7 @@ class PlanOnGraph(TypedDict):
     cypher_query: Optional[str]
 
 
-class GraphState(TypedDict):
+class GraphState(TypedDict, total=False):
     """
     Represents the state of the general purpose Adaptive System Graph.
     Used by the NeuroSymbolicPlanner.
@@ -33,7 +33,7 @@ class GraphState(TypedDict):
     max_iterations: int
 
 
-class RiskAssessmentState(TypedDict):
+class RiskAssessmentState(TypedDict, total=False):
     """
     The 'Memory' of a v23 Reasoning Loop. 
     Tracks the evolution of the analysis from draft to final.
@@ -56,7 +56,7 @@ class RiskAssessmentState(TypedDict):
     human_readable_status: str  # "I am currently verifying the debt ratio..."
 
 
-class SNCAnalysisState(TypedDict):
+class SNCAnalysisState(TypedDict, total=False):
     """
     The State for the Shared National Credit (SNC) Analysis Graph.
     """
@@ -80,7 +80,7 @@ class SNCAnalysisState(TypedDict):
     human_readable_status: str
 
 
-class MarketSentimentState(TypedDict):
+class MarketSentimentState(TypedDict, total=False):
     """
     State for the Market Sentiment & News Monitoring Graph.
     """
@@ -108,7 +108,7 @@ class MarketSentimentState(TypedDict):
     human_readable_status: str
 
 
-class RedTeamState(TypedDict):
+class RedTeamState(TypedDict, total=False):
     """
     State for the Adversarial Red Team Loop.
     """
@@ -127,7 +127,7 @@ class RedTeamState(TypedDict):
     human_readable_status: str
 
 
-class ESGAnalysisState(TypedDict):
+class ESGAnalysisState(TypedDict, total=False):
     """
     State for the ESG (Environmental, Social, Governance) Analysis Graph.
     """
@@ -153,7 +153,7 @@ class ESGAnalysisState(TypedDict):
     final_report: Optional[str]
 
 
-class ComplianceState(TypedDict):
+class ComplianceState(TypedDict, total=False):
     """
     State for the Regulatory Compliance Graph.
     """
@@ -177,7 +177,7 @@ class ComplianceState(TypedDict):
     final_report: Optional[str]
 
 
-class QuantumRiskState(TypedDict):
+class QuantumRiskState(TypedDict, total=False):
     """
     State for the Quantum-Enhanced Risk Graph.
     Tracks the execution of QMC simulations and Hybrid QNN inference.
@@ -201,7 +201,7 @@ class QuantumRiskState(TypedDict):
     iteration_count: int
 
 
-class CrisisSimulationState(TypedDict):
+class CrisisSimulationState(TypedDict, total=False):
     """
     State for the Macro-Economic Crisis Simulation Graph.
     """
@@ -227,7 +227,7 @@ class CrisisSimulationState(TypedDict):
     final_report: Optional[str]
 
 
-class ReflectorState(TypedDict):
+class ReflectorState(TypedDict, total=False):
     """
     State for the Reflector (Meta-Cognition) Graph.
     """
@@ -245,35 +245,35 @@ class ReflectorState(TypedDict):
 # --- Omniscient State (v23.5) ---
 
 
-class EntityEcosystem(TypedDict):
+class EntityEcosystem(TypedDict, total=False):
     legal_entity: Dict[str, str]
     management_assessment: Dict[str, Any]
     competitive_positioning: Dict[str, str]
 
 
-class EquityAnalysis(TypedDict):
+class EquityAnalysis(TypedDict, total=False):
     fundamentals: Dict[str, str]
     valuation_engine: Dict[str, Any]
 
 
-class CreditAnalysis(TypedDict):
+class CreditAnalysis(TypedDict, total=False):
     snc_rating_model: Dict[str, Any]
     cds_market_implied_rating: str
     covenant_risk_analysis: Dict[str, Any]
 
 
-class SimulationEngine(TypedDict):
+class SimulationEngine(TypedDict, total=False):
     monte_carlo_default_prob: float
     quantum_scenarios: List[Dict[str, Any]]
     trading_dynamics: Dict[str, str]
 
 
-class StrategicSynthesis(TypedDict):
+class StrategicSynthesis(TypedDict, total=False):
     m_and_a_posture: str
     final_verdict: Dict[str, Any]
 
 
-class OmniscientNodes(TypedDict):
+class OmniscientNodes(TypedDict, total=False):
     entity_ecosystem: EntityEcosystem
     equity_analysis: EquityAnalysis
     credit_analysis: CreditAnalysis
@@ -281,18 +281,18 @@ class OmniscientNodes(TypedDict):
     strategic_synthesis: StrategicSynthesis
 
 
-class OmniscientMeta(TypedDict):
+class OmniscientMeta(TypedDict, total=False):
     target: str
     generated_at: str
     model_version: str
 
 
-class OmniscientKnowledgeGraph(TypedDict):
+class OmniscientKnowledgeGraph(TypedDict, total=False):
     meta: OmniscientMeta
     nodes: OmniscientNodes
 
 
-class OmniscientState(TypedDict):
+class OmniscientState(TypedDict, total=False):
     """
     State for the v23.5 'AI Partner' Omniscient Workflow.
     """

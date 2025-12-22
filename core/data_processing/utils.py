@@ -62,10 +62,10 @@ class GoldStandardScrubber:
 
     @staticmethod
     def compute_file_hash(content: Union[str, bytes]) -> str:
-        """Generates MD5 hash for change detection."""
+        """Generates SHA256 hash for change detection."""
         if isinstance(content, str):
             content = content.encode('utf-8')
-        return hashlib.md5(content).hexdigest()
+        return hashlib.sha256(content).hexdigest()
 
     @staticmethod
     def clean_text(text: str) -> str:
@@ -281,7 +281,7 @@ class FileHandlers:
                 artifact_type=ArtifactType.DATA.value,
                 title=f"Market Data: {os.path.basename(filepath)}",
                 metadata=meta,
-                content_hash=hashlib.md5(filepath.encode()).hexdigest()
+                content_hash=hashlib.sha256(filepath.encode()).hexdigest()
             )
         except Exception as e:
             logger.error(f"Parquet Read Error {filepath}: {e}")

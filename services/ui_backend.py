@@ -65,4 +65,4 @@ def get_agents():
 if __name__ == '__main__':
     print(f"Serving UI from {SHOWCASE_DIR}")
     # Host 0.0.0.0 is important for some environments
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=False)
