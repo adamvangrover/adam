@@ -21,6 +21,21 @@
 
 ### Security
 - Addressed `bandit` warnings regarding requests without timeout.
+
+## [v23.5-patch-security] - 2025-05-21 (Operation Green Light)
+
+### Security
+- **Hardening**: Replaced MD5 with SHA-256 for file hashing (`core/data_processing`).
+- **Web**: Disabled Flask debug mode (`services/ui_backend.py`) and enabled Jinja2 autoescape (`core/newsletter_layout`).
+- **Network**: Enforced 30s timeouts on external API requests (`government_stats_api`, `market_data_api`).
+- **SQL**: Added input validation to `MCPRegistry` to prevent SQL injection.
+
+### Reliability
+- **Fallback**: Implemented graceful degradation for `langgraph` in all `core/engine/*_graph.py` modules. System now boots without graph dependencies.
+- **Types**: Relaxed `TypedDict` strictness (`total=False`) in `core/engine/states.py` to support partial async updates.
+- **Documentation**: Added Google-style docstrings to `core/agents/agent_base.py`.
+- **Fixes**: Corrected indentation syntax error in `core/vertical_risk_agent/tools/mcp_server/server2.py`.
+
 ## [Unreleased] - 2025-05-20 (Simulated)
 
 ### Fixed

@@ -148,6 +148,13 @@ class MCPRegistry:
     def get_historical_data(self, ticker: str, start_year: int = 2020) -> str:
         """Convenience wrapper for Lakehouse history."""
         # Note: lakehouse.execute returns JSON string
+        if not ticker.isalnum():
+            raise ValueError("Ticker must be alphanumeric to prevent SQL injection.")
+        try:
+            start_year = int(start_year)
+        except ValueError:
+            raise ValueError("start_year must be an integer.")
+
         query = f"SELECT * FROM financials WHERE ticker = '{ticker}' AND year >= {start_year}"
         return self.lakehouse.execute(query)
 

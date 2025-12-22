@@ -10,8 +10,23 @@ It uses a cyclical approach to ensure no violation is missed and interpretations
 
 import logging
 from typing import Literal, Dict, Any
-from langgraph.graph import StateGraph, END, START
-from langgraph.checkpoint.memory import MemorySaver
+try:
+    from langgraph.graph import StateGraph, END, START
+    from langgraph.checkpoint.memory import MemorySaver
+    HAS_LANGGRAPH = True
+except ImportError:
+    HAS_LANGGRAPH = False
+    class StateGraph:
+         def __init__(self, *args, **kwargs): pass
+         def add_node(self, *args, **kwargs): pass
+         def add_edge(self, *args, **kwargs): pass
+         def set_entry_point(self, *args, **kwargs): pass
+         def add_conditional_edges(self, *args, **kwargs): pass
+         def compile(self, *args, **kwargs): return None
+    END = "END"
+    START = "START"
+    class MemorySaver: pass
+    logger.warning("LangGraph not installed. Graphs will be disabled.")
 
 from core.engine.states import ComplianceState
 
@@ -146,6 +161,9 @@ def should_continue_compliance(state: ComplianceState) -> Literal["revise_compli
 
 
 def build_compliance_graph():
+    if not HAS_LANGGRAPH:
+        return None
+
     workflow = StateGraph(ComplianceState)
 
     workflow.add_node("identify_jurisdiction", identify_jurisdiction_node)

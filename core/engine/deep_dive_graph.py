@@ -1,7 +1,22 @@
 import logging
 from typing import Dict, Any, List
-from langgraph.graph import StateGraph, END, START
-from langgraph.checkpoint.memory import MemorySaver
+try:
+    from langgraph.graph import StateGraph, END, START
+    from langgraph.checkpoint.memory import MemorySaver
+    HAS_LANGGRAPH = True
+except ImportError:
+    HAS_LANGGRAPH = False
+    class StateGraph:
+         def __init__(self, *args, **kwargs): pass
+         def add_node(self, *args, **kwargs): pass
+         def add_edge(self, *args, **kwargs): pass
+         def set_entry_point(self, *args, **kwargs): pass
+         def add_conditional_edges(self, *args, **kwargs): pass
+         def compile(self, *args, **kwargs): return None
+    END = "END"
+    START = "START"
+    class MemorySaver: pass
+    logger.warning("LangGraph not installed. Graphs will be disabled.")
 
 from core.engine.states import OmniscientState
 from core.engine.valuation_utils import calculate_dcf, calculate_multiples, get_price_targets
@@ -286,6 +301,9 @@ def strategic_synthesis_node(state: OmniscientState) -> Dict[str, Any]:
 
 
 def build_deep_dive_graph():
+    if not HAS_LANGGRAPH:
+        return None
+
     workflow = StateGraph(OmniscientState)
 
     # Add Nodes

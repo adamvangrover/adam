@@ -1,6 +1,6 @@
 try:
-from core.vertical_risk_agent.tools.agent_tools import AgentTools, FinancialRatio
-from mcp.server.fastmcp import FastMCP
+    from core.vertical_risk_agent.tools.agent_tools import AgentTools, FinancialRatio
+    from mcp.server.fastmcp import FastMCP
 except ImportError:
     # Fallback for environments without MCP installed
     class FastMCP:

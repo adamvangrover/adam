@@ -10,8 +10,23 @@ and then critiques the findings against known controversies (greenwashing detect
 
 import logging
 from typing import Literal, Dict, Any
-from langgraph.graph import StateGraph, END, START
-from langgraph.checkpoint.memory import MemorySaver
+try:
+    from langgraph.graph import StateGraph, END, START
+    from langgraph.checkpoint.memory import MemorySaver
+    HAS_LANGGRAPH = True
+except ImportError:
+    HAS_LANGGRAPH = False
+    class StateGraph:
+         def __init__(self, *args, **kwargs): pass
+         def add_node(self, *args, **kwargs): pass
+         def add_edge(self, *args, **kwargs): pass
+         def set_entry_point(self, *args, **kwargs): pass
+         def add_conditional_edges(self, *args, **kwargs): pass
+         def compile(self, *args, **kwargs): return None
+    END = "END"
+    START = "START"
+    class MemorySaver: pass
+    logger.warning("LangGraph not installed. Graphs will be disabled.")
 
 from core.engine.states import ESGAnalysisState
 
@@ -154,6 +169,9 @@ def should_continue_esg(state: ESGAnalysisState) -> Literal["revise_esg", "END"]
 
 
 def build_esg_graph():
+    if not HAS_LANGGRAPH:
+        return None
+
     workflow = StateGraph(ESGAnalysisState)
 
     # Add Nodes
