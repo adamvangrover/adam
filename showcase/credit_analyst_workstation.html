@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM Credit Workstation | Enterprise v4.0</title>
+
+    <!-- Core Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #020617;
+            --panel-bg: #0f172a;
+            --cyan-glow: #06b6d4;
+            --purple-glow: #8b5cf6;
+            --border-color: rgba(148, 163, 184, 0.1);
+            --glass: rgba(15, 23, 42, 0.95);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+        }
+
+        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: var(--bg-dark); }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+        }
+
+        .input-group {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 4px 6px;
+            margin-bottom: 4px;
+        }
+
+        .input-label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #94a3b8;
+        }
+
+        .num-input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-family: 'JetBrains Mono', monospace;
+            width: 100%;
+            font-size: 0.75rem;
+            outline: none;
+            border-bottom: 1px solid transparent;
+        }
+        .num-input:focus { border-bottom-color: var(--cyan-glow); }
+
+        .tab-btn {
+            padding: 8px 12px;
+            font-size: 0.75rem;
+            color: #64748b;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            color: var(--cyan-glow);
+            border-bottom-color: var(--cyan-glow);
+            background: rgba(6, 182, 212, 0.05);
+        }
+
+        .yby-grid {
+            display: grid;
+            grid-template-columns: 110px repeat(7, 1fr);
+            gap: 2px;
+            font-size: 0.7rem;
+        }
+        .yby-cell {
+            background: rgba(255,255,255,0.02);
+            padding: 4px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .yby-cell.label { justify-content: flex-start; padding-left: 8px; color: #94a3b8; }
+        .yby-input {
+            width: 100%; background: transparent; text-align: center;
+            color: var(--cyan-glow); outline: none; font-family: 'JetBrains Mono';
+        }
+
+        /* Matrix Table for Sensitivity */
+        .matrix-table td, .matrix-table th {
+            padding: 6px;
+            text-align: center;
+            font-size: 0.7rem;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .matrix-header { font-weight: bold; color: #94a3b8; }
+        .matrix-val { font-family: 'JetBrains Mono'; }
+
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #06b6d4;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #06b6d4;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+
+    <!-- Top Bar -->
+    <header class="h-10 bg-[#020617] border-b border-white/5 flex items-center justify-between px-4 z-50 shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2">
+                <i data-lucide="activity" class="text-cyan-400 w-4 h-4"></i>
+                <span class="font-bold text-xs tracking-widest text-gray-200">ADAM <span class="text-cyan-400">CREDIT WORKSTATION</span> <span class="text-[9px] text-gray-600 ml-1">ENTERPRISE v4.0</span></span>
+            </div>
+            <div class="h-4 w-[1px] bg-gray-800 mx-2"></div>
+            <!-- Industry Selector -->
+            <select id="industry_select" onchange="updateIndustry()" class="bg-transparent text-xs text-gray-400 border border-gray-800 rounded px-2 py-0.5 outline-none hover:border-gray-600 transition">
+                <option value="General">General Industry</option>
+                <option value="Technology">Technology</option>
+                <option value="Healthcare">Healthcare</option>
+                <option value="Energy">Energy</option>
+                <option value="Financials">Financials</option>
+                <option value="Industrials">Industrials</option>
+            </select>
+             <!-- SaaS Toggle -->
+             <div class="flex items-center gap-2 ml-4 border-l border-white/10 pl-4">
+                <span class="text-[9px] text-gray-500 uppercase font-bold">SaaS Mode</span>
+                <input type="checkbox" id="saas_toggle" onchange="toggleSaaS()" class="accent-cyan-500 w-3 h-3">
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+             <button onclick="toggleSidePanel()" class="text-xs text-gray-500 hover:text-cyan-400 flex items-center gap-1">
+                <i data-lucide="book-open" class="w-3 h-3"></i> Guide
+            </button>
+            <button onclick="exportReport()" class="bg-cyan-950/30 hover:bg-cyan-900/50 border border-cyan-500/30 text-cyan-400 px-3 py-1 rounded text-[10px] uppercase font-bold tracking-wide transition flex items-center gap-2">
+                <i data-lucide="download" class="w-3 h-3"></i> Export PDF
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="flex-1 flex overflow-hidden">
+
+        <!-- Left Sidebar: Inputs -->
+        <aside class="w-[320px] bg-[#020617] border-r border-white/5 flex flex-col overflow-y-auto custom-scroll z-10">
+
+            <!-- Entity Info -->
+            <div class="p-3 border-b border-white/5">
+                <h3 class="text-[10px] font-bold text-gray-500 uppercase mb-2">Target Entity</h3>
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="col-span-2 input-group">
+                        <label class="input-label">Company</label>
+                        <input type="text" id="co_name" value="Orion Dynamics" class="num-input">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Ticker</label>
+                        <input type="text" id="ticker" value="ORION" class="num-input">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scenarios -->
+            <div class="p-3 border-b border-white/5">
+                <h3 class="text-[10px] font-bold text-gray-500 uppercase mb-2">Scenario Manager</h3>
+                <div class="grid grid-cols-3 gap-1">
+                    <button onclick="applyScenario('Base')" class="text-[9px] py-1 bg-white/5 hover:bg-white/10 text-gray-300 rounded border border-white/5">Reset Base</button>
+                    <button onclick="applyScenario('Bull')" class="text-[9px] py-1 bg-green-900/20 hover:bg-green-900/30 text-green-400 rounded border border-green-500/20">Bull Case</button>
+                    <button onclick="applyScenario('Bear')" class="text-[9px] py-1 bg-red-900/20 hover:bg-red-900/30 text-red-400 rounded border border-red-500/20">Stress Case</button>
+                </div>
+                <div id="scenario_badge" class="mt-2 text-[9px] text-center text-gray-500 italic">Current: Base Case</div>
+            </div>
+
+            <!-- Cap Structure -->
+            <div class="p-3 border-b border-white/5">
+                <h3 class="text-[10px] font-bold text-gray-500 uppercase mb-2">Capital Structure (LTM)</h3>
+                <div class="space-y-1">
+                    <div class="input-group border-l-2 border-green-500">
+                        <label class="input-label flex justify-between"><span>Senior Secured</span> <span class="text-green-500 text-[9px]">1st Lien</span></label>
+                        <input type="number" id="debt_sec" value="2500" class="num-input" oninput="runModel()">
+                    </div>
+                    <div class="input-group border-l-2 border-yellow-500">
+                        <label class="input-label">Unsecured Notes</label>
+                        <input type="number" id="debt_unsec" value="1200" class="num-input" oninput="runModel()">
+                    </div>
+                    <div class="input-group border-l-2 border-red-500">
+                        <label class="input-label">Subordinated / Mezz</label>
+                        <input type="number" id="debt_sub" value="300" class="num-input" oninput="runModel()">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Cash & Equivalents</label>
+                        <input type="number" id="cash" value="200" class="num-input" oninput="runModel()">
+                    </div>
+                </div>
+                <div class="mt-2 flex justify-between text-[10px] bg-white/5 p-1 rounded">
+                    <span class="text-gray-400">Net Debt:</span>
+                    <span id="lbl_net_debt" class="font-mono text-white">$3,800</span>
+                </div>
+            </div>
+
+            <!-- Historicals -->
+            <div class="p-3 border-b border-white/5">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-[10px] font-bold text-gray-500 uppercase">Historical P&L</h3>
+                    <button onclick="loadDemo()" class="text-[9px] text-cyan-500 hover:text-white">Load Demo</button>
+                </div>
+                <div class="grid grid-cols-3 gap-1 mb-1 text-[9px] text-center text-gray-600">
+                    <div>FY-2</div>
+                    <div>FY-1</div>
+                    <div class="text-white">LTM</div>
+                </div>
+                <div class="grid grid-cols-3 gap-1 mb-2">
+                    <input id="rev_m2" value="4500" class="bg-white/5 text-center text-[10px] py-1 rounded text-gray-400 border-none outline-none">
+                    <input id="rev_m1" value="4800" class="bg-white/5 text-center text-[10px] py-1 rounded text-gray-400 border-none outline-none">
+                    <input id="rev_ltm" value="5100" class="bg-white/10 text-center text-[10px] py-1 rounded text-white font-bold border-none outline-none" oninput="runModel()">
+                </div>
+                <div class="grid grid-cols-3 gap-1 mb-3">
+                    <input id="ebitda_m2" value="1000" class="bg-white/5 text-center text-[10px] py-1 rounded text-gray-400 border-none outline-none">
+                    <input id="ebitda_m1" value="1100" class="bg-white/5 text-center text-[10px] py-1 rounded text-gray-400 border-none outline-none">
+                    <input id="ebitda_ltm" value="1250" class="bg-white/10 text-center text-[10px] py-1 rounded text-white font-bold border-none outline-none" oninput="runModel()">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="input-group">
+                        <label class="input-label">LTM Capex</label>
+                        <input id="capex_ltm" value="300" class="num-input" oninput="runModel()">
+                    </div>
+                     <div class="input-group">
+                        <label class="input-label">LTM NWC</label>
+                        <input id="nwc_ltm" value="250" class="num-input" oninput="runModel()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rates & Valuation -->
+            <div class="p-3">
+                <h3 class="text-[10px] font-bold text-gray-500 uppercase mb-2">Valuation Assumptions</h3>
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                     <div class="input-group">
+                        <label class="input-label">WACC (%)</label>
+                        <input type="number" id="wacc" value="9.0" step="0.1" class="num-input" oninput="runModel()">
+                    </div>
+                     <div class="input-group">
+                        <label class="input-label">Terminal Mult (x)</label>
+                        <input type="number" id="term_mult" value="8.0" step="0.5" class="num-input" oninput="runModel()">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Base Rate (SOFR) %</label>
+                    <input type="number" id="base_rate" value="5.3" step="0.1" class="num-input" oninput="runModel()">
+                </div>
+                <div class="text-[9px] text-gray-600 mt-1 italic" id="industry_context">
+                    Industry Risk Premium applied to WACC.
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- Center: Tabbed Content -->
+        <main class="flex-1 flex flex-col min-w-0 bg-[#050b14] relative">
+
+            <!-- Tab Navigation -->
+            <div class="h-9 border-b border-white/5 flex px-2 bg-[#020617] overflow-x-auto">
+                <div class="tab-btn active" onclick="switchTab('dashboard', this)">Dashboard</div>
+                <div class="tab-btn" onclick="switchTab('model', this)">Projection Model</div>
+                <div class="tab-btn" onclick="switchTab('sensitivity', this)">Sensitivity</div>
+                <div class="tab-btn" onclick="switchTab('structure', this)">Structural Risk</div>
+                <div class="tab-btn" onclick="switchTab('covenants', this)">Covenants</div>
+                <div class="tab-btn" onclick="switchTab('hybrid', this)">Hybrid</div>
+                <div class="tab-btn" onclick="switchTab('memo', this)">Memo</div>
+            </div>
+
+            <!-- Views -->
+            <div class="flex-1 overflow-y-auto custom-scroll p-4 relative" id="main_content">
+
+                <!-- View: Dashboard -->
+                <div id="view_dashboard" class="space-y-4">
+                    <!-- KPI Cards -->
+                    <div class="grid grid-cols-4 gap-4">
+                        <div class="glass-panel p-3 border-t-2 border-cyan-500">
+                            <div class="text-[9px] text-gray-400 uppercase">Enterprise Value</div>
+                            <div class="text-xl font-bold text-white mt-1" id="out_ev">---</div>
+                            <div class="text-[9px] text-gray-500">Implied from DCF</div>
+                        </div>
+                        <div class="glass-panel p-3 border-t-2 border-purple-500">
+                            <div class="text-[9px] text-gray-400 uppercase">Equity / Share</div>
+                            <div class="text-xl font-bold text-purple-400 mt-1" id="out_share">---</div>
+                            <div class="text-[9px] text-gray-500">Intrinsic Value</div>
+                        </div>
+                        <div class="glass-panel p-3 border-t-2 border-yellow-500">
+                            <div class="text-[9px] text-gray-400 uppercase">Net Leverage</div>
+                            <div class="text-xl font-bold text-yellow-400 mt-1" id="out_lev">---</div>
+                            <div class="text-[9px] text-gray-500">Total Debt / EBITDA</div>
+                        </div>
+                        <div class="glass-panel p-3 border-t-2 border-green-500">
+                            <div class="text-[9px] text-gray-400 uppercase">SNC Classification</div>
+                            <div class="text-xl font-bold text-green-400 mt-1" id="out_snc">---</div>
+                            <div class="text-[9px] text-gray-500" id="out_snc_detail">Repayment Capacity</div>
+                        </div>
+                    </div>
+
+                    <!-- Charts -->
+                    <div class="grid grid-cols-2 gap-4 h-64">
+                         <div class="glass-panel p-3 flex flex-col">
+                            <div class="text-[9px] font-bold text-gray-400 uppercase mb-2">Levered FCF vs Repayment</div>
+                            <div class="flex-1 relative"><canvas id="chart_fcf"></canvas></div>
+                        </div>
+                         <div class="glass-panel p-3 flex flex-col">
+                            <div class="text-[9px] font-bold text-gray-400 uppercase mb-2">Credit Profile Evolution</div>
+                            <div class="flex-1 relative"><canvas id="chart_credit"></canvas></div>
+                        </div>
+                    </div>
+
+                    <!-- Implied Ratings -->
+                    <div class="glass-panel p-3">
+                         <div class="text-[9px] font-bold text-gray-400 uppercase mb-2">Implied Ratings Schedule</div>
+                         <div class="overflow-x-auto">
+                            <table class="w-full text-[10px] text-left">
+                                <thead class="text-gray-500 border-b border-white/5">
+                                    <tr>
+                                        <th class="py-1">Metric</th>
+                                        <th class="text-right text-cyan-400">Y1</th>
+                                        <th class="text-right text-cyan-400">Y2</th>
+                                        <th class="text-right text-cyan-400">Y3</th>
+                                        <th class="text-right text-cyan-400">Y4</th>
+                                        <th class="text-right text-cyan-400">Y5</th>
+                                        <th class="text-right text-cyan-400">Y6</th>
+                                        <th class="text-right text-cyan-400">Y7</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ratings_body" class="font-mono text-gray-300"></tbody>
+                            </table>
+                         </div>
+                    </div>
+                </div>
+
+                <!-- View: Model -->
+                <div id="view_model" class="hidden space-y-4">
+                    <div class="glass-panel p-4">
+                        <div class="flex justify-between items-end mb-3">
+                            <h2 class="text-sm font-bold text-gray-200">Year-by-Year Operating Assumptions</h2>
+                            <button onclick="normalizeAssumptions()" class="text-[9px] px-2 py-1 border border-cyan-500/30 text-cyan-400 rounded hover:bg-cyan-900/20">Normalize to 3Y Avg</button>
+                        </div>
+                        <div class="yby-grid" id="assumptions_grid">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+                    <div class="glass-panel p-4">
+                        <h2 class="text-sm font-bold text-gray-200 mb-2">LGD Waterfall Analysis</h2>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="input-label">Distressed EV Multiple</label>
+                                <input type="range" min="3" max="8" step="0.5" value="5" class="w-full" oninput="this.nextElementSibling.innerText = this.value + 'x'; runModel()">
+                                <span class="text-xs text-cyan-400 float-right">5x</span>
+                            </div>
+                            <div class="space-y-1 text-xs">
+                                <div class="flex justify-between"><span>Secured Recovery:</span> <span id="rec_sec" class="text-green-400">--%</span></div>
+                                <div class="flex justify-between"><span>Unsecured Recovery:</span> <span id="rec_unsec" class="text-yellow-400">--%</span></div>
+                                <div class="flex justify-between"><span>Subordinated Recovery:</span> <span id="rec_sub" class="text-red-400">--%</span></div>
+                                <div class="flex justify-between border-t border-gray-700 pt-1"><span>Blended LGD:</span> <span id="val_lgd" class="font-bold">--%</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- View: Structural Risk (Merton) -->
+                <div id="view_structure" class="hidden space-y-4">
+                     <div class="glass-panel p-6">
+                        <h2 class="text-sm font-bold text-red-400 mb-4">Merton Structural Model (Distance to Default)</h2>
+                        <div class="grid grid-cols-3 gap-6">
+                            <div class="space-y-4">
+                                <div class="input-group">
+                                    <label class="input-label">Asset Volatility (%)</label>
+                                    <input type="number" id="asset_vol" value="30" class="num-input" oninput="runMerton()">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Risk Free Rate (%)</label>
+                                    <input type="number" id="rf_rate" value="4.5" class="num-input" oninput="runMerton()">
+                                </div>
+                                <div class="input-group">
+                                    <label class="input-label">Time Horizon (Years)</label>
+                                    <input type="number" id="horizon" value="1" class="num-input" oninput="runMerton()">
+                                </div>
+                            </div>
+                            <div class="col-span-2 flex flex-col items-center justify-center p-4 bg-white/5 rounded">
+                                <div class="text-4xl font-bold text-white mb-2" id="merton_dd">--</div>
+                                <div class="text-xs text-gray-500 uppercase tracking-widest mb-4">Distance to Default (Std Dev)</div>
+                                <div class="text-2xl font-bold text-red-500" id="merton_pd">--%</div>
+                                <div class="text-xs text-gray-500 uppercase tracking-widest">Implied Probability of Default</div>
+                            </div>
+                        </div>
+                        <div class="mt-4 text-[10px] text-gray-500">
+                            Based on naive KMV approach. Asset Value inferred from EV. Asset Volatility is a key input.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- View: Covenants -->
+                <div id="view_covenants" class="hidden space-y-4">
+                    <div class="glass-panel p-6">
+                        <h2 class="text-sm font-bold text-yellow-400 mb-4">Financial Covenants Check</h2>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div class="input-group">
+                                <label class="input-label">Max Total Leverage (x)</label>
+                                <input type="number" id="cov_max_lev" value="4.5" step="0.25" class="num-input" oninput="runCovenants()">
+                            </div>
+                            <div class="input-group">
+                                <label class="input-label">Min Interest Coverage (x)</label>
+                                <input type="number" id="cov_min_icr" value="2.0" step="0.25" class="num-input" oninput="runCovenants()">
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-xs text-center">
+                                <thead class="text-gray-500 border-b border-white/5">
+                                    <tr>
+                                        <th class="py-2 text-left">Metric</th>
+                                        <th>Y1</th><th>Y2</th><th>Y3</th><th>Y4</th><th>Y5</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="covenant_body" class="font-mono text-gray-300">
+                                    <!-- Injected -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- View: Sensitivity -->
+                <div id="view_sensitivity" class="hidden">
+                    <div class="glass-panel p-6 flex flex-col items-center">
+                        <h2 class="text-sm font-bold text-gray-200 mb-4">Valuation Sensitivity: Enterprise Value ($mm)</h2>
+                        <div class="overflow-x-auto">
+                            <table class="matrix-table">
+                                <thead id="sens_head"></thead>
+                                <tbody id="sens_body"></tbody>
+                            </table>
+                        </div>
+                        <div class="text-[10px] text-gray-500 mt-4">
+                            Vertical: WACC (%) | Horizontal: Terminal Growth / Exit Multiple
+                        </div>
+                    </div>
+                </div>
+
+                <!-- View: Hybrid Checklist -->
+                <div id="view_hybrid" class="hidden space-y-4">
+                    <div class="glass-panel p-6">
+                        <h2 class="text-sm font-bold text-cyan-400 mb-4">Hybrid Instrument Equity Credit Checklist</h2>
+                        <div class="space-y-4 text-xs">
+                            <div class="flex items-center justify-between">
+                                <span>1. Is the instrument deeply subordinated (Junior to all debt)?</span>
+                                <input type="checkbox" id="chk_sub" onchange="calcHybrid()" class="accent-cyan-500">
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>2. Are coupon payments deferrable at issuer's discretion?</span>
+                                <input type="checkbox" id="chk_def" onchange="calcHybrid()" class="accent-cyan-500">
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>3. Is remaining maturity > 20 years?</span>
+                                <input type="checkbox" id="chk_mat" onchange="calcHybrid()" class="accent-cyan-500">
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span>4. Is there no incentive to redeem (step-ups)?</span>
+                                <input type="checkbox" id="chk_step" onchange="calcHybrid()" class="accent-cyan-500">
+                            </div>
+                            <div class="mt-6 border-t border-white/10 pt-4 flex justify-between items-center">
+                                <span class="font-bold text-gray-400">Estimated Equity Credit:</span>
+                                <span id="hybrid_result" class="text-xl font-bold text-white">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- View: Memo -->
+                <div id="view_memo" class="hidden space-y-4 h-full flex flex-col">
+                    <div class="glass-panel p-4 flex-1 flex flex-col gap-4">
+                        <div class="flex-1 flex flex-col">
+                            <label class="text-xs font-bold text-cyan-400 mb-2">Investment Thesis</label>
+                            <textarea id="memo_thesis" class="flex-1 bg-black/20 border border-white/5 rounded p-2 text-xs text-gray-300 resize-none outline-none focus:border-cyan-500/50" placeholder="Key drivers, competitive advantage, catalyst..."></textarea>
+                        </div>
+                        <div class="flex-1 flex flex-col">
+                            <label class="text-xs font-bold text-red-400 mb-2">Key Risks & Mitigants</label>
+                            <textarea id="memo_risks" class="flex-1 bg-black/20 border border-white/5 rounded p-2 text-xs text-gray-300 resize-none outline-none focus:border-red-500/50" placeholder="Cyclicality, leverage, integration risk..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+
+        <!-- Right Guide Panel -->
+        <aside id="guide_panel" class="w-0 overflow-hidden bg-[#0a0f1e] border-l border-white/5 transition-all duration-300 flex flex-col">
+            <div class="p-4 border-b border-white/5 flex justify-between items-center">
+                <h3 class="font-bold text-xs text-cyan-400">ANALYST GUIDE</h3>
+                <button onclick="toggleSidePanel()" class="text-gray-500 hover:text-white"><i data-lucide="x" class="w-4 h-4"></i></button>
+            </div>
+            <div class="p-4 overflow-y-auto custom-scroll text-[10px] text-gray-400 space-y-4">
+                <div>
+                    <h4 class="text-white font-bold mb-1">SNC Classifications</h4>
+                    <p class="mb-1"><span class="text-green-400">Pass:</span> FCF/Debt > 50%, DSCR > 1.5x.</p>
+                    <p class="mb-1"><span class="text-yellow-400">Special Mention:</span> FCF/Debt > 40%, DSCR > 1.2x.</p>
+                    <p class="mb-1"><span class="text-red-400">Substandard:</span> FCF/Debt < 30%.</p>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-1">Industry Benchmarks</h4>
+                    <p>Default assumptions based on <span id="guide_industry" class="text-cyan-400">General</span> sector:</p>
+                    <ul class="list-disc pl-4 mt-1 space-y-1">
+                        <li>Growth: <span id="guide_growth">5%</span></li>
+                        <li>Margins: <span id="guide_margin">25%</span></li>
+                        <li>Risk Premium: <span id="guide_spread">300bps</span></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold mb-1">Covenant Logic</h4>
+                    <p>Leverage breaches turn <span class="text-red-400">Red</span>. Cushion < 0.5x turns <span class="text-yellow-400">Yellow</span>.</p>
+                </div>
+            </div>
+        </aside>
+
+    </div>
+
+    <!-- Logic -->
+    <script>
+        lucide.createIcons();
+
+        // --- Data ---
+        const SECTOR_DATA = {
+            "General": { growth: 5.0, margin: 25.0, spread: 300, capex: 5.0 },
+            "Technology": { growth: 8.5, margin: 30.0, spread: 250, capex: 4.0 },
+            "Healthcare": { growth: 4.0, margin: 20.0, spread: 280, capex: 3.0 },
+            "Energy": { growth: 2.0, margin: 35.0, spread: 450, capex: 12.0 },
+            "Financials": { growth: 3.0, margin: 40.0, spread: 350, capex: 2.0 },
+            "Industrials": { growth: 3.5, margin: 15.0, spread: 320, capex: 6.0 }
+        };
+
+        const RATINGS_MAP = [
+            { pd: 0.05, sp: 'AAA', moody: 'Aaa' },
+            { pd: 0.1, sp: 'AA+', moody: 'Aa1' },
+            { pd: 0.2, sp: 'AA', moody: 'Aa2' },
+            { pd: 0.3, sp: 'A+', moody: 'A1' },
+            { pd: 0.5, sp: 'A', moody: 'A2' },
+            { pd: 0.8, sp: 'BBB+', moody: 'Baa1' },
+            { pd: 1.2, sp: 'BBB', moody: 'Baa2' },
+            { pd: 2.0, sp: 'BB+', moody: 'Ba1' },
+            { pd: 3.5, sp: 'BB', moody: 'Ba2' },
+            { pd: 5.0, sp: 'B+', moody: 'B1' },
+            { pd: 8.0, sp: 'B', moody: 'B2' },
+            { pd: 12.0, sp: 'B-', moody: 'B3' },
+            { pd: 20.0, sp: 'CCC+', moody: 'Caa1' },
+            { pd: 100, sp: 'D', moody: 'C' }
+        ];
+
+        let chartFCF = null;
+        let chartCredit = null;
+        let LATEST_PROJ = null;
+
+        // --- UI State ---
+        function switchTab(viewId, btn) {
+            document.querySelectorAll('[id^="view_"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById('view_' + viewId).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            btn.classList.add('active');
+
+            if(viewId === 'sensitivity') renderSensitivity();
+            if(viewId === 'covenants') runCovenants();
+            if(viewId === 'structure') runMerton();
+        }
+
+        function toggleSidePanel() {
+            const p = document.getElementById('guide_panel');
+            p.classList.toggle('w-0');
+            p.classList.toggle('w-[250px]');
+        }
+
+        function toggleSaaS() {
+            // Re-init grid with or without SaaS rows
+            initGrid();
+            // Re-calc
+            runModel();
+        }
+
+        // --- Core Model ---
+        function initGrid() {
+            const grid = document.getElementById('assumptions_grid');
+            const isSaaS = document.getElementById('saas_toggle').checked;
+
+            let rows = [
+                { id: 'growth', label: 'Rev Growth %', def: 5.0 },
+                { id: 'margin', label: 'EBITDA Mrg %', def: 25.0 },
+                { id: 'capex_pct', label: 'CapEx % Rev', def: 5.0 },
+                { id: 'tax_rate', label: 'Tax Rate %', def: 21.0 },
+                { id: 'nwc_pct', label: 'NWC % Rev', def: 5.0 }
+            ];
+
+            if(isSaaS) {
+                rows.push({ id: 'churn', label: 'Churn Rate %', def: 5.0 });
+                rows.push({ id: 'cac', label: 'CAC % Rev', def: 15.0 });
+            }
+
+            grid.innerHTML = `
+                <div class="yby-cell label font-bold">DRIVER</div>
+                <div class="yby-cell text-cyan-400 font-bold">Y1</div><div class="yby-cell text-cyan-400 font-bold">Y2</div>
+                <div class="yby-cell text-cyan-400 font-bold">Y3</div><div class="yby-cell text-cyan-400 font-bold">Y4</div>
+                <div class="yby-cell text-cyan-400 font-bold">Y5</div><div class="yby-cell text-cyan-400 font-bold">Y6</div>
+                <div class="yby-cell text-cyan-400 font-bold">Y7</div>
+            `;
+
+            rows.forEach(row => {
+                grid.innerHTML += `<div class="yby-cell label">${row.label}</div>`;
+                for(let i=1; i<=7; i++) {
+                    grid.innerHTML += `<div class="yby-cell"><input type="number" id="${row.id}_${i}" value="${row.def}" step="0.1" class="yby-input" oninput="runModel()"></div>`;
+                }
+            });
+        }
+
+        function getArr(id) {
+            const arr = [];
+            for(let i=1; i<=7; i++) {
+                const el = document.getElementById(`${id}_${i}`);
+                arr.push(el ? (parseFloat(el.value) || 0) : 0);
+            }
+            return arr;
+        }
+
+        function setArr(id, valArr) {
+            for(let i=1; i<=7; i++) {
+                const el = document.getElementById(`${id}_${i}`);
+                if(el) el.value = (valArr[i-1] ?? valArr[0]).toFixed(1);
+            }
+        }
+
+        // Reusable core calc logic
+        function calculateProjections(inputs, overrides={}) {
+            const totalDebt = inputs.dSec + inputs.dUnsec + inputs.dSub;
+
+            // Interest Calc
+            const spSec = 0.025, spUnsec = 0.045, spSub = 0.075;
+            const baseRate = inputs.baseRate;
+            const interestExp = (inputs.dSec * (baseRate + spSec)) + (inputs.dUnsec * (baseRate + spUnsec)) + (inputs.dSub * (baseRate + spSub));
+
+            let proj = [];
+            let curRev = inputs.revLtm;
+            let prevNWC = inputs.nwcLtm;
+            let cumulLeveredFCF = 0;
+
+            const wacc = (overrides.wacc ?? inputs.wacc)/100;
+
+            for(let i=0; i<7; i++) {
+                curRev = curRev * (1 + inputs.g[i]/100);
+                const ebitda = curRev * (inputs.m[i]/100);
+                const capex = curRev * (inputs.c[i]/100);
+                const da = capex;
+                const ebit = ebitda - da;
+                const tax = Math.max(0, (ebit - interestExp) * (inputs.t[i]/100));
+
+                const currNWC = curRev * (inputs.n[i]/100);
+                const chgNWC = currNWC - prevNWC;
+                prevNWC = currNWC;
+
+                // Unlevered FCF for Valuation
+                const taxU = Math.max(0, ebit * (inputs.t[i]/100)); // Tax on EBIT
+                const ufcf = ebitda - taxU - capex - chgNWC;
+
+                // Levered FCF for Repayment
+                const lfcf = ebitda - tax - capex - chgNWC - interestExp;
+                cumulLeveredFCF += lfcf;
+
+                const lev = totalDebt > 0 ? totalDebt / ebitda : 0;
+                const interestCov = interestExp > 0 ? ebitda / interestExp : 100;
+
+                let pd = lev > 6 ? 12 : (lev > 4 ? 4 : (lev > 3 ? 1.5 : 0.2));
+                const rating = RATINGS_MAP.find(r => pd <= r.pd) || RATINGS_MAP[RATINGS_MAP.length-1];
+
+                proj.push({ year: i+1, rev: curRev, ebitda, ufcf, lfcf, cumulLeveredFCF, lev, interestCov, pd, rating });
+            }
+
+            // DCF Valuation
+            let pv = 0;
+            proj.forEach(p => pv += p.ufcf / Math.pow(1+wacc, p.year));
+
+            const termEbitda = proj[6].ebitda;
+            const termMult = overrides.mult ?? inputs.termMult;
+            const tv = termEbitda * termMult;
+            const pvTv = tv / Math.pow(1+wacc, 7);
+            const ev = pv + pvTv;
+
+            return { proj, ev, totalDebt, interestExp };
+        }
+
+        function runModel() {
+            const inp = (id) => parseFloat(document.getElementById(id).value) || 0;
+
+            const inputs = {
+                dSec: inp('debt_sec'), dUnsec: inp('debt_unsec'), dSub: inp('debt_sub'),
+                cash: inp('cash'), baseRate: inp('base_rate')/100,
+                revLtm: inp('rev_ltm'), nwcLtm: inp('nwc_ltm'),
+                g: getArr('growth'), m: getArr('margin'), c: getArr('capex_pct'),
+                t: getArr('tax_rate'), n: getArr('nwc_pct'),
+                wacc: inp('wacc'), termMult: inp('term_mult')
+            };
+
+            const res = calculateProjections(inputs);
+            LATEST_PROJ = res;
+
+            const totalDebt = res.totalDebt;
+            const netDebt = totalDebt - inputs.cash;
+
+            document.getElementById('lbl_net_debt').innerText = '$' + netDebt.toLocaleString();
+
+            // 5. Update UI
+            document.getElementById('out_ev').innerText = '$' + Math.round(res.ev).toLocaleString();
+            document.getElementById('out_share').innerText = '$' + ((res.ev - netDebt)/100).toFixed(2);
+            document.getElementById('out_lev').innerText = (totalDebt / inp('ebitda_ltm')).toFixed(1) + 'x';
+
+            // SNC
+            const finalCumul = res.proj[6].cumulLeveredFCF;
+            const repayCap = totalDebt > 0 ? (finalCumul / totalDebt) : 100;
+            let snc = "Pass";
+            if(repayCap < 0.3) snc = "Substandard";
+            else if(repayCap < 0.5) snc = "Special Mention";
+
+            const sncEl = document.getElementById('out_snc');
+            sncEl.innerText = snc;
+            sncEl.className = `text-xl font-bold mt-1 ${snc==='Pass'?'text-green-400':(snc==='Substandard'?'text-red-400':'text-yellow-400')}`;
+            document.getElementById('out_snc_detail').innerText = `Repay Cap: ${(repayCap*100).toFixed(0)}%`;
+
+            // Waterfall
+            runWaterfall(res.totalDebt, inputs);
+
+            // Tables & Charts
+            renderRatingsTable(res.proj);
+            renderCharts(res.proj, totalDebt);
+
+            // Update Active Tab calcs
+            if(!document.getElementById('view_covenants').classList.contains('hidden')) runCovenants();
+            if(!document.getElementById('view_structure').classList.contains('hidden')) runMerton();
+        }
+
+        function runWaterfall(totalDebt, inputs) {
+             const inp = (id) => parseFloat(document.getElementById(id).value) || 0;
+            const distressMult = parseFloat(document.querySelector('input[type=range]').value);
+            const distressVal = inp('ebitda_ltm') * distressMult;
+            let rem = distressVal;
+
+            const recSec = Math.min(inputs.dSec, rem); rem -= recSec;
+            const recUnsec = Math.min(inputs.dUnsec, rem); rem -= recUnsec;
+            const recSub = Math.min(inputs.dSub, rem);
+
+            const secPct = inputs.dSec > 0 ? (recSec/inputs.dSec)*100 : 100;
+            const unsecPct = inputs.dUnsec > 0 ? (recUnsec/inputs.dUnsec)*100 : 0;
+            const subPct = inputs.dSub > 0 ? (recSub/inputs.dSub)*100 : 0;
+            const blended = totalDebt > 0 ? ((recSec+recUnsec+recSub)/totalDebt)*100 : 100;
+
+             document.getElementById('rec_sec').innerText = secPct.toFixed(0) + '%';
+            document.getElementById('rec_unsec').innerText = unsecPct.toFixed(0) + '%';
+            document.getElementById('rec_sub').innerText = subPct.toFixed(0) + '%';
+            document.getElementById('val_lgd').innerText = (100 - blended).toFixed(1) + '%';
+        }
+
+        function runMerton() {
+            if(!LATEST_PROJ) return;
+            const ev = LATEST_PROJ.ev; // Use Implied EV as Proxy for Asset Value
+            const debt = LATEST_PROJ.totalDebt;
+            const assetVol = parseFloat(document.getElementById('asset_vol').value) / 100;
+            const rf = parseFloat(document.getElementById('rf_rate').value) / 100;
+            const T = parseFloat(document.getElementById('horizon').value);
+
+            // Naive KMV: DD = (EV - Debt) / (EV * AssetVol)
+            // Or Black Scholes logic:
+            // d2 = (ln(V/D) + (r - 0.5*v^2)T) / (v*sqrt(T))
+
+            const d2 = (Math.log(ev/debt) + (rf - 0.5*Math.pow(assetVol,2))*T) / (assetVol * Math.sqrt(T));
+
+            // NormCDF
+            const pd = normalCDF(-d2);
+
+            document.getElementById('merton_dd').innerText = d2.toFixed(2);
+            document.getElementById('merton_pd').innerText = (pd * 100).toFixed(2) + '%';
+        }
+
+        function normalCDF(x) {
+            var t = 1 / (1 + .2316419 * Math.abs(x));
+            var d = .3989423 * Math.exp(-x * x / 2);
+            var prob = d * t * (.3193815 + t * (-.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+            if (x > 0) prob = 1 - prob;
+            return prob;
+        }
+
+        function runCovenants() {
+            if(!LATEST_PROJ) return;
+            const maxLev = parseFloat(document.getElementById('cov_max_lev').value);
+            const minICR = parseFloat(document.getElementById('cov_min_icr').value);
+            const tb = document.getElementById('covenant_body');
+
+            let html = '';
+
+            // Leverage Row
+            html += `<tr class="border-b border-white/5"><td class="text-left text-gray-400 py-1">Lev (Max ${maxLev}x)</td>`;
+            LATEST_PROJ.proj.slice(0,5).forEach(p => {
+                const breach = p.lev > maxLev;
+                html += `<td class="${breach?'text-red-500 font-bold':'text-green-500'}">${p.lev.toFixed(1)}x</td>`;
+            });
+            html += '</tr>';
+
+             // ICR Row
+            html += `<tr class="border-b border-white/5"><td class="text-left text-gray-400 py-1">ICR (Min ${minICR}x)</td>`;
+            LATEST_PROJ.proj.slice(0,5).forEach(p => {
+                const breach = p.interestCov < minICR;
+                html += `<td class="${breach?'text-red-500 font-bold':'text-green-500'}">${p.interestCov.toFixed(1)}x</td>`;
+            });
+            html += '</tr>';
+
+            tb.innerHTML = html;
+        }
+
+        function renderRatingsTable(proj) {
+            const tb = document.getElementById('ratings_body');
+            let h = '';
+            const row = (lbl, key, fmt) => {
+                let s = `<tr class="border-b border-gray-800"><td class="py-1 text-gray-500">${lbl}</td>`;
+                proj.forEach(p => s += `<td class="text-right ${key==='rating'?'text-cyan-400':''}">${key==='rating'?p.rating.sp : fmt(p[key])}</td>`);
+                return s + '</tr>';
+            };
+            h += row('Net Leverage', 'lev', v=>v.toFixed(1)+'x');
+            h += row('S&P Rating', 'rating', null);
+            h += `<tr><td class="py-1 text-gray-500">Moody's</td>`;
+            proj.forEach(p => h += `<td class="text-right text-purple-400">${p.rating.moody}</td>`);
+            h += '</tr>';
+            tb.innerHTML = h;
+        }
+
+        function renderCharts(proj, debt) {
+            const labels = proj.map(p => 'Y'+p.year);
+            if(chartFCF) chartFCF.destroy();
+            chartFCF = new Chart(document.getElementById('chart_fcf'), {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [
+                        { label: 'Annual Levered FCF', data: proj.map(p=>p.lfcf), backgroundColor: '#06b6d4', yAxisID: 'y' },
+                        { label: 'Cumul LFCF / Debt %', data: proj.map(p=> (p.cumulLeveredFCF/debt)*100), type:'line', borderColor:'#8b5cf6', yAxisID: 'y1' }
+                    ]
+                },
+                options: {
+                    responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{color:'#94a3b8', font:{size:8}}}},
+                    scales:{x:{display:false}, y:{display:false}, y1:{display:false, min:0}}
+                }
+            });
+
+            if(chartCredit) chartCredit.destroy();
+            chartCredit = new Chart(document.getElementById('chart_credit'), {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        { label: 'Lev', data: proj.map(p=>p.lev), borderColor: '#eab308' }
+                    ]
+                },
+                options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{display:false}, y:{display:false}} }
+            });
+        }
+
+        function updateIndustry() {
+            const sec = document.getElementById('industry_select').value;
+            const d = SECTOR_DATA[sec];
+            setArr('growth', Array(7).fill(d.growth));
+            setArr('margin', Array(7).fill(d.margin));
+            setArr('capex_pct', Array(7).fill(d.capex));
+            runModel();
+        }
+
+        function applyScenario(type) {
+             const sec = document.getElementById('industry_select').value;
+            const d = SECTOR_DATA[sec];
+            document.getElementById('scenario_badge').innerText = `Current: ${type} Case`;
+
+            if(type === 'Base') updateIndustry();
+            if(type === 'Bull') {
+                setArr('growth', Array(7).fill(d.growth + 2));
+                setArr('margin', Array(7).fill(d.margin + 2));
+            }
+            if(type === 'Bear') {
+                setArr('growth', Array(7).fill(d.growth - 3));
+                setArr('margin', Array(7).fill(d.margin - 5));
+            }
+            runModel();
+        }
+
+        function normalizeAssumptions() {
+            const inp = (id) => parseFloat(document.getElementById(id).value) || 0;
+            const r2 = inp('rev_m2'), r1 = inp('rev_m1'), r0 = inp('rev_ltm');
+            const e2 = inp('ebitda_m2'), e1 = inp('ebitda_m1'), e0 = inp('ebitda_ltm');
+            const g1 = (r1 - r2)/r2 * 100;
+            const g0 = (r0 - r1)/r1 * 100;
+            const avgG = (g1 + g0) / 2;
+            const m2 = e2/r2*100, m1 = e1/r1*100, m0 = e0/r0*100;
+            const avgM = (m2 + m1 + m0) / 3;
+            const avgC = (inp('capex_ltm') / r0) * 100;
+            const avgN = (inp('nwc_ltm') / r0) * 100;
+
+            setArr('growth', Array(7).fill(avgG));
+            setArr('margin', Array(7).fill(avgM));
+            setArr('capex_pct', Array(7).fill(avgC));
+            setArr('nwc_pct', Array(7).fill(avgN));
+            runModel();
+        }
+
+        function renderSensitivity() {
+            const head = document.getElementById('sens_head');
+            const body = document.getElementById('sens_body');
+            const inp = (id) => parseFloat(document.getElementById(id).value) || 0;
+            const waccBase = inp('wacc');
+            const multBase = inp('term_mult');
+
+            const mults = [multBase-2, multBase-1, multBase, multBase+1, multBase+2];
+            const waccs = [waccBase-2, waccBase-1, waccBase, waccBase+1, waccBase+2];
+
+            const inputs = {
+                dSec: inp('debt_sec'), dUnsec: inp('debt_unsec'), dSub: inp('debt_sub'),
+                cash: inp('cash'), baseRate: inp('base_rate')/100,
+                revLtm: inp('rev_ltm'), nwcLtm: inp('nwc_ltm'),
+                g: getArr('growth'), m: getArr('margin'), c: getArr('capex_pct'),
+                t: getArr('tax_rate'), n: getArr('nwc_pct'),
+                wacc: inp('wacc'), termMult: inp('term_mult')
+            };
+
+            let hHTML = '<tr><th class="bg-gray-800 p-2">WACC \\ Mult</th>';
+            mults.forEach(m => hHTML += `<th class="text-cyan-400 p-2">${m.toFixed(1)}x</th>`);
+            head.innerHTML = hHTML + '</tr>';
+
+            let bHTML = '';
+            waccs.forEach(w => {
+                bHTML += `<tr><td class="text-purple-400 font-bold p-2">${w.toFixed(1)}%</td>`;
+                mults.forEach(m => {
+                    const res = calculateProjections(inputs, { wacc: w, mult: m });
+                    bHTML += `<td class="text-gray-400 matrix-val p-2 border border-white/5 hover:text-white transition cursor-default" title="Implied EV">$${Math.round(res.ev).toLocaleString()}</td>`;
+                });
+                bHTML += '</tr>';
+            });
+            body.innerHTML = bHTML;
+        }
+
+        function calcHybrid() {
+            let score = 0;
+            if(document.getElementById('chk_sub').checked) score += 25;
+            if(document.getElementById('chk_def').checked) score += 25;
+            if(document.getElementById('chk_mat').checked) score += 25;
+            if(document.getElementById('chk_step').checked) score += 25;
+            let credit = 0;
+            if(score === 100) credit = 100; else if(score >= 50) credit = 50;
+            document.getElementById('hybrid_result').innerText = credit + '%';
+            document.getElementById('hybrid_result').className = `text-xl font-bold ${credit===100?'text-green-400':(credit===50?'text-yellow-400':'text-red-400')}`;
+        }
+
+        function loadDemo() {
+            document.getElementById('co_name').value = "Orion Dynamics";
+            runModel();
+        }
+
+        function exportReport() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFillColor(2, 6, 23); doc.rect(0,0,210,297,'F');
+            doc.setTextColor(255,255,255); doc.setFontSize(18);
+            doc.text("CREDIT ANALYSIS MEMO", 10, 20);
+            doc.setFontSize(12); doc.setTextColor(6, 182, 212);
+            doc.text("Entity: " + document.getElementById('co_name').value, 10, 30);
+
+            doc.setFontSize(10); doc.setTextColor(200, 200, 200);
+            const memo = document.getElementById('memo_thesis').value;
+            doc.text("Investment Thesis:", 10, 40);
+            doc.setFontSize(9); doc.setTextColor(150, 150, 150);
+            const splitText = doc.splitTextToSize(memo || "(No thesis provided)", 190);
+            doc.text(splitText, 10, 46);
+
+            let y = 60 + (splitText.length * 5);
+            doc.setFontSize(12); doc.setTextColor(255, 255, 255);
+            doc.text("Financial Projections ($mm)", 10, y);
+
+            if(LATEST_PROJ) {
+                const data = LATEST_PROJ.proj.map(p => [
+                    "Y"+p.year, Math.round(p.rev), Math.round(p.ebitda), p.lev.toFixed(1)+"x", p.rating.sp
+                ]);
+                doc.autoTable({
+                    startY: y + 5,
+                    head: [['Year', 'Revenue', 'EBITDA', 'Leverage', 'Rating']],
+                    body: data,
+                    theme: 'grid',
+                    styles: { fillColor: [15, 23, 42], textColor: 255 },
+                    headStyles: { fillColor: [6, 182, 212] }
+                });
+            }
+            doc.save("Credit_Report.pdf");
+        }
+
+        // --- Init ---
+        initGrid();
+        runModel();
+
+    </script>
+</body>
+</html>
