@@ -16,16 +16,24 @@ CORS(app)
 
 @app.route('/')
 def serve_index():
+    """Serves the main index.html file."""
     return send_from_directory(SHOWCASE_DIR, 'index.html')
 
 
 @app.route('/<path:path>')
 def serve_static(path):
+    """Serves static files from the showcase directory."""
     return send_from_directory(SHOWCASE_DIR, path)
 
 
 @app.route('/api/state')
 def get_state():
+    """
+    Retrieves the current system state.
+
+    Simulates real-time updates by reading generated data and adding noise
+    to system statistics.
+    """
     # Simulate real-time updates by reading the generated data and adding some noise
     try:
         with open(DATA_FILE, 'r') as f:
@@ -44,6 +52,7 @@ def get_state():
 
 @app.route('/api/files')
 def get_files():
+    """Retrieves the file structure of the repository."""
     try:
         with open(DATA_FILE, 'r') as f:
             data = json.load(f)
@@ -54,6 +63,7 @@ def get_files():
 
 @app.route('/api/agents')
 def get_agents():
+    """Retrieves the list of active agents."""
     try:
         with open(DATA_FILE, 'r') as f:
             data = json.load(f)
