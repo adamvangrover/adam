@@ -41,20 +41,37 @@ def generate_attack_node(state: RedTeamState) -> Dict[str, Any]:
 def simulate_impact_node(state: RedTeamState) -> Dict[str, Any]:
     """
     Node: Simulates the impact of the scenario on the target.
+    Enhancement: Applies Counterfactual Logic ("What If?") to test robustness.
     """
     desc = state["current_scenario_description"]
 
-    # Mock simulation logic (In real life, this queries the KG or a quantitative model)
-    # We assign a random impact score for demo purposes, biased by iteration count
-    base_impact = random.uniform(2.0, 6.0)
+    # Mock simulation logic
+    base_impact = random.uniform(3.0, 8.0)
     escalation_bonus = state["iteration_count"] * 1.5
-    total_impact = min(10.0, base_impact + escalation_bonus)
 
-    logger.info(f"Simulated impact for '{desc}': {total_impact:.2f}/10.0")
+    # Counterfactual Logic Simulation
+    # We ask: "What if the entity has mitigation X?"
+    mitigation_factor = 0.0
+    cf_note = "Base Assumption: No Mitigation."
+
+    if "Cyber" in desc:
+        # CF: What if they have air-gapped backups?
+        if random.random() > 0.5:
+            mitigation_factor = 2.0
+            cf_note = "Counterfactual: Entity has air-gapped backups (Impact Reduced)."
+    elif "Macro" in desc:
+        # CF: What if they have interest rate swaps?
+        if random.random() > 0.5:
+            mitigation_factor = 1.5
+            cf_note = "Counterfactual: Interest Rate Swaps active (Impact Reduced)."
+
+    total_impact = min(10.0, max(0.0, base_impact + escalation_bonus - mitigation_factor))
+
+    logger.info(f"Simulated impact for '{desc}': {total_impact:.2f}/10.0. {cf_note}")
 
     return {
         "simulated_impact_score": total_impact,
-        "human_readable_status": f"Simulating impact... Score: {total_impact:.1f}"
+        "human_readable_status": f"Simulating impact... Score: {total_impact:.1f} ({cf_note})"
     }
 
 def critique_node(state: RedTeamState) -> Dict[str, Any]:
@@ -68,7 +85,7 @@ def critique_node(state: RedTeamState) -> Dict[str, Any]:
 
     notes = state["critique_notes"]
     if is_severe:
-        notes.append(f"Pass: Impact {impact:.1f} meets threshold {threshold}.")
+        notes.append(f"Pass: Impact {impact:.1f} meets threshold {threshold}. Valid Stress Test.")
     else:
         notes.append(f"Fail: Impact {impact:.1f} below threshold {threshold}. Needs escalation.")
 

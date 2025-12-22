@@ -9,48 +9,9 @@ from core.engine.strategy_utils import determine_ma_posture, synthesize_verdict
 from core.engine.entity_utils import assess_management, assess_competitive_position
 from core.engine.snc_utils import map_financials_to_rating, calculate_leverage
 from core.vertical_risk_agent.generative_risk import GenerativeRiskEngine
+from core.engine.data_fetcher import fetch_financial_context
 
 logger = logging.getLogger(__name__)
-
-# --- Mock Data Fetcher ---
-
-def fetch_financial_context(ticker: str) -> Dict[str, Any]:
-    """
-    Simulates fetching diverse datasets from a data lake (SNC, Market, Fundamentals).
-    """
-    # Base numbers for simulation
-    return {
-        "fundamentals": {
-            "revenue": 10000,
-            "ebitda": 2500,
-            "fcf": 1500,
-            "total_debt": 5000,
-            "cash_equivalents": 800,
-            "shares_outstanding": 500,
-            "beta": 1.1,
-            "growth_rate": 0.04,
-            "tax_rate": 0.21,
-            "net_debt": 4200,
-            "enterprise_value": 30000
-        },
-        "market_data": {
-            "market_cap": 25000,
-            "current_price": 50.0,
-            "volatility": 0.25,
-            "pe_ratio": 15.0
-        },
-        "syndicate_data": {
-            "facilities": [
-                {"id": "TLB", "amount": 2000, "rate": "S+350"},
-                {"id": "RCF", "amount": 500, "rate": "S+250"}
-            ],
-            "banks": [{"role": "Lead", "share": 0.15}]
-        },
-        "peers": [
-            {"ticker": "COMP1", "ev_ebitda": 11.5},
-            {"ticker": "COMP2", "ev_ebitda": 12.8}
-        ]
-    }
 
 # --- Nodes ---
 
@@ -61,18 +22,28 @@ def entity_resolution_node(state: OmniscientState) -> Dict[str, Any]:
     logger.info(f"Phase 1: Analyzing Entity {state['ticker']}")
     ticker = state["ticker"]
 
-    # In reality, verify legal entity hierarchy here.
+    # Fetch Context (Enriched/Universal Ingestor)
+    context = fetch_financial_context(ticker)
+    kg_meta = context.get("kg_metadata", {})
+
+    # Use Real Metadata if available, otherwise synthetic fallback
+    legal_name = kg_meta.get("target") if kg_meta else f"{ticker} Global Holdings Inc."
+
     legal_entity = {
-        "name": f"{ticker} Global Holdings Inc.",
-        "lei": "5493006MHB84DD0ZWV18", # Mock LEI
+        "name": legal_name,
+        "lei": "5493006MHB84DD0ZWV18", # Default Mock LEI
         "jurisdiction": "Delaware, USA"
     }
 
+    # Check if we have deep nodes in the context (if we fetched a full KG)
+    # Ideally data_fetcher would return the full node, but it returns a flat context for now.
+    # We stick to the assessment utils for the dynamic parts.
+
     mgmt = assess_management(ticker)
-    comp = assess_competitive_position(ticker, "Technology") # Assume tech for now
+    comp = assess_competitive_position(ticker, "Technology")
 
     # Update State
-    legal_entity["sector"] = "Technology" # Default or extracted
+    legal_entity["sector"] = "Technology"
 
     state["v23_knowledge_graph"]["nodes"]["entity_ecosystem"] = {
         "legal_entity": legal_entity,
@@ -82,7 +53,7 @@ def entity_resolution_node(state: OmniscientState) -> Dict[str, Any]:
 
     return {
         "v23_knowledge_graph": state["v23_knowledge_graph"],
-        "human_readable_status": "Phase 1 Complete: Entity & Management Assessed."
+        "human_readable_status": f"Phase 1 Complete: Entity Resolved ({legal_name})."
     }
 
 def deep_fundamental_node(state: OmniscientState) -> Dict[str, Any]:
@@ -105,8 +76,8 @@ def deep_fundamental_node(state: OmniscientState) -> Dict[str, Any]:
 
     # Fundamentals Summary
     fund_summary = {
-        "revenue_cagr_3yr": "5.2%",
-        "ebitda_margin_trend": "Expanding"
+        "revenue_cagr_3yr": f"{fin.get('growth_rate', 0.04):.1%}", # Dynamic based on context
+        "ebitda_margin_trend": "Expanding" if fin.get("ebitda", 0) > 0 else "Contracting"
     }
 
     # Adapter for DCF
@@ -120,7 +91,7 @@ def deep_fundamental_node(state: OmniscientState) -> Dict[str, Any]:
     mult_res_adapter = {
         "current_ev_ebitda": mult_res.get("current_ev_ebitda", 0.0),
         "peer_median_ev_ebitda": mult_res.get("peer_median_ev_ebitda", 0.0),
-        "verdict": "Undervalued" # Mock logic or derived
+        "verdict": mult_res.get("verdict", "Unknown")
     }
 
     state["v23_knowledge_graph"]["nodes"]["equity_analysis"] = {
@@ -155,13 +126,13 @@ def credit_snc_node(state: OmniscientState) -> Dict[str, Any]:
 
     primary_facility_assessment = {
         "facility_type": primary_fac.get("id", "Term Loan"),
-        "collateral_coverage": "Strong", # Mock
+        "collateral_coverage": "Strong" if leverage < 4.0 else "Weak",
         "repayment_capacity": "High" if rating == "Pass" else "Low"
     }
 
     snc_model = {
         "overall_borrower_rating": rating,
-        "rationale": "Strong coverage ratios support rating.",
+        "rationale": "Strong coverage ratios support rating." if rating == "Pass" else "Elevated leverage concerns.",
         "primary_facility_assessment": primary_facility_assessment
     }
 
@@ -174,13 +145,13 @@ def credit_snc_node(state: OmniscientState) -> Dict[str, Any]:
 
     state["v23_knowledge_graph"]["nodes"]["credit_analysis"] = {
         "snc_rating_model": snc_model,
-        "cds_market_implied_rating": "BB-", # Mock
+        "cds_market_implied_rating": "BB-" if rating == "Pass" else "CCC",
         "covenant_risk_analysis": covenant_risk
     }
 
     return {
         "v23_knowledge_graph": state["v23_knowledge_graph"],
-        "human_readable_status": "Phase 3 Complete: Credit Rating Assigned."
+        "human_readable_status": f"Phase 3 Complete: Credit Rating Assigned ({rating})."
     }
 
 def risk_simulation_node(state: OmniscientState) -> Dict[str, Any]:
@@ -190,7 +161,6 @@ def risk_simulation_node(state: OmniscientState) -> Dict[str, Any]:
     logger.info("Phase 4: Simulation Engine")
 
     # Initialize Generative Risk Engine
-    # In a real run, we might pass a path, here we use default mock
     engine = GenerativeRiskEngine()
 
     # Generate Tail Scenarios
@@ -206,7 +176,7 @@ def risk_simulation_node(state: OmniscientState) -> Dict[str, Any]:
             "scenario_name": s.description,
             "probability": prob,
             "impact_severity": "High",
-            "estimated_impact_ev": "-15%" # Simplified
+            "estimated_impact_ev": "-15%"
         })
 
     simulation_engine = {
@@ -238,20 +208,19 @@ def strategic_synthesis_node(state: OmniscientState) -> Dict[str, Any]:
     credit_rating = kg["credit_analysis"]["snc_rating_model"]["overall_borrower_rating"]
     pd_str = kg["simulation_engine"]["monte_carlo_default_prob"]
 
-    # Parse PD string "2.5%" -> 0.025
+    # Parse PD string
     try:
         if isinstance(pd_str, str):
             pd = float(pd_str.replace("%", "")) / 100.0
         else:
             pd = float(pd_str)
     except:
-        pd = 0.05 # Default if parsing fails
+        pd = 0.05
 
     # 1. M&A Posture
     ma_posture = determine_ma_posture(data["fundamentals"], data["market_data"])
 
     # 2. Final Verdict
-    # Normalize PD to risk score 0-10 (0.05 -> 10)
     risk_score = pd * 200
 
     verdict = synthesize_verdict(

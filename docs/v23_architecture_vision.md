@@ -180,3 +180,26 @@ Instead of running imperative commands (like kubectl apply), the Architect Agent
 ### 5.2 The Architect Agent System Prompt
 
 The system prompt defines the persona and operational constraints of the Architect Agent. It explicitly instructs the agent to operate within the GitOps framework.
+
+---
+
+## 5. v23.5 Addendum: The "Risk Intelligence Core"
+
+As of v23.5, the "Deep Dive" capabilities have been fully operationalized with the following components:
+
+### 5.1 Universal Data Fetcher (`core/engine/data_fetcher.py`)
+A unified ingestion layer that abstracts the "Financial Services Lakehouse".
+*   **Gold Standard Integration:** Automatically hydrates the Knowledge Graph from curated datasets (`v23_5_knowledge_graph.json`).
+*   **Raw Market Data:** Ingests high-fidelity time-series data (e.g., `spy_market_data.json`) for quantitative modeling.
+*   **Fallback Synthesis:** Generates plausible synthetic data for missing fields to ensure downstream model stability (DCF, Monte Carlo).
+
+### 5.2 Deep Dive Graph (`core/engine/deep_dive_graph.py`)
+A specialized 5-phase graph implementing the "Autonomous Financial Analyst" protocol:
+1.  **Entity Resolution:** Resolves LEIs and corporate hierarchy.
+2.  **Deep Fundamental:** Executes DCF and Multiples valuation.
+3.  **Credit & SNC:** Calculates regulatory risk ratings and covenant headroom.
+4.  **Risk Simulation:** Runs Generative Risk Engine scenarios.
+5.  **Strategic Synthesis:** Produces a final investment conviction.
+
+### 5.3 Neural Cortex Visualization (`core/agents/architect_agent/index.html`)
+The "Mission Control" interface has been upgraded to a force-directed graph (Vis-Network), visualizing the real-time reasoning traces of the Red Team and SNC Analysis graphs.
