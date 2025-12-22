@@ -9,7 +9,6 @@ from datetime import datetime, timedelta
 # Configuring specific logger for the Temporal Engine to ensure observability
 logger = logging.getLogger("adam.core.system.temporal_engine")
 
-
 class PulseTask:
     """
     Represents a single recurring task within the Temporal Engine.
@@ -17,7 +16,6 @@ class PulseTask:
     This class encapsulates the logic, schedule, and state of a recurring job.
     It adheres to the "Async First" philosophy by expecting coroutines.
     """
-
     def __init__(
         self,
         name: str,
@@ -43,7 +41,6 @@ class PulseTask:
         self.is_running: bool = False
         self.error_count: int = 0
 
-
 class TemporalEngine:
     """
     The Async Scheduler for the Adam System.
@@ -51,7 +48,6 @@ class TemporalEngine:
     Replaces the blocking logic of task_scheduler.py with an asyncio-native approach.
     Allows for 'Heartbeat' tasks that run alongside the main agent loop.
     """
-
     def __init__(self):
         self.tasks: Dict[str, PulseTask] = {}
         self._stop_event = asyncio.Event()
@@ -89,7 +85,7 @@ class TemporalEngine:
             await task.coro_func(**task.kwargs)
             duration = time.perf_counter() - start_time
             task.last_run = datetime.now()
-            task.error_count = 0  # Reset consecutive errors on success
+            task.error_count = 0 # Reset consecutive errors on success
             logger.info(f"PULSE: Finished {task.name} in {duration:.2f}s")
 
         except Exception as e:
