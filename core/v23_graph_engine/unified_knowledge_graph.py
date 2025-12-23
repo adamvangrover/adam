@@ -112,19 +112,24 @@ class UnifiedKnowledgeGraph:
                 self.graph.add_node(facility_id, type="CreditFacility", name="General Facility")
                 self.graph.add_edge(entity_id, facility_id, relation="BORROWS")
 
+            # Bolt Optimization: Batch node/edge creation for O(1) graph update overhead
+            covenant_nodes = []
+            covenant_edges = []
+
             for cov in covenants:
                 cov_name = cov.get("name", "Unknown Covenant")
                 cov_id = f"Covenant::{ticker}::{cov_name}"
 
-                self.graph.add_node(
-                    cov_id,
-                    type="Covenant",
-                    name=cov_name,
-                    threshold=cov.get("threshold"),
-                    operator=cov.get("operator")
-                )
+                covenant_nodes.append((cov_id, {
+                    "type": "Covenant",
+                    "name": cov_name,
+                    "threshold": cov.get("threshold"),
+                    "operator": cov.get("operator")
+                }))
+                covenant_edges.append((facility_id, cov_id, {"relation": "GOVERNED_BY"}))
 
-                self.graph.add_edge(facility_id, cov_id, relation="GOVERNED_BY")
+            self.graph.add_nodes_from(covenant_nodes)
+            self.graph.add_edges_from(covenant_edges)
 
         # 4. Risk Model Output
         if risk_state.get("draft_memo"):
