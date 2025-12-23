@@ -204,6 +204,7 @@ def create_app(config_name='default'):
         return 'Hello, World!'
 
     @app.route('/api/v23/analyze', methods=['POST'])
+    @jwt_required()
     def run_v23_analysis():
         data = request.get_json()
         query = data.get('query')
