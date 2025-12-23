@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { dataManager } from '../utils/DataManager';
 import { useNavigate } from 'react-router-dom';
 
@@ -6,6 +6,7 @@ const GlobalNav: React.FC = () => {
   const [status, setStatus] = useState('CONNECTING...');
   const [mode, setMode] = useState<'LIVE' | 'ARCHIVE'>('LIVE');
   const navigate = useNavigate();
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const checkStatus = async () => {
@@ -17,6 +18,18 @@ const GlobalNav: React.FC = () => {
     checkStatus();
     const interval = setInterval(checkStatus, 10000); // Check every 10s
     return () => clearInterval(interval);
+  }, []);
+
+  // Palette: Keyboard shortcut for Global Search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const toggleMode = () => {
@@ -59,7 +72,9 @@ const GlobalNav: React.FC = () => {
       <div style={{ flexGrow: 1, maxWidth: '600px', margin: '0 40px', position: 'relative' }}>
         <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#444' }}>🔍</span>
         <input
+          ref={searchInputRef}
           type="text"
+          aria-label="Global Search"
           placeholder="GLOBAL SEARCH (Ctrl+K)..."
           className="cyber-input"
           style={{
@@ -74,17 +89,19 @@ const GlobalNav: React.FC = () => {
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
 
         {/* Mode Switcher */}
-        <div
+        <button
             onClick={toggleMode}
+            aria-label={`Switch to ${mode === 'LIVE' ? 'Archive' : 'Live'} Mode`}
             style={{
                 cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px',
                 padding: '5px 10px', border: '1px solid #333', borderRadius: '4px',
-                background: mode === 'LIVE' ? 'rgba(0, 255, 0, 0.1)' : 'rgba(255, 165, 0, 0.1)'
+                background: mode === 'LIVE' ? 'rgba(0, 255, 0, 0.1)' : 'rgba(255, 165, 0, 0.1)',
+                color: 'inherit', font: 'inherit'
             }}
         >
             <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: mode === 'LIVE' ? '#0f0' : '#ffa500' }}></div>
             <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: mode === 'LIVE' ? '#0f0' : '#ffa500' }}>{mode} MODE</span>
-        </div>
+        </button>
 
         {/* System Status */}
         <div style={{ textAlign: 'right', borderLeft: '1px solid #333', paddingLeft: '20px' }}>
@@ -96,7 +113,7 @@ const GlobalNav: React.FC = () => {
         </div>
 
         {/* Archive Link */}
-         <a href="/showcase/index.html" style={{ color: '#666', fontSize: '1.2rem', textDecoration: 'none' }} title="Static Showcase">📂</a>
+         <a href="/showcase/index.html" style={{ color: '#666', fontSize: '1.2rem', textDecoration: 'none' }} title="Open Static Showcase">📂</a>
 
       </div>
     </header>
