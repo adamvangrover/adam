@@ -56,6 +56,10 @@ class TestAdaptiveAPIReal(unittest.TestCase):
                 # Create app
                 app = create_app('default')
 
+                # Initialize DB for auth checks
+                with app.app_context():
+                    api_module.db.create_all()
+
                 # Check if globals are initialized
                 if api_module.agent_orchestrator is None:
                     self.fail("AgentOrchestrator is None. Initialization block failed.")
@@ -75,9 +79,18 @@ class TestAdaptiveAPIReal(unittest.TestCase):
                 # Mock route_request
                 api_module.meta_orchestrator.route_request = AsyncMock(return_value={"status": "Mock Success"})
 
+                # Create access token for auth
+                from flask_jwt_extended import create_access_token
+                with app.app_context():
+                    access_token = create_access_token(identity='test_user')
+                    headers = {
+                        'Authorization': f'Bearer {access_token}'
+                    }
+
                 resp = client.post('/api/v23/analyze',
                                    data=json.dumps({"query": "test"}),
-                                   content_type='application/json')
+                                   content_type='application/json',
+                                   headers=headers)
 
                 self.assertEqual(resp.status_code, 200)
                 self.assertEqual(resp.get_json(), {"status": "Mock Success"})
