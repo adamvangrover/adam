@@ -52,3 +52,8 @@
 **Vulnerability:** The `GitRepoSubAgent` was vulnerable to path traversal (e.g., `http://example.com/..`) allowing clones outside the target directory. Additionally, the agent defined a synchronous `execute` method while the base class monkey-patched it to be async, causing runtime crashes.
 **Learning:** Naive path validation (`split('/')[-1]`) is insufficient for URL-derived paths. Also, complex architecture changes (like monkey-patching base classes for async) can silently break legacy subclasses that don't adhere to the new contract.
 **Prevention:** Use `os.path.abspath` and `startswith` (or `commonpath`) to validate paths against a safe root. Ensure subclasses verify compliance with base class contracts, especially when metaclass or `__init__` magic is involved.
+
+## 2025-12-22 - SSRF in Supply Chain Agent
+**Vulnerability:** The `SupplyChainRiskAgent` blindly followed URLs provided in its configuration to scrape content, exposing the system to Server-Side Request Forgery (SSRF) against internal services (e.g., cloud metadata, localhost).
+**Learning:** Agents that consume "urls" from configuration or user input are prime targets for SSRF. Simply using `requests.get()` without validation is a common oversight.
+**Prevention:** Implement a strict `_is_safe_url` validator that checks the URL scheme (http/https) and blocks private/loopback IP addresses using the `ipaddress` module.
