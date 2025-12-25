@@ -70,7 +70,13 @@ const GlobalNav: React.FC = () => {
 
       {/* Global Search */}
       <div style={{ flexGrow: 1, maxWidth: '600px', margin: '0 40px', position: 'relative' }}>
-        <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#444' }}>🔍</span>
+        <span
+          style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#444' }}
+          role="img"
+          aria-label="Search icon"
+        >
+          🔍
+        </span>
         <input
           ref={searchInputRef}
           type="text"
@@ -113,7 +119,14 @@ const GlobalNav: React.FC = () => {
         </div>
 
         {/* Archive Link */}
-         <a href="/showcase/index.html" style={{ color: '#666', fontSize: '1.2rem', textDecoration: 'none' }} title="Open Static Showcase">📂</a>
+         <a
+           href="/showcase/index.html"
+           style={{ color: '#666', fontSize: '1.2rem', textDecoration: 'none' }}
+           title="Open Static Showcase"
+           aria-label="Open Static Showcase"
+          >
+            📂
+          </a>
 
       </div>
     </header>
