@@ -27,3 +27,7 @@
 ## 2025-05-23 - [NetworkX Batching]
 **Learning:** `graph.add_nodes_from` with attributes is significantly faster (~30%) than looping `graph.add_node` for large datasets (100k+ nodes), likely due to reduced function call overhead and internal optimizations.
 **Action:** When ingesting large subgraphs, always batch node/edge creation into lists.
+
+## 2025-12-25 - [Optimized Loading Component Style Injection]
+**Learning:** React components that inject <style> tags on every render cause unnecessary style recalculations and layout thrashing. Moving static styles to global CSS files (e.g., index.css) is a simple but effective optimization.
+**Action:** Always check for <style> tags inside functional components during code review.
