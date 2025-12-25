@@ -13,6 +13,14 @@ app = Flask(__name__)
 agent_orchestrator = AgentOrchestrator()
 echo_system = Echo()
 
+# 🛡️ Sentinel: Add security headers
+@app.after_request
+def add_security_headers(response):
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    response.headers['Content-Security-Policy'] = "default-src 'self'"
+    return response
 
 @app.route("/", methods=["POST"])
 def api_endpoint():
