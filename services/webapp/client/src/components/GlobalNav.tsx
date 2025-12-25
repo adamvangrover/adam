@@ -47,20 +47,25 @@ const GlobalNav: React.FC = () => {
       zIndex: 100
     }}>
       {/* Brand */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '20px', cursor: 'pointer' }} onClick={() => navigate('/')}>
+      <button
+        style={{ display: 'flex', alignItems: 'center', gap: '20px', cursor: 'pointer', background: 'none', border: 'none', padding: 0 }}
+        onClick={() => navigate('/')}
+        aria-label="Go to Dashboard"
+      >
         <div style={{ position: 'relative' }}>
             <h1 style={{ margin: 0, fontSize: '1.5rem', color: 'var(--primary-color)', letterSpacing: '2px', textShadow: '0 0 10px var(--primary-color)' }}>ADAM v23.5</h1>
             <div className="scan-line" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.5, pointerEvents: 'none' }}></div>
         </div>
         <div className="mono-font" style={{ fontSize: '0.8rem', color: '#666', borderLeft: '1px solid #333', paddingLeft: '10px' }}>UNIFIED FINANCIAL OS</div>
-      </div>
+      </button>
 
       {/* Global Search */}
       <div style={{ flexGrow: 1, maxWidth: '600px', margin: '0 40px', position: 'relative' }}>
-        <span style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#444' }}>🔍</span>
+        <span aria-hidden="true" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#444' }}>🔍</span>
         <input
           type="text"
           placeholder="GLOBAL SEARCH (Ctrl+K)..."
+          aria-label="Global Search"
           className="cyber-input"
           style={{
             width: '100%', background: 'rgba(0,0,0,0.3)', border: '1px solid #333',
@@ -74,8 +79,10 @@ const GlobalNav: React.FC = () => {
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
 
         {/* Mode Switcher */}
-        <div
+        <button
             onClick={toggleMode}
+            aria-label={`Switch to ${mode === 'LIVE' ? 'Archive' : 'Live'} Mode`}
+            className="hover:opacity-80 focus:ring-2 focus:ring-cyan-500 outline-none"
             style={{
                 cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px',
                 padding: '5px 10px', border: '1px solid #333', borderRadius: '4px',
@@ -84,7 +91,7 @@ const GlobalNav: React.FC = () => {
         >
             <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: mode === 'LIVE' ? '#0f0' : '#ffa500' }}></div>
             <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: mode === 'LIVE' ? '#0f0' : '#ffa500' }}>{mode} MODE</span>
-        </div>
+        </button>
 
         {/* System Status */}
         <div style={{ textAlign: 'right', borderLeft: '1px solid #333', paddingLeft: '20px' }}>
@@ -96,7 +103,14 @@ const GlobalNav: React.FC = () => {
         </div>
 
         {/* Archive Link */}
-         <a href="/showcase/index.html" style={{ color: '#666', fontSize: '1.2rem', textDecoration: 'none' }} title="Static Showcase">📂</a>
+         <a
+            href="/showcase/index.html"
+            style={{ color: '#666', fontSize: '1.2rem', textDecoration: 'none' }}
+            title="Static Showcase"
+            aria-label="Open Static Showcase"
+          >
+            📂
+          </a>
 
       </div>
     </header>
