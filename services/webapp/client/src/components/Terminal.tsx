@@ -33,6 +33,8 @@ const Terminal: React.FC = () => {
       '> TYPE "help" FOR COMMANDS'
   ]);
   const [input, setInput] = useState('');
+  const [commandHistory, setCommandHistory] = useState<string[]>([]);
+  const [historyPointer, setHistoryPointer] = useState<number>(-1);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleCommand = async (cmd: string) => {
@@ -40,6 +42,12 @@ const Terminal: React.FC = () => {
     const newHistory = [...history, `[${timestamp}] $ ${cmd}`];
 
     const cleanCmd = cmd.trim().toLowerCase();
+
+    // Add to command history if not empty
+    if (cmd.trim()) {
+        setCommandHistory(prev => [...prev, cmd]);
+        setHistoryPointer(-1);
+    }
 
     switch (cleanCmd) {
       case 'help':
@@ -107,6 +115,34 @@ const Terminal: React.FC = () => {
     setInput('');
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+        handleCommand(input);
+    } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (commandHistory.length === 0) return;
+        const newPointer = historyPointer === -1 ? commandHistory.length - 1 : Math.max(0, historyPointer - 1);
+        setHistoryPointer(newPointer);
+        setInput(commandHistory[newPointer]);
+    } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (historyPointer === -1) return;
+        if (historyPointer < commandHistory.length - 1) {
+            const newPointer = historyPointer + 1;
+            setHistoryPointer(newPointer);
+            setInput(commandHistory[newPointer]);
+        } else {
+            setHistoryPointer(-1);
+            setInput('');
+        }
+    } else if (e.key === 'Tab') {
+        e.preventDefault();
+        const commands = ['help', 'status', 'scan agents', 'query', 'mode', 'clear'];
+        const match = commands.find(c => c.startsWith(input.toLowerCase()));
+        if (match) setInput(match);
+    }
+  };
+
   const focusInput = () => {
       inputRef.current?.focus();
   }
@@ -141,7 +177,7 @@ const Terminal: React.FC = () => {
           placeholder="Type 'help' for commands..."
           spellCheck={false}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && handleCommand(input)}
+          onKeyDown={handleKeyDown}
           style={{
             background: 'transparent', border: 'none', color: '#fff',
             flexGrow: 1, outline: 'none', fontFamily: 'monospace',

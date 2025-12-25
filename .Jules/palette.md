@@ -32,6 +32,13 @@
 **Learning:** When allowing users to edit raw JSON data that drives an underlying object state, do not bind the input directly to the object stringification. This causes a loop where invalid JSON prevents updates or resets the cursor. Use a separate string state for the editor, and parse/commit it to the object state only on valid submit/blur.
 **Action:** Use separate 'draft' string state for raw editors.
 
+## 2025-05-22 - Interactive Divs vs Buttons
+**Learning:** Using `div` with `onClick` for main navigation controls (like mode switchers) breaks keyboard accessibility completely. It's a common pattern in "custom" UIs but excludes keyboard users.
+**Action:** Always use semantic `<button>` elements for actions, even if styling requires stripping default button styles (`background: none; border: none`).
+
+## 2025-05-22 - Testing Interactive Components
+**Learning:** For components with complex keyboard interactions (like terminals or comboboxes), relying on manual verification is risky. Using `@testing-library/react`'s `fireEvent.keyDown` allows for robust, automated testing of these interactions.
+**Action:** Always write unit tests for keyboard navigation logic.
 ## 2025-12-24 - Loading State Accessibility
 **Learning:** Stylistic loading animations (like CSS spinners) are invisible to screen readers. Adding `role="status"` and a visually hidden text span ensures assistive technology users know content is loading.
 **Action:** Always pair visual spinners with invisible descriptive text and proper ARIA live regions.
