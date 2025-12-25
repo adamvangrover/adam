@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ADAM // Terminal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- xterm.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css" />
+
+    <!-- PyScript -->
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+
+    <style>
+        #terminal-container {
+            width: 100%;
+            height: 100%;
+            padding: 10px;
+            background: rgba(5, 11, 20, 0.95);
+            border: 1px solid var(--panel-border);
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        .xterm-viewport {
+            overflow-y: auto !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white h-screen flex flex-col overflow-hidden">
+    <!-- Header -->
+    <header class="h-14 border-b border-gray-800 bg-gray-900/50 backdrop-blur flex items-center px-4 justify-between shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-2 h-2 rounded-full bg-cyan-500 shadow-[0_0_10px_rgba(6,182,212,0.8)]"></div>
+            <span class="font-mono font-bold tracking-wider text-cyan-500">ADAM // TERMINAL</span>
+        </div>
+        <div class="flex items-center gap-4 text-xs font-mono text-gray-400">
+            <div class="flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                <span>MCP SERVER: ACTIVE</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                <span>PYSCRIPT: RUNNING</span>
+            </div>
+             <a href="index.html" class="hover:text-cyan-400 transition-colors">[EXIT]</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col p-4 relative">
+        <div class="glass-panel flex-1 relative overflow-hidden flex flex-col">
+            <div id="terminal-container"></div>
+        </div>
+    </main>
+
+    <!-- Scanlines -->
+    <div class="scan-line"></div>
+    <div class="scan-glow"></div>
+
+    <!-- xterm.js Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-web-links@0.9.0/lib/xterm-addon-web-links.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-search@0.13.0/lib/xterm-addon-search.js"></script>
+
+    <!-- Terminal Logic -->
+    <script>
+        // Expose terminal to window for PyScript to access
+        window.terminal = null;
+        window.fitAddon = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const term = new Terminal({
+                cursorBlink: true,
+                fontFamily: '"JetBrains Mono", monospace',
+                fontSize: 14,
+                theme: {
+                    background: '#050b14',
+                    foreground: '#e2e8f0',
+                    cursor: '#06b6d4',
+                    selection: 'rgba(6, 182, 212, 0.3)',
+                    black: '#000000',
+                    red: '#ef4444',
+                    green: '#10b981',
+                    yellow: '#f59e0b',
+                    blue: '#3b82f6',
+                    magenta: '#d946ef',
+                    cyan: '#06b6d4',
+                    white: '#ffffff',
+                }
+            });
+
+            const fitAddon = new FitAddon.FitAddon();
+            const webLinksAddon = new WebLinksAddon.WebLinksAddon();
+            const searchAddon = new SearchAddon.SearchAddon();
+
+            term.loadAddon(fitAddon);
+            term.loadAddon(webLinksAddon);
+            term.loadAddon(searchAddon);
+
+            term.open(document.getElementById('terminal-container'));
+            fitAddon.fit();
+
+            window.terminal = term;
+            window.fitAddon = fitAddon;
+
+            window.addEventListener('resize', () => {
+                fitAddon.fit();
+            });
+
+            term.writeln('\x1b[1;36mADAM INTELLIGENCE ENGINE v23.5 [Secure Connection]\x1b[0m');
+            term.writeln('Initializing PyScript Runtime...');
+        });
+    </script>
+
+    <!-- PyScript Logic -->
+    <script type="py" src="js/terminal_logic.py" config="pyscript.toml"></script>
+
+    <!-- Config -->
+    <script type="json" id="pyscript-config">
+        {
+            "packages": ["pandas", "numpy"]
+        }
+    </script>
+</body>
+</html>
