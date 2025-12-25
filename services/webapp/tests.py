@@ -143,8 +143,20 @@ class ApiTestCase(unittest.TestCase):
         self.assertIn('max-age=31536000', headers['Strict-Transport-Security'])
 
     def test_v23_analysis_validation(self):
+        # Authenticate first
+        user = User(username='analyst')
+        user.set_password('password')
+        db.session.add(user)
+        db.session.commit()
+        response = self.client.post('/api/login',
+                                    data=json.dumps({'username': 'analyst', 'password': 'password'}),
+                                    content_type='application/json')
+        access_token = json.loads(response.data)['access_token']
+        headers = {'Authorization': f'Bearer {access_token}'}
+
         # Valid query
         response = self.client.post('/api/v23/analyze',
+                                    headers=headers,
                                     data=json.dumps({'query': 'analyze AAPL'}),
                                     content_type='application/json')
         # Expect 200 (mock result) or 500 depending on config, but NOT 400 for validation
@@ -152,6 +164,7 @@ class ApiTestCase(unittest.TestCase):
 
         # Invalid type
         response = self.client.post('/api/v23/analyze',
+                                    headers=headers,
                                     data=json.dumps({'query': 12345}),
                                     content_type='application/json')
         self.assertEqual(response.status_code, 400)
@@ -159,6 +172,7 @@ class ApiTestCase(unittest.TestCase):
 
         # Too long
         response = self.client.post('/api/v23/analyze',
+                                    headers=headers,
                                     data=json.dumps({'query': 'A' * 5001}),
                                     content_type='application/json')
         self.assertEqual(response.status_code, 400)
@@ -200,6 +214,17 @@ class SecurityTestCase(unittest.TestCase):
 
     @patch('services.webapp.api.meta_orchestrator')
     def test_analyze_error_leak(self, mock_meta):
+        # Authenticate first
+        user = User(username='sec_tester')
+        user.set_password('password')
+        db.session.add(user)
+        db.session.commit()
+        response = self.client.post('/api/login',
+                                    data=json.dumps({'username': 'sec_tester', 'password': 'password'}),
+                                    content_type='application/json')
+        access_token = json.loads(response.data)['access_token']
+        headers = {'Authorization': f'Bearer {access_token}'}
+
         # Setup the mock to raise a sensitive error
         sensitive_info = "DB_PASSWORD=secret123"
         mock_meta.route_request.side_effect = Exception(f"Connection failed: {sensitive_info}")
@@ -211,6 +236,7 @@ class SecurityTestCase(unittest.TestCase):
 
         try:
             response = self.client.post('/api/v23/analyze',
+                                        headers=headers,
                                         data=json.dumps({'query': 'test query'}),
                                         content_type='application/json')
 

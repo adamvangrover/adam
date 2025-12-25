@@ -57,3 +57,16 @@
 **Vulnerability:** The `SupplyChainRiskAgent` blindly followed URLs provided in its configuration to scrape content, exposing the system to Server-Side Request Forgery (SSRF) against internal services (e.g., cloud metadata, localhost).
 **Learning:** Agents that consume "urls" from configuration or user input are prime targets for SSRF. Simply using `requests.get()` without validation is a common oversight.
 **Prevention:** Implement a strict `_is_safe_url` validator that checks the URL scheme (http/https) and blocks private/loopback IP addresses using the `ipaddress` module.
+
+## 2024-06-03 - Flask Security Headers
+**Vulnerability:** Missing security headers (CSP, HSTS, X-Content-Type-Options) in Flask applications.
+**Learning:** Default Flask apps do not include these headers, leaving them vulnerable to XSS and MIME sniffing.
+**Prevention:** Always use a middleware or an after_request hook to inject security headers.
+
+### Status and Integration Review
+**Status:** Implemented in `core/api.py` and `services/webapp/api.py`. Verified via unit tests.
+**Integration:** The headers are applied via a Flask `after_request` hook, ensuring they cover all endpoints served by these applications.
+**Relevance:**
+- **CSP (`default-src 'self'`):** Critical for preventing XSS in the Adam v23 dashboard, especially given the dynamic rendering of agent outputs.
+- **HSTS:** Essential for the production environment where financial data is transmitted.
+- **X-Frame-Options:** Prevents the dashboard from being embedded in malicious sites (Clickjacking), protecting the "Mission Control" interface.

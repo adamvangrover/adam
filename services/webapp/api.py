@@ -193,6 +193,7 @@ def create_app(config_name='default'):
         response.headers['X-Content-Type-Options'] = 'nosniff'
         response.headers['X-Frame-Options'] = 'SAMEORIGIN'
         response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+        response.headers['Content-Security-Policy'] = "default-src 'self'"
         return response
 
     # ---------------------------------------------------------------------------- #
