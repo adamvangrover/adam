@@ -70,3 +70,23 @@
 - **CSP (`default-src 'self'`):** Critical for preventing XSS in the Adam v23 dashboard, especially given the dynamic rendering of agent outputs.
 - **HSTS:** Essential for the production environment where financial data is transmitted.
 - **X-Frame-Options:** Prevents the dashboard from being embedded in malicious sites (Clickjacking), protecting the "Mission Control" interface.
+
+## 2024-05-22 - [CRITICAL] XXE in XBRL Handler
+**Vulnerability:** Usage of `xml.etree.ElementTree` to parse XBRL files allows XML External Entity (XXE) attacks.
+**Learning:** Even internal financial data parsers must treat inputs as untrusted. Standard library XML parsers are often insecure by default.
+**Prevention:** Use `defusedxml` for all XML parsing tasks.
+
+## 2024-05-22 - [CRITICAL] Insecure Deserialization (Pickle)
+**Vulnerability:** `core/analysis/technical_analysis.py` uses `pickle.load` to load ML models.
+**Learning:** Pickle is inherently insecure and allows arbitrary code execution if the file is tampered with.
+**Prevention:** Use safer formats like ONNX, Safetensors, or JSON for model serialization. Never unpickle untrusted data.
+
+## 2024-05-22 - [HIGH] Hardcoded Secrets
+**Vulnerability:** Potential hardcoded API keys or secrets found in `config/Adam_v22.0_Portable_Config.json` and `tinker_lab/tinker-cookbook/AGENTS.md`.
+**Learning:** Secrets in code/config files can be leaked via version control.
+**Prevention:** Use environment variables or a secrets manager. Scan commits for high-entropy strings.
+
+## 2024-05-22 - [MEDIUM] Flask Debug Mode
+**Vulnerability:** Flags in `final_check_2.txt` suggest Flask might be running with `debug=True` in some contexts.
+**Learning:** Debug mode exposes the Werkzeug debugger, which allows arbitrary code execution.
+**Prevention:** Ensure `debug=False` is strictly enforced in all production entry points.
