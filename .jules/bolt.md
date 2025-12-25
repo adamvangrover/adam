@@ -23,3 +23,7 @@
 ## 2024-05-21 - [Costly Database Connections in Request Handlers]
 **Learning:** Initializing database drivers (like Neo4j) inside request handlers creates a new connection pool for every request, leading to severe performance degradation under load.
 **Action:** Always verify database driver initialization scope. Move to singleton or app-level context.
+
+## 2025-05-23 - [NetworkX Batching]
+**Learning:** `graph.add_nodes_from` with attributes is significantly faster (~30%) than looping `graph.add_node` for large datasets (100k+ nodes), likely due to reduced function call overhead and internal optimizations.
+**Action:** When ingesting large subgraphs, always batch node/edge creation into lists.

@@ -5,6 +5,8 @@ import logging
 from bs4 import BeautifulSoup
 import folium
 from geopy.geocoders import Nominatim
+from urllib.parse import urlparse
+import ipaddress
 
 
 class SupplyChainRiskAgent:
@@ -40,6 +42,44 @@ class SupplyChainRiskAgent:
             self.logger.error(f"Failed to fetch news. Status code: {response.status_code}")
             return []
 
+    def _is_safe_url(self, url):
+        """
+        Validates the URL to prevent SSRF attacks.
+        Checks for:
+        - Allowed schemes (http, https)
+        - Private/Loopback IP addresses
+        """
+        try:
+            parsed = urlparse(url)
+            if parsed.scheme not in ('http', 'https'):
+                self.logger.warning(f"Blocked unsafe scheme: {parsed.scheme}")
+                return False
+
+            hostname = parsed.hostname
+            if not hostname:
+                return False
+
+            # Check if hostname is an IP address
+            try:
+                ip_obj = ipaddress.ip_address(hostname)
+                if ip_obj.is_private or ip_obj.is_loopback:
+                    self.logger.warning(f"Blocked private IP: {hostname}")
+                    return False
+            except ValueError:
+                # Not an IP address, proceed to check if it resolves to private IP (optional but recommended)
+                # Note: DNS resolution can be slow or manipulated (DNS Rebinding), but it's a layer of defense.
+                # For this environment, we'll skip DNS resolution to avoid network issues or flakiness,
+                # relying on the fact that most SSRF payloads use direct IPs or 'localhost'.
+                if hostname in ('localhost', '127.0.0.1', '::1'):
+                    self.logger.warning(f"Blocked localhost: {hostname}")
+                    return False
+
+            return True
+
+        except Exception as e:
+            self.logger.error(f"URL validation failed for {url}: {e}")
+            return False
+
     def fetch_web_scraped_data(self):
         """
         Fetches additional data through web scraping from the provided URLs.
@@ -47,15 +87,25 @@ class SupplyChainRiskAgent:
         """
         scraped_data = []
         for url in self.web_scraping_urls:
-            response = requests.get(url)
-            if response.status_code == 200:
-                soup = BeautifulSoup(response.content, 'html.parser')
-                paragraphs = soup.find_all('p')
-                for p in paragraphs:
-                    if p.text:
-                        scraped_data.append(p.text.strip())
-            else:
-                self.logger.error(f"Failed to scrape {url}. Status code: {response.status_code}")
+            # 🛡️ Sentinel: SSRF Protection
+            if not self._is_safe_url(url):
+                self.logger.warning(f"Skipping unsafe URL: {url}")
+                continue
+
+            try:
+                # Add timeout to prevent DoS via slow connections
+                response = requests.get(url, timeout=10)
+                if response.status_code == 200:
+                    soup = BeautifulSoup(response.content, 'html.parser')
+                    paragraphs = soup.find_all('p')
+                    for p in paragraphs:
+                        if p.text:
+                            scraped_data.append(p.text.strip())
+                else:
+                    self.logger.error(f"Failed to scrape {url}. Status code: {response.status_code}")
+            except requests.RequestException as e:
+                self.logger.error(f"Request failed for {url}: {e}")
+
         return scraped_data
 
     def analyze_impact(self, articles):
@@ -182,7 +232,8 @@ class SupplyChainRiskAgent:
 
 if __name__ == "__main__":
     # Example of usage
-    API_KEY = 'YOUR_NEWS_API_KEY'  # Replace with your NewsAPI key
+    import os
+    API_KEY = os.environ.get('NEWS_API_KEY', 'YOUR_NEWS_API_KEY')  # Use env var
     SUPPLIER_DATA = [
         {'name': 'Supplier A', 'location': 'New York, USA'},
         {'name': 'Supplier B', 'location': 'Shanghai, China'}
