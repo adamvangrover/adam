@@ -1,34 +1,187 @@
 {
-  "manifestVersion": "1.0",
-  "name": "ADAM Financial Engine",
-  "description": "Comprehensive Agentic Intelligence Engine for Finance.",
-  "version": "23.5.0",
-  "homepage": "https://github.com/adamvangrover/adam",
-  "servers": [
-    {
-      "id": "adam-financial-core",
-      "name": "Adam Financial Core",
+  "mcp": {
+    "version": "1.0",
+    "server": {
       "type": "stdio",
       "command": "python",
-      "args": ["server/mcp_server.py"],
-      "env": { "PYTHONPATH": "." }
+      "args": ["server/server.py"]
+    },
+    "registry": {
+      "tools": [
+        {
+          "name": "run_deep_dive_analysis",
+          "description": "Triggers the v23.5 Deep Dive Protocol. Analyzes Entity, Fundamentals, Credit, Risk, and Synthesis phases.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string",
+                "description": "The target entity and analysis context (e.g., 'Analyze Apple Inc. for credit risk')."
+              }
+            },
+            "required": ["query"]
+          }
+        },
+        {
+          "name": "calculate_credit_exposure",
+          "description": "Calculates credit exposure using standard risk models.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "entity_id": { "type": "string" },
+              "amount": { "type": "number" }
+            },
+            "required": ["entity_id", "amount"]
+          }
+        },
+        {
+          "name": "retrieve_market_data",
+          "description": "Fetches real-time market data (Price, Market Cap, Beta, P/E) via yfinance.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "ticker": { "type": "string" }
+            },
+            "required": ["ticker"]
+          }
+        },
+        {
+          "name": "run_red_team_attack",
+          "description": "Executes an adversarial Red Team attack on a portfolio or model to find vulnerabilities.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "scenario": {
+                "type": "string",
+                "description": "The attack vector (e.g., 'Liquidity Crunch', 'Correlation Breakdown')."
+              }
+            },
+            "required": ["scenario"]
+          }
+        },
+        {
+          "name": "run_crisis_simulation",
+          "description": "Simulates a macro-economic crisis event using the v23 Crisis Simulation Graph.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "macro_shock": {
+                "type": "string",
+                "description": "The macro event (e.g., 'Global Recession', 'Interest Rate Spike')."
+              }
+            },
+            "required": ["macro_shock"]
+          }
+        },
+        {
+          "name": "get_snc_rating",
+          "description": "Retrieves the Shared National Credit (SNC) regulatory rating for a borrower.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "borrower_id": { "type": "string" }
+            },
+            "required": ["borrower_id"]
+          }
+        },
+        {
+          "name": "generate_stress_scenarios",
+          "description": "Generates synthetic tail-risk scenarios using the Generative Risk Engine (GAN).",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "regime": {
+                "type": "string",
+                "enum": ["stress", "normal", "bubble"],
+                "default": "stress"
+              },
+              "n_samples": { "type": "integer", "default": 5 }
+            }
+          }
+        },
+        {
+          "name": "simulate_quantum_merton_model",
+          "description": "Runs a Quantum Monte Carlo simulation for credit risk (Merton Model).",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "asset_value": { "type": "number" },
+              "debt": { "type": "number" },
+              "volatility": { "type": "number" },
+              "horizon": { "type": "number", "default": 1.0 }
+            },
+            "required": ["asset_value", "debt", "volatility"]
+          }
+        },
+        {
+          "name": "execute_python_sandbox",
+          "description": "Executes arbitrary Python code in a sandboxed environment. Use for ad-hoc analysis.",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "code": { "type": "string" }
+            },
+            "required": ["code"]
+          }
+        }
+      ],
+      "resources": [
+        {
+          "uri": "adam://profile/bio",
+          "name": "Professional Biography",
+          "description": "Adam's professional background and expertise."
+        },
+        {
+          "uri": "adam://portfolio/case-studies",
+          "name": "Case Studies",
+          "description": "Selected financial case studies and deal history."
+        },
+        {
+          "uri": "adam://docs/architecture",
+          "name": "System Architecture",
+          "description": "Documentation for the Adam v23.5 Adaptive System Architecture."
+        },
+        {
+          "uri": "financial://market/book/{symbol}",
+          "name": "Order Book",
+          "description": "Real-time Level 2 order book."
+        }
+      ],
+      "prompts": [
+        {
+          "name": "deep-dive",
+          "description": "Initiate a full Deep Dive analysis on a target entity.",
+          "arguments": [
+            {
+              "name": "entity",
+              "description": "The company name or ticker.",
+              "required": true
+            }
+          ]
+        },
+        {
+          "name": "red-team-attack",
+          "description": "Run an adversarial stress test on a specific strategy.",
+          "arguments": [
+            {
+              "name": "strategy",
+              "description": "The strategy to attack.",
+              "required": true
+            }
+          ]
+        },
+        {
+          "name": "crisis-simulation",
+          "description": "Simulate a macroeconomic shock event.",
+          "arguments": [
+             {
+               "name": "event",
+               "description": "The crisis event to simulate.",
+               "required": true
+             }
+          ]
+        }
+      ]
     }
-  ],
-  "capabilities": {
-    "tools": [
-      { "name": "run_quantum_simulation", "description": "Run Quantum Monte Carlo (Merton Model)." },
-      { "name": "generate_market_scenarios", "description": "Generate GAN-based market stress scenarios." },
-      { "name": "analyze_snc_credit", "description": "Perform Shared National Credit (SNC) rating analysis." },
-      { "name": "analyze_covenants", "description": "Analyze covenant breach risk." },
-      { "name": "compare_peers", "description": "Compare valuation multiples." },
-      { "name": "plan_workflow", "description": "Generate Neuro-Symbolic reasoning plan." },
-      { "name": "ingest_file", "description": "Ingest document into Knowledge Base." },
-      { "name": "retrieve_market_data", "description": "Get real-time market data." },
-      { "name": "execute_python_sandbox", "description": "Run Python code." }
-    ],
-    "resources": [
-      { "uri": "adam://project/manifest", "description": "Project capabilities manifest." },
-      { "uri": "adam://docs/{filename}", "description": "Dynamic documentation access." }
-    ]
   }
 }
