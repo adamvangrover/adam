@@ -31,3 +31,11 @@
 ## 2025-05-21 - Raw Data Editing Pattern
 **Learning:** When allowing users to edit raw JSON data that drives an underlying object state, do not bind the input directly to the object stringification. This causes a loop where invalid JSON prevents updates or resets the cursor. Use a separate string state for the editor, and parse/commit it to the object state only on valid submit/blur.
 **Action:** Use separate 'draft' string state for raw editors.
+
+## 2025-12-24 - Loading State Accessibility
+**Learning:** Stylistic loading animations (like CSS spinners) are invisible to screen readers. Adding `role="status"` and a visually hidden text span ensures assistive technology users know content is loading.
+**Action:** Always pair visual spinners with invisible descriptive text and proper ARIA live regions.
+
+## 2025-12-24 - Verify Rendered Components
+**Learning:** In a codebase with legacy or duplicate files (e.g., `Header.js` vs `GlobalNav.tsx`), always verify which component is actually being rendered by the application (via `App.tsx` or `Layout.tsx`) before applying fixes. Screenshots and entry point analysis are crucial.
+**Action:** Trace the component tree from `App.tsx` or `index.js` before assuming a file is active.
