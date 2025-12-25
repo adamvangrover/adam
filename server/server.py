@@ -122,7 +122,7 @@ def get_profile_bio() -> str:
     Resource URI: adam://profile/bio
     """
     return """
-    Adam is a high-level financial services professional with a background in credit risk management,
+    Adam is a financial services professional with a background in credit risk management,
     investment banking, and corporate ratings advisory. He has experience at institutions such as
     Credit Suisse and S&P. He specializes in quantitative finance, agentic AI systems, and
     risk modeling.
@@ -132,13 +132,13 @@ def get_profile_bio() -> str:
 @mcp.resource("adam://portfolio/case-studies")
 def get_case_studies() -> str:
     """
-    Returns selected financial case studies.
+    Returns selected MOCK financial case studies.
     Resource URI: adam://portfolio/case-studies
     """
     return json.dumps([
-        {"title": "LBO of Tech Conglomerate", "roi": "22%", "sector": "Technology"},
-        {"title": "Distressed Debt Restructuring", "recovery": "85 cents on dollar", "sector": "Energy"},
-        {"title": "IPO Advisory for FinTech", "valuation": "$2.5B", "sector": "Finance"}
+        {"title": "MOCK LBO of Tech Conglomerate", "roi": "22%", "sector": "Technology"},
+        {"title": "MOCK Distressed Debt Restructuring", "recovery": "85 cents on dollar", "sector": "Energy"},
+        {"title": "MOCK IPO Advisory for FinTech", "valuation": "$2.5B", "sector": "Finance"}
     ], indent=2)
 
 
