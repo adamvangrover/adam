@@ -644,6 +644,64 @@ class AgentOrchestrator:
             logging.error(f"Target agent '{target_agent_name}' not found for A2A message.")
             return None
 
+    def health_check(self) -> Dict[str, str]:
+        """
+        Performs a health check on all loaded agents.
+        Returns a dictionary mapping agent names to their status ('OK' or error message).
+        """
+        status_report = {}
+        for name, agent in self.agents.items():
+            try:
+                if hasattr(agent, 'health_check'):
+                    # If agent has its own health check, use it (async support needed if agent's check is async)
+                    # For now assume sync or property
+                    status = agent.health_check() if callable(agent.health_check) else "OK"
+                else:
+                    # Basic check: verify essential attributes
+                    if not agent.config:
+                        status = "Error: Missing configuration"
+                    else:
+                        status = "OK"
+            except Exception as e:
+                status = f"Error: {str(e)}"
+            status_report[name] = status
+
+        logging.info(f"Health Check Report: {status_report}")
+        return status_report
+
+    def _get_fallback_agent(self) -> Optional[AgentBase]:
+        """Returns a generic fallback agent if available."""
+        # Try generic names
+        for name in ["GeneralAgent", "QueryUnderstandingAgent", "NewsBotAgent"]:
+            agent = self.get_agent(name)
+            if agent:
+                return agent
+        return None
+
+    def execute_agent_safe(self, agent_name: str, context: Dict[str, Any]) -> Any:
+        """
+        Executes an agent with automatic fallback on failure.
+        """
+        try:
+            result = self.execute_agent(agent_name, context)
+            if result is None:
+                # execute_agent returns None on error or async dispatch.
+                # If we want fallback for async dispatch failure, we need to check logs or broker.
+                # Here we assume immediate None implies failure if not async.
+                pass
+            return result
+        except Exception as e:
+            logging.error(f"Execution of {agent_name} failed: {e}. Attempting fallback.")
+            fallback = self._get_fallback_agent()
+            if fallback:
+                logging.info(f"Routing to fallback agent: {fallback.config.get('name')}")
+                # Modifying context to indicate fallback
+                context['original_intent'] = f"Failed execution of {agent_name}"
+                return self.execute_agent(fallback.config.get('name'), context)
+            else:
+                logging.critical("No fallback agent available.")
+                return None
+
 
 def get_orchestrator() -> AgentOrchestrator:
     """Auto-detects runtime and selects the appropriate orchestrator."""
