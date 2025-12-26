@@ -39,6 +39,10 @@ class RiskAssessmentAgent(AgentBase):
         self.knowledge_base = self._load_knowledge_base()
         self.debug_mode = self.knowledge_base.get("metadata", {}).get("debug_mode", False)
 
+        # Robustness: In-memory cache for risk assessments (simple LRU-like via limit)
+        self._risk_cache = {}
+        self._cache_size_limit = 100
+
     def _load_knowledge_base(self) -> Dict[str, Any]:
         """
         Loads the knowledge base from the JSON file.
@@ -73,6 +77,17 @@ class RiskAssessmentAgent(AgentBase):
         if context is None:
             context = {}
 
+        # Check Cache
+        company_name = target_data.get("company_name", "UNKNOWN")
+        cache_key = f"{risk_type}:{company_name}"
+
+        if cache_key in self._risk_cache:
+            # Check expiry (e.g., 5 minutes)
+            cached_result, timestamp = self._risk_cache[cache_key]
+            if (datetime.datetime.now() - timestamp).total_seconds() < 300:
+                logger.info(f"Returning cached risk assessment for {cache_key}")
+                return cached_result
+
         # --- v23 Update: Check for Cyclical Reasoning Graph ---
         use_graph = self.config.get("use_v23_graph", False) or context.get("use_v23_graph", False)
 
@@ -82,7 +97,7 @@ class RiskAssessmentAgent(AgentBase):
                 from core.engine.states import init_risk_state
 
                 logger.info("Delegating to v23 CyclicalReasoningGraph...")
-                ticker = target_data.get("company_name", "UNKNOWN")
+                ticker = company_name
                 intent = context.get("user_intent", f"Assess risk for {ticker}")
 
                 initial_state = init_risk_state(ticker, intent)
@@ -93,12 +108,16 @@ class RiskAssessmentAgent(AgentBase):
                 else:
                     final_state = cyclical_reasoning_app.invoke(initial_state, config=config)
 
-                return {
+                result = {
                     "overall_risk_score": final_state.get("quality_score", 0) * 100,
                     "risk_factors": {"Analysis": "See detailed report"},
                     "detailed_report": final_state.get("draft_analysis", ""),
                     "graph_state": final_state
                 }
+
+                # Cache Result
+                self._update_cache(cache_key, result)
+                return result
 
             except ImportError:
                 logger.warning("v23 CyclicalReasoningGraph not available. Falling back to v21 logic.")
@@ -109,7 +128,7 @@ class RiskAssessmentAgent(AgentBase):
         # Note: We run these synchronously as they are CPU bound math operations,
         # but in a real system we might offload to a thread pool if they get heavy.
         if risk_type == "investment":
-            result = self.assess_investment_risk(target_data.get("company_name"), target_data.get(
+            result = self.assess_investment_risk(company_name, target_data.get(
                 "financial_data", {}), target_data.get("market_data", {}))
         elif risk_type == "loan":
             result = self.assess_loan_risk(target_data.get("loan_details", {}), target_data.get("borrower_data", {}))
@@ -119,8 +138,22 @@ class RiskAssessmentAgent(AgentBase):
             logger.warning(f"Unknown risk type: {risk_type}")
             return {"error": "Unknown risk type."}
 
+        # Cache Result
+        self._update_cache(cache_key, result)
+
         logger.info(f"Risk assessment completed. Score: {result.get('overall_risk_score', 'N/A')}")
         return result
+
+    def _update_cache(self, key: str, value: Any) -> None:
+        """Updates the cache, managing size limits."""
+        if len(self._risk_cache) >= self._cache_size_limit:
+            # Remove oldest (first inserted in Python 3.7+ dict)
+            iterator = iter(self._risk_cache)
+            try:
+                del self._risk_cache[next(iterator)]
+            except StopIteration:
+                pass
+        self._risk_cache[key] = (value, datetime.datetime.now())
 
     def assess_investment_risk(self, company_name: str, financial_data: Dict, market_data: Dict) -> Dict:
         """
