@@ -1,135 +1,90 @@
 #!/usr/bin/env python3
+"""
+Interactive Setup Script for Adam v2.0
+Helps users configure the environment, API keys, and Docker settings.
+"""
+
 import os
 import sys
-import subprocess
+import getpass
+import shutil
 
-# ANSI Colors
-GREEN = "\033[92m"
-YELLOW = "\033[93m"
-RED = "\033[91m"
-CYAN = "\033[96m"
-RESET = "\033[0m"
-
-def print_banner():
-    print(f"{CYAN}")
+def print_header():
     print("=" * 60)
-    print("      ADAM SYSTEM - INTERACTIVE SETUP WIZARD")
+    print("   ADAM v2.0 - Interactive Setup")
+    print("   Transforming Static Data into Agentic Intelligence")
     print("=" * 60)
-    print(f"{RESET}")
+    print()
 
-def check_python():
-    print(f"{CYAN}[*] Checking Python environment...{RESET}")
-    version = sys.version_info
-    if version.major < 3 or (version.major == 3 and version.minor < 9):
-        print(f"{RED}[!] Error: Python 3.9+ is required. You are running {version.major}.{version.minor}{RESET}")
-        sys.exit(1)
-    print(f"{GREEN}[✓] Python {version.major}.{version.minor} detected.{RESET}")
+def check_file_exists(filepath):
+    return os.path.exists(filepath)
 
-def check_docker():
-    print(f"{CYAN}[*] Checking Docker...{RESET}")
-    try:
-        subprocess.run(["docker", "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        print(f"{GREEN}[✓] Docker detected.{RESET}")
-        return True
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        print(f"{YELLOW}[!] Docker not found. You will be limited to local execution.{RESET}")
-        return False
+def setup_env_file():
+    print("[*] Configuring Environment Variables (.env)...")
 
-def check_node():
-    print(f"{CYAN}[*] Checking Node.js (for UI)...{RESET}")
-    try:
-        subprocess.run(["npm", "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        print(f"{GREEN}[✓] Node/npm detected.{RESET}")
-        return True
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        print(f"{YELLOW}[!] npm not found. The React UI cannot be built locally.{RESET}")
-        return False
-
-def setup_env():
-    print(f"\n{CYAN}[*] Configuring Environment (.env)...{RESET}")
-
-    if os.path.exists(".env"):
-        overwrite = input(f"{YELLOW}[?] .env already exists. Overwrite? (y/N): {RESET}").lower()
+    if check_file_exists(".env"):
+        overwrite = input("    .env file already exists. Overwrite? (y/N): ").lower()
         if overwrite != 'y':
-            print(f"{GREEN}[*] Keeping existing .env.{RESET}")
+            print("    Skipping .env creation.")
             return
 
-    env_content = []
+    openai_key = getpass.getpass("    Enter OpenAI API Key (leave blank for Mock Mode): ")
 
-    print("\n--- Configuration Mode ---")
-    print("1. Mock / Demo Mode (No API keys required)")
-    print("2. Production Mode (Requires OpenAI/Neo4j keys)")
-    choice = input("Select mode [1]: ").strip() or "1"
-
-    if choice == "1":
-        print(f"{GREEN}[*] Configuring for Mock Mode.{RESET}")
-        env_content = [
-            "# Adam System - Mock Mode Configuration",
-            "FLASK_CONFIG=development",
-            "CORE_INTEGRATION=False",  # Disable heavy core integration for pure UI demo
-            "SECRET_KEY=dev-secret-key-123",
-            "CORS_ALLOWED_ORIGINS=*",
-            "NEO4J_URI=bolt://localhost:7687", # Still useful if local neo4j exists
-            "NEO4J_USER=neo4j",
-            "NEO4J_PASSWORD=password"
-        ]
+    env_content = "# Adam v2.0 Configuration\n"
+    if openai_key:
+        env_content += f"OPENAI_API_KEY={openai_key}\n"
+        print("    > OpenAI Key set.")
     else:
-        print(f"{GREEN}[*] Configuring for Production.{RESET}")
-        openai_key = input("Enter OpenAI API Key: ").strip()
-        neo4j_uri = input("Enter Neo4j URI [bolt://localhost:7687]: ").strip() or "bolt://localhost:7687"
-        neo4j_user = input("Enter Neo4j User [neo4j]: ").strip() or "neo4j"
-        neo4j_pass = input("Enter Neo4j Password: ").strip()
+        env_content += "OPENAI_API_KEY=mock\n"
+        env_content += "ADAM_MOCK_MODE=true\n"
+        print("    > Mock Mode enabled.")
 
-        env_content = [
-            "# Adam System - Production Configuration",
-            "FLASK_CONFIG=production",
-            "CORE_INTEGRATION=True",
-            f"OPENAI_API_KEY={openai_key}",
-            f"NEO4J_URI={neo4j_uri}",
-            f"NEO4J_USER={neo4j_user}",
-            f"NEO4J_PASSWORD={neo4j_pass}",
-            "SECRET_KEY=prod-secret-key-change-me",
-            "CORS_ALLOWED_ORIGINS=*"
-        ]
+    # Default settings
+    env_content += "LOG_LEVEL=INFO\n"
+    env_content += "DATABASE_URL=sqlite:///finance_data.db\n"
 
     with open(".env", "w") as f:
-        f.write("\n".join(env_content))
-    print(f"{GREEN}[✓] .env file created.{RESET}")
+        f.write(env_content)
 
-def install_dependencies():
-    print(f"\n{CYAN}[*] Installing Python Dependencies...{RESET}")
-    confirm = input("Run pip install? (Y/n): ").lower() or 'y'
-    if confirm == 'y':
-        try:
-            subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
-            print(f"{GREEN}[✓] Dependencies installed.{RESET}")
-        except subprocess.CalledProcessError:
-            print(f"{RED}[!] Failed to install dependencies.{RESET}")
+    print("    .env file created successfully.")
+
+def setup_docker():
+    print("\n[*] Checking Docker Configuration...")
+    if not check_file_exists("Dockerfile"):
+        print("    Error: Dockerfile not found in root.")
+        return
+
+    print("    Docker configuration appears valid.")
+    # In a real scenario, we might check if docker daemon is running
+    # but strictly python logic here is safer.
+
+def create_startup_script():
+    print("\n[*] Creating 'adam' CLI alias...")
+    # This is symbolic, creates a helper script
+    with open("adam", "w") as f:
+        f.write("#!/bin/bash\n")
+        f.write("python3 scripts/run_adam.py \"$@\"\n")
+
+    os.chmod("adam", 0o755)
+    print("    Created './adam' script. You can run './adam --help'")
 
 def main():
-    print_banner()
-    check_python()
-    has_docker = check_docker()
-    has_node = check_node()
+    print_header()
 
-    setup_env()
-    install_dependencies()
+    try:
+        setup_env_file()
+        setup_docker()
+        create_startup_script()
 
-    print(f"\n{CYAN}" + "=" * 60)
-    print("SETUP COMPLETE")
-    print("=" * 60 + f"{RESET}")
-    print("\nTo start the system:")
+        print("\n" + "=" * 60)
+        print("   Setup Complete!")
+        print("   Run './adam' to start the system.")
+        print("   Run './scripts/run_ui.sh' to start the Web App.")
+        print("=" * 60)
 
-    if has_docker:
-        print(f"  {GREEN}docker-compose up -d{RESET}  (Recommended)")
-    else:
-        print(f"  {GREEN}./run_adam.sh{RESET}       (Local fallback)")
-
-    print("\nAccess the UI at: http://localhost:80 (Docker) or http://localhost:3000 (Local)")
+    except KeyboardInterrupt:
+        print("\nSetup aborted.")
+        sys.exit(1)
 
 if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        print(f"\n{RED}[!] Setup cancelled.{RESET}")
-        sys.exit(0)
+    main()

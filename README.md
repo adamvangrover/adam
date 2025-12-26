@@ -95,6 +95,19 @@ Garbage in, garbage out. Adam's pipeline scrubs, validates, and normalizes every
 
 -----
 
+## Adam v2.0: The Agentic Swarm
+
+The system has evolved into a hybrid architecture supporting both the robust v23 Graph Engine and the new v2.0 Agentic Swarm.
+
+### Key Features
+*   **Dual-Core Engine:** Run in modern Swarm mode (default) or Legacy Graph mode (`--legacy`).
+*   **Model Context Protocol (MCP):** Standardized, secure tool access for SQL, Search, and Market Data.
+*   **Swarm Telemetry:** Real-time visibility into agent thought processes via `logs/swarm_telemetry.jsonl`.
+*   **Self-Optimization:** Includes an `EvolutionaryOptimizer` agent that analyzes its own codebase.
+
+### Swarm Memory
+The system now maintains a persistent "Collective Unconscious" via the `MemoryMatrix`, allowing agents to share insights across sessions.
+
 ## ⚡ Getting Started
 
 We use **`uv`** for lightning-fast, reproducible Python environment management.
