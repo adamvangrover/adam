@@ -18,7 +18,8 @@ class TestDataRetrievalAgent(unittest.IsolatedAsyncioTestCase):
                     "description": "Test Description",
                     "expertise": ["data access"]
                 }
-            }
+            },
+            "market_baseline_file_path": "dummy_path_market.json"
         }
         self.mock_data_sources = {
             "risk_ratings": {"type": "json", "path": "dummy_path.json"},
@@ -76,7 +77,7 @@ class TestDataRetrievalAgent(unittest.IsolatedAsyncioTestCase):
         
         # Combined assertions: Check result AND check call args (stricter test)
         self.assertEqual(result, {"market_trends": ["test"]})
-        mock_load_data.assert_called_once_with(self.mock_data_sources['market_baseline'])
+        mock_load_data.assert_called_once_with(self.mock_data_sources['market_baseline'], cache=False)
 
     @patch('core.utils.config_utils.load_config')
     @patch('core.agents.data_retrieval_agent.load_data')
