@@ -8,7 +8,7 @@ from typing import Optional, Union, List, Dict, Any
 from core.agents.agent_base import AgentBase
 from core.utils.data_utils import load_data
 from core.system.knowledge_base import KnowledgeBase
-from core.system.error_handler import DataNotFoundError, FileReadError
+from core.system.error_handler import DataNotFoundError, FileReadError, InvalidInputError
 from semantic_kernel import Kernel
 from core.data_sources.data_fetcher import DataFetcher
 
@@ -83,7 +83,9 @@ class DataRetrievalAgent(AgentBase):
                 return self.data_fetcher.fetch_recommendations(company_id)
             else:
                 logging.warning(f"Unknown data_type requested: {data_type}")
-                return None
+                raise InvalidInputError(input_string=data_type, reason="Unknown data_type requested")
+        except InvalidInputError:
+            raise
         except Exception as e:
             logging.exception(f"Error during execute for '{data_type}': {e}")
             return None
@@ -315,6 +317,7 @@ class DataRetrievalAgent(AgentBase):
                 rating = data.get(company_id)
                 if rating is None:
                     logging.warning(f"Risk rating for company_id '{company_id}' not found in {self.risk_ratings_path}.")
+                    raise DataNotFoundError(data_identifier=company_id, source=self.risk_ratings_path)
                 return rating
             else:
                 logging.error(f"Failed to load risk ratings data from {self.risk_ratings_path}")
@@ -322,6 +325,8 @@ class DataRetrievalAgent(AgentBase):
         except FileReadError as e:
             logging.error(f"FileReadError while reading risk ratings: {e}")
             return None
+        except DataNotFoundError:
+            raise
         except Exception as e:
             logging.exception(f"Unexpected error in get_risk_rating for {company_id}: {e}")
             return None
