@@ -16,6 +16,11 @@ try:
 except ImportError:
     np = None
 from typing import Literal, Dict, Any, List, Optional
+from core.engine.states import RiskAssessmentState, ResearchArtifact
+from core.utils.logging_utils import get_logger
+
+logger = get_logger(__name__)
+
 try:
     from langgraph.graph import StateGraph, END, START
     from langgraph.checkpoint.memory import MemorySaver
@@ -34,16 +39,11 @@ except ImportError:
     class MemorySaver: pass
     logger.warning("LangGraph not installed. Graphs will be disabled.")
 
-from core.engine.states import RiskAssessmentState, ResearchArtifact
-from core.utils.logging_utils import get_logger
-
 # v23.5 Integration: APEX Generative Risk Engine
 try:
     from core.vertical_risk_agent.generative_risk import GenerativeRiskEngine, MarketScenario
 except ImportError:
     GenerativeRiskEngine = None
-
-logger = get_logger(__name__)
 
 # Import RiskAssessmentAgent (Math-heavy, no complex dependencies)
 try:

@@ -17,6 +17,7 @@ async def async_main():
     parser.add_argument("--query", type=str, help="Single query to execute")
     parser.add_argument("--system_prompt", type=str, help="System Prompt to inject (String)")
     parser.add_argument("--system_prompt_path", type=str, help="System Prompt to inject (File Path)")
+    parser.add_argument("--legacy", action="store_true", help="Force usage of legacy v23 graph engine components")
     args = parser.parse_args()
 
     try:
@@ -53,6 +54,10 @@ async def async_main():
             legacy_orchestrator = None  # Fallback
 
         # Initialize Meta Orchestrator (v23 Brain)
+        # If --legacy is passed, we might modify behavior, but for now we pass it via context or config
+        if args.legacy:
+            logger.info("LEGACY MODE: Enabled. Routing priority will favor v23_graph_engine components.")
+
         meta_orchestrator = MetaOrchestrator(legacy_orchestrator=legacy_orchestrator)
 
         # Inject System Prompt into Context

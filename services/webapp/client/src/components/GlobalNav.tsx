@@ -32,6 +32,15 @@ const GlobalNav: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  const [isMockMode, setIsMockMode] = useState(false);
+  useEffect(() => {
+    // Check if system is in Mock Mode via API
+    fetch('/api/system/status')
+      .then(res => res.json())
+      .then(data => setIsMockMode(data.mode === 'MOCK'))
+      .catch(() => setIsMockMode(false));
+  }, []);
+
   const toggleMode = () => {
     if (mode === 'LIVE') {
       setMode('ARCHIVE');
@@ -109,6 +118,16 @@ const GlobalNav: React.FC = () => {
             <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: mode === 'LIVE' ? '#0f0' : '#ffa500' }}>{mode} MODE</span>
         </button>
 
+        {/* Mock Mode Indicator */}
+        {isMockMode && (
+          <div style={{
+             padding: '5px 10px', border: '1px solid #ff00ff', borderRadius: '4px',
+             background: 'rgba(255, 0, 255, 0.1)', color: '#ff00ff', fontSize: '0.8rem', fontWeight: 'bold'
+          }}>
+            MOCK DATA
+          </div>
+        )}
+
         {/* System Status */}
         <div style={{ textAlign: 'right', borderLeft: '1px solid #333', paddingLeft: '20px' }}>
           <div style={{ fontSize: '0.6rem', color: '#888', marginBottom: '2px' }}>SYSTEM STATUS</div>
@@ -117,6 +136,17 @@ const GlobalNav: React.FC = () => {
             fontWeight: 'bold', fontSize: '0.85rem', letterSpacing: '1px'
           }}>{status}</div>
         </div>
+
+        {/* Swarm Link */}
+        <a
+           href="/swarm"
+           onClick={(e) => { e.preventDefault(); navigate('/swarm'); }}
+           style={{ color: '#0ff', fontSize: '1.2rem', textDecoration: 'none' }}
+           title="Swarm Telemetry"
+           aria-label="Swarm Telemetry"
+         >
+           🧠
+         </a>
 
         {/* Archive Link */}
          <a

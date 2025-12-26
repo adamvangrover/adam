@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import GlassCard from '../common/GlassCard';
 import { dataManager } from '../../utils/DataManager';
-import { Filter, ArrowUp, ArrowDown } from 'lucide-react';
+import { Filter, ArrowUp, ArrowDown, X } from 'lucide-react';
 
 const AgentRegistry = () => {
     const [agents, setAgents] = useState([]);
@@ -53,11 +53,21 @@ const AgentRegistry = () => {
                     <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500" size={16} />
                     <input
                         type="text"
+                        aria-label="Filter agents"
                         placeholder="Filter agents..."
-                        className="bg-slate-900 border border-slate-700 rounded-md py-2 pl-10 pr-4 text-slate-200 focus:outline-none focus:border-cyan-500"
+                        className="bg-slate-900 border border-slate-700 rounded-md py-2 pl-10 pr-10 text-slate-200 focus:outline-none focus:border-cyan-500 transition-colors"
                         value={filter}
                         onChange={(e) => setFilter(e.target.value)}
                     />
+                    {filter && (
+                        <button
+                            onClick={() => setFilter('')}
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-500 hover:text-white focus:outline-none focus:text-cyan-400 transition-colors"
+                            aria-label="Clear filter"
+                        >
+                            <X size={16} />
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -65,16 +75,40 @@ const AgentRegistry = () => {
                 <table className="w-full text-left border-collapse">
                     <thead>
                         <tr className="bg-slate-900/50 text-slate-400 text-sm uppercase tracking-wider border-b border-slate-700">
-                            <th className="p-4 cursor-pointer hover:text-white" onClick={() => requestSort('name')}>
+                            <th className="p-4 cursor-pointer hover:text-white focus:outline-none focus:text-cyan-400"
+                                onClick={() => requestSort('name')}
+                                tabIndex={0}
+                                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && requestSort('name')}
+                                role="columnheader"
+                                aria-sort={sortConfig.key === 'name' ? sortConfig.direction : 'none'}
+                            >
                                 <div className="flex items-center">Agent Name {sortConfig.key === 'name' && (sortConfig.direction === 'ascending' ? <ArrowUp size={14} className="ml-1"/> : <ArrowDown size={14} className="ml-1"/>)}</div>
                             </th>
-                            <th className="p-4 cursor-pointer hover:text-white" onClick={() => requestSort('status')}>
+                            <th className="p-4 cursor-pointer hover:text-white focus:outline-none focus:text-cyan-400"
+                                onClick={() => requestSort('status')}
+                                tabIndex={0}
+                                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && requestSort('status')}
+                                role="columnheader"
+                                aria-sort={sortConfig.key === 'status' ? sortConfig.direction : 'none'}
+                            >
                                 <div className="flex items-center">Status {sortConfig.key === 'status' && (sortConfig.direction === 'ascending' ? <ArrowUp size={14} className="ml-1"/> : <ArrowDown size={14} className="ml-1"/>)}</div>
                             </th>
-                            <th className="p-4 cursor-pointer hover:text-white" onClick={() => requestSort('task')}>
+                            <th className="p-4 cursor-pointer hover:text-white focus:outline-none focus:text-cyan-400"
+                                onClick={() => requestSort('task')}
+                                tabIndex={0}
+                                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && requestSort('task')}
+                                role="columnheader"
+                                aria-sort={sortConfig.key === 'task' ? sortConfig.direction : 'none'}
+                            >
                                 <div className="flex items-center">Current Task {sortConfig.key === 'task' && (sortConfig.direction === 'ascending' ? <ArrowUp size={14} className="ml-1"/> : <ArrowDown size={14} className="ml-1"/>)}</div>
                             </th>
-                            <th className="p-4 cursor-pointer hover:text-white" onClick={() => requestSort('efficiency')}>
+                            <th className="p-4 cursor-pointer hover:text-white focus:outline-none focus:text-cyan-400"
+                                onClick={() => requestSort('efficiency')}
+                                tabIndex={0}
+                                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && requestSort('efficiency')}
+                                role="columnheader"
+                                aria-sort={sortConfig.key === 'efficiency' ? sortConfig.direction : 'none'}
+                            >
                                 <div className="flex items-center">Efficiency {sortConfig.key === 'efficiency' && (sortConfig.direction === 'ascending' ? <ArrowUp size={14} className="ml-1"/> : <ArrowDown size={14} className="ml-1"/>)}</div>
                             </th>
                         </tr>

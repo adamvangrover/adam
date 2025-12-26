@@ -237,6 +237,15 @@ class UniversalIngestor:
         if "gold_standard" in filepath or "ui_data.json" in filepath:
             return
 
+        # ROBUSTNESS: Safe Mode Check
+        # Skip files larger than 10MB to avoid MemoryError in constrained environments
+        try:
+            if os.path.getsize(filepath) > 10 * 1024 * 1024:
+                print(f"Skipping large file: {filepath} (>10MB)")
+                return
+        except OSError:
+            return
+
         try:
             if filepath.endswith('.json'):
                 self._process_json(filepath)
@@ -244,7 +253,7 @@ class UniversalIngestor:
                 self._process_jsonl(filepath)
             elif filepath.endswith('.md'):
                 self._process_markdown(filepath)
-            elif filepath.endswith('.txt'):
+            elif filepath.endswith('.txt') or filepath.endswith('.log'):
                 self._process_text(filepath)
             elif filepath.endswith('.py'):
                 self._process_python(filepath)

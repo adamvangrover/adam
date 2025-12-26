@@ -12,6 +12,7 @@ const Vault = lazy(() => import('./pages/Vault'));
 const AgentStatus = lazy(() => import('./pages/AgentStatus'));
 const KnowledgeGraph = lazy(() => import('./pages/KnowledgeGraph'));
 const DeepDive = lazy(() => import('./pages/DeepDive'));
+const SwarmActivity = lazy(() => import('./pages/SwarmActivity'));
 
 // Lazy load placeholders/secondary pages
 const MarketData = lazy(() => import('./pages/MarketData'));
@@ -33,6 +34,7 @@ const App: React.FC = () => {
           <Route path="analysis-tools" element={<Suspense fallback={<Loading />}><AnalysisTools /></Suspense>} />
           <Route path="knowledge-graph" element={<Suspense fallback={<Loading />}><KnowledgeGraph /></Suspense>} />
           <Route path="agents" element={<Suspense fallback={<Loading />}><AgentStatus /></Suspense>} />
+          <Route path="swarm" element={<Suspense fallback={<Loading />}><SwarmActivity /></Suspense>} />
           <Route path="vault" element={<Suspense fallback={<Loading />}><Vault /></Suspense>} />
           <Route path="deep-dive/:id" element={<Suspense fallback={<Loading />}><DeepDive /></Suspense>} />
           <Route path="portfolio-management" element={<Suspense fallback={<Loading />}><PortfolioManagement /></Suspense>} />

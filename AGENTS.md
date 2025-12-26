@@ -158,6 +158,12 @@ Please follow these guidelines when contributing to the ADAM project:
 *   **Missing Files:** If you encounter `Knowledge base file not found` errors, ensure `data/risk_rating_mapping.json` exists. A default one is created if missing in some tests, but should be present in `data/` for production.
 *   **Testing:** Always run tests using `python3 -m pytest` to ensure the correct virtual environment is used.
 
+## Agent Prompts (v2.0)
+
+The prompt library has been updated with v2.0 standards, emphasizing structured tool use (JSON Schema) and iterative workflows (Plan-Execute-Reflect).
+
+*   **Credit Risk Architect:** `prompt_library/v2_0_credit_risk_architect.md` - The flagship agent prompt using MCP standards.
+
 ## Quantum-AI Convergence (New Capabilities)
 
 Following the strategic analysis in `docs/whitepapers/quantum_ai_convergence.md`, the following modules have been added to the system:

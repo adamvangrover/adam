@@ -1,4 +1,3 @@
-from legacy_api import app
 import unittest
 from unittest.mock import patch, MagicMock
 import json
@@ -17,6 +16,7 @@ legacy_api = importlib.util.module_from_spec(spec)
 sys.modules["legacy_api"] = legacy_api
 spec.loader.exec_module(legacy_api)
 
+from legacy_api import app
 
 class TestCoreApiSecurity(unittest.TestCase):
     def setUp(self):

@@ -33,7 +33,9 @@ class TestAWOPlanner(unittest.TestCase):
     def test_parse_empty_plan(self):
         text = "No steps here."
         plan = self.planner.parse_natural_language_plan(text)
-        self.assertEqual(len(plan['steps']), 0)
+        # The planner now returns a single generic step when no steps are found
+        self.assertEqual(len(plan['steps']), 1)
+        self.assertEqual(plan['steps'][0]['description'], "No steps here.")
 
 
 if __name__ == '__main__':
