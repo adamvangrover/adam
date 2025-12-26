@@ -33,6 +33,7 @@ from core.system.agent_orchestrator import AgentOrchestrator
 from core.mcp.registry import MCPRegistry
 from core.llm_plugin import LLMPlugin
 from core.engine.autonomous_self_improvement import CodeAlchemist
+from core.utils.logging_utils import SwarmLogger
 
 # v23.5 Deep Dive Agents (for Fallback)
 from core.agents.specialized.management_assessment_agent import ManagementAssessmentAgent
@@ -60,14 +61,19 @@ class MetaOrchestrator:
         # Integration Path 3: Native Gemini Tooling
         self.llm_plugin = LLMPlugin(config={"provider": "gemini", "gemini_model_name": "gemini-3-pro"})
         self.code_alchemist = CodeAlchemist()
+        self.swarm_logger = SwarmLogger()
 
     async def route_request(self, query: str, context: Optional[Dict[str, Any]] = None) -> Any:
         """
         Analyzes the query complexity and routes to the best engine.
         Now Async!
         """
+        self.swarm_logger.log_event("REQUEST_RECEIVED", "MetaOrchestrator", {"query": query, "context": context})
+
         complexity = self._assess_complexity(query, context)
         logger.info(f"MetaOrchestrator: Query complexity is {complexity}")
+
+        self.swarm_logger.log_thought("MetaOrchestrator", f"Assessed complexity as {complexity}. Routing accordingly.")
 
         result = None
         if complexity == "DEEP_DIVE":
