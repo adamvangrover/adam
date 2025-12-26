@@ -30,6 +30,32 @@ def _get_allowed_simulations():
         return []
     return [os.path.splitext(f)[0] for f in os.listdir(simulations_dir) if f.endswith('.py') and not f.startswith('__')]
 
+
+def _is_password_strong(password: str) -> bool:
+    """
+    🛡️ Sentinel: Validate password strength.
+    Requires:
+    - At least 8 characters
+    - At least one uppercase letter
+    - At least one lowercase letter
+    - At least one digit
+    - At least one special character
+    """
+    if not password:
+        return False
+    if len(password) < 8:
+        return False
+    if not re.search(r'[A-Z]', password):
+        return False
+    if not re.search(r'[a-z]', password):
+        return False
+    if not re.search(r'\d', password):
+        return False
+    # Check for at least one special character (anything not alphanumeric)
+    if not re.search(r'[^a-zA-Z0-9]', password):
+        return False
+    return True
+
 # ---------------------------------------------------------------------------- #
 # Initialize Extensions
 # ---------------------------------------------------------------------------- #
@@ -299,6 +325,14 @@ def create_app(config_name='default'):
         data = request.get_json()
         username = data.get('username')
         password = data.get('password')
+
+        # 🛡️ Sentinel: Enforce strong password policy
+        if not _is_password_strong(password):
+            return jsonify({
+                'error': 'Password is too weak. It must be at least 8 characters and contain '
+                         'uppercase, lowercase, number, and special character.'
+            }), 400
+
         if User.query.filter_by(username=username).first():
             return jsonify({'error': 'User already exists'}), 400
 
