@@ -33,6 +33,7 @@ from core.system.agent_orchestrator import AgentOrchestrator
 from core.mcp.registry import MCPRegistry
 from core.llm_plugin import LLMPlugin
 from core.engine.autonomous_self_improvement import CodeAlchemist
+from core.engine.swarm.hive_mind import HiveMind
 from core.utils.logging_utils import SwarmLogger
 
 # v23.5 Deep Dive Agents (for Fallback)
@@ -61,6 +62,7 @@ class MetaOrchestrator:
         # Integration Path 3: Native Gemini Tooling
         self.llm_plugin = LLMPlugin(config={"provider": "gemini", "gemini_model_name": "gemini-3-pro"})
         self.code_alchemist = CodeAlchemist()
+        self.hive_mind = HiveMind(worker_count=5)
         self.swarm_logger = SwarmLogger()
 
     async def route_request(self, query: str, context: Optional[Dict[str, Any]] = None) -> Any:
@@ -78,6 +80,8 @@ class MetaOrchestrator:
         result = None
         if complexity == "DEEP_DIVE":
             result = await self._run_deep_dive_flow(query, context)
+        elif complexity == "SWARM":
+            result = await self._run_swarm_flow(query)
         elif complexity == "CODE_GEN":
             result = await self._run_code_gen_flow(query)
         elif complexity == "RED_TEAM":
@@ -173,6 +177,10 @@ class MetaOrchestrator:
         if any(x in query_lower for x in ["generate code", "write a function", "implement", "refactor", "code agent"]):
             return "CODE_GEN"
 
+        # Swarm Trigger
+        if any(x in query_lower for x in ["swarm", "scan", "parallel", "hive"]):
+            return "SWARM"
+
         # v23.5 Deep Dive Trigger
         if "deep dive" in query_lower or context.get("simulation_depth") == "Deep":
             return "DEEP_DIVE"
@@ -197,6 +205,29 @@ class MetaOrchestrator:
                 return category
 
         return "LOW"
+
+    async def _run_swarm_flow(self, query: str):
+        logger.info("Engaging Swarm Intelligence (Hive Mind)...")
+        try:
+            # Initialize swarm if not already running (lazy load)
+            if not self.hive_mind.workers:
+                await self.hive_mind.initialize()
+
+            # Disperse task
+            task_payload = {"target": query.replace("swarm", "").strip()}
+            await self.hive_mind.disperse_task("ANALYST", task_payload)
+
+            # Wait for results
+            results = await self.hive_mind.gather_results(timeout=5.0)
+
+            return {
+                "status": "Swarm Execution Complete",
+                "worker_count": self.hive_mind.worker_count,
+                "results": results
+            }
+        except Exception as e:
+            logger.error(f"Swarm Execution Failed: {e}", exc_info=True)
+            return {"error": str(e)}
 
     async def _run_code_gen_flow(self, query: str):
         logger.info("Engaging Code Alchemist for Autonomous Coding...")
