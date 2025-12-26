@@ -28,6 +28,30 @@ class ApiTestCase(unittest.TestCase):
         data = json.loads(response.data)
         self.assertEqual(data, [])
 
+    def test_register_weak_password(self):
+        # 🛡️ Sentinel: Test password strength validation
+        weak_passwords = [
+            'short',           # Too short
+            'alllowercase1!',  # No uppercase
+            'ALLUPPERCASE1!',  # No lowercase
+            'NoNumbers!!!!',   # No digits
+            'NoSpecialChar12'  # No special chars
+        ]
+
+        for pwd in weak_passwords:
+            response = self.client.post('/api/register',
+                                        data=json.dumps({'username': f'user_{pwd}', 'password': pwd}),
+                                        content_type='application/json')
+            self.assertEqual(response.status_code, 400, f"Allowed weak password: {pwd}")
+            self.assertIn('Password is too weak', json.loads(response.data)['error'])
+
+        # Test strong password
+        strong_pwd = 'StrongPassword1!'
+        response = self.client.post('/api/register',
+                                    data=json.dumps({'username': 'good_user', 'password': strong_pwd}),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+
     def test_login(self):
         # Create a test user
         user = User(username='testuser')
