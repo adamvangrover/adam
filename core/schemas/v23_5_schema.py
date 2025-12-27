@@ -82,16 +82,16 @@ class PrimaryFacilityAssessment(BaseModel):
 
 
 class SNCRatingModel(BaseModel):
-    overall_borrower_rating: Literal["Pass", "Special Mention", "Substandard", "Doubtful"]
+    overall_borrower_rating: Literal["Pass", "Special Mention", "Substandard", "Doubtful", "Loss"]
     rationale: str
     primary_facility_assessment: PrimaryFacilityAssessment
 
 
 class CovenantRiskAnalysis(BaseModel):
-    primary_constraint: str
+    primary_constraint: str = Field(description="The primary restrictive covenant or 'Choke Point'")
     current_level: float
     breach_threshold: float
-    headroom_assessment: str
+    headroom_assessment: str = Field(description="Analysis of headroom (e.g., '15% Cushion')")
 
 
 class CreditAnalysis(BaseModel):
