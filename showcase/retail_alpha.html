@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM :: RETAIL ALPHA</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #00f3ff;
+            --accent-color: #0aff60;
+            --danger-color: #ff0055;
+            --warning-color: #ffaa00;
+            --bg-color: #050b14;
+            --panel-bg: rgba(5, 11, 20, 0.8);
+            --card-bg: rgba(255, 255, 255, 0.03);
+        }
+        body { margin: 0; background: var(--bg-color); color: #e0e0e0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .signal-card {
+            background: var(--card-bg);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .signal-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 243, 255, 0.1);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            font-family: 'JetBrains Mono';
+        }
+        .badge-buy { background: rgba(10, 255, 96, 0.1); color: var(--accent-color); border: 1px solid var(--accent-color); }
+        .badge-sell { background: rgba(255, 0, 85, 0.1); color: var(--danger-color); border: 1px solid var(--danger-color); }
+        .badge-hold { background: rgba(255, 170, 0, 0.1); color: var(--warning-color); border: 1px solid var(--warning-color); }
+
+        .progress-bar {
+            height: 6px;
+            background: #222;
+            border-radius: 3px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .progress-fill { height: 100%; transition: width 1s ease; }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="scan-line"></div>
+
+    <header class="cyber-header">
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <h1 class="mono" style="margin: 0; font-size: 1.5rem; color: var(--primary-color); letter-spacing: 2px;">RETAIL ALPHA</h1>
+            <div class="mono" style="font-size: 0.8rem; color: #666; border-left: 1px solid #333; padding-left: 10px;">INSTITUTIONAL SUPPLEMENT</div>
+        </div>
+        <nav style="display: flex; gap: 10px;">
+            <a href="index.html" class="cyber-btn">HOME</a>
+            <a href="#" class="cyber-btn" style="border-color: var(--accent-color); color: var(--accent-color);">REFRESH SIGNALS</a>
+        </nav>
+    </header>
+
+    <main style="padding: 20px; max-width: 1400px; margin: 0 auto;">
+
+        <div class="glass-panel" style="padding: 20px; margin-bottom: 30px; border-left: 4px solid var(--accent-color);">
+            <h2 class="mono" style="margin-top: 0;">MARKET DIVERGENCE DETECTOR</h2>
+            <p style="color: #ccc; max-width: 800px;">
+                This module identifies <strong style="color:white;">High Conviction Setups</strong> by analyzing the divergence between
+                Institutional Order Flow ("Smart Money") and Retail Sentiment ("Hype").
+            </p>
+            <div class="metric-row" style="justify-content: flex-start; gap: 30px; margin-top: 15px;">
+                <div>
+                    <span style="color: #888;">Current Regime:</span>
+                    <span id="market-regime" class="mono" style="color: var(--warning-color);">LOADING...</span>
+                </div>
+                <div>
+                    <span style="color: #888;">VIX:</span>
+                    <span id="market-vix" class="mono">--</span>
+                </div>
+            </div>
+        </div>
+
+        <h3 class="mono" style="color: var(--primary-color); border-bottom: 1px solid #333; padding-bottom: 10px;">ACTIVE SIGNALS</h3>
+        <div id="signals-grid" class="grid-container">
+            <!-- Cards will be injected here -->
+            <div style="color: #666;">Loading Alpha Signals...</div>
+        </div>
+
+    </main>
+
+    <script>
+        async function loadData() {
+            try {
+                const response = await fetch('data/retail_alpha.json');
+                const data = await response.json();
+                renderDashboard(data);
+            } catch (e) {
+                console.error("Failed to load data", e);
+                document.getElementById('signals-grid').innerHTML = `<div style="color:red">Failed to load data/retail_alpha.json. Run scripts/generate_retail_alpha.py</div>`;
+            }
+        }
+
+        function renderDashboard(data) {
+            // Render Header Data
+            document.getElementById('market-regime').textContent = data.market_status.regime;
+            document.getElementById('market-vix').textContent = data.market_status.vix;
+
+            const container = document.getElementById('signals-grid');
+            container.innerHTML = '';
+
+            data.signals.forEach(signal => {
+                const card = document.createElement('div');
+                card.className = 'signal-card';
+
+                let badgeClass = 'badge-hold';
+                if (signal.signal.includes('BUY')) badgeClass = 'badge-buy';
+                if (signal.signal.includes('SELL')) badgeClass = 'badge-sell';
+
+                // Colors for bars
+                const instColor = signal.institutional_score > 50 ? '#0aff60' : '#ff0055';
+                const retColor = signal.retail_score > 50 ? '#00f3ff' : '#888';
+
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <h2 class="mono" style="margin:0; font-size:1.8rem;">${signal.ticker}</h2>
+                        <span class="badge ${badgeClass}">${signal.signal}</span>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <div class="metric-row">
+                            <span>Conviction</span>
+                            <span class="mono">${signal.conviction}%</span>
+                        </div>
+                        <div class="progress-bar" style="background: #333;">
+                            <div class="progress-fill" style="width: ${signal.conviction}%; background: linear-gradient(90deg, #444, #fff);"></div>
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                        <div>
+                            <div class="metric-row">
+                                <span style="font-size:0.75rem; color:#888;">SMART MONEY</span>
+                                <span class="mono">${signal.institutional_score}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${signal.institutional_score}%; background: ${instColor}"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="metric-row">
+                                <span style="font-size:0.75rem; color:#888;">RETAIL HYPE</span>
+                                <span class="mono">${signal.retail_score}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${signal.retail_score}%; background: ${retColor}"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 4px; font-size: 0.85rem; color: #ccc; margin-bottom: 10px;">
+                        <strong>Analysis:</strong> ${signal.reason}
+                    </div>
+
+                    <div style="font-size: 0.8rem; color: var(--primary-color);">
+                        <span style="opacity:0.7;">Catalyst:</span> ${signal.catalyst}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Initialize
+        loadData();
+    </script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+</body>
+</html>
