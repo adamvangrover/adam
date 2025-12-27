@@ -33,6 +33,10 @@ class CovenantAnalystAgent(AgentBase):
         # Analysis Logic
         headroom = covenant_threshold - current_leverage
 
+        # Calculate headroom percentage for narrative
+        # Avoid division by zero
+        headroom_pct = (headroom / covenant_threshold) * 100 if covenant_threshold > 0 else 0.0
+
         # Determine Risk Level and Narrative
         if headroom < 0:
             risk = "Critical (Breach)"
@@ -41,21 +45,20 @@ class CovenantAnalystAgent(AgentBase):
                           "Immediate waiver request or equity cure required.")
         elif headroom < 0.5:
             risk = "High"
-            assessment = (f"Tight Headroom ({headroom:.2f}x). Any EBITDA degradation (>10%) "
+            assessment = (f"Tight Headroom ({headroom:.2f}x / {headroom_pct:.1f}%). Any EBITDA degradation (>10%) "
                           "will trigger a default event. Management likely restricted from M&A/Dividends.")
         elif headroom < 1.0:
             risk = "Medium"
-            assessment = (f"Moderate Headroom ({headroom:.2f}x). Standard operating flexibility exists, "
+            assessment = (f"Moderate Headroom ({headroom:.2f}x / {headroom_pct:.1f}%). Standard operating flexibility exists, "
                           "but large debt-funded capex is constrained.")
         else:
             risk = "Low"
-            assessment = (f"Ample Headroom ({headroom:.2f}x). Full access to revolver and "
+            assessment = (f"Ample Headroom ({headroom:.2f}x / {headroom_pct:.1f}%). Full access to revolver and "
                           "accordion features likely available.")
 
         return CovenantRiskAnalysis(
             primary_constraint=f"Net Leverage Ratio < {covenant_threshold:.2f}x",
             current_level=current_leverage,
             breach_threshold=covenant_threshold,
-            risk_assessment=risk,
-            detailed_narrative=assessment  # Assuming schema supports this or will ignore
+            headroom_assessment=assessment
         )

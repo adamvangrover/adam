@@ -27,7 +27,7 @@ class SNCRatingAgent(AgentBase):
         super().__init__(config)
         self.persona = "SNC Examiner"
 
-    def execute(self,
+    async def execute(self,
                 financials: Dict[str, float],
                 capital_structure: List[Dict[str, Any]],
                 enterprise_value: float) -> SNCRatingModel:
