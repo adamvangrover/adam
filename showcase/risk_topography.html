@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam v23.5 - Risk Topography</title>
+
+    <!-- Tailwind CSS (via CDN for speed) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: { 850: '#1e293b', 900: '#0f172a' },
+                        cyan: { 400: '#22d3ee', 500: '#06b6d4', 900: '#164e63' },
+                        red: { 500: '#ef4444', 900: '#7f1d1d' },
+                        amber: { 500: '#f59e0b', 900: '#78350f' },
+                        emerald: { 500: '#10b981', 900: '#064e3b' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Three.js and modules -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #050b14; color: #e2e8f0; font-family: 'Inter', sans-serif; }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+        .scan-line {
+            width: 100%;
+            height: 2px;
+            background: rgba(6, 182, 212, 0.5);
+            position: absolute;
+            top: 0;
+            left: 0;
+            animation: scan 3s linear infinite;
+            z-index: 50;
+            pointer-events: none;
+        }
+        @keyframes scan {
+            0% { top: 0; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        #tooltip {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-200">
+
+    <!-- Header -->
+    <div class="absolute top-0 left-0 w-full p-4 z-10 flex justify-between items-center glass-panel border-b border-cyan-900/50">
+        <div>
+            <h1 class="text-2xl font-bold tracking-wider text-cyan-400">ADAM <span class="text-white text-opacity-50 text-sm">v23.5</span></h1>
+            <h2 class="text-sm text-cyan-200/70 uppercase tracking-widest">Risk Topography - Covenant Breaches</h2>
+        </div>
+        <div class="text-right text-xs text-slate-400">
+            <div>DATA SOURCE: LIVE</div>
+            <div class="text-emerald-400">SYSTEM: ONLINE</div>
+        </div>
+    </div>
+
+    <!-- Scan Line Effect -->
+    <div class="scan-line"></div>
+
+    <!-- 3D Container -->
+    <div id="container" class="w-full h-screen"></div>
+
+    <!-- Legend / Controls -->
+    <div class="absolute bottom-4 left-4 p-4 glass-panel rounded-lg w-64 z-10">
+        <h3 class="text-xs uppercase font-bold text-cyan-500 mb-2 border-b border-cyan-900 pb-1">Risk Spectrum</h3>
+        <div class="flex items-center mb-1"><div class="w-3 h-3 bg-emerald-500 rounded-full mr-2"></div> <span class="text-xs">Pass (High Headroom)</span></div>
+        <div class="flex items-center mb-1"><div class="w-3 h-3 bg-amber-500 rounded-full mr-2"></div> <span class="text-xs">Watchlist (Tight)</span></div>
+        <div class="flex items-center mb-1"><div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div> <span class="text-xs">Substandard (Breach)</span></div>
+        <div class="mt-4 text-[10px] text-slate-500 italic">
+            Z-Axis: Leverage Ratio<br>
+            Color: Covenant Headroom Risk
+        </div>
+    </div>
+
+    <!-- Tooltip -->
+    <div id="tooltip" class="glass-panel p-3 rounded-lg text-sm max-w-xs transform -translate-x-1/2 -translate-y-full mb-2">
+        <div id="tooltip-title" class="font-bold text-cyan-400 mb-1">Company Name</div>
+        <div id="tooltip-content" class="text-xs space-y-1">
+            <div>Rating: <span class="text-white" id="tooltip-rating">--</span></div>
+            <div>Leverage: <span class="text-white" id="tooltip-leverage">--</span></div>
+            <div>Headroom: <span class="text-white" id="tooltip-headroom">--</span></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // --- Config ---
+        const DATA_URL = 'data/phase3_portfolio_demo.json';
+
+        // --- Init Scene ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x050b14);
+        scene.fog = new THREE.FogExp2(0x050b14, 0.035);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(10, 10, 10);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.getElementById('container').appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+
+        // --- Lights ---
+        const ambientLight = new THREE.AmbientLight(0x404040, 2);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 2);
+        dirLight.position.set(5, 10, 7.5);
+        scene.add(dirLight);
+
+        const pointLight = new THREE.PointLight(0x06b6d4, 5, 50);
+        pointLight.position.set(0, 5, 0);
+        scene.add(pointLight);
+
+        // --- Grid Helper ---
+        const gridHelper = new THREE.GridHelper(40, 40, 0x1e293b, 0x0f172a);
+        scene.add(gridHelper);
+
+        // --- Data Loading & Visualization ---
+        async function loadData() {
+            try {
+                const response = await fetch(DATA_URL);
+                const data = await response.json();
+                renderData(data.portfolio);
+            } catch (err) {
+                console.error("Failed to load data", err);
+                // Fallback / Mock for Dev
+                console.warn("Using fallback mock data");
+                renderData([
+                    { entity_name: "Mock Breach Co", analysis: { covenant_risk_analysis: { current_level: 6.5, breach_threshold: 6.0, headroom_assessment: "BREACH" }, snc_rating_model: { overall_borrower_rating: "Substandard" } } }
+                ]);
+            }
+        }
+
+        const objects = [];
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        function renderData(portfolio) {
+            const geometry = new THREE.BoxGeometry(1, 1, 1);
+
+            // Layout Logic: Spiral or Grid
+            let count = 0;
+            const spacing = 3;
+
+            portfolio.forEach((item, index) => {
+                const credit = item.analysis;
+                const leverage = credit.covenant_risk_analysis.current_level;
+                const threshold = credit.covenant_risk_analysis.breach_threshold;
+                const rating = credit.snc_rating_model.overall_borrower_rating;
+
+                // Determine Color based on Rating
+                let color = 0x10b981; // Emerald (Pass)
+                if (rating === "Special Mention") color = 0xf59e0b; // Amber
+                if (rating === "Substandard" || rating === "Doubtful") color = 0xef4444; // Red
+
+                const material = new THREE.MeshStandardMaterial({
+                    color: color,
+                    roughness: 0.2,
+                    metalness: 0.8,
+                    transparent: true,
+                    opacity: 0.9
+                });
+
+                const bar = new THREE.Mesh(geometry, material);
+
+                // Position in a circle for dramatic effect
+                const angle = (index / portfolio.length) * Math.PI * 2;
+                const radius = 5;
+                const x = Math.cos(angle) * radius;
+                const z = Math.sin(angle) * radius;
+
+                // Height = Leverage Ratio (Visual Metaphor for Risk Tower)
+                bar.scale.y = leverage;
+                bar.position.set(x, leverage / 2, z); // Center the bar vertically
+
+                bar.userData = {
+                    name: item.entity_name,
+                    leverage: leverage,
+                    threshold: threshold,
+                    rating: rating,
+                    headroom: credit.covenant_risk_analysis.headroom_assessment
+                };
+
+                scene.add(bar);
+                objects.push(bar);
+
+                // Add Glow/Wireframe
+                const edges = new THREE.EdgesGeometry(geometry);
+                const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.3 }));
+                bar.add(line);
+            });
+        }
+
+        // --- Interaction ---
+        window.addEventListener('mousemove', onMouseMove, false);
+
+        function onMouseMove(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        }
+
+        const tooltip = document.getElementById('tooltip');
+        const tTitle = document.getElementById('tooltip-title');
+        const tRating = document.getElementById('tooltip-rating');
+        const tLev = document.getElementById('tooltip-leverage');
+        const tHead = document.getElementById('tooltip-headroom');
+
+        function updateInteraction() {
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(objects);
+
+            if (intersects.length > 0) {
+                const target = intersects[0].object;
+
+                // Update Tooltip
+                tooltip.style.opacity = 1;
+                tooltip.style.left = (event.clientX + 10) + 'px';
+                tooltip.style.top = (event.clientY - 10) + 'px'; // Move with mouse roughly, logic simplified here as mouse event is separate
+
+                // Using fixed position update in loop isn't ideal for 'event.client',
+                // but we can just use the last known mouse position projected or simple css hover logic?
+                // For Three.js, we need to manually update tooltip content.
+
+                tTitle.textContent = target.userData.name;
+                tRating.textContent = target.userData.rating;
+                tLev.textContent = target.userData.leverage.toFixed(2) + 'x';
+
+                // Clean up headroom text
+                const hrText = target.userData.headroom.length > 50 ? target.userData.headroom.substring(0, 50) + "..." : target.userData.headroom;
+                tHead.textContent = hrText;
+
+                target.material.emissive.setHex(0x333333);
+            } else {
+                tooltip.style.opacity = 0;
+                objects.forEach(obj => obj.material.emissive.setHex(0x000000));
+            }
+        }
+
+        // Fix tooltip position tracking
+        document.addEventListener('mousemove', (e) => {
+            if(tooltip.style.opacity == 1){
+                tooltip.style.left = e.clientX + 'px';
+                tooltip.style.top = (e.clientY - 10) + 'px';
+            }
+        });
+
+
+        // --- Animation Loop ---
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            updateInteraction();
+
+            // Subtle rotation of the whole group?
+            // scene.rotation.y += 0.001;
+
+            renderer.render(scene, camera);
+        }
+
+        loadData();
+        animate();
+
+        // Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+    </script>
+</body>
+</html>
