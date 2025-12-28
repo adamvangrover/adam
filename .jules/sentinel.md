@@ -90,3 +90,7 @@
 **Vulnerability:** Flags in `final_check_2.txt` suggest Flask might be running with `debug=True` in some contexts.
 **Learning:** Debug mode exposes the Werkzeug debugger, which allows arbitrary code execution.
 **Prevention:** Ensure `debug=False` is strictly enforced in all production entry points.
+## 2025-12-27 - [Hardcoded API Key Placeholder]
+**Vulnerability:** Hardcoded API key placeholder ('YOUR_NEWS_API_KEY') in 'core/agents/event_driven_risk_agent.py'.
+**Learning:** Placeholder strings for secrets can be dangerous if committed, as they encourage users to edit the file directly, potentially leaking secrets if the file is tracked.
+**Prevention:** Always use environment variables for configuration. Agents should fail gracefully or default to mock mode if critical secrets are missing, rather than using placeholder strings.
