@@ -1,23 +1,27 @@
 # core/agents/event_driven_risk_agent.py
 
+import os
 import datetime
 import requests
 import json
 from typing import List, Dict
-from .base_agent import BaseAgent
+from core.agents.agent_base import AgentBase
 from utils.data_validation import validate_event_data
 from utils.visualization_tools import generate_event_impact_chart
 
 
-class EventDrivenRiskAgent(BaseAgent):
+class EventDrivenRiskAgent(AgentBase):
     """
     Agent that tracks and assesses the market impact of events.
     """
 
-    def __init__(self, name: str = "EventDrivenRiskAgent"):
-        super().__init__(name)
+    def __init__(self, name: str = "EventDrivenRiskAgent", config: Dict = None):
+        if config is None:
+            config = {}
+        config["agent_id"] = name
+        super().__init__(config)
         self.event_data = {}  # Store event data
-        self.api_key = "YOUR_NEWS_API_KEY"  # replace with working api key
+        self.api_key = os.getenv("NEWS_API_KEY")  # Get from env
         self.news_api_url = "https://newsapi.org/v2/everything"
 
     def fetch_events(self, keywords: List[str], from_date: datetime.date, to_date: datetime.date) -> List[Dict]:
@@ -124,6 +128,20 @@ class EventDrivenRiskAgent(BaseAgent):
         """Generates a visualization of event impacts"""
         generate_event_impact_chart(event_impacts)
 
+    async def execute(self, *args, **kwargs):
+        """
+        Executes the agent's logic. Wraps run() for AgentBase compatibility.
+        """
+        keywords = kwargs.get("keywords", [])
+        from_date = kwargs.get("from_date", datetime.date.today())
+        to_date = kwargs.get("to_date", datetime.date.today())
+
+        # If args are provided, try to map them
+        if args and isinstance(args[0], list):
+            keywords = args[0]
+
+        return self.run(keywords, from_date, to_date)
+
     def run(self, keywords: List[str], from_date: datetime.date, to_date: datetime.date):
         """
         Runs the event-driven risk analysis.
@@ -136,7 +154,7 @@ class EventDrivenRiskAgent(BaseAgent):
 
         events = self.fetch_events(keywords, from_date, to_date)
         if not events:  # handle error from fetch_events
-            return
+            return {}
         impacts = self.analyze_event_impact(events)
         alerts = self.generate_risk_alerts(impacts)
         self.generate_event_visualization(impacts)
