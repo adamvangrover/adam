@@ -145,7 +145,12 @@ class UnifiedKnowledgeGraph:
             lei_to_name = {}
             node_id_to_name = {}
 
+            # Bolt Optimization: Collections for batch processing
+            nodes_to_add = []
+            edges_to_add = []
+
             # 1. Legal Entities
+            seen_sectors = set()
             for entity in nodes_data.get("legal_entities", []):
                 name = entity.get("legal_name")
                 lei = entity.get("lei_code")
@@ -158,41 +163,43 @@ class UnifiedKnowledgeGraph:
                         node_id_to_name[nid] = name
 
                     # Add Node with all metadata
-                    self.graph.add_node(name, **entity, type="LegalEntity")
-                    self.graph.add_edge(name, "Company", relation="is_a", type="fibo")
+                    nodes_to_add.append((name, {**entity, "type": "LegalEntity"}))
+                    edges_to_add.append((name, "Company", {"relation": "is_a", "type": "fibo"}))
 
                     # Link to Sector
                     sector = entity.get("sector")
                     if sector:
-                        self.graph.add_edge(name, sector, relation="belongs_to", type="fibo")
-                        if sector not in self.graph:
-                            self.graph.add_edge(sector, "MarketSector", relation="is_a", type="fibo")
+                        edges_to_add.append((name, sector, {"relation": "belongs_to", "type": "fibo"}))
+                        if sector not in seen_sectors:
+                            # Optimistically add sector -> MarketSector edge
+                            edges_to_add.append((sector, "MarketSector", {"relation": "is_a", "type": "fibo"}))
+                            seen_sectors.add(sector)
 
             # 2. Supply Chain Relations
             for rel in nodes_data.get("supply_chain_relations", []):
                 src = lei_to_name.get(rel.get("source_lei"))
                 tgt = lei_to_name.get(rel.get("target_lei"))
                 if src and tgt:
-                    self.graph.add_edge(src, tgt,
-                                        relation=rel.get("relationship_type", "connected_to"),
-                                        type="supply_chain",
-                                        criticality=rel.get("criticality_score"),
-                                        desc=rel.get("dependency_description"))
+                    edges_to_add.append((src, tgt, {
+                        "relation": rel.get("relationship_type", "connected_to"),
+                        "type": "supply_chain",
+                        "criticality": rel.get("criticality_score"),
+                        "desc": rel.get("dependency_description")
+                    }))
 
             # 3. Macro Indicators
             for macro in nodes_data.get("macro_indicators", []):
                 name = macro.get("name")
                 if name:
-                    self.graph.add_node(name, **macro, type="MacroIndicator")
+                    nodes_to_add.append((name, {**macro, "type": "MacroIndicator"}))
                     impacts = macro.get("impact_map", {})
                     for sector, impact_type in impacts.items():
-                        if sector not in self.graph:
-                            self.graph.add_edge(sector, "MarketSector", relation="is_a", type="fibo")
-
-                        self.graph.add_edge(name, sector,
-                                            relation="impacts",
-                                            impact_type=impact_type,
-                                            type="macro_impact")
+                        edges_to_add.append((sector, "MarketSector", {"relation": "is_a", "type": "fibo"}))
+                        edges_to_add.append((name, sector, {
+                            "relation": "impacts",
+                            "impact_type": impact_type,
+                            "type": "macro_impact"
+                        }))
 
             # 4. Crisis Scenarios
             sim_params = ukg_root.get("simulation_parameters", {})
@@ -204,27 +211,31 @@ class UnifiedKnowledgeGraph:
                     if 'type' in scenario_attrs:
                         scenario_attrs['scenario_type'] = scenario_attrs.pop('type')
 
-                    self.graph.add_node(name, **scenario_attrs, type="CrisisScenario")
+                    nodes_to_add.append((name, {**scenario_attrs, "type": "CrisisScenario"}))
                     # Link to affected nodes if explicitly listed
                     for affected_id in scenario.get("affected_nodes", []):
                         target_name = node_id_to_name.get(affected_id)
                         if target_name:
-                            self.graph.add_edge(name, target_name, relation="affects", type="scenario_impact")
+                            edges_to_add.append((name, target_name, {"relation": "affects", "type": "scenario_impact"}))
 
             # 5. Regulatory Rules
             reg_rules = ukg_root.get("regulatory_rules", {})
             for framework, rules in reg_rules.items():
                 framework_node = f"Framework: {framework.upper()}"
-                self.graph.add_node(framework_node, type="RegulatoryFramework")
+                nodes_to_add.append((framework_node, {"type": "RegulatoryFramework"}))
 
                 for rule in rules:
                     rule_name = rule.get("name")
                     if rule_name:
-                        self.graph.add_node(rule_name, **rule, type="Regulation")
-                        self.graph.add_edge(framework_node, rule_name, relation="contains", type="regulatory_structure")
-                        self.graph.add_edge(rule_name, "Company", relation="applies_to", type="regulatory_scope")
+                        nodes_to_add.append((rule_name, {**rule, "type": "Regulation"}))
+                        edges_to_add.append((framework_node, rule_name, {"relation": "contains", "type": "regulatory_structure"}))
+                        edges_to_add.append((rule_name, "Company", {"relation": "applies_to", "type": "regulatory_scope"}))
 
-            logger.info("Seed data ingestion complete.")
+            # Bolt Optimization: Use bulk add for performance
+            self.graph.add_nodes_from(nodes_to_add)
+            self.graph.add_edges_from(edges_to_add)
+
+            logger.info(f"Seed data ingestion complete. Added {len(nodes_to_add)} nodes and {len(edges_to_add)} edges.")
 
         except Exception as e:
             logger.error(f"Failed to ingest seed data: {e}", exc_info=True)
