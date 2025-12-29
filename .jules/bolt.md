@@ -31,3 +31,7 @@
 ## 2025-12-25 - [Optimized Loading Component Style Injection]
 **Learning:** React components that inject <style> tags on every render cause unnecessary style recalculations and layout thrashing. Moving static styles to global CSS files (e.g., index.css) is a simple but effective optimization.
 **Action:** Always check for <style> tags inside functional components during code review.
+
+## 2025-12-28 - [Duplicate Knowledge Graph Identity]
+**Learning:** A critical "trap" was identified where `core/engine/unified_knowledge_graph.py` and `core/v23_graph_engine/unified_knowledge_graph.py` contain identical but distinct classes. Optimizing one without the other leads to inconsistent system behavior depending on which module imports it.
+**Action:** When working on core components, always `grep` for potential duplicates or moved files to ensure the optimization is applied globally.
