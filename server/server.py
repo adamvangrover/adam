@@ -221,33 +221,27 @@ def retrieve_market_data(ticker: str) -> str:
 @mcp.tool()
 def execute_python_sandbox(code: str) -> str:
     """
-    Executes arbitrary Python code in a sandboxed environment.
-    WARNING: Use with caution.
+    Executes Python code in a secure, isolated sandbox.
+
+    Security Features:
+    - Static Analysis (AST) prevents dangerous imports and access to private attributes.
+    - Process Isolation contains memory and crashes.
+    - Restricted Globals limits accessible functions to safe subsets (math, json, pandas).
+    - Timeouts prevent infinite loops.
     """
-    # Simple restricted exec environment
-    # In a production environment, this should be much more locked down (e.g., separate process/container)
-
-    allowed_locals = {
-        "pd": pd,
-        "json": json,
-        "math": math,
-        "print": print
-    }
-
-    f = io.StringIO()
     try:
-        with redirect_stdout(f):
-             # We only allow local variables, no globals/builtins access ideally, but for functionality we need some
-             exec(code, {"__builtins__": __builtins__}, allowed_locals)
-        output = f.getvalue()
+        from core.security.sandbox import SecureSandbox
+        result = SecureSandbox.execute(code)
+        return json.dumps(result)
+    except ImportError:
         return json.dumps({
-            "status": "success",
-            "output": output
+            "status": "error",
+            "error": "SecureSandbox module not found. Please contact administrator."
         })
     except Exception as e:
         return json.dumps({
             "status": "error",
-            "error": str(e)
+            "error": f"Execution failed: {str(e)}"
         })
 
 @mcp.tool()
