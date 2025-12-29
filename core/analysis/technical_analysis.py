@@ -195,9 +195,9 @@ class TechnicalAnalyst:
         Returns:
             Loaded ML model object.
         """
-        import pickle
+        from core.security.safe_unpickler import safe_load
         with open(model_path, 'rb') as f:
-            model = pickle.load(f)
+            model = safe_load(f)
         return model
 
     def save_model(self, model: Any, model_path: str) -> None:
