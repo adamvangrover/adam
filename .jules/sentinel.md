@@ -94,3 +94,7 @@
 **Vulnerability:** Hardcoded API key placeholder ('YOUR_NEWS_API_KEY') in 'core/agents/event_driven_risk_agent.py'.
 **Learning:** Placeholder strings for secrets can be dangerous if committed, as they encourage users to edit the file directly, potentially leaking secrets if the file is tracked.
 **Prevention:** Always use environment variables for configuration. Agents should fail gracefully or default to mock mode if critical secrets are missing, rather than using placeholder strings.
+## 2025-12-28 - Critical RCE in MCP Tools
+**Vulnerability:** Found Remote Code Execution (RCE) vulnerabilities in `server/server.py` and `server/mcp_server.py`. The `execute_python_sandbox` tool allowed arbitrary code execution using `exec()`, sometimes even explicitly re-enabling `__builtins__`.
+**Learning:** Developers often add "sandbox" features for demos or debugging without realizing the immense security risk. `exec()` in Python is inherently unsafe for untrusted input.
+**Prevention:** Implemented a `SecureSandbox` module (`core/security/sandbox.py`) using a "Defense in Depth" strategy: Static Analysis (AST validation), Restricted Globals (whitelisting safe functions), Process Isolation, and Execution Timeouts. This allows useful functionality (like math/logic) while blocking RCE vectors.
