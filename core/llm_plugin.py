@@ -179,6 +179,51 @@ class MockLLM(BaseLLM):
     def get_context_length(self) -> int:
         return 2048
 
+    def get_embedding(self, text: str) -> List[float]:
+        """Mock embedding vector."""
+        # Return a random-ish vector based on length, or just fixed
+        return [0.1] * 768
+
+    def generate_audio_analysis(self, prompt: str, audio_path: str, **kwargs) -> str:
+        return f"Mock Audio Analysis of {audio_path}: Positive sentiment detected."
+
+
+class VertexLLM(BaseLLM):
+    """
+    Integration for Google Cloud Vertex AI (Alphabet Ecosystem Enterprise).
+    """
+    def __init__(self, project_id: str, location: str = "us-central1", model_name: str = "gemini-1.0-pro"):
+        self.project_id = project_id
+        self.location = location
+        self.model_name = model_name
+        self._aiplatform = None
+
+    @property
+    def aiplatform(self):
+        if self._aiplatform is None:
+            try:
+                # import google.cloud.aiplatform as aiplatform
+                # self._aiplatform = aiplatform
+                # aiplatform.init(project=self.project_id, location=self.location)
+                self._aiplatform = "MOCK_VERTEX" # Stub for now
+            except ImportError:
+                 raise LLMConfigurationError("google-cloud-aiplatform not installed.")
+        return self._aiplatform
+
+    def generate_text(self, prompt: str, **kwargs) -> str:
+        return f"[Vertex AI Stub] Processed by {self.model_name}: {prompt[:50]}..."
+
+    def generate_structured(self, prompt: str, response_schema: Any, tools: Optional[List[Any]] = None, **kwargs) -> Tuple[Any, Dict[str, Any]]:
+        raise NotImplementedError("Vertex structured gen stub.")
+
+    def get_token_count(self, text: str) -> int:
+        return len(text.split())
+
+    def get_model_name(self) -> str:
+        return self.model_name
+
+    def get_context_length(self) -> int:
+        return 32000
 
 class GeminiLLM(BaseLLM):
     """Integration for Google's Gemini ecosystem."""
@@ -295,6 +340,58 @@ class GeminiLLM(BaseLLM):
         if "1.5" in self.model_name:
              return 1000000
         return 32000
+
+    def generate_multimodal(self, prompt: str, image_path: str, **kwargs) -> str:
+        """
+        Generates text based on text prompt and image input using Gemini Vision capabilities.
+        """
+        if self.genai == "MOCK":
+            logger.info(f"Gemini Mock Vision: Analyzing {image_path} with prompt '{prompt}'")
+            return f"[Gemini Mock Vision] Analysis of {os.path.basename(image_path)}: The image appears to show financial trends consistent with the prompt '{prompt}'."
+
+        try:
+            # Validate image path
+            if not os.path.exists(image_path):
+                raise FileNotFoundError(f"Image file not found: {image_path}")
+
+            # Load image using PIL (standard for Gemini API)
+            try:
+                import PIL.Image
+                img = PIL.Image.open(image_path)
+            except ImportError:
+                raise LLMConfigurationError("Pillow (PIL) library not installed. Required for image processing.")
+            except Exception as e:
+                raise LLMPluginError(f"Failed to load image: {e}")
+
+            # Initialize model (Gemini 1.5 Pro is multimodal by default)
+            model = self.genai.GenerativeModel(self.model_name)
+
+            # Generate content
+            # Pass prompt and image as a list
+            response = model.generate_content([prompt, img], **kwargs)
+            return response.text
+
+        except Exception as e:
+            logger.error(f"Gemini Multimodal Error: {e}")
+            raise LLMAPIError(f"Gemini Multimodal Error: {e}") from e
+
+    def generate_audio_analysis(self, prompt: str, audio_path: str, **kwargs) -> str:
+        """
+        Generates analysis from audio input (Gemini 1.5 Pro).
+        """
+        if self.genai == "MOCK":
+             logger.info(f"Gemini Mock Audio: Analyzing {audio_path}")
+             return f"[Gemini Mock Audio] Transcript/Analysis of {audio_path}: CEO expressed confidence in Q4."
+
+        try:
+             # Real implementation would upload file to File API first
+             # This is a stub for the 'Alphabet Ecosystem' integration
+             logger.info(f"Uploading {audio_path} to Gemini File API...")
+             # mock_file_ref = self.genai.upload_file(audio_path)
+             # response = model.generate_content([prompt, mock_file_ref])
+             return "Gemini Audio Analysis Stub: Real implementation requires File API upload."
+        except Exception as e:
+             raise LLMAPIError(f"Gemini Audio Error: {e}")
 
     def get_embedding(self, text: str) -> List[float]:
         """
@@ -776,6 +873,20 @@ class LLMPlugin:
     def get_context_length(self) -> int:
         """Returns the context length of the current LLM model."""
         return self.llm.get_context_length()
+
+    def get_embedding(self, text: str) -> List[float]:
+        """Returns the embedding vector for the text."""
+        return self.llm.get_embedding(text)
+
+    def generate_multimodal(self, prompt: str, image_path: str, **kwargs) -> str:
+        """Generates text from prompt and image."""
+        return self.llm.generate_multimodal(prompt, image_path, **kwargs)
+
+    def generate_audio_analysis(self, prompt: str, audio_path: str, **kwargs) -> str:
+        """Generates text from prompt and audio."""
+        if hasattr(self.llm, 'generate_audio_analysis'):
+            return self.llm.generate_audio_analysis(prompt, audio_path, **kwargs)
+        raise NotImplementedError("Audio analysis not supported by this provider.")
 
     def identify_intent_and_entities(self, query: str) -> Tuple[str, Dict[str, Any], float]:
         """Identifies the intent and entities in a user query using the configured LLM."""

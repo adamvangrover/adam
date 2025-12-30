@@ -164,6 +164,15 @@ The prompt library has been updated with v2.0 standards, emphasizing structured 
 
 *   **Credit Risk Architect:** `prompt_library/v2_0_credit_risk_architect.md` - The flagship agent prompt using MCP standards.
 
+## Alphabet Ecosystem Integration (v24.0 Preview)
+
+The system is now integrating the full "Alphabet Ecosystem" (Gemini, Vertex AI, DeepMind Research) to create a Universal Financial Intelligence System.
+
+*   **Gemini Financial Report Analyzer:** (`core/analysis/gemini_analyzer.py`) Performs deep qualitative analysis, extracting risk factors, sentiment, and ESG metrics using Gemini 1.5 Pro.
+*   **Audio Financial Analyzer:** (`core/analysis/multimodal_analyst.py`) Analyzes earnings call audio for sentiment and speaker intent (Multimodal).
+*   **RAG Financial Analyzer:** (`core/analysis/rag_analyzer.py`) Uses a lightweight RAG engine to synthesize insights from large document sets.
+*   **AlphaAgent:** (`core/simulations/alpha_finance.py`) An RL agent trained in the `AlphaFinance` environment for portfolio optimization (DeepMind AlphaZero inspiration).
+
 ## Quantum-AI Convergence (New Capabilities)
 
 Following the strategic analysis in `docs/whitepapers/quantum_ai_convergence.md`, the following modules have been added to the system:
