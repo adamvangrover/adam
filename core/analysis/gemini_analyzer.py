@@ -126,11 +126,46 @@ class GeminiFinancialReportAnalyzer(BaseFinancialAnalyzer):
     async def analyze_image(self, image_path: str, context: str = "") -> Dict[str, Any]:
         """
         Asynchronously analyzes a financial image (chart, table).
-        For future multimodal alignment.
+        Uses Gemini Vision via LLMPlugin.
         """
-        # Placeholder for actual implementation using Gemini Vision
-        logger.info(f"Multimodal analysis requested for {image_path}. Feature pending.")
-        return {"status": "not_implemented", "description": "Image analysis feature coming in v24.0"}
+        prompt = (
+            f"Analyze this financial image. Context: {context}\n"
+            f"Provide a structured summary including:\n"
+            f"- Chart Type / Data Type\n"
+            f"- Key Trends or Data Points\n"
+            f"- Anomalies\n"
+            f"- Strategic Implications\n"
+            f"Return the result as a JSON object."
+        )
+
+        try:
+            loop = asyncio.get_running_loop()
+            # Offload blocking call to thread
+            response_text = await loop.run_in_executor(
+                None,
+                lambda: self.llm.generate_multimodal(prompt=prompt, image_path=image_path)
+            )
+
+            # Attempt to parse JSON if the model followed instructions
+            # Models often wrap JSON in ```json blocks
+            clean_text = response_text.replace("```json", "").replace("```", "").strip()
+            try:
+                result_json = json.loads(clean_text)
+                return result_json
+            except json.JSONDecodeError:
+                # Fallback to returning raw text wrapped in dict
+                logger.warning("Gemini Vision response was not valid JSON. Returning raw text.")
+                return {
+                    "raw_analysis": response_text,
+                    "parsing_error": "Could not parse JSON response"
+                }
+
+        except Exception as e:
+            logger.error(f"Error during Gemini image analysis: {e}")
+            return {
+                "error": str(e),
+                "status": "failed"
+            }
 
 if __name__ == "__main__":
     # Test block
