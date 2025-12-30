@@ -11,6 +11,7 @@ from scipy import stats  # For statistical calculations (e.g., for DCF)
 from typing import Dict, Any, Optional, Union, List
 from core.agents.agent_base import AgentBase
 from core.system.memory_manager import VectorMemoryManager
+from core.analysis.gemini_analyzer import GeminiFinancialReportAnalyzer  # Import the new analyzer
 from semantic_kernel import Kernel  # Added for type hinting
 import asyncio  # Added import
 import yaml  # Added for example usage block
@@ -67,6 +68,15 @@ class FundamentalAnalystAgent(AgentBase):
         self.persona = self.config.get('persona', "Financial Analyst")
         self.description = self.config.get('description', "Performs fundamental company analysis.")
         self.memory_manager = VectorMemoryManager()
+
+        # Initialize Gemini Analyzer
+        # We try to use it if available, gracefully fallback if not configured
+        try:
+            self.gemini_analyzer = GeminiFinancialReportAnalyzer()
+        except Exception as e:
+            logging.warning(f"Could not initialize GeminiFinancialReportAnalyzer: {e}")
+            self.gemini_analyzer = None
+
         # The 'peers' key in self.config (e.g., ['DataRetrievalAgent']) is used by AgentOrchestrator
         # to set up connections via self.add_peer_agent(peer_instance)
 
@@ -111,6 +121,21 @@ class FundamentalAnalystAgent(AgentBase):
             financial_health = self.assess_financial_health(financial_ratios)
             raw_metrics = self.extract_raw_metrics(company_data)
 
+            # Enhanced Analysis with Gemini (if applicable)
+            gemini_insights = None
+            if self.gemini_analyzer:
+                # Simulate extracting text from "qualitative_company_info" or similar fields
+                qualitative_info = company_data.get('qualitative_company_info', {})
+                # Flatten dict to string for analysis
+                report_text = json.dumps(qualitative_info, indent=2)
+                if len(report_text) > 20: # Arbitrary check for content
+                     logging.info(f"Running Gemini analysis for {company_id}...")
+                     # Use await for the async method call
+                     gemini_analysis_result = await self.gemini_analyzer.analyze_report(report_text, context=f"Company: {company_id}")
+                     gemini_insights = gemini_analysis_result.model_dump()
+                else:
+                    logging.info("Not enough qualitative data for Gemini analysis.")
+
             analysis_summary = await self.generate_analysis_summary(
                 company_id,
                 financial_ratios,
@@ -118,7 +143,8 @@ class FundamentalAnalystAgent(AgentBase):
                 comps_valuation,
                 financial_health,
                 enterprise_value_result,
-                history_context=history_context
+                history_context=history_context,
+                gemini_insights=gemini_insights
             )
 
             # Save to Memory
@@ -137,6 +163,7 @@ class FundamentalAnalystAgent(AgentBase):
                 "enterprise_value": enterprise_value_result,
                 "financial_health": financial_health,
                 "analysis_summary": analysis_summary,
+                "gemini_insights": gemini_insights,
                 "error": None
             }
             logging.debug(f"FAA_XAI:EXECUTE_OUTPUT: {result_package}")
@@ -296,7 +323,7 @@ class FundamentalAnalystAgent(AgentBase):
     async def generate_analysis_summary(self, company_id: str, financial_ratios: Dict[str, float],
                                         dcf_valuation: Optional[float], comps_valuation: Optional[float],
                                         financial_health: str, enterprise_value: Optional[float],
-                                        history_context: str = "") -> str:
+                                        history_context: str = "", gemini_insights: Optional[Dict] = None) -> str:
         # ... (existing summary generation logic, SK or fallback) ...
         # This method's logging is mostly for SK call, fallback summary is straightforward
         # For XAI, the inputs to this are already logged by `execute` and prior calc methods.
@@ -321,6 +348,10 @@ class FundamentalAnalystAgent(AgentBase):
                     "Provide a brief overall conclusion based on the data."
                 )
 
+                gemini_summary = ""
+                if gemini_insights:
+                    gemini_summary = f"\nAI Insights (Gemini):\n{gemini_insights.get('executive_summary', '')}\nSentiment: {gemini_insights.get('management_sentiment', '')}"
+
                 input_vars = {
                     "company_id": company_id,
                     "financial_health": financial_health,
@@ -329,7 +360,7 @@ class FundamentalAnalystAgent(AgentBase):
                     "comps_valuation_summary": comps_summary,
                     "enterprise_value_summary": enterprise_value_summary_str,
                     "user_provided_key_insights_or_conclusion_prompt": user_prompt_for_conclusion,
-                    "history_context": history_context
+                    "history_context": history_context + gemini_summary
                 }
 
                 logging.info(
@@ -386,6 +417,30 @@ class FundamentalAnalystAgent(AgentBase):
         recovery_rate = self.estimate_recovery_rate(financial_ratios if financial_ratios else {}, default_likelihood)
         if recovery_rate is not None:
             summary += f"Estimated Recovery Rate (in default): {recovery_rate:.2%}\n"
+
+        if gemini_insights:
+             summary += "\n--- AI Insights (Gemini) ---\n"
+             summary += f"Management Sentiment: {gemini_insights.get('management_sentiment', 'N/A')}\n"
+             summary += f"Executive Summary: {gemini_insights.get('executive_summary', 'N/A')}\n"
+
+             if gemini_insights.get('forward_looking_statements'):
+                  summary += "Forward Guidance:\n"
+                  for item in gemini_insights['forward_looking_statements'][:3]: # Limit to top 3
+                      summary += f"  - {item}\n"
+
+             if gemini_insights.get('risk_factors'):
+                 summary += "Key Risks:\n"
+                 for rf in gemini_insights['risk_factors']:
+                     summary += f"  - {rf['description']} (Severity: {rf['severity']}, Horizon: {rf['time_horizon']})\n"
+
+             if gemini_insights.get('competitor_mentions'):
+                 summary += "Competitor Dynamics:\n"
+                 for comp in gemini_insights['competitor_mentions']:
+                     summary += f"  - {comp['name']}: {comp['relationship']}\n"
+
+             if gemini_insights.get('esg_analysis'):
+                 esg = gemini_insights['esg_analysis']
+                 summary += f"ESG Scorecard: Env={esg.get('environmental_score')}, Soc={esg.get('social_score')}, Gov={esg.get('governance_score')}\n"
 
         summary += "\n(Summary generated using fallback string formatting.)"
         logging.debug(f"FAA_XAI:GEN_SUMMARY_FALLBACK_OUTPUT: '{summary}'")
@@ -669,6 +724,11 @@ if __name__ == '__main__':
         mock_kernel_instance = MockKernel()
         agent_with_kernel_and_mock_a2a = FundamentalAnalystAgent(
             config=agent_specific_config, kernel=mock_kernel_instance)
+
+        # Mock Peer for A2A check
+        class MockPeer:
+             name = 'DataRetrievalAgent'
+        agent_with_kernel_and_mock_a2a.add_peer_agent(MockPeer())
 
         with patch.object(agent_with_kernel_and_mock_a2a, 'send_message', new=mock_send_message):
             print("\n--- Test with SK Kernel and Mocked A2A (ABC_TEST) ---")

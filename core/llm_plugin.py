@@ -80,6 +80,20 @@ class BaseLLM(ABC):
         """Returns the LLM's context length (token limit)."""
         pass
 
+    def generate_multimodal(self, prompt: str, image_path: str, **kwargs) -> str:
+        """
+        Generates text based on text prompt and image input.
+        Future alignment for Multimodal Agents.
+        """
+        raise NotImplementedError("Multimodal generation not supported by this provider.")
+
+    def get_embedding(self, text: str) -> List[float]:
+        """
+        Returns the vector embedding for the text.
+        Future alignment for RAG/Vector Search integration.
+        """
+        raise NotImplementedError("Embeddings not supported by this provider.")
+
     # Optional interface for intent detection (can be overridden by specific models)
     def identify_intent_and_entities(self, query: str) -> Tuple[str, Dict[str, Any], float]:
         """Optional method for specialized intent detection."""
@@ -167,9 +181,9 @@ class MockLLM(BaseLLM):
 
 
 class GeminiLLM(BaseLLM):
-    """Integration for Google's Gemini 3 ecosystem."""
+    """Integration for Google's Gemini ecosystem."""
 
-    def __init__(self, api_key: str, model_name: str = "gemini-3-pro"):
+    def __init__(self, api_key: str, model_name: str = "gemini-1.5-pro"):
         self.api_key = api_key
         self.model_name = model_name
         self._genai = None  # Lazy init
@@ -197,7 +211,9 @@ class GeminiLLM(BaseLLM):
             # Handle parameters like thinking_level
             generation_config = {}
             if "thinking_level" in kwargs:
-                generation_config["thinking_level"] = kwargs["thinking_level"]
+                # Assuming API supports it, or filter it out if not
+                # generation_config["thinking_level"] = kwargs["thinking_level"]
+                pass
 
             response = model.generate_content(prompt, generation_config=generation_config)
             return response.text
@@ -222,30 +238,38 @@ class GeminiLLM(BaseLLM):
 
         try:
             # Real API Implementation
-            model = self.genai.GenerativeModel(self.model_name, tools=tools)
+            # Note: Gemini structured output configuration varies by SDK version.
+            # We assume a pattern where we can pass response_mime_type and schema.
 
+            # Using standard generation config for JSON
             generation_config = {
                 "response_mime_type": "application/json",
-                "response_schema": response_schema,
-                "thinking_level": thinking_level
             }
 
-            if thought_signature:
-                generation_config["thought_signature"] = thought_signature
+            model = self.genai.GenerativeModel(self.model_name, tools=tools)
 
-            response = model.generate_content(prompt, generation_config=generation_config)
+            full_prompt = prompt
+            if response_schema:
+                 # Provide schema in prompt as fallback or primary if API doesn't support direct schema injection easily
+                 # But newer Gemini SDK supports response_schema in generation_config.
+                 # Let's try to pass it if possible, or append to prompt.
+                 json_schema = response_schema.model_json_schema()
+                 full_prompt += f"\n\nPlease output JSON strictly adhering to this schema:\n{json.dumps(json_schema)}"
 
-            # Parse result (Hypothetical SDK support)
+            response = model.generate_content(full_prompt, generation_config=generation_config)
+
+            # Parse result
             try:
-                result_obj = response.parsed
-            except:
-                json_data = json.loads(response.text)
+                # Attempt to clean potential markdown fencing
+                text_response = response.text.replace("```json", "").replace("```", "").strip()
+                json_data = json.loads(text_response)
                 result_obj = response_schema(**json_data)
-
-            new_signature = getattr(response, "thought_signature", "simulated_new_signature")
+            except Exception as inner_e:
+                logger.warning(f"Failed to parse structured response from Gemini: {inner_e}")
+                raise LLMAPIError(f"Gemini Structured Parsing Error: {inner_e}")
 
             metadata = {
-                "thought_signature": new_signature,
+                "thought_signature": "gemini_stateless", # Gemini is stateless unless using chat session
                 "usage": response.usage_metadata if hasattr(response, 'usage_metadata') else {}
             }
 
@@ -267,7 +291,30 @@ class GeminiLLM(BaseLLM):
         return self.model_name
 
     def get_context_length(self) -> int:
-        return 1000000  # Gemini has huge context
+        # 1M tokens for Gemini 1.5 Pro
+        if "1.5" in self.model_name:
+             return 1000000
+        return 32000
+
+    def get_embedding(self, text: str) -> List[float]:
+        """
+        Native support for Gemini Embeddings.
+        """
+        if self.genai == "MOCK":
+            # Return dummy 768-dim vector
+            return [0.01] * 768
+
+        try:
+            result = self.genai.embed_content(
+                model="models/embedding-001",
+                content=text,
+                task_type="retrieval_document",
+                title="Embedding request"
+            )
+            return result['embedding']
+        except Exception as e:
+            logger.error(f"Gemini Embedding Error: {e}")
+            raise LLMAPIError(f"Gemini Embedding Error: {e}")
 
 
 class OpenAILLM(BaseLLM):
@@ -648,9 +695,15 @@ class LLMPlugin:
 
         # Validation for keys
         if not api_key and provider not in ["huggingface", "mock", "gemini"]:
-            # Gemini allows "MOCK" behavior internally without key, others might fail
+            # Gemini allows "MOCK" behavior internally without key if package missing, but here we enforce key check if provider is explicitly gemini and package exists
+            # Actually, let's keep it consistent:
             raise LLMConfigurationError(
                 f"API key for {provider} ({api_key_env_var}) not found in environment variables.")
+
+        # Special handling for Gemini mock fallback if key is missing
+        if provider == "gemini" and not api_key:
+             logger.warning("GEMINI_API_KEY not found. Defaulting to Mock behavior for Gemini.")
+             api_key = "mock_key"
 
         # Get model name defaults
         default_model_name = "default-model"
@@ -661,7 +714,7 @@ class LLMPlugin:
         elif provider == "cohere":
             default_model_name = "command"
         elif provider == "gemini":
-            default_model_name = "gemini-3-pro"
+            default_model_name = "gemini-1.5-pro"
         elif provider == "mock":
             default_model_name = "mock-model"
 
@@ -673,8 +726,7 @@ class LLMPlugin:
         elif provider == "mock":
             return MockLLM(model_name=model_name)
         elif provider == "gemini":
-            # Pass "mock_key" if not present so init doesn't fail before mock logic triggers
-            return GeminiLLM(api_key=api_key or "mock_key", model_name=model_name)
+            return GeminiLLM(api_key=api_key, model_name=model_name)
         else:
             return provider_map[provider](api_key=api_key, model_name=model_name)
 

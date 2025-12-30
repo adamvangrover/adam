@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     openai_api_key: Optional[str] = None
     anthropic_api_key: Optional[str] = None
     cohere_api_key: Optional[str] = None
+    google_api_key: Optional[str] = None  # Added for Gemini support
 
     # Database / Infrastructure
     postgres_user: Optional[str] = None
