@@ -4,6 +4,24 @@ This document provides a comprehensive catalog of all the agents in the ADAM sys
 
 ---
 
+## `repo_guardian_agent`
+
+*   **File:** `core/agents/governance/repo_guardian/agent.py`
+*   **Description:** The "Gatekeeper" of the repository. This governance agent reviews incoming Pull Requests (or diffs) against enterprise-grade standards, checking for security, quality, compatibility, and best practices. It combines deterministic static analysis (heuristics) with LLM-based reasoning.
+*   **Configuration:** `config/agents.yaml`
+    *   `strictness`: Level of strictness for reviews (1-10).
+    *   `focus_areas`: List of areas to focus on (e.g., ["security", "backward_compatibility"]).
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.AgentBase`.
+*   **Agent Forge and Lifecycle:** Created on demand during CI/CD pipelines or manually via CLI.
+*   **Model Context Protocol (MCP):** Stateless review process, but outputs structured `ReviewDecision` objects.
+*   **Tools and Hooks:**
+    *   **Tools:** `GitTools`, `StaticAnalyzer`.
+*   **Compute and Resource Requirements:** Low to Medium (depending on LLM usage).
+*   **Dependencies:** `pydantic`, `jinja2`, `semantic_kernel` (optional).
+*   **Developer Notes:** Located in its own modular subdirectory `core/agents/governance/repo_guardian/`. Can be run standalone via `run_guardian.py`.
+
+---
+
 ## `agent_forge_agent`
 
 *   **File:** `core/agents/agent_forge.py`
