@@ -249,21 +249,32 @@ class UnifiedKnowledgeGraph:
 
     def ingest_financial_data(self, companies: List[Dict[str, Any]]):
         """Ingests financial entities."""
+        # Bolt Optimization: Batch processing to reduce graph update overhead
+        nodes_to_add = []
+        edges_to_add = []
+        seen_sectors = set()
+
         for company in companies:
             node_id = company.get("symbol") or company.get("company_id")
             if not node_id:
                 continue
 
-            self.graph.add_node(
-                node_id,
-                type="Company",
-                sector=company.get("sector"),
-                description=company.get("description")
-            )
+            nodes_to_add.append((node_id, {
+                "type": "Company",
+                "sector": company.get("sector"),
+                "description": company.get("description")
+            }))
+
             # Add sector node
-            if company.get("sector"):
-                self.graph.add_node(company["sector"], type="Sector")
-                self.graph.add_edge(node_id, company["sector"], relation="belongs_to")
+            sector = company.get("sector")
+            if sector:
+                if sector not in seen_sectors:
+                    nodes_to_add.append((sector, {"type": "Sector"}))
+                    seen_sectors.add(sector)
+                edges_to_add.append((node_id, sector, {"relation": "belongs_to"}))
+
+        self.graph.add_nodes_from(nodes_to_add)
+        self.graph.add_edges_from(edges_to_add)
 
     def ingest_memory_vectors(self, memory_entries: List[Dict[str, Any]]):
         """Ingests past analysis as Memory Nodes."""
