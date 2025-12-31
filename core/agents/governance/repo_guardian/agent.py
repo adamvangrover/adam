@@ -12,10 +12,10 @@ except ImportError:
     KernelArguments = Any
 
 from core.agents.governance.repo_guardian.schemas import (
-    PullRequest, FileDiff, ReviewDecision, CodeReviewParams, ReviewDecisionStatus, ReviewComment
+    PullRequest, FileDiff, ReviewDecision, CodeReviewParams, ReviewDecisionStatus, ReviewComment, AnalysisResult
 )
 from core.agents.governance.repo_guardian.prompts import SYSTEM_PROMPT, REVIEW_PROMPT_TEMPLATE
-from core.agents.governance.repo_guardian.tools import GitTools, StaticAnalyzer
+from core.agents.governance.repo_guardian.tools import GitTools, StaticAnalyzer, SecurityScanner
 from core.prompting.base_prompt_plugin import BasePromptPlugin
 
 # Initialize logger
@@ -32,6 +32,7 @@ class RepoGuardianAgent(AgentBase):
         super().__init__(config, constitution, kernel)
         self.tools = GitTools()
         self.analyzer = StaticAnalyzer()
+        self.scanner = SecurityScanner()
 
         # Override system persona if needed, or rely on prompt injection
         self.system_prompt = SYSTEM_PROMPT
@@ -67,20 +68,21 @@ class RepoGuardianAgent(AgentBase):
             logger.info(f"RepoGuardian starting review for PR {pr.pr_id} by {pr.author}")
 
             # 2. Heuristic Analysis (Pre-LLM)
-            heuristic_comments = self._run_heuristics(pr)
+            heuristic_comments, analysis_results = self._run_heuristics(pr)
 
             # 3. LLM Review
-            decision = await self._llm_review(pr, params)
+            decision = await self._llm_review(pr, params, analysis_results)
 
             # 4. Merge Heuristics into Decision
             decision.comments.extend(heuristic_comments)
+            decision.analysis_results = analysis_results
 
             # Adjust score/status based on critical heuristic failures
             critical_issues = [c for c in heuristic_comments if c.severity == "critical"]
-            if critical_issues and decision.status == ReviewDecisionStatus.APPROVE:
-                decision.status = ReviewDecisionStatus.REQUEST_CHANGES
+            if critical_issues:
+                decision.status = ReviewDecisionStatus.REJECT if any(c.message.startswith("SECURITY") for c in critical_issues) else ReviewDecisionStatus.REQUEST_CHANGES
                 decision.summary += "\n\n[AUTOMATED] Decision downgraded due to critical heuristic failures."
-                decision.score = max(0, decision.score - 20)
+                decision.score = max(0, decision.score - (25 * len(critical_issues)))
 
             logger.info(f"Review complete for PR {pr.pr_id}: {decision.status}")
             return decision
@@ -89,7 +91,7 @@ class RepoGuardianAgent(AgentBase):
             logger.error(f"Error in RepoGuardian execution: {e}", exc_info=True)
             # Fallback decision
             return ReviewDecision(
-                pr_id=kwargs.get("pr", {}).get("pr_id", "unknown") if kwargs.get("pr") else "unknown",
+                pr_id=kwargs.get("pr", {}).get("pr_id", "unknown") if isinstance(kwargs.get("pr"), dict) else "unknown",
                 status=ReviewDecisionStatus.REJECT,
                 summary=f"Internal Agent Error: {str(e)}",
                 score=0,
@@ -100,11 +102,14 @@ class RepoGuardianAgent(AgentBase):
                 )]
             )
 
-    def _run_heuristics(self, pr: PullRequest) -> List[ReviewComment]:
+    def _run_heuristics(self, pr: PullRequest) -> tuple[List[ReviewComment], Dict[str, AnalysisResult]]:
         """Runs deterministic checks."""
         comments = []
+        results = {}
 
         for file in pr.files:
+            file_results = AnalysisResult()
+
             # Check for large files
             if len(file.diff_content) > 50000:
                 comments.append(ReviewComment(
@@ -113,7 +118,53 @@ class RepoGuardianAgent(AgentBase):
                     message="File diff is unusually large (>50KB). Consider breaking this into smaller commits."
                 ))
 
-            # Check for Pydantic V2 usage in schemas
+            # Security Scan
+            findings = self.scanner.scan_content(file.diff_content)
+            if findings:
+                file_results.security_findings = findings
+                for finding in findings:
+                    comments.append(ReviewComment(
+                        filepath=file.filepath,
+                        severity="critical",
+                        message=f"SECURITY: Potential {finding['type']} detected: {finding['snippet']}"
+                    ))
+
+            # Python-specific AST Analysis
+            if file.filepath.endswith(".py") and file.change_type != "delete":
+                # Only analyze if we have content. For diffs, this is tricky as valid python might not be in diff chunks.
+                # Ideally, we reconstruct the full file, but for now we try to parse the new_content if provided,
+                # or just look for patterns in diff if that fails.
+
+                content_to_analyze = file.new_content if file.new_content else file.diff_content
+                # Heuristic: if analyzing diff content, AST might fail.
+                # We can try to clean it (remove +/-, skip headers) or just use naive checks for diffs.
+
+                # If we have the full new content, use AST
+                if file.new_content:
+                    report = self.analyzer.analyze_python_code(file.new_content, file.filepath)
+
+                    file_results.missing_docstrings = report["missing_docstrings"]
+                    file_results.missing_type_hints = report["missing_type_hints"]
+                    file_results.dangerous_functions = report["dangerous_functions"]
+
+                    for issue in report["dangerous_functions"]:
+                        comments.append(ReviewComment(
+                            filepath=file.filepath,
+                            severity="warning",
+                            message=f"Usage of dangerous function detected: {issue}"
+                        ))
+
+                # Fallback Naive Checks on Diff Content if AST didn't run (e.g. no new_content)
+                else:
+                    if "def " in file.diff_content and "->" not in file.diff_content:
+                         file_results.missing_type_hints.append("Potentially missing return annotation (heuristic)")
+                         comments.append(ReviewComment(
+                            filepath=file.filepath,
+                            severity="suggestion",
+                            message="Some function definitions appear to be missing return type hints."
+                        ))
+
+            # Pydantic V2 Check (Naive)
             if "pydantic" in file.diff_content and "BaseModel" in file.diff_content:
                 if "validator" in file.diff_content and "field_validator" not in file.diff_content:
                      comments.append(ReviewComment(
@@ -122,26 +173,20 @@ class RepoGuardianAgent(AgentBase):
                         message="Detected potential legacy Pydantic V1 'validator'. Use V2 'field_validator' if possible."
                     ))
 
-            # Check for strict typing
-            if file.filepath.endswith(".py") and file.change_type != "delete":
-                if "def " in file.diff_content and "->" not in file.diff_content:
-                     comments.append(ReviewComment(
-                        filepath=file.filepath,
-                        severity="suggestion",
-                        message="Some function definitions appear to be missing return type hints."
-                    ))
+            results[file.filepath] = file_results
 
-        return comments
+        return comments, results
 
-    async def _llm_review(self, pr: PullRequest, params: CodeReviewParams) -> ReviewDecision:
+    async def _llm_review(self, pr: PullRequest, params: CodeReviewParams, analysis_results: Dict[str, AnalysisResult]) -> ReviewDecision:
         """Delegates the deep understanding to the LLM."""
 
         # Prepare the Prompt using simple Jinja2 rendering (simulated here or via existing tools)
-        # For robustness, we'll do simple f-string/replace if Jinja isn't handy, but we assume Jinja2 is installed per memory.
         from jinja2 import Template
 
         template = Template(REVIEW_PROMPT_TEMPLATE)
-        user_prompt = template.render(pr=pr, params=params)
+        # Convert Pydantic objects to dicts for Jinja
+        analysis_dicts = {k: v.model_dump() for k, v in analysis_results.items()}
+        user_prompt = template.render(pr=pr, params=params, analysis_results=analysis_dicts)
 
         # Mock LLM call if no kernel
         if not self.kernel:
@@ -151,24 +196,13 @@ class RepoGuardianAgent(AgentBase):
                 status=ReviewDecisionStatus.APPROVE,
                 summary="[MOCK] No Kernel. Changes look structurally okay based on heuristics.",
                 score=80,
-                comments=[]
+                comments=[],
+                analysis_results=analysis_results
             )
 
-        # Call LLM via Kernel (Assuming we have a suitable function registered or we use the prompt directly)
+        # Call LLM via Kernel
         try:
-            # This relies on the agent being configured with a chat completion service
-            # We construct a full prompt with System + User
             full_prompt = f"{self.system_prompt}\n\n{user_prompt}"
-
-            # Note: This is a simplification. In a real v23/v22 setup, we'd use a specific prompt function.
-            # Assuming 'kernel.invoke_prompt' or similar exists for ad-hoc queries.
-            # If not, we fall back to a registered function if available.
-
-            # Attempting standard SK invocation
-            # Using a hypothetical "ChatPlugin" or "WriterPlugin"
-
-            # For now, let's assume we use the 'Prompt-as-Code' style wrapper if we were fully integrated.
-            # Here I will try to use `kernel.invoke_prompt` if it exists (SK > 1.0)
 
             result_str = ""
             if hasattr(self.kernel, 'invoke_prompt'):
@@ -177,17 +211,18 @@ class RepoGuardianAgent(AgentBase):
                  result_str = str(result)
             else:
                 # Fallback or SK < 1.0
-                # We might need to register the function first
                 sk_func = self.kernel.create_semantic_function(full_prompt, max_tokens=2000, temperature=0.2)
                 result = await self.kernel.invoke(sk_func)
                 result_str = str(result)
 
             # Parse JSON from result
-            # Clean up markdown code blocks if present
             cleaned_result = result_str.replace("```json", "").replace("```", "").strip()
 
             try:
                 data = json.loads(cleaned_result)
+                # Ensure analysis results are passed through if LLM didn't include them
+                if "analysis_results" not in data:
+                    data["analysis_results"] = analysis_results
                 return ReviewDecision(**data)
             except json.JSONDecodeError:
                 logger.error(f"Failed to parse LLM response as JSON: {result_str}")
@@ -196,7 +231,8 @@ class RepoGuardianAgent(AgentBase):
                     status=ReviewDecisionStatus.REQUEST_CHANGES,
                     summary="Agent failed to parse LLM review. Please check logs.",
                     score=50,
-                    comments=[ReviewComment(filepath="meta", severity="warning", message="LLM output was not valid JSON.")]
+                    comments=[ReviewComment(filepath="meta", severity="warning", message="LLM output was not valid JSON.")],
+                    analysis_results=analysis_results
                 )
 
         except Exception as e:

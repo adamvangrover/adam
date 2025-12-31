@@ -1,5 +1,5 @@
 from typing import List, Optional, Dict, Any, Literal
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
 from enum import Enum
 
@@ -51,6 +51,14 @@ class ReviewDecisionStatus(str, Enum):
     REQUEST_CHANGES = "request_changes"
     REJECT = "reject"
 
+class AnalysisResult(BaseModel):
+    """Result of static code analysis."""
+    missing_docstrings: List[str] = []
+    missing_type_hints: List[str] = []
+    dangerous_functions: List[str] = []
+    security_findings: List[Dict[str, str]] = []
+    model_config = ConfigDict(extra="allow")
+
 class ReviewDecision(BaseModel):
     pr_id: str = Field(..., description="ID of the PR being reviewed")
     status: ReviewDecisionStatus = Field(..., description="Final decision")
@@ -58,6 +66,7 @@ class ReviewDecision(BaseModel):
     comments: List[ReviewComment] = Field(default_factory=list, description="Detailed comments")
     score: int = Field(..., ge=0, le=100, description="Quality score (0-100)")
     automated_fixes: Optional[List[Dict[str, str]]] = Field(None, description="List of automated patches if generated")
+    analysis_results: Optional[Dict[str, AnalysisResult]] = Field(None, description="Raw analysis data per file")
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 class RepoState(BaseModel):
@@ -66,3 +75,4 @@ class RepoState(BaseModel):
     test_coverage_percent: Optional[float] = None
     lint_score: Optional[float] = None
     open_issues: int = 0
+    security_vulnerabilities: int = 0
