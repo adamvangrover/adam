@@ -84,13 +84,54 @@ AGENT_CLASSES = {
     "DataRetrievalAgent": "core.agents.data_retrieval_agent",
     "ResultAggregationAgent": "core.agents.result_aggregation_agent",
     "ReportGeneratorAgent": "core.agents.report_generator_agent",
-    "SNCAnalystAgent": "core.agents.snc_analyst_agent",  # Added snc_analyst_agent
+    "SNCAnalystAgent": "core.agents.snc_analyst_agent",
     "BehavioralEconomicsAgent": "core.agents.behavioral_economics_agent",
     "MetaCognitiveAgent": "core.agents.meta_cognitive_agent",
     "NewsBotAgent": "core.agents.news_bot",
     "NexusAgent": NexusAgent,
     "IngestionAgent": AgentBase,  # Using AgentBase as a placeholder
     "AuditorAgent": AgentBase,  # Using AgentBase as a placeholder
+
+    # Aliases for snake_case configuration compatibility
+    "market_sentiment_agent": "core.agents.market_sentiment_agent",
+    "macroeconomic_analysis_agent": "core.agents.macroeconomic_analysis_agent",
+    "geopolitical_risk_agent": "core.agents.geopolitical_risk_agent",
+    "industry_specialist_agent": "core.agents.industry_specialist_agent",
+    "fundamental_analyst_agent": "core.agents.fundamental_analyst_agent",
+    "technical_analyst_agent": "core.agents.technical_analyst_agent",
+    "risk_assessment_agent": "core.agents.risk_assessment_agent",
+    "newsletter_layout_specialist_agent": "core.agents.newsletter_layout_specialist_agent",
+    "data_verification_agent": "core.agents.data_verification_agent",
+    "lexica_agent": "core.agents.lexica_agent",
+    "archive_manager_agent": "core.agents.archive_manager_agent",
+    "agent_forge": "core.agents.agent_forge",
+    "prompt_tuner": "core.agents.prompt_tuner",
+    "code_alchemist": "core.agents.code_alchemist",
+    "lingua_maestro": "core.agents.lingua_maestro",
+    "sense_weaver": "core.agents.sense_weaver",
+    "query_understanding_agent": "core.agents.query_understanding_agent",
+    "data_retrieval_agent": "core.agents.data_retrieval_agent",
+    "result_aggregation_agent": "core.agents.result_aggregation_agent",
+    "report_generator_agent": "core.agents.report_generator_agent",
+    "snc_analyst_agent": "core.agents.snc_analyst_agent",
+    "behavioral_economics_agent": "core.agents.behavioral_economics_agent",
+    "meta_cognitive_agent": "core.agents.meta_cognitive_agent",
+    "news_bot_agent": "core.agents.news_bot",
+
+    # Placeholders for agents that might be missing or under development but referenced in config
+    "echo_agent": AgentBase,
+    "portfolio_optimization_agent": AgentBase,
+    "data_visualization_agent": AgentBase,
+    "natural_language_generation_agent": AgentBase,
+    "machine_learning_model_training_agent": AgentBase,
+    "legal_agent": AgentBase,
+    "financial_modeling_agent": AgentBase,
+    "supply_chain_risk_agent": AgentBase,
+    "algo_trading_agent": AgentBase,
+    "discussion_chair_agent": AgentBase,
+    "anomaly_detection_agent": AgentBase,
+    "regulatory_compliance_agent": AgentBase,
+    "credit_sentry_agents": AgentBase,
 }
 
 
