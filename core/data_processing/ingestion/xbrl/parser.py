@@ -7,7 +7,8 @@ and mapping them to the internal FIBO-grounded ontology.
 It prioritizes accuracy over speed, ensuring "Gold Standard" data ingestion.
 """
 
-import xml.etree.ElementTree as ET
+# 🛡️ Sentinel: Use defusedxml to prevent XXE (XML External Entity) attacks
+import defusedxml.ElementTree as ET
 from typing import Dict, Any, Optional
 
 
