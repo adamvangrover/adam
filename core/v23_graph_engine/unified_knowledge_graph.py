@@ -278,17 +278,24 @@ class UnifiedKnowledgeGraph:
 
     def ingest_memory_vectors(self, memory_entries: List[Dict[str, Any]]):
         """Ingests past analysis as Memory Nodes."""
+        # Bolt Optimization: Batch processing for memory nodes
+        nodes_to_add = []
+        edges_to_add = []
+
         for entry in memory_entries:
             node_id = f"Memory::{entry['company_id']}::{entry['timestamp']}"
-            self.graph.add_node(
-                node_id,
-                type="Memory",
-                summary=entry.get("analysis_summary"),
-                timestamp=entry.get("timestamp")
-            )
+            nodes_to_add.append((node_id, {
+                "type": "Memory",
+                "summary": entry.get("analysis_summary"),
+                "timestamp": entry.get("timestamp")
+            }))
+
             # Link to Company
             if entry.get("company_id"):
-                self.graph.add_edge(node_id, entry["company_id"], relation="analyzes")
+                edges_to_add.append((node_id, entry["company_id"], {"relation": "analyzes"}))
+
+        self.graph.add_nodes_from(nodes_to_add)
+        self.graph.add_edges_from(edges_to_add)
 
     def ingest_risk_state(self, risk_state: Dict[str, Any]):
         """
