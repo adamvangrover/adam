@@ -1,6 +1,7 @@
 from typing import Dict, Any, List, Optional
 import logging
-import xml.etree.ElementTree as ET
+# 🛡️ Sentinel: Use defusedxml to prevent XXE (XML External Entity) attacks
+import defusedxml.ElementTree as ET
 import pandas as pd
 import requests
 from datetime import datetime
