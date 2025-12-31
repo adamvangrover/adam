@@ -23,6 +23,7 @@ class SafeUnpickler(pickle.Unpickler):
         'joblib',
         'pytz', # Often used in pandas
         'datetime', # often used in pandas
+        'torch', # Allow torch tensors
     }
 
     # Specific allowed classes in builtins or other sensitive modules

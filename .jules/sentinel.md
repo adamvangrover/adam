@@ -98,3 +98,7 @@
 **Vulnerability:** Found Remote Code Execution (RCE) vulnerabilities in `server/server.py` and `server/mcp_server.py`. The `execute_python_sandbox` tool allowed arbitrary code execution using `exec()`, sometimes even explicitly re-enabling `__builtins__`.
 **Learning:** Developers often add "sandbox" features for demos or debugging without realizing the immense security risk. `exec()` in Python is inherently unsafe for untrusted input.
 **Prevention:** Implemented a `SecureSandbox` module (`core/security/sandbox.py`) using a "Defense in Depth" strategy: Static Analysis (AST validation), Restricted Globals (whitelisting safe functions), Process Isolation, and Execution Timeouts. This allows useful functionality (like math/logic) while blocking RCE vectors.
+## 2024-05-23 - Insecure Deserialization in StateManager
+**Vulnerability:** The `StateManager` class in `src/adam/core/state_manager.py` was using `pickle.loads` to deserialize data retrieved from Redis.
+**Learning:** Redis is often treated as a trusted data store, but in a microservices environment, it can be a vector for lateral movement. If an attacker compromises a service with Redis access, they can inject malicious payloads to compromise other services.
+**Prevention:** Always use safe deserialization methods. We replaced `pickle.loads` with `core.security.safe_unpickler.safe_loads`, which restricts the allowed classes to a safe whitelist (numpy, pandas, torch, etc.).

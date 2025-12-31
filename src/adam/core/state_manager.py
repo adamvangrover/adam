@@ -1,5 +1,7 @@
 import pickle
 import logging
+import sys
+import os
 from typing import Dict, Any, Optional
 
 # Conditional import to handle missing dependencies safely
@@ -8,6 +10,20 @@ try:
     REDIS_AVAILABLE = True
 except ImportError:
     REDIS_AVAILABLE = False
+
+# Import Secure Unpickler
+# We attempt to import from the core package.
+# Depending on the execution environment, 'core' might be in the python path.
+try:
+    from core.security.safe_unpickler import safe_loads
+except ImportError:
+    # If standard import fails, try to look up from root if we are deep in src
+    try:
+        sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
+        from core.security.safe_unpickler import safe_loads
+    except ImportError:
+        # 🛡️ Sentinel: Fail Closed. Do not allow unsafe unpickling.
+        safe_loads = None
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +48,12 @@ class StateManager:
         else:
              logger.warning("Redis library not installed. Falling back to in-memory storage.")
 
+        if self.using_redis and safe_loads is None:
+             logger.error("Security Module 'core.security.safe_unpickler' not found. Redis persistence disabled to prevent RCE.")
+             self.using_redis = False
+             self.redis = None
+
+
     def save_state(self, key: str, state: Dict[str, Any]):
         """Save optimizer state dictionary."""
         if self.using_redis and self.redis:
@@ -52,7 +74,12 @@ class StateManager:
             try:
                 data = self.redis.get(key)
                 if data:
-                    return pickle.loads(data)
+                    if safe_loads:
+                        # 🛡️ Sentinel: Use safe_loads to prevent RCE
+                        return safe_loads(data)
+                    else:
+                        logger.error("Safe loads unavailable. Cannot deserialize.")
+                        return None
             except Exception as e:
                 logger.error(f"Failed to load state from Redis: {e}")
                 return self.local_store.get(key)
