@@ -1,193 +1,145 @@
-from typing import List, Optional, Dict, Any
-from pydantic import BaseModel, Field
-from core.llm_plugin import LLMPlugin
-from core.analysis.base_analyzer import BaseFinancialAnalyzer
 import logging
 import asyncio
 import json
+from typing import Dict, Any, List, Optional
 
-# Configure logging
+from core.interfaces.financial_analyzer import (
+    BaseFinancialAnalyzer,
+    FinancialAnalysisResult,
+    RiskFactor,
+    StrategicInsight,
+    ESGMetric,
+    CompetitorDynamic,
+    ForwardGuidance,
+    SupplyChainNode,
+    GeopoliticalExposure,
+    TechnologicalMoat
+)
+from core.llm_plugin import LLMPlugin, LLMAPIError
+
 logger = logging.getLogger(__name__)
-
-# --- Expanded Schema for Comprehensive Analysis ---
-
-class RiskFactor(BaseModel):
-    description: str = Field(..., description="Description of the risk factor.")
-    severity: str = Field(..., description="Severity of the risk (High, Medium, Low).")
-    time_horizon: str = Field(..., description="Estimated time horizon (Short, Medium, Long).")
-    mitigation_strategy: Optional[str] = Field(None, description="Potential mitigation strategy mentioned or inferred.")
-
-class FinancialInsight(BaseModel):
-    category: str = Field(..., description="Category (Strategy, Operations, Market, Legal).")
-    observation: str = Field(..., description="The specific observation or fact.")
-    sentiment: str = Field(..., description="Sentiment (Positive, Negative, Neutral).")
-    confidence: float = Field(..., description="Confidence score (0.0 - 1.0) in this insight.")
-
-class CompetitorAnalysis(BaseModel):
-    name: str = Field(..., description="Name of the competitor mentioned.")
-    relationship: str = Field(..., description="Context of mention (e.g., gaining share, losing share, pricing pressure).")
-
-class ESGMetrics(BaseModel):
-    environmental_score: str = Field(..., description="Qualitative score (High/Med/Low) based on mentions of green initiatives vs violations.")
-    social_score: str = Field(..., description="Qualitative score based on labor, diversity, and community mentions.")
-    governance_score: str = Field(..., description="Qualitative score based on board structure, transparency, and ethics.")
-    key_issues: List[str] = Field(default_factory=list, description="Specific ESG issues identified.")
-
-class ReportAnalysis(BaseModel):
-    executive_summary: str = Field(..., description="A concise executive summary of the report.")
-    risk_factors: List[RiskFactor] = Field(default_factory=list, description="List of identified risk factors.")
-    strategic_insights: List[FinancialInsight] = Field(default_factory=list, description="List of key strategic insights.")
-    competitor_mentions: List[CompetitorAnalysis] = Field(default_factory=list, description="Competitors mentioned and the context.")
-    esg_analysis: Optional[ESGMetrics] = Field(None, description="Environmental, Social, and Governance analysis.")
-    management_sentiment: str = Field(..., description="Overall assessment of management sentiment/tone.")
-    forward_looking_statements: List[str] = Field(default_factory=list, description="Key predictions or guidance provided by management.")
 
 class GeminiFinancialReportAnalyzer(BaseFinancialAnalyzer):
     """
-    Analyzer that leverages Google Gemini's long-context capabilities
-    to extract deep insights from financial texts.
-
-    Implements BaseFinancialAnalyzer for future alignment.
+    Alphabet Ecosystem Analyzer using Google's Gemini 1.5 Pro.
+    Leverages huge context window, native multimodal capabilities,
+    and structured generation for deep qualitative analysis.
     """
 
-    def __init__(self, llm_plugin: Optional[LLMPlugin] = None):
-        """
-        Initialize with an existing LLMPlugin or create a new one.
-        """
-        if llm_plugin:
-            self.llm = llm_plugin
-        else:
-            # specialized config for Gemini if not provided
-            config = {
-                "provider": "gemini",
-                "gemini_model_name": "gemini-1.5-pro"
-            }
-            try:
-                self.llm = LLMPlugin(config=config)
-            except Exception as e:
-                logger.warning(f"Failed to initialize Gemini for analysis: {e}. Falling back to default config.")
-                self.llm = LLMPlugin() # Fallback to whatever is default
+    def __init__(self, llm_plugin: LLMPlugin):
+        self.llm = llm_plugin
+        # Ensure we are using a Gemini model for best results, but allow fallback
+        if "gemini" not in self.llm.get_model_name().lower() and "mock" not in self.llm.get_model_name().lower():
+             logger.warning(f"GeminiFinancialReportAnalyzer initialized with non-Gemini model: {self.llm.get_model_name()}. Features may be limited.")
 
-    async def analyze_report(self, report_text: str, context: str = "") -> ReportAnalysis:
+    async def analyze_report(self, report_text: str, context: Dict[str, Any] = None) -> FinancialAnalysisResult:
         """
-        Asynchronously analyzes a financial report text.
+        Asynchronously analyzes a financial report using Chain-of-Thought prompting
+        and structured JSON output.
         """
-        if not report_text:
-            return ReportAnalysis(
-                executive_summary="No report text provided.",
-                management_sentiment="Unknown"
-            )
+        context = context or {}
+        ticker = context.get("ticker", "UNKNOWN")
+        period = context.get("period", "UNKNOWN")
 
-        # Advanced Prompting: Chain of Thought
-        prompt = (
-            f"You are a senior financial analyst. Your task is to perform a comprehensive 'Deep Dive' analysis "
-            f"of the following financial report text.\n\n"
-            f"Context: {context}\n\n"
-            f"Report Text:\n{report_text}\n\n"
-            f"Please follow this reasoning process:\n"
-            f"1. Read the text thoroughly to understand the macro and micro context.\n"
-            f"2. Identify specific risk factors, categorizing their severity and time horizon.\n"
-            f"3. Extract strategic insights, assessing the sentiment and your confidence in them.\n"
-            f"4. Look for mentions of competitors and analyze the competitive dynamic.\n"
-            f"5. Evaluate ESG (Environmental, Social, Governance) factors mentioned.\n"
-            f"6. Synthesize the management's tone and extract key forward-looking statements.\n"
-            f"7. Summarize the findings into a structured format.\n\n"
-            f"Provide the final output strictly adhering to the JSON schema for ReportAnalysis."
-        )
+        logger.info(f"Starting Gemini analysis for {ticker} ({period})...")
 
+        # 1. Construct the Chain-of-Thought Prompt
+        # We force the model to reason first before emitting JSON.
+        prompt = f"""
+        You are an expert Principal Financial Analyst for 'Adam', an advanced AI investment system.
+        Your task is to perform a deep qualitative analysis of the following financial report for {ticker}.
+
+        Do not just summarize. Extract actionable intelligence.
+
+        REPORT TEXT (Snippet):
+        {report_text[:100000]}... (truncated if too long, though Gemini 1.5 handles 1M+ tokens)
+
+        ---
+        ANALYSIS INSTRUCTIONS:
+
+        1. **Risk Factors**: Identify specific risks. Categorize by severity (Low/Medium/High/Critical) and time horizon. Look for "hidden" risks not explicitly flagged as risk factors.
+        2. **Strategic Insights**: What is management's core strategy? How confident are they? (Score 0.0-1.0).
+        3. **ESG Metrics**: Evaluate Environmental, Social, and Governance factors qualitatively.
+        4. **Competitor Dynamics**: Who are they worried about? What is their market positioning?
+        5. **Forward Guidance**: Extract concrete numbers and predictions.
+
+        DEEP RESEARCH TOPICS (v24.0):
+        6. **Supply Chain Mapping**: Extract key suppliers, manufacturing hubs, and logistics partners. Assess their risk.
+        7. **Geopolitical Exposure**: Identify revenue or assets exposed to specific regions (China, Russia, Middle East, etc.) and the nature of the risk.
+        8. **Technological Moat**: Analyze the durability of their IP and technology stack. Is it a wide or narrow moat?
+
+        Thinking Process:
+        First, silently reason through the text. Connect dots between the CEO's letter and the Risk Factors section.
+        Then, generate the output strictly in the requested JSON format.
+        """
+
+        # 2. Async Execution Wrapper
+        # Since LLMPlugin is synchronous (standard python `requests` or `google-generativeai` blocking calls),
+        # we offload to a thread to keep the agent loop non-blocking.
         try:
-            # Use structured generation
-            # Note: generate_structured is currently synchronous in LLMPlugin.
-            # We wrap it in asyncio.to_thread to prevent blocking the event loop
-            # if the underlying API call is blocking (which it likely is in the sync plugin).
-
             loop = asyncio.get_running_loop()
-            analysis, metadata = await loop.run_in_executor(
+            # We use a helper to call the synchronous generate_structured
+            result, metadata = await loop.run_in_executor(
                 None,
                 lambda: self.llm.generate_structured(
                     prompt=prompt,
-                    response_schema=ReportAnalysis,
-                    thinking_level="high", # Hint to Gemini if supported
-                    thought_signature="financial_deep_dive"
+                    response_schema=FinancialAnalysisResult,
+                    thinking_level="high", # Hint to the underlying plugin if supported
+                    thought_signature=f"analyze_{ticker}_{period}"
                 )
             )
 
-            logger.info(f"Gemini Analysis complete. Usage: {metadata.get('usage')}")
-            return analysis
+            # Post-processing: inject known context if missing
+            if result.ticker == "UNKNOWN": result.ticker = ticker
+            if result.period == "UNKNOWN": result.period = period
+
+            logger.info(f"Gemini Analysis completed for {ticker}. Thought Signature: {metadata.get('thought_signature')}")
+            return result
 
         except Exception as e:
-            logger.error(f"Error during Gemini analysis: {e}")
-            # Return empty/safe result with error note in summary
-            return ReportAnalysis(
-                executive_summary=f"Analysis failed due to an error: {str(e)}",
-                management_sentiment="Error"
+            logger.error(f"Gemini Analysis Failed: {e}")
+            # Return empty/safe result on failure
+            return FinancialAnalysisResult(
+                ticker=ticker,
+                period=period,
+                risk_factors=[],
+                strategic_insights=[],
+                esg_metrics=[],
+                competitor_dynamics=[],
+                forward_guidance=[],
+                supply_chain_map=[],
+                geopolitical_exposure=[],
+                technological_moat=[],
+                summary_narrative=f"Analysis failed: {str(e)}"
             )
 
-    async def analyze_image(self, image_path: str, context: str = "") -> Dict[str, Any]:
+    async def analyze_multimodal(self, image_paths: List[str], prompt: str) -> str:
         """
-        Asynchronously analyzes a financial image (chart, table).
-        Uses Gemini Vision via LLMPlugin.
+        Uses Gemini Vision to analyze charts or tables in the report.
         """
-        prompt = (
-            f"Analyze this financial image. Context: {context}\n"
-            f"Provide a structured summary including:\n"
-            f"- Chart Type / Data Type\n"
-            f"- Key Trends or Data Points\n"
-            f"- Anomalies\n"
-            f"- Strategic Implications\n"
-            f"Return the result as a JSON object."
-        )
+        logger.info(f"Starting Gemini Multimodal Analysis on {len(image_paths)} images...")
 
-        try:
-            loop = asyncio.get_running_loop()
-            # Offload blocking call to thread
-            response_text = await loop.run_in_executor(
-                None,
-                lambda: self.llm.generate_multimodal(prompt=prompt, image_path=image_path)
-            )
+        combined_analysis = []
+        loop = asyncio.get_running_loop()
 
-            # Attempt to parse JSON if the model followed instructions
-            # Models often wrap JSON in ```json blocks
-            clean_text = response_text.replace("```json", "").replace("```", "").strip()
+        for path in image_paths:
             try:
-                result_json = json.loads(clean_text)
-                return result_json
-            except json.JSONDecodeError:
-                # Fallback to returning raw text wrapped in dict
-                logger.warning("Gemini Vision response was not valid JSON. Returning raw text.")
-                return {
-                    "raw_analysis": response_text,
-                    "parsing_error": "Could not parse JSON response"
-                }
+                # Parallelize? For now, sequential async
+                response = await loop.run_in_executor(
+                    None,
+                    lambda p=path: self.llm.generate_multimodal(prompt, p)
+                )
+                combined_analysis.append(f"Image {path}: {response}")
+            except Exception as e:
+                logger.error(f"Failed to analyze image {path}: {e}")
+                combined_analysis.append(f"Image {path}: Error - {e}")
 
-        except Exception as e:
-            logger.error(f"Error during Gemini image analysis: {e}")
-            return {
-                "error": str(e),
-                "status": "failed"
-            }
+        return "\n\n".join(combined_analysis)
 
-if __name__ == "__main__":
-    # Test block
-    logging.basicConfig(level=logging.INFO)
-    print("--- Testing GeminiFinancialReportAnalyzer (Async/Comprehensive) ---")
+# --- Integration Helper ---
 
-    # Mock text
-    mock_report = """
-    Q3 2024 Earnings Call.
-    We are pleased to report a 20% increase in revenue. However, supply chain headwinds persist in the Asia-Pacific region.
-    We are doubling down on our AI strategy, investing $500M into new data centers.
-    We see significant risk from regulatory changes in the EU, which could impact 10% of our business over the next 2 years.
-    Our competitor, TechCorp, has aggressively lowered prices, putting pressure on our margins.
-    We are committed to reducing our carbon footprint by 30% by 2030.
-    Management remains cautiously optimistic about the fiscal year end and expects 15% growth next year.
-    """
-
-    async def run_test():
-        analyzer = GeminiFinancialReportAnalyzer()
-        # Note: This will likely use MockLLM if no API key is set in env
-        result = await analyzer.analyze_report(mock_report, context="Tech Sector")
-        print("\nResult:")
-        print(result.model_dump_json(indent=2))
-
-    asyncio.run(run_test())
+def get_gemini_analyzer() -> GeminiFinancialReportAnalyzer:
+    """Factory to get a configured analyzer instance."""
+    # Assumes LLMPlugin is configured via env vars or default config
+    plugin = LLMPlugin()
+    return GeminiFinancialReportAnalyzer(plugin)

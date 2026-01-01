@@ -1,0 +1,38 @@
+{
+  "manifest_version": "1.0",
+  "system_name": "Adam",
+  "version": "23.5-Alphabet-Expansion",
+  "capabilities": [
+    {
+      "name": "Gemini Financial Analysis",
+      "description": "Deep qualitative analysis of 10-K/10-Q reports using Gemini 1.5 Pro.",
+      "input_types": ["text/plain", "application/pdf", "image/png"],
+      "output_types": ["application/json"],
+      "provider": "Google Vertex AI",
+      "latency": "asynchronous"
+    },
+    {
+      "name": "Multimodal Chart Analysis",
+      "description": "Extraction of trends and anomalies from financial charts.",
+      "input_types": ["image/*"],
+      "output_types": ["text/markdown"],
+      "provider": "Gemini Vision"
+    },
+    {
+      "name": "Market Sentiment Embedding",
+      "description": "High-dimensional vector embedding of market news.",
+      "input_types": ["text/plain"],
+      "output_types": ["vector/float32"],
+      "dimensions": 768
+    }
+  ],
+  "infrastructure": {
+    "data_warehouse": "BigQuery (Stub)",
+    "messaging": "Pub/Sub (Stub)",
+    "compute": "Vertex AI"
+  },
+  "roadmap": {
+    "next_milestone": "Adam v24.0 (Quantum-Native)",
+    "features": ["Real-time Video Analysis", "Quantum Risk Monte Carlo"]
+  }
+}
