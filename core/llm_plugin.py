@@ -876,10 +876,12 @@ class LLMPlugin:
 
     def get_embedding(self, text: str) -> List[float]:
         """Returns the embedding vector for the text."""
+        # Ensure underlying LLM supports this or raises NotImplementedError
         return self.llm.get_embedding(text)
 
     def generate_multimodal(self, prompt: str, image_path: str, **kwargs) -> str:
         """Generates text from prompt and image."""
+        # Proxy to underlying LLM
         return self.llm.generate_multimodal(prompt, image_path, **kwargs)
 
     def generate_audio_analysis(self, prompt: str, audio_path: str, **kwargs) -> str:

@@ -5,7 +5,11 @@ import datetime
 import requests
 import numpy as np
 from web3 import Web3
-from web3.middleware import geth_poa_middleware
+try:
+    from web3.middleware import geth_poa_middleware
+except ImportError:
+    # Web3 v7+ change
+    from web3.middleware import ExtraDataToPOAMiddleware as geth_poa_middleware
 from sklearn.linear_model import LinearRegression
 import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
