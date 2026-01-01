@@ -2,7 +2,7 @@
 
 ## Defining the Role: From Subject Matter Expert to Thought Leader
 
-For the ambitious professional, the transition from a functional expert (e.g., Credit Risk Director, Data Scientist) to a "Strategic AI Leader" requires a fundamental shift in mindset. It is no longer enough to manage models or approve loans; one must articulate a vision for how **Agentic AI** reshapes the competitive landscape of the institution.
+For the ambitious professional, the transition from a functional expert (e.g., Credit, Risk, Banking, Wealth, Management, Data Scientist) to a "Strategic AI Leader" requires a fundamental shift in mindset. It is no longer enough to manage models or build relationships or approve loans; one must articulate a vision for how **Agentic AI** reshapes the competitive landscape of the institution.
 
 The "Head of AI Risk" or "AI Product Owner" is not just a gatekeeper; they are the **Architect of the Institution's Cognitive Future**.
 
@@ -30,7 +30,7 @@ Instead of saying "I check the model's work," say:
 
 ## Navigating the Executive Search Landscape
 
-To execute this career pivot, the user must engage with the specific executive search firms that dominate the intersection of quantitative finance and AI.
+To execute this career pivot, the user may engage with the specific executive search firms or others that dominate the intersection of quantitative finance and AI.
 
 ### The "Apex" Tier: Alternative Asset Management Specialists
 These firms control access to the C-suite and Investment Committee roles at mega-funds (Apollo, Blackstone, KKR, Carlyle).
