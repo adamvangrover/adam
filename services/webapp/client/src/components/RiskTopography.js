@@ -56,18 +56,20 @@ const RiskNode = ({ position, color, label }) => {
 }
 
 
-const RiskTopography = () => {
-    // Simulated Data for the "Vertical Slice"
-    const portfolioCompanies = [
+const RiskTopography = ({ data }) => {
+    // Default Simulated Data for the "Vertical Slice" if no props provided
+    const defaultData = [
         { name: "TechCorp (Distressed)", headroom: 0.05, risk: "High", pos: [-2, 0, 1] }, // < 10% Headroom -> Red
         { name: "EnergyCo", headroom: 0.25, risk: "Low", pos: [2, 1, -1] },
         { name: "RetailGrp", headroom: 0.12, risk: "Medium", pos: [0, -0.5, 0] },
     ];
 
+    const portfolioCompanies = data || defaultData;
+
   return (
     <div className="h-96 w-full glass-panel border border-cyan-900/30 rounded-lg overflow-hidden">
       <div className="absolute top-4 left-4 z-10 text-cyan-400 font-mono text-xs">
-         RISK TOPOGRAPHY // VOLATILITY SURFACE
+         RISK TOPOGRAPHY // VOLATILITY SURFACE // 3D VIEW
       </div>
       <Canvas camera={{ position: [5, 5, 5], fov: 60 }}>
         <ambientLight intensity={0.5} />
