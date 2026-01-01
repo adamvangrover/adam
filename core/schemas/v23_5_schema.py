@@ -81,10 +81,26 @@ class PrimaryFacilityAssessment(BaseModel):
     repayment_capacity: str
 
 
+class DialogueTurn(BaseModel):
+    speaker: Literal["Regulator", "Strategist"]
+    argument: str
+    counter_point: Optional[str] = None
+
+
+class RiskDialogue(BaseModel):
+    turns: List[DialogueTurn]
+    conclusion: str
+    override_applied: bool = False
+
+
 class SNCRatingModel(BaseModel):
     overall_borrower_rating: Literal["Pass", "Special Mention", "Substandard", "Doubtful", "Loss"]
     rationale: str
     primary_facility_assessment: PrimaryFacilityAssessment
+    legacy_rating: Optional[str] = Field(None, description="Rating from the legacy Leverage/Coverage model")
+    model_consensus: Optional[bool] = Field(None, description="True if Legacy and New models agree")
+    conviction_score: Optional[float] = Field(None, description="Internal confidence score (0.0-1.0)")
+    risk_dialogue: Optional[RiskDialogue] = Field(None, description="The debate between Regulatory and Strategic agents")
 
 
 class CovenantRiskAnalysis(BaseModel):

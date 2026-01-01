@@ -26,6 +26,7 @@ When working on the ADAM project, please adhere to the following principles:
     *   [Sub-Agents](#sub-agents)
     *   [Meta-Agents](#meta-agents)
     *   [Orchestrator Agents](#orchestrator-agents)
+*   [Agentic Oversight Framework (AOF)](#agentic-oversight-framework-aof)
 *   [Getting Started](#getting-started)
 *   [Contribution Guidelines](#contribution-guidelines)
 *   [Operational Notes & Troubleshooting](#operational-notes--troubleshooting-v23-update)
@@ -128,6 +129,18 @@ The v23.5 upgrade expands the system scope to a full-spectrum "Autonomous Financ
 *   **Strategic Synthesis:** M&A and conviction levels.
 
 This upgrade is defined by the "Hyper-Dimensional Knowledge Graph" (HDKG) output schema and a new "Deep Dive" execution protocol. The system prompt is available in `config/Adam_v23.5_Portable_Config.json` and `prompt_library/Adam_v23.5_System_Prompt.md`.
+
+## Agentic Oversight Framework (AOF)
+
+As detailed in `docs/whitepapers/agentic_convergence_strategic_assessment.md`, the platform now implements a rigorous governance model for non-deterministic AI agents, managed by the "Head of AI Risk" persona.
+
+*   **Automated Resolution Pathways (ARPs):** Rigid workflows that prevent agents from improvising in high-risk scenarios.
+*   **Deterministic HITL Triggers:** Agents must halt and request human review if their internal conviction score falls below a set threshold (default 85%).
+    *   Implemented via the `@AgenticOversightFramework.oversight_guardrail` decorator in `core/system/aof_guardrail.py`.
+*   **Human-Machine Markdown (HMM) Protocol:** A structured communication standard (`core/system/hmm_protocol.py`) for analyst interventions and overrides.
+    *   Requests use `HMM INTERVENTION REQUEST`.
+    *   Logs use `HMM ACTION LOG`.
+*   **"Four Eyes" Principle:** Critical outputs require dual verification.
 
 ## Getting Started
 
