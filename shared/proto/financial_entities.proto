@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package financial_entities;
+
+service OrderEntry {
+  rpc AddOrder (OrderRequest) returns (OrderResponse);
+  rpc GetOrderBook (OrderBookRequest) returns (stream OrderBookStream);
+}
+
+message OrderRequest {
+  string symbol = 1;
+  string side = 2; // "BUY" or "SELL"
+  double price = 3;
+  double quantity = 4;
+  string order_type = 5; // "LIMIT", "MARKET"
+  string trader_id = 6;
+}
+
+message OrderResponse {
+  string order_id = 1;
+  string status = 2;
+  string message = 3;
+}
+
+message OrderBookRequest {
+  string symbol = 1;
+}
+
+message OrderBookStream {
+  repeated Order bids = 1;
+  repeated Order asks = 2;
+  int64 timestamp = 3;
+}
+
+message Order {
+  double price = 1;
+  double quantity = 2;
+}
