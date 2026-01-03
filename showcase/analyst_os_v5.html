@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyst OS // Credit & Valuation Architect v5.0</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        bg: '#0b1121', // Deep dark blue/black
+                        panel: '#151e32',
+                        border: '#2a3b55',
+                        accent: '#3b82f6',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444',
+                        text: '#e2e8f0',
+                        muted: '#94a3b8'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #0b1121; color: #e2e8f0; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0b1121; }
+        ::-webkit-scrollbar-thumb { background: #2a3b55; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
+
+        /* Inputs */
+        .input-bare {
+            background: transparent;
+            border: 1px solid transparent;
+            color: #3b82f6;
+            text-align: right;
+            width: 100%;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.2s;
+            border-radius: 2px;
+        }
+        .input-bare:hover { border-color: #2a3b55; background: #1a2642; }
+        .input-bare:focus { outline: none; border-color: #3b82f6; background: #1e293b; color: white; }
+        
+        .input-hist {
+            color: #94a3b8; /* Muted color for history inputs to distinguish from projections */
+        }
+        .input-hist:focus { color: white; }
+
+        /* Table Styles */
+        .fin-table th { @apply text-xs font-semibold text-muted uppercase tracking-wider py-2 px-3 border-b border-border bg-panel/50; }
+        .fin-table td { @apply text-xs border-b border-border/50 py-1 px-3; }
+        .fin-table tr:hover td { @apply bg-white/5; }
+
+        /* Utilities */
+        .glass-panel {
+            background: rgba(21, 30, 50, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Print Optimization */
+        @media print {
+            body { background: white; color: black; -webkit-print-color-adjust: exact; }
+            .no-print { display: none; }
+            .glass-panel { border: 1px solid #ccc; break-inside: avoid; background: white; color: black; box-shadow: none; }
+            .input-bare { color: black; }
+            input { border: none !important; }
+        }
+
+        /* Toast Animation */
+        @keyframes slideUp {
+            from { transform: translate(-50%, 100%); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+        .toast-enter { animation: slideUp 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans text-sm selection:bg-accent/30 selection:text-white">
+
+    <!-- Modal Overlay -->
+    <div id="modalOverlay" class="fixed inset-0 bg-black/80 hidden z-[60] items-center justify-center backdrop-blur-sm opacity-0 transition-opacity duration-200">
+        <div class="bg-panel border border-border rounded-lg p-6 max-w-md w-full shadow-2xl transform scale-95 transition-transform" id="modalContent">
+            <h3 id="modalTitle" class="text-lg font-bold text-white mb-2">Notification</h3>
+            <p id="modalMessage" class="text-muted mb-6 text-sm"></p>
+            <div id="modalInputContainer" class="hidden mb-6">
+                <label class="text-xs text-muted block mb-1 uppercase tracking-wide">Input Name</label>
+                <input type="text" id="modalInput" class="w-full bg-bg border border-border rounded p-2 text-white outline-none focus:border-accent font-mono text-sm">
+            </div>
+            <div class="flex justify-end gap-3">
+                <button id="modalCancel" class="px-4 py-2 rounded text-muted hover:text-white hover:bg-white/10 transition text-xs font-bold uppercase tracking-wide">Cancel</button>
+                <button id="modalConfirm" class="px-4 py-2 rounded bg-accent hover:bg-blue-600 text-white transition text-xs font-bold uppercase tracking-wide shadow-lg shadow-blue-500/20">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="border-b border-border bg-bg/95 backdrop-blur-md px-6 py-3 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3 group cursor-pointer" onclick="window.location.reload()">
+                <div class="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-400 rounded flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold tracking-tight text-white leading-tight">CREDIT<span class="text-accent font-mono">ARCHITECT</span></h1>
+                    <div class="text-[10px] text-muted uppercase tracking-widest">Risk & Valuation Engine v5.0</div>
+                </div>
+            </div>
+            <div class="h-6 w-px bg-border mx-2"></div>
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-muted"><i class="fas fa-industry mr-1"></i>Template:</span>
+                <select id="industrySelect" onchange="App.loadIndustryTemplate(this.value)" class="bg-panel border border-border text-xs rounded px-2 py-1 outline-none focus:border-accent text-white hover:bg-border/50 transition cursor-pointer">
+                    <option value="custom">Custom / Manual</option>
+                    <option value="saas">Software (SaaS)</option>
+                    <option value="mfg">Industrial Mfg</option>
+                    <option value="retail">Retail / Consumer</option>
+                    <option value="energy">Energy / Utilities</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3 no-print">
+            <div class="flex items-center bg-panel border border-border rounded-md p-0.5">
+                <select id="scenarioSelect" onchange="StorageManager.loadScenario(this.value)" class="bg-transparent text-xs text-white px-3 py-1.5 outline-none cursor-pointer w-40">
+                    <option value="">-- Load Scenario --</option>
+                </select>
+                <button onclick="StorageManager.saveCurrentScenario()" class="px-3 py-1.5 text-xs text-accent hover:bg-white/5 border-l border-border transition" title="Save Scenario"><i class="fas fa-save"></i></button>
+            </div>
+            
+            <button onclick="App.exportToCSV()" class="text-muted hover:text-white px-3 py-1.5 rounded text-xs transition border border-transparent hover:border-border"><i class="fas fa-file-csv mr-2"></i>Export</button>
+            <button onclick="window.print()" class="text-muted hover:text-white px-3 py-1.5 rounded text-xs transition border border-transparent hover:border-border"><i class="fas fa-print mr-2"></i>Print</button>
+            <button onclick="StorageManager.resetToHardDefaults()" class="text-danger hover:bg-danger/10 px-3 py-1.5 rounded text-xs transition border border-transparent hover:border-danger/30" title="Factory Reset"><i class="fas fa-power-off"></i></button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 grid grid-cols-12 gap-6 max-w-[1920px] mx-auto w-full">
+
+        <!-- LEFT SIDEBAR: INPUTS -->
+        <aside class="col-span-12 xl:col-span-3 space-y-6 no-print overflow-y-auto max-h-[calc(100vh-80px)] pr-2 custom-scrollbar">
+            
+            <!-- Macro Drivers -->
+            <div class="glass-panel rounded-lg p-4">
+                <h3 class="text-xs font-bold text-accent mb-4 border-b border-border pb-2 flex justify-between items-center">
+                    <span><i class="fas fa-sliders-h mr-2"></i>MACRO & DRIVERS</span>
+                    <i class="fas fa-chevron-down text-muted text-[10px]"></i>
+                </h3>
+                <div class="grid grid-cols-2 gap-x-4 gap-y-3">
+                    <div>
+                        <label class="text-[10px] text-muted uppercase tracking-wide block mb-1">Risk-Free (%)</label>
+                        <input type="number" id="inp_rfr" class="input-bare bg-bg border border-border/50 p-1" value="4.0" step="0.1" onchange="App.recalculate()">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-muted uppercase tracking-wide block mb-1">ERP (%)</label>
+                        <input type="number" id="inp_erp" class="input-bare bg-bg border border-border/50 p-1" value="5.5" step="0.1" onchange="App.recalculate()">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-muted uppercase tracking-wide block mb-1">Beta</label>
+                        <input type="number" id="inp_beta" class="input-bare bg-bg border border-border/50 p-1" value="1.2" step="0.05" onchange="App.recalculate()">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-muted uppercase tracking-wide block mb-1">Tax Rate (%)</label>
+                        <input type="number" id="inp_tax" class="input-bare bg-bg border border-border/50 p-1" value="21.0" step="0.5" onchange="App.recalculate()">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-muted uppercase tracking-wide block mb-1">Term Growth (%)</label>
+                        <input type="number" id="inp_tgr" class="input-bare bg-bg border border-border/50 p-1" value="2.0" step="0.1" onchange="App.recalculate()">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-muted uppercase tracking-wide block mb-1">Shares (M)</label>
+                        <input type="number" id="inp_shares" class="input-bare bg-bg border border-border/50 p-1" value="100" onchange="App.recalculate()">
+                    </div>
+                </div>
+                
+                <div class="mt-4 pt-3 border-t border-border flex justify-between items-center bg-bg/50 p-2 rounded border border-border/30">
+                    <span class="text-xs font-semibold text-muted">Calculated WACC</span>
+                    <span id="out_wacc" class="text-sm font-bold text-success font-mono">0.00%</span>
+                </div>
+            </div>
+
+            <!-- Debt Waterfall -->
+            <div class="glass-panel rounded-lg p-4">
+                <div class="flex justify-between items-center mb-4 border-b border-border pb-2">
+                    <h3 class="text-xs font-bold text-accent uppercase"><i class="fas fa-layer-group mr-2"></i>Debt Waterfall & Amort</h3>
+                    <button onclick="App.addTranche()" class="text-[10px] bg-border hover:bg-accent text-white px-2 py-1 rounded transition"><i class="fas fa-plus"></i> Add</button>
+                </div>
+                
+                <div class="grid grid-cols-12 gap-1 text-[9px] text-muted uppercase mb-2 text-center">
+                    <div class="col-span-3 text-left">Tranche</div>
+                    <div class="col-span-3">Amount</div>
+                    <div class="col-span-2">Rate %</div>
+                    <div class="col-span-2">Amort %</div>
+                    <div class="col-span-2"></div>
+                </div>
+
+                <div id="debt-waterfall-container" class="space-y-2 mb-4">
+                    <!-- Dynamic Tranches -->
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 pt-2 border-t border-border">
+                    <div>
+                        <label class="text-[10px] text-muted uppercase block">Total Debt</label>
+                        <div id="total_debt_disp" class="text-white font-mono text-sm font-bold text-right">$0</div>
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-muted uppercase block">Cash ($M)</label>
+                        <input type="number" id="inp_cash" class="input-bare bg-bg border border-border/50 p-1" value="150" onchange="App.recalculate()">
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <label class="text-[10px] text-muted uppercase block mb-1">Current Share Price</label>
+                    <input type="number" id="inp_price" class="input-bare bg-bg border border-border/50 p-1 text-lg font-bold text-white" value="45.50" onchange="App.recalculate()">
+                </div>
+            </div>
+
+            <!-- Capital Structure Chart -->
+            <div class="glass-panel rounded-lg p-4">
+                <h3 class="text-xs font-bold text-muted uppercase mb-2">Capital Structure (MV)</h3>
+                <div class="h-48 relative">
+                    <canvas id="capStructChart"></canvas>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- RIGHT MAIN: ANALYSIS -->
+        <div class="col-span-12 xl:col-span-9 space-y-6">
+
+            <!-- KPI HEADER -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <div class="glass-panel p-4 rounded-lg relative overflow-hidden group">
+                    <div class="absolute -right-4 -top-4 text-bg opacity-30 group-hover:opacity-50 transition-opacity">
+                        <i class="fas fa-building text-8xl"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <div class="text-[10px] text-muted uppercase font-bold tracking-wider mb-1">Enterprise Value</div>
+                        <div id="dash_ev" class="text-2xl font-bold text-white font-mono tracking-tight">$0M</div>
+                        <div class="text-[10px] text-accent mt-1 flex items-center gap-1"><i class="fas fa-calculator"></i> Implied</div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-4 rounded-lg">
+                    <div class="text-[10px] text-muted uppercase font-bold tracking-wider mb-1">Implied Share Price</div>
+                    <div class="flex justify-between items-baseline">
+                        <div id="dash_share_price" class="text-2xl font-bold text-white font-mono">$0.00</div>
+                        <div id="dash_upside" class="text-xs font-bold px-2 py-0.5 rounded bg-white/5">0%</div>
+                    </div>
+                    <div class="w-full bg-bg h-1 mt-2 rounded-full overflow-hidden">
+                        <div id="upside_bar" class="h-full bg-muted w-1/2 transition-all duration-500"></div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-4 rounded-lg">
+                    <div class="text-[10px] text-muted uppercase font-bold tracking-wider mb-1">Net Leverage (LTM)</div>
+                    <div id="dash_leverage" class="text-2xl font-bold text-accent font-mono">0.0x</div>
+                    <div class="text-[10px] text-muted mt-1">Total Debt / LTM EBITDA</div>
+                </div>
+
+                <div class="glass-panel p-4 rounded-lg relative overflow-hidden">
+                     <div class="text-[10px] text-muted uppercase font-bold tracking-wider mb-1">Synthetic Rating</div>
+                     <div class="flex items-baseline gap-2">
+                        <div id="dash_rating" class="text-3xl font-bold text-white font-mono">--</div>
+                        <div id="dash_rating_desc" class="text-[10px] uppercase font-bold px-2 py-1 rounded bg-white/10 text-muted">Investment Grade</div>
+                     </div>
+                     <div id="dash_rating_bg" class="absolute -right-2 -bottom-4 text-7xl font-bold opacity-5 select-none pointer-events-none">A</div>
+                </div>
+            </div>
+
+            <!-- DCF MODEL GRID -->
+            <div class="glass-panel rounded-lg overflow-hidden border border-border flex flex-col h-[500px]">
+                <div class="bg-panel px-4 py-2 border-b border-border flex justify-between items-center flex-shrink-0">
+                    <div>
+                        <h3 class="text-xs font-bold text-white uppercase tracking-wide"><i class="fas fa-table mr-2 text-accent"></i>FCF Bridge & Valuation ($M)</h3>
+                        <div class="text-[9px] text-muted italic mt-0.5">EBITDA &rarr; UFCF &rarr; Levered FCF</div>
+                    </div>
+                    <span class="text-[10px] bg-accent/10 text-accent px-2 py-1 rounded border border-accent/20">All inputs auto-calculate</span>
+                </div>
+                <div class="overflow-auto flex-1 custom-scrollbar">
+                    <table class="w-full fin-table text-right" id="financialTable">
+                        <thead>
+                            <tr>
+                                <th class="text-left w-48 sticky left-0 z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.5)]">Metric</th>
+                                <th class="text-muted w-24">FY-3</th>
+                                <th class="text-muted w-24">FY-2</th>
+                                <th class="text-white border-r border-accent/20 bg-accent/5 w-24">LTM</th>
+                                <th class="text-accent w-24">FY+1</th>
+                                <th class="text-accent w-24">FY+2</th>
+                                <th class="text-accent w-24">FY+3</th>
+                                <th class="text-accent w-24">FY+4</th>
+                                <th class="text-accent w-24">FY+5</th>
+                                <th class="text-accent w-24">FY+6</th>
+                                <th class="text-accent w-24">FY+7</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modelBody" class="font-mono text-xs">
+                            <!-- JS Generated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- VISUALS ROW -->
+            <div class="glass-panel rounded-lg p-4">
+                <h3 class="text-xs font-bold text-white mb-4 uppercase border-b border-border pb-2 flex items-center">
+                    <i class="fas fa-chart-bar mr-2 text-success"></i>Deleveraging & Capacity
+                </h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="h-64">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="debtProfileChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTTOM ROW: RISK & SENSITIVITY -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <!-- Credit Risk Module -->
+                <div class="glass-panel rounded-lg p-4">
+                    <h3 class="text-xs font-bold text-white mb-4 uppercase border-b border-border pb-2 flex items-center">
+                        <i class="fas fa-shield-alt mr-2 text-danger"></i>Credit Risk Profile
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="bg-bg/50 p-2 rounded border border-border/50 text-center">
+                                <div class="text-[9px] text-muted uppercase">Prob. Default</div>
+                                <div id="risk_pd" class="text-sm font-bold text-white font-mono mt-1">--%</div>
+                            </div>
+                            <div class="bg-bg/50 p-2 rounded border border-border/50 text-center">
+                                <div class="text-[9px] text-muted uppercase">Loss Given Default</div>
+                                <div id="risk_lgd" class="text-sm font-bold text-white font-mono mt-1">--%</div>
+                            </div>
+                            <div class="bg-bg/50 p-2 rounded border border-border/50 text-center">
+                                <div class="text-[9px] text-muted uppercase">Asset Coverage</div>
+                                <div id="risk_ev_coverage" class="text-sm font-bold text-white font-mono mt-1">--x</div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-1 text-xs">
+                                <span class="text-muted">Debt Repayment Capacity (Cum Lev. FCF / Debt)</span>
+                                <span id="risk_capacity_ratio" class="font-bold font-mono text-white">0.0x</span>
+                            </div>
+                            <div class="w-full bg-bg h-2 rounded-full overflow-hidden border border-border/30">
+                                <div id="risk_capacity_bar" class="h-full bg-accent w-0 transition-all duration-700"></div>
+                            </div>
+                            <div class="flex justify-between mt-1">
+                                <span class="text-[9px] text-muted">Threshold: 1.0x</span>
+                                <span id="risk_status_text" class="text-[9px] font-bold uppercase text-danger">At Risk</span>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto mt-2">
+                            <table class="w-full text-xs text-left">
+                                <thead>
+                                    <tr class="text-muted border-b border-border">
+                                        <th class="py-1 font-normal">Tranche</th>
+                                        <th class="py-1 font-normal text-right">Amt</th>
+                                        <th class="py-1 font-normal text-right">Recov%</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="waterfallBody" class="font-mono text-[10px]">
+                                    <!-- JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sensitivity Matrix -->
+                <div class="glass-panel rounded-lg p-4">
+                    <h3 class="text-xs font-bold text-white mb-4 uppercase border-b border-border pb-2 flex items-center">
+                        <i class="fas fa-chess-board mr-2 text-warning"></i>Valuation Sensitivity
+                    </h3>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-center text-[10px] font-mono border-collapse" id="sensitivityTable">
+                            <!-- JS -->
+                        </table>
+                    </div>
+                    
+                    <div class="mt-4 flex items-center justify-center gap-4 text-[10px] text-muted">
+                        <div class="flex items-center gap-1"><div class="w-2 h-2 bg-success rounded-full"></div> >10% Undervalued</div>
+                        <div class="flex items-center gap-1"><div class="w-2 h-2 bg-danger rounded-full"></div> >10% Overvalued</div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-panel border border-accent text-white px-6 py-3 rounded-lg shadow-2xl shadow-blue-900/50 flex items-center gap-3 z-[70] hidden">
+        <i class="fas fa-check-circle text-accent"></i>
+        <span id="toastMsg" class="font-medium text-sm">Action Successful</span>
+    </div>
+
+    <script>
+        // --- Libraries & Constants ---
+        
+        const Constants = {
+            Templates: {
+                'custom': { margin: 0.15, growth: 0.05, capex: 0.05, nwc: 0.10, beta: 1.0 },
+                'saas': { margin: 0.25, growth: 0.15, capex: 0.02, nwc: -0.05, beta: 1.4 },
+                'mfg': { margin: 0.12, growth: 0.03, capex: 0.08, nwc: 0.15, beta: 1.1 },
+                'retail': { margin: 0.08, growth: 0.04, capex: 0.04, nwc: 0.05, beta: 0.9 },
+                'energy': { margin: 0.35, growth: 0.02, capex: 0.12, nwc: 0.08, beta: 0.7 }
+            },
+            RatingScale: [
+                { maxLev: 1.5, rating: 'AAA', desc: 'Prime' },
+                { maxLev: 2.0, rating: 'AA', desc: 'High Grade' },
+                { maxLev: 2.5, rating: 'A', desc: 'Upper Medium' },
+                { maxLev: 3.5, rating: 'BBB', desc: 'Lower Medium' },
+                { maxLev: 4.5, rating: 'BB', desc: 'Speculative' },
+                { maxLev: 6.0, rating: 'B', desc: 'Highly Speculative' },
+                { maxLev: 99, rating: 'CCC', desc: 'Distressed' }
+            ]
+        };
+
+        const Utils = {
+            fmtM: (n) => (n !== null && n !== undefined) ? n.toFixed(1) : '-',
+            fmtP: (n) => (n !== null && n !== undefined) ? (n * 100).toFixed(1) + '%' : '-',
+            fmt$: (n) => '$' + n.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0}),
+            safeFloat: (id) => {
+                const el = document.getElementById(id);
+                return el ? (parseFloat(el.value) || 0) : 0;
+            }
+        };
+
+        // --- Storage Manager ---
+        const StorageManager = {
+            KEYS: { SCENARIOS: 'cred_arch_scenarios_v5' },
+            
+            getScenarios: function() {
+                const data = localStorage.getItem(this.KEYS.SCENARIOS);
+                return data ? JSON.parse(data) : {};
+            },
+
+            saveCurrentScenario: function() {
+                App.modal.prompt("Save Scenario As:", (name) => {
+                    if (!name) return;
+                    const scenarios = this.getScenarios();
+                    scenarios[name] = {
+                        inputs: App.getInputs(),
+                        debtTranches: App.state.debtTranches,
+                        projections: App.state.projections,
+                        history: App.state.history
+                    };
+                    localStorage.setItem(this.KEYS.SCENARIOS, JSON.stringify(scenarios));
+                    this.updateDropdown();
+                    App.showToast(`Scenario '${name}' saved`);
+                });
+            },
+
+            loadScenario: function(name) {
+                if(!name) return;
+                const scenarios = this.getScenarios();
+                const s = scenarios[name];
+                if(s) {
+                    App.state.debtTranches = JSON.parse(JSON.stringify(s.debtTranches));
+                    App.state.projections = JSON.parse(JSON.stringify(s.projections));
+                    if(s.history) App.state.history = JSON.parse(JSON.stringify(s.history));
+                    App.setInputs(s.inputs); // This triggers recalc
+                    App.showToast(`Loaded '${name}'`);
+                }
+            },
+
+            updateDropdown: function() {
+                const select = document.getElementById('scenarioSelect');
+                select.innerHTML = '<option value="">-- Load Scenario --</option>';
+                const scenarios = this.getScenarios();
+                Object.keys(scenarios).forEach(name => {
+                    const opt = document.createElement('option');
+                    opt.value = name;
+                    opt.innerText = name;
+                    select.appendChild(opt);
+                });
+            },
+            
+            resetToHardDefaults: function() {
+                App.modal.confirm("Reset to Factory Defaults? All scenarios will be lost.", () => {
+                    localStorage.removeItem(this.KEYS.SCENARIOS);
+                    location.reload();
+                });
+            }
+        };
+
+        // --- Main App Logic ---
+        const App = {
+            state: {
+                inputs: {},
+                history: {
+                    revenue: [800, 900, 1000],
+                    ebitda_margin: [0.15, 0.16, 0.18],
+                    capex_percent: [0.05, 0.05, 0.05],
+                    nwc_percent: [0.10, 0.10, 0.10]
+                },
+                projections: {
+                    rev_growth: Array(7).fill(0.05),
+                    ebitda_margin: Array(7).fill(0.18),
+                    capex_percent: Array(7).fill(0.05),
+                    nwc_percent: Array(7).fill(0.10)
+                },
+                debtTranches: [
+                    { name: "Revolver", amount: 50, rate: 6.5, amort: 0, priority: 1 },
+                    { name: "Term Loan A", amount: 400, rate: 7.5, amort: 10.0, priority: 2 },
+                    { name: "Senior Notes", amount: 750, rate: 9.0, amort: 0, priority: 3 }
+                ]
+            },
+
+            charts: {},
+
+            init: function() {
+                this.setupModal();
+                StorageManager.updateDropdown();
+                this.renderDebtInputs();
+                this.recalculate();
+                console.log("Credit Architect v5.0 Initialized");
+            },
+
+            // --- Modal System ---
+            modal: {
+                el: document.getElementById('modalOverlay'),
+                confirm: function(msg, callback) {
+                    App.showModal('Confirm', msg, false, callback);
+                },
+                prompt: function(msg, callback) {
+                    App.showModal('Input Required', msg, true, callback);
+                }
+            },
+
+            setupModal: function() {
+                const m = document.getElementById('modalOverlay');
+                document.getElementById('modalCancel').onclick = () => {
+                    m.classList.remove('opacity-100');
+                    setTimeout(() => m.classList.add('hidden'), 200);
+                };
+            },
+
+            showModal: function(title, msg, isPrompt, callback) {
+                const m = document.getElementById('modalOverlay');
+                const inpContainer = document.getElementById('modalInputContainer');
+                const inp = document.getElementById('modalInput');
+                const confirmBtn = document.getElementById('modalConfirm');
+
+                document.getElementById('modalTitle').innerText = title;
+                document.getElementById('modalMessage').innerText = msg;
+                
+                if (isPrompt) {
+                    inpContainer.classList.remove('hidden');
+                    inp.value = '';
+                    setTimeout(() => inp.focus(), 50);
+                } else {
+                    inpContainer.classList.add('hidden');
+                }
+
+                confirmBtn.onclick = () => {
+                    const val = isPrompt ? inp.value : true;
+                    if(callback) callback(val);
+                    m.classList.remove('opacity-100');
+                    setTimeout(() => m.classList.add('hidden'), 200);
+                };
+
+                m.classList.remove('hidden');
+                // Force reflow
+                void m.offsetWidth; 
+                m.classList.add('opacity-100');
+            },
+
+            showToast: function(msg) {
+                const t = document.getElementById('toast');
+                document.getElementById('toastMsg').innerText = msg;
+                t.classList.remove('hidden');
+                t.classList.add('toast-enter');
+                setTimeout(() => {
+                    t.classList.remove('toast-enter');
+                    t.classList.add('hidden');
+                }, 3000);
+            },
+
+            // --- Business Logic ---
+
+            getInputs: function() {
+                return {
+                    rfr: Utils.safeFloat('inp_rfr'),
+                    erp: Utils.safeFloat('inp_erp'),
+                    beta: Utils.safeFloat('inp_beta'),
+                    tax: Utils.safeFloat('inp_tax'),
+                    tgr: Utils.safeFloat('inp_tgr'),
+                    shares: Utils.safeFloat('inp_shares'),
+                    price: Utils.safeFloat('inp_price'),
+                    cash: Utils.safeFloat('inp_cash')
+                };
+            },
+
+            setInputs: function(data) {
+                document.getElementById('inp_rfr').value = data.rfr;
+                document.getElementById('inp_erp').value = data.erp;
+                document.getElementById('inp_beta').value = data.beta;
+                document.getElementById('inp_tax').value = data.tax;
+                document.getElementById('inp_tgr').value = data.tgr;
+                document.getElementById('inp_shares').value = data.shares;
+                document.getElementById('inp_price').value = data.price;
+                document.getElementById('inp_cash').value = data.cash;
+                this.renderDebtInputs();
+                this.recalculate();
+            },
+
+            loadIndustryTemplate: function(val) {
+                const tmpl = Constants.Templates[val];
+                if (!tmpl) return;
+
+                document.getElementById('inp_beta').value = tmpl.beta;
+                this.state.projections.rev_growth.fill(tmpl.growth);
+                this.state.projections.ebitda_margin.fill(tmpl.margin);
+                this.state.projections.capex_percent.fill(tmpl.capex);
+                this.state.projections.nwc_percent.fill(tmpl.nwc);
+                
+                this.recalculate();
+                this.showToast(`Applied ${val.toUpperCase()} Template`);
+            },
+
+            // --- Calculations ---
+
+            recalculate: function() {
+                const inputs = this.getInputs();
+                
+                // 1. Debt Calc (Static for WACC)
+                let totalDebtStart = 0;
+                let weightedRateSum = 0;
+                this.state.debtTranches.forEach(t => {
+                    totalDebtStart += t.amount;
+                    weightedRateSum += (t.amount * t.rate);
+                });
+                const avgCod = totalDebtStart > 0 ? (weightedRateSum / totalDebtStart) : 0;
+                document.getElementById('total_debt_disp').innerText = '$' + totalDebtStart.toLocaleString();
+
+                // 2. WACC
+                const marketCap = inputs.shares * inputs.price;
+                const totalCap = marketCap + totalDebtStart;
+                const costEquity = inputs.rfr + (inputs.beta * inputs.erp);
+                const afterTaxCod = avgCod * (1 - (inputs.tax / 100));
+                
+                const w = (marketCap / totalCap) * costEquity;
+                const d = (totalDebtStart / totalCap) * afterTaxCod;
+                const wacc = w + d;
+
+                document.getElementById('out_wacc').innerText = wacc.toFixed(2) + '%';
+
+                // 3. Projections & FCF
+                let lastRev = this.state.history.revenue[2];
+                let prevRevForNWC = lastRev;
+                let prevNwcPercent = this.state.history.nwc_percent[2];
+
+                const proj = { 
+                    rev: [], ebitda: [], fcf: [], 
+                    ebit: [], nopat: [], da: [], 
+                    capex: [], nwcChg: [],
+                    interest: [], taxShield: [], mandatoryAmort: [], leveredFcf: [],
+                    totalDebtEnd: []
+                };
+
+                // Initialize Debt Balances
+                let debtBalances = this.state.debtTranches.map(t => t.amount);
+
+                for(let i=0; i<7; i++) {
+                    // Operating Loop
+                    const g = this.state.projections.rev_growth[i];
+                    const m = this.state.projections.ebitda_margin[i];
+                    const c = this.state.projections.capex_percent[i];
+                    const n = this.state.projections.nwc_percent[i];
+
+                    const rev = lastRev * (1 + g);
+                    const ebitda = rev * m;
+                    const capex = rev * c;
+                    const da = capex * 0.95; 
+                    const ebit = ebitda - da;
+                    const taxes = Math.max(0, ebit * (inputs.tax/100));
+                    const nopat = ebit - taxes;
+                    
+                    const nwcReq = rev * n;
+                    const prevNwc = prevRevForNWC * (i===0 ? prevNwcPercent : this.state.projections.nwc_percent[i-1]);
+                    const changeNwc = nwcReq - prevNwc;
+
+                    const ufcf = nopat + da - capex - changeNwc;
+
+                    // Debt Schedule Loop
+                    let annualInterest = 0;
+                    let annualAmort = 0;
+                    
+                    debtBalances = debtBalances.map((bal, idx) => {
+                        const tranche = this.state.debtTranches[idx];
+                        const interest = bal * (tranche.rate / 100);
+                        const scheduledAmort = tranche.amount * (tranche.amort / 100);
+                        const actualAmort = Math.min(bal, scheduledAmort); // Can't amortize more than balance
+                        
+                        annualInterest += interest;
+                        annualAmort += actualAmort;
+                        
+                        return bal - actualAmort; // Return new balance
+                    });
+
+                    const taxShield = annualInterest * (inputs.tax/100);
+                    // Levered FCF Bridge
+                    // Start with UFCF. 
+                    // UFCF assumes no interest tax shield in NOPAT, but captures operations.
+                    // Levered FCF = UFCF - Interest(1-t) - Mandatory Amort.
+                    // Or: UFCF - Interest + TaxShield - Mandatory Amort.
+                    
+                    const levered = ufcf - annualInterest + taxShield - annualAmort;
+                    const totalDebtNow = debtBalances.reduce((a,b) => a+b, 0);
+
+                    proj.rev.push(rev);
+                    proj.ebitda.push(ebitda);
+                    proj.ebit.push(ebit);
+                    proj.nopat.push(nopat);
+                    proj.da.push(da);
+                    proj.capex.push(capex);
+                    proj.nwcChg.push(changeNwc);
+                    proj.fcf.push(ufcf); // Unlevered
+                    
+                    proj.interest.push(annualInterest);
+                    proj.taxShield.push(taxShield);
+                    proj.mandatoryAmort.push(annualAmort);
+                    proj.leveredFcf.push(levered);
+                    proj.totalDebtEnd.push(totalDebtNow);
+
+                    lastRev = rev;
+                    prevRevForNWC = rev;
+                }
+
+                // 4. Valuation (Based on UFCF)
+                let pvFcf = 0;
+                proj.fcf.forEach((f, i) => {
+                    pvFcf += f / Math.pow(1 + wacc/100, i+1);
+                });
+
+                const termFcf = proj.fcf[6] * (1 + inputs.tgr/100);
+                const termVal = termFcf / ((wacc - inputs.tgr)/100);
+                const pvTerm = termVal / Math.pow(1 + wacc/100, 7);
+
+                const ev = pvFcf + pvTerm;
+                const eqVal = ev - totalDebtStart + inputs.cash;
+                const impliedPrice = eqVal / inputs.shares;
+                const upside = (impliedPrice - inputs.price) / inputs.price;
+
+                // 5. Risk & Credit
+                const ltmEbitda = this.state.history.revenue[2] * this.state.history.ebitda_margin[2];
+                const leverage = totalDebtStart / ltmEbitda;
+                const ratingObj = Constants.RatingScale.find(r => leverage <= r.maxLev) || Constants.RatingScale[6];
+                
+                // Capacity: Cumulative Levered FCF vs Remaining Debt
+                // If I can pay off remaining debt with my discretionary cash flow
+                const cumLevFcf = proj.leveredFcf.reduce((a,b) => a+b, 0);
+                const capacity = totalDebtStart > 0 ? cumLevFcf / totalDebtStart : 99; // Using total debt start as denominator for a "Paydown Ratio"
+                
+                // Coverage (EV / Debt)
+                const coverage = totalDebtStart > 0 ? ev / totalDebtStart : 99;
+                
+                const pd = Math.min(leverage * 1.5, 99.9);
+                const lgd = Math.max(0, Math.min(100, (1 - (ev*0.6 / totalDebtStart))*100));
+
+                // 6. Render Updates
+                this.updateDashboard(ev, impliedPrice, upside, leverage, ratingObj, pd, lgd, capacity, coverage);
+                this.renderGrid(proj);
+                this.renderWaterfall(ev, totalDebtStart);
+                this.renderSensitivity(wacc, inputs.tgr, proj.fcf, totalDebtStart, inputs.cash, inputs.shares);
+                this.renderCharts(eqVal, totalDebtStart, proj);
+            },
+
+            // --- Rendering ---
+
+            updateDashboard: function(ev, price, upside, lev, rating, pd, lgd, cap, cov) {
+                document.getElementById('dash_ev').innerText = Utils.fmt$(ev) + 'M';
+                document.getElementById('dash_share_price').innerText = '$' + price.toFixed(2);
+                
+                const upEl = document.getElementById('dash_upside');
+                upEl.innerText = (upside>0 ? '+' : '') + (upside*100).toFixed(1) + '%';
+                upEl.className = `text-xs font-bold px-2 py-0.5 rounded ${upside>0 ? 'bg-success/20 text-success' : 'bg-danger/20 text-danger'}`;
+                
+                const bar = document.getElementById('upside_bar');
+                bar.style.width = Math.min(Math.abs(upside)*100, 100) + '%';
+                bar.className = `h-full transition-all duration-500 ${upside>0 ? 'bg-success' : 'bg-danger'}`;
+
+                document.getElementById('dash_leverage').innerText = lev.toFixed(2) + 'x';
+                document.getElementById('dash_rating').innerText = rating.rating;
+                document.getElementById('dash_rating_desc').innerText = rating.desc;
+                document.getElementById('dash_rating_desc').className = `text-[10px] uppercase font-bold px-2 py-1 rounded bg-white/10 ${rating.rating.startsWith('A') ? 'text-success' : (rating.rating.startsWith('B') ? 'text-warning' : 'text-danger')}`;
+                document.getElementById('dash_rating_bg').innerText = rating.rating.charAt(0);
+
+                // Risk Panel
+                document.getElementById('risk_pd').innerText = pd.toFixed(2) + '%';
+                document.getElementById('risk_lgd').innerText = lgd.toFixed(1) + '%';
+                document.getElementById('risk_ev_coverage').innerText = cov.toFixed(2) + 'x';
+                
+                document.getElementById('risk_capacity_ratio').innerText = cap.toFixed(2) + 'x';
+                document.getElementById('risk_capacity_bar').style.width = Math.min(cap*33, 100) + '%'; // 3x is full
+                document.getElementById('risk_capacity_bar').className = `h-full transition-all duration-700 ${cap >= 1 ? 'bg-success' : 'bg-danger'}`;
+                
+                const statusEl = document.getElementById('risk_status_text');
+                statusEl.innerText = cap >= 1 ? 'Strong' : 'At Risk';
+                statusEl.className = `text-[9px] font-bold uppercase ${cap >= 1 ? 'text-success' : 'text-danger'}`;
+            },
+
+            renderGrid: function(proj) {
+                const tbody = document.getElementById('modelBody');
+                tbody.innerHTML = '';
+                
+                // Helper to build rows
+                const createRow = (label, histData, projData, type, fieldKey) => {
+                    const tr = document.createElement('tr');
+                    
+                    // Label formatting
+                    let indent = 'pl-2';
+                    if (['(-) Taxes', '(-) CapEx', '(-) \u0394 NWC', '(-) Cash Interest', '(-) Mand. Amort'].some(s => label.includes(s))) indent = 'pl-6';
+                    if (['NOPAT', '(=) UFCF', '(=) Levered FCF'].some(s => label.includes(s))) indent = 'pl-2 font-bold';
+                    
+                    const bold = label.startsWith('=') ? 'font-bold text-accent' : 'text-muted';
+                    tr.innerHTML = `<td class="text-left ${bold} ${indent} font-semibold sticky left-0 z-10 bg-[#0b1121] border-r border-border/50">${label}</td>`;
+                    
+                    // Historic Cols (0, 1, 2)
+                    for(let i=0; i<3; i++) {
+                        let val = histData ? histData[i] : null;
+                        let content = '-';
+                        if(val !== null && val !== undefined) {
+                            if(type === 'input_pct' || type === 'input_abs') {
+                                // EDITABLE HISTORY
+                                const formattedVal = type === 'input_pct' ? (val*100).toFixed(1) : val.toFixed(1);
+                                content = `<input type="number" step="0.1" value="${formattedVal}" 
+                                    class="input-bare input-hist text-right w-full h-full bg-transparent focus:bg-panel" 
+                                    onchange="App.updateHistory('${fieldKey}', ${i}, this.value)">`;
+                            } else {
+                                // Calculated History
+                                content = type.includes('pct') ? (val*100).toFixed(1)+'%' : val.toFixed(1);
+                            }
+                        }
+                        tr.innerHTML += `<td class="text-muted">${content}</td>`;
+                    }
+
+                    // Projection Cols (0-6)
+                    projData.forEach((v, i) => {
+                        let content;
+                        if(type === 'input_pct' || type === 'input_pct_proj') {
+                            content = `<input type="number" step="0.1" value="${(v*100).toFixed(1)}" 
+                                class="input-bare text-accent text-right w-full h-full bg-transparent focus:bg-panel" 
+                                onchange="App.updateProjection('${fieldKey}', ${i}, this.value)">`;
+                        } else if(type === 'input_growth') {
+                            content = `<input type="number" step="0.1" value="${(v*100).toFixed(1)}" 
+                                class="input-bare text-accent text-right w-full h-full bg-transparent focus:bg-panel" 
+                                onchange="App.updateProjection('rev_growth', ${i}, this.value)">`;
+                        } else {
+                            content = `<span class="text-white">${v.toFixed(1)}</span>`;
+                        }
+                        tr.innerHTML += `<td>${content}</td>`;
+                    });
+                    
+                    return tr;
+                };
+
+                // --- BUILD ROWS ---
+                
+                // EBITDA Block
+                tbody.appendChild(createRow('Revenue', this.state.history.revenue, proj.rev, 'input_abs', 'revenue'));
+                const hG = [null, this.state.history.revenue[1]/this.state.history.revenue[0]-1, this.state.history.revenue[2]/this.state.history.revenue[1]-1];
+                tbody.appendChild(createRow('Growth %', hG, this.state.projections.rev_growth, 'input_growth', 'rev_growth'));
+                const hE = this.state.history.revenue.map((r,i) => r*this.state.history.ebitda_margin[i]);
+                tbody.appendChild(createRow('EBITDA', hE, proj.ebitda, 'calc_abs', ''));
+                tbody.appendChild(createRow('Margin %', this.state.history.ebitda_margin, this.state.projections.ebitda_margin, 'input_pct', 'ebitda_margin'));
+
+                // UFCF Bridge
+                const hDA = hE.map(e => e * 0.2); 
+                tbody.appendChild(createRow('(-) D&A', hDA, proj.da, 'calc_abs', ''));
+                const hEBIT = hE.map((e,i) => e - hDA[i]);
+                // tbody.appendChild(createRow('= EBIT', hEBIT, proj.ebit, 'calc_abs', ''));
+                const taxRate = this.getInputs().tax / 100;
+                const hTax = hEBIT.map(e => Math.max(0, e*taxRate));
+                const pTax = proj.ebit.map(e => Math.max(0, e*taxRate));
+                tbody.appendChild(createRow('(-) Taxes', hTax, pTax, 'calc_abs', ''));
+                const hNOPAT = hEBIT.map((e,i) => e - hTax[i]);
+                // tbody.appendChild(createRow('NOPAT', hNOPAT, proj.nopat, 'calc_abs', ''));
+                tbody.appendChild(createRow('(+) D&A', hDA, proj.da, 'calc_abs', ''));
+                const hCapex = this.state.history.revenue.map((r,i) => r * this.state.history.capex_percent[i]);
+                tbody.appendChild(createRow('(-) CapEx', hCapex, proj.capex, 'calc_abs', ''));
+                const hNwcChg = [0, 0, 0];
+                tbody.appendChild(createRow('(-) \u0394 NWC', hNwcChg, proj.nwcChg, 'calc_abs', ''));
+                
+                const hUFCF = hNOPAT.map((n, i) => n + hDA[i] - hCapex[i]);
+                tbody.appendChild(createRow('(=) UFCF', hUFCF, proj.fcf, 'calc_abs', ''));
+
+                // Levered FCF Bridge
+                // Empty historic for bridge items
+                const emptyHist = [null, null, null];
+                tbody.appendChild(createRow('(-) Cash Interest', emptyHist, proj.interest, 'calc_abs', ''));
+                tbody.appendChild(createRow('(+) Tax Shield', emptyHist, proj.taxShield, 'calc_abs', ''));
+                tbody.appendChild(createRow('(-) Mand. Amort', emptyHist, proj.mandatoryAmort, 'calc_abs', ''));
+                tbody.appendChild(createRow('(=) Levered FCF', emptyHist, proj.leveredFcf, 'calc_abs', ''));
+
+            },
+
+            updateProjection: function(field, idx, val) {
+                this.state.projections[field][idx] = parseFloat(val) / 100;
+                this.recalculate();
+            },
+
+            updateHistory: function(field, idx, val) {
+                const num = parseFloat(val);
+                this.state.history[field][idx] = field === 'revenue' ? num : (num / 100);
+                this.recalculate();
+            },
+
+            renderDebtInputs: function() {
+                const con = document.getElementById('debt-waterfall-container');
+                con.innerHTML = '';
+                this.state.debtTranches.forEach((t, i) => {
+                    const div = document.createElement('div');
+                    div.className = "grid grid-cols-12 gap-1 items-center text-xs mb-1";
+                    div.innerHTML = `
+                        <div class="col-span-3"><input type="text" value="${t.name}" class="bg-transparent border-b border-transparent focus:border-accent outline-none w-full text-white" onchange="App.updateTranche(${i}, 'name', this.value)"></div>
+                        <div class="col-span-3"><input type="number" value="${t.amount}" class="bg-panel border border-border/50 text-right w-full p-1 text-white rounded" onchange="App.updateTranche(${i}, 'amount', this.value)"></div>
+                        <div class="col-span-2 relative"><input type="number" value="${t.rate}" class="bg-panel border border-border/50 text-right w-full p-1 text-warning rounded pr-2" onchange="App.updateTranche(${i}, 'rate', this.value)"></div>
+                        <div class="col-span-2 relative"><input type="number" value="${t.amort}" class="bg-panel border border-border/50 text-right w-full p-1 text-blue-400 rounded pr-2" onchange="App.updateTranche(${i}, 'amort', this.value)"></div>
+                        <div class="col-span-2 text-center"><button onclick="App.removeTranche(${i})" class="text-danger hover:text-red-400"><i class="fas fa-times"></i></button></div>
+                    `;
+                    con.appendChild(div);
+                });
+            },
+
+            addTranche: function() {
+                this.state.debtTranches.push({ name: "New Tranche", amount: 100, rate: 8.0, amort: 0, priority: this.state.debtTranches.length + 1 });
+                this.renderDebtInputs();
+                this.recalculate();
+            },
+
+            removeTranche: function(i) {
+                this.state.debtTranches.splice(i, 1);
+                this.renderDebtInputs();
+                this.recalculate();
+            },
+
+            updateTranche: function(i, field, val) {
+                this.state.debtTranches[i][field] = field === 'name' ? val : parseFloat(val);
+                this.recalculate();
+            },
+
+            renderWaterfall: function(ev, totalDebt) {
+                const tbody = document.getElementById('waterfallBody');
+                tbody.innerHTML = '';
+                let remainingVal = ev * 0.7; // Assume 30% discount for recovery scenario
+                
+                this.state.debtTranches.forEach(t => {
+                    const covered = Math.min(remainingVal, t.amount);
+                    const recov = t.amount > 0 ? (covered/t.amount) : 1;
+                    remainingVal = Math.max(0, remainingVal - t.amount);
+                    
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b border-border/30";
+                    tr.innerHTML = `
+                        <td class="py-1 text-muted">${t.name}</td>
+                        <td class="py-1 text-right text-white">${t.amount}</td>
+                        <td class="py-1 text-right font-bold ${recov===1 ? 'text-success' : (recov>0.5 ? 'text-warning' : 'text-danger')}">${(recov*100).toFixed(0)}%</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            },
+
+            renderSensitivity: function(baseWacc, baseTgr, projFcf, debt, cash, shares) {
+                const table = document.getElementById('sensitivityTable');
+                table.innerHTML = '';
+
+                // Header
+                const wSteps = [-1, -0.5, 0, 0.5, 1];
+                const tSteps = [-0.5, -0.25, 0, 0.25, 0.5];
+
+                let hRow = '<thead class="bg-panel border-b border-border text-muted"><tr><th class="p-1">WACC \\ TGR</th>';
+                tSteps.forEach(t => hRow += `<th class="p-1">${(baseTgr+t).toFixed(2)}%</th>`);
+                hRow += '</tr></thead>';
+                table.innerHTML = hRow;
+
+                // Body
+                const tbody = document.createElement('tbody');
+                const currPrice = Utils.safeFloat('inp_price');
+
+                wSteps.forEach(w => {
+                    const wVal = baseWacc + w;
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td class="p-1 font-bold text-muted bg-panel border-r border-border">${wVal.toFixed(2)}%</td>`;
+                    
+                    tSteps.forEach(t => {
+                        const tVal = baseTgr + t;
+                        // Quick Valuation
+                        let pv = 0;
+                        projFcf.forEach((f, i) => pv += f / Math.pow(1 + wVal/100, i+1));
+                        const term = (projFcf[6] * (1+tVal/100)) / ((wVal - tVal)/100);
+                        const pvTerm = term / Math.pow(1 + wVal/100, 7);
+                        const val = ((pv + pvTerm) - debt + cash) / shares;
+                        
+                        const diff = (val - currPrice) / currPrice;
+                        let cls = 'text-muted';
+                        if(diff > 0.1) cls = 'text-success bg-success/10 font-bold';
+                        else if(diff < -0.1) cls = 'text-danger bg-danger/10 font-bold';
+                        else if(w===0 && t===0) cls = 'text-accent border border-accent bg-accent/10';
+
+                        tr.innerHTML += `<td class="p-1 border border-border/30 ${cls}">${val.toFixed(1)}</td>`;
+                    });
+                    tbody.appendChild(tr);
+                });
+                table.appendChild(tbody);
+            },
+
+            renderCharts: function(equity, debt, proj) {
+                // 1. Cap Structure Doughnut
+                if(this.charts.capStruct) this.charts.capStruct.destroy();
+                const ctxCap = document.getElementById('capStructChart').getContext('2d');
+                this.charts.capStruct = new Chart(ctxCap, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Equity', 'Debt'],
+                        datasets: [{
+                            data: [equity, debt],
+                            backgroundColor: ['#3b82f6', '#ef4444'],
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: { position: 'right', labels: { color: '#94a3b8', font: { family: 'Inter', size: 10 }, boxWidth: 10 } }
+                        }
+                    }
+                });
+
+                // 2. Performance Bar Chart (Rev, EBITDA, FCF)
+                if(this.charts.performance) this.charts.performance.destroy();
+                const ctxPerf = document.getElementById('performanceChart').getContext('2d');
+                const labels = ['FY+1', 'FY+2', 'FY+3', 'FY+4', 'FY+5', 'FY+6', 'FY+7'];
+                this.charts.performance = new Chart(ctxPerf, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            { label: 'EBITDA', data: proj.ebitda, backgroundColor: '#3b82f6', barPercentage: 0.7 },
+                            { label: 'UFCF', data: proj.fcf, backgroundColor: '#60a5fa', barPercentage: 0.7 },
+                            { label: 'Levered FCF', data: proj.leveredFcf, backgroundColor: '#10b981', barPercentage: 0.7 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: '#94a3b8', font: { size: 10 } } },
+                            title: { display: true, text: 'Cash Flow Bridge', color: '#e2e8f0' }
+                        },
+                        scales: {
+                            y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
+                            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                        }
+                    }
+                });
+
+                // 3. Debt/FCF Profile (Line)
+                if(this.charts.debtProfile) this.charts.debtProfile.destroy();
+                const ctxDebt = document.getElementById('debtProfileChart').getContext('2d');
+                
+                // Calculate Cumulative Levered FCF
+                let runningSum = 0;
+                const cumLevFcf = proj.leveredFcf.map(f => {
+                    runningSum += f;
+                    return runningSum;
+                });
+
+                this.charts.debtProfile = new Chart(ctxDebt, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            { 
+                                label: 'Cum. Levered FCF', 
+                                data: cumLevFcf, 
+                                borderColor: '#10b981', 
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)', 
+                                fill: true,
+                                tension: 0.3
+                            },
+                            { 
+                                label: 'Debt Balance', 
+                                data: proj.totalDebtEnd, 
+                                borderColor: '#ef4444', 
+                                borderDash: [5, 5], 
+                                pointRadius: 2,
+                                tension: 0.1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: '#94a3b8', font: { size: 10 } } },
+                            title: { display: true, text: 'Deleveraging Capacity', color: '#e2e8f0' },
+                            tooltip: { mode: 'index', intersect: false }
+                        },
+                        scales: {
+                            y: { 
+                                type: 'linear', display: true, position: 'left', 
+                                grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' },
+                                title: { display: true, text: '$ Millions', color: '#64748b' }
+                            },
+                            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                        }
+                    }
+                });
+            },
+
+            exportToCSV: function() {
+                let csv = "Metric,FY+1,FY+2,FY+3,FY+4,FY+5,FY+6,FY+7\n";
+                // Simple export logic
+                const inputs = this.getInputs();
+                csv += `Revenue Growth,${this.state.projections.rev_growth.join(',')}\n`;
+                csv += `EBITDA Margin,${this.state.projections.ebitda_margin.join(',')}\n`;
+                
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = `AnalystOS_Model_${new Date().toISOString().slice(0,10)}.csv`;
+                link.click();
+            }
+        };
+
+        window.onload = function() {
+            App.init();
+        };
+
+    </script>
+</body>
+</html>
