@@ -22,12 +22,14 @@ class TestV30Architecture(unittest.TestCase):
         self.assertEqual(res['result']['status'], "Working")
 
     def test_orchestrator_decomposition(self):
-        res = orchestrator.process_intent("I want to buy some AAPL", "User")
+        # Changed query to match regex in v30_orchestrator.py: buy (\d+) ...
+        res = orchestrator.process_intent("I want to buy 10 shares of AAPL", "User")
         self.assertEqual(res['status'], "completed")
         trace = res['trace']
         self.assertEqual(len(trace), 2)
-        self.assertEqual(trace[0]['step'], "Check Market Data for AAPL")
-        self.assertEqual(trace[1]['step'], "Execute Buy Order")
+        # The key is 'description', not 'step' in the new orchestrator output
+        self.assertEqual(trace[0]['description'], "Check Market Data for AAPL")
+        self.assertEqual(trace[1]['description'], "Execute Buy Order for AAPL")
 
     def test_news_bot(self):
         bot = NewsBotAgent()
