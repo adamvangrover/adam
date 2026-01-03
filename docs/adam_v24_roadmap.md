@@ -1,29 +1,34 @@
-# Roadmap to Adam v24.0
+# Adam v24.0 Roadmap: Towards Multimodal Omniscience
 
-## Vision: The Quantum-Native, Multimodal Architect
+## Vision
+To evolve Adam from a text-based financial analyst into a **Multimodal, Quantum-Native, Autonomous Investment Architect**.
 
-The transition from v23.5 to v24.0 marks the shift from "Adaptive" to "Omniscient". By leveraging the Alphabet Ecosystem (Gemini, Vertex AI) and integrating quantum-ready risk engines, Adam will move beyond analysis into high-fidelity simulation.
+## Phases
 
-## Milestones
-
-### Q1 2024: The Multimodal Baseline (Current Status: v23.5)
-*   [x] **Gemini 1.5 Pro Integration**: Single-pass 10-K analysis.
-*   [x] **Structured Reasoning**: Chain-of-Thought JSON extraction.
+### Phase 1: The Alphabet Foundation (Current - v23.5/v24.0 Alpha)
+*   [x] **Gemini 1.5 Pro Integration**: 1M+ token context window for full 10-K analysis.
+*   [x] **Structured Reasoning**: "Chain of Thought" extraction of Risk, Strategy, and ESG.
 *   [x] **Infrastructure Stubs**: BigQuery and Pub/Sub interfaces defined.
-*   [ ] **Video Analysis**: Real-time processing of earnings calls (Audio + Video).
+*   [x] **Quantum-Ready**: Quantum Monte Carlo engine architecture established.
 
-### Q2 2024: Cognitive RAG & Vector Memory
-*   **Vertex Vector Search**: Replace in-memory FAISS/Chroma with scalable Vertex AI Vector Search.
-*   **Episodic Memory**: Agents retain "memories" of past analyses across sessions using vector embeddings.
-*   **Graph-RAG**: Combining the Knowledge Graph with Vector Embeddings for multi-hop reasoning.
+### Phase 2: Multimodal Omniscience (v24.1)
+*   [ ] **Chart Vision**: Train/Fine-tune Gemini to extract precise data points from financial charts (Bar, Line, Pie).
+*   [ ] **Satellite Intelligence**: Integrate satellite imagery analysis (via Gemini Vision) for supply chain monitoring (e.g., counting cars in parking lots, shipping containers).
+*   [ ] **Audio Forensics**: Native processing of Earnings Call audio to detect vocal stress markers in CEO responses.
 
-### Q3 2024: Quantum-Native Risk (v24.0 Alpha)
-*   **Quantum Monte Carlo**: Replace pseudo-random number generators with quantum circuit simulations (via generic tensor networks or QPU access).
-*   **Crisis Simulation Engine**: Fully autonomous generation of "Black Swan" scenarios using generative video and text.
+### Phase 3: Cognitive Persistence (v24.2)
+*   [ ] **Full RAG Pipeline**: Connect `EpisodicMemory` to a live Vertex AI Vector Search index containing 10 years of global financial filing history.
+*   [ ] **Active Learning**: Agents autonomously flag "low confidence" insights for human review, refining the vector store.
 
-### Q4 2024: The "Adam Omni-Mind"
-*   **Unified Perception**: Seamlessly blending text, image, audio, and market data streams.
-*   **Self-Correction Loop**: Agents that deploy sub-agents to verify their own code and analysis.
+### Phase 4: Quantum Supremacy (v25.0)
+*   [ ] **QPU Integration**: Replace `SimulatorBackend` in `QuantumMonteCarloEngine` with real Google Quantum AI (Cirq) hardware execution.
+*   [ ] **Quantum Approximate Optimization**: Use QAOA for portfolio rebalancing.
 
-## Machine Manifest
-See `core/manifests/machine_manifest.json` for the programmatic definition of current capabilities.
+## Key Milestones
+
+| Milestone | Target Date | Description |
+| :--- | :--- | :--- |
+| **Alpha Release** | Q2 2024 | Core Gemini logic and Infrastructure stubs (Completed). |
+| **Beta Release** | Q3 2024 | Live connection to Vertex AI and BigQuery. First "Vision" features. |
+| **v24.0 GA** | Q4 2024 | Full production readiness with SLA support. |
+| **Quantum PoC** | Q1 2025 | First experimental run on quantum hardware. |
