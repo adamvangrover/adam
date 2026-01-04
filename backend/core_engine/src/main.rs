@@ -1,110 +1,189 @@
 use tonic::{transport::Server, Request, Response, Status};
-use std::sync::{Arc, Mutex};
-use std::collections::BTreeMap;
-use std::collections::HashMap;
-use tokio::sync::mpsc;
+use tokio::sync::{RwLock, mpsc};
 use tokio_stream::wrappers::ReceiverStream;
+use std::sync::Arc;
+use std::collections::{HashMap, BTreeMap};
 use std::time::Duration;
+use chrono::Utc;
 
+// -----------------------------------------------------------------------------
+// PROTO MODULE
+// -----------------------------------------------------------------------------
 pub mod financial_entities {
     tonic::include_proto!("financial_entities");
 }
 
-use financial_entities::order_entry_server::{OrderEntry, OrderEntryServer};
-use financial_entities::market_data_stream_server::{MarketDataStream, MarketDataStreamServer};
-use financial_entities::{Order, OrderAck, SubscriptionRequest, Quote};
+// Import all generated structs
+use financial_entities::{
+    order_entry_server::{OrderEntry, OrderEntryServer},
+    market_data_stream_server::{MarketDataStream, MarketDataStreamServer},
+    Order, OrderAck, SubscriptionRequest, Quote, OrderBookRequest, OrderBookStream
+};
 
-#[derive(Debug, Default)]
-pub struct OrderBook {
-    // Basic order book: symbol -> side ("BUY"|"SELL") -> price -> list of orders
-    // Using BTreeMap for price ordering.
-    // Buy orders: descending price priority.
-    // Sell orders: ascending price priority.
-    // For simplicity in this prototype, we'll just store all orders in a BTreeMap keyed by price.
-    // In a real engine, we'd separate buy/sell and handle time priority.
-    // Here: symbol -> BTreeMap<OrderedPrice, Vec<Order>>
-    // Since BTreeMap keys must be Ord, and f64 isn't, we use a wrapper or just use ordered_float crate?
-    // For zero-dependency simplicity in this scaffold, we'll stick to a simpler structure but use BTreeMap
-    // to demonstrate intent.
-    // We will use string representation of price for key to avoid float issues, or just a simple list for now
-    // but the requirement is "BTreeMap".
-    // Let's implement: symbol -> BTreeMap<u64, Vec<Order>> where u64 is price * 10000 (micros).
-    books: Mutex<HashMap<String, BTreeMap<u64, Vec<Order>>>>,
+// -----------------------------------------------------------------------------
+// CORE ENGINE: ORDER BOOK LOGIC
+// -----------------------------------------------------------------------------
+
+/// precise_price converts a float price to micro-units (u64) to avoid 
+/// floating point comparison issues in BTreeMaps.
+fn precise_price(price: f64) -> u64 {
+    (price * 1_000_000.0).round() as u64
 }
 
-impl OrderBook {
-    fn add_order(&self, order: Order) {
-        let mut books = self.books.lock().unwrap();
-        let price_micros = (order.price * 10000.0) as u64;
+#[derive(Debug, Default)]
+struct SecurityBook {
+    /// Bids: Buy orders, ordered High -> Low (Reverse)
+    /// We use u64 (micros) as key. BTreeMap sorts Low -> High by default, 
+    /// so we will iterate using `.rev()` for Bids.
+    bids: BTreeMap<u64, Vec<Order>>,
+    
+    /// Asks: Sell orders, ordered Low -> High
+    asks: BTreeMap<u64, Vec<Order>>,
+}
 
-        books.entry(order.symbol.clone())
-            .or_insert_with(BTreeMap::new)
-            .entry(price_micros)
-            .or_insert_with(Vec::new)
-            .push(order.clone());
+impl SecurityBook {
+    fn add(&mut self, order: Order) {
+        let price_key = precise_price(order.price);
+        match order.side.as_str() {
+            "BUY" => {
+                self.bids.entry(price_key).or_default().push(order);
+            }
+            "SELL" => {
+                self.asks.entry(price_key).or_default().push(order);
+            }
+            _ => eprintln!("Invalid side: {}", order.side),
+        }
+    }
 
-        println!("Order added to book for {}: Price {}, Side {}", order.symbol, order.price, order.side);
+    /// Generates a snapshot of the top N levels for streaming
+    fn snapshot(&self, symbol: &str) -> OrderBookStream {
+        // Flatten the maps to lists of orders for the proto response
+        // In a real scenario, you would aggregate volume at price levels here.
+        let bids = self.bids.iter().rev().take(10)
+            .flat_map(|(_, orders)| orders.clone())
+            .collect();
+            
+        let asks = self.asks.iter().take(10)
+            .flat_map(|(_, orders)| orders.clone())
+            .collect();
+
+        OrderBookStream {
+            symbol: symbol.to_string(),
+            bids,
+            asks,
+            timestamp: Utc::now().timestamp_millis(),
+        }
     }
 }
 
 #[derive(Debug, Default)]
-pub struct MyOrderEntry {
-    order_book: Arc<OrderBook>,
+pub struct EngineState {
+    // RwLock allows multiple readers (Streamers) to access simultaneously.
+    // Only locks exclusively during Order Entry.
+    books: RwLock<HashMap<String, SecurityBook>>,
+}
+
+// -----------------------------------------------------------------------------
+// SERVICE 1: ORDER ENTRY
+// -----------------------------------------------------------------------------
+#[derive(Debug)]
+pub struct FinancialOrderEntry {
+    state: Arc<EngineState>,
 }
 
 #[tonic::async_trait]
-impl OrderEntry for MyOrderEntry {
+impl OrderEntry for FinancialOrderEntry {
     async fn add_order(
         &self,
         request: Request<Order>,
     ) -> Result<Response<OrderAck>, Status> {
-        let order = request.into_inner();
-        println!("Received order: {:?}", order);
+        let mut order = request.into_inner();
+        
+        // Validation
+        if order.price <= 0.0 || order.quantity <= 0.0 {
+            return Err(Status::invalid_argument("Price and Quantity must be positive"));
+        }
 
-        self.order_book.add_order(order.clone());
+        // Augment with server-side metadata
+        order.timestamp = Utc::now().timestamp_millis();
+        let symbol = order.symbol.clone();
+        let order_id = order.order_id.clone();
 
-        let reply = OrderAck {
-            order_id: order.order_id,
+        // Lock for Write
+        let mut books = self.state.books.write().await;
+        let book = books.entry(symbol.clone()).or_insert_with(SecurityBook::default);
+        
+        book.add(order);
+        println!("INFO: Order {} accepted for {}", order_id, symbol);
+
+        Ok(Response::new(OrderAck {
+            order_id,
             status: "ACCEPTED".into(),
-            message: "Order received and added to book".into(),
-        };
+            message: "Order successfully committed to engine memory".into(),
+            timestamp: Utc::now().timestamp_millis(),
+        }))
+    }
 
-        Ok(Response::new(reply))
+    // New method implementation from 'main' branch requirements
+    async fn get_order_book_snapshot(
+        &self,
+        request: Request<OrderBookRequest>,
+    ) -> Result<Response<OrderBookStream>, Status> {
+        let req = request.into_inner();
+        let books = self.state.books.read().await;
+
+        if let Some(book) = books.get(&req.symbol) {
+            Ok(Response::new(book.snapshot(&req.symbol)))
+        } else {
+            Err(Status::not_found("Symbol not found in engine"))
+        }
     }
 }
 
-#[derive(Debug, Default)]
-pub struct MyMarketDataStream;
+// -----------------------------------------------------------------------------
+// SERVICE 2: MARKET DATA STREAM
+// -----------------------------------------------------------------------------
+#[derive(Debug)]
+pub struct FinancialMarketData {
+    state: Arc<EngineState>,
+}
 
 #[tonic::async_trait]
-impl MarketDataStream for MyMarketDataStream {
+impl MarketDataStream for FinancialMarketData {
     type SubscribeQuotesStream = ReceiverStream<Result<Quote, Status>>;
 
     async fn subscribe_quotes(
         &self,
         request: Request<SubscriptionRequest>,
     ) -> Result<Response<Self::SubscribeQuotesStream>, Status> {
-        println!("Received subscription request: {:?}", request);
-        let (tx, rx) = mpsc::channel(4);
+        let req = request.into_inner();
+        println!("INFO: Client subscribed to Market Data: {:?}", req.symbols);
 
+        let (tx, rx) = mpsc::channel(16);
+        
+        // Spawn a task to simulate streaming updates
+        // In production, this would subscribe to an internal Event Bus
         tokio::spawn(async move {
-            let symbols = request.into_inner().symbols;
-            // Mock streaming data
+            let mut interval = tokio::time::interval(Duration::from_millis(500));
             loop {
-                for symbol in &symbols {
+                interval.tick().await; // Wait for tick
+
+                for sym in &req.symbols {
+                    // Mock data generation (replace with real book listeners later)
                     let quote = Quote {
-                        symbol: symbol.clone(),
-                        bid: 100.0,
-                        ask: 101.0,
-                        bid_size: 10.0,
-                        ask_size: 10.0,
-                        timestamp: chrono::Utc::now().timestamp_millis(),
+                        symbol: sym.clone(),
+                        bid: 100.0 + (rand::random::<f64>() * 2.0),
+                        ask: 102.0 + (rand::random::<f64>() * 2.0),
+                        bid_size: 500.0,
+                        ask_size: 500.0,
+                        timestamp: Utc::now().timestamp_millis(),
                     };
-                    if let Err(_) = tx.send(Ok(quote)).await {
-                        return; // Client disconnected
+
+                    if tx.send(Ok(quote)).await.is_err() {
+                        println!("WARN: Client disconnected, stopping stream for {:?}", req.symbols);
+                        return;
                     }
                 }
-                tokio::time::sleep(Duration::from_millis(1000)).await;
             }
         });
 
@@ -112,18 +191,31 @@ impl MarketDataStream for MyMarketDataStream {
     }
 }
 
+// -----------------------------------------------------------------------------
+// MAIN ENTRY POINT
+// -----------------------------------------------------------------------------
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr = "[::1]:50051".parse()?;
-    let order_book = Arc::new(OrderBook::default());
-    let order_entry = MyOrderEntry { order_book: order_book.clone() };
-    let market_data = MyMarketDataStream::default();
+    
+    // Shared State Container
+    let shared_state = Arc::new(EngineState::default());
 
-    println!("Core Engine Server listening on {}", addr);
+    // Service Initialization
+    let order_entry_svc = FinancialOrderEntry { 
+        state: shared_state.clone() 
+    };
+    let market_data_svc = FinancialMarketData { 
+        state: shared_state.clone() 
+    };
+
+    println!("Core Engine v0.1.0 listening on {}", addr);
+    println!("├── Service: OrderEntry (Active)");
+    println!("└── Service: MarketDataStream (Active)");
 
     Server::builder()
-        .add_service(OrderEntryServer::new(order_entry))
-        .add_service(MarketDataStreamServer::new(market_data))
+        .add_service(OrderEntryServer::new(order_entry_svc))
+        .add_service(MarketDataStreamServer::new(market_data_svc))
         .serve(addr)
         .await?;
 
