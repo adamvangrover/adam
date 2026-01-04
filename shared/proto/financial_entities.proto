@@ -2,37 +2,175 @@ syntax = "proto3";
 
 package financial_entities;
 
+// -----------------------------------------------------------------------------
+// SERVICES
+// -----------------------------------------------------------------------------
+
 service OrderEntry {
-  rpc AddOrder (OrderRequest) returns (OrderResponse);
-  rpc GetOrderBook (OrderBookRequest) returns (stream OrderBookStream);
+  // Submit a new order to the matching engine
+  rpc AddOrder (Order) returns (OrderAck);
+  
+  // Cancel an existing order
+  rpc CancelOrder (CancelRequest) returns (OrderAck);
+  
+  // Request a snapshot of the current order book for a symbol
+  rpc GetOrderBookSnapshot (OrderBookRequest) returns (OrderBookStream);
 }
 
-message OrderRequest {
+service MarketDataStream {
+  // Subscribe to real-time Level 1 quotes (Top of Book)
+  rpc SubscribeQuotes (SubscriptionRequest) returns (stream Quote);
+  
+  // Subscribe to real-time trades (Time & Sales)
+  rpc SubscribeTrades (SubscriptionRequest) returns (stream Trade);
+  
+  // Subscribe to real-time OHLC candles
+  rpc SubscribeCandles (CandleRequest) returns (stream Candle);
+}
+
+// -----------------------------------------------------------------------------
+// ENUMS
+// -----------------------------------------------------------------------------
+
+enum Side {
+  SIDE_UNSPECIFIED = 0;
+  BUY = 1;
+  SELL = 2;
+  SELL_SHORT = 3;
+}
+
+enum OrderType {
+  ORDER_TYPE_UNSPECIFIED = 0;
+  LIMIT = 1;
+  MARKET = 2;
+  STOP_LOSS = 3;
+  STOP_LIMIT = 4;
+}
+
+enum TimeInForce {
+  TIF_UNSPECIFIED = 0;
+  DAY = 1;        // Good for Day
+  GTC = 2;        // Good Till Cancel
+  IOC = 3;        // Immediate or Cancel
+  FOK = 4;        // Fill or Kill
+}
+
+enum OrderStatus {
+  STATUS_UNSPECIFIED = 0;
+  ACCEPTED = 1;
+  REJECTED = 2;
+  FILLED = 3;
+  PARTIALLY_FILLED = 4;
+  CANCELED = 5;
+}
+
+// -----------------------------------------------------------------------------
+// MESSAGES: TRADING
+// -----------------------------------------------------------------------------
+
+message Order {
+  string order_id = 1;        // Client-generated UUID
+  string trader_id = 2;       // ID of the user/algo placing the order
+  string symbol = 3;          // Ticker symbol (e.g., "AAPL")
+  Side side = 4;              // Buy or Sell
+  double price = 5;           // Limit price (ignored for Market orders)
+  double quantity = 6;        // Quantity to trade
+  OrderType order_type = 7;   // Limit, Market, etc.
+  TimeInForce time_in_force = 8; 
+  int64 timestamp = 9;        // Unix timestamp (millis)
+}
+
+message CancelRequest {
+  string order_id = 1;
+  string symbol = 2;
+}
+
+message OrderAck {
+  string order_id = 1;
+  OrderStatus status = 2;
+  string message = 3;         // Error message or confirmation detail
+  int64 timestamp = 4;
+}
+
+message ExecutionReport {
+  string order_id = 1;
+  string execution_id = 2;
+  string symbol = 3;
+  Side side = 4;
+  double last_price = 5;      // Price of this specific fill
+  double last_quantity = 6;   // Quantity of this specific fill
+  double leaves_quantity = 7; // Remaining quantity open on the order
+  OrderStatus status = 8;
+  int64 timestamp = 9;
+}
+
+// -----------------------------------------------------------------------------
+// MESSAGES: MARKET DATA
+// -----------------------------------------------------------------------------
+
+message SubscriptionRequest {
+  repeated string symbols = 1;
+}
+
+message Quote {
   string symbol = 1;
-  string side = 2; // "BUY" or "SELL"
+  double bid = 2;             // Best Bid Price
+  double ask = 3;             // Best Ask Price
+  double bid_size = 4;        // Quantity at Best Bid
+  double ask_size = 5;        // Quantity at Best Ask
+  string exchange = 6;        // e.g., "NYSE", "NASDAQ"
+  int64 timestamp = 7;
+}
+
+message Trade {
+  string trade_id = 1;
+  string symbol = 2;
   double price = 3;
   double quantity = 4;
-  string order_type = 5; // "LIMIT", "MARKET"
-  string trader_id = 6;
+  Side side = 5;              // Taker side (Aggressor)
+  int64 timestamp = 6;
 }
 
-message OrderResponse {
-  string order_id = 1;
-  string status = 2;
-  string message = 3;
-}
+// -----------------------------------------------------------------------------
+// MESSAGES: ORDER BOOK
+// -----------------------------------------------------------------------------
 
 message OrderBookRequest {
   string symbol = 1;
+  int32 depth = 2;            // How many levels to return (e.g., 10)
+}
+
+// Represents a single price level in the book
+message PriceLevel {
+  double price = 1;
+  double quantity = 2;
+  int32 order_count = 3;      // Number of orders at this price level
 }
 
 message OrderBookStream {
-  repeated Order bids = 1;
-  repeated Order asks = 2;
-  int64 timestamp = 3;
+  string symbol = 1;
+  repeated PriceLevel bids = 2;
+  repeated PriceLevel asks = 3;
+  int64 timestamp = 4;
+  int64 sequence_id = 5;      // For detecting dropped packets
 }
 
-message Order {
-  double price = 1;
-  double quantity = 2;
+// -----------------------------------------------------------------------------
+// MESSAGES: ANALYTICS
+// -----------------------------------------------------------------------------
+
+message CandleRequest {
+  repeated string symbols = 1;
+  string interval = 2;        // "1m", "5m", "1h", "1d"
+}
+
+message Candle {
+  string symbol = 1;
+  double open = 2;
+  double high = 3;
+  double low = 4;
+  double close = 5;
+  double volume = 6;
+  int64 start_timestamp = 7;  // Candle open time
+  int64 end_timestamp = 8;    // Candle close time
 }
