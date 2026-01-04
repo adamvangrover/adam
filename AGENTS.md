@@ -175,6 +175,7 @@ Please follow these guidelines when contributing to the ADAM project:
 
 The prompt library has been updated with v2.0 standards, emphasizing structured tool use (JSON Schema) and iterative workflows (Plan-Execute-Reflect).
 
+*   **Canonical Agent Core (Recommended):** `prompt_library/system/agent_core.md` - The new reference implementation for all general-purpose agents. It defines the standard for role, behavior, and output requirements.
 *   **Credit Risk Architect:** `prompt_library/v2_0_credit_risk_architect.md` - The flagship agent prompt using MCP standards.
 
 ## Alphabet Ecosystem Integration (v24.0 Preview)
