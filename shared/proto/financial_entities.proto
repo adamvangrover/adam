@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package financial_entities;
+
+service OrderEntry {
+  rpc AddOrder (Order) returns (OrderAck);
+}
+
+service MarketDataStream {
+  rpc SubscribeQuotes (SubscriptionRequest) returns (stream Quote);
+}
+
+message Order {
+  string order_id = 1;
+  string symbol = 2;
+  string side = 3; // "BUY" or "SELL"
+  double price = 4;
+  double quantity = 5;
+  string order_type = 6; // "LIMIT", "MARKET"
+  int64 timestamp = 7;
+}
+
+message OrderAck {
+  string order_id = 1;
+  string status = 2; // "ACCEPTED", "REJECTED"
+  string message = 3;
+}
+
+message SubscriptionRequest {
+  repeated string symbols = 1;
+}
+
+message Quote {
+  string symbol = 1;
+  double bid = 2;
+  double ask = 3;
+  double bid_size = 4;
+  double ask_size = 5;
+  int64 timestamp = 6;
+}
+
+message Trade {
+  string trade_id = 1;
+  string symbol = 2;
+  double price = 3;
+  double quantity = 4;
+  string side = 5;
+  int64 timestamp = 6;
+}
