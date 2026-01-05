@@ -12,6 +12,18 @@ from core.settings import settings
 async def async_main():
     """
     Main execution logic for Adam v23.0 (Adaptive System).
+
+    This function handles:
+    1. Parsing command line arguments.
+    2. Bootstrapping the environment.
+    3. Initializing the Meta Orchestrator.
+    4. Running the interactive loop or single-shot query.
+
+    Args:
+        None (uses sys.argv via argparse)
+
+    Returns:
+        None
     """
     parser = argparse.ArgumentParser(description="Adam v23.0 Execution")
     parser.add_argument("--query", type=str, help="Single query to execute")

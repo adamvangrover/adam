@@ -21,23 +21,7 @@ from core.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
-try:
-    from langgraph.graph import StateGraph, END, START
-    from langgraph.checkpoint.memory import MemorySaver
-    HAS_LANGGRAPH = True
-except ImportError:
-    HAS_LANGGRAPH = False
-    class StateGraph:
-         def __init__(self, *args, **kwargs): pass
-         def add_node(self, *args, **kwargs): pass
-         def add_edge(self, *args, **kwargs): pass
-         def set_entry_point(self, *args, **kwargs): pass
-         def add_conditional_edges(self, *args, **kwargs): pass
-         def compile(self, *args, **kwargs): return None
-    END = "END"
-    START = "START"
-    class MemorySaver: pass
-    logger.warning("LangGraph not installed. Graphs will be disabled.")
+from core.utils.graph_utils import StateGraph, END, START, MemorySaver, HAS_LANGGRAPH
 
 # v23.5 Integration: APEX Generative Risk Engine
 try:
