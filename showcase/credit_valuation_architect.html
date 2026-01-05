@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyst OS // Credit & Valuation Architect v6.2</title>
+
+    <!-- Core Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        bg: '#0f172a',
+                        panel: '#1e293b',
+                        border: '#334155',
+                        accent: '#3b82f6',
+                        accentHover: '#2563eb',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444',
+                        text: '#f8fafc',
+                        muted: '#94a3b8'
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Input Styling */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+        /* Replaced @apply with standard CSS for portability */
+        .input-seamless {
+            background-color: transparent;
+            border-bottom: 1px dashed #334155;
+            text-align: right;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.2s;
+            width: 100%;
+            color: #f8fafc;
+        }
+        .input-seamless:focus {
+            outline: none;
+            border-bottom: 1px solid #3b82f6;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .chart-container { position: relative; width: 100%; height: 100%; }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; color: black; }
+            .glass-panel { background: white; border: 1px solid #ccc; box-shadow: none; }
+            input { color: black !important; border: none !important; }
+            .text-white { color: black !important; }
+            .text-muted { color: #666 !important; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col overflow-hidden">
+    <div id="root" class="flex-1 flex flex-col h-screen"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo, useRef } = React;
+
+        // --- Constants & Utilities ---
+        const SCENARIOS = { BASE: 'Base', BULL: 'Bull', BEAR: 'Bear' };
+        const VALUATION_METHODS = { PERPETUITY: 'Perpetuity Growth', MULTIPLE: 'Exit Multiple' };
+
+        // --- DATASET LIBRARY (Extracted from Repository) ---
+        const PRESETS = {
+            CORPORATES: {
+                'Apple Inc. (AAPL)': {
+                    meta: { date: '2023-10-27', source: 'Gold Standard KG', wacc_notes: '8.5% Cost of Capital' },
+                    inputs: { rfr: 4.5, erp: 5.0, tax: 21.0, shares: 15500, price: 175.00, cash: 60000 },
+                    scenarioData: {
+                        [SCENARIOS.BASE]: { beta: 1.1, tgr: 3.0, exitMult: 24.0, growth: Array(7).fill(0.085), margin: Array(7).fill(0.32) },
+                        [SCENARIOS.BULL]: { beta: 1.0, tgr: 3.5, exitMult: 28.0, growth: Array(7).fill(0.12), margin: Array(7).fill(0.35) },
+                        [SCENARIOS.BEAR]: { beta: 1.3, tgr: 2.0, exitMult: 18.0, growth: Array(7).fill(0.04), margin: Array(7).fill(0.28) }
+                    },
+                    debt: [ { name: "Revolver (Unsecured)", amount: 5000, rate: 5.5, amort: 0 } ],
+                    historical: { revenue: [365000, 394000, 383000], margin: [0.30, 0.31, 0.32] }
+                },
+                'Ford Motor Co (F)': {
+                    meta: { date: '2023-10-27', source: 'Gold Standard KG', wacc_notes: 'High Beta, 12% WACC' },
+                    inputs: { rfr: 4.5, erp: 6.0, tax: 21.0, shares: 4000, price: 10.00, cash: 25000 },
+                    scenarioData: {
+                        [SCENARIOS.BASE]: { beta: 1.6, tgr: 1.0, exitMult: 6.5, growth: Array(7).fill(0.04), margin: Array(7).fill(0.08) },
+                        [SCENARIOS.BULL]: { beta: 1.4, tgr: 1.5, exitMult: 8.0, growth: Array(7).fill(0.06), margin: Array(7).fill(0.10) },
+                        [SCENARIOS.BEAR]: { beta: 1.9, tgr: 0.0, exitMult: 4.5, growth: Array(7).fill(-0.02), margin: Array(7).fill(0.05) }
+                    },
+                    debt: [
+                        { name: "Term Loan B", amount: 2000, rate: 8.5, amort: 1 },
+                        { name: "Auto ABS/Debt", amount: 90000, rate: 6.0, amort: 15 }
+                    ],
+                    historical: { revenue: [136000, 158000, 176000], margin: [0.07, 0.08, 0.075] }
+                },
+                'NVIDIA Corp (NVDA)': {
+                    meta: { date: '2025-12-01', source: 'Deep Dive Report v23.5', wacc_notes: '9.2% WACC, Massive Growth' },
+                    inputs: { rfr: 4.2, erp: 5.0, tax: 21.0, shares: 2460, price: 460.00, cash: 25000 },
+                    scenarioData: {
+                        [SCENARIOS.BASE]: { beta: 1.7, tgr: 4.5, exitMult: 34.5, growth: [0.60, 0.40, 0.25, 0.15, 0.10, 0.08, 0.06], margin: Array(7).fill(0.55) },
+                        [SCENARIOS.BULL]: { beta: 1.5, tgr: 5.0, exitMult: 45.0, growth: [0.80, 0.50, 0.35, 0.25, 0.20, 0.15, 0.10], margin: Array(7).fill(0.60) },
+                        [SCENARIOS.BEAR]: { beta: 2.2, tgr: 3.0, exitMult: 20.0, growth: [0.30, 0.15, 0.05, 0.02, 0.02, 0.02, 0.02], margin: Array(7).fill(0.40) }
+                    },
+                    debt: [ { name: "Unsecured Revolver", amount: 0, rate: 6.0, amort: 0 } ],
+                    historical: { revenue: [26900, 60900, 96000], margin: [0.45, 0.50, 0.54] }
+                },
+                'GameStop Corp (GME)': {
+                    meta: { date: '2023-10-27', source: 'Gold Standard KG', wacc_notes: 'Distressed 15% WACC' },
+                    inputs: { rfr: 4.5, erp: 7.0, tax: 21.0, shares: 305, price: 15.00, cash: 1000 },
+                    scenarioData: {
+                        [SCENARIOS.BASE]: { beta: 2.0, tgr: -5.0, exitMult: 8.0, growth: Array(7).fill(-0.05), margin: Array(7).fill(-0.02) },
+                        [SCENARIOS.BULL]: { beta: 2.5, tgr: 0.0, exitMult: 12.0, growth: Array(7).fill(0.00), margin: Array(7).fill(0.01) },
+                        [SCENARIOS.BEAR]: { beta: 1.8, tgr: -10.0, exitMult: 2.0, growth: Array(7).fill(-0.15), margin: Array(7).fill(-0.08) }
+                    },
+                    debt: [ { name: "ABL Revolver", amount: 500, rate: 9.5, amort: 0 } ],
+                    historical: { revenue: [6000, 5800, 5200], margin: [-0.01, -0.02, -0.03] }
+                }
+            },
+            TEMPLATES: {
+                'SaaS (High Growth)': {
+                    meta: { date: 'N/A', source: 'Template', wacc_notes: 'Standard SaaS Model' },
+                    inputs: { rfr: 4.0, erp: 5.5, tax: 21.0, shares: 100, price: 50.00, cash: 100 },
+                    scenarioData: {
+                        [SCENARIOS.BASE]: { beta: 1.4, tgr: 3.5, exitMult: 15.0, growth: [0.30, 0.25, 0.20, 0.15, 0.12, 0.10, 0.08], margin: [0.10, 0.15, 0.20, 0.25, 0.28, 0.30, 0.32] },
+                        [SCENARIOS.BULL]: { beta: 1.2, tgr: 4.0, exitMult: 20.0, growth: [0.40, 0.35, 0.30, 0.25, 0.20, 0.15, 0.12], margin: [0.15, 0.20, 0.25, 0.30, 0.35, 0.38, 0.40] },
+                        [SCENARIOS.BEAR]: { beta: 1.8, tgr: 2.0, exitMult: 8.0, growth: [0.15, 0.10, 0.05, 0.02, 0.02, 0.02, 0.02], margin: [0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05] }
+                    },
+                    debt: [ { name: "Venture Debt", amount: 50, rate: 10.0, amort: 10 } ],
+                    historical: { revenue: [100, 150, 220], margin: [0.05, 0.08, 0.09] }
+                },
+                'Industrial (Cyclical)': {
+                    meta: { date: 'N/A', source: 'Template', wacc_notes: 'Standard Industrial Model' },
+                    inputs: { rfr: 4.0, erp: 5.5, tax: 21.0, shares: 100, price: 35.00, cash: 200 },
+                    scenarioData: {
+                        [SCENARIOS.BASE]: { beta: 1.1, tgr: 2.0, exitMult: 8.0, growth: Array(7).fill(0.03), margin: Array(7).fill(0.12) },
+                        [SCENARIOS.BULL]: { beta: 1.0, tgr: 2.5, exitMult: 10.0, growth: Array(7).fill(0.05), margin: Array(7).fill(0.14) },
+                        [SCENARIOS.BEAR]: { beta: 1.4, tgr: 0.0, exitMult: 5.0, growth: Array(7).fill(-0.02), margin: Array(7).fill(0.08) }
+                    },
+                    debt: [ { name: "Senior Notes", amount: 300, rate: 5.5, amort: 0 }, { name: "Revolver", amount: 50, rate: 6.0, amort: 0 } ],
+                    historical: { revenue: [1000, 950, 1020], margin: [0.11, 0.10, 0.12] }
+                }
+            }
+        };
+
+        const fmt = {
+            $: (n) => `$${n.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0})}`,
+            $m: (n) => `$${(n/1000000).toFixed(1)}M`, // If handling raw large numbers
+            pct: (n) => `${(n * 100).toFixed(1)}%`,
+            num: (n) => n.toLocaleString(undefined, {minimumFractionDigits:1, maximumFractionDigits:1}) + 'x',
+            cleanNum: (n) => n.toLocaleString(undefined, {minimumFractionDigits:1, maximumFractionDigits:1})
+        };
+
+        // --- Components ---
+
+        // 1. Debt Waterfall Component
+        const DebtWaterfall = ({ debts, onUpdate, onAdd, onRemove, totalDebt, cash }) => {
+            const netDebt = totalDebt - cash;
+            return (
+                <div className="glass-panel rounded-lg p-4 flex flex-col h-full">
+                    <div className="flex justify-between items-center mb-3">
+                        <h3 className="text-xs font-bold text-accent uppercase tracking-wider"><i className="fas fa-layer-group mr-2"></i>Debt Structure</h3>
+                        <button onClick={onAdd} className="text-[10px] bg-accent/20 hover:bg-accent text-accent hover:text-white px-2 py-1 rounded transition">
+                            <i className="fas fa-plus mr-1"></i>Add Tranche
+                        </button>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto custom-scrollbar pr-1">
+                        <table className="w-full text-xs">
+                            <thead>
+                                <tr className="text-muted border-b border-border/50 text-[10px] uppercase">
+                                    <th className="text-left py-1 font-medium">Instrument</th>
+                                    <th className="text-right py-1 font-medium">Amt ($M)</th>
+                                    <th className="text-right py-1 font-medium">Rate %</th>
+                                    <th className="w-6"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {debts.map((d, i) => (
+                                    <tr key={i} className="group hover:bg-white/5 transition-colors">
+                                        <td className="py-1">
+                                            <input type="text" value={d.name} onChange={(e) => onUpdate(i, 'name', e.target.value)} className="bg-transparent focus:text-accent w-full outline-none text-slate-300" />
+                                        </td>
+                                        <td className="py-1">
+                                            <input type="number" value={d.amount} onChange={(e) => onUpdate(i, 'amount', parseFloat(e.target.value))} className="input-seamless text-white" />
+                                        </td>
+                                        <td className="py-1">
+                                            <input type="number" value={d.rate} onChange={(e) => onUpdate(i, 'rate', parseFloat(e.target.value))} className="input-seamless text-warning" />
+                                        </td>
+                                        <td className="text-center">
+                                            <button onClick={() => onRemove(i)} className="text-muted hover:text-danger opacity-0 group-hover:opacity-100 transition"><i className="fas fa-times"></i></button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div className="mt-3 pt-3 border-t border-border/50 grid grid-cols-2 gap-4">
+                        <div>
+                            <div className="text-[10px] text-muted uppercase">Gross Debt</div>
+                            <div className="text-sm font-mono font-bold text-white">{fmt.$(totalDebt)}</div>
+                        </div>
+                        <div>
+                            <div className="text-[10px] text-muted uppercase">Net Debt</div>
+                            <div className={`text-sm font-mono font-bold ${netDebt > 0 ? 'text-danger' : 'text-success'}`}>{fmt.$(netDebt)}</div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // 2. Charts Component (Wrapper for Chart.js)
+        const FinancialChart = ({ type, data, options }) => {
+            const canvasRef = useRef(null);
+            const chartInstance = useRef(null);
+
+            useEffect(() => {
+                if (canvasRef.current) {
+                    if (chartInstance.current) chartInstance.current.destroy();
+                    chartInstance.current = new Chart(canvasRef.current, { type, data, options });
+                }
+                return () => { if (chartInstance.current) chartInstance.current.destroy(); };
+            }, [data, options, type]);
+
+            return <canvas ref={canvasRef}></canvas>;
+        };
+
+        // 3. AI Insight Component (Mock)
+        const AIInsight = ({ data, meta }) => {
+            const [loading, setLoading] = useState(false);
+            const [insight, setInsight] = useState("");
+
+            useEffect(() => {
+                setLoading(true);
+                // Heuristic generation based on data
+                setTimeout(() => {
+                    const { ev, upside, wacc, leverage, rating } = data;
+                    let text = `Analysis`;
+                    if(meta && meta.target) text += ` for ${meta.target}`;
+                    text += ` indicates an Enterprise Value of ${fmt.$(ev)}M. `;
+                    text += upside > 0
+                        ? `The equity appears undervalued with ${fmt.pct(upside)} upside potential. `
+                        : `The equity appears overvalued by ${fmt.pct(Math.abs(upside))}. `;
+
+                    text += `Leverage is currently ${leverage.toFixed(1)}x (${rating}). `;
+
+                    if(meta && meta.wacc_notes) text += `[Note: ${meta.wacc_notes}]. `;
+
+                    if(wacc > 12) text += `High WACC (${wacc.toFixed(1)}%) implies significant distress/risk premium. `;
+                    else if(wacc < 7) text += `Low WACC (${wacc.toFixed(1)}%) indicates a stable, blue-chip profile. `;
+
+                    setInsight(text);
+                    setLoading(false);
+                }, 800);
+            }, [data, meta]);
+
+            return (
+                <div className="glass-panel p-4 rounded-lg relative overflow-hidden">
+                    <div className="flex items-center gap-2 mb-2">
+                        <div className="w-2 h-2 rounded-full bg-accent animate-pulse-slow"></div>
+                        <h3 className="text-xs font-bold text-accent uppercase">AI Analyst Insight</h3>
+                    </div>
+                    {loading ? (
+                        <div className="space-y-2 animate-pulse">
+                            <div className="h-2 bg-white/10 rounded w-3/4"></div>
+                            <div className="h-2 bg-white/10 rounded w-1/2"></div>
+                        </div>
+                    ) : (
+                        <p className="text-xs text-muted leading-relaxed font-mono">{insight}</p>
+                    )}
+                    <i className="fas fa-robot absolute -bottom-4 -right-4 text-6xl text-white/5 rotate-12"></i>
+                </div>
+            );
+        };
+
+        // --- Main Application ---
+        const App = () => {
+            // -- State --
+            const [activeScenario, setActiveScenario] = useState(SCENARIOS.BASE);
+            const [valMethod, setValMethod] = useState(VALUATION_METHODS.PERPETUITY);
+            const [currentMeta, setCurrentMeta] = useState(null);
+
+            // Default Initial State (Generic)
+            const [inputs, setInputs] = useState({
+                rfr: 4.0, erp: 5.5, tax: 21.0, shares: 100, price: 45.50, cash: 150
+            });
+
+            const [scenarioData, setScenarioData] = useState({
+                [SCENARIOS.BASE]: { beta: 1.2, tgr: 2.0, exitMult: 10.0, growth: Array(7).fill(0.05), margin: Array(7).fill(0.18) },
+                [SCENARIOS.BULL]: { beta: 1.1, tgr: 2.5, exitMult: 12.0, growth: Array(7).fill(0.08), margin: Array(7).fill(0.22) },
+                [SCENARIOS.BEAR]: { beta: 1.4, tgr: 1.5, exitMult: 8.0,  growth: Array(7).fill(0.02), margin: Array(7).fill(0.14) }
+            });
+
+            const [debtTranches, setDebtTranches] = useState([
+                { name: "Revolver", amount: 50, rate: 6.5, amort: 0 },
+                { name: "Term Loan A", amount: 400, rate: 7.5, amort: 5 },
+                { name: "Senior Notes", amount: 750, rate: 9.0, amort: 0 }
+            ]);
+
+            const [historical, setHistorical] = useState({
+                revenue: [800, 900, 1000],
+                margin: [0.15, 0.16, 0.18]
+            });
+
+            // -- Save/Load LocalStorage --
+            const saveToLocal = () => {
+                const packet = { inputs, scenarioData, debtTranches, historical, meta: currentMeta, timestamp: new Date() };
+                localStorage.setItem('adam_cv_architect_save', JSON.stringify(packet));
+                alert("Session Saved to Local Storage");
+            };
+
+            const loadFromLocal = () => {
+                const data = localStorage.getItem('adam_cv_architect_save');
+                if(data) {
+                    const parsed = JSON.parse(data);
+                    setInputs(parsed.inputs);
+                    setScenarioData(parsed.scenarioData);
+                    setDebtTranches(parsed.debtTranches);
+                    setHistorical(parsed.historical);
+                    setCurrentMeta(parsed.meta);
+                    alert(`Loaded Session from ${new Date(parsed.timestamp).toLocaleString()}`);
+                } else {
+                    alert("No saved session found.");
+                }
+            };
+
+            // -- Calculations --
+            const currentScenario = scenarioData[activeScenario];
+
+            // 1. WACC
+            const totalDebt = debtTranches.reduce((sum, t) => sum + t.amount, 0);
+            const weightedRateSum = debtTranches.reduce((sum, t) => sum + (t.amount * t.rate), 0);
+            const avgCod = totalDebt > 0 ? weightedRateSum / totalDebt : 0;
+
+            const marketCap = inputs.shares * inputs.price;
+            const totalCap = marketCap + totalDebt;
+            const costEquity = inputs.rfr + (currentScenario.beta * inputs.erp);
+            const afterTaxCod = avgCod * (1 - (inputs.tax / 100));
+
+            const wacc = ((marketCap / totalCap) * costEquity) + ((totalDebt / totalCap) * afterTaxCod);
+
+            // 2. Projections
+            const projections = useMemo(() => {
+                let lastRev = historical.revenue[2];
+                let proj = { rev: [], ebitda: [], fcf: [], debts: [] };
+
+                // Debt amortization tracking
+                let currentDebts = debtTranches.map(d => d.amount);
+
+                for (let i = 0; i < 7; i++) {
+                    // Ops
+                    const g = currentScenario.growth[i];
+                    const m = currentScenario.margin[i];
+                    const rev = lastRev * (1 + g);
+                    const ebitda = rev * m;
+                    const da = ebitda * 0.15; // Simplified D&A assumption
+                    const ebit = ebitda - da;
+                    const tax = Math.max(0, ebit * (inputs.tax / 100));
+                    const nopat = ebit - tax;
+                    const capex = rev * 0.04; // Simplified CapEx
+                    const nwcChg = rev * 0.01; // Simplified NWC
+                    const fcf = nopat + da - capex - nwcChg; // Unlevered
+
+                    // Debt Service
+                    let interest = 0;
+                    let amort = 0;
+                    currentDebts = currentDebts.map((amt, idx) => {
+                        const tranche = debtTranches[idx];
+                        interest += amt * (tranche.rate / 100);
+                        const pay = Math.min(amt, tranche.amount * (tranche.amort / 100));
+                        amort += pay;
+                        return amt - pay;
+                    });
+
+                    const leveredFcf = fcf - (interest * (1 - inputs.tax/100)) - amort;
+
+                    proj.rev.push(rev);
+                    proj.ebitda.push(ebitda);
+                    proj.fcf.push(fcf);
+                    proj.debts.push(currentDebts.reduce((a, b) => a + b, 0));
+
+                    lastRev = rev;
+                }
+                return proj;
+            }, [currentScenario, historical, inputs.tax, debtTranches]);
+
+            // 3. Valuation
+            const terminalYearFCF = projections.fcf[6];
+            let terminalValue = 0;
+
+            if (valMethod === VALUATION_METHODS.PERPETUITY) {
+                terminalValue = (terminalYearFCF * (1 + currentScenario.tgr / 100)) / ((wacc - currentScenario.tgr) / 100);
+            } else {
+                const terminalEBITDA = projections.ebitda[6];
+                terminalValue = terminalEBITDA * currentScenario.exitMult;
+            }
+
+            const pvFcf = projections.fcf.reduce((sum, f, i) => sum + (f / Math.pow(1 + wacc / 100, i + 1)), 0);
+            const pvTerminal = terminalValue / Math.pow(1 + wacc / 100, 7);
+            const enterpriseValue = pvFcf + pvTerminal;
+            const equityValue = enterpriseValue - totalDebt + inputs.cash;
+            const impliedSharePrice = equityValue / inputs.shares;
+            const upside = (impliedSharePrice - inputs.price) / inputs.price;
+
+            // 4. Ratios
+            const ltmEbitda = historical.revenue[2] * historical.margin[2];
+            const leverageRatio = totalDebt / ltmEbitda;
+
+            const getRating = (lev) => {
+                if (lev < 1.5) return 'AAA';
+                if (lev < 2.5) return 'AA';
+                if (lev < 3.5) return 'A';
+                if (lev < 4.5) return 'BBB';
+                if (lev < 5.5) return 'BB';
+                return 'B';
+            };
+            const rating = getRating(leverageRatio);
+
+
+            // --- Handlers ---
+            const handleInputChange = (field, value) => {
+                setInputs(prev => ({ ...prev, [field]: parseFloat(value) }));
+            };
+
+            const handleScenarioChange = (field, idx, value) => {
+                const newData = { ...scenarioData };
+                const arr = [...newData[activeScenario][field]];
+                arr[idx] = parseFloat(value) / 100; // Store as decimal
+                newData[activeScenario][field] = arr;
+                setScenarioData(newData);
+            };
+
+            const handleScalarScenarioChange = (field, value) => {
+                const newData = { ...scenarioData };
+                newData[activeScenario][field] = parseFloat(value);
+                setScenarioData(newData);
+            };
+
+            const updateDebt = (i, field, value) => {
+                const newDebts = [...debtTranches];
+                newDebts[i][field] = value;
+                setDebtTranches(newDebts);
+            };
+
+            const addDebt = () => setDebtTranches([...debtTranches, { name: 'New Tranche', amount: 0, rate: 0, amort: 0 }]);
+            const removeDebt = (i) => setDebtTranches(debtTranches.filter((_, idx) => idx !== i));
+
+            const loadPreset = (category, name) => {
+                const p = PRESETS[category][name];
+                if (!p) return;
+
+                setInputs(p.inputs);
+                setScenarioData(p.scenarioData);
+                setDebtTranches(p.debt);
+                setHistorical(p.historical);
+                setCurrentMeta({...p.meta, target: name});
+                setActiveScenario(SCENARIOS.BASE);
+            };
+
+            // --- Chart Options ---
+            const commonChartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false, color: '#334155' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+                    y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
+                }
+            };
+
+            const perfChartData = {
+                labels: ['FY+1', 'FY+2', 'FY+3', 'FY+4', 'FY+5', 'FY+6', 'FY+7'],
+                datasets: [
+                    { label: 'EBITDA', data: projections.ebitda, backgroundColor: '#3b82f6', borderRadius: 4 },
+                    { label: 'FCF', data: projections.fcf, backgroundColor: '#10b981', borderRadius: 4 }
+                ]
+            };
+
+            return (
+                <div className="flex-1 flex flex-col h-screen max-w-[1920px] mx-auto w-full bg-bg">
+
+                    {/* Header */}
+                    <header className="h-14 border-b border-border bg-bg/95 backdrop-blur flex items-center justify-between px-6 z-50">
+                        <div className="flex items-center gap-4">
+                            <div className="w-8 h-8 rounded bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+                                <i className="fas fa-layer-group"></i>
+                            </div>
+                            <div>
+                                <h1 className="text-sm font-bold text-white tracking-tight leading-none">ANALYST<span className="text-accent font-mono">OS</span></h1>
+                                <div className="text-[9px] text-muted uppercase tracking-[0.2em] mt-0.5">Credit & Valuation Architect v6.2</div>
+                            </div>
+                            <div className="h-6 w-px bg-border mx-2"></div>
+
+                            {/* Preset Selector Group */}
+                            <select className="bg-panel border border-border text-xs text-muted rounded px-2 py-1 outline-none focus:border-accent w-48" onChange={(e) => {
+                                const [cat, name] = e.target.value.split('::');
+                                if(cat && name) loadPreset(cat, name);
+                            }}>
+                                <option value="">Load Analysis Preset...</option>
+                                <optgroup label="Corporate Profiles (v23 KG)">
+                                    {Object.keys(PRESETS.CORPORATES).map(k => <option key={k} value={`CORPORATES::${k}`}>{k}</option>)}
+                                </optgroup>
+                                <optgroup label="Sector Templates">
+                                    {Object.keys(PRESETS.TEMPLATES).map(k => <option key={k} value={`TEMPLATES::${k}`}>{k}</option>)}
+                                </optgroup>
+                            </select>
+
+                            <button onClick={saveToLocal} className="text-[10px] bg-panel hover:bg-white/10 text-muted hover:text-white px-2 py-1 rounded border border-border transition" title="Save to Browser Storage">
+                                <i className="fas fa-save mr-1"></i> Save
+                            </button>
+                            <button onClick={loadFromLocal} className="text-[10px] bg-panel hover:bg-white/10 text-muted hover:text-white px-2 py-1 rounded border border-border transition" title="Load from Browser Storage">
+                                <i className="fas fa-upload mr-1"></i> Load
+                            </button>
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                            {/* Scenario Switcher */}
+                            <div className="flex bg-panel rounded p-0.5 border border-border">
+                                {Object.values(SCENARIOS).map(s => (
+                                    <button
+                                        key={s}
+                                        onClick={() => setActiveScenario(s)}
+                                        className={`px-3 py-1 text-[10px] uppercase font-bold rounded transition-all ${activeScenario === s
+                                            ? (s === SCENARIOS.BULL ? 'bg-success/20 text-success' : (s === SCENARIOS.BEAR ? 'bg-danger/20 text-danger' : 'bg-accent/20 text-accent'))
+                                            : 'text-muted hover:text-white'}`}
+                                    >
+                                        {s}
+                                    </button>
+                                ))}
+                            </div>
+                            <button onClick={() => window.print()} className="text-muted hover:text-white no-print"><i className="fas fa-print"></i></button>
+                        </div>
+                    </header>
+
+                    {/* Main Workspace */}
+                    <div className="flex-1 overflow-hidden grid grid-cols-12 gap-0">
+
+                        {/* LEFT: Inputs & Controls */}
+                        <div className="col-span-3 border-r border-border overflow-y-auto custom-scrollbar p-5 space-y-6 bg-bg/50 no-print">
+
+                            {/* Market Data */}
+                            <div className="space-y-4">
+                                <h3 className="text-xs font-bold text-accent uppercase tracking-wider mb-2 border-b border-border/50 pb-1">Market Data & Assumptions</h3>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-[10px] text-muted uppercase block mb-1">Share Price</label>
+                                        <input type="number" value={inputs.price} onChange={(e) => handleInputChange('price', e.target.value)} className="input-seamless text-white text-lg font-bold" />
+                                    </div>
+                                    <div>
+                                        <label className="text-[10px] text-muted uppercase block mb-1">Shares (M)</label>
+                                        <input type="number" value={inputs.shares} onChange={(e) => handleInputChange('shares', e.target.value)} className="input-seamless text-white" />
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                                    <div><label className="text-[10px] text-muted uppercase">Risk Free %</label><input type="number" value={inputs.rfr} onChange={(e) => handleInputChange('rfr', e.target.value)} className="input-seamless text-slate-300" /></div>
+                                    <div><label className="text-[10px] text-muted uppercase">ERP %</label><input type="number" value={inputs.erp} onChange={(e) => handleInputChange('erp', e.target.value)} className="input-seamless text-slate-300" /></div>
+                                    <div><label className="text-[10px] text-muted uppercase">Beta</label><input type="number" value={currentScenario.beta} onChange={(e) => handleScalarScenarioChange('beta', e.target.value)} className="input-seamless text-accent" /></div>
+                                    <div><label className="text-[10px] text-muted uppercase">Tax Rate %</label><input type="number" value={inputs.tax} onChange={(e) => handleInputChange('tax', e.target.value)} className="input-seamless text-slate-300" /></div>
+                                </div>
+                                <div className="bg-panel/50 p-2 rounded border border-border/50 flex justify-between items-center">
+                                    <span className="text-[10px] text-muted uppercase">Calculated WACC</span>
+                                    <span className="text-sm font-bold font-mono text-warning">{wacc.toFixed(2)}%</span>
+                                </div>
+                            </div>
+
+                            {/* Debt Module */}
+                            <DebtWaterfall
+                                debts={debtTranches}
+                                totalDebt={totalDebt}
+                                cash={inputs.cash}
+                                onUpdate={updateDebt}
+                                onAdd={addDebt}
+                                onRemove={removeDebt}
+                            />
+
+                            {/* Terminal Value Settings */}
+                            <div className="glass-panel rounded-lg p-4">
+                                <h3 className="text-xs font-bold text-accent uppercase tracking-wider mb-3">Terminal Value Method</h3>
+                                <div className="flex gap-2 mb-3">
+                                    {Object.values(VALUATION_METHODS).map(m => (
+                                        <button key={m} onClick={() => setValMethod(m)}
+                                            className={`flex-1 py-1 text-[9px] uppercase font-bold rounded border ${valMethod === m ? 'bg-accent text-white border-accent' : 'bg-transparent text-muted border-border'}`}>
+                                            {m.split(' ')[0]}
+                                        </button>
+                                    ))}
+                                </div>
+                                {valMethod === VALUATION_METHODS.PERPETUITY ? (
+                                    <div>
+                                        <label className="text-[10px] text-muted uppercase block">Terminal Growth Rate %</label>
+                                        <input type="number" value={currentScenario.tgr} onChange={(e) => handleScalarScenarioChange('tgr', e.target.value)} className="input-seamless text-accent text-lg" step="0.1" />
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <label className="text-[10px] text-muted uppercase block">Exit Multiple (EV/EBITDA)</label>
+                                        <input type="number" value={currentScenario.exitMult} onChange={(e) => handleScalarScenarioChange('exitMult', e.target.value)} className="input-seamless text-accent text-lg" step="0.5" />
+                                    </div>
+                                )}
+                            </div>
+
+                        </div>
+
+                        {/* CENTER: Grid & Charts */}
+                        <div className="col-span-9 flex flex-col h-full overflow-hidden">
+
+                            {/* KPI Bar */}
+                            <div className="grid grid-cols-4 gap-0 border-b border-border h-24 divide-x divide-border bg-panel/30">
+                                <div className="p-4 flex flex-col justify-center">
+                                    <div className="text-[10px] text-muted uppercase tracking-wider font-bold mb-1">Implied Enterprise Value</div>
+                                    <div className="text-2xl font-bold text-white font-mono tracking-tighter">{fmt.$(enterpriseValue)}M</div>
+                                    <div className="text-[10px] text-accent mt-1"><i className="fas fa-chart-pie mr-1"></i>{valMethod}</div>
+                                </div>
+                                <div className="p-4 flex flex-col justify-center">
+                                    <div className="text-[10px] text-muted uppercase tracking-wider font-bold mb-1">Implied Share Price</div>
+                                    <div className="flex items-baseline gap-2">
+                                        <div className="text-2xl font-bold text-white font-mono tracking-tighter">{fmt.$(impliedSharePrice)}</div>
+                                        <div className={`text-xs font-bold px-1.5 py-0.5 rounded ${upside > 0 ? 'bg-success/20 text-success' : 'bg-danger/20 text-danger'}`}>
+                                            {upside > 0 ? '+' : ''}{fmt.pct(upside)}
+                                        </div>
+                                    </div>
+                                    <div className="w-full bg-bg h-1 mt-2 rounded-full overflow-hidden">
+                                        <div className={`h-full ${upside > 0 ? 'bg-success' : 'bg-danger'}`} style={{width: `${Math.min(Math.abs(upside)*100, 100)}%`}}></div>
+                                    </div>
+                                </div>
+                                <div className="p-4 flex flex-col justify-center">
+                                    <div className="text-[10px] text-muted uppercase tracking-wider font-bold mb-1">Net Leverage / Rating</div>
+                                    <div className="flex items-center gap-3">
+                                        <div className="text-2xl font-bold text-warning font-mono tracking-tighter">{fmt.num(leverageRatio)}</div>
+                                        <div className={`text-sm font-bold px-2 py-1 rounded bg-white/10 ${rating.startsWith('A') ? 'text-success' : 'text-warning'}`}>{rating}</div>
+                                    </div>
+                                    <div className="text-[10px] text-muted mt-1">Target: &lt; 3.0x</div>
+                                </div>
+                                <div className="p-4 flex flex-col justify-center relative overflow-hidden group cursor-pointer hover:bg-white/5 transition">
+                                    <div className="absolute top-2 right-2 text-accent/50 group-hover:text-accent transition"><i className="fas fa-external-link-alt"></i></div>
+                                    <div className="text-[10px] text-muted uppercase tracking-wider font-bold mb-1">Scenario</div>
+                                    <div className="text-xl font-bold text-white uppercase">{activeScenario} Case</div>
+                                    <div className="text-[10px] text-muted mt-1">Growth: {currentScenario.growth[0]*100}% | Margin: {currentScenario.margin[0]*100}%</div>
+                                </div>
+                            </div>
+
+                            {/* Projections Grid */}
+                            <div className="flex-1 p-6 overflow-y-auto custom-scrollbar">
+
+                                <div className="grid grid-cols-3 gap-6 mb-6">
+                                    {/* Main Chart */}
+                                    <div className="col-span-2 glass-panel p-4 rounded-lg h-64">
+                                        <div className="flex justify-between mb-2">
+                                            <h3 className="text-[10px] font-bold text-muted uppercase">Projected Performance</h3>
+                                            <div className="flex gap-2 text-[10px]">
+                                                <span className="flex items-center gap-1"><div className="w-2 h-2 rounded bg-blue-500"></div> EBITDA</span>
+                                                <span className="flex items-center gap-1"><div className="w-2 h-2 rounded bg-emerald-500"></div> FCF</span>
+                                            </div>
+                                        </div>
+                                        <div className="relative h-48">
+                                            <FinancialChart
+                                                type="bar"
+                                                data={perfChartData}
+                                                options={commonChartOptions}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* AI Insight */}
+                                    <div className="col-span-1">
+                                        <AIInsight data={{ ev: enterpriseValue, upside, wacc, leverage: leverageRatio, rating }} meta={currentMeta} />
+
+                                        {/* Mini sensitivity table */}
+                                        <div className="mt-4 glass-panel p-3 rounded-lg">
+                                            <h3 className="text-[10px] font-bold text-muted uppercase mb-2">Sensitivity (Price)</h3>
+                                            <div className="grid grid-cols-3 gap-1 text-center text-[10px] font-mono">
+                                                <div className="text-muted">WACC</div>
+                                                <div>-0.5%</div>
+                                                <div>+0.5%</div>
+                                                <div className="text-muted">Base</div>
+                                                <div className="text-success">{fmt.$( (terminalValue / Math.pow(1 + (wacc-0.5)/100, 7) + pvFcf - totalDebt + inputs.cash)/inputs.shares )}</div>
+                                                <div className="text-danger">{fmt.$( (terminalValue / Math.pow(1 + (wacc+0.5)/100, 7) + pvFcf - totalDebt + inputs.cash)/inputs.shares )}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* The Spreadsheet */}
+                                <div className="glass-panel rounded-lg overflow-hidden border border-border">
+                                    <div className="bg-panel/50 px-4 py-2 border-b border-border flex justify-between items-center">
+                                        <h3 className="text-xs font-bold text-white uppercase tracking-wide"><i className="fas fa-table mr-2 text-accent"></i>Cash Flow Model</h3>
+                                        <span className="text-[10px] text-muted italic">Values in $ Millions</span>
+                                    </div>
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-right text-xs font-mono">
+                                            <thead className="bg-bg/50 text-muted">
+                                                <tr>
+                                                    <th className="text-left p-3 w-48 sticky left-0 bg-[#0f172a] z-10 border-r border-border">Metric</th>
+                                                    <th className="p-3">FY-3</th>
+                                                    <th className="p-3">FY-2</th>
+                                                    <th className="p-3 border-r border-accent/20 bg-accent/5 text-white">LTM</th>
+                                                    {Array.from({length:7}).map((_, i) => <th key={i} className="p-3 text-accent">FY+{i+1}</th>)}
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-border/30">
+                                                {/* Revenue Row */}
+                                                <tr className="hover:bg-white/5">
+                                                    <td className="text-left p-2 pl-4 sticky left-0 bg-[#0f172a] z-10 border-r border-border font-medium">Revenue</td>
+                                                    {historical.revenue.map((v, i) => <td key={i} className="p-2 text-muted">{fmt.cleanNum(v)}</td>)}
+                                                    {projections.rev.map((v, i) => <td key={i} className="p-2 font-bold text-white">{fmt.cleanNum(v)}</td>)}
+                                                </tr>
+                                                {/* Growth Input Row */}
+                                                <tr className="bg-bg/30">
+                                                    <td className="text-left p-1 pl-6 sticky left-0 bg-[#0f172a] z-10 border-r border-border text-[10px] text-muted uppercase">Growth %</td>
+                                                    <td className="p-1" colSpan="3"></td>
+                                                    {currentScenario.growth.map((v, i) => (
+                                                        <td key={i} className="p-1">
+                                                            <input
+                                                                type="number"
+                                                                value={(v*100).toFixed(1)}
+                                                                onChange={(e) => handleScenarioChange('growth', i, e.target.value)}
+                                                                className="input-seamless text-accent text-center text-[10px]"
+                                                            />
+                                                        </td>
+                                                    ))}
+                                                </tr>
+                                                {/* EBITDA Row */}
+                                                <tr className="hover:bg-white/5">
+                                                    <td className="text-left p-2 pl-4 sticky left-0 bg-[#0f172a] z-10 border-r border-border font-medium">EBITDA</td>
+                                                    {historical.revenue.map((r, i) => <td key={i} className="p-2 text-muted">{fmt.cleanNum(r * historical.margin[i])}</td>)}
+                                                    {projections.ebitda.map((v, i) => <td key={i} className="p-2">{fmt.cleanNum(v)}</td>)}
+                                                </tr>
+                                                {/* Margin Input Row */}
+                                                <tr className="bg-bg/30">
+                                                    <td className="text-left p-1 pl-6 sticky left-0 bg-[#0f172a] z-10 border-r border-border text-[10px] text-muted uppercase">Margin %</td>
+                                                    {historical.margin.map((v, i) => <td key={i} className="p-1 text-[10px] text-muted text-center">{(v*100).toFixed(1)}%</td>)}
+                                                    {currentScenario.margin.map((v, i) => (
+                                                        <td key={i} className="p-1">
+                                                            <input
+                                                                type="number"
+                                                                value={(v*100).toFixed(1)}
+                                                                onChange={(e) => handleScenarioChange('margin', i, e.target.value)}
+                                                                className="input-seamless text-accent text-center text-[10px]"
+                                                            />
+                                                        </td>
+                                                    ))}
+                                                </tr>
+                                                <tr className="h-px bg-border/50"><td colSpan="11"></td></tr>
+
+                                                {/* Simple FCF Bridge Display */}
+                                                <tr className="hover:bg-white/5">
+                                                    <td className="text-left p-2 pl-4 sticky left-0 bg-[#0f172a] z-10 border-r border-border">(-) Est. Taxes</td>
+                                                    <td colSpan="3" className="text-center text-muted">-</td>
+                                                    {projections.ebitda.map((v, i) => <td key={i} className="p-2 text-danger/80">({fmt.cleanNum((v - v*0.15)* (inputs.tax/100))})</td>)}
+                                                </tr>
+                                                <tr className="hover:bg-white/5">
+                                                    <td className="text-left p-2 pl-4 sticky left-0 bg-[#0f172a] z-10 border-r border-border font-bold text-accent">Unlevered FCF</td>
+                                                    <td colSpan="3" className="text-center text-muted">-</td>
+                                                    {projections.fcf.map((v, i) => <td key={i} className="p-2 font-bold text-accent">{fmt.cleanNum(v)}</td>)}
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
