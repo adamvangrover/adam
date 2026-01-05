@@ -10,9 +10,7 @@ It leverages the v23 LangGraph architecture.
 
 import logging
 from typing import Literal, Dict, Any
-from langgraph.graph import StateGraph, END, START
-from langgraph.checkpoint.memory import MemorySaver
-
+from core.utils.graph_utils import StateGraph, END, START, MemorySaver, HAS_LANGGRAPH
 from core.engine.states import SNCAnalysisState
 from core.engine.snc_utils import (
     calculate_leverage,
@@ -146,6 +144,9 @@ def should_continue_snc(state: SNCAnalysisState) -> Literal["revise_snc", "human
 
 
 def build_snc_graph():
+    if not HAS_LANGGRAPH:
+        logger.warning("LangGraph not available. SNC Graph will be mocked.")
+
     workflow = StateGraph(SNCAnalysisState)
 
     workflow.add_node("analyze_structure", analyze_structure_node)

@@ -53,15 +53,33 @@ class BaseLLM(ABC):
 
     @abstractmethod
     def generate_text(self, prompt: str, **kwargs) -> str:
-        """Generates text from a prompt."""
+        """
+        Generates text from a prompt.
+
+        Args:
+            prompt (str): The input prompt.
+            **kwargs: Additional generation parameters.
+
+        Returns:
+            str: The generated text.
+        """
         pass
 
     @abstractmethod
     def generate_structured(self, prompt: str, response_schema: Any, tools: Optional[List[Any]] = None, **kwargs) -> Tuple[Any, Dict[str, Any]]:
         """
         Generates structured output conforming to a Pydantic schema.
-        Returns: (ValidatedPydanticObject, MetadataDict)
-        MetadataDict contains 'thought_signature', 'token_usage', etc.
+
+        Args:
+            prompt (str): The input prompt.
+            response_schema (Any): The Pydantic model class to validate against.
+            tools (Optional[List[Any]]): List of tools (for function calling models).
+            **kwargs: Additional parameters (e.g., thought_signature).
+
+        Returns:
+            Tuple[Any, Dict[str, Any]]: A tuple containing:
+                - The validated Pydantic object.
+                - Metadata dictionary (e.g., 'thought_signature', 'token_usage').
         """
         pass
 
