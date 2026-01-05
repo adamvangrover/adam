@@ -189,9 +189,13 @@ The system is now integrating the full "Alphabet Ecosystem" (Gemini, Vertex AI, 
 
 ## Quantum-AI Convergence (New Capabilities)
 
-Following the strategic analysis in `docs/whitepapers/quantum_ai_convergence.md`, the following modules have been added to the system:
+Following the strategic analysis in `docs/whitepapers/quantum_ai_convergence.md` and `docs/whitepapers/convergence_of_complexity.md`, the following modules have been added to the system:
 
 *   **End-to-End Quantum Monte Carlo:** `core/v22_quantum_pipeline/qmc_engine.py` implements the Matsakos-Nield framework for simulating stochastic processes on quantum circuits.
+*   **Quantum Financial Synthesis:** `core/v22_quantum_pipeline/quantum_financial_synthesis.py` implements "Ground State" portfolio optimization using Imaginary Time Evolution.
+*   **Root Node Reasoning Agent:** `core/agents/specialized/root_node_agent.py` implements MCTS and GRPO-inspired reasoning for complex problem formulation.
+*   **Risk Co-Pilot Agent:** `core/agents/specialized/risk_copilot_agent.py` implements Root Cause Analysis (RCA) for credit breaches.
+*   **World Model Engine:** `core/simulations/world_model.py` simulates market physics, treating capital as mass and risk as energy.
 *   **Generative Risk Engine:** `core/vertical_risk_agent/generative_risk.py` provides GAN-based market scenario generation for tail risk stress testing.
 *   **Explainable Quantum AI:** `core/xai/iqnn_cs.py` implements the Interpretable Quantum Neural Network (IQNN-CS) framework with Inter-Class Attribution Alignment (ICAA) metrics.
 
