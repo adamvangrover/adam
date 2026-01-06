@@ -1,9 +1,13 @@
 from core.tools.base_tool import BaseTool
+from core.security.sql_validator import SQLValidator
 from typing import Any
 import json
 import os
 import pandas as pd
+import logging
 
+# Configure logger
+logger = logging.getLogger(__name__)
 
 class LakehouseConnector(BaseTool):
     name = "microsoft_fabric_run_sql"
@@ -35,14 +39,16 @@ class LakehouseConnector(BaseTool):
         Executes a SQL query against the Fabric Lakehouse.
         Graceful Fallback: If connection fails (simulated), queries local Parquet/JSON files.
         """
-        # Security Check: Read-only
-        if "DROP" in sql_query.upper() or "DELETE" in sql_query.upper() or "UPDATE" in sql_query.upper():
-            return json.dumps({"error": "SecurityViolation: Read-only access enforced."})
+        # Security Check: STRICT WHITELIST via SQLValidator
+        if not SQLValidator.validate_read_only(sql_query):
+             logger.warning(f"SecurityViolation: Blocked unsafe SQL query: {sql_query}")
+             return json.dumps({"error": "SecurityViolation: Only strict read-only SELECT statements are allowed."})
 
         # SIMULATE CONNECTION FAILURE -> FALLBACK
         try:
             return self._query_local_lake(sql_query)
         except Exception as e:
+            logger.error(f"Lakehouse query failed: {e}")
             return json.dumps({"error": f"Fallback failed: {e}"})
 
     def _query_local_lake(self, query: str) -> str:
