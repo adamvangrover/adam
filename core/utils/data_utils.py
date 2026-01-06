@@ -260,6 +260,13 @@ def load_data(source_config: Dict[str, Any], cache: bool = True) -> Optional[Uni
         raise InvalidInputError("Missing 'path' in source_config")
 
     file_path = Path(file_path)
+
+    # Check for supported types BEFORE checking if file exists
+    supported_types = ["json", "csv", "yaml"]
+    if data_type not in supported_types:
+        logging.error(f"Unsupported data type: {data_type}")
+        raise InvalidInputError(f"Unsupported data type: {data_type}")
+
     if not file_path.exists():
         logging.error(f"Data file not found: {file_path}")
         raise FileReadError(str(file_path), "File not found")
