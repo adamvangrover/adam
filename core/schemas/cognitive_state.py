@@ -1,24 +1,29 @@
+from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field
-from typing import List, Optional
 
 class ThoughtNode(BaseModel):
     """
-    Minimal placeholder for ThoughtNode.
+    Represents a discrete unit of thought or reasoning.
+    Merged: Uses 'thought_id' (main) and 'confidence' (main) but defaults to 0.0 (v24).
     """
     thought_id: str
     content: str
-    confidence: float
+    confidence: float = Field(default=0.0, description="Confidence score between 0.0 and 1.0")
 
 class StrategicPlan(BaseModel):
     """
-    Minimal placeholder for StrategicPlan.
+    Represents a structured plan with specific goals and actionable steps.
+    Merged: Retains 'goals' from v24 for context, and 'plan_id' from main for identification.
     """
     plan_id: str
-    steps: List[str]
+    goals: List[str] = Field(default_factory=list, description="High-level objectives")
+    steps: List[str] = Field(default_factory=list, description="Actionable execution steps")
 
 class CognitiveState(BaseModel):
     """
-    Minimal placeholder for CognitiveState.
+    Represents the current mental snapshot of the agent.
+    Merged: Uses v24's List structure for thoughts (richer context) 
+    and main's explicit naming for 'active_plan'.
     """
-    current_thought: Optional[ThoughtNode] = None
+    current_thoughts: List[ThoughtNode] = Field(default_factory=list)
     active_plan: Optional[StrategicPlan] = None
