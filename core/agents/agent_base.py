@@ -9,6 +9,7 @@ from datetime import datetime
 
 # HNASP Imports
 from core.schemas.hnasp import HNASPState, Meta, PersonaState, LogicLayer, ContextStream, PersonaDynamics, SecurityContext, PersonaIdentities, Identity, EPAVector
+from core.agents.mixins.memory_mixin import MemoryMixin
 
 # JsonLogic
 try:
@@ -30,11 +31,11 @@ except ImportError:
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-class AgentBase(ABC):
+class AgentBase(ABC, MemoryMixin):
     """
     Abstract base class for all agents in the system.
     Defines the common interface and behavior expected of all agents.
-    This version incorporates MCP, A2A, Semantic Kernel, and HNASP.
+    This version incorporates MCP, A2A, Semantic Kernel, HNASP, and Memory persistence.
     """
 
     def __init__(self, config: Dict[str, Any], constitution: Optional[Dict[str, Any]] = None, kernel: Optional[Kernel] = None):
