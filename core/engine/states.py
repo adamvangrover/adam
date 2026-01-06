@@ -3,6 +3,7 @@ import operator
 from datetime import datetime
 
 
+# NOTE: TypedDicts use total=False to allow for partial updates during graph execution (fixing strictness issues).
 class ResearchArtifact(TypedDict, total=False):
     """
     A specific piece of research data collected by an agent.

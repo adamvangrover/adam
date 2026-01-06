@@ -5,6 +5,7 @@ This directory contains the core components of the ADAM system. These components
 ## Subdirectories
 
 *   **`agents/`:** This directory contains the autonomous agents that perform specific tasks.
+    *   **`metacognition/`**: Contains modules for Adaptive Conviction, State Anchors, and Tool RAG (Protocol Paradox implementation).
 *   **`analysis/`:** This directory contains modules for performing various types of analysis, such as fundamental and technical analysis.
 *   **`data_access/`:** This directory contains modules for accessing data from various sources.
 *   **`data_sources/`:** This directory contains modules for specific data sources, such as APIs and databases.
@@ -25,5 +26,6 @@ When interacting with the core components, please adhere to the following princi
 *   **Abstraction:** Interact with the components through their public APIs. Avoid directly accessing their internal implementation details.
 *   **Configuration:** Use the configuration files in the `config/` directory to configure the behavior of the core components.
 *   **Logging:** Use the logging system to record important events and debug issues.
+*   **Metacognition:** Agents implementing `AdaptiveAgent` capabilities should utilize the `measure_conviction` and `create_anchor` methods to ensure robust A2A communication.
 
 By following these guidelines, you can help to ensure that the ADAM system remains stable, modular, and easy to maintain.

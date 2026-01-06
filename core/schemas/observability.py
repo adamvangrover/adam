@@ -1,8 +1,20 @@
-from pydantic import BaseModel, Field
-from typing import Dict, Any, Optional
+from typing import Dict, Any, List, Optional
 from datetime import datetime
+from pydantic import BaseModel, Field
+
+class Metric(BaseModel):
+    """
+    Represents a single quantitative data point.
+    Merged: Uses 'utcnow' (main) for telemetry standardization.
+    """
+    name: str
+    value: float
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 class Span(BaseModel):
+    """
+    Represents a single operation within a trace.
+    """
     span_id: str
     trace_id: str
     name: str
@@ -10,14 +22,19 @@ class Span(BaseModel):
     end_time: Optional[datetime] = None
 
 class Trace(BaseModel):
+    """
+    Represents a collection of spans describing a workflow.
+    Merged: Uses List typing (main) with default factories (v24).
+    """
     trace_id: str
-    spans: list[Span] = Field(default_factory=list)
+    spans: List[Span] = Field(default_factory=list)
 
 class AgentTelemetry(BaseModel):
+    """
+    Aggregated telemetry data for a specific agent.
+    Merged: Includes 'metrics' (main) and 'traces' (both), with 
+    robust default initialization (v24).
+    """
     agent_id: str
-    traces: list[Trace] = Field(default_factory=list)
-
-class Metric(BaseModel):
-    name: str
-    value: float
-    timestamp: datetime = Field(default_factory=datetime.now)
+    metrics: List[Metric] = Field(default_factory=list)
+    traces: List[Trace] = Field(default_factory=list)

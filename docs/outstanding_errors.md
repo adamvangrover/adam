@@ -23,6 +23,16 @@ These failures are known and expected in this environment. The core v23 "Adaptiv
 - **Missing Modules:** Installed missing dependencies: `fastapi`, `statsmodels`, `flask-cors`, `pandera`, `flask-socketio`, `flask-sqlalchemy`, `flask-jwt-extended`, `celery`, `pyarrow`, `scikit-learn`, `beautifulsoup4`, `langchain`, `langchain-community`, `transformers`, `edgartools`, `tweepy`, `scikit-learn`.
 - **v23 Verification:** Validated the core v23 pipeline via `tests/verify_v23_full.py` and `tests/verify_v23_updates.py`.
 
+### 3. Schema Import Errors
+**Context:** `core/schemas/__init__.py` attempts to import modules that do not exist or are misplaced.
+**Modules Missing:**
+*   `core.schemas.hnasp_integration`
+*   `core.schemas.cognitive_state`
+*   `core.schemas.observability`
+*   `core.schemas.registry` (referenced but not found in expected path)
+**Impact:** Importing `core.schemas` will raise `ModuleNotFoundError`. This affects any code relying on `IntegratedAgentState`, `AgentTelemetry`, or related classes.
+**Workaround:** None currently implemented to preserve code integrity.
+
 ## Notes
 - `tests/test_v30_architecture.py` now passes.
 - `tests/test_v23_5_pipeline.py` passes.
