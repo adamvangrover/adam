@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     """
     # System
     app_name: str = "Adam v23.5"
+    # SECURITY: Debug mode MUST be False in production to prevent data leakage.
     debug: bool = False
     log_level: str = "INFO"
     environment: str = "production"

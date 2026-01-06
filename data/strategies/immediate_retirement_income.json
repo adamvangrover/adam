@@ -1,0 +1,62 @@
+{
+  "portfolio_name": "Adam Immediate Retirement Income",
+  "version": "1.0",
+  "target_allocation": {
+    "equities": {
+      "weight": 0.40,
+      "components": {
+        "dividend_aristocrats": {
+          "weight": 0.20,
+          "ticker_proxy": "NOBL",
+          "rationale": "High-quality companies with 25+ years of dividend growth."
+        },
+        "high_yield_equity": {
+          "weight": 0.10,
+          "ticker_proxy": "VYM",
+          "rationale": "Focus on current yield to support withdrawal rates."
+        },
+        "covered_calls": {
+          "weight": 0.10,
+          "ticker_proxy": "JEPI",
+          "rationale": "Income generation from volatility premiums."
+        }
+      }
+    },
+    "fixed_income": {
+      "weight": 0.50,
+      "components": {
+        "short_term_treasuries": {
+          "weight": 0.20,
+          "ticker_proxy": "SHV",
+          "rationale": "Cash equivalent for 1-2 years of living expenses."
+        },
+        "investment_grade_bonds": {
+          "weight": 0.20,
+          "ticker_proxy": "AGG",
+          "rationale": "Core stability and yield."
+        },
+        "preferred_stock": {
+          "weight": 0.10,
+          "ticker_proxy": "PFF",
+          "rationale": "Higher yield hybrid securities."
+        }
+      }
+    },
+    "alternatives": {
+      "weight": 0.10,
+      "components": {
+        "reits": {
+          "weight": 0.10,
+          "ticker_proxy": "VNQ",
+          "rationale": "Real estate income and inflation correlation."
+        }
+      }
+    }
+  },
+  "rebalancing_rules": {
+    "frequency": "Quarterly",
+    "threshold": 0.03,
+    "cash_flow_management": "Dividends and interest swept to cash bucket for monthly withdrawals."
+  },
+  "architect_notes": "Prioritizes 'Sequence of Returns Risk' mitigation. High allocation to cash-proxies and income-generating assets to prevent selling principal during market downturns."
+}

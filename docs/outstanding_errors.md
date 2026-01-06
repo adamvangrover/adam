@@ -24,6 +24,16 @@
 **Context:** Frontend tests require `playwright` and a running server.
 **Action:** Run `verify_fe.py` locally if modifying UI components.
 
+### 3. Schema Import Errors
+**Context:** `core/schemas/__init__.py` attempts to import modules that do not exist or are misplaced.
+**Modules Missing:**
+*   `core.schemas.hnasp_integration`
+*   `core.schemas.cognitive_state`
+*   `core.schemas.observability`
+*   `core.schemas.registry` (referenced but not found in expected path)
+**Impact:** Importing `core.schemas` will raise `ModuleNotFoundError`. This affects any code relying on `IntegratedAgentState`, `AgentTelemetry`, or related classes.
+**Workaround:** None currently implemented to preserve code integrity.
+
 ## Notes
 - Always run tests with `PYTHONPATH=.` from the root directory.
 - `requirements.txt` may need further pruning of unused dependencies (e.g., conflicting `flask` versions if any).
