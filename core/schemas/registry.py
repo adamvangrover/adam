@@ -1,12 +1,13 @@
-from typing import Dict, Any, Type, Optional
+from typing import Dict, Type, Optional
 from pydantic import BaseModel
 
 class SchemaRegistry:
     """
     Central registry for Pydantic schemas.
-    Merged: Uses strict typing (main) to ensure only BaseModels are registered,
-    improving type safety across the autopoietic system.
+    Merged: Prioritizes the strict typing from 'main' (Type[BaseModel]) to ensure
+    data integrity, while keeping the simple interface from the guide.
     """
+    # Adopted '_registry' from main as it is more semantically accurate than '_schemas'
     _registry: Dict[str, Type[BaseModel]] = {}
 
     @classmethod
