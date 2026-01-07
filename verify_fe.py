@@ -15,7 +15,7 @@ def verify_financial_engineering():
         # Wait for the page to load
         # Updated to match v24.0 "ADAM ENGINE"
         expect(page.locator("h1")).to_contain_text("ADAM")
-        expect(page.locator("h1")).to_contain_text("ENGINE")
+        expect(page.locator("h1")).to_contain_text("QUANTUM")
 
         # Take a screenshot of the initial state (DCF Tab)
         print("Taking initial screenshot...")
@@ -32,7 +32,8 @@ def verify_financial_engineering():
         # Run Simulation
         print("Running Monte Carlo Simulation...")
         # v24.0 uses button with text "RUN MONTE CARLO"
-        page.click("button:text('RUN MONTE CARLO')")
+        # The button text in the HTML is "INITIATE MONTE CARLO"
+        page.click("button:text('INITIATE MONTE CARLO')")
 
         # Wait for simulation to finish (loading hidden)
         expect(page.locator("#mc-loading")).to_be_hidden(timeout=10000)
@@ -41,7 +42,7 @@ def verify_financial_engineering():
         expect(page.locator("#mc-mean")).not_to_have_text("-")
 
         # Take screenshot of Monte Carlo results
-        print("Taking Monte Carlo screenshot...")
+        print("Taking Monte Carlo results screenshot...")
         page.screenshot(path="verification_monte_carlo.png")
 
         # Click on Sensitivity Matrix tab
