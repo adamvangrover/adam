@@ -1,37 +1,115 @@
-# ADAM Prompt Library
+# Adam Prompt Library (AOPL)
 
-Welcome to the ADAM Prompt Library! This library provides a comprehensive collection of prompts for a variety of financial analysis and communication tasks. The prompts are designed to be used with large language models (LLMs) to help you generate high-quality, consistent, and insightful content.
+Welcome to the **Adam Operational Prompt Library (AOPL)**. This is the central cortex of the Adam system, containing the instructions, cognitive architectures, and functional templates that drive the behavior of our autonomous agents.
 
-## Structure
+> **"Code defines the body; Prompts define the mind."**
 
-The prompt library is organized into the following modules:
+## 🗂️ Library Structure
 
-*   **`credit_analysis`**: Prompts for conducting corporate credit risk analysis, underwriting, review, and monitoring.
-*   **`due_diligence`**: Prompts for conducting due diligence on a company.
-*   **`market_analysis`**: Prompts for conducting market analysis, including daily briefings, sector deep dives, and risk assessments.
-*   **`esg_analysis`**: Prompts for conducting ESG analysis, including investment opportunity scans and risk assessments.
-*   **`communication`**: Prompts for generating professional communications, such as escalation emails.
-*   **`model_validation`**: Prompts for generating challenges to financial models.
+We follow a strict hierarchical structure to ensure prompts are modular, reusable, and versioned.
 
-Each module contains a JSON file with the prompts and a Markdown file with a guide on how to use them.
+### 1. `AOPL-v1.0/` (Core Brain)
+The foundational prompt sets for the v23 "Adaptive System".
+*   **`system_architecture/`**: High-level meta-prompts.
+    *   `AWO_System_Prompt.md`: Defines the "Architect" persona and meta-cognition.
+    *   `MetaOrchestrator.md`: Routing logic for the central brain.
+*   **`professional_outcomes/`**: Domain-specific expert personas.
+    *   `credit_analysis.md`: Instructions for Shared National Credit (SNC) analysis.
+    *   `market_analysis.md`: Guidelines for macro-economic trend spotting.
+    *   `esg_analysis.md`: Directives for Environmental, Social, and Governance scoring.
+*   **`learning/`**: Prompts for autonomous self-improvement.
+    *   `reflection.md`: Instructions for the `ReflectorAgent` to critique its own work.
+    *   `few_shot_examples.md`: A library of "Gold Standard" Q&A pairs for in-context learning.
 
-## How to Use
+### 2. Specialized Modules
+*   **`risk_architect_agent/`**: Deep-dive prompts for the Vertical Risk Agent (SNCs, Covenants, Monte Carlo).
 
-To use a prompt from the library, you will need to:
+### 3. Root Files
+*   **`Adam_v23.5_System_Prompt.md`**: **The Master Prompt**. This is the entry point for the "Apex Architect" model. It combines system instructions, personality vectors (HNASP), and tool definitions.
 
-1.  **Choose a module** that corresponds to the task you want to perform.
-2.  **Select a prompt** from the JSON file in that module.
-3.  **Use the prompt** to guide the LLM in generating the desired content.
+---
 
-For more detailed instructions on how to use the prompts in each module, please refer to the corresponding Markdown guide.
+## 🚀 Usage Guide
 
-## Contributing
+### Loading Prompts in Code
+Adam uses a dynamic loader to fetch prompts. Do not hardcode strings in Python files.
 
-If you would like to contribute to the prompt library, please follow these guidelines:
+```python
+from core.utils.prompt_utils import load_prompt
 
-*   **Create a new module** for each new task or workflow.
-*   **Use a consistent structure** for your JSON and Markdown files.
-*   **Write clear and concise prompts** that are easy to understand and use.
-*   **Test your prompts** with a variety of inputs to ensure that they are working as expected.
+# 1. Load the Master System Prompt
+system_prompt_template = load_prompt("Adam_v23.5_System_Prompt.md")
 
-Thank you for your contributions to the ADAM Prompt Library!
+# 2. Render with Jinja2 Variables
+rendered_prompt = system_prompt_template.render(
+    user_query="Analyze Apple's debt structure",
+    current_date="2023-10-27",
+    security_context="INTERNAL_ONLY"
+)
+
+# 3. Pass to Agent
+agent.execute(rendered_prompt)
+```
+
+### Dynamic Variable Injection
+We use **Jinja2** templating. Common variables include:
+*   `{{ user_query }}`: The raw input from the user.
+*   `{{ context }}`: A JSON string or dict containing retrieved knowledge (RAG).
+*   `{{ tools }}`: A list of available tools/functions.
+*   `{{ persona }}`: The specific role the agent should adopt (e.g., "Skeptical Risk Officer").
+
+---
+
+## ✍️ Prompt Engineering Guidelines
+
+When contributing to this library, adhere to the **"Chain of Thought" (CoT)** and **"Role-Task-Constraint"** principles.
+
+### 1. Define the Persona
+Every prompt must start by defining WHO the AI is.
+> *Example:* "You are the Chief Risk Officer of a Tier-1 Investment Bank. You are skeptical, precise, and obsessed with downside protection."
+
+### 2. Define the Task
+Be explicit about the input and the expected output format.
+> *Example:* "Input: A 10-K filing. Output: A JSON object containing 'EBITDA', 'Total Debt', and 'Leverage Ratio'."
+
+### 3. Apply Constraints
+Tell the model what NOT to do.
+> *Example:* "Do not hallucinate data. If a metric is missing, write 'N/A'. Do not use markdown bolding in the JSON output."
+
+### 4. Use XML Tags for Structure
+We use XML tags to compartmentalize prompt sections for better LLM adherence.
+```xml
+<context>
+{{ context }}
+</context>
+
+<instructions>
+1. Analyze the context.
+2. Calculate ratios.
+</instructions>
+
+<output_format>
+JSON only.
+</output_format>
+```
+
+---
+
+## 🛠️ Contribution Workflow
+
+1.  **Create**: Draft your prompt in a `.md` file.
+2.  **Categorize**: Place it in `AOPL-v1.0/professional_outcomes/` (if it's a task) or `system_architecture/` (if it's a behavior).
+3.  **Test**: Run it against the `tests/test_prompt_framework.py` suite to ensure variables render correctly.
+4.  **PR**: Submit your PR with the tag `[PROMPT]`.
+
+---
+
+## 📚 Reference: Available Personas
+
+| Persona ID | Role | File Path |
+| :--- | :--- | :--- |
+| `APEX_ARCHITECT` | System Controller | `Adam_v23.5_System_Prompt.md` |
+| `CREDIT_ANALYST` | SNC & Debt Specialist | `AOPL-v1.0/professional_outcomes/credit_analysis.md` |
+| `ESG_SCORER` | Sustainability Auditor | `AOPL-v1.0/professional_outcomes/esg_analysis.md` |
+| `REFLECTOR` | Critic & improver | `AOPL-v1.0/learning/reflection.md` |
+

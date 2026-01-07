@@ -39,6 +39,7 @@
 ## 2025-05-22 - Testing Interactive Components
 **Learning:** For components with complex keyboard interactions (like terminals or comboboxes), relying on manual verification is risky. Using `@testing-library/react`'s `fireEvent.keyDown` allows for robust, automated testing of these interactions.
 **Action:** Always write unit tests for keyboard navigation logic.
+
 ## 2025-12-24 - Loading State Accessibility
 **Learning:** Stylistic loading animations (like CSS spinners) are invisible to screen readers. Adding `role="status"` and a visually hidden text span ensures assistive technology users know content is loading.
 **Action:** Always pair visual spinners with invisible descriptive text and proper ARIA live regions.
@@ -46,3 +47,7 @@
 ## 2025-12-24 - Verify Rendered Components
 **Learning:** In a codebase with legacy or duplicate files (e.g., `Header.js` vs `GlobalNav.tsx`), always verify which component is actually being rendered by the application (via `App.tsx` or `Layout.tsx`) before applying fixes. Screenshots and entry point analysis are crucial.
 **Action:** Trace the component tree from `App.tsx` or `index.js` before assuming a file is active.
+
+## 2024-05-23 - Accessibility of Custom Meters
+**Learning:** Custom visualization components like progress bars or meters (often built with `div`s) are invisible to screen readers unless explicitly annotated with `role="progressbar"` (or `meter`) and proper ARIA values (`aria-valuenow`, `aria-valuemin`, `aria-valuemax`).
+**Action:** Always check custom "bar" components for these attributes. When auditing, if you see a `div` representing a value, it likely needs ARIA.

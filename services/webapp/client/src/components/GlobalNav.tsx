@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { dataManager } from '../utils/DataManager';
 import { useNavigate } from 'react-router-dom';
+import { Loader2 } from 'lucide-react';
 
 const GlobalNav: React.FC = () => {
   const [status, setStatus] = useState('CONNECTING...');
   const [mode, setMode] = useState<'LIVE' | 'ARCHIVE'>('LIVE');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -47,15 +49,18 @@ const GlobalNav: React.FC = () => {
       dataManager.toggleSimulationMode(true);
       navigate('/vault');
     } else {
-      setMode('LIVE');
+      setIsLoading(true);
       dataManager.checkConnection().then(s => {
         setStatus(s.status);
         if (s.status === 'ONLINE') {
+            setMode('LIVE');
             dataManager.toggleSimulationMode(false);
             navigate('/');
         } else {
             alert("Cannot switch to LIVE: Backend unreachable.");
         }
+      }).finally(() => {
+        setIsLoading(false);
       });
     }
   };
@@ -87,7 +92,6 @@ const GlobalNav: React.FC = () => {
         <input
           ref={searchInputRef}
           type="text"
-          aria-label="Global Search"
           placeholder="GLOBAL SEARCH (Ctrl+K)..."
           aria-label="Global Search"
           className="cyber-input"
@@ -105,17 +109,27 @@ const GlobalNav: React.FC = () => {
         {/* Mode Switcher */}
         <button
             onClick={toggleMode}
-            aria-label={`Switch to ${mode === 'LIVE' ? 'Archive' : 'Live'} Mode`}
-            className="hover:opacity-80 focus:ring-2 focus:ring-cyan-500 outline-none"
+            disabled={isLoading}
+            aria-label={isLoading ? "Checking connection..." : `Switch to ${mode === 'LIVE' ? 'Archive' : 'Live'} Mode`}
+            className="hover:opacity-80 focus:ring-2 focus:ring-cyan-500 outline-none disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
-                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px',
+                cursor: isLoading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '10px',
                 padding: '5px 10px', border: '1px solid #333', borderRadius: '4px',
                 background: mode === 'LIVE' ? 'rgba(0, 255, 0, 0.1)' : 'rgba(255, 165, 0, 0.1)',
                 color: 'inherit', font: 'inherit'
             }}
         >
-            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: mode === 'LIVE' ? '#0f0' : '#ffa500' }}></div>
-            <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: mode === 'LIVE' ? '#0f0' : '#ffa500' }}>{mode} MODE</span>
+            {isLoading ? (
+                <>
+                  <Loader2 className="animate-spin h-3 w-3 text-cyan-500" />
+                  <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#0ff' }}>CHECKING...</span>
+                </>
+            ) : (
+                <>
+                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: mode === 'LIVE' ? '#0f0' : '#ffa500' }}></div>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: mode === 'LIVE' ? '#0f0' : '#ffa500' }}>{mode} MODE</span>
+                </>
+            )}
         </button>
 
         {/* Mock Mode Indicator */}

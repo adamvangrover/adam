@@ -1,4 +1,3 @@
-
 # Adam v23.5: The Neuro-Symbolic Financial Sovereign
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/) [![Docker Image](https://img.shields.io/badge/docker-ready-blue)](https://hub.docker.com/) [![FinanceBench](https://img.shields.io/badge/FinanceBench-99%25-green)](https://arxiv.org/abs/2311.11944)
@@ -17,9 +16,12 @@ The era of the generic LLM "wrapper" is over. Institutional finance faces an **E
 
 ---
 
-## 🧠 Architecture: The "System 2" Reasoning Engine
+## 🧠 Architecture: Hybrid Cognitive Engine
 
-Adam abandons the linear chain for the **Cyclical Reasoning Graph**. The system instantiates an adversarial "Credit Committee" in silicon that actively hunts for failure modes in its own drafts.
+Adam v23.5 utilizes a **Hybrid Architecture** that combines the responsiveness of asynchronous message passing with the depth of cyclical graph reasoning.
+
+### 1. The "System 2" Reasoning Engine (Brain)
+Located in `core/engine/`, this component handles complex, high-stakes analysis (Deep Dives, Risk assessments). It uses **LangGraph** to model reasoning as a state machine.
 
 ```mermaid
 graph TD
@@ -50,15 +52,19 @@ graph TD
     %% Output
     Synth -->|Report| Dashboard[Neural Dashboard]
     Synth -->|Action| Exec[Execution API]
-````
+```
 
-### Core Components
+### 2. The Asynchronous Swarm (Body)
+Located in `core/system/v22_async/`, this component handles high-throughput, non-blocking tasks (News monitoring, HFT signals, Data ingestion). It uses a **Message Broker** pattern.
 
-  * **Neuro-Symbolic Planner:** The "Cortex" that breaks high-level goals into executable graphs, combining LLM creativity with Knowledge Graph logic.
-  * **Adversarial Critic:** A feedback loop that scores insights (0-100% conviction). Low conviction results are automatically rejected and refined.
-  * **Traceability:** Every conclusion is back-linked to specific source document fragments via the W3C PROV-O ontology ("Glass Box" reasoning).
+### 3. Key Modules
 
-> *Under the hood, this is powered by a **Hybrid Cloud-Native Topology** (Kafka, Kubernetes, Polyglot Persistence) ensuring high-throughput ingestion of 10-Ks and market feeds.*
+| Module | Path | Description |
+| :--- | :--- | :--- |
+| **Meta Orchestrator** | `core/engine/meta_orchestrator.py` | The central router that decides between Fast (Swarm) and Deep (Graph) execution paths. |
+| **Agents** | `core/agents/` | Specialized workers (Risk, Compliance, Fundamental) containing domain-specific logic. |
+| **Universal Ingestor** | `core/data_processing/` | Pipeline for scrubbing and normalizing incoming data (10-Ks, News) into the Knowledge Graph. |
+| **Neuro-Symbolic Planner** | `core/engine/neuro_symbolic_planner.py` | Compiles abstract goals into executable agent workflows. |
 
 -----
 
@@ -66,25 +72,25 @@ graph TD
 
 Adam unifies institutional credit risk analysis, private wealth management, and quantitative engineering into a single cognitive architecture.
 
-### 1\. The Deterministic Quantitative Core
+### 1. The Deterministic Quantitative Core
 
 **We do not let LLMs do math.** Adam uses a hard-coded Python/Rust engine for 100% accuracy.
 
   * **ICAT (Integrated Credit Analysis Tool):** Python-based engine for 3-statement modeling, DCF valuation, and sensitivity analysis.
   * **SNC Rating Module:** Automatically maps leverage and coverage ratios to the **Shared National Credit** regulatory scale (Pass, Special Mention, Substandard, Doubtful).
 
-### 2\. Institutional Due Diligence
+### 2. Institutional Due Diligence
 
   * **PromptFrame V2.1:** Instantiates a "Credit Committee" with distinct personas (The Bull, The Bear, The Synthesizer) to weigh evidence.
   * **Automated Deep Dives:** Generates 30+ page Investment Memos, handling everything from XBRL extraction to covenant analysis.
 
-### 3\. Family Office & Wealth Management
+### 3. Family Office & Wealth Management
 
   * **Trust Modeling:** Encodes complex estate structures and beneficiary requirements.
   * **Automated IPS:** Dynamically generates and enforces Investment Policy Statements (IPS) based on shifting market conditions.
   * **Cross-Entity Risk:** Aggregates exposure across Family Office, Foundation, and Personal Trust entities.
 
-### 4\. The Gold Standard Data Pipeline
+### 4. The Gold Standard Data Pipeline
 
 **"The Universal Ingestor"**
 Garbage in, garbage out. Adam's pipeline scrubs, validates, and normalizes every token before it reaches the reasoning engine.
@@ -94,19 +100,6 @@ Garbage in, garbage out. Adam's pipeline scrubs, validates, and normalizes every
   * **FIBO Grounding:** All data is mapped to the Financial Industry Business Ontology (FIBO).
 
 -----
-
-## Adam v2.0: The Agentic Swarm
-
-The system has evolved into a hybrid architecture supporting both the robust v23 Graph Engine and the new v2.0 Agentic Swarm.
-
-### Key Features
-*   **Dual-Core Engine:** Run in modern Swarm mode (default) or Legacy Graph mode (`--legacy`).
-*   **Model Context Protocol (MCP):** Standardized, secure tool access for SQL, Search, and Market Data.
-*   **Swarm Telemetry:** Real-time visibility into agent thought processes via `logs/swarm_telemetry.jsonl`.
-*   **Self-Optimization:** Includes an `EvolutionaryOptimizer` agent that analyzes its own codebase.
-
-### Swarm Memory
-The system now maintains a persistent "Collective Unconscious" via the `MemoryMatrix`, allowing agents to share insights across sessions.
 
 ## ⚡ Getting Started
 
@@ -122,10 +115,11 @@ We use **`uv`** for lightning-fast, reproducible Python environment management.
 
 ```bash
 # 1. Clone the repository
-git clone [https://github.com/adamvangrover/adam.git](https://github.com/adamvangrover/adam.git)
+git clone https://github.com/adamvangrover/adam.git
 cd adam
 
 # 2. Sync dependencies with uv (10-100x faster than pip)
+# If you don't have uv, you can use: pip install -r requirements.txt
 uv sync
 
 # 3. Activate the virtual environment
@@ -138,7 +132,9 @@ python scripts/swarm_showcase.py --target .
 # Open showcase/index.html in your browser to see the Neural Dashboard.
 ```
 
-> *For Docker-based deployments or running the interactive CLI, please see [docs/setup\_guide.md](https://www.google.com/search?q=docs/setup_guide.md).*
+### Deployment
+
+For full deployment instructions, including Docker and Cloud setup, please refer to the [Deployment Guide](showcase/deployment.html) or `docs/deployment.md`.
 
 -----
 
@@ -155,11 +151,8 @@ python scripts/swarm_showcase.py --target .
 We are building the open-source standard for institutional AI.
 
   * **Current Focus:** Refining the Quantum Risk Module and adding connectors for Bloomberg (BBG) and FactSet.
-  * Please read [CONTRIBUTING.md](https://www.google.com/search?q=CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+  * Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
 ### License
 
 Distributed under the MIT License. See `LICENSE` for more information.
-
-```
-```

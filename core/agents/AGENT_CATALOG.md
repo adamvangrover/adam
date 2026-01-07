@@ -960,3 +960,54 @@ This document provides a comprehensive catalog of all the agents in the ADAM sys
 *   **Compute and Resource Requirements:** Low to Medium (LLM context window for 13F data).
 *   **Dependencies:** `semantic_kernel` (optional).
 *   **Developer Notes:** This agent relies on "Prompt-as-Code" via `LIB-PRO-010`.
+
+---
+
+## `evolutionary_architect`
+
+*   **File:** `core/agents/meta_agents/evolutionary_architect.py`
+*   **Description:** A meta-agent responsible for the continuous, autonomous optimization and evolution of the Adam Platform codebase. It proposes, refactors, and implements new features using an evolutionary "Generator-Critic" loop.
+*   **Configuration:** `config/agents.yaml`
+    *   `target_modules`: List of modules to focus evolution on.
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.AgentBase`.
+*   **Agent Forge and Lifecycle:** Runs in the background (Path B) or on demand.
+*   **Model Context Protocol (MCP):** Exposes `propose_refactor`, `run_regression_suite`, `analyze_performance_metrics`.
+*   **Tools and Hooks:**
+    *   **Tools:** Code generation, file manipulation.
+*   **Compute and Resource Requirements:** High (LLM heavy, requires sandbox).
+*   **Dependencies:** None.
+*   **Developer Notes:** Operates primarily in the `experimental/` namespace to prevent core instability.
+
+---
+
+## `didactic_architect`
+
+*   **File:** `core/agents/meta_agents/didactic_architect.py`
+*   **Description:** This agent autonomously generates and maintains interactive documentation, tutorials, and setup guides. It ensures that the system's complexity remains interpretable to human users by bridging the gap between code changes and user understanding.
+*   **Configuration:** `config/agents.yaml`
+    *   `doc_path`: Path to the documentation directory.
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.AgentBase`.
+*   **Agent Forge and Lifecycle:** Triggered by code changes (CI/CD) or user query.
+*   **Model Context Protocol (MCP):** Exposes `generate_tutorial`, `explain_logic_trace`, `update_documentation`.
+*   **Tools and Hooks:**
+    *   **Tools:** AST parsing, file writing.
+*   **Compute and Resource Requirements:** Medium.
+*   **Dependencies:** None.
+*   **Developer Notes:** Generates "live" documentation such as Jupyter notebooks.
+
+---
+
+## `chronos_agent`
+
+*   **File:** `core/agents/meta_agents/chronos_agent.py`
+*   **Description:** The "Keeper of Time and Memory". Chronos manages the temporal state of the application, implementing Hierarchical Temporal Memory (HTM) to provide agents with appropriate short, medium, and long-term context. It also identifies historical financial analogies.
+*   **Configuration:** `config/agents.yaml`
+    *   `memory_backend`: Vector DB or Graph DB configuration.
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.AgentBase`.
+*   **Agent Forge and Lifecycle:** Continuous (runs as a service).
+*   **Model Context Protocol (MCP):** Exposes `retrieve_temporal_context`, `search_episodic_memory`, `perform_time_travel_debug`.
+*   **Tools and Hooks:**
+    *   **Tools:** Vector DB access, Time Travel Debugging.
+*   **Compute and Resource Requirements:** Medium (Database I/O, LLM context).
+*   **Dependencies:** None.
+*   **Developer Notes:** Critical for maintaining persona and context over long time horizons.

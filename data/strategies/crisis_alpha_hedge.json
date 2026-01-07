@@ -1,0 +1,56 @@
+{
+  "portfolio_name": "Adam Crisis Alpha Hedge",
+  "version": "1.0",
+  "target_allocation": {
+    "equities": {
+      "weight": 0.20,
+      "components": {
+        "global_min_vol": {
+          "weight": 0.20,
+          "ticker_proxy": "ACWV",
+          "rationale": "Defensive equity exposure to reduce downside capture."
+        }
+      }
+    },
+    "fixed_income": {
+      "weight": 0.40,
+      "components": {
+        "long_term_treasuries": {
+          "weight": 0.20,
+          "ticker_proxy": "ZROZ",
+          "rationale": "Zero-coupon bonds for maximum convexity in deflation."
+        },
+        "short_term_tips": {
+          "weight": 0.20,
+          "ticker_proxy": "VTIP",
+          "rationale": "Liquidity and inflation protection."
+        }
+      }
+    },
+    "alternatives": {
+      "weight": 0.40,
+      "components": {
+        "managed_futures": {
+          "weight": 0.20,
+          "ticker_proxy": "DBMF",
+          "rationale": "Trend following across all asset classes."
+        },
+        "volatility_long": {
+          "weight": 0.10,
+          "ticker_proxy": "VIXY",
+          "rationale": "Direct exposure to VIX spikes."
+        },
+        "gold": {
+          "weight": 0.10,
+          "ticker_proxy": "SGOL",
+          "rationale": "Physical Swiss gold trust."
+        }
+      }
+    }
+  },
+  "rebalancing_rules": {
+    "frequency": "Monthly",
+    "threshold": 0.02
+  },
+  "architect_notes": "A 'Doomsday' portfolio. High allocation to uncorrelated assets (Managed Futures, Volatility). Expected to underperform in bull markets but skyrocket during crashes (2008, 2020)."
+}

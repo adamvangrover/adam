@@ -11,8 +11,11 @@ class ExplainableStateTranslator:
         iteration = state.get('iteration_count', 0)
         quality = state.get('quality_score', 0.0)
 
+        # Safely get ticker, defaulting to "Entity" if not found
+        ticker = state.get('ticker', 'Entity')
+
         if iteration == 0:
-            return f"🔎 Starting analysis on {state['ticker']}. {status}"
+            return f"🔎 Starting analysis on {ticker}. {status}"
 
         if state.get('needs_correction'):
             return (

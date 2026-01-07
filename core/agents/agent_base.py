@@ -3,12 +3,16 @@ from typing import Any, Dict, List, Optional
 import logging
 import json
 import asyncio
+from pydantic import BaseModel
 import uuid
 import warnings
 from datetime import datetime
 
+from core.utils.logging_utils import SwarmLogger
+
 # HNASP Imports
 from core.schemas.hnasp import HNASPState, Meta, PersonaState, LogicLayer, ContextStream, PersonaDynamics, SecurityContext, PersonaIdentities, Identity, EPAVector
+from core.agents.mixins.memory_mixin import MemoryMixin
 
 # JsonLogic
 try:
@@ -30,11 +34,11 @@ except ImportError:
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-class AgentBase(ABC):
+class AgentBase(ABC, MemoryMixin):
     """
     Abstract base class for all agents in the system.
     Defines the common interface and behavior expected of all agents.
-    This version incorporates MCP, A2A, Semantic Kernel, and HNASP.
+    This version incorporates MCP, A2A, Semantic Kernel, HNASP, and Memory persistence.
     """
 
     def __init__(self, config: Dict[str, Any], constitution: Optional[Dict[str, Any]] = None, kernel: Optional[Kernel] = None):
@@ -92,6 +96,12 @@ class AgentBase(ABC):
         self._original_execute = self.execute
 
         async def wrapped_execute(*args: Any, **kwargs: Any) -> Any:
+            swarm_logger = SwarmLogger()
+            agent_id = self.config.get("agent_id", self.name)
+
+            # Log Start
+            swarm_logger.log_event("TASK_START", agent_id, {"inputs": kwargs, "args": [str(a) for a in args]})
+
             # Update state variables from inputs if applicable
             if kwargs:
                 self.state.logic_layer.state_variables.update(kwargs)
@@ -105,8 +115,24 @@ class AgentBase(ABC):
             if args and isinstance(args[0], str):
                 self.update_persona(args[0])
 
-            # Execute original logic
-            return await self._original_execute(*args, **kwargs)
+            try:
+                # Execute original logic
+                result = await self._original_execute(*args, **kwargs)
+                # Log Complete
+                log_result = result
+                if isinstance(result, BaseModel):
+                    try:
+                        log_result = result.model_dump(mode='json')
+                    except Exception as e:
+                        logging.warning(f"Failed to serialize Pydantic model for logging: {e}")
+                        log_result = str(result)
+
+                swarm_logger.log_event("TASK_COMPLETE", agent_id, {"output": log_result})
+                return result
+            except Exception as e:
+                # Log Error
+                swarm_logger.log_event("TASK_ERROR", agent_id, {"error": str(e)})
+                raise e
 
         self.execute = wrapped_execute # type: ignore[method-assign] # Bind wrapper to instance
 

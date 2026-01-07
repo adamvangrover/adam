@@ -102,3 +102,13 @@
 **Vulnerability:** The `StateManager` class in `src/adam/core/state_manager.py` was using `pickle.loads` to deserialize data retrieved from Redis.
 **Learning:** Redis is often treated as a trusted data store, but in a microservices environment, it can be a vector for lateral movement. If an attacker compromises a service with Redis access, they can inject malicious payloads to compromise other services.
 **Prevention:** Always use safe deserialization methods. We replaced `pickle.loads` with `core.security.safe_unpickler.safe_loads`, which restricts the allowed classes to a safe whitelist (numpy, pandas, torch, etc.).
+
+## 2025-01-04 - Insecure SQL Blacklist
+**Vulnerability:** The `LakehouseConnector` in `core/data_access/lakehouse_connector.py` used a blacklist (`if "DROP" in ...`) to prevent SQL injection. This approach is fundamentally flawed as it fails to block other dangerous commands like `INSERT`, `ALTER`, `TRUNCATE`, `GRANT`, or chained commands using semicolons.
+**Learning:** Blacklists for security are almost always insufficient because attackers can use synonyms, different case, or commands not on the list.
+**Prevention:** Always use a whitelist approach for security validations. In this case, we implemented a custom tokenizer-based SQL validator to strictly enforce `SELECT` queries and prevent multiple statements, handling comments and literals correctly without external dependencies.
+
+## 2026-01-06 - Username Validation Gap
+**Vulnerability:** The registration endpoint allowed creation of users with invalid usernames (e.g. empty strings, extremely long strings, or HTML tags) because it only checked for uniqueness.
+**Learning:** Even if an ORM handles SQL injection, input validation is crucial for preventing Stored XSS (via username display) and ensuring data integrity.
+**Prevention:** Always validate all user inputs against a strict allowlist (e.g. alphanumeric only) before processing, even if the database doesn't strictly require it.
