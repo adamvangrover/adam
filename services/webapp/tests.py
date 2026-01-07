@@ -28,6 +28,24 @@ class ApiTestCase(unittest.TestCase):
         data = json.loads(response.data)
         self.assertEqual(data, [])
 
+    def test_register_username_validation(self):
+        # 🛡️ Sentinel: Test username format validation
+        invalid_usernames = [
+            'usr',             # Too short (< 4 chars)
+            'user@name',       # Special char @
+            '<script>',        # XSS attempt
+            'user name',       # Space
+            'a' * 31           # Too long (> 30 chars)
+        ]
+        strong_pwd = 'StrongPassword1!'
+
+        for uname in invalid_usernames:
+            response = self.client.post('/api/register',
+                                        data=json.dumps({'username': uname, 'password': strong_pwd}),
+                                        content_type='application/json')
+            self.assertEqual(response.status_code, 400, f"Allowed invalid username: {uname}")
+            self.assertIn('Invalid username format', json.loads(response.data).get('error', ''))
+
     def test_register_weak_password(self):
         # 🛡️ Sentinel: Test password strength validation
         weak_passwords = [
@@ -39,8 +57,12 @@ class ApiTestCase(unittest.TestCase):
         ]
 
         for pwd in weak_passwords:
+            # Sentinel: Ensure username is valid for password tests
+            # 'valid_user_' + pwd might contain invalid characters from pwd (like !) which triggers username validation first
+            # Also hash can produce negative numbers, hyphen is allowed but let's be safe and use abs
+            safe_username = f'user_{abs(hash(pwd))}'
             response = self.client.post('/api/register',
-                                        data=json.dumps({'username': f'user_{pwd}', 'password': pwd}),
+                                        data=json.dumps({'username': safe_username, 'password': pwd}),
                                         content_type='application/json')
             self.assertEqual(response.status_code, 400, f"Allowed weak password: {pwd}")
             self.assertIn('Password is too weak', json.loads(response.data)['error'])
