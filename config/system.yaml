@@ -16,6 +16,15 @@ tasks:
     parameters:
       #... (add parameters for the weekly analysis)
 
+  # NEW: Autonomous Weekly Newsletter Task
+  - name: generate_weekly_market_mayhem
+    schedule: weekly
+    parameters:
+      script: "scripts/generate_newsletter.py"
+      mode: "live"
+      template: "v24"
+      recipients: ["subscribers@adam-financial.com"]
+
 # Resource Limits
 resource_limits:
   cpu_limit: 80  # Percentage
