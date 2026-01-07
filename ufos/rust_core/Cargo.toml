@@ -1,0 +1,32 @@
+[package]
+name = "ufos_core"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+anyhow = "1"
+thiserror = "1"
+crossbeam = "0.8"
+parking_lot = "0.12"
+pyo3 = { version = "0.20", features = ["auto-initialize"] }
+arrow = "53.2"
+io-uring = "0.6"
+axum = "0.7" # For SSE / Web Interface
+tower-http = { version = "0.5", features = ["cors"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
+futures = "0.3"
+rand = "0.8"
+chrono = "0.4"
+lazy_static = "1.4"
+# Using libc for low-level memory ops if needed
+libc = "0.2"
+# Core affinity as requested
+core_affinity = "0.8"
+
+[lib]
+name = "ufos_lib"
+crate-type = ["cdylib", "rlib"]
