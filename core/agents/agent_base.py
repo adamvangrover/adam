@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional
 import logging
 import json
 import asyncio
+from pydantic import BaseModel
 import uuid
 import warnings
 from datetime import datetime
@@ -118,7 +119,15 @@ class AgentBase(ABC, MemoryMixin):
                 # Execute original logic
                 result = await self._original_execute(*args, **kwargs)
                 # Log Complete
-                swarm_logger.log_event("TASK_COMPLETE", agent_id, {"output": result})
+                log_result = result
+                if isinstance(result, BaseModel):
+                    try:
+                        log_result = result.model_dump(mode='json')
+                    except Exception as e:
+                        logging.warning(f"Failed to serialize Pydantic model for logging: {e}")
+                        log_result = str(result)
+
+                swarm_logger.log_event("TASK_COMPLETE", agent_id, {"output": log_result})
                 return result
             except Exception as e:
                 # Log Error
