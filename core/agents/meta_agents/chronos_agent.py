@@ -17,8 +17,9 @@ from core.schemas.meta_agent_schemas import (
     MemoryFragment,
     HistoricalComparison
 )
+from core.utils.logging_utils import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 class ChronosAgent(AgentBase):
     """
@@ -234,3 +235,6 @@ class ChronosAgent(AgentBase):
         Provide a concise 2-sentence summary of the temporal context.
         """
         return await self.llm_engine.generate_response(f"{self.SYSTEM_PROMPT}\n\n{prompt}")
+
+# Alias for backward compatibility and to satisfy imports expecting 'Chronos'
+Chronos = ChronosAgent
