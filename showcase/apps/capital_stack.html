@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Capital Stack Analyzer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-dark: #050510;
+            --panel-glass: rgba(20, 20, 40, 0.8);
+            --info-blue: #3b82f6;
+            --grid-line: rgba(59, 130, 246, 0.05);
+            --tranche-senior: #10b981;
+            --tranche-mezz: #f59e0b;
+            --tranche-equity: #3b82f6;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 40px 40px;
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: var(--panel-glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            transition: border-color 0.3s;
+        }
+        .glass-panel:hover { border-color: rgba(59, 130, 246, 0.5); }
+
+        input, select {
+            background: rgba(0,0,0,0.3); border: 1px solid #334155; color: #e2e8f0;
+            font-family: inherit; font-size: 0.75rem; padding: 4px; width: 100%;
+        }
+        input:focus { outline: none; border-color: var(--info-blue); }
+
+        .tranche-row { transition: background 0.2s; }
+        .tranche-row:hover { background: rgba(255,255,255,0.05); }
+
+        /* Waterfall bars */
+        .waterfall-bar { transition: height 0.5s ease; width: 100%; }
+
+        button { transition: all 0.2s; }
+        button:active { transform: scale(0.95); }
+    </style>
+</head>
+<body class="h-screen flex flex-col p-4 text-xs">
+
+    <div class="flex justify-between items-center mb-4 border-b border-blue-900/50 pb-2 flex-shrink-0">
+        <h1 class="text-lg font-bold text-blue-400 tracking-widest flex items-center">
+            <i data-lucide="layers" class="w-5 h-5 mr-2"></i>
+            CAPITAL STACK & LGD ANALYZER
+        </h1>
+        <div class="flex gap-2">
+             <button onclick="app.calc()" class="px-3 py-1 bg-blue-900/40 hover:bg-blue-600 border border-blue-500 text-white rounded font-bold flex items-center gap-1">
+                <i data-lucide="refresh-cw" class="w-3 h-3"></i> RECALC
+            </button>
+             <button onclick="window.print()" class="px-3 py-1 bg-gray-800 hover:bg-gray-700 border border-gray-600 text-gray-300 rounded font-bold flex items-center gap-1">
+                <i data-lucide="printer" class="w-3 h-3"></i> PRINT
+            </button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-12 gap-4 flex-grow overflow-hidden">
+
+        <!-- Inputs Sidebar -->
+        <aside class="col-span-4 flex flex-col gap-3 overflow-y-auto pr-2 custom-scroll">
+
+            <!-- Tranche Input -->
+            <div class="glass-panel p-3 rounded">
+                <div class="text-[10px] text-blue-400 mb-2 uppercase font-bold flex justify-between">
+                    <span>Debt Tranches ($M)</span>
+                    <button onclick="app.addTranche()" class="text-[9px] bg-blue-900 px-2 rounded hover:bg-blue-700">+ ADD</button>
+                </div>
+                <div id="tranches-container" class="space-y-2">
+                    <!-- Dynamic Rows -->
+                </div>
+            </div>
+
+            <!-- Equity Input -->
+            <div class="glass-panel p-3 rounded">
+                <div class="text-[10px] text-blue-400 mb-2 uppercase font-bold">Equity Layer</div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-gray-500 mb-1">Common Equity ($M)</label>
+                        <input type="number" id="equity-amt" value="250" onchange="app.calc()">
+                    </div>
+                     <div>
+                        <label class="block text-gray-500 mb-1">Target IRR (%)</label>
+                        <input type="number" id="equity-irr" value="20" onchange="app.calc()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Collateral / LGD Assumptions -->
+            <div class="glass-panel p-3 rounded">
+                <div class="text-[10px] text-red-400 mb-2 uppercase font-bold flex items-center gap-2">
+                    <i data-lucide="alert-triangle" class="w-3 h-3"></i> LGD Scenario
+                </div>
+                <div class="space-y-2">
+                    <div>
+                        <label class="block text-gray-500 mb-1">Total Enterprise Value (Exit) ($M)</label>
+                        <input type="number" id="ev-exit" value="1200" disabled class="opacity-50" title="Calculated from DCF/Manual">
+                    </div>
+                    <div>
+                        <label class="block text-gray-500 mb-1">Distressed Sale Discount (%)</label>
+                        <input type="number" id="distress-disc" value="40" onchange="app.calc()">
+                    </div>
+                    <div>
+                        <label class="block text-gray-500 mb-1">Liquidation Costs (%)</label>
+                        <input type="number" id="liq-costs" value="5" onchange="app.calc()">
+                    </div>
+                    <div class="pt-2 border-t border-gray-700">
+                        <label class="block text-white font-bold mb-1">Net Collateral Value ($M)</label>
+                        <input type="number" id="collateral-val" value="0" disabled class="bg-red-900/20 text-red-300 font-bold border-red-500/30">
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Dashboard -->
+        <main class="col-span-8 flex flex-col gap-4 overflow-y-auto pr-2 custom-scroll">
+
+             <!-- Summary Cards -->
+             <div class="grid grid-cols-3 gap-3">
+                 <div class="glass-panel p-3 rounded text-center">
+                     <div class="text-gray-500 text-[9px] uppercase">Total Capitalization</div>
+                     <div class="text-xl font-bold text-white mt-1" id="total-cap">$0.0M</div>
+                 </div>
+                 <div class="glass-panel p-3 rounded text-center">
+                     <div class="text-gray-500 text-[9px] uppercase">Blended Cost of Debt</div>
+                     <div class="text-xl font-bold text-blue-400 mt-1" id="blended-rate">0.0%</div>
+                 </div>
+                 <div class="glass-panel p-3 rounded text-center">
+                     <div class="text-gray-500 text-[9px] uppercase">Annual Interest (Cash)</div>
+                     <div class="text-xl font-bold text-green-400 mt-1" id="annual-int">$0.0M</div>
+                 </div>
+             </div>
+
+             <!-- Charts Row -->
+             <div class="grid grid-cols-2 gap-3 h-64">
+                 <div class="glass-panel p-3 rounded flex flex-col">
+                     <div class="text-[10px] text-gray-400 mb-2 font-bold uppercase">Capital Structure</div>
+                     <div class="flex-grow relative">
+                         <canvas id="chart-stack"></canvas>
+                     </div>
+                 </div>
+                 <div class="glass-panel p-3 rounded flex flex-col">
+                     <div class="text-[10px] text-gray-400 mb-2 font-bold uppercase">LGD Waterfall (Recovery Analysis)</div>
+                     <div class="flex-grow relative">
+                         <canvas id="chart-waterfall"></canvas>
+                     </div>
+                 </div>
+             </div>
+
+             <!-- Pro Forma Table -->
+             <div class="glass-panel p-3 rounded">
+                 <div class="text-[10px] text-blue-400 mb-2 uppercase font-bold">Pro Forma Credit Statistics</div>
+                 <table class="w-full text-left font-mono">
+                     <thead>
+                         <tr class="text-gray-500 border-b border-gray-700">
+                             <th class="py-1">Tranche</th>
+                             <th class="text-right">Amount</th>
+                             <th class="text-right">Rate</th>
+                             <th class="text-right">Interest</th>
+                             <th class="text-right">Levaerage (x)</th>
+                             <th class="text-right text-red-400">Recovery %</th>
+                         </tr>
+                     </thead>
+                     <tbody id="stats-body">
+                         <!-- Filled by JS -->
+                     </tbody>
+                 </table>
+             </div>
+
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const app = {
+            chartStack: null,
+            chartWaterfall: null,
+
+            // Initial State
+            tranches: [
+                { name: 'Revolver', amt: 50, rate: 6.5, type: 'Cash', priority: 1 },
+                { name: 'Term Loan A', amt: 300, rate: 7.0, type: 'Cash', priority: 2 },
+                { name: 'Term Loan B', amt: 450, rate: 8.5, type: 'Cash', priority: 3 },
+                { name: 'Mezzanine', amt: 150, rate: 12.0, type: 'PIK', priority: 4 }
+            ],
+
+            init: function() {
+                this.renderInputs();
+                this.calc();
+            },
+
+            addTranche: function() {
+                this.tranches.push({ name: 'New Tranche', amt: 0, rate: 8.0, type: 'Cash', priority: this.tranches.length + 1 });
+                this.renderInputs();
+            },
+
+            removeTranche: function(idx) {
+                this.tranches.splice(idx, 1);
+                this.renderInputs();
+                this.calc();
+            },
+
+            renderInputs: function() {
+                const container = document.getElementById('tranches-container');
+                container.innerHTML = '';
+
+                this.tranches.forEach((t, i) => {
+                    const row = document.createElement('div');
+                    row.className = 'glass-panel p-2 rounded text-[9px] tranche-row relative group';
+                    row.innerHTML = `
+                        <div class="flex justify-between mb-1 items-center">
+                            <input type="text" value="${t.name}" class="font-bold bg-transparent border-none w-24 p-0 focus:ring-0" onchange="app.updateTranche(${i}, 'name', this.value)">
+                            <div class="text-gray-500">Pri: ${t.priority}</div>
+                            <button onclick="app.removeTranche(${i})" class="text-red-500 opacity-0 group-hover:opacity-100 font-bold px-1">X</button>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="block text-gray-600">Amt ($)</label>
+                                <input type="number" value="${t.amt}" onchange="app.updateTranche(${i}, 'amt', this.value)">
+                            </div>
+                            <div>
+                                <label class="block text-gray-600">Rate (%)</label>
+                                <input type="number" value="${t.rate}" step="0.1" onchange="app.updateTranche(${i}, 'rate', this.value)">
+                            </div>
+                            <div>
+                                <label class="block text-gray-600">Type</label>
+                                <select onchange="app.updateTranche(${i}, 'type', this.value)">
+                                    <option value="Cash" ${t.type === 'Cash' ? 'selected' : ''}>Cash</option>
+                                    <option value="PIK" ${t.type === 'PIK' ? 'selected' : ''}>PIK</option>
+                                </select>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(row);
+                });
+            },
+
+            updateTranche: function(idx, field, val) {
+                if(field === 'amt' || field === 'rate') val = parseFloat(val);
+                this.tranches[idx][field] = val;
+                this.calc();
+            },
+
+            calc: function() {
+                const equityAmt = parseFloat(document.getElementById('equity-amt').value) || 0;
+
+                // 1. Debt Stats
+                let totalDebt = 0;
+                let totalInt = 0;
+                let weightedRateSum = 0;
+
+                this.tranches.forEach(t => {
+                    totalDebt += t.amt;
+                    let int = t.amt * (t.rate / 100);
+                    if(t.type === 'Cash') totalInt += int;
+                    weightedRateSum += (t.rate * t.amt);
+                });
+
+                const totalCap = totalDebt + equityAmt;
+                const blendedRate = totalDebt > 0 ? (weightedRateSum / totalDebt) : 0;
+
+                // UI Updates Summary
+                document.getElementById('total-cap').innerText = `$${totalCap.toLocaleString()}M`;
+                document.getElementById('blended-rate').innerText = `${blendedRate.toFixed(2)}%`;
+                document.getElementById('annual-int').innerText = `$${totalInt.toLocaleString()}M`;
+
+                // 2. LGD Logic
+                const evExit = parseFloat(document.getElementById('ev-exit').value) || totalCap; // Default to cap if no input
+                // Allow manually overriding EV Exit if user wants, but currently fixed.
+                // Let's assume EV Exit matches Total Cap for base, but we calculate DISTRESSED value
+
+                const distressDisc = parseFloat(document.getElementById('distress-disc').value) / 100;
+                const liqCosts = parseFloat(document.getElementById('liq-costs').value) / 100;
+
+                const grossDistressedVal = evExit * (1 - distressDisc);
+                const netCollateral = grossDistressedVal * (1 - liqCosts);
+
+                document.getElementById('collateral-val').value = netCollateral.toFixed(1);
+
+                // Waterfall Calculation
+                let remainingCollateral = netCollateral;
+                const recoveryStats = [];
+
+                // Sort by priority just in case
+                const sortedTranches = [...this.tranches].sort((a,b) => a.priority - b.priority);
+
+                let cumDebt = 0;
+
+                sortedTranches.forEach(t => {
+                    cumDebt += t.amt;
+                    let recoveryAmt = Math.min(t.amt, remainingCollateral);
+                    let recoveryPct = t.amt > 0 ? (recoveryAmt / t.amt) : 0;
+                    remainingCollateral = Math.max(0, remainingCollateral - recoveryAmt);
+
+                    recoveryStats.push({ ...t, recoveryAmt, recoveryPct, cumDebt });
+                });
+
+                // Equity Recovery
+                let equityRecAmt = remainingCollateral;
+                let equityRecPct = equityAmt > 0 ? (equityRecAmt / equityAmt) : 0;
+
+                // Update Table
+                const tbody = document.getElementById('stats-body');
+                tbody.innerHTML = '';
+
+                // Assume assumed EBITDA for leverage calc
+                const ebitda = 250; // Hardcoded for demo/simplicity or fetch from DCF? Let's assume 250
+
+                sortedTranches.forEach(s => {
+                    const intExp = s.amt * (s.rate/100);
+                    const lev = s.cumDebt / ebitda;
+                    const recClass = s.recoveryPct === 1 ? 'text-green-400' : (s.recoveryPct > 0 ? 'text-yellow-400' : 'text-red-500');
+
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-white/5 border-b border-gray-800">
+                            <td class="py-1 pl-2 text-gray-300 font-bold">${s.name} <span class="text-[8px] text-gray-500">(${s.type})</span></td>
+                            <td class="text-right text-gray-400">$${s.amt.toFixed(1)}</td>
+                            <td class="text-right text-gray-400">${s.rate.toFixed(1)}%</td>
+                            <td class="text-right text-gray-400">$${intExp.toFixed(1)}</td>
+                            <td class="text-right text-blue-300">${lev.toFixed(1)}x</td>
+                            <td class="text-right ${recClass} font-bold">${(s.recoveryPct * 100).toFixed(0)}%</td>
+                        </tr>
+                    `;
+                });
+
+                // Equity Row
+                tbody.innerHTML += `
+                    <tr class="hover:bg-white/5 bg-blue-900/10">
+                        <td class="py-1 pl-2 text-blue-300 font-bold">Common Equity</td>
+                        <td class="text-right text-blue-300">$${equityAmt.toFixed(1)}</td>
+                        <td class="text-right">-</td>
+                        <td class="text-right">-</td>
+                        <td class="text-right">-</td>
+                        <td class="text-right ${equityRecPct > 0 ? 'text-green-400' : 'text-red-500'} font-bold">${(equityRecPct * 100).toFixed(0)}%</td>
+                    </tr>
+                `;
+
+                this.renderCharts(sortedTranches, equityAmt, recoveryStats, equityRecAmt);
+            },
+
+            renderCharts: function(tranches, equity, recStats, eqRec) {
+                // Stack Chart
+                const ctxStack = document.getElementById('chart-stack').getContext('2d');
+                if(this.chartStack) this.chartStack.destroy();
+
+                const labels = ['Capital Structure'];
+                const datasets = tranches.map(t => ({
+                    label: t.name,
+                    data: [t.amt],
+                    backgroundColor: this.getColor(t.priority)
+                }));
+                datasets.push({
+                    label: 'Equity',
+                    data: [equity],
+                    backgroundColor: '#3b82f6'
+                });
+
+                this.chartStack = new Chart(ctxStack, {
+                    type: 'bar',
+                    data: { labels, datasets },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true, maintainAspectRatio: false,
+                        scales: { x: { stacked: true, grid: { color: '#334155' } }, y: { stacked: true, display: false } },
+                        plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: {size: 9} } } }
+                    }
+                });
+
+                // Waterfall Chart (Recovery)
+                const ctxWater = document.getElementById('chart-waterfall').getContext('2d');
+                if(this.chartWaterfall) this.chartWaterfall.destroy();
+
+                // Prepare Data for Waterfall: Show Total Claim vs Recovery
+                // Just showing Recovery Bars side-by-side for simplicity
+                const recLabels = [...tranches.map(t=>t.name), 'Equity'];
+                const claimData = [...tranches.map(t=>t.amt), equity];
+                const recData = [...recStats.map(r=>r.recoveryAmt), eqRec];
+
+                this.chartWaterfall = new Chart(ctxWater, {
+                    type: 'bar',
+                    data: {
+                        labels: recLabels,
+                        datasets: [
+                            {
+                                label: 'Recovered',
+                                data: recData,
+                                backgroundColor: '#10b981',
+                                stack: 'Stack 0'
+                            },
+                            {
+                                label: 'Written Off',
+                                data: claimData.map((c, i) => c - recData[i]),
+                                backgroundColor: '#ef4444',
+                                stack: 'Stack 0'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        scales: { x: { ticks: { color: '#94a3b8', font: {size: 9} } }, y: { grid: { color: '#334155' } } },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            },
+
+            getColor: function(p) {
+                const colors = ['#10b981', '#34d399', '#f59e0b', '#f97316', '#ef4444'];
+                return colors[(p-1) % colors.length];
+            }
+        };
+
+        window.onload = function() {
+            lucide.createIcons();
+            app.init();
+        };
+    </script>
+</body>
+</html>

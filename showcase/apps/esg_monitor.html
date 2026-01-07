@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | ESG Monitor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-dark: #020804;
+            --panel-glass: rgba(10, 30, 15, 0.7);
+            --leaf-green: #10b981;
+            --warning-yellow: #f59e0b;
+            --grid-line: rgba(16, 185, 129, 0.05);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 20px 20px;
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: var(--panel-glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.05);
+        }
+
+        input {
+            background: rgba(0,0,0,0.3); border: 1px solid #064e3b; color: var(--leaf-green);
+            padding: 4px 8px; font-family: inherit; font-size: 0.8rem; width: 100%;
+        }
+        input:focus { outline: none; border-color: var(--leaf-green); }
+
+        .score-circle {
+            width: 80px; height: 80px; border-radius: 50%;
+            border: 4px solid var(--leaf-green);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; font-weight: bold; color: white;
+            box-shadow: 0 0 15px var(--leaf-green);
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col p-4 text-xs">
+
+    <div class="flex justify-between items-center mb-4 border-b border-green-900 pb-2">
+        <h1 class="text-lg font-bold text-green-400 tracking-widest flex items-center">
+            <i data-lucide="leaf" class="w-5 h-5 mr-2"></i>
+            ESG MONITOR & GREENWASHING DETECTOR
+        </h1>
+        <div class="flex gap-2 w-1/3">
+             <input type="text" placeholder="Search Company (Ticker)..." value="TSLA" id="ticker-input">
+             <button onclick="analyzeESG()" class="px-3 py-1 bg-green-900/40 hover:bg-green-600 border border-green-500 text-white rounded font-bold flex items-center gap-1">
+                <i data-lucide="search" class="w-3 h-3"></i> SCAN
+            </button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-12 gap-4 flex-grow overflow-hidden">
+
+        <!-- Main Score -->
+        <aside class="col-span-4 flex flex-col gap-4">
+            <div class="glass-panel p-6 rounded flex flex-col items-center justify-center h-1/3">
+                <div class="text-gray-400 text-[10px] uppercase mb-4">Composite ESG Score</div>
+                <div class="score-circle" id="esg-score">A</div>
+                <div class="mt-4 text-green-300 font-bold" id="company-name">TESLA, INC.</div>
+            </div>
+
+            <div class="glass-panel p-4 rounded flex-grow">
+                 <div class="text-[10px] text-green-400 mb-3 uppercase font-bold">Greenwashing Conviction</div>
+
+                 <div class="space-y-4">
+                     <div>
+                         <div class="flex justify-between mb-1 text-gray-300"><span>Vague Claims</span><span class="text-yellow-400">Medium Risk</span></div>
+                         <div class="w-full h-1 bg-gray-800 rounded"><div class="h-full bg-yellow-500 rounded" style="width: 45%"></div></div>
+                     </div>
+                     <div>
+                         <div class="flex justify-between mb-1 text-gray-300"><span>Data Omission</span><span class="text-green-400">Low Risk</span></div>
+                         <div class="w-full h-1 bg-gray-800 rounded"><div class="h-full bg-green-500 rounded" style="width: 15%"></div></div>
+                     </div>
+                     <div>
+                         <div class="flex justify-between mb-1 text-gray-300"><span>Supply Chain Opacity</span><span class="text-red-400">High Risk</span></div>
+                         <div class="w-full h-1 bg-gray-800 rounded"><div class="h-full bg-red-500 rounded" style="width: 80%"></div></div>
+                     </div>
+                 </div>
+
+                 <div class="mt-6 p-3 bg-red-900/10 border border-red-900/50 rounded text-[10px] text-gray-300">
+                     <strong class="text-red-400">AI FLAG:</strong> Discrepancy detected between stated Cobalt sourcing policy and 3rd party satellite imagery of supply routes in DRC.
+                 </div>
+            </div>
+        </aside>
+
+        <!-- Details -->
+        <main class="col-span-8 flex flex-col gap-4">
+             <!-- Radar Chart -->
+             <div class="glass-panel p-4 rounded h-1/2 relative">
+                <div class="absolute top-2 left-2 text-[10px] text-gray-500">DIMENSIONAL ANALYSIS</div>
+                <div class="h-full flex justify-center items-center">
+                    <canvas id="esg-radar"></canvas>
+                </div>
+             </div>
+
+             <!-- News / Sentiment -->
+             <div class="glass-panel p-4 rounded h-1/2 overflow-y-auto">
+                 <div class="text-[10px] text-green-400 mb-3 uppercase font-bold">Relevant News Stream</div>
+                 <div class="space-y-3">
+                     <div class="p-2 border-b border-green-900/30">
+                         <div class="flex justify-between text-[9px] text-gray-500"><span>Reuters</span><span>2h ago</span></div>
+                         <div class="text-gray-300 font-bold">New battery recycling plant opens in Nevada, claiming 95% recovery rate.</div>
+                         <div class="flex gap-2 mt-1"><span class="text-green-400 text-[9px] border border-green-900 px-1 rounded">POSITIVE</span></div>
+                     </div>
+                     <div class="p-2 border-b border-green-900/30">
+                         <div class="flex justify-between text-[9px] text-gray-500"><span>WSJ</span><span>5h ago</span></div>
+                         <div class="text-gray-300 font-bold">SEC probes claims regarding 'Full Self Driving' safety statistics.</div>
+                         <div class="flex gap-2 mt-1"><span class="text-red-400 text-[9px] border border-red-900 px-1 rounded">GOVERNANCE RISK</span></div>
+                     </div>
+                     <div class="p-2 border-b border-green-900/30">
+                         <div class="flex justify-between text-[9px] text-gray-500"><span>Bloomberg Green</span><span>1d ago</span></div>
+                         <div class="text-gray-300 font-bold">Carbon credit sales drop 15% YoY as regulatory scrutiny tightens.</div>
+                     </div>
+                 </div>
+             </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let radarChart = null;
+
+        function analyzeESG() {
+            const ticker = document.getElementById('ticker-input').value.toUpperCase();
+            document.getElementById('company-name').innerText = ticker + " INC.";
+
+            // Randomize Score
+            const scores = ['AAA', 'AA', 'A', 'BBB', 'BB', 'B', 'CCC'];
+            document.getElementById('esg-score').innerText = scores[Math.floor(Math.random() * 3)]; // Bias to good for demo
+
+            renderRadar();
+        }
+
+        function renderRadar() {
+            const ctx = document.getElementById('esg-radar').getContext('2d');
+            if(radarChart) radarChart.destroy();
+
+            radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Carbon Footprint', 'Water Usage', 'Labor Rights', 'Board Diversity', 'Data Privacy', 'Business Ethics'],
+                    datasets: [{
+                        label: 'Company Score',
+                        data: Array.from({length: 6}, () => Math.random() * 100),
+                        backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                        borderColor: '#10b981',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#fff'
+                    }, {
+                        label: 'Industry Avg',
+                        data: Array.from({length: 6}, () => Math.random() * 100),
+                        backgroundColor: 'rgba(100, 116, 139, 0.2)',
+                        borderColor: '#64748b',
+                        borderWidth: 1,
+                        borderDash: [5, 5],
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(255,255,255,0.1)' },
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            pointLabels: { color: '#94a3b8', font: { size: 10 } },
+                            ticks: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#cbd5e1' } }
+                    }
+                }
+            });
+        }
+
+        window.onload = function() {
+            lucide.createIcons();
+            analyzeESG();
+        };
+    </script>
+</body>
+</html>
