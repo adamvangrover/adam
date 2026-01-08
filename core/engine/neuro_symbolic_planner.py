@@ -23,6 +23,24 @@ class NeuroSymbolicPlanner:
     - Neural Side: Uses LLMs to parse unstructured requests into directed graphs.
     """
 
+    # Bolt Optimization: Pre-compile Regex patterns to avoid re-compilation overhead
+    # Pattern for entity extraction: "Analyze [Entity] [Intent]"
+    ENTITY_PATTERN = re.compile(
+        r"Analyze\s+([A-Za-z0-9\s\.]+?)(?:\s+(?:credit|market|esg|risk|rating).*)?$", re.IGNORECASE
+    )
+
+    # Patterns for parsing LLM numbered lists
+    # Captures "1. [Task]" or "Step 1: [Task]"
+    PATTERN_STD = re.compile(r"^\s*[\*]*(\d+)[\*\.\)]+\s+(.+)$", re.MULTILINE)
+    PATTERN_ALT = re.compile(r"^\s*Step\s+(\d+)\s*[:\.]\s+(.+)$", re.MULTILINE | re.IGNORECASE)
+
+    # Pattern for dependency extraction: "after step X" or "depends on X"
+    DEP_PATTERN = re.compile(r"(?:step|task)\s+(\d+)", re.IGNORECASE)
+
+    # Patterns for execution step verification
+    RELATION_VERIFY_PATTERN = re.compile(r"Verify relationship: (.*?) [-–]")
+    ANALYZE_PATTERN = re.compile(r"Analyze (.*?) ", re.IGNORECASE)
+
     def __init__(self):
         self.kg = UnifiedKnowledgeGraph()
         self.default_agent = None
@@ -46,10 +64,7 @@ class NeuroSymbolicPlanner:
         logger.info(f"[Planner] Creating plan for request: '{request}'")
 
         # 1. Entity Extraction (Heuristic/Regex)
-        # Try to find "Analyze [Entity] [Intent]" or just "Analyze [Entity]"
-        # Regex: Analyze (Group 1: Entity) (Optional Group 2: Intent)
-        entity_match = re.search(
-            r"Analyze\s+([A-Za-z0-9\s\.]+?)(?:\s+(?:credit|market|esg|risk|rating).*)?$", request, re.IGNORECASE)
+        entity_match = self.ENTITY_PATTERN.search(request)
 
         if entity_match:
             start_node = entity_match.group(1).strip()
@@ -151,12 +166,8 @@ class NeuroSymbolicPlanner:
         """
         steps = []
 
-        # Regex for "1. [Task]" or "Step 1: [Task]"
-        # Captures numbered lists common in CoT (Chain of Thought) outputs
-        pattern_std = re.compile(r"^\s*[\*]*(\d+)[\*\.\)]+\s+(.+)$", re.MULTILINE)
-        pattern_alt = re.compile(r"^\s*Step\s+(\d+)\s*[:\.]\s+(.+)$", re.MULTILINE | re.IGNORECASE)
-
-        matches = pattern_std.findall(text) or pattern_alt.findall(text)
+        # Uses pre-compiled regex patterns
+        matches = self.PATTERN_STD.findall(text) or self.PATTERN_ALT.findall(text)
 
         if not matches:
             logger.warning("No numbered steps found in text. Returning Empty Plan.")
@@ -174,7 +185,8 @@ class NeuroSymbolicPlanner:
         for num, desc in matches:
             desc = desc.strip()
             # Naive dependency extraction: looks for "after step X" or "depends on X"
-            dep_matches = re.findall(r"(?:step|task)\s+(\d+)", desc.lower())
+            # Bolt Optimization: Avoids desc.lower() by using re.IGNORECASE in DEP_PATTERN
+            dep_matches = self.DEP_PATTERN.findall(desc)
             dependencies = list(set(dep_matches))
 
             steps.append({
@@ -227,8 +239,8 @@ class NeuroSymbolicPlanner:
 
             temp_mark.add(node_id)
             try:
-                # Iterate over a copy to allow modification if needed (though we don't modify here)
-                for dep_id in list(adj_list[node_id]):
+                # Bolt Optimization: Removed unnecessary list copy
+                for dep_id in adj_list[node_id]:
                     visit(dep_id)
             finally:
                 temp_mark.remove(node_id)
@@ -277,12 +289,12 @@ class NeuroSymbolicPlanner:
                 target_entity = "Unknown"
 
                 # Regex 1: Relationship verification pattern
-                match = re.search(r"Verify relationship: (.*?) [-–]", description)
+                match = self.RELATION_VERIFY_PATTERN.search(description)
                 if match:
                     target_entity = match.group(1).strip()
                 else:
                     # Regex 2: General analysis pattern (Analyze X...)
-                    match_req = re.search(r"Analyze (.*?) ", description, re.IGNORECASE)
+                    match_req = self.ANALYZE_PATTERN.search(description)
                     if match_req:
                         target_entity = match_req.group(1).strip()
                     else:
