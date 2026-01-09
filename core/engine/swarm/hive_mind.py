@@ -9,7 +9,7 @@ import asyncio
 import logging
 from typing import List, Dict, Any
 from core.engine.swarm.pheromone_board import PheromoneBoard
-from core.engine.swarm.worker_node import SwarmWorker, AnalysisWorker
+from core.engine.swarm.worker_node import SwarmWorker, AnalysisWorker, CoderWorker, ReviewerWorker, TesterWorker
 
 logger = logging.getLogger(__name__)
 
@@ -22,13 +22,37 @@ class HiveMind:
 
     async def initialize(self):
         """
-        Spin up the workers.
+        Spin up the workers with a diverse distribution of roles.
         """
         logger.info(f"HiveMind initializing with {self.worker_count} workers...")
-        for _ in range(self.worker_count):
-            worker = AnalysisWorker(self.board, role="analyst")
-            self.workers.append(worker)
-            self.tasks.append(asyncio.create_task(worker.run()))
+
+        # Determine distribution
+        # e.g., 40% Analyst, 20% Coder, 20% Reviewer, 20% Tester
+        count_analyst = max(1, int(self.worker_count * 0.4))
+        count_coder = int(self.worker_count * 0.2)
+        count_reviewer = int(self.worker_count * 0.2)
+        count_tester = self.worker_count - count_analyst - count_coder - count_reviewer
+
+        # Spawn Analysts
+        for _ in range(count_analyst):
+            self._spawn_worker(AnalysisWorker, "analyst")
+
+        # Spawn Coders
+        for _ in range(count_coder):
+            self._spawn_worker(CoderWorker, "coder")
+
+        # Spawn Reviewers
+        for _ in range(count_reviewer):
+            self._spawn_worker(ReviewerWorker, "reviewer")
+
+        # Spawn Testers
+        for _ in range(count_tester):
+            self._spawn_worker(TesterWorker, "tester")
+
+    def _spawn_worker(self, worker_class, role):
+        worker = worker_class(self.board, role=role)
+        self.workers.append(worker)
+        self.tasks.append(asyncio.create_task(worker.run()))
 
     async def disperse_task(self, task_type: str, payload: Dict[str, Any], intensity: float = 10.0):
         """
