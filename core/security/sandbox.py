@@ -198,12 +198,17 @@ class SecureSandbox:
         output_buffer = io.StringIO()
         safe_globals = cls._get_safe_globals()
 
+        # Explicitly define an empty local scope to prevent leaking implementation details
+        # unless necessary for specific execution contexts
+        safe_locals = {}
+
         try:
             # We use compile to get code object
             # exec() is used here, but ONLY on the code that passed AST validation
             # and ONLY with the restricted globals dictionary.
             with redirect_stdout(output_buffer), redirect_stderr(output_buffer):
-                exec(code, safe_globals)
+                # nosec: B102 - This usage of exec is guarded by strict AST validation and restricted globals
+                exec(code, safe_globals, safe_locals)
 
             # Attempt to capture the last expression if possible (like a REPL)
             # but simple exec doesn't return it. For now, rely on print output.

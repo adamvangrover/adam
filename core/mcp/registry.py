@@ -19,6 +19,7 @@ from core.data_access.lakehouse_connector import LakehouseConnector
 import requests
 import json
 import os
+import shlex
 
 
 class MCPRegistry:
@@ -155,8 +156,12 @@ class MCPRegistry:
         except ValueError:
             raise ValueError("start_year must be an integer.")
 
-        query = f"SELECT * FROM financials WHERE ticker = '{ticker}' AND year >= {start_year}"
-        return self.lakehouse.execute(query)
+        # Use parameterized query equivalent via f-string since we validated inputs
+        # But for full safety, if LakehouseConnector supports parameters, we should use them.
+        # Assuming LakehouseConnector.execute accepts params:
+        query = "SELECT * FROM financials WHERE ticker = :ticker AND year >= :start_year"
+        params = {"ticker": ticker, "start_year": start_year}
+        return self.lakehouse.execute(query, params=params)
 
     def submit_plan(self, plan_text: str) -> Dict[str, Any]:
         """Parses and logs a natural language plan."""

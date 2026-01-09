@@ -115,7 +115,12 @@ class AgentBase(ABC):
 
             try:
                 # Execute original logic
-                result = await self._original_execute(*args, **kwargs)
+                result = self._original_execute(*args, **kwargs)
+
+                # Check if the result is a coroutine and await it if so
+                if asyncio.iscoroutine(result):
+                    result = await result
+
                 # Log Complete
                 swarm_logger.log_event("TASK_COMPLETE", agent_id, {"output": result})
                 return result

@@ -1,54 +1,49 @@
 {
-  "session_id": "JULES_SESSION_ID",
-  "status": "IN_PROGRESS",
-  "diagnostic_summary": {
-    "total_checks": 5,
-    "passed_checks": 1,
-    "failed_checks": 4,
-    "test_suite": {
-      "collected": 184,
-      "passed": 94,
-      "failed": 88,
-      "errors": 2
-    }
-  },
-  "critical_blockers_resolved": [
-    "Missing system dependencies (flask, pydantic, torch, etc.) installed.",
-    "core/v23_graph_engine/data_pipeline/graph.py created (was missing).",
-    "core/agents/agent_base.py refactored for async loop safety and imports.",
-    "core/system/interaction_loop.py refactored for async compatibility and exception handling.",
-    "tests/test_interaction_loop.py fixed (mocking logic and async support)."
-  ],
-  "prioritized_remediation_tasks": [
+  "phases": [
     {
-      "priority": "HIGH",
-      "module": "tests/test_agents.py",
-      "issue": "Multiple agent execution failures (Sentiment, Macro, etc.) likely due to MockLLM/JsonLogic integration.",
-      "action": "Audit specific agent 'execute' methods for sync/async mismatches."
+      "id": "1",
+      "name": "Environment Stabilization",
+      "description": "Fix missing dependencies and environment configuration to allow tests to run.",
+      "items": [
+        "Install missing pip packages: celery",
+        "Investigate and fix 'edgar' package mismatch.",
+        "Fix 'pytest' execution path in checks."
+      ],
+      "status": "In Progress"
     },
     {
-      "priority": "HIGH",
-      "module": "tests/api/test_service_state.py",
-      "issue": "Adam-mini optimization endpoint returning 500 error.",
-      "action": "Debug src/adam/core/optimizers.py AdamMini implementation for runtime errors."
+      "id": "2",
+      "name": "Critical Code Repairs",
+      "description": "Fix import errors and broken references preventing application startup.",
+      "items": [
+        "Fix 'core.schemas.hnasp' import error (HNASP class missing/circular).",
+        "Fix 'src.market_mayhem.scanners' dependency on 'edgar'.",
+        "Fix 'services.webapp.api' dependency on 'celery'."
+      ],
+      "status": "Pending"
     },
     {
-      "priority": "MEDIUM",
-      "module": "core/utils/config_utils.py",
-      "issue": "Configuration loading tests failing (file not found/empty).",
-      "action": "Robustify config loading to handle missing files with defaults."
+      "id": "3",
+      "name": "Security Hardening",
+      "description": "Address high-confidence security vulnerabilities identified by Bandit.",
+      "items": [
+        "Refactor SQL injection vulnerabilities in 'core/mcp/registry.py' and 'core/memory/engine.py' to use parameterized queries.",
+        "Review and harden 'exec' usage in 'core/security/sandbox.py'.",
+        "Fix insecure file permissions in 'scripts/setup_interactive.py'.",
+        "Remove hardcoded 0.0.0.0 bind in 'services/ui_backend.py'."
+      ],
+      "status": "Pending"
     },
     {
-      "priority": "MEDIUM",
-      "module": "core/api/server.py",
-      "issue": "MyPy errors regarding type assignment and flask_sqlalchemy.",
-      "action": "Add type stubs or ignore directives for dynamic Flask attributes."
-    },
-    {
-      "priority": "LOW",
-      "module": "core/agents/*.py",
-      "issue": "Missing docstrings and type hints.",
-      "action": "Apply Google-style docstrings to all Agent classes."
+      "id": "4",
+      "name": "Code Hygiene & Standardization",
+      "description": "Enforce linting, typing, and documentation standards.",
+      "items": [
+        "Resolve Flake8 unused imports and formatting errors.",
+        "Add missing docstrings to core modules.",
+        "Ensure Pydantic v2 compliance (ConfigDict)."
+      ],
+      "status": "Pending"
     }
   ]
 }

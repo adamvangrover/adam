@@ -8,7 +8,7 @@ Description: Core logic for detecting institutional accumulation of distressed a
 import pandas as pd
 from edgar import Company, Filing, set_identity
 from typing import List, Dict, Optional
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_exception_type
 import logging
 import time
@@ -31,7 +31,9 @@ class Holding(BaseModel):
     share_type: str  # 'SH' or 'PRN'
     discretion: str
 
-    @validator('cusip')
+    model_config = ConfigDict(populate_by_name=True)
+
+    @field_validator('cusip')
     def validate_cusip(cls, v):
         if len(v)!= 9:
             raise ValueError(f"Invalid CUSIP length: {v}")
@@ -48,6 +50,8 @@ class WhaleSignal(BaseModel):
     conviction_score: float  # Value / Total Portfolio (Simplified)
     description: str
     share_type: str # Critical for distinguishing Debt (PRN) from Equity (SH)
+
+    model_config = ConfigDict(populate_by_name=True)
 
 # --- Core Logic Class ---
 class WhaleScanner:

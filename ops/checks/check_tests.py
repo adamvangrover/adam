@@ -1,14 +1,9 @@
 import subprocess
 import sys
-import shutil
 
 def run_tests(paths):
-    pytest_cmd = shutil.which("pytest")
-    if not pytest_cmd:
-        print("pytest not found. Please install it with 'pip install pytest'.")
-        return False
-
-    cmd = [pytest_cmd] + paths
+    # Use sys.executable to ensure we use the same python environment
+    cmd = [sys.executable, "-m", "pytest"] + paths
     print(f"Running tests: {' '.join(cmd)}")
     result = subprocess.run(cmd)
     return result.returncode == 0

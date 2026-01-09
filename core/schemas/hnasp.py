@@ -1,6 +1,7 @@
 from typing import Dict, Any, List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
+import uuid
 
 class EPAVector(BaseModel):
     E: float = 0.0
@@ -26,8 +27,6 @@ class PersonaState(BaseModel):
 class SecurityContext(BaseModel):
     user_id: str
     clearance: str
-
-import uuid
 
 class Meta(BaseModel):
     agent_id: str
@@ -57,6 +56,9 @@ class ModelConfig(BaseModel):
     model_name: str = "default"
     temperature: float = 0.7
 
+    # Pydantic v2 config
+    model_config = ConfigDict(populate_by_name=True)
+
 class ContextStream(BaseModel):
     history: List[Turn] = Field(default_factory=list)
 
@@ -65,3 +67,6 @@ class HNASPState(BaseModel):
     persona_state: PersonaState
     logic_layer: LogicLayer
     context_stream: ContextStream
+
+# Alias HNASP to HNASPState for backward compatibility
+HNASP = HNASPState
