@@ -87,7 +87,6 @@ const GlobalNav: React.FC = () => {
         <input
           ref={searchInputRef}
           type="text"
-          aria-label="Global Search"
           placeholder="GLOBAL SEARCH (Ctrl+K)..."
           aria-label="Global Search"
           className="cyber-input"

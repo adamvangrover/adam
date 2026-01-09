@@ -19,6 +19,16 @@ class GoldStandardScrubber:
     3. Converts to standard format (metadata extraction).
     """
 
+    # Bolt Optimization: Pre-compile regex for performance
+    ENTITY_REGEX = re.compile(r'\b[A-Z][a-z]+\b')
+
+    # Bolt Optimization: Move keywords to class constant
+    HIGH_IMPACT_KEYWORDS = (
+        "confidential", "proprietary", "strategy", "roadmap",
+        "quarterly report", "financial statement", "10-k", "10-q",
+        "risk assessment", "audit", "compliance"
+    )
+
     @staticmethod
     def clean_text(text: str) -> str:
         """Removes artifacts, fixes encoding, standardizes whitespace."""
@@ -95,13 +105,8 @@ class GoldStandardScrubber:
         """Determines if the content is 'high impact' and warrants a deeper scan."""
         # Check first 2KB for keywords
         head = content[:2048].lower()
-        high_impact_keywords = [
-            "confidential", "proprietary", "strategy", "roadmap",
-            "quarterly report", "financial statement", "10-k", "10-q",
-            "risk assessment", "audit", "compliance"
-        ]
 
-        if any(kw in head for kw in high_impact_keywords):
+        if any(kw in head for kw in GoldStandardScrubber.HIGH_IMPACT_KEYWORDS):
             return True
 
         if artifact_type in ["report", "newsletter"]:
@@ -135,8 +140,8 @@ class GoldStandardScrubber:
                 metadata['review_required'] = True
                 metadata['review_reason'] = "LARGE_FILE_SIZE"
 
-            # Extract entities with adaptive limit
-            words = re.findall(r'\b[A-Z][a-z]+\b', content[:scan_limit])
+            # Extract entities with adaptive limit using pre-compiled regex
+            words = GoldStandardScrubber.ENTITY_REGEX.findall(content[:scan_limit])
             if words:
                 metadata['potential_entities'] = list(set(words))[:10]
 
