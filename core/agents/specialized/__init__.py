@@ -1,2 +1,3 @@
 # core/agents/specialized package
 from .institutional_trend_agent import InstitutionalTrendAgent
+from .credit_risk_controller_agent import CreditRiskControllerAgent
