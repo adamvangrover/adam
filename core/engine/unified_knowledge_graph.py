@@ -387,17 +387,21 @@ class UnifiedKnowledgeGraph:
 
     def ingest_regulatory_updates(self, regulations: List[Dict[str, Any]]):
         """Ingests regulatory updates as Regulation nodes."""
+        # Bolt Optimization: Batch processing for regulations to avoid N graph updates and N log calls
+        nodes_to_add = []
         for reg in regulations:
             # unique ID based on source and title
             node_id = f"Regulation::{reg.get('source')}::{reg.get('title')}"
-            self.graph.add_node(
-                node_id,
-                type="Regulation",
-                source=reg.get("source"),
-                title=reg.get("title"),
-                summary=reg.get("summary")
-            )
-            logger.info(f"Ingested Regulation: {node_id}")
+            nodes_to_add.append((node_id, {
+                "type": "Regulation",
+                "source": reg.get("source"),
+                "title": reg.get("title"),
+                "summary": reg.get("summary")
+            }))
+
+        if nodes_to_add:
+            self.graph.add_nodes_from(nodes_to_add)
+            logger.info(f"Ingested {len(nodes_to_add)} Regulatory Updates.")
 
     def ingest_compliance_event(self, event: Dict[str, Any]):
         """Ingests a compliance event (e.g. violation) linked to an entity."""
