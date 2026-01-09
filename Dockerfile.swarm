@@ -1,0 +1,35 @@
+# Dockerfile.swarm
+# Optimized for the Adam Swarm Architecture (HiveMind)
+
+# Use a lightweight Python base
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the codebase
+COPY core /app/core
+COPY config /app/config
+COPY prompt_library /app/prompt_library
+
+# Create non-root user for security
+RUN useradd -m swarmuser
+USER swarmuser
+
+# Default command: Run the HiveMind entrypoint
+CMD ["python", "core/engine/swarm/entrypoint.py"]
