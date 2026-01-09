@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Quantum Risk Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-dark: #020408;
+            --panel-glass: rgba(10, 15, 30, 0.7);
+            --neon-blue: #00f3ff;
+            --neon-purple: #bc13fe;
+            --grid-line: rgba(0, 243, 255, 0.05);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 30px 30px;
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: var(--panel-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.05);
+        }
+
+        .quantum-text {
+            text-shadow: 0 0 5px var(--neon-blue);
+        }
+
+        .qubit-state {
+            width: 100%; height: 20px;
+            background: #0f172a; border-radius: 10px;
+            position: relative; overflow: hidden;
+            border: 1px solid #334155;
+        }
+        .qubit-probability {
+            height: 100%; background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            transition: width 1s ease-in-out;
+            width: 50%;
+        }
+
+        button { transition: all 0.2s; }
+        button:active { transform: scale(0.95); }
+    </style>
+</head>
+<body class="h-screen flex flex-col p-4 text-xs">
+
+    <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2">
+        <h1 class="text-lg font-bold text-white tracking-widest flex items-center quantum-text">
+            <i data-lucide="atom" class="w-5 h-5 mr-2 text-cyan-400"></i>
+            QUANTUM RISK ENGINE (QRE-v22)
+        </h1>
+        <div class="flex gap-2">
+             <button onclick="runQuantumSim()" class="px-3 py-1 bg-cyan-900/40 hover:bg-cyan-500/40 border border-cyan-500 text-cyan-300 rounded text-[10px] font-bold flex items-center gap-1">
+                <i data-lucide="zap" class="w-3 h-3"></i> COLLAPSE WAVEFUNCTION
+            </button>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-12 gap-4 flex-grow overflow-hidden">
+
+        <!-- Sidebar: Qubit Control -->
+        <aside class="col-span-3 flex flex-col gap-3">
+            <div class="glass-panel p-3 rounded">
+                <div class="text-[10px] text-cyan-400 mb-2 uppercase font-bold flex justify-between">
+                    <span>Qubit Configuration</span>
+                    <span class="text-gray-500">5 Qubits</span>
+                </div>
+                <div class="space-y-3">
+                    <div>
+                        <div class="flex justify-between text-[9px] mb-1"><span>Market Volatility (q0)</span><span id="p-q0">50% | 50%</span></div>
+                        <div class="qubit-state"><div class="qubit-probability" id="q0-bar"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[9px] mb-1"><span>Interest Rate Shock (q1)</span><span id="p-q1">50% | 50%</span></div>
+                        <div class="qubit-state"><div class="qubit-probability" id="q1-bar"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[9px] mb-1"><span>Credit Default (q2)</span><span id="p-q2">50% | 50%</span></div>
+                        <div class="qubit-state"><div class="qubit-probability" id="q2-bar"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[9px] mb-1"><span>Liquidity Crisis (q3)</span><span id="p-q3">50% | 50%</span></div>
+                        <div class="qubit-state"><div class="qubit-probability" id="q3-bar"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[9px] mb-1"><span>Geopolitical Event (q4)</span><span id="p-q4">50% | 50%</span></div>
+                        <div class="qubit-state"><div class="qubit-probability" id="q4-bar"></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-3 rounded flex-grow">
+                 <div class="text-[10px] text-cyan-400 mb-2 uppercase font-bold">Quantum Metrics</div>
+                 <div class="space-y-2 font-mono">
+                     <div class="flex justify-between"><span class="text-gray-400">Coherence Time</span><span class="text-white">124 μs</span></div>
+                     <div class="flex justify-between"><span class="text-gray-400">Gate Fidelity</span><span class="text-green-400">99.94%</span></div>
+                     <div class="flex justify-between"><span class="text-gray-400">Circuit Depth</span><span class="text-white">42</span></div>
+                     <div class="border-t border-gray-700 my-2 pt-2"></div>
+                     <div class="flex justify-between"><span class="text-gray-400">Tail Risk (Q-VaR)</span><span class="text-purple-400 font-bold" id="q-var">-</span></div>
+                     <div class="flex justify-between"><span class="text-gray-400">CVaR (99%)</span><span class="text-rose-400 font-bold" id="q-cvar">-</span></div>
+                 </div>
+            </div>
+        </aside>
+
+        <!-- Main Visualization -->
+        <main class="col-span-9 flex flex-col gap-4">
+             <!-- Probability Surface -->
+             <div class="glass-panel p-4 rounded h-1/2 relative flex flex-col">
+                <div class="text-[10px] text-gray-500 absolute top-2 left-3">PROBABILITY AMPLITUDE SURFACE</div>
+                <div class="flex-grow flex items-center justify-center">
+                    <canvas id="amplitude-chart"></canvas>
+                </div>
+             </div>
+
+             <!-- Interference Pattern (Tail Risk) -->
+             <div class="glass-panel p-4 rounded h-1/2 relative flex flex-col">
+                <div class="text-[10px] text-gray-500 absolute top-2 left-3">INTERFERENCE PATTERN (TAIL RISK DISTRIBUTION)</div>
+                <div class="flex-grow">
+                    <canvas id="interference-chart"></canvas>
+                </div>
+             </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let ampChart = null;
+        let intChart = null;
+
+        function runQuantumSim() {
+            // Animate Qubits
+            for(let i=0; i<5; i++) {
+                const p = Math.random() * 100;
+                document.getElementById(`q${i}-bar`).style.width = `${p}%`;
+                document.getElementById(`p-q${i}`).innerText = `${Math.round(p)}% | ${Math.round(100-p)}%`;
+            }
+
+            // Update Metrics
+            document.getElementById('q-var').innerText = `$${(Math.random()*10 + 20).toFixed(2)}M`;
+            document.getElementById('q-cvar').innerText = `$${(Math.random()*15 + 35).toFixed(2)}M`;
+
+            // Generate Data
+            const states = 32; // 2^5
+            const amplitudes = Array.from({length: states}, () => Math.random());
+            const interference = Array.from({length: 100}, (_, i) => {
+                let x = (i - 50) / 10;
+                return Math.exp(-x*x) * (Math.cos(5*x) + Math.sin(3*x)) + (Math.random() * 0.2); // Wave packet look
+            });
+
+            renderCharts(amplitudes, interference);
+        }
+
+        function renderCharts(amplitudes, interference) {
+            const ctx1 = document.getElementById('amplitude-chart').getContext('2d');
+            const ctx2 = document.getElementById('interference-chart').getContext('2d');
+
+            if(ampChart) ampChart.destroy();
+            if(intChart) intChart.destroy();
+
+            // Amplitude Bar Chart
+            ampChart = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: Array.from({length: 32}, (_, i) => '|' + i.toString(2).padStart(5,'0') + '>'),
+                    datasets: [{
+                        label: 'Probability Amplitude',
+                        data: amplitudes,
+                        backgroundColor: 'rgba(0, 243, 255, 0.4)',
+                        borderColor: '#00f3ff',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { display: false }
+                    }
+                }
+            });
+
+            // Interference Line Chart
+            intChart = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 100}, (_,i)=>i),
+                    datasets: [{
+                        label: 'Wavefunction',
+                        data: interference,
+                        borderColor: '#bc13fe',
+                        backgroundColor: 'rgba(188, 19, 254, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { grid: { color: '#1e293b' } }
+                    }
+                }
+            });
+        }
+
+        window.onload = function() {
+            lucide.createIcons();
+            runQuantumSim();
+        };
+    </script>
+</body>
+</html>

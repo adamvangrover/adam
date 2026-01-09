@@ -35,3 +35,7 @@
 ## 2025-12-28 - [Duplicate Knowledge Graph Identity]
 **Learning:** A critical "trap" was identified where `core/engine/unified_knowledge_graph.py` and `core/v23_graph_engine/unified_knowledge_graph.py` contain identical but distinct classes. Optimizing one without the other leads to inconsistent system behavior depending on which module imports it.
 **Action:** When working on core components, always `grep` for potential duplicates or moved files to ensure the optimization is applied globally.
+
+## 2026-01-08 - [Regex Compilation in Loops]
+**Learning:** `re.search` and `re.findall` inside loops or frequent calls compile the regex pattern implicitly, even if cached. Explicitly pre-compiling patterns to class constants avoids this overhead and also prevents unnecessary string operations like `desc.lower()` when `re.IGNORECASE` can be used.
+**Action:** Always pre-compile regex patterns as module or class constants.

@@ -51,3 +51,7 @@
 ## 2024-05-23 - Accessibility of Custom Meters
 **Learning:** Custom visualization components like progress bars or meters (often built with `div`s) are invisible to screen readers unless explicitly annotated with `role="progressbar"` (or `meter`) and proper ARIA values (`aria-valuenow`, `aria-valuemin`, `aria-valuemax`).
 **Action:** Always check custom "bar" components for these attributes. When auditing, if you see a `div` representing a value, it likely needs ARIA.
+
+## 2025-05-23 - Preserving Aesthetic during Refactor
+**Learning:** When refactoring legacy components with heavy inline styles to Tailwind, particularly in themed applications (e.g., "Cyber"), be careful to map exact colors (like neon hex codes) to arbitrary values (e.g., `text-[#00f3ff]`) if they don't exist in the theme tokens, to preserve the specific aesthetic.
+**Action:** Use arbitrary values for unique brand colors if not present in the design system to avoid visual regression.

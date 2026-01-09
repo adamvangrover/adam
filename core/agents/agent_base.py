@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional
 import logging
 import json
 import asyncio
+from pydantic import BaseModel
 import uuid
 import warnings
 from datetime import datetime
