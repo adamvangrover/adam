@@ -186,21 +186,39 @@
 
             <div class="glass-panel p-3 rounded">
                 <div class="text-[10px] text-gray-500 mb-2 uppercase font-bold flex justify-between items-center">
-                    <span>3. Projections</span>
+                    <span>3. Projections (Year 1 - 5)</span>
                     <i data-lucide="trending-up" class="w-3 h-3 text-cyan-500/50"></i>
                 </div>
                 <div class="space-y-2">
                     <div>
-                        <label class="block text-gray-400 text-[10px] mb-1">Rev Growth % (Avg)</label>
-                        <input type="number" id="avgGrowth" value="5.0" class="w-full px-2 py-1 rounded" onchange="app.runModel()">
+                        <label class="block text-gray-400 text-[10px] mb-1">Revenue Growth %</label>
+                        <div class="grid grid-cols-5 gap-1">
+                            <input type="number" class="y-input-growth w-full px-1 py-1 rounded text-center text-[9px]" value="5.0" onchange="app.runModel()">
+                            <input type="number" class="y-input-growth w-full px-1 py-1 rounded text-center text-[9px]" value="5.0" onchange="app.runModel()">
+                            <input type="number" class="y-input-growth w-full px-1 py-1 rounded text-center text-[9px]" value="4.5" onchange="app.runModel()">
+                            <input type="number" class="y-input-growth w-full px-1 py-1 rounded text-center text-[9px]" value="4.0" onchange="app.runModel()">
+                            <input type="number" class="y-input-growth w-full px-1 py-1 rounded text-center text-[9px]" value="3.5" onchange="app.runModel()">
+                        </div>
                     </div>
                     <div>
-                        <label class="block text-gray-400 text-[10px] mb-1">EBITDA Margin % (Avg)</label>
-                        <input type="number" id="avgMargin" value="25.0" class="w-full px-2 py-1 rounded" onchange="app.runModel()">
+                        <label class="block text-gray-400 text-[10px] mb-1">EBITDA Margin %</label>
+                        <div class="grid grid-cols-5 gap-1">
+                             <input type="number" class="y-input-margin w-full px-1 py-1 rounded text-center text-[9px]" value="25.0" onchange="app.runModel()">
+                             <input type="number" class="y-input-margin w-full px-1 py-1 rounded text-center text-[9px]" value="25.5" onchange="app.runModel()">
+                             <input type="number" class="y-input-margin w-full px-1 py-1 rounded text-center text-[9px]" value="26.0" onchange="app.runModel()">
+                             <input type="number" class="y-input-margin w-full px-1 py-1 rounded text-center text-[9px]" value="26.5" onchange="app.runModel()">
+                             <input type="number" class="y-input-margin w-full px-1 py-1 rounded text-center text-[9px]" value="27.0" onchange="app.runModel()">
+                        </div>
                     </div>
                     <div>
                         <label class="block text-gray-400 text-[10px] mb-1">Capex % Rev</label>
-                        <input type="number" id="capexPct" value="3.0" class="w-full px-2 py-1 rounded" onchange="app.runModel()">
+                        <div class="grid grid-cols-5 gap-1">
+                             <input type="number" class="y-input-capex w-full px-1 py-1 rounded text-center text-[9px]" value="3.0" onchange="app.runModel()">
+                             <input type="number" class="y-input-capex w-full px-1 py-1 rounded text-center text-[9px]" value="3.0" onchange="app.runModel()">
+                             <input type="number" class="y-input-capex w-full px-1 py-1 rounded text-center text-[9px]" value="3.0" onchange="app.runModel()">
+                             <input type="number" class="y-input-capex w-full px-1 py-1 rounded text-center text-[9px]" value="2.5" onchange="app.runModel()">
+                             <input type="number" class="y-input-capex w-full px-1 py-1 rounded text-center text-[9px]" value="2.5" onchange="app.runModel()">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -341,10 +359,14 @@
 
                 for(let i=0; i<iterations; i++) {
                     // Shock the inputs using random walk
+                    // Apply scalars to the entire array for simulation simplicity
+                    const growthShock = this.randomNormal(0, growthVol);
+                    const marginShock = this.randomNormal(0, marginVol);
+
                     const shockedInputs = {
                         ...baseInputs,
-                        avgGrowth: this.randomNormal(baseInputs.avgGrowth, growthVol),
-                        avgMargin: this.randomNormal(baseInputs.avgMargin, marginVol)
+                        growthArr: baseInputs.growthArr.map(g => g + growthShock),
+                        marginArr: baseInputs.marginArr.map(m => m + marginShock)
                     };
 
                     // Shock WACC
@@ -399,18 +421,22 @@
                 let rev = inputs.ltmRev;
                 let proj = [];
 
-                for(let i=1; i<=5; i++) {
-                    rev = rev * (1 + inputs.avgGrowth);
-                    let ebitda = rev * inputs.avgMargin;
+                for(let i=0; i<5; i++) {
+                    const growthRate = inputs.growthArr[i];
+                    const margin = inputs.marginArr[i];
+                    const capexPct = inputs.capexArr[i];
+
+                    rev = rev * (1 + growthRate);
+                    let ebitda = rev * margin;
                     let da = ebitda * 0.15; // Assumption: D&A is 15% of EBITDA
                     let ebit = ebitda - da;
                     let tax = Math.max(0, ebit * inputs.taxRate);
                     let nopat = ebit - tax;
-                    let capex = rev * inputs.capexPct;
+                    let capex = rev * capexPct;
                     let nwc = rev * 0.01; // 1% proxy
                     let ufcf = nopat + da - capex - nwc;
 
-                    proj.push({ year: i, rev, ebitda, ufcf });
+                    proj.push({ year: i+1, rev, ebitda, ufcf });
                 }
 
                 let pvFcf = 0;
@@ -431,18 +457,21 @@
             runModel: function() {
                 // 1. Gather Inputs
                 let ltmRev = this.getVal('ltmRev');
-                let avgGrowth = this.getVal('avgGrowth') / 100;
-                let avgMargin = this.getVal('avgMargin') / 100;
-                let capexPct = this.getVal('capexPct') / 100;
+
+                // Array Inputs
+                const getArr = (cls) => Array.from(document.querySelectorAll(cls)).map(el => parseFloat(el.value)/100);
+                let growthArr = getArr('.y-input-growth');
+                let marginArr = getArr('.y-input-margin');
+                let capexArr = getArr('.y-input-capex');
 
                 // Scenario Overrides
                 const scenario = document.getElementById('scenario').value;
                 if(scenario === 'bull') {
-                    avgGrowth *= 1.2;
-                    avgMargin *= 1.1;
+                    growthArr = growthArr.map(g => g * 1.2);
+                    marginArr = marginArr.map(m => m * 1.1);
                 } else if (scenario === 'bear') {
-                    avgGrowth *= 0.8;
-                    avgMargin *= 0.9;
+                    growthArr = growthArr.map(g => g * 0.8);
+                    marginArr = marginArr.map(m => m * 0.9);
                 }
 
                 // WACC Calculation
@@ -462,7 +491,7 @@
                 const netDebt = this.getVal('netDebt');
                 const shares = this.getVal('shares');
 
-                const inputs = { ltmRev, avgGrowth, avgMargin, capexPct, taxRate };
+                const inputs = { ltmRev, growthArr, marginArr, capexArr, taxRate };
 
                 // 2. Execute Calculation
                 const result = this.calculateDCF(wacc, tgr, inputs);
@@ -574,11 +603,12 @@
                 panel.classList.remove('hidden');
                 
                 // Get inputs directly for clean state
+                const getArr = (cls) => Array.from(document.querySelectorAll(cls)).map(el => parseFloat(el.value)/100);
                 const inputs = { 
                     ltmRev: this.getVal('ltmRev'), 
-                    avgGrowth: this.getVal('avgGrowth') / 100, 
-                    avgMargin: this.getVal('avgMargin') / 100, 
-                    capexPct: this.getVal('capexPct') / 100, 
+                    growthArr: getArr('.y-input-growth'),
+                    marginArr: getArr('.y-input-margin'),
+                    capexArr: getArr('.y-input-capex'),
                     taxRate: this.getVal('taxRate') / 100 
                 };
                 

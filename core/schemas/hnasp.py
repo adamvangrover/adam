@@ -19,6 +19,9 @@ class PersonaIdentities(BaseModel):
 
 class PersonaDynamics(BaseModel):
     current_deflection: float = 0.0
+    target_behavior_epa: Optional[EPAVector] = None # Added for BayesACTEngine compatibility
+
+    model_config = ConfigDict(extra='allow') # Allow dynamic attributes
 
 class PersonaState(BaseModel):
     identities: PersonaIdentities
@@ -32,6 +35,9 @@ class Meta(BaseModel):
     agent_id: str
     trace_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     security_context: SecurityContext
+    timestamp: Optional[datetime] = None # Added for run_cycle compatibility
+
+    model_config = ConfigDict(extra='allow') # Allow dynamic attributes
 
 class ExecutionTrace(BaseModel):
     rule_id: str
@@ -60,7 +66,18 @@ class ModelConfig(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
 class ContextStream(BaseModel):
-    history: List[Turn] = Field(default_factory=list)
+    # Field alias required because code expects "turns" but tests or legacy code might populate "history"
+    history: List[Turn] = Field(default_factory=list, alias="turns")
+
+    model_config = ConfigDict(populate_by_name=True, extra='allow')
+
+    @property
+    def turns(self):
+        return self.history
+
+    @turns.setter
+    def turns(self, value):
+        self.history = value
 
 class HNASPState(BaseModel):
     meta: Meta

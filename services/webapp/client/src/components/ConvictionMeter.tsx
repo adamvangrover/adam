@@ -22,7 +22,14 @@ export const ConvictionMeter: React.FC<ConvictionMeterProps> = ({ score, reasoni
             </div>
 
             {/* Meter Bar */}
-            <div className="w-full bg-gray-200 rounded-full h-4 mb-4 overflow-hidden">
+            <div
+                className="w-full bg-gray-200 rounded-full h-4 mb-4 overflow-hidden"
+                role="progressbar"
+                aria-valuenow={score}
+                aria-valuemin={0}
+                aria-valuemax={10}
+                aria-label="Conviction Score"
+            >
                 <div
                     className="h-full transition-all duration-500 ease-out"
                     style={{

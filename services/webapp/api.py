@@ -15,7 +15,7 @@ import re
 import threading
 from datetime import datetime, timezone
 from .config import config
-from .celery import celery
+from .celery_app import celery
 
 # ---------------------------------------------------------------------------- #
 # Helpers
@@ -54,6 +54,28 @@ def _is_password_strong(password: str) -> bool:
     # Check for at least one special character (anything not alphanumeric)
     if not re.search(r'[^a-zA-Z0-9]', password):
         return False
+    return True
+
+
+def _validate_username(username: str) -> bool:
+    """
+    🛡️ Sentinel: Validate username format.
+    Requires:
+    - Length between 4 and 30 characters
+    - Alphanumeric characters, underscores, and hyphens only
+    - Cannot start or end with special characters
+    """
+    if not username:
+        return False
+
+    # Check length
+    if len(username) < 4 or len(username) > 30:
+        return False
+
+    # Check allowed characters (alphanumeric, underscore, hyphen)
+    if not re.match(r'^[a-zA-Z0-9_-]+$', username):
+        return False
+
     return True
 
 # ---------------------------------------------------------------------------- #
@@ -325,6 +347,12 @@ def create_app(config_name='default'):
         data = request.get_json()
         username = data.get('username')
         password = data.get('password')
+
+        # 🛡️ Sentinel: Validate username format
+        if not _validate_username(username):
+            return jsonify({
+                'error': 'Invalid username format. Must be 4-30 characters, alphanumeric, underscores, or hyphens.'
+            }), 400
 
         # 🛡️ Sentinel: Enforce strong password policy
         if not _is_password_strong(password):

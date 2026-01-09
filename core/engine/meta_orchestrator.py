@@ -183,6 +183,8 @@ class MetaOrchestrator:
 
         # v23.5 Deep Dive Trigger
         if "deep dive" in query_lower or context.get("simulation_depth") == "Deep":
+            # Per Swarm Codex, use Swarm for Deep Dive if enabled (implicit via presence of new swarm features)
+            # For now we keep "DEEP_DIVE" routing, but we can enhance _run_deep_dive_flow to use Swarm
             return "DEEP_DIVE"
 
         # Heuristic Mapping
@@ -248,8 +250,24 @@ class MetaOrchestrator:
         """
         Primary execution method for Deep Dive.
         Tries the v23 Graph first, falls back to Manual Orchestration.
+        NOW with Swarm Integration (Phase 2).
         """
         logger.info("Engaging v23.5 Deep Dive Protocol...")
+
+        # Check if we should use Swarm (e.g. if graph fails or just as parallel support)
+        # For this implementation, we will try to use Swarm for initial data gathering if applicable
+        use_swarm = True
+        if use_swarm:
+             try:
+                logger.info("Deep Dive: Dispatching Swarm Scouts...")
+                if not self.hive_mind.workers:
+                    await self.hive_mind.initialize()
+
+                # Fire and forget swarm task for preliminary data
+                await self.hive_mind.disperse_task("ANALYST", {"target": query, "purpose": "preliminary_deep_dive"}, intensity=8.0)
+             except Exception as e:
+                 logger.warning(f"Deep Dive Swarm Dispatch failed: {e}")
+
         if context and "system_prompt" in context:
             logger.info("Deep Dive: System Prompt Context Active")
 
