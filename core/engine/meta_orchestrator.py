@@ -40,8 +40,8 @@ from core.utils.logging_utils import SwarmLogger
 from core.agents.specialized.management_assessment_agent import ManagementAssessmentAgent
 from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
 from core.agents.specialized.peer_comparison_agent import PeerComparisonAgent
-from core.agents.specialized.credit_snc import SNCRatingAgent
-from core.agents.specialized.financial_covenant_agent import CovenantAnalystAgent
+from core.agents.specialized.credit_snc import SNCRatingAgent # Corrected import path
+from core.agents.specialized.financial_covenant_agent import CovenantAnalystAgent # Renamed to match file
 from core.agents.specialized.monte_carlo_risk_agent import MonteCarloRiskAgent
 from core.agents.specialized.quantum_scenario_agent import QuantumScenarioAgent
 from core.agents.specialized.portfolio_manager_agent import PortfolioManagerAgent

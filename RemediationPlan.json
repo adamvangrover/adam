@@ -1,55 +1,49 @@
 {
-  "session_id": "JULES_SESSION_ID",
-  "status": "COMPLETED",
-  "diagnostic_summary": {
-    "status": "PARTIAL_SUCCESS",
-    "reason": "Environment Stabilized, Critical Tests Passing, Full Suite Flaky",
-    "details": "Dependencies installed. Critical modules (HNAPS, Market Mayhem, Config) fixed. Full test suite has 88 failures mostly due to async test runner issues and global state pollution, but individual components verify successfully."
-  },
-  "critical_blockers_resolved": [
-    "Installed all system dependencies (pandas, pydantic, flask, torch, etc.)",
-    "Fixed core/schemas/hnasp.py Pydantic v2 compatibility and schema errors",
-    "Fixed src/market_mayhem/scanners.py list handling logic",
-    "Fixed core/utils/config_utils.py robustness against missing files",
-    "Fixed core/agents/agent_base.py async execution wrapper logic"
-  ],
-  "fixes_applied": [
+  "phases": [
     {
-      "module": "core/schemas/hnasp.py",
-      "description": "Updated Pydantic models to V2. Added `ConfigDict` and `field_validator`. Changed `execution_trace` to `List[ExecutionTrace]` to match usage in `state_manager.py`. Added alias for `ContextStream` 'turns' field."
+      "id": "1",
+      "name": "Environment Stabilization",
+      "description": "Fix missing dependencies and environment configuration to allow tests to run.",
+      "items": [
+        "Install missing pip packages: celery",
+        "Investigate and fix 'edgar' package mismatch.",
+        "Fix 'pytest' execution path in checks."
+      ],
+      "status": "In Progress"
     },
     {
-      "module": "core/hnasp/state_manager.py",
-      "description": "Updated logic to append to `execution_trace` list instead of overwriting. Verified with `tests/test_hnasp.py`."
+      "id": "2",
+      "name": "Critical Code Repairs",
+      "description": "Fix import errors and broken references preventing application startup.",
+      "items": [
+        "Fix 'core.schemas.hnasp' import error (HNASP class missing/circular).",
+        "Fix 'src.market_mayhem.scanners' dependency on 'edgar'.",
+        "Fix 'services.webapp.api' dependency on 'celery'."
+      ],
+      "status": "Pending"
     },
     {
-      "module": "src/market_mayhem/scanners.py",
-      "description": "Fixed `WhaleScanner` to handle `edgartools` returning a single `Filing` object vs a list. Updated `Holding` model validators for Pydantic V2."
+      "id": "3",
+      "name": "Security Hardening",
+      "description": "Address high-confidence security vulnerabilities identified by Bandit.",
+      "items": [
+        "Refactor SQL injection vulnerabilities in 'core/mcp/registry.py' and 'core/memory/engine.py' to use parameterized queries.",
+        "Review and harden 'exec' usage in 'core/security/sandbox.py'.",
+        "Fix insecure file permissions in 'scripts/setup_interactive.py'.",
+        "Remove hardcoded 0.0.0.0 bind in 'services/ui_backend.py'."
+      ],
+      "status": "Pending"
     },
     {
-      "module": "core/utils/config_utils.py",
-      "description": "Improved `load_app_config` to handle missing files and non-dict content without crashing. Returns empty dict and logs warnings instead of exceptions."
-    },
-    {
-      "module": "core/agents/agent_base.py",
-      "description": "Refactored `__init__` to correctly wrap `execute` method, preventing `RuntimeWarning: coroutine was never awaited` errors in async environments."
-    }
-  ],
-  "outstanding_issues": [
-    {
-      "priority": "MEDIUM",
-      "module": "tests/test_agents.py",
-      "issue": "Test pollution causes failures in full suite run despite passing in isolation."
-    },
-    {
-      "priority": "LOW",
-      "module": "core/utils/secrets_utils.py",
-      "issue": "Minor logic in tests regarding log capturing."
-    },
-    {
-      "priority": "MEDIUM",
-      "module": "Integration Tests",
-      "issue": "Full `ops/run_checks.py` suite requires deeper refactoring of mock objects to handle async/await correctly across all agent interactions."
+      "id": "4",
+      "name": "Code Hygiene & Standardization",
+      "description": "Enforce linting, typing, and documentation standards.",
+      "items": [
+        "Resolve Flake8 unused imports and formatting errors.",
+        "Add missing docstrings to core modules.",
+        "Ensure Pydantic v2 compliance (ConfigDict)."
+      ],
+      "status": "Pending"
     }
   ],
   "notes": [

@@ -62,6 +62,7 @@ class ModelConfig(BaseModel):
     model_name: str = "default"
     temperature: float = 0.7
 
+    # Pydantic v2 config
     model_config = ConfigDict(populate_by_name=True)
 
 class ContextStream(BaseModel):
@@ -84,5 +85,5 @@ class HNASPState(BaseModel):
     logic_layer: LogicLayer
     context_stream: ContextStream
 
-# Deprecated or Alias for Backward Compatibility
+# Alias HNASP to HNASPState for backward compatibility
 HNASP = HNASPState
