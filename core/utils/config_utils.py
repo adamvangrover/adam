@@ -28,6 +28,8 @@ def load_config(file_path: str) -> Optional[Dict[str, Any]]:
                 return {}  # Return empty dict
             return config
     except FileNotFoundError:
+        # Logging as error might be too noisy for optional configs, using warning
+        # But tests expect ERROR for non-existent files in direct load_config calls
         logging.error(f"Config file not found: {file_path}")
         return None
     except yaml.YAMLError as e:
@@ -41,6 +43,11 @@ def load_config(file_path: str) -> Optional[Dict[str, Any]]:
 def load_app_config() -> Dict[str, Any]:
     """
     Loads and merges configurations from a predefined list of YAML files.
+
+    Robustness Update:
+    - Handles missing files gracefully (logs warning but continues).
+    - Merges dictionaries deeply if needed (currently shallow update).
+    - Returns empty dict if no configs loaded instead of crashing.
 
     Returns:
         A dictionary containing the combined configuration.
@@ -76,15 +83,29 @@ def load_app_config() -> Dict[str, Any]:
         config_files_ordered = config_files_base + ["config/agents.yaml"]
 
     combined_config: Dict[str, Any] = {}
+    files_loaded = 0
+
     for file_path in config_files_ordered:
+        # We handle FileNotFoundError inside load_config, which logs ERROR.
+        # But for app startup, missing some config files might be acceptable (WARN)
+        # or critical (ERROR). Since load_config already logs ERROR on missing,
+        # we can just skip here.
         loaded_content = load_config(file_path)
         if loaded_content is not None:
-            # Simple update is fine as each file should have its own top-level key mostly
-            # For agents.yaml vs settings.yaml, if both have an 'agents' key,
-            # loading agents.yaml after settings.yaml ensures its 'agents' key prevails.
-            combined_config.update(loaded_content)
+            if isinstance(loaded_content, dict):
+                combined_config.update(loaded_content)
+                files_loaded += 1
+            else:
+                logging.warning(f"Configuration file {file_path} content is not a dictionary. Skipping.")
         else:
+            # Already logged in load_config
+            # Ideally we would downgrade log level for optional files, but
+            # load_config is generic.
             logging.warning(f"Configuration file {file_path} could not be loaded. Skipping.")
+            pass
+
+    if files_loaded == 0:
+        logging.warning("No configuration files were successfully loaded. Application may not function correctly.")
 
     return combined_config
 
@@ -121,36 +142,3 @@ def save_config(config: Dict[str, Any], file_path: str) -> bool:
     except Exception as e:
         logging.error(f"Error saving config to {file_path}: {e}")
         return False
-
-
-# Example Usage (you can remove this when you integrate it into your project)
-if __name__ == '__main__':
-    # Create a dummy config file for testing
-    dummy_config = {"key1": "value1", "key2": 123}
-    with open("test_config.yaml", "w") as f:
-        yaml.dump(dummy_config, f)
-
-    # Load the dummy config
-    config = load_config("test_config.yaml")
-    print(f"Loaded config: {config}")
-
-    # Test with a non-existent file
-    config = load_config("nonexistent_file.yaml")
-    print(f"Loaded config (nonexistent): {config}")
-
-    # Test with an invalid YAML file.
-    with open("invalid.yaml", "w") as f:
-        f.write("key1: value1\nkey2: - item1\n  -item2")  # Invalid YAML
-    config = load_config("invalid.yaml")
-    print(f"Loaded config (invalid YAML): {config}")
-
-    # Test with an empty yaml file
-    with open("empty.yaml", "w") as f:
-        pass  # Creates an empty file
-    config = load_config("empty.yaml")
-    print(f"Loaded config (empty YAML): {config}")
-
-    # Cleanup the test files
-    os.remove("test_config.yaml")
-    os.remove("invalid.yaml")
-    os.remove("empty.yaml")

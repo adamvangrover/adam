@@ -156,17 +156,23 @@ class HNASPStateManager:
                     return "SYSTEM ERROR: Logic Verification Failed. Response halted."
 
         # Logic to "Inject" the backend trace into the state
-        current_state.logic_layer.execution_trace = ExecutionTrace(
+        # execution_trace expects a List[ExecutionTrace], but here we are trying to set a single object
+        # We need to append to the list
+
+        trace_object = ExecutionTrace(
             rule_id="batch",
-            result=backend_trace
+            result=backend_trace,
+            timestamp=datetime.now()
         )
+        current_state.logic_layer.execution_trace.append(trace_object)
 
         # Record Agent Thought
         thought_turn = Turn(
             role="agent_thought",
             timestamp=datetime.now(),
-            logic_eval=backend_trace,
-            internal_monologue="Logic validated."
+            # logic_eval is not in Turn schema, storing in internal_monologue
+            content="",
+            internal_monologue=f"Logic validated. Eval: {backend_trace}"
         )
         current_state.context_stream.turns.append(thought_turn)
 
