@@ -81,6 +81,10 @@ The ADAM system employs a hierarchical agent architecture that consists of three
 *   **Behavioral Economics Agent:** Analyzes market data and user interactions for signs of cognitive biases and irrational behavior.
 *   **Meta-Cognitive Agent:** Monitors the reasoning and outputs of other agents to ensure logical consistency, coherence, and alignment with core principles.
 
+#### Real-Time Agents (v23.5)
+
+*   **MarketUpdateAgent:** Handles dynamic data ingestion and simulation control via natural language. (`core/agents/specialized/market_update_agent.py`)
+
 ### Orchestrator Agents
 
 *   **Role:** The Orchestrator Agent is the "brain" and "central nervous system" of the entire agentic system. It is the highest level of control, responsible for interpreting user intent, formulating plans, delegating tasks, and synthesizing a final, coherent response.

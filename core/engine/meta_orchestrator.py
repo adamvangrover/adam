@@ -40,6 +40,7 @@ from core.agents.specialized.covenant_analyst_agent import CovenantAnalystAgent
 from core.agents.specialized.monte_carlo_risk_agent import MonteCarloRiskAgent
 from core.agents.specialized.quantum_scenario_agent import QuantumScenarioAgent
 from core.agents.specialized.portfolio_manager_agent import PortfolioManagerAgent
+from core.agents.specialized.market_update_agent import MarketUpdateAgent
 from core.schemas.v23_5_schema import V23KnowledgeGraph, Meta, Nodes, HyperDimensionalKnowledgeGraph, EquityAnalysis, Fundamentals, ValuationEngine, DCFModel, PriceTargets
 
 logger = logging.getLogger(__name__)
@@ -79,6 +80,8 @@ class MetaOrchestrator:
             result = await self._run_fo_execution(query)
         elif complexity == "FO_MARKET":
             result = await self._run_fo_market(query)
+        elif complexity == "MARKET_CONTROL":
+            result = await self._run_market_control(query)
         elif complexity == "HIGH":
             result = await self._run_adaptive_flow(query)
         elif complexity == "MEDIUM":
@@ -151,6 +154,10 @@ class MetaOrchestrator:
         # Deep Dive / v23.5
         if any(x in query_lower for x in ["deep dive", "full analysis", "partner", "valuation", "covenant"]):
             return "DEEP_DIVE"
+
+        # Market Control / Scenario (High Priority)
+        if any(x in query_lower for x in ["update", "set scenario", "activate scenario", "simulate market"]):
+            return "MARKET_CONTROL"
 
         # Red Team / Adversarial
         if any(x in query_lower for x in ["attack", "adversarial"]):
@@ -630,3 +637,12 @@ class MetaOrchestrator:
 
         result = self.mcp_registry.invoke("screen_deal", deal_name=deal_name, sector=sector, valuation=val, ebitda=ebitda)
         return {"status": "Deal Screened", "result": result}
+
+    async def _run_market_control(self, query: str):
+        logger.info("Engaging Market Control Agent...")
+        agent = MarketUpdateAgent()
+        result = await agent.execute(query)
+        return {
+            "status": "Market Control Executed",
+            "result": result
+        }

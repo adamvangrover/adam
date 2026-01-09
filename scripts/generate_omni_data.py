@@ -207,6 +207,8 @@ def main():
     root_dir = os.path.abspath('.')
     print(f"Scanning {root_dir} for OMNI data...")
 
+    vault_content = get_vault_content(root_dir)
+
     data = {
         'generated_at': time.time(),
         'system_info': {
@@ -219,7 +221,9 @@ def main():
         'agents': scan_agents(root_dir),
         'knowledge_graph': get_knowledge_graph_data(root_dir),
         'financial_data': get_financial_data(root_dir),
-        'vault': get_vault_content(root_dir)
+        'vault': vault_content,
+        'reports': vault_content['reports'],
+        'prompts': vault_content['prompts']
     }
 
     # Inject specific source code if requested (e.g. robo_advisor)
@@ -236,7 +240,7 @@ def main():
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     
     with open(output_path, 'w', encoding='utf-8') as f:
-        f.write(f"window.ADAM_STATE = {json.dumps(data, indent=2)};")
+        f.write(f"window.MOCK_DATA = {json.dumps(data, indent=2)};")
     
     print(f"OMNI State written to {output_path}")
 

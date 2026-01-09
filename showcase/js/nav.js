@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { type: 'divider' },
         { name: 'Reports Library', icon: 'fa-file-alt', link: 'reports.html' },
         { name: 'Data Vault', icon: 'fa-database', link: 'data.html' },
+        { name: 'Scenario Engine', icon: 'fa-chess', link: 'scenario_dashboard.html' },
         { name: 'App Deploy', icon: 'fa-rocket', link: 'deployment.html' },
     ];
 
