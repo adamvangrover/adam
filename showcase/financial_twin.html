@@ -12,8 +12,9 @@
     <link rel="stylesheet" href="css/style.css">
 
     <style>
-        .entity-panel { background: rgba(15, 23, 42, 0.9); border-left: 1px solid #334155; }
+        .entity-panel { background: rgba(15, 23, 42, 0.95); border-left: 1px solid #334155; backdrop-filter: blur(10px); }
         .node-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #94a3b8; }
+        #loading-overlay { transition: opacity 0.5s; }
     </style>
 </head>
 <body class="h-screen flex flex-col grid-bg overflow-hidden text-slate-200">
@@ -29,18 +30,27 @@
                 <span class="text-slate-400">ENTITY:</span>
                 <span class="text-white font-bold">JPMORGAN CHASE & CO.</span>
             </div>
-            <button class="bg-cyan-900/30 hover:bg-cyan-600 text-cyan-400 hover:text-white border border-cyan-800/50 rounded px-3 py-1 transition" onclick="runSimulation()">
-                <i class="fas fa-play mr-1"></i> Simulate Shock
+            <div class="bg-slate-800 border border-slate-700 rounded px-3 py-1 flex items-center gap-2">
+                <span class="text-slate-400">RISK SCORE:</span>
+                <span class="text-emerald-400 font-bold" id="risk-score">12.4</span>
+            </div>
+            <button id="sim-btn" class="bg-cyan-900/30 hover:bg-cyan-600 text-cyan-400 hover:text-white border border-cyan-800/50 rounded px-3 py-1 transition flex items-center gap-2" onclick="runShockSimulation()">
+                <i class="fas fa-bolt"></i> Simulate Contagion
             </button>
         </div>
     </header>
 
     <main class="flex-1 flex overflow-hidden relative">
 
-        <!-- Graph Area -->
-        <div id="twin-network" class="flex-1 bg-gradient-to-b from-[#0f172a] to-[#050b14]"></div>
+        <div id="twin-network" class="flex-1 bg-gradient-to-b from-[#0f172a] to-[#050b14] cursor-crosshair"></div>
 
-        <!-- Entity Inspector -->
+        <div id="loading-overlay" class="absolute inset-0 flex items-center justify-center bg-slate-900 z-30 pointer-events-none">
+            <div class="text-center">
+                <i class="fas fa-circle-notch fa-spin text-4xl text-cyan-500 mb-4"></i>
+                <p class="text-xs font-mono text-cyan-400">CONSTRUCTING NEURAL GRAPH...</p>
+            </div>
+        </div>
+
         <aside class="w-80 entity-panel absolute right-0 top-0 h-full transform transition-transform duration-300 translate-x-full z-20 flex flex-col shadow-2xl" id="inspector">
             <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/50">
                 <h3 class="font-bold text-white font-mono flex items-center gap-2">
@@ -51,48 +61,25 @@
             </div>
             
             <div class="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-6">
-                
-                <!-- Metrics -->
-                <div>
-                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 border-b border-slate-700 pb-1">Core Metrics</h4>
-                    <div class="grid grid-cols-2 gap-3" id="insp-metrics">
-                        <!-- Injected -->
-                    </div>
-                </div>
-
-                <!-- Exposure -->
-                <div>
-                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 border-b border-slate-700 pb-1">Risk Exposure</h4>
-                    <div class="space-y-3" id="insp-risks">
-                        <!-- Injected -->
-                    </div>
-                </div>
-
-                <!-- Relationships -->
-                <div>
-                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 border-b border-slate-700 pb-1">Dependencies</h4>
-                    <ul class="text-xs text-slate-300 space-y-2 font-mono" id="insp-deps">
-                        <!-- Injected -->
-                    </ul>
-                </div>
-
+                <div id="inspector-content" class="space-y-4 text-xs"></div>
             </div>
 
             <div class="p-4 border-t border-slate-700 bg-slate-800/50">
-                <button class="w-full bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold py-2 rounded border border-slate-600 transition">
-                    View Full Dossier
+                <button class="w-full bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold py-2 rounded border border-slate-600 transition uppercase tracking-wider">
+                    Generate Dossier
                 </button>
             </div>
         </aside>
 
-        <!-- Controls -->
         <div class="absolute bottom-6 left-6 flex flex-col gap-2 z-10">
-            <div class="bg-slate-900/80 backdrop-blur border border-slate-700 rounded-lg p-3 w-64">
-                <h4 class="text-xs font-bold text-slate-400 mb-2">Filters</h4>
+            <div class="bg-slate-900/80 backdrop-blur border border-slate-700 rounded-lg p-3 w-64 shadow-xl">
+                <h4 class="text-xs font-bold text-slate-400 mb-2 uppercase tracking-wider">Layers</h4>
                 <div class="flex flex-wrap gap-2">
-                    <button class="text-[10px] bg-blue-900/30 text-blue-300 border border-blue-800 rounded px-2 py-1 hover:bg-blue-800/50 transition">Subsidiaries</button>
-                    <button class="text-[10px] bg-red-900/30 text-red-300 border border-red-800 rounded px-2 py-1 hover:bg-red-800/50 transition">Risks</button>
-                    <button class="text-[10px] bg-green-900/30 text-green-300 border border-green-800 rounded px-2 py-1 hover:bg-green-800/50 transition">Assets</button>
+                    <button onclick="filterGraph('all')" class="text-[10px] bg-slate-700 text-white border border-slate-600 rounded px-2 py-1 hover:bg-slate-600 transition">All</button>
+                    <button onclick="filterGraph('unit')" class="text-[10px] bg-blue-900/30 text-blue-300 border border-blue-800 rounded px-2 py-1 hover:bg-blue-800/50 transition">Units</button>
+                    <button onclick="filterGraph('risk')" class="text-[10px] bg-red-900/30 text-red-300 border border-red-800 rounded px-2 py-1 hover:bg-red-800/50 transition">Risks</button>
+                    <button onclick="filterGraph('asset')" class="text-[10px] bg-emerald-900/30 text-emerald-300 border border-emerald-800 rounded px-2 py-1 hover:bg-emerald-800/50 transition">Assets</button>
+                    <button onclick="filterGraph('macro')" class="text-[10px] bg-amber-900/30 text-amber-300 border border-amber-800 rounded px-2 py-1 hover:bg-amber-800/50 transition">Macro</button>
                 </div>
             </div>
         </div>
@@ -104,73 +91,104 @@
         let network = null;
         let nodes = null;
         let edges = null;
+        let allNodes = [];
+        let allEdges = [];
 
         document.addEventListener('DOMContentLoaded', () => {
-            initGraph();
+            setTimeout(() => {
+                initGraph();
+                document.getElementById('loading-overlay').style.opacity = '0';
+            }, 800);
         });
 
         function initGraph() {
-            // Mock Data representing JPM Digital Twin
-            const data = {
+            // Expanded Universe Data
+            const rawData = {
                 nodes: [
-                    { id: 1, label: 'JPMORGAN CHASE', group: 'core', value: 50 },
+                    // Core
+                    { id: 1, label: 'JPMORGAN CHASE', group: 'core', value: 60, title: "Global Systemically Important Bank" },
 
-                    // Business Lines
-                    { id: 2, label: 'Consumer & Community', group: 'unit', value: 30 },
-                    { id: 3, label: 'Corporate & Inv. Bank', group: 'unit', value: 35 },
-                    { id: 4, label: 'Asset Management', group: 'unit', value: 25 },
+                    // Business Units
+                    { id: 2, label: 'Consumer & Community', group: 'unit', value: 35 },
+                    { id: 3, label: 'Corporate & Inv. Bank', group: 'unit', value: 40 },
+                    { id: 4, label: 'Asset Management', group: 'unit', value: 30 },
+                    { id: 5, label: 'Commercial Banking', group: 'unit', value: 25 },
 
-                    // Risks
-                    { id: 10, label: 'Credit Risk', group: 'risk', value: 20 },
-                    { id: 11, label: 'Market Risk', group: 'risk', value: 15 },
-                    { id: 12, label: 'Cyber Threat', group: 'risk', value: 10 },
+                    // Risks (Hidden Latent Risks)
+                    { id: 10, label: 'Credit Risk', group: 'risk', value: 25 },
+                    { id: 11, label: 'Market Volatility', group: 'risk', value: 20 },
+                    { id: 12, label: 'Cyber Threat', group: 'risk', value: 15 },
+                    { id: 13, label: 'Geopolitical Tension', group: 'risk', value: 30 },
+                    { id: 14, label: 'Liquidity Stress', group: 'risk', value: 18 },
 
                     // Assets / Exposures
-                    { id: 20, label: 'CRE Loans', group: 'asset', value: 15 },
-                    { id: 21, label: 'Treasury Sec.', group: 'asset', value: 20 },
-                    { id: 22, label: 'Derivatives', group: 'asset', value: 25 },
+                    { id: 20, label: 'CRE Loans (Office)', group: 'asset', value: 20 },
+                    { id: 21, label: 'US Treasuries', group: 'asset', value: 25 },
+                    { id: 22, label: 'Derivatives Book', group: 'asset', value: 30 },
+                    { id: 23, label: 'Tech Sector Loans', group: 'asset', value: 15 },
+                    { id: 24, label: 'Energy Portfolio', group: 'asset', value: 18 },
 
-                    // Subsidiaries
+                    // Subsidiaries / Legal
                     { id: 30, label: 'Chase Bank NA', group: 'sub', value: 20 },
-                    { id: 31, label: 'JPM Securities', group: 'sub', value: 15 }
+                    { id: 31, label: 'JPM Securities', group: 'sub', value: 15 },
+                    { id: 32, label: 'JPM Europe Ltd', group: 'sub', value: 12 },
+
+                    // Macro Factors (The Universe)
+                    { id: 40, label: 'Fed Rates', group: 'macro', value: 40 },
+                    { id: 41, label: 'Oil Prices', group: 'macro', value: 35 },
+                    { id: 42, label: 'GDP Growth', group: 'macro', value: 30 },
+                    { id: 43, label: 'Regulatory Cap', group: 'macro', value: 25 }
                 ],
                 edges: [
-                    { from: 1, to: 2 }, { from: 1, to: 3 }, { from: 1, to: 4 },
-                    { from: 1, to: 30 }, { from: 1, to: 31 },
-                    { from: 3, to: 11 }, { from: 2, to: 10 }, { from: 1, to: 12 },
-                    { from: 2, to: 20 }, { from: 3, to: 22 }, { from: 4, to: 21 }
+                    // Structural
+                    { from: 1, to: 2 }, { from: 1, to: 3 }, { from: 1, to: 4 }, { from: 1, to: 5 },
+                    { from: 1, to: 30 }, { from: 1, to: 31 }, { from: 1, to: 32 },
+
+                    // Risk Correlations
+                    { from: 3, to: 11, dashes: true }, { from: 2, to: 10, dashes: true }, { from: 1, to: 12, dashes: true },
+                    { from: 13, to: 11, width: 2 }, { from: 14, to: 4 },
+
+                    // Asset Mappings
+                    { from: 2, to: 20 }, { from: 3, to: 22 }, { from: 4, to: 21 },
+                    { from: 3, to: 23 }, { from: 3, to: 24 },
+
+                    // Macro Impacts
+                    { from: 40, to: 21 }, { from: 40, to: 20 }, { from: 41, to: 24 }, { from: 43, to: 1 }
                 ]
             };
 
+            allNodes = rawData.nodes;
+            allEdges = rawData.edges;
+
+            nodes = new vis.DataSet(allNodes);
+            edges = new vis.DataSet(allEdges);
+
             const container = document.getElementById('twin-network');
-
-            nodes = new vis.DataSet(data.nodes);
-            edges = new vis.DataSet(data.edges);
-
             const options = {
                 nodes: {
                     shape: 'dot',
-                    font: { face: 'JetBrains Mono', color: '#e2e8f0', size: 12 },
+                    font: { face: 'JetBrains Mono', color: '#94a3b8', size: 12 },
                     borderWidth: 2,
                     shadow: true
                 },
                 edges: {
                     width: 1,
-                    color: { color: '#475569', highlight: '#22d3ee' },
-                    smooth: { type: 'continuous' }
+                    color: { color: '#475569', opacity: 0.4 },
+                    smooth: { type: 'continuous', roundness: 0.5 }
                 },
                 groups: {
-                    core: { color: { background: '#0f172a', border: '#22d3ee' }, size: 40 },
+                    core: { color: { background: '#0f172a', border: '#22d3ee' }, size: 50, font: { size: 16, color: '#fff' } },
                     unit: { color: { background: '#1e293b', border: '#3b82f6' } },
                     risk: { color: { background: '#450a0a', border: '#ef4444' }, shape: 'diamond' },
                     asset: { color: { background: '#064e3b', border: '#10b981' }, shape: 'square' },
-                    sub: { color: { background: '#334155', border: '#94a3b8' } }
+                    sub: { color: { background: '#334155', border: '#94a3b8' } },
+                    macro: { color: { background: '#451a03', border: '#f59e0b' }, shape: 'triangle' }
                 },
                 physics: {
                     stabilization: false,
-                    barnesHut: { gravitationalConstant: -2000, springConstant: 0.04 }
+                    barnesHut: { gravitationalConstant: -3000, springConstant: 0.04, springLength: 150 }
                 },
-                interaction: { hover: true }
+                interaction: { hover: true, tooltipDelay: 200 }
             };
 
             network = new vis.Network(container, { nodes, edges }, options);
@@ -186,105 +204,99 @@
             });
         }
 
+        function filterGraph(type) {
+            if (type === 'all') {
+                nodes.clear();
+                nodes.add(allNodes);
+                edges.clear();
+                edges.add(allEdges);
+            } else {
+                const filteredNodes = allNodes.filter(n => n.group === type || n.group === 'core');
+                const filteredIds = filteredNodes.map(n => n.id);
+                const filteredEdges = allEdges.filter(e => filteredIds.includes(e.from) && filteredIds.includes(e.to));
+
+                nodes.clear();
+                nodes.add(filteredNodes);
+                edges.clear();
+                edges.add(filteredEdges);
+            }
+            network.fit();
+        }
+
+        function runShockSimulation() {
+            const btn = document.getElementById('sim-btn');
+            const riskScore = document.getElementById('risk-score');
+
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Simulating...';
+            btn.disabled = true;
+
+            // 1. Highlight Risk Nodes
+            const riskNodes = nodes.get({ filter: item => item.group === 'risk' || item.group === 'macro' });
+            const updates = riskNodes.map(n => ({ id: n.id, color: { background: '#ef4444', border: '#fff' }, size: n.value * 1.5 }));
+            nodes.update(updates);
+
+            // 2. Propagate to Core
+            setTimeout(() => {
+                nodes.update({ id: 1, color: { background: '#7f1d1d', border: '#ef4444' } }); // JPM turns red
+                network.fit({ animation: { duration: 1000, easingFunction: 'easeInOutQuad' } });
+
+                // Update Score
+                let score = 12.4;
+                const interval = setInterval(() => {
+                    score += 0.5;
+                    riskScore.textContent = score.toFixed(1);
+                    riskScore.className = "text-red-500 font-bold animate-pulse";
+                    if (score >= 45.0) clearInterval(interval);
+                }, 50);
+            }, 1000);
+
+            // 3. Reset
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-bolt"></i> Simulate Contagion';
+                btn.disabled = false;
+                // Revert colors roughly (in a real app, we'd store original state)
+                initGraph();
+                riskScore.textContent = "12.4";
+                riskScore.className = "text-emerald-400 font-bold";
+            }, 4000);
+        }
+
         function openInspector(node) {
             const insp = document.getElementById('inspector');
-            insp.classList.remove('translate-x-full');
+            const content = document.getElementById('inspector-content');
 
+            insp.classList.remove('translate-x-full');
             document.getElementById('insp-title').innerText = node.label;
 
-            // Mock Data Generation based on node type
-            let metricsHtml = '';
-            let riskHtml = '';
-
-            if (node.group === 'unit' || node.group === 'core') {
-                metricsHtml = `
-                    <div class="bg-slate-800 p-2 rounded">
-                        <div class="text-[10px] text-slate-500 uppercase">Revenue (TTM)</div>
-                        <div class="text-sm font-bold text-white font-mono">$${(Math.random()*50).toFixed(1)}B</div>
-                    </div>
-                    <div class="bg-slate-800 p-2 rounded">
-                        <div class="text-[10px] text-slate-500 uppercase">Employees</div>
-                        <div class="text-sm font-bold text-white font-mono">${(Math.random()*100).toFixed(1)}k</div>
-                    </div>
-                `;
-            } else if (node.group === 'risk') {
-                metricsHtml = `
-                    <div class="bg-slate-800 p-2 rounded">
-                        <div class="text-[10px] text-slate-500 uppercase">VaR (99%)</div>
-                        <div class="text-sm font-bold text-red-400 font-mono">$${(Math.random()*500).toFixed(0)}M</div>
-                    </div>
-                    <div class="bg-slate-800 p-2 rounded">
-                        <div class="text-[10px] text-slate-500 uppercase">Sensitivity</div>
-                        <div class="text-sm font-bold text-white font-mono">High</div>
-                    </div>
-                `;
-            } else {
-                metricsHtml = `
-                    <div class="bg-slate-800 p-2 rounded">
-                        <div class="text-[10px] text-slate-500 uppercase">Value</div>
-                        <div class="text-sm font-bold text-white font-mono">$${(Math.random()*10).toFixed(1)}B</div>
-                    </div>
-                `;
-            }
-            document.getElementById('insp-metrics').innerHTML = metricsHtml;
-
-            // Risks
-            document.getElementById('insp-risks').innerHTML = `
-                <div class="flex items-center justify-between text-xs">
-                    <span class="text-slate-400">Contagion Score</span>
-                    <div class="w-24 bg-slate-700 h-2 rounded-full overflow-hidden">
-                        <div class="bg-amber-500 h-full" style="width: ${Math.random()*100}%"></div>
-                    </div>
+            // Generate Mock Data
+            let html = `
+                <div class="bg-slate-800 p-3 rounded border border-slate-700">
+                    <div class="text-xs text-slate-500 mb-1">Exposure Value</div>
+                    <div class="text-lg font-mono text-white">$${(node.value * 1.2).toFixed(1)}B</div>
                 </div>
-                <div class="flex items-center justify-between text-xs">
-                    <span class="text-slate-400">Regulatory Impact</span>
-                    <span class="text-slate-300 font-mono">Medium</span>
+                <div class="bg-slate-800 p-3 rounded border border-slate-700">
+                    <div class="text-xs text-slate-500 mb-1">VaR (99%)</div>
+                    <div class="text-lg font-mono text-white">$${(node.value * 0.05).toFixed(2)}B</div>
                 </div>
             `;
 
-            // Dependencies
-            const connectedIds = network.getConnectedNodes(node.id);
-            let depsHtml = '';
-            connectedIds.forEach(id => {
-                const n = nodes.get(id);
-                depsHtml += `
-                    <li class="flex items-center gap-2">
-                        <i class="fas fa-link text-slate-600 text-[10px]"></i>
-                        <span>${n.label}</span>
-                        <span class="text-[10px] text-slate-500 ml-auto uppercase">${n.group}</span>
-                    </li>
+            if (node.group === 'risk') {
+                html += `
+                    <div class="mt-4">
+                        <h4 class="text-xs font-bold text-red-400 uppercase mb-2">Impact Analysis</h4>
+                        <div class="h-1 w-full bg-slate-700 rounded overflow-hidden">
+                            <div class="h-full bg-red-500" style="width: ${Math.min(100, node.value * 3)}%"></div>
+                        </div>
+                        <p class="mt-2 text-slate-400 italic">High correlation with liquidity stress vectors.</p>
+                    </div>
                 `;
-            });
-            document.getElementById('insp-deps').innerHTML = depsHtml;
+            }
+
+            content.innerHTML = html;
         }
 
         function closeInspector() {
             document.getElementById('inspector').classList.add('translate-x-full');
-            network.unselectAll();
-        }
-
-        function runSimulation() {
-            // Visual shockwave
-            const nodeIds = nodes.getIds();
-            const updates = nodeIds.map(id => {
-                const isRisk = nodes.get(id).group === 'risk';
-                return {
-                    id: id,
-                    color: isRisk ? { background: '#ff0000' } : null,
-                    size: isRisk ? 30 : 20
-                };
-            });
-            nodes.update(updates);
-
-            setTimeout(() => {
-                // Revert
-                nodes.update(nodeIds.map(id => ({
-                    id: id,
-                    color: { background: nodes.get(id).group === 'risk' ? '#450a0a' : undefined },
-                    size: nodes.get(id).group === 'core' ? 40 : 20
-                })));
-                alert("Simulation Complete: Stress impact recorded in risk nodes.");
-            }, 1000);
         }
     </script>
 </body>

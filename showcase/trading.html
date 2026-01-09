@@ -6,15 +6,10 @@
     <title>ADAM | Trading Terminal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-
-    <!-- TradingView Widget Script (using CDN or lightweight-charts) -->
     <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
-
+    <link rel="stylesheet" href="css/style.css">
     <style>
-        .order-book-row { cursor: pointer; transition: background 0.1s; }
-        .order-book-row:hover { background: rgba(255,255,255,0.05); }
+        .order-book-row:hover { background: rgba(255,255,255,0.05); cursor: pointer;}
         .ask-bar { background: rgba(239, 68, 68, 0.2); }
         .bid-bar { background: rgba(16, 185, 129, 0.2); }
     </style>
@@ -24,6 +19,7 @@
 
     <header class="h-12 border-b border-slate-700/50 flex items-center justify-between px-4 bg-[#0f172a] z-40 shrink-0">
         <div class="flex items-center gap-4">
+            <a href="index.html" class="text-slate-400 hover:text-white"><i class="fas fa-arrow-left"></i></a>
             <h1 class="text-sm font-bold tracking-tight mono text-white">ADAM <span class="text-emerald-400">TRADER</span></h1>
             <div class="h-4 w-px bg-slate-700"></div>
             <div class="flex items-center gap-2 text-xs font-mono">
@@ -31,225 +27,147 @@
                 <input type="text" value="AAPL" class="bg-transparent border-b border-slate-600 w-16 text-white focus:outline-none focus:border-cyan-500 uppercase text-center font-bold">
             </div>
             <div class="flex items-center gap-2 text-xs font-mono">
-                <span class="text-emerald-400 font-bold">$184.22</span>
+                <span class="text-emerald-400 font-bold" id="live-price">$184.22</span>
                 <span class="text-emerald-500">+1.2%</span>
             </div>
         </div>
         <div class="flex items-center gap-4 text-xs font-mono">
-            <div class="flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="text-slate-400">MARKET OPEN</span>
-            </div>
-            <div class="h-4 w-px bg-slate-700"></div>
-            <span class="text-slate-400">BALANCE: <span class="text-white">$1,240,500.00</span></span>
+            <span class="text-slate-400">BALANCE: <span class="text-white" id="balance">$100,000.00</span></span>
         </div>
     </header>
 
     <main class="flex-1 grid grid-cols-12 grid-rows-12 gap-1 p-1 bg-[#050b14]">
 
-        <!-- CHART (Top Left) -->
-        <div class="col-span-9 row-span-8 bg-[#0f1115] border border-slate-800 relative" id="chart-container">
-            <div class="absolute top-2 left-2 z-10 flex gap-1">
-                <button class="px-2 py-1 bg-slate-800 text-xs text-slate-300 rounded border border-slate-700 hover:bg-slate-700">1H</button>
-                <button class="px-2 py-1 bg-slate-700 text-xs text-white rounded border border-slate-600">4H</button>
-                <button class="px-2 py-1 bg-slate-800 text-xs text-slate-300 rounded border border-slate-700 hover:bg-slate-700">1D</button>
-            </div>
-        </div>
+        <div class="col-span-9 row-span-8 bg-[#0f1115] border border-slate-800 relative" id="chart-container"></div>
 
-        <!-- ORDER BOOK (Top Right) -->
         <div class="col-span-3 row-span-8 bg-[#0f1115] border border-slate-800 flex flex-col font-mono text-[10px]">
-            <div class="p-2 border-b border-slate-800 flex justify-between text-slate-500 uppercase tracking-wider">
-                <span>Price (USD)</span>
-                <span>Size</span>
-                <span>Total</span>
+            <div class="p-2 border-b border-slate-800 flex justify-between text-slate-500 uppercase">
+                <span>Price</span><span>Size</span>
             </div>
-            <div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col">
+            <div class="flex-1 overflow-y-auto flex flex-col" id="order-book">
                 <div id="asks" class="flex flex-col-reverse justify-end pb-1"></div>
-                <div class="py-1 border-y border-slate-800 text-center text-lg font-bold text-white bg-slate-900" id="current-price">
-                    184.22 <i class="fas fa-caret-up text-emerald-500 text-xs"></i>
-                </div>
+                <div class="py-1 border-y border-slate-800 text-center text-lg font-bold text-white bg-slate-900" id="spread-price">184.22</div>
                 <div id="bids" class="pt-1"></div>
             </div>
         </div>
 
-        <!-- POSITIONS / LOGS (Bottom Left) -->
         <div class="col-span-9 row-span-4 bg-[#0f1115] border border-slate-800 flex flex-col">
-            <div class="flex border-b border-slate-800">
-                <button class="px-4 py-2 text-xs font-bold text-cyan-400 border-b-2 border-cyan-400 bg-slate-900">POSITIONS</button>
-                <button class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-white transition">OPEN ORDERS</button>
-                <button class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-white transition">HISTORY</button>
-            </div>
-            <div class="flex-1 overflow-y-auto p-0">
-                <table class="w-full text-left border-collapse text-[11px] font-mono">
-                    <thead class="bg-slate-900 text-slate-500 sticky top-0">
-                        <tr>
-                            <th class="p-2 font-normal">Symbol</th>
-                            <th class="p-2 font-normal">Side</th>
-                            <th class="p-2 font-normal text-right">Size</th>
-                            <th class="p-2 font-normal text-right">Entry Price</th>
-                            <th class="p-2 font-normal text-right">Mark Price</th>
-                            <th class="p-2 font-normal text-right">PNL (ROE%)</th>
-                            <th class="p-2 font-normal text-right">Actions</th>
-                        </tr>
+            <div class="p-2 border-b border-slate-800 bg-slate-900 text-xs font-bold text-cyan-400">POSITIONS</div>
+            <div class="flex-1 overflow-y-auto">
+                <table class="w-full text-left text-[11px] font-mono">
+                    <thead class="text-slate-500 bg-slate-900/50">
+                        <tr><th class="p-2">Symbol</th><th class="p-2">Size</th><th class="p-2">Entry</th><th class="p-2">PNL</th></tr>
                     </thead>
-                    <tbody class="text-slate-300 divide-y divide-slate-800/50">
-                        <tr>
-                            <td class="p-2 text-white font-bold">AAPL</td>
-                            <td class="p-2 text-emerald-400">LONG</td>
-                            <td class="p-2 text-right">500</td>
-                            <td class="p-2 text-right">182.50</td>
-                            <td class="p-2 text-right">184.22</td>
-                            <td class="p-2 text-right text-emerald-400">+$860.00 (0.94%)</td>
-                            <td class="p-2 text-right"><button class="text-slate-500 hover:text-white">Close</button></td>
-                        </tr>
-                        <tr>
-                            <td class="p-2 text-white font-bold">TSLA</td>
-                            <td class="p-2 text-red-400">SHORT</td>
-                            <td class="p-2 text-right">200</td>
-                            <td class="p-2 text-right">240.00</td>
-                            <td class="p-2 text-right">238.50</td>
-                            <td class="p-2 text-right text-emerald-400">+$300.00 (0.62%)</td>
-                            <td class="p-2 text-right"><button class="text-slate-500 hover:text-white">Close</button></td>
-                        </tr>
-                    </tbody>
+                    <tbody id="positions-body" class="text-slate-300">
+                        </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- ORDER ENTRY (Bottom Right) -->
         <div class="col-span-3 row-span-4 bg-[#0f1115] border border-slate-800 p-4 flex flex-col gap-4 font-mono text-xs">
             <div class="flex bg-slate-900 rounded p-1">
-                <button class="flex-1 py-1.5 rounded text-center font-bold bg-emerald-600 text-white shadow-lg">BUY</button>
-                <button class="flex-1 py-1.5 rounded text-center font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition">SELL</button>
+                <button class="flex-1 py-1.5 rounded text-center font-bold bg-emerald-600 text-white" onclick="setSide('buy')">BUY</button>
+                <button class="flex-1 py-1.5 rounded text-center font-bold text-slate-400 hover:text-white" onclick="setSide('sell')">SELL</button>
             </div>
-
-            <div class="space-y-3">
-                <div class="flex justify-between items-center">
-                    <span class="text-slate-500">Order Type</span>
-                    <select class="bg-slate-900 border border-slate-700 text-white rounded px-2 py-1 outline-none">
-                        <option>Limit</option>
-                        <option>Market</option>
-                        <option>Stop Limit</option>
-                    </select>
-                </div>
-                <div>
-                    <div class="flex justify-between text-slate-500 mb-1"><span>Price</span> <span class="text-[10px]">USDT</span></div>
-                    <input type="number" value="184.20" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-right text-white focus:border-cyan-500 outline-none">
-                </div>
-                <div>
-                    <div class="flex justify-between text-slate-500 mb-1"><span>Amount</span> <span class="text-[10px]">AAPL</span></div>
-                    <input type="number" value="100" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-right text-white focus:border-cyan-500 outline-none">
-                </div>
-                <div>
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="text-slate-500">Total</span>
-                    </div>
-                    <div class="text-right text-white font-bold border-t border-slate-800 pt-2 text-sm">$18,420.00</div>
-                </div>
-            </div>
-
-            <button class="mt-auto w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded shadow-lg shadow-emerald-500/20 transition uppercase tracking-widest text-sm">
-                Place Buy Order
+            <input type="number" id="order-qty" value="10" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-right text-white focus:border-cyan-500 outline-none" placeholder="Qty">
+            <button class="mt-auto w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded transition uppercase" onclick="executeOrder()">
+                SUBMIT ORDER
             </button>
         </div>
-
     </main>
 
-    <script src="js/nav.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            initChart();
-            initOrderBook();
-        });
+        let currentPrice = 184.22;
+        let balance = 100000;
+        let positions = [];
+        let orderSide = 'buy';
 
         function initChart() {
-            const chartContainer = document.getElementById('chart-container');
-            const chart = LightweightCharts.createChart(chartContainer, {
-                width: chartContainer.clientWidth,
-                height: chartContainer.clientHeight,
-                layout: {
-                    background: { type: 'solid', color: '#0f1115' },
-                    textColor: '#94a3b8',
-                },
-                grid: {
-                    vertLines: { color: '#1e293b' },
-                    horzLines: { color: '#1e293b' },
-                },
-                crosshair: {
-                    mode: LightweightCharts.CrosshairMode.Normal,
-                },
-                timeScale: {
-                    borderColor: '#334155',
-                },
+            const container = document.getElementById('chart-container');
+            const chart = LightweightCharts.createChart(container, {
+                layout: { background: { color: '#0f1115' }, textColor: '#94a3b8' },
+                grid: { vertLines: { color: '#1e293b' }, horzLines: { color: '#1e293b' } },
+                width: container.clientWidth, height: container.clientHeight
             });
+            const series = chart.addCandlestickSeries({ upColor: '#10b981', downColor: '#ef4444' });
 
-            const candleSeries = chart.addCandlestickSeries({
-                upColor: '#10b981',
-                downColor: '#ef4444',
-                borderVisible: false,
-                wickUpColor: '#10b981',
-                wickDownColor: '#ef4444',
-            });
-
-            // Mock Data Generator
-            const data = [];
+            // Mock Data
+            let data = [];
             let time = new Date(Date.now() - 100 * 24 * 60 * 60 * 1000).getTime() / 1000;
-            let value = 150;
-            for (let i = 0; i < 200; i++) {
-                time += 24 * 60 * 60;
-                const open = value + Math.random() * 10 - 5;
-                const high = open + Math.random() * 5;
-                const low = open - Math.random() * 5;
-                const close = (open + high + low) / 3;
-                value = close;
-                data.push({ time, open, high, low, close });
+            let val = 180;
+            for(let i=0; i<100; i++) {
+                time += 86400;
+                let o = val + Math.random() - 0.5;
+                let c = o + Math.random() - 0.5;
+                data.push({ time: time, open: o, high: Math.max(o,c)+0.5, low: Math.min(o,c)-0.5, close: c });
+                val = c;
             }
-
-            candleSeries.setData(data);
-
-            // Resize observer
-            new ResizeObserver(entries => {
-                if (entries.length === 0 || entries[0].target !== chartContainer) { return; }
-                const newRect = entries[0].contentRect;
-                chart.applyOptions({ height: newRect.height, width: newRect.width });
-            }).observe(chartContainer);
+            series.setData(data);
         }
 
-        function initOrderBook() {
-            const asksContainer = document.getElementById('asks');
-            const bidsContainer = document.getElementById('bids');
-            const currentPrice = 184.22;
-
-            function generateRow(price, size, type) {
-                const total = (price * size).toFixed(0);
-                const width = Math.min(100, (size / 10)); // simplistic bar width
-                const colorClass = type === 'ask' ? 'text-red-400' : 'text-emerald-400';
-                const bgClass = type === 'ask' ? 'ask-bar' : 'bid-bar';
-
-                return `
-                    <div class="flex justify-between px-2 py-0.5 relative overflow-hidden order-book-row">
-                        <div class="absolute top-0 right-0 h-full ${bgClass} z-0" style="width: ${width}%"></div>
-                        <span class="${colorClass} relative z-10 w-1/3 text-left">${price.toFixed(2)}</span>
-                        <span class="text-slate-300 relative z-10 w-1/3 text-right">${size.toFixed(4)}</span>
-                        <span class="text-slate-500 relative z-10 w-1/3 text-right">${total}</span>
-                    </div>
-                `;
-            }
-
-            let asksHtml = '';
-            for(let i=10; i>0; i--) {
-                const price = currentPrice + (i * 0.05);
-                asksHtml += generateRow(price, Math.random() * 500, 'ask');
-            }
-            asksContainer.innerHTML = asksHtml;
-
-            let bidsHtml = '';
-            for(let i=1; i<=10; i++) {
-                const price = currentPrice - (i * 0.05);
-                bidsHtml += generateRow(price, Math.random() * 500, 'bid');
-            }
-            bidsContainer.innerHTML = bidsHtml;
+        function renderOrderBook() {
+            const asks = document.getElementById('asks');
+            const bids = document.getElementById('bids');
+            let aHtml = '', bHtml = '';
+            for(let i=5; i>0; i--) aHtml += `<div class="flex justify-between px-2 py-0.5 ask-bar"><span class="text-red-400">${(currentPrice + i*0.05).toFixed(2)}</span><span class="text-slate-400">${Math.floor(Math.random()*500)}</span></div>`;
+            for(let i=1; i<=5; i++) bHtml += `<div class="flex justify-between px-2 py-0.5 bid-bar"><span class="text-emerald-400">${(currentPrice - i*0.05).toFixed(2)}</span><span class="text-slate-400">${Math.floor(Math.random()*500)}</span></div>`;
+            asks.innerHTML = aHtml;
+            bids.innerHTML = bHtml;
         }
+
+        function setSide(side) {
+            orderSide = side;
+            const btn = document.querySelector('button[onclick="executeOrder()"]');
+            if(side === 'buy') {
+                btn.classList.remove('bg-red-600', 'hover:bg-red-500');
+                btn.classList.add('bg-emerald-600', 'hover:bg-emerald-500');
+            } else {
+                btn.classList.remove('bg-emerald-600', 'hover:bg-emerald-500');
+                btn.classList.add('bg-red-600', 'hover:bg-red-500');
+            }
+        }
+
+        function executeOrder() {
+            const qty = parseInt(document.getElementById('order-qty').value);
+            const cost = qty * currentPrice;
+
+            if (orderSide === 'buy') {
+                if (balance >= cost) {
+                    balance -= cost;
+                    positions.push({ symbol: 'AAPL', size: qty, entry: currentPrice, pnl: 0 });
+                } else alert("Insufficient Funds");
+            } else {
+                // Simple sell logic for demo
+                balance += cost;
+                positions.push({ symbol: 'AAPL', size: -qty, entry: currentPrice, pnl: 0 });
+            }
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('balance').innerText = `$${balance.toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+            const tbody = document.getElementById('positions-body');
+            tbody.innerHTML = positions.map(p => `
+                <tr>
+                    <td class="p-2 text-white font-bold">${p.symbol}</td>
+                    <td class="p-2 ${p.size > 0 ? 'text-emerald-400' : 'text-red-400'}">${p.size}</td>
+                    <td class="p-2">${p.entry.toFixed(2)}</td>
+                    <td class="p-2 text-slate-400">0.00</td>
+                </tr>
+            `).join('');
+        }
+
+        // Auto-update price slightly to make it alive
+        setInterval(() => {
+            currentPrice += (Math.random() - 0.5) * 0.1;
+            document.getElementById('live-price').innerText = `$${currentPrice.toFixed(2)}`;
+            document.getElementById('spread-price').innerText = currentPrice.toFixed(2);
+            renderOrderBook();
+        }, 1000);
+
+        initChart();
+        renderOrderBook();
+        updateUI();
     </script>
 </body>
 </html>

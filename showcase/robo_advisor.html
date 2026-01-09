@@ -6,231 +6,88 @@
     <title>ADAM | Robo Advisor</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="h-screen flex flex-col grid-bg overflow-hidden text-slate-200">
     <div class="scan-line"></div>
 
-    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 shrink-0">
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a] z-40 shrink-0">
         <div class="flex items-center gap-4">
-            <a href="index.html" class="text-slate-400 hover:text-white transition"><i class="fas fa-arrow-left"></i></a>
-            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-cyan-400">v23.5</span> <span class="text-slate-500 font-normal">| Robo Advisor</span></h1>
+            <a href="index.html" class="text-slate-400 hover:text-white"><i class="fas fa-arrow-left"></i></a>
+            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-cyan-400">v23.5</span> | Robo Advisor</h1>
         </div>
-        <button class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2 rounded shadow-lg shadow-emerald-500/20 transition uppercase tracking-wider" onclick="generatePortfolio()">
+        <button class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-4 py-2 rounded uppercase" onclick="generatePortfolio()">
             <i class="fas fa-magic mr-2"></i> Rebalance
         </button>
     </header>
 
     <main class="flex-1 overflow-y-auto p-6 flex flex-col md:flex-row gap-6">
-
-        <!-- Controls -->
         <div class="w-full md:w-80 flex flex-col gap-6 shrink-0">
-
-            <div class="cyber-card p-6 rounded-lg">
-                <h3 class="text-sm font-bold text-white uppercase tracking-widest mb-6 border-b border-slate-700 pb-2">Client Profile</h3>
-
-                <div class="space-y-6">
+            <div class="cyber-card p-6 rounded-lg bg-slate-900 border border-slate-800">
+                <h3 class="text-sm font-bold text-white uppercase mb-4">Client Profile</h3>
+                <div class="space-y-4">
                     <div>
-                        <label class="flex justify-between text-xs text-slate-400 mb-2 font-mono">
-                            <span>Risk Tolerance</span>
-                            <span class="text-cyan-400 font-bold" id="risk-val">High</span>
-                        </label>
-                        <input type="range" min="1" max="5" value="4" class="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-500" id="risk-slider" oninput="updateProfile()">
-                        <div class="flex justify-between text-[10px] text-slate-600 mt-1 font-mono uppercase">
-                            <span>Conservative</span>
-                            <span>Aggressive</span>
-                        </div>
+                        <label class="text-xs text-slate-400 block mb-1">Risk Tolerance</label>
+                        <input type="range" min="1" max="5" value="4" class="w-full accent-cyan-500" id="risk-slider" oninput="updateProfile()">
+                        <div class="flex justify-between text-[10px] text-slate-500"><span>Safe</span><span>Aggressive</span></div>
                     </div>
-
                     <div>
-                        <label class="block text-xs text-slate-400 mb-2 font-mono">Investment Horizon</label>
-                        <select class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white text-xs outline-none focus:border-cyan-500 font-mono">
+                        <label class="text-xs text-slate-400 block mb-1">Investment Horizon</label>
+                        <select class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-xs text-white outline-none">
                             <option>Short Term (< 3 Years)</option>
                             <option selected>Medium Term (3-10 Years)</option>
                             <option>Long Term (10+ Years)</option>
                         </select>
                     </div>
-
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-2 font-mono">Focus Area</label>
-                        <div class="flex flex-wrap gap-2">
-                            <button class="flex-1 py-1.5 bg-cyan-900/30 border border-cyan-700 text-cyan-400 rounded text-xs font-bold hover:bg-cyan-800 transition active-btn">Growth</button>
-                            <button class="flex-1 py-1.5 bg-slate-800 border border-slate-700 text-slate-400 rounded text-xs font-bold hover:text-white transition">Income</button>
-                            <button class="flex-1 py-1.5 bg-slate-800 border border-slate-700 text-slate-400 rounded text-xs font-bold hover:text-white transition">ESG</button>
-                        </div>
-                    </div>
                 </div>
             </div>
-
-            <div class="cyber-card p-6 rounded-lg flex-1">
-                <h3 class="text-sm font-bold text-white uppercase tracking-widest mb-4 border-b border-slate-700 pb-2">AI Insights</h3>
-                <div class="space-y-4 text-xs leading-relaxed text-slate-300 font-mono">
-                    <p class="border-l-2 border-emerald-500 pl-3">
-                        <span class="text-emerald-400 font-bold block mb-1">Sentiment Overlay:</span>
-                        Market sentiment is currently slightly bearish. Recommend increasing allocation to defensive sectors.
-                    </p>
-                    <p class="border-l-2 border-amber-500 pl-3">
-                        <span class="text-amber-400 font-bold block mb-1">Volatility Alert:</span>
-                        VIX > 25. Historical correlation suggests reducing leverage in high-beta assets.
-                    </p>
-                </div>
-            </div>
-
         </div>
 
-        <!-- Visualization -->
         <div class="flex-1 flex flex-col gap-6">
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-1/2">
-                <div class="cyber-card p-4 rounded-lg flex flex-col relative">
-                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest absolute top-4 left-4">Current Allocation</h3>
-                    <div class="flex-1 flex items-center justify-center p-4">
-                        <canvas id="currentChart"></canvas>
-                    </div>
+            <div class="grid grid-cols-2 gap-6 h-64">
+                <div class="bg-slate-900 border border-slate-800 rounded p-4 relative">
+                    <h3 class="absolute top-2 left-4 text-xs text-slate-500 font-bold uppercase">Current</h3>
+                    <canvas id="currentChart"></canvas>
                 </div>
-                <div class="cyber-card p-4 rounded-lg flex flex-col relative border-cyan-500/30">
-                    <h3 class="text-xs font-bold text-cyan-400 uppercase tracking-widest absolute top-4 left-4">Proposed Allocation</h3>
-                    <div class="flex-1 flex items-center justify-center p-4">
-                        <canvas id="proposedChart"></canvas>
-                    </div>
+                <div class="bg-slate-900 border border-slate-800 rounded p-4 relative border-cyan-500/30">
+                    <h3 class="absolute top-2 left-4 text-xs text-cyan-500 font-bold uppercase">Proposed</h3>
+                    <canvas id="proposedChart"></canvas>
                 </div>
             </div>
-
-            <div class="cyber-card p-0 rounded-lg flex-1 overflow-hidden flex flex-col">
-                <div class="p-4 border-b border-slate-700 bg-slate-800/50">
-                    <h3 class="text-sm font-bold text-white font-mono">Rebalancing Plan</h3>
-                </div>
-                <div class="flex-1 overflow-y-auto p-0">
-                    <table class="w-full text-left text-xs font-mono">
-                        <thead class="bg-slate-900 text-slate-500 border-b border-slate-700">
-                            <tr>
-                                <th class="p-3">Asset Class</th>
-                                <th class="p-3 text-right">Current %</th>
-                                <th class="p-3 text-right">Target %</th>
-                                <th class="p-3 text-right">Delta</th>
-                                <th class="p-3 text-right">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-800 text-slate-300" id="rebalance-table">
-                            <!-- Injected -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
         </div>
-
     </main>
 
-    <script src="js/nav.js"></script>
     <script>
         let currentChart, proposedChart;
-
-        document.addEventListener('DOMContentLoaded', () => {
-            initCharts();
-            updateProfile();
-        });
 
         function initCharts() {
             const ctx1 = document.getElementById('currentChart').getContext('2d');
             const ctx2 = document.getElementById('proposedChart').getContext('2d');
+            const opts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#94a3b8' } } } };
 
-            const commonOptions = {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'right', labels: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 10 } } }
-                },
-                elements: { arc: { borderWidth: 0 } }
-            };
-
-            currentChart = new Chart(ctx1, {
-                type: 'doughnut',
-                data: {
-                    labels: ['US Equity', 'Intl Equity', 'Bonds', 'Cash', 'Crypto'],
-                    datasets: [{
-                        data: [40, 20, 30, 5, 5],
-                        backgroundColor: ['#3b82f6', '#0ea5e9', '#64748b', '#10b981', '#f59e0b']
-                    }]
-                },
-                options: commonOptions
-            });
-
-            proposedChart = new Chart(ctx2, {
-                type: 'doughnut',
-                data: {
-                    labels: ['US Equity', 'Intl Equity', 'Bonds', 'Cash', 'Crypto'],
-                    datasets: [{
-                        data: [50, 15, 20, 5, 10], // Default aggressive
-                        backgroundColor: ['#3b82f6', '#0ea5e9', '#64748b', '#10b981', '#f59e0b']
-                    }]
-                },
-                options: commonOptions
-            });
+            currentChart = new Chart(ctx1, { type: 'doughnut', data: { labels: ['Equity', 'Bonds', 'Cash'], datasets: [{ data: [60, 30, 10], backgroundColor: ['#3b82f6', '#64748b', '#10b981'] }] }, options: opts });
+            proposedChart = new Chart(ctx2, { type: 'doughnut', data: { labels: ['Equity', 'Bonds', 'Cash'], datasets: [{ data: [70, 20, 10], backgroundColor: ['#3b82f6', '#64748b', '#10b981'] }] }, options: opts });
         }
 
         function updateProfile() {
-            const slider = document.getElementById('risk-slider');
-            const val = document.getElementById('risk-val');
-
-            const levels = ['Conservative', 'Moderate-Conservative', 'Balanced', 'Growth', 'Aggressive'];
-            const riskLevel = parseInt(slider.value) - 1;
-            val.innerText = levels[riskLevel];
-
-            // Update Proposed Allocation based on risk
-            let newData = [];
-            if (riskLevel === 0) newData = [20, 10, 60, 10, 0]; // Conservative
-            else if (riskLevel === 2) newData = [40, 20, 30, 10, 0]; // Balanced
-            else if (riskLevel === 4) newData = [50, 20, 10, 5, 15]; // Aggressive
-            else newData = [45, 15, 30, 5, 5]; // Default
-
-            proposedChart.data.datasets[0].data = newData;
+            const val = parseInt(document.getElementById('risk-slider').value);
+            // Simple logic: Higher risk = more equity
+            const equity = 20 + (val * 15);
+            const bonds = 90 - equity;
+            const cash = 10;
+            proposedChart.data.datasets[0].data = [equity, bonds, cash];
             proposedChart.update();
-
-            generateTable(newData);
-        }
-
-        function generateTable(targetData) {
-            const currentData = currentChart.data.datasets[0].data;
-            const labels = currentChart.data.labels;
-            const tbody = document.getElementById('rebalance-table');
-            tbody.innerHTML = '';
-
-            labels.forEach((label, i) => {
-                const current = currentData[i];
-                const target = targetData[i];
-                const delta = target - current;
-
-                let action = '-';
-                let colorClass = 'text-slate-500';
-
-                if (delta > 1) { action = 'BUY'; colorClass = 'text-emerald-400 font-bold'; }
-                if (delta < -1) { action = 'SELL'; colorClass = 'text-red-400 font-bold'; }
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="p-3 font-bold text-white">${label}</td>
-                    <td class="p-3 text-right">${current}%</td>
-                    <td class="p-3 text-right text-cyan-400">${target}%</td>
-                    <td class="p-3 text-right ${delta > 0 ? 'text-emerald-400' : 'text-red-400'}">${delta > 0 ? '+' : ''}${delta}%</td>
-                    <td class="p-3 text-right ${colorClass}">${action}</td>
-                `;
-                tbody.appendChild(tr);
-            });
         }
 
         function generatePortfolio() {
-            // Animation effect
             const btn = document.querySelector('button[onclick="generatePortfolio()"]');
-            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Optimizing...';
-            setTimeout(() => {
-                btn.innerHTML = '<i class="fas fa-check mr-2"></i> Done';
-                setTimeout(() => btn.innerHTML = '<i class="fas fa-magic mr-2"></i> Rebalance', 2000);
-            }, 1000);
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Working...';
+            setTimeout(() => { btn.innerHTML = '<i class="fas fa-check"></i> Done'; setTimeout(() => btn.innerHTML = original, 2000); }, 1000);
         }
+
+        document.addEventListener('DOMContentLoaded', initCharts);
     </script>
 </body>
 </html>
