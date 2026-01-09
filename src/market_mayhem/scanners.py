@@ -8,7 +8,7 @@ Description: Core logic for detecting institutional accumulation of distressed a
 import pandas as pd
 from edgar import Company, Filing, set_identity
 from typing import List, Dict, Optional
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_exception_type
 import logging
 import time
@@ -31,7 +31,8 @@ class Holding(BaseModel):
     share_type: str  # 'SH' or 'PRN'
     discretion: str
 
-    @validator('cusip')
+    @field_validator('cusip')
+    @classmethod
     def validate_cusip(cls, v):
         if len(v)!= 9:
             raise ValueError(f"Invalid CUSIP length: {v}")
@@ -87,17 +88,13 @@ class WhaleScanner:
         # Explicitly filter for 13F-HR. Do not process 13F-NT.
         filings = company.get_filings(form="13F-HR").latest(limit)
 
-        # edgartools returns a single object if limit=1, ensure list
-        if not isinstance(filings, list):
-             # Depending on edgartools version, latest(n) might return a Filings object which is iterable
-             # or a single Filing. We need to handle this.
-             # For the purpose of this architecture, we assume an iterable list of Filing objects.
-             if hasattr(filings, '__iter__'):
-                 return list(filings)
-             else:
-                 return [filings]
+        # edgartools returns an EntityFilings object which is iterable
+        # Convert to list of Filing objects
+        if hasattr(filings, '__iter__'):
+             return list(filings)
 
-        return filings
+        # If it returns a single Filing object
+        return [filings]
 
     def _parse_13f_xml(self, filing: Filing) -> pd.DataFrame:
         """

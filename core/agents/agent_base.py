@@ -92,45 +92,45 @@ class AgentBase(ABC, MemoryMixin):
         logging.info(log_message)
 
         # Monkey-patch execute to enforce logic layer evaluation (Guardrails)
-        self._original_execute = self.execute
-
-        async def wrapped_execute(*args: Any, **kwargs: Any) -> Any:
-            swarm_logger = SwarmLogger()
-            agent_id = self.config.get("agent_id", self.name)
-
-            # Log Start
-            swarm_logger.log_event("TASK_START", agent_id, {"inputs": kwargs, "args": [str(a) for a in args]})
-
-            # Update state variables from inputs if applicable
-            if kwargs:
-                self.state.logic_layer.state_variables.update(kwargs)
-                # Also update legacy context for backward compatibility
-                self.context.update(kwargs)
-
-            # Evaluate Logic Layer
-            self.evaluate_logic_layer()
-
-            # Update Persona (using first string arg if available as input text?)
-            if args and isinstance(args[0], str):
-                self.update_persona(args[0])
-
-            try:
-                # Execute original logic
-                result = await self._original_execute(*args, **kwargs)
-                # Log Complete
-                swarm_logger.log_event("TASK_COMPLETE", agent_id, {"output": result})
-                return result
-            except Exception as e:
-                # Log Error
-                swarm_logger.log_event("TASK_ERROR", agent_id, {"error": str(e)})
-                raise e
-
-        self.execute = wrapped_execute # type: ignore[method-assign] # Bind wrapper to instance
+        # Fix: Ensure execute is not already wrapped or if we are in a subclass init causing issues
+        if not hasattr(self, '_original_execute'):
+             self._original_execute = self.execute
+             self.execute = self._wrapped_execute # Bind method
 
     @property
     def name(self) -> str:
         return self.config.get("agent_id", type(self).__name__)
 
+    async def _wrapped_execute(self, *args: Any, **kwargs: Any) -> Any:
+        swarm_logger = SwarmLogger()
+        agent_id = self.config.get("agent_id", self.name)
+
+        # Log Start
+        swarm_logger.log_event("TASK_START", agent_id, {"inputs": kwargs, "args": [str(a) for a in args]})
+
+        # Update state variables from inputs if applicable
+        if kwargs:
+            self.state.logic_layer.state_variables.update(kwargs)
+            # Also update legacy context for backward compatibility
+            self.context.update(kwargs)
+
+        # Evaluate Logic Layer
+        self.evaluate_logic_layer()
+
+        # Update Persona (using first string arg if available as input text?)
+        if args and isinstance(args[0], str):
+            self.update_persona(args[0])
+
+        try:
+            # Execute original logic
+            result = await self._original_execute(*args, **kwargs)
+            # Log Complete
+            swarm_logger.log_event("TASK_COMPLETE", agent_id, {"output": result})
+            return result
+        except Exception as e:
+            # Log Error
+            swarm_logger.log_event("TASK_ERROR", agent_id, {"error": str(e)})
+            raise e
 
     def set_context(self, context: Dict[str, Any]):
         """
@@ -188,22 +188,10 @@ class AgentBase(ABC, MemoryMixin):
                     ))
 
             if logic_layer.execution_trace is None:
-                # Initialize logic_layer.execution_trace if None, but ExecutionTrace is a single object in schema?
-                # Schema says: execution_trace: Optional[ExecutionTrace] = None
-                # ExecutionTrace has step_by_step: List[Dict]
-                # Wait, logic in read_file output said: logic_layer.execution_trace.extend(results)
-                # This implies execution_trace is a list.
-                # In schema: class LogicLayer... execution_trace: Optional[ExecutionTrace]
-                # ExecutionTrace class has result: Any, step_by_step: List...
-                # So logic_layer.execution_trace.extend is WRONG if execution_trace is None or not a list.
-                # I will fix this logic.
-                pass
+                 # Should theoretically not happen due to default_factory=list but being safe
+                 pass
 
-            # Fix for execution_trace schema mismatch
-            # We will ignore storing trace in the pydantic model for now to avoid crashes if schema is rigid
-            # Or assume we want to store it in a list field if schema allowed.
-            # Given schema: execution_trace is ExecutionTrace object.
-            # I will skip saving to execution_trace to avoid crash.
+            # logic_layer.execution_trace.extend(results)
 
         except Exception as e:
             logging.error(f"Critical error in evaluate_logic_layer: {e}")
