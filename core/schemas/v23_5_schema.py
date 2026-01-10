@@ -1,172 +1,115 @@
 from __future__ import annotations
-from typing import List, Literal, Optional
+from enum import Enum
+from typing import List, Optional, Dict, Any, Literal
 from pydantic import BaseModel, Field, ConfigDict
 
-# --- Core Definitions ---
+class MetricUnit(str, Enum):
+    USD = "USD"
+    EUR = "EUR"
+    PERCENT = "PERCENT"
+    RATIO = "RATIO"
+    COUNT = "COUNT"
 
+class FinancialMetric(BaseModel):
+    """
+    Represents a strictly validated financial metric.
+    """
+    model_config = ConfigDict(populate_by_name=True)
 
-class Meta(BaseModel):
-    target: str
-    generated_at: str
-    model_version: Literal["Adam-v23.5-Apex-Architect"]
+    metric_name: str = Field(..., description="The standardized name of the metric (e.g., 'EBITDA')")
+    value: float = Field(..., description="The numerical value of the metric")
+    unit: MetricUnit = Field(..., description="The unit of measurement")
+    period: str = Field(..., description="The time period (e.g., 'FY2023', 'Q3-2024')")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Conviction score (0.0 to 1.0)")
+    source: str = Field(..., description="Origin of the data (e.g., 'SEC Filing', 'Yahoo Finance')")
+    provenance_id: Optional[str] = Field(None, description="Hash/ID of the source document")
 
+class IntentCategory(str, Enum):
+    DEEP_DIVE = "DEEP_DIVE"
+    RISK_ALERT = "RISK_ALERT"
+    MARKET_UPDATE = "MARKET_UPDATE"
+    UNCERTAIN = "UNCERTAIN"
+    COMPLIANCE_CHECK = "COMPLIANCE_CHECK"
 
-class LegalEntity(BaseModel):
-    name: str
-    lei: str
-    jurisdiction: str
-    sector: str
+class RoutingResult(BaseModel):
+    """
+    Result of the Semantic Router classification.
+    """
+    intent: IntentCategory
+    confidence_score: float
+    routing_metadata: Dict[str, Any] = Field(default_factory=dict)
 
-# --- Phase 1: Entity & Management ---
+class GraphNode(BaseModel):
+    """
+    Represents a node in the Knowledge Graph for planning.
+    """
+    id: str
+    label: str
+    properties: Dict[str, Any]
 
-
-class ManagementAssessment(BaseModel):
-    capital_allocation_score: float = Field(description="Score 0-10 on capital allocation efficiency")
-    alignment_analysis: str = Field(description="Analysis of insider buying/selling and compensation alignment")
-    key_person_risk: Literal["High", "Med", "Low"]
-
-
-class CompetitivePositioning(BaseModel):
-    moat_status: Literal["Wide", "Narrow", "None"]
-    technology_risk_vector: str
-
-
-class EntityEcosystem(BaseModel):
-    legal_entity: LegalEntity
-    management_assessment: ManagementAssessment
-    competitive_positioning: CompetitivePositioning
-
-# --- Phase 2: Deep Fundamental & Valuation ---
-
-
-class Fundamentals(BaseModel):
-    revenue_cagr_3yr: str
-    ebitda_margin_trend: Literal["Expanding", "Contracting", "Stable"]
-
-
-class DCFModel(BaseModel):
-    wacc_assumption: str
-    terminal_growth: str
-    intrinsic_value_estimate: float
-
-
-class MultiplesAnalysis(BaseModel):
-    current_ev_ebitda: float
-    peer_median_ev_ebitda: float
-    verdict: Literal["Undervalued", "Overvalued", "Fair"]
-
-
-class PriceTargets(BaseModel):
-    bear_case: float
-    base_case: float
-    bull_case: float
-
-
-class ValuationEngine(BaseModel):
-    dcf_model: DCFModel
-    multiples_analysis: MultiplesAnalysis
-    price_targets: PriceTargets
-
-
-class EquityAnalysis(BaseModel):
-    fundamentals: Fundamentals
-    valuation_engine: ValuationEngine
-
-# --- Phase 3: Credit, Covenants & SNC Ratings ---
-
-
-class PrimaryFacilityAssessment(BaseModel):
-    facility_type: str
-    collateral_coverage: Literal["Strong", "Adequate", "Weak"]
-    repayment_capacity: str
-
-
-class DialogueTurn(BaseModel):
-    speaker: Literal["Regulator", "Strategist"]
-    argument: str
-    counter_point: Optional[str] = None
-
-
-class RiskDialogue(BaseModel):
-    turns: List[DialogueTurn]
-    conclusion: str
-    override_applied: bool = False
-
-
-class SNCRatingModel(BaseModel):
-    overall_borrower_rating: Literal["Pass", "Special Mention", "Substandard", "Doubtful", "Loss"]
+class PlanStep(BaseModel):
+    """
+    A single step in a Neuro-Symbolic Plan.
+    """
+    step_id: str
+    action: str = Field(..., description="The action to perform (e.g., 'FETCH_DATA', 'RUN_SIMULATION')")
+    target_entity: str
+    parameters: Dict[str, Any]
     rationale: str
-    primary_facility_assessment: PrimaryFacilityAssessment
-    legacy_rating: Optional[str] = Field(None, description="Rating from the legacy Leverage/Coverage model")
-    model_consensus: Optional[bool] = Field(None, description="True if Legacy and New models agree")
-    conviction_score: Optional[float] = Field(None, description="Internal confidence score (0.0-1.0)")
-    risk_dialogue: Optional[RiskDialogue] = Field(None, description="The debate between Regulatory and Strategic agents")
 
+class ExecutionPlan(BaseModel):
+    """
+    A complete execution plan generated by the Planner.
+    """
+    plan_id: str
+    steps: List[PlanStep]
+    estimated_complexity: str
 
-class CovenantRiskAnalysis(BaseModel):
-    primary_constraint: str = Field(description="The primary restrictive covenant or 'Choke Point'")
-    current_level: float
-    breach_threshold: float
-    headroom_assessment: str = Field(description="Analysis of headroom (e.g., '15% Cushion')")
+class CritiqueResult(BaseModel):
+    """
+    Output from the Self-Reflection Agent.
+    """
+    passed: bool
+    feedback: str
+    missing_data: List[str] = Field(default_factory=list)
+    score: float = Field(..., ge=0.0, le=1.0)
 
+class IngestedArtifact(BaseModel):
+    """
+    Represents a document or data point processed by the Ingestion Engine.
+    """
+    content: str
+    artifact_type: str
+    source_url: Optional[str] = None
+    conviction_score: float
+    entities: List[str] = Field(default_factory=list)
+    timestamp: str
 
-class CreditAnalysis(BaseModel):
-    snc_rating_model: SNCRatingModel
-    cds_market_implied_rating: str
-    covenant_risk_analysis: CovenantRiskAnalysis
+class DeepDiveRequest(BaseModel):
+    """
+    Standardized request structure for a Deep Dive analysis.
+    """
+    query: str
+    user_id: str
+    thread_id: str
+    context: Dict[str, Any] = Field(default_factory=dict)
 
-# --- Phase 4: Risk, Simulation & Quantum Modeling ---
-
-
-class QuantumScenario(BaseModel):
-    scenario_name: str
-    probability: Literal["Low", "Med", "High"]
-    impact_severity: Literal["Critical", "High", "Moderate"]
-    estimated_impact_ev: str
-
-
-class TradingDynamics(BaseModel):
-    short_interest: str
-    liquidity_risk: Literal["Low", "Med", "High"]
-
-
-class SimulationEngine(BaseModel):
-    monte_carlo_default_prob: str
-    quantum_scenarios: List[QuantumScenario]
-    trading_dynamics: TradingDynamics
-
-# --- Phase 5: Synthesis & Conviction ---
-
-
-class FinalVerdict(BaseModel):
-    recommendation: Literal["Strong Buy", "Buy", "Hold", "Sell", "Strong Sell"]
-    conviction_level: int = Field(ge=1, le=10)
-    time_horizon: str
-    rationale_summary: str
-    justification_trace: List[str]
-
-
-class StrategicSynthesis(BaseModel):
-    m_and_a_posture: Literal["Buyer", "Seller", "Neutral"]
-    final_verdict: FinalVerdict
-
-# --- Unified Graph Structure ---
-
-
-class Nodes(BaseModel):
-    entity_ecosystem: EntityEcosystem
-    equity_analysis: EquityAnalysis
-    credit_analysis: CreditAnalysis
-    simulation_engine: SimulationEngine
-    strategic_synthesis: StrategicSynthesis
-
+# --- Legacy / Core Graph Models to satisfy imports ---
 
 class V23KnowledgeGraph(BaseModel):
-    meta: Meta
-    nodes: Nodes
-    model_config = ConfigDict(populate_by_name=True)
-
+    """
+    The core Knowledge Graph container for v23.5.
+    """
+    nodes: Dict[str, Dict[str, Any]] = Field(default_factory=dict)
+    edges: List[Dict[str, Any]] = Field(default_factory=list)
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+    version: str = "23.5"
 
 class HyperDimensionalKnowledgeGraph(BaseModel):
+    """
+    Top-level container for the HDKG output.
+    """
     v23_knowledge_graph: V23KnowledgeGraph
-    model_config = ConfigDict(populate_by_name=True)
+
+    # Allow extra fields for forward compatibility
+    model_config = ConfigDict(extra='allow')
