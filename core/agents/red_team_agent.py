@@ -7,39 +7,73 @@ import asyncio
 from core.agents.agent_base import AgentBase
 from langgraph.graph import StateGraph, END
 from core.engine.states import RedTeamState, GraphState
+from core.agents.skills.counterfactual_reasoning_skill import CounterfactualReasoningSkill
 
 logger = logging.getLogger(__name__)
 
 
 class RedTeamAgent(AgentBase):
     """
-    The Red Team Agent acts as an adversary to the system.
-    It generates novel and challenging scenarios (stress tests) to validate risk models.
-    In v23, it implements an internal Adversarial Self-Correction Loop using LangGraph.
+    The Red Team Agent acts as an internal adversary to the system.
+
+    ### Functionality:
+    It generates novel and challenging scenarios (stress tests) to validate risk models before
+    strategies are deployed. This is a critical component of the "Sovereign Financial Intelligence"
+    architecture (v23.5), ensuring that the system is robust against "Black Swan" events.
+
+    ### Architecture:
+    In v23.5, this agent implements an internal **Adversarial Self-Correction Loop** using LangGraph.
+    Instead of a single-shot generation, it iteratively refines its attack scenarios until they
+    meet a severity threshold.
+
+    ### Workflow:
+    1.  **Generate Attack**: Uses `CounterfactualReasoningSkill` to invert assumptions in a credit memo.
+    2.  **Simulate Impact**: Estimates the financial damage (e.g., VaR spike) of the scenario.
+    3.  **Critique**: Checks if the scenario is severe enough (Severity > Threshold).
+    4.  **Escalate**: If too mild, it loops back to Generate Attack with instructions to "Escalate".
     """
 
     def __init__(self, config: Dict[str, Any], kernel=None):
         super().__init__(config, kernel=kernel)
-        self.name = "RedTeamAgent"
-        # Compile the internal graph once
+        self._name = config.get("name", "RedTeamAgent") # Use private attribute to avoid conflict
+        self.skill = CounterfactualReasoningSkill(llm_client=kernel)
+        # Compile the internal graph once during initialization
         self.graph_app = self._build_red_team_graph()
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @name.setter
+    def name(self, value: str):
+        self._name = value
 
     async def execute(self, state: Dict[str, Any]) -> Dict[str, Any]:
         """
         Main entry point. compatible with AdaptiveSystemGraph.
+
+        Args:
+            state (dict): Can be a legacy dict or a GraphState. Must contain target info.
+
+        Returns:
+            dict: The final critique and impact assessment.
         """
         logger.info(f"[{self.name}] Executing Adversarial Stress Test...")
 
         # Determine target from input state
         target_entity = "General Portfolio"
+        credit_memo = {}
+
         if isinstance(state, dict):
             # Handle GraphState input (from AdaptiveSystemGraph)
             if "request" in state:
-                # Extract target from request (simplified)
                 target_entity = state.get("request", "Unknown Target")
             # Handle direct dictionary input (legacy)
             elif "target_portfolio_id" in state:
                 target_entity = state["target_portfolio_id"]
+
+            # Extract memo if available
+            credit_memo = state.get("credit_memo", {"assumptions": {"revenue_growth": 0.05, "interest_rate": 0.04}})
 
         # Initialize RedTeamState
         initial_state: RedTeamState = {
@@ -47,11 +81,13 @@ class RedTeamAgent(AgentBase):
             "scenario_type": "Macro",
             "current_scenario_description": "",
             "simulated_impact_score": 0.0,
-            "severity_threshold": 7.5,  # Target high severity
+            "severity_threshold": 7.5,  # Target high severity (0-10 scale)
             "critique_notes": [],
             "iteration_count": 0,
             "is_sufficiently_severe": False,
-            "human_readable_status": "Initiating Red Team Loop..."
+            "human_readable_status": "Initiating Red Team Loop...",
+            # Inject data for skill use
+            "data_context": {"credit_memo": credit_memo}
         }
 
         # Invoke the internal graph (Adversarial Self-Correction)
@@ -62,7 +98,8 @@ class RedTeamAgent(AgentBase):
             "critique": {
                 "feedback": final_state.get("current_scenario_description"),
                 "meets_standards": final_state.get("is_sufficiently_severe"),
-                "impact_score": final_state.get("simulated_impact_score")
+                "impact_score": final_state.get("simulated_impact_score"),
+                "skill_output": final_state.get("skill_output", {})
             },
             "human_readable_status": final_state.get("human_readable_status")
         }
@@ -71,70 +108,48 @@ class RedTeamAgent(AgentBase):
 
     async def _generate_attack_node(self, state: RedTeamState) -> Dict[str, Any]:
         """
-        Node: Generates or refines an adversarial scenario.
+        Node: Generates or refines an adversarial scenario using CounterfactualReasoningSkill.
         """
         target = state["target_entity"]
         iteration = state["iteration_count"]
         current_desc = state.get("current_scenario_description", "")
-        impact = state.get("simulated_impact_score", 0.0)
+
+        credit_memo = state.get("data_context", {}).get("credit_memo", {})
+        if not credit_memo:
+             credit_memo = {"assumptions": {"revenue_growth": 0.05, "interest_rate": 0.04}}
 
         logger.info(f"[{self.name}] Generating scenario (Iter {iteration})...")
 
-        new_desc = ""
+        # Use Skill to generate the base bear case
+        bear_case = self.skill.generate_bear_case(credit_memo)
+        new_desc = f"{bear_case['scenario']}: {bear_case['failure_catalyst']} triggered by {bear_case['inverted_assumptions']}"
 
-        # Logic Upgrade: Adversarial Self-Correction
+        # Escalation Logic: If previous iterations failed, make it worse.
         if iteration > 0 and not state["is_sufficiently_severe"]:
-            # Escalation Logic: Use LLM to generate a MORE severe version
-            prompt = f"""
-            You are a Red Team Adversary.
-            The previous scenario was: "{current_desc}"
-            The simulated impact was {impact}/10.0, which is insufficient.
-            Generate a MORE SEVERE variation of this scenario for {target}.
-            Increase volatility parameters or add a second correlated shock.
-            """
-
-            # Call LLM (using Kernel if available, else Mock)
-            if self.kernel:
-                # Assuming simple invoke support or we wrap it.
-                # For brevity/robustness in this snippet, we use a simulation if kernel complex
-                # But task says "Use the LLM".
-                try:
-                    # Mocking LLM call structure for stability in this snippet
-                    # In production: result = await self.kernel.invoke_prompt(prompt)
-                    new_desc = f"{current_desc} AND massive cyber-attack on payments infrastructure."
-                except Exception as e:
-                    logger.error(f"LLM generation failed: {e}")
-                    new_desc = f"{current_desc} (Escalated Severity via fallback logic)"
-            else:
-                new_desc = f"{current_desc} + Simultaneous Geopolitical Crisis in key markets."
-
-        else:
-            # Initial Generation
-            new_desc = f"Hypothetical 30% drop in {target} equity value due to regulatory probe."
+             new_desc = f"ESCALATED (Iter {iteration}): {new_desc} AND Secondary Liquidity Crisis."
 
         return {
             "current_scenario_description": new_desc,
             "iteration_count": iteration + 1,
-            "human_readable_status": f"Drafting scenario (Iter {iteration})"
+            "human_readable_status": f"Drafting scenario (Iter {iteration})",
+            "skill_output": bear_case
         }
 
     async def _simulate_impact_node(self, state: RedTeamState) -> Dict[str, Any]:
         """
         Node: Simulates impact.
+        In a full implementation, this would call the QuantumRiskEngine.
+        Here we use the skill's heuristic score and apply multipliers for escalation.
         """
         desc = state["current_scenario_description"]
-        iteration = state["iteration_count"]
+        skill_output = state.get("skill_output", {})
 
-        # Mock simulation: Impact increases with string length/complexity (proxy for severity)
-        # In reality, this would query the GenerativeRiskEngine
-        base_impact = 4.0
-        if "AND" in desc or "+" in desc:
-            base_impact += 3.0
-        if "Simultaneous" in desc:
-            base_impact += 2.0
+        # Use skill output if available, else fallback
+        total_impact = skill_output.get("simulated_impact_score", 0.0) / 10.0 # Scale to 0-10
 
-        # Add random noise
-        total_impact = min(10.0, base_impact + random.uniform(-0.5, 1.0))
+        # Adjust for escalation (manual boost if we added "AND Secondary Liquidity Crisis")
+        if "ESCALATED" in desc:
+            total_impact = min(10.0, total_impact * 1.5)
 
         logger.info(f"[{self.name}] Simulated Impact: {total_impact:.2f}")
 
@@ -146,6 +161,7 @@ class RedTeamAgent(AgentBase):
     async def _critique_node(self, state: RedTeamState) -> Dict[str, Any]:
         """
         Node: Checks severity threshold.
+        Acts as the 'Reflector' in the cyclical process.
         """
         impact = state["simulated_impact_score"]
         threshold = state["severity_threshold"]
@@ -158,9 +174,12 @@ class RedTeamAgent(AgentBase):
         }
 
     def _should_continue(self, state: RedTeamState) -> Literal["escalate", "finalize"]:
+        """
+        Conditional Edge: Decides whether to loop back or finish.
+        """
         if state["is_sufficiently_severe"]:
             return "finalize"
-        if state["iteration_count"] >= 3:  # Max retries
+        if state["iteration_count"] >= 3:  # Max retries to prevent infinite loops
             return "finalize"
         return "escalate"
 

@@ -1,0 +1,39 @@
+name: PromptOps Evaluation
+
+on:
+  pull_request:
+    paths:
+      - 'prompts/**'
+      - 'core/agents/templates/**'
+
+jobs:
+  evaluate-prompts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest openai
+
+      - name: Run Golden Dataset Evaluation
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          # This script would run the prompt against the golden dataset
+          # using an LLM-as-a-Judge approach.
+          # For now, we verify the dataset existence and basic structure.
+          python -c "import json; [json.loads(line) for line in open('tests/golden_dataset.jsonl')]"
+          echo "Golden Dataset validated."
+
+      - name: Run Prompt Logic Tests
+        run: |
+           # Placeholder for specific unit tests on prompt templates
+           echo "Running prompt template validation..."

@@ -1,16 +1,30 @@
-from typing import Dict, Any, List, Optional
+# core/schemas/hnasp.py
+
+from typing import List, Dict, Any, Optional
 from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
-import uuid
+
+# --- Enums / Constants ---
+
+# --- Sub-Schemas ---
+
+class SecurityContext(BaseModel):
+    user_id: str
+    clearance: str
+
+class Meta(BaseModel):
+    agent_id: str
+    trace_id: str
+    security_context: SecurityContext
 
 class EPAVector(BaseModel):
-    E: float = 0.0
-    P: float = 0.0
-    A: float = 0.0
+    E: float
+    P: float
+    A: float
 
 class Identity(BaseModel):
     label: str
-    fundamental_epa: Optional[EPAVector] = None
+    fundamental_epa: EPAVector
     transient_epa: Optional[EPAVector] = None
 
 class PersonaIdentities(BaseModel):
@@ -19,71 +33,49 @@ class PersonaIdentities(BaseModel):
 
 class PersonaDynamics(BaseModel):
     current_deflection: float = 0.0
-    target_behavior_epa: Optional[EPAVector] = None # Added for BayesACTEngine compatibility
-
-    model_config = ConfigDict(extra='allow') # Allow dynamic attributes
 
 class PersonaState(BaseModel):
     identities: PersonaIdentities
     dynamics: PersonaDynamics = Field(default_factory=PersonaDynamics)
 
-class SecurityContext(BaseModel):
-    user_id: str
-    clearance: str
-
-class Meta(BaseModel):
-    agent_id: str
-    trace_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    security_context: SecurityContext
-    timestamp: Optional[datetime] = None # Added for run_cycle compatibility
-
-    model_config = ConfigDict(extra='allow') # Allow dynamic attributes
+class LogicLayer(BaseModel):
+    engine: str = "JsonLogic"
+    active_rules: Dict[str, Any] = Field(default_factory=dict)
+    state_variables: Dict[str, Any] = Field(default_factory=dict)
+    execution_trace: List[Any] = Field(default_factory=list)
 
 class ExecutionTrace(BaseModel):
     rule_id: str
     result: Any
-    timestamp: datetime
     error: Optional[str] = None
-
-class LogicLayer(BaseModel):
-    state_variables: Dict[str, Any] = Field(default_factory=dict)
-    active_rules: Dict[str, Any] = Field(default_factory=dict)
-    execution_trace: List[ExecutionTrace] = Field(default_factory=list)
+    timestamp: datetime
 
 class Turn(BaseModel):
     role: str
     content: str
     timestamp: datetime = Field(default_factory=datetime.utcnow)
-    intent: Optional[str] = None
-    sentiment_vector: Optional[EPAVector] = None
-    internal_monologue: Optional[str] = None
-
-class ModelConfig(BaseModel):
-    model_name: str = "default"
-    temperature: float = 0.7
-
-    # Pydantic v2 config
-    model_config = ConfigDict(populate_by_name=True)
+    logic_eval: Optional[Dict[str, Any]] = None
 
 class ContextStream(BaseModel):
-    # Field alias required because code expects "turns" but tests or legacy code might populate "history"
-    history: List[Turn] = Field(default_factory=list, alias="turns")
+    turns: List[Turn] = Field(default_factory=list)
 
-    model_config = ConfigDict(populate_by_name=True, extra='allow')
+class ModelConfig(BaseModel):
+    """Configuration for the HNASP model."""
+    provider: str = "default"
+    temperature: float = 0.7
+    max_tokens: int = 1000
 
-    @property
-    def turns(self):
-        return self.history
-
-    @turns.setter
-    def turns(self, value):
-        self.history = value
+# --- Main HNASP State ---
 
 class HNASPState(BaseModel):
+    """
+    Hybrid Neurosymbolic Agent State Protocol (HNASP) Schema.
+    Treats agent state as a structured database row.
+    """
     meta: Meta
-    persona_state: PersonaState
     logic_layer: LogicLayer
+    persona_state: PersonaState
     context_stream: ContextStream
+    model_config_data: Optional[ModelConfig] = None
 
-# Alias HNASP to HNASPState for backward compatibility
-HNASP = HNASPState
+    model_config = ConfigDict(populate_by_name=True)

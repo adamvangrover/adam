@@ -5,7 +5,17 @@ import yaml
 import json
 from datetime import datetime
 import uuid
-from pythonjsonlogger import jsonlogger
+
+# Handle missing pythonjsonlogger for lightweight environments
+try:
+    from pythonjsonlogger import jsonlogger
+    JSON_LOGGER_AVAILABLE = True
+except ImportError:
+    JSON_LOGGER_AVAILABLE = False
+    # Mock class to prevent import errors in type hints or basic usage
+    class jsonlogger:
+        class JsonFormatter(logging.Formatter):
+            pass
 
 class CustomJsonFormatter(jsonlogger.JsonFormatter):
     def add_fields(self, log_record, record, message_dict):
@@ -18,6 +28,7 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
             log_record['level'] = log_record['level'].upper()
         else:
             log_record['level'] = record.levelname
+
 from typing import Dict, Any, Optional
 
 def setup_logging(config=None, default_path='config/logging.yaml', default_level=logging.INFO, env_key='LOG_CFG'):
@@ -40,18 +51,21 @@ def setup_logging(config=None, default_path='config/logging.yaml', default_level
                 logging.basicConfig(level=default_level)
     else:
         # Default to JSON logging if no config file found (Modern default)
-        handler = logging.StreamHandler()
-        formatter = CustomJsonFormatter('%(timestamp)s %(level)s %(name)s %(message)s')
-        handler.setFormatter(formatter)
         root_logger = logging.getLogger()
-        root_logger.addHandler(handler)
         root_logger.setLevel(default_level)
 
-        # Prevent duplicate logs if basicConfig was already called
-        if not root_logger.handlers:
-            logging.basicConfig(level=default_level)
+        handler = logging.StreamHandler()
 
-        logging.info("Logging configured with default JSON Formatter")
+        if JSON_LOGGER_AVAILABLE:
+            formatter = CustomJsonFormatter('%(timestamp)s %(level)s %(name)s %(message)s')
+            handler.setFormatter(formatter)
+        else:
+            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+            handler.setFormatter(formatter)
+
+        root_logger.addHandler(handler)
+
+        logging.info(f"Logging configured with {'JSON' if JSON_LOGGER_AVAILABLE else 'Standard'} Formatter")
 
 
 def get_logger(name: str) -> logging.Logger:
@@ -100,6 +114,7 @@ class TraceLogger:
 
     def get_trace(self):
         return self.steps
+
 class SwarmLogger:
     """
     Structured telemetry logger for the Agent Swarm.
@@ -133,6 +148,10 @@ class SwarmLogger:
         try:
             with open(self.log_file, "a") as f:
                 f.write(json.dumps(entry) + "\n")
+
+            # Also log to standard logging for visibility
+            logging.info(f"[{event_type}] {agent_id}: {json.dumps(details)}")
+
         except Exception as e:
             # Fallback to standard logging if file write fails
             logging.error(f"Failed to write swarm telemetry: {e}")
