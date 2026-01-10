@@ -7,28 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
 
     <style>
-        /* Base Settings */
-        body { background-color: #0f172a; }
-        
-        /* Glassmorphism Panel */
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.4);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(51, 65, 85, 0.5);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Scanline Effect */
-        .scan-line {
-            position: fixed; top: 0; left: 0; width: 100%; height: 5px;
-            background: rgba(99, 102, 241, 0.2);
-            opacity: 0.4; animation: scan 6s linear infinite; pointer-events: none; z-index: 9999;
-        }
-        @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
-
         /* Contagion Alert Animation */
         .contagion-alert {
             animation: flashRed 2s infinite;
@@ -40,14 +21,9 @@
 
         /* Graph Container */
         #network-container { width: 100%; height: 100%; background: #0b1120; }
-        
-        /* Custom Scrollbar */
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-200 font-sans overflow-hidden h-screen flex flex-col">
+<body class="bg-slate-900 text-slate-200 font-sans overflow-hidden h-screen flex flex-col grid-bg">
     <div class="scan-line"></div>
 
     <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-50 shrink-0">
@@ -98,11 +74,11 @@
                 <h3 class="text-emerald-400 font-bold font-mono uppercase mb-4 text-sm tracking-wider flex justify-between">
                     Tracked Entities <i class="fas fa-globe"></i>
                 </h3>
-                <div class="space-y-1 overflow-y-auto custom-scrollbar flex-1" id="company-list">
+                <div class="space-y-1 overflow-y-auto flex-1" id="company-list">
                     </div>
             </div>
 
-            <div id="info-panel" class="glass-panel p-5 rounded-lg flex-1 overflow-y-auto custom-scrollbar border border-slate-700/50">
+            <div id="info-panel" class="glass-panel p-5 rounded-lg flex-1 overflow-y-auto border border-slate-700/50">
                 <h3 class="text-indigo-400 font-bold font-mono uppercase mb-4 text-sm tracking-wider">Real-Time Telemetry</h3>
                 <div id="entity-details" class="space-y-4 font-mono text-xs text-slate-400">
                     <div class="flex flex-col items-center justify-center h-40 text-slate-600">
@@ -122,6 +98,17 @@
                         <i class="fas fa-chart-down text-red-500 mr-2 group-hover:scale-110 transition-transform"></i> Credit Default
                     </button>
                 </div>
+
+                <!-- Added Save Valuation Button for SPA Req -->
+                <div class="mt-4 pt-4 border-t border-slate-700">
+                    <div class="flex gap-2">
+                        <input type="number" id="valuation-input" placeholder="Valuation ($B)" class="bg-slate-900 border border-slate-700 text-xs p-2 rounded w-full text-white">
+                        <button onclick="saveValuation()" class="p-2 bg-emerald-900/50 border border-emerald-700 hover:bg-emerald-800 text-emerald-400 rounded text-xs whitespace-nowrap">
+                            <i class="fas fa-save"></i> Save
+                        </button>
+                    </div>
+                </div>
+
                 <button onclick="resetGraph()" class="w-full mt-3 py-2 border border-slate-600 text-slate-400 hover:bg-slate-700 rounded text-xs transition">
                     <i class="fas fa-undo mr-2"></i> Reset State
                 </button>
@@ -370,6 +357,25 @@
 
         function resetGraph() {
             if(currentTicker) loadEntityGraph(currentTicker);
+        }
+
+        // --- Cross Module Persistence ---
+        function saveValuation() {
+            const val = document.getElementById('valuation-input').value;
+            if(!val) return;
+
+            // Save to LocalStorage
+            localStorage.setItem('adam_valuation_' + currentTicker, val);
+
+            // Notify Parent
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'LOG',
+                    message: `Manual valuation entry for ${currentTicker}: $${val}B. Saved to local state.`,
+                    source: 'FIN_TWIN'
+                }, '*');
+            }
+            alert(`Valuation saved for ${currentTicker}`);
         }
     </script>
 </body>

@@ -1,109 +1,41 @@
-import os
+from playwright.sync_api import sync_playwright, expect
 import time
-import subprocess
-from playwright.sync_api import sync_playwright
 
-# Configuration
-PORT = 8000
-DIRECTORY = "showcase"  # The folder where your HTML files are located
-SCREENSHOT_DIR = "verification"
+def verify_showcase():
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page()
 
-def ensure_dir(directory):
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+        # Navigate to the local server
+        page.goto("http://0.0.0.0:8080/showcase/index.html")
 
-def verify_ui():
-    ensure_dir(SCREENSHOT_DIR)
-    
-    print(f"Starting local server on port {PORT} serving '{DIRECTORY}'...")
-    # Start a static file server in the background
-    # We use subprocess to keep it independent of the test thread
-    server_process = subprocess.Popen(
-        ["python3", "-m", "http.server", str(PORT)], 
-        cwd=DIRECTORY
-    )
-    
-    time.sleep(2)  # Give server time to spin up
+        # 1. Verify Shell Loads
+        print("Verifying Shell...")
+        # Use more specific locator to avoid strict mode violation
+        expect(page.locator("text=ADAM").first).to_be_visible()
+        expect(page.locator("#toggle-terminal")).to_be_visible()
 
-    try:
-        with sync_playwright() as p:
-            print("Launching Browser...")
-            browser = p.chromium.launch(headless=True)
-            page = browser.new_page()
+        # 2. Verify Initial Iframe (Mission Control)
+        print("Verifying Mission Control Iframe...")
+        iframe = page.frame_locator("#content-frame")
+        expect(iframe.locator("text=Mission Control").first).to_be_visible()
 
-            # 1. Verify Neural Dashboard
-            # --------------------------
-            print("1. Verifying Neural Dashboard...")
-            try:
-                page.goto(f"http://localhost:{PORT}/neural_dashboard.html")
-                # Wait for the specific graph canvas ID
-                page.wait_for_selector("#viz-canvas", timeout=5000)
-                # Allow animations (pulse/logs) to run briefly
-                time.sleep(2) 
-                page.screenshot(path=f"{SCREENSHOT_DIR}/1_neural_dashboard.png")
-                print("   -> Success")
-            except Exception as e:
-                print(f"   -> Failed: {e}")
+        # 3. Test Navigation to Reports
+        print("Navigating to Reports...")
+        page.click("a[href='#reports']")
+        time.sleep(1) # Allow iframe update
+        expect(iframe.locator("text=Generated Reports")).to_be_visible()
 
-            # 2. Verify Deep Dive Explorer
-            # --------------------------
-            print("2. Verifying Deep Dive Explorer...")
-            try:
-                page.goto(f"http://localhost:{PORT}/deep_dive.html")
-                # Wait for sidebar items to populate
-                page.wait_for_selector("#report-list div", timeout=5000)
-                
-                # Simulate user interaction: Click the first report
-                page.click("#report-list > div:first-child")
-                
-                # Wait for the charts (phase-widgets) to render
-                page.wait_for_selector(".phase-widget", timeout=5000)
-                time.sleep(1)
-                page.screenshot(path=f"{SCREENSHOT_DIR}/2_deep_dive.png")
-                print("   -> Success")
-            except Exception as e:
-                print(f"   -> Failed: {e}")
+        # 4. Open Terminal
+        print("Opening Terminal...")
+        page.click("#toggle-terminal")
+        expect(page.locator("#terminal-pane")).to_be_visible()
 
-            # 3. Verify Financial Digital Twin
-            # --------------------------
-            print("3. Verifying Financial Twin...")
-            try:
-                page.goto(f"http://localhost:{PORT}/financial_twin.html")
-                # Wait for Vis.js network container
-                page.wait_for_selector("#network-container", timeout=5000)
-                time.sleep(2) # Wait for physics stabilization
-                page.screenshot(path=f"{SCREENSHOT_DIR}/3_financial_twin.png")
-                print("   -> Success")
-            except Exception as e:
-                print(f"   -> Failed: {e}")
+        # 5. Take Screenshot
+        print("Taking Screenshot...")
+        page.screenshot(path="verification/showcase_final.png")
 
-            # 4. Verify Agent Registry
-            # --------------------------
-            print("4. Verifying Agent Registry...")
-            try:
-                page.goto(f"http://localhost:{PORT}/agents.html")
-                # Wait for the glass cards
-                page.wait_for_selector(".glass-panel", timeout=5000)
-                
-                # Simulate opening the terminal
-                page.click("#terminal") 
-                time.sleep(1)
-                
-                page.screenshot(path=f"{SCREENSHOT_DIR}/4_agent_registry.png")
-                print("   -> Success")
-            except Exception as e:
-                print(f"   -> Failed: {e}")
-
-            browser.close()
-            print(f"\nVerification complete. Screenshots saved to '{SCREENSHOT_DIR}/'")
-
-    except Exception as e:
-        print(f"CRITICAL ERROR: {e}")
-
-    finally:
-        # Always kill the server, even if tests fail
-        print("Shutting down server...")
-        server_process.terminate()
+        browser.close()
 
 if __name__ == "__main__":
-    verify_ui()
+    verify_showcase()

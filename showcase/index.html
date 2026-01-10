@@ -3,176 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM System | Mission Control</title>
+    <title>ADAM v23.0 | Integrated Financial Intelligence Platform</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Marked (Markdown) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Prism (Code Highlight) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+
+    <!-- Custom Styles -->
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .stat-card {
-            background: rgba(30, 41, 59, 0.4);
-            border-left: 4px solid #3b82f6;
+        /* Shell specific overrides */
+        body { overflow: hidden; } /* Shell handles scrolling */
+        .sidebar-link.active {
+            background-color: rgba(6, 182, 212, 0.1);
+            color: #22d3ee; /* cyan-400 */
+            border-right: 2px solid #22d3ee;
+        }
+        #terminal-pane {
+            transition: height 0.3s ease-in-out;
         }
     </style>
 </head>
-<body class="h-screen flex flex-col grid-bg">
-    <div class="scan-line"></div>
+<body class="bg-slate-950 text-slate-200 font-sans h-screen flex flex-col">
 
-    <!-- Nav will be injected by nav.js -->
-
-    <!-- Main Content -->
-    <main class="flex-1 p-6 grid grid-cols-12 gap-6 overflow-y-auto">
-
-        <!-- Welcome Banner -->
-        <div class="col-span-12 glass-panel p-6 rounded-lg border-l-4 border-cyan-500">
-            <h2 class="text-3xl font-bold text-white mb-2 font-mono">WELCOME BACK, OPERATOR.</h2>
-            <p class="text-slate-400 max-w-2xl">
-                The Adam v23.0 Adaptive System is online. This dashboard provides real-time oversight of the Neuro-Symbolic Hybrid architecture, monitoring the interplay between the message-driven "Body" and the graph-based "Brain".
-            </p>
-        </div>
-
-        <!-- System Status -->
-        <div class="col-span-12 lg:col-span-8 grid grid-cols-1 md:grid-cols-4 gap-4 h-min">
-            <div class="glass-panel p-4 rounded border-t-2 border-blue-500 hover-card">
-                <h3 class="text-slate-400 text-xs uppercase font-bold tracking-wider">CPU Load</h3>
-                <div class="text-3xl font-bold text-white mt-1 font-mono" id="cpu-stat">--%</div>
-                <div class="w-full bg-slate-700 h-1 mt-3 rounded overflow-hidden">
-                    <div class="bg-blue-500 h-1 rounded transition-all duration-500" style="width: 0%" id="cpu-bar"></div>
-                </div>
+    <!-- Top Bar -->
+    <header class="h-14 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-4 shrink-0 z-20">
+        <div class="flex items-center space-x-4">
+            <div class="text-cyan-500 font-bold text-xl tracking-tighter flex items-center">
+                <i class="fas fa-cube mr-2"></i> ADAM <span class="text-slate-500 text-xs ml-2 font-mono">v23.5</span>
             </div>
-            <div class="glass-panel p-4 rounded border-t-2 border-purple-500 hover-card">
-                <h3 class="text-slate-400 text-xs uppercase font-bold tracking-wider">Memory</h3>
-                <div class="text-3xl font-bold text-white mt-1 font-mono" id="mem-stat">--%</div>
-                <div class="w-full bg-slate-700 h-1 mt-3 rounded overflow-hidden">
-                    <div class="bg-purple-500 h-1 rounded transition-all duration-500" style="width: 0%" id="mem-bar"></div>
-                </div>
-            </div>
-            <div class="glass-panel p-4 rounded border-t-2 border-emerald-500 hover-card">
-                <h3 class="text-slate-400 text-xs uppercase font-bold tracking-wider">Active Agents</h3>
-                <div class="text-3xl font-bold text-white mt-1 font-mono" id="agent-stat">--</div>
-                <div class="text-xs text-emerald-400 mt-2 flex items-center">
-                    <span class="w-2 h-2 bg-emerald-500 rounded-full mr-2 animate-pulse"></span> Optimal
-                </div>
-            </div>
-             <div class="glass-panel p-4 rounded border-t-2 border-amber-500 hover-card">
-                <h3 class="text-slate-400 text-xs uppercase font-bold tracking-wider">Risk Level</h3>
-                <div class="text-3xl font-bold text-white mt-1 font-mono">LOW</div>
-                <div class="text-xs text-amber-400 mt-2">Market Stability: 92%</div>
+
+            <!-- Global Search -->
+            <div class="relative hidden md:block group">
+                <i class="fas fa-search absolute left-3 top-2.5 text-slate-500 text-sm group-focus-within:text-cyan-500 transition"></i>
+                <input type="text" id="global-search" placeholder="Search Repository..."
+                    class="bg-slate-800 border border-slate-700 text-slate-300 text-sm rounded-full pl-9 pr-4 py-1.5 focus:outline-none focus:border-cyan-500 w-64 transition-all focus:w-96 shadow-inner">
+                <!-- Search Results Dropdown -->
+                <div id="search-results" class="hidden absolute top-full left-0 w-full mt-2 bg-slate-900 border border-slate-700 rounded-lg shadow-xl max-h-96 overflow-y-auto z-50 custom-scrollbar"></div>
             </div>
         </div>
 
-        <!-- System Logs -->
-        <div class="col-span-12 lg:col-span-4 glass-panel rounded p-4 font-mono text-xs overflow-hidden flex flex-col h-64 lg:h-auto border border-slate-700">
-            <div class="flex justify-between items-center mb-2 border-b border-slate-700 pb-2">
-                <h3 class="text-slate-400 uppercase font-bold">Event Stream</h3>
-                <span class="text-[10px] bg-slate-800 px-1 rounded text-slate-500">LIVE</span>
+        <div class="flex items-center space-x-4">
+            <!-- Mode Toggle -->
+            <button id="mode-toggle" class="text-xs font-mono font-bold text-slate-400 hover:text-white border border-slate-700 bg-slate-800 px-3 py-1 rounded transition flex items-center">
+                <i class="fas fa-cube mr-1"></i> STATIC
+            </button>
+            <div id="mode-indicator" class="w-2 h-2 rounded-full bg-slate-500"></div>
+
+            <div class="h-6 w-px bg-slate-800 mx-2"></div>
+
+            <button id="toggle-terminal" class="text-slate-400 hover:text-cyan-400 text-sm font-mono flex items-center transition" title="Toggle Terminal">
+                <i class="fas fa-terminal mr-2"></i> <span class="hidden sm:inline">TERMINAL</span>
+            </button>
+
+            <img src="https://ui-avatars.com/api/?name=Admin&background=0f172a&color=22d3ee" class="w-8 h-8 rounded border border-slate-700 p-0.5 ml-2 hover:border-cyan-500 transition cursor-pointer">
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-16 md:w-64 bg-slate-900 border-r border-slate-800 flex flex-col shrink-0 transition-all duration-300 group">
+            <div class="flex-1 overflow-y-auto py-4 space-y-1 custom-scrollbar">
+                <div class="px-4 text-[10px] font-bold text-slate-600 uppercase tracking-wider mb-2 hidden md:block mt-2">Core Modules</div>
+
+                <a href="#mission_control" class="sidebar-link active flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-cyan-400 transition cursor-pointer" data-target="mission_control.html">
+                    <i class="fas fa-tachometer-alt w-6 text-center"></i>
+                    <span class="ml-3 font-medium hidden md:block text-sm">Mission Control</span>
+                </a>
+
+                <a href="#neural_dashboard" class="sidebar-link flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-purple-400 transition cursor-pointer" data-target="neural_dashboard.html">
+                    <i class="fas fa-project-diagram w-6 text-center"></i>
+                    <span class="ml-3 font-medium hidden md:block text-sm">Neural Dashboard</span>
+                </a>
+
+                <a href="#deep_dive" class="sidebar-link flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-blue-400 transition cursor-pointer" data-target="deep_dive.html">
+                    <i class="fas fa-search-dollar w-6 text-center"></i>
+                    <span class="ml-3 font-medium hidden md:block text-sm">Deep Dive Analyst</span>
+                </a>
+
+                <a href="#financial_twin" class="sidebar-link flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-emerald-400 transition cursor-pointer" data-target="financial_twin.html">
+                    <i class="fas fa-globe w-6 text-center"></i>
+                    <span class="ml-3 font-medium hidden md:block text-sm">Financial Twin</span>
+                </a>
+
+                <div class="mt-6 px-4 text-[10px] font-bold text-slate-600 uppercase tracking-wider mb-2 hidden md:block">Knowledge Base</div>
+
+                <a href="#agents" class="sidebar-link flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-amber-400 transition cursor-pointer" data-target="agents.html">
+                    <i class="fas fa-robot w-6 text-center"></i>
+                    <span class="ml-3 font-medium hidden md:block text-sm">Agent Registry</span>
+                </a>
+
+                <a href="#reports" class="sidebar-link flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-rose-400 transition cursor-pointer" data-target="reports.html">
+                    <i class="fas fa-file-alt w-6 text-center"></i>
+                    <span class="ml-3 font-medium hidden md:block text-sm">The Vault (Reports)</span>
+                </a>
+
+                <a href="#prompts" class="sidebar-link flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-indigo-400 transition cursor-pointer" data-target="prompts.html">
+                    <i class="fas fa-code w-6 text-center"></i>
+                    <span class="ml-3 font-medium hidden md:block text-sm">Prompt Library</span>
+                </a>
+
+                <a href="#repository" class="sidebar-link flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-teal-400 transition cursor-pointer" data-target="repository.html">
+                    <i class="fas fa-folder-tree w-6 text-center"></i>
+                    <span class="ml-3 font-medium hidden md:block text-sm">Repo Browser</span>
+                </a>
             </div>
-            <div id="logs" class="flex-1 overflow-y-auto space-y-2 text-cyan-400">
-                <div>> [INIT] Loading core protocols...</div>
+
+            <!-- Footer -->
+            <div class="p-4 border-t border-slate-800 hidden md:block bg-slate-900/50">
+                <div class="text-[10px] text-slate-600 uppercase font-bold mb-1">System Status</div>
+                <div class="flex items-center text-xs font-mono text-emerald-500">
+                    <div class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2 animate-pulse"></div>
+                    Operational
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col relative bg-slate-950 overflow-hidden">
+            <!-- Iframe Container -->
+            <iframe id="content-frame" class="w-full h-full border-none bg-slate-950" src="mission_control.html" title="Module Content"></iframe>
+
+            <!-- Terminal Pane (Overlay or Bottom) -->
+            <div id="terminal-pane" class="h-0 bg-slate-900 border-t border-slate-700 absolute bottom-0 w-full flex flex-col overflow-hidden z-30 shadow-[0_-5px_25px_rgba(0,0,0,0.8)] backdrop-blur-md">
+                <div class="flex items-center justify-between px-4 py-1 bg-slate-800 border-b border-slate-700 select-none">
+                    <div class="text-xs font-mono text-slate-400 uppercase flex items-center">
+                        <i class="fas fa-terminal mr-2 text-slate-500"></i> Adam System Console
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button id="clear-terminal" class="text-slate-500 hover:text-white text-xs transition"><i class="fas fa-ban mr-1"></i> Clear</button>
+                        <button id="close-terminal" class="text-slate-500 hover:text-white text-xs transition"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <div id="terminal-content" class="flex-1 p-4 font-mono text-xs text-green-400 overflow-y-auto space-y-1 bg-black/50 custom-scrollbar">
+                    <div><span class="text-slate-500">[SYSTEM]</span> Initializing Adam v23.0 Shell...</div>
+                    <div><span class="text-slate-500">[SYSTEM]</span> Loading repository index...</div>
+                </div>
+                <!-- Input Line -->
+                <div class="px-4 py-2 bg-slate-900 flex items-center border-t border-slate-800">
+                    <span class="text-green-500 mr-2 font-bold">➜</span>
+                    <input type="text" id="terminal-input" class="bg-transparent border-none focus:outline-none text-slate-200 text-xs font-mono w-full placeholder-slate-600" placeholder="Enter command or natural language query...">
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Universal Viewer Modal -->
+    <div id="universal-viewer" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-panel-dark rounded-lg shadow-2xl w-full max-w-6xl h-[85vh] flex flex-col overflow-hidden animate-fade-in border border-slate-700">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-700 bg-slate-900/90">
+                <div class="flex items-center">
+                    <i id="viewer-icon" class="fas fa-file-code text-cyan-500 mr-4 text-2xl"></i>
+                    <div>
+                        <h3 id="viewer-title" class="text-lg font-bold text-white font-mono">filename.ext</h3>
+                        <p id="viewer-meta" class="text-xs text-slate-400 font-mono">/path/to/file • 12KB</p>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <button class="text-slate-400 hover:text-white px-3 py-1 rounded hover:bg-slate-800 transition" onclick="window.shell.closeViewer()">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="flex-1 overflow-auto bg-[#0d1117] custom-scrollbar relative" id="viewer-body">
+                <!-- Content injected here -->
+                <div class="flex items-center justify-center h-full text-slate-500">
+                    <i class="fas fa-circle-notch fa-spin text-3xl"></i>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="px-6 py-3 border-t border-slate-700 flex justify-between items-center bg-slate-900/90">
+                <div class="flex space-x-4">
+                    <button class="text-xs text-slate-400 hover:text-white flex items-center transition">
+                        <i class="fas fa-download mr-1"></i> Download
+                    </button>
+                    <button class="text-xs text-slate-400 hover:text-white flex items-center transition">
+                        <i class="fas fa-copy mr-1"></i> Copy Path
+                    </button>
+                </div>
+                <div class="text-[10px] text-slate-500 font-mono uppercase tracking-wider">READ ONLY MODE</div>
             </div>
         </div>
+    </div>
 
-        <!-- Architecture Quick Access -->
-        <div class="col-span-12 glass-panel rounded p-6">
-            <h2 class="text-xl mb-6 font-semibold text-white flex items-center">
-                <span class="w-1 h-6 bg-cyan-500 mr-3 rounded"></span> System Modules
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- v21 -->
-                <div class="p-5 bg-slate-800/50 rounded-lg hover:bg-slate-700 transition cursor-pointer border border-slate-700 hover:border-blue-500 group" onclick="window.location.href='reports.html'">
-                    <div class="flex justify-between items-start">
-                         <h3 class="text-lg font-bold text-slate-200 group-hover:text-blue-400 transition">v21.0 Synchronous</h3>
-                         <span class="text-xs font-mono bg-blue-900/30 text-blue-400 px-2 py-1 rounded">LEGACY</span>
-                    </div>
-                    <p class="text-sm text-slate-400 mt-3 leading-relaxed">Structured Orchestration Core. Handles deterministic financial reporting and baseline analysis.</p>
-                </div>
-                <!-- v22 -->
-                <div class="p-5 bg-slate-800/50 rounded-lg hover:bg-slate-700 transition cursor-pointer border border-slate-700 hover:border-purple-500 group" onclick="window.location.href='agents.html'">
-                    <div class="flex justify-between items-start">
-                         <h3 class="text-lg font-bold text-slate-200 group-hover:text-purple-400 transition">v22.0 Asynchronous</h3>
-                         <span class="text-xs font-mono bg-purple-900/30 text-purple-400 px-2 py-1 rounded">ACTIVE</span>
-                    </div>
-                    <p class="text-sm text-slate-400 mt-3 leading-relaxed">Message-Driven Bus (RabbitMQ/In-Memory). High throughput agent communication and task distribution.</p>
-                </div>
-                <!-- v23 -->
-                <div class="p-5 bg-slate-800/50 rounded-lg hover:bg-slate-700 transition cursor-pointer border border-slate-700 hover:border-cyan-500 group relative overflow-hidden" onclick="window.location.href='neural_dashboard.html'">
-                    <div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition">
-                         <svg class="w-16 h-16 text-cyan-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4zM2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path></svg>
-                    </div>
-                    <div class="flex justify-between items-start">
-                         <h3 class="text-lg font-bold text-slate-200 group-hover:text-cyan-400 transition">v23.0 Adaptive</h3>
-                         <span class="text-xs font-mono bg-cyan-900/30 text-cyan-400 px-2 py-1 rounded animate-pulse">NEURO-SYMBOLIC</span>
-                    </div>
-                    <p class="text-sm text-slate-400 mt-3 leading-relaxed">Cyclical Reasoning Graph (LangGraph). Self-correcting logic, planning, and adaptive execution.</p>
-                    <div class="mt-4 flex items-center text-xs text-cyan-500 font-bold uppercase tracking-wider">
-                        Enter Neural Dashboard <span class="ml-2">&rarr;</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
+    <!-- Scripts -->
     <script src="js/mock_data.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/nav.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const logs = document.getElementById('logs');
-            const logMsg = (msg, type='INFO') => {
-                const div = document.createElement('div');
-                div.className = "hover:bg-slate-800 p-1 rounded transition";
-                const time = new Date().toLocaleTimeString('en-US', {hour12: false});
-
-                let color = 'text-cyan-400';
-                if(type === 'WARN') color = 'text-amber-400';
-                if(type === 'ERROR') color = 'text-red-400';
-                if(type === 'SUCCESS') color = 'text-emerald-400';
-
-                div.innerHTML = `<span class="text-slate-600 mr-2">[${time}]</span> <span class="${color}">> ${msg}</span>`;
-                logs.appendChild(div);
-                logs.scrollTop = logs.scrollHeight;
-            };
-
-            logMsg("Initializing Mission Control Interface...", "INFO");
-            await window.dataManager.init();
-
-            if (window.dataManager.useApi) {
-                logMsg("Connected to Live Backend API.", "SUCCESS");
-            } else {
-                logMsg("Backend offline. Loaded static dataset.", "WARN");
-            }
-
-            const updateStats = () => {
-                const stats = window.dataManager.getSystemStats();
-                document.getElementById('cpu-stat').textContent = `${stats.cpu_usage || 12}%`;
-                document.getElementById('cpu-bar').style.width = `${stats.cpu_usage || 12}%`;
-
-                document.getElementById('mem-stat').textContent = `${stats.memory_usage || 34}%`;
-                document.getElementById('mem-bar').style.width = `${stats.memory_usage || 34}%`;
-
-                document.getElementById('agent-stat').textContent = stats.active_tasks || 8;
-
-                // Random mock logs
-                const mockActions = [
-                    "SNC_Analyst_Agent polling credit_sentry_queue...",
-                    "Market_Sentiment_Agent analyzing TSLA news...",
-                    "Risk_Assessment_Agent calculating VaR...",
-                    "Heartbeat signal received from Orchestrator.",
-                    "Memory cleanup cycle completed.",
-                    "Knowledge Graph updated: 12 new nodes."
-                ];
-
-                if(Math.random() > 0.7) {
-                    logMsg(mockActions[Math.floor(Math.random() * mockActions.length)], "INFO");
-                }
-            };
-
-            updateStats();
-
-            // Simulation loop
-            setInterval(() => {
-                updateStats();
-            }, 3000);
-        });
-    </script>
+    <script src="js/shell.js"></script>
 </body>
 </html>

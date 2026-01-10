@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM System | Mission Control</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .stat-card {
+            background: rgba(30, 41, 59, 0.4);
+            border-left: 4px solid #3b82f6;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col grid-bg">
+    <div class="scan-line"></div>
+
+    <!-- Nav will be injected by nav.js -->
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 grid grid-cols-12 gap-6 overflow-y-auto">
+
+        <!-- Welcome Banner -->
+        <div class="col-span-12 glass-panel p-6 rounded-lg border-l-4 border-cyan-500">
+            <h2 class="text-3xl font-bold text-white mb-2 font-mono">WELCOME BACK, OPERATOR.</h2>
+            <p class="text-slate-400 max-w-2xl">
+                The Adam v23.0 Adaptive System is online. This dashboard provides real-time oversight of the Neuro-Symbolic Hybrid architecture, monitoring the interplay between the message-driven "Body" and the graph-based "Brain".
+            </p>
+        </div>
+
+        <!-- System Status -->
+        <div class="col-span-12 lg:col-span-8 grid grid-cols-1 md:grid-cols-4 gap-4 h-min">
+            <div class="glass-panel p-4 rounded border-t-2 border-blue-500 hover-card">
+                <h3 class="text-slate-400 text-xs uppercase font-bold tracking-wider">CPU Load</h3>
+                <div class="text-3xl font-bold text-white mt-1 font-mono" id="cpu-stat">--%</div>
+                <div class="w-full bg-slate-700 h-1 mt-3 rounded overflow-hidden">
+                    <div class="bg-blue-500 h-1 rounded transition-all duration-500" style="width: 0%" id="cpu-bar"></div>
+                </div>
+            </div>
+            <div class="glass-panel p-4 rounded border-t-2 border-purple-500 hover-card">
+                <h3 class="text-slate-400 text-xs uppercase font-bold tracking-wider">Memory</h3>
+                <div class="text-3xl font-bold text-white mt-1 font-mono" id="mem-stat">--%</div>
+                <div class="w-full bg-slate-700 h-1 mt-3 rounded overflow-hidden">
+                    <div class="bg-purple-500 h-1 rounded transition-all duration-500" style="width: 0%" id="mem-bar"></div>
+                </div>
+            </div>
+            <div class="glass-panel p-4 rounded border-t-2 border-emerald-500 hover-card">
+                <h3 class="text-slate-400 text-xs uppercase font-bold tracking-wider">Active Agents</h3>
+                <div class="text-3xl font-bold text-white mt-1 font-mono" id="agent-stat">--</div>
+                <div class="text-xs text-emerald-400 mt-2 flex items-center">
+                    <span class="w-2 h-2 bg-emerald-500 rounded-full mr-2 animate-pulse"></span> Optimal
+                </div>
+            </div>
+             <div class="glass-panel p-4 rounded border-t-2 border-amber-500 hover-card">
+                <h3 class="text-slate-400 text-xs uppercase font-bold tracking-wider">Risk Level</h3>
+                <div class="text-3xl font-bold text-white mt-1 font-mono">LOW</div>
+                <div class="text-xs text-amber-400 mt-2">Market Stability: 92%</div>
+            </div>
+        </div>
+
+        <!-- System Logs -->
+        <div class="col-span-12 lg:col-span-4 glass-panel rounded p-4 font-mono text-xs overflow-hidden flex flex-col h-64 lg:h-auto border border-slate-700">
+            <div class="flex justify-between items-center mb-2 border-b border-slate-700 pb-2">
+                <h3 class="text-slate-400 uppercase font-bold">Event Stream</h3>
+                <span class="text-[10px] bg-slate-800 px-1 rounded text-slate-500">LIVE</span>
+            </div>
+            <div id="logs" class="flex-1 overflow-y-auto space-y-2 text-cyan-400">
+                <div>> [INIT] Loading core protocols...</div>
+            </div>
+        </div>
+
+        <!-- Architecture Quick Access -->
+        <div class="col-span-12 glass-panel rounded p-6">
+            <h2 class="text-xl mb-6 font-semibold text-white flex items-center">
+                <span class="w-1 h-6 bg-cyan-500 mr-3 rounded"></span> System Modules
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- v21 -->
+                <div class="p-5 bg-slate-800/50 rounded-lg hover:bg-slate-700 transition cursor-pointer border border-slate-700 hover:border-blue-500 group" onclick="window.parent.location.hash='#reports'">
+                    <div class="flex justify-between items-start">
+                         <h3 class="text-lg font-bold text-slate-200 group-hover:text-blue-400 transition">v21.0 Synchronous</h3>
+                         <span class="text-xs font-mono bg-blue-900/30 text-blue-400 px-2 py-1 rounded">LEGACY</span>
+                    </div>
+                    <p class="text-sm text-slate-400 mt-3 leading-relaxed">Structured Orchestration Core. Handles deterministic financial reporting and baseline analysis.</p>
+                </div>
+                <!-- v22 -->
+                <div class="p-5 bg-slate-800/50 rounded-lg hover:bg-slate-700 transition cursor-pointer border border-slate-700 hover:border-purple-500 group" onclick="window.parent.location.hash='#agents'">
+                    <div class="flex justify-between items-start">
+                         <h3 class="text-lg font-bold text-slate-200 group-hover:text-purple-400 transition">v22.0 Asynchronous</h3>
+                         <span class="text-xs font-mono bg-purple-900/30 text-purple-400 px-2 py-1 rounded">ACTIVE</span>
+                    </div>
+                    <p class="text-sm text-slate-400 mt-3 leading-relaxed">Message-Driven Bus (RabbitMQ/In-Memory). High throughput agent communication and task distribution.</p>
+                </div>
+                <!-- v23 -->
+                <div class="p-5 bg-slate-800/50 rounded-lg hover:bg-slate-700 transition cursor-pointer border border-slate-700 hover:border-cyan-500 group relative overflow-hidden" onclick="window.parent.location.hash='#neural_dashboard'">
+                    <div class="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition">
+                         <svg class="w-16 h-16 text-cyan-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4zM2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path></svg>
+                    </div>
+                    <div class="flex justify-between items-start">
+                         <h3 class="text-lg font-bold text-slate-200 group-hover:text-cyan-400 transition">v23.0 Adaptive</h3>
+                         <span class="text-xs font-mono bg-cyan-900/30 text-cyan-400 px-2 py-1 rounded animate-pulse">NEURO-SYMBOLIC</span>
+                    </div>
+                    <p class="text-sm text-slate-400 mt-3 leading-relaxed">Cyclical Reasoning Graph (LangGraph). Self-correcting logic, planning, and adaptive execution.</p>
+                    <div class="mt-4 flex items-center text-xs text-cyan-500 font-bold uppercase tracking-wider">
+                        Enter Neural Dashboard <span class="ml-2">&rarr;</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="js/mock_data.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/nav.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const logs = document.getElementById('logs');
+            const logMsg = (msg, type='INFO') => {
+                const div = document.createElement('div');
+                div.className = "hover:bg-slate-800 p-1 rounded transition";
+                const time = new Date().toLocaleTimeString('en-US', {hour12: false});
+
+                let color = 'text-cyan-400';
+                if(type === 'WARN') color = 'text-amber-400';
+                if(type === 'ERROR') color = 'text-red-400';
+                if(type === 'SUCCESS') color = 'text-emerald-400';
+
+                div.innerHTML = `<span class="text-slate-600 mr-2">[${time}]</span> <span class="${color}">> ${msg}</span>`;
+                logs.appendChild(div);
+                logs.scrollTop = logs.scrollHeight;
+
+                // Also send to parent shell
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({ type: 'LOG', message: msg, source: 'MISSION' }, '*');
+                }
+            };
+
+            logMsg("Initializing Mission Control Interface...", "INFO");
+            await window.dataManager.init();
+
+            if (window.dataManager.useApi) {
+                logMsg("Connected to Live Backend API.", "SUCCESS");
+            } else {
+                logMsg("Backend offline. Loaded static dataset.", "WARN");
+            }
+
+            const updateStats = () => {
+                const stats = window.dataManager.getSystemStats();
+                document.getElementById('cpu-stat').textContent = `${stats.cpu_usage || 12}%`;
+                document.getElementById('cpu-bar').style.width = `${stats.cpu_usage || 12}%`;
+
+                document.getElementById('mem-stat').textContent = `${stats.memory_usage || 34}%`;
+                document.getElementById('mem-bar').style.width = `${stats.memory_usage || 34}%`;
+
+                document.getElementById('agent-stat').textContent = stats.active_tasks || 8;
+
+                // Random mock logs
+                const mockActions = [
+                    "SNC_Analyst_Agent polling credit_sentry_queue...",
+                    "Market_Sentiment_Agent analyzing TSLA news...",
+                    "Risk_Assessment_Agent calculating VaR...",
+                    "Heartbeat signal received from Orchestrator.",
+                    "Memory cleanup cycle completed.",
+                    "Knowledge Graph updated: 12 new nodes."
+                ];
+
+                if(Math.random() > 0.7) {
+                    logMsg(mockActions[Math.floor(Math.random() * mockActions.length)], "INFO");
+                }
+            };
+
+            updateStats();
+
+            // Simulation loop
+            setInterval(() => {
+                updateStats();
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

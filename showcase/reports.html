@@ -10,11 +10,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+         /* Hide sidebar on small screens or inside iframes with limited width */
+        @media (max-width: 640px) {
+            aside { display: none; }
+        }
+    </style>
 </head>
 <body class="h-screen flex flex-col grid-bg text-slate-300">
-    <div class="scan-line"></div>
-
-    <!-- Nav injected by nav.js -->
+    <!-- No Nav - It is injected by shell or ignored if iframe -->
 
     <main class="flex-1 flex overflow-hidden">
         <!-- Sidebar: Report List -->
@@ -55,8 +59,8 @@
 
     <script src="js/mock_data.js"></script>
     <script src="js/app.js"></script>
-    <script src="js/nav.js"></script>
     <script>
+        // No Nav.js needed if inside shell
         let currentReportData = null;
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -126,6 +130,11 @@
 
             titleEl.textContent = report.title || report.file_name || "Report Details";
             contentEl.innerHTML = ''; // Clear previous
+
+            // Log action to parent shell
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({ type: 'LOG', message: `Opened report: ${titleEl.textContent}`, source: 'VAULT' }, '*');
+            }
 
             // Handle different report types
             if (report.error) {

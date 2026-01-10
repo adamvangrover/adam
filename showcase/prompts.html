@@ -8,8 +8,7 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="h-screen flex flex-col grid-bg text-slate-200">
-    <div class="scan-line"></div>
-    <!-- Nav via nav.js -->
+    <!-- No Nav - shell handles navigation -->
 
     <main class="flex-1 p-8 overflow-y-auto grid grid-cols-12 gap-6">
 
@@ -43,8 +42,8 @@
                     <span class="text-xs text-slate-500 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">READ ONLY</span>
                 </div>
                 <div class="flex space-x-3 text-xs font-mono">
-                    <button class="text-slate-400 hover:text-white" onclick="alert('Copy function mock')">COPY</button>
-                    <button class="text-slate-400 hover:text-white" onclick="alert('History function mock')">HISTORY</button>
+                    <button id="copy-btn" class="text-slate-400 hover:text-white transition">COPY</button>
+                    <button id="run-btn" class="text-slate-400 hover:text-cyan-400 transition flex items-center"><i class="fas fa-play mr-1"></i> RUN AS CODE</button>
                 </div>
             </div>
 
@@ -66,7 +65,6 @@
 
     <script src="js/mock_data.js"></script>
     <script src="js/app.js"></script>
-    <script src="js/nav.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
              const data = window.MOCK_DATA || {};
@@ -131,6 +129,31 @@
                 .replace(/---/g, '<span class="text-slate-500">---</span>');
 
             container.innerHTML = `<pre>${html}</pre>`;
+
+            // Wire up buttons
+            const copyBtn = document.getElementById('copy-btn');
+            copyBtn.onclick = () => {
+                navigator.clipboard.writeText(content);
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = "COPIED!";
+                setTimeout(() => copyBtn.textContent = originalText, 2000);
+            };
+
+            const runBtn = document.getElementById('run-btn');
+            runBtn.onclick = () => {
+                 if (window.parent && window.parent !== window) {
+                     window.parent.postMessage({ type: 'LOG', message: `Executing prompt template: ${item.path}`, source: 'AOPL' }, '*');
+
+                     // Simulate sending to terminal
+                     // We can also ask the parent to execute a command
+                     window.parent.shell.processCommand(`agent start --prompt ${item.path}`);
+                     // Note: window.parent.shell might not be accessible due to cross-origin if configured strictly, but typically works in same origin
+                     // Better to use postMessage if we implemented a listener for commands there.
+                     // But here we'll just log for visual effect.
+                } else {
+                    alert("Run as Code: Would execute this prompt in the Agent environment.");
+                }
+            };
         }
     </script>
 </body>

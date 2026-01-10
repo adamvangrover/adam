@@ -6,27 +6,8 @@
     <title>ADAM v23 | Agent Registry</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
+    <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Base styles */
-        body { background-color: #0f172a; }
-        
-        /* CRT Scanline effect */
-        .scan-line {
-            position: fixed; top: 0; left: 0; width: 100%; height: 5px;
-            background: rgba(16, 185, 129, 0.1);
-            opacity: 0.4; animation: scan 6s linear infinite; pointer-events: none; z-index: 9999;
-        }
-        @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
-
-        /* Glassmorphism Panel */
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.4);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        }
-
         /* Slide-up Terminal */
         .terminal-overlay {
             position: fixed; bottom: 0; left: 0; width: 100%;
@@ -39,22 +20,13 @@
             transform: translateY(100%); /* Hidden by default */
         }
         .terminal-overlay.open { transform: translateY(0); }
-        
-        /* Scrollbar styling */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-200 font-sans h-screen flex flex-col overflow-hidden">
+<body class="bg-slate-900 text-slate-200 font-sans h-screen flex flex-col overflow-hidden grid-bg">
     <div class="scan-line"></div>
 
     <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 shrink-0">
         <div class="flex items-center gap-4">
-            <button id="nav-toggle" class="text-slate-400 hover:text-white transition">
-                <i class="fas fa-bars"></i>
-            </button>
             <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-emerald-400">v23</span> <span class="text-slate-500 font-normal">| Agent Registry</span></h1>
         </div>
         <div class="flex gap-4 font-mono text-xs text-slate-400 hidden md:flex">
@@ -81,6 +53,7 @@
         </div>
     </main>
 
+    <!-- Internal Terminal Overlay (Specific to Agent Registry) -->
     <div id="terminal" class="terminal-overlay flex flex-col font-mono text-sm shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
         <div class="h-10 bg-slate-800 flex items-center justify-between px-4 border-b border-slate-700 cursor-pointer hover:bg-slate-750 transition" onclick="toggleTerminal()">
             <div class="flex items-center gap-2">
@@ -95,6 +68,7 @@
         </div>
     </div>
 
+    <script src="js/mock_data.js"></script>
     <script>
         // -- DATA & STATE --
         let allAgents = [];

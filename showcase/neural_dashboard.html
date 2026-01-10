@@ -7,28 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
     
     <style>
-        /* Base styles */
-        body { background-color: #0f172a; color: #e2e8f0; }
-        
-        /* Glassmorphism */
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.4);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(51, 65, 85, 0.5);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Scanline Effect */
-        .scan-line {
-            position: fixed; top: 0; left: 0; width: 100%; height: 5px;
-            background: rgba(16, 185, 129, 0.1);
-            opacity: 0.4; animation: scan 6s linear infinite; pointer-events: none; z-index: 9999;
-        }
-        @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
-
         /* Vis.js Customization */
         #viz-canvas { width: 100%; height: 100%; outline: none; }
         .vis-tooltip {
@@ -45,7 +26,7 @@
         .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden font-sans">
+<body class="h-screen flex flex-col overflow-hidden font-sans grid-bg">
 
     <div class="scan-line"></div>
 
@@ -134,9 +115,9 @@
 
     </main>
 
+    <script src="js/mock_data.js"></script>
     <script>
         // --- DATA DEFINITIONS ---
-        // Merged from both branches to ensure all graphs work
         const GRAPHS = {
             'SNC': {
                 title: "Shared National Credit (SNC) Analysis",
@@ -334,9 +315,9 @@
             div.className = `${colorClass} border-l-2 ${borderClass} pl-2 text-xs font-mono animate-fade-in`;
             div.innerHTML = `<span class="opacity-50">[${time}]</span> ${msg}`;
 
-            const container = document.getElementById('log-container');
-            container.appendChild(div);
-            container.scrollTop = container.scrollHeight;
+            const logContainer = document.getElementById('log-container');
+            logContainer.appendChild(div);
+            logContainer.scrollTop = logContainer.scrollHeight;
         }
 
         function runVisualAnimation(nodes) {
@@ -362,22 +343,16 @@
         }
 
         // --- INITIALIZATION ---
-        // Shim for dataManager if app.js fails to load or mock_data is missing
-        window.dataManager = window.dataManager || {
-            init: async () => Promise.resolve(),
-            getSystemStats: () => ({ memory_usage: "14.5" })
-        };
 
         window.addEventListener('load', () => {
-            // Load stats (using shim or real)
-            window.dataManager.init().then(() => {
-                const stats = window.dataManager.getSystemStats ? window.dataManager.getSystemStats() : { memory_usage: "14.2" };
-                document.getElementById('mem-usage').innerText = (stats.memory_usage || "14.2") + " GB";
-            });
+            // Stats
+            const mem = document.getElementById('mem-usage');
+            if(mem) mem.innerText = "14.2 GB";
             
             // Randomize Ops Rate
             setInterval(() => {
-                 document.getElementById('ops-rate').innerText = Math.floor(2000 + Math.random() * 500) + " /s";
+                 const ops = document.getElementById('ops-rate');
+                 if(ops) ops.innerText = Math.floor(2000 + Math.random() * 500) + " /s";
             }, 1000);
 
             // Load default graph
