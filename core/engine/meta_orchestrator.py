@@ -34,6 +34,7 @@ from core.mcp.registry import MCPRegistry
 from core.llm_plugin import LLMPlugin
 from core.engine.autonomous_self_improvement import CodeAlchemist
 from core.engine.swarm.hive_mind import HiveMind
+from core.engine.semantic_router import SemanticRouter
 from core.utils.logging_utils import SwarmLogger
 
 # v23.5 Deep Dive Agents (for Fallback)
@@ -63,6 +64,7 @@ class MetaOrchestrator:
         self.llm_plugin = LLMPlugin(config={"provider": "gemini", "gemini_model_name": "gemini-3-pro"})
         self.code_alchemist = CodeAlchemist()
         self.hive_mind = HiveMind(worker_count=5)
+        self.semantic_router = SemanticRouter()
         self.swarm_logger = SwarmLogger()
 
     async def route_request(self, query: str, context: Optional[Dict[str, Any]] = None) -> Any:
@@ -72,8 +74,9 @@ class MetaOrchestrator:
         """
         self.swarm_logger.log_event("REQUEST_RECEIVED", "MetaOrchestrator", {"query": query, "context": context})
 
-        complexity = self._assess_complexity(query, context)
-        logger.info(f"MetaOrchestrator: Query complexity is {complexity}")
+        # Use Semantic Routing
+        complexity = self.semantic_router.route(query)
+        logger.info(f"MetaOrchestrator: Query routed to {complexity} via SemanticRouter")
 
         self.swarm_logger.log_thought("MetaOrchestrator", f"Assessed complexity as {complexity}. Routing accordingly.")
 
@@ -165,48 +168,7 @@ class MetaOrchestrator:
             logger.warning(f"Reflection failed: {e}. Returning original result.")
             return result
 
-    def _assess_complexity(self, query: str, context: Dict[str, Any] = None) -> str:
-        """
-        Simple heuristic for routing. 
-        In production, this would be a BERT classifier or Router LLM.
-        """
-        query_lower = query.lower()
-        context = context or {}
-
-        # Code Generation / Refactoring
-        if any(x in query_lower for x in ["generate code", "write a function", "implement", "refactor", "code agent"]):
-            return "CODE_GEN"
-
-        # Swarm Trigger
-        if any(x in query_lower for x in ["swarm", "scan", "parallel", "hive"]):
-            return "SWARM"
-
-        # v23.5 Deep Dive Trigger
-        if "deep dive" in query_lower or context.get("simulation_depth") == "Deep":
-            # Per Swarm Codex, use Swarm for Deep Dive if enabled (implicit via presence of new swarm features)
-            # For now we keep "DEEP_DIVE" routing, but we can enhance _run_deep_dive_flow to use Swarm
-            return "DEEP_DIVE"
-
-        # Heuristic Mapping
-        triggers = {
-            "DEEP_DIVE": ["deep dive", "full analysis", "partner", "valuation", "covenant"],
-            "RED_TEAM": ["attack", "adversarial"],
-            "CRISIS": ["simulation", "simulate", "crisis", "shock", "stress test", "scenario"],
-            "ESG": ["esg", "environmental", "sustainability", "carbon", "green", "social impact"],
-            "COMPLIANCE": ["compliance", "kyc", "aml", "regulation", "violation", "dodd-frank", "basel"],
-            "FO_WEALTH": ["ips", "trust", "estate", "wealth", "goal", "governance"],
-            "FO_DEAL": ["deal", "private equity", "venture", "screening", "multiple"],
-            "FO_EXECUTION": ["buy", "sell", "execute trade", "place order"],
-            "FO_MARKET": ["price", "quote", "ticker", "market data"],
-            "HIGH": ["analyze", "risk", "plan", "strategy", "report"],
-            "MEDIUM": ["monitor", "alert", "watch", "notify"]
-        }
-
-        for category, keywords in triggers.items():
-            if any(k in query_lower for k in keywords):
-                return category
-
-        return "LOW"
+    # _assess_complexity is deprecated and replaced by self.semantic_router.route
 
     async def _run_swarm_flow(self, query: str):
         logger.info("Engaging Swarm Intelligence (Hive Mind)...")
