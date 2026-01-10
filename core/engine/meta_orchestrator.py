@@ -17,18 +17,27 @@ import logging
 import asyncio
 import re
 from typing import Dict, Any, Optional
-
 import uuid
+
+# --- Core Imports ---
 from core.schemas.hnasp import HNASPState, Meta as HNASPMeta, PersonaState, LogicLayer, ContextStream
 from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner
-from core.engine.states import init_risk_state, init_esg_state, init_compliance_state, init_crisis_state, init_omniscient_state
+from core.engine.states import (
+    init_risk_state, init_esg_state, init_compliance_state, 
+    init_crisis_state, init_omniscient_state, init_surveillance_state,
+    init_reflector_state
+)
+
+# --- Graph Applications ---
 from core.engine.red_team_graph import red_team_app
 from core.engine.esg_graph import esg_graph_app
 from core.engine.regulatory_compliance_graph import compliance_graph_app
 from core.engine.crisis_simulation_graph import crisis_simulation_app
 from core.engine.deep_dive_graph import deep_dive_app
+from core.engine.surveillance_graph import surveillance_graph_app
 from core.engine.reflector_graph import reflector_app
-from core.engine.states import init_reflector_state
+
+# --- Orchestration & Tools ---
 from core.system.agent_orchestrator import AgentOrchestrator
 from core.mcp.registry import MCPRegistry
 from core.llm_plugin import LLMPlugin
@@ -37,16 +46,22 @@ from core.engine.swarm.hive_mind import HiveMind
 from core.engine.semantic_router import SemanticRouter
 from core.utils.logging_utils import SwarmLogger
 
-# v23.5 Deep Dive Agents (for Fallback)
+# --- v23.5 Deep Dive Agents (Fallback Support) ---
 from core.agents.specialized.management_assessment_agent import ManagementAssessmentAgent
 from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
 from core.agents.specialized.peer_comparison_agent import PeerComparisonAgent
-from core.agents.specialized.credit_snc import SNCRatingAgent # Corrected import path
-from core.agents.specialized.financial_covenant_agent import CovenantAnalystAgent # Renamed to match file
+from core.agents.specialized.credit_snc import SNCRatingAgent 
+from core.agents.specialized.financial_covenant_agent import CovenantAnalystAgent 
 from core.agents.specialized.monte_carlo_risk_agent import MonteCarloRiskAgent
 from core.agents.specialized.quantum_scenario_agent import QuantumScenarioAgent
 from core.agents.specialized.portfolio_manager_agent import PortfolioManagerAgent
-from core.schemas.v23_5_schema import V23KnowledgeGraph, Meta, Nodes, HyperDimensionalKnowledgeGraph, EquityAnalysis, Fundamentals, ValuationEngine, DCFModel, PriceTargets
+
+# --- Schemas ---
+from core.schemas.v23_5_schema import (
+    V23KnowledgeGraph, Meta, Nodes, HyperDimensionalKnowledgeGraph, 
+    EquityAnalysis, Fundamentals, ValuationEngine, DCFModel, PriceTargets, 
+    CreditAnalysis, CovenantRiskAnalysis
+)
 
 logger = logging.getLogger(__name__)
 
@@ -59,9 +74,12 @@ class MetaOrchestrator:
         except Exception as e:
             logger.error(f"Failed to initialize AgentOrchestrator in MetaOrchestrator: {e}")
             self.legacy_orchestrator = None
+            
         self.mcp_registry = MCPRegistry()  # FO Super-App Integration
+        
         # Integration Path 3: Native Gemini Tooling
         self.llm_plugin = LLMPlugin(config={"provider": "gemini", "gemini_model_name": "gemini-3-pro"})
+        
         self.code_alchemist = CodeAlchemist()
         self.hive_mind = HiveMind(worker_count=5)
         self.semantic_router = SemanticRouter()
@@ -70,17 +88,24 @@ class MetaOrchestrator:
     async def route_request(self, query: str, context: Optional[Dict[str, Any]] = None) -> Any:
         """
         Analyzes the query complexity and routes to the best engine.
-        Now Async!
+        Implements a Hybrid Routing Strategy: Heuristic -> Semantic.
         """
         self.swarm_logger.log_event("REQUEST_RECEIVED", "MetaOrchestrator", {"query": query, "context": context})
 
-        # Use Semantic Routing
-        complexity = self.semantic_router.route(query)
-        logger.info(f"MetaOrchestrator: Query routed to {complexity} via SemanticRouter")
+        # 1. Attempt Heuristic Routing (Fast Path for specific keywords)
+        complexity = self._assess_complexity(query, context)
+        
+        # 2. If Heuristics are uncertain, use Semantic Router (ML/LLM Path)
+        if complexity == "LOW":
+            logger.info("Heuristic check indeterminate. Engaging SemanticRouter.")
+            complexity = self.semantic_router.route(query)
 
+        logger.info(f"MetaOrchestrator: Query routed to {complexity}")
         self.swarm_logger.log_thought("MetaOrchestrator", f"Assessed complexity as {complexity}. Routing accordingly.")
 
         result = None
+        
+        # --- Routing Logic ---
         if complexity == "DEEP_DIVE":
             result = await self._run_deep_dive_flow(query, context)
         elif complexity == "SWARM":
@@ -91,6 +116,8 @@ class MetaOrchestrator:
             result = await self._run_red_team_flow(query)
         elif complexity == "CRISIS":
             result = await self._run_crisis_flow(query)
+        elif complexity == "SURVEILLANCE":
+            result = await self._run_surveillance_flow(query)
         elif complexity == "ESG":
             result = await self._run_esg_flow(query)
         elif complexity == "COMPLIANCE":
@@ -111,7 +138,7 @@ class MetaOrchestrator:
             if self.legacy_orchestrator:
                 result = await self.legacy_orchestrator.execute_workflow("test_workflow", initial_context={"user_query": query})
             else:
-                logger.warning("Legacy Orchestrator not available. Falling back to simple echo.")
+                logger.warning("Legacy Orchestrator not available.")
                 result = {"status": "Legacy Orchestrator Unavailable", "query": query}
         else:
             # Low complexity -> Legacy Single Agent Execution
@@ -120,7 +147,6 @@ class MetaOrchestrator:
                 self.legacy_orchestrator.execute_agent("QueryUnderstandingAgent", context={"user_query": query})
                 result = {"status": "Dispatched to Message Broker", "query": query}
             else:
-                logger.warning("Legacy Orchestrator not available. Falling back to simple echo.")
                 result = {"status": "Legacy Orchestrator Unavailable", "query": query}
 
         # Optional: Reflection Step for high-value outputs
@@ -128,6 +154,48 @@ class MetaOrchestrator:
             result = await self._reflect_on_result(result, query)
 
         return result
+
+    def _assess_complexity(self, query: str, context: Dict[str, Any] = None) -> str:
+        """
+        Simple heuristic for routing. 
+        Acts as a 'Fast Path' before engaging the heavier SemanticRouter.
+        """
+        query_lower = query.lower()
+        context = context or {}
+
+        # Code Generation / Refactoring
+        if any(x in query_lower for x in ["generate code", "write a function", "implement", "refactor", "code agent"]):
+            return "CODE_GEN"
+
+        # Swarm Trigger
+        if any(x in query_lower for x in ["swarm", "scan", "parallel", "hive"]):
+            return "SWARM"
+
+        # v23.5 Deep Dive Trigger
+        if "deep dive" in query_lower or context.get("simulation_depth") == "Deep":
+            return "DEEP_DIVE"
+
+        # Heuristic Mapping
+        triggers = {
+            "DEEP_DIVE": ["deep dive", "full analysis", "partner", "valuation", "covenant"],
+            "RED_TEAM": ["attack", "adversarial", "red team"],
+            "CRISIS": ["simulation", "simulate", "crisis", "shock", "stress test", "scenario"],
+            "SURVEILLANCE": ["surveillance", "watch", "zombie", "distressed", "monitor", "alert", "weakest link"],
+            "ESG": ["esg", "environmental", "sustainability", "carbon", "green", "social impact"],
+            "COMPLIANCE": ["compliance", "kyc", "aml", "regulation", "violation", "dodd-frank", "basel"],
+            "FO_WEALTH": ["ips", "trust", "estate", "wealth", "goal", "governance"],
+            "FO_DEAL": ["deal", "private equity", "venture", "screening", "multiple"],
+            "FO_EXECUTION": ["buy", "sell", "execute trade", "place order"],
+            "FO_MARKET": ["price", "quote", "ticker", "market data"],
+            "HIGH": ["analyze", "risk", "plan", "strategy", "report"],
+            "MEDIUM": ["monitor", "alert", "watch", "notify"]
+        }
+
+        for category, keywords in triggers.items():
+            if any(k in query_lower for k in keywords):
+                return category
+
+        return "LOW"
 
     async def _reflect_on_result(self, result: Any, query: str) -> Any:
         """
@@ -167,8 +235,6 @@ class MetaOrchestrator:
         except Exception as e:
             logger.warning(f"Reflection failed: {e}. Returning original result.")
             return result
-
-    # _assess_complexity is deprecated and replaced by self.semantic_router.route
 
     async def _run_swarm_flow(self, query: str):
         logger.info("Engaging Swarm Intelligence (Hive Mind)...")
@@ -224,7 +290,7 @@ class MetaOrchestrator:
                 logger.info("Deep Dive: Dispatching Swarm Scouts...")
                 if not self.hive_mind.workers:
                     await self.hive_mind.initialize()
-
+                
                 # Fire and forget swarm task for preliminary data
                 await self.hive_mind.disperse_task("ANALYST", {"target": query, "purpose": "preliminary_deep_dive"}, intensity=8.0)
              except Exception as e:
@@ -390,8 +456,6 @@ class MetaOrchestrator:
             )
 
             # Manually construct CreditAnalysis
-            from core.schemas.v23_5_schema import CreditAnalysis, CovenantRiskAnalysis
-
             credit_analysis = CreditAnalysis(
                 snc_rating_model=snc_model,
                 cds_market_implied_rating="BBB-",
@@ -659,6 +723,34 @@ class MetaOrchestrator:
             logger.error(f"Crisis Simulation Failed: {e}")
             return {"error": str(e)}
 
+    async def _run_surveillance_flow(self, query: str):
+        logger.info("Engaging Distressed Surveillance Graph...")
+
+        sector = "General"
+        if "tech" in query.lower() or "tmt" in query.lower():
+            sector = "TMT"
+        elif "retail" in query.lower():
+            sector = "Retail"
+        elif "health" in query.lower():
+            sector = "Healthcare"
+
+        initial_state = init_surveillance_state(sector=sector)
+
+        try:
+            config = {"configurable": {"thread_id": "1"}}
+            if hasattr(surveillance_graph_app, 'ainvoke'):
+                result = await surveillance_graph_app.ainvoke(initial_state, config=config)
+            else:
+                result = surveillance_graph_app.invoke(initial_state, config=config)
+            return {
+                "status": "Surveillance Complete",
+                "watchlist": result.get("watchlist", []),
+                "final_report": result.get("final_report", "")
+            }
+        except Exception as e:
+            logger.error(f"Surveillance Execution Failed: {e}")
+            return {"error": str(e)}
+
     async def _run_fo_market(self, query: str):
         logger.info("Engaging FO Super-App Market Module...")
         # Simple extraction logic
@@ -726,7 +818,7 @@ class MetaOrchestrator:
 
         elif "ips" in query.lower() or "governance" in query.lower():
             result = self.mcp_registry.invoke("generate_ips", family_name="Smith", risk_profile="Growth", goals=[
-                                              "Preserve Capital", "Growth"], constraints=["ESG"])
+                                                "Preserve Capital", "Growth"], constraints=["ESG"])
             return {"status": "IPS Generated", "ips": result}
 
         return {"status": "Wealth Module: Unknown Action"}

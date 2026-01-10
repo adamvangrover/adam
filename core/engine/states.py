@@ -610,3 +610,48 @@ def init_omniscient_state(ticker: str) -> OmniscientState:
         },
         "human_readable_status": "Initializing AI Partner Deep Dive..."
     }
+
+
+class SurveillanceState(TypedDict, total=False):
+    """
+    State for the Distressed Surveillance Graph.
+
+    Attributes:
+        focus_sector (str): Target sector for surveillance.
+        search_parameters (List[str]): List of search queries.
+        raw_search_results (List[Dict[str, Any]]): Raw results from search tool.
+        identified_issuers (List[Dict[str, Any]]): List of potential candidates.
+        watchlist (List[Dict[str, Any]]): Final formatted watchlist.
+        final_report (Optional[str]): Narrative report.
+        iteration_count (int): Iteration counter.
+        human_readable_status (str): Status message.
+    """
+    # Input
+    focus_sector: str
+    search_parameters: List[str]
+
+    # Internal
+    raw_search_results: List[Dict[str, Any]]
+    identified_issuers: List[Dict[str, Any]]  # Intermediate
+
+    # Output
+    watchlist: List[Dict[str, Any]]  # List of DistressedIssuer dicts
+    final_report: Optional[str]
+
+    # Control Flow
+    iteration_count: int
+    human_readable_status: str
+
+
+def init_surveillance_state(sector: str = "General") -> SurveillanceState:
+    """Initializes the Surveillance State."""
+    return {
+        "focus_sector": sector,
+        "search_parameters": [],
+        "raw_search_results": [],
+        "identified_issuers": [],
+        "watchlist": [],
+        "final_report": None,
+        "iteration_count": 0,
+        "human_readable_status": "Initializing Surveillance..."
+    }
