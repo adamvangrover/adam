@@ -21,12 +21,13 @@ from typing import Dict, Any, Optional
 import uuid
 from core.schemas.hnasp import HNASPState, Meta as HNASPMeta, PersonaState, LogicLayer, ContextStream
 from core.engine.neuro_symbolic_planner import NeuroSymbolicPlanner
-from core.engine.states import init_risk_state, init_esg_state, init_compliance_state, init_crisis_state, init_omniscient_state
+from core.engine.states import init_risk_state, init_esg_state, init_compliance_state, init_crisis_state, init_omniscient_state, init_surveillance_state
 from core.engine.red_team_graph import red_team_app
 from core.engine.esg_graph import esg_graph_app
 from core.engine.regulatory_compliance_graph import compliance_graph_app
 from core.engine.crisis_simulation_graph import crisis_simulation_app
 from core.engine.deep_dive_graph import deep_dive_app
+from core.engine.surveillance_graph import surveillance_graph_app
 from core.engine.reflector_graph import reflector_app
 from core.engine.states import init_reflector_state
 from core.system.agent_orchestrator import AgentOrchestrator
@@ -88,6 +89,8 @@ class MetaOrchestrator:
             result = await self._run_red_team_flow(query)
         elif complexity == "CRISIS":
             result = await self._run_crisis_flow(query)
+        elif complexity == "SURVEILLANCE":
+            result = await self._run_surveillance_flow(query)
         elif complexity == "ESG":
             result = await self._run_esg_flow(query)
         elif complexity == "COMPLIANCE":
@@ -192,6 +195,7 @@ class MetaOrchestrator:
             "DEEP_DIVE": ["deep dive", "full analysis", "partner", "valuation", "covenant"],
             "RED_TEAM": ["attack", "adversarial"],
             "CRISIS": ["simulation", "simulate", "crisis", "shock", "stress test", "scenario"],
+            "SURVEILLANCE": ["surveillance", "watch", "zombie", "distressed", "monitor", "alert", "weakest link"],
             "ESG": ["esg", "environmental", "sustainability", "carbon", "green", "social impact"],
             "COMPLIANCE": ["compliance", "kyc", "aml", "regulation", "violation", "dodd-frank", "basel"],
             "FO_WEALTH": ["ips", "trust", "estate", "wealth", "goal", "governance"],
@@ -695,6 +699,34 @@ class MetaOrchestrator:
             }
         except Exception as e:
             logger.error(f"Crisis Simulation Failed: {e}")
+            return {"error": str(e)}
+
+    async def _run_surveillance_flow(self, query: str):
+        logger.info("Engaging Distressed Surveillance Graph...")
+
+        sector = "General"
+        if "tech" in query.lower() or "tmt" in query.lower():
+            sector = "TMT"
+        elif "retail" in query.lower():
+            sector = "Retail"
+        elif "health" in query.lower():
+            sector = "Healthcare"
+
+        initial_state = init_surveillance_state(sector=sector)
+
+        try:
+            config = {"configurable": {"thread_id": "1"}}
+            if hasattr(surveillance_graph_app, 'ainvoke'):
+                result = await surveillance_graph_app.ainvoke(initial_state, config=config)
+            else:
+                result = surveillance_graph_app.invoke(initial_state, config=config)
+            return {
+                "status": "Surveillance Complete",
+                "watchlist": result.get("watchlist", []),
+                "final_report": result.get("final_report", "")
+            }
+        except Exception as e:
+            logger.error(f"Surveillance Execution Failed: {e}")
             return {"error": str(e)}
 
     async def _run_fo_market(self, query: str):
