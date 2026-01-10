@@ -36,64 +36,8 @@ except ImportError as e:
     logger.error(f"Failed to import RiskAssessmentAgent: {e}")
     RiskAssessmentAgent = None
 
-# Refactored Data Retrieval Logic (Decoupled from Semantic Kernel)
-
-
-class V23DataRetriever:
-    """
-    A lightweight, v23-compliant data retriever that mirrors the logic
-    of the legacy DataRetrievalAgent but without heavy dependencies.
-    Includes rich mock data for showcase purposes.
-    """
-
-    def __init__(self):
-        self.mock_db = {
-            "AAPL": self._create_mock_data("Apple Inc.", "Technology", 180.0, 0.5),
-            "TSLA": self._create_mock_data("Tesla Inc.", "Automotive", 240.0, 0.8),
-            "JPM": self._create_mock_data("JPMorgan Chase", "Financials", 150.0, 0.3),
-            "NVDA": self._create_mock_data("NVIDIA Corp", "Technology", 450.0, 0.6),
-            "ABC_TEST": self._create_mock_data("ABC Test Corp", "Technology", 100.0, 0.4),
-        }
-
-    def _create_mock_data(self, name, industry, price, volatility_factor):
-        return {
-            "company_info": {
-                "name": name,
-                "industry_sector": industry,
-                "country": "USA"
-            },
-            "financial_data_detailed": {
-                "income_statement": {
-                    "revenue": [1000 * (1.1**i) for i in range(3)],
-                    "net_income": [150 * (1.1**i) for i in range(3)],
-                    "ebitda": [300 * (1.1**i) for i in range(3)],
-                },
-                "balance_sheet": {
-                    "total_assets": [2000 * (1.1**i) for i in range(3)],
-                    "total_liabilities": [1000 * (1.1**i) for i in range(3)],
-                    "shareholders_equity": [1000 * (1.1**i) for i in range(3)]
-                },
-                "key_ratios": {
-                    "debt_to_equity_ratio": 0.5 + (random.random() * 0.2),
-                    "net_profit_margin": 0.15 + (random.random() * 0.1),
-                    "current_ratio": 1.5 + (random.random() * 1.0),
-                    "interest_coverage_ratio": 10.0 + (random.random() * 5.0)
-                },
-                "market_data": {
-                    "share_price": price,
-                    "volatility_factor": volatility_factor,
-                    "shares_outstanding": 10000000
-                }
-            }
-        }
-
-    def get_financials(self, company_id: str) -> Optional[Dict[str, Any]]:
-        # Check mock DB first
-        if company_id in self.mock_db:
-            return self.mock_db[company_id]
-
-        # Fallback for unknown tickers - generate on fly
-        return self._create_mock_data(f"{company_id} Corp", "Unknown", 100.0, 0.5)
+from core.tools.tool_registry import ToolRegistry
+from core.data_processing.conviction_scorer import ConvictionScorer
 
 # --- Adapters & Helpers ---
 
@@ -127,7 +71,9 @@ def map_dra_to_raa(financials: Dict[str, Any]) -> tuple[Dict, Dict]:
 # --- Initialization ---
 
 
-data_retriever = V23DataRetriever()
+tool_registry = ToolRegistry()
+conviction_scorer = ConvictionScorer()
+
 try:
     risk_assessor = RiskAssessmentAgent(config={"name": "CyclicalRiskAgent"}) if RiskAssessmentAgent else None
 except Exception as e:
@@ -147,25 +93,53 @@ except Exception as e:
 def retrieve_data_node(state: RiskAssessmentState) -> Dict[str, Any]:
     """
     Node: Retrieve Data
-    Calls V23DataRetriever to fetch financials.
+    Calls ToolRegistry to fetch LIVE financials.
+    Applies Conviction Scoring.
     """
     logger.info(f"--- Node: Retrieve Data for {state['ticker']} ---")
     ticker = state["ticker"]
 
     artifacts = []
-    financials = data_retriever.get_financials(ticker)
 
-    if financials:
+    # 1. Fetch Financials (Live/Mock)
+    financials = tool_registry.execute("get_financials", ticker=ticker)
+
+    # 2. Fetch News (Live/Mock)
+    news = tool_registry.execute("get_news", ticker=ticker, limit=2)
+
+    status_msgs = []
+
+    if financials and "error" not in financials:
         content = json.dumps(financials, indent=2)
+        # Score conviction
+        score = conviction_scorer.calculate_conviction(content, "Financial Report") # Weak check, but shows intent
+
         artifacts.append(ResearchArtifact(
             title=f"{ticker} Financial Data",
             content=content,
-            source="V23DataRetriever",
-            credibility_score=1.0
+            source="ToolRegistry (Yahoo/Mock)",
+            credibility_score=0.9 if score > 0.0 else 0.5
         ))
-        status = f"Retrieved comprehensive financials for {ticker}."
+        status_msgs.append("financials")
+
+    if news:
+        for item in news:
+            content = item.get("title", "") + ": " + item.get("link", "")
+            # Verify news against Gold Standard (simulated)
+            score = conviction_scorer.calculate_conviction(item.get("title", ""), "Official Press Release")
+
+            artifacts.append(ResearchArtifact(
+                title=f"News: {item.get('title', 'Unknown')}",
+                content=content,
+                source="Web Search",
+                credibility_score=score
+            ))
+        status_msgs.append(f"{len(news)} news items")
+
+    if not artifacts:
+        status = f"No valid data found for {ticker}."
     else:
-        status = f"No data found for {ticker}."
+        status = f"Retrieved {', '.join(status_msgs)} for {ticker}."
 
     return {
         "research_data": artifacts,
@@ -223,7 +197,7 @@ def generate_draft_node(state: RiskAssessmentState) -> Dict[str, Any]:
 
 def critique_node(state: RiskAssessmentState) -> Dict[str, Any]:
     """
-    Node: Critique (Enhanced with APEX Engine)
+    Node: Critique (Enhanced with APEX Engine and Self-Reflection Agent)
     """
     logger.info("--- Node: Critique (System 2 Verification) ---")
     draft = state.get("draft_analysis", "")
@@ -245,18 +219,29 @@ def critique_node(state: RiskAssessmentState) -> Dict[str, Any]:
             "human_readable_status": "Critique failed due to errors."
         }
 
-    # 2. APEX Engine Verification (Tail Risk Check)
+    # 2. Self-Reflection (Simulated LLM)
+    # In production, this would call an LLM with the "Constitution" prompt.
+    # Here we simulate the output of such an agent.
+
+    has_liquidity = "Liquidity" in draft or "current_ratio" in draft
+    has_conviction = "Score" in draft
+
+    if not has_liquidity:
+        critique_notes.append("Self-Reflection: The draft is missing Liquidity Risk analysis.")
+        needs_correction = True
+
+    if not has_conviction:
+        critique_notes.append("Self-Reflection: No conviction score or verdict found.")
+        needs_correction = True
+
+    # 3. APEX Engine Verification (Tail Risk Check)
     if apex_engine:
         logger.info("Invoking APEX Generative Risk Engine for Validation...")
-        # Simulate Reverse Stress Test to find "Kill Shot" scenarios
-        # Using a dummy portfolio value for now
         breaches = apex_engine.reverse_stress_test(
             target_loss_threshold=5000000,
             current_portfolio_value=10000000
         )
-
         if breaches:
-            # If APEX finds a breach, check if the draft mentions "Tail Risk" or "Crash"
             draft_lower = draft.lower()
             if "tail risk" not in draft_lower and "crash" not in draft_lower:
                 breach_desc = breaches[0].description
@@ -264,18 +249,19 @@ def critique_node(state: RiskAssessmentState) -> Dict[str, Any]:
                     f"APEX Engine Warning: Identified critical Tail Risk scenario '{breach_desc}' that is absent from the draft.")
                 needs_correction = True
 
-    # 3. Iterative Refinement Logic
-    if iteration < 2:
-        critique_notes.append("Analysis lacks depth on 'Liquidity Risk'. Please expand.")
-        quality_score = 0.65
+    # 4. Scoring Logic (Replacing simple counter)
+    base_score = 0.6
+    if has_liquidity: base_score += 0.2
+    if has_conviction: base_score += 0.1
+    if not needs_correction: base_score += 0.1
+
+    quality_score = min(0.99, base_score)
+
+    # Force at least one refinement if quality is low, but respect max iterations in conditional edge
+    if quality_score < 0.8:
         needs_correction = True
-    elif iteration < 3 and needs_correction:  # Only add this if we are still refining
-        critique_notes.append("Consider macroeconomic headwinds (inflation).")
-        quality_score = 0.75
-    else:
-        if not needs_correction:  # If APEX didn't flag anything and iterations are done
-            critique_notes.append("Assessment is comprehensive and robust.")
-            quality_score = 0.95
+        if iteration == 0: # Always provide specific feedback on first pass
+             critique_notes.append("General: Please expand on macro factors.")
 
     return {
         "critique_notes": critique_notes,
