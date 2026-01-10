@@ -77,3 +77,32 @@ class MemoryMixin:
             logging.info(f"Saved memory to {file_path}")
         except Exception as e:
             logging.error(f"Failed to save memory: {e}")
+
+    # --- Additive Enhancements for v23.5 ---
+
+    def remember(self, key: str, value: Any):
+        """
+        Convenience method to update internal state/context memory immediately.
+        Does not persist to disk (use save_memory for that).
+        """
+        if hasattr(self, 'context'):
+            self.context[key] = value
+
+        if hasattr(self, 'state') and hasattr(self.state, 'logic_layer'):
+            self.state.logic_layer.state_variables[key] = value
+
+    def recall(self, key: str) -> Any:
+        """
+        Retrieves a value from internal state/context memory.
+        """
+        # Check HNASP state first
+        if hasattr(self, 'state') and hasattr(self.state, 'logic_layer'):
+            val = self.state.logic_layer.state_variables.get(key)
+            if val is not None:
+                return val
+
+        # Fallback to legacy context
+        if hasattr(self, 'context'):
+            return self.context.get(key)
+
+        return None
