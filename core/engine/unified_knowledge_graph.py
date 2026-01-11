@@ -21,33 +21,59 @@ import networkx as nx
 import logging
 import json
 import os
+import threading
 from typing import List, Dict, Any, Optional
+
+# Bolt Optimization: Import GraphCache for thread-safe singleton
+from core.engine.graph_cache import GraphCache
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Shared instance for Singleton pattern
+# Legacy support for module-level singleton access
+# (Deprecated: Use GraphCache.get_instance().get_graph() directly if possible)
 _SHARED_GRAPH_INSTANCE = None
+
+# Lock for Double-Checked Locking in __init__
+_INIT_LOCK = threading.Lock()
 
 
 class UnifiedKnowledgeGraph:
     def __init__(self):
         """
         Initializes the in-memory Knowledge Graph.
-        Uses a Singleton pattern to avoid re-parsing the seed file on every instantiation.
+        Uses a Singleton pattern via GraphCache to avoid re-parsing the seed file.
         """
         global _SHARED_GRAPH_INSTANCE
-        if _SHARED_GRAPH_INSTANCE is None:
-            logger.info("Initializing Shared Knowledge Graph...")
-            self.graph = nx.DiGraph()
-            self._ingest_fibo_ontology()
-            self._ingest_provenance_data()
-            self._ingest_seed_data()
-            _SHARED_GRAPH_INSTANCE = self.graph
+
+        cache = GraphCache.get_instance()
+
+        # Check cache first (Optimistic check)
+        cached_graph = cache.get_graph()
+
+        if cached_graph is not None:
+             self.graph = cached_graph
         else:
-            # Reuse the shared graph instance
-            self.graph = _SHARED_GRAPH_INSTANCE
+            # Double-Checked Locking
+            with _INIT_LOCK:
+                # Check cache again inside lock
+                cached_graph = cache.get_graph()
+                if cached_graph is not None:
+                     self.graph = cached_graph
+                else:
+                    logger.info("Initializing Shared Knowledge Graph...")
+                    self.graph = nx.DiGraph()
+                    self._ingest_fibo_ontology()
+                    self._ingest_provenance_data()
+                    self._ingest_seed_data()
+
+                    # Bolt Optimization: Store in thread-safe cache
+                    cache.set_graph(self.graph)
+
+        # Ensure legacy global is sync'd
+        if _SHARED_GRAPH_INSTANCE is None:
+             _SHARED_GRAPH_INSTANCE = self.graph
 
     def _ingest_fibo_ontology(self):
         """
