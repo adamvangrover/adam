@@ -2,79 +2,123 @@
 import os
 import yaml
 import json
-from typing import Any, Dict, Optional
-
+import re
+from typing import Tuple, Dict, Any, Optional, Union, List
 from core.utils.logging_utils import get_logger
 
 logger = get_logger(__name__)
 
 # Path to the prompt library relative to this file
-# core/prompting/loader.py -> ../../prompt_library
 PROMPT_LIB_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../prompt_library'))
 
-
-def load_prompt(prompt_name: str, type: str = "text") -> Any:
+class PromptLoader:
     """
-    Loads a prompt from the library by name.
-
-    Args:
-        prompt_name (str): The name of the prompt (filename without extension).
-        type (str): 'text' (returns content) or 'json'/'yaml' (returns dict).
-
-    Returns:
-        The prompt content or data structure.
+    Utility to load prompts from the filesystem.
+    Supports simple text loading, JSON/YAML parsing, and 'Prompt-as-Code' style Markdown with YAML Frontmatter.
     """
-    logger.info(f"Loading prompt: {prompt_name}")
 
-    # Search for files with supported extensions
-    extensions = ['.md', '.json', '.yaml', '.yml', '.txt']
+    @staticmethod
+    def get_path(prompt_name: str) -> str:
+        """Finds the file path for a given prompt name (without extension)."""
+        extensions = ['.md', '.json', '.yaml', '.yml', '.txt']
 
-    found_path = None
-    for ext in extensions:
-        # Check root of prompt_library
-        path = os.path.join(PROMPT_LIB_PATH, f"{prompt_name}{ext}")
-        if os.path.exists(path):
-            found_path = path
-            break
+        # Check specific AOPL-v1.0 paths first for efficiency (Analyst OS)
+        priority_paths = [
+            os.path.join(PROMPT_LIB_PATH, "AOPL-v1.0/analyst_os", f"{prompt_name}.md"),
+            os.path.join(PROMPT_LIB_PATH, "AOPL-v1.0", f"{prompt_name}.md"),
+        ]
 
-        # Check immediate subdirectories (e.g. AOPL-v1.0)
-        # For simplicity, we can just walk the directory
+        for p in priority_paths:
+            if os.path.exists(p):
+                return p
 
-    if not found_path:
-        # Deep search
+        # Fallback to recursive search
         for root, dirs, files in os.walk(PROMPT_LIB_PATH):
             for ext in extensions:
                 if f"{prompt_name}{ext}" in files:
-                    found_path = os.path.join(root, f"{prompt_name}{ext}")
-                    break
-            if found_path:
-                break
+                    return os.path.join(root, f"{prompt_name}{ext}")
 
-    if not found_path:
         raise FileNotFoundError(f"Prompt '{prompt_name}' not found in {PROMPT_LIB_PATH}")
 
-    with open(found_path, 'r', encoding='utf-8') as f:
-        content = f.read()
-
-    if found_path.endswith('.json'):
-        try:
-            return json.loads(content)
-        except json.JSONDecodeError as e:
-            logger.error(f"Failed to parse JSON prompt {prompt_name}: {e}")
-            return content
-
-    if found_path.endswith(('.yaml', '.yml')):
-        try:
-            return yaml.safe_load(content)
-        except yaml.YAMLError as e:
-            logger.error(f"Failed to parse YAML prompt {prompt_name}: {e}")
-            return content
-
-    return content
-
-
-class PromptLoader:
-    """Class wrapper for convenience."""
     @staticmethod
-    def get(name: str) -> Any:
-        return load_prompt(name)
+    def load_markdown_with_frontmatter(prompt_name: str) -> Tuple[Dict[str, Any], str, str]:
+        """
+        Parses a Markdown file with YAML frontmatter.
+        Expected format:
+        ---
+        key: value
+        ---
+        ### SYSTEM PROMPT
+        ...
+        ### USER PROMPT
+        ...
+
+        Returns:
+            (metadata, system_template, user_template)
+        """
+        path = PromptLoader.get_path(prompt_name)
+        with open(path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        # Split Frontmatter
+        frontmatter = {}
+        body = content
+
+        if content.startswith("---"):
+            parts = content.split("---", 2)
+            if len(parts) >= 3:
+                try:
+                    frontmatter = yaml.safe_load(parts[1])
+                    body = parts[2]
+                except yaml.YAMLError as e:
+                    logger.error(f"Failed to parse YAML frontmatter for {prompt_name}: {e}")
+
+        # Split System/User Prompts based on headers
+        # We look for "### SYSTEM PROMPT" and "### USER PROMPT" (or similar variations)
+        system_match = re.search(r"###\s*SYSTEM\s*PROMPT\s*\n(.*?)(?=###\s*USER\s*PROMPT|$)", body, re.DOTALL | re.IGNORECASE)
+        user_match = re.search(r"###\s*USER\s*PROMPT\s*(?:###\s*TASK\s*PROMPT.*?)?\n(.*)", body, re.DOTALL | re.IGNORECASE)
+
+        # Fallback regex if headers are slightly different or order is swapped
+        if not user_match:
+             # Try just finding the task prompt if user prompt header is missing
+             user_match = re.search(r"###\s*TASK\s*PROMPT.*?\n(.*)", body, re.DOTALL | re.IGNORECASE)
+
+        system_text = system_match.group(1).strip() if system_match else ""
+        user_text = user_match.group(1).strip() if user_match else body.replace(system_match.group(0) if system_match else "", "").strip()
+
+        return frontmatter, system_text, user_text
+
+    @staticmethod
+    def get(name: str) -> Union[str, Dict[str, Any], List[Any]]:
+        """
+        Loads a prompt by name.
+        If the file is JSON or YAML, parses and returns the data structure.
+        Otherwise, returns the raw text content.
+        """
+        path = PromptLoader.get_path(name)
+        with open(path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        if path.endswith('.json'):
+            try:
+                return json.loads(content)
+            except json.JSONDecodeError as e:
+                logger.error(f"Failed to parse JSON prompt {name}: {e}")
+                return content
+
+        if path.endswith(('.yaml', '.yml')):
+            try:
+                return yaml.safe_load(content)
+            except yaml.YAMLError as e:
+                logger.error(f"Failed to parse YAML prompt {name}: {e}")
+                return content
+
+        return content
+
+# Legacy function support for backward compatibility
+def load_prompt(prompt_name: str, type: str = "text") -> Any:
+    """
+    Deprecated: Use PromptLoader.get(prompt_name) instead.
+    Preserves original signature for backward compatibility.
+    """
+    return PromptLoader.get(prompt_name)
