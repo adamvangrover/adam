@@ -63,13 +63,19 @@ The market has shown resilience despite macroeconomic headwinds. Our algorithms 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-140px)]">
             {/* Feed List */}
-            <div className="lg:col-span-1 space-y-4 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-700">
+            <div
+                className="lg:col-span-1 space-y-4 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 rounded"
+                tabIndex={0}
+                role="region"
+                aria-label="Intel Feed Items"
+            >
                 <h2 className="text-xl font-mono text-cyan-400 font-bold mb-4">Intel Feed</h2>
                 {news.map((item) => (
-                    <div
+                    <button
                         key={item.id}
                         onClick={() => setSelectedItem(item)}
-                        className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 ${
+                        aria-current={selectedItem?.id === item.id ? 'true' : undefined}
+                        className={`w-full text-left p-4 rounded-lg border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
                             selectedItem?.id === item.id
                             ? 'bg-slate-800 border-cyan-500/50 shadow-lg shadow-cyan-900/20'
                             : 'bg-slate-900/50 border-slate-700 hover:bg-slate-800 hover:border-slate-600'
@@ -90,7 +96,7 @@ The market has shown resilience despite macroeconomic headwinds. Our algorithms 
                                 High Priority
                             </div>
                         )}
-                    </div>
+                    </button>
                 ))}
             </div>
 
@@ -109,7 +115,11 @@ The market has shown resilience despite macroeconomic headwinds. Our algorithms 
                                 </p>
                             </div>
                         </div>
-                        <div className="flex-1 overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-slate-700 prose prose-invert prose-slate max-w-none">
+                        <div
+                            className="flex-1 overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-slate-700 prose prose-invert prose-slate max-w-none focus:outline-none focus:ring-2 focus:ring-cyan-500/30 rounded"
+                            tabIndex={0}
+                            aria-label="Report Content"
+                        >
                             <ReactMarkdown>{getMockContent(selectedItem)}</ReactMarkdown>
                         </div>
                     </div>
