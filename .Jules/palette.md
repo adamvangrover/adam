@@ -55,3 +55,7 @@
 ## 2025-05-23 - Preserving Aesthetic during Refactor
 **Learning:** When refactoring legacy components with heavy inline styles to Tailwind, particularly in themed applications (e.g., "Cyber"), be careful to map exact colors (like neon hex codes) to arbitrary values (e.g., `text-[#00f3ff]`) if they don't exist in the theme tokens, to preserve the specific aesthetic.
 **Action:** Use arbitrary values for unique brand colors if not present in the design system to avoid visual regression.
+
+## 2026-01-11 - Interactive List Accessibility
+**Learning:** Scrollable lists of clickable items (like news feeds) are often implemented as `div`s with `onClick`, blocking keyboard access. Converting them to `<button>` elements inside a container with `tabIndex="0"` and `role="region"` restores full accessibility without compromising layout.
+**Action:** Always implement clickable list items as buttons and ensure their container is keyboard-scrollable.
