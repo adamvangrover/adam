@@ -8,6 +8,8 @@ except ImportError:
     TfidfVectorizer = None
     cosine_similarity = None
 
+from core.utils.repo_context import RepoContextManager
+
 logger = logging.getLogger(__name__)
 
 class SemanticRouter:
@@ -15,6 +17,9 @@ class SemanticRouter:
     Implements semantic intent classification using Vector Space Models.
     Replaces naive keyword matching with Cosine Similarity over TF-IDF vectors
     (or Dense Embeddings if sentence-transformers were available).
+
+    Updated for v24: Integrates with RepoContextManager to allow dynamic
+    customization of routes based on documentation.
     """
 
     INTENT_EXAMPLES = {
@@ -72,10 +77,34 @@ class SemanticRouter:
         self.intent_vectors = {}
         self.routes = list(self.INTENT_EXAMPLES.keys())
 
+        # Load Context to enhance examples
+        self._load_dynamic_examples()
+
         if TfidfVectorizer:
             self._train_vectorizer()
         else:
             logger.warning("Scikit-learn not found. SemanticRouter running in fallback mode (Keyword Match).")
+
+    def _load_dynamic_examples(self):
+        """
+        Enhances intent examples by reading the AGENTS.md documentation.
+        If the docs mention new agents or capabilities, we can (in theory)
+        add them to the routing logic.
+        """
+        try:
+            ctx = RepoContextManager()
+            agent_defs = ctx.get_agent_definitions()
+
+            # Simple heuristic: If "Crisis Simulation" is emphasized in docs, add more crisis keywords
+            if "Crisis Simulation" in agent_defs:
+                self.INTENT_EXAMPLES["CRISIS"].extend(["stress test portfolio", "macro shock analysis"])
+
+            # If "Swarm" is present (v24), ensure Swarm keywords
+            if "Swarm" in agent_defs:
+                self.INTENT_EXAMPLES["SWARM"].extend(["hive mind", "distributed analysis"])
+
+        except Exception as e:
+            logger.warning(f"Failed to load dynamic routing examples: {e}")
 
     def _train_vectorizer(self):
         """Pre-computes vectors for intent prototypes."""

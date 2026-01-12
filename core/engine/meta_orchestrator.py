@@ -36,6 +36,7 @@ from core.engine.autonomous_self_improvement import CodeAlchemist
 from core.engine.swarm.hive_mind import HiveMind
 from core.engine.semantic_router import SemanticRouter
 from core.utils.logging_utils import SwarmLogger
+from core.utils.repo_context import RepoContextManager
 
 # v23.5 Deep Dive Agents (for Fallback)
 from core.agents.specialized.management_assessment_agent import ManagementAssessmentAgent
@@ -67,12 +68,23 @@ class MetaOrchestrator:
         self.semantic_router = SemanticRouter()
         self.swarm_logger = SwarmLogger()
 
+        # Initialize Repo Context for System Awareness
+        self.repo_context = RepoContextManager()
+        logger.info("MetaOrchestrator initialized with Repo Context Awareness.")
+
     async def route_request(self, query: str, context: Optional[Dict[str, Any]] = None) -> Any:
         """
         Analyzes the query complexity and routes to the best engine.
         Now Async!
         """
         self.swarm_logger.log_event("REQUEST_RECEIVED", "MetaOrchestrator", {"query": query, "context": context})
+
+        # Context Injection: If system prompt is missing, try to inject from Repo Context
+        if context is None:
+            context = {}
+        if "system_prompt" not in context:
+            # We can optionally inject the high-level goal from AGENTS.md
+            pass
 
         # Use Semantic Routing
         complexity = self.semantic_router.route(query)
