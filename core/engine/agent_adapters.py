@@ -19,6 +19,14 @@ try:
 except ImportError:
     LegacyRAA = None
 
+# Optional imports for live tools
+try:
+    import yfinance as yf
+    YFINANCE_AVAILABLE = True
+except ImportError:
+    YFINANCE_AVAILABLE = False
+    logger.warning("yfinance not installed. DataRetriever will use mock data.")
+
 
 class V23DataRetrieverAdapter:
     """
@@ -27,6 +35,98 @@ class V23DataRetrieverAdapter:
     """
 
     def get_financials(self, company_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Fetches financial data for a company.
+        Tries yfinance first, then falls back to robust mocks.
+        """
+        data = None
+        if YFINANCE_AVAILABLE:
+            try:
+                data = self._fetch_yfinance_data(company_id)
+                if data:
+                    logger.info(f"Successfully fetched live data for {company_id}")
+            except Exception as e:
+                logger.error(f"Failed to fetch yfinance data for {company_id}: {e}")
+
+        if not data:
+            logger.info(f"Using mock data for {company_id}")
+            data = self._get_mock_data(company_id)
+
+        return data
+
+    def _fetch_yfinance_data(self, ticker_symbol: str) -> Optional[Dict[str, Any]]:
+        """Fetches and normalizes data from yfinance."""
+        ticker = yf.Ticker(ticker_symbol)
+        info = ticker.info
+
+        # Basic validation: check if we got valid info
+        if not info or 'symbol' not in info:
+            return None
+
+        # Fetch financials
+        income_stmt = ticker.financials
+        balance_sheet = ticker.balance_sheet
+
+        # We need to convert these pandas DataFrames to the dictionary structure expected by Adam
+        # This is a simplified mapping. Real world would need robust handling of dates/keys.
+
+        def safe_get_series(df, key):
+            if key in df.index:
+                # Get the most recent 3 values
+                return df.loc[key].head(3).tolist()
+            return [0, 0, 0]
+
+        financial_data_detailed = {
+            "income_statement": {
+                "revenue": safe_get_series(income_stmt, "Total Revenue"),
+                "cogs": safe_get_series(income_stmt, "Cost Of Revenue"),
+                "gross_profit": safe_get_series(income_stmt, "Gross Profit"),
+                "operating_expenses": safe_get_series(income_stmt, "Operating Expense"),
+                "ebitda": safe_get_series(income_stmt, "EBITDA"),
+                "depreciation_amortization": safe_get_series(income_stmt, "Reconciled Depreciation"), # yf key varies
+                "ebit": safe_get_series(income_stmt, "EBIT"),
+                "interest_expense": safe_get_series(income_stmt, "Interest Expense"),
+                "income_before_tax": safe_get_series(income_stmt, "Pretax Income"),
+                "taxes": safe_get_series(income_stmt, "Tax Provision"),
+                "net_income": safe_get_series(income_stmt, "Net Income")
+            },
+            "balance_sheet": {
+                "cash_and_equivalents": safe_get_series(balance_sheet, "Cash And Cash Equivalents"),
+                "accounts_receivable": safe_get_series(balance_sheet, "Accounts Receivable"),
+                "inventory": safe_get_series(balance_sheet, "Inventory"),
+                "total_current_assets": safe_get_series(balance_sheet, "Total Current Assets"),
+                "property_plant_equipment_net": safe_get_series(balance_sheet, "Net PPE"),
+                "total_assets": safe_get_series(balance_sheet, "Total Assets"),
+                "accounts_payable": safe_get_series(balance_sheet, "Accounts Payable"),
+                "short_term_debt": [0,0,0], # Often hard to map exactly without deep inspection
+                "total_current_liabilities": safe_get_series(balance_sheet, "Total Current Liabilities"),
+                "long_term_debt": safe_get_series(balance_sheet, "Long Term Debt"),
+                "total_liabilities": safe_get_series(balance_sheet, "Total Liabilities Net Minority Interest"),
+                "shareholders_equity": safe_get_series(balance_sheet, "Stockholders Equity")
+            },
+            "key_ratios": {
+                "debt_to_equity_ratio": info.get("debtToEquity", 0) / 100.0 if info.get("debtToEquity") else 0.5,
+                "net_profit_margin": info.get("profitMargins", 0.1),
+                "current_ratio": info.get("currentRatio", 1.0),
+                "interest_coverage_ratio": 5.0 # yfinance often missing this directly
+            },
+            "market_data": {
+                "share_price": info.get("currentPrice", 0.0),
+                "shares_outstanding": info.get("sharesOutstanding", 0)
+            }
+        }
+
+        return {
+            "company_info": {
+                "name": info.get("longName", ticker_symbol),
+                "industry_sector": info.get("sector", "Unknown"),
+                "country": info.get("country", "Unknown")
+            },
+            "financial_data_detailed": financial_data_detailed
+        }
+
+    def _get_mock_data(self, company_id: str) -> Dict[str, Any]:
+        """Legacy mock data generator."""
         # Logic ported from core/agents/data_retrieval_agent.py
         # We simulate fetching data.
         # Robust mock for all tickers in this scaffolding phase

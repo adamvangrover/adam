@@ -6,6 +6,7 @@ import re
 import asyncio
 from typing import List, Dict, Any, Optional, Set
 from langgraph.graph import StateGraph, END, START
+from enum import Enum
 
 # Internal imports
 from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
@@ -13,6 +14,11 @@ from core.engine.states import GraphState
 
 logger = logging.getLogger(__name__)
 
+class PlannerIntent(Enum):
+    DEEP_DIVE = "DEEP_DIVE"
+    RISK_ALERT = "RISK_ALERT"
+    MARKET_UPDATE = "MARKET_UPDATE"
+    GENERAL_QUERY = "GENERAL_QUERY"
 
 class NeuroSymbolicPlanner:
     """
@@ -20,7 +26,7 @@ class NeuroSymbolicPlanner:
 
     Bridge Pattern:
     - Symbolic Side: Uses NetworkX/Neo4j to find valid reasoning paths.
-    - Neural Side: Uses LLMs to parse unstructured requests into directed graphs.
+    - Neural Side: Uses LLMs (or semantic emulation) to parse unstructured requests into directed graphs.
     """
 
     # Bolt Optimization: Pre-compile Regex patterns to avoid re-compilation overhead
@@ -56,47 +62,98 @@ class NeuroSymbolicPlanner:
     def create_plan(self, request: str) -> Dict[str, Any]:
         """
         Orchestrates the planning process (High-Level API):
-        1. Parse Request
-        2. Extract Entities
+        1. Classify Intent (Semantic Router)
+        2. Extract Entities (Dynamic NER)
         3. Discover Symbolic Path
         4. Fallback to LLM Planning
         """
         logger.info(f"[Planner] Creating plan for request: '{request}'")
 
-        # 1. Entity Extraction (Heuristic/Regex)
-        entity_match = self.ENTITY_PATTERN.search(request)
+        # 1. Semantic Intent Classification
+        intent = self._classify_intent_semantic(request)
+        logger.info(f"[Planner] Classified Intent: {intent.value}")
 
-        if entity_match:
-            start_node = entity_match.group(1).strip()
-            # Clean up common suffixes for graph matching if needed,
-            # but keeping it raw is often safer for fuzzy matching in KG
+        # 2. Dynamic Entity Extraction
+        entities = self._extract_entities_dynamic(request)
+        start_node = entities.get("primary_entity")
 
-            # Intent mapping (simple keyword search in the whole request)
-            request_lower = request.lower()
-            target_node = "Investment_Decision"  # Default generic target
-            if "credit" in request_lower:
-                target_node = "Credit_Default"
-            elif "market" in request_lower:
-                target_node = "Market_Crash"
-            elif "esg" in request_lower:
-                target_node = "ESG_Controversy"
-            elif "liquidity" in request_lower:
-                target_node = "Liquidity_Crisis"
+        if start_node:
+            # Map Intent to Target Node
+            target_node = self._map_intent_to_target(intent, request)
 
             logger.info(f"[Planner] Extracted Entity: '{start_node}', Inferred Target: '{target_node}'")
 
-            # 2. Symbolic Discovery
+            # 3. Symbolic Discovery
             # We try to find a path from Entity -> Risk
             plan = self.discover_plan(start_node, target_node)
-
-            # If discovery found a path (even if it's a fallback), use it.
-            # But if it returned a Generic Fallback because of no path, we might want to try NLP parsing
-            # if we had a real LLM connected. Here we stick to the plan returned.
             return plan
 
-        # 3. Fallback to NLP Parsing logic (simulated here via simple regex on numbered lists)
-        logger.info("[Planner] Entity extraction failed. Falling back to NLP parsing.")
+        # 4. Fallback to NLP Parsing logic
+        logger.info("[Planner] Entity extraction failed or no path found. Falling back to NLP parsing.")
         return self.parse_natural_language_plan(request)
+
+    def _classify_intent_semantic(self, request: str) -> PlannerIntent:
+        """
+        Classifies the user intent using a semantic router.
+        (Currently uses weighted keyword scoring as a robust fallback for LLM)
+        """
+        request_lower = request.lower()
+
+        # Weighted keywords
+        scores = {
+            PlannerIntent.DEEP_DIVE: 0,
+            PlannerIntent.RISK_ALERT: 0,
+            PlannerIntent.MARKET_UPDATE: 0
+        }
+
+        keywords = {
+            PlannerIntent.DEEP_DIVE: ["deep dive", "comprehensive", "full analysis", "valuation", "fundamental", "report"],
+            PlannerIntent.RISK_ALERT: ["risk", "alert", "exposure", "default", "crisis", "warning", "downgrade"],
+            PlannerIntent.MARKET_UPDATE: ["market", "price", "news", "update", "sentiment", "trend", "moving"]
+        }
+
+        for intent, words in keywords.items():
+            for word in words:
+                if word in request_lower:
+                    scores[intent] += 1
+
+        # Determine winner
+        best_intent = max(scores, key=scores.get)
+        if scores[best_intent] == 0:
+            return PlannerIntent.GENERAL_QUERY
+        return best_intent
+
+    def _extract_entities_dynamic(self, request: str) -> Dict[str, str]:
+        """
+        Extracts entities dynamically using regex and heuristic patterns.
+        (Placeholder for Named Entity Recognition model)
+        """
+        # Try specific pattern first
+        match = self.ENTITY_PATTERN.search(request)
+        if match:
+            return {"primary_entity": match.group(1).strip()}
+
+        # Fallback: Look for known tickers or capitalized words in middle of sentence
+        # This is a very basic heuristic.
+        words = request.split()
+        potential_entities = [w for w in words if w.isupper() and len(w) <= 5 and len(w) >= 2]
+        if potential_entities:
+             # Heuristic: return the first potential ticker
+            return {"primary_entity": potential_entities[0].strip(".,!?:")}
+
+        return {}
+
+    def _map_intent_to_target(self, intent: PlannerIntent, request: str) -> str:
+        """Maps the classified intent to a target node in the graph."""
+        if intent == PlannerIntent.RISK_ALERT:
+            if "liquidity" in request.lower(): return "Liquidity_Crisis"
+            return "Credit_Default"
+        elif intent == PlannerIntent.MARKET_UPDATE:
+            return "Market_Crash" # Or 'Market_Volatility' if node exists
+        elif intent == PlannerIntent.DEEP_DIVE:
+            return "Investment_Decision"
+
+        return "Investment_Decision" # Default
 
     # -------------------------------------------------------------------------
     # 1. SYMBOLIC DISCOVERY (Graph Traversal)
@@ -115,6 +172,18 @@ class NeuroSymbolicPlanner:
 
         # 1. Pathfinding
         try:
+            # Check if start node exists (fuzzy match if needed)
+            if not graph.has_node(start_node):
+                # Try to find case-insensitive match
+                nodes = list(graph.nodes())
+                start_node_lower = start_node.lower()
+                candidates = [n for n in nodes if n.lower() == start_node_lower or start_node_lower in n.lower()]
+                if candidates:
+                    start_node = candidates[0]
+                    logger.info(f"[PoG] Fuzzy matched '{start_node_lower}' to '{start_node}'")
+                else:
+                    raise nx.NodeNotFound(f"Node {start_node} not found")
+
             path_nodes = nx.shortest_path(graph, source=start_node, target=target_node)
         except (nx.NodeNotFound, nx.NetworkXNoPath) as e:
             logger.warning(f"[PoG] Path finding failed: {e}. Reverting to Fallback.")

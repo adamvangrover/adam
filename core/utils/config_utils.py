@@ -3,6 +3,7 @@
 import yaml
 import os  # Import the 'os' module
 import logging
+import re
 from typing import Dict, Any, Optional
 
 
@@ -10,9 +11,29 @@ from typing import Dict, Any, Optional
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
+# 🛡️ Sentinel: Regex for finding environment variables in the format ${VAR}
+ENV_VAR_PATTERN = re.compile(r'\$\{(\w+)\}')
+
+
+def _substitute_env_vars(content: str) -> str:
+    """
+    🛡️ Sentinel: Substitute environment variables in the format ${VAR} within a string.
+    If the variable is not set, it is replaced with an empty string.
+    """
+    def replace(match):
+        var_name = match.group(1)
+        val = os.environ.get(var_name)
+        if val is None:
+            logging.warning(f"Environment variable '{var_name}' not set. Replacing with empty string.")
+            return ""
+        return val
+
+    return ENV_VAR_PATTERN.sub(replace, content)
+
+
 def load_config(file_path: str) -> Optional[Dict[str, Any]]:
     """
-    Loads a YAML configuration file.
+    Loads a YAML configuration file with environment variable substitution.
 
     Args:
         file_path: The path to the YAML configuration file.
@@ -22,7 +43,12 @@ def load_config(file_path: str) -> Optional[Dict[str, Any]]:
     """
     try:
         with open(file_path, 'r') as f:
-            config = yaml.safe_load(f)
+            content = f.read()
+
+            # 🛡️ Sentinel: Substitute environment variables before parsing
+            content = _substitute_env_vars(content)
+
+            config = yaml.safe_load(content)
             if config is None:  # Handle empty YAML files
                 logging.warning(f"Configuration file is empty: {file_path}")
                 return {}  # Return empty dict
