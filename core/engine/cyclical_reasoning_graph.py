@@ -38,6 +38,7 @@ except ImportError as e:
 
 from core.tools.tool_registry import ToolRegistry
 from core.data_processing.conviction_scorer import ConvictionScorer
+from core.prompting.personas.risk_officer import RiskOfficerPersona
 
 # --- Adapters & Helpers ---
 
@@ -198,6 +199,7 @@ def generate_draft_node(state: RiskAssessmentState) -> Dict[str, Any]:
 def critique_node(state: RiskAssessmentState) -> Dict[str, Any]:
     """
     Node: Critique (Enhanced with APEX Engine and Self-Reflection Agent)
+    Updated for v24: Uses RiskOfficerPersona (Prompt-as-Code).
     """
     logger.info("--- Node: Critique (System 2 Verification) ---")
     draft = state.get("draft_analysis", "")
@@ -209,30 +211,36 @@ def critique_node(state: RiskAssessmentState) -> Dict[str, Any]:
 
     # 1. Structural Checks
     if "Error" in draft:
-        critique_notes.append("Analysis failed due to system error.")
-        quality_score = 0.1
-        needs_correction = True
         return {
-            "critique_notes": critique_notes,
-            "quality_score": quality_score,
-            "needs_correction": needs_correction,
+            "critique_notes": ["Analysis failed due to system error."],
+            "quality_score": 0.1,
+            "needs_correction": True,
             "human_readable_status": "Critique failed due to errors."
         }
 
-    # 2. Self-Reflection (Simulated LLM)
-    # In production, this would call an LLM with the "Constitution" prompt.
-    # Here we simulate the output of such an agent.
+    # 2. Self-Reflection using Persona (Mocked for now as we don't have a live LLM loop here)
+    try:
+        # Instantiate the Prompt Plugin
+        persona = RiskOfficerPersona.default()
 
-    has_liquidity = "Liquidity" in draft or "current_ratio" in draft
-    has_conviction = "Score" in draft
+        # In a real run, we would call:
+        # result = await llm_engine.execute(persona, inputs={"draft_analysis": draft, "ticker": state["ticker"], "iteration": iteration})
 
-    if not has_liquidity:
-        critique_notes.append("Self-Reflection: The draft is missing Liquidity Risk analysis.")
-        needs_correction = True
+        # Simulating the Persona's logic:
+        has_liquidity = "Liquidity" in draft or "current_ratio" in draft
+        has_conviction = "Score" in draft
 
-    if not has_conviction:
-        critique_notes.append("Self-Reflection: No conviction score or verdict found.")
-        needs_correction = True
+        if not has_liquidity:
+            critique_notes.append(f"[SRO]: The draft is missing Liquidity Risk analysis.")
+            needs_correction = True
+
+        if not has_conviction:
+            critique_notes.append(f"[SRO]: No conviction score or verdict found.")
+            needs_correction = True
+
+    except Exception as e:
+        logger.warning(f"Persona Execution Failed: {e}. Falling back to simple logic.")
+        critique_notes.append("System check failed.")
 
     # 3. APEX Engine Verification (Tail Risk Check)
     if apex_engine:
