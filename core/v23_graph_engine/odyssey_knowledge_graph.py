@@ -73,9 +73,20 @@ class OdysseyKnowledgeGraph(UnifiedKnowledgeGraph):
                     )
                     self.graph.add_edge(node_id, fac_id, relation="BORROWS")
 
-    def detect_fractured_ouroboros(self) -> List[List[str]]:
+    def detect_fractured_ouroboros(self, limit: int = 100) -> List[List[str]]:
+        """
+        Detects cycles in the graph (Fractured Ouroboros).
+
+        Bolt Optimization:
+        Uses itertools.islice to limit the number of cycles found.
+        nx.simple_cycles tries to find ALL elementary cycles, which is exponential.
+        For risk detection, finding a few examples is sufficient.
+        """
         try:
-            cycles = list(nx.simple_cycles(self.graph))
+            import itertools
+            # Bolt Optimization: Cap cycle detection to prevent exponential runtime
+            cycle_iter = nx.simple_cycles(self.graph)
+            cycles = list(itertools.islice(cycle_iter, limit))
             return [c for c in cycles if len(c) > 1]
         except Exception as e:
             logger.error(f"Cycle detection failed: {e}")
