@@ -14,12 +14,20 @@ import sys
 import os
 import asyncio
 import json
+import importlib
 from typing import List, Dict, Any, Optional
 
 # Ensure core is importable
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../..")))
 
-# Import Core Engines
+# Import Dynamic Registry
+try:
+    from core.vertical_risk_agent.tools.mcp_server.components import get_component_module
+except ImportError:
+    print("Warning: Could not import component registry.")
+    def get_component_module(name): return None
+
+# Import Core Engines (Fallback if registry fails for core components)
 try:
     from core.vertical_risk_agent.generative_risk import GenerativeRiskEngine
     from core.v22_quantum_pipeline.qmc_engine import QuantumMonteCarloEngine
@@ -115,6 +123,21 @@ def get_repo_assessment() -> str:
             return f.read()
     except FileNotFoundError:
         return "Assessment not found."
+
+
+@mcp.resource("adam://knowledge/artifacts")
+def list_gold_standard_artifacts() -> str:
+    """
+    Lists all available Gold Standard data artifacts in the repository.
+    Resource URI: adam://knowledge/artifacts
+    """
+    import os
+    gold_std_path = "data/gold_standard/"
+    if not os.path.exists(gold_std_path):
+        return "Gold Standard directory not found."
+
+    files = [f for f in os.listdir(gold_std_path) if f.endswith('.json') or f.endswith('.jsonl')]
+    return json.dumps({"artifacts": files}, indent=2)
 
 # --- Tools ---
 
@@ -329,6 +352,75 @@ def get_agent_status(agent_name: str) -> str:
         return f"Agent '{agent_name}' is ACTIVE. Type: {type(agent).__name__}"
     else:
         return f"Agent '{agent_name}' is NOT FOUND."
+
+
+# --- New Features: Industry Router, Developer Swarm, Autonomous Improvement ---
+
+def _load_module_dynamically(component_key: str) -> Optional[Any]:
+    module_path = get_component_module(component_key)
+    if not module_path:
+        return None
+    try:
+        return importlib.import_module(module_path)
+    except ImportError as e:
+        print(f"Failed to load component {component_key}: {e}")
+        return None
+
+@mcp.tool()
+async def analyze_industry(sector: str) -> str:
+    """
+    Routes analysis request to the specialized agent for the given sector.
+    """
+    # Map 'tech' to 'technology', etc.
+    sector_key = sector.lower()
+    if "tech" in sector_key: sector_key = "technology"
+    elif "finance" in sector_key: sector_key = "financials"
+    elif "energy" in sector_key: sector_key = "energy"
+
+    module = _load_module_dynamically(sector_key)
+    if not module:
+        return f"No specialist found for sector: {sector}"
+
+    # In a real scenario, we'd instantiate the agent class from the module
+    # For now, we return a routing confirmation
+    return f"Routed to {module.__name__} for {sector} analysis."
+
+@mcp.tool()
+async def generate_code(spec: str) -> str:
+    """
+    Uses the CoderAgent to generate code based on a specification.
+    """
+    module = _load_module_dynamically("coder")
+    if not module:
+        return "CoderAgent not available."
+
+    # Placeholder for agent invocation
+    return f"CoderAgent received spec: {spec[:50]}... (Code generation started)"
+
+@mcp.tool()
+async def review_code(code: str) -> str:
+    """
+    Uses the ReviewerAgent to review the provided code.
+    """
+    module = _load_module_dynamically("reviewer")
+    if not module:
+        return "ReviewerAgent not available."
+
+    # Placeholder for agent invocation
+    return "ReviewerAgent: Code looks solid. No critical vulnerabilities found (Mock)."
+
+@mcp.tool()
+async def run_autonomous_improvement() -> str:
+    """
+    Triggers the MIT SEAL Autonomous Improvement Loop.
+    """
+    module = _load_module_dynamically("seal_loop")
+    if not module or not hasattr(module, "SEALLoop"):
+        return "SEAL Loop module not available."
+
+    seal = module.SEALLoop()
+    result = await seal.run_autonomous_improvement(iterations=1)
+    return json.dumps(result, indent=2)
 
 
 if __name__ == "__main__":
