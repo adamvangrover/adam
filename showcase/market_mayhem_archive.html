@@ -31,7 +31,7 @@
         }
         .cyber-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
 
-        .archive-list { max-width: 1000px; margin: 40px auto; display: flex; flex-direction: column; gap: 15px; padding: 0 20px; }
+        .archive-list { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
 
         .year-header {
             font-family: 'JetBrains Mono'; font-size: 2rem; color: #333; font-weight: bold;
@@ -40,8 +40,9 @@
 
         .archive-item {
             border: 1px solid #333; background: rgba(255, 255, 255, 0.03); padding: 20px;
-            display: flex; justify-content: space-between; align-items: center; gap: 20px;
+            display: flex; align-items: stretch; gap: 20px;
             transition: all 0.2s ease;
+            margin-bottom: 15px;
         }
         .archive-item:hover { border-color: var(--accent-color); background: rgba(204, 0, 0, 0.05); transform: translateX(5px); }
 
@@ -52,20 +53,43 @@
         .read-btn {
             padding: 8px 16px; border: 1px solid var(--accent-color); color: var(--accent-color);
             font-family: 'JetBrains Mono'; text-transform: uppercase; font-size: 0.75rem;
-            background: rgba(0,0,0,0.5); text-decoration: none; white-space: nowrap;
+            background: rgba(0,0,0,0.5); text-decoration: none; white-space: nowrap; align-self: center;
         }
         .read-btn:hover { background: var(--accent-color); color: #000; }
 
-        .type-badge { font-size: 0.6rem; padding: 2px 6px; border-radius: 2px; font-weight: bold; font-family: 'JetBrains Mono'; }
-        .flash { background: #ff0000; color: white; }
-        .weekly { background: #ffa500; color: black; }
-        .historical { background: #666; color: white; }
-
-        @media (max-width: 768px) {
-            .archive-item { flex-direction: column; align-items: flex-start; }
-            .read-btn { width: 100%; text-align: center; }
-        }
+        .type-badge { font-size: 0.6rem; padding: 2px 6px; border-radius: 2px; font-weight: bold; font-family: 'JetBrains Mono'; background: #333; color: white; }
+        .historical { background: #666; }
     </style>
+    <script>
+        function filterArchive() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const yearFilter = document.getElementById('yearFilter').value;
+            const items = document.querySelectorAll('.archive-item');
+            const headers = document.querySelectorAll('.year-header');
+
+            items.forEach(item => {
+                const title = item.getAttribute('data-title');
+                const year = item.getAttribute('data-year');
+
+                let matchesSearch = title.includes(input);
+                let matchesYear = (yearFilter === 'ALL') || (year === yearFilter) || (yearFilter === 'HISTORICAL' && year === 'HISTORICAL');
+
+                if (matchesSearch && matchesYear) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Hide headers if no children visible
+            headers.forEach(header => {
+                const year = header.getAttribute('data-year');
+                const visibleSiblings = document.querySelectorAll(`.archive-item[data-year="${year}"][style*="display: flex"]`);
+                // Note: style check is tricky in raw JS, simplier to just show all headers or implement smarter logic.
+                // For MVP, we'll leave headers visible or just basic toggling.
+            });
+        }
+    </script>
 </head>
 <body>
     <div class="scan-line"></div>
@@ -79,311 +103,153 @@
     <main>
         <div class="archive-list">
 
-            <div class="year-header">2025 ARCHIVE</div>
+    <div style="margin-bottom: 30px; display: flex; gap: 10px;">
+        <input type="text" id="searchInput" placeholder="Search archive..."
+            style="background: #111; border: 1px solid #333; color: white; padding: 10px; flex-grow: 1; font-family: 'JetBrains Mono';"
+            onkeyup="filterArchive()">
+        <select id="yearFilter" onchange="filterArchive()" style="background: #111; border: 1px solid #333; color: white; padding: 10px; font-family: 'JetBrains Mono';">
+            <option value="ALL">ALL YEARS</option>
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+            <option value="HISTORICAL">HISTORICAL</option>
+        </select>
+    </div>
+    <div id="archiveGrid">
+    <div class="year-header" data-year="2025">2025 ARCHIVE</div>
 
-            <div class="archive-item">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span class="item-date">2025-12-14</span>
-                    </div>
-                    <h3 class="item-title">THE GREAT DIVERGENCE</h3>
-                    <div class="item-summary">S&P 500 valuation ceilings vs. credit fracture...</div>
-                </div>
-                <a href="newsletter_market_mayhem.html" class="read-btn">DECRYPT &rarr;</a>
-            </div>
-
-            <div class="archive-item">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span class="item-date">2025-12-02</span>
-                        <span class="type-badge weekly">WEEKLY</span>
-                    </div>
-                    <h3 class="item-title">THE GREAT CALIBRATION</h3>
-                    <div class="item-summary">"AI ROI Reckoning" vs Macro slowdown. Energy is the lone safe harbor.</div>
-                </div>
-                <a href="newsletter_market_mayhem_dec_02_2025.html" class="read-btn">DECRYPT &rarr;</a>
-            </div>
-
-            <div class="archive-item">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span class="item-date">2025-11-14</span>
-                    </div>
-                    <h3 class="item-title">THE YIELD CURVE SNAP</h3>
-                    <div class="item-summary">10-Year Treasury breaches 5.0%...</div>
-                </div>
-                <a href="newsletter_market_mayhem_nov.html" class="read-btn">DECRYPT &rarr;</a>
-            </div>
-
-            <div class="archive-item">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span class="item-date">2025-11-13</span>
-                        <span class="type-badge weekly">WEEKLY</span>
-                    </div>
-                    <h3 class="item-title">THE SHUTDOWN HANGOVER</h3>
-                    <div class="item-summary">Growth fears replace inflation fears as 43-day shutdown ends.</div>
-                </div>
-                <a href="newsletter_market_mayhem_nov_13_2025.html" class="read-btn">DECRYPT &rarr;</a>
-            </div>
-
-            <div class="archive-item">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span class="item-date">2025-11-01</span>
-                        <span class="type-badge flash">FLASH</span>
-                    </div>
-                    <h3 class="item-title">FLASH: FED EMERGENCY MEETING RUMORS</h3>
-                    <div class="item-summary">Bond market dislocation triggers rumors of emergency liquidity injection.</div>
-                </div>
-                <a href="newsletter_flash_nov_01_2025.html" class="read-btn">DECRYPT &rarr;</a>
-            </div>
-
-            <div class="archive-item">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span class="item-date">2025-10-31</span>
-                        <span class="type-badge weekly">WEEKLY</span>
-                    </div>
-                    <h3 class="item-title">SPOOKY VOLATILITY: S&P 6666</h3>
-                    <div class="item-summary">Market dresses as a Bear. Double whammy of "China Jitters" and "Big Tech Fatigue".</div>
-                </div>
-                <a href="newsletter_market_mayhem_oct_31_2025.html" class="read-btn">DECRYPT &rarr;</a>
-            </div>
-
-            <div class="archive-item">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span class="item-date">2025-10-14</span>
-                    </div>
-                    <h3 class="item-title">ENERGY WARS: MIDNIGHT HAMMER</h3>
-                    <div class="item-summary">Geopolitical supply shock...</div>
-                </div>
-                <a href="newsletter_market_mayhem_oct.html" class="read-btn">DECRYPT &rarr;</a>
-            </div>
-
-            <div class="archive-item">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span class="item-date">2025-09-21</span>
-                        <span class="type-badge weekly">WEEKLY</span>
-                    </div>
-                    <h3 class="item-title">WEEKLY INTEL: OIL BREAKOUT</h3>
-                    <div class="item-summary">Technical breakout in crude. $90 is the next stop.</div>
-                </div>
-                <a href="newsletter_weekly_sep_21_2025.html" class="read-btn">DECRYPT &rarr;</a>
-            </div>
-
-            <div class="archive-item">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span class="item-date">2025-09-19</span>
-                        <span class="type-badge weekly">WEEKLY</span>
-                    </div>
-                    <h3 class="item-title">THE GREAT DISCONNECT</h3>
-                    <div class="item-summary">Wall Street euphoria vs. economic strain. The "Triad of Risk" signals repricing.</div>
-                </div>
-                <a href="newsletter_market_mayhem_sep_19_2025.html" class="read-btn">DECRYPT &rarr;</a>
-            </div>
-
-            <div class="archive-item">
+            <div class="archive-item" data-title="the liquidity trap" data-year="2025">
+                <div style="width: 5px; background: #ff0000; margin-right: 15px;"></div>
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <span class="item-date">2025-09-14</span>
+                        <span class="type-badge">MONTHLY</span>
                     </div>
                     <h3 class="item-title">THE LIQUIDITY TRAP</h3>
-                    <div class="item-summary">Fed pauses cuts as core services inflation sticks. Small caps get crushed.</div>
+                    <div class="item-summary">Fed pauses cuts as core services inflation sticks. Small caps get crushed. The case for 'Quality' factor investing.</div>
                 </div>
                 <a href="newsletter_market_mayhem_sep_2025.html" class="read-btn">DECRYPT &rarr;</a>
             </div>
 
-            <div class="archive-item">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span class="item-date">2025-08-29</span>
-                        <span class="type-badge weekly">WEEKLY</span>
-                    </div>
-                    <h3 class="item-title">DOG DAYS OF DEFIANCE</h3>
-                    <div class="item-summary">Defying seasonal weakness. "Soft Landing" narrative gets a boost from Jackson Hole.</div>
-                </div>
-                <a href="newsletter_market_mayhem_aug_29_2025.html" class="read-btn">DECRYPT &rarr;</a>
-            </div>
-
-            <div class="archive-item">
+            <div class="archive-item" data-title="summer doldrums & ai fatigue" data-year="2025">
+                <div style="width: 5px; background: #ffff00; margin-right: 15px;"></div>
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <span class="item-date">2025-08-14</span>
+                        <span class="type-badge">MONTHLY</span>
                     </div>
                     <h3 class="item-title">SUMMER DOLDRUMS & AI FATIGUE</h3>
-                    <div class="item-summary">Volume dries up. AI Capex questions emerge. Nvidia earnings preview.</div>
+                    <div class="item-summary">Volume dries up. AI Capex questions emerge. Nvidia earnings preview: Is the bar too high?</div>
                 </div>
                 <a href="newsletter_market_mayhem_aug_2025.html" class="read-btn">DECRYPT &rarr;</a>
             </div>
 
-            <div class="archive-item">
+            <div class="archive-item" data-title="crypto regulation shock" data-year="2025">
+                <div style="width: 5px; background: #ff0000; margin-right: 15px;"></div>
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <span class="item-date">2025-07-14</span>
+                        <span class="type-badge">MONTHLY</span>
                     </div>
-                    <h3 class="item-title">MID-YEAR OUTLOOK: BEYOND THE HYPE</h3>
-                    <div class="item-summary">AI transitioning from buzzword to tangible driver. Energy markets volatile.</div>
+                    <h3 class="item-title">CRYPTO REGULATION SHOCK</h3>
+                    <div class="item-summary">SEC 2.0 launches 'Operation Chokepoint'. DeFi protocols under siege. Bitcoin flight to safety narrative tested.</div>
                 </div>
-                <a href="newsletter_market_mayhem_jul_2025_v2.html" class="read-btn">DECRYPT &rarr;</a>
+                <a href="newsletter_market_mayhem_jul_2025.html" class="read-btn">DECRYPT &rarr;</a>
             </div>
 
-            <div class="archive-item">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span class="item-date">2025-06-29</span>
-                        <span class="type-badge weekly">WEEKLY</span>
-                    </div>
-                    <h3 class="item-title">INTERACTIVE: MARKET PULSE</h3>
-                    <div class="item-summary">Interactive dashboard: Market Pulse, Strategic Themes, and Forward Outlook.</div>
-                </div>
-                <a href="newsletter_market_mayhem_jun_29_2025.html" class="read-btn">DECRYPT &rarr;</a>
-            </div>
-
-            <div class="archive-item">
+            <div class="archive-item" data-title="the dollar wrecking ball" data-year="2025">
+                <div style="width: 5px; background: #ff0000; margin-right: 15px;"></div>
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <span class="item-date">2025-06-14</span>
+                        <span class="type-badge">MONTHLY</span>
                     </div>
                     <h3 class="item-title">THE DOLLAR WRECKING BALL</h3>
-                    <div class="item-summary">DXY breaks 108. Emerging Market currencies collapse.</div>
+                    <div class="item-summary">DXY breaks 108. Emerging Market currencies collapse. Carry trade unwind begins.</div>
                 </div>
                 <a href="newsletter_market_mayhem_jun_2025.html" class="read-btn">DECRYPT &rarr;</a>
             </div>
 
-            <div class="archive-item">
+            <div class="archive-item" data-title="commercial real estate: the reckoning" data-year="2025">
+                <div style="width: 5px; background: #ff0000; margin-right: 15px;"></div>
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <span class="item-date">2025-05-14</span>
+                        <span class="type-badge">MONTHLY</span>
                     </div>
                     <h3 class="item-title">COMMERCIAL REAL ESTATE: THE RECKONING</h3>
-                    <div class="item-summary">Office vacancy hits 25%. Regional banks take haircuts.</div>
+                    <div class="item-summary">Office vacancy hits 25%. Regional banks take haircuts. The 'Extend and Pretend' game ends.</div>
                 </div>
                 <a href="newsletter_market_mayhem_may_2025.html" class="read-btn">DECRYPT &rarr;</a>
             </div>
 
-            <div class="archive-item">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span class="item-date">2025-05-02</span>
-                        <span class="type-badge weekly">WEEKLY</span>
-                    </div>
-                    <h3 class="item-title">SELL IN MAY? NOT TODAY.</h3>
-                    <div class="item-summary">"AI Bid" refuses to die. Oil is the spoiler. "Higher for Longer" reality sets in.</div>
-                </div>
-                <a href="newsletter_market_mayhem_may_02_2025.html" class="read-btn">DECRYPT &rarr;</a>
-            </div>
-
-            <div class="archive-item">
+            <div class="archive-item" data-title="q1 earnings: profit margin squeeze" data-year="2025">
+                <div style="width: 5px; background: #ffff00; margin-right: 15px;"></div>
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <span class="item-date">2025-04-14</span>
+                        <span class="type-badge">MONTHLY</span>
                     </div>
                     <h3 class="item-title">Q1 EARNINGS: PROFIT MARGIN SQUEEZE</h3>
-                    <div class="item-summary">Wage inflation eats into margins. Guidance cut across Consumer Discretionary.</div>
+                    <div class="item-summary">Wage inflation eats into margins. Guidance cut across Consumer Discretionary. The Recession is not cancelled, just delayed.</div>
                 </div>
                 <a href="newsletter_market_mayhem_apr_2025.html" class="read-btn">DECRYPT &rarr;</a>
             </div>
+            <div class="year-header" data-year="2024">2024 ARCHIVE</div>
 
-            <div class="archive-item">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span class="item-date">2025-04-04</span>
-                        <span class="type-badge weekly">WEEKLY</span>
-                    </div>
-                    <h3 class="item-title">SPRING AWAKENING</h3>
-                    <div class="item-summary">"Goldilocks" Jobs Report keeps the soft landing dream alive.</div>
-                </div>
-                <a href="newsletter_market_mayhem_apr_04_2025.html" class="read-btn">DECRYPT &rarr;</a>
-            </div>
-
-            <div class="archive-item">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span class="item-date">2025-03-14</span>
-                    </div>
-                    <h3 class="item-title">BANKING CRISIS 2.0?</h3>
-                    <div class="item-summary">NYCB echoes. Is it idiosyncratic or systemic?</div>
-                </div>
-                <a href="newsletter_market_mayhem_mar_2025.html" class="read-btn">DECRYPT &rarr;</a>
-            </div>
-
-            <div class="archive-item">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span class="item-date">2025-02-14</span>
-                    </div>
-                    <h3 class="item-title">THE AI BUBBLE BURST?</h3>
-                    <div class="item-summary">Semis correct 20%. Is the hype cycle over?</div>
-                </div>
-                <a href="newsletter_market_mayhem_feb_2025.html" class="read-btn">DECRYPT &rarr;</a>
-            </div>
-
-            <div class="archive-item">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span class="item-date">2025-01-14</span>
-                    </div>
-                    <h3 class="item-title">2025 OUTLOOK: THE YEAR OF VOLATILITY</h3>
-                    <div class="item-summary">Regime shift. The era of 'Great Moderation' is officially dead.</div>
-                </div>
-                <a href="newsletter_market_mayhem_jan_2025.html" class="read-btn">DECRYPT &rarr;</a>
-            </div>
-
-            <div class="year-header">2024 ARCHIVE</div>
-
-            <div class="archive-item">
+            <div class="archive-item" data-title="2024 post-mortem: the soft landing miracle" data-year="2024">
+                <div style="width: 5px; background: #00ff00; margin-right: 15px;"></div>
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <span class="item-date">2024-12-14</span>
+                        <span class="type-badge">YEARLY_REVIEW</span>
                     </div>
                     <h3 class="item-title">2024 POST-MORTEM: THE SOFT LANDING MIRACLE</h3>
-                    <div class="item-summary">How the Fed threaded the needle.</div>
+                    <div class="item-summary">How the Fed threaded the needle. Inflation down, unemployment low. Can it last?</div>
                 </div>
                 <a href="newsletter_market_mayhem_dec_2024.html" class="read-btn">DECRYPT &rarr;</a>
             </div>
+            <div class="year-header" data-year="2020">2020 ARCHIVE</div>
 
-            <div class="year-header">HISTORICAL ARCHIVE</div>
-
-            <div class="archive-item">
+            <div class="archive-item" data-title="market mayhem: the great shut-in" data-year="2020">
+                <div style="width: 5px; background: #ff0000; margin-right: 15px;"></div>
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <span class="item-date">2020-03-20</span>
-                        <span class="type-badge historical">HISTORICAL</span>
+                        <span class="type-badge">HISTORICAL</span>
                     </div>
-                    <h3 class="item-title">THE GREAT SHUT-IN</h3>
-                    <div class="item-summary">COVID-19 Pandemic. "Lockdown". Fed cuts to zero.</div>
+                    <h3 class="item-title">MARKET MAYHEM: THE GREAT SHUT-IN</h3>
+                    <div class="item-summary">"Lockdown". The global economy has come to a screeching halt. With "15 Days to Slow the Spread" in effect, markets are pricing in a depression-level GDP contraction.</div>
                 </div>
                 <a href="newsletter_market_mayhem_mar_2020.html" class="read-btn">DECRYPT &rarr;</a>
             </div>
+            <div class="year-header" data-year="HISTORICAL">HISTORICAL ARCHIVE</div>
 
-            <div class="archive-item">
+            <div class="archive-item" data-title="market mayhem: the lehman moment" data-year="HISTORICAL">
+                <div style="width: 5px; background: #666; margin-right: 15px;"></div>
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <span class="item-date">2008-09-19</span>
                         <span class="type-badge historical">HISTORICAL</span>
                     </div>
-                    <h3 class="item-title">THE LEHMAN MOMENT</h3>
-                    <div class="item-summary">Lehman Brothers files for Chapter 11. "Existential Panic".</div>
+                    <h3 class="item-title">MARKET MAYHEM: THE LEHMAN MOMENT</h3>
+                    <div class="item-summary">"Existential Panic". There are decades where nothing happens; and there are weeks where decades happen. This was one of those weeks. A 158-year-old bank vanished, the world's largest insurer was nationalized, and the money market broke the buck.</div>
                 </div>
                 <a href="newsletter_market_mayhem_sep_2008.html" class="read-btn">DECRYPT &rarr;</a>
             </div>
 
-            <div class="archive-item">
+            <div class="archive-item" data-title="market mayhem: black monday aftermath" data-year="HISTORICAL">
+                <div style="width: 5px; background: #666; margin-right: 15px;"></div>
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <span class="item-date">1987-10-23</span>
                         <span class="type-badge historical">HISTORICAL</span>
                     </div>
-                    <h3 class="item-title">BLACK MONDAY AFTERMATH</h3>
-                    <div class="item-summary">Dow falls 22.6% in a single day. "Shell-Shocked".</div>
+                    <h3 class="item-title">MARKET MAYHEM: BLACK MONDAY AFTERMATH</h3>
+                    <div class="item-summary">"Shell-Shocked". On October 19th, the Dow Jones Industrial Average fell 22.6% in a single day. 508 points. It was the largest one-day percentage drop in history.</div>
                 </div>
                 <a href="newsletter_market_mayhem_oct_1987.html" class="read-btn">DECRYPT &rarr;</a>
             </div>
-
+            </div>
         </div>
         <div style="text-align: center; margin: 60px 0; color: #444; font-family: 'JetBrains Mono'; font-size: 0.7rem;">
             END OF TRANSMISSION
