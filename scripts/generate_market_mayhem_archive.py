@@ -240,7 +240,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             --cyber-blue: #00f3ff;
         }}
         body {{ margin: 0; background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }}
-        
+
         .newsletter-wrapper {{
             max-width: 1000px;
             margin: 40px auto;
@@ -280,7 +280,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             letter-spacing: 1px;
         }}
         p {{ line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }}
-        
+
         /* Sidebar */
         .cyber-sidebar {{
             font-family: 'JetBrains Mono', monospace;
@@ -361,7 +361,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             </div>
 
             <h1 class="title">{title}</h1>
-            
+
             <p style="font-size: 1.2rem; font-style: italic; color: #444; border-bottom: 1px solid #eee; padding-bottom: 20px;">
                 {summary}
             </p>
@@ -417,7 +417,7 @@ def generate_files():
         critique = item.get("adam_critique", "Analysis pending...")
         body = item.get("full_body", f"<p>{item['summary']}</p>")
         tickers = item.get("related_tickers", [])
-        
+
         # Build HTML fragments
         highlights = ""
         for h in item.get("content_highlights", []):
@@ -445,8 +445,8 @@ def generate_files():
 
 # Regex patterns for extraction (Updated to handle new format if needed, but we mostly write)
 # The scan function primarily reads specifically formatted files.
-# Since we are regenerating them all, the scan function is less critical for metadata *extraction* 
-# from the file itself if we have the source data here. 
+# Since we are regenerating them all, the scan function is less critical for metadata *extraction*
+# from the file itself if we have the source data here.
 # BUT, to keep the archive page script self-contained if we run it later without this big list:
 TITLE_RE = re.compile(r'<h1 class="title">(.*?)</h1>', re.IGNORECASE)
 DATE_RE = re.compile(r'<span>([\d-]+)</span>', re.IGNORECASE) # Updated selector
@@ -458,12 +458,12 @@ def scan_newsletters():
     # This is a fallback if we want to pick up files NOT in NEWSLETTER_DATA
     # For now, we rely on NEWSLETTER_DATA for the archive page generation to ensure high quality
     # But let's merge them.
-    
+
     known_filenames = set(item["filename"] for item in NEWSLETTER_DATA)
     files = glob.glob(os.path.join(OUTPUT_DIR, "newsletter_*.html"))
-    
+
     scanned_items = []
-    
+
     for filepath in files:
         filename = os.path.basename(filepath)
         if filename == "newsletter_market_mayhem.html": continue
@@ -473,11 +473,11 @@ def scan_newsletters():
         try:
             with open(filepath, 'r', encoding='utf-8') as f:
                 content = f.read()
-            
+
             title = TITLE_RE.search(content)
             date = DATE_RE.search(content)
             summary = SUMMARY_RE.search(content)
-            
+
             if title and date:
                 scanned_items.append({
                     "date": date.group(1).strip(),
@@ -488,15 +488,15 @@ def scan_newsletters():
                     "sentiment_score": 50 # Default
                 })
         except: pass
-    
+
     return NEWSLETTER_DATA + scanned_items
 
 def generate_archive_page():
     print("Generating archive page...")
     generate_files() # Regenerate content
-    
+
     all_items = scan_newsletters()
-    
+
     # Sort
     all_items.sort(key=lambda x: x["date"], reverse=True)
 
@@ -516,11 +516,11 @@ def generate_archive_page():
 
     # Build HTML
     list_html = ""
-    
+
     # Filter Bar (Client Side)
     list_html += """
     <div style="margin-bottom: 30px; display: flex; gap: 10px;">
-        <input type="text" id="searchInput" placeholder="Search archive..." 
+        <input type="text" id="searchInput" placeholder="Search archive..."
             style="background: #111; border: 1px solid #333; color: white; padding: 10px; flex-grow: 1; font-family: 'JetBrains Mono';"
             onkeyup="filterArchive()">
         <select id="yearFilter" onchange="filterArchive()" style="background: #111; border: 1px solid #333; color: white; padding: 10px; font-family: 'JetBrains Mono';">
@@ -573,7 +573,7 @@ def generate_archive_page():
                 <a href="{item["filename"]}" class="read-btn">DECRYPT &rarr;</a>
             </div>
             """
-    
+
     list_html += "</div>" # End Grid
 
     page_html = f"""<!DOCTYPE html>
@@ -648,7 +648,7 @@ def generate_archive_page():
             items.forEach(item => {{
                 const title = item.getAttribute('data-title');
                 const year = item.getAttribute('data-year');
-                
+
                 let matchesSearch = title.includes(input);
                 let matchesYear = (yearFilter === 'ALL') || (year === yearFilter) || (yearFilter === 'HISTORICAL' && year === 'HISTORICAL');
 
@@ -663,7 +663,7 @@ def generate_archive_page():
             headers.forEach(header => {{
                 const year = header.getAttribute('data-year');
                 const visibleSiblings = document.querySelectorAll(`.archive-item[data-year="${{year}}"][style*="display: flex"]`);
-                // Note: style check is tricky in raw JS, simplier to just show all headers or implement smarter logic. 
+                // Note: style check is tricky in raw JS, simplier to just show all headers or implement smarter logic.
                 // For MVP, we'll leave headers visible or just basic toggling.
             }});
         }}
