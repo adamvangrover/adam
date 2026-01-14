@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | System Knowledge Graph</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #020408;
+            --panel-bg: rgba(15, 23, 42, 0.95);
+            --border-color: #334155;
+            --accent-cyan: #22d3ee;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+
+        .scan-line {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+    <div class="scan-line"></div>
+
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 shrink-0">
+        <div class="flex items-center gap-4">
+            <div class="w-8 h-8 bg-purple-900/50 rounded flex items-center justify-center border border-purple-500/30">
+                <i class="fas fa-brain text-purple-400"></i>
+            </div>
+            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-purple-400">CORE</span> <span class="text-slate-500 font-normal">| System Knowledge Graph</span></h1>
+        </div>
+
+        <div class="flex items-center gap-4 text-xs font-mono">
+             <div class="relative">
+                <i class="fas fa-search absolute left-3 top-2 text-slate-500"></i>
+                <input type="text" id="search-input" placeholder="Search modules..." class="bg-slate-800 border border-slate-700 rounded-full pl-8 pr-4 py-1.5 w-64 text-white focus:outline-none focus:border-purple-500">
+            </div>
+            <button id="btn-cluster" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-600 rounded px-3 py-1.5 transition">
+                <i class="fas fa-project-diagram mr-1"></i> Cluster
+            </button>
+            <div class="h-6 w-px bg-slate-700"></div>
+            <div class="flex items-center gap-2">
+                <span class="text-slate-400">MODE:</span>
+                <button id="mode-dev" class="px-2 py-1 rounded bg-purple-900/40 text-purple-300 border border-purple-700">DEV</button>
+                <button id="mode-train" class="px-2 py-1 rounded hover:bg-slate-800 text-slate-500 border border-transparent">TRAINING</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 flex overflow-hidden relative">
+        <div id="graph-container" class="flex-1 bg-gradient-to-b from-[#0f172a] to-[#020408]"></div>
+
+        <!-- Legend / Stats -->
+        <div class="absolute bottom-6 left-6 z-20 pointer-events-none">
+            <div class="glass-panel rounded-lg p-4 w-64 pointer-events-auto">
+                <h4 class="text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wider mono">Repo Stats</h4>
+                <div class="grid grid-cols-2 gap-4 text-xs mono mb-4">
+                    <div>
+                        <div class="text-slate-500">Files</div>
+                        <div class="text-white font-bold text-lg" id="stat-nodes">0</div>
+                    </div>
+                    <div>
+                        <div class="text-slate-500">Links</div>
+                        <div class="text-white font-bold text-lg" id="stat-edges">0</div>
+                    </div>
+                </div>
+
+                <h4 class="text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wider mono">Legend</h4>
+                <div class="space-y-1 text-[10px] mono text-slate-300">
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#ef4444]"></span> House View / Strategy</div>
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#a855f7]"></span> Core Engine</div>
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#10b981]"></span> Agents</div>
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#3b82f6]"></span> UI / Showcase</div>
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#f59e0b]"></span> Documentation</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        class SystemGraph {
+            constructor() {
+                this.container = document.getElementById('graph-container');
+                this.network = null;
+                this.data = null;
+                this.isClustered = false;
+            }
+
+            async init() {
+                try {
+                    const res = await fetch('data/system_knowledge_graph.json');
+                    const json = await res.json();
+
+                    document.getElementById('stat-nodes').innerText = json.nodes.length;
+                    document.getElementById('stat-edges').innerText = json.edges.length;
+
+                    this.data = {
+                        nodes: new vis.DataSet(json.nodes),
+                        edges: new vis.DataSet(json.edges)
+                    };
+
+                    this.render();
+                    this.setupEvents();
+                } catch (e) {
+                    console.error("Failed to load graph", e);
+                }
+            }
+
+            render() {
+                const options = {
+                    nodes: {
+                        shape: 'dot',
+                        font: { face: 'Inter', color: '#cbd5e1', size: 10 },
+                        borderWidth: 1
+                    },
+                    edges: {
+                        color: { color: '#334155', opacity: 0.3 },
+                        smooth: { type: 'continuous', roundness: 0.5 },
+                        arrows: { to: { enabled: true, scaleFactor: 0.5 } }
+                    },
+                    groups: {
+                        strategy: { color: '#ef4444', size: 40, font: {size: 14, face:'JetBrains Mono'} },
+                        core: { color: '#a855f7' },
+                        agent: { color: '#10b981' },
+                        ui: { color: '#3b82f6' },
+                        knowledge: { color: '#f59e0b', shape: 'square' },
+                        code: { color: '#64748b' },
+                        doc: { color: '#94a3b8', shape: 'text' }
+                    },
+                    physics: {
+                        stabilization: true,
+                        barnesHut: {
+                            gravitationalConstant: -2000,
+                            springConstant: 0.01,
+                            springLength: 150
+                        }
+                    },
+                    interaction: { tooltipDelay: 200, hover: true }
+                };
+
+                this.network = new vis.Network(this.container, this.data, options);
+
+                // Stabilize event
+                this.network.on("stabilizationIterationsDone", () => {
+                    this.network.setOptions({ physics: { enabled: false } });
+                });
+            }
+
+            setupEvents() {
+                document.getElementById('search-input').addEventListener('input', (e) => {
+                    const term = e.target.value.toLowerCase();
+                    if(term.length < 2) return;
+
+                    const matches = this.data.nodes.get({
+                        filter: n => n.label.toLowerCase().includes(term)
+                    });
+
+                    if(matches.length > 0) {
+                        this.network.focus(matches[0].id, { scale: 1.5, animation: true });
+                        this.network.selectNodes([matches[0].id]);
+                    }
+                });
+
+                document.getElementById('btn-cluster').addEventListener('click', () => {
+                    if(!this.isClustered) {
+                        const groups = ['core', 'agent', 'ui', 'knowledge', 'strategy'];
+                        groups.forEach(g => {
+                            this.network.cluster({
+                                joinCondition: (opts) => opts.group === g,
+                                clusterNodeProperties: {
+                                    label: g.toUpperCase(),
+                                    shape: 'database',
+                                    color: '#fff',
+                                    font: {size: 20, color: '#000'}
+                                }
+                            });
+                        });
+                        this.isClustered = true;
+                    } else {
+                        Object.keys(this.network.clustering.clusteredNodes).forEach(id => {
+                            try { this.network.openCluster(id); } catch(e){}
+                        });
+                        this.isClustered = false;
+                    }
+                });
+
+                // Mode Toggle
+                document.getElementById('mode-train').addEventListener('click', () => {
+                   this.setMode('train');
+                });
+                document.getElementById('mode-dev').addEventListener('click', () => {
+                   this.setMode('dev');
+                });
+            }
+
+            setMode(mode) {
+                const trainBtn = document.getElementById('mode-train');
+                const devBtn = document.getElementById('mode-dev');
+
+                if(mode === 'train') {
+                    trainBtn.className = "px-2 py-1 rounded bg-amber-900/40 text-amber-300 border border-amber-700";
+                    devBtn.className = "px-2 py-1 rounded hover:bg-slate-800 text-slate-500 border border-transparent";
+
+                    // Highlight docs and strategy
+                    const allNodes = this.data.nodes.get();
+                    const updates = allNodes.map(n => ({
+                        id: n.id,
+                        hidden: !(n.group === 'knowledge' || n.group === 'strategy' || n.path?.endsWith('.md'))
+                    }));
+                    this.data.nodes.update(updates);
+
+                } else {
+                    devBtn.className = "px-2 py-1 rounded bg-purple-900/40 text-purple-300 border border-purple-700";
+                    trainBtn.className = "px-2 py-1 rounded hover:bg-slate-800 text-slate-500 border border-transparent";
+
+                    // Show all
+                    const allNodes = this.data.nodes.get();
+                    const updates = allNodes.map(n => ({
+                        id: n.id,
+                        hidden: false
+                    }));
+                    this.data.nodes.update(updates);
+                }
+            }
+        }
+
+        const app = new SystemGraph();
+        document.addEventListener('DOMContentLoaded', () => app.init());
+    </script>
+</body>
+</html>

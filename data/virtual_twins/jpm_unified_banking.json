@@ -23,10 +23,16 @@
     { "id": "101", "label": "Liink Network", "group": "infra", "type": "Infrastructure", "initial_value": 30.0, "risk_exposure": 0.4 },
     { "id": "102", "label": "JPM Coin", "group": "asset", "type": "Digital Asset", "initial_value": 20.0, "risk_exposure": 0.6 },
 
+    { "id": "300", "label": "AI Compute Grid", "group": "ai_infra", "type": "Infrastructure", "initial_value": 80.0, "risk_exposure": 0.3 },
+    { "id": "301", "label": "LLM Training Cluster", "group": "ai_infra", "type": "Infrastructure", "initial_value": 60.0, "risk_exposure": 0.4 },
+    { "id": "302", "label": "Inference Engine", "group": "ai_infra", "type": "Infrastructure", "initial_value": 40.0, "risk_exposure": 0.2 },
+    { "id": "303", "label": "Data Lakehouse", "group": "ai_infra", "type": "Infrastructure", "initial_value": 70.0, "risk_exposure": 0.1 },
+
     { "id": "200", "label": "SNC Agent", "group": "agent", "type": "AI Agent", "initial_value": 10.0, "risk_exposure": 0.1 },
     { "id": "201", "label": "Fraud Agent", "group": "agent", "type": "AI Agent", "initial_value": 10.0, "risk_exposure": 0.1 },
     { "id": "202", "label": "Compliance Agent", "group": "agent", "type": "AI Agent", "initial_value": 10.0, "risk_exposure": 0.05 },
     { "id": "203", "label": "Sentinel (Security)", "group": "agent", "type": "AI Agent", "initial_value": 15.0, "risk_exposure": 0.05 },
+    { "id": "204", "label": "Omniscient Analyst", "group": "agent", "type": "AI Agent", "initial_value": 20.0, "risk_exposure": 0.2 },
 
     { "id": "10", "label": "Liquidity Crunch", "group": "risk", "type": "Risk Factor", "initial_value": 60.0, "risk_exposure": 0.8 },
     { "id": "11", "label": "Rates Volatility", "group": "risk", "type": "Risk Factor", "initial_value": 40.0, "risk_exposure": 0.7 },
@@ -45,10 +51,16 @@
     { "from": "100", "to": "101", "type": "POWERS" },
     { "from": "100", "to": "102", "type": "ISSUES" },
 
+    { "from": "300", "to": "301", "type": "POWERS" }, { "from": "300", "to": "302", "type": "POWERS" },
+    { "from": "303", "to": "301", "type": "FEEDS" }, { "from": "303", "to": "302", "type": "FEEDS" },
+    { "from": "1", "to": "300", "type": "INVESTS_IN" },
+
     { "from": "200", "to": "5", "type": "MONITORS" },
     { "from": "201", "to": "2a", "type": "MONITORS" }, { "from": "201", "to": "3b", "type": "MONITORS" },
     { "from": "202", "to": "1", "type": "MONITORS" },
     { "from": "203", "to": "100", "type": "PROTECTS" }, { "from": "203", "to": "1", "type": "PROTECTS" },
+    { "from": "204", "to": "3", "type": "ADVISES" }, { "from": "204", "to": "302", "type": "RUNS_ON" },
+    { "from": "200", "to": "302", "type": "RUNS_ON" }, { "from": "201", "to": "302", "type": "RUNS_ON" },
 
     { "from": "10", "to": "3", "type": "IMPACTS" }, { "from": "10", "to": "5", "type": "IMPACTS" },
     { "from": "11", "to": "3a", "type": "IMPACTS" }, { "from": "11", "to": "2b", "type": "IMPACTS" },
