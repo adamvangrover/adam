@@ -1,12 +1,20 @@
 import os
-import random
-import datetime
+import re
+import glob
+from datetime import datetime
 
 # --- Configuration ---
 OUTPUT_DIR = "showcase"
 ARCHIVE_FILE = "showcase/market_mayhem_archive.html"
 TEMPLATE_FILE = "showcase/newsletter_market_mayhem.html"  # We'll use this as a base, but I'll inline the template for simplicity
 
+# Regex patterns for extraction
+TITLE_RE = re.compile(r'<h1 class="title">(.*?)</h1>', re.IGNORECASE)
+DATE_RE = re.compile(r'Date:</strong>\s*([\d-]+)', re.IGNORECASE)
+SUMMARY_RE = re.compile(r'Executive Summary:</strong>\s*(.*?)(?:</p>|<br>)', re.IGNORECASE | re.DOTALL)
+TYPE_RE = re.compile(r'TYPE:\s*(.*?)\s*//', re.IGNORECASE)
+
+# --- Original Data (Restored for fallback generation) ---
 NEWSLETTER_DATA = [
     # 2025 Monthly
     {
@@ -156,6 +164,44 @@ NEWSLETTER_DATA = [
             "Saudi production cuts extended.",
             "XLE calls."
         ]
+    },
+
+    # Historical Archives (Parsed from existing files)
+    {
+        "date": "2020-03-20",
+        "title": "MARKET MAYHEM: THE GREAT SHUT-IN",
+        "summary": "'Lockdown'. The global economy has come to a screeching halt. With '15 Days to Slow the Spread' in effect, markets are pricing in a depression-level GDP contraction.",
+        "type": "HISTORICAL ARCHIVE",
+        "filename": "newsletter_market_mayhem_mar_2020.html",
+        "content_highlights": [
+            "S&P 500 drops 35% in a month.",
+            "Fed cuts rates to zero.",
+            "Oil futures turn negative."
+        ]
+    },
+    {
+        "date": "2008-09-19",
+        "title": "MARKET MAYHEM: THE LEHMAN MOMENT",
+        "summary": "'Existential Panic'. There are decades where nothing happens; and there are weeks where decades happen. This was one of those weeks. A 158-year-old bank vanished, the world's largest insurer was nationalized, and the money market broke the buck.",
+        "type": "HISTORICAL ARCHIVE",
+        "filename": "newsletter_market_mayhem_sep_2008.html",
+        "content_highlights": [
+            "Lehman Brothers files for Chapter 11.",
+            "AIG bailed out by Fed.",
+            "Reserve Primary Fund breaks the buck."
+        ]
+    },
+    {
+        "date": "1987-10-23",
+        "title": "MARKET MAYHEM: BLACK MONDAY AFTERMATH",
+        "summary": "'Shell-Shocked'. On October 19th, the Dow Jones Industrial Average fell 22.6% in a single day. 508 points. It was the largest one-day percentage drop in history.",
+        "type": "HISTORICAL ARCHIVE",
+        "filename": "newsletter_market_mayhem_oct_1987.html",
+        "content_highlights": [
+            "Dow drops 22.6% in one day.",
+            "Portfolio insurance blamed.",
+            "Greenspan pledges liquidity."
+        ]
     }
 ]
 
@@ -284,9 +330,20 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 """
 
 def generate_files():
+    """Generates the static HTML files for the newsletters defined in NEWSLETTER_DATA."""
     print("Generating newsletter files...")
+
+    # Ensure output directory exists
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR)
+
     for item in NEWSLETTER_DATA:
         filepath = os.path.join(OUTPUT_DIR, item["filename"])
+
+        # Check if file already exists to avoid overwriting manual edits?
+        # For now, we overwrite to ensure consistency with the data source,
+        # but in a real scenario we might want to be careful.
+        # Since this is a generator script, "source of truth" is here.
 
         # Build highlights list
         highlights = ""
@@ -301,29 +358,81 @@ def generate_files():
             highlights_html=highlights
         )
 
-        with open(filepath, "w") as f:
+        with open(filepath, "w", encoding='utf-8') as f:
             f.write(content)
-        print(f"Created: {filepath}")
+        print(f"Created/Updated: {filepath}")
 
-def generate_archive_page():
-    print("Updating archive page...")
+def scan_newsletters():
+    """Scans the showcase directory for newsletter HTML files and extracts metadata."""
+    print(f"Scanning {OUTPUT_DIR} for newsletters...")
+    newsletters = []
 
-    # We will reconstruct the archive list HTML based on sorting NEWSLETTER_DATA + existing ones
+    # Pattern to match newsletter files
+    files = glob.glob(os.path.join(OUTPUT_DIR, "newsletter_*.html"))
 
-    # Existing ones (hardcoded for now to ensure we don't lose them)
-    all_newsletters = NEWSLETTER_DATA + [
-        {"date": "2025-12-14", "title": "THE GREAT DIVERGENCE", "summary": "S&P 500 valuation ceilings vs. credit fracture...", "filename": "newsletter_market_mayhem.html", "type": "MONTHLY"},
-        {"date": "2025-11-14", "title": "THE YIELD CURVE SNAP", "summary": "10-Year Treasury breaches 5.0%...", "filename": "newsletter_market_mayhem_nov.html", "type": "MONTHLY"},
-        {"date": "2025-10-14", "title": "ENERGY WARS: MIDNIGHT HAMMER", "summary": "Geopolitical supply shock...", "filename": "newsletter_market_mayhem_oct.html", "type": "MONTHLY"},
-    ]
+    for filepath in files:
+        filename = os.path.basename(filepath)
+
+        # Skip the template itself if it exists or other non-content files
+        if filename == "newsletter_market_mayhem.html":
+            pass
+
+        try:
+            with open(filepath, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            # Extract Data
+            title_match = TITLE_RE.search(content)
+            date_match = DATE_RE.search(content)
+            summary_match = SUMMARY_RE.search(content)
+            type_match = TYPE_RE.search(content)
+
+            if title_match and date_match:
+                title = title_match.group(1).strip()
+                date_str = date_match.group(1).strip()
+                summary = summary_match.group(1).strip() if summary_match else "No summary available."
+                msg_type = type_match.group(1).strip() if type_match else "UNKNOWN"
+
+                # Cleanup summary if it has HTML tags
+                summary = re.sub(r'<[^>]+>', '', summary)
+
+                newsletters.append({
+                    "date": date_str,
+                    "title": title,
+                    "summary": summary,
+                    "filename": filename,
+                    "type": msg_type
+                })
+        except Exception as e:
+            print(f"Error parsing {filename}: {e}")
 
     # Sort by date descending
-    all_newsletters.sort(key=lambda x: x["date"], reverse=True)
+    def parse_date(d):
+        try:
+            return datetime.strptime(d, "%Y-%m-%d")
+        except:
+            return datetime.min
+
+    newsletters.sort(key=lambda x: parse_date(x["date"]), reverse=True)
+    return newsletters
+
+def generate_archive_page():
+    print("Generating archive page...")
+
+    # We scan to get EVERYTHING on disk (generated + manual)
+    all_newsletters = scan_newsletters()
+    print(f"Found {len(all_newsletters)} newsletters.")
 
     # Group by Year
     grouped = {}
     for item in all_newsletters:
-        year = item["date"].split("-")[0]
+        try:
+            year = item["date"].split("-")[0]
+            if len(year) != 4 or not year.isdigit():
+                year = "UNKNOWN"
+        except:
+            year = "UNKNOWN"
+
         if year not in grouped:
             grouped[year] = []
         grouped[year].append(item)
@@ -331,15 +440,31 @@ def generate_archive_page():
     # Build HTML List
     list_html = ""
 
-    for year in sorted(grouped.keys(), reverse=True):
-        list_html += f'<div class="year-header">{year} ARCHIVE</div>\n'
+    # Sort years descending
+    sorted_years = sorted([y for y in grouped.keys() if y != "UNKNOWN"], reverse=True)
+    if "UNKNOWN" in grouped:
+        sorted_years.append("UNKNOWN")
+
+    for year in sorted_years:
+        header_text = f"{year} ARCHIVE"
+
+        # NOTE: Logic changed to prevent duplicate headers.
+        # We simply use the Year.
+        # If we wanted to group all pre-2020, we would need to restructure 'grouped' dictionary beforehand.
+        # But Year-based is cleaner.
+
+        list_html += f'<div class="year-header">{header_text}</div>\n'
 
         for item in grouped[year]:
             type_badge = ""
-            if item["type"] == "FLASH":
+            t_upper = item["type"].upper()
+
+            if "FLASH" in t_upper:
                 type_badge = '<span class="type-badge flash">FLASH</span>'
-            elif item["type"] == "WEEKLY":
+            elif "WEEKLY" in t_upper:
                 type_badge = '<span class="type-badge weekly">WEEKLY</span>'
+            elif "HISTORICAL" in t_upper:
+                type_badge = '<span class="type-badge historical">HISTORICAL</span>'
 
             list_html += f"""
             <div class="archive-item">
@@ -417,6 +542,7 @@ def generate_archive_page():
         .type-badge {{ font-size: 0.6rem; padding: 2px 6px; border-radius: 2px; font-weight: bold; font-family: 'JetBrains Mono'; }}
         .flash {{ background: #ff0000; color: white; }}
         .weekly {{ background: #ffa500; color: black; }}
+        .historical {{ background: #666; color: white; }}
 
         @media (max-width: 768px) {{
             .archive-item {{ flex-direction: column; align-items: flex-start; }}
@@ -445,10 +571,13 @@ def generate_archive_page():
 </html>
     """
 
-    with open(ARCHIVE_FILE, "w") as f:
+    with open(ARCHIVE_FILE, "w", encoding='utf-8') as f:
         f.write(page_html)
     print(f"Updated: {ARCHIVE_FILE}")
 
 if __name__ == "__main__":
+    # 1. Regenerate existing/missing files based on source of truth
     generate_files()
+
+    # 2. Update the archive page by scanning everything on disk
     generate_archive_page()

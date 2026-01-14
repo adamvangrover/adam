@@ -91,26 +91,75 @@ def get_knowledge_graph_data(root_dir):
     
     # scan for .ttl or .json graph files
     data_dir = os.path.join(root_dir, 'data')
+    gold_dir = os.path.join(data_dir, 'gold_standard')
     
-    # 1. Try to load v23_knowledge_graph.json or similar
-    kg_files = glob.glob(os.path.join(data_dir, '*knowledge_graph*.json'))
-    for kg_file in kg_files:
+    # Priority: Gold Standard v23.5 -> Root Knowledge Graph -> Others
+    candidates = [
+        os.path.join(gold_dir, 'v23_5_knowledge_graph.json'),
+        os.path.join(data_dir, 'knowledge_graph_v2.json'),
+        os.path.join(data_dir, 'knowledge_graph.json')
+    ]
+    # Add globs
+    candidates.extend(glob.glob(os.path.join(data_dir, '*knowledge_graph*.json')))
+
+    selected_file = None
+    for f in candidates:
+        if os.path.exists(f):
+            selected_file = f
+            break
+
+    if selected_file:
         try:
-            with open(kg_file, 'r') as f:
+            with open(selected_file, 'r', encoding='utf-8') as f:
                 content = json.load(f)
-                # Heuristic to find nodes/edges
-                if 'nodes' in content:
-                    # Normalize nodes
-                    for n in content['nodes']:
-                        # Handle different formats
-                        nid = n.get('id') or n.get('name')
-                        if nid:
-                            nodes.append({'id': nid, 'label': n.get('label', 'Entity'), 'group': n.get('type', 'Unknown')})
-                if 'edges' in content:
-                    edges.extend(content['edges'])
-                if 'relationships' in content: # Alternate key
-                    edges.extend(content['relationships'])
-        except: pass
+
+                # Handle List (V23.5 Batch Dump) vs Dict (Single Graph)
+                if isinstance(content, list):
+                    # It's a list of knowledge graphs. We'll merge them or take the first one.
+                    # For simplicity, let's flatten all nodes from all items.
+                    for item in content:
+                        if isinstance(item, dict):
+                            # V23.5 Deep Dive Structure
+                            if 'nodes' in item:
+                                # nodes might be nested deeper in V23.5 structure: nodes -> entity_ecosystem ...
+                                # Or it might be a direct dictionary of nodes.
+                                raw_nodes = item['nodes']
+                                if isinstance(raw_nodes, dict):
+                                    # It's hierarchical. We need to flatten it or extract meaningful entities.
+                                    # Heuristic: Extract the main entity
+                                    meta = item.get('meta', {})
+                                    target = meta.get('target', 'Unknown')
+                                    nodes.append({'id': target, 'label': target, 'group': 'Target', 'meta': meta})
+
+                                    # Attempt to find other entities in specific sub-keys
+                                    for section, data in raw_nodes.items():
+                                        if isinstance(data, dict):
+                                            # e.g. "competitors" inside "market_radar_node" or similar
+                                            pass
+                                elif isinstance(raw_nodes, list):
+                                    nodes.extend(raw_nodes)
+
+                            # relationships
+                            if 'relationships' in item:
+                                edges.extend(item['relationships'])
+
+                elif isinstance(content, dict):
+                    # Check for "nodes"
+                    node_list = content.get('nodes', [])
+                    if isinstance(node_list, dict): # Sometimes nodes are a dict by ID
+                        for nid, nops in node_list.items():
+                            if isinstance(nops, dict):
+                                nops['id'] = nid
+                                nodes.append(nops)
+                    elif isinstance(node_list, list):
+                        nodes = node_list
+
+                    # Check for "edges" or "relationships"
+                    edge_list = content.get('edges', content.get('relationships', []))
+                    edges = edge_list
+
+        except Exception as e:
+            print(f"Error reading KG {selected_file}: {e}")
 
     # Fallback/Augment with dummy data if empty
     if not nodes:
@@ -124,27 +173,45 @@ def get_knowledge_graph_data(root_dir):
             {'from': 'Adam_System', 'to': 'Risk_Model'}
         ]
 
-    return {'nodes': nodes, 'edges': edges}
+    # Normalize for VisJS (id, label, group)
+    normalized_nodes = []
+    for n in nodes:
+        if isinstance(n, str): continue
+        nid = n.get('id') or n.get('name')
+        if not nid: continue
+        label = n.get('label') or n.get('name') or nid
+        group = n.get('group') or n.get('type') or 'Entity'
+        normalized_nodes.append({'id': nid, 'label': label, 'group': group})
+
+    return {'nodes': normalized_nodes, 'edges': edges}
 
 def get_financial_data(root_dir):
     # Scan downloads for CSVs
     market_data = {}
     downloads_dir = os.path.join(root_dir, 'downloads')
+
+    # Also check data/market_data (though it's parquet mostly)
+
     if os.path.exists(downloads_dir):
         csv_files = glob.glob(os.path.join(downloads_dir, '*.csv'))
         for csv_file in csv_files:
             filename = os.path.basename(csv_file)
-            # Read last 50 lines to keep it light
             try:
                 with open(csv_file, 'r') as f:
                     lines = f.readlines()[-50:]
-                    # Simple parsing assuming Date,Close or similar
                     parsed = []
-                    header = lines[0].strip().split(',')
+                    # Simple parsing
                     for line in lines[1:]:
                         cols = line.strip().split(',')
                         if len(cols) >= 2:
-                            parsed.append({'time': cols[0], 'value': float(cols[4]) if len(cols) > 4 else float(cols[1])}) # Guessing Close col
+                            # Heuristic: Find first float col
+                            val = 0.0
+                            for c in cols[1:]:
+                                try:
+                                    val = float(c)
+                                    break
+                                except: continue
+                            parsed.append({'time': cols[0], 'value': val})
                     market_data[filename] = parsed
             except: pass
     
@@ -163,37 +230,39 @@ def get_financial_data(root_dir):
 
 def get_reports(root_dir):
     reports = []
-    report_dir = os.path.join(root_dir, 'core/libraries_and_archives/reports')
-    if os.path.exists(report_dir):
-        # Look for both .json and .jsonl
-        files = glob.glob(os.path.join(report_dir, '*.json')) + glob.glob(os.path.join(report_dir, '*.jsonl'))
-        for f in files:
-            try:
-                with open(f, 'r') as file:
-                    # Handle jsonl by reading just the first line if it's not a list
-                    content_str = file.read().strip()
-                    if f.endswith('.jsonl'):
-                        # Try to read line by line, but for reports usually it's one big object or list of objects
-                        # If first char is '{', it might be one object per line.
-                        # For now, let's assume valid JSON or single line JSONL
-                        try:
-                            data = json.loads(content_str)
-                        except json.JSONDecodeError:
-                            # Try first line
-                            data = json.loads(content_str.split('\n')[0])
-                    else:
-                        data = json.loads(content_str)
+    report_dirs = [
+        os.path.join(root_dir, 'core/libraries_and_archives/reports'),
+        os.path.join(root_dir, 'data/gold_standard') # check here too
+    ]
 
-                    reports.append({
-                        'title': data.get('title', data.get('company_name', os.path.basename(f))),
-                        'path': os.path.relpath(f, root_dir),
-                        'date': data.get('date', data.get('assessment_date', 'Unknown')),
-                        'executive_summary': data.get('executive_summary', data.get('summary', '')),
-                        'content': data
-                    })
-            except Exception as e:
-                print(f"Error parsing {f}: {e}")
-                pass
+    files = []
+    for d in report_dirs:
+        if os.path.exists(d):
+            files.extend(glob.glob(os.path.join(d, '*.json')))
+            files.extend(glob.glob(os.path.join(d, '*.jsonl')))
+
+    for f in files:
+        try:
+            with open(f, 'r') as file:
+                content_str = file.read().strip()
+                if not content_str: continue
+
+                if f.endswith('.jsonl'):
+                    # Try first line
+                    data = json.loads(content_str.split('\n')[0])
+                else:
+                    data = json.loads(content_str)
+
+                reports.append({
+                    'title': data.get('title', data.get('company_name', os.path.basename(f))),
+                    'path': os.path.relpath(f, root_dir),
+                    'date': data.get('date', data.get('assessment_date', 'Unknown')),
+                    'executive_summary': data.get('executive_summary', data.get('summary', '')),
+                    'content': data
+                })
+        except Exception as e:
+            # print(f"Error parsing {f}: {e}")
+            pass
     return reports
 
 def get_prompts(root_dir):
@@ -214,6 +283,55 @@ def get_prompts(root_dir):
                     except: pass
     return prompts
 
+def get_training_sets(root_dir):
+    sets = []
+    ts_dir = os.path.join(root_dir, 'data/artisanal_training_sets')
+    if os.path.exists(ts_dir):
+        for f in glob.glob(os.path.join(ts_dir, '*.jsonl')):
+            filename = os.path.basename(f)
+            size = os.path.getsize(f)
+            # Count lines for samples
+            line_count = 0
+            try:
+                with open(f, 'r') as file:
+                    for _ in file: line_count += 1
+            except: pass
+
+            # Determine type
+            t_type = "Generic"
+            if "snc" in filename: t_type = "Instruction (SNC)"
+            elif "esg" in filename: t_type = "Classification (ESG)"
+            elif "risk" in filename: t_type = "Reasoning (Risk)"
+            elif "compliance" in filename: t_type = "Audit (Compliance)"
+
+            sets.append({
+                'filename': filename,
+                'path': os.path.relpath(f, root_dir),
+                'size': size,
+                'samples': line_count,
+                'type': t_type,
+                'status': 'Ready'
+            })
+    return sets
+
+def get_strategies(root_dir):
+    strats = []
+    s_dir = os.path.join(root_dir, 'data/strategies')
+    if os.path.exists(s_dir):
+        for f in glob.glob(os.path.join(s_dir, '*.json')):
+            try:
+                with open(f, 'r') as file:
+                    data = json.load(file)
+                    strats.append({
+                        'name': data.get('name', data.get('strategy_name', os.path.basename(f).replace('.json','').replace('_',' ').title())),
+                        'filename': os.path.basename(f),
+                        'description': data.get('description', ''),
+                        'risk_profile': data.get('risk_profile', 'Unknown'),
+                        'content': data
+                    })
+            except: pass
+    return strats
+
 def main():
     root_dir = os.path.abspath('.')
     print(f"Scanning {root_dir} for OMNI data...")
@@ -222,22 +340,19 @@ def main():
         'stats': {
             'version': '23.5',
             'status': 'HYBRID_ONLINE',
-            'cpu_load': 12,
-            'memory_usage': 34,
-            'active_tasks': 4
+            'cpu_load': random.randint(10, 40),
+            'memory_usage': random.randint(30, 60),
+            'active_tasks': random.randint(2, 8)
         },
         'files': get_file_tree(root_dir),
         'agents': scan_agents(root_dir),
         'reports': get_reports(root_dir),
         'prompts': get_prompts(root_dir),
-        'strategies': [],
-        'training_sets': [],
+        'strategies': get_strategies(root_dir),
+        'training_sets': get_training_sets(root_dir),
         'knowledge_graph': get_knowledge_graph_data(root_dir),
         'financial_data': get_financial_data(root_dir)
     }
-
-    # Inject specific source code if requested (e.g. robo_advisor)
-    # We can add a 'code_docs' section if needed, but app.js doesn't seem to explicitly look for it in top level
 
     output_path = os.path.join(root_dir, 'showcase/js/mock_data.js')
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
