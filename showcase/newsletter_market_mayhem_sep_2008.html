@@ -6,15 +6,27 @@
     <title>ADAM v23.5 :: MARKET MAYHEM: THE LEHMAN MOMENT</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
             --paper-bg: #fdfbf7;
             --ink-color: #1a1a1a;
             --accent-red: #cc0000;
+            --cyber-black: #050b14;
+            --cyber-blue: #00f3ff;
         }
-        .newsletter-container {
-            max-width: 900px;
+        body { margin: 0; background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }
+
+        .newsletter-wrapper {
+            max-width: 1000px;
             margin: 40px auto;
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 40px;
+            padding: 20px;
+        }
+
+        .paper-sheet {
             background: var(--paper-bg);
             color: var(--ink-color);
             padding: 60px;
@@ -22,19 +34,8 @@
             box-shadow: 0 0 50px rgba(0,0,0,0.5);
             position: relative;
         }
-        .cyber-badge-overlay {
-            position: absolute;
-            top: -15px;
-            right: -15px;
-            background: #050b14;
-            border: 1px solid #00f3ff;
-            color: #00f3ff;
-            padding: 8px 16px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem;
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
-            z-index: 10;
-        }
+
+        /* Typography */
         h1.title {
             font-family: 'Playfair Display', serif;
             font-size: 3rem;
@@ -44,32 +45,70 @@
             letter-spacing: -1px;
             line-height: 1.1;
         }
-        .meta-header {
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid #ccc;
-            padding-bottom: 20px;
-            margin-bottom: 40px;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.9rem;
-            color: #555;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
         h2 {
             font-family: 'Inter', sans-serif;
             font-weight: 700;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             margin-top: 40px;
             margin-bottom: 15px;
             color: var(--accent-red);
-            border-left: 4px solid var(--accent-red);
-            padding-left: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         p { line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
-        ul { margin-bottom: 20px; }
-        li { margin-bottom: 10px; line-height: 1.6; }
-        .back-link { position: fixed; top: 20px; left: 20px; z-index: 100; }
+
+        /* Sidebar */
+        .cyber-sidebar {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .sidebar-widget {
+            border: 1px solid #333;
+            background: rgba(255,255,255,0.02);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .sidebar-title {
+            color: var(--cyber-blue);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        /* Sentiment Meter */
+        .sentiment-track {
+            height: 6px; background: #333; border-radius: 3px; overflow: hidden; margin-top: 10px;
+        }
+        .sentiment-bar {
+            height: 100%; background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00);
+            width: 2%;
+            transition: width 1s ease;
+        }
+
+        /* Ticker Tag */
+        .ticker-tag {
+            display: inline-block;
+            background: #222;
+            color: var(--cyber-blue);
+            padding: 4px 8px;
+            margin: 2px;
+            font-size: 0.75rem;
+            border: 1px solid #444;
+            border-radius: 4px;
+        }
+
+        /* Adam Critique */
+        .adam-critique {
+            background: #0f172a;
+            border-left: 4px solid var(--cyber-blue);
+            color: #94a3b8;
+            padding: 20px;
+            margin-top: 40px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+
         .cyber-btn {
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.75rem;
@@ -77,48 +116,75 @@
             border: 1px solid #444;
             color: #e0e0e0;
             background: rgba(0,0,0,0.8);
-            border-radius: 2px;
-            text-transform: uppercase;
             text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
         }
-        .cyber-btn:hover { border-color: #00f3ff; color: #00f3ff; }
+        .cyber-btn:hover { border-color: var(--cyber-blue); color: var(--cyber-blue); }
     </style>
 </head>
-<body style="background: #050b14;">
-    <a href="market_mayhem_archive.html" class="cyber-btn back-link">&larr; BACK TO ARCHIVE</a>
+<body>
+    <div style="max-width: 1400px; margin: 0 auto; padding: 20px;">
+        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; BACK TO ARCHIVE</a>
+    </div>
 
-    <div class="newsletter-container">
-        <div class="cyber-badge-overlay">TYPE: HISTORICAL ARCHIVE // ADAM v23.5</div>
-        <h1 class="title">MARKET MAYHEM: THE LEHMAN MOMENT</h1>
-        <div class="meta-header">
-            <div><strong>Date:</strong> 2008-09-19</div>
-            <div><strong>Source:</strong> Apex Financial Architect</div>
-            <div><strong>Clearance:</strong> Institutional</div>
+    <div class="newsletter-wrapper">
+        <!-- Main Content (Paper Style) -->
+        <div class="paper-sheet">
+            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px;">
+                <span>2008-09-19</span>
+                <span>TYPE: HISTORICAL</span>
+            </div>
+
+            <h1 class="title">MARKET MAYHEM: THE LEHMAN MOMENT</h1>
+
+            <p style="font-size: 1.2rem; font-style: italic; color: #444; border-bottom: 1px solid #eee; padding-bottom: 20px;">
+                "Existential Panic". There are decades where nothing happens; and there are weeks where decades happen. This was one of those weeks. A 158-year-old bank vanished, the world's largest insurer was nationalized, and the money market broke the buck.
+            </p>
+
+
+        <p><strong>The Week Wall Street Died.</strong> On Monday, September 15th, Lehman Brothers filed for the largest bankruptcy in U.S. history ($600B+ assets). The government let them fail, hoping to reduce moral hazard. The result was global panic.</p>
+        <p>By Tuesday, AIG—the insurer of the world's financial system via CDS—was on the brink. The Fed stepped in with an $85B revolving credit facility, effectively nationalizing the company.</p>
+        <p><strong>The Real Panic:</strong> The Reserve Primary Fund, a money market fund considered 'as good as cash', broke the buck (NAV fell to $0.97) due to Lehman exposure. This triggered a $140B run on money market funds, freezing the commercial paper market. The gears of capitalism have ground to a halt.</p>
+
+
+            <div class="adam-critique">
+                <strong style="color: var(--cyber-blue);">/// ADAM SYSTEM CRITIQUE</strong><br><br>
+                The financial system is insolvent. Counterparty risk is infinite. Trust has evaporated. The TARP program ($700B) is controversial but necessary. Gold is the only asset acting as a store of value. We are witnessing the end of the Investment Banking era.
+            </div>
         </div>
 
-        <p style="font-size: 1.2rem; font-style: italic; color: #444; border-bottom: 1px solid #eee; padding-bottom: 20px;">
-            <strong>Executive Summary:</strong> 'Existential Panic'. There are decades where nothing happens; and there are weeks where decades happen. This was one of those weeks. A 158-year-old bank vanished, the world's largest insurer was nationalized, and the money market broke the buck.
-        </p>
+        <!-- Sidebar (Cyber Style) -->
+        <aside class="cyber-sidebar">
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Market Sentiment</div>
+                <div style="display:flex; justify-content:space-between; font-size:2rem; font-weight:bold;">
+                    <span>2</span>
+                    <span style="font-size:0.8rem; align-self:center; color:#666;">/ 100</span>
+                </div>
+                <div class="sentiment-track">
+                    <div class="sentiment-bar"></div>
+                </div>
+                <div style="font-size:0.7rem; color:#666; margin-top:5px;">0=PANIC | 100=EUPHORIA</div>
+            </div>
 
-        <h2>I. SITUATION REPORT</h2>
-        <p>Market conditions are evolving rapidly. Key developments include:</p>
-        <ul>
-            <li>Lehman Brothers files for Chapter 11.</li>
-<li>AIG bailed out by Fed.</li>
-<li>Reserve Primary Fund breaks the buck.</li>
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Related Assets</div>
+                <div>
+                    <span class="ticker-tag">LEH</span><span class="ticker-tag">AIG</span><span class="ticker-tag">XLF</span><span class="ticker-tag">GLD</span>
+                </div>
+            </div>
 
-        </ul>
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Strategic Implication</div>
+                <ul style="font-size:0.8rem; color:#aaa; padding-left:20px; line-height:1.5;">
+                    <li>Lehman Brothers files Ch. 11 (Sep 15).</li>
+<li>AIG $85B Bailout (Sep 16).</li>
+<li>Reserve Primary Fund breaks the buck (Sep 16).</li>
 
-        <h2>II. STRATEGIC IMPLICATIONS</h2>
-        <p>
-            Based on the current volatility profile, we recommend a defensive posture.
-            The risk-reward skew has shifted unfavorably for long-duration assets.
-            Capital preservation is paramount in this regime.
-        </p>
-
-        <div style="margin-top: 60px; font-size: 0.8rem; color: #999; border-top: 1px solid #eee; padding-top: 20px;">
-            <p><strong>Disclaimer:</strong> Generated by Adam v23.5 for simulation purposes.</p>
-        </div>
+                </ul>
+            </div>
+        </aside>
     </div>
 </body>
 </html>
