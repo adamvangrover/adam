@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Unified Banking World Model</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+
+    <style>
+        /* Cyberpunk / Fintech Theme Base */
+        :root {
+            --bg-dark: #020408;
+            --panel-bg: rgba(15, 23, 42, 0.95);
+            --border-color: #334155;
+            --accent-cyan: #22d3ee;
+            --accent-red: #ef4444;
+            --accent-green: #10b981;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+
+        /* CRT Scanline Effect */
+        .scan-line {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        /* Grid Background */
+        .grid-bg {
+            background-image:
+                linear-gradient(rgba(30, 41, 59, 0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(30, 41, 59, 0.3) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        /* Utility Classes */
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan); }
+
+        /* Sliders */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px; width: 16px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            margin-top: -6px;
+            box-shadow: 0 0 10px var(--accent-cyan);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px;
+            cursor: pointer;
+            background: #334155;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col grid-bg">
+    <div class="scan-line"></div>
+
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 shrink-0">
+        <div class="flex items-center gap-4">
+            <div class="w-8 h-8 bg-cyan-900/50 rounded flex items-center justify-center border border-cyan-500/30">
+                <i class="fas fa-globe text-cyan-400"></i>
+            </div>
+            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-cyan-400">v24.0</span> <span class="text-slate-500 font-normal">| Unified Banking World Model</span></h1>
+        </div>
+
+        <div class="flex items-center gap-6 text-xs font-mono">
+            <div class="flex items-center gap-2">
+                <span class="text-slate-400">SCENARIO:</span>
+                <select id="scenario-select" class="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-white focus:outline-none focus:border-cyan-500">
+                    <option value="Baseline">Baseline Growth</option>
+                    <option value="Liquidity Crunch">Liquidity Crunch</option>
+                    <option value="Cyber Event">Cyber Event</option>
+                </select>
+            </div>
+
+            <div class="bg-slate-800 border border-slate-700 rounded px-3 py-1 flex items-center gap-2">
+                <span class="text-slate-400">MARKET TEMP:</span>
+                <span class="text-red-400 font-bold" id="market-temp">--.--</span>
+                <i class="fas fa-fire text-red-500 ml-1"></i>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button id="btn-play" class="bg-cyan-900/20 hover:bg-cyan-900/40 text-cyan-400 border border-cyan-800/50 rounded px-3 py-1 transition">
+                    <i class="fas fa-play"></i>
+                </button>
+                <input type="range" id="time-slider" min="0" max="100" value="0" class="w-32">
+                <span id="time-display" class="w-8 text-right text-slate-400">T+0</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 flex overflow-hidden relative">
+
+        <div id="twin-network" class="flex-1 bg-gradient-to-b from-[#0f172a] to-[#050b14]"></div>
+
+        <aside id="inspector" class="w-80 glass-panel absolute right-0 top-0 h-full transform transition-transform duration-300 translate-x-full z-30 flex flex-col shadow-2xl border-l border-slate-700">
+            <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-900/50">
+                <h3 class="font-bold text-white mono flex items-center gap-2">
+                    <i class="fas fa-microchip text-cyan-400"></i>
+                    <span id="insp-title">Node Inspector</span>
+                </h3>
+                <button onclick="app.closeInspector()" class="text-slate-400 hover:text-white transition"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-4 custom-scrollbar space-y-6" id="insp-content">
+            </div>
+
+            <div class="p-4 border-t border-slate-700 bg-slate-900/50">
+                <div class="text-[10px] text-slate-500 mono mb-2">SYSTEM HEALTH</div>
+                <div class="flex items-center gap-2">
+                    <div class="h-1 flex-1 bg-slate-700 rounded-full overflow-hidden">
+                        <div class="h-full bg-green-500 w-[100%]" id="health-bar"></div>
+                    </div>
+                    <span class="text-xs text-white font-bold" id="health-val">100%</span>
+                </div>
+            </div>
+        </aside>
+
+        <div class="absolute bottom-6 left-6 z-20 flex flex-col gap-3">
+            <div class="glass-panel rounded-lg p-3 w-64 border border-slate-700">
+                <h4 class="text-[10px] font-bold text-slate-400 mb-2 uppercase tracking-wider mono">Visual Filters</h4>
+                <div class="flex flex-wrap gap-2" id="filter-controls">
+                    <button data-group="unit" class="filter-btn text-[10px] bg-blue-900/20 text-blue-300 border border-blue-800 rounded px-2 py-1 hover:bg-blue-800/40 transition active">Biz Units</button>
+                    <button data-group="sub" class="filter-btn text-[10px] bg-indigo-900/20 text-indigo-300 border border-indigo-800 rounded px-2 py-1 hover:bg-indigo-800/40 transition active">Desks</button>
+                    <button data-group="risk" class="filter-btn text-[10px] bg-red-900/20 text-red-300 border border-red-800 rounded px-2 py-1 hover:bg-red-800/40 transition active">Risks</button>
+                    <button data-group="infra" class="filter-btn text-[10px] bg-purple-900/20 text-purple-300 border border-purple-800 rounded px-2 py-1 hover:bg-purple-800/40 transition active">Infra</button>
+                    <button data-group="agent" class="filter-btn text-[10px] bg-green-900/20 text-green-300 border border-green-800 rounded px-2 py-1 hover:bg-green-800/40 transition active">Agents</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute bottom-6 right-80 mr-6 z-20 w-96 pointer-events-none">
+            <div class="glass-panel rounded-lg p-2 border border-slate-700">
+                <div class="text-[10px] text-slate-500 mono mb-1 border-b border-slate-700 pb-1 flex justify-between">
+                    <span>SWARM CONSOLE</span>
+                    <span class="text-green-500">● ASYNC</span>
+                </div>
+                <div id="console-log" class="h-24 overflow-y-auto custom-scrollbar text-[10px] mono text-slate-300 space-y-1">
+                    <div class="text-slate-500">>> Initializing Swarm...</div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        class DigitalTwinApp {
+            constructor() {
+                this.container = document.getElementById('twin-network');
+                this.nodes = new vis.DataSet([]);
+                this.edges = new vis.DataSet([]);
+                this.network = null;
+
+                this.simulationData = null;
+                this.currentScenario = "Baseline";
+                this.currentTimeStep = 0;
+                this.isPlaying = false;
+                this.playInterval = null;
+
+                this.nodeBaseColors = {}; // Store original colors
+            }
+
+            async init() {
+                await this.loadData();
+                this.setupNetwork();
+                this.setupEvents();
+                this.updateState(0); // Initial state
+            }
+
+            async loadData() {
+                try {
+                    const response = await fetch('data/unified_banking_scenarios.json');
+                    if (!response.ok) throw new Error('Simulation file not found');
+                    this.simulationData = await response.json();
+
+                    this.log(`Loaded Twin: ${this.simulationData.metadata.twin_name}`, 'success');
+
+                    // Populate initial nodes/edges
+                    this.nodes.add(this.simulationData.entities.map(e => ({
+                        id: e.id,
+                        label: e.label,
+                        group: e.group,
+                        title: e.type // Tooltip
+                    })));
+
+                    this.edges.add(this.simulationData.relationships);
+
+                    // Save base colors for restoration
+                    // Note: Vis.js applies group colors by default, but we can override individually
+                } catch (e) {
+                    this.log("Failed to load simulation data.", "error");
+                    console.error(e);
+                }
+            }
+
+            setupNetwork() {
+                const options = {
+                    nodes: {
+                        shape: 'dot',
+                        font: { face: 'JetBrains Mono', color: '#cbd5e1', size: 12, background: 'rgba(15,23,42,0.8)' },
+                        borderWidth: 2,
+                        shadow: true
+                    },
+                    edges: {
+                        width: 1,
+                        color: { color: '#475569', highlight: '#22d3ee' },
+                        smooth: { type: 'continuous' },
+                        arrows: 'to'
+                    },
+                    groups: {
+                        core: { color: { background: '#0f172a', border: '#22d3ee' }, size: 45, font: {size: 16, color: '#fff'} },
+                        unit: { color: { background: '#1e293b', border: '#3b82f6' }, size: 30 },
+                        sub: { color: { background: '#334155', border: '#94a3b8' }, size: 20 },
+                        risk: { color: { background: '#450a0a', border: '#ef4444' }, shape: 'diamond', size: 25 },
+                        asset: { color: { background: '#064e3b', border: '#10b981' }, shape: 'square', size: 15 },
+                        infra: { color: { background: '#581c87', border: '#a855f7' }, shape: 'hexagon', size: 25 },
+                        agent: { color: { background: '#065f46', border: '#34d399' }, shape: 'box', size: 20 }
+                    },
+                    physics: {
+                        stabilization: false,
+                        barnesHut: { gravitationalConstant: -4000, springConstant: 0.04, springLength: 120 }
+                    },
+                    interaction: { hover: true }
+                };
+
+                this.network = new vis.Network(this.container, { nodes: this.nodes, edges: this.edges }, options);
+
+                this.network.on("click", (params) => {
+                    if (params.nodes.length > 0) {
+                        this.openInspector(params.nodes[0]);
+                    } else {
+                        this.closeInspector();
+                    }
+                });
+            }
+
+            setupEvents() {
+                // Play Button
+                document.getElementById('btn-play').addEventListener('click', () => {
+                    this.isPlaying = !this.isPlaying;
+                    document.getElementById('btn-play').innerHTML = this.isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
+
+                    if (this.isPlaying) {
+                        this.playInterval = setInterval(() => {
+                            let next = parseInt(document.getElementById('time-slider').value) + 1;
+                            if (next >= 100) next = 0; // Loop
+                            document.getElementById('time-slider').value = next;
+                            this.updateState(next);
+                        }, 200); // Speed of playback
+                    } else {
+                        clearInterval(this.playInterval);
+                    }
+                });
+
+                // Slider
+                document.getElementById('time-slider').addEventListener('input', (e) => {
+                    this.updateState(parseInt(e.target.value));
+                });
+
+                // Scenario Dropdown
+                document.getElementById('scenario-select').addEventListener('change', (e) => {
+                    this.currentScenario = e.target.value;
+                    this.log(`Switched to scenario: ${this.currentScenario}`, 'warn');
+                    this.updateState(parseInt(document.getElementById('time-slider').value));
+                });
+
+                // Filters
+                const filterBtns = document.querySelectorAll('.filter-btn');
+                filterBtns.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.target.classList.toggle('active');
+                        e.target.classList.toggle('opacity-50');
+                        this.applyFilters();
+                    });
+                });
+            }
+
+            applyFilters() {
+                const activeGroups = Array.from(document.querySelectorAll('.filter-btn.active')).map(b => b.dataset.group);
+                activeGroups.push('core'); // Always show core
+
+                const allNodes = this.nodes.get();
+                const updates = allNodes.map(n => ({
+                    id: n.id,
+                    hidden: !activeGroups.includes(n.group)
+                }));
+                this.nodes.update(updates);
+            }
+
+            updateState(timeStep) {
+                if (!this.simulationData) return;
+
+                this.currentTimeStep = timeStep;
+                document.getElementById('time-display').innerText = `T+${timeStep}`;
+
+                const scenarioData = this.simulationData.scenarios[this.currentScenario];
+                if (!scenarioData || !scenarioData[timeStep]) return;
+
+                const state = scenarioData[timeStep];
+
+                // Update Global Metrics
+                document.getElementById('market-temp').innerText = state.temp.toFixed(2);
+
+                // Update Node Visuals based on Value/Momentum
+                const updates = [];
+                let totalSystemValue = 0;
+                let initialSystemValue = 0; // Rough approximation from Step 0
+
+                const initialState = scenarioData[0];
+
+                for (const [nodeId, value] of Object.entries(state.values)) {
+                    const initial = initialState.values[nodeId];
+                    if (initial) {
+                        const pctChange = ((value - initial) / initial);
+                        totalSystemValue += value;
+                        initialSystemValue += initial;
+
+                        // Visual Logic:
+                        // Significant Drop -> Red Flash
+                        // Significant Rise -> Green Flash
+                        // High Momentum (Flow) -> Larger Size?
+
+                        let colorOverride = null;
+                        if (pctChange < -0.2) colorOverride = { background: '#ef4444', border: '#7f1d1d' }; // Crash
+                        else if (pctChange < -0.1) colorOverride = { background: '#f97316', border: '#7c2d12' }; // Stress
+                        else if (pctChange > 0.1) colorOverride = { background: '#10b981', border: '#064e3b' }; // Boom
+
+                        if (colorOverride) {
+                            updates.push({ id: nodeId, color: colorOverride });
+                        } else {
+                            // Reset to default group color (requires removing specific color prop)
+                            updates.push({ id: nodeId, color: null });
+                        }
+                    }
+                }
+
+                this.nodes.update(updates);
+
+                // Update Health Bar
+                const healthPct = Math.max(0, Math.min(100, (totalSystemValue / initialSystemValue) * 100));
+                document.getElementById('health-bar').style.width = `${healthPct}%`;
+                document.getElementById('health-bar').className = `h-full ${healthPct < 50 ? 'bg-red-500' : healthPct < 80 ? 'bg-amber-500' : 'bg-green-500'}`;
+                document.getElementById('health-val').innerText = `${healthPct.toFixed(0)}%`;
+
+                // Update Inspector if open
+                const selectedIds = this.network.getSelectedNodes();
+                if (selectedIds.length > 0) {
+                    this.updateInspector(selectedIds[0], state, initialState);
+                }
+            }
+
+            openInspector(nodeId) {
+                document.getElementById('inspector').classList.remove('translate-x-full');
+                const scenarioData = this.simulationData.scenarios[this.currentScenario];
+                const state = scenarioData[this.currentTimeStep];
+                const initialState = scenarioData[0];
+                this.updateInspector(nodeId, state, initialState);
+            }
+
+            updateInspector(nodeId, currentState, initialState) {
+                const node = this.nodes.get(nodeId);
+                document.getElementById('insp-title').innerText = node.label;
+
+                const val = currentState.values[nodeId];
+                const flow = currentState.flows[nodeId];
+
+                let html = `<div class="mb-6"><h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 border-b border-slate-700 pb-1">Live Metrics (T+${this.currentTimeStep})</h4>`;
+
+                if (val !== undefined) {
+                    const initVal = initialState.values[nodeId];
+                    const delta = val - initVal;
+                    const pct = (delta / initVal) * 100;
+
+                    html += `<div class="grid grid-cols-2 gap-3">`;
+                    html += this.metricCard('Current Val', val.toFixed(1), delta < 0 ? 'text-red-400' : 'text-green-400');
+                    html += this.metricCard('Delta', `${delta > 0 ? '+' : ''}${delta.toFixed(1)} (${pct.toFixed(1)}%)`, delta < 0 ? 'text-red-400' : 'text-green-400');
+                    html += this.metricCard('Momentum/Flow', flow.toFixed(2), 'text-cyan-400');
+                    html += `</div>`;
+                } else {
+                    html += `<div class="text-slate-400 text-xs italic">Static Entity - No Simulation Data</div>`;
+                }
+
+                html += `</div>`;
+
+                // Static metadata from original entity list
+                const staticEntity = this.simulationData.entities.find(e => e.id === nodeId);
+                if (staticEntity) {
+                     html += `<div><h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3 border-b border-slate-700 pb-1">Profile</h4>`;
+                     html += `<ul class="space-y-1 text-xs mono text-slate-300">`;
+                     html += `<li>Type: <span class="text-white">${staticEntity.type}</span></li>`;
+                     if(staticEntity.risk_exposure) html += `<li>Risk Exposure: <span class="text-amber-400">${staticEntity.risk_exposure}</span></li>`;
+                     html += `</ul></div>`;
+                }
+
+                document.getElementById('insp-content').innerHTML = html;
+            }
+
+            closeInspector() {
+                document.getElementById('inspector').classList.add('translate-x-full');
+                this.network.unselectAll();
+            }
+
+            metricCard(label, value, colorClass = 'text-white') {
+                return `
+                <div class="bg-slate-800/50 border border-slate-700 p-2 rounded">
+                    <div class="text-[9px] text-slate-500 uppercase mb-1">${label}</div>
+                    <div class="text-sm font-bold ${colorClass} mono">${value}</div>
+                </div>`;
+            }
+
+            log(msg, type='info') {
+                const consoleEl = document.getElementById('console-log');
+                const line = document.createElement('div');
+                const timestamp = new Date().toLocaleTimeString('en-US', {hour12: false, hour: '2-digit', minute:'2-digit', second:'2-digit'});
+
+                let colorClass = 'text-slate-300';
+                if(type === 'error') colorClass = 'text-red-400';
+                if(type === 'success') colorClass = 'text-green-400';
+                if(type === 'warn') colorClass = 'text-amber-400';
+
+                line.className = `${colorClass}`;
+                line.innerHTML = `<span class="text-slate-600 mr-2">[${timestamp}]</span> ${msg}`;
+                consoleEl.appendChild(line);
+                consoleEl.scrollTop = consoleEl.scrollHeight;
+            }
+        }
+
+        // Initialize App
+        const app = new DigitalTwinApp();
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
+</body>
+</html>
