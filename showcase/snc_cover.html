@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v23.5 | SNC Regulatory Cover</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="h-screen flex flex-col grid-bg text-slate-200 overflow-hidden">
+    <div class="scan-line"></div>
+
+    <!-- Header -->
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a] z-40 shrink-0">
+        <div class="flex items-center gap-4">
+            <button id="nav-toggle" class="text-slate-400 hover:text-white transition md:hidden">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-cyan-400">v23.5</span> <span class="text-slate-500 font-normal">| SNC Analyst Workflow</span></h1>
+        </div>
+        <div class="flex items-center gap-6 font-mono text-xs">
+            <div class="hidden md:block text-slate-400">MODULE: <span class="text-white">REG-SNC-01</span></div>
+            <div class="hidden md:block text-slate-400">STATUS: <span class="text-emerald-400">ACTIVE</span></div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 overflow-y-auto custom-scrollbar pb-32">
+
+        <div class="max-w-5xl mx-auto space-y-8">
+
+            <!-- Cover Sheet Section -->
+            <div class="cyber-card p-8 rounded-lg">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white font-mono flex items-center gap-2">
+                            <i class="fas fa-file-contract text-cyan-400"></i> SNC Regulatory Cover Sheet
+                        </h2>
+                        <p class="text-slate-400 text-sm mt-1">Shared National Credit Program | Regulatory Classification</p>
+                    </div>
+                    <div class="px-3 py-1 border border-cyan-500/30 bg-cyan-500/10 rounded text-cyan-400 text-xs font-mono">
+                        FORM ID: SNC-2025-A
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="block text-xs font-mono text-slate-500 mb-2 uppercase">Obligor / Borrower Name</label>
+                        <input type="text" class="cyber-input rounded" placeholder="e.g. Acme Corp Inc." value="Titan Energy Partners (Simulated)">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-mono text-slate-500 mb-2 uppercase">Facility ID / CUSIP</label>
+                        <input type="text" class="cyber-input rounded" placeholder="e.g. 123456789" value="98765XYZ-TermB">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-mono text-slate-500 mb-2 uppercase">Agent Bank</label>
+                        <input type="text" class="cyber-input rounded" value="JPMorgan Chase & Co.">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-mono text-slate-500 mb-2 uppercase">Commitment Amount</label>
+                        <input type="text" class="cyber-input rounded" value="$1,200,000,000.00">
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-xs font-mono text-slate-500 mb-2 uppercase">Regulatory Rating Classification</label>
+                    <div class="grid grid-cols-5 gap-2">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="rating" value="pass" class="peer sr-only" checked>
+                            <div class="text-center py-2 rounded border border-slate-700 bg-slate-800/50 text-slate-400 text-xs font-bold peer-checked:bg-emerald-500/20 peer-checked:border-emerald-500 peer-checked:text-emerald-400 transition hover:bg-slate-700">PASS</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="rating" value="sm" class="peer sr-only">
+                            <div class="text-center py-2 rounded border border-slate-700 bg-slate-800/50 text-slate-400 text-xs font-bold peer-checked:bg-amber-500/20 peer-checked:border-amber-500 peer-checked:text-amber-400 transition hover:bg-slate-700">SPECIAL MENTION</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="rating" value="sub" class="peer sr-only">
+                            <div class="text-center py-2 rounded border border-slate-700 bg-slate-800/50 text-slate-400 text-xs font-bold peer-checked:bg-orange-500/20 peer-checked:border-orange-500 peer-checked:text-orange-400 transition hover:bg-slate-700">SUBSTANDARD</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="rating" value="doubtful" class="peer sr-only">
+                            <div class="text-center py-2 rounded border border-slate-700 bg-slate-800/50 text-slate-400 text-xs font-bold peer-checked:bg-red-500/20 peer-checked:border-red-500 peer-checked:text-red-400 transition hover:bg-slate-700">DOUBTFUL</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="rating" value="loss" class="peer sr-only">
+                            <div class="text-center py-2 rounded border border-slate-700 bg-slate-800/50 text-slate-400 text-xs font-bold peer-checked:bg-slate-500/20 peer-checked:border-slate-500 peer-checked:text-slate-300 transition hover:bg-slate-700">LOSS</div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-xs font-mono text-slate-500 mb-2 uppercase">Rating Rationale (Executive Summary)</label>
+                    <textarea class="cyber-input rounded h-32 resize-none" placeholder="Enter justification..."></textarea>
+                </div>
+
+                <div class="flex justify-end gap-3">
+                    <button class="cyber-btn bg-slate-800 border-slate-600 text-slate-300 hover:bg-slate-700">Save Draft</button>
+                    <button class="cyber-btn bg-cyan-900/30 border-cyan-500 text-cyan-400 hover:bg-cyan-600 hover:text-white">Submit to Committee</button>
+                </div>
+            </div>
+
+            <!-- Memo Prompt Skeleton Generator -->
+            <div class="cyber-card p-8 rounded-lg relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                    <i class="fas fa-bone text-6xl text-white"></i>
+                </div>
+
+                <h2 class="text-xl font-bold text-white font-mono flex items-center gap-2 mb-4">
+                    <i class="fas fa-pen-nib text-purple-400"></i> Financial Narrative Skeleton
+                </h2>
+                <p class="text-slate-400 text-xs mb-6 max-w-2xl">
+                    Generate a qualitative narrative skeleton based on standard AOPL-OS-001 protocols.
+                    <span class="text-red-400 font-bold">ABSOLUTE CONSTRAINT: NO NUMBERS.</span>
+                    Use placeholders for all metrics.
+                </p>
+
+                <div class="bg-[#0a0a0c] border border-slate-700 rounded-lg p-4 font-mono text-xs text-slate-300 mb-4 h-48 overflow-auto" id="skeleton-output" contenteditable="true">
+                    // Click 'Generate Skeleton' to initialize drafting protocol...
+                </div>
+
+                <div class="flex gap-3">
+                    <button class="cyber-btn hover:bg-purple-600 hover:text-white border-purple-500 text-purple-400" onclick="generateSkeleton()">
+                        <i class="fas fa-magic mr-2"></i> Generate Skeleton
+                    </button>
+                    <button class="cyber-btn hover:bg-blue-600 hover:text-white border-blue-500 text-blue-400" onclick="injectData()">
+                        <i class="fas fa-database mr-2"></i> Inject Live Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- Injection Workflow Status -->
+            <div class="cyber-card p-6 rounded-lg hidden" id="injection-status">
+                <h3 class="text-sm font-bold text-white font-mono mb-3">Injection Workflow Status</h3>
+                <div class="w-full bg-slate-800 rounded-full h-2 mb-2 overflow-hidden">
+                    <div class="bg-cyan-500 h-2 rounded-full w-0 transition-all duration-1000" id="injection-bar"></div>
+                </div>
+                <div class="flex justify-between text-[10px] font-mono text-slate-500">
+                    <span id="injection-step">Initializing...</span>
+                    <span id="injection-pct">0%</span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        function generateSkeleton() {
+            const skeleton = `Top-line performance was {{REVENUE_DIRECTION}} year-over-year, settling at {{REVENUE_CURRENT}}. This variance of {{REVENUE_YOY_VAR}} was primarily driven by {{QUALITATIVE_DRIVER_1}} in the {{SEGMENT_NAME}} segment.
+
+EBITDA margins {{MARGIN_DIRECTION}} to {{EBITDA_MARGIN}}, reflecting the {{QUALITATIVE_DRIVER_2}}. Management has noted that {{QUALITATIVE_DRIVER_3}} will likely persist into the next quarter.
+
+Liquidity remains {{LIQUIDITY_STATUS}} with {{LIQUIDITY_AVAIL}} available under the revolver. The leverage profile has {{LEVERAGE_DIRECTION}} to {{NET_LEVERAGE}}, which is {{COVENANT_STATUS}} the maximum covenant of {{COVENANT_MAX}}.`;
+
+            const output = document.getElementById('skeleton-output');
+            output.innerText = "";
+
+            // Typing effect
+            let i = 0;
+            const speed = 10;
+            function typeWriter() {
+                if (i < skeleton.length) {
+                    output.innerText += skeleton.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, speed);
+                }
+            }
+            typeWriter();
+        }
+
+        function injectData() {
+            const statusPanel = document.getElementById('injection-status');
+            const bar = document.getElementById('injection-bar');
+            const step = document.getElementById('injection-step');
+            const pct = document.getElementById('injection-pct');
+            const output = document.getElementById('skeleton-output');
+
+            statusPanel.classList.remove('hidden');
+
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                bar.style.width = progress + '%';
+                pct.innerText = progress + '%';
+
+                if (progress < 30) step.innerText = "Fetching Data from DataVault...";
+                else if (progress < 60) step.innerText = "Mapping Placeholders...";
+                else if (progress < 90) step.innerText = "Verifying Semantic Consistency...";
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    step.innerText = "Injection Complete.";
+                    step.className = "text-emerald-400";
+
+                    // Replace logic
+                    output.innerHTML = output.innerText
+                        .replace('{{REVENUE_DIRECTION}}', '<span class="text-emerald-400 font-bold">Robust</span>')
+                        .replace('{{REVENUE_CURRENT}}', '<span class="text-white font-bold">$4.2B</span>')
+                        .replace('{{REVENUE_YOY_VAR}}', '<span class="text-emerald-400 font-bold">+12%</span>')
+                        .replace('{{QUALITATIVE_DRIVER_1}}', 'increased volume')
+                        .replace('{{SEGMENT_NAME}}', 'North American')
+                        .replace('{{MARGIN_DIRECTION}}', '<span class="text-red-400 font-bold">Contracted</span>')
+                        .replace('{{EBITDA_MARGIN}}', '<span class="text-white font-bold">18.5%</span>')
+                        .replace('{{QUALITATIVE_DRIVER_2}}', 'inflationary pressure on raw materials')
+                        .replace('{{QUALITATIVE_DRIVER_3}}', 'supply chain disruptions')
+                        .replace('{{LIQUIDITY_STATUS}}', '<span class="text-emerald-400 font-bold">Strong</span>')
+                        .replace('{{LIQUIDITY_AVAIL}}', '<span class="text-white font-bold">$350M</span>')
+                        .replace('{{LEVERAGE_DIRECTION}}', '<span class="text-emerald-400 font-bold">Improved</span>')
+                        .replace('{{NET_LEVERAGE}}', '<span class="text-white font-bold">2.8x</span>')
+                        .replace('{{COVENANT_STATUS}}', 'well below')
+                        .replace('{{COVENANT_MAX}}', '<span class="text-slate-400">4.5x</span>');
+                }
+            }, 100);
+        }
+    </script>
+
+    <!-- Adam Global Nav -->
+    <script src="../showcase/js/nav.js" data-root=".."></script>
+</body>
+</html>
