@@ -1,0 +1,58 @@
+{
+    "strategy_name": "Reflationary Agentic Boom Barbell",
+    "version": "1.0",
+    "date": "2026-01-12",
+    "description": "A high-volatility regime allocation strategy designed for the 'No Landing' scenario, capitalizing on the Agentic AI boom and Sovereign asset accumulation while hedging against interest rate fragility.",
+    "macro_assumptions": {
+        "us_gdp_growth": 2.6,
+        "cpi_inflation": 2.7,
+        "fed_funds_rate": 3.75,
+        "regime_type": "Reflationary / Agentic"
+    },
+    "allocation": {
+        "long_leg": [
+            {
+                "asset": "NVDA",
+                "weight": 0.15,
+                "rationale": "Sovereign AI Capex Floor; Inelastic demand for inference compute."
+            },
+            {
+                "asset": "PLTR",
+                "weight": 0.10,
+                "rationale": "Sovereign Operating System; Defense grid integration."
+            },
+            {
+                "asset": "BTC",
+                "weight": 0.20,
+                "rationale": "Digital Sovereign Reserve; FASB fair value accounting adoption."
+            },
+            {
+                "asset": "COPX",
+                "weight": 0.10,
+                "rationale": "Electrification of the AI grid; Copper supply constraints."
+            }
+        ],
+        "short_leg": [
+            {
+                "asset": "KRE",
+                "weight": -0.10,
+                "rationale": "Maturity wall risk; CRE exposure in regional banks."
+            },
+            {
+                "asset": "XLY",
+                "weight": -0.10,
+                "rationale": "Consumer fatigue; Sticky inflation eroding purchasing power."
+            }
+        ],
+        "neutral_cash": {
+            "asset": "US_TREASURIES_SHORT_TERM",
+            "weight": 0.25,
+            "rationale": "Dry powder; 3.5% yield floor."
+        }
+    },
+    "risk_metrics": {
+        "expected_volatility": "High",
+        "beta": 1.4,
+        "sharpe_ratio_target": 1.8
+    }
+}
