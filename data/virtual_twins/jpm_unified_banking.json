@@ -1,0 +1,59 @@
+{
+  "id": "jpm_unified_twin_v2",
+  "name": "JPM AI Core Banking World Model",
+  "description": "A high-fidelity digital twin of the JPM infrastructure, modeling business units, AI swarm agents, blockchain assets, and systemic risk exposures.",
+  "entities": [
+    { "id": "1", "label": "JPMORGAN CHASE", "group": "core", "type": "Holding Company", "initial_value": 500.0, "risk_exposure": 0.1 },
+
+    { "id": "2", "label": "Consumer & Comm (CCB)", "group": "unit", "type": "Line of Business", "initial_value": 180.0, "risk_exposure": 0.2 },
+    { "id": "2a", "label": "CCB - Card", "group": "sub", "type": "Desk", "initial_value": 80.0, "risk_exposure": 0.3 },
+    { "id": "2b", "label": "CCB - Home Lending", "group": "sub", "type": "Desk", "initial_value": 60.0, "risk_exposure": 0.4 },
+    { "id": "2c", "label": "CCB - Auto", "group": "sub", "type": "Desk", "initial_value": 40.0, "risk_exposure": 0.25 },
+
+    { "id": "3", "label": "CIB (Investment Bank)", "group": "unit", "type": "Line of Business", "initial_value": 200.0, "risk_exposure": 0.45 },
+    { "id": "3a", "label": "CIB - Markets", "group": "sub", "type": "Desk", "initial_value": 100.0, "risk_exposure": 0.6 },
+    { "id": "3b", "label": "CIB - Payments", "group": "sub", "type": "Desk", "initial_value": 50.0, "risk_exposure": 0.2 },
+    { "id": "3c", "label": "CIB - Securities Svcs", "group": "sub", "type": "Desk", "initial_value": 50.0, "risk_exposure": 0.15 },
+
+    { "id": "4", "label": "Asset & Wealth (AWM)", "group": "unit", "type": "Line of Business", "initial_value": 120.0, "risk_exposure": 0.15 },
+
+    { "id": "5", "label": "Commercial Banking (CB)", "group": "unit", "type": "Line of Business", "initial_value": 100.0, "risk_exposure": 0.3 },
+
+    { "id": "100", "label": "Onyx Blockchain", "group": "infra", "type": "Infrastructure", "initial_value": 50.0, "risk_exposure": 0.5 },
+    { "id": "101", "label": "Liink Network", "group": "infra", "type": "Infrastructure", "initial_value": 30.0, "risk_exposure": 0.4 },
+    { "id": "102", "label": "JPM Coin", "group": "asset", "type": "Digital Asset", "initial_value": 20.0, "risk_exposure": 0.6 },
+
+    { "id": "200", "label": "SNC Agent", "group": "agent", "type": "AI Agent", "initial_value": 10.0, "risk_exposure": 0.1 },
+    { "id": "201", "label": "Fraud Agent", "group": "agent", "type": "AI Agent", "initial_value": 10.0, "risk_exposure": 0.1 },
+    { "id": "202", "label": "Compliance Agent", "group": "agent", "type": "AI Agent", "initial_value": 10.0, "risk_exposure": 0.05 },
+    { "id": "203", "label": "Sentinel (Security)", "group": "agent", "type": "AI Agent", "initial_value": 15.0, "risk_exposure": 0.05 },
+
+    { "id": "10", "label": "Liquidity Crunch", "group": "risk", "type": "Risk Factor", "initial_value": 60.0, "risk_exposure": 0.8 },
+    { "id": "11", "label": "Rates Volatility", "group": "risk", "type": "Risk Factor", "initial_value": 40.0, "risk_exposure": 0.7 },
+    { "id": "12", "label": "Cyber Breach", "group": "risk", "type": "Risk Factor", "initial_value": 30.0, "risk_exposure": 0.95 },
+    { "id": "13", "label": "Geopolitcal Shock", "group": "risk", "type": "Risk Factor", "initial_value": 50.0, "risk_exposure": 0.85 },
+    { "id": "14", "label": "Model Drift", "group": "risk", "type": "Risk Factor", "initial_value": 20.0, "risk_exposure": 0.6 }
+  ],
+  "relationships": [
+    { "from": "1", "to": "2", "type": "OWNS" }, { "from": "1", "to": "3", "type": "OWNS" },
+    { "from": "1", "to": "4", "type": "OWNS" }, { "from": "1", "to": "5", "type": "OWNS" },
+
+    { "from": "2", "to": "2a", "type": "CONTAINS" }, { "from": "2", "to": "2b", "type": "CONTAINS" }, { "from": "2", "to": "2c", "type": "CONTAINS" },
+    { "from": "3", "to": "3a", "type": "CONTAINS" }, { "from": "3", "to": "3b", "type": "CONTAINS" }, { "from": "3", "to": "3c", "type": "CONTAINS" },
+
+    { "from": "3", "to": "100", "type": "OPERATES" },
+    { "from": "100", "to": "101", "type": "POWERS" },
+    { "from": "100", "to": "102", "type": "ISSUES" },
+
+    { "from": "200", "to": "5", "type": "MONITORS" },
+    { "from": "201", "to": "2a", "type": "MONITORS" }, { "from": "201", "to": "3b", "type": "MONITORS" },
+    { "from": "202", "to": "1", "type": "MONITORS" },
+    { "from": "203", "to": "100", "type": "PROTECTS" }, { "from": "203", "to": "1", "type": "PROTECTS" },
+
+    { "from": "10", "to": "3", "type": "IMPACTS" }, { "from": "10", "to": "5", "type": "IMPACTS" },
+    { "from": "11", "to": "3a", "type": "IMPACTS" }, { "from": "11", "to": "2b", "type": "IMPACTS" },
+    { "from": "12", "to": "1", "type": "IMPACTS" }, { "from": "12", "to": "100", "type": "IMPACTS" },
+    { "from": "13", "to": "3a", "type": "IMPACTS" },
+    { "from": "14", "to": "200", "type": "AFFECTS" }, { "from": "14", "to": "201", "type": "AFFECTS" }
+  ]
+}
