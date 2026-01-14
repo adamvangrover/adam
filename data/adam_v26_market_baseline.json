@@ -1,6 +1,6 @@
 {
   "market_baseline": {
-    "version": "26.0",
+    "version": "26.1",
     "status": "LIVE_SIMULATION",
     "last_updated": "2026-01-12T09:30:00Z",
     "simulation_metadata": {
@@ -9,11 +9,14 @@
       "active_narratives": [
         "Q4_2025_Earnings_Kickoff",
         "Sovereign_AI_Capex_Floor",
-        "Crypto_Treasury_Integration"
+        "Crypto_Treasury_Integration",
+        "Qatar_Sovereign_Adoption_Thesis",
+        "Peru_Energy_Mining_Thesis"
       ],
       "risk_indices": {
         "geopolitical_risk_index_gpr": {
           "value": 138.5,
+          "note": "Comparable to Korean War/Cuban Missile Crisis levels. Signals high probability of adverse events.",
           "provenance": {
             "source": "FED_Paper_Replication",
             "timestamp": "2026-01-11T23:59:00Z",
@@ -46,7 +49,7 @@
           },
           "pboc": {
             "1y_lpr": 3.05,
-            "note": "Further 5bps cut Jan 5th to support property developers.",
+            "note": "Further 5bps cut Jan 5th to support property developers. Fighting deflation.",
             "provenance": {
               "source": "PBoC_Official_Site",
               "timestamp": "2026-01-05T02:00:00Z",
@@ -57,6 +60,8 @@
         "economic_indicators": {
           "us_cpi_yoy": {
             "value": 2.3,
+            "forecast": 2.7,
+            "note": "Rising due to tariff pass-through.",
             "release_date": "2026-01-10",
             "provenance": {
               "source": "BLS_Gov_API",
@@ -67,10 +72,18 @@
           "us_unemployment": {
             "value": 4.4,
             "trend": "Stabilizing",
+            "note": "Agentic AI driving 'labor hoarding' for high-skill roles.",
             "provenance": {
               "source": "BLS_Gov_API",
               "timestamp": "2026-01-05T13:30:00Z",
               "latency_hours": 164.0
+            }
+          },
+          "us_gdp_growth_2026": {
+            "value": 2.6,
+            "provenance": {
+              "source": "Consensus_Forecast",
+              "timestamp": "2026-01-12T09:00:00Z"
             }
           }
         }
@@ -100,7 +113,7 @@
           "NVDA": {
             "price": 142.10,
             "change_daily": 0.015,
-            "narrative": "Stabilizing post-Apex paradox; enterprise software partners (ServiceNow, SAP) confirming backlog.",
+            "narrative": "Stabilizing post-Apex paradox; Jevons Paradox validation; Sovereign AI demand floor.",
             "provenance": {
               "source": "Aggregated_Exchange_Feed",
               "timestamp": "2026-01-12T09:30:00Z",
@@ -109,7 +122,7 @@
           },
           "TSLA": {
             "price": 315.00,
-            "narrative": "Robotaxi regulatory approval in California pending final vote.",
+            "narrative": "Robotaxi regulatory approval in California pending final vote; delayed to Q2 2026.",
             "provenance": {
               "source": "Aggregated_Exchange_Feed",
               "timestamp": "2026-01-12T09:30:00Z",
@@ -118,7 +131,7 @@
           },
           "PLTR": {
             "price": 68.50,
-            "narrative": "Government contract expansion for 'Sovereign AI' defense grid.",
+            "narrative": "GovTech Prime status; 'Maven' and 'Titan' contracts; Sovereign AI defense grid.",
             "provenance": {
               "source": "Aggregated_Exchange_Feed",
               "timestamp": "2026-01-12T09:30:00Z",
@@ -156,6 +169,11 @@
               "latency_hours": 10.5
             }
           }
+        },
+        "maturity_wall": {
+          "total_volume": "1.5 Trillion USD",
+          "risk_sectors": ["Commercial Real Estate (Office)", "Regional Banks"],
+          "safe_sectors": ["Data Centers", "Industrial Properties"]
         }
       },
       "alternative_assets": {
@@ -163,7 +181,7 @@
           "BTC": {
             "price": 108500.00,
             "change_24h": -0.02,
-            "narrative": "Consolidating above $100k; Nation-state accumulation rumors (Qatar, Peru).",
+            "narrative": "Consolidating above $100k; Nation-state accumulation rumors (Qatar, Peru); FASB ASU 2023-08 effective.",
             "provenance": {
               "source": "CoinGecko_Public_API",
               "timestamp": "2026-01-12T09:30:00Z",
@@ -195,7 +213,7 @@
         "news_sentiment": {
           "score": 0.65,
           "label": "Cautiously Optimistic",
-          "top_topics": ["Earnings", "Fed", "AI Regulation"],
+          "top_topics": ["Earnings", "Fed", "AI Regulation", "Sovereign AI", "Tariffs"],
           "provenance": {
             "source": "Adam_News_Bot_Aggregator",
             "timestamp": "2026-01-12T09:00:00Z",
@@ -206,7 +224,8 @@
           "ticker_mentions": [
             {"symbol": "NVDA", "count": 15400, "sentiment": 0.4},
             {"symbol": "MSTR", "count": 8200, "sentiment": 0.8},
-            {"symbol": "AAPL", "count": 6500, "sentiment": 0.6}
+            {"symbol": "AAPL", "count": 6500, "sentiment": 0.6},
+            {"symbol": "PLTR", "count": 12000, "sentiment": 0.9}
           ],
           "provenance": {
             "source": "Social_Media_Firehose_V2",

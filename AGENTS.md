@@ -130,6 +130,17 @@ The v23.5 upgrade expands the system scope to a full-spectrum "Autonomous Financ
 
 This upgrade is defined by the "Hyper-Dimensional Knowledge Graph" (HDKG) output schema and a new "Deep Dive" execution protocol. The system prompt is available in `config/Adam_v23.5_Portable_Config.json` and `prompt_library/Adam_v23.5_System_Prompt.md`.
 
+### Adam v26.0 "Reflationary Agentic Boom" Strategy (New)
+
+The system now incorporates the "Global Macro-Strategic Outlook 2026" as a core operating baseline.
+*   **Core Themes:** Sovereign AI, Agentic AI (Execution vs Creation), Crypto Institutionalization (FASB).
+*   **Market Regime:** "Reflationary Agentic Boom" (High Growth, Sticky Inflation, High Rates).
+*   **Strategic Directives:**
+    *   **Agentic AI Focus:** Shift development from chatbot interfaces to autonomous execution agents ("Silicon Workforces").
+    *   **Sovereign AI Awareness:** Monitor geopolitical fragmentation and the rise of "AI Factories" as national security assets.
+    *   **Crypto-Treasury Integration:** Incorporate fair-value accounting logic for digital assets in all financial analysis.
+    *   **Maturity Wall Vigilance:** Prioritize credit risk analysis for 2026 maturities in the office/CRE sectors.
+
 ## Agentic Oversight Framework (AOF)
 
 As detailed in `docs/whitepapers/agentic_convergence_strategic_assessment.md`, the platform now implements a rigorous governance model for non-deterministic AI agents, managed by the "Head of AI Risk" persona.
