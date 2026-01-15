@@ -139,6 +139,7 @@ class AdamNavigator {
             { name: 'Deep Dive Analyst', icon: 'fa-search-dollar', link: 'deep_dive.html' },
             { name: 'Digital Twin', icon: 'fa-project-diagram', link: 'financial_twin.html' },
             { name: 'Agent Registry', icon: 'fa-users-cog', link: 'agents.html' },
+            { name: 'Prompt Library', icon: 'fa-scroll', link: 'prompts.html' },
             { type: 'divider' },
             { name: 'Reports Library', icon: 'fa-file-alt', link: 'reports.html' },
             { name: 'Data Vault', icon: 'fa-database', link: 'data.html' },
