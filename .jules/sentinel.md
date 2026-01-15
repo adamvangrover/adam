@@ -112,3 +112,8 @@
 **Vulnerability:** The registration endpoint allowed creation of users with invalid usernames (e.g. empty strings, extremely long strings, or HTML tags) because it only checked for uniqueness.
 **Learning:** Even if an ORM handles SQL injection, input validation is crucial for preventing Stored XSS (via username display) and ensuring data integrity.
 **Prevention:** Always validate all user inputs against a strict allowlist (e.g. alphanumeric only) before processing, even if the database doesn't strictly require it.
+
+## 2026-01-14 - Unbounded External Requests & Legacy Logging
+**Vulnerability:** `EventDrivenRiskAgent` performed `requests.get` without a timeout, creating a potential DoS vector where a thread could hang indefinitely. It also used `print` for error reporting, bypassing centralized logging.
+**Learning:** Even with guidelines in place, agents created without strict template adherence can miss basic resilience features like timeouts.
+**Prevention:** Enforce a strict `AgentBase` or linting rule that flags `requests` calls without `timeout`. Use `logging` exclusively.

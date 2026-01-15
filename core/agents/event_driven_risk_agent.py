@@ -4,10 +4,17 @@ import os
 import datetime
 import requests
 import json
+import logging
 from typing import List, Dict
 from core.agents.agent_base import AgentBase
 from utils.data_validation import validate_event_data
 from utils.visualization_tools import generate_event_impact_chart
+
+
+# 🛡️ Sentinel: Enforce timeout on external requests to prevent DoS
+REQUEST_TIMEOUT = 10  # seconds
+
+logger = logging.getLogger(__name__)
 
 
 class EventDrivenRiskAgent(AgentBase):
@@ -46,7 +53,8 @@ class EventDrivenRiskAgent(AgentBase):
                 "pageSize": 100,  # max
             }
             try:
-                response = requests.get(self.news_api_url, params=params)
+                # 🛡️ Sentinel: Added timeout to prevent hanging
+                response = requests.get(self.news_api_url, params=params, timeout=REQUEST_TIMEOUT)
                 response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
                 data = response.json()
                 if data["status"] == "ok" and data["articles"]:
@@ -63,10 +71,10 @@ class EventDrivenRiskAgent(AgentBase):
                             events.append(event)
 
             except requests.exceptions.RequestException as e:
-                print(f"Error fetching news: {e}")
+                logger.error(f"Error fetching news from {self.news_api_url}: {e}")
                 return []  # return empty list on error
             except json.JSONDecodeError as e:
-                print(f"Error decoding JSON: {e}")
+                logger.error(f"Error decoding JSON response: {e}")
                 return []  # return empty list on error
         return events
 
