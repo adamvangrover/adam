@@ -176,6 +176,7 @@
                         <button class="tab-btn" onclick="switchTab('tab-persona')">PERSONA & PROMPT</button>
                         <button class="tab-btn" onclick="switchTab('tab-logic')">LOGIC & WORKFLOW</button>
                         <button class="tab-btn" onclick="switchTab('tab-config')">CONFIGURATION</button>
+                        <button class="tab-btn" onclick="switchTab('tab-export')">PORTABLE EXPORT</button>
                     </div>
                 </div>
                 <button onclick="closeModal()" class="text-slate-400 hover:text-white transition"><i class="fas fa-times fa-lg"></i></button>
@@ -311,6 +312,39 @@
                             <div class="code-block text-xs text-amber-100/80 h-[500px] overflow-y-auto relative group">
                                 <button class="copy-btn opacity-0 group-hover:opacity-100" onclick="copyToClipboard('modal-json')"><i class="fas fa-copy"></i> Copy</button>
                                 <div id="modal-json" class="whitespace-pre-wrap">Loading...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Portable Export -->
+                <div id="tab-export" class="tab-content space-y-6">
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="text-cyan-400 font-mono text-sm">FULL PORTABLE CARD (MARKDOWN)</h4>
+                                <span class="text-xs text-slate-500">Universal Format</span>
+                            </div>
+                            <div class="code-block text-xs text-slate-300 h-96 overflow-y-auto relative group">
+                                <button class="copy-btn opacity-0 group-hover:opacity-100" onclick="copyToClipboard('modal-export-md')"><i class="fas fa-copy"></i> Copy Markdown</button>
+                                <div id="modal-export-md" class="whitespace-pre-wrap">Loading...</div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="text-cyan-400 font-mono text-sm mb-2">JSON DEFINITION</h4>
+                                <div class="code-block text-xs text-amber-100/80 h-64 overflow-y-auto relative group">
+                                    <button class="copy-btn opacity-0 group-hover:opacity-100" onclick="copyToClipboard('modal-export-json')"><i class="fas fa-copy"></i> Copy JSON</button>
+                                    <div id="modal-export-json" class="whitespace-pre-wrap">Loading...</div>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-cyan-400 font-mono text-sm mb-2">YAML DEFINITION</h4>
+                                <div class="code-block text-xs text-emerald-100/80 h-64 overflow-y-auto relative group">
+                                    <button class="copy-btn opacity-0 group-hover:opacity-100" onclick="copyToClipboard('modal-export-yaml')"><i class="fas fa-copy"></i> Copy YAML</button>
+                                    <div id="modal-export-yaml" class="whitespace-pre-wrap">Loading...</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -626,6 +660,11 @@
             // Config
             document.getElementById('modal-yaml').innerText = agent.yaml_config || "# No YAML configuration";
             document.getElementById('modal-json').innerText = agent.json_config || "// No JSON configuration";
+
+            // Export Tab
+            document.getElementById('modal-export-md').innerText = agent.markdown_copy || agent.portable_prompt || "# No Markdown Available";
+            document.getElementById('modal-export-json').innerText = agent.json_config || JSON.stringify(agent, null, 2);
+            document.getElementById('modal-export-yaml').innerText = agent.yaml_config || "# No YAML Available";
 
             // Reset Tabs
             switchTab('tab-overview');
