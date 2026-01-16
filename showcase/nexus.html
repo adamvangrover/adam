@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | NEXUS Simulation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --bg-deep: #050505;
+            --panel-bg: rgba(20, 20, 25, 0.9);
+            --border: #333;
+            --accent: #f59e0b; /* Amber for geopolitical tension */
+            --accent-sec: #10b981; /* Green for stability */
+            --accent-danger: #ef4444; /* Red for conflict */
+            --text-main: #d4d4d8;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Share Tech Mono', monospace;
+            overflow: hidden;
+        }
+
+        .crt-overlay {
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 50;
+        }
+
+        .glass-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(4px);
+        }
+
+        .scroll-hide::-webkit-scrollbar { display: none; }
+
+        .pulse-dot {
+            height: 8px; width: 8px;
+            background-color: var(--accent-danger);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        /* Typewriter effect for stream */
+        .stream-item {
+            border-left: 2px solid var(--border);
+            padding-left: 10px;
+            margin-bottom: 8px;
+            opacity: 0.8;
+            font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .stream-item:first-child {
+            border-left: 2px solid var(--accent);
+            opacity: 1;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+    <div class="crt-overlay"></div>
+
+    <!-- Header -->
+    <header class="h-14 border-b border-zinc-800 flex items-center justify-between px-6 bg-zinc-900/50 z-40">
+        <div class="flex items-center gap-4">
+            <i class="fas fa-globe-americas text-amber-500 text-xl"></i>
+            <h1 class="text-xl tracking-widest font-bold">ADAM <span class="text-amber-500">NEXUS</span> <span class="text-xs text-zinc-500">| SOVEREIGN SIMULATION LAYER</span></h1>
+        </div>
+        <div class="flex items-center gap-6 text-sm">
+            <div class="flex items-center gap-2">
+                <span class="text-zinc-500">SIMULATION CONFIDENCE:</span>
+                <span class="text-green-400">98.4%</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="pulse-dot"></div>
+                <span class="text-red-400">DIVERGENCE DETECTED</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 flex overflow-hidden relative">
+        <!-- Sidebar: Intel Stream -->
+        <aside class="w-96 border-r border-zinc-800 bg-zinc-900/30 flex flex-col z-30">
+            <div class="p-3 border-b border-zinc-800 font-bold text-xs tracking-wider text-amber-500">
+                SYNTHETIC COGNITIVE STREAM
+            </div>
+            <div id="intel-stream" class="flex-1 overflow-y-auto p-4 space-y-2 scroll-hide">
+                <!-- Stream items injected here -->
+            </div>
+            <div class="p-3 border-t border-zinc-800 h-48">
+                <div class="text-[10px] text-zinc-500 mb-2">GLOBAL STABILITY METRIC</div>
+                <canvas id="stabilityChart"></canvas>
+            </div>
+        </aside>
+
+        <!-- Main Graph Area -->
+        <div class="flex-1 relative bg-black">
+            <div id="nexus-network" class="w-full h-full"></div>
+
+            <!-- Overlay Info -->
+            <div class="absolute bottom-6 left-6 glass-panel p-4 rounded max-w-md pointer-events-none">
+                <h3 class="text-amber-500 font-bold mb-2">GEOPOLITICAL FORCE MAP</h3>
+                <p class="text-xs text-zinc-400">
+                    Visualizing 2nd and 3rd order effects of sovereign policy decisions.
+                    Green lines indicate strategic alliances. Red dashed lines indicate
+                    resource conflicts or ideological friction.
+                </p>
+            </div>
+        </div>
+
+        <!-- Inspector Panel (Right) -->
+        <aside id="node-inspector" class="absolute right-0 top-0 h-full w-80 glass-panel transform translate-x-full transition-transform duration-300 z-40 border-l border-zinc-800 flex flex-col">
+            <div class="p-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-900">
+                <h3 class="font-bold text-amber-500" id="insp-title">Node Inspector</h3>
+                <button onclick="closeInspector()" class="text-zinc-500 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-4 flex-1 overflow-y-auto" id="insp-content">
+                <!-- Content injected here -->
+            </div>
+        </aside>
+
+    </main>
+
+    <script src="js/mock_data.js"></script>
+    <script>
+        // Init Global Data (Simulated fetch)
+        let network = null;
+        let chart = null;
+        let simulationData = null;
+
+        async function initNexus() {
+            try {
+                const res = await fetch('data/nexus_simulation.json');
+                simulationData = await res.json();
+
+                initGraph(simulationData.graph);
+                initStream(simulationData.stream);
+                initChart(simulationData.metrics);
+
+            } catch (e) {
+                console.error("Failed to load simulation data", e);
+                document.getElementById('nexus-network').innerHTML = `<div class='text-red-500 p-10'>Failed to load simulation data. Ensure 'scripts/generate_nexus_simulation.py' has been run.</div>`;
+            }
+        }
+
+        function initGraph(graphData) {
+            const container = document.getElementById('nexus-network');
+            const data = {
+                nodes: new vis.DataSet(graphData.nodes),
+                edges: new vis.DataSet(graphData.edges)
+            };
+            const options = {
+                nodes: {
+                    shape: 'dot',
+                    font: { face: 'JetBrains Mono', color: '#d4d4d8' },
+                    borderWidth: 2,
+                    color: { background: '#18181b', border: '#71717a' }
+                },
+                edges: {
+                    width: 1,
+                    smooth: { type: 'continuous' }
+                },
+                groups: {
+                    autocracy: { color: { background: '#3f3f46', border: '#f59e0b' }, size: 20 },
+                    democracy: { color: { background: '#3f3f46', border: '#3b82f6' }, size: 20 },
+                    state: { color: { background: '#3f3f46', border: '#10b981' }, size: 25 },
+                },
+                physics: {
+                    stabilization: false,
+                    barnesHut: { gravitationalConstant: -3000, springLength: 150 }
+                },
+                interaction: { hover: true }
+            };
+
+            network = new vis.Network(container, data, options);
+
+            network.on("click", function(params) {
+                if(params.nodes.length > 0) {
+                    const nodeId = params.nodes[0];
+                    const node = data.nodes.get(nodeId);
+                    openInspector(node);
+                } else {
+                    closeInspector();
+                }
+            });
+        }
+
+        function initStream(streamData) {
+            const container = document.getElementById('intel-stream');
+            let index = 0;
+
+            // Initial batch
+            renderStreamBatch(streamData.slice(-10).reverse(), container);
+
+            // Simulate live feed
+            setInterval(() => {
+                const item = streamData[Math.floor(Math.random() * streamData.length)];
+                const el = document.createElement('div');
+                el.className = 'stream-item text-green-400';
+                el.innerText = item;
+                container.prepend(el);
+
+                if(container.children.length > 50) {
+                    container.removeChild(container.lastChild);
+                }
+            }, 2000);
+        }
+
+        function renderStreamBatch(items, container) {
+            items.forEach(txt => {
+                const el = document.createElement('div');
+                el.className = 'stream-item';
+                el.innerText = txt;
+                container.appendChild(el);
+            });
+        }
+
+        function initChart(metrics) {
+            const ctx = document.getElementById('stabilityChart').getContext('2d');
+            // Mock trend data based on global metric
+            const trend = Array(20).fill(0).map(() => metrics.global_stability + (Math.random() * 0.2 - 0.1));
+
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array(20).fill(''),
+                    datasets: [{
+                        label: 'Global Stability',
+                        data: trend,
+                        borderColor: '#10b981',
+                        borderWidth: 1,
+                        tension: 0.4,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false },
+                        y: {
+                            display: true,
+                            grid: { color: '#333' },
+                            ticks: { color: '#666', font: {size: 8} }
+                        }
+                    }
+                }
+            });
+        }
+
+        function openInspector(node) {
+            const panel = document.getElementById('node-inspector');
+            panel.classList.remove('translate-x-full');
+
+            document.getElementById('insp-title').innerText = node.label;
+            document.getElementById('insp-content').innerHTML = `
+                <div class="space-y-4">
+                    <div class="p-3 bg-zinc-800/50 rounded border border-zinc-700">
+                        <div class="text-[10px] text-zinc-500 uppercase">Status</div>
+                        <div class="text-sm font-mono text-white">${node.title}</div>
+                    </div>
+
+                    <div>
+                        <div class="text-[10px] text-zinc-500 uppercase mb-2">Simulated Intent</div>
+                        <div class="text-xs font-mono text-green-400 p-2 bg-black rounded border border-green-900/30">
+                            "Simulating strategic moves based on ideology ${node.group}..."
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <button class="bg-amber-900/20 text-amber-500 border border-amber-900 text-xs py-1 hover:bg-amber-900/40">
+                            ISOLATE
+                        </button>
+                        <button class="bg-blue-900/20 text-blue-500 border border-blue-900 text-xs py-1 hover:bg-blue-900/40">
+                            TRACE ASSETS
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.closeInspector = function() {
+            document.getElementById('node-inspector').classList.add('translate-x-full');
+            if(network) network.unselectAll();
+        }
+
+        document.addEventListener('DOMContentLoaded', initNexus);
+
+    </script>
+</body>
+</html>
