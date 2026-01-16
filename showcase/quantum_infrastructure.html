@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Quantum Infrastructure</title>
+    <!-- Dependencies injected by nav.js, but adding placeholder for layout -->
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Courier New', Courier, monospace; }
+        .quantum-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.1);
+        }
+        .scan-line {
+            width: 100%;
+            height: 2px;
+            background: rgba(56, 189, 248, 0.5);
+            position: absolute;
+            animation: scan 3s linear infinite;
+        }
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        .log-entry {
+            font-size: 0.75rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 4px 0;
+        }
+        .log-entry:hover { background: rgba(56, 189, 248, 0.1); }
+        .node {
+            transition: all 0.3s ease;
+        }
+        .node:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            background: rgba(56, 189, 248, 0.2);
+            height: 4px;
+            border-radius: 2px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #22d3ee;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px #22d3ee;
+        }
+    </style>
+</head>
+<body class="overflow-hidden">
+
+    <!-- Main Content Container (Padded for Nav) -->
+    <div class="h-screen w-full flex flex-col p-4 md:p-6 space-y-4">
+
+        <!-- Header -->
+        <div class="flex justify-between items-center pb-2 border-b border-cyan-900/50">
+            <div>
+                <h1 class="text-2xl font-bold text-cyan-400 tracking-wider">QUANTUM INFRASTRUCTURE <span class="text-xs text-slate-500">v2.0.4 Runtime</span></h1>
+                <p class="text-xs text-slate-400">Hybrid Multi-Cloud Data Lake // Align Future Simulation</p>
+            </div>
+            <div class="flex gap-4 text-xs font-mono">
+                <div class="text-right">
+                    <div class="text-slate-500">SYSTEM ENTROPY</div>
+                    <div class="text-amber-400 font-bold" id="entropy-metric">--</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-slate-500">CRITICALITY</div>
+                    <div class="text-red-400 font-bold" id="criticality-metric">--</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-slate-500">QUBIT COHERENCE</div>
+                    <div class="text-cyan-400 font-bold" id="coherence-metric">--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid Layout -->
+        <div class="flex-1 grid grid-cols-1 md:grid-cols-12 gap-4 min-h-0">
+
+            <!-- Left Col: Quantum Runtime (Visual) -->
+            <div class="md:col-span-8 flex flex-col gap-4 min-h-0">
+
+                <!-- Visualization Canvas -->
+                <div class="relative flex-1 quantum-panel rounded-lg overflow-hidden flex flex-col">
+                    <!-- Simulation Controls -->
+                    <div class="p-2 border-b border-cyan-900/30 flex justify-between items-center bg-black/40 z-10">
+                        <div class="flex items-center gap-4 w-1/2">
+                            <span class="text-xs font-bold text-cyan-500 whitespace-nowrap">ALIGN FUTURE EVOLUTION</span>
+                            <input type="range" id="sim-slider" class="w-full" min="0" max="100" value="0">
+                        </div>
+                        <div class="flex gap-4 text-[10px] text-cyan-700">
+                            <span id="sim-state-label" class="text-amber-500 font-bold">FAULT TOLERANT</span>
+                            <span><i class="fas fa-circle text-[6px] text-cyan-400"></i> AGENT</span>
+                            <span><i class="fas fa-circle text-[6px] text-purple-500"></i> ENTANGLEMENT</span>
+                        </div>
+                    </div>
+
+                    <div class="absolute top-0 left-0 w-full h-full pointer-events-none scan-line opacity-20"></div>
+                    <canvas id="quantum-canvas" class="w-full h-full bg-slate-900/50"></canvas>
+                </div>
+
+                <!-- Infrastructure Topology -->
+                <div class="h-40 quantum-panel rounded-lg p-4 relative overflow-hidden">
+                    <div class="absolute top-2 left-4 text-xs font-bold text-slate-500">MULTI-CLOUD TOPOLOGY</div>
+                    <div id="infra-container" class="w-full h-full flex items-center justify-center gap-8 pt-4">
+                        <!-- Injected via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Col: Provenance Log -->
+            <div class="md:col-span-4 flex flex-col quantum-panel rounded-lg min-h-0">
+                <div class="p-3 border-b border-cyan-900/30 bg-black/20 flex justify-between items-center">
+                    <span class="text-xs font-bold text-cyan-500"><i class="fas fa-history mr-2"></i>DATA PROVENANCE LOG</span>
+                    <span class="text-[10px] text-slate-500" id="log-count">0 EVENTS</span>
+                </div>
+                <div id="provenance-feed" class="flex-1 overflow-y-auto p-3 font-mono text-xs custom-scrollbar space-y-1">
+                    <!-- Logs injected here -->
+                    <div class="text-slate-500 text-center mt-10">Waiting for data stream...</div>
+                </div>
+                <div class="p-2 border-t border-cyan-900/30 bg-black/20 text-[10px] text-slate-500 flex justify-between">
+                    <span>HASH VALIDATION: ACTIVE</span>
+                    <span><i class="fas fa-lock text-emerald-500"></i> SECURE</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/nav.js" data-root="."></script>
+    <script src="js/mock_quantum_data.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!window.QUANTUM_DATA) {
+                console.error("Mock data not loaded");
+                return;
+            }
+
+            const data = window.QUANTUM_DATA;
+            const simData = data.simulation;
+
+            // 1. Render Metrics
+            document.getElementById('coherence-metric').innerText = data.metrics.coherence_time;
+            document.getElementById('log-count').innerText = `${data.logs.length} EVENTS`;
+
+            // 2. Render Provenance Logs
+            const logContainer = document.getElementById('provenance-feed');
+            logContainer.innerHTML = ''; // Clear loading state
+
+            data.logs.forEach((log, index) => {
+                const el = document.createElement('div');
+                el.className = 'log-entry group cursor-pointer transition-colors';
+
+                // Color coding based on status
+                let statusColor = 'text-slate-400';
+                if(log.status === 'SUCCESS') statusColor = 'text-emerald-400';
+                if(log.status === 'WARNING') statusColor = 'text-amber-400';
+                if(log.status === 'OPTIMIZED') statusColor = 'text-cyan-400';
+
+                el.innerHTML = `
+                    <div class="flex justify-between opacity-70 group-hover:opacity-100">
+                        <span class="text-slate-500">${log.iso_time.split('T')[1].replace('Z','')}</span>
+                        <span class="${statusColor} font-bold">${log.status}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-slate-300 font-bold">[${log.module}]</span>
+                        <span class="text-slate-400">${log.operation}</span>
+                    </div>
+                    <div class="text-[10px] text-slate-600 truncate mt-1">Hash: ${log.hash}</div>
+                    <div class="hidden group-hover:block text-[10px] text-cyan-600 mt-1">
+                        Inputs: ${JSON.stringify(log.inputs)}
+                    </div>
+                `;
+                logContainer.appendChild(el);
+            });
+
+            // 3. Render Infrastructure Nodes
+            const infraContainer = document.getElementById('infra-container');
+            const iconMap = {
+                'cloud': 'fa-cloud',
+                'quantum': 'fa-atom',
+                'edge': 'fa-server'
+            };
+
+            data.infrastructure.nodes.forEach(node => {
+                const div = document.createElement('div');
+                div.className = `node flex flex-col items-center gap-2 p-3 rounded bg-slate-800/50 border border-slate-700/50 min-w-[100px] z-10 relative`;
+                if(node.type === 'quantum') div.classList.add('border-cyan-500', 'shadow-[0_0_15px_rgba(6,182,212,0.3)]');
+
+                div.innerHTML = `
+                    <div class="text-2xl ${node.type === 'quantum' ? 'text-cyan-400 animate-spin-slow' : 'text-slate-400'}">
+                        <i class="fas ${iconMap[node.type] || 'fa-circle'}"></i>
+                    </div>
+                    <div class="text-[10px] font-bold text-slate-300 text-center">${node.label}</div>
+                    <div class="text-[8px] text-slate-500 uppercase">${node.status}</div>
+                `;
+                infraContainer.appendChild(div);
+            });
+
+            // 4. Quantum Canvas with Simulation Integration
+            initCanvas(simData);
+        });
+
+        function initCanvas(simData) {
+            const canvas = document.getElementById('quantum-canvas');
+            const ctx = canvas.getContext('2d');
+            const slider = document.getElementById('sim-slider');
+            const stateLabel = document.getElementById('sim-state-label');
+            const entropyMetric = document.getElementById('entropy-metric');
+            const criticalityMetric = document.getElementById('criticality-metric');
+
+            let width, height;
+
+            const resize = () => {
+                const parent = canvas.parentElement;
+                width = canvas.width = parent.clientWidth;
+                height = canvas.height = parent.clientHeight;
+            };
+            window.addEventListener('resize', resize);
+            resize();
+
+            // Initialize Particles from Simulation Data (or fallback)
+            let particles = [];
+            const useSim = simData && simData.available;
+
+            if (useSim) {
+                slider.max = simData.timeline.length - 1;
+                simData.qubit_registry.forEach((q, i) => {
+                    particles.push({
+                        id: q.name,
+                        type: q.type,
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        targetX: 0,
+                        targetY: 0,
+                        vx: 0,
+                        vy: 0,
+                        phase: Math.random() * Math.PI * 2,
+                        size: 2 + (q.initial_complexity * 3),
+                        color: '#22d3ee'
+                    });
+                });
+            } else {
+                // Fallback particles
+                for(let i=0; i<50; i++) {
+                    particles.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2,
+                        size: Math.random() * 2 + 1,
+                        color: '#22d3ee'
+                    });
+                }
+            }
+
+            function updateMetrics(stepIndex) {
+                if(!useSim) return;
+                const step = simData.timeline[stepIndex];
+                if(!step) return;
+
+                entropyMetric.innerText = step.entropy.toFixed(3);
+                criticalityMetric.innerText = step.criticality.toFixed(3);
+
+                if(step.entropy > 0.6) {
+                    stateLabel.innerText = "FAULT TOLERANT (HIGH ENTROPY)";
+                    stateLabel.className = "text-amber-500 font-bold";
+                } else if (step.entropy > 0.2) {
+                    stateLabel.innerText = "TRANSITIONING";
+                    stateLabel.className = "text-cyan-500 font-bold";
+                } else {
+                    stateLabel.innerText = "FAULT INTOLERANT (OPTIMIZED)";
+                    stateLabel.className = "text-emerald-500 font-bold";
+                }
+            }
+
+            // Animation Loop
+            function animate() {
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.3)'; // Trail effect
+                ctx.fillRect(0, 0, width, height);
+
+                const currentStepIndex = parseInt(slider.value);
+                const progress = currentStepIndex / (parseInt(slider.max) || 1);
+
+                // Update Simulation State
+                updateMetrics(currentStepIndex);
+
+                // Grid Logic for "Intolerant" State (Target positions)
+                if (useSim) {
+                    const cols = Math.ceil(Math.sqrt(particles.length));
+                    const cellW = width / cols;
+                    const cellH = height / cols;
+
+                    particles.forEach((p, i) => {
+                        const col = i % cols;
+                        const row = Math.floor(i / cols);
+
+                        // Target is Grid
+                        const gridX = (col * cellW) + (cellW / 2);
+                        const gridY = (row * cellH) + (cellH / 2);
+
+                        // Force Directed (Random) vs Grid based on Progress
+                        // High Entropy (Progress 0) -> Random/Floaty
+                        // Low Entropy (Progress 1) -> Grid Lock
+
+                        // Interpolate behavior
+                        const entropy = 1.0 - progress;
+
+                        // Physics
+                        if (progress < 0.8) {
+                            // Brownian / Random motion
+                            p.vx += (Math.random() - 0.5) * entropy * 0.5;
+                            p.vy += (Math.random() - 0.5) * entropy * 0.5;
+
+                            // Slight pull to center to keep them on screen
+                            const dx = (width/2) - p.x;
+                            const dy = (height/2) - p.y;
+                            p.vx += dx * 0.0001;
+                            p.vy += dy * 0.0001;
+
+                            // Dampening
+                            p.vx *= 0.95;
+                            p.vy *= 0.95;
+                        } else {
+                            // Snap to Grid (Intolerant / Optimized)
+                            const dx = gridX - p.x;
+                            const dy = gridY - p.y;
+                            p.vx += dx * 0.05;
+                            p.vy += dy * 0.05;
+                            p.vx *= 0.8; // Heavy dampening
+                            p.vy *= 0.8;
+                        }
+
+                        p.x += p.vx;
+                        p.y += p.vy;
+
+                        // Color Shift based on Phase (simulated)
+                        const phaseIntensity = Math.sin(p.phase + Date.now()/500);
+                        const r = Math.floor(34 + (progress * 100)); // Dark -> Bright Green/Cyan
+                        const g = Math.floor(211 + (phaseIntensity * 20));
+                        const b = 238;
+
+                        // At high entropy: particles are cyan/purple. At low: Uniform Emerald.
+                        if (progress > 0.8) {
+                             ctx.fillStyle = `rgba(52, 211, 153, ${0.5 + phaseIntensity*0.5})`; // Emerald
+                        } else {
+                             ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.8)`;
+                        }
+
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+
+                    // Draw connections (Entanglement)
+                    // Only draw if entropy is high (messy connections) or specifically defined
+                    ctx.strokeStyle = `rgba(56, 189, 248, ${0.1 * (1.0 - progress)})`; // Fade out connections as we optimize? Or maybe align them.
+                    ctx.lineWidth = 1;
+
+                    // Simple distance based connection for demo
+                    // In a real graph, we'd use the 'entangled_with' property
+                    for(let i=0; i<particles.length; i+=2) { // Optimization: skip some
+                         const p1 = particles[i];
+                         // Connect to nearest neighbor
+                         // (Simplified for performance on 164 nodes)
+                         if (progress < 0.5) {
+                            // Random lines
+                         }
+                    }
+
+                } else {
+                    // Fallback Animation
+                     particles.forEach(p => {
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        if(p.x < 0 || p.x > width) p.vx *= -1;
+                        if(p.y < 0 || p.y > height) p.vy *= -1;
+                        ctx.fillStyle = p.color;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+                }
+
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+    </script>
+</body>
+</html>
