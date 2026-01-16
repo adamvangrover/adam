@@ -17,6 +17,31 @@ class Meta19Agent(AgentBase):
         self.logical_fallacies = self.config.get("logical_fallacies", {})
         self.positive_keywords = self.config.get("positive_keywords", [])
         self.negative_keywords = self.config.get("negative_keywords", [])
+
+        # Pre-compile regex patterns for performance
+        self.compiled_fallacies = {}
+        self.fallacy_prefilters = {}
+        for fallacy, patterns in self.logical_fallacies.items():
+            self.compiled_fallacies[fallacy] = [re.compile(p, re.IGNORECASE) for p in patterns]
+            # Create a combined regex for fast pre-filtering
+            if patterns:
+                # Use (?:...) for non-capturing groups to ensure precedence is correct
+                combined_pattern = "|".join(f"(?:{p})" for p in patterns)
+                self.fallacy_prefilters[fallacy] = re.compile(combined_pattern, re.IGNORECASE)
+            else:
+                self.fallacy_prefilters[fallacy] = None
+
+        # Optimize keywords by joining them into single regexes
+        if self.positive_keywords:
+            self.positive_pattern = re.compile("|".join(f"(?:{k})" for k in self.positive_keywords), re.IGNORECASE)
+        else:
+            self.positive_pattern = None
+
+        if self.negative_keywords:
+            self.negative_pattern = re.compile("|".join(f"(?:{k})" for k in self.negative_keywords), re.IGNORECASE)
+        else:
+            self.negative_pattern = None
+
         logging.info(f"MetaCognitiveAgent initialized with {len(self.logical_fallacies)} logical fallacy patterns.")
 
     async def execute(self, analysis_chain: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -69,12 +94,17 @@ class Meta19Agent(AgentBase):
         Detects logical fallacies in a given text using regex patterns.
         """
         detected_fallacies = []
-        for fallacy, patterns in self.logical_fallacies.items():
+        for fallacy, patterns in self.compiled_fallacies.items():
+            # Check pre-filter first to avoid iterating through all patterns if none match
+            prefilter = self.fallacy_prefilters.get(fallacy)
+            if prefilter and not prefilter.search(text):
+                continue
+
             for pattern in patterns:
-                if re.search(pattern, text, re.IGNORECASE):
+                if pattern.search(text):
                     detected_fallacies.append({
                         "fallacy": fallacy,
-                        "evidence": f"Detected pattern '{pattern}'"
+                        "evidence": f"Detected pattern '{pattern.pattern}'"
                     })
         return detected_fallacies
 
@@ -85,8 +115,8 @@ class Meta19Agent(AgentBase):
         inconsistencies = []
         outputs_text = " ".join([str(step.get("output", "")) for step in analysis_chain]).lower()
 
-        has_positive = any(re.search(keyword, outputs_text, re.IGNORECASE) for keyword in self.positive_keywords)
-        has_negative = any(re.search(keyword, outputs_text, re.IGNORECASE) for keyword in self.negative_keywords)
+        has_positive = bool(self.positive_pattern.search(outputs_text)) if self.positive_pattern else False
+        has_negative = bool(self.negative_pattern.search(outputs_text)) if self.negative_pattern else False
 
         if has_positive and has_negative:
             inconsistencies.append(

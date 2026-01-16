@@ -50,7 +50,8 @@ class TwinBuilderAgent(AgentBase):
 # Example usage (for testing purposes)
 if __name__ == '__main__':
     # This would be configured and run by the AgentOrchestrator in a real scenario
-    sample_path = '../../data/virtual_twins/sample_enterprise_twin.json'
+    # Updated to point to the JPM Unified Banking World Model definition
+    sample_path = '../../data/virtual_twins/jpm_unified_banking.json'
     builder_agent = TwinBuilderAgent(twin_definition_path=sample_path)
     import asyncio
     asyncio.run(builder_agent.execute())

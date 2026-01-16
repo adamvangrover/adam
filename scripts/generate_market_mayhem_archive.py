@@ -210,7 +210,183 @@ def parse_markdown_file(filepath):
         print(f"Error parsing MD {filepath}: {e}")
         return None
 
-# --- Main Generation ---
+# --- Static Data (Historical & Simulated) ---
+
+NEWSLETTER_DATA = [
+    # 2026 The Reflationary Agentic Boom
+    {
+        "date": "2026-01-12",
+        "title": "GLOBAL MACRO-STRATEGIC OUTLOOK 2026: THE REFLATIONARY AGENTIC BOOM",
+        "summary": "As markets open on January 12, 2026, the global financial system has entered a new regime: the Reflationary Agentic Boom. Paradoxical growth, sticky inflation, and the 'Binary Big Bang' of Agentic AI.",
+        "type": "ANNUAL_STRATEGY",
+        "filename": "newsletter_market_mayhem_jan_2026.html",
+        "is_sourced": True,
+        "full_body": """
+        <h3>1. Executive Intelligence Summary: The Architecture of the New Regime</h3>
+        <p>As markets open on January 12, 2026, the global financial system has decisively exited the post-pandemic transitional phase and entered a new, distinct market regime: the <strong>Reflationary Agentic Boom</strong>. This paradigm is defined by a paradoxical but potent combination of accelerating economic growth in the United States, sticky inflation floors driven by geopolitical fragmentation and tariffs, and a technological productivity shock moving from generative experimentation to "agentic" execution.</p>
+        <p>The prevailing narrative of late 2024 and 2025—that the Federal Reserve's tightening cycle would inevitably induce a recession—has been falsified by the data. Instead, the US economy is tracking toward a robust 2.5% to 2.6% real GDP growth rate for 2026. This resilience is not merely a cyclical rebound but a structural shift powered by three pillars: the fiscal impulse of anticipated tax cuts, the capital expenditure (Capex) super-cycle associated with "Sovereign AI," and the integration of digital assets into the institutional balance sheet via new accounting standards.</p>
+
+        <h3>2. Macroeconomic Dynamics: The "No Landing" Reality</h3>
+        <p>The defining macroeconomic surprise of 2026 is the persistent exceptionalism of the United States economy. While consensus forecasts in 2024 predicted a hard landing, the actual trajectory has been one of re-acceleration. Current data indicates that the US is poised to outperform all other major developed economies.</p>
+        <p><strong>The Inflation Paradox:</strong> While growth is robust, the inflation battle has morphed rather than ended. We are currently witnessing a clash between two opposing secular forces: the inflationary pressure of geopolitical fragmentation and tariffs, versus the deflationary pressure of technological automation.</p>
+
+        <h3>3. The Sovereign AI Paradigm</h3>
+        <p>The most significant thematic evolution in 2026 is the shift from corporate AI adoption to "Sovereign AI." This concept posits that artificial intelligence infrastructure—data centers, foundation models, and the energy grids that power them—is not merely a commercial asset but a critical component of national security. Nations are building "AI Factories" to secure their digital borders.</p>
+        <p><strong>Implication:</strong> The "Sovereign AI Capex Floor" provides a baseline of demand for hardware (NVDA) and operating systems (PLTR) that is inelastic to interest rates.</p>
+
+        <h3>4. The Agentic Technology Revolution</h3>
+        <p>We are witnessing the transition from "Generative AI"—tools that create content—to "Agentic AI"—systems that execute work. This "Binary Big Bang" is reshaping labor markets and corporate efficiency. By automating cognitive labor, companies are reducing their operating leverage and suppressing wage inflation in white-collar sectors. This "Tech Deflation" is the counterweight to "Tariff Inflation".</p>
+
+        <h3>5. The New Crypto-Financial Architecture</h3>
+        <p>The year 2026 marks the definitive integration of cryptocurrency into the global financial architecture. The implementation of FASB ASU 2023-08 has unlocked corporate treasuries, allowing Bitcoin to be held at fair value. Combined with rumors of sovereign wealth accumulation (Qatar, Peru), this has established a valuation floor for Bitcoin above $100,000.</p>
+
+        <h3>8. Strategic Asset Allocation: The "Barbell" Strategy</h3>
+        <p>Given the confluence of "No Landing" growth, sticky inflation, and the Agentic Boom, a "Barbell" asset allocation strategy is optimal:</p>
+        <ul>
+            <li><strong>Leg 1 (Agentic Growth):</strong> Overweight AI Infrastructure (NVDA) and Sovereign Operating Systems (PLTR).</li>
+            <li><strong>Leg 2 (Sovereignty Hedge):</strong> Overweight Bitcoin (BTC) and Industrial Commodities (Copper).</li>
+            <li><strong>Underweight:</strong> Regional Banks and Consumer Discretionary firms reliant on cheap debt.</li>
+        </ul>
+        """
+    },
+    # 2025 Monthly
+    {
+        "date": "2025-09-14",
+        "title": "THE LIQUIDITY TRAP",
+        "summary": "Fed pauses cuts as core services inflation sticks. Small caps get crushed. The case for 'Quality' factor investing.",
+        "type": "MONTHLY",
+        "filename": "newsletter_market_mayhem_sep_2025.html",
+        "is_sourced": True,
+        "full_body": """
+        <p>The Federal Reserve's decision to hold rates steady at 5.25% has sent shockwaves through the small-cap sector. The Russell 2000 has plummeted 8% in just two weeks, reflecting growing fears of a credit crunch for regional banks and smaller enterprises dependent on floating-rate debt.</p>
+        <p>Core services inflation remains stubbornly high at 4.2%, driven primarily by shelter and healthcare costs. This data point has effectively killed the "pivot" narrative for Q4 2025. The yield curve remains inverted, with the 2s10s spread widening to -45bps.</p>
+        <p><strong>Sector Analysis:</strong> We are seeing a massive rotation into 'Quality'—companies with strong balance sheets and high free cash flow yields. Mega-cap tech (AAPL, MSFT) is acting as a safe haven, while unprofitable tech and highly leveraged industrials are being sold off aggressively.</p>
+        """
+    },
+    {
+        "date": "2025-08-14",
+        "title": "SUMMER DOLDRUMS & AI FATIGUE",
+        "summary": "Volume dries up. AI Capex questions emerge. Nvidia earnings preview: Is the bar too high?",
+        "type": "MONTHLY",
+        "filename": "newsletter_market_mayhem_aug_2025.html",
+        "is_sourced": True,
+        "full_body": """
+        <p>Trading volumes have collapsed to year-to-date lows as Wall Street heads to the Hamptons. However, beneath the calm surface, cracks are forming in the AI narrative. Several hyperscalers (GOOGL, META) have hinted at 'optimizing' capital expenditures, sparking fears of an AI spending slowdown.</p>
+        <p>All eyes are on Nvidia's upcoming earnings. The buy-side whisper numbers are astronomical, setting a bar that may be impossible to clear. A disappointment here could trigger a broader correction in the semiconductor index (SOXX).</p>
+        <p><strong>Strategy:</strong> We are observing a quiet rotation into Healthcare (XLV) and Utilities (XLU) as investors seek yield and defensive characteristics amidst the uncertainty.</p>
+        """
+    },
+    {
+        "date": "2025-07-14",
+        "title": "CRYPTO REGULATION SHOCK",
+        "summary": "SEC 2.0 launches 'Operation Chokepoint'. DeFi protocols under siege. Bitcoin flight to safety narrative tested.",
+        "type": "MONTHLY",
+        "filename": "newsletter_market_mayhem_jul_2025.html",
+        "is_sourced": True,
+        "full_body": """
+        <p>The SEC has launched a coordinated enforcement blitz against major DeFi protocols and centralized exchanges, dubbed 'Operation Chokepoint 2.0'. The immediate impact has been a bloodbath in the altcoin market, with ETH/BTC ratios hitting multi-year lows.</p>
+        <p>Bitcoin, however, is showing relative strength. The 'flight to safety' narrative within the crypto ecosystem is funneling capital into BTC. Institutional investors view the regulatory purge as a necessary cleansing before true mass adoption can occur.</p>
+        <p><strong>Outlook:</strong> Expect continued volatility. The legal battles will take years to resolve. In the meantime, 'Code is Law' is being tested by 'Law is Law'.</p>
+        """
+    },
+    {
+        "date": "2025-06-14",
+        "title": "THE DOLLAR WRECKING BALL",
+        "summary": "DXY breaks 108. Emerging Market currencies collapse. Carry trade unwind begins.",
+        "type": "MONTHLY",
+        "filename": "newsletter_market_mayhem_jun_2025.html",
+        "is_sourced": True,
+        "full_body": """
+        <p>The US Dollar Index (DXY) has shattered resistance at 108, acting as a wrecking ball for global risk assets. The Japanese Yen has collapsed to 160 against the dollar, forcing the BOJ to intervene—unsuccessfully so far.</p>
+        <p>Emerging Market (EM) debt is under severe stress. Countries with high dollar-denominated debt burdens are seeing their credit default swap (CDS) spreads blow out. The 'Carry Trade'—borrowing in Yen to buy tech stocks—is unwinding rapidly, adding selling pressure to the Nasdaq.</p>
+        <p><strong>Macro View:</strong> The Fed's 'Higher for Longer' stance is diverging from the ECB and BOJ, creating a rate differential vacuum that sucks capital into the USD.</p>
+        """
+    },
+    {
+        "date": "2025-05-14",
+        "title": "COMMERCIAL REAL ESTATE: THE RECKONING",
+        "summary": "Office vacancy hits 25%. Regional banks take haircuts. The 'Extend and Pretend' game ends.",
+        "type": "MONTHLY",
+        "filename": "newsletter_market_mayhem_may_2025.html",
+        "is_sourced": True,
+        "full_body": """
+        <p>The 'Extend and Pretend' game is officially over. A landmark sale of a Class-A office tower in San Francisco for $100/sqft—down 75% from its 2019 valuation—has set a terrifying new comparable for the market.</p>
+        <p>Regional banks (KRE) are taking massive haircuts on their loan portfolios. We expect a wave of consolidation in the banking sector as smaller players are forced to merge or fail. Meanwhile, Private Credit funds are raising record amounts of dry powder to act as the liquidity providers of last resort.</p>
+        <p><strong>Investment Implication:</strong> Avoid regional banks. Look for distress-focused alternative asset managers.</p>
+        """
+    },
+    {
+        "date": "2025-04-14",
+        "title": "Q1 EARNINGS: PROFIT MARGIN SQUEEZE",
+        "summary": "Wage inflation eats into margins. Guidance cut across Consumer Discretionary. The Recession is not cancelled, just delayed.",
+        "type": "MONTHLY",
+        "filename": "newsletter_market_mayhem_apr_2025.html",
+        "is_sourced": True,
+        "full_body": """
+        <p>Q1 earnings season has revealed a troubling trend: profit margin compression. While top-line revenue remains resilient, bottom-line earnings are being eroded by sticky wage inflation (running at 4.5%) and higher input costs.</p>
+        <p>Consumer Discretionary giants like Target and Home Depot have cut full-year guidance, citing 'consumer fatigue' and 'shrink' (theft). The narrative is shifting from 'Goldilocks' to 'Stagflation'—slowing growth with persistent inflation.</p>
+        <p><strong>Key Metric:</strong> Operating margins for the S&P 500 ex-Energy have contracted by 120bps year-over-year.</p>
+        """
+    },
+    # 2024 Retrospective / Highlights
+    {
+        "date": "2024-12-14",
+        "title": "2024 POST-MORTEM: THE SOFT LANDING MIRACLE",
+        "summary": "How the Fed threaded the needle. Inflation down, unemployment low. Can it last?",
+        "type": "YEARLY_REVIEW",
+        "filename": "newsletter_market_mayhem_dec_2024.html",
+        "is_sourced": True,
+        "full_body": """
+        <p>2024 will go down in history as the year of the 'Soft Landing Miracle'. Against all odds, the Federal Reserve managed to bring inflation down from 9% to 3% without triggering a recession. Unemployment remained historically low at 3.7%.</p>
+        <p>The S&P 500 returned a stunning 24%, driven almost entirely by the 'Magnificent 7' tech giants. The AI revolution fueled a productivity boom narrative that offset higher interest rates.</p>
+        <p><strong>Retrospective:</strong> The 'Immaculate Disinflation' was real. Supply chains healed, and the labor market rebalanced without mass layoffs. But valuations are now stretched.</p>
+        """
+    },
+
+    # Historical - REAL DATA
+    {
+        "date": "2020-03-20",
+        "title": "MARKET MAYHEM: THE GREAT SHUT-IN",
+        "summary": "\"Lockdown\". The global economy has come to a screeching halt. With \"15 Days to Slow the Spread\" in effect, markets are pricing in a depression-level GDP contraction.",
+        "type": "HISTORICAL",
+        "filename": "newsletter_market_mayhem_mar_2020.html",
+        "is_sourced": True,
+        "full_body": """
+        <p><strong>The World Has Stopped.</strong> In an unprecedented event, the global economy has entered a medically-induced coma. The S&P 500 has crashed 34% from its February highs, the fastest bear market in history.</p>
+        <p>Volatility is off the charts. The VIX closed at 82.69 on March 16th, surpassing the 2008 peak. Credit spreads have blown out, and liquidity in the Treasury market—usually the deepest in the world—has evaporated.</p>
+        <p><strong>Oil Shock:</strong> Demand destruction is so severe that WTI crude futures are trading at imminent risk of turning negative due to storage capacity constraints. (Update: They did, hitting -$37.63 in April).</p>
+        <p><strong>Central Bank Response:</strong> The Fed has unleashed 'Unlimited QE', buying corporate bonds for the first time in history. The mantra is 'Don't Fight the Fed', but the economic data is catastrophic.</p>
+        """
+    },
+    {
+        "date": "2008-09-19",
+        "title": "MARKET MAYHEM: THE LEHMAN MOMENT",
+        "summary": "\"Existential Panic\". There are decades where nothing happens; and there are weeks where decades happen. This was one of those weeks. A 158-year-old bank vanished, the world's largest insurer was nationalized, and the money market broke the buck.",
+        "type": "HISTORICAL",
+        "filename": "newsletter_market_mayhem_sep_2008.html",
+        "is_sourced": True,
+        "full_body": """
+        <p><strong>The Week Wall Street Died.</strong> On Monday, September 15th, Lehman Brothers filed for the largest bankruptcy in U.S. history ($600B+ assets). The government let them fail, hoping to reduce moral hazard. The result was global panic.</p>
+        <p>By Tuesday, AIG—the insurer of the world's financial system via CDS—was on the brink. The Fed stepped in with an $85B revolving credit facility, effectively nationalizing the company.</p>
+        <p><strong>The Real Panic:</strong> The Reserve Primary Fund, a money market fund considered 'as good as cash', broke the buck (NAV fell to $0.97) due to Lehman exposure. This triggered a $140B run on money market funds, freezing the commercial paper market. The gears of capitalism have ground to a halt.</p>
+        """
+    },
+    {
+        "date": "1987-10-23",
+        "title": "MARKET MAYHEM: BLACK MONDAY AFTERMATH",
+        "summary": "\"Shell-Shocked\". On October 19th, the Dow Jones Industrial Average fell 22.6% in a single day. 508 points. It was the largest one-day percentage drop in history.",
+        "type": "HISTORICAL",
+        "filename": "newsletter_market_mayhem_oct_1987.html",
+        "is_sourced": True,
+        "full_body": """
+        <p><strong>The Crash.</strong> Monday, October 19th, will live in infamy. The Dow Jones Industrial Average collapsed 508 points, losing 22.6% of its value in a single session. Volume on the NYSE reached an unprecedented 604 million shares, leaving the ticker tape hours behind.</p>
+        <p><strong>The Culprit:</strong> Program trading. 'Portfolio Insurance' strategies, designed to sell futures as the market falls to hedge portfolios, kicked in simultaneously. This selling pressure crushed the futures market, which dragged down the spot market in a vicious spiral.</p>
+        <p><strong>The Aftermath:</strong> Alan Greenspan's Fed has issued a statement: 'The Federal Reserve, consistent with its responsibilities as the Nation's central bank, affirmed today its readiness to serve as a source of liquidity to support the economic and financial system.' The bleeding has stopped, but the scar remains.</p>
+        """
+    }
+]
+
+# --- Templates ---
 
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
@@ -316,7 +492,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     </div>
 
     <div class="newsletter-wrapper">
-        <!-- Main Content (Paper Style) -->
         <div class="paper-sheet">
             <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px;">
                 <span>{date}</span>
@@ -325,7 +500,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
             <h1 class="title">{title}</h1>
 
-            <!-- Body Content -->
             {full_body}
 
             <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
@@ -333,7 +507,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             </div>
         </div>
 
-        <!-- Sidebar (Cyber Style) -->
         <aside class="cyber-sidebar">
             <div class="sidebar-widget">
                 <div class="sidebar-title">Metadata</div>
@@ -357,6 +530,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </html>
 """
 
+# --- Main Generation ---
+
 def generate_archive():
     print("Starting Archive Generation...")
 
@@ -377,59 +552,32 @@ def generate_archive():
         if item:
             all_items.append(item)
 
-    # 2. Add Legacy/Hardcoded items if missing (from original script logic)
-    historical_items = [
-        {
-            "date": "2020-03-20",
-            "title": "MARKET MAYHEM: THE GREAT SHUT-IN",
-            "summary": "Lockdown. The global economy has come to a screeching halt.",
-            "type": "HISTORICAL",
-            "filename": "newsletter_market_mayhem_mar_2020.html",
-            "full_body": "<p>The World Has Stopped...</p>", # simplified for this reconstruction
-            "is_sourced": True
-        },
-        {
-            "date": "2008-09-19",
-            "title": "MARKET MAYHEM: THE LEHMAN MOMENT",
-            "summary": "Existential Panic. A 158-year-old bank vanished.",
-            "type": "HISTORICAL",
-            "filename": "newsletter_market_mayhem_sep_2008.html",
-             "full_body": "<p>The Week Wall Street Died...</p>",
-             "is_sourced": True
-        },
-        {
-            "date": "1987-10-23",
-            "title": "MARKET MAYHEM: BLACK MONDAY AFTERMATH",
-            "summary": "Shell-Shocked. Dow Jones fell 22.6% in a single day.",
-            "type": "HISTORICAL",
-            "filename": "newsletter_market_mayhem_oct_1987.html",
-             "full_body": "<p>The Crash...</p>",
-             "is_sourced": True
-        }
-    ]
-
-    # Check if we already have these dates, if not, add them
+    # 2. Add Hardcoded/Static Data (from NEWSLETTER_DATA)
+    # Check if we already have these dates/titles to avoid duplicates
     existing_dates = set(i['date'] for i in all_items)
-    for h in historical_items:
-        if h['date'] not in existing_dates:
-            all_items.append(h)
+    
+    for static_item in NEWSLETTER_DATA:
+        if static_item['date'] not in existing_dates:
+            # Ensure required fields exist for static items
+            if 'is_sourced' not in static_item:
+                static_item['is_sourced'] = True
+            all_items.append(static_item)
+            existing_dates.add(static_item['date'])
 
     # 3. Scan for Orphan HTML Files in Showcase
-    # This ensures that if we have HTML files that were generated previously or manually added,
-    # but lack a source file in the newsletters directory, they are still indexed.
     print("Scanning for orphan HTML files in showcase/...")
     existing_filenames = set(item['filename'] for item in all_items)
     showcase_files = glob.glob(os.path.join(OUTPUT_DIR, "newsletter_*.html")) + \
-                     glob.glob(os.path.join(OUTPUT_DIR, "MM*.html")) + \
-                     glob.glob(os.path.join(OUTPUT_DIR, "*_Market_Mayhem.html")) + \
-                     glob.glob(os.path.join(OUTPUT_DIR, "Deep_Dive_*.html")) + \
-                     glob.glob(os.path.join(OUTPUT_DIR, "Tech_Watch_*.html")) + \
-                     glob.glob(os.path.join(OUTPUT_DIR, "Industry_Report_*.html")) + \
-                     glob.glob(os.path.join(OUTPUT_DIR, "House_View_*.html")) + \
-                     glob.glob(os.path.join(OUTPUT_DIR, "Equity_Research_*.html")) + \
-                     glob.glob(os.path.join(OUTPUT_DIR, "Weekly_Recap_*.html")) + \
-                     glob.glob(os.path.join(OUTPUT_DIR, "Market_Mayhem_*.html")) + \
-                     glob.glob(os.path.join(OUTPUT_DIR, "market_*.html"))
+                      glob.glob(os.path.join(OUTPUT_DIR, "MM*.html")) + \
+                      glob.glob(os.path.join(OUTPUT_DIR, "*_Market_Mayhem.html")) + \
+                      glob.glob(os.path.join(OUTPUT_DIR, "Deep_Dive_*.html")) + \
+                      glob.glob(os.path.join(OUTPUT_DIR, "Tech_Watch_*.html")) + \
+                      glob.glob(os.path.join(OUTPUT_DIR, "Industry_Report_*.html")) + \
+                      glob.glob(os.path.join(OUTPUT_DIR, "House_View_*.html")) + \
+                      glob.glob(os.path.join(OUTPUT_DIR, "Equity_Research_*.html")) + \
+                      glob.glob(os.path.join(OUTPUT_DIR, "Weekly_Recap_*.html")) + \
+                      glob.glob(os.path.join(OUTPUT_DIR, "Market_Mayhem_*.html")) + \
+                      glob.glob(os.path.join(OUTPUT_DIR, "market_*.html"))
 
     TITLE_RE = re.compile(r'<h1 class="title">(.*?)</h1>', re.IGNORECASE)
     DATE_RE = re.compile(r'<span>([\d-]+)</span>', re.IGNORECASE)
@@ -476,7 +624,7 @@ def generate_archive():
             date=item["date"],
             summary=item["summary"],
             type=item["type"],
-            full_body=item["full_body"]
+            full_body=item.get("full_body", "")
         )
 
         with open(out_path, "w", encoding='utf-8') as f:
@@ -512,7 +660,7 @@ def generate_archive():
             """
     for y in sorted(grouped.keys(), reverse=True):
         list_html += f'<option value="{y}">{y}</option>'
-
+        
     list_html += """
             <option value="HISTORICAL">HISTORICAL</option>
         </select>

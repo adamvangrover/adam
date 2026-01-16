@@ -11,6 +11,15 @@ import numpy as np
 import logging
 from typing import Dict, List, Any, Tuple
 from pydantic import BaseModel
+try:
+    from core.infrastructure.provenance import ProvenanceLogger
+except ImportError:
+    # Fallback if module structure differs slightly in test env
+    try:
+        from core.infrastructure.provenance import ProvenanceLogger
+    except:
+        class ProvenanceLogger:
+            def log_execution(self, *args, **kwargs): pass
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +38,25 @@ class WorldModelEngine:
         self.assets = assets
         self.gravity_constant = 0.05 # Mean reversion strength
         self.friction_coefficient = 0.01 # Transaction costs/Liquidity drag
+        self.growth_drift = 0.0 # Secular growth trend
+        self.logger = ProvenanceLogger()
+        self.active_scenario = "Baseline"
+        self.fundamental_anchors = {} # Map asset -> fair value
+
+    def load_scenario(self, scenario_name: str):
+        """
+        Loads physics parameters for a specific macro regime.
+        """
+        self.active_scenario = scenario_name
+        if scenario_name == "Reflationary_Agentic_Boom_2026":
+            # High growth, sticky inflation (high temp floor), low friction (AI efficiency)
+            self.gravity_constant = 0.02 # Weaker mean reversion (momentum dominates)
+            self.friction_coefficient = 0.005 # AI reduces transaction costs
+            self.growth_drift = 0.05 # Strong secular growth (AI Productivity)
+        elif scenario_name == "Stagflation_2025":
+            self.gravity_constant = 0.08
+            self.friction_coefficient = 0.03
+            self.growth_drift = -0.01
 
     def generate_trajectory(self, initial_state: MarketState, steps: int = 50) -> List[MarketState]:
         """
@@ -48,14 +76,22 @@ class WorldModelEngine:
                 price = current_state.asset_prices.get(asset, 100.0)
                 momentum = current_state.capital_flows.get(asset, 0.0)
 
-                # Force 1: Gravity (Mean Reversion to Fundamental Value - simplistically 100)
-                force_gravity = -self.gravity_constant * (price - 100.0)
+                # Determine Anchor (Fundamental Value)
+                # If not set, defaults to 100.0 OR the initial price if we want to assume efficient market start
+                # Here we default to 100.0 to preserve legacy behavior, but allow overrides
+                anchor = self.fundamental_anchors.get(asset, 100.0)
+
+                # Force 1: Gravity (Mean Reversion to Fundamental Value)
+                force_gravity = -self.gravity_constant * (price - anchor)
 
                 # Force 2: Thermal Noise (Stochastic Volatility)
                 force_thermal = np.random.normal(0, total_energy)
 
+                # Force 3: Growth Drift (Productivity/Inflation)
+                force_drift = self.growth_drift
+
                 # Update Momentum (F = ma)
-                new_momentum = momentum + force_gravity + force_thermal
+                new_momentum = momentum + force_gravity + force_thermal + force_drift
 
                 # Apply Friction
                 new_momentum *= (1 - self.friction_coefficient)
@@ -72,6 +108,10 @@ class WorldModelEngine:
             kinetic_energy = sum([abs(m) for m in new_flows.values()])
             new_temp = 0.9 * current_state.market_temperature + 0.1 * (1 + kinetic_energy * 0.1)
 
+            # Enforce Temperature Floor for Reflationary Scenarios (Sticky Inflation)
+            if self.active_scenario == "Reflationary_Agentic_Boom_2026":
+                new_temp = max(new_temp, 1.2)
+
             next_state = MarketState(
                 timestamp=current_state.timestamp + 1,
                 asset_prices=new_prices,
@@ -80,6 +120,15 @@ class WorldModelEngine:
             )
             trajectory.append(next_state)
             current_state = next_state
+
+        # Log Provenance
+        self.logger.log_execution(
+            module="WorldModelEngine",
+            operation="generate_trajectory",
+            inputs={"initial_state": initial_state.model_dump(), "steps": steps, "scenario": self.active_scenario},
+            outputs={"final_state": trajectory[-1].model_dump(), "trajectory_len": len(trajectory)},
+            metadata={"assets": self.assets}
+        )
 
         return trajectory
 
