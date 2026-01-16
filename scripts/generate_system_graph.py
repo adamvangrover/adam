@@ -25,32 +25,15 @@ def get_file_type(filename):
 def get_group(file_type, path_parts):
     if "agents" in path_parts: return "agent"
     if "simulations" in path_parts: return "simulation"
+    if "prompt_library" in path_parts: return "prompt"
     if "core" in path_parts and file_type == "code": return "core"
     if "showcase" in path_parts: return "ui"
     if "docs" in path_parts: return "knowledge"
+    if "AGENTS.md" in path_parts: return "knowledge"
     return file_type
 
-class CodeVisitor(ast.NodeVisitor):
-    def __init__(self):
-        self.classes = []
-        self.functions = []
-
-    def visit_ClassDef(self, node):
-        self.classes.append(node.name)
-        # We don't recurse into classes to find methods *as global functions*,
-        # but we could extract methods here if we wanted deeper granularity.
-        # For now, let's keep it to top-level classes.
-        self.generic_visit(node)
-
-    def visit_FunctionDef(self, node):
-        # Only capture top-level functions or we'd get methods too if we visited classes
-        # But generic_visit goes deep.
-        # Let's simple capture all defs for now, knowing some are methods.
-        self.functions.append(node.name)
-        self.generic_visit(node)
-
 def parse_code_structure(filepath):
-    """Parses a Python file to extract classes and functions."""
+    """Parses a Python file to extract classes and functions with metadata."""
     structure = {"classes": [], "functions": [], "imports": []}
     try:
         with open(filepath, "r") as f:
@@ -67,17 +50,39 @@ def parse_code_structure(filepath):
                     structure["imports"].append(node.module)
 
         # Extract Classes and Functions
-        # We prefer top-level only to avoid cluttering the graph with every helper method
         for node in tree.body:
             if isinstance(node, ast.ClassDef):
-                structure["classes"].append(node.name)
+                bases = [b.id for b in node.bases if isinstance(b, ast.Name)]
+                docstring = ast.get_docstring(node)
+                structure["classes"].append({
+                    "name": node.name,
+                    "docstring": docstring,
+                    "bases": bases,
+                    "lineno": node.lineno
+                })
             elif isinstance(node, ast.FunctionDef):
-                structure["functions"].append(node.name)
+                docstring = ast.get_docstring(node)
+                args = [a.arg for a in node.args.args]
+                structure["functions"].append({
+                    "name": node.name,
+                    "docstring": docstring,
+                    "args": args,
+                    "lineno": node.lineno
+                })
 
     except Exception as e:
         # logger.warning(f"Could not parse {filepath}: {e}")
         pass
     return structure
+
+def extract_file_content_preview(filepath):
+    """Reads a file and returns a preview of its content."""
+    try:
+        with open(filepath, 'r') as f:
+            content = f.read(500) # Read first 500 chars
+            return content
+    except:
+        return ""
 
 def extract_agents_from_md(filepath):
     """Extracts agent names from AGENTS.md or similar files."""
@@ -138,8 +143,15 @@ def generate_graph():
             if group == "knowledge" and file.isupper():
                  color = "#f59e0b"
                  size += 10
+            elif group == "prompt":
+                 color = "#ec4899" # Pink
             else:
                 color = None
+
+            # Content preview for markdown/text
+            content_preview = ""
+            if file_type == "doc" or group == "prompt":
+                content_preview = extract_file_content_preview(path)
 
             node = {
                 "id": node_id,
@@ -148,7 +160,8 @@ def generate_graph():
                 "title": rel_path,
                 "value": size,
                 "path": rel_path,
-                "level": "file"
+                "level": "file",
+                "preview": content_preview
             }
             if color: node["color"] = color
             nodes.append(node)
@@ -164,31 +177,37 @@ def generate_graph():
                 structure = parse_code_structure(path)
 
                 # Add Class Nodes
-                for cls_name in structure["classes"]:
+                for cls_data in structure["classes"]:
                     cls_id = next_id
                     next_id += 1
                     nodes.append({
                         "id": cls_id,
-                        "label": cls_name,
+                        "label": cls_data["name"],
                         "group": "class",
                         "size": 15,
                         "color": "#eab308", # Yellow
-                        "level": "code"
+                        "level": "code",
+                        "docstring": cls_data["docstring"],
+                        "bases": cls_data["bases"],
+                        "lineno": cls_data["lineno"]
                     })
                     # Link Class -> File
                     edges.append({"from": cls_id, "to": node_id, "color": "#555555"})
 
                 # Add Function Nodes (only top level)
-                for func_name in structure["functions"]:
+                for func_data in structure["functions"]:
                     func_id = next_id
                     next_id += 1
                     nodes.append({
                         "id": func_id,
-                        "label": func_name + "()",
+                        "label": func_data["name"] + "()",
                         "group": "function",
                         "size": 10,
                         "color": "#3b82f6", # Blue
-                        "level": "code"
+                        "level": "code",
+                        "docstring": func_data["docstring"],
+                        "args": func_data["args"],
+                        "lineno": func_data["lineno"]
                     })
                     # Link Function -> File
                     edges.append({"from": func_id, "to": node_id, "color": "#555555"})
@@ -224,7 +243,8 @@ def generate_graph():
         "size": 60,
         "color": "#ef4444",
         "font": {"size": 20, "face": "JetBrains Mono"},
-        "level": "concept"
+        "level": "concept",
+        "preview": "Central Strategy & Vision Node"
     })
     next_id += 1
 
@@ -236,7 +256,8 @@ def generate_graph():
         "size": 60,
         "color": "#a855f7",
          "font": {"size": 20, "face": "JetBrains Mono"},
-         "level": "concept"
+         "level": "concept",
+         "preview": "Core AI Infrastructure & Tooling"
     })
     next_id += 1
 
@@ -245,11 +266,16 @@ def generate_graph():
     # 4. Scan for House View Docs
     logger.info("Extracting House Views...")
     for node in nodes:
-        if node.get("level") == "file" and node["group"] == "knowledge" and "docs/" in node["path"]:
-            if node["label"].isupper() or "vision" in node["label"] or "roadmap" in node["label"]:
-                edges.append({"from": house_view_root, "to": node["id"]})
-            elif "architecture" in node["label"] or "guide" in node["label"]:
-                 edges.append({"from": infra_root, "to": node["id"]})
+        if node.get("level") == "file":
+             # Link prompts to infra or house view?
+             if node["group"] == "prompt":
+                  edges.append({"from": infra_root, "to": node["id"], "color": {"opacity": 0.2}})
+
+             if node["group"] == "knowledge" and "docs/" in node["path"]:
+                if node["label"].isupper() or "vision" in node["label"] or "roadmap" in node["label"]:
+                    edges.append({"from": house_view_root, "to": node["id"]})
+                elif "architecture" in node["label"] or "guide" in node["label"]:
+                     edges.append({"from": infra_root, "to": node["id"]})
 
     # 5. Extract Abstract Agent Concepts
     logger.info("Extracting Agents from Markdown...")
@@ -269,7 +295,8 @@ def generate_graph():
                 "shape": "diamond",
                 "size": 25,
                 "color": "#10b981",
-                "level": "concept"
+                "level": "concept",
+                "preview": f"Agent Definition: {agent_name}"
             })
 
             edges.append({"from": agents_md_id, "to": agent_id, "dashes": True})
