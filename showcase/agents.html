@@ -163,47 +163,193 @@
     </div>
 
     <div id="details-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
-        <div class="w-full max-w-4xl flex flex-col max-h-[85vh] bg-[#0f1115] border border-slate-700 rounded-lg overflow-hidden shadow-2xl">
-            <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/50">
-                <h3 class="text-lg font-bold text-white font-mono flex items-center gap-2">
-                    <i class="fas fa-id-card text-cyan-400"></i> <span id="modal-title">Agent Details</span>
-                </h3>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="p-6 overflow-y-auto flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div>
-                    <div class="text-xs text-slate-400 mb-2 font-mono uppercase tracking-widest flex justify-between">
-                        <span>System Prompt / Instructions</span>
-                        <span class="text-emerald-400 cursor-pointer hover:underline" onclick="injectPrompt()">[INJECT FROM LIBRARY]</span>
-                    </div>
-                    <pre class="code-editor h-[400px] p-4 rounded border border-slate-700 focus:border-emerald-500 outline-none" id="modal-content" contenteditable="true">Loading...</pre>
-                </div>
-                <div class="flex flex-col gap-4">
-                    <div>
-                        <label class="text-xs text-slate-500 font-bold uppercase tracking-widest mb-2 block">Description</label>
-                        <p class="text-sm text-slate-300 leading-relaxed mb-4" id="modal-desc">Loading...</p>
-                        
-                        <div class="text-xs text-slate-400 mb-2 font-mono uppercase tracking-widest">Registered Capabilities</div>
-                        <div id="modal-capabilities" class="flex flex-wrap gap-2">
-                            </div>
-                    </div>
+        <div class="w-full max-w-5xl flex flex-col h-[90vh] bg-[#0f1115] border border-slate-700 rounded-lg overflow-hidden shadow-2xl relative">
 
-                    <div class="mt-auto space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="p-3 bg-slate-900/50 rounded border border-slate-700 text-center">
-                                <div class="text-xs text-slate-500 uppercase mb-1">Status</div>
-                                <div class="text-lg font-bold text-white font-mono" id="modal-status">IDLE</div>
+            <!-- Modal Header -->
+            <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800/50 shrink-0">
+                <div class="flex items-center gap-4">
+                    <h3 class="text-lg font-bold text-white font-mono flex items-center gap-2">
+                        <i class="fas fa-id-card text-cyan-400"></i> <span id="modal-title">Agent Details</span>
+                    </h3>
+                    <div class="flex bg-slate-900/50 rounded p-1 border border-slate-700">
+                        <button class="tab-btn active" onclick="switchTab('tab-overview')">OVERVIEW</button>
+                        <button class="tab-btn" onclick="switchTab('tab-persona')">PERSONA & PROMPT</button>
+                        <button class="tab-btn" onclick="switchTab('tab-logic')">LOGIC & WORKFLOW</button>
+                        <button class="tab-btn" onclick="switchTab('tab-config')">CONFIGURATION</button>
+                        <button class="tab-btn" onclick="switchTab('tab-export')">PORTABLE EXPORT</button>
+                    </div>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white transition"><i class="fas fa-times fa-lg"></i></button>
+            </div>
+
+            <!-- Modal Body (Scrollable) -->
+            <div class="flex-1 overflow-y-auto custom-scrollbar p-6 bg-[#050b14]">
+
+                <!-- Tab: Overview -->
+                <div id="tab-overview" class="tab-content active space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Left Col: Status & Stats -->
+                        <div class="space-y-4">
+                            <div class="glass-panel p-4 rounded-lg">
+                                <div class="text-xs text-slate-500 uppercase tracking-widest mb-1">Status</div>
+                                <div class="text-xl font-bold text-emerald-400 font-mono flex items-center gap-2" id="modal-status">
+                                    <span class="status-dot bg-emerald-500 animate-pulse"></span> ONLINE
+                                </div>
                             </div>
-                            <div class="p-3 bg-slate-900/50 rounded border border-slate-700 text-center">
-                                <div class="text-xs text-slate-500 uppercase mb-1">Success Rate</div>
-                                <div class="text-lg font-bold text-emerald-400 font-mono">99.2%</div>
+                            <div class="glass-panel p-4 rounded-lg">
+                                <div class="text-xs text-slate-500 uppercase tracking-widest mb-1">Type</div>
+                                <div class="text-sm font-bold text-white font-mono" id="modal-type">Specialized Agent</div>
+                            </div>
+                            <div class="glass-panel p-4 rounded-lg">
+                                <div class="text-xs text-slate-500 uppercase tracking-widest mb-2">Capabilities</div>
+                                <div id="modal-capabilities" class="flex flex-wrap gap-2"></div>
+                            </div>
+
+                            <button class="w-full py-3 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded border border-cyan-400/50 shadow-[0_0_15px_rgba(6,182,212,0.3)] transition uppercase tracking-wider text-sm flex items-center justify-center gap-2" onclick="deployAgent()">
+                                <i class="fas fa-play"></i> Deploy to Console
+                            </button>
+                        </div>
+
+                        <!-- Right Col: Description & Task -->
+                        <div class="lg:col-span-2 space-y-6">
+                            <div>
+                                <h4 class="text-cyan-400 font-mono text-sm mb-2 border-b border-slate-800 pb-1">DESCRIPTION</h4>
+                                <p class="text-slate-300 text-sm leading-relaxed" id="modal-desc">Loading...</p>
+                            </div>
+                            <div>
+                                <h4 class="text-cyan-400 font-mono text-sm mb-2 border-b border-slate-800 pb-1">TASK DIRECTIVE</h4>
+                                <div class="bg-slate-900/50 border-l-2 border-emerald-500 p-4 rounded-r text-sm text-slate-200 font-mono" id="modal-task">
+                                    // Task details unavailable.
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-cyan-400 font-mono text-sm mb-2 border-b border-slate-800 pb-1">CONTEXT AWARENESS</h4>
+                                <ul class="list-disc list-inside text-sm text-slate-400 space-y-1" id="modal-context">
+                                    <li>Standard Context Window</li>
+                                </ul>
                             </div>
                         </div>
-                        <button class="w-full py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded text-xs transition uppercase tracking-wider" onclick="deployAgent()">
-                            <i class="fas fa-play mr-2"></i> Deploy to Console
-                        </button>
                     </div>
                 </div>
+
+                <!-- Tab: Persona & Prompt -->
+                <div id="tab-persona" class="tab-content space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+                        <div class="flex flex-col h-full">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="text-cyan-400 font-mono text-sm">SYSTEM PERSONA</h4>
+                                <span class="text-xs text-slate-500">Identity Protocol</span>
+                            </div>
+                            <div class="code-block flex-1 text-xs leading-relaxed text-amber-100/90 relative group">
+                                <button class="copy-btn opacity-0 group-hover:opacity-100" onclick="copyToClipboard('modal-persona-text')"><i class="fas fa-copy"></i> Copy</button>
+                                <div id="modal-persona-text" class="whitespace-pre-wrap">Loading...</div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col h-full">
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="text-cyan-400 font-mono text-sm">FULL SYSTEM PROMPT</h4>
+                                <span class="text-xs text-emerald-400 cursor-pointer hover:underline" onclick="injectPrompt()">[LOAD DEFAULT]</span>
+                            </div>
+                            <div class="code-block flex-1 text-xs text-slate-300 relative group">
+                                <button class="copy-btn opacity-0 group-hover:opacity-100" onclick="copyToClipboard('modal-prompt-text')"><i class="fas fa-copy"></i> Copy</button>
+                                <div id="modal-prompt-text" class="whitespace-pre-wrap">// Full prompt text...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-slate-800 pt-4">
+                        <h4 class="text-cyan-400 font-mono text-sm mb-2">PORTABLE LLM PROMPT (FULL SYSTEM CONTEXT)</h4>
+                        <div class="code-block text-xs text-slate-400 h-64 overflow-y-auto relative group">
+                            <button class="copy-btn opacity-0 group-hover:opacity-100" onclick="copyToClipboard('modal-md-copy')"><i class="fas fa-copy"></i> Copy Prompt</button>
+                            <div id="modal-md-copy" class="whitespace-pre-wrap">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Logic & Workflow -->
+                <div id="tab-logic" class="tab-content space-y-6">
+                    <div>
+                        <h4 class="text-cyan-400 font-mono text-sm mb-2">WORKFLOW EXECUTION</h4>
+                        <div class="bg-slate-900 border border-slate-700 p-4 rounded-lg">
+                            <ol class="list-decimal list-inside space-y-2 text-sm text-slate-300 font-mono" id="modal-workflow">
+                                <li>Loading...</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="text-cyan-400 font-mono text-sm mb-2">REASONING PROCESS</h4>
+                            <div class="code-block text-xs text-blue-200/80 h-64 overflow-y-auto" id="modal-reasoning">
+                                // Internal logic description...
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-cyan-400 font-mono text-sm mb-2">ENVIRONMENT PLUGINS</h4>
+                            <div class="bg-slate-900 border border-slate-700 p-4 rounded-lg h-64 overflow-y-auto">
+                                <ul class="space-y-2" id="modal-plugins">
+                                    <li class="flex items-center gap-2 text-xs text-slate-400">
+                                        <i class="fas fa-plug"></i> No plugins detected.
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Configuration -->
+                <div id="tab-config" class="tab-content space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="text-cyan-400 font-mono text-sm mb-2">YAML CONFIG</h4>
+                            <div class="code-block text-xs text-emerald-100/80 h-[500px] overflow-y-auto relative group">
+                                <button class="copy-btn opacity-0 group-hover:opacity-100" onclick="copyToClipboard('modal-yaml')"><i class="fas fa-copy"></i> Copy</button>
+                                <div id="modal-yaml" class="whitespace-pre-wrap">Loading...</div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-cyan-400 font-mono text-sm mb-2">JSON CONFIG</h4>
+                            <div class="code-block text-xs text-amber-100/80 h-[500px] overflow-y-auto relative group">
+                                <button class="copy-btn opacity-0 group-hover:opacity-100" onclick="copyToClipboard('modal-json')"><i class="fas fa-copy"></i> Copy</button>
+                                <div id="modal-json" class="whitespace-pre-wrap">Loading...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Portable Export -->
+                <div id="tab-export" class="tab-content space-y-6">
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="text-cyan-400 font-mono text-sm">FULL PORTABLE CARD (MARKDOWN)</h4>
+                                <span class="text-xs text-slate-500">Universal Format</span>
+                            </div>
+                            <div class="code-block text-xs text-slate-300 h-96 overflow-y-auto relative group">
+                                <button class="copy-btn opacity-0 group-hover:opacity-100" onclick="copyToClipboard('modal-export-md')"><i class="fas fa-copy"></i> Copy Markdown</button>
+                                <div id="modal-export-md" class="whitespace-pre-wrap">Loading...</div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="text-cyan-400 font-mono text-sm mb-2">JSON DEFINITION</h4>
+                                <div class="code-block text-xs text-amber-100/80 h-64 overflow-y-auto relative group">
+                                    <button class="copy-btn opacity-0 group-hover:opacity-100" onclick="copyToClipboard('modal-export-json')"><i class="fas fa-copy"></i> Copy JSON</button>
+                                    <div id="modal-export-json" class="whitespace-pre-wrap">Loading...</div>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-cyan-400 font-mono text-sm mb-2">YAML DEFINITION</h4>
+                                <div class="code-block text-xs text-emerald-100/80 h-64 overflow-y-auto relative group">
+                                    <button class="copy-btn opacity-0 group-hover:opacity-100" onclick="copyToClipboard('modal-export-yaml')"><i class="fas fa-copy"></i> Copy YAML</button>
+                                    <div id="modal-export-yaml" class="whitespace-pre-wrap">Loading...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -244,6 +390,7 @@
     </div>
 
     <script src="js/mock_data.js"></script>
+    <script src="js/mock_agents_rich.js"></script>
     <script src="js/repo_data.js"></script>
     <script src="js/app.js"></script>
     <script>
@@ -438,30 +585,120 @@
         function openDetails(agent) {
             selectedAgent = agent;
             document.getElementById('details-modal').classList.remove('hidden');
-            document.getElementById('modal-title').innerText = formatName(agent.name);
-            document.getElementById('modal-desc').innerText = agent.docstring || "No documentation provided.";
-            document.getElementById('modal-content').innerText = agent.prompt || "// System prompt not exposed in registry.";
-            
-            // Random status for demo
-            const status = Math.random() > 0.7 ? 'ACTIVE' : 'IDLE';
-            const statusEl = document.getElementById('modal-status');
-            statusEl.innerText = status;
-            statusEl.className = status === 'ACTIVE' ? 'text-lg font-bold text-emerald-400 font-mono animate-pulse' : 'text-lg font-bold text-slate-400 font-mono';
 
+            // Basic Info
+            document.getElementById('modal-title').innerText = formatName(agent.name);
+            document.getElementById('modal-type').innerText = agent.type;
+            document.getElementById('modal-desc').innerText = agent.docstring || "No documentation provided.";
+            
+            // Random status for demo (if not set)
+            const status = agent.status || (Math.random() > 0.7 ? 'ACTIVE' : 'IDLE');
+            const statusEl = document.getElementById('modal-status');
+            statusEl.innerHTML = `<span class="status-dot ${status === 'ACTIVE' ? 'bg-emerald-500 animate-pulse' : 'bg-slate-500'}"></span> ${status}`;
+            statusEl.className = `text-xl font-bold font-mono flex items-center gap-2 ${status === 'ACTIVE' ? 'text-emerald-400' : 'text-slate-400'}`;
+
+            // Capabilities Tags
             const capsDiv = document.getElementById('modal-capabilities');
             capsDiv.innerHTML = '';
-            // Generate tags
-            const keywords = ['Risk', 'Analysis', 'Market', 'Sentiment', 'Orchestration', 'Validation'];
+            const keywords = ['Risk', 'Analysis', 'Market', 'Sentiment', 'Orchestration', 'Validation', 'Financial', 'Data'];
+            let foundCaps = false;
             keywords.forEach(k => {
-                if((agent.name + agent.docstring).includes(k)) {
-                    capsDiv.innerHTML += `<span class="badge-blue text-[10px] px-2 py-1 rounded border border-blue-500/30">${k.toUpperCase()}</span>`;
+                if((agent.name + (agent.docstring || '')).toLowerCase().includes(k.toLowerCase())) {
+                    capsDiv.innerHTML += `<span class="cyber-badge badge-blue">${k.toUpperCase()}</span>`;
+                    foundCaps = true;
                 }
             });
-            if(capsDiv.innerHTML === '') capsDiv.innerHTML = `<span class="text-slate-500 text-xs">Standard Logic Unit</span>`;
+            if(!foundCaps) capsDiv.innerHTML = `<span class="text-slate-500 text-xs">Standard Logic Unit</span>`;
+
+            // --- Advanced Fields (Portable Card Data) ---
+
+            // Task
+            document.getElementById('modal-task').innerText = agent.task_description || "// Task directive not explicitly defined.";
+
+            // Context
+            const contextList = document.getElementById('modal-context');
+            contextList.innerHTML = '';
+            if (agent.context_awareness && Array.isArray(agent.context_awareness)) {
+                agent.context_awareness.forEach(ctx => {
+                    contextList.innerHTML += `<li>${ctx}</li>`;
+                });
+            } else if (typeof agent.context_awareness === 'string') {
+                 contextList.innerHTML = `<li>${agent.context_awareness}</li>`;
+            } else {
+                contextList.innerHTML = `<li>Standard Execution Context</li>`;
+            }
+
+            // Persona & Prompt
+            document.getElementById('modal-persona-text').innerText = agent.system_prompt_persona || "// Persona not defined.";
+            document.getElementById('modal-prompt-text').innerText = agent.prompt || "// System prompt hidden.";
+            document.getElementById('modal-md-copy').innerText = agent.portable_prompt || agent.markdown_copy || "## Agent Description\n\nNo portable prompt available.";
+
+            // Logic & Workflow
+            const workflowList = document.getElementById('modal-workflow');
+            workflowList.innerHTML = '';
+            if (agent.workflow && Array.isArray(agent.workflow)) {
+                agent.workflow.forEach(step => {
+                    workflowList.innerHTML += `<li class="py-1 border-b border-slate-800/50 last:border-0">${step}</li>`;
+                });
+            } else {
+                workflowList.innerHTML = `<li>Standard linear execution.</li>`;
+            }
+
+            document.getElementById('modal-reasoning').innerText = agent.reasoning_process || "// Standard logic processing.";
+
+            // Plugins
+            const pluginList = document.getElementById('modal-plugins');
+            pluginList.innerHTML = '';
+            if (agent.environment_plugin && Array.isArray(agent.environment_plugin)) {
+                agent.environment_plugin.forEach(p => {
+                    pluginList.innerHTML += `<li class="flex items-center gap-2 text-xs text-cyan-300"><i class="fas fa-plug"></i> ${p}</li>`;
+                });
+            } else {
+                pluginList.innerHTML = `<li class="flex items-center gap-2 text-xs text-slate-500"><i class="fas fa-ban"></i> No external plugins.</li>`;
+            }
+
+            // Config
+            document.getElementById('modal-yaml').innerText = agent.yaml_config || "# No YAML configuration";
+            document.getElementById('modal-json').innerText = agent.json_config || "// No JSON configuration";
+
+            // Export Tab
+            document.getElementById('modal-export-md').innerText = agent.markdown_copy || agent.portable_prompt || "# No Markdown Available";
+            document.getElementById('modal-export-json').innerText = agent.json_config || JSON.stringify(agent, null, 2);
+            document.getElementById('modal-export-yaml').innerText = agent.yaml_config || "# No YAML Available";
+
+            // Reset Tabs
+            switchTab('tab-overview');
         }
 
         function closeModal() {
             document.getElementById('details-modal').classList.add('hidden');
+        }
+
+        function switchTab(tabId) {
+            // Hide all content
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            // Show target
+            document.getElementById(tabId).classList.add('active');
+
+            // Update buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            // Find the button that triggered this (naive approach for simplicity, relies on text match or onclick attr)
+            // Ideally we pass 'this' or select by index, but looping to check onclick attr is safe enough here
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                if(btn.getAttribute('onclick').includes(tabId)) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function copyToClipboard(elementId) {
+            const text = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Copied to clipboard!");
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
         }
 
         function deployAgent() {

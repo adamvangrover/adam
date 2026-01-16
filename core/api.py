@@ -1,17 +1,20 @@
 from flask import Flask, request, jsonify
 import logging
+import secrets
 from core.system.agent_orchestrator import AgentOrchestrator
 from core.system.echo import Echo
 from core.utils.api_utils import (
     get_knowledge_graph_data,
     update_knowledge_graph_node,
 )
+from core.settings import settings
 
 app = Flask(__name__)
 
 # Initialize Agent Orchestrator and Echo System
 agent_orchestrator = AgentOrchestrator()
-echo_system = Echo()
+# Fix: Echo requires a config argument to initialize, preventing startup crash.
+echo_system = Echo(config={})
 
 # 🛡️ Sentinel: Add security headers
 @app.after_request
@@ -29,6 +32,13 @@ def api_endpoint():
 
     This is the unified API endpoint for interacting with all of Adam's functionalities.
     """
+    # 🛡️ Sentinel: Enforce API Key Authentication
+    api_key = request.headers.get("X-API-Key")
+    # Use constant-time comparison to prevent timing attacks
+    if not api_key or not secrets.compare_digest(api_key, settings.adam_api_key):
+        logging.warning(f"Unauthorized access attempt from {request.remote_addr}")
+        return jsonify({"error": "Unauthorized: Invalid or missing API Key"}), 401
+
     try:
         data = request.get_json()
         module = data.get("module")

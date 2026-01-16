@@ -27,6 +27,7 @@
         </div>
         <nav style="display: flex; gap: 10px;">
             <a href="index.html" class="cyber-btn">&larr; DASHBOARD</a>
+            <button class="cyber-btn" onclick="copyThesis()" style="border-color: var(--accent-color); color: var(--accent-color);">COPY THESIS</button>
             <button class="cyber-btn" onclick="runAnalysis()">RUN ANALYSIS</button>
         </nav>
     </header>
@@ -200,6 +201,33 @@
                     <div style="width: 40px; text-align: right; color: #888;">${c.score}</div>
                 </div>
             `).join('');
+        }
+
+        function copyThesis() {
+            const data = SIMULATION_DATA;
+            let prompt = "### SYSTEM PROMPT: MACRO STRATEGY & FLOW ANALYSIS ###\n\n";
+            prompt += "# ROLE\nYou are a Macro Hedge Fund Strategist specializing in 13F analysis and institutional flow rotation.\n\n";
+            prompt += "# CURRENT MARKET REGIME (Q3 2025)\n";
+            prompt += `"${data.narrative}"\n\n`;
+
+            prompt += "# DATA: SECTOR ROTATION\n";
+            data.sectors.forEach(s => {
+                prompt += `- ${s.sector}: ${s.flow} ($B) [Z-Score: ${s.z}] (Actor: ${s.actor})\n`;
+            });
+
+            prompt += "\n# DATA: CLUSTER CONVICTION\n";
+            data.clusters.forEach(c => {
+                prompt += `- ${c.ticker} (${c.sector}): ${c.conviction} Conviction (${c.count} Funds)\n`;
+            });
+
+            prompt += "\n# DATA: CROWDING RISK (0-100)\n";
+            data.crowding.forEach(c => {
+                prompt += `- ${c.ticker}: ${c.score}\n`;
+            });
+
+            prompt += "\n# TASK\nBased on the flow data above, generate a trade idea list (Long/Short) and identify the primary risk factors for the coming quarter.";
+
+            navigator.clipboard.writeText(prompt).then(() => alert("Thesis Context copied to clipboard!"));
         }
     </script>
 </body>

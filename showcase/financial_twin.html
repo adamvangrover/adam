@@ -88,6 +88,9 @@
             <button id="btn-reset" class="bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-600 rounded px-4 py-1.5 transition hidden">
                 <i class="fas fa-undo mr-1"></i> Reset
             </button>
+            <button onclick="copySimulationContext()" class="bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-slate-600 rounded px-4 py-1.5 transition flex items-center gap-2" title="Copy Graph State as Prompt">
+                <i class="fas fa-copy"></i> Copy Context
+            </button>
         </div>
     </header>
 
@@ -458,6 +461,31 @@
         document.addEventListener('DOMContentLoaded', () => {
             app.init();
         });
+
+        function copySimulationContext() {
+            const nodes = app.nodes.get();
+            const edges = app.edges.get();
+
+            let prompt = "### SYSTEM PROMPT: FINANCIAL DIGITAL TWIN SIMULATION ###\n\n";
+            prompt += "# ROLE\nYou are a Risk Contagion Simulator for a Global Systemically Important Bank (GSIB).\n\n";
+            prompt += "# GRAPH TOPOLOGY\n";
+
+            prompt += "## NODES (Entities & Assets)\n";
+            nodes.forEach(n => {
+                prompt += `- [${n.id}] ${n.label} (Type: ${n.group})\n`;
+            });
+
+            prompt += "\n## EDGES (Dependencies)\n";
+            edges.forEach(e => {
+                const src = nodes.find(n => n.id === e.from).label;
+                const dst = nodes.find(n => n.id === e.to).label;
+                prompt += `- ${src} --> ${dst}\n`;
+            });
+
+            prompt += "\n# TASK\nSimulate a propagation event starting from a 'Risk' node. Describe the cascade effect on connected 'Unit' and 'Subsidiary' nodes. Estimate financial impact in USD.";
+
+            navigator.clipboard.writeText(prompt).then(() => alert("Simulation Context copied to clipboard!"));
+        }
     </script>
 </body>
 </html>
