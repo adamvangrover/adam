@@ -21,7 +21,7 @@ def load_twin(filepath: str) -> Dict[str, Any]:
     with open(filepath, 'r') as f:
         return json.load(f)
 
-def run_scenario(scenario_name: str, twin_data: Dict[str, Any], initial_temp: float, shock: Dict[str, Any] = None) -> Dict[str, Any]:
+def run_scenario(scenario_name: str, twin_data: Dict[str, Any], initial_temp: float, shock: Dict[str, Any] = None, scenario_mode: str = None) -> Dict[str, Any]:
     logger.info(f"--- Running Scenario: {scenario_name} ---")
 
     entities = twin_data.get('entities', [])
@@ -29,6 +29,8 @@ def run_scenario(scenario_name: str, twin_data: Dict[str, Any], initial_temp: fl
     assets = list(asset_map.keys())
 
     engine = WorldModelEngine(assets)
+    if scenario_mode:
+        engine.load_scenario(scenario_mode)
 
     initial_prices = {aid: asset_map[aid]['initial_value'] for aid in assets}
     initial_flows = {aid: 0.0 for aid in assets}
@@ -93,6 +95,15 @@ def run_simulation():
         twin_data,
         initial_temp=1.2,
         shock={"shock_asset": "100", "shock_magnitude": -40.0} # Shock to Onyx
+    )
+
+    # 4. Reflationary Agentic Boom (High Growth, Sticky Inflation)
+    scenarios_output["Reflationary Agentic Boom"] = run_scenario(
+        "Reflationary Agentic Boom",
+        twin_data,
+        initial_temp=1.5,
+        shock=None,
+        scenario_mode="Reflationary_Agentic_Boom_2026"
     )
 
     final_output = {

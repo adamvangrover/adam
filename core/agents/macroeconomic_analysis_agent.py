@@ -119,3 +119,35 @@ class MacroeconomicAnalysisAgent(AgentBase):
         """
         # Placeholder logic
         return "stable"
+
+    def generate_reflation_report(self) -> Dict[str, Any]:
+        """
+        Generates the 'Reflationary Agentic Boom' narrative report.
+
+        This method serves as the logic core for the 2026 Strategy Showcase.
+        It synthesizes the conflict between AI-driven deflation (productivity)
+        and Sovereign-driven inflation (fiscal dominance/tariffs).
+        """
+        return {
+            "regime": "Reflationary Agentic Boom",
+            "year": 2026,
+            "core_thesis": "The 'Apex Paradox': Simultaneous supply-side deflation (AI) and demand-side inflation (Fiscal).",
+            "key_drivers": [
+                {
+                    "factor": "Agentic Productivity",
+                    "impact": "Deflationary",
+                    "mechanism": "Zero-marginal cost labor for cognitive tasks."
+                },
+                {
+                    "factor": "Sovereign Fiscal Dominance",
+                    "impact": "Inflationary",
+                    "mechanism": "Monetization of debt to fund AI/Energy infrastructure."
+                },
+                {
+                    "factor": "Geopolitical Fragmentation",
+                    "impact": "Inflationary",
+                    "mechanism": "Supply chain duplication and tariff wars."
+                }
+            ],
+            "strategic_implication": "Avoid the 'Muddled Middle'. Barbell allocation required."
+        }

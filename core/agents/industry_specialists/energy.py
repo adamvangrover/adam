@@ -83,3 +83,17 @@ class EnergySpecialist:
     def analyze_financial_health(self, financial_statements):
         # ... (analyze financial data to assess financial health)
         return "stable"  # Example
+
+    def generate_outlook(self):
+        """
+        Generates a standardized sector outlook for the Sector Swarm Showcase.
+        """
+        return {
+            "sector": "Energy",
+            "rating": "OVERWEIGHT",
+            "outlook": "Bullish",
+            "thesis": "AI Data Centers require massive baseload power. Nuclear and Natural Gas are the only viable immediate solutions.",
+            "top_picks": ["XOM", "CCJ", "EQT"],
+            "risks": ["Global Recession", "Carbon Tax"],
+            "sentiment_score": 0.75
+        }
