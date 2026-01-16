@@ -35,11 +35,16 @@ class SupplyChainRiskAgent:
             'apiKey': self.news_api_key
         }
 
-        response = requests.get(self.base_url, params=params)
-        if response.status_code == 200:
-            return response.json()['articles']
-        else:
-            self.logger.error(f"Failed to fetch news. Status code: {response.status_code}")
+        # 🛡️ Sentinel: Added timeout to prevent DoS via slow connections
+        try:
+            response = requests.get(self.base_url, params=params, timeout=10)
+            if response.status_code == 200:
+                return response.json()['articles']
+            else:
+                self.logger.error(f"Failed to fetch news. Status code: {response.status_code}")
+                return []
+        except requests.RequestException as e:
+            self.logger.error(f"Request failed: {e}")
             return []
 
     def _is_safe_url(self, url):
@@ -233,7 +238,15 @@ class SupplyChainRiskAgent:
 if __name__ == "__main__":
     # Example of usage
     import os
-    API_KEY = os.environ.get('NEWS_API_KEY', 'YOUR_NEWS_API_KEY')  # Use env var
+    import sys
+
+    # 🛡️ Sentinel: Enforce secure configuration
+    API_KEY = os.environ.get('NEWS_API_KEY')
+    if not API_KEY or API_KEY.startswith("YOUR_"):
+        print("Error: NEWS_API_KEY environment variable not set or valid.")
+        print("Please export NEWS_API_KEY='your-actual-api-key' before running.")
+        sys.exit(1)
+
     SUPPLIER_DATA = [
         {'name': 'Supplier A', 'location': 'New York, USA'},
         {'name': 'Supplier B', 'location': 'Shanghai, China'}
