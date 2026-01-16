@@ -2,11 +2,15 @@ import os
 import re
 import glob
 import json
+import yaml
 from datetime import datetime
 
 # --- Configuration ---
 OUTPUT_DIR = "showcase"
-SOURCE_DIR = "core/libraries_and_archives/newsletters"
+SOURCE_DIRS = [
+    "core/libraries_and_archives/newsletters",
+    "core/libraries_and_archives/reports"
+]
 ARCHIVE_FILE = "showcase/market_mayhem_archive.html"
 
 # --- Formatting Helpers ---
@@ -60,6 +64,12 @@ def simple_md_to_html(text):
 
 def parse_date(date_str):
     """Attempts to parse various date formats into YYYY-MM-DD."""
+    if not date_str: return "2025-01-01"
+
+    if isinstance(date_str, (datetime,)):
+        return date_str.strftime("%Y-%m-%d")
+    date_str = str(date_str)
+
     formats = [
         "%Y-%m-%d",
         "%B %d, %Y",       # March 15, 2025
@@ -75,73 +85,207 @@ def parse_date(date_str):
         except ValueError:
             continue
 
-    # Fallback: Try regex to extract date parts
     match = re.search(r'(\d{4})[-_]?(\d{2})[-_]?(\d{2})', date_str)
     if match:
         return f"{match.group(1)}-{match.group(2)}-{match.group(3)}"
 
-    return date_str # Return original if failed (or handle error)
+    match_us = re.search(r'(\d{2})[-_]?(\d{2})[-_]?(\d{4})', date_str)
+    if match_us:
+        return f"{match_us.group(3)}-{match_us.group(1)}-{match_us.group(2)}"
+
+    return date_str
 
 # --- Parsers ---
+
+def format_dict_as_html(data_dict, level=2):
+    """Recursively formats a dictionary as HTML."""
+    html = ""
+    for key, value in data_dict.items():
+        title = key.replace('_', ' ').title()
+        html += f"<h{level}>{title}</h{level}>"
+
+        if isinstance(value, list):
+            html += "<ul>"
+            for item in value:
+                if isinstance(item, dict):
+                    # Handle list of dicts (e.g., dcf_details revenue_growth)
+                    html += "<li>"
+                    parts = []
+                    for k, v in item.items():
+                        parts.append(f"<strong>{k}:</strong> {v}")
+                    html += ", ".join(parts) + "</li>"
+                else:
+                    html += f"<li>{item}</li>"
+            html += "</ul>"
+        elif isinstance(value, dict):
+            html += format_dict_as_html(value, level + 1)
+        else:
+            html += f"<p>{value}</p>"
+    return html
 
 def parse_json_file(filepath):
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
-            data = json.load(f)
+            try:
+                data = yaml.safe_load(f)
+            except yaml.YAMLError as ye:
+                f.seek(0)
+                content = f.read()
+                content = re.sub(r'//.*', '', content)
+                try:
+                    data = json.loads(content)
+                except json.JSONDecodeError:
+                     print(f"Error parsing JSON/YAML {filepath}: {ye}")
+                     return None
 
-        # Extract fields
-        title = data.get('title', 'Untitled Report')
+        if not data: return None
 
-        # Try to find date in title or filename
-        date_str = "2025-01-01" # Default
+        # Extract Title
+        title = data.get('title') or data.get('topic') or data.get('report_title')
+        if not title:
+            company = data.get('company')
+            if company:
+                title = f"{company} Report"
+            else:
+                title = 'Untitled Report'
 
-        # Heuristic: Extract date from filename if not in data
+        # Extract Date
+        date_str = "2025-01-01"
         filename = os.path.basename(filepath)
         date_match = re.search(r'(\d{4}_\d{2}_\d{2})', filename)
-        if date_match:
-            date_str = parse_date(date_match.group(1).replace('_', '-'))
-        elif "date" in data: # sometimes in root
+
+        if "date" in data:
              date_str = parse_date(data["date"])
+        elif "report_date" in data:
+             date_str = parse_date(data["report_date"])
+        elif date_match:
+            date_str = parse_date(date_match.group(1).replace('_', '-'))
+        else:
+             date_match_2 = re.search(r'(\d{4})[-_]?(\d{2})[-_]?(\d{2})', filename)
+             if date_match_2:
+                 date_str = f"{date_match_2.group(1)}-{date_match_2.group(2)}-{date_match_2.group(3)}"
 
         # Construct Body
         body_html = ""
+        summary = data.get('summary', "")
+
+        # Schema 1: 'sections' list
         sections = data.get('sections', [])
-        summary = ""
+        if sections:
+            for section in sections:
+                if isinstance(section, dict):
+                    sec_title = section.get('title', '')
+                    if sec_title: body_html += f"<h2>{sec_title}</h2>"
 
-        for section in sections:
-            sec_title = section.get('title', '')
-            if sec_title: body_html += f"<h2>{sec_title}</h2>"
+                    if 'content' in section:
+                        body_html += simple_md_to_html(section['content'])
+                        if not summary and ("Summary" in sec_title or not summary):
+                            summary = section['content'][:200] + "..."
 
-            if 'content' in section:
-                body_html += f"<p>{section['content']}</p>"
-                if not summary and "Summary" in sec_title:
-                    summary = section['content'][:200] + "..."
+                    if 'items' in section:
+                        body_html += "<ul>"
+                        for item in section['items']:
+                            body_html += f"<li>{item}</li>"
+                        body_html += "</ul>"
 
-            if 'items' in section:
-                body_html += "<ul>"
-                for item in section['items']:
-                    body_html += f"<li>{item}</li>"
-                body_html += "</ul>"
+                    if 'ideas' in section:
+                        for idea in section['ideas']:
+                            body_html += f"<h3>{idea.get('asset', 'Asset')}</h3>"
+                            body_html += f"<p><strong>Rationale:</strong> {idea.get('rationale','')}</p>"
 
-            if 'ideas' in section:
-                for idea in section['ideas']:
-                    body_html += f"<h3>{idea.get('asset', 'Asset')}</h3>"
-                    body_html += f"<p><strong>Rationale:</strong> {idea.get('rationale','')}</p>"
+        # Schema 2: 'analysis' dict (NVDA style)
+        elif "analysis" in data:
+            if summary: body_html += f"<h2>Executive Summary</h2><p>{summary}</p>"
+            body_html += format_dict_as_html(data['analysis'])
+
+            # Add other top-level keys like 'trading_levels'
+            for key in ['trading_levels', 'financial_performance', 'valuation']:
+                if key in data and key not in data['analysis']: # avoid dups
+                     body_html += f"<h2>{key.replace('_', ' ').title()}</h2>"
+                     if isinstance(data[key], dict):
+                         body_html += format_dict_as_html(data[key], 3)
+                     else:
+                         body_html += f"<p>{data[key]}</p>"
+
+        # Schema 3: Just summary + details (Market Overviews style, though usually list)
+        elif summary:
+             body_html += f"<p>{summary}</p>"
+             # Add any other string fields as paragraphs
+             for k, v in data.items():
+                 if k not in ['title', 'date', 'summary', 'file_name', 'company', 'analyst'] and isinstance(v, str):
+                     body_html += f"<h3>{k.replace('_', ' ').title()}</h3><p>{v}</p>"
 
         if not summary: summary = f"Market Report from {date_str}"
+
+        # Determine Type
+        type_ = "NEWSLETTER"
+        lower_title = title.lower()
+        if "deep dive" in lower_title: type_ = "DEEP_DIVE"
+        elif "industry" in lower_title: type_ = "INDUSTRY_REPORT"
+        elif "company" in lower_title or "report" in lower_title: type_ = "COMPANY_REPORT"
+        elif "thematic" in lower_title: type_ = "THEMATIC_REPORT"
+        elif "outlook" in lower_title or "review" in lower_title: type_ = "MARKET_OUTLOOK"
+
+        # Determine filename
+        if "file_name" in data:
+            out_filename = data["file_name"].replace('.json', '.html')
+        else:
+            out_filename = filename.replace('.json', '.html').replace('.md', '.html')
 
         return {
             "title": title,
             "date": date_str,
             "summary": summary,
-            "type": "NEWSLETTER", # Default for JSONs in this folder
+            "type": type_,
             "full_body": body_html,
             "sentiment_score": 50, # Default
-            "filename": filename.replace('.json', '.html').replace('.md', '.html'),
+            "filename": out_filename,
             "is_sourced": True
         }
     except Exception as e:
-        print(f"Error parsing JSON {filepath}: {e}")
+        print(f"Error processing {filepath}: {e}")
+        return None
+
+def parse_txt_file(filepath):
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        filename = os.path.basename(filepath)
+
+        # Metadata Extraction attempt
+        title_match = re.search(r'COMPREHENSIVE.*?:\s*(.*?)$', content, re.MULTILINE)
+        title = title_match.group(1).strip() if title_match else filename.replace('.txt', '').replace('_', ' ')
+
+        date_match = re.search(r'DATE:\s*(.*?)$', content, re.MULTILINE)
+        date_str = parse_date(date_match.group(1)) if date_match else "2025-01-01"
+
+        # Type
+        type_ = "REPORT"
+        if "Deep Dive" in content or "DEEP DIVE" in content: type_ = "DEEP_DIVE"
+
+        # Body - just wrap in pre or do basic p splitting
+        # Use simple_md_to_html logic but simpler
+        body_html = f"<div style='white-space: pre-wrap; font-family: inherit;'>{content}</div>"
+
+        # Summary
+        summary = "Comprehensive report."
+        summary_match = re.search(r'EXECUTIVE SUMMARY.*?\n\n(.*?)\n', content, re.DOTALL)
+        if summary_match:
+             summary = summary_match.group(1)[:300] + "..."
+
+        return {
+            "title": title,
+            "date": date_str,
+            "summary": summary,
+            "type": type_,
+            "full_body": body_html,
+            "sentiment_score": 50,
+            "filename": filename.replace('.txt', '.html'),
+            "is_sourced": True
+        }
+    except Exception as e:
+        print(f"Error parsing TXT {filepath}: {e}")
         return None
 
 def parse_markdown_file(filepath):
@@ -538,25 +682,33 @@ def generate_archive():
     # 1. Gather all data sources
     all_items = []
 
-    # Scan Source Directory
-    print(f"Scanning {SOURCE_DIR}...")
-    source_files = glob.glob(os.path.join(SOURCE_DIR, "*"))
+    # Scan Source Directories
+    for source_dir in SOURCE_DIRS:
+        print(f"Scanning {source_dir}...")
+        if not os.path.exists(source_dir):
+            print(f"Directory not found: {source_dir}")
+            continue
 
-    for filepath in source_files:
-        item = None
-        if filepath.endswith(".json"):
-            item = parse_json_file(filepath)
-        elif filepath.endswith(".md"):
-            item = parse_markdown_file(filepath)
+        source_files = glob.glob(os.path.join(source_dir, "*"))
 
-        if item:
-            all_items.append(item)
+        for filepath in source_files:
+            item = None
+            if filepath.endswith(".json"):
+                item = parse_json_file(filepath)
+            elif filepath.endswith(".md"):
+                item = parse_markdown_file(filepath)
+            elif filepath.endswith(".txt"):
+                item = parse_txt_file(filepath)
+
+            if item:
+                all_items.append(item)
 
     # 2. Add Hardcoded/Static Data (from NEWSLETTER_DATA)
     # Check if we already have these dates/titles to avoid duplicates
     existing_dates = set(i['date'] for i in all_items)
     
     for static_item in NEWSLETTER_DATA:
+        # Check by title or date overlap
         if static_item['date'] not in existing_dates:
             # Ensure required fields exist for static items
             if 'is_sourced' not in static_item:
@@ -599,8 +751,12 @@ def generate_archive():
             type_m = TYPE_RE.search(content)
 
             if title_m and date_m:
+                date_str = date_m.group(1).strip()
+                # Attempt fix for bad parsed dates
+                parsed_date = parse_date(date_str)
+
                 all_items.append({
-                    "date": date_m.group(1).strip(),
+                    "date": parsed_date,
                     "title": title_m.group(1).strip(),
                     "summary": summary_m.group(1).strip() if summary_m else "No summary available.",
                     "filename": filename,
@@ -672,11 +828,15 @@ def generate_archive():
         list_html += f'<div class="year-header" data-year="{year}">{year} ARCHIVE</div>\n'
         for item in grouped[year]:
             type_color = "#333"
-            if item['type'] == 'MARKET_PULSE': type_color = "#00f3ff"
-            elif item['type'] == 'DEEP_DIVE': type_color = "#cc0000"
-            elif item['type'] == 'NEWSLETTER': type_color = "#ffff00"
-            elif item['type'] == 'AGENT_NOTE': type_color = "#00ff00" # Matrix Green
-            elif item['type'] == 'PERFORMANCE_REVIEW': type_color = "#60a5fa" # Slate Blue
+            type_ = item.get("type", "REPORT")
+            if type_ == 'MARKET_PULSE': type_color = "#00f3ff"
+            elif type_ == 'DEEP_DIVE': type_color = "#cc0000"
+            elif type_ == 'NEWSLETTER': type_color = "#ffff00"
+            elif type_ == 'AGENT_NOTE': type_color = "#00ff00" # Matrix Green
+            elif type_ == 'PERFORMANCE_REVIEW': type_color = "#60a5fa" # Slate Blue
+            elif type_ == 'COMPANY_REPORT': type_color = "#f472b6" # Pink
+            elif type_ == 'THEMATIC_REPORT': type_color = "#a78bfa" # Purple
+            elif type_ == 'MARKET_OUTLOOK': type_color = "#fca5a5" # Light Red
 
             list_html += f"""
             <div class="archive-item" data-title="{item['title'].lower()}" data-year="{year}">
@@ -684,7 +844,7 @@ def generate_archive():
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <span class="item-date">{item["date"]}</span>
-                        <span class="type-badge" style="background:{type_color}; color:#000;">{item.get("type", "REPORT")}</span>
+                        <span class="type-badge" style="background:{type_color}; color:#000;">{type_}</span>
                     </div>
                     <h3 class="item-title">{item["title"]}</h3>
                     <div class="item-summary">{item["summary"]}</div>

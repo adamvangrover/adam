@@ -26,6 +26,11 @@
             padding: 20px;
         }
 
+        /* Responsive for mobile */
+        @media (max-width: 768px) {
+            .newsletter-wrapper { grid-template-columns: 1fr; }
+        }
+
         .paper-sheet {
             background: var(--paper-bg);
             color: var(--ink-color);
@@ -56,6 +61,7 @@
             letter-spacing: 1px;
         }
         p { line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
+        li { line-height: 1.6; margin-bottom: 10px; }
 
         /* Sidebar */
         .cyber-sidebar {
@@ -74,39 +80,6 @@
             border-bottom: 1px solid #333;
             padding-bottom: 10px;
             margin-bottom: 15px;
-        }
-
-        /* Sentiment Meter */
-        .sentiment-track {
-            height: 6px; background: #333; border-radius: 3px; overflow: hidden; margin-top: 10px;
-        }
-        .sentiment-bar {
-            height: 100%; background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00);
-            width: 30%;
-            transition: width 1s ease;
-        }
-
-        /* Ticker Tag */
-        .ticker-tag {
-            display: inline-block;
-            background: #222;
-            color: var(--cyber-blue);
-            padding: 4px 8px;
-            margin: 2px;
-            font-size: 0.75rem;
-            border: 1px solid #444;
-            border-radius: 4px;
-        }
-
-        /* Adam Critique */
-        .adam-critique {
-            background: #0f172a;
-            border-left: 4px solid var(--cyber-blue);
-            color: #94a3b8;
-            padding: 20px;
-            margin-top: 40px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
         }
 
         .cyber-btn {
@@ -129,7 +102,6 @@
     </div>
 
     <div class="newsletter-wrapper">
-        <!-- Main Content (Paper Style) -->
         <div class="paper-sheet">
             <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px;">
                 <span>2025-06-14</span>
@@ -138,51 +110,33 @@
 
             <h1 class="title">THE DOLLAR WRECKING BALL</h1>
 
-            <p style="font-size: 1.2rem; font-style: italic; color: #444; border-bottom: 1px solid #eee; padding-bottom: 20px;">
-                DXY breaks 108. Emerging Market currencies collapse. Carry trade unwind begins.
-            </p>
-
 
         <p>The US Dollar Index (DXY) has shattered resistance at 108, acting as a wrecking ball for global risk assets. The Japanese Yen has collapsed to 160 against the dollar, forcing the BOJ to intervene—unsuccessfully so far.</p>
         <p>Emerging Market (EM) debt is under severe stress. Countries with high dollar-denominated debt burdens are seeing their credit default swap (CDS) spreads blow out. The 'Carry Trade'—borrowing in Yen to buy tech stocks—is unwinding rapidly, adding selling pressure to the Nasdaq.</p>
         <p><strong>Macro View:</strong> The Fed's 'Higher for Longer' stance is diverging from the ECB and BOJ, creating a rate differential vacuum that sucks capital into the USD.</p>
 
 
-            <div class="adam-critique">
-                <strong style="color: var(--cyber-blue);">/// ADAM SYSTEM CRITIQUE</strong><br><br>
-                The Dollar Smile theory is in full effect. Strong US growth relative to the rest of the world is driving the DXY higher. This is deflationary for global assets. I am hedging Emerging Market exposure and looking for opportunities in domestic small caps if the dollar stabilizes.
+            <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
+                End of Report.
             </div>
         </div>
 
-        <!-- Sidebar (Cyber Style) -->
         <aside class="cyber-sidebar">
             <div class="sidebar-widget">
-                <div class="sidebar-title">Market Sentiment</div>
-                <div style="display:flex; justify-content:space-between; font-size:2rem; font-weight:bold;">
-                    <span>30</span>
-                    <span style="font-size:0.8rem; align-self:center; color:#666;">/ 100</span>
-                </div>
-                <div class="sentiment-track">
-                    <div class="sentiment-bar"></div>
-                </div>
-                <div style="font-size:0.7rem; color:#666; margin-top:5px;">0=PANIC | 100=EUPHORIA</div>
-            </div>
-
-            <div class="sidebar-widget">
-                <div class="sidebar-title">Related Assets</div>
-                <div>
-                    <span class="ticker-tag">UUP</span><span class="ticker-tag">FXY</span><span class="ticker-tag">EEM</span><span class="ticker-tag">DX-Y.NYB</span>
+                <div class="sidebar-title">Metadata</div>
+                <div style="font-size: 0.8rem; color: #aaa;">
+                    <div>DATE: <span style="color:#fff">2025-06-14</span></div>
+                    <div>TYPE: <span style="color:#fff">MONTHLY</span></div>
+                    <div>CLASS: <span style="color:#fff">UNCLASSIFIED</span></div>
                 </div>
             </div>
 
-            <div class="sidebar-widget">
-                <div class="sidebar-title">Strategic Implication</div>
-                <ul style="font-size:0.8rem; color:#aaa; padding-left:20px; line-height:1.5;">
-                    <li>JPY/USD hits 160.</li>
-<li>EM Debt crisis looming.</li>
-<li>Long USD/Short JPY trade crowded but working.</li>
-
-                </ul>
+             <div class="sidebar-widget">
+                <div class="sidebar-title">System Status</div>
+                 <div style="display:flex; align-items:center; gap:10px;">
+                    <div style="width:10px; height:10px; background:#00ff00; border-radius:50%; box-shadow: 0 0 5px #00ff00;"></div>
+                    <span style="font-size:0.8rem; color:#00ff00;">ONLINE</span>
+                </div>
             </div>
         </aside>
     </div>
