@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     cohere_api_key: Optional[str] = None
     google_api_key: Optional[str] = None  # Added for Gemini support
 
+    # Internal Security
+    adam_api_key: str = "default-insecure-key-change-me"
+
     # Database / Infrastructure
     postgres_user: Optional[str] = None
     postgres_password: Optional[str] = None

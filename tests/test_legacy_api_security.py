@@ -33,9 +33,10 @@ class TestCoreApiSecurity(unittest.TestCase):
                 "action": "get_data",
                 "parameters": {"module": "test", "concept": "test"}
             }
+            headers = {"X-API-Key": "default-insecure-key-change-me"}
 
             # Act
-            response = self.app.post('/', json=payload)
+            response = self.app.post('/', json=payload, headers=headers)
 
             # Assert
             data = json.loads(response.data)
@@ -46,6 +47,25 @@ class TestCoreApiSecurity(unittest.TestCase):
             self.assertNotEqual(data["error"], error_message)  # NO leak
             self.assertEqual(response.status_code, 500)
             print("FIX CONFIRMED: Error message is generic.")
+
+    def test_unauthorized_access(self):
+        """Test that requests without a valid API key are rejected."""
+        payload = {
+            "module": "knowledge_graph",
+            "action": "get_data",
+            "parameters": {"module": "test", "concept": "test"}
+        }
+
+        # Case 1: No API Key
+        response = self.app.post('/', json=payload)
+        self.assertEqual(response.status_code, 401)
+        self.assertIn("Unauthorized", response.json["error"])
+
+        # Case 2: Invalid API Key
+        headers = {"X-API-Key": "wrong-key"}
+        response = self.app.post('/', json=payload, headers=headers)
+        self.assertEqual(response.status_code, 401)
+        self.assertIn("Unauthorized", response.json["error"])
 
 
 if __name__ == '__main__':
