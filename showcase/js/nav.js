@@ -144,6 +144,7 @@ class AdamNavigator {
             { name: 'Reports Library', icon: 'fa-file-alt', link: 'reports.html' },
             { name: 'Data Vault', icon: 'fa-database', link: 'data.html' },
             { name: 'App Deploy', icon: 'fa-rocket', link: 'deployment.html' },
+            { name: 'Quantum Infra', icon: 'fa-network-wired', link: 'quantum_infrastructure.html' },
             { type: 'divider' },
             { name: 'Root Directory', icon: 'fa-folder-tree', link: 'ROOT' }
         ];
