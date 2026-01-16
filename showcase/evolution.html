@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM EVOLUTION :: SYSTEM HISTORY</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #050b14;
+            --text-primary: #e0e0e0;
+            --accent-cyan: #00f3ff;
+            --accent-purple: #bd00ff;
+            --accent-yellow: #ffd700;
+        }
+        body { margin: 0; background: var(--bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .cyber-header {
+            height: 60px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; border-bottom: 1px solid var(--accent-cyan);
+            background: rgba(5, 11, 20, 0.95); position: sticky; top: 0; z-index: 100;
+        }
+
+        .timeline-container {
+            max-width: 1000px; margin: 60px auto; padding: 0 20px; position: relative;
+        }
+        .timeline-line {
+            position: absolute; left: 50%; width: 2px; background: #333; top: 0; bottom: 0; transform: translateX(-50%);
+        }
+
+        .timeline-node {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 80px; position: relative;
+        }
+        .timeline-node:nth-child(even) { flex-direction: row-reverse; }
+
+        .node-content {
+            width: 45%; background: rgba(255, 255, 255, 0.02); border: 1px solid #333; padding: 20px;
+            backdrop-filter: blur(5px); position: relative; transition: all 0.3s;
+        }
+        .node-content:hover { border-color: var(--accent-cyan); box-shadow: 0 0 20px rgba(0, 243, 255, 0.1); }
+        .node-content::before {
+            content: ''; position: absolute; top: 20px; width: 20px; height: 1px; background: var(--accent-cyan);
+        }
+        .timeline-node:nth-child(odd) .node-content::before { right: -21px; }
+        .timeline-node:nth-child(even) .node-content::before { left: -21px; }
+
+        .node-marker {
+            width: 20px; height: 20px; background: #000; border: 2px solid var(--accent-cyan); border-radius: 50%;
+            position: absolute; left: 50%; transform: translateX(-50%); z-index: 10;
+        }
+
+        .version-tag {
+            font-size: 0.8rem; background: rgba(0, 243, 255, 0.1); color: var(--accent-cyan);
+            padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 10px;
+        }
+
+        .capability-list { padding-left: 20px; color: #aaa; font-size: 0.9rem; }
+        .capability-list li { margin-bottom: 5px; }
+
+        .metrics-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1000px; margin: 40px auto; padding: 0 20px;
+        }
+        .metric-card {
+            background: rgba(255, 255, 255, 0.02); border: 1px solid #333; padding: 20px; text-align: center;
+        }
+
+        .cyber-btn {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 6px 12px;
+            border: 1px solid #444; color: var(--text-primary); text-decoration: none; display: inline-block;
+        }
+        .cyber-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+
+        .constraints-section {
+            max-width: 1000px; margin: 60px auto; padding: 40px; border: 1px solid var(--accent-purple);
+            background: rgba(189, 0, 255, 0.02); position: relative;
+        }
+        .constraints-title {
+            position: absolute; top: -15px; left: 40px; background: var(--bg-color); padding: 0 10px;
+            color: var(--accent-purple); font-weight: bold; font-family: 'JetBrains Mono';
+        }
+
+    </style>
+</head>
+<body>
+    <header class="cyber-header">
+        <h1 class="mono" style="color: var(--accent-cyan); margin: 0;">ADAM EVOLUTION</h1>
+        <nav>
+            <a href="index.html" class="cyber-btn">MISSION CONTROL</a>
+        </nav>
+    </header>
+
+    <!-- Metrics Header -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <h3 class="mono" style="color: #666; font-size: 0.8rem;">MODEL GENERATIONS</h3>
+            <canvas id="genChart" height="150"></canvas>
+        </div>
+        <div class="metric-card">
+            <h3 class="mono" style="color: #666; font-size: 0.8rem;">AGENT COMPLEXITY</h3>
+            <canvas id="agentChart" height="150"></canvas>
+        </div>
+        <div class="metric-card">
+            <h3 class="mono" style="color: #666; font-size: 0.8rem;">SYSTEM ENTROPY</h3>
+            <canvas id="entropyChart" height="150"></canvas>
+        </div>
+    </div>
+
+    <div class="timeline-container">
+        <div class="timeline-line"></div>
+
+        <!-- Node: v2.0 Swarm -->
+        <div class="timeline-node">
+            <div class="node-content">
+                <span class="version-tag mono">v2.0 SWARM (CURRENT)</span>
+                <h2 style="margin: 5px 0;">The Agentic Singularity</h2>
+                <p style="font-size: 0.9rem; color: #888;">Transition to hybrid MCP + Swarm Intelligence. Agents are now self-reflective and tool-using.</p>
+                <ul class="capability-list">
+                    <li>Persistent MemoryMatrix</li>
+                    <li>Evolutionary Optimization</li>
+                    <li>Model Context Protocol (MCP)</li>
+                    <li>Distributed Cognition</li>
+                </ul>
+            </div>
+            <div class="node-marker"></div>
+        </div>
+
+        <!-- Node: v23.5 -->
+        <div class="timeline-node">
+            <div class="node-content">
+                <span class="version-tag mono">v23.5 AI PARTNER</span>
+                <h2 style="margin: 5px 0;">Digital Twin Integration</h2>
+                <p style="font-size: 0.9rem; color: #888;">Establishment of high-fidelity "Digital Twins" and the Deep Dive Analyst protocol.</p>
+                <ul class="capability-list">
+                    <li>Deep Dive Protocol (5-Phase)</li>
+                    <li>Quantum Risk Simulation</li>
+                    <li>Deployment Console</li>
+                    <li>Visual Knowledge Graph</li>
+                </ul>
+            </div>
+            <div class="node-marker"></div>
+        </div>
+
+        <!-- Node: v23 -->
+        <div class="timeline-node">
+            <div class="node-content">
+                <span class="version-tag mono">v23.0 GRAPH AWAKENING</span>
+                <h2 style="margin: 5px 0;">Neuro-Symbolic Core</h2>
+                <p style="font-size: 0.9rem; color: #888;">Shift from linear scripts to cyclical graph-based reasoning (LangGraph).</p>
+                <ul class="capability-list">
+                    <li>Unified Knowledge Graph</li>
+                    <li>Cyclical Reasoning Loops</li>
+                    <li>Session Persistence</li>
+                </ul>
+            </div>
+            <div class="node-marker"></div>
+        </div>
+
+        <!-- Node: v22 -->
+        <div class="timeline-node">
+            <div class="node-content">
+                <span class="version-tag mono">v22.0 ODYSSEY</span>
+                <h2 style="margin: 5px 0;">Multi-Agent Hub</h2>
+                <p style="font-size: 0.9rem; color: #888;">Introduction of the "Hub and Spoke" architecture for risk management.</p>
+                <ul class="capability-list">
+                    <li>Risk-Alpha Synthesis</li>
+                    <li>The "Six Pillars" Logic</li>
+                    <li>Counterfactual Analysis</li>
+                </ul>
+            </div>
+            <div class="node-marker"></div>
+        </div>
+
+        <!-- Node: v21 -->
+        <div class="timeline-node">
+            <div class="node-content">
+                <span class="version-tag mono">v21.0 STATIC ERA</span>
+                <h2 style="margin: 5px 0;">Monolithic Scripts</h2>
+                <p style="font-size: 0.9rem; color: #888;">Linear, single-shot execution scripts for basic automation.</p>
+                <ul class="capability-list">
+                    <li>Basic Automation</li>
+                    <li>Ephemeral State</li>
+                    <li>Direct Execution</li>
+                </ul>
+            </div>
+            <div class="node-marker"></div>
+        </div>
+    </div>
+
+    <!-- Constraints Section -->
+    <div class="constraints-section">
+        <div class="constraints-title">SYSTEM CONSTRAINTS & BOUNDARIES</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+            <div>
+                <h3 class="mono" style="color: var(--accent-purple);">COGNITIVE LIMITS</h3>
+                <ul style="color: #aaa; line-height: 1.6;">
+                    <li><strong>Context Window:</strong> 128k Tokens (Soft Limit). Information beyond this requires RAG retrieval.</li>
+                    <li><strong>Temporal Lag:</strong> Knowledge cutoff applies to base model; "NewsBot" bridges the gap but has latency.</li>
+                    <li><strong>Hallucination Risk:</strong> Non-zero probability in creative synthesis tasks. Requires "Red Team" verification.</li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="mono" style="color: var(--accent-purple);">SAFETY PROTOCOLS</h3>
+                <ul style="color: #aaa; line-height: 1.6;">
+                    <li><strong>No Trade Execution:</strong> System is ADVISORY only. Cannot execute real-money transactions.</li>
+                    <li><strong>PII Redaction:</strong> All client data is anonymized before processing in the cloud layer.</li>
+                    <li><strong>Adversarial Mandatory:</strong> Bear cases must be generated for every Bull thesis.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Charts
+        const commonOptions = {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { x: { display: false }, y: { display: false } }
+        };
+
+        // Gen Chart
+        new Chart(document.getElementById('genChart'), {
+            type: 'line',
+            data: {
+                labels: ['v21', 'v22', 'v23', 'v23.5', 'v2.0'],
+                datasets: [{
+                    data: [1, 5, 20, 50, 100],
+                    borderColor: '#00f3ff', tension: 0.4, borderWidth: 2, pointRadius: 0
+                }]
+            },
+            options: commonOptions
+        });
+
+        // Agent Complexity
+        new Chart(document.getElementById('agentChart'), {
+            type: 'bar',
+            data: {
+                labels: ['v21', 'v22', 'v23', 'v23.5', 'v2.0'],
+                datasets: [{
+                    data: [2, 5, 12, 18, 35],
+                    backgroundColor: '#bd00ff', borderRadius: 2
+                }]
+            },
+            options: commonOptions
+        });
+
+        // Entropy (Inverse Stability)
+        new Chart(document.getElementById('entropyChart'), {
+            type: 'line',
+            data: {
+                labels: ['v21', 'v22', 'v23', 'v23.5', 'v2.0'],
+                datasets: [{
+                    data: [10, 30, 80, 40, 20], // High entropy during v23 transition
+                    borderColor: '#ffd700', tension: 0.4, borderWidth: 2, pointRadius: 0
+                }]
+            },
+            options: commonOptions
+        });
+    </script>
+<script src="js/command_palette.js"></script></body>
+</html>
