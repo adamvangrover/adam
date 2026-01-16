@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Sector Swarm Intelligence</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-dark: #020408;
+            --panel-bg: rgba(15, 23, 42, 0.95);
+            --border-color: #334155;
+            --accent-cyan: #22d3ee;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+        }
+
+        .scan-line {
+            position: fixed; top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(to bottom, rgba(16, 185, 129, 0), rgba(16, 185, 129, 0.5), rgba(16, 185, 129, 0));
+            opacity: 0.1; animation: scan 8s linear infinite; pointer-events: none; z-index: 50;
+        }
+        @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
+
+        /* Hexagon Avatar */
+        .hexagon {
+            width: 60px; height: 60px;
+            background: #1e293b;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            display: flex; align-items: center; justify-content: center;
+            border: 1px solid #475569;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen bg-[#050b14] relative overflow-x-hidden">
+    <div class="scan-line"></div>
+
+    <!-- Header -->
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 sticky top-0">
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="text-slate-400 hover:text-white transition"><i class="fas fa-arrow-left"></i></a>
+            <div class="w-8 h-8 bg-emerald-900/50 rounded flex items-center justify-center border border-emerald-500/30">
+                <i class="fas fa-users text-emerald-400"></i>
+            </div>
+            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-emerald-400">SWARM</span> <span class="text-slate-500 font-normal">| Sector Intelligence Roundtable</span></h1>
+        </div>
+    </header>
+
+    <main class="flex-1 p-6 max-w-7xl mx-auto w-full flex flex-col gap-6">
+
+        <!-- Synthesis -->
+        <div class="glass-panel p-6 rounded-lg text-center">
+            <h2 class="text-sm font-bold text-slate-500 mono uppercase mb-2">Swarm Consensus Synthesis</h2>
+            <p class="text-xl text-white font-light" id="synthesis-text">Loading intelligence...</p>
+        </div>
+
+        <!-- Specialists Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="specialist-grid">
+            <!-- Cards go here -->
+        </div>
+
+        <!-- Cross-Impact Matrix -->
+        <div class="glass-panel p-6 rounded-lg">
+            <h2 class="text-sm font-bold text-slate-500 mono uppercase mb-4 flex items-center gap-2">
+                <i class="fas fa-network-wired"></i> Cross-Impact Matrix
+            </h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-slate-400">
+                    <thead class="text-xs text-slate-500 uppercase bg-slate-800/50">
+                        <tr>
+                            <th class="px-6 py-3 mono">Source \ Target</th>
+                            <th class="px-6 py-3 mono text-cyan-400">Technology</th>
+                            <th class="px-6 py-3 mono text-emerald-400">Financials</th>
+                            <th class="px-6 py-3 mono text-amber-400">Energy</th>
+                        </tr>
+                    </thead>
+                    <tbody id="matrix-body" class="divide-y divide-slate-700/50">
+                        <!-- Matrix rows -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-4 text-xs text-slate-500 mono">
+                * Values represent correlation strength (-1.0 to 1.0). Hover for narrative logic.
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        async function loadData() {
+            try {
+                const response = await fetch('data/sector_outlook.json');
+                const data = await response.json();
+                render(data);
+            } catch (e) {
+                console.error("Failed to load sector data:", e);
+            }
+        }
+
+        function render(data) {
+            document.getElementById('synthesis-text').innerText = data.synthesis;
+
+            renderGrid(data.sectors);
+            renderMatrix(data.matrix);
+        }
+
+        function renderMatrix(matrix) {
+            const sectors = ['Technology', 'Financials', 'Energy'];
+            const tbody = document.getElementById('matrix-body');
+
+            tbody.innerHTML = sectors.map(source => {
+                let rowHtml = `<tr class="bg-slate-900/20 hover:bg-slate-800/50 transition"><th class="px-6 py-4 font-bold text-slate-300 whitespace-nowrap mono">${source}</th>`;
+
+                rowHtml += sectors.map(target => {
+                    const cell = matrix[source][target];
+                    let val = 0;
+                    let narrative = "";
+
+                    if (typeof cell === 'object') {
+                        val = cell.value;
+                        narrative = cell.narrative;
+                    } else {
+                        val = cell; // Self or simple
+                    }
+
+                    let colorClass = "text-slate-500";
+                    if (val > 0.5) colorClass = "text-green-400 font-bold";
+                    else if (val > 0.2) colorClass = "text-green-600";
+                    else if (val < -0.2) colorClass = "text-red-400";
+
+                    // Heatmap bg
+                    let bgStyle = "";
+                    if (val > 0) bgStyle = `background: rgba(16, 185, 129, ${val * 0.2})`;
+                    if (val < 0) bgStyle = `background: rgba(239, 68, 68, ${Math.abs(val) * 0.2})`;
+
+                    return `
+                        <td class="px-6 py-4 cursor-help" style="${bgStyle}" title="${narrative}">
+                            <div class="flex flex-col">
+                                <span class="${colorClass} mono text-lg">${val.toFixed(2)}</span>
+                                <span class="text-[10px] text-slate-500 truncate max-w-[150px]">${narrative || 'Identity'}</span>
+                            </div>
+                        </td>
+                    `;
+                }).join('');
+
+                rowHtml += '</tr>';
+                return rowHtml;
+            }).join('');
+        }
+
+        function renderGrid(sectors) {
+            const grid = document.getElementById('specialist-grid');
+            grid.innerHTML = sectors.map(s => {
+                let color = 'slate';
+                let icon = 'fa-briefcase';
+                if(s.sector === 'Technology') { color = 'cyan'; icon = 'fa-microchip'; }
+                if(s.sector === 'Energy') { color = 'amber'; icon = 'fa-bolt'; }
+                if(s.sector === 'Financials') { color = 'emerald'; icon = 'fa-landmark'; }
+
+                return `
+                <div class="glass-panel rounded-lg overflow-hidden flex flex-col hover:border-${color}-500/50 transition duration-300 group">
+                    <div class="p-6 border-b border-slate-700/50 bg-${color}-900/10 flex items-center gap-4">
+                        <div class="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center border border-${color}-500/30 group-hover:scale-110 transition">
+                            <i class="fas ${icon} text-${color}-400 text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-white mono">${s.sector}</h3>
+                            <div class="text-xs text-${color}-400 font-mono">${s.rating}</div>
+                        </div>
+                        <div class="ml-auto text-2xl font-bold text-slate-700">${(s.sentiment_score * 100).toFixed(0)}</div>
+                    </div>
+
+                    <div class="p-6 flex-1 space-y-4">
+                        <div>
+                            <h4 class="text-xs font-bold text-slate-500 uppercase mb-1">Thesis</h4>
+                            <p class="text-sm text-slate-300 leading-relaxed">${s.thesis}</p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-500 uppercase mb-1">Top Picks</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    ${s.top_picks.map(p => `<span class="bg-slate-800 text-${color}-400 px-2 py-1 rounded text-xs font-mono border border-slate-700">${p}</span>`).join('')}
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-500 uppercase mb-1">Risks</h4>
+                                <ul class="text-xs text-red-400 list-disc list-inside">
+                                    ${s.risks.map(r => `<li>${r}</li>`).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', loadData);
+    </script>
+    <script src="js/hud.js"></script>
+</body>
+</html>

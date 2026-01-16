@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Macro Strategy 2026</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #020408;
+            --panel-bg: rgba(15, 23, 42, 0.95);
+            --border-color: #334155;
+            --accent-cyan: #22d3ee;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+        }
+
+        .scan-line {
+            position: fixed; top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(to bottom, rgba(34, 211, 238, 0), rgba(34, 211, 238, 0.5), rgba(34, 211, 238, 0));
+            opacity: 0.1; animation: scan 8s linear infinite; pointer-events: none; z-index: 50;
+        }
+        @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen bg-[#050b14] relative overflow-x-hidden">
+    <div class="scan-line"></div>
+
+    <!-- Header -->
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 sticky top-0">
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="text-slate-400 hover:text-white transition"><i class="fas fa-arrow-left"></i></a>
+            <div class="w-8 h-8 bg-amber-900/50 rounded flex items-center justify-center border border-amber-500/30">
+                <i class="fas fa-chess-knight text-amber-400"></i>
+            </div>
+            <h1 class="text-xl font-bold tracking-tight mono">ADAM <span class="text-amber-400">STRATEGY</span> <span class="text-slate-500 font-normal">| Reflationary Agentic Boom 2026</span></h1>
+        </div>
+        <div class="flex items-center gap-4 text-xs font-mono">
+             <span class="text-emerald-400"><i class="fas fa-check-circle mr-1"></i> THESIS ACTIVE</span>
+             <a href="unified_banking.html" class="px-3 py-1 bg-cyan-900/30 border border-cyan-700 text-cyan-400 rounded hover:bg-cyan-900/50 transition">
+                <i class="fas fa-globe mr-1"></i> SIMULATION
+             </a>
+        </div>
+    </header>
+
+    <main class="flex-1 p-6 grid grid-cols-12 gap-6 max-w-7xl mx-auto w-full">
+
+        <!-- Narrative Column -->
+        <div class="col-span-12 lg:col-span-4 space-y-6">
+            <div class="glass-panel p-6 rounded-lg relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 text-slate-700"><i class="fas fa-quote-right text-4xl opacity-20"></i></div>
+                <h2 class="text-lg font-bold text-amber-400 mono mb-4 border-b border-slate-700 pb-2">STRATEGIC NARRATIVE</h2>
+                <div class="prose prose-invert prose-sm text-slate-300 font-light leading-relaxed">
+                    <p class="mb-4">
+                        The 2026 regime is characterized by the <strong>"Reflationary Agentic Boom"</strong>. This paradox features high nominal growth driven by AI productivity shocks ("Agentic Alpha"), concurrent with sticky inflation driven by fiscal dominance and geopolitical fragmentation.
+                    </p>
+                    <p class="mb-4">
+                        Capital will flow violently into two extremes:
+                        <ol class="list-decimal pl-4 space-y-1 mt-2">
+                            <li><span class="text-cyan-400">The Builders:</span> Sovereign AI infrastructure and energy grids.</li>
+                            <li><span class="text-amber-400">The Hard Assets:</span> Bitcoin and commodities as hedges against debasement.</li>
+                        </ol>
+                    </p>
+                    <p>
+                        The middle ground—unprofitable tech and consumer discretionary—will be hollowed out by the "Maturity Wall."
+                    </p>
+                </div>
+
+                <div class="mt-6 flex items-center gap-3">
+                    <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=Macro" class="w-10 h-10 rounded-full border border-slate-600 bg-slate-800">
+                    <div>
+                        <div class="text-xs font-bold text-white">Macroeconomic Analysis Agent</div>
+                        <div class="text-[10px] text-slate-500 mono">generated via core/agents/macroeconomic_analysis_agent.py</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-4 rounded-lg">
+                <h3 class="text-xs font-bold text-slate-500 mono uppercase mb-3">Tactical Underweights</h3>
+                <div class="space-y-3" id="underweights-container">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Portfolio Visualization -->
+        <div class="col-span-12 lg:col-span-8 space-y-6">
+            <div class="glass-panel p-6 rounded-lg">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-lg font-bold text-white mono">TARGET ALLOCATION (BARBELL)</h2>
+                    <span class="text-xs font-mono bg-slate-800 px-2 py-1 rounded text-slate-400">MODEL v1.0</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="h-64 relative">
+                        <canvas id="allocationChart"></canvas>
+                    </div>
+                    <div class="space-y-4 overflow-y-auto max-h-64 custom-scrollbar" id="components-list">
+                        <!-- Populated via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6">
+                <div class="glass-panel p-4 rounded-lg border-l-4 border-cyan-500">
+                    <div class="text-xs text-slate-500 mono uppercase mb-1">Growth Engine</div>
+                    <div class="text-2xl font-bold text-white mb-1">50%</div>
+                    <div class="text-xs text-cyan-400">AI Infra, Sovereign OS, Utilities</div>
+                </div>
+                <div class="glass-panel p-4 rounded-lg border-l-4 border-amber-500">
+                    <div class="text-xs text-slate-500 mono uppercase mb-1">Sovereignty Hedge</div>
+                    <div class="text-2xl font-bold text-white mb-1">40%</div>
+                    <div class="text-xs text-amber-400">Bitcoin, Gold, Industrial Commodities</div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Use Fetch to load the JSON strategy file
+        async function loadStrategy() {
+            try {
+                // In a real deployment, this would be the actual path.
+                // For showcase, we assume the file structure allows access.
+                const response = await fetch('../data/strategies/reflationary_agentic_boom_portfolio.json');
+                const data = await response.json();
+                renderDashboard(data);
+            } catch (e) {
+                console.error("Failed to load strategy:", e);
+                // Fallback Mock Data if file fetch fails (e.g. CORS or path issue)
+                renderDashboard(MOCK_STRATEGY);
+            }
+        }
+
+        const MOCK_STRATEGY = {
+            "target_allocation": {
+                "agentic_growth_engine": {
+                    "weight": 0.50,
+                    "components": {
+                        "ai_infrastructure": { "weight": 0.25, "ticker_proxy": "NVDA", "rationale": "Inelastic demand" },
+                        "sovereign_operating_systems": { "weight": 0.15, "ticker_proxy": "PLTR", "rationale": "Defense grid" },
+                        "power_utilities": { "weight": 0.10, "ticker_proxy": "XLU", "rationale": "Data center power" }
+                    }
+                },
+                "inflation_sovereignty_hedge": {
+                    "weight": 0.40,
+                    "components": {
+                        "bitcoin": { "weight": 0.25, "ticker_proxy": "BTC", "rationale": "Monetary debasement hedge" },
+                        "industrial_commodities": { "weight": 0.15, "ticker_proxy": "CPER", "rationale": "Infrastructure build-out" }
+                    }
+                },
+                "liquidity_buffer": {
+                    "weight": 0.10,
+                    "components": {
+                        "short_duration_treasuries": { "weight": 0.10, "ticker_proxy": "SHV", "rationale": "Dry powder" }
+                    }
+                }
+            },
+            "tactical_underweights": [
+                { "sector": "Regional Banks", "rationale": "CRE Exposure / Maturity Wall" },
+                { "sector": "Consumer Disc.", "rationale": "Purchasing power erosion" }
+            ]
+        };
+
+        function renderDashboard(data) {
+            // 1. Chart
+            const ctx = document.getElementById('allocationChart').getContext('2d');
+            const allocations = data.target_allocation;
+
+            // Flatten for chart
+            const labels = [];
+            const dataPoints = [];
+            const colors = [];
+            const details = []; // For list
+
+            // Colors mapping
+            const colorMap = {
+                "agentic_growth_engine": ["#22d3ee", "#06b6d4", "#0891b2"], // Cyans
+                "inflation_sovereignty_hedge": ["#f59e0b", "#d97706"], // Ambers
+                "liquidity_buffer": ["#64748b"] // Slate
+            };
+
+            Object.entries(allocations).forEach(([bucketKey, bucket]) => {
+                const baseColors = colorMap[bucketKey] || ["#cbd5e1"];
+                let colorIdx = 0;
+
+                Object.entries(bucket.components).forEach(([compKey, comp]) => {
+                    const label = compKey.replace(/_/g, ' ').toUpperCase();
+                    labels.push(label);
+                    dataPoints.push(comp.weight * 100);
+                    colors.push(baseColors[colorIdx % baseColors.length]);
+                    colorIdx++;
+
+                    details.push({
+                        label: label,
+                        ticker: comp.ticker_proxy,
+                        weight: comp.weight,
+                        rationale: comp.rationale,
+                        color: colors[colors.length-1]
+                    });
+                });
+            });
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: dataPoints,
+                        backgroundColor: colors,
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    cutout: '70%'
+                }
+            });
+
+            // 2. Components List
+            const listContainer = document.getElementById('components-list');
+            listContainer.innerHTML = details.map(d => `
+                <div class="flex items-start gap-3 p-2 hover:bg-slate-800/50 rounded transition">
+                    <div class="w-3 h-3 rounded-full mt-1 shrink-0" style="background-color: ${d.color}"></div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-bold text-slate-200">${d.label}</span>
+                            <span class="text-xs font-mono bg-slate-800 px-1 rounded text-cyan-400">${d.ticker}</span>
+                            <span class="text-xs font-bold text-slate-400">${(d.weight * 100).toFixed(0)}%</span>
+                        </div>
+                        <div class="text-xs text-slate-500 mt-1">${d.rationale}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            // 3. Underweights
+            const underweightsContainer = document.getElementById('underweights-container');
+            if(data.tactical_underweights) {
+                underweightsContainer.innerHTML = data.tactical_underweights.map(u => `
+                    <div class="bg-red-900/10 border border-red-900/30 p-2 rounded">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs font-bold text-red-400">${u.sector}</span>
+                            <i class="fas fa-arrow-down text-red-500 text-xs"></i>
+                        </div>
+                        <div class="text-[10px] text-slate-400 leading-tight">${u.rationale}</div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', loadStrategy);
+    </script>
+</body>
+</html>
