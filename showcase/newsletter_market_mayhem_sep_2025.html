@@ -26,6 +26,11 @@
             padding: 20px;
         }
 
+        /* Responsive for mobile */
+        @media (max-width: 768px) {
+            .newsletter-wrapper { grid-template-columns: 1fr; }
+        }
+
         .paper-sheet {
             background: var(--paper-bg);
             color: var(--ink-color);
@@ -56,6 +61,7 @@
             letter-spacing: 1px;
         }
         p { line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
+        li { line-height: 1.6; margin-bottom: 10px; }
 
         /* Sidebar */
         .cyber-sidebar {
@@ -74,39 +80,6 @@
             border-bottom: 1px solid #333;
             padding-bottom: 10px;
             margin-bottom: 15px;
-        }
-
-        /* Sentiment Meter */
-        .sentiment-track {
-            height: 6px; background: #333; border-radius: 3px; overflow: hidden; margin-top: 10px;
-        }
-        .sentiment-bar {
-            height: 100%; background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00);
-            width: 35%;
-            transition: width 1s ease;
-        }
-
-        /* Ticker Tag */
-        .ticker-tag {
-            display: inline-block;
-            background: #222;
-            color: var(--cyber-blue);
-            padding: 4px 8px;
-            margin: 2px;
-            font-size: 0.75rem;
-            border: 1px solid #444;
-            border-radius: 4px;
-        }
-
-        /* Adam Critique */
-        .adam-critique {
-            background: #0f172a;
-            border-left: 4px solid var(--cyber-blue);
-            color: #94a3b8;
-            padding: 20px;
-            margin-top: 40px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
         }
 
         .cyber-btn {
@@ -129,7 +102,6 @@
     </div>
 
     <div class="newsletter-wrapper">
-        <!-- Main Content (Paper Style) -->
         <div class="paper-sheet">
             <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px;">
                 <span>2025-09-14</span>
@@ -138,51 +110,33 @@
 
             <h1 class="title">THE LIQUIDITY TRAP</h1>
 
-            <p style="font-size: 1.2rem; font-style: italic; color: #444; border-bottom: 1px solid #eee; padding-bottom: 20px;">
-                Fed pauses cuts as core services inflation sticks. Small caps get crushed. The case for 'Quality' factor investing.
-            </p>
-
 
         <p>The Federal Reserve's decision to hold rates steady at 5.25% has sent shockwaves through the small-cap sector. The Russell 2000 has plummeted 8% in just two weeks, reflecting growing fears of a credit crunch for regional banks and smaller enterprises dependent on floating-rate debt.</p>
         <p>Core services inflation remains stubbornly high at 4.2%, driven primarily by shelter and healthcare costs. This data point has effectively killed the "pivot" narrative for Q4 2025. The yield curve remains inverted, with the 2s10s spread widening to -45bps.</p>
         <p><strong>Sector Analysis:</strong> We are seeing a massive rotation into 'Quality'—companies with strong balance sheets and high free cash flow yields. Mega-cap tech (AAPL, MSFT) is acting as a safe haven, while unprofitable tech and highly leveraged industrials are being sold off aggressively.</p>
 
 
-            <div class="adam-critique">
-                <strong style="color: var(--cyber-blue);">/// ADAM SYSTEM CRITIQUE</strong><br><br>
-                The market is mispricing duration risk. With sticky service inflation (4.2% annualized), the Fed's hands are tied. The 'Liquidity Trap' narrative is gaining traction as M2 supply contracts for the 4th consecutive month. I am reducing exposure to Consumer Discretionary (XLY) and increasing allocation to Defensive Healthcare (XLV).
+            <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
+                End of Report.
             </div>
         </div>
 
-        <!-- Sidebar (Cyber Style) -->
         <aside class="cyber-sidebar">
             <div class="sidebar-widget">
-                <div class="sidebar-title">Market Sentiment</div>
-                <div style="display:flex; justify-content:space-between; font-size:2rem; font-weight:bold;">
-                    <span>35</span>
-                    <span style="font-size:0.8rem; align-self:center; color:#666;">/ 100</span>
-                </div>
-                <div class="sentiment-track">
-                    <div class="sentiment-bar"></div>
-                </div>
-                <div style="font-size:0.7rem; color:#666; margin-top:5px;">0=PANIC | 100=EUPHORIA</div>
-            </div>
-
-            <div class="sidebar-widget">
-                <div class="sidebar-title">Related Assets</div>
-                <div>
-                    <span class="ticker-tag">IWM</span><span class="ticker-tag">AAPL</span><span class="ticker-tag">MSFT</span><span class="ticker-tag">TLT</span>
+                <div class="sidebar-title">Metadata</div>
+                <div style="font-size: 0.8rem; color: #aaa;">
+                    <div>DATE: <span style="color:#fff">2025-09-14</span></div>
+                    <div>TYPE: <span style="color:#fff">MONTHLY</span></div>
+                    <div>CLASS: <span style="color:#fff">UNCLASSIFIED</span></div>
                 </div>
             </div>
 
-            <div class="sidebar-widget">
-                <div class="sidebar-title">Strategic Implication</div>
-                <ul style="font-size:0.8rem; color:#aaa; padding-left:20px; line-height:1.5;">
-                    <li>Fed holds rates steady at 5.25%.</li>
-<li>Russell 2000 drops 8% in two weeks.</li>
-<li>Long Mega-Cap Tech (Quality) vs Short Unprofitable Tech.</li>
-
-                </ul>
+             <div class="sidebar-widget">
+                <div class="sidebar-title">System Status</div>
+                 <div style="display:flex; align-items:center; gap:10px;">
+                    <div style="width:10px; height:10px; background:#00ff00; border-radius:50%; box-shadow: 0 0 5px #00ff00;"></div>
+                    <span style="font-size:0.8rem; color:#00ff00;">ONLINE</span>
+                </div>
             </div>
         </aside>
     </div>
