@@ -59,3 +59,7 @@
 ## 2026-01-11 - Interactive List Accessibility
 **Learning:** Scrollable lists of clickable items (like news feeds) are often implemented as `div`s with `onClick`, blocking keyboard access. Converting them to `<button>` elements inside a container with `tabIndex="0"` and `role="region"` restores full accessibility without compromising layout.
 **Action:** Always implement clickable list items as buttons and ensure their container is keyboard-scrollable.
+
+## 2026-01-12 - Identifying Debt via Inline Styles
+**Learning:** Components using extensive inline `style` attributes often indicate legacy code or prototypes that lack both design system consistency and accessibility features. These are high-yield targets for refactoring.
+**Action:** Use `grep "style={{"` to find and prioritize components that need both visual and accessible upgrades.
