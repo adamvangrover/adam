@@ -49,6 +49,7 @@ class AdamNavigator {
 
             // 5. Render Interface
             this._renderNavigation();
+            this._injectCommandPalette();
             this._injectGlobalStyles();
 
             // 6. Bind Human Interaction Events
@@ -145,6 +146,7 @@ class AdamNavigator {
             { name: 'Data Vault', icon: 'fa-database', link: 'data.html' },
             { name: 'App Deploy', icon: 'fa-rocket', link: 'deployment.html' },
             { name: 'Quantum Infra', icon: 'fa-network-wired', link: 'quantum_infrastructure.html' },
+            { name: 'Evolution Hub', icon: 'fa-dna', link: 'evolution.html' },
             { type: 'divider' },
             { name: 'Root Directory', icon: 'fa-folder-tree', link: 'ROOT' }
         ];
@@ -255,6 +257,35 @@ class AdamNavigator {
     }
 
     /**
+     * Injects the Global Command Palette Modal
+     */
+    _injectCommandPalette() {
+        const palette = document.createElement('div');
+        palette.id = 'command-palette-overlay';
+        palette.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex items-start justify-center pt-20 transition-opacity duration-200 opacity-0';
+        palette.innerHTML = `
+            <div class="w-full max-w-2xl bg-[#0f172a] border border-slate-700 rounded-lg shadow-2xl transform scale-95 transition-transform duration-200">
+                <div class="border-b border-slate-700 p-4 flex items-center gap-3">
+                    <i class="fas fa-search text-cyan-400"></i>
+                    <input type="text" id="cp-input" placeholder="Type a command or search..."
+                        class="w-full bg-transparent text-white text-lg focus:outline-none font-mono placeholder-slate-500">
+                    <span class="text-xs text-slate-500 border border-slate-700 px-2 py-1 rounded">ESC</span>
+                </div>
+                <div class="max-h-[60vh] overflow-y-auto custom-scrollbar p-2" id="cp-results">
+                    <div class="text-center py-10 text-slate-500 font-mono text-sm">
+                        Waiting for input...
+                    </div>
+                </div>
+                <div class="border-t border-slate-700 p-2 bg-slate-900/50 rounded-b-lg flex justify-between px-4 text-xs text-slate-500 font-mono">
+                    <span><i class="fas fa-level-down-alt"></i> to select</span>
+                    <span><i class="fas fa-arrow-up"></i><i class="fas fa-arrow-down"></i> to navigate</span>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(palette);
+    }
+
+    /**
      * Injects layout styles for the main content area
      */
     _injectGlobalStyles() {
@@ -266,6 +297,12 @@ class AdamNavigator {
             .glass-panel {
                 backdrop-filter: blur(12px);
                 background: rgba(15, 23, 42, 0.95);
+            }
+            #command-palette-overlay.active {
+                opacity: 1;
+            }
+            #command-palette-overlay.active > div {
+                transform: scale(100%);
             }
         `;
         document.head.appendChild(style);
@@ -314,12 +351,11 @@ class AdamNavigator {
             }
         });
 
-        // 3. Search Logic
+        // 3. Search Logic (Sidebar)
         const searchInput = document.getElementById('global-search');
         if (searchInput) {
-            searchInput.addEventListener('input', (e) => this._handleSearch(e.target.value));
+            searchInput.addEventListener('input', (e) => this._handleSearch(e.target.value, 'search-results'));
             
-            // Close search when clicking outside
             document.addEventListener('click', (e) => {
                 const results = document.getElementById('search-results');
                 if (results && !searchInput.contains(e.target) && !results.contains(e.target)) {
@@ -327,14 +363,61 @@ class AdamNavigator {
                 }
             });
         }
+
+        // 4. Command Palette Logic (Ctrl+K)
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                this._toggleCommandPalette();
+            }
+            if (e.key === 'Escape') {
+                const palette = document.getElementById('command-palette-overlay');
+                if (!palette.classList.contains('hidden')) {
+                    this._toggleCommandPalette();
+                }
+            }
+        });
+
+        // Close on overlay click
+        document.getElementById('command-palette-overlay')?.addEventListener('click', (e) => {
+            if (e.target.id === 'command-palette-overlay') {
+                this._toggleCommandPalette();
+            }
+        });
+
+        // CP Input Handler
+        const cpInput = document.getElementById('cp-input');
+        if (cpInput) {
+            cpInput.addEventListener('input', (e) => this._handleSearch(e.target.value, 'cp-results'));
+        }
+    }
+
+    _toggleCommandPalette() {
+        const palette = document.getElementById('command-palette-overlay');
+        const input = document.getElementById('cp-input');
+
+        if (palette.classList.contains('hidden')) {
+            palette.classList.remove('hidden');
+            // Trigger reflow for transition
+            void palette.offsetWidth;
+            palette.classList.add('active');
+            input.value = '';
+            input.focus();
+            this._handleSearch('', 'cp-results'); // Show default state
+        } else {
+            palette.classList.remove('active');
+            setTimeout(() => {
+                palette.classList.add('hidden');
+            }, 200);
+        }
     }
 
     /**
      * Search Handler
      */
-    _handleSearch(query) {
-        const resultsContainer = document.getElementById('search-results');
-        if (!query) {
+    _handleSearch(query, containerId) {
+        const resultsContainer = document.getElementById(containerId);
+        if (!query && containerId === 'search-results') {
             resultsContainer.classList.add('hidden');
             return;
         }

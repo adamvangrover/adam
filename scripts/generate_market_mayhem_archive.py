@@ -3,7 +3,9 @@ import re
 import glob
 import json
 import yaml
+import hashlib
 from datetime import datetime
+from collections import Counter
 
 # --- Configuration ---
 OUTPUT_DIR = "showcase"
@@ -12,6 +14,51 @@ SOURCE_DIRS = [
     "core/libraries_and_archives/reports"
 ]
 ARCHIVE_FILE = "showcase/market_mayhem_archive.html"
+
+# --- Analysis Helpers ---
+
+POSITIVE_WORDS = {"growth", "profit", "boom", "bullish", "strong", "gain", "rally", "opportunity", "breakthrough", "resilient", "optimism", "surge", "upward", "recovery"}
+NEGATIVE_WORDS = {"loss", "crash", "recession", "bearish", "weak", "risk", "inflation", "crisis", "downturn", "collapse", "uncertainty", "volatile", "fear", "panic", "decline"}
+
+def analyze_sentiment(text):
+    """Calculates a sentiment score (0-100) based on keyword density."""
+    if not text: return 50
+    text_lower = text.lower()
+    words = re.findall(r'\w+', text_lower)
+    if not words: return 50
+
+    pos_count = sum(1 for w in words if w in POSITIVE_WORDS)
+    neg_count = sum(1 for w in words if w in NEGATIVE_WORDS)
+
+    total_matches = pos_count + neg_count
+    if total_matches == 0: return 50
+
+    # Scale: 0 (All Neg) to 100 (All Pos)
+    # Base is 50.
+    # Logic: Score = (Pos / Total) * 100
+    score = (pos_count / total_matches) * 100
+    return int(score)
+
+def extract_entities(text):
+    """Extracts Tickers ($AAPL) and Agents (@AgentName) and potential Sovereigns."""
+    tickers = sorted(list(set(re.findall(r'\$([A-Z]{2,5})', text))))
+    agents = sorted(list(set(re.findall(r'@([A-Za-z0-9_]+)', text))))
+
+    # Simple heuristic for Sovereigns/Countries
+    sovereigns = []
+    if "United States" in text or "US" in text: sovereigns.append("US")
+    if "China" in text: sovereigns.append("CN")
+    if "Europe" in text or "EU" in text: sovereigns.append("EU")
+
+    return {
+        "tickers": tickers,
+        "agents": agents,
+        "sovereigns": sovereigns
+    }
+
+def calculate_provenance(text):
+    """Generates a SHA-256 hash of the content."""
+    return hashlib.sha256(text.encode('utf-8')).hexdigest()
 
 # --- Formatting Helpers ---
 
@@ -34,7 +81,7 @@ def simple_md_to_html(text):
     in_list = False
 
     for line in lines:
-        if line.strip().startswith('* '):
+        if line.strip().startswith('* ') or line.strip().startswith('- '):
             if not in_list:
                 new_lines.append('<ul>')
                 in_list = True
@@ -108,7 +155,6 @@ def format_dict_as_html(data_dict, level=2):
             html += "<ul>"
             for item in value:
                 if isinstance(item, dict):
-                    # Handle list of dicts (e.g., dcf_details revenue_growth)
                     html += "<li>"
                     parts = []
                     for k, v in item.items():
@@ -135,7 +181,7 @@ def parse_json_file(filepath):
                 try:
                     data = json.loads(content)
                 except json.JSONDecodeError:
-                     print(f"Error parsing JSON/YAML {filepath}: {ye}")
+                     # print(f"Error parsing JSON/YAML {filepath}: {ye}")
                      return None
 
         if not data: return None
@@ -169,6 +215,13 @@ def parse_json_file(filepath):
         body_html = ""
         summary = data.get('summary', "")
 
+        # Financial Metrics for Visualization (if available)
+        metrics_json = "{}"
+        if "financial_performance" in data and "metrics" in data["financial_performance"]:
+             metrics_json = json.dumps(data["financial_performance"]["metrics"])
+        elif "metrics" in data:
+             metrics_json = json.dumps(data["metrics"])
+
         # Schema 1: 'sections' list
         sections = data.get('sections', [])
         if sections:
@@ -188,29 +241,27 @@ def parse_json_file(filepath):
                             body_html += f"<li>{item}</li>"
                         body_html += "</ul>"
 
-                    if 'ideas' in section:
-                        for idea in section['ideas']:
-                            body_html += f"<h3>{idea.get('asset', 'Asset')}</h3>"
-                            body_html += f"<p><strong>Rationale:</strong> {idea.get('rationale','')}</p>"
+                    if 'metrics' in section:
+                         # Capture metrics for this section for the body, but also potential chart
+                         body_html += format_dict_as_html(section['metrics'], 3)
 
-        # Schema 2: 'analysis' dict (NVDA style)
+
+        # Schema 2: 'analysis' dict
         elif "analysis" in data:
             if summary: body_html += f"<h2>Executive Summary</h2><p>{summary}</p>"
             body_html += format_dict_as_html(data['analysis'])
 
-            # Add other top-level keys like 'trading_levels'
             for key in ['trading_levels', 'financial_performance', 'valuation']:
-                if key in data and key not in data['analysis']: # avoid dups
+                if key in data and key not in data['analysis']:
                      body_html += f"<h2>{key.replace('_', ' ').title()}</h2>"
                      if isinstance(data[key], dict):
                          body_html += format_dict_as_html(data[key], 3)
                      else:
                          body_html += f"<p>{data[key]}</p>"
 
-        # Schema 3: Just summary + details (Market Overviews style, though usually list)
+        # Schema 3: Generic
         elif summary:
              body_html += f"<p>{summary}</p>"
-             # Add any other string fields as paragraphs
              for k, v in data.items():
                  if k not in ['title', 'date', 'summary', 'file_name', 'company', 'analyst'] and isinstance(v, str):
                      body_html += f"<h3>{k.replace('_', ' ').title()}</h3><p>{v}</p>"
@@ -232,15 +283,24 @@ def parse_json_file(filepath):
         else:
             out_filename = filename.replace('.json', '.html').replace('.md', '.html')
 
+        # Analysis
+        full_text = f"{title} {summary} {body_html}"
+        sentiment = analyze_sentiment(full_text)
+        entities = extract_entities(full_text)
+        prov_hash = calculate_provenance(full_text)
+
         return {
             "title": title,
             "date": date_str,
             "summary": summary,
             "type": type_,
             "full_body": body_html,
-            "sentiment_score": 50, # Default
+            "sentiment_score": sentiment,
+            "entities": entities,
+            "provenance_hash": prov_hash,
             "filename": out_filename,
-            "is_sourced": True
+            "is_sourced": True,
+            "metrics_json": metrics_json
         }
     except Exception as e:
         print(f"Error processing {filepath}: {e}")
@@ -253,26 +313,26 @@ def parse_txt_file(filepath):
 
         filename = os.path.basename(filepath)
 
-        # Metadata Extraction attempt
         title_match = re.search(r'COMPREHENSIVE.*?:\s*(.*?)$', content, re.MULTILINE)
         title = title_match.group(1).strip() if title_match else filename.replace('.txt', '').replace('_', ' ')
 
         date_match = re.search(r'DATE:\s*(.*?)$', content, re.MULTILINE)
         date_str = parse_date(date_match.group(1)) if date_match else "2025-01-01"
 
-        # Type
         type_ = "REPORT"
         if "Deep Dive" in content or "DEEP DIVE" in content: type_ = "DEEP_DIVE"
 
-        # Body - just wrap in pre or do basic p splitting
-        # Use simple_md_to_html logic but simpler
         body_html = f"<div style='white-space: pre-wrap; font-family: inherit;'>{content}</div>"
 
-        # Summary
         summary = "Comprehensive report."
         summary_match = re.search(r'EXECUTIVE SUMMARY.*?\n\n(.*?)\n', content, re.DOTALL)
         if summary_match:
              summary = summary_match.group(1)[:300] + "..."
+
+        # Analysis
+        sentiment = analyze_sentiment(content)
+        entities = extract_entities(content)
+        prov_hash = calculate_provenance(content)
 
         return {
             "title": title,
@@ -280,9 +340,12 @@ def parse_txt_file(filepath):
             "summary": summary,
             "type": type_,
             "full_body": body_html,
-            "sentiment_score": 50,
+            "sentiment_score": sentiment,
+            "entities": entities,
+            "provenance_hash": prov_hash,
             "filename": filename.replace('.txt', '.html'),
-            "is_sourced": True
+            "is_sourced": True,
+            "metrics_json": "{}"
         }
     except Exception as e:
         print(f"Error parsing TXT {filepath}: {e}")
@@ -295,26 +358,21 @@ def parse_markdown_file(filepath):
 
         filename = os.path.basename(filepath)
 
-        # Metadata Extraction
         title_match = re.search(r'^# (.*?)$', content, re.MULTILINE)
         title = title_match.group(1).strip() if title_match else filename.replace('.md', '')
 
-        # Date Extraction
         date_match = re.search(r'\*\*Date:\*\* (.*?)$', content, re.MULTILINE)
         if not date_match:
-             # Try regex in filename
              date_match = re.search(r'(\d{4})[-_]?(\d{2})[-_]?(\d{2})', filename)
              if date_match:
                  raw_date = f"{date_match.group(1)}-{date_match.group(2)}-{date_match.group(3)}"
              else:
-                 # Try finding date in title
-                 raw_date = "2025-01-01" # Fallback
+                 raw_date = "2025-01-01"
         else:
             raw_date = date_match.group(1)
 
         date = parse_date(raw_date)
 
-        # Type Heuristics
         if "Deep_Dive" in filename: type_ = "DEEP_DIVE"
         elif "Pulse" in filename or "Pulse" in title: type_ = "MARKET_PULSE"
         elif "Industry" in filename: type_ = "INDUSTRY_REPORT"
@@ -324,7 +382,6 @@ def parse_markdown_file(filepath):
         elif "Performance" in filename or "Audit" in title: type_ = "PERFORMANCE_REVIEW"
         else: type_ = "NEWSLETTER"
 
-        # Summary Heuristics
         summary_match = re.search(r'(Executive Summary|Summary)\s*\n(.*?)(?=\n##)', content, re.DOTALL | re.IGNORECASE)
         if summary_match:
             summary_raw = summary_match.group(2).strip()
@@ -332,12 +389,15 @@ def parse_markdown_file(filepath):
         else:
             summary = "Market analysis and strategic insights."
 
-        # Convert Body
-        # Remove the title line from content before converting if it was extracted
         if title_match:
              content = content.replace(title_match.group(0), "", 1).strip()
 
         body_html = simple_md_to_html(content)
+
+        # Analysis
+        sentiment = analyze_sentiment(content)
+        entities = extract_entities(content)
+        prov_hash = calculate_provenance(content)
 
         return {
             "title": title,
@@ -345,23 +405,25 @@ def parse_markdown_file(filepath):
             "summary": summary,
             "type": type_,
             "full_body": body_html,
-            "sentiment_score": 50,
+            "sentiment_score": sentiment,
+            "entities": entities,
+            "provenance_hash": prov_hash,
             "filename": filename.replace('.md', '.html').replace('.json', '.html'),
-            "is_sourced": True
+            "is_sourced": True,
+            "metrics_json": "{}"
         }
 
     except Exception as e:
         print(f"Error parsing MD {filepath}: {e}")
         return None
 
-# --- Static Data (Historical & Simulated) ---
+# --- Static Data ---
 
 NEWSLETTER_DATA = [
-    # 2026 The Reflationary Agentic Boom
     {
         "date": "2026-01-12",
         "title": "GLOBAL MACRO-STRATEGIC OUTLOOK 2026: THE REFLATIONARY AGENTIC BOOM",
-        "summary": "As markets open on January 12, 2026, the global financial system has entered a new regime: the Reflationary Agentic Boom. Paradoxical growth, sticky inflation, and the 'Binary Big Bang' of Agentic AI.",
+        "summary": "As markets open on January 12, 2026, the global financial system has entered a new regime: the Reflationary Agentic Boom.",
         "type": "ANNUAL_STRATEGY",
         "filename": "newsletter_market_mayhem_jan_2026.html",
         "is_sourced": True,
@@ -393,116 +455,7 @@ NEWSLETTER_DATA = [
         </ul>
         """
     },
-    # 2025 Monthly
-    {
-        "date": "2025-09-14",
-        "title": "THE LIQUIDITY TRAP",
-        "summary": "Fed pauses cuts as core services inflation sticks. Small caps get crushed. The case for 'Quality' factor investing.",
-        "type": "MONTHLY",
-        "filename": "newsletter_market_mayhem_sep_2025.html",
-        "is_sourced": True,
-        "full_body": """
-        <p>The Federal Reserve's decision to hold rates steady at 5.25% has sent shockwaves through the small-cap sector. The Russell 2000 has plummeted 8% in just two weeks, reflecting growing fears of a credit crunch for regional banks and smaller enterprises dependent on floating-rate debt.</p>
-        <p>Core services inflation remains stubbornly high at 4.2%, driven primarily by shelter and healthcare costs. This data point has effectively killed the "pivot" narrative for Q4 2025. The yield curve remains inverted, with the 2s10s spread widening to -45bps.</p>
-        <p><strong>Sector Analysis:</strong> We are seeing a massive rotation into 'Quality'—companies with strong balance sheets and high free cash flow yields. Mega-cap tech (AAPL, MSFT) is acting as a safe haven, while unprofitable tech and highly leveraged industrials are being sold off aggressively.</p>
-        """
-    },
-    {
-        "date": "2025-08-14",
-        "title": "SUMMER DOLDRUMS & AI FATIGUE",
-        "summary": "Volume dries up. AI Capex questions emerge. Nvidia earnings preview: Is the bar too high?",
-        "type": "MONTHLY",
-        "filename": "newsletter_market_mayhem_aug_2025.html",
-        "is_sourced": True,
-        "full_body": """
-        <p>Trading volumes have collapsed to year-to-date lows as Wall Street heads to the Hamptons. However, beneath the calm surface, cracks are forming in the AI narrative. Several hyperscalers (GOOGL, META) have hinted at 'optimizing' capital expenditures, sparking fears of an AI spending slowdown.</p>
-        <p>All eyes are on Nvidia's upcoming earnings. The buy-side whisper numbers are astronomical, setting a bar that may be impossible to clear. A disappointment here could trigger a broader correction in the semiconductor index (SOXX).</p>
-        <p><strong>Strategy:</strong> We are observing a quiet rotation into Healthcare (XLV) and Utilities (XLU) as investors seek yield and defensive characteristics amidst the uncertainty.</p>
-        """
-    },
-    {
-        "date": "2025-07-14",
-        "title": "CRYPTO REGULATION SHOCK",
-        "summary": "SEC 2.0 launches 'Operation Chokepoint'. DeFi protocols under siege. Bitcoin flight to safety narrative tested.",
-        "type": "MONTHLY",
-        "filename": "newsletter_market_mayhem_jul_2025.html",
-        "is_sourced": True,
-        "full_body": """
-        <p>The SEC has launched a coordinated enforcement blitz against major DeFi protocols and centralized exchanges, dubbed 'Operation Chokepoint 2.0'. The immediate impact has been a bloodbath in the altcoin market, with ETH/BTC ratios hitting multi-year lows.</p>
-        <p>Bitcoin, however, is showing relative strength. The 'flight to safety' narrative within the crypto ecosystem is funneling capital into BTC. Institutional investors view the regulatory purge as a necessary cleansing before true mass adoption can occur.</p>
-        <p><strong>Outlook:</strong> Expect continued volatility. The legal battles will take years to resolve. In the meantime, 'Code is Law' is being tested by 'Law is Law'.</p>
-        """
-    },
-    {
-        "date": "2025-06-14",
-        "title": "THE DOLLAR WRECKING BALL",
-        "summary": "DXY breaks 108. Emerging Market currencies collapse. Carry trade unwind begins.",
-        "type": "MONTHLY",
-        "filename": "newsletter_market_mayhem_jun_2025.html",
-        "is_sourced": True,
-        "full_body": """
-        <p>The US Dollar Index (DXY) has shattered resistance at 108, acting as a wrecking ball for global risk assets. The Japanese Yen has collapsed to 160 against the dollar, forcing the BOJ to intervene—unsuccessfully so far.</p>
-        <p>Emerging Market (EM) debt is under severe stress. Countries with high dollar-denominated debt burdens are seeing their credit default swap (CDS) spreads blow out. The 'Carry Trade'—borrowing in Yen to buy tech stocks—is unwinding rapidly, adding selling pressure to the Nasdaq.</p>
-        <p><strong>Macro View:</strong> The Fed's 'Higher for Longer' stance is diverging from the ECB and BOJ, creating a rate differential vacuum that sucks capital into the USD.</p>
-        """
-    },
-    {
-        "date": "2025-05-14",
-        "title": "COMMERCIAL REAL ESTATE: THE RECKONING",
-        "summary": "Office vacancy hits 25%. Regional banks take haircuts. The 'Extend and Pretend' game ends.",
-        "type": "MONTHLY",
-        "filename": "newsletter_market_mayhem_may_2025.html",
-        "is_sourced": True,
-        "full_body": """
-        <p>The 'Extend and Pretend' game is officially over. A landmark sale of a Class-A office tower in San Francisco for $100/sqft—down 75% from its 2019 valuation—has set a terrifying new comparable for the market.</p>
-        <p>Regional banks (KRE) are taking massive haircuts on their loan portfolios. We expect a wave of consolidation in the banking sector as smaller players are forced to merge or fail. Meanwhile, Private Credit funds are raising record amounts of dry powder to act as the liquidity providers of last resort.</p>
-        <p><strong>Investment Implication:</strong> Avoid regional banks. Look for distress-focused alternative asset managers.</p>
-        """
-    },
-    {
-        "date": "2025-04-14",
-        "title": "Q1 EARNINGS: PROFIT MARGIN SQUEEZE",
-        "summary": "Wage inflation eats into margins. Guidance cut across Consumer Discretionary. The Recession is not cancelled, just delayed.",
-        "type": "MONTHLY",
-        "filename": "newsletter_market_mayhem_apr_2025.html",
-        "is_sourced": True,
-        "full_body": """
-        <p>Q1 earnings season has revealed a troubling trend: profit margin compression. While top-line revenue remains resilient, bottom-line earnings are being eroded by sticky wage inflation (running at 4.5%) and higher input costs.</p>
-        <p>Consumer Discretionary giants like Target and Home Depot have cut full-year guidance, citing 'consumer fatigue' and 'shrink' (theft). The narrative is shifting from 'Goldilocks' to 'Stagflation'—slowing growth with persistent inflation.</p>
-        <p><strong>Key Metric:</strong> Operating margins for the S&P 500 ex-Energy have contracted by 120bps year-over-year.</p>
-        """
-    },
-    # 2024 Retrospective / Highlights
-    {
-        "date": "2024-12-14",
-        "title": "2024 POST-MORTEM: THE SOFT LANDING MIRACLE",
-        "summary": "How the Fed threaded the needle. Inflation down, unemployment low. Can it last?",
-        "type": "YEARLY_REVIEW",
-        "filename": "newsletter_market_mayhem_dec_2024.html",
-        "is_sourced": True,
-        "full_body": """
-        <p>2024 will go down in history as the year of the 'Soft Landing Miracle'. Against all odds, the Federal Reserve managed to bring inflation down from 9% to 3% without triggering a recession. Unemployment remained historically low at 3.7%.</p>
-        <p>The S&P 500 returned a stunning 24%, driven almost entirely by the 'Magnificent 7' tech giants. The AI revolution fueled a productivity boom narrative that offset higher interest rates.</p>
-        <p><strong>Retrospective:</strong> The 'Immaculate Disinflation' was real. Supply chains healed, and the labor market rebalanced without mass layoffs. But valuations are now stretched.</p>
-        """
-    },
-
-    # Historical - REAL DATA
-    {
-        "date": "2020-03-20",
-        "title": "MARKET MAYHEM: THE GREAT SHUT-IN",
-        "summary": "\"Lockdown\". The global economy has come to a screeching halt. With \"15 Days to Slow the Spread\" in effect, markets are pricing in a depression-level GDP contraction.",
-        "type": "HISTORICAL",
-        "filename": "newsletter_market_mayhem_mar_2020.html",
-        "is_sourced": True,
-        "full_body": """
-        <p><strong>The World Has Stopped.</strong> In an unprecedented event, the global economy has entered a medically-induced coma. The S&P 500 has crashed 34% from its February highs, the fastest bear market in history.</p>
-        <p>Volatility is off the charts. The VIX closed at 82.69 on March 16th, surpassing the 2008 peak. Credit spreads have blown out, and liquidity in the Treasury market—usually the deepest in the world—has evaporated.</p>
-        <p><strong>Oil Shock:</strong> Demand destruction is so severe that WTI crude futures are trading at imminent risk of turning negative due to storage capacity constraints. (Update: They did, hitting -$37.63 in April).</p>
-        <p><strong>Central Bank Response:</strong> The Fed has unleashed 'Unlimited QE', buying corporate bonds for the first time in history. The mantra is 'Don't Fight the Fed', but the economic data is catastrophic.</p>
-        """
-    },
-    {
+     {
         "date": "2008-09-19",
         "title": "MARKET MAYHEM: THE LEHMAN MOMENT",
         "summary": "\"Existential Panic\". There are decades where nothing happens; and there are weeks where decades happen. This was one of those weeks. A 158-year-old bank vanished, the world's largest insurer was nationalized, and the money market broke the buck.",
@@ -527,10 +480,24 @@ NEWSLETTER_DATA = [
         <p><strong>The Culprit:</strong> Program trading. 'Portfolio Insurance' strategies, designed to sell futures as the market falls to hedge portfolios, kicked in simultaneously. This selling pressure crushed the futures market, which dragged down the spot market in a vicious spiral.</p>
         <p><strong>The Aftermath:</strong> Alan Greenspan's Fed has issued a statement: 'The Federal Reserve, consistent with its responsibilities as the Nation's central bank, affirmed today its readiness to serve as a source of liquidity to support the economic and financial system.' The bleeding has stopped, but the scar remains.</p>
         """
+    },
+     {
+        "date": "2020-03-20",
+        "title": "MARKET MAYHEM: THE GREAT SHUT-IN",
+        "summary": "\"Lockdown\". The global economy has come to a screeching halt. With \"15 Days to Slow the Spread\" in effect, markets are pricing in a depression-level GDP contraction.",
+        "type": "HISTORICAL",
+        "filename": "newsletter_market_mayhem_mar_2020.html",
+        "is_sourced": True,
+        "full_body": """
+        <p><strong>The World Has Stopped.</strong> In an unprecedented event, the global economy has entered a medically-induced coma. The S&P 500 has crashed 34% from its February highs, the fastest bear market in history.</p>
+        <p>Volatility is off the charts. The VIX closed at 82.69 on March 16th, surpassing the 2008 peak. Credit spreads have blown out, and liquidity in the Treasury market—usually the deepest in the world—has evaporated.</p>
+        <p><strong>Oil Shock:</strong> Demand destruction is so severe that WTI crude futures are trading at imminent risk of turning negative due to storage capacity constraints. (Update: They did, hitting -$37.63 in April).</p>
+        <p><strong>Central Bank Response:</strong> The Fed has unleashed 'Unlimited QE', buying corporate bonds for the first time in history. The mantra is 'Don't Fight the Fed', but the economic data is catastrophic.</p>
+        """
     }
 ]
 
-# --- Templates ---
+# --- Report Template (Enhanced with Cyber HUD) ---
 
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
@@ -539,8 +506,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM v23.5 :: {title}</title>
     <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/nav.js" defer></script>
     <style>
         :root {{
             --paper-bg: #fdfbf7;
@@ -548,22 +518,19 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             --accent-red: #cc0000;
             --cyber-black: #050b14;
             --cyber-blue: #00f3ff;
+            --cyber-green: #00ff00;
         }}
         body {{ margin: 0; background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }}
 
         .newsletter-wrapper {{
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 40px auto;
             display: grid;
             grid-template-columns: 3fr 1fr;
             gap: 40px;
             padding: 20px;
         }}
-
-        /* Responsive for mobile */
-        @media (max-width: 768px) {{
-            .newsletter-wrapper {{ grid-template-columns: 1fr; }}
-        }}
+        @media (max-width: 768px) {{ .newsletter-wrapper {{ grid-template-columns: 1fr; }} }}
 
         .paper-sheet {{
             background: var(--paper-bg);
@@ -574,102 +541,151 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             position: relative;
         }}
 
-        /* Typography */
         h1.title {{
-            font-family: 'Playfair Display', serif;
-            font-size: 3rem;
-            border-bottom: 4px solid var(--ink-color);
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-            letter-spacing: -1px;
-            line-height: 1.1;
+            font-family: 'Playfair Display', serif; font-size: 3rem; border-bottom: 4px solid var(--ink-color);
+            padding-bottom: 20px; margin-bottom: 30px; letter-spacing: -1px; line-height: 1.1;
         }}
         h2 {{
-            font-family: 'Inter', sans-serif;
-            font-weight: 700;
-            font-size: 1.2rem;
-            margin-top: 40px;
-            margin-bottom: 15px;
-            color: var(--accent-red);
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1.2rem; margin-top: 40px;
+            margin-bottom: 15px; color: var(--accent-red); text-transform: uppercase; letter-spacing: 1px;
         }}
         p {{ line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }}
         li {{ line-height: 1.6; margin-bottom: 10px; }}
 
-        /* Sidebar */
-        .cyber-sidebar {{
-            font-family: 'JetBrains Mono', monospace;
-        }}
+        /* Cyber HUD Sidebar */
+        .cyber-sidebar {{ font-family: 'JetBrains Mono', monospace; }}
         .sidebar-widget {{
-            border: 1px solid #333;
-            background: rgba(255,255,255,0.02);
-            padding: 20px;
-            margin-bottom: 20px;
+            border: 1px solid #333; background: rgba(5, 11, 20, 0.8); padding: 15px; margin-bottom: 20px;
+            backdrop-filter: blur(5px);
         }}
         .sidebar-title {{
-            color: var(--cyber-blue);
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+            color: var(--cyber-blue); font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid #333;
+            padding-bottom: 8px; margin-bottom: 12px; letter-spacing: 1px;
         }}
+        .stat-row {{ display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; color: #aaa; }}
+        .stat-val {{ color: #fff; font-weight: bold; }}
+
+        .sentiment-bar {{ height: 4px; background: #333; margin-top: 5px; border-radius: 2px; overflow: hidden; }}
+        .sentiment-fill {{ height: 100%; background: var(--cyber-blue); }}
+
+        .tag-cloud {{ display: flex; flex-wrap: wrap; gap: 5px; }}
+        .tag {{ background: #222; color: #ccc; padding: 2px 6px; font-size: 0.7rem; border-radius: 3px; border: 1px solid #444; }}
+        .tag.ticker {{ color: var(--cyber-green); border-color: var(--cyber-green); }}
+        .tag.agent {{ color: var(--cyber-blue); border-color: var(--cyber-blue); }}
 
         .cyber-btn {{
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            padding: 6px 12px;
-            border: 1px solid #444;
-            color: #e0e0e0;
-            background: rgba(0,0,0,0.8);
-            text-decoration: none;
-            display: inline-block;
-            margin-bottom: 20px;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 8px 16px; border: 1px solid #444;
+            color: #e0e0e0; background: rgba(0,0,0,0.8); text-decoration: none; display: inline-block;
         }}
         .cyber-btn:hover {{ border-color: var(--cyber-blue); color: var(--cyber-blue); }}
     </style>
 </head>
 <body>
-    <div style="max-width: 1400px; margin: 0 auto; padding: 20px;">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; BACK TO ARCHIVE</a>
+    <div style="max-width: 1400px; margin: 0 auto; padding: 20px; display:flex; justify-content:space-between; align-items:center;">
+        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
         <div class="paper-sheet">
             <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px;">
                 <span>{date}</span>
-                <span>TYPE: {type}</span>
+                <span>ID: {prov_short}</span>
             </div>
 
             <h1 class="title">{title}</h1>
 
+            <!-- Dynamic Chart Injection Area if metrics exist -->
+            <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
+                <canvas id="financialChart"></canvas>
+            </div>
+
             {full_body}
 
             <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
-                End of Report.
+                End of Transmission.
             </div>
         </div>
 
         <aside class="cyber-sidebar">
             <div class="sidebar-widget">
-                <div class="sidebar-title">Metadata</div>
-                <div style="font-size: 0.8rem; color: #aaa;">
-                    <div>DATE: <span style="color:#fff">{date}</span></div>
-                    <div>TYPE: <span style="color:#fff">{type}</span></div>
-                    <div>CLASS: <span style="color:#fff">UNCLASSIFIED</span></div>
+                <div class="sidebar-title">Intelligence Metadata</div>
+                <div class="stat-row"><span>DATE</span> <span class="stat-val">{date}</span></div>
+                <div class="stat-row"><span>TYPE</span> <span class="stat-val">{type}</span></div>
+                <div class="stat-row"><span>CLASS</span> <span class="stat-val">UNCLASSIFIED</span></div>
+                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="{prov_hash}">{prov_short}</span></div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Sentiment Analysis</div>
+                <div class="stat-row"><span>SCORE</span> <span class="stat-val">{sentiment_score}/100</span></div>
+                <div class="sentiment-bar">
+                    <div class="sentiment-fill" style="width: {sentiment_score}%;"></div>
+                </div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Detected Entities</div>
+                <div class="tag-cloud">
+                    {entity_html}
                 </div>
             </div>
 
              <div class="sidebar-widget">
-                <div class="sidebar-title">System Status</div>
-                 <div style="display:flex; align-items:center; gap:10px;">
-                    <div style="width:10px; height:10px; background:#00ff00; border-radius:50%; box-shadow: 0 0 5px #00ff00;"></div>
-                    <span style="font-size:0.8rem; color:#00ff00;">ONLINE</span>
+                <div class="sidebar-title">Contributing Agents</div>
+                 <div style="display:flex; flex-direction:column; gap:5px;">
+                    {agent_html}
                 </div>
             </div>
         </aside>
     </div>
+
+    <script>
+        // Chart Injection Logic
+        const metricsData = {metrics_json};
+
+        if (metricsData && Object.keys(metricsData).length > 0) {{
+            const ctx = document.getElementById('financialChart');
+            const container = document.getElementById('financialChartContainer');
+
+            // Basic parsing of metrics structure (assuming flat or Year->Val)
+            let labels = [];
+            let values = [];
+            let labelName = "Metric";
+
+            // Try to find a timeseries
+            for (const [key, val] of Object.entries(metricsData)) {{
+                if (typeof val === 'object') {{
+                    // Likely year -> value
+                    labels = Object.keys(val);
+                    values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
+                    labelName = key;
+                    break;
+                }}
+            }}
+
+            if (labels.length > 0) {{
+                container.style.display = 'block';
+                new Chart(ctx, {{
+                    type: 'bar',
+                    data: {{
+                        labels: labels,
+                        datasets: [{{
+                            label: labelName,
+                            data: values,
+                            backgroundColor: 'rgba(204, 0, 0, 0.5)',
+                            borderColor: '#cc0000',
+                            borderWidth: 1
+                        }}]
+                    }},
+                    options: {{
+                        responsive: true,
+                        plugins: {{ legend: {{ display: true }} }}
+                    }}
+                }});
+            }}
+        }}
+    </script>
 </body>
 </html>
 """
@@ -677,101 +693,52 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 # --- Main Generation ---
 
 def generate_archive():
-    print("Starting Archive Generation...")
+    print("Starting Enhanced Archive Generation...")
 
-    # 1. Gather all data sources
     all_items = []
 
-    # Scan Source Directories
+    # 1. Add Static Data (ensure processing)
+    for item in NEWSLETTER_DATA:
+        full_text = f"{item['title']} {item['summary']} {item.get('full_body', '')}"
+        item['sentiment_score'] = analyze_sentiment(full_text)
+        item['entities'] = extract_entities(full_text)
+        item['provenance_hash'] = calculate_provenance(full_text)
+        item['metrics_json'] = "{}"
+        all_items.append(item)
+
+    # 2. Scan Directories
     for source_dir in SOURCE_DIRS:
-        print(f"Scanning {source_dir}...")
-        if not os.path.exists(source_dir):
-            print(f"Directory not found: {source_dir}")
-            continue
-
-        source_files = glob.glob(os.path.join(source_dir, "*"))
-
-        for filepath in source_files:
+        if not os.path.exists(source_dir): continue
+        files = glob.glob(os.path.join(source_dir, "*"))
+        for filepath in files:
             item = None
-            if filepath.endswith(".json"):
-                item = parse_json_file(filepath)
-            elif filepath.endswith(".md"):
-                item = parse_markdown_file(filepath)
-            elif filepath.endswith(".txt"):
-                item = parse_txt_file(filepath)
+            if filepath.endswith(".json"): item = parse_json_file(filepath)
+            elif filepath.endswith(".md"): item = parse_markdown_file(filepath)
+            elif filepath.endswith(".txt"): item = parse_txt_file(filepath)
 
-            if item:
-                all_items.append(item)
+            if item: all_items.append(item)
 
-    # 2. Add Hardcoded/Static Data (from NEWSLETTER_DATA)
-    # Check if we already have these dates/titles to avoid duplicates
-    existing_dates = set(i['date'] for i in all_items)
-    
-    for static_item in NEWSLETTER_DATA:
-        # Check by title or date overlap
-        if static_item['date'] not in existing_dates:
-            # Ensure required fields exist for static items
-            if 'is_sourced' not in static_item:
-                static_item['is_sourced'] = True
-            all_items.append(static_item)
-            existing_dates.add(static_item['date'])
+    # Deduplicate based on title/date
+    unique_items = {f"{i['date']}_{i['title']}": i for i in all_items}.values()
+    sorted_items = sorted(unique_items, key=lambda x: x['date'], reverse=True)
 
-    # 3. Scan for Orphan HTML Files in Showcase
-    print("Scanning for orphan HTML files in showcase/...")
-    existing_filenames = set(item['filename'] for item in all_items)
-    showcase_files = glob.glob(os.path.join(OUTPUT_DIR, "newsletter_*.html")) + \
-                      glob.glob(os.path.join(OUTPUT_DIR, "MM*.html")) + \
-                      glob.glob(os.path.join(OUTPUT_DIR, "*_Market_Mayhem.html")) + \
-                      glob.glob(os.path.join(OUTPUT_DIR, "Deep_Dive_*.html")) + \
-                      glob.glob(os.path.join(OUTPUT_DIR, "Tech_Watch_*.html")) + \
-                      glob.glob(os.path.join(OUTPUT_DIR, "Industry_Report_*.html")) + \
-                      glob.glob(os.path.join(OUTPUT_DIR, "House_View_*.html")) + \
-                      glob.glob(os.path.join(OUTPUT_DIR, "Equity_Research_*.html")) + \
-                      glob.glob(os.path.join(OUTPUT_DIR, "Weekly_Recap_*.html")) + \
-                      glob.glob(os.path.join(OUTPUT_DIR, "Market_Mayhem_*.html")) + \
-                      glob.glob(os.path.join(OUTPUT_DIR, "market_*.html"))
-
-    TITLE_RE = re.compile(r'<h1 class="title">(.*?)</h1>', re.IGNORECASE)
-    DATE_RE = re.compile(r'<span>([\d-]+)</span>', re.IGNORECASE)
-    SUMMARY_RE = re.compile(r'font-style: italic.*?>(.*?)</p>', re.IGNORECASE | re.DOTALL)
-    TYPE_RE = re.compile(r'TYPE: (.*?)</span>', re.IGNORECASE)
-
-    for filepath in showcase_files:
-        filename = os.path.basename(filepath)
-        if filename == "market_mayhem_archive.html": continue
-        if filename in existing_filenames: continue
-
-        try:
-            with open(filepath, 'r', encoding='utf-8') as f:
-                content = f.read()
-
-            title_m = TITLE_RE.search(content)
-            date_m = DATE_RE.search(content)
-            summary_m = SUMMARY_RE.search(content)
-            type_m = TYPE_RE.search(content)
-
-            if title_m and date_m:
-                date_str = date_m.group(1).strip()
-                # Attempt fix for bad parsed dates
-                parsed_date = parse_date(date_str)
-
-                all_items.append({
-                    "date": parsed_date,
-                    "title": title_m.group(1).strip(),
-                    "summary": summary_m.group(1).strip() if summary_m else "No summary available.",
-                    "filename": filename,
-                    "type": type_m.group(1).strip() if type_m else "NEWSLETTER",
-                    "sentiment_score": 50, # Default
-                    "is_sourced": False # Don't regenerate file
-                })
-        except Exception as e:
-            # print(f"Skipping {filename}: {e}")
-            pass
-
-    # 4. Generate HTML Files (Only for sourced items)
-    print(f"Processing {len(all_items)} total reports...")
-    for item in all_items:
+    # 3. Generate HTML Reports
+    print(f"Generating {len(sorted_items)} report pages...")
+    for item in sorted_items:
         if not item.get("is_sourced", False): continue
+
+        # Build Entity HTML
+        entity_html = ""
+        for t in item['entities']['tickers']: entity_html += f'<span class="tag ticker">${t}</span>'
+        for s in item['entities']['sovereigns']: entity_html += f'<span class="tag">{s}</span>'
+
+        # Build Agent HTML
+        agent_html = ""
+        if item['entities']['agents']:
+            for a in item['entities']['agents']:
+                agent_html += f'<div style="font-size:0.75rem; color:#ccc;"><i class="fas fa-robot"></i> {a}</div>'
+        else:
+            agent_html = '<div style="font-size:0.75rem; color:#666;">System Core</div>'
 
         out_path = os.path.join(OUTPUT_DIR, item['filename'])
 
@@ -780,112 +747,57 @@ def generate_archive():
             date=item["date"],
             summary=item["summary"],
             type=item["type"],
-            full_body=item.get("full_body", "")
+            full_body=item.get("full_body", ""),
+            sentiment_score=item.get("sentiment_score", 50),
+            prov_hash=item.get("provenance_hash", "UNKNOWN"),
+            prov_short=item.get("provenance_hash", "UNKNOWN")[:8],
+            entity_html=entity_html,
+            agent_html=agent_html,
+            metrics_json=item.get("metrics_json", "{}")
         )
 
         with open(out_path, "w", encoding='utf-8') as f:
             f.write(content)
 
-    # 5. Generate Archive Index
-    all_items.sort(key=lambda x: x["date"], reverse=True)
+    # 4. Generate Main Archive Page (Cyber Dashboard)
 
+    # Prepare data for Chart.js
+    dates = [i['date'] for i in sorted_items][::-1]
+    sentiments = [i['sentiment_score'] for i in sorted_items][::-1]
+
+    # Top Entities
+    all_tickers = []
+    for i in sorted_items: all_tickers.extend(i['entities']['tickers'])
+    ticker_counts = Counter(all_tickers).most_common(10)
+
+    # Grouping
     grouped = {}
     historical = []
+    for item in sorted_items:
+        year = item["date"].split("-")[0]
+        if int(year) < 2021: historical.append(item)
+        else:
+            if year not in grouped: grouped[year] = []
+            grouped[year].append(item)
 
-    for item in all_items:
-        try:
-            year = item["date"].split("-")[0]
-            if int(year) < 2020:
-                historical.append(item)
-            else:
-                if year not in grouped: grouped[year] = []
-                grouped[year].append(item)
-        except: pass
-
-    # Build Archive HTML
-    list_html = ""
-
-    # Filter Bar
-    list_html += """
-    <div style="margin-bottom: 30px; display: flex; gap: 10px;">
-        <input type="text" id="searchInput" placeholder="Search archive..."
-            style="background: #111; border: 1px solid #333; color: white; padding: 10px; flex-grow: 1; font-family: 'JetBrains Mono';"
-            onkeyup="filterArchive()">
-        <select id="yearFilter" onchange="filterArchive()" style="background: #111; border: 1px solid #333; color: white; padding: 10px; font-family: 'JetBrains Mono';">
-            <option value="ALL">ALL YEARS</option>
-            """
-    for y in sorted(grouped.keys(), reverse=True):
-        list_html += f'<option value="{y}">{y}</option>'
-        
-    list_html += """
-            <option value="HISTORICAL">HISTORICAL</option>
-        </select>
-    </div>
-    <div id="archiveGrid">
-    """
-
-    for year in sorted(grouped.keys(), reverse=True):
-        list_html += f'<div class="year-header" data-year="{year}">{year} ARCHIVE</div>\n'
-        for item in grouped[year]:
-            type_color = "#333"
-            type_ = item.get("type", "REPORT")
-            if type_ == 'MARKET_PULSE': type_color = "#00f3ff"
-            elif type_ == 'DEEP_DIVE': type_color = "#cc0000"
-            elif type_ == 'NEWSLETTER': type_color = "#ffff00"
-            elif type_ == 'AGENT_NOTE': type_color = "#00ff00" # Matrix Green
-            elif type_ == 'PERFORMANCE_REVIEW': type_color = "#60a5fa" # Slate Blue
-            elif type_ == 'COMPANY_REPORT': type_color = "#f472b6" # Pink
-            elif type_ == 'THEMATIC_REPORT': type_color = "#a78bfa" # Purple
-            elif type_ == 'MARKET_OUTLOOK': type_color = "#fca5a5" # Light Red
-
-            list_html += f"""
-            <div class="archive-item" data-title="{item['title'].lower()}" data-year="{year}">
-                <div style="width: 5px; background: {type_color}; margin-right: 15px;"></div>
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span class="item-date">{item["date"]}</span>
-                        <span class="type-badge" style="background:{type_color}; color:#000;">{type_}</span>
-                    </div>
-                    <h3 class="item-title">{item["title"]}</h3>
-                    <div class="item-summary">{item["summary"]}</div>
-                </div>
-                <a href="{item["filename"]}" class="read-btn">DECRYPT &rarr;</a>
-            </div>
-            """
-
-    if historical:
-        list_html += f'<div class="year-header" data-year="HISTORICAL">HISTORICAL ARCHIVE</div>\n'
-        for item in historical:
-            list_html += f"""
-            <div class="archive-item" data-title="{item['title'].lower()}" data-year="HISTORICAL">
-                <div style="width: 5px; background: #666; margin-right: 15px;"></div>
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span class="item-date">{item["date"]}</span>
-                        <span class="type-badge historical">HISTORICAL</span>
-                    </div>
-                    <h3 class="item-title">{item["title"]}</h3>
-                    <div class="item-summary">{item["summary"]}</div>
-                </div>
-                <a href="{item["filename"]}" class="read-btn">DECRYPT &rarr;</a>
-            </div>
-            """
-
-    list_html += "</div>" # End Grid
-
-    page_html = f"""<!DOCTYPE html>
+    archive_html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM v23.5 :: MARKET MAYHEM ARCHIVE</title>
     <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/nav.js" defer></script>
     <style>
         :root {{
             --primary-color: #00f3ff;
             --accent-color: #cc0000;
             --bg-color: #050b14;
+            --panel-bg: rgba(15, 23, 42, 0.6);
             --text-primary: #e0e0e0;
         }}
         body {{ margin: 0; background: var(--bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif; overflow-x: hidden; }}
@@ -893,95 +805,218 @@ def generate_archive():
 
         .cyber-header {{
             height: 60px; display: flex; align-items: center; justify-content: space-between;
-            padding: 0 20px; border-bottom: 1px solid var(--accent-color);
+            padding: 0 20px; border-bottom: 1px solid #333;
             background: rgba(5, 11, 20, 0.95); position: sticky; top: 0; z-index: 100;
         }}
-        .scan-line {{ position: fixed; top: 0; left: 0; width: 100%; height: 2px; background: rgba(204, 0, 0, 0.1); animation: scan 3s linear infinite; pointer-events: none; z-index: 999; }}
-        @keyframes scan {{ 0% {{ top: 0; }} 100% {{ top: 100%; }} }}
 
-        .cyber-btn {{
-            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 6px 12px;
-            border: 1px solid #444; color: var(--text-primary); background: rgba(0,0,0,0.3);
-            text-decoration: none; display: inline-block;
+        .dashboard-grid {{
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: calc(100vh - 60px);
         }}
-        .cyber-btn:hover {{ border-color: var(--primary-color); color: var(--primary-color); }}
 
-        .archive-list {{ max-width: 1000px; margin: 40px auto; padding: 0 20px; }}
+        .filters-panel {{
+            background: var(--panel-bg);
+            border-right: 1px solid #333;
+            padding: 20px;
+        }}
 
-        .year-header {{
-            font-family: 'JetBrains Mono'; font-size: 2rem; color: #333; font-weight: bold;
-            border-bottom: 2px solid #222; margin-top: 40px; margin-bottom: 20px;
+        .content-panel {{
+            padding: 30px;
+            overflow-y: auto;
+        }}
+
+        .chart-container {{
+            background: rgba(0,0,0,0.3);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            height: 300px;
         }}
 
         .archive-item {{
             border: 1px solid #333; background: rgba(255, 255, 255, 0.03); padding: 20px;
-            display: flex; align-items: stretch; gap: 20px;
-            transition: all 0.2s ease;
-            margin-bottom: 15px;
+            display: flex; gap: 20px; transition: all 0.2s ease; margin-bottom: 15px;
+            border-left: 3px solid #666;
         }}
-        .archive-item:hover {{ border-color: var(--accent-color); background: rgba(204, 0, 0, 0.05); transform: translateX(5px); }}
+        .archive-item:hover {{ border-color: var(--primary-color); background: rgba(0, 243, 255, 0.05); transform: translateX(5px); }}
 
-        .item-date {{ font-family: 'JetBrains Mono'; font-size: 0.8rem; color: var(--accent-color); }}
-        .item-title {{ font-size: 1.2rem; font-weight: 700; color: #fff; margin: 5px 0; font-family: 'Inter'; }}
-        .item-summary {{ color: #888; font-size: 0.85rem; max-width: 600px; }}
+        .type-badge {{ font-size: 0.6rem; padding: 2px 6px; border-radius: 2px; font-weight: bold; font-family: 'JetBrains Mono'; background: #333; color: white; margin-left: 10px; }}
 
-        .read-btn {{
-            padding: 8px 16px; border: 1px solid var(--accent-color); color: var(--accent-color);
-            font-family: 'JetBrains Mono'; text-transform: uppercase; font-size: 0.75rem;
-            background: rgba(0,0,0,0.5); text-decoration: none; white-space: nowrap; align-self: center;
+        .filter-group {{ margin-bottom: 20px; }}
+        .filter-label {{ font-size: 0.7rem; color: #888; text-transform: uppercase; margin-bottom: 8px; display: block; }}
+        .filter-select {{ width: 100%; background: #111; color: #fff; border: 1px solid #444; padding: 8px; font-family: 'JetBrains Mono'; border-radius: 4px; }}
+
+        .tag-cloud-item {{
+            display: inline-block; font-size: 0.75rem; color: #aaa; margin: 2px; padding: 2px 6px;
+            border: 1px solid #333; border-radius: 4px; cursor: pointer;
         }}
-        .read-btn:hover {{ background: var(--accent-color); color: #000; }}
+        .tag-cloud-item:hover {{ border-color: var(--primary-color); color: var(--primary-color); }}
 
-        .type-badge {{ font-size: 0.6rem; padding: 2px 6px; border-radius: 2px; font-weight: bold; font-family: 'JetBrains Mono'; background: #333; color: white; }}
-        .historical {{ background: #666; }}
+        /* Types Colors */
+        .type-NEWSLETTER {{ border-left-color: #ffff00; }}
+        .type-DEEP_DIVE {{ border-left-color: #cc0000; }}
+        .type-MARKET_PULSE {{ border-left-color: #00f3ff; }}
+        .type-HISTORICAL {{ border-left-color: #666; }}
     </style>
-    <script>
-        function filterArchive() {{
-            const input = document.getElementById('searchInput').value.toLowerCase();
-            const yearFilter = document.getElementById('yearFilter').value;
-            const items = document.querySelectorAll('.archive-item');
-            const headers = document.querySelectorAll('.year-header');
-
-            items.forEach(item => {{
-                const title = item.getAttribute('data-title');
-                const year = item.getAttribute('data-year');
-
-                let matchesSearch = title.includes(input);
-                let matchesYear = (yearFilter === 'ALL') || (year === yearFilter) || (yearFilter === 'HISTORICAL' && year === 'HISTORICAL');
-
-                if (matchesSearch && matchesYear) {{
-                    item.style.display = 'flex';
-                }} else {{
-                    item.style.display = 'none';
-                }}
-            }});
-        }}
-    </script>
 </head>
 <body>
-    <div class="scan-line"></div>
     <header class="cyber-header">
         <div style="display: flex; align-items: center; gap: 20px;">
-            <h1 class="mono" style="margin: 0; font-size: 1.5rem; color: var(--accent-color); letter-spacing: 2px;">MARKET MAYHEM</h1>
-            <div class="mono" style="font-size: 0.8rem; color: #666; border-left: 1px solid #333; padding-left: 10px;">DEEP ARCHIVE</div>
+            <i class="fas fa-archive text-cyan-400"></i>
+            <h1 class="mono" style="margin: 0; font-size: 1.2rem; letter-spacing: 1px;">MARKET MAYHEM ARCHIVE</h1>
         </div>
-        <nav><a href="index.html" class="cyber-btn">&larr; MISSION CONTROL</a></nav>
+        <div class="mono" style="font-size: 0.8rem; color: #666;">v23.5.0</div>
     </header>
-    <main>
-        <div class="archive-list">
-            {list_html}
-        </div>
-        <div style="text-align: center; margin: 60px 0; color: #444; font-family: 'JetBrains Mono'; font-size: 0.7rem;">
-            END OF TRANSMISSION
-        </div>
-    </main>
+
+    <div class="dashboard-grid">
+        <aside class="filters-panel">
+            <div class="filter-group">
+                <label class="filter-label">Search Intelligence</label>
+                <input type="text" id="searchInput" placeholder="Keywords..." class="filter-select" onkeyup="applyFilters()">
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">Fiscal Year</label>
+                <select id="yearFilter" class="filter-select" onchange="applyFilters()">
+                    <option value="ALL">ALL YEARS</option>
+                    {"".join([f'<option value="{y}">{y}</option>' for y in sorted(grouped.keys(), reverse=True)])}
+                    <option value="HISTORICAL">HISTORICAL</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">Report Type</label>
+                <select id="typeFilter" class="filter-select" onchange="applyFilters()">
+                    <option value="ALL">ALL TYPES</option>
+                    <option value="NEWSLETTER">Newsletter</option>
+                    <option value="DEEP_DIVE">Deep Dive</option>
+                    <option value="COMPANY_REPORT">Company Report</option>
+                    <option value="MARKET_PULSE">Market Pulse</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">Top Entities</label>
+                <div>
+                    {"".join([f'<span class="tag-cloud-item" onclick="setSearch(\'${t[0]}\')">${t[0]}</span>' for t in ticker_counts])}
+                </div>
+            </div>
+        </aside>
+
+        <main class="content-panel">
+            <div class="chart-container">
+                <canvas id="sentimentChart"></canvas>
+            </div>
+
+            <div id="archiveGrid">
+    """
+
+    # Inject Items
+    for year in sorted(grouped.keys(), reverse=True):
+        for item in grouped[year]:
+            archive_html += f"""
+            <div class="archive-item type-{item['type']}" data-year="{year}" data-type="{item['type']}" data-title="{item['title'].lower()} {item['summary'].lower()}">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">{item['date']}</span>
+                        <span class="type-badge">{item['type']}</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: {item['sentiment_score']}</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">{item['title']}</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">{item['summary']}</p>
+                </div>
+                <a href="{item['filename']}" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+            """
+
+    # Historical
+    for item in historical:
+         archive_html += f"""
+            <div class="archive-item type-HISTORICAL" data-year="HISTORICAL" data-type="HISTORICAL" data-title="{item['title'].lower()}">
+                <div style="flex-grow: 1;">
+                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">{item['date']}</span>
+                        <span class="type-badge">HISTORICAL</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">{item['title']}</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">{item['summary']}</p>
+                </div>
+                 <a href="{item['filename']}" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+            """
+
+    archive_html += """
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Chart Initialization
+        const ctx = document.getElementById('sentimentChart').getContext('2d');
+        const chartData = {
+            labels: """ + json.dumps(dates) + """,
+            datasets: [{
+                label: 'Market Sentiment Index',
+                data: """ + json.dumps(sentiments) + """,
+                borderColor: '#00f3ff',
+                backgroundColor: 'rgba(0, 243, 255, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'line',
+            data: chartData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: '#ccc', font: { family: 'JetBrains Mono' } } },
+                    title: { display: true, text: 'SENTIMENT TIMELINE', color: '#888', font: { family: 'JetBrains Mono' } }
+                },
+                scales: {
+                    y: { grid: { color: '#333' }, ticks: { color: '#666' } },
+                    x: { grid: { color: '#333' }, ticks: { display: false } }
+                }
+            }
+        });
+
+        // Filter Logic
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const year = document.getElementById('yearFilter').value;
+            const type = document.getElementById('typeFilter').value;
+
+            const items = document.querySelectorAll('.archive-item');
+
+            items.forEach(item => {
+                const itemYear = item.dataset.year;
+                const itemType = item.dataset.type;
+                const itemText = item.dataset.title;
+
+                let matchSearch = itemText.includes(search);
+                let matchYear = year === 'ALL' || itemYear === year;
+                let matchType = type === 'ALL' || itemType === type;
+
+                item.style.display = (matchSearch && matchYear && matchType) ? 'flex' : 'none';
+            });
+        }
+
+        function setSearch(term) {
+            document.getElementById('searchInput').value = term;
+            applyFilters();
+        }
+    </script>
 </body>
 </html>
     """
 
     with open(ARCHIVE_FILE, "w", encoding='utf-8') as f:
-        f.write(page_html)
-    print(f"Archive Index Updated: {ARCHIVE_FILE}")
+        f.write(archive_html)
+    print(f"Archive Updated: {ARCHIVE_FILE}")
 
 if __name__ == "__main__":
     generate_archive()
