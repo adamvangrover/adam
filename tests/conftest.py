@@ -50,7 +50,7 @@ if "facebook_scraper" not in sys.modules:
 if "torch._dynamo" not in sys.modules:
     mock_dynamo = create_magic_mock_module("torch._dynamo")
     # Make disable() a pass-through decorator
-    mock_dynamo.disable = MagicMock(side_effect=lambda fn=None, recursive=True: (lambda x: x) if fn is None else fn)
+    mock_dynamo.disable = MagicMock(side_effect=lambda fn=None, recursive=True, **kwargs: (lambda x: x) if fn is None else fn)
     sys.modules["torch._dynamo"] = mock_dynamo
 
 # We can also mock core.llm_plugin to avoid API key checks during collection/init
