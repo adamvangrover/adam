@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v23.5 :: EVOLUTION HUB</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/nav.js" defer></script>
+    <style>
+        :root {
+            --primary-color: #00f3ff;
+            --accent-color: #cc0000;
+            --bg-color: #050b14;
+            --panel-bg: rgba(15, 23, 42, 0.6);
+            --text-primary: #e0e0e0;
+        }
+        body { margin: 0; background: var(--bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .cyber-header {
+            height: 60px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; border-bottom: 1px solid #333;
+            background: rgba(5, 11, 20, 0.95); position: sticky; top: 0; z-index: 100;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            font-family: 'JetBrains Mono';
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+            margin-bottom: 60px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #333;
+            transform: translateX(-50%);
+        }
+        .timeline-item {
+            position: relative;
+            width: 50%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .timeline-item:nth-child(odd) { left: 0; text-align: right; border-right: 2px solid var(--primary-color); }
+        .timeline-item:nth-child(even) { left: 50%; text-align: left; border-left: 2px solid var(--accent-color); }
+
+        .timeline-content {
+            background: rgba(255,255,255,0.03);
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 4px;
+        }
+        .timeline-date { color: #888; font-size: 0.8rem; font-family: 'JetBrains Mono'; }
+        .timeline-title { color: #fff; font-size: 1.2rem; margin: 5px 0; }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 60px;
+        }
+        .metric-card {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid #333;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        /* Constraints */
+        .constraints-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .constraint-card {
+            background: rgba(204, 0, 0, 0.05);
+            border: 1px solid #cc0000;
+            padding: 20px;
+        }
+        .constraint-icon { color: #cc0000; font-size: 1.5rem; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <header class="cyber-header">
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <i class="fas fa-dna text-cyan-400"></i>
+            <h1 class="mono" style="margin: 0; font-size: 1.2rem; letter-spacing: 1px;">ADAM EVOLUTION HUB</h1>
+        </div>
+        <a href="index.html" class="mono" style="font-size: 0.8rem; color: #666; text-decoration:none;">&larr; MISSION CONTROL</a>
+    </header>
+
+    <div class="container">
+
+        <!-- Section 1: Timeline -->
+        <h2 class="section-title">System Phylogeny</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <span class="timeline-date">2023 - Q1</span>
+                    <h3 class="timeline-title">v21.0: The Genesis Script</h3>
+                    <p>Single-file Python script. Hardcoded rules. Linear execution. The "Adam" prototype focused on basic RSS parsing and keyword matching.</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <span class="timeline-date">2023 - Q3</span>
+                    <h3 class="timeline-title">v22.0: Modular Intelligence</h3>
+                    <p>Introduction of `core/` architecture. Separation of concerns (Data vs Logic). First integration of LLM prompts for summarization.</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <span class="timeline-date">2024 - Q2</span>
+                    <h3 class="timeline-title">v23.0: The Agent Swarm</h3>
+                    <p>Transition to multi-agent architecture. Specialized agents (Financial, Risk, Sentiment) collaborating via a central message bus. Introduction of the "Showcase" UI.</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <span class="timeline-date">2025 - Q1 (Current)</span>
+                    <h3 class="timeline-title">v23.5: Quantum & Cognitive Fabric</h3>
+                    <p>Implementation of "Quantum State" tracking (Entropy). Self-reflective loops. Enhanced visualization (Cyber-HUD). Deep Archive integration.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Metrics -->
+        <h2 class="section-title">Performance Telemetry</h2>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <canvas id="complexityChart"></canvas>
+            </div>
+            <div class="metric-card">
+                <canvas id="cognitiveChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Section 3: Constraints -->
+        <h2 class="section-title" style="color: #cc0000; border-color: #cc0000;">Operational Constraints & Boundaries</h2>
+        <div class="constraints-grid">
+            <div class="constraint-card">
+                <i class="fas fa-hand-paper constraint-icon"></i>
+                <h3 class="mono">NO TRADE EXECUTION</h3>
+                <p>The system is strictly prohibited from executing live market orders. All outputs are simulated or advisory. "Human-in-the-loop" is hardcoded for any transaction logic.</p>
+            </div>
+            <div class="constraint-card">
+                <i class="fas fa-brain constraint-icon"></i>
+                <h3 class="mono">CONTEXT WINDOW LIMITS</h3>
+                <p>Cognitive depth is bounded by the underlying LLM context window (currently 128k tokens). Recursive summarization is used to mitigate information loss over long time horizons.</p>
+            </div>
+            <div class="constraint-card">
+                <i class="fas fa-network-wired constraint-icon"></i>
+                <h3 class="mono">DATA LATENCY</h3>
+                <p>Real-time feeds operate with a variable latency (15-60s) due to processing overhead in the Agent Swarm consensus layer. Not suitable for HFT.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Complexity Chart (Lines of Code / Modules)
+        new Chart(document.getElementById('complexityChart'), {
+            type: 'line',
+            data: {
+                labels: ['v21', 'v22', 'v23', 'v23.5'],
+                datasets: [{
+                    label: 'System Complexity (Modules)',
+                    data: [5, 12, 45, 82],
+                    borderColor: '#00f3ff',
+                    backgroundColor: 'rgba(0, 243, 255, 0.1)',
+                    fill: true
+                }]
+            },
+            options: {
+                plugins: {
+                    title: { display: true, text: 'ARCHITECTURAL COMPLEXITY', color: '#888' },
+                    legend: { labels: { color: '#ccc' } }
+                },
+                scales: {
+                    y: { grid: { color: '#333' }, ticks: { color: '#666' } },
+                    x: { grid: { color: '#333' }, ticks: { color: '#666' } }
+                }
+            }
+        });
+
+        // Cognitive Chart (Inference Ops)
+        new Chart(document.getElementById('cognitiveChart'), {
+            type: 'bar',
+            data: {
+                labels: ['v21', 'v22', 'v23', 'v23.5'],
+                datasets: [{
+                    label: 'Cognitive Throughput (Ops/Sec)',
+                    data: [0, 5, 120, 450],
+                    backgroundColor: '#cc0000',
+                }]
+            },
+            options: {
+                plugins: {
+                    title: { display: true, text: 'COGNITIVE GENERATION RATE', color: '#888' },
+                    legend: { labels: { color: '#ccc' } }
+                },
+                scales: {
+                    y: { grid: { color: '#333' }, ticks: { color: '#666' } },
+                    x: { grid: { color: '#333' }, ticks: { color: '#666' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
