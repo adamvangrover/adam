@@ -39,14 +39,21 @@ class AlignFutureSimulator:
 
     def scan_repository(self):
         """Scans the repository to populate the quantum lattice (Qubits)."""
-        agents_dir = self.repo_root / "core" / "agents"
-        if not agents_dir.exists():
-            return
+        scan_paths = [
+            self.repo_root / "core" / "agents",
+            self.repo_root / "core" / "simulations",
+            self.repo_root / "core" / "workflows",
+            self.repo_root / "core" / "financial_data"
+        ]
 
-        for root, _, files in os.walk(agents_dir):
-            for file in files:
-                if file.endswith(".py") and not file.startswith("__"):
-                    self._process_file(Path(root) / file)
+        for path in scan_paths:
+            if not path.exists():
+                continue
+
+            for root, _, files in os.walk(path):
+                for file in files:
+                    if file.endswith(".py") and not file.startswith("__"):
+                        self._process_file(Path(root) / file)
 
         # Create mock entanglements based on "coupling"
         self._entangle_system()
@@ -62,6 +69,15 @@ class AlignFutureSimulator:
             # Normalize complexity to 0-1 range (assuming max file is ~500 lines)
             complexity = min(loc / 500.0, 1.0)
 
+            # Determine Type based on path
+            type_label = "Module"
+            if "agents" in str(filepath):
+                type_label = "Agent"
+            elif "simulations" in str(filepath):
+                type_label = "Simulation"
+            elif "workflows" in str(filepath):
+                type_label = "Workflow"
+
             # Extract class names
             for node in ast.walk(tree):
                 if isinstance(node, ast.ClassDef):
@@ -69,7 +85,7 @@ class AlignFutureSimulator:
                     # Create Qubit
                     self.qubits[entity_name] = QuantumEntity(
                         name=entity_name,
-                        type_label="Agent",
+                        type_label=type_label,
                         complexity=complexity
                     )
         except Exception as e:

@@ -3,15 +3,26 @@ import time
 import random
 import os
 import sys
+import importlib.util
 from datetime import datetime, timedelta
 
 # Ensure python path includes repo root for imports
 sys.path.append(os.getcwd())
 
+# Dynamic import to bypass core.simulations.__init__ dependencies
 try:
-    from core.simulations.align_future_simulator import AlignFutureSimulator
-except ImportError as e:
-    print(f"Warning: Could not import AlignFutureSimulator. Dependencies might be missing: {e}")
+    # Check if file exists first
+    sim_path = "core/simulations/align_future_simulator.py"
+    if os.path.exists(sim_path):
+        spec = importlib.util.spec_from_file_location("align_future_simulator", sim_path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        AlignFutureSimulator = module.AlignFutureSimulator
+    else:
+        print(f"Warning: File {sim_path} not found.")
+        AlignFutureSimulator = None
+except Exception as e:
+    print(f"Warning: Could not import AlignFutureSimulator: {e}")
     AlignFutureSimulator = None
 
 def generate_quantum_provenance():
