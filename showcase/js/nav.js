@@ -131,6 +131,9 @@ class AdamNavigator {
             { name: 'Chat Portal', icon: 'fa-comments', link: 'chat.html' },
             { name: 'Terminal', icon: 'fa-terminal', link: 'terminal.html' },
             { type: 'divider' },
+            { name: 'System Evolution', icon: 'fa-history', link: 'evolution.html' }, // Added
+            { name: 'Market Archive', icon: 'fa-archive', link: 'market_mayhem_archive.html' }, // Added
+            { type: 'divider' },
             { name: 'Trading Platform', icon: 'fa-chart-line', link: 'trading.html' },
             { name: 'Robo Advisor', icon: 'fa-robot', link: 'robo_advisor.html' },
             { name: 'Research Lab', icon: 'fa-flask', link: 'research.html' },

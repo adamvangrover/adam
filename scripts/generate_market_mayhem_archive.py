@@ -694,6 +694,25 @@ def generate_archive_page(items):
         "summary": i["summary"]
     } for i in items])
 
+    # Agent Portfolio Generation
+    agent_portfolio = {}
+    for item in items:
+        if item.get("related_agents"):
+            for agent in item["related_agents"]:
+                if agent not in agent_portfolio: agent_portfolio[agent] = []
+                agent_portfolio[agent].append({
+                    "title": item["title"],
+                    "date": item["date"],
+                    "type": item["type"],
+                    "filename": item["filename"]
+                })
+
+    portfolio_path = os.path.join(OUTPUT_DIR, "data", "agent_portfolio.json")
+    os.makedirs(os.path.dirname(portfolio_path), exist_ok=True)
+    with open(portfolio_path, "w", encoding='utf-8') as f:
+        json.dump(agent_portfolio, f, indent=2)
+    print(f"Generated Agent Portfolio: {portfolio_path}")
+
     # HTML Construction
     # (Simplified for brevity, but including the JSON data injection)
 

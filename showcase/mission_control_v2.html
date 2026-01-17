@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v23.5 :: MISSION CONTROL V2</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #00f3ff;
+            --accent-color: #0aff60;
+            --bg-color: #050b14;
+            --panel-bg: rgba(5, 11, 20, 0.8);
+            --text-primary: #e0e0e0;
+            --text-muted: #888;
+            --panel-border: #333;
+        }
+        body { margin: 0; background: var(--bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Header Styling */
+        .cyber-header {
+            height: 60px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; border-bottom: 1px solid var(--primary-color);
+            background: rgba(5, 11, 20, 0.95); position: sticky; top: 0; z-index: 100;
+        }
+
+        /* Effects */
+        .scan-line { position: fixed; top: 0; left: 0; width: 100%; height: 2px; background: rgba(0, 243, 255, 0.1); animation: scan 3s linear infinite; pointer-events: none; z-index: 999; }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+
+        a { text-decoration: none; color: inherit; transition: color 0.2s; }
+        a:hover { color: var(--primary-color); }
+
+        /* Components */
+        .mode-badge { padding: 4px 8px; border: 1px solid #ffa500; color: #ffa500; font-size: 0.75rem; border-radius: 4px; font-weight: bold; white-space: nowrap; }
+
+        .cyber-btn {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            padding: 6px 12px;
+            border: 1px solid #444;
+            color: var(--text-primary);
+            background: rgba(0,0,0,0.3);
+            border-radius: 2px;
+            text-transform: uppercase;
+        }
+        .cyber-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--panel-border);
+            backdrop-filter: blur(5px);
+        }
+    </style>
+</head>
+<body>
+    <div class="scan-line"></div>
+
+    <header class="cyber-header">
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <h1 class="mono" style="margin: 0; font-size: 1.5rem; color: var(--primary-color); letter-spacing: 2px;">ADAM v23.5</h1>
+            <div class="mono" style="font-size: 0.8rem; color: #666; border-left: 1px solid #333; padding-left: 10px;">UNIFIED FINANCIAL OS</div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <nav style="display: flex; gap: 10px;">
+                <a href="../index.html" class="cyber-btn">&uarr; UP LEVEL</a>
+                <a href="../index.html" class="cyber-btn">LIVE OPERATIONS</a>
+                <a href="analyst_os.html" class="cyber-btn" style="border-color: var(--accent-color); color: var(--accent-color);">LAUNCH ANALYST OS</a>
+                <a href="https://github.com/adamvangrover/adam" class="cyber-btn" target="_blank">GITHUB</a>
+            </nav>
+            <div class="mode-badge">ARCHIVE MODE</div>
+        </div>
+    </header>
+
+    <div style="display: flex; min-height: calc(100vh - 60px);">
+        <aside class="glass-panel" style="width: 260px; border-right: 1px solid var(--panel-border); padding: 20px; font-size: 0.9rem; flex-shrink: 0;">
+            <h3 class="mono" style="margin-top: 0; font-size: 0.8rem; color: var(--primary-color); border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 15px;">
+                /// DIRECTORY INDEX
+            </h3>
+            <ul style="list-style: none; padding: 0; margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;">
+                <li style="margin-bottom: 8px;"><span style="margin-right:8px;">🖥️</span> <a href="analyst_os.html" style="color: var(--accent-color); font-weight: bold;">analyst_os.html</a></li>
+                <li style="margin-bottom: 8px;"><span style="margin-right:8px;">📟</span> <a href="terminal_profile.html" style="color: var(--primary-color); font-weight: bold;">terminal_profile.html</a></li>
+                <li style="margin-bottom: 8px;"><span style="margin-right:8px; opacity:0.7;">📂</span> <a href="apps/" style="color: var(--primary-color);">apps/</a></li>
+                <li style="margin-bottom: 8px;"><span style="margin-right:8px; opacity:0.7;">📂</span> <a href="css/index.html" style="color: var(--primary-color);">css/</a></li>
+                <li style="margin-bottom: 8px;"><span style="margin-right:8px; opacity:0.7;">📂</span> <a href="data/index.html" style="color: var(--primary-color);">data/</a></li>
+                <li style="margin-bottom: 8px;"><span style="margin-right:8px; opacity:0.7;">📂</span> <a href="js/index.html" style="color: var(--primary-color);">js/</a></li>
+                <li style="margin-bottom: 6px; padding-top:10px; border-top: 1px dashed #333;"><span style="margin-right:8px; opacity:0.5;">📄</span> <a href="agents.html" style="color: var(--text-muted);">agents.html</a></li>
+                <li style="margin-bottom: 6px;"><span style="margin-right:8px; opacity:0.5;">📄</span> <a href="graph.html" style="color: var(--text-muted);">graph.html</a></li>
+                <li style="margin-bottom: 6px;"><span style="margin-right:8px; opacity:0.5;">📄</span> <a href="reports.html" style="color: var(--text-muted);">reports.html</a></li>
+                <li style="margin-bottom: 6px;"><span style="margin-right:8px; opacity:0.5;">📄</span> <a href="research.html" style="color: var(--text-muted);">research.html</a></li>
+                <li style="margin-bottom: 6px;"><span style="margin-right:8px; opacity:0.5;">📄</span> <a href="trading.html" style="color: var(--text-muted);">trading.html</a></li>
+            </ul>
+        </aside>
+
+        <main style="flex-grow: 1; padding: 40px;">
+            <h2 class="mono" style="color: var(--primary-color); border-bottom: 1px solid #333; padding-bottom: 10px;">SYSTEM ARCHIVE</h2>
+            <p style="color: #ccc; max-width: 800px; line-height: 1.6; margin-bottom: 30px;">
+                Welcome to the Adam v23.5 Static Archive. This repository contains historical artifacts, agent logs, and system snapshots.
+                For real-time analysis and active agent operations, switch to <strong>LIVE MODE</strong> or launch the new Analyst OS below.
+            </p>
+
+            <div class="glass-panel" style="border-radius: 4px; padding: 25px; border: 1px solid var(--accent-color); background: rgba(10, 255, 96, 0.02); margin-bottom: 40px;">
+                <h3 style="margin-top:0; color: var(--accent-color); font-family: 'JetBrains Mono';">NEW: ADAM Analyst OS</h3>
+                <p style="font-size: 0.9rem;">A Client-Side, Privacy-First Financial Workbench ("The Bloomberg Killer Lite").</p>
+                <div style="margin-top: 15px;">
+                    <a href="analyst_os.html" class="cyber-btn" style="background: rgba(10,255,96,0.1); border-color: var(--accent-color); color: var(--accent-color);">LAUNCH DESKTOP &rarr;</a>
+                </div>
+            </div>
+
+            <div class="glass-panel" style="border-radius: 4px; padding: 25px; border: 1px solid var(--primary-color); background: rgba(6, 182, 212, 0.02); margin-bottom: 40px;">
+                <h3 style="margin-top:0; color: var(--primary-color); font-family: 'JetBrains Mono';">LIVE: Agentic Terminal</h3>
+                <p style="font-size: 0.9rem;">Interact with Adam's capabilities directly via the MCP-powered terminal.</p>
+                <div style="margin-top: 15px;">
+                    <a href="terminal_profile.html" class="cyber-btn" style="background: rgba(6, 182, 212, 0.1); border-color: var(--primary-color); color: var(--primary-color);">OPEN TERMINAL &rarr;</a>
+                </div>
+            </div>
+
+            <!-- System Status Widget -->
+            <div class="glass-panel" style="margin-bottom: 40px; padding: 15px; border-top: 2px solid #bd00ff; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <h4 class="mono" style="margin:0; color:#bd00ff;">SYSTEM EVOLUTION STATUS</h4>
+                    <span style="font-size:0.8rem; color:#888;">Current Version: v2.0 (Swarm) | Active Agents: 35+</span>
+                </div>
+                <a href="evolution_v2.html" class="cyber-btn" style="border-color:#bd00ff; color:#bd00ff;">VIEW TIMELINE &rarr;</a>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
+                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
+                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: var(--accent-color);">CREDIT & VALUATION</h3>
+                    <p style="font-size: 0.8rem; color: #ccc;">Analyst OS Architect v6.2</p>
+                    <a href="credit_valuation_architect.html" style="color: var(--primary-color); font-size: 0.8rem;">LAUNCH ARCHITECT &rarr;</a>
+                </div>
+
+                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
+                    <h3 class="mono" style="margin-top: 0; font-size: 1rem; color: #cc0000;">MARKET MAYHEM</h3>
+                    <p style="font-size: 0.8rem; color: #ccc;">Strategic Intelligence Archive</p>
+                    <a href="archive_v2/index.html" style="color: var(--primary-color); font-size: 0.8rem;">ACCESS ARCHIVE &rarr;</a>
+                </div>
+
+                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
+                    <h3 class="mono" style="margin-top: 0; font-size: 1rem;">LATEST ARTIFACT</h3>
+                    <p style="font-size: 0.8rem; color: #888;">market_mayhem_dec_2025.json</p>
+                    <a href="data/market_mayhem_dec_2025.json" target="_blank" style="color: var(--primary-color); font-size: 0.8rem;">VIEW JSON &rarr;</a>
+                </div>
+
+                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
+                    <h3 class="mono" style="margin-top: 0; font-size: 1rem;">ACTIVE NODES</h3>
+                    <p style="font-size: 0.8rem; color: #888;">Knowledge Graph: 12,405 Entities</p>
+                    <a href="graph.html" style="color: var(--primary-color); font-size: 0.8rem;">EXPLORE MAP &rarr;</a>
+                </div>
+
+                <div style="border: 1px solid #333; padding: 20px; background: rgba(0,0,0,0.2);">
+                    <h3 class="mono" style="margin-top: 0; font-size: 1rem;">INSTITUTIONAL RADAR</h3>
+                    <p style="font-size: 0.8rem; color: #888;">13F Trend Monitor & Synthesis</p>
+                    <a href="institutional_radar.html" style="color: var(--primary-color); font-size: 0.8rem;">LAUNCH RADAR &rarr;</a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Adam Global Nav -->
+    <script src="../showcase/js/nav.js" data-root=".."></script>
+<script src="js/command_palette.js"></script></body>
+</html>
