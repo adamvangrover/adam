@@ -36,6 +36,7 @@ from core.agents.sense_weaver import SenseWeaver
 from core.agents.snc_analyst_agent import SNCAnalystAgent  # Added import
 from core.agents.behavioral_economics_agent import BehavioralEconomicsAgent
 from core.agents.meta_cognitive_agent import MetaCognitiveAgent
+from core.agents.black_swan_agent import BlackSwanAgent
 
 from pydantic import ValidationError
 from core.schemas.config_schema import AgentsYamlConfig
@@ -87,6 +88,7 @@ AGENT_CLASSES = {
     "SNCAnalystAgent": "core.agents.snc_analyst_agent",
     "BehavioralEconomicsAgent": "core.agents.behavioral_economics_agent",
     "MetaCognitiveAgent": "core.agents.meta_cognitive_agent",
+    "BlackSwanAgent": BlackSwanAgent,
     "NewsBotAgent": "core.agents.news_bot",
     "NexusAgent": NexusAgent,
     "IngestionAgent": AgentBase,  # Using AgentBase as a placeholder
@@ -116,6 +118,7 @@ AGENT_CLASSES = {
     "snc_analyst_agent": "core.agents.snc_analyst_agent",
     "behavioral_economics_agent": "core.agents.behavioral_economics_agent",
     "meta_cognitive_agent": "core.agents.meta_cognitive_agent",
+    "black_swan_agent": BlackSwanAgent,
     "news_bot_agent": "core.agents.news_bot",
 
     # Placeholders for agents that might be missing or under development but referenced in config

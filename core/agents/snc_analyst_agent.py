@@ -139,7 +139,8 @@ class SNCAnalystAgent(AgentBase):
             financial_analysis_result,
             qualitative_analysis_result,
             credit_risk_mitigation_info,
-            economic_data_context
+            economic_data_context,
+            industry_data_context
         )
 
         self._log_audit_event("RATING_DETERMINED", {
@@ -185,6 +186,7 @@ class SNCAnalystAgent(AgentBase):
             "profitability": key_ratios.get("net_profit_margin"),
             "liquidity_ratio": key_ratios.get("current_ratio"),
             "interest_coverage": key_ratios.get("interest_coverage_ratio"),
+            "tier_1_capital_ratio": key_ratios.get("tier_1_capital_ratio"),
             **sk_financial_inputs
         }
         logging.debug(f"SNC_FIN_ANALYSIS_OUTPUT: {analysis_result}")
@@ -262,7 +264,7 @@ class SNCAnalystAgent(AgentBase):
 
         return None, "SK assessments did not map to a definitive rating."
 
-    def _rate_from_fallback_logic(self, financial_analysis: Dict[str, Any], qualitative_analysis: Dict[str, Any], credit_risk_mitigation: Dict[str, Any]) -> Tuple[Optional[SNCRating], str]:
+    def _rate_from_fallback_logic(self, financial_analysis: Dict[str, Any], qualitative_analysis: Dict[str, Any], credit_risk_mitigation: Dict[str, Any], sector_name: str = "General", market_data: Dict[str, Any] = None) -> Tuple[Optional[SNCRating], str]:
         """Provides a rating based on hardcoded financial metrics if SK fails."""
 
         # 1. Use Compliance Validators first
@@ -272,11 +274,12 @@ class SNCAnalystAgent(AgentBase):
                 "debt_to_equity_ratio": financial_analysis.get("debt_to_equity"),
                 "net_profit_margin": financial_analysis.get("profitability"),
                 "current_ratio": financial_analysis.get("liquidity_ratio"),
-                "interest_coverage_ratio": financial_analysis.get("interest_coverage")
+                "interest_coverage_ratio": financial_analysis.get("interest_coverage"),
+                "tier_1_capital_ratio": financial_analysis.get("tier_1_capital_ratio")
             }
         }
 
-        compliance_result = evaluate_compliance(compliance_input)
+        compliance_result = evaluate_compliance(compliance_input, sector_name=sector_name, market_data=market_data)
         self._log_audit_event("COMPLIANCE_CHECK", {
             "passed": compliance_result.passed,
             "violations": compliance_result.violations
@@ -352,7 +355,8 @@ class SNCAnalystAgent(AgentBase):
                                 financial_analysis: Dict[str, Any],
                                 qualitative_analysis: Dict[str, Any],
                                 credit_risk_mitigation: Dict[str, Any],
-                                economic_data_context: Dict[str, Any]
+                                economic_data_context: Dict[str, Any],
+                                industry_data_context: Dict[str, Any]
                                 ) -> Tuple[Optional[SNCRating], str]:
         logging.debug(f"SNC_DETERMINE_RATING_INPUT: company='{company_name}'")
 
@@ -452,11 +456,17 @@ class SNCAnalystAgent(AgentBase):
                     "debt_to_equity_ratio": financial_analysis.get("debt_to_equity"),
                     "net_profit_margin": financial_analysis.get("profitability"),
                     "current_ratio": financial_analysis.get("liquidity_ratio"),
-                    "interest_coverage_ratio": financial_analysis.get("interest_coverage")
+                    "interest_coverage_ratio": financial_analysis.get("interest_coverage"),
+                    "tier_1_capital_ratio": financial_analysis.get("tier_1_capital_ratio")
                 }
              }
 
-             compliance_result = evaluate_compliance(compliance_input)
+             sector_name = industry_data_context.get('sector', 'General')
+             market_data = {
+                "vix": economic_data_context.get('vix') or economic_data_context.get('volatility_index')
+             }
+
+             compliance_result = evaluate_compliance(compliance_input, sector_name=sector_name, market_data=market_data)
              self._log_audit_event("COMPLIANCE_CHECK_PRIMARY", {
                 "passed": compliance_result.passed,
                 "violations": compliance_result.violations,
@@ -474,10 +484,16 @@ class SNCAnalystAgent(AgentBase):
         # Fallback path: If SK skills did not yield a rating, use hardcoded financial logic
         if rating is None:
             logging.warning(f"SK-based rating was inconclusive for {company_name}. Using fallback logic.")
+            sector_name = industry_data_context.get('sector', 'General')
+            market_data = {
+                "vix": economic_data_context.get('vix') or economic_data_context.get('volatility_index')
+            }
             rating, final_rationale = self._rate_from_fallback_logic(
                 financial_analysis,
                 qualitative_analysis,
-                credit_risk_mitigation
+                credit_risk_mitigation,
+                sector_name=sector_name,
+                market_data=market_data
             )
         else:
             # Synthesize a comprehensive rationale if the primary path was successful
