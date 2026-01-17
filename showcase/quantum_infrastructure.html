@@ -117,19 +117,35 @@
                 </div>
             </div>
 
-            <!-- Right Col: Provenance Log -->
-            <div class="md:col-span-4 flex flex-col quantum-panel rounded-lg min-h-0">
-                <div class="p-3 border-b border-cyan-900/30 bg-black/20 flex justify-between items-center">
-                    <span class="text-xs font-bold text-cyan-500"><i class="fas fa-history mr-2"></i>DATA PROVENANCE LOG</span>
-                    <span class="text-[10px] text-slate-500" id="log-count">0 EVENTS</span>
+            <!-- Right Col: Runtime & Logs -->
+            <div class="md:col-span-4 flex flex-col gap-4 min-h-0">
+
+                <!-- Live Search Runtime -->
+                <div class="h-1/3 quantum-panel rounded-lg flex flex-col min-h-0 relative overflow-hidden">
+                    <div class="p-2 border-b border-cyan-900/30 bg-black/20 flex justify-between items-center">
+                        <span class="text-xs font-bold text-cyan-500"><i class="fas fa-search mr-2"></i>LIVE SEARCH RUNTIME</span>
+                        <span class="text-[10px] text-emerald-400 animate-pulse">ACTIVE</span>
+                    </div>
+                    <div id="search-runtime-container" class="flex-1 p-3 text-xs font-mono overflow-hidden relative space-y-2">
+                         <!-- Injected queries -->
+                    </div>
+                     <div class="absolute bottom-0 left-0 w-full h-8 bg-gradient-to-t from-slate-900 to-transparent pointer-events-none"></div>
                 </div>
-                <div id="provenance-feed" class="flex-1 overflow-y-auto p-3 font-mono text-xs custom-scrollbar space-y-1">
-                    <!-- Logs injected here -->
-                    <div class="text-slate-500 text-center mt-10">Waiting for data stream...</div>
-                </div>
-                <div class="p-2 border-t border-cyan-900/30 bg-black/20 text-[10px] text-slate-500 flex justify-between">
-                    <span>HASH VALIDATION: ACTIVE</span>
-                    <span><i class="fas fa-lock text-emerald-500"></i> SECURE</span>
+
+                <!-- Provenance Log -->
+                <div class="flex-1 flex flex-col quantum-panel rounded-lg min-h-0">
+                    <div class="p-3 border-b border-cyan-900/30 bg-black/20 flex justify-between items-center">
+                        <span class="text-xs font-bold text-cyan-500"><i class="fas fa-history mr-2"></i>DATA PROVENANCE LOG</span>
+                        <span class="text-[10px] text-slate-500" id="log-count">0 EVENTS</span>
+                    </div>
+                    <div id="provenance-feed" class="flex-1 overflow-y-auto p-3 font-mono text-xs custom-scrollbar space-y-1">
+                        <!-- Logs injected here -->
+                        <div class="text-slate-500 text-center mt-10">Waiting for data stream...</div>
+                    </div>
+                    <div class="p-2 border-t border-cyan-900/30 bg-black/20 text-[10px] text-slate-500 flex justify-between">
+                        <span>HASH VALIDATION: ACTIVE</span>
+                        <span><i class="fas fa-lock text-emerald-500"></i> SECURE</span>
+                    </div>
                 </div>
             </div>
 
@@ -184,18 +200,31 @@
                 logContainer.appendChild(el);
             });
 
-            // 3. Render Infrastructure Nodes
+            // 3. Render Infrastructure Nodes & Topology
             const infraContainer = document.getElementById('infra-container');
+            infraContainer.style.position = 'relative'; // Ensure positioning context
+            infraContainer.innerHTML = ''; // Clear
+
+            // SVG Layer for connections
+            const svgNS = "http://www.w3.org/2000/svg";
+            const svg = document.createElementNS(svgNS, "svg");
+            svg.setAttribute("class", "absolute top-0 left-0 w-full h-full pointer-events-none z-0");
+            infraContainer.appendChild(svg);
+
             const iconMap = {
                 'cloud': 'fa-cloud',
                 'quantum': 'fa-atom',
                 'edge': 'fa-server'
             };
 
+            // Map for node elements to draw lines
+            const nodeElements = {};
+
             data.infrastructure.nodes.forEach(node => {
                 const div = document.createElement('div');
-                div.className = `node flex flex-col items-center gap-2 p-3 rounded bg-slate-800/50 border border-slate-700/50 min-w-[100px] z-10 relative`;
+                div.className = `node flex flex-col items-center gap-2 p-3 rounded bg-slate-800/50 border border-slate-700/50 min-w-[100px] z-10 relative bg-opacity-80 backdrop-blur-sm`;
                 if(node.type === 'quantum') div.classList.add('border-cyan-500', 'shadow-[0_0_15px_rgba(6,182,212,0.3)]');
+                div.id = `node-${node.id}`;
 
                 div.innerHTML = `
                     <div class="text-2xl ${node.type === 'quantum' ? 'text-cyan-400 animate-spin-slow' : 'text-slate-400'}">
@@ -205,11 +234,77 @@
                     <div class="text-[8px] text-slate-500 uppercase">${node.status}</div>
                 `;
                 infraContainer.appendChild(div);
+                nodeElements[node.id] = div;
             });
+
+            // Draw connections after layout
+            setTimeout(() => {
+                if(data.infrastructure.links) {
+                    data.infrastructure.links.forEach(link => {
+                        const source = nodeElements[link.source];
+                        const target = nodeElements[link.target];
+                        if(source && target) {
+                            const rect1 = source.getBoundingClientRect();
+                            const rect2 = target.getBoundingClientRect();
+                            const parentRect = infraContainer.getBoundingClientRect();
+
+                            const x1 = rect1.left + rect1.width/2 - parentRect.left;
+                            const y1 = rect1.top + rect1.height/2 - parentRect.top;
+                            const x2 = rect2.left + rect2.width/2 - parentRect.left;
+                            const y2 = rect2.top + rect2.height/2 - parentRect.top;
+
+                            const line = document.createElementNS(svgNS, "line");
+                            line.setAttribute("x1", x1);
+                            line.setAttribute("y1", y1);
+                            line.setAttribute("x2", x2);
+                            line.setAttribute("y2", y2);
+                            line.setAttribute("stroke", "rgba(56, 189, 248, 0.3)");
+                            line.setAttribute("stroke-width", "2");
+                            svg.appendChild(line);
+                        }
+                    });
+                }
+            }, 100);
 
             // 4. Quantum Canvas with Simulation Integration
             initCanvas(simData);
+
+            // 5. Init Live Search Runtime
+            initSearchRuntime();
         });
+
+        function initSearchRuntime() {
+            const container = document.getElementById('search-runtime-container');
+            const queries = [
+                "optimizing supply chain vectors...",
+                "calculating sovereign risk alpha...",
+                "querying dark pool liquidity...",
+                "analyzing semiconductor shortage...",
+                "simulating cyber-attack fallout...",
+                "rebalancing quantum portfolio...",
+                "scanning for regulatory drift...",
+                "indexing unstructured news data...",
+                "detecting anomaly in sector swarm...",
+                "running monte carlo simulations..."
+            ];
+
+            function addQuery() {
+                const q = queries[Math.floor(Math.random() * queries.length)];
+                const div = document.createElement('div');
+                div.className = "flex items-center gap-2 text-slate-400 animate-pulse";
+                div.innerHTML = `
+                    <span class="text-cyan-500">></span>
+                    <span class="typing-effect">${q}</span>
+                    <span class="ml-auto text-[8px] text-slate-600 font-mono">${(Math.random()*100).toFixed(1)}ms</span>
+                `;
+                container.prepend(div);
+                if(container.children.length > 8) container.lastChild.remove();
+            }
+
+            // Start loop
+            setInterval(addQuery, 1500);
+            addQuery(); // Initial
+        }
 
         function initCanvas(simData) {
             const canvas = document.getElementById('quantum-canvas');
