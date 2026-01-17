@@ -358,8 +358,13 @@
                 } else if (node.preview) {
                     // Prompt / Knowledge Preview
                      html += `<div class="mb-4">
-                            <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Preview / Definition</h4>
-                            <div class="bg-slate-800/50 border border-slate-700 p-3 rounded text-xs text-slate-300 mono whitespace-pre-wrap h-64 overflow-y-auto custom-scrollbar">${this.escapeHtml(node.preview)}</div>
+                            <div class="flex justify-between items-center mb-2">
+                                <h4 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Preview / Definition</h4>
+                                <button onclick="app.copyContent('${node.id}')" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-purple-400 border border-slate-600 px-2 py-1 rounded transition">
+                                    <i class="fas fa-copy mr-1"></i> Copy Context
+                                </button>
+                            </div>
+                            <div class="bg-slate-800/50 border border-slate-700 p-3 rounded text-xs text-slate-300 mono whitespace-pre-wrap h-64 overflow-y-auto custom-scrollbar" id="preview-${node.id}">${this.escapeHtml(node.preview)}</div>
                         </div>`;
                 }
 
@@ -383,6 +388,27 @@
 
             closeInspector() {
                 document.getElementById('inspector').classList.add('translate-x-full');
+            }
+
+            copyContent(nodeId) {
+                // Handle potentially stringified IDs from HTML attributes
+                let node = this.data.nodes.get(nodeId);
+                if (!node) node = this.data.nodes.get(parseInt(nodeId));
+
+                if(node && node.preview) {
+                    navigator.clipboard.writeText(node.preview).then(() => {
+                        const btn = document.querySelector(`button[onclick="app.copyContent('${nodeId}')"]`);
+                        if(btn) {
+                            const original = btn.innerHTML;
+                            btn.innerHTML = '<i class="fas fa-check mr-1"></i> Copied';
+                            btn.classList.add('text-green-400', 'border-green-800');
+                            setTimeout(() => {
+                                btn.innerHTML = original;
+                                btn.classList.remove('text-green-400', 'border-green-800');
+                            }, 2000);
+                        }
+                    });
+                }
             }
 
             escapeHtml(text) {

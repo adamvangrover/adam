@@ -8,8 +8,9 @@ from pathlib import Path
 # Configuration
 REPO_ROOT = "."
 OUTPUT_FILE = "showcase/data/system_knowledge_graph.json"
-IGNORE_DIRS = {".git", ".venv", "node_modules", "__pycache__", "dist", "build", "env", "venv"}
+IGNORE_DIRS = {".git", ".venv", "node_modules", "__pycache__", "dist", "build", "env", "venv", "verification_artifacts"}
 IGNORE_FILES = {".DS_Store"}
+HOUSE_VIEW_DIR = "core/libraries_and_archives"
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("GraphGen")
@@ -20,9 +21,11 @@ def get_file_type(filename):
     if filename.endswith(".html"): return "ui"
     if filename.endswith(".md"): return "doc"
     if filename.endswith(".json"): return "data"
+    if filename.endswith(".txt"): return "doc"
     return "file"
 
 def get_group(file_type, path_parts):
+    if HOUSE_VIEW_DIR in "/".join(path_parts): return "strategy"
     if "agents" in path_parts: return "agent"
     if "simulations" in path_parts: return "simulation"
     if "prompt_library" in path_parts: return "prompt"
@@ -75,11 +78,29 @@ def parse_code_structure(filepath):
         pass
     return structure
 
-def extract_file_content_preview(filepath):
+def extract_file_content_preview(filepath, file_type):
     """Reads a file and returns a preview of its content."""
     try:
         with open(filepath, 'r') as f:
-            content = f.read(500) # Read first 500 chars
+            if file_type == "data" and filepath.suffix == ".json":
+                try:
+                    data = json.load(f)
+                    # If list, take first few items
+                    if isinstance(data, list):
+                        preview = json.dumps(data[:2], indent=2) + "\n..."
+                    elif isinstance(data, dict):
+                        # Extract key fields if present
+                        if "title" in data and "summary" in data:
+                            return f"TITLE: {data['title']}\nSUMMARY: {data['summary']}\n\n" + json.dumps(data, indent=2)[:500]
+                        preview = json.dumps(data, indent=2)[:500] + "..."
+                    else:
+                        preview = str(data)[:500]
+                    return preview
+                except:
+                    f.seek(0)
+                    return f.read(500)
+
+            content = f.read(1000) # Read first 1000 chars for richer context
             return content
     except:
         return ""
@@ -140,18 +161,22 @@ def generate_graph():
             label = file
             size = 10 + (os.path.getsize(path) / 1000)
             if size > 40: size = 40
+
+            # Color logic
+            color = None
             if group == "knowledge" and file.isupper():
                  color = "#f59e0b"
                  size += 10
             elif group == "prompt":
                  color = "#ec4899" # Pink
-            else:
-                color = None
+            elif group == "strategy":
+                 color = "#ef4444" # Red for House Views
+                 size = 25
 
-            # Content preview for markdown/text
+            # Content preview for markdown/text/data/prompt
             content_preview = ""
-            if file_type == "doc" or group == "prompt":
-                content_preview = extract_file_content_preview(path)
+            if file_type in ["doc", "data"] or group in ["prompt", "strategy", "knowledge"]:
+                content_preview = extract_file_content_preview(path, file_type)
 
             node = {
                 "id": node_id,
@@ -169,7 +194,8 @@ def generate_graph():
             file_registry.append({
                 "id": node_id,
                 "path": rel_path,
-                "type": file_type
+                "type": file_type,
+                "group": group
             })
 
             # 1b. Parse Code Structure (if Python)
@@ -244,7 +270,7 @@ def generate_graph():
         "color": "#ef4444",
         "font": {"size": 20, "face": "JetBrains Mono"},
         "level": "concept",
-        "preview": "Central Strategy & Vision Node"
+        "preview": "Central Strategy & Vision Node. Aggregates all market reports, outlooks, and strategic archives."
     })
     next_id += 1
 
@@ -263,19 +289,28 @@ def generate_graph():
 
     edges.append({"from": house_view_root, "to": infra_root, "dashes": True})
 
-    # 4. Scan for House View Docs
-    logger.info("Extracting House Views...")
-    for node in nodes:
-        if node.get("level") == "file":
-             # Link prompts to infra or house view?
-             if node["group"] == "prompt":
-                  edges.append({"from": infra_root, "to": node["id"], "color": {"opacity": 0.2}})
+    # 4. Link House View Docs and Infra
+    logger.info("Linking House Views & Concepts...")
+    for file_node in file_registry:
+        node_id = file_node["id"]
+        path = file_node["path"]
+        group = file_node["group"]
 
-             if node["group"] == "knowledge" and "docs/" in node["path"]:
-                if node["label"].isupper() or "vision" in node["label"] or "roadmap" in node["label"]:
-                    edges.append({"from": house_view_root, "to": node["id"]})
-                elif "architecture" in node["label"] or "guide" in node["label"]:
-                     edges.append({"from": infra_root, "to": node["id"]})
+        # Explicit Strategy/House View Link
+        if group == "strategy":
+            edges.append({"from": house_view_root, "to": node_id, "color": "#ef4444"})
+
+        # Prompts to Infra
+        elif group == "prompt":
+             edges.append({"from": infra_root, "to": node_id, "color": {"opacity": 0.2}})
+
+        # Knowledge linking
+        elif group == "knowledge" and "docs/" in path:
+            label = path.split("/")[-1]
+            if label.isupper() or "vision" in label.lower() or "roadmap" in label.lower():
+                edges.append({"from": house_view_root, "to": node_id})
+            elif "architecture" in label.lower() or "guide" in label.lower():
+                 edges.append({"from": infra_root, "to": node_id})
 
     # 5. Extract Abstract Agent Concepts
     logger.info("Extracting Agents from Markdown...")
