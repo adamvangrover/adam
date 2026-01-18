@@ -16,45 +16,60 @@ from core.research.oswm.inference import OSWMInference
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("ResearchDemo")
 
-def run_gnn_analysis():
-    logger.info("--- Starting Graph Neural Network Risk Analysis ---")
+def run_advanced_gnn_analysis():
+    logger.info("--- Starting Advanced GNN Risk Analysis (GAT + Explainer) ---")
     try:
-        engine = GraphRiskEngine()
-        logger.info(f"Graph Engine initialized with {engine.num_nodes} nodes.")
+        # Use GAT model
+        engine = GraphRiskEngine(model_type="GAT")
+        logger.info(f"Graph Engine initialized with {engine.num_nodes} nodes using GAT.")
 
         risk_scores = engine.predict_risk()
 
-        # Top 5 riskiest nodes
-        sorted_risk = sorted(risk_scores.items(), key=lambda x: x[1], reverse=True)
-        top_risky = sorted_risk[:5]
+        # Explain the riskiest node
+        if risk_scores:
+            sorted_risk = sorted(risk_scores.items(), key=lambda x: x[1], reverse=True)
+            top_risky_node = sorted_risk[0][0]
 
-        logger.info("Top 5 High-Risk Nodes detected by GNN:")
-        for node, score in top_risky:
-            logger.info(f"  {node}: {score:.4f}")
+            logger.info(f"Explaining top risky node: {top_risky_node}")
+            explanation = engine.explain_risk(top_risky_node)
 
-        return sorted_risk
+            if explanation:
+                mask_adj, mask_feat = explanation
+                # Simple summary of explanation: Top feature index
+                # Sum mask across samples if needed, but here mask_feat is same shape as x
+                # Assuming mask_feat is (N, F), we look at row for the node?
+                # Actually explain_node returns masks for ALL input (usually) or local?
+                # My implementation returns mask_feat same size as X.
+
+                # Let's just log success
+                logger.info(f"  Explanation generated successfully.")
+
+            return sorted_risk
+        else:
+            return []
     except Exception as e:
-        logger.error(f"GNN Analysis failed: {e}")
+        logger.error(f"GNN Analysis failed: {e}", exc_info=True)
         return []
 
-def run_federated_learning():
-    logger.info("--- Starting Federated Learning Simulation ---")
-    coordinator = FederatedCoordinator(num_clients=3, input_dim=10)
+def run_fingraphfl_simulation():
+    logger.info("--- Starting FinGraphFL Simulation (Privacy + MSGuard) ---")
+    # Use FinGraphFL mode
+    coordinator = FederatedCoordinator(num_clients=3, input_dim=10, mode="FinGraphFL")
 
     history = []
-    for round_num in range(1, 6):
+    for round_num in range(1, 4): # Short run for demo
         loss, acc = coordinator.run_round(round_num)
         history.append({"round": round_num, "loss": loss, "accuracy": acc})
 
-    logger.info("FL Simulation Complete.")
+    logger.info("FinGraphFL Simulation Complete.")
     return history
 
-def run_oswm_simulation():
-    logger.info("--- Starting One-Shot World Model Simulation ---")
+def run_oswm_pfn_simulation():
+    logger.info("--- Starting OSWM Simulation (PFN + Synthetic Priors) ---")
     oswm = OSWMInference()
 
-    logger.info("Pre-training on synthetic prior (Physics/Sine waves)...")
-    oswm.pretrain_on_synthetic_prior(steps=50)
+    logger.info("Pre-training on Synthetic Priors (NN + Momentum)...")
+    oswm.pretrain_on_synthetic_prior(steps=20, batch_size=4) # Short training for demo speed
 
     # Create a synthetic "Crisis" context (market dropping)
     # Price dropping from 100 to 90 over 10 ticks
@@ -62,34 +77,36 @@ def run_oswm_simulation():
     logger.info(f"Context (Market Crash Start): {context}")
 
     # Predict recovery?
-    logger.info("Generating future scenario...")
+    logger.info("Generating future scenario via In-Context Learning...")
     future_prices = oswm.generate_scenario(context, steps=10)
     logger.info(f"Predicted Future: {future_prices}")
 
     return {"context": context, "prediction": future_prices}
 
 def main():
-    logger.info("Initializing Research Modules...")
+    logger.info("Initializing Advanced Research Modules...")
 
-    # 1. GNN
-    gnn_results = run_gnn_analysis()
+    # 1. Advanced GNN
+    gnn_results = run_advanced_gnn_analysis()
 
-    # 2. FL
-    fl_history = run_federated_learning()
+    # 2. FinGraphFL
+    fl_history = run_fingraphfl_simulation()
 
-    # 3. OSWM
-    oswm_scenario = run_oswm_simulation()
+    # 3. OSWM PFN
+    oswm_scenario = run_oswm_pfn_simulation()
 
     # Output structure
     output_data = {
         "gnn_risk_analysis": {
-            "top_risky_nodes": gnn_results[:10]
+            "model": "GAT",
+            "top_risky_nodes": gnn_results[:10] if gnn_results else []
         },
         "federated_learning": {
+            "mode": "FinGraphFL",
             "training_history": fl_history
         },
         "oswm_simulation": {
-            "scenario_type": "Market Recovery",
+            "scenario_type": "Market Recovery (PFN)",
             "data": oswm_scenario
         }
     }

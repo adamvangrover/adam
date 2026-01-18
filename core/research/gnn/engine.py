@@ -2,10 +2,11 @@ import torch
 import networkx as nx
 import numpy as np
 from core.engine.unified_knowledge_graph import UnifiedKnowledgeGraph
-from .model import GCN
+from .model import GCN, GAT, GraphSAGE
+from .explainer import GNNExplainer
 
 class GraphRiskEngine:
-    def __init__(self):
+    def __init__(self, model_type="GCN"):
         self.ukg = UnifiedKnowledgeGraph()
         self.graph = self.ukg.graph
         self.node_list = list(self.graph.nodes())
@@ -15,11 +16,18 @@ class GraphRiskEngine:
         self.adj = self._build_adjacency_matrix()
         self.features = self._build_feature_matrix()
 
-        # Initialize GNN
-        # Input dim: Number of unique node types (one-hot)
-        # Hidden: 16
-        # Output: 1 (Risk Probability)
-        self.model = GCN(nfeat=self.features.shape[1], nhid=16, nclass=1)
+        self.model_type = model_type
+        input_dim = self.features.shape[1]
+
+        # Initialize GNN based on type
+        if model_type == "GAT":
+            self.model = GAT(nfeat=input_dim, nhid=16, nclass=1)
+        elif model_type == "GraphSAGE":
+            self.model = GraphSAGE(nfeat=input_dim, nhid=16, nclass=1)
+        else:
+            self.model = GCN(nfeat=input_dim, nhid=16, nclass=1)
+
+        self.explainer = GNNExplainer(self.model)
 
     def _build_adjacency_matrix(self):
         """Builds normalized sparse adjacency matrix."""
@@ -63,6 +71,10 @@ class GraphRiskEngine:
     def predict_risk(self):
         """Runs GNN inference to predict risk for all nodes."""
         self.model.eval()
+
+        # GAT needs dense adj usually, handled inside GAT forward or here?
+        # Our implemented GAT handles conversion if sparse.
+
         with torch.no_grad():
             risk_scores = self.model(self.features, self.adj)
 
@@ -71,3 +83,13 @@ class GraphRiskEngine:
             results[node] = risk_scores[i].item()
 
         return results
+
+    def explain_risk(self, node_id):
+        """
+        Returns explanation (masked adj, masked features) for a node.
+        """
+        if node_id not in self.node_map:
+            return None
+        idx = self.node_map[node_id]
+        mask_adj, mask_feat = self.explainer.explain_node(idx, self.features, self.adj)
+        return mask_adj, mask_feat
