@@ -122,3 +122,16 @@
 **Vulnerability:** The core API endpoint (`/`) in `core/api.py` was completely unauthenticated, allowing any network user to invoke agent orchestration and knowledge graph modification functions.
 **Learning:** Middleware or decorators for authentication are essential for all exposed endpoints. Assuming an API is "internal" or "safe" because it's not well-documented is a fatal flaw.
 **Prevention:** Implemented strict API Key verification using `X-API-Key` header against a server-side configuration setting.
+
+## 2024-05-23 - [Critical] Sandbox Escape via str.format
+**Vulnerability:** The `SecureSandbox` relied on AST validation to block access to private attributes (starting with `__`). However, `str.format` allows attribute access within the format string (e.g., `"{0.__class__}"`), which is processed by the C-level implementation of `format` and bypasses the Python AST checks. This allowed attackers to access `__class__`, `__globals__`, and eventually import modules like `os`.
+**Learning:** AST-based sandboxing is insufficient if the language or standard library provides methods that perform their own dynamic attribute lookup or evaluation (like `format`, `eval`, `getattr`, etc.).
+**Prevention:** In addition to AST validation, strict allowlisting of methods/functions is necessary. Specifically, `format` and `format_map` must be banned in sandboxes that allow string formatting, or the sandbox must use a safe subset of formatting (though banning is safer).
+
+## 2024-05-23 - [Security Enhancement] Governance Enforcer & Air Gap Simulation
+**Vulnerability:** Relying solely on sandbox hardening (like fixing specific escapes) creates a "cat and mouse" game. An attacker with admin/kernel level access could bypass static checks. There was no mechanism for "Human-in-the-Loop" approval or "Conviction Scoring" to assess the *intent* or *risk level* of code before execution.
+**Learning:** Defense in depth requires layers beyond just the runtime environment. A "Governance Layer" that scores risk and enforces policy (like "Dead Hands" or "Air Gaps") is crucial for critical systems.
+**Prevention:** Implemented `GovernanceEnforcer` in `core/security/governance.py` and integrated it into `SecureSandbox`.
+- **Conviction Scoring:** Analyzes code for risky patterns (recursion, loops, imports) and assigns a risk score.
+- **Human-in-the-Loop:** High-risk scores trigger an `ApprovalRequired` exception, simulating a "stop-the-line" event.
+- **Air Gap Simulation:** Added a `security_level` parameter to sandbox execution to enforce stricter governance policies.
