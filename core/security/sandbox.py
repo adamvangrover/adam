@@ -7,6 +7,7 @@ import time
 import json
 import logging
 from typing import Dict, Any, Optional
+from core.security.governance import GovernanceEnforcer, ApprovalRequired
 
 logger = logging.getLogger(__name__)
 
@@ -110,18 +111,28 @@ class SecureSandbox:
     # --------------------------------------------------------------------------
 
     @classmethod
-    def execute(cls, code: str, timeout: float = 5.0) -> Dict[str, Any]:
+    def execute(cls, code: str, timeout: float = 5.0, security_level: str = "standard") -> Dict[str, Any]:
         """
         Executes the provided code in a secure sandbox.
 
         Args:
             code (str): The Python code to execute.
             timeout (float): Maximum execution time in seconds.
+            security_level (str): "standard", "governed", or "air_gapped".
 
         Returns:
             Dict containing 'status' ('success'/'error'), 'output', and 'result' (last expression).
         """
         try:
+            # Step 0: Governance Check (for higher security tiers)
+            if security_level != "standard":
+                try:
+                    GovernanceEnforcer.validate(code, context=f"sandbox_{security_level}")
+                except ApprovalRequired as e:
+                     return {"status": "error", "error": f"Governance Approval Required: {e}"}
+                except Exception as e:
+                     return {"status": "error", "error": f"Governance Check Failed: {e}"}
+
             # Step 1: Static Analysis
             cls._validate_ast(code)
 
@@ -186,6 +197,11 @@ class SecureSandbox:
             # Check for banned function calls
             if isinstance(node, ast.Name) and node.id in cls.BANNED_FUNCTIONS:
                 raise SecurityViolation(f"Function '{node.id}' is banned.")
+
+            # Check for banned method calls (format/format_map)
+            # These are banned because they can be used to bypass AST checks for private attributes
+            if isinstance(node, ast.Attribute) and node.attr in {'format', 'format_map'}:
+                raise SecurityViolation(f"Method '{node.attr}' is banned for security reasons.")
 
     @classmethod
     def _worker(cls, code: str, result_queue: multiprocessing.Queue):
