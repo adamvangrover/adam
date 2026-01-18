@@ -4,143 +4,150 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM v23.5 :: 2022 Year in Review: Navigating a Turbulent Market</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --paper-bg: #fdfbf7;
             --ink-color: #1a1a1a;
-            --accent-red: #cc0000;
             --cyber-black: #050b14;
             --cyber-blue: #00f3ff;
+            --cyber-purple: #a855f7;
         }
-        body { margin: 0; background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }
-
-        .newsletter-wrapper {
-            max-width: 1000px;
-            margin: 40px auto;
-            display: grid;
-            grid-template-columns: 3fr 1fr;
-            gap: 40px;
-            padding: 20px;
-        }
-
-        /* Responsive for mobile */
-        @media (max-width: 768px) {
-            .newsletter-wrapper { grid-template-columns: 1fr; }
-        }
+        body { background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }
 
         .paper-sheet {
-            background: var(--paper-bg);
-            color: var(--ink-color);
-            padding: 60px;
-            font-family: 'Georgia', 'Times New Roman', serif;
+            background: var(--paper-bg); color: var(--ink-color);
+            padding: 60px; font-family: 'Georgia', serif;
             box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            position: relative;
         }
 
-        /* Typography */
         h1.title {
-            font-family: 'Playfair Display', serif;
-            font-size: 3rem;
-            border-bottom: 4px solid var(--ink-color);
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-            letter-spacing: -1px;
-            line-height: 1.1;
+            font-family: 'Playfair Display', serif; font-size: 3rem;
+            border-bottom: 4px solid var(--ink-color); padding-bottom: 20px; margin-bottom: 30px;
         }
         h2 {
-            font-family: 'Inter', sans-serif;
-            font-weight: 700;
-            font-size: 1.2rem;
-            margin-top: 40px;
-            margin-bottom: 15px;
-            color: var(--accent-red);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        p { line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
-        li { line-height: 1.6; margin-bottom: 10px; }
-
-        /* Sidebar */
-        .cyber-sidebar {
-            font-family: 'JetBrains Mono', monospace;
-        }
-        .sidebar-widget {
-            border: 1px solid #333;
-            background: rgba(255,255,255,0.02);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .sidebar-title {
-            color: var(--cyber-blue);
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+            font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1.2rem;
+            margin-top: 40px; color: #cc0000; text-transform: uppercase;
         }
 
-        .cyber-btn {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            padding: 6px 12px;
-            border: 1px solid #444;
-            color: #e0e0e0;
-            background: rgba(0,0,0,0.8);
-            text-decoration: none;
-            display: inline-block;
-            margin-bottom: 20px;
+        /* Cyber-HUD Sidebar */
+        .cyber-sidebar { font-family: 'JetBrains Mono', monospace; }
+        .hud-widget {
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            background: rgba(5, 11, 20, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 20px; margin-bottom: 20px;
+            position: relative; overflow: hidden;
         }
-        .cyber-btn:hover { border-color: var(--cyber-blue); color: var(--cyber-blue); }
+        .hud-widget::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--cyber-blue), transparent);
+        }
+        .hud-title { color: var(--cyber-blue); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 10px; }
+        .hud-value { color: white; font-size: 0.9rem; }
+        .hud-label { color: #64748b; font-size: 0.7rem; }
     </style>
 </head>
 <body>
-    <div style="max-width: 1400px; margin: 0 auto; padding: 20px;">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; BACK TO ARCHIVE</a>
+    <div class="fixed top-0 w-full z-50">
+        <!-- Global Nav Injection Point -->
     </div>
 
-    <div class="newsletter-wrapper">
-        <div class="paper-sheet">
-            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px;">
-                <span>2023-01-01</span>
-                <span>TYPE: MARKET_OUTLOOK</span>
+    <div class="max-w-[1600px] mx-auto p-6 pt-20 grid grid-cols-1 xl:grid-cols-4 gap-8">
+
+        <!-- Left: Navigation/Context -->
+        <div class="hidden xl:block col-span-1">
+            <a href="market_mayhem_archive.html" class="inline-flex items-center gap-2 text-cyan-400 hover:text-white transition-colors mb-8 font-mono text-sm">
+                <i class="fas fa-arrow-left"></i> RETURN TO ARCHIVE
+            </a>
+
+            <div class="hud-widget">
+                <div class="hud-title">Contributing Agent</div>
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 rounded bg-cyan-900/30 flex items-center justify-center text-cyan-400">
+                        <i class="fas fa-robot text-lg"></i>
+                    </div>
+                    <div>
+                        <div class="hud-value font-bold">RiskManagementAgent</div>
+                        <div class="hud-label">v23.5.0 Active</div>
+                    </div>
+                </div>
+                <a href="agents.html" class="text-xs text-cyan-500 hover:text-white block mt-2 text-right">VIEW PROFILE >></a>
             </div>
 
-            <h1 class="title">2022 Year in Review: Navigating a Turbulent Market</h1>
+            <div class="hud-widget">
+                <div class="hud-title">Provenance</div>
+                <div class="font-mono text-xs text-slate-400 break-all">
+                    ID: f8964893d7894371<br>
+                    TS: 2023-01-01
+                </div>
+                <div class="mt-3 flex items-center gap-2 text-xs text-green-400">
+                    <i class="fas fa-check-circle"></i> VERIFIED
+                </div>
+            </div>
+        </div>
 
-            <h2>Market Overview</h2><p>2022 was a challenging year for investors, marked by heightened volatility, rising inflation, and geopolitical tensions. Major stock indices experienced significant declines, with the S&P 500 ending the year down 19.4%. The technology sector was particularly hard hit, as rising interest rates and slowing economic growth weighed on valuations.</p>
+        <!-- Center: The Report -->
+        <div class="col-span-1 xl:col-span-2">
+            <div class="paper-sheet rounded-sm">
+                <div class="flex justify-between font-mono text-xs text-gray-500 mb-8">
+                    <span>2023-01-01</span>
+                    <span>NEWSLETTER</span>
+                </div>
+
+                <h1 class="title">2022 Year in Review: Navigating a Turbulent Market</h1>
+
+                <div class="prose prose-slate max-w-none">
+                    <h2>Market Overview</h2><p>2022 was a challenging year for investors, marked by heightened volatility, rising inflation, and geopolitical tensions. Major stock indices experienced significant declines, with the S&P 500 ending the year down 19.4%. The technology sector was particularly hard hit, as rising interest rates and slowing economic growth weighed on valuations.</p>
 <h2>Major Themes and Trends</h2><p>Several key themes and trends shaped the market in 2022: <em> <strong>Inflation:</strong> Inflation surged to multi-decade highs, driven by supply chain disruptions, strong consumer demand, and expansionary monetary policies. </em> <strong>Rising Interest Rates:</strong>  Central banks responded to inflation by aggressively raising interest rates, leading to increased borrowing costs and tighter financial conditions. <em> <strong>Geopolitical Risks:</strong> The war in Ukraine, tensions between the US and China, and political instability in several regions added to market uncertainty. </em> <strong>Energy Crisis:</strong>  The energy crisis, triggered by the war in Ukraine and supply constraints, led to soaring energy prices and concerns about economic growth. <em> <strong>Shifting Consumer Behavior:</strong>  Consumer spending patterns shifted as inflation and economic uncertainty weighed on discretionary spending. </em> <strong>Technological Innovation:</strong>  Despite market challenges, technological innovation continued at a rapid pace, with advancements in artificial intelligence, cloud computing, and renewable energy.</p>
 <h2>Industry Performance</h2><p>Industry performance was mixed in 2022: <em> <strong>Energy:</strong> The energy sector was the top performer, benefiting from high energy prices. </em> <strong>Utilities:</strong>  Utilities also performed relatively well, as they are considered defensive investments in times of economic uncertainty. <em> <strong>Consumer Staples:</strong>  Consumer staples companies, which provide essential goods and services, also showed resilience. </em> <strong>Technology:</strong>  The technology sector was the worst performer, as valuations declined sharply. * <strong>Consumer Discretionary:</strong>  Consumer discretionary companies, which are sensitive to economic conditions, also faced headwinds.</p>
 <h2>Top Performers</h2><p>Some of the top-performing companies in 2022 included: <em> <strong>ExxonMobil (XOM):</strong>  Benefited from high oil prices. </em> <strong>Chevron (CVX):</strong>  Another energy giant that profited from the energy crisis. <em> <strong>NextEra Energy (NEE):</strong>  A leading renewable energy company. </em> <strong>PepsiCo (PEP):</strong>  A consumer staples giant with strong brand recognition. * <strong>Dollar General (DG):</strong>  A discount retailer that benefited from value-conscious consumers.</p>
 <h2>Portfolio Construction and Optimization</h2><p>In a volatile and uncertain market like 2022, portfolio construction and optimization are crucial. Investors should consider: <em> <strong>Diversification:</strong>  Diversifying across asset classes, sectors, and geographies to reduce risk. </em> <strong>Risk Management:</strong>  Implementing risk management strategies, such as hedging or position sizing, to mitigate potential losses. <em> <strong>Value Investing:</strong>  Focusing on undervalued companies with strong fundamentals. </em> <strong>Long-Term Perspective:</strong>  Maintaining a long-term perspective and avoiding impulsive decisions based on short-term market fluctuations.</p>
 <h2>Looking Ahead</h2><p>While 2022 presented significant challenges, it also created opportunities for investors. As we move forward, it's essential to stay informed about market trends, assess risks carefully, and maintain a disciplined investment approach. Adam v15.4 can assist investors in navigating the complexities of the market and making informed decisions.</p>
 
+                </div>
 
-            <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
-                End of Report.
+                <div class="mt-12 pt-8 border-t border-gray-300 italic text-gray-500 text-sm font-serif text-center">
+                    Generated by Adam v23.5 Autonomous Financial System
+                </div>
             </div>
         </div>
 
-        <aside class="cyber-sidebar">
-            <div class="sidebar-widget">
-                <div class="sidebar-title">Metadata</div>
-                <div style="font-size: 0.8rem; color: #aaa;">
-                    <div>DATE: <span style="color:#fff">2023-01-01</span></div>
-                    <div>TYPE: <span style="color:#fff">MARKET_OUTLOOK</span></div>
-                    <div>CLASS: <span style="color:#fff">UNCLASSIFIED</span></div>
+        <!-- Right: Analysis HUD -->
+        <div class="col-span-1">
+            <div class="hud-widget">
+                <div class="hud-title">Sentiment Analysis</div>
+                <div class="flex items-end gap-2 mb-2">
+                    <div class="text-3xl font-bold text-yellow-400">42</div>
+                    <div class="text-sm text-slate-400 mb-1">/ 100</div>
+                </div>
+                <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+                    <div class="h-full bg-yellow-500" style="width: 42%"></div>
+                </div>
+                <div class="mt-2 text-xs text-center text-yellow-400 font-bold">NEUTRAL</div>
+            </div>
+
+            <div class="hud-widget">
+                <div class="hud-title">Detected Entities</div>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-2 py-1 bg-slate-800 text-cyan-400 rounded text-xs border border-slate-700">PEP</span><span class="px-2 py-1 bg-slate-800 text-cyan-400 rounded text-xs border border-slate-700">XOM</span><span class="px-2 py-1 bg-slate-800 text-cyan-400 rounded text-xs border border-slate-700">CVX</span><span class="px-2 py-1 bg-slate-800 text-cyan-400 rounded text-xs border border-slate-700">DG</span><span class="px-2 py-1 bg-slate-800 text-cyan-400 rounded text-xs border border-slate-700">NEE</span>
                 </div>
             </div>
 
-             <div class="sidebar-widget">
-                <div class="sidebar-title">System Status</div>
-                 <div style="display:flex; align-items:center; gap:10px;">
-                    <div style="width:10px; height:10px; background:#00ff00; border-radius:50%; box-shadow: 0 0 5px #00ff00;"></div>
-                    <span style="font-size:0.8rem; color:#00ff00;">ONLINE</span>
-                </div>
+            <div class="hud-widget">
+                <div class="hud-title">Contextual Links</div>
+                <ul class="space-y-2 text-sm text-slate-400">
+                    <li class="hover:text-cyan-400 cursor-pointer"><i class="fas fa-link mr-2 text-xs"></i>Sector Performance</li>
+                    <li class="hover:text-cyan-400 cursor-pointer"><i class="fas fa-link mr-2 text-xs"></i>Related 13F Filings</li>
+                    <li class="hover:text-cyan-400 cursor-pointer"><i class="fas fa-link mr-2 text-xs"></i>Historical Correlation</li>
+                </ul>
             </div>
-        </aside>
+        </div>
     </div>
+
+    <!-- Adam Global Nav -->
+    <script src="js/nav.js"></script>
 </body>
 </html>

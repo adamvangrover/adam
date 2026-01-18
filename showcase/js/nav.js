@@ -49,6 +49,7 @@ class AdamNavigator {
 
             // 5. Render Interface
             this._renderNavigation();
+            this._renderCommandPalette(); // NEW
             this._injectGlobalStyles();
 
             // 6. Bind Human Interaction Events
@@ -128,6 +129,7 @@ class AdamNavigator {
     _getMenuConfig() {
         return [
             { name: 'Mission Control', icon: 'fa-tachometer-alt', link: 'index.html' },
+            { name: 'Evolution Hub', icon: 'fa-code-branch', link: 'evolution.html' },
             { name: 'Chat Portal', icon: 'fa-comments', link: 'chat.html' },
             { name: 'Terminal', icon: 'fa-terminal', link: 'terminal.html' },
             { type: 'divider' },
@@ -168,7 +170,7 @@ class AdamNavigator {
                     </button>
                 </div>
                 <div class="relative group">
-                    <input type="text" id="global-search" placeholder="Search Agents, Docs..."
+                    <input type="text" id="global-search" placeholder="Search (Ctrl+K)..."
                         class="w-full bg-slate-900/50 border border-slate-700 rounded px-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors font-mono">
                     <i class="fas fa-search absolute right-3 top-2 text-slate-500 text-xs"></i>
                     <div id="search-results" class="absolute left-0 top-full mt-2 w-64 bg-slate-800 border border-slate-700 rounded shadow-xl hidden z-50 max-h-64 overflow-y-auto"></div>
@@ -255,6 +257,33 @@ class AdamNavigator {
     }
 
     /**
+     * Renders the Command Palette Modal
+     */
+    _renderCommandPalette() {
+        const modal = document.createElement('div');
+        modal.id = 'cmd-palette';
+        modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4';
+        modal.innerHTML = `
+            <div class="w-full max-w-2xl bg-[#0f172a] border border-slate-700 rounded-lg shadow-2xl flex flex-col max-h-[80vh]">
+                <div class="p-4 border-b border-slate-700 flex items-center gap-3">
+                    <i class="fas fa-search text-cyan-400 text-lg"></i>
+                    <input type="text" id="cmd-input" placeholder="What are you looking for? (Type 'Report', 'Agent', 'Tool'...)"
+                        class="flex-1 bg-transparent border-none text-white text-lg focus:outline-none font-mono" autocomplete="off">
+                    <span class="text-xs text-slate-500 font-mono border border-slate-700 px-2 py-1 rounded">ESC</span>
+                </div>
+                <div id="cmd-results" class="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar min-h-[300px]">
+                    <!-- Results -->
+                </div>
+                <div class="p-3 border-t border-slate-700 text-xs text-slate-500 flex justify-between bg-slate-900/50 rounded-b-lg">
+                    <span><strong>Adam v23.5</strong> Global Index</span>
+                    <span class="font-mono text-cyan-400">Index Active</span>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    /**
      * Injects layout styles for the main content area
      */
     _injectGlobalStyles() {
@@ -267,6 +296,16 @@ class AdamNavigator {
                 backdrop-filter: blur(12px);
                 background: rgba(15, 23, 42, 0.95);
             }
+            /* Command Palette Styles */
+            .cmd-item {
+                display: flex; align-items: center; justify-content: space-between;
+                padding: 12px; border-radius: 6px; cursor: pointer; color: #e2e8f0;
+                transition: all 0.2s; border: 1px solid transparent;
+            }
+            .cmd-item:hover, .cmd-item.selected {
+                background: rgba(6, 182, 212, 0.1); border-color: rgba(6, 182, 212, 0.3);
+            }
+            .cmd-highlight { color: #22d3ee; font-weight: bold; }
         `;
         document.head.appendChild(style);
         document.body.classList.add('has-global-nav');
@@ -314,10 +353,11 @@ class AdamNavigator {
             }
         });
 
-        // 3. Search Logic
+        // 3. Global Search (Sidebar)
         const searchInput = document.getElementById('global-search');
         if (searchInput) {
-            searchInput.addEventListener('input', (e) => this._handleSearch(e.target.value));
+            // Also triggers Command Palette on Click if desired, but sticking to text input for sidebar consistency
+            searchInput.addEventListener('input', (e) => this._handleSidebarSearch(e.target.value));
             
             // Close search when clicking outside
             document.addEventListener('click', (e) => {
@@ -327,41 +367,62 @@ class AdamNavigator {
                 }
             });
         }
+
+        // 4. Command Palette Events (Ctrl+K)
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                this._toggleCommandPalette();
+            }
+            if (e.key === 'Escape') {
+                document.getElementById('cmd-palette')?.classList.add('hidden');
+            }
+        });
+
+        const cmdInput = document.getElementById('cmd-input');
+        if (cmdInput) {
+            cmdInput.addEventListener('input', (e) => this._handleCommandSearch(e.target.value));
+        }
+
+        // Close on backdrop click
+        document.getElementById('cmd-palette')?.addEventListener('click', (e) => {
+            if (e.target.id === 'cmd-palette') {
+                e.target.classList.add('hidden');
+            }
+        });
     }
 
     /**
-     * Search Handler
+     * Toggles the Command Palette Visibility
      */
-    _handleSearch(query) {
+    _toggleCommandPalette() {
+        const palette = document.getElementById('cmd-palette');
+        const input = document.getElementById('cmd-input');
+        if (palette.classList.contains('hidden')) {
+            palette.classList.remove('hidden');
+            input.value = '';
+            input.focus();
+            this._handleCommandSearch(''); // Show default
+        } else {
+            palette.classList.add('hidden');
+        }
+    }
+
+    /**
+     * Sidebar Search Handler (Legacy / Quick)
+     */
+    _handleSidebarSearch(query) {
         const resultsContainer = document.getElementById('search-results');
         if (!query) {
             resultsContainer.classList.add('hidden');
             return;
         }
 
-        let results = [];
-        
-        // Priority 1: Window Global Search (from app.js)
-        if (window.globalSearch) {
-            results = window.globalSearch.search(query);
-        } 
-        // Priority 2: Fallback to REPO_DATA if available
-        else if (window.REPO_DATA) {
-            const lowerQuery = query.toLowerCase();
-            results = (window.REPO_DATA.nodes || [])
-                .filter(n => n.label && n.label.toLowerCase().includes(lowerQuery))
-                .slice(0, 5)
-                .map(n => ({
-                    title: n.label,
-                    type: n.group,
-                    link: this._sanitizePath(`${this.showcasePath}/data.html?file=${n.path}`)
-                }));
-        }
-
-        this._renderSearchResults(results, resultsContainer);
+        const results = this._performSearch(query).slice(0, 5);
+        this._renderSidebarResults(results, resultsContainer);
     }
 
-    _renderSearchResults(results, container) {
+    _renderSidebarResults(results, container) {
         if (!results || results.length === 0) {
             container.classList.add('hidden');
             return;
@@ -371,7 +432,7 @@ class AdamNavigator {
         container.innerHTML = results.map(r => `
             <a href="${r.link}" class="block px-4 py-2 hover:bg-slate-700 border-b border-slate-700 last:border-0 transition-colors">
                 <div class="flex justify-between">
-                    <span class="text-xs text-cyan-400 font-bold font-mono">${r.type || 'FILE'}</span>
+                    <span class="text-xs text-cyan-400 font-bold font-mono">${r.type}</span>
                     <i class="fas fa-chevron-right text-[10px] text-slate-600"></i>
                 </div>
                 <div class="text-sm text-white font-medium">${r.title}</div>
@@ -380,13 +441,83 @@ class AdamNavigator {
     }
 
     /**
-     * Fallback UI in case of JS crash
+     * Command Palette Search Handler (Rich)
      */
-    _renderSafeMode(error) {
-        const safeNav = document.createElement('div');
-        safeNav.style = "position:fixed; top:0; left:0; width:100%; height:40px; background:#ef4444; color:white; z-index:9999; display:flex; align-items:center; justify-content:center; font-family:monospace; font-size:12px; font-weight:bold;";
-        safeNav.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px"></i> NAV SYSTEM FAILURE: ${error.message}`;
-        document.body.prepend(safeNav);
+    _handleCommandSearch(query) {
+        const container = document.getElementById('cmd-results');
+        const results = this._performSearch(query); // Get all results
+
+        if (results.length === 0) {
+            container.innerHTML = `<div class="text-center text-slate-500 py-10 font-mono">No intelligence found.</div>`;
+            return;
+        }
+
+        container.innerHTML = results.map(r => `
+            <div class="cmd-item" onclick="window.location.href='${r.link}'">
+                <div class="flex items-center gap-4">
+                    <div class="text-xs font-mono px-2 py-1 rounded bg-slate-800 border border-slate-700 ${r.color || 'text-slate-400'} w-24 text-center">
+                        ${r.type}
+                    </div>
+                    <div>
+                        <div class="font-bold text-sm">${r.title}</div>
+                        <div class="text-xs text-slate-500">${r.desc || 'System Resource'}</div>
+                    </div>
+                </div>
+                <div class="text-xs text-cyan-900 group-hover:text-cyan-400 font-mono">JUMP &crarr;</div>
+            </div>
+        `).join('');
+    }
+
+    /**
+     * Core Search Logic
+     */
+    _performSearch(query) {
+        const lowerQuery = query.toLowerCase();
+        let results = [];
+
+        // 1. Navigation Items
+        const menuItems = this._getMenuConfig();
+        results = results.concat(menuItems
+            .filter(i => i.type !== 'divider' && i.link !== 'ROOT')
+            .filter(i => i.name.toLowerCase().includes(lowerQuery))
+            .map(i => ({
+                title: i.name,
+                type: "NAVIGATION",
+                link: this._sanitizePath(`${this.showcasePath}/${i.link}`),
+                desc: "Jump to module",
+                color: "text-blue-400"
+            }))
+        );
+
+        // 2. REPO_DATA (Mock Agents / Files)
+        if (window.REPO_DATA && window.REPO_DATA.nodes) {
+            results = results.concat(window.REPO_DATA.nodes
+                .filter(n => n.label && n.label.toLowerCase().includes(lowerQuery))
+                .map(n => ({
+                    title: n.label,
+                    type: n.group || "FILE",
+                    link: this._sanitizePath(`${this.showcasePath}/data.html?file=${n.path}`),
+                    desc: n.path,
+                    color: n.group === 'Agent' ? 'text-green-400' : 'text-slate-400'
+                }))
+            );
+        }
+
+        // 3. Global Search (from app.js logic if available, usually Mock Data)
+        if (window.MOCK_DATA && window.MOCK_DATA.files) {
+             results = results.concat(window.MOCK_DATA.files
+                .filter(f => f.path.toLowerCase().includes(lowerQuery))
+                .map(f => ({
+                    title: f.path.split('/').pop(),
+                    type: "REPOSITORY",
+                    link: this._sanitizePath(`${this.showcasePath}/data.html?file=${f.path}`),
+                    desc: f.path,
+                    color: "text-purple-400"
+                }))
+            );
+        }
+
+        return results;
     }
 }
 

@@ -4,142 +4,149 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM v23.5 :: Adam v15.4 Newsletter - February 7, 2025</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --paper-bg: #fdfbf7;
             --ink-color: #1a1a1a;
-            --accent-red: #cc0000;
             --cyber-black: #050b14;
             --cyber-blue: #00f3ff;
+            --cyber-purple: #a855f7;
         }
-        body { margin: 0; background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }
-
-        .newsletter-wrapper {
-            max-width: 1000px;
-            margin: 40px auto;
-            display: grid;
-            grid-template-columns: 3fr 1fr;
-            gap: 40px;
-            padding: 20px;
-        }
-
-        /* Responsive for mobile */
-        @media (max-width: 768px) {
-            .newsletter-wrapper { grid-template-columns: 1fr; }
-        }
+        body { background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }
 
         .paper-sheet {
-            background: var(--paper-bg);
-            color: var(--ink-color);
-            padding: 60px;
-            font-family: 'Georgia', 'Times New Roman', serif;
+            background: var(--paper-bg); color: var(--ink-color);
+            padding: 60px; font-family: 'Georgia', serif;
             box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            position: relative;
         }
 
-        /* Typography */
         h1.title {
-            font-family: 'Playfair Display', serif;
-            font-size: 3rem;
-            border-bottom: 4px solid var(--ink-color);
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-            letter-spacing: -1px;
-            line-height: 1.1;
+            font-family: 'Playfair Display', serif; font-size: 3rem;
+            border-bottom: 4px solid var(--ink-color); padding-bottom: 20px; margin-bottom: 30px;
         }
         h2 {
-            font-family: 'Inter', sans-serif;
-            font-weight: 700;
-            font-size: 1.2rem;
-            margin-top: 40px;
-            margin-bottom: 15px;
-            color: var(--accent-red);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        p { line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
-        li { line-height: 1.6; margin-bottom: 10px; }
-
-        /* Sidebar */
-        .cyber-sidebar {
-            font-family: 'JetBrains Mono', monospace;
-        }
-        .sidebar-widget {
-            border: 1px solid #333;
-            background: rgba(255,255,255,0.02);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .sidebar-title {
-            color: var(--cyber-blue);
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+            font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1.2rem;
+            margin-top: 40px; color: #cc0000; text-transform: uppercase;
         }
 
-        .cyber-btn {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            padding: 6px 12px;
-            border: 1px solid #444;
-            color: #e0e0e0;
-            background: rgba(0,0,0,0.8);
-            text-decoration: none;
-            display: inline-block;
-            margin-bottom: 20px;
+        /* Cyber-HUD Sidebar */
+        .cyber-sidebar { font-family: 'JetBrains Mono', monospace; }
+        .hud-widget {
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            background: rgba(5, 11, 20, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 20px; margin-bottom: 20px;
+            position: relative; overflow: hidden;
         }
-        .cyber-btn:hover { border-color: var(--cyber-blue); color: var(--cyber-blue); }
+        .hud-widget::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--cyber-blue), transparent);
+        }
+        .hud-title { color: var(--cyber-blue); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 10px; }
+        .hud-value { color: white; font-size: 0.9rem; }
+        .hud-label { color: #64748b; font-size: 0.7rem; }
     </style>
 </head>
 <body>
-    <div style="max-width: 1400px; margin: 0 auto; padding: 20px;">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; BACK TO ARCHIVE</a>
+    <div class="fixed top-0 w-full z-50">
+        <!-- Global Nav Injection Point -->
     </div>
 
-    <div class="newsletter-wrapper">
-        <div class="paper-sheet">
-            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px;">
-                <span>2025-02-07</span>
-                <span>TYPE: NEWSLETTER</span>
+    <div class="max-w-[1600px] mx-auto p-6 pt-20 grid grid-cols-1 xl:grid-cols-4 gap-8">
+
+        <!-- Left: Navigation/Context -->
+        <div class="hidden xl:block col-span-1">
+            <a href="market_mayhem_archive.html" class="inline-flex items-center gap-2 text-cyan-400 hover:text-white transition-colors mb-8 font-mono text-sm">
+                <i class="fas fa-arrow-left"></i> RETURN TO ARCHIVE
+            </a>
+
+            <div class="hud-widget">
+                <div class="hud-title">Contributing Agent</div>
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 rounded bg-cyan-900/30 flex items-center justify-center text-cyan-400">
+                        <i class="fas fa-robot text-lg"></i>
+                    </div>
+                    <div>
+                        <div class="hud-value font-bold">SentimentAnalysisAgent</div>
+                        <div class="hud-label">v23.5.0 Active</div>
+                    </div>
+                </div>
+                <a href="agents.html" class="text-xs text-cyan-500 hover:text-white block mt-2 text-right">VIEW PROFILE >></a>
             </div>
 
-            <h1 class="title">Adam v15.4 Newsletter - February 7, 2025</h1>
+            <div class="hud-widget">
+                <div class="hud-title">Provenance</div>
+                <div class="font-mono text-xs text-slate-400 break-all">
+                    ID: 7a315c43946589fd<br>
+                    TS: 2025-02-07
+                </div>
+                <div class="mt-3 flex items-center gap-2 text-xs text-green-400">
+                    <i class="fas fa-check-circle"></i> VERIFIED
+                </div>
+            </div>
+        </div>
 
-            <h2>Market Mayhem (Executive Summary)</h2><p>Market volatility has increased this week as investors grapple with uncertainty surrounding the new administration's policy agenda and potential changes to the regulatory landscape. Concerns about potential tariffs and trade tensions have also weighed on market sentiment. The S&P 500 is down 1.2% for the week, while the Nasdaq has fallen 1.8%.</p>
-<h2>Key News & Events</h2><ul><li>New administration announces plans for infrastructure spending and tax reform.</li><li>Concerns rise about potential trade tensions with China and other key trading partners.</li><li>Regulatory changes are expected in the technology and healthcare sectors.</li><li>Inflation remains elevated, with the CPI rising 0.4% in January.</li><li>The Federal Reserve signals potential interest rate hikes in the coming months.</li></ul><h2>Top Investment Ideas</h2><h3>iShares Russell 1000 Value ETF (IWD)</h3><p><strong>Rationale:</strong> A diversified value ETF, offering exposure to undervalued companies with strong fundamentals, which may provide a hedge against market volatility and potential economic slowdown.</p><h3>Invesco DB Commodity Index Tracking Fund (DBC)</h3><p><strong>Rationale:</strong> A broad commodity index tracking fund, offering diversification and potential inflation protection in an uncertain economic environment.</p><h3>SPDR Gold Shares (GLD)</h3><p><strong>Rationale:</strong> A gold ETF, providing a safe haven asset that can hedge against geopolitical risks and market volatility.</p><h2>Notable Signals & Rumors</h2><ul><li>Rumors of increased regulatory scrutiny on technology giants are circulating.</li><li>A prominent economist warns of potential stagflation, a combination of slow economic growth and high inflation.</li><li>Insider buying activity has increased in the energy and materials sectors.</li></ul><h2>Policy Impact & Geopolitical Outlook</h2><p>The new administration's policy agenda is expected to have a significant impact on various sectors, with potential winners and losers emerging. Trade tensions and geopolitical risks remain elevated, adding to market uncertainty. Investors should closely monitor policy developments and assess their potential impact on their portfolios.</p>
+        <!-- Center: The Report -->
+        <div class="col-span-1 xl:col-span-2">
+            <div class="paper-sheet rounded-sm">
+                <div class="flex justify-between font-mono text-xs text-gray-500 mb-8">
+                    <span>2025-02-07</span>
+                    <span>NEWSLETTER</span>
+                </div>
+
+                <h1 class="title">Adam v15.4 Newsletter - February 7, 2025</h1>
+
+                <div class="prose prose-slate max-w-none">
+                    <h2>Market Mayhem (Executive Summary)</h2><p>Market volatility has increased this week as investors grapple with uncertainty surrounding the new administration's policy agenda and potential changes to the regulatory landscape. Concerns about potential tariffs and trade tensions have also weighed on market sentiment. The S&P 500 is down 1.2% for the week, while the Nasdaq has fallen 1.8%.</p>
+<h2>Key News & Events</h2><ul><li>New administration announces plans for infrastructure spending and tax reform.</li><li>Concerns rise about potential trade tensions with China and other key trading partners.</li><li>Regulatory changes are expected in the technology and healthcare sectors.</li><li>Inflation remains elevated, with the CPI rising 0.4% in January.</li><li>The Federal Reserve signals potential interest rate hikes in the coming months.</li></ul><h2>Top Investment Ideas</h2><h2>Notable Signals & Rumors</h2><ul><li>Rumors of increased regulatory scrutiny on technology giants are circulating.</li><li>A prominent economist warns of potential stagflation, a combination of slow economic growth and high inflation.</li><li>Insider buying activity has increased in the energy and materials sectors.</li></ul><h2>Policy Impact & Geopolitical Outlook</h2><p>The new administration's policy agenda is expected to have a significant impact on various sectors, with potential winners and losers emerging. Trade tensions and geopolitical risks remain elevated, adding to market uncertainty. Investors should closely monitor policy developments and assess their potential impact on their portfolios.</p>
 <h2>Deals & Corporate Actions</h2><ul><li>A major pharmaceutical company announces a merger with a biotechnology firm.</li><li>A leading technology company announces a strategic partnership with a government agency.</li><li>An energy company announces a new renewable energy project.</li></ul><h2>Earnings Watch</h2><ul><li>Several major banks are scheduled to report earnings next week.</li><li>Retail companies are expected to report earnings later this month.</li><li>The upcoming earnings season will provide insights into the health of the consumer and the overall economy.</li></ul><h2>Thematic Deep Dive</h2><p>This section provides a deep dive into the potential impact of regulatory changes on various sectors, including technology, healthcare, and energy. We also discuss strategies for managing regulatory risk and identifying investment opportunities in a changing regulatory landscape.</p>
 <h2>Fun Tidbits & Quotes</h2><ul><li>"The only constant in life is change." - Heraclitus</li><li>Did you know that the first stock exchange was established in Amsterdam in 1602?</li></ul><h2>Quirky Sign-Off</h2><p>Stay agile, stay informed, and may your investments weather any storm!</p>
 <h2>Disclaimer</h2><p>The information and recommendations provided in this newsletter are for informational purposes only and should not be construed as financial advice. Investing involves risk, and you could lose money. Consult with a qualified financial advisor before making any investment decisions.</p>
 
+                </div>
 
-            <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
-                End of Report.
+                <div class="mt-12 pt-8 border-t border-gray-300 italic text-gray-500 text-sm font-serif text-center">
+                    Generated by Adam v23.5 Autonomous Financial System
+                </div>
             </div>
         </div>
 
-        <aside class="cyber-sidebar">
-            <div class="sidebar-widget">
-                <div class="sidebar-title">Metadata</div>
-                <div style="font-size: 0.8rem; color: #aaa;">
-                    <div>DATE: <span style="color:#fff">2025-02-07</span></div>
-                    <div>TYPE: <span style="color:#fff">NEWSLETTER</span></div>
-                    <div>CLASS: <span style="color:#fff">UNCLASSIFIED</span></div>
+        <!-- Right: Analysis HUD -->
+        <div class="col-span-1">
+            <div class="hud-widget">
+                <div class="hud-title">Sentiment Analysis</div>
+                <div class="flex items-end gap-2 mb-2">
+                    <div class="text-3xl font-bold text-red-400">36</div>
+                    <div class="text-sm text-slate-400 mb-1">/ 100</div>
+                </div>
+                <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+                    <div class="h-full bg-red-500" style="width: 36%"></div>
+                </div>
+                <div class="mt-2 text-xs text-center text-red-400 font-bold">BEARISH</div>
+            </div>
+
+            <div class="hud-widget">
+                <div class="hud-title">Detected Entities</div>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-2 py-1 bg-slate-800 text-cyan-400 rounded text-xs border border-slate-700">GLD</span><span class="px-2 py-1 bg-slate-800 text-cyan-400 rounded text-xs border border-slate-700">IWD</span><span class="px-2 py-1 bg-slate-800 text-cyan-400 rounded text-xs border border-slate-700">DBC</span>
                 </div>
             </div>
 
-             <div class="sidebar-widget">
-                <div class="sidebar-title">System Status</div>
-                 <div style="display:flex; align-items:center; gap:10px;">
-                    <div style="width:10px; height:10px; background:#00ff00; border-radius:50%; box-shadow: 0 0 5px #00ff00;"></div>
-                    <span style="font-size:0.8rem; color:#00ff00;">ONLINE</span>
-                </div>
+            <div class="hud-widget">
+                <div class="hud-title">Contextual Links</div>
+                <ul class="space-y-2 text-sm text-slate-400">
+                    <li class="hover:text-cyan-400 cursor-pointer"><i class="fas fa-link mr-2 text-xs"></i>Sector Performance</li>
+                    <li class="hover:text-cyan-400 cursor-pointer"><i class="fas fa-link mr-2 text-xs"></i>Related 13F Filings</li>
+                    <li class="hover:text-cyan-400 cursor-pointer"><i class="fas fa-link mr-2 text-xs"></i>Historical Correlation</li>
+                </ul>
             </div>
-        </aside>
+        </div>
     </div>
+
+    <!-- Adam Global Nav -->
+    <script src="js/nav.js"></script>
 </body>
 </html>

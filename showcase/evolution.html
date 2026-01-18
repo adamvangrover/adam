@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v23.5 | Evolution Hub</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #050b14;
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .glass-panel {
+            background: rgba(13, 20, 31, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.1);
+        }
+        .text-purple-glow {
+            color: #a855f7;
+            text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+        }
+        .scan-line {
+            width: 100%;
+            height: 2px;
+            background: rgba(168, 85, 247, 0.3);
+            opacity: 0.5;
+            animation: scan 3s linear infinite;
+            position: fixed;
+            top: 0;
+            pointer-events: none;
+            z-index: 50;
+        }
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+        .timeline-node::before {
+            content: '';
+            position: absolute;
+            left: -29px;
+            top: 6px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #0f172a;
+            border: 2px solid #a855f7;
+        }
+    </style>
+</head>
+<body>
+    <div class="scan-line"></div>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const TIMELINE_DATA = [
+            {
+                version: "v21.0",
+                date: "Q3 2023",
+                title: "Monolithic Intelligence",
+                desc: "Single-threaded reasoning loop. Limited tool use. Static knowledge base.",
+                status: "DEPRECATED"
+            },
+            {
+                version: "v22.0",
+                date: "Q1 2024",
+                title: "Async Architecture",
+                desc: "Introduction of RabbitMQ for non-blocking operations. First multi-agent prototypes.",
+                status: "ARCHIVED"
+            },
+            {
+                version: "v23.0",
+                date: "Q3 2024",
+                title: "Adaptive Graph",
+                desc: "Cyclical reasoning graphs (LangGraph). Neuro-symbolic planning. Self-correction loops.",
+                status: "ACTIVE_LTS"
+            },
+            {
+                version: "v2.0 Swarm",
+                date: "Q1 2025",
+                title: "Hive Mind",
+                desc: "Distributed swarm intelligence. Emergent behavior. Real-time consensus protocols.",
+                status: "ALPHA"
+            }
+        ];
+
+        const MetricsChart = () => {
+            const chartRef = useRef(null);
+
+            useEffect(() => {
+                const ctx = chartRef.current.getContext('2d');
+                new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Cognitive Density', 'Agent Autonomy', 'Context Window', 'Knowledge Reach', 'Inference Speed', 'Safety Guardrails'],
+                        datasets: [{
+                            label: 'Adam v23.5 (Current)',
+                            data: [87, 64, 90, 95, 75, 88],
+                            fill: true,
+                            backgroundColor: 'rgba(168, 85, 247, 0.2)',
+                            borderColor: '#a855f7',
+                            pointBackgroundColor: '#a855f7',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#a855f7'
+                        }, {
+                            label: 'Adam v21 (Legacy)',
+                            data: [45, 20, 30, 40, 60, 50],
+                            fill: true,
+                            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                            borderColor: '#3b82f6',
+                            pointBackgroundColor: '#3b82f6',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#3b82f6'
+                        }]
+                    },
+                    options: {
+                        elements: {
+                            line: { borderWidth: 3 }
+                        },
+                        scales: {
+                            r: {
+                                angleLines: { color: '#1e293b' },
+                                grid: { color: '#1e293b' },
+                                pointLabels: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 10 } },
+                                ticks: { display: false, backdropColor: 'transparent' }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: { color: '#cbd5e1', font: { family: 'JetBrains Mono' } }
+                            }
+                        }
+                    }
+                });
+            }, []);
+
+            return <canvas ref={chartRef}></canvas>;
+        };
+
+        const EvolutionHub = () => {
+            return (
+                <div className="min-h-screen p-6 md:pl-72 transition-all duration-300">
+                    <header className="flex justify-between items-center mb-8 glass-panel p-6 rounded-lg border-l-4 border-l-purple-500">
+                        <div>
+                            <h1 className="text-3xl font-bold text-purple-glow tracking-tighter">ADAM EVOLUTION HUB</h1>
+                            <p className="text-xs text-slate-400 mt-1">SYSTEM LINEAGE // VERSION CONTROL // TELEMETRY</p>
+                        </div>
+                        <div className="text-right hidden md:block">
+                            <div className="text-2xl font-bold text-white">v23.5.Apex</div>
+                            <div className="text-xs text-emerald-400">STABLE BUILD</div>
+                        </div>
+                    </header>
+
+                    <main className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                        {/* Timeline Section */}
+                        <div className="glass-panel p-8 rounded-lg">
+                            <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
+                                <i className="fas fa-code-branch text-purple-400"></i>
+                                PHYLOGENY TIMELINE
+                            </h2>
+                            <div className="relative border-l-2 border-slate-700 ml-3 space-y-10 pl-8 py-2">
+                                {TIMELINE_DATA.map((item, idx) => (
+                                    <div key={idx} className="relative timeline-node">
+                                        <div className="flex justify-between items-center mb-1">
+                                            <span className="text-purple-400 font-bold text-lg">{item.version}</span>
+                                            <span className="text-slate-500 text-xs font-mono border border-slate-700 px-2 py-0.5 rounded">{item.date}</span>
+                                        </div>
+                                        <h3 className="text-white font-bold mb-2">{item.title}</h3>
+                                        <p className="text-slate-400 text-sm leading-relaxed">{item.desc}</p>
+                                        <div className="mt-3">
+                                            <span className={`text-[10px] font-bold px-2 py-1 rounded ${
+                                                item.status === 'ACTIVE_LTS' ? 'bg-green-900/30 text-green-400' :
+                                                item.status === 'ALPHA' ? 'bg-purple-900/30 text-purple-400' :
+                                                'bg-slate-800 text-slate-500'
+                                            }`}>
+                                                {item.status}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Right Column: Metrics & Constraints */}
+                        <div className="space-y-8">
+                            {/* Metrics */}
+                            <div className="glass-panel p-8 rounded-lg">
+                                <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
+                                    <i className="fas fa-chart-radar text-blue-400"></i>
+                                    SYSTEM TELEMETRY
+                                </h2>
+                                <div className="h-[300px]">
+                                    <MetricsChart />
+                                </div>
+                            </div>
+
+                            {/* Constraints */}
+                            <div className="glass-panel p-8 rounded-lg border-red-900/30">
+                                <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
+                                    <i className="fas fa-shield-alt text-red-400"></i>
+                                    OPERATIONAL CONSTRAINTS
+                                </h2>
+                                <ul className="space-y-4 text-sm text-slate-400">
+                                    <li className="flex items-start gap-3">
+                                        <i className="fas fa-check-circle text-green-500 mt-1"></i>
+                                        <span>
+                                            <strong className="text-white block">Fiduciary Guardrails</strong>
+                                            No autonomous execution of trades exceeding $50k notional without human-in-the-loop approval.
+                                        </span>
+                                    </li>
+                                    <li className="flex items-start gap-3">
+                                        <i className="fas fa-check-circle text-green-500 mt-1"></i>
+                                        <span>
+                                            <strong className="text-white block">Hallucination Check</strong>
+                                            All financial advice must be grounded in verified documents found in the Knowledge Graph.
+                                        </span>
+                                    </li>
+                                    <li className="flex items-start gap-3">
+                                        <i className="fas fa-check-circle text-green-500 mt-1"></i>
+                                        <span>
+                                            <strong className="text-white block">Temporal Consistency</strong>
+                                            Agents cannot access future data in backtesting simulations.
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<EvolutionHub />);
+    </script>
+
+    <!-- Adam Global Nav -->
+    <script src="../showcase/js/nav.js" data-root=".."></script>
+</body>
+</html>

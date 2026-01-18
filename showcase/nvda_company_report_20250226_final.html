@@ -4,137 +4,144 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM v23.5 :: Nvidia Corporation (NVDA) Report</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --paper-bg: #fdfbf7;
             --ink-color: #1a1a1a;
-            --accent-red: #cc0000;
             --cyber-black: #050b14;
             --cyber-blue: #00f3ff;
+            --cyber-purple: #a855f7;
         }
-        body { margin: 0; background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }
-
-        .newsletter-wrapper {
-            max-width: 1000px;
-            margin: 40px auto;
-            display: grid;
-            grid-template-columns: 3fr 1fr;
-            gap: 40px;
-            padding: 20px;
-        }
-
-        /* Responsive for mobile */
-        @media (max-width: 768px) {
-            .newsletter-wrapper { grid-template-columns: 1fr; }
-        }
+        body { background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }
 
         .paper-sheet {
-            background: var(--paper-bg);
-            color: var(--ink-color);
-            padding: 60px;
-            font-family: 'Georgia', 'Times New Roman', serif;
+            background: var(--paper-bg); color: var(--ink-color);
+            padding: 60px; font-family: 'Georgia', serif;
             box-shadow: 0 0 50px rgba(0,0,0,0.5);
-            position: relative;
         }
 
-        /* Typography */
         h1.title {
-            font-family: 'Playfair Display', serif;
-            font-size: 3rem;
-            border-bottom: 4px solid var(--ink-color);
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-            letter-spacing: -1px;
-            line-height: 1.1;
+            font-family: 'Playfair Display', serif; font-size: 3rem;
+            border-bottom: 4px solid var(--ink-color); padding-bottom: 20px; margin-bottom: 30px;
         }
         h2 {
-            font-family: 'Inter', sans-serif;
-            font-weight: 700;
-            font-size: 1.2rem;
-            margin-top: 40px;
-            margin-bottom: 15px;
-            color: var(--accent-red);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        p { line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
-        li { line-height: 1.6; margin-bottom: 10px; }
-
-        /* Sidebar */
-        .cyber-sidebar {
-            font-family: 'JetBrains Mono', monospace;
-        }
-        .sidebar-widget {
-            border: 1px solid #333;
-            background: rgba(255,255,255,0.02);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .sidebar-title {
-            color: var(--cyber-blue);
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+            font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1.2rem;
+            margin-top: 40px; color: #cc0000; text-transform: uppercase;
         }
 
-        .cyber-btn {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            padding: 6px 12px;
-            border: 1px solid #444;
-            color: #e0e0e0;
-            background: rgba(0,0,0,0.8);
-            text-decoration: none;
-            display: inline-block;
-            margin-bottom: 20px;
+        /* Cyber-HUD Sidebar */
+        .cyber-sidebar { font-family: 'JetBrains Mono', monospace; }
+        .hud-widget {
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            background: rgba(5, 11, 20, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 20px; margin-bottom: 20px;
+            position: relative; overflow: hidden;
         }
-        .cyber-btn:hover { border-color: var(--cyber-blue); color: var(--cyber-blue); }
+        .hud-widget::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--cyber-blue), transparent);
+        }
+        .hud-title { color: var(--cyber-blue); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 10px; }
+        .hud-value { color: white; font-size: 0.9rem; }
+        .hud-label { color: #64748b; font-size: 0.7rem; }
     </style>
 </head>
 <body>
-    <div style="max-width: 1400px; margin: 0 auto; padding: 20px;">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; BACK TO ARCHIVE</a>
+    <div class="fixed top-0 w-full z-50">
+        <!-- Global Nav Injection Point -->
     </div>
 
-    <div class="newsletter-wrapper">
-        <div class="paper-sheet">
-            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px;">
-                <span>2025-02-26</span>
-                <span>TYPE: COMPANY_REPORT</span>
+    <div class="max-w-[1600px] mx-auto p-6 pt-20 grid grid-cols-1 xl:grid-cols-4 gap-8">
+
+        <!-- Left: Navigation/Context -->
+        <div class="hidden xl:block col-span-1">
+            <a href="market_mayhem_archive.html" class="inline-flex items-center gap-2 text-cyan-400 hover:text-white transition-colors mb-8 font-mono text-sm">
+                <i class="fas fa-arrow-left"></i> RETURN TO ARCHIVE
+            </a>
+
+            <div class="hud-widget">
+                <div class="hud-title">Contributing Agent</div>
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 rounded bg-cyan-900/30 flex items-center justify-center text-cyan-400">
+                        <i class="fas fa-robot text-lg"></i>
+                    </div>
+                    <div>
+                        <div class="hud-value font-bold">FinancialModelingAgent</div>
+                        <div class="hud-label">v23.5.0 Active</div>
+                    </div>
+                </div>
+                <a href="agents.html" class="text-xs text-cyan-500 hover:text-white block mt-2 text-right">VIEW PROFILE >></a>
             </div>
 
-            <h1 class="title">Nvidia Corporation (NVDA) Report</h1>
-
-            <h2>Executive Summary</h2><p>Nvidia's Q4 FY25 results were impressive, but we believe the current valuation fully reflects the company's growth prospects and potential risks. We maintain a "Hold" rating and set a price target of $145.</p><h2>Q4 Fy25 Highlights</h2><ul><li>Record quarterly revenue of $39.3 billion, up 78% year-over-year.</li><li>Record data center revenue of $35.6 billion, up 93% year-over-year.</li><li>Strong demand for Blackwell architecture, with $11 billion in revenue in its first quarter.</li></ul><h2>Fy25 Highlights</h2><ul><li>Record full-year revenue of $130.5 billion, up 114% year-over-year.</li><li>Data center revenue for FY25 was $115.2 billion, up 142% year-over-year.</li></ul><h2>Key Growth Drivers</h2><ul><li>Continued demand for AI and HPC solutions.</li><li>Adoption of Blackwell architecture in data centers.</li><li>Expanding use of AI in various applications.</li></ul><h2>Challenges</h2><ul><li>Intensifying competition from AMD, Intel, and TPUs, leading to potential market share loss and pricing pressure.</li><li>Geopolitical risks and supply chain vulnerabilities, particularly related to Taiwan, could disrupt production and sales.</li><li>Potential slowdown in growth due to market saturation and macroeconomic factors.</li></ul><h2>Financial Performance</h2><h3>Revenue Growth</h3><p>Strong in Q4 FY25 and FY25, but sustainability is a concern.</p><h3>Profitability</h3><p>Margins could be pressured by competition and R&D investments.</p><h3>Balance Sheet</h3><p>Healthy, but potential for increased debt to fund growth initiatives.</p><h2>Valuation</h2><h3>Model</h3><p>DCF and comparable company analysis</p><h3>Justification</h3><p>The DCF model incorporates a balanced outlook, considering both growth opportunities and potential risks.  Comparable company analysis supports a more moderate valuation given the competitive landscape and potential for growth deceleration.</p><h3>Comparable Company Analysis</h3><h4>Companies</h4><ul><li>AMD</li><li>Intel</li><li>Broadcom</li><li>Qualcomm</li></ul><h4>Metrics</h4><ul><li>P/E ratio</li><li>Price-to-Sales ratio</li><li>EV/EBITDA</li></ul><h4>Takeaways</h4><p>Nvidia's valuation multiples are currently elevated compared to peers, suggesting limited upside potential.</p><h3>Dcf Details</h3><h4>Revenue Growth</h4><ul><li><strong>year:</strong> FY26, <strong>growth:</strong> 22%</li><li><strong>year:</strong> FY27, <strong>growth:</strong> 18%</li><li><strong>year:</strong> FY28-FY29, <strong>growth:</strong> 15%</li><li><strong>year:</strong> FY30-FY31, <strong>growth:</strong> 12%</li><li><strong>year:</strong> FY32-FY34, <strong>growth:</strong> 8%</li><li><strong>year:</strong> Terminal, <strong>growth:</strong> 3%</li></ul><h4>Gross Margin</h4><p>Gradually declining from 73% in FY25 to 65% in the terminal year.</p><h4>Operating Expenses</h4><p>Growing at a moderate pace, potentially limiting operating leverage.</p><h4>Tax Rate</h4><p>17%</p><h4>Discount Rate Wacc</h4><p>12%</p><h4>Terminal Multiple</h4><p>12x</p><h2>Trading Levels</h2><h3>Equity</h3><h4>Outlook</h4><p>Neutral</p><h4>Price Target</h4><p>145</p><h4>Potential Upside</h4><p>14.5%</p>
-
-            <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
-                End of Report.
+            <div class="hud-widget">
+                <div class="hud-title">Provenance</div>
+                <div class="font-mono text-xs text-slate-400 break-all">
+                    ID: 6a32107623a3443a<br>
+                    TS: 2025-02-26
+                </div>
+                <div class="mt-3 flex items-center gap-2 text-xs text-green-400">
+                    <i class="fas fa-check-circle"></i> VERIFIED
+                </div>
             </div>
         </div>
 
-        <aside class="cyber-sidebar">
-            <div class="sidebar-widget">
-                <div class="sidebar-title">Metadata</div>
-                <div style="font-size: 0.8rem; color: #aaa;">
-                    <div>DATE: <span style="color:#fff">2025-02-26</span></div>
-                    <div>TYPE: <span style="color:#fff">COMPANY_REPORT</span></div>
-                    <div>CLASS: <span style="color:#fff">UNCLASSIFIED</span></div>
+        <!-- Center: The Report -->
+        <div class="col-span-1 xl:col-span-2">
+            <div class="paper-sheet rounded-sm">
+                <div class="flex justify-between font-mono text-xs text-gray-500 mb-8">
+                    <span>2025-02-26</span>
+                    <span>NEWSLETTER</span>
+                </div>
+
+                <h1 class="title">Nvidia Corporation (NVDA) Report</h1>
+
+                <div class="prose prose-slate max-w-none">
+                    <h2>Executive Summary</h2><p>Nvidia's Q4 FY25 results were impressive, but we believe the current valuation fully reflects the company's growth prospects and potential risks. We maintain a "Hold" rating and set a price target of $145.</p><h2>Q4 Fy25 Highlights</h2><ul><li>Record quarterly revenue of $39.3 billion, up 78% year-over-year.</li><li>Record data center revenue of $35.6 billion, up 93% year-over-year.</li><li>Strong demand for Blackwell architecture, with $11 billion in revenue in its first quarter.</li></ul><h2>Fy25 Highlights</h2><ul><li>Record full-year revenue of $130.5 billion, up 114% year-over-year.</li><li>Data center revenue for FY25 was $115.2 billion, up 142% year-over-year.</li></ul><h2>Key Growth Drivers</h2><ul><li>Continued demand for AI and HPC solutions.</li><li>Adoption of Blackwell architecture in data centers.</li><li>Expanding use of AI in various applications.</li></ul><h2>Challenges</h2><ul><li>Intensifying competition from AMD, Intel, and TPUs, leading to potential market share loss and pricing pressure.</li><li>Geopolitical risks and supply chain vulnerabilities, particularly related to Taiwan, could disrupt production and sales.</li><li>Potential slowdown in growth due to market saturation and macroeconomic factors.</li></ul><h2>Financial Performance</h2><h3>Revenue Growth</h3><p>Strong in Q4 FY25 and FY25, but sustainability is a concern.</p><h3>Profitability</h3><p>Margins could be pressured by competition and R&D investments.</p><h3>Balance Sheet</h3><p>Healthy, but potential for increased debt to fund growth initiatives.</p><h2>Valuation</h2><h3>Model</h3><p>DCF and comparable company analysis</p><h3>Justification</h3><p>The DCF model incorporates a balanced outlook, considering both growth opportunities and potential risks.  Comparable company analysis supports a more moderate valuation given the competitive landscape and potential for growth deceleration.</p><h3>Comparable Company Analysis</h3><h4>Companies</h4><ul><li>AMD</li><li>Intel</li><li>Broadcom</li><li>Qualcomm</li></ul><h4>Metrics</h4><ul><li>P/E ratio</li><li>Price-to-Sales ratio</li><li>EV/EBITDA</li></ul><h4>Takeaways</h4><p>Nvidia's valuation multiples are currently elevated compared to peers, suggesting limited upside potential.</p><h3>Dcf Details</h3><h4>Revenue Growth</h4><ul><li><strong>year:</strong> FY26, <strong>growth:</strong> 22%</li><li><strong>year:</strong> FY27, <strong>growth:</strong> 18%</li><li><strong>year:</strong> FY28-FY29, <strong>growth:</strong> 15%</li><li><strong>year:</strong> FY30-FY31, <strong>growth:</strong> 12%</li><li><strong>year:</strong> FY32-FY34, <strong>growth:</strong> 8%</li><li><strong>year:</strong> Terminal, <strong>growth:</strong> 3%</li></ul><h4>Gross Margin</h4><p>Gradually declining from 73% in FY25 to 65% in the terminal year.</p><h4>Operating Expenses</h4><p>Growing at a moderate pace, potentially limiting operating leverage.</p><h4>Tax Rate</h4><p>17%</p><h4>Discount Rate Wacc</h4><p>12%</p><h4>Terminal Multiple</h4><p>12x</p><h2>Trading Levels</h2><h3>Equity</h3><h4>Outlook</h4><p>Neutral</p><h4>Price Target</h4><p>145</p><h4>Potential Upside</h4><p>14.5%</p>
+                </div>
+
+                <div class="mt-12 pt-8 border-t border-gray-300 italic text-gray-500 text-sm font-serif text-center">
+                    Generated by Adam v23.5 Autonomous Financial System
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Analysis HUD -->
+        <div class="col-span-1">
+            <div class="hud-widget">
+                <div class="hud-title">Sentiment Analysis</div>
+                <div class="flex items-end gap-2 mb-2">
+                    <div class="text-3xl font-bold text-green-400">88</div>
+                    <div class="text-sm text-slate-400 mb-1">/ 100</div>
+                </div>
+                <div class="h-2 bg-slate-800 rounded-full overflow-hidden">
+                    <div class="h-full bg-green-500" style="width: 88%"></div>
+                </div>
+                <div class="mt-2 text-xs text-center text-green-400 font-bold">BULLISH</div>
+            </div>
+
+            <div class="hud-widget">
+                <div class="hud-title">Detected Entities</div>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-2 py-1 bg-slate-800 text-cyan-400 rounded text-xs border border-slate-700">NVDA</span>
                 </div>
             </div>
 
-             <div class="sidebar-widget">
-                <div class="sidebar-title">System Status</div>
-                 <div style="display:flex; align-items:center; gap:10px;">
-                    <div style="width:10px; height:10px; background:#00ff00; border-radius:50%; box-shadow: 0 0 5px #00ff00;"></div>
-                    <span style="font-size:0.8rem; color:#00ff00;">ONLINE</span>
-                </div>
+            <div class="hud-widget">
+                <div class="hud-title">Contextual Links</div>
+                <ul class="space-y-2 text-sm text-slate-400">
+                    <li class="hover:text-cyan-400 cursor-pointer"><i class="fas fa-link mr-2 text-xs"></i>Sector Performance</li>
+                    <li class="hover:text-cyan-400 cursor-pointer"><i class="fas fa-link mr-2 text-xs"></i>Related 13F Filings</li>
+                    <li class="hover:text-cyan-400 cursor-pointer"><i class="fas fa-link mr-2 text-xs"></i>Historical Correlation</li>
+                </ul>
             </div>
-        </aside>
+        </div>
     </div>
+
+    <!-- Adam Global Nav -->
+    <script src="js/nav.js"></script>
 </body>
 </html>
