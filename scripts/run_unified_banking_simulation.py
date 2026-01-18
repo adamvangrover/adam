@@ -4,15 +4,15 @@ import time
 import random
 import json
 from uuid import uuid4
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Ensure core modules are in path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from core.unified_ledger.schema import ParentOrder, ChildOrder, OrderSide, OrderType, ExecutionVenue, TimeInForce
-from core.quantitative.pricing import AvellanedaStoikovModel
 from core.quantitative.matching_engine import MatchingEngine
 from core.simulation.scenarios.ccar_2025 import CCAR_2025
+from core.agents.market_making_agent import MarketMakingAgent
 
 OUTPUT_FILE = "showcase/data/unified_banking_log.json"
 
@@ -27,11 +27,11 @@ def run_simulation():
     symbol = "JPM_HY_CREDIT"
 
     # 2. Initialize Agents
-    market_maker_algo = AvellanedaStoikovModel(
-        gamma=0.5,
-        sigma=CCAR_2025.vix_peak / 100.0,
-        T=1/252,
-        k=1.5
+    # The Agent manages the specific "Avellaneda-Stoikov" model internally
+    mm_agent = MarketMakingAgent(
+        initial_gamma=0.5,
+        initial_sigma=CCAR_2025.vix_peak / 100.0,
+        dt=1/252
     )
 
     mm_inventory = 0.0
@@ -42,11 +42,11 @@ def run_simulation():
         "metadata": {
             "scenario": CCAR_2025.name,
             "description": CCAR_2025.description,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "symbol": symbol,
             "mm_parameters": {
-                "gamma": market_maker_algo.gamma,
-                "sigma": market_maker_algo.sigma
+                "initial_gamma": 0.5,
+                "sigma": CCAR_2025.vix_peak / 100.0
             }
         },
         "ticks": [],
@@ -66,22 +66,33 @@ def run_simulation():
     prev_mm_bid_id = None
     prev_mm_ask_id = None
 
+    print(f"Starting Simulation with VIX={CCAR_2025.vix_peak}")
+
     for i, qty in enumerate(chunks):
         tick_data = {
             "tick": i + 1,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "mid_price_start": mid_price,
             "mm_inventory_start": mm_inventory
         }
 
-        # A. Cancel Previous Quotes
+        # A. Agent Thinking Phase (RL Adaptation)
+        market_state = {
+            "vix": CCAR_2025.vix_peak,
+            "inventory": mm_inventory,
+            "sigma": CCAR_2025.vix_peak / 100.0
+        }
+        current_gamma = mm_agent.adapt_strategy(market_state)
+        tick_data["mm_gamma"] = current_gamma
+
+        # B. Cancel Previous Quotes
         if prev_mm_bid_id:
             matching_engine.cancel_order(symbol, prev_mm_bid_id)
         if prev_mm_ask_id:
             matching_engine.cancel_order(symbol, prev_mm_ask_id)
 
-        # B. Market Maker Updates Quotes
-        bid, ask = market_maker_algo.get_quotes(mid_price, mm_inventory, time_remaining=(len(chunks)-i)/252)
+        # C. Market Maker Updates Quotes
+        bid, ask = mm_agent.get_quotes(mid_price, mm_inventory, time_remaining=(len(chunks)-i)/252)
         spread = ask - bid
 
         tick_data["mm_quote"] = {"bid": bid, "ask": ask, "spread": spread}
@@ -113,7 +124,7 @@ def run_simulation():
         prev_mm_bid_id = mm_bid_order.order_id
         prev_mm_ask_id = mm_ask_order.order_id
 
-        # C. Wealth Management Execution
+        # D. Wealth Management Execution
         child_order = ChildOrder(
             parent_id=parent_order.order_id,
             symbol=symbol,
@@ -146,7 +157,7 @@ def run_simulation():
         tick_data["mm_inventory_end"] = mm_inventory
         simulation_log["ticks"].append(tick_data)
 
-        print(f"Tick {i+1}: Price {tick_data['mid_price_start']:.2f} -> {mid_price:.2f} | Inv {mm_inventory}")
+        print(f"Tick {i+1}: Price {tick_data['mid_price_start']:.2f} -> {mid_price:.2f} | Inv {mm_inventory} | Gamma {current_gamma:.4f}")
 
     # Save to JSON
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
