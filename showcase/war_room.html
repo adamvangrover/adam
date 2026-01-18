@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v24.0 :: STRATEGIC WAR ROOM</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ff3333; /* Red for War Room */
+            --accent-color: #ff9900;
+            --bg-color: #050505;
+            --panel-bg: rgba(20, 5, 5, 0.8);
+            --text-primary: #e0e0e0;
+            --text-muted: #888;
+            --panel-border: #551111;
+        }
+        body { margin: 0; background: var(--bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Header Styling */
+        .cyber-header {
+            height: 60px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; border-bottom: 2px solid var(--primary-color);
+            background: rgba(20, 5, 5, 0.95); position: sticky; top: 0; z-index: 100;
+        }
+
+        .cyber-btn {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            padding: 8px 16px;
+            border: 1px solid #662222;
+            color: var(--primary-color);
+            background: rgba(50,10,10,0.3);
+            border-radius: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .cyber-btn:hover { background: var(--primary-color); color: #000; box-shadow: 0 0 10px var(--primary-color); }
+
+        .glass-panel {
+            background: rgba(30, 10, 10, 0.4);
+            border: 1px solid var(--panel-border);
+            backdrop-filter: blur(5px);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: 320px 1fr 380px;
+            gap: 20px;
+            padding: 20px;
+            height: calc(100vh - 100px);
+        }
+
+        .sidebar { overflow-y: auto; }
+        .main-view { display: flex; flex-direction: column; }
+        .intel-feed { overflow-y: auto; border-left: 1px solid var(--panel-border); padding-left: 20px;}
+
+        h2, h3 { color: var(--primary-color); margin-top: 0; text-transform: uppercase; letter-spacing: 1px; }
+
+        .scenario-card {
+            border: 1px solid #333; padding: 15px; margin-bottom: 10px; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .scenario-card:hover, .scenario-card.active { border-color: var(--accent-color); background: rgba(255, 153, 0, 0.1); }
+
+        .map-display {
+            flex-grow: 1;
+            background: radial-gradient(circle at center, #1a0505 0%, #000 100%);
+            border: 1px solid var(--panel-border);
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+
+        .map-overlay {
+            position: absolute; width: 100%; height: 100%;
+            background-image: linear-gradient(0deg, transparent 24%, rgba(255, 51, 51, .1) 25%, rgba(255, 51, 51, .1) 26%, transparent 27%, transparent 74%, rgba(255, 51, 51, .1) 75%, rgba(255, 51, 51, .1) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(255, 51, 51, .1) 25%, rgba(255, 51, 51, .1) 26%, transparent 27%, transparent 74%, rgba(255, 51, 51, .1) 75%, rgba(255, 51, 51, .1) 76%, transparent 77%, transparent);
+            background-size: 50px 50px;
+        }
+
+        .event-log {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #ccc;
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .event-item { margin-bottom: 8px; border-left: 2px solid #555; padding-left: 10px; opacity: 0; animation: fadeIn 0.5s forwards; }
+        .event-item.critical { border-color: red; color: #ff9999; }
+        .event-item.economic { border-color: orange; color: #ffcc99; }
+        .event-item.cyber { border-color: #00ff00; color: #ccffcc; }
+        .event-item.quantum { border-color: #aa00ff; color: #eebbff; }
+
+        @keyframes fadeIn { to { opacity: 1; } }
+
+        .briefing-doc {
+            background: #fff; color: #000; padding: 20px; font-family: 'Times New Roman', serif;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            display: none;
+        }
+        .briefing-doc.visible { display: block; animation: slideUp 0.5s ease-out; }
+
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .defcon-indicator {
+            font-size: 2rem; font-weight: bold; padding: 10px 20px; border: 3px solid #333; display: inline-block;
+            color: #333; margin-bottom: 20px;
+        }
+        .defcon-indicator.active-1 { border-color: red; color: white; background: red; box-shadow: 0 0 20px red; animation: pulse 1s infinite; }
+        .defcon-indicator.active-2 { border-color: orangered; color: orangered; }
+        .defcon-indicator.active-3 { border-color: yellow; color: yellow; }
+        .defcon-indicator.active-4 { border-color: green; color: green; }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
+        .scan-line { position: fixed; top: 0; left: 0; width: 100%; height: 2px; background: rgba(255, 0, 0, 0.3); animation: scan 4s linear infinite; pointer-events: none; z-index: 999; }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+
+        /* Impact Grid */
+        .impact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px;}
+        .impact-cell { background: rgba(0,0,0,0.3); padding: 5px; border: 1px solid #333; }
+        .impact-label { font-size: 0.6rem; color: #888; display: flex; justify-content: space-between; margin-bottom: 2px; text-transform: uppercase; }
+        .impact-track { height: 4px; background: #221111; width: 100%; }
+        .impact-fill { height: 100%; background: var(--primary-color); width: 0%; transition: width 0.5s ease-out; }
+
+        /* Critique Swarm */
+        .critique-card {
+            background: rgba(255,255,255,0.05);
+            border-left: 3px solid #ff3333;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 0.8rem;
+        }
+        .critique-role { font-weight: bold; color: #ff9999; font-family: 'JetBrains Mono'; display: flex; justify-content: space-between;}
+        .critique-perspective { font-style: italic; color: #aaa; margin-bottom: 5px; font-size: 0.7rem; }
+
+    </style>
+</head>
+<body>
+    <div class="scan-line"></div>
+    <header class="cyber-header">
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <h1 class="mono" style="margin: 0; font-size: 1.5rem; letter-spacing: 2px;">STRATEGIC WAR ROOM</h1>
+            <div class="mono" style="font-size: 0.8rem; color: var(--primary-color); border-left: 1px solid #551111; padding-left: 10px;">DEFCON SYSTEM ACTIVE</div>
+        </div>
+        <nav style="display: flex; gap: 10px;">
+            <a href="index.html" class="cyber-btn">&larr; EXIT TO DASHBOARD</a>
+        </nav>
+    </header>
+
+    <div class="grid-container">
+        <!-- Sidebar: Controls -->
+        <aside class="sidebar">
+            <div class="glass-panel">
+                <h3>Select Scenario</h3>
+                <div class="scenario-card" onclick="selectScenario('sim_semi_blockade')" id="card_sim_semi_blockade">
+                    <div class="mono" style="font-weight: bold; color: var(--accent-color);">SEMICONDUCTOR BLOCKADE</div>
+                    <div style="font-size: 0.8rem; margin-top: 5px;">Intensity: HIGH (8/10)</div>
+                    <div style="font-size: 0.8rem; color: #888;">Supply chain disruption, naval escalation.</div>
+                </div>
+                <div class="scenario-card" onclick="selectScenario('sim_energy_shock')" id="card_sim_energy_shock">
+                    <div class="mono" style="font-weight: bold; color: yellow;">ENERGY SHOCK</div>
+                    <div style="font-size: 0.8rem; margin-top: 5px;">Intensity: MEDIUM (6/10)</div>
+                    <div style="font-size: 0.8rem; color: #888;">Grid instability, resource denial.</div>
+                </div>
+                <div class="scenario-card" onclick="selectScenario('sim_cyber_attack')" id="card_sim_cyber_attack">
+                    <div class="mono" style="font-weight: bold; color: #00ff00;">CYBER INFRASTRUCTURE</div>
+                    <div style="font-size: 0.8rem; margin-top: 5px;">Intensity: CRITICAL (9/10)</div>
+                    <div style="font-size: 0.8rem; color: #888;">Data paralysis, financial contagion.</div>
+                </div>
+                 <div class="scenario-card" onclick="selectScenario('sim_quantum_event')" id="card_sim_quantum_event">
+                    <div class="mono" style="font-weight: bold; color: #aa00ff;">QUANTUM DECRYPTION</div>
+                    <div style="font-size: 0.8rem; margin-top: 5px;">Intensity: EXISTENTIAL (10/10)</div>
+                    <div style="font-size: 0.8rem; color: #888;">Algorithm breach, ledger collapse.</div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button class="cyber-btn" style="width: 100%; padding: 15px; font-size: 1rem;" onclick="runSimulation()">INITIATE SIMULATION</button>
+                    <div class="mono" style="text-align: center; font-size: 0.7rem; color: #666; margin-top: 5px;">MONTE CARLO ENGINE: READY</div>
+                </div>
+            </div>
+
+            <div class="glass-panel">
+                <h3>System Status</h3>
+                <div class="defcon-indicator" id="defcon-display">DEFCON 5</div>
+
+                <h4 style="margin-top: 20px; font-size: 0.8rem; color: #888; text-transform: uppercase;">Sector Impact (Real-Time)</h4>
+                <div id="impact-monitor" class="impact-grid">
+                    <!-- Generated via JS -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main: Map & Timeline -->
+        <main class="main-view">
+            <div class="map-display">
+                <div class="map-overlay"></div>
+                <div style="text-align: center;">
+                    <h1 class="mono" style="color: #331111; font-size: 5rem; user-select: none;">GLOBAL THEATER</h1>
+                    <div id="simulation-status" class="mono" style="color: var(--primary-color); margin-top: 20px;">AWAITING SCENARIO INPUT...</div>
+                    <div id="mc-stats" class="mono" style="color: var(--accent-color); font-size: 0.8rem; margin-top: 10px; display: none;"></div>
+                </div>
+            </div>
+
+            <div class="glass-panel" style="height: 250px; margin-top: 20px; display: flex; flex-direction: column;">
+                <h3>Live Event Stream</h3>
+                <div class="event-log" id="event-log">
+                    <!-- Events will appear here -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Right: Intel Feed / Briefing -->
+        <aside class="intel-feed">
+            <h3 class="mono">STRATEGIC INTELLIGENCE</h3>
+            <div id="briefing-container">
+                <p style="color: #666; font-style: italic;">Briefing will be generated upon simulation completion...</p>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/nav.js"></script>
+    <script src="js/hud.js"></script>
+    <script>
+        let warRoomData = null;
+        let activeScenarioId = null;
+        let simulationInterval = null;
+        const ALL_SECTORS = [
+            "Technology", "Energy", "Finance", "Healthcare", "Industrials",
+            "Services", "Media", "Telecom", "Consumer", "Retail",
+            "Real Estate", "Shadow Banking", "Political"
+        ];
+
+        // Load data on start
+        fetch('data/war_room_data.json')
+            .then(response => response.json())
+            .then(data => {
+                warRoomData = data;
+                console.log("War Room Data Loaded", data);
+                initImpactGrid();
+            })
+            .catch(err => console.error("Failed to load war room data", err));
+
+        function initImpactGrid() {
+            const grid = document.getElementById('impact-monitor');
+            grid.innerHTML = ALL_SECTORS.map(s => {
+                const id = s.replace(' ', '-').toLowerCase();
+                return `
+                    <div class="impact-cell">
+                        <div class="impact-label"><span>${s}</span><span id="val-${id}">0%</span></div>
+                        <div class="impact-track"><div class="impact-fill" id="bar-${id}"></div></div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectScenario(id) {
+            if (!warRoomData) return;
+            activeScenarioId = id;
+
+            // UI Update
+            document.querySelectorAll('.scenario-card').forEach(el => el.classList.remove('active'));
+            document.getElementById('card_' + id).classList.add('active');
+
+            document.getElementById('simulation-status').innerText = "SCENARIO SELECTED: " + warRoomData.scenarios[id].simulation.scenario.toUpperCase();
+            document.getElementById('mc-stats').style.display = 'none';
+            document.getElementById('event-log').innerHTML = ''; // Clear log
+            document.getElementById('briefing-container').innerHTML = '<p style="color: #666; font-style: italic;">Briefing will be generated upon simulation completion...</p>';
+            updateDefcon(5);
+            resetImpactBars();
+        }
+
+        function runSimulation() {
+            if (!activeScenarioId || !warRoomData) {
+                alert("Please select a scenario first.");
+                return;
+            }
+
+            const scenario = warRoomData.scenarios[activeScenarioId];
+            const timeline = scenario.simulation.timeline;
+
+            document.getElementById('simulation-status').innerText = "SIMULATION RUNNING...";
+            document.getElementById('event-log').innerHTML = '';
+            resetImpactBars();
+
+            let i = 0;
+            if (simulationInterval) clearInterval(simulationInterval);
+
+            simulationInterval = setInterval(() => {
+                if (i >= timeline.length) {
+                    clearInterval(simulationInterval);
+                    finishSimulation(scenario);
+                    return;
+                }
+
+                const event = timeline[i];
+                addEventToLog(event);
+                updateDefcon(event.defcon_level);
+
+                // Simulate progressive impact buildup
+                const progress = (i + 1) / timeline.length;
+                updateImpactBars(scenario.simulation.sector_impact, progress);
+
+                i++;
+
+            }, 600); // 600ms per event (faster)
+        }
+
+        function resetImpactBars() {
+            ALL_SECTORS.forEach(s => {
+                const id = s.replace(' ', '-').toLowerCase();
+                const elBar = document.getElementById('bar-' + id);
+                const elVal = document.getElementById('val-' + id);
+                if(elBar) elBar.style.width = '0%';
+                if(elVal) elVal.innerText = '0%';
+            });
+        }
+
+        function updateImpactBars(finalImpacts, progress) {
+            if(!finalImpacts) return;
+
+            for (const [key, val] of Object.entries(finalImpacts)) {
+                const id = key.replace(' ', '-').toLowerCase();
+                const elBar = document.getElementById('bar-' + id);
+                const elVal = document.getElementById('val-' + id);
+
+                if (elBar && elVal) {
+                    const currentVal = Math.floor(val * progress);
+                    elBar.style.width = currentVal + '%';
+                    elVal.innerText = currentVal + '%';
+
+                    // Color coding
+                    if (currentVal > 70) elBar.style.background = '#ff3333';
+                    else if (currentVal > 40) elBar.style.background = '#ff9900';
+                    else elBar.style.background = '#00f3ff';
+                }
+            }
+        }
+
+        function addEventToLog(event) {
+            const log = document.getElementById('event-log');
+            const item = document.createElement('div');
+            let typeClass = 'economic';
+            if (event.impact_score > 60) typeClass = 'critical';
+            if (event.type === 'Cyber') typeClass = 'cyber';
+            if (event.type === 'Quantum') typeClass = 'quantum';
+
+            item.className = `event-item ${typeClass}`;
+            item.innerHTML = `
+                <span class="mono" style="color: #666;">[${event.date}]</span>
+                <strong>${event.type.toUpperCase()}</strong>: ${event.description}
+                <span style="font-size:0.7em; opacity:0.7;">(IMPACT: ${event.impact_score})</span>
+            `;
+            log.prepend(item); // Newest at top
+        }
+
+        function updateDefcon(level) {
+            const display = document.getElementById('defcon-display');
+            display.innerText = "DEFCON " + level;
+            display.className = "defcon-indicator active-" + level;
+        }
+
+        function finishSimulation(scenario) {
+            document.getElementById('simulation-status').innerText = "SIMULATION COMPLETE. GENERATING BRIEFING...";
+
+            // Show stats if available
+            if (scenario.simulation.statistics) {
+                const s = scenario.simulation.statistics;
+                document.getElementById('mc-stats').innerText = `MONTE CARLO RESULTS (20 Runs) :: Mean Impact: ${s.mean_impact} :: 95% CI: [${s.confidence_95[0]} - ${s.confidence_95[1]}]`;
+                document.getElementById('mc-stats').style.display = 'block';
+            }
+
+            // Finalize bars
+            updateImpactBars(scenario.simulation.sector_impact, 1.0);
+
+            setTimeout(() => {
+                document.getElementById('simulation-status').innerText = "STRATEGIC BRIEFING AVAILABLE";
+                renderBriefing(scenario.briefing);
+            }, 1000);
+        }
+
+        function renderBriefing(briefing) {
+            const container = document.getElementById('briefing-container');
+            let falloutHtml = '';
+            if (briefing.economic_fallout) {
+                falloutHtml = `
+                    <div style="margin-bottom: 15px;">
+                        <strong>3. ECONOMIC FALLOUT ANALYSIS</strong>
+                        <p>${briefing.economic_fallout}</p>
+                    </div>
+                `;
+            }
+
+            let critiqueHtml = '';
+            if (briefing.independent_critiques && briefing.independent_critiques.length > 0) {
+                 critiqueHtml = `<div style="margin-top: 20px; border-top: 2px dashed #ccc; padding-top: 10px;">
+                    <strong>APPENDIX: INDEPENDENT CRITIQUE SWARM</strong>`;
+
+                 briefing.independent_critiques.forEach(c => {
+                     critiqueHtml += `
+                        <div class="critique-card">
+                            <div class="critique-role">
+                                <span><i class="fas fa-robot"></i> ${c.agent.toUpperCase()}</span>
+                            </div>
+                            <div class="critique-perspective">${c.perspective}</div>
+                            <div>"${c.critique}"</div>
+                        </div>
+                     `;
+                 });
+                 critiqueHtml += `</div>`;
+            }
+
+            container.innerHTML = `
+                <div class="briefing-doc visible">
+                    <div style="border-bottom: 2px solid #000; margin-bottom: 15px; padding-bottom: 10px; text-align: center;">
+                        <h2 style="color: #000; margin: 0;">THE WHITE HOUSE</h2>
+                        <h4 style="color: #000; margin: 5px 0;">WASHINGTON</h4>
+                        <div style="font-size: 0.8rem; margin-top: 5px; font-weight: bold; color: red;">${briefing.classification}</div>
+                    </div>
+
+                    <div style="font-family: 'Courier New', monospace; font-size: 0.9rem; margin-bottom: 20px;">
+                        <div><strong>MEMORANDUM FOR:</strong> ${briefing.header.to}</div>
+                        <div><strong>FROM:</strong> ${briefing.header.from}</div>
+                        <div><strong>SUBJECT:</strong> ${briefing.header.subject}</div>
+                        <div><strong>DATE:</strong> ${briefing.header.date}</div>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <strong>1. EXECUTIVE SUMMARY</strong>
+                        <p>${briefing.executive_summary}</p>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <strong>2. KEY JUDGMENTS</strong>
+                        <ul>
+                            ${briefing.key_judgments.map(j => `<li>${j}</li>`).join('')}
+                        </ul>
+                    </div>
+
+                    ${falloutHtml}
+
+                    <div style="margin-bottom: 15px;">
+                        <strong>${falloutHtml ? '4' : '3'}. STRATEGIC RECOMMENDATIONS</strong>
+                        <ol>
+                            ${briefing.recommendations.map(r => `<li>${r}</li>`).join('')}
+                        </ol>
+                    </div>
+
+                    ${critiqueHtml}
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
