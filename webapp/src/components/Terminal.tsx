@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import TerminalDisplay from './TerminalDisplay';
 
 const Terminal: React.FC = () => {
   const [output, setOutput] = useState<string[]>([]);
   const [input, setInput] = useState('');
   const [isLive] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
 
   const simulateBoot = async () => {
     const bootSequence = [
@@ -23,12 +23,6 @@ const Terminal: React.FC = () => {
   useEffect(() => {
     simulateBoot();
   }, []);
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [output]);
 
   const handleCommand = (cmd: string) => {
     const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
@@ -66,19 +60,7 @@ const Terminal: React.FC = () => {
         </div>
 
         <div className="h-full flex flex-col">
-            <div
-                className="flex-1 overflow-y-auto space-y-1 text-green-400 p-2 focus:outline-none focus:ring-1 focus:ring-cyber-cyan/30"
-                ref={scrollRef}
-                role="log"
-                aria-live="polite"
-                aria-atomic="false"
-                aria-label="Terminal Output"
-                tabIndex={0}
-            >
-                {output.map((line, i) => (
-                    <div key={i} className="break-all">{line}</div>
-                ))}
-            </div>
+            <TerminalDisplay lines={output} />
             <div className="mt-2 flex items-center border-t border-cyber-cyan/20 pt-2">
                 <span className="text-cyber-cyan mr-2">{'>'}</span>
                 <input
