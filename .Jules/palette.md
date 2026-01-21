@@ -63,3 +63,7 @@
 ## 2026-01-12 - Identifying Debt via Inline Styles
 **Learning:** Components using extensive inline `style` attributes often indicate legacy code or prototypes that lack both design system consistency and accessibility features. These are high-yield targets for refactoring.
 **Action:** Use `grep "style={{"` to find and prioritize components that need both visual and accessible upgrades.
+
+## 2026-02-15 - Micro-Interactions for Long Calculations
+**Learning:** In data-heavy applications, users expect immediate feedback even for operations that take < 2 seconds. A simple spinner or "Analyzing..." text prevents rage clicks and reassures the user the system is working.
+**Action:** Always add a loading state to "Run Analysis" or "Calculate" buttons, even if the backend is fast.
