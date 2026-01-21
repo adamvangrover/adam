@@ -1,9 +1,13 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from .layers import GraphConvolutionLayer, GraphAttentionLayer
+from .layers import GraphConvolutionLayer, GraphAttentionLayer, GraphSAGELayer
 
 class GCN(nn.Module):
+    """
+    Graph Convolutional Network (GCN)
+    Two-layer GCN with ReLU activation and Dropout.
+    """
     def __init__(self, nfeat, nhid, nclass, dropout=0.5):
         super(GCN, self).__init__()
         self.gc1 = GraphConvolutionLayer(nfeat, nhid)
@@ -17,8 +21,11 @@ class GCN(nn.Module):
         return torch.sigmoid(x)
 
 class GAT(nn.Module):
-    def __init__(self, nfeat, nhid, nclass, dropout=0.5, alpha=0.2, nheads=2):
-        """Dense GAT model."""
+    """
+    Graph Attention Network (GAT) 
+    Multi-head attention mechanism.
+    """
+    def __init__(self, nfeat, nhid, nclass, dropout=0.6, alpha=0.2, nheads=2):
         super(GAT, self).__init__()
         self.dropout = dropout
 
@@ -33,4 +40,21 @@ class GAT(nn.Module):
         x = torch.cat([att(x, adj) for att in self.attentions], dim=1)
         x = F.dropout(x, self.dropout, training=self.training)
         x = F.elu(self.out_att(x, adj))
+        return torch.sigmoid(x)
+
+class GraphSAGE(nn.Module):
+    """
+    GraphSAGE 
+    Inductive learning model using neighbor sampling and aggregation.
+    """
+    def __init__(self, nfeat, nhid, nclass, dropout=0.5):
+        super(GraphSAGE, self).__init__()
+        self.sage1 = GraphSAGELayer(nfeat, nhid)
+        self.sage2 = GraphSAGELayer(nhid, nclass)
+        self.dropout = dropout
+
+    def forward(self, x, adj):
+        x = self.sage1(x, adj)
+        x = F.dropout(x, self.dropout, training=self.training)
+        x = self.sage2(x, adj)
         return torch.sigmoid(x)

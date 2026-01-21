@@ -21,42 +21,37 @@ from core.xai.iqnn_cs import IQNNCS
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("ResearchDemo")
 
-def run_gnn_analysis():
-    logger.info("--- Starting Graph Neural Network Risk Analysis ---")
+def run_advanced_gnn_analysis():
+    logger.info("--- Starting Advanced GNN Risk Analysis (GAT + Explainer) ---")
     try:
-        # GNN now defaults to GCN, but we can imagine configuring it for GAT
-        # For this demo, we'll stick to GCN but mention the GAT capability in logs
-        engine = GraphRiskEngine()
+        # Use GAT model (Main Branch) for better topological feature extraction
+        engine = GraphRiskEngine(model_type="GAT")
         logger.info(f"Graph Engine initialized with {engine.num_nodes} nodes.")
-        logger.info("Model Architecture: GCN (Hybrid with GAT capability)")
+        logger.info("Model Architecture: Graph Attention Network (GAT)")
 
         risk_scores = engine.predict_risk()
 
-        # Top 5 riskiest nodes
-        sorted_risk = sorted(risk_scores.items(), key=lambda x: x[1], reverse=True)
-        top_risky = sorted_risk[:5]
+        # Explain the riskiest node 
+        if risk_scores:
+            sorted_risk = sorted(risk_scores.items(), key=lambda x: x[1], reverse=True)
+            top_risky_node, top_score = sorted_risk[0]
 
-        logger.info("Top 5 High-Risk Nodes detected by GNN:")
-        for node, score in top_risky:
-            logger.info(f"  {node}: {score:.4f}")
+            logger.info(f"Explaining top risky node: {top_risky_node} (Score: {top_score:.4f})")
+            
+            # Use the merged Explain method
+            mask_adj, mask_feat = engine.explain_risk(top_risky_node)
 
-        # Run GNN Explainer on the #1 riskiest node
-        if top_risky:
-            top_node, _ = top_risky[0]
-            node_idx = engine.node_map[top_node]
-            logger.info(f"Running GNNExplainer on {top_node} (Index {node_idx})...")
+            if mask_feat is not None:
+                # Summarize feature importance from the mask tensor
+                # Taking the mean importance across the node features
+                avg_importance = torch.mean(mask_feat, dim=0).detach().numpy()
+                logger.info(f"  Explanation Generated. Top Feature Indices: {np.argsort(avg_importance)[-3:]}")
+            
+            return sorted_risk
+        return []
 
-            explainer = GNNExplainer(engine.model, epochs=50)
-            explanation = explainer.explain_node(node_idx, engine.features, engine.adj)
-
-            logger.info("Feature Importance Scores:")
-            logger.info(explanation['feature_importance'])
-
-        return sorted_risk
     except Exception as e:
-        logger.error(f"GNN Analysis failed: {e}")
-        import traceback
-        traceback.print_exc()
+        logger.error(f"GNN Analysis failed: {e}", exc_info=True)
         return []
 
 def run_xai_analysis(gnn_results):
@@ -77,41 +72,64 @@ def run_xai_analysis(gnn_results):
         iqnn.record_prediction(np.random.rand(5), predicted_class, attr)
 
     report = iqnn.generate_explanation_report()
-    logger.info("XAI Report Generated:")
-    print(report)
+    logger.info("XAI Report Generated.")
     return report
 
-def run_federated_learning():
-    logger.info("--- Starting Federated Learning Simulation (Non-IID) ---")
-    logger.info("Using enhanced CreditRiskModel with BatchNorm and Dropout.")
-
-    # Simulate 3 banks with different sector biases
+def run_federated_learning_simulation():
+    logger.info("--- Starting FinGraphFL Simulation (Privacy + MSGuard) ---")
+    
+    # Simulate 3 banks with different sector biases (Feature Branch Configs)
+    # merged into the FinGraphFL mode (Main Branch Capability)
     client_configs = [
         {"id": "Bank_Tech (High Vol)", "sector_bias": {1: 1.0}},
         {"id": "Bank_Energy (High Debt)", "sector_bias": {0: 1.0}},
         {"id": "Bank_Retail (Stable)", "sector_bias": {0: -0.5, 1: -0.5}}
     ]
 
-    coordinator = FederatedCoordinator(num_clients=3, input_dim=10, client_configs=client_configs)
+    # Initialize Coordinator in FinGraphFL mode
+    coordinator = FederatedCoordinator(
+        num_clients=3, 
+        input_dim=10, 
+        client_configs=client_configs,
+        mode="FinGraphFL" 
+    )
 
     history = []
-    for round_num in range(1, 6):
+    for round_num in range(1, 4): # Short run for demo
         loss, acc = coordinator.run_round(round_num)
         history.append({"round": round_num, "loss": loss, "accuracy": acc})
 
-    logger.info("FL Simulation Complete.")
+    logger.info("FinGraphFL Simulation Complete.")
     return history
 
 def run_oswm_simulation():
     logger.info("--- Starting One-Shot World Model Simulation ---")
+    
+    # Initialize the Agent (which handles OSWM pretraining internally)
+    agent = StrategicForesightAgent(config={})
+    
+    # Generate a Strategic Market Briefing
+    # This utilizes the internal OSWMInference engine
+    briefing = agent.execute(ticker="SPY", horizon=10)
+    
+    # Wait for async execution if this was real async, but here we simulate sync return
+    # If execute returns a coroutine in actual implementation, we'd run_until_complete here.
+    # Assuming the merged agent wrapper handles the sync/async bridge or returns dict directly for demo.
+    
+    # Since execute is async in AgentBase, but our demo might be sync script:
+    # We will manually call the synchronous worker method for the demo if needed, 
+    # or assume we are running in an event loop. 
+    # For this script, let's call the worker directly to avoid async complexity in the demo script:
+    if hasattr(agent, "_generate_market_briefing"):
+        briefing = agent._generate_market_briefing(ticker="SPY", horizon=10)
+    else:
+        # Fallback if async
+        import asyncio
+        briefing = asyncio.run(agent.execute(ticker="SPY", horizon=10))
 
-    agent = StrategicForesightAgent()
-
-    # Generate a briefing
-    briefing = agent.generate_briefing(ticker="SPY", horizon=10)
-
-    logger.info(f"Strategic Briefing Status: {briefing['status']}")
-    logger.info(f"Narrative: {briefing['narrative']}")
+    logger.info(f"Strategic Briefing Status: {briefing.get('status', 'UNKNOWN')}")
+    if 'narrative' in briefing:
+        logger.info(f"Narrative: {briefing['narrative']}")
 
     return briefing
 
@@ -129,30 +147,32 @@ def run_quantum_simulation():
     return {"var_result": result, "optimization": opt_result}
 
 def main():
-    logger.info("Initializing Research Modules...")
+    logger.info("Initializing Advanced Research Modules...")
 
-    # 1. GNN
-    gnn_results = run_gnn_analysis()
+    # 1. Advanced GNN (GAT + Explainer)
+    gnn_results = run_advanced_gnn_analysis()
 
-    # 2. XAI
+    # 2. XAI (IQNN-CS)
     xai_report = run_xai_analysis(gnn_results)
 
-    # 3. FL
-    fl_history = run_federated_learning()
+    # 3. FinGraphFL (Federated Learning with Privacy)
+    fl_history = run_federated_learning_simulation()
 
-    # 4. OSWM
+    # 4. OSWM (One-Shot World Model)
     oswm_briefing = run_oswm_simulation()
 
-    # 5. Quantum
+    # 5. Quantum (QAOA)
     quantum_results = run_quantum_simulation()
 
     # Output structure
     output_data = {
         "gnn_risk_analysis": {
-            "top_risky_nodes": gnn_results[:10]
+            "model": "GAT",
+            "top_risky_nodes": gnn_results[:10] if gnn_results else []
         },
         "xai_report": xai_report,
         "federated_learning": {
+            "mode": "FinGraphFL",
             "training_history": fl_history
         },
         "oswm_simulation": {

@@ -9,7 +9,16 @@ import networkx as nx
 from typing import Dict, List, Optional, Any
 from core.system.provenance_logger import ProvenanceLogger, ActivityType
 
+
 class CrisisSimulationEngine:
+    # Pre-compiled regex patterns for performance
+    TITLE_PATTERN = re.compile(r"^# PROMPT:\s*(.*)", re.MULTILINE)
+    ID_PATTERN = re.compile(r"\*\*?ID:?\*\*?\s*(.*)", re.IGNORECASE)
+    TAGS_PATTERN = re.compile(r"\*\*?Tags:?\*\*?\s*\[(.*)\]", re.IGNORECASE)
+    MARKET_IMPACT_PATTERN = re.compile(r"\*\*Market Impact:\*\*(.*?)(##|$)", re.DOTALL)
+    IMPACT_LINE_PATTERN = re.compile(r"\*\s*\*\*(.*?):\*\*\s*(.*)")
+    IMPACT_DETAIL_PATTERN = re.compile(r"([A-Z]+)\s*([+-]?\d+%)")
+
     def __init__(self, knowledge_graph: Optional[nx.DiGraph] = None, logger: Optional[ProvenanceLogger] = None):
         self.kg = knowledge_graph if knowledge_graph else nx.DiGraph()
         self.logger = logger if logger else ProvenanceLogger()
@@ -33,16 +42,26 @@ class CrisisSimulationEngine:
 
     def _extract_title(self, content: str) -> str:
         # Matches "# PROMPT: Title"
-        match = re.search(r"^# PROMPT:\s*(.*)", content, re.MULTILINE)
+        match = self.TITLE_PATTERN.search(content)
         return match.group(1).strip() if match else "UNKNOWN"
 
     def _extract_field(self, content: str, label: str) -> str:
+        if label == "ID":
+            match = self.ID_PATTERN.search(content)
+            return match.group(1).strip() if match else "UNKNOWN"
+
         # Matches "**Label:** Value"
         pattern = r"\*\*?" + re.escape(label) + r":?\*\*?\s*(.*)"
         match = re.search(pattern, content, re.IGNORECASE)
         return match.group(1).strip() if match else "UNKNOWN"
 
     def _extract_list(self, content: str, label: str) -> List[str]:
+        if label == "Tags":
+            match = self.TAGS_PATTERN.search(content)
+            if match:
+                return [x.strip() for x in match.group(1).split(',')]
+            return []
+
         pattern = r"\*\*?" + re.escape(label) + r":?\*\*?\s*\[(.*)\]"
         match = re.search(pattern, content, re.IGNORECASE)
         if match:
@@ -52,7 +71,7 @@ class CrisisSimulationEngine:
     def _parse_shocks(self, content: str) -> List[Dict[str, Any]]:
         # Heuristic parsing of "Market Impact" section
         shocks = []
-        impact_section = re.search(r"\*\*Market Impact:\*\*(.*?)(##|$)", content, re.DOTALL)
+        impact_section = self.MARKET_IMPACT_PATTERN.search(content)
         if impact_section:
             lines = impact_section.group(1).strip().split('\n')
             for line in lines:
@@ -63,12 +82,12 @@ class CrisisSimulationEngine:
                     # 2. optional whitespace
                     # 3. **Category:**
                     # 4. Details
-                    match = re.match(r"\*\s*\*\*(.*?):\*\*\s*(.*)", line.strip())
+                    match = self.IMPACT_LINE_PATTERN.match(line.strip())
                     if match:
                         category = match.group(1)
                         details = match.group(2)
                         # Parse details like "NDX -15%"
-                        impacts = re.findall(r"([A-Z]+)\s*([+-]?\d+%)", details)
+                        impacts = self.IMPACT_DETAIL_PATTERN.findall(details)
                         for ticker, change in impacts:
                             shocks.append({
                                 "target": ticker,
@@ -101,7 +120,7 @@ class CrisisSimulationEngine:
 
             # Update Graph State (Mocking property update)
             if target in self.kg.nodes:
-                current_val = self.kg.nodes[target].get('valuation', 100) # Default mock value
+                current_val = self.kg.nodes[target].get('valuation', 100)  # Default mock value
                 self.kg.nodes[target]['valuation'] = current_val * (1 + magnitude)
 
         # 2. Second Order Effects (Simple Neighbors Propagation)
@@ -131,12 +150,13 @@ class CrisisSimulationEngine:
 
         return simulation_log
 
+
 if __name__ == "__main__":
     # Mock Usage
     kg = nx.DiGraph()
     kg.add_node("NDX", type="Index", valuation=15000)
     kg.add_node("NVDA", type="Equity", valuation=1000)
-    kg.add_edge("NDX", "NVDA", weight=0.8) # NVDA depends on NDX sentiment
+    kg.add_edge("NDX", "NVDA", weight=0.8)  # NVDA depends on NDX sentiment
 
     engine = CrisisSimulationEngine(kg)
     # Assuming the file exists from previous turn

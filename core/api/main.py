@@ -2,9 +2,11 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from core.api.routers import agents
+from core.settings import settings
 from contextlib import asynccontextmanager
 import logging
 import traceback
+import os
 
 # Setup logger
 logger = logging.getLogger("core.api")
@@ -29,15 +31,30 @@ app = FastAPI(
 async def global_exception_handler(request: Request, exc: Exception):
     logger.error(f"Global Exception: {str(exc)}")
     logger.error(traceback.format_exc())
+
+    # 🛡️ Sentinel: Don't leak internal details in production
+    if settings.debug:
+        content = {"message": "Internal Server Error", "details": str(exc)}
+    else:
+        content = {"message": "Internal Server Error"}
+
     return JSONResponse(
         status_code=500,
-        content={"message": "Internal Server Error", "details": str(exc)},
+        content=content,
     )
+
+# 🛡️ Sentinel: Restrict CORS to specific origins
+# Allow configuring via environment variable, default to common development ports
+allowed_origins_str = os.environ.get(
+    "ALLOWED_ORIGINS",
+    "http://localhost:3000,http://localhost:5000,http://127.0.0.1:3000,http://127.0.0.1:5000"
+)
+allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",")]
 
 # Add CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
