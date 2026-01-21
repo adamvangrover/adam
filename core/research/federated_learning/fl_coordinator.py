@@ -7,20 +7,49 @@ from .privacy import MSGuard
 
 class FederatedCoordinator:
     """
-    Manages the Federated Learning process (aggregation).
+    Manages the Federated Learning process (aggregation). 
+
+[Image of federated learning architecture]
+
     Supports 'Standard' (MLP) and 'FinGraphFL' (GAT + Privacy) modes.
     """
-    def __init__(self, num_clients=3, input_dim=10, mode="Standard"):
+
+    def __init__(self, num_clients=3, input_dim=10, client_configs=None, mode="Standard"):
         self.mode = mode
         self.round_history = []
 
-        if mode == "FinGraphFL":
+        # 1. Initialize Global Model based on Mode
+        if self.mode == "FinGraphFL":
             print("Initializing FinGraphFL: GAT models + Differential Privacy + MSGuard")
             self.global_model = GAT(nfeat=input_dim, nhid=16, nclass=1)
-            self.clients = [FinGraphFLClient(client_id=f"Bank_{i}", input_dim=input_dim) for i in range(num_clients)]
         else:
             self.global_model = CreditRiskModel(input_dim=input_dim)
-            self.clients = [FederatedClient(client_id=f"Bank_{i}", input_dim=input_dim) for i in range(num_clients)]
+
+        # 2. Initialize Clients (Handling Configs + Mode)
+        self.clients = []
+        
+        if self.mode == "FinGraphFL":
+            # Graph/Privacy Mode
+            # Uses FinGraphFLClient. Respects IDs from config if present, ignoring sector_bias 
+            # as graph topology usually overrides simple bias params.
+            if client_configs:
+                for cfg in client_configs:
+                    self.clients.append(FinGraphFLClient(client_id=cfg['id'], input_dim=input_dim))
+            else:
+                self.clients = [FinGraphFLClient(client_id=f"Bank_{i}", input_dim=input_dim) for i in range(num_clients)]
+        
+        else:
+            # Standard Mode
+            # Uses standard FederatedClient. Fully supports sector_bias from feature branch.
+            if client_configs:
+                for cfg in client_configs:
+                    self.clients.append(FederatedClient(
+                        client_id=cfg['id'],
+                        input_dim=input_dim,
+                        sector_bias=cfg.get('sector_bias')
+                    ))
+            else:
+                self.clients = [FederatedClient(client_id=f"Bank_{i}", input_dim=input_dim) for i in range(num_clients)]
 
     def aggregate_weights(self, client_weights):
         """

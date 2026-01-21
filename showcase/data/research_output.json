@@ -3,94 +3,118 @@
     "model": "GAT",
     "top_risky_nodes": [
       [
-        "RiskProfile",
-        0.6969138383865356
+        "Framework: BASEL_III",
+        0.9090366363525391
       ],
       [
-        "ESGScore",
-        0.6969138383865356
-      ],
-      [
-        "InterestRate",
-        0.6969138383865356
-      ],
-      [
-        "CyberAttack",
-        0.6969138383865356
-      ],
-      [
-        "NewsArticle",
-        0.6969138383865356
-      ],
-      [
-        "SocialMediaPost",
-        0.6969138383865356
-      ],
-      [
-        "Apple Inc.",
-        0.6969138383865356
+        "TAIWAN SEMICONDUCTOR MANUFACTURING COMPANY LTD.",
+        0.847232460975647
       ],
       [
         "Company",
-        0.6969137787818909
+        0.785216748714447
       ],
       [
-        "FinancialReport",
-        0.6969137787818909
+        "Framework: GDPR",
+        0.7618621587753296
       ],
       [
-        "FinancialData",
-        0.6969137787818909
+        "Framework: DORA",
+        0.7618621587753296
+      ],
+      [
+        "Framework: AI_ACT",
+        0.7618621587753296
+      ],
+      [
+        "ASML HOLDING N.V.",
+        0.7560371160507202
+      ],
+      [
+        "US Consumer Price Index (YoY)",
+        0.7462680339813232
+      ],
+      [
+        "NVIDIA CORPORATION",
+        0.7375922203063965
+      ],
+      [
+        "AMAZON.COM, INC.",
+        0.6608426570892334
       ]
     ]
   },
+  "xai_report": "--- IQNN-CS Interpretability Report ---\nClass 0 ICAA: 0.9745 [ROBUST]\nClass 1 ICAA: 0.9718 [ROBUST]\nGlobal Model Interpretability Score: 0.9731\nCONCLUSION: The model demonstrates consistent economic logic across predictions.",
   "federated_learning": {
     "mode": "FinGraphFL",
     "training_history": [
       {
         "round": 1,
-        "loss": 10.234120082855226,
-        "accuracy": 0.59
+        "loss": 0.6722633322079976,
+        "accuracy": 0.77
       },
       {
         "round": 2,
-        "loss": 14.821059481302896,
-        "accuracy": 0.64
+        "loss": 0.6020883123079935,
+        "accuracy": 0.7766666666666667
       },
       {
         "round": 3,
-        "loss": 15.21865863800049,
-        "accuracy": 0.64
+        "loss": 0.5544495224952698,
+        "accuracy": 0.7966666666666667
+      },
+      {
+        "round": 4,
+        "loss": 0.5305350720882416,
+        "accuracy": 0.81
+      },
+      {
+        "round": 5,
+        "loss": 0.4950747211774191,
+        "accuracy": 0.8433333333333333
       }
     ]
   },
   "oswm_simulation": {
-    "scenario_type": "Market Recovery (PFN)",
-    "data": {
-      "context": [
-        100.10528876015746,
-        99.424507567205,
-        98.54649452687751,
-        97.40256932928466,
-        96.5704471314305,
-        95.33734368171788,
-        94.69924105195716,
-        93.3763358473451,
-        92.67059734299276,
-        91.28241261482624
+    "briefing": {
+      "target": "SPY",
+      "status": "REGIME_SHIFT_IMMINENT",
+      "forecast_drift_pct": -5.629680451921746,
+      "volatility_index": 0.0014630107331253283,
+      "projected_path": [
+        664.0418595613221,
+        662.2248344123444,
+        661.1871633849094,
+        660.0593224576089,
+        658.8131750843032,
+        657.4622712166645,
+        656.1136100540709,
+        654.8392549424077,
+        653.711945103042,
+        652.7217268426464
       ],
-      "prediction": [
-        3.278953790664673,
-        2.6389472484588623,
-        2.6141812801361084,
-        2.615004777908325,
-        2.6132285594940186,
-        2.608318328857422,
-        2.600945234298706,
-        2.592027425765991,
-        2.581348180770874,
-        2.569990873336792
-      ]
+      "narrative": "CRITICAL ALERT: OSWM detects a 5.6% CRASH trajectory for SPY. Hedging recommended."
+    }
+  },
+  "quantum_simulation": {
+    "var_result": {
+      "backend": "ibmq_mock_guadalupe",
+      "method": "Quantum Amplitude Estimation (QAE)",
+      "speedup_factor": "~100x (Simulated)",
+      "VaR_99": 66138.93567053287,
+      "classical_equivalent_samples": 1000000,
+      "quantum_samples": 1000,
+      "status": "COMPLETED"
+    },
+    "optimization": {
+      "method": "QAOA",
+      "allocation": {
+        "AAPL": 0.28680824702177193,
+        "GOOGL": 0.16555278224208395,
+        "MSFT": 0.2607440592495226,
+        "AMZN": 0.28689491148662155
+      },
+      "energy": -0.5
     }
   }
 }

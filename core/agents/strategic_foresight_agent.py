@@ -2,8 +2,12 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime
 import json
 import logging
+import numpy as np
 
-# Import the Critique Swarm
+# --- Imports from Feature Branch ---
+from core.research.oswm.inference import OSWMInference
+
+# --- Imports from Main Branch ---
 from core.agents.critique_swarm import CritiqueSwarm
 
 # Try importing AgentBase, but allow fallback if running in a restricted script environment
@@ -15,50 +19,143 @@ except ImportError:
             self.config = config
         async def execute(self, **kwargs): pass
 
+# Configure logging
+logger = logging.getLogger(__name__)
+
 class StrategicForesightAgent(AgentBase):
     """
     Strategic Foresight Agent
 
-    Analyzes geopolitical simulation data to produce high-level National Security Council (NSC)
-    style briefings. Focuses on "Global Macro 2026" themes.
-    Includes Monte Carlo analysis and Independent Critique.
+    A unified intelligence unit acting as the system's "Pre-Crime" and National Security division.
+    It combines:
+    1. OSWM (One-Shot World Model) for financial regime shift detection (Market Pre-Crime).
+    2. Geopolitical Simulation analysis for National Security Council (NSC) style briefings.
     """
 
     def __init__(self, config: Dict[str, Any], kernel=None):
         super().__init__(config, kernel)
+        
+        # Identity & Security (from Main)
         self.role = "National Security Advisor"
         self.clearance = "TOP SECRET // NOFORN"
+        
+        # Subsystems
+        # 1. Initialize OSWM (from Feature Branch)
+        try:
+            self.oswm = OSWMInference()
+            self.oswm.pretrain_on_synthetic_prior(steps=10) # Quick init for demo
+            self.oswm_enabled = True
+        except Exception as e:
+            logger.error(f"Failed to initialize OSWM: {e}")
+            self.oswm_enabled = False
+
+        # 2. Initialize Critique Swarm (from Main)
         self.critique_swarm = CritiqueSwarm()
+        
+        logger.info("Strategic Foresight Agent initialized with Hybrid Capabilities (OSWM + GeoSim).")
 
     async def execute(self, **kwargs) -> Dict[str, Any]:
         """
-        Executes the foresight analysis.
-
-        Args:
-            simulation_data (Dict): Output from SovereignConflictSimulation.
-
-        Returns:
-            Dict: Structured briefing object.
+        Executes the foresight analysis. Dispatches logic based on input type.
         """
-        simulation_data = kwargs.get('simulation_data')
-        if not simulation_data:
-            return {"error": "No simulation data provided"}
+        # Dispatch 1: Financial Market Analysis (Feature Branch Logic)
+        if "ticker" in kwargs:
+            ticker = kwargs.get("ticker")
+            horizon = kwargs.get("horizon", 10)
+            return self._generate_market_briefing(ticker, horizon)
 
-        briefing = self.generate_briefing(simulation_data)
+        # Dispatch 2: Geopolitical Simulation (Main Branch Logic)
+        elif "simulation_data" in kwargs:
+            simulation_data = kwargs.get('simulation_data')
+            briefing = self._generate_nsc_briefing(simulation_data)
+            
+            # Add Swarm Critique (Main Branch Feature)
+            critiques = self.critique_swarm.critique(briefing, simulation_data)
+            briefing["independent_critiques"] = critiques
+            return briefing
 
-        # Add Swarm Critique
-        critiques = self.critique_swarm.critique(briefing, simulation_data)
-        briefing["independent_critiques"] = critiques
+        else:
+            return {"error": "Invalid input. Provide 'ticker' for market analysis or 'simulation_data' for geopolitical sitrep."}
 
+    # =========================================================================
+    # Capability A: Financial Foresight (OSWM) - From Feature Branch
+    # =========================================================================
+
+    def _generate_market_briefing(self, ticker: str, horizon: int) -> Dict[str, Any]:
+        """Generates a strategic briefing based on OSWM predictions."""
+        if not self.oswm_enabled:
+            return {"status": "OSWM_OFFLINE", "error": "Model not loaded"}
+
+        logger.info(f"Generating strategic market briefing for {ticker} (Horizon: {horizon})...")
+
+        # 1. Load Context
+        context, stats = self.oswm.load_market_context(ticker, period="1mo")
+
+        if len(context) < 10:
+            logger.warning("Insufficient data for robust prediction.")
+            return {"status": "INSUFFICIENT_DATA"}
+
+        # 2. Run Simulations (Monte Carlo approximation)
+        num_sims = 5
+        predictions = []
+        for _ in range(num_sims):
+            # Perturb input slightly to simulate uncertainty
+            perturbed_context = [c + np.random.normal(0, 0.01) for c in context[-10:]]
+            pred = self.oswm.generate_scenario(perturbed_context, steps=horizon)
+            predictions.append(pred)
+
+        # 3. Analyze Results
+        predictions = np.array(predictions)
+        avg_pred = np.mean(predictions, axis=0)
+        std_pred = np.std(predictions, axis=0)
+
+        # Denormalize
+        mean, std = stats["mean"], stats["std"]
+        avg_price = avg_pred * std + mean
+        current_price = context[-1] * std + mean
+        final_price = avg_price[-1]
+
+        # Detect Regime Shift
+        drift = (final_price - current_price) / current_price
+        volatility_forecast = np.mean(std_pred)
+
+        status = "STABLE"
+        if abs(drift) > 0.05:
+            status = "REGIME_SHIFT_IMMINENT"
+        elif volatility_forecast > 0.5:
+            status = "HIGH_UNCERTAINTY"
+
+        briefing = {
+            "type": "MARKET_INTELLIGENCE",
+            "target": ticker,
+            "status": status,
+            "forecast_drift_pct": float(drift * 100),
+            "volatility_index": float(volatility_forecast),
+            "projected_path": avg_price.tolist(),
+            "narrative": self._construct_market_narrative(ticker, status, drift)
+        }
+
+        logger.info(f"Market Briefing complete: {status}")
         return briefing
 
-    def generate_briefing(self, sim_data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Generates a structured briefing based on simulation data.
-        """
+    def _construct_market_narrative(self, ticker, status, drift):
+        if status == "REGIME_SHIFT_IMMINENT":
+            direction = "CRASH" if drift < 0 else "melt-up"
+            return f"CRITICAL ALERT: OSWM detects a {abs(drift*100):.1f}% {direction} trajectory for {ticker}. Hedging recommended."
+        elif status == "HIGH_UNCERTAINTY":
+            return f"WARNING: Market physics are breaking down for {ticker}. Predictive confidence is low."
+        else:
+            return f"Conditions for {ticker} appear nominal. Standard risk parameters apply."
+
+    # =========================================================================
+    # Capability B: Geopolitical Foresight (NSC) - From Main Branch
+    # =========================================================================
+
+    def _generate_nsc_briefing(self, sim_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Generates a structured NSC briefing based on simulation data."""
         scenario = sim_data.get("scenario", "Unknown Scenario")
 
-        # Check if Monte Carlo data exists, otherwise fallback to single run
+        # Check if Monte Carlo data exists
         stats = sim_data.get("statistics", {})
         if stats:
              total_impact = stats.get("mean_impact", 0)
@@ -81,10 +178,8 @@ class StrategicForesightAgent(AgentBase):
             threat_level = "MODERATE"
             tone = "Standard diplomatic channels sufficient."
 
-        # Generate Strategic Recommendations based on scenario
+        # Generate Recommendations & Fallout
         recommendations = self._get_recommendations(scenario, threat_level)
-
-        # Generate Economic Fallout text
         economic_fallout = self._analyze_economic_fallout(sector_impact)
 
         briefing = {
@@ -94,6 +189,7 @@ class StrategicForesightAgent(AgentBase):
                 "date": datetime.now().strftime("%Y-%m-%d %H00Z"),
                 "subject": f"SITREP: {scenario.upper()} - {threat_level} THREAT"
             },
+            "type": "NATIONAL_SECURITY_BRIEF",
             "executive_summary": f"Simulation indicates a rapidly evolving {scenario} scenario. Total economic and geopolitical impact is estimated at index {total_impact}{stats_text}. {tone}",
             "key_judgments": [
                 f"Projected Impact Range: {stats.get('min_impact',0)} - {stats.get('max_impact',0)}.",
@@ -106,6 +202,8 @@ class StrategicForesightAgent(AgentBase):
         }
 
         return briefing
+
+    # --- Helpers for Geopolitical Analysis ---
 
     def _get_affected_sector(self, scenario):
         if "Semiconductor" in scenario:

@@ -7,6 +7,7 @@ class GraphConvolutionLayer(nn.Module):
     """
     Simple GCN Layer: H' = A * H * W
     Supports sparse adjacency matrix A.
+    
     """
     def __init__(self, in_features, out_features, bias=True):
         super(GraphConvolutionLayer, self).__init__()
@@ -44,6 +45,8 @@ class GraphConvolutionLayer(nn.Module):
 class GraphAttentionLayer(nn.Module):
     """
     GAT Layer: Uses attention mechanism to weigh neighbors.
+    Similar to https://arxiv.org/abs/1710.10903
+    
     """
     def __init__(self, in_features, out_features, dropout=0.6, alpha=0.2, concat=True):
         super(GraphAttentionLayer, self).__init__()
@@ -53,16 +56,17 @@ class GraphAttentionLayer(nn.Module):
         self.alpha = alpha
         self.concat = concat
 
-        self.W = nn.Parameter(torch.zeros(size=(in_features, out_features)))
+        # Use empty + xavier_uniform (slightly more efficient than zeros + xavier)
+        self.W = nn.Parameter(torch.empty(size=(in_features, out_features)))
         nn.init.xavier_uniform_(self.W.data, gain=1.414)
-        self.a = nn.Parameter(torch.zeros(size=(2*out_features, 1)))
+        self.a = nn.Parameter(torch.empty(size=(2*out_features, 1)))
         nn.init.xavier_uniform_(self.a.data, gain=1.414)
 
         self.leakyrelu = nn.LeakyReLU(self.alpha)
 
     def forward(self, h, adj):
         # Wh.shape: (N, out_features)
-        Wh = torch.mm(h, self.W)
+        Wh = torch.mm(h, self.W) 
         a_input = self._prepare_attentional_mechanism_input(Wh)
         e = self.leakyrelu(torch.matmul(a_input, self.a).squeeze(2))
 
@@ -84,15 +88,28 @@ class GraphAttentionLayer(nn.Module):
             return h_prime
 
     def _prepare_attentional_mechanism_input(self, Wh):
-        N = Wh.size()[0]
+        N = Wh.size()[0] # number of nodes
+
+        # Below, two matrices are created that contain embeddings in their rows in different orders.
+        # (e.g. for a=4 nodes)
+        # Wh_repeated_in_chunks = 
+        # [[e1, e1, e1, e1], 
+        #  [e2, e2, e2, e2], ... ]
+        # Wh_repeated_alternating = 
+        # [[e1, e2, e3, e4], 
+        #  [e1, e2, e3, e4], ... ]
+
         Wh_repeated_in_chunks = Wh.repeat_interleave(N, dim=0)
         Wh_repeated_alternating = Wh.repeat(N, 1)
+
         all_combinations_matrix = torch.cat([Wh_repeated_in_chunks, Wh_repeated_alternating], dim=1)
+
         return all_combinations_matrix.view(N, N, 2 * self.out_features)
 
 class GraphSAGELayer(nn.Module):
     """
     GraphSAGE Layer: Inductive learning with neighborhood aggregation (Mean).
+    
     """
     def __init__(self, in_features, out_features, bias=True):
         super(GraphSAGELayer, self).__init__()
