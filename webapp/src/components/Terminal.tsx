@@ -5,6 +5,8 @@ const Terminal: React.FC = () => {
   const [output, setOutput] = useState<string[]>([]);
   const [input, setInput] = useState('');
   const [isLive] = useState(false);
+  const [history, setHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
 
   const simulateBoot = async () => {
     const bootSequence = [
@@ -21,12 +23,17 @@ const Terminal: React.FC = () => {
   };
 
   useEffect(() => {
-    simulateBoot();
+    // Prevent synchronous state update warning
+    setTimeout(() => simulateBoot(), 0);
   }, []);
 
   const handleCommand = (cmd: string) => {
+    if (!cmd.trim()) return;
+
     const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
     setOutput(prev => [...prev, `[${timestamp}] $ ${cmd}`]);
+    setHistory(prev => [...prev, cmd]);
+    setHistoryIndex(-1);
 
     if (cmd === 'help') {
         setOutput(prev => [...prev, "AVAILABLE COMMANDS:", "  help - Show this menu", "  status - System Health", "  query [ticker] - Deep Dive", "  clear - Clear Screen"]);
@@ -49,6 +56,23 @@ const Terminal: React.FC = () => {
     if (e.key === 'Enter') {
         handleCommand(input);
         setInput('');
+    } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (history.length === 0) return;
+        const newIndex = historyIndex === -1 ? history.length - 1 : Math.max(0, historyIndex - 1);
+        setHistoryIndex(newIndex);
+        setInput(history[newIndex]);
+    } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (historyIndex === -1) return;
+        if (historyIndex === history.length - 1) {
+            setHistoryIndex(-1);
+            setInput('');
+        } else {
+            const newIndex = historyIndex + 1;
+            setHistoryIndex(newIndex);
+            setInput(history[newIndex]);
+        }
     }
   };
 
