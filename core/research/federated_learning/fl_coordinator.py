@@ -7,9 +7,20 @@ class FederatedCoordinator:
     """
     Manages the Federated Learning process (aggregation).
     """
-    def __init__(self, num_clients=3, input_dim=10):
+    def __init__(self, num_clients=3, input_dim=10, client_configs=None):
         self.global_model = CreditRiskModel(input_dim=input_dim)
-        self.clients = [FederatedClient(client_id=f"Bank_{i}", input_dim=input_dim) for i in range(num_clients)]
+
+        if client_configs:
+            self.clients = []
+            for cfg in client_configs:
+                self.clients.append(FederatedClient(
+                    client_id=cfg['id'],
+                    input_dim=input_dim,
+                    sector_bias=cfg.get('sector_bias')
+                ))
+        else:
+            self.clients = [FederatedClient(client_id=f"Bank_{i}", input_dim=input_dim) for i in range(num_clients)]
+
         self.round_history = []
 
     def aggregate_weights(self, client_weights):
