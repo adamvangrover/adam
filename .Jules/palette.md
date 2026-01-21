@@ -64,6 +64,10 @@
 **Learning:** Components using extensive inline `style` attributes often indicate legacy code or prototypes that lack both design system consistency and accessibility features. These are high-yield targets for refactoring.
 **Action:** Use `grep "style={{"` to find and prioritize components that need both visual and accessible upgrades.
 
+## 2026-02-15 - Micro-Interactions for Long Calculations
+**Learning:** In data-heavy applications, users expect immediate feedback even for operations that take < 2 seconds. A simple spinner or "Analyzing..." text prevents rage clicks and reassures the user the system is working.
+**Action:** Always add a loading state to "Run Analysis" or "Calculate" buttons, even if the backend is fast.
+
 ## 2026-05-24 - Terminal Command History Expectations
 **Learning:** Users interacting with a "Terminal" UI component bring strong mental models from real CLIs, specifically expecting Up/Down arrow keys to cycle command history. Without this, the component feels "broken" or "fake" rather than just simple.
 **Action:** When building terminal-like inputs, always implement history state and Up/Down navigation.
