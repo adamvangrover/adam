@@ -71,3 +71,7 @@
 ## 2026-05-24 - Terminal Command History Expectations
 **Learning:** Users interacting with a "Terminal" UI component bring strong mental models from real CLIs, specifically expecting Up/Down arrow keys to cycle command history. Without this, the component feels "broken" or "fake" rather than just simple.
 **Action:** When building terminal-like inputs, always implement history state and Up/Down navigation.
+
+## 2026-05-24 - Associating Labels with Meters
+**Learning:** Custom meters (like CPU usage) often have visual labels (e.g., "CPU: 65%") that are separate elements. Using `aria-labelledby` on the progressbar element pointing to the label's ID creates a semantic relationship that screen readers respect.
+**Action:** Always use `id` and `aria-labelledby` to link custom controls to their visual text labels.
