@@ -162,14 +162,15 @@ class AdamNavigator {
             <div class="p-4 border-b border-slate-700/50">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-lg font-bold tracking-tight text-white mono">ADAM <span class="text-cyan-400">v23.5</span></h2>
-                    <button id="nav-close" class="text-slate-400 hover:text-white md:hidden">
-                        <i class="fas fa-times"></i>
+                    <button id="nav-close" class="text-slate-400 hover:text-white md:hidden" aria-label="Close navigation">
+                        <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
                 </div>
                 <div class="relative group">
-                    <input type="text" id="global-search" placeholder="Search Agents, Docs..."
+                    <input type="text" id="global-search" placeholder="Search Agents, Docs... (Ctrl+K)"
+                        aria-label="Global search"
                         class="w-full bg-slate-900/50 border border-slate-700 rounded px-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors font-mono">
-                    <i class="fas fa-search absolute right-3 top-2 text-slate-500 text-xs"></i>
+                    <i class="fas fa-search absolute right-3 top-2 text-slate-500 text-xs" aria-hidden="true"></i>
                     <div id="search-results" class="absolute left-0 top-full mt-2 w-64 bg-slate-800 border border-slate-700 rounded shadow-xl hidden z-50 max-h-64 overflow-y-auto"></div>
                 </div>
             </div>
@@ -212,7 +213,7 @@ class AdamNavigator {
             html += `
                 <li>
                     <a href="${linkUrl}" class="flex items-center gap-3 px-3 py-2 rounded text-sm font-medium transition group ${activeClass}">
-                        <i class="fas ${item.icon} w-5 text-center ${isActive ? 'text-cyan-400' : 'text-slate-500 group-hover:text-white'}"></i>
+                        <i class="fas ${item.icon} w-5 text-center ${isActive ? 'text-cyan-400' : 'text-slate-500 group-hover:text-white'}" aria-hidden="true"></i>
                         ${item.name}
                     </a>
                 </li>
@@ -233,7 +234,7 @@ class AdamNavigator {
                 </div>
                 <div class="flex items-center justify-between text-xs mb-3">
                     <span class="text-slate-400">Theme</span>
-                    <button id="theme-toggle" class="text-cyan-400 hover:text-white transition"><i class="fas fa-adjust"></i> Switch</button>
+                    <button id="theme-toggle" class="text-cyan-400 hover:text-white transition"><i class="fas fa-adjust" aria-hidden="true"></i> Switch</button>
                 </div>
                 <div class="flex items-center justify-between text-xs">
                     <span class="text-slate-400">Data Source</span>
@@ -285,16 +286,26 @@ class AdamNavigator {
             const toggleBtn = document.createElement('button');
             toggleBtn.id = 'nav-toggle';
             toggleBtn.className = 'fixed top-4 left-4 z-50 p-2 bg-slate-800 text-white rounded md:hidden border border-slate-700 shadow-lg';
-            toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            toggleBtn.style.zIndex = '1001'; // Ensure it's above .cyber-header (z-100) and .scan-line (z-999)
+            toggleBtn.innerHTML = '<i class="fas fa-bars" aria-hidden="true"></i>';
+            toggleBtn.setAttribute('aria-label', 'Toggle navigation');
+            toggleBtn.setAttribute('aria-expanded', 'false');
+            toggleBtn.setAttribute('aria-controls', 'side-nav');
             document.body.appendChild(toggleBtn);
         }
 
         const nav = document.getElementById('side-nav');
+        const toggleBtn = document.getElementById('nav-toggle');
         const handleToggle = () => {
             const isClosed = nav.classList.contains('-translate-x-full');
             nav.classList.toggle('-translate-x-full', !isClosed);
             overlay.classList.toggle('opacity-0', !isClosed);
             overlay.classList.toggle('pointer-events-none', !isClosed);
+
+            // Update aria-expanded state
+            if (toggleBtn) {
+                toggleBtn.setAttribute('aria-expanded', isClosed ? 'true' : 'false');
+            }
         };
 
         document.getElementById('nav-toggle')?.addEventListener('click', handleToggle);
@@ -323,6 +334,14 @@ class AdamNavigator {
                 const results = document.getElementById('search-results');
                 if (results && !searchInput.contains(e.target) && !results.contains(e.target)) {
                     results.classList.add('hidden');
+                }
+            });
+
+            // Keyboard Shortcut (Ctrl+K or Cmd+K)
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    searchInput.focus();
                 }
             });
         }
@@ -371,7 +390,7 @@ class AdamNavigator {
             <a href="${r.link}" class="block px-4 py-2 hover:bg-slate-700 border-b border-slate-700 last:border-0 transition-colors">
                 <div class="flex justify-between">
                     <span class="text-xs text-cyan-400 font-bold font-mono">${r.type || 'FILE'}</span>
-                    <i class="fas fa-chevron-right text-[10px] text-slate-600"></i>
+                    <i class="fas fa-chevron-right text-[10px] text-slate-600" aria-hidden="true"></i>
                 </div>
                 <div class="text-sm text-white font-medium">${r.title}</div>
             </a>
