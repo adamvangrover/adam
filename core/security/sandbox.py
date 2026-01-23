@@ -111,7 +111,7 @@ class SecureSandbox:
     # --------------------------------------------------------------------------
 
     @classmethod
-    def execute(cls, code: str, timeout: float = 5.0, security_level: str = "standard") -> Dict[str, Any]:
+    def execute(cls, code: str, timeout: float = 5.0, security_level: str = "standard", memory_limit_mb: int = 512) -> Dict[str, Any]:
         """
         Executes the provided code in a secure sandbox.
 
@@ -119,6 +119,7 @@ class SecureSandbox:
             code (str): The Python code to execute.
             timeout (float): Maximum execution time in seconds.
             security_level (str): "standard", "governed", or "air_gapped".
+            memory_limit_mb (int): Maximum memory usage in MB. Defaults to 512MB.
 
         Returns:
             Dict containing 'status' ('success'/'error'), 'output', and 'result' (last expression).
@@ -140,7 +141,7 @@ class SecureSandbox:
             result_queue = multiprocessing.Queue()
             process = multiprocessing.Process(
                 target=cls._worker,
-                args=(code, result_queue)
+                args=(code, result_queue, memory_limit_mb)
             )
             process.start()
             process.join(timeout)
@@ -204,12 +205,21 @@ class SecureSandbox:
                 raise SecurityViolation(f"Method '{node.attr}' is banned for security reasons.")
 
     @classmethod
-    def _worker(cls, code: str, result_queue: multiprocessing.Queue):
+    def _worker(cls, code: str, result_queue: multiprocessing.Queue, memory_limit_mb: int):
         """
         The function running inside the isolated process.
         """
         import io
         from contextlib import redirect_stdout, redirect_stderr
+        try:
+            import resource
+            # Limit memory usage (RLIMIT_AS is virtual memory size)
+            # Convert MB to Bytes
+            limit = memory_limit_mb * 1024 * 1024
+            resource.setrlimit(resource.RLIMIT_AS, (limit, limit))
+        except (ImportError, ValueError, OSError):
+            # Ignore if resource module not present (Windows) or other error
+            pass
 
         output_buffer = io.StringIO()
         safe_globals = cls._get_safe_globals()
@@ -236,6 +246,6 @@ class SecureSandbox:
         except Exception as e:
             result_queue.put({
                 "status": "error",
-                "error": str(e),
+                "error": f"{type(e).__name__}: {str(e)}",
                 "output": output_buffer.getvalue()
             })
