@@ -71,3 +71,7 @@
 ## 2026-05-24 - Terminal Command History Expectations
 **Learning:** Users interacting with a "Terminal" UI component bring strong mental models from real CLIs, specifically expecting Up/Down arrow keys to cycle command history. Without this, the component feels "broken" or "fake" rather than just simple.
 **Action:** When building terminal-like inputs, always implement history state and Up/Down navigation.
+
+## 2026-07-18 - Label Association in Legacy Forms
+**Learning:** Legacy form components often use implicit layouts (e.g., `div` wrapping `label` and `input`) without explicit `htmlFor`/`id` association, breaking accessibility.
+**Action:** When refactoring, always add unique `id`s to inputs and `htmlFor` to labels, even if visual layout seems "obvious".
