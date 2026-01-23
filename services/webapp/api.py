@@ -13,9 +13,16 @@ import functools
 import asyncio
 import re
 import threading
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from .config import config
 from .celery_app import celery
+
+# ---------------------------------------------------------------------------- #
+# Constants
+# ---------------------------------------------------------------------------- #
+
+IP_BLOCK_THRESHOLD = 5
+BLOCK_DURATION_MINUTES = 15
 
 # ---------------------------------------------------------------------------- #
 # Helpers
@@ -215,6 +222,14 @@ class TokenBlocklist(db.Model):
     jti = db.Column(db.String(36), nullable=False, index=True)
     created_at = db.Column(db.DateTime, nullable=False)
 
+
+class LoginAttempt(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    ip_address = db.Column(db.String(50), nullable=False, index=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    successful = db.Column(db.Boolean, default=False)
+
+
 # ---------------------------------------------------------------------------- #
 # Application Factory
 # ---------------------------------------------------------------------------- #
@@ -413,15 +428,39 @@ def create_app(config_name='default'):
         """
         Login endpoint.
         """
+        # 🛡️ Sentinel: Rate limiting check
+        ip_address = request.remote_addr
+        cutoff_time = datetime.utcnow() - timedelta(minutes=BLOCK_DURATION_MINUTES)
+
+        # Count failed attempts in the last window
+        failed_attempts = LoginAttempt.query.filter(
+            LoginAttempt.ip_address == ip_address,
+            LoginAttempt.successful == False,
+            LoginAttempt.timestamp > cutoff_time
+        ).count()
+
+        if failed_attempts >= IP_BLOCK_THRESHOLD:
+            # Check if there is a recent successful login to reset counter?
+            # Standard practice is strict block.
+            return jsonify({'error': 'Too many failed login attempts. Please try again later.'}), 429
+
         data = request.get_json()
         username = data.get('username')
         password = data.get('password')
         user = User.query.filter_by(username=username).first()
+
         if user and user.check_password(password):
+            # Log successful attempt
+            db.session.add(LoginAttempt(ip_address=ip_address, successful=True))
+            db.session.commit()
+
             access_token = create_access_token(identity=str(user.id))
             refresh_token = create_refresh_token(identity=str(user.id))
             return jsonify(access_token=access_token, refresh_token=refresh_token)
         else:
+            # Log failed attempt
+            db.session.add(LoginAttempt(ip_address=ip_address, successful=False))
+            db.session.commit()
             return jsonify({'error': 'Invalid credentials'}), 401
 
     @app.route('/api/logout', methods=['POST'])

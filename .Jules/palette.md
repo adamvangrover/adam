@@ -75,3 +75,7 @@
 ## 2026-05-24 - Associating Labels with Meters
 **Learning:** Custom meters (like CPU usage) often have visual labels (e.g., "CPU: 65%") that are separate elements. Using `aria-labelledby` on the progressbar element pointing to the label's ID creates a semantic relationship that screen readers respect.
 **Action:** Always use `id` and `aria-labelledby` to link custom controls to their visual text labels.
+
+## 2026-07-18 - Label Association in Legacy Forms
+**Learning:** Legacy form components often use implicit layouts (e.g., `div` wrapping `label` and `input`) without explicit `htmlFor`/`id` association, breaking accessibility.
+**Action:** When refactoring, always add unique `id`s to inputs and `htmlFor` to labels, even if visual layout seems "obvious".
