@@ -10,6 +10,16 @@ class BayesACTEngine:
             "greet": {"E": 2.0, "P": 1.0, "A": 1.0},
             "attack": {"E": -2.0, "P": 1.5, "A": 1.5},
             "agree": {"E": 1.5, "P": 0.5, "A": 0.0},
+
+            # Financial Domain
+            "bullish": {"E": 2.5, "P": 2.0, "A": 2.5},
+            "bearish": {"E": -1.5, "P": -1.0, "A": -0.5},
+            "crash": {"E": -3.0, "P": -2.5, "A": 3.0},
+            "rally": {"E": 2.8, "P": 2.2, "A": 2.8},
+            "volatility": {"E": -0.5, "P": -0.5, "A": 2.5},
+            "growth": {"E": 2.0, "P": 1.5, "A": 1.5},
+            "risk": {"E": -1.0, "P": -0.5, "A": 1.0},
+
             "default": {"E": 0.0, "P": 0.0, "A": 0.0}
         }
 
@@ -41,6 +51,14 @@ class BayesACTEngine:
             vals = self.epa_dictionary["attack"]
         elif "yes" in text_lower or "agree" in text_lower:
             vals = self.epa_dictionary["agree"]
+        elif "bull" in text_lower or "up" in text_lower or "buy" in text_lower:
+            vals = self.epa_dictionary["bullish"]
+        elif "bear" in text_lower or "down" in text_lower or "sell" in text_lower:
+            vals = self.epa_dictionary["bearish"]
+        elif "crash" in text_lower or "collapse" in text_lower:
+            vals = self.epa_dictionary["crash"]
+        elif "rally" in text_lower or "boom" in text_lower:
+            vals = self.epa_dictionary["rally"]
         else:
             vals = self.epa_dictionary["default"]
 
