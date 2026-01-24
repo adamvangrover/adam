@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSWM | Full Market Omni-Scan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #020202; color: #c0c0c0; font-family: 'Courier New', Courier, monospace; overflow-x: hidden; }
+        .cyber-panel { background: rgba(10, 10, 15, 0.95); border: 1px solid #333; }
+        .cyber-header { border-bottom: 1px solid #33ff00; color: #33ff00; text-shadow: 0 0 5px rgba(51, 255, 0, 0.5); }
+        .metric-label { color: #666; font-size: 0.7rem; }
+        .metric-val { color: #eee; font-weight: bold; }
+        .text-xs { font-size: 0.7rem; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #333; }
+        .critique-card { border-left: 3px solid; padding-left: 8px; margin-bottom: 8px; }
+        .critique-high { border-color: #ff3333; background: rgba(255, 51, 51, 0.05); }
+        .critique-med { border-color: #ffaa00; background: rgba(255, 170, 0, 0.05); }
+        .critique-low { border-color: #33ff00; background: rgba(51, 255, 0, 0.05); }
+    </style>
+</head>
+<body class="p-4 text-xs">
+
+    <!-- HEADER -->
+    <header class="flex justify-between items-end mb-4 border-b border-gray-800 pb-2">
+        <div>
+            <h1 class="text-2xl font-bold text-white tracking-widest">MARKET OMNI-SCAN <span class="text-green-500 text-sm">v25.1</span></h1>
+            <p class="text-gray-500">DIGITAL TWIN FULL SPECTRUM ANALYSIS</p>
+        </div>
+        <div class="text-right">
+            <div id="timestamp" class="text-gray-400">LOADING...</div>
+            <div class="text-green-500">SYSTEM STATUS: ONLINE</div>
+        </div>
+    </header>
+
+    <!-- MAIN GRID -->
+    <div class="grid grid-cols-12 gap-4">
+
+        <!-- LEFT COL: SECTORS (4 cols) -->
+        <div class="col-span-12 md:col-span-4 space-y-4">
+            <div class="cyber-panel p-3 h-full">
+                <h2 class="cyber-header font-bold mb-3">GLOBAL SECTORS</h2>
+                <div id="sectorContainer" class="space-y-4 h-[80vh] overflow-y-auto pr-2">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- MID COL: CRITIQUE & FLOWS (5 cols) -->
+        <div class="col-span-12 md:col-span-5 space-y-4">
+
+            <!-- CRITIQUE ENGINE -->
+            <div class="cyber-panel p-3">
+                <h2 class="cyber-header font-bold mb-3 text-red-400 border-red-900">TWIN CRITIQUE ENGINE</h2>
+                <div id="critiqueContainer" class="space-y-2">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <!-- INSTITUTIONAL FLOWS -->
+            <div class="cyber-panel p-3">
+                <h2 class="cyber-header font-bold mb-3 text-purple-400 border-purple-900">INSTITUTIONAL FLOWS</h2>
+                <div id="flowsContainer" class="grid grid-cols-2 gap-2">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <!-- DERIVATIVES -->
+            <div class="cyber-panel p-3">
+                <h2 class="cyber-header font-bold mb-3 text-blue-400 border-blue-900">DERIVATIVES & VOLATILITY</h2>
+                <div class="grid grid-cols-3 gap-2 text-center mb-4">
+                    <div>
+                        <div class="metric-label">ATM IV</div>
+                        <div id="atmIv" class="text-lg font-bold text-blue-300">--</div>
+                    </div>
+                    <div>
+                        <div class="metric-label">SKEW</div>
+                        <div id="skew" class="text-xs text-gray-300 mt-1">--</div>
+                    </div>
+                    <div>
+                        <div class="metric-label">TERM STRUCT</div>
+                        <div id="termStruct" class="text-xs text-gray-300 mt-1">--</div>
+                    </div>
+                </div>
+                <div id="greeksContainer" class="grid grid-cols-3 gap-2 border-t border-gray-800 pt-2">
+                    <!-- Greeks -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT COL: ASSETS (3 cols) -->
+        <div class="col-span-12 md:col-span-3 space-y-4">
+            <div class="cyber-panel p-3 h-full">
+                <h2 class="cyber-header font-bold mb-3 text-yellow-400 border-yellow-900">ASSET CLASSES</h2>
+                <div id="assetsContainer" class="space-y-6 h-[80vh] overflow-y-auto pr-2">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        async function loadData() {
+            try {
+                const res = await fetch('data/full_market_critique.json');
+                const data = await res.json();
+                render(data);
+            } catch (e) {
+                console.error(e);
+                document.getElementById('timestamp').innerText = "DATA FETCH FAILED";
+            }
+        }
+
+        function render(data) {
+            document.getElementById('timestamp').innerText = new Date(data.timestamp).toLocaleString();
+
+            // 1. Sectors
+            const secContainer = document.getElementById('sectorContainer');
+            for (const [name, info] of Object.entries(data.sectors)) {
+                const div = document.createElement('div');
+                div.className = "mb-4 border-b border-gray-800 pb-2";
+
+                let rows = '';
+                info.constituents.forEach(c => {
+                    const chg = c.change;
+                    const color = chg >= 0 ? 'text-green-400' : 'text-red-400';
+                    rows += `
+                        <div class="flex justify-between hover:bg-gray-900 px-1">
+                            <span class="text-gray-400 w-12">${c.ticker}</span>
+                            <span class="text-white text-right flex-1">${c.price.toFixed(2)}</span>
+                            <span class="${color} text-right w-16">${chg.toFixed(2)}</span>
+                        </div>
+                    `;
+                });
+
+                div.innerHTML = `
+                    <div class="flex justify-between mb-1">
+                        <span class="font-bold text-gray-200">${name.toUpperCase()}</span>
+                        <span class="text-xs ${info.sentiment === 'Bullish' ? 'text-green-500' : 'text-red-500'}">[${info.sentiment}]</span>
+                    </div>
+                    <div class="text-xs font-mono">
+                        ${rows}
+                    </div>
+                `;
+                secContainer.appendChild(div);
+            }
+
+            // 2. Asset Classes
+            const assetContainer = document.getElementById('assetsContainer');
+            for (const [cat, items] of Object.entries(data.markets)) {
+                const div = document.createElement('div');
+
+                let rows = '';
+                items.forEach(c => {
+                    // Calc change roughly
+                    const chg = c.price - c.previous_close;
+                    const color = chg >= 0 ? 'text-green-400' : 'text-red-400';
+                    rows += `
+                        <div class="flex justify-between hover:bg-gray-900 px-1 py-1">
+                            <span class="text-gray-400">${c.ticker}</span>
+                            <div class="text-right">
+                                <span class="text-white block">${c.price.toFixed(2)}</span>
+                                <span class="${color} text-[0.65rem]">${chg.toFixed(2)}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                div.innerHTML = `
+                    <h3 class="font-bold text-yellow-600 mb-2 text-xs uppercase tracking-wider">${cat}</h3>
+                    <div class="bg-gray-900/50 p-1 rounded">
+                        ${rows}
+                    </div>
+                `;
+                assetContainer.appendChild(div);
+            }
+
+            // 3. Critique
+            const critiqueContainer = document.getElementById('critiqueContainer');
+            data.digital_twin_critique.forEach(c => {
+                const div = document.createElement('div');
+                let style = "critique-low";
+                if(c.severity === "High") style = "critique-med";
+                if(c.severity === "Critical") style = "critique-high";
+
+                div.className = `critique-card ${style} p-2`;
+                div.innerHTML = `
+                    <div class="flex justify-between font-bold text-gray-300 mb-1">
+                        <span>${c.area}</span>
+                        <span class="uppercase text-[0.6rem] bg-black px-1 rounded border border-gray-700">${c.severity}</span>
+                    </div>
+                    <p class="text-gray-400 mb-1 leading-tight">${c.finding}</p>
+                    <p class="text-green-600 italic">>> ${c.recommendation}</p>
+                `;
+                critiqueContainer.appendChild(div);
+            });
+
+            // 4. Flows
+            const flows = data.institutional_flows;
+            const flowContainer = document.getElementById('flowsContainer');
+            for (const [k, v] of Object.entries(flows)) {
+                const div = document.createElement('div');
+                div.className = "bg-gray-900 p-2 rounded";
+                div.innerHTML = `
+                    <div class="metric-label uppercase">${k.replace(/_/g, ' ')}</div>
+                    <div class="metric-val text-purple-200">${v}</div>
+                `;
+                flowContainer.appendChild(div);
+            }
+
+            // 5. Derivatives
+            const derivs = data.derivatives;
+            document.getElementById('atmIv').innerText = derivs.volatility_surface.ATM_IV + '%';
+            document.getElementById('skew').innerText = derivs.volatility_surface.Skew;
+            document.getElementById('termStruct').innerText = derivs.volatility_surface.Term_Structure;
+
+            const greeks = document.getElementById('greeksContainer');
+            for (const [k, v] of Object.entries(derivs.greeks)) {
+                const div = document.createElement('div');
+                div.className = "text-center";
+                div.innerHTML = `
+                    <div class="metric-label">${k.replace('System_', '')}</div>
+                    <div class="metric-val text-blue-200">${v}</div>
+                `;
+                greeks.appendChild(div);
+            }
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
