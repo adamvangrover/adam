@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v25.5 :: WAR ROOM</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --primary: #00f3ff;
+            --secondary: #ff00ff;
+            --alert: #ff3333;
+            --panel-bg: rgba(10, 15, 20, 0.95);
+            --border: 1px solid #333;
+        }
+        body { margin: 0; background: var(--bg-color); color: #e0e0e0; font-family: 'JetBrains Mono', monospace; overflow: hidden; }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            height: 100vh;
+            gap: 2px;
+            background: #222; /* Gap color */
+        }
+
+        .quadrant {
+            background: var(--bg-color);
+            position: relative;
+            padding: 20px;
+            overflow: hidden;
+            border: 1px solid #111;
+        }
+
+        .quadrant-header {
+            position: absolute; top: 10px; left: 10px;
+            font-size: 0.8rem; color: var(--primary);
+            background: rgba(0, 243, 255, 0.1);
+            padding: 2px 8px;
+            border-left: 2px solid var(--primary);
+        }
+
+        /* Q1: Ticker */
+        .ticker-row { display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 15px 0; }
+        .ticker-symbol { font-size: 1.5rem; font-weight: bold; }
+        .ticker-price { font-size: 1.5rem; }
+        .pos { color: #0f0; } .neg { color: #f00; }
+
+        /* Q2: News */
+        .news-item { margin-bottom: 15px; border-left: 2px solid #333; padding-left: 10px; transition: all 0.3s; }
+        .news-item:hover { border-left-color: var(--secondary); background: rgba(255,0,255,0.05); }
+        .news-source { font-size: 0.7rem; color: #888; text-transform: uppercase; }
+        .news-title { font-size: 0.95rem; margin: 2px 0; }
+        .news-meta { font-size: 0.7rem; display: flex; gap: 10px; }
+
+        /* Q3: Radar */
+        canvas { display: block; margin: 40px auto; }
+
+        /* Q4: System Health */
+        .health-metric { margin-bottom: 20px; }
+        .bar-container { height: 10px; background: #333; margin-top: 5px; width: 100%; }
+        .bar-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.5s; }
+
+        .scan-line { position: fixed; top: 0; left: 0; width: 100%; height: 2px; background: rgba(0, 243, 255, 0.2); animation: scan 6s linear infinite; pointer-events: none; z-index: 99; }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+
+        .blink { animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    </style>
+</head>
+<body>
+    <div class="scan-line"></div>
+    <div class="grid-container">
+
+        <!-- QUADRANT 1: MARKET TICKER -->
+        <div class="quadrant" id="q1">
+            <div class="quadrant-header">LIVE MARKET DATA // S&P 500</div>
+            <div style="margin-top: 30px;" id="ticker-feed">
+                <!-- JS Populated -->
+            </div>
+        </div>
+
+        <!-- QUADRANT 2: INTELLIGENCE FEED -->
+        <div class="quadrant" id="q2">
+            <div class="quadrant-header">GLOBAL INTELLIGENCE STREAM</div>
+            <div style="margin-top: 30px;" id="news-feed">
+                <!-- JS Populated -->
+            </div>
+        </div>
+
+        <!-- QUADRANT 3: RISK RADAR -->
+        <div class="quadrant" id="q3">
+            <div class="quadrant-header">MULTIVARIATE RISK RADAR</div>
+            <canvas id="riskCanvas" width="400" height="400"></canvas>
+            <div style="text-align: center; font-size: 0.8rem; color: #888;">
+                RISK PROFILE: <span style="color: #ffa500; font-weight: bold;">MODERATE-HIGH</span>
+            </div>
+        </div>
+
+        <!-- QUADRANT 4: SYSTEM HEALTH -->
+        <div class="quadrant" id="q4">
+            <div class="quadrant-header">SYSTEM HEALTH & AGENT STATUS</div>
+            <div style="margin-top: 40px; padding: 0 20px;">
+                <div class="health-metric">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>CPU LOAD</span>
+                        <span id="cpu-val">0%</span>
+                    </div>
+                    <div class="bar-container"><div class="bar-fill" id="cpu-bar"></div></div>
+                </div>
+                <div class="health-metric">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>MEMORY ALLOCATION</span>
+                        <span id="mem-val">0%</span>
+                    </div>
+                    <div class="bar-container"><div class="bar-fill" id="mem-bar"></div></div>
+                </div>
+                <div class="health-metric">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>NEURAL COHERENCE</span>
+                        <span id="coh-val">0%</span>
+                    </div>
+                    <div class="bar-container"><div class="bar-fill" id="coh-bar" style="background: var(--secondary);"></div></div>
+                </div>
+
+                <div style="margin-top: 40px; border-top: 1px solid #333; padding-top: 20px;">
+                    <div style="font-size: 0.8rem; color: #666; margin-bottom: 10px;">ACTIVE AGENTS</div>
+                    <div id="agent-list" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.8rem;">
+                        <!-- JS populated -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // EMBEDDED SEED DATA (Simulating the LiveMockEngine)
+        const SEED_DATA = {
+          "market_data": {
+            "indices": {
+              "SPX": { "price": 5842.10, "change_percent": 0.45 },
+              "NDX": { "price": 20105.30, "change_percent": 0.88 },
+              "VIX": { "price": 14.20, "change_percent": -2.10 },
+              "BTC": { "price": 64200.00, "change_percent": 1.20 },
+              "EUR/USD": { "price": 1.08, "change_percent": -0.15 }
+            }
+          },
+          "headlines": [
+            { "source": "Bloomberg", "title": "Tech Rally Extends as AI Demand Outstrips Supply", "sentiment": "positive" },
+            { "source": "Reuters", "title": "Fed Minutes Show Consensus on 'Patient' Approach", "sentiment": "neutral" },
+            { "source": "WSJ", "title": "Oil Prices Dip Below $75 on Demand Concerns", "sentiment": "negative" },
+            { "source": "CNBC", "title": "Chipmakers Surge in Pre-market Trading", "sentiment": "positive" },
+            { "source": "FT", "title": "European Markets Close Higher on Earnings Beat", "sentiment": "positive" }
+          ]
+        };
+
+        // --- Q1: Ticker Logic ---
+        function renderTicker() {
+            const container = document.getElementById('ticker-feed');
+            container.innerHTML = '';
+            for (const [sym, data] of Object.entries(SEED_DATA.market_data.indices)) {
+                // Apply random drift
+                const drift = (Math.random() - 0.5) * 0.1;
+                const price = (data.price + (Math.random() * 10 - 5)).toFixed(2);
+                const change = (data.change_percent + drift).toFixed(2);
+                const isPos = change >= 0;
+
+                const div = document.createElement('div');
+                div.className = 'ticker-row';
+                div.innerHTML = `
+                    <div class="ticker-symbol">${sym}</div>
+                    <div style="text-align: right;">
+                        <div class="ticker-price">${price}</div>
+                        <div style="font-size: 1rem;" class="${isPos ? 'pos' : 'neg'}">
+                            ${isPos ? '▲' : '▼'} ${change}%
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            }
+        }
+
+        // --- Q2: News Logic ---
+        function renderNews() {
+            const container = document.getElementById('news-feed');
+            container.innerHTML = '';
+            SEED_DATA.headlines.forEach(news => {
+                const div = document.createElement('div');
+                div.className = 'news-item';
+                div.innerHTML = `
+                    <div class="news-source">${news.source}</div>
+                    <div class="news-title">${news.title}</div>
+                    <div class="news-meta">
+                        <span style="color: ${news.sentiment==='positive'?'#0f0':news.sentiment==='negative'?'#f00':'#aaa'}">
+                            ${news.sentiment.toUpperCase()}
+                        </span>
+                        <span>:: LIVE</span>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // --- Q3: Radar Logic (Canvas) ---
+        function drawRadar() {
+            const canvas = document.getElementById('riskCanvas');
+            const ctx = canvas.getContext('2d');
+            const cx = 200, cy = 200, radius = 150;
+
+            // Clear
+            ctx.clearRect(0,0,400,400);
+
+            // Draw Web
+            ctx.strokeStyle = '#333';
+            ctx.beginPath();
+            for(let r=30; r<=radius; r+=30) {
+                ctx.arc(cx, cy, r, 0, Math.PI*2);
+            }
+            ctx.stroke();
+
+            // Axes
+            const axes = 5;
+            const labels = ['Liquidity', 'Volatility', 'Geopolitical', 'Cyber', 'Credit'];
+            const angles = [];
+            for(let i=0; i<axes; i++) {
+                const ang = (Math.PI*2/axes)*i - Math.PI/2;
+                angles.push(ang);
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.lineTo(cx + Math.cos(ang)*radius, cy + Math.sin(ang)*radius);
+                ctx.stroke();
+
+                // Labels
+                ctx.fillStyle = '#888';
+                ctx.font = '12px JetBrains Mono';
+                ctx.fillText(labels[i], cx + Math.cos(ang)*(radius+20) - 20, cy + Math.sin(ang)*(radius+20));
+            }
+
+            // Data Polygon (Dynamic)
+            const values = labels.map(() => 0.3 + Math.random()*0.5); // Random values 0.3 - 0.8
+            ctx.fillStyle = 'rgba(0, 243, 255, 0.2)';
+            ctx.strokeStyle = '#00f3ff';
+            ctx.lineWidth = 2;
+
+            ctx.beginPath();
+            values.forEach((v, i) => {
+                const r = v * radius;
+                const x = cx + Math.cos(angles[i]) * r;
+                const y = cy + Math.sin(angles[i]) * r;
+                if(i===0) ctx.moveTo(x,y);
+                else ctx.lineTo(x,y);
+            });
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        // --- Q4: System Health ---
+        function updateHealth() {
+            const cpu = Math.floor(20 + Math.random() * 40);
+            const mem = Math.floor(40 + Math.random() * 20);
+            const coh = Math.floor(85 + Math.random() * 10);
+
+            document.getElementById('cpu-val').innerText = cpu + '%';
+            document.getElementById('cpu-bar').style.width = cpu + '%';
+
+            document.getElementById('mem-val').innerText = mem + '%';
+            document.getElementById('mem-bar').style.width = mem + '%';
+
+            document.getElementById('coh-val').innerText = coh + '%';
+            document.getElementById('coh-bar').style.width = coh + '%';
+        }
+
+        function renderAgents() {
+            const list = document.getElementById('agent-list');
+            const agents = ['RiskOfficer', 'TechAnalyst', 'MacroSentinel', 'Blindspot', 'ConsensusEngine'];
+            list.innerHTML = agents.map(a => `
+                <div style="display:flex; align-items:center; gap:5px;">
+                    <div style="width:6px; height:6px; background:#0f0; border-radius:50%; box-shadow:0 0 5px #0f0;"></div>
+                    ${a}
+                </div>
+            `).join('');
+        }
+
+        // Init & Loops
+        renderTicker();
+        renderNews();
+        renderAgents();
+        drawRadar(); // Draw once, maybe animate later
+        updateHealth();
+
+        setInterval(renderTicker, 2000); // Fast ticker updates
+        setInterval(drawRadar, 3000); // Radar fluctuations
+        setInterval(updateHealth, 1000); // Health heartbeat
+
+    </script>
+</body>
+</html>

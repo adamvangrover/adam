@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v25.5 :: FUTURE LENS</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --primary: #a020f0; /* Purple for Future */
+            --secondary: #00f3ff;
+            --panel-bg: rgba(15, 10, 25, 0.95);
+        }
+        body { margin: 0; background: var(--bg-color); color: #e0e0e0; font-family: 'JetBrains Mono', monospace; }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--primary); padding-bottom: 20px; margin-bottom: 40px;
+        }
+
+        h1 { margin: 0; color: #fff; text-shadow: 0 0 10px var(--primary); }
+        .sub { color: var(--primary); font-size: 0.9rem; letter-spacing: 2px; }
+
+        .dashboard-grid {
+            display: grid; grid-template-columns: 2fr 1fr; gap: 30px;
+        }
+
+        .panel {
+            background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 20px; border-radius: 8px;
+        }
+        .panel h3 { margin-top: 0; color: var(--secondary); display: flex; align-items: center; gap: 10px; }
+
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .stat-card { background: rgba(0,0,0,0.3); padding: 15px; text-align: center; border: 1px solid #222; }
+        .stat-val { font-size: 2rem; font-weight: bold; color: #fff; }
+        .stat-label { font-size: 0.7rem; color: #888; text-transform: uppercase; }
+
+        /* Future Lens Specifics */
+        .time-travel-slider {
+            width: 100%; margin: 30px 0; -webkit-appearance: none; height: 4px; background: #333; outline: none;
+        }
+        .time-travel-slider::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 20px; height: 20px; background: var(--primary); cursor: pointer; border-radius: 50%; box-shadow: 0 0 10px var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>FUTURE LENS</h1>
+                <div class="sub">PROBABILISTIC FORECASTING ENGINE</div>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-size: 0.8rem; color: #888;">TIMELINE HORIZON</div>
+                <div style="font-size: 1.5rem; color: #fff;">T + 30 DAYS</div>
+            </div>
+        </header>
+
+        <div class="dashboard-grid">
+
+            <!-- Main Chart Area -->
+            <div class="panel">
+                <h3><span style="color:var(--primary)">◉</span> MONTE CARLO PROJECTION (SPX)</h3>
+                <canvas id="forecastChart" height="400"></canvas>
+
+                <div style="margin-top: 20px; display: flex; justify-content: space-between; font-size: 0.8rem; color: #888;">
+                    <span>MODEL: Geometric Brownian Motion (Drift Adjusted)</span>
+                    <span>SIMULATIONS: 10,000</span>
+                    <span>CONFIDENCE: 95%</span>
+                </div>
+            </div>
+
+            <!-- Side Stats -->
+            <div class="panel">
+                <h3>SCENARIO ANALYSIS</h3>
+                <p style="font-size: 0.8rem; color: #ccc;">Adjust the volatility assumption to see impact on forward confidence bands.</p>
+
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Bull Case (95%)</div>
+                        <div class="stat-val" style="color: #0f0" id="bull-val">6020</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Bear Case (95%)</div>
+                        <div class="stat-val" style="color: #f00" id="bear-val">5650</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Implied Volatility</div>
+                        <div class="stat-val" style="color: #0ff">14.2%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Trend Signal</div>
+                        <div class="stat-val" style="color: #a020f0">LONG</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <label style="font-size: 0.8rem; color: #888;">VOLATILITY ADJUSTMENT SCALAR</label>
+                    <input type="range" min="0.5" max="3.0" step="0.1" value="1.0" class="time-travel-slider" oninput="updateChart(this.value)">
+                    <div style="text-align: center; color: var(--primary); font-weight: bold;" id="vol-display">1.0x (Baseline)</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Mock Data Generation (similar to ForecastingEngine.py)
+        function generatePath(start, days, vol, drift) {
+            let path = [start];
+            let current = start;
+            for(let i=0; i<days; i++) {
+                const shock = (Math.random() + Math.random() + Math.random() + Math.random() + Math.random() + Math.random() - 3) / 3; // Approx Gaussian
+                current = current * Math.exp(drift + shock * (vol/Math.sqrt(252)));
+                path.push(current);
+            }
+            return path;
+        }
+
+        const CTX = document.getElementById('forecastChart').getContext('2d');
+        const DAYS = 30;
+        const START_PRICE = 5845.00;
+
+        let myChart;
+
+        function runSim(volMultiplier) {
+            const meanPath = [];
+            const upper95 = [];
+            const lower95 = [];
+
+            // Generate deterministic curves for demo visual smoothness
+            for(let i=0; i<=DAYS; i++) {
+                const t = i/365;
+                const drift = 0.08 * t; // 8% annual return
+                const sigma = 0.142 * volMultiplier * Math.sqrt(t);
+
+                meanPath.push(START_PRICE * Math.exp(drift));
+                upper95.push(START_PRICE * Math.exp(drift + 1.96*sigma));
+                lower95.push(START_PRICE * Math.exp(drift - 1.96*sigma));
+            }
+
+            // Update DOM stats
+            document.getElementById('bull-val').innerText = upper95[DAYS].toFixed(0);
+            document.getElementById('bear-val').innerText = lower95[DAYS].toFixed(0);
+            document.getElementById('vol-display').innerText = volMultiplier + "x";
+
+            return { labels: Array.from({length:DAYS+1},(_,i)=>'Day '+i), mean: meanPath, upper: upper95, lower: lower95 };
+        }
+
+        function initChart() {
+            const data = runSim(1.0);
+
+            myChart = new Chart(CTX, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Upper 95% Band',
+                            data: data.upper,
+                            borderColor: 'transparent',
+                            backgroundColor: 'rgba(160, 32, 240, 0.2)', // Purple haze
+                            fill: '+1',
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Lower 95% Band',
+                            data: data.lower,
+                            borderColor: 'transparent',
+                            backgroundColor: 'transparent',
+                            fill: false,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Mean Projection',
+                            data: data.mean,
+                            borderColor: '#00f3ff',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        y: {
+                            grid: { color: '#333' },
+                            ticks: { color: '#888' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { display: false } // Hide days to keep clean
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChart(val) {
+            const data = runSim(val);
+            myChart.data.datasets[0].data = data.upper;
+            myChart.data.datasets[1].data = data.lower;
+            myChart.data.datasets[2].data = data.mean;
+            myChart.update();
+        }
+
+        initChart();
+
+    </script>
+</body>
+</html>

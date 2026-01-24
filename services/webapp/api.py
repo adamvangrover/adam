@@ -16,6 +16,19 @@ import threading
 from datetime import datetime, timezone, timedelta
 from .config import config
 from .celery_app import celery
+from .governance import GovernanceMiddleware
+
+# Import the Live Mock Engine for dynamic simulation data
+try:
+    from core.engine.live_mock_engine import live_engine
+    from core.engine.forecasting_engine import forecasting_engine
+    from core.engine.conviction_manager import conviction_manager
+except ImportError as e:
+    # Fallback if core is not in path or other import issues
+    logging.warning(f"Could not import core engines: {e}. Simulation endpoints will be static.")
+    live_engine = None
+    forecasting_engine = None
+    conviction_manager = None
 
 # ---------------------------------------------------------------------------- #
 # Constants
@@ -252,6 +265,9 @@ def create_app(config_name='default'):
     socketio.init_app(app, cors_allowed_origins=app.config.get('CORS_ALLOWED_ORIGINS', []))
     jwt.init_app(app)
 
+    # 🛡️ Governance: Initialize middleware
+    GovernanceMiddleware(app)
+
     # Configure Celery
     celery.conf.update(app.config)
 
@@ -298,6 +314,85 @@ def create_app(config_name='default'):
     @app.route('/api/hello')
     def hello_world():
         return 'Hello, World!'
+
+    # ---------------------------------------------------------------------------- #
+    # Mission Control / Synthesizer Endpoints
+    # ---------------------------------------------------------------------------- #
+
+    @app.route('/api/synthesizer/confidence', methods=['GET'])
+    @jwt_required()
+    def get_synthesizer_confidence():
+        """
+        Returns the system's aggregated confidence score and market pulse signals.
+        Powered by the LiveMockEngine to simulate real-time volatility.
+        """
+        if live_engine:
+            pulse = live_engine.get_market_pulse()
+            score = live_engine.get_synthesizer_score()
+            return jsonify({
+                "score": score,
+                "pulse": pulse,
+                "timestamp": datetime.utcnow().isoformat()
+            })
+        else:
+            return jsonify({
+                "score": 50,
+                "pulse": {},
+                "status": "Simulation Engine Offline"
+            })
+
+    @app.route('/api/intercom/stream', methods=['GET'])
+    @jwt_required()
+    def get_intercom_stream():
+        """
+        Returns a stream of 'thoughts' from the agent swarm.
+        """
+        if live_engine:
+            thoughts = live_engine.get_agent_stream(limit=10)
+            return jsonify(thoughts)
+        else:
+            return jsonify(["System offline.", "Waiting for agent connection..."])
+
+    @app.route('/api/synthesizer/forecast/<symbol>', methods=['GET'])
+    @jwt_required()
+    def get_forecast(symbol):
+        """
+        Returns historical data and a 30-day probabilistic forecast for the given symbol.
+        """
+        if not forecasting_engine:
+             return jsonify({'error': 'Forecasting Engine Unavailable'}), 503
+
+        # Load history from the generated JSON
+        try:
+            data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'core', 'data', 'generated_history.json')
+            with open(data_path, 'r') as f:
+                history_db = json.load(f)
+
+            symbol = symbol.upper()
+            if symbol not in history_db:
+                return jsonify({'error': 'Symbol not found'}), 404
+
+            history = history_db[symbol]
+            forecast = forecasting_engine.generate_forecast(symbol, history, days=30)
+
+            return jsonify({
+                "history": history[-90:], # Return last 90 days for context
+                "forecast": forecast
+            })
+        except Exception as e:
+            app.logger.error(f"Forecasting error: {e}")
+            return jsonify({'error': str(e)}), 500
+
+    @app.route('/api/synthesizer/conviction', methods=['GET'])
+    @jwt_required()
+    def get_conviction():
+        """
+        Returns the current conviction heatmap of the agent swarm.
+        """
+        if conviction_manager:
+            return jsonify(conviction_manager.get_conviction_map())
+        else:
+            return jsonify({'error': 'Conviction Manager Unavailable'}), 503
 
     @app.route('/api/v23/analyze', methods=['POST'])
     @jwt_required()
