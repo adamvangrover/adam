@@ -57,6 +57,7 @@ class DataFetcher:
             data = {
                 "symbol": ticker_symbol,
                 "current_price": info.get("currentPrice") or info.get("regularMarketPrice"),
+                "previous_close": info.get("previousClose") or info.get("regularMarketPreviousClose"),
                 "open": info.get("open") or info.get("regularMarketOpen"),
                 "high": info.get("dayHigh") or info.get("regularMarketDayHigh"),
                 "low": info.get("dayLow") or info.get("regularMarketDayLow"),
@@ -318,3 +319,129 @@ class DataFetcher:
         except Exception as e:
             logger.error(f"Error fetching calendar: {e}")
             return {}
+
+    @retry_with_backoff(retries=2, backoff_in_seconds=1)
+    def fetch_credit_metrics(self) -> Dict[str, Any]:
+        """
+        Fetches credit market metrics.
+        Specifically targeting High Yield (HYG) and Investment Grade (LQD) ETFs as proxies for CDX,
+        and 10Y Treasury Yield (^TNX) to estimate spreads.
+        """
+        metrics = {}
+        tickers = {
+            "HYG": "High Yield Corp Bond ETF",
+            "LQD": "Inv Grade Corp Bond ETF",
+            "^TNX": "10-Year Treasury Yield"
+        }
+
+        for symbol, name in tickers.items():
+            data = self.fetch_realtime_snapshot(symbol)
+            if data and data.get("last_price"):
+                metrics[symbol] = data
+                metrics[symbol]['name'] = name
+            else:
+                 # Try to fetch standard market data if snapshot fails
+                data = self.fetch_market_data(symbol)
+                if data:
+                     # Adapt to snapshot format lightly
+                     metrics[symbol] = {
+                         "symbol": symbol,
+                         "last_price": data.get("current_price"),
+                         "previous_close": data.get("previous_close"),
+                         "name": name
+                     }
+        return metrics
+
+    @retry_with_backoff(retries=2, backoff_in_seconds=1)
+    def fetch_volatility_metrics(self) -> Dict[str, Any]:
+        """
+        Fetches volatility metrics: VIX, VIX3M, MOVE Index.
+        """
+        metrics = {}
+        tickers = ["^VIX", "^VIX3M", "^MOVE"]
+
+        for symbol in tickers:
+            data = self.fetch_realtime_snapshot(symbol)
+            if data and data.get("last_price"):
+                 metrics[symbol] = data
+            else:
+                 # Fallback
+                 data = self.fetch_market_data(symbol)
+                 if data:
+                     metrics[symbol] = {
+                         "symbol": symbol,
+                         "last_price": data.get("current_price"),
+                         "previous_close": data.get("previous_close")
+                     }
+        return metrics
+
+    @retry_with_backoff(retries=2, backoff_in_seconds=1)
+    def fetch_crypto_metrics(self) -> Dict[str, Any]:
+        """
+        Fetches major crypto metrics: BTC-USD, ETH-USD.
+        """
+        metrics = {}
+        tickers = ["BTC-USD", "ETH-USD"]
+
+        for symbol in tickers:
+            data = self.fetch_realtime_snapshot(symbol)
+            if data and data.get("last_price"):
+                 metrics[symbol] = data
+            else:
+                 data = self.fetch_market_data(symbol)
+                 if data:
+                     metrics[symbol] = {
+                         "symbol": symbol,
+                         "last_price": data.get("current_price"),
+                         "previous_close": data.get("previous_close")
+                     }
+        return metrics
+
+    @retry_with_backoff(retries=2, backoff_in_seconds=1)
+    def fetch_treasury_metrics(self) -> Dict[str, Any]:
+        """
+        Fetches Treasury metrics for curve analysis.
+        Uses ^TNX (10Y Yield), ^IRX (13W Yield), ^FVX (5Y Yield).
+        Also fetches IEF (7-10 Year Treasury Bond ETF) for price action comparison.
+        """
+        metrics = {}
+        tickers = {
+            "^TNX": "10-Year Treasury Yield",
+            "^IRX": "13-Week Treasury Bill",
+            "^FVX": "5-Year Treasury Yield",
+            "IEF": "iShares 7-10 Year Treasury Bond ETF"
+        }
+
+        for symbol, name in tickers.items():
+            data = self.fetch_realtime_snapshot(symbol)
+            if data and data.get("last_price"):
+                 metrics[symbol] = data
+                 metrics[symbol]['name'] = name
+            else:
+                 data = self.fetch_market_data(symbol)
+                 if data:
+                     metrics[symbol] = {
+                         "symbol": symbol,
+                         "last_price": data.get("current_price"),
+                         "previous_close": data.get("previous_close"),
+                         "name": name
+                     }
+        return metrics
+
+    def fetch_macro_liquidity(self) -> Dict[str, Any]:
+        """
+        Fetches macro liquidity indicators.
+        Note: True Fed Balance Sheet/TGA/Reverse Repo requires FRED data which is not available via yfinance.
+        Returning a placeholder structure for the agent to use (or simulate).
+        """
+        # Placeholder for liquidity index
+        return {
+            "status": "simulated",
+            "liquidity_index": 0.0, # Placeholder
+            "components": {
+                "fed_balance_sheet": 0.0,
+                "tga": 0.0,
+                "reverse_repo": 0.0
+            },
+            "note": "Real-time macro liquidity data requires FRED API integration."
+        }

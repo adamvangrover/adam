@@ -9,7 +9,10 @@ import asyncio
 import os  # For os.path.exists and os.remove
 import logging
 import sys
-import os
+from datetime import datetime, timezone
+
+from core.compliance.snc_validators import evaluate_compliance, RiskLevel
+
 # Add the project root to sys.path to allow imports like 'from core...'
 # when running this script directly for its __main__ block.
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -53,14 +56,39 @@ class SNCAnalystAgent(AgentBase):
         if not self.occ_guidelines_snc:
             logging.warning("OCC Guidelines SNC not found in agent configuration.")
 
+        self.audit_log = []
+
+    def _log_audit_event(self, event_type: str, details: Dict[str, Any]):
+        """Logs an event to the internal audit trail."""
+        self.audit_log.append({
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "event_type": event_type,
+            "details": details
+        })
+
+    def generate_defense_file(self, filepath: str):
+        """Generates a JSON audit trail file."""
+        try:
+            with open(filepath, 'w') as f:
+                json.dump(self.audit_log, f, indent=2)
+            logging.info(f"Defense file generated at {filepath}")
+        except Exception as e:
+            logging.error(f"Failed to generate defense file: {e}")
+
     async def execute(self, **kwargs) -> Optional[Tuple[Optional[SNCRating], str]]:
+        # Reset audit log for new execution to prevent state pollution
+        self.audit_log = []
+
         company_id = kwargs.get('company_id')
         logging.info(f"Executing SNC analysis for company_id: {company_id}")
         logging.debug(f"SNC_ANALYSIS_EXECUTE_INPUT: company_id='{company_id}', all_kwargs={kwargs}")
 
+        self._log_audit_event("SNC_ANALYSIS_START", {"company_id": company_id})
+
         if not company_id:
             error_msg = "Company ID not provided for SNC analysis."
             logging.error(error_msg)
+            self._log_audit_event("ERROR", {"message": error_msg})
             return None, error_msg
 
         if 'DataRetrievalAgent' not in self.peer_agents:
@@ -85,6 +113,11 @@ class SNCAnalystAgent(AgentBase):
         economic_data_context = company_data_package.get('economic_data_context', {})
         collateral_and_debt_details = company_data_package.get('collateral_and_debt_details', {})
 
+        self._log_audit_event("DATA_RECEIVED", {
+            "financial_keys": list(financial_data_detailed.keys()),
+            "qualitative_keys": list(qualitative_company_info.keys())
+        })
+
         logging.debug(f"SNC_ANALYSIS_DATA_EXTRACTED: CompanyInfo: {list(company_info.keys())}, FinancialDetailed: {list(financial_data_detailed.keys())}, Qualitative: {list(qualitative_company_info.keys())}, Industry: {list(industry_data_context.keys())}, Economic: {list(economic_data_context.keys())}, Collateral: {list(collateral_and_debt_details.keys())}")
 
         financial_analysis_inputs_for_sk = self._prepare_financial_inputs_for_sk(financial_data_detailed)
@@ -106,8 +139,15 @@ class SNCAnalystAgent(AgentBase):
             financial_analysis_result,
             qualitative_analysis_result,
             credit_risk_mitigation_info,
-            economic_data_context
+            economic_data_context,
+            industry_data_context
         )
+
+        self._log_audit_event("RATING_DETERMINED", {
+            "rating": rating.value if rating else 'N/A',
+            "rationale_preview": rationale[:100] + "..."
+        })
+
         logging.debug(
             f"SNC_ANALYSIS_EXECUTE_OUTPUT: Rating='{rating.value if rating else 'N/A'}', Rationale='{rationale}'")
         return rating, rationale
@@ -146,6 +186,7 @@ class SNCAnalystAgent(AgentBase):
             "profitability": key_ratios.get("net_profit_margin"),
             "liquidity_ratio": key_ratios.get("current_ratio"),
             "interest_coverage": key_ratios.get("interest_coverage_ratio"),
+            "tier_1_capital_ratio": key_ratios.get("tier_1_capital_ratio"),
             **sk_financial_inputs
         }
         logging.debug(f"SNC_FIN_ANALYSIS_OUTPUT: {analysis_result}")
@@ -223,8 +264,32 @@ class SNCAnalystAgent(AgentBase):
 
         return None, "SK assessments did not map to a definitive rating."
 
-    def _rate_from_fallback_logic(self, financial_analysis: Dict[str, Any], qualitative_analysis: Dict[str, Any], credit_risk_mitigation: Dict[str, Any]) -> Tuple[Optional[SNCRating], str]:
+    def _rate_from_fallback_logic(self, financial_analysis: Dict[str, Any], qualitative_analysis: Dict[str, Any], credit_risk_mitigation: Dict[str, Any], sector_name: str = "General", market_data: Dict[str, Any] = None) -> Tuple[Optional[SNCRating], str]:
         """Provides a rating based on hardcoded financial metrics if SK fails."""
+
+        # 1. Use Compliance Validators first
+        # Construct a dummy 'key_ratios' dict as that's what evaluate_compliance expects
+        compliance_input = {
+            "key_ratios": {
+                "debt_to_equity_ratio": financial_analysis.get("debt_to_equity"),
+                "net_profit_margin": financial_analysis.get("profitability"),
+                "current_ratio": financial_analysis.get("liquidity_ratio"),
+                "interest_coverage_ratio": financial_analysis.get("interest_coverage"),
+                "tier_1_capital_ratio": financial_analysis.get("tier_1_capital_ratio")
+            }
+        }
+
+        compliance_result = evaluate_compliance(compliance_input, sector_name=sector_name, market_data=market_data)
+        self._log_audit_event("COMPLIANCE_CHECK", {
+            "passed": compliance_result.passed,
+            "violations": compliance_result.violations
+        })
+
+        if not compliance_result.passed:
+             rationale = "Compliance Validation Failed:\n- " + "\n- ".join(compliance_result.violations)
+             return SNCRating.SUBSTANDARD, rationale
+
+        # 2. Existing Legacy Fallback Logic (if compliance passes but other specific combos are bad)
         debt_to_equity = financial_analysis.get("debt_to_equity")
         profitability = financial_analysis.get("profitability")
 
@@ -290,7 +355,8 @@ class SNCAnalystAgent(AgentBase):
                                 financial_analysis: Dict[str, Any],
                                 qualitative_analysis: Dict[str, Any],
                                 credit_risk_mitigation: Dict[str, Any],
-                                economic_data_context: Dict[str, Any]
+                                economic_data_context: Dict[str, Any],
+                                industry_data_context: Dict[str, Any]
                                 ) -> Tuple[Optional[SNCRating], str]:
         logging.debug(f"SNC_DETERMINE_RATING_INPUT: company='{company_name}'")
 
@@ -383,14 +449,51 @@ class SNCAnalystAgent(AgentBase):
             nonaccrual_sk_assessment_str
         )
 
+        # Enforce Compliance Validators on Primary Path
+        if rating is not None:
+             compliance_input = {
+                "key_ratios": {
+                    "debt_to_equity_ratio": financial_analysis.get("debt_to_equity"),
+                    "net_profit_margin": financial_analysis.get("profitability"),
+                    "current_ratio": financial_analysis.get("liquidity_ratio"),
+                    "interest_coverage_ratio": financial_analysis.get("interest_coverage"),
+                    "tier_1_capital_ratio": financial_analysis.get("tier_1_capital_ratio")
+                }
+             }
+
+             sector_name = industry_data_context.get('sector', 'General')
+             market_data = {
+                "vix": economic_data_context.get('vix') or economic_data_context.get('volatility_index')
+             }
+
+             compliance_result = evaluate_compliance(compliance_input, sector_name=sector_name, market_data=market_data)
+             self._log_audit_event("COMPLIANCE_CHECK_PRIMARY", {
+                "passed": compliance_result.passed,
+                "violations": compliance_result.violations,
+                "original_rating": rating.value
+             })
+
+             if not compliance_result.passed:
+                 logging.warning(f"Compliance check failed for {company_name} despite SK rating.")
+                 # Downgrade to SUBSTANDARD if compliance fails, unless it is already worse (DOUBTFUL or LOSS)
+                 if rating not in [SNCRating.LOSS, SNCRating.DOUBTFUL]:
+                      rating = SNCRating.SUBSTANDARD
+                      sk_rationale += "\n\nCRITICAL COMPLIANCE VIOLATION: Rating capped at Substandard due to policy breaches: " + ", ".join(compliance_result.violations)
+
         final_rationale = ""
         # Fallback path: If SK skills did not yield a rating, use hardcoded financial logic
         if rating is None:
             logging.warning(f"SK-based rating was inconclusive for {company_name}. Using fallback logic.")
+            sector_name = industry_data_context.get('sector', 'General')
+            market_data = {
+                "vix": economic_data_context.get('vix') or economic_data_context.get('volatility_index')
+            }
             rating, final_rationale = self._rate_from_fallback_logic(
                 financial_analysis,
                 qualitative_analysis,
-                credit_risk_mitigation
+                credit_risk_mitigation,
+                sector_name=sector_name,
+                market_data=market_data
             )
         else:
             # Synthesize a comprehensive rationale if the primary path was successful

@@ -49,6 +49,7 @@ class AdamNavigator {
 
             // 5. Render Interface
             this._renderNavigation();
+            this._injectCommandPalette();
             this._injectGlobalStyles();
 
             // 6. Bind Human Interaction Events
@@ -145,6 +146,7 @@ class AdamNavigator {
             { name: 'Data Vault', icon: 'fa-database', link: 'data.html' },
             { name: 'App Deploy', icon: 'fa-rocket', link: 'deployment.html' },
             { name: 'Quantum Infra', icon: 'fa-network-wired', link: 'quantum_infrastructure.html' },
+            { name: 'Evolution Hub', icon: 'fa-dna', link: 'evolution.html' },
             { type: 'divider' },
             { name: 'Root Directory', icon: 'fa-folder-tree', link: 'ROOT' }
         ];
@@ -163,14 +165,15 @@ class AdamNavigator {
             <div class="p-4 border-b border-slate-700/50">
                 <div class="flex items-center justify-between mb-4">
                     <h2 class="text-lg font-bold tracking-tight text-white mono">ADAM <span class="text-cyan-400">v23.5</span></h2>
-                    <button id="nav-close" class="text-slate-400 hover:text-white md:hidden">
-                        <i class="fas fa-times"></i>
+                    <button id="nav-close" class="text-slate-400 hover:text-white md:hidden" aria-label="Close navigation">
+                        <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
                 </div>
                 <div class="relative group">
-                    <input type="text" id="global-search" placeholder="Search Agents, Docs..."
+                    <input type="text" id="global-search" placeholder="Search Agents, Docs... (Ctrl+K)"
+                        aria-label="Global search"
                         class="w-full bg-slate-900/50 border border-slate-700 rounded px-3 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-500 transition-colors font-mono">
-                    <i class="fas fa-search absolute right-3 top-2 text-slate-500 text-xs"></i>
+                    <i class="fas fa-search absolute right-3 top-2 text-slate-500 text-xs" aria-hidden="true"></i>
                     <div id="search-results" class="absolute left-0 top-full mt-2 w-64 bg-slate-800 border border-slate-700 rounded shadow-xl hidden z-50 max-h-64 overflow-y-auto"></div>
                 </div>
             </div>
@@ -213,7 +216,7 @@ class AdamNavigator {
             html += `
                 <li>
                     <a href="${linkUrl}" class="flex items-center gap-3 px-3 py-2 rounded text-sm font-medium transition group ${activeClass}">
-                        <i class="fas ${item.icon} w-5 text-center ${isActive ? 'text-cyan-400' : 'text-slate-500 group-hover:text-white'}"></i>
+                        <i class="fas ${item.icon} w-5 text-center ${isActive ? 'text-cyan-400' : 'text-slate-500 group-hover:text-white'}" aria-hidden="true"></i>
                         ${item.name}
                     </a>
                 </li>
@@ -234,7 +237,7 @@ class AdamNavigator {
                 </div>
                 <div class="flex items-center justify-between text-xs mb-3">
                     <span class="text-slate-400">Theme</span>
-                    <button id="theme-toggle" class="text-cyan-400 hover:text-white transition"><i class="fas fa-adjust"></i> Switch</button>
+                    <button id="theme-toggle" class="text-cyan-400 hover:text-white transition"><i class="fas fa-adjust" aria-hidden="true"></i> Switch</button>
                 </div>
                 <div class="flex items-center justify-between text-xs">
                     <span class="text-slate-400">Data Source</span>
@@ -255,6 +258,35 @@ class AdamNavigator {
     }
 
     /**
+     * Injects the Global Command Palette Modal
+     */
+    _injectCommandPalette() {
+        const palette = document.createElement('div');
+        palette.id = 'command-palette-overlay';
+        palette.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm z-[100] hidden flex items-start justify-center pt-20 transition-opacity duration-200 opacity-0';
+        palette.innerHTML = `
+            <div class="w-full max-w-2xl bg-[#0f172a] border border-slate-700 rounded-lg shadow-2xl transform scale-95 transition-transform duration-200">
+                <div class="border-b border-slate-700 p-4 flex items-center gap-3">
+                    <i class="fas fa-search text-cyan-400"></i>
+                    <input type="text" id="cp-input" placeholder="Type a command or search..."
+                        class="w-full bg-transparent text-white text-lg focus:outline-none font-mono placeholder-slate-500">
+                    <span class="text-xs text-slate-500 border border-slate-700 px-2 py-1 rounded">ESC</span>
+                </div>
+                <div class="max-h-[60vh] overflow-y-auto custom-scrollbar p-2" id="cp-results">
+                    <div class="text-center py-10 text-slate-500 font-mono text-sm">
+                        Waiting for input...
+                    </div>
+                </div>
+                <div class="border-t border-slate-700 p-2 bg-slate-900/50 rounded-b-lg flex justify-between px-4 text-xs text-slate-500 font-mono">
+                    <span><i class="fas fa-level-down-alt"></i> to select</span>
+                    <span><i class="fas fa-arrow-up"></i><i class="fas fa-arrow-down"></i> to navigate</span>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(palette);
+    }
+
+    /**
      * Injects layout styles for the main content area
      */
     _injectGlobalStyles() {
@@ -266,6 +298,12 @@ class AdamNavigator {
             .glass-panel {
                 backdrop-filter: blur(12px);
                 background: rgba(15, 23, 42, 0.95);
+            }
+            #command-palette-overlay.active {
+                opacity: 1;
+            }
+            #command-palette-overlay.active > div {
+                transform: scale(100%);
             }
         `;
         document.head.appendChild(style);
@@ -286,16 +324,26 @@ class AdamNavigator {
             const toggleBtn = document.createElement('button');
             toggleBtn.id = 'nav-toggle';
             toggleBtn.className = 'fixed top-4 left-4 z-50 p-2 bg-slate-800 text-white rounded md:hidden border border-slate-700 shadow-lg';
-            toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            toggleBtn.style.zIndex = '1001'; // Ensure it's above .cyber-header (z-100) and .scan-line (z-999)
+            toggleBtn.innerHTML = '<i class="fas fa-bars" aria-hidden="true"></i>';
+            toggleBtn.setAttribute('aria-label', 'Toggle navigation');
+            toggleBtn.setAttribute('aria-expanded', 'false');
+            toggleBtn.setAttribute('aria-controls', 'side-nav');
             document.body.appendChild(toggleBtn);
         }
 
         const nav = document.getElementById('side-nav');
+        const toggleBtn = document.getElementById('nav-toggle');
         const handleToggle = () => {
             const isClosed = nav.classList.contains('-translate-x-full');
             nav.classList.toggle('-translate-x-full', !isClosed);
             overlay.classList.toggle('opacity-0', !isClosed);
             overlay.classList.toggle('pointer-events-none', !isClosed);
+
+            // Update aria-expanded state
+            if (toggleBtn) {
+                toggleBtn.setAttribute('aria-expanded', isClosed ? 'true' : 'false');
+            }
         };
 
         document.getElementById('nav-toggle')?.addEventListener('click', handleToggle);
@@ -314,27 +362,81 @@ class AdamNavigator {
             }
         });
 
-        // 3. Search Logic
+        // 3. Search Logic (Sidebar)
         const searchInput = document.getElementById('global-search');
         if (searchInput) {
-            searchInput.addEventListener('input', (e) => this._handleSearch(e.target.value));
+            searchInput.addEventListener('input', (e) => this._handleSearch(e.target.value, 'search-results'));
             
-            // Close search when clicking outside
             document.addEventListener('click', (e) => {
                 const results = document.getElementById('search-results');
                 if (results && !searchInput.contains(e.target) && !results.contains(e.target)) {
                     results.classList.add('hidden');
                 }
             });
+
+            // Keyboard Shortcut (Ctrl+K or Cmd+K)
+            document.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    searchInput.focus();
+                }
+            });
+        }
+
+        // 4. Command Palette Logic (Ctrl+K)
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                this._toggleCommandPalette();
+            }
+            if (e.key === 'Escape') {
+                const palette = document.getElementById('command-palette-overlay');
+                if (!palette.classList.contains('hidden')) {
+                    this._toggleCommandPalette();
+                }
+            }
+        });
+
+        // Close on overlay click
+        document.getElementById('command-palette-overlay')?.addEventListener('click', (e) => {
+            if (e.target.id === 'command-palette-overlay') {
+                this._toggleCommandPalette();
+            }
+        });
+
+        // CP Input Handler
+        const cpInput = document.getElementById('cp-input');
+        if (cpInput) {
+            cpInput.addEventListener('input', (e) => this._handleSearch(e.target.value, 'cp-results'));
+        }
+    }
+
+    _toggleCommandPalette() {
+        const palette = document.getElementById('command-palette-overlay');
+        const input = document.getElementById('cp-input');
+
+        if (palette.classList.contains('hidden')) {
+            palette.classList.remove('hidden');
+            // Trigger reflow for transition
+            void palette.offsetWidth;
+            palette.classList.add('active');
+            input.value = '';
+            input.focus();
+            this._handleSearch('', 'cp-results'); // Show default state
+        } else {
+            palette.classList.remove('active');
+            setTimeout(() => {
+                palette.classList.add('hidden');
+            }, 200);
         }
     }
 
     /**
      * Search Handler
      */
-    _handleSearch(query) {
-        const resultsContainer = document.getElementById('search-results');
-        if (!query) {
+    _handleSearch(query, containerId) {
+        const resultsContainer = document.getElementById(containerId);
+        if (!query && containerId === 'search-results') {
             resultsContainer.classList.add('hidden');
             return;
         }
@@ -372,7 +474,7 @@ class AdamNavigator {
             <a href="${r.link}" class="block px-4 py-2 hover:bg-slate-700 border-b border-slate-700 last:border-0 transition-colors">
                 <div class="flex justify-between">
                     <span class="text-xs text-cyan-400 font-bold font-mono">${r.type || 'FILE'}</span>
-                    <i class="fas fa-chevron-right text-[10px] text-slate-600"></i>
+                    <i class="fas fa-chevron-right text-[10px] text-slate-600" aria-hidden="true"></i>
                 </div>
                 <div class="text-sm text-white font-medium">${r.title}</div>
             </a>

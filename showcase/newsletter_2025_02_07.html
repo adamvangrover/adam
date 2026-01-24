@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM v23.5 :: Adam v15.4 Newsletter - February 7, 2025</title>
     <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/nav.js" defer></script>
     <style>
         :root {
             --paper-bg: #fdfbf7;
@@ -14,22 +17,19 @@
             --accent-red: #cc0000;
             --cyber-black: #050b14;
             --cyber-blue: #00f3ff;
+            --cyber-green: #00ff00;
         }
         body { margin: 0; background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }
 
         .newsletter-wrapper {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 40px auto;
             display: grid;
             grid-template-columns: 3fr 1fr;
             gap: 40px;
             padding: 20px;
         }
-
-        /* Responsive for mobile */
-        @media (max-width: 768px) {
-            .newsletter-wrapper { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 768px) { .newsletter-wrapper { grid-template-columns: 1fr; } }
 
         .paper-sheet {
             background: var(--paper-bg);
@@ -40,106 +40,155 @@
             position: relative;
         }
 
-        /* Typography */
         h1.title {
-            font-family: 'Playfair Display', serif;
-            font-size: 3rem;
-            border-bottom: 4px solid var(--ink-color);
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-            letter-spacing: -1px;
-            line-height: 1.1;
+            font-family: 'Playfair Display', serif; font-size: 3rem; border-bottom: 4px solid var(--ink-color);
+            padding-bottom: 20px; margin-bottom: 30px; letter-spacing: -1px; line-height: 1.1;
         }
         h2 {
-            font-family: 'Inter', sans-serif;
-            font-weight: 700;
-            font-size: 1.2rem;
-            margin-top: 40px;
-            margin-bottom: 15px;
-            color: var(--accent-red);
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1.2rem; margin-top: 40px;
+            margin-bottom: 15px; color: var(--accent-red); text-transform: uppercase; letter-spacing: 1px;
         }
         p { line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
         li { line-height: 1.6; margin-bottom: 10px; }
 
-        /* Sidebar */
-        .cyber-sidebar {
-            font-family: 'JetBrains Mono', monospace;
-        }
+        /* Cyber HUD Sidebar */
+        .cyber-sidebar { font-family: 'JetBrains Mono', monospace; }
         .sidebar-widget {
-            border: 1px solid #333;
-            background: rgba(255,255,255,0.02);
-            padding: 20px;
-            margin-bottom: 20px;
+            border: 1px solid #333; background: rgba(5, 11, 20, 0.8); padding: 15px; margin-bottom: 20px;
+            backdrop-filter: blur(5px);
         }
         .sidebar-title {
-            color: var(--cyber-blue);
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+            color: var(--cyber-blue); font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid #333;
+            padding-bottom: 8px; margin-bottom: 12px; letter-spacing: 1px;
         }
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; color: #aaa; }
+        .stat-val { color: #fff; font-weight: bold; }
+
+        .sentiment-bar { height: 4px; background: #333; margin-top: 5px; border-radius: 2px; overflow: hidden; }
+        .sentiment-fill { height: 100%; background: var(--cyber-blue); }
+
+        .tag-cloud { display: flex; flex-wrap: wrap; gap: 5px; }
+        .tag { background: #222; color: #ccc; padding: 2px 6px; font-size: 0.7rem; border-radius: 3px; border: 1px solid #444; }
+        .tag.ticker { color: var(--cyber-green); border-color: var(--cyber-green); }
+        .tag.agent { color: var(--cyber-blue); border-color: var(--cyber-blue); }
 
         .cyber-btn {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            padding: 6px 12px;
-            border: 1px solid #444;
-            color: #e0e0e0;
-            background: rgba(0,0,0,0.8);
-            text-decoration: none;
-            display: inline-block;
-            margin-bottom: 20px;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 8px 16px; border: 1px solid #444;
+            color: #e0e0e0; background: rgba(0,0,0,0.8); text-decoration: none; display: inline-block;
         }
         .cyber-btn:hover { border-color: var(--cyber-blue); color: var(--cyber-blue); }
     </style>
 </head>
 <body>
-    <div style="max-width: 1400px; margin: 0 auto; padding: 20px;">
-        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; BACK TO ARCHIVE</a>
+    <div style="max-width: 1400px; margin: 0 auto; padding: 20px; display:flex; justify-content:space-between; align-items:center;">
+        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
     </div>
 
     <div class="newsletter-wrapper">
         <div class="paper-sheet">
             <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px;">
                 <span>2025-02-07</span>
-                <span>TYPE: NEWSLETTER</span>
+                <span>ID: 94d42b3a</span>
             </div>
 
             <h1 class="title">Adam v15.4 Newsletter - February 7, 2025</h1>
 
+            <!-- Dynamic Chart Injection Area if metrics exist -->
+            <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
+                <canvas id="financialChart"></canvas>
+            </div>
+
             <h2>Market Mayhem (Executive Summary)</h2><p>Market volatility has increased this week as investors grapple with uncertainty surrounding the new administration's policy agenda and potential changes to the regulatory landscape. Concerns about potential tariffs and trade tensions have also weighed on market sentiment. The S&P 500 is down 1.2% for the week, while the Nasdaq has fallen 1.8%.</p>
-<h2>Key News & Events</h2><ul><li>New administration announces plans for infrastructure spending and tax reform.</li><li>Concerns rise about potential trade tensions with China and other key trading partners.</li><li>Regulatory changes are expected in the technology and healthcare sectors.</li><li>Inflation remains elevated, with the CPI rising 0.4% in January.</li><li>The Federal Reserve signals potential interest rate hikes in the coming months.</li></ul><h2>Top Investment Ideas</h2><h3>iShares Russell 1000 Value ETF (IWD)</h3><p><strong>Rationale:</strong> A diversified value ETF, offering exposure to undervalued companies with strong fundamentals, which may provide a hedge against market volatility and potential economic slowdown.</p><h3>Invesco DB Commodity Index Tracking Fund (DBC)</h3><p><strong>Rationale:</strong> A broad commodity index tracking fund, offering diversification and potential inflation protection in an uncertain economic environment.</p><h3>SPDR Gold Shares (GLD)</h3><p><strong>Rationale:</strong> A gold ETF, providing a safe haven asset that can hedge against geopolitical risks and market volatility.</p><h2>Notable Signals & Rumors</h2><ul><li>Rumors of increased regulatory scrutiny on technology giants are circulating.</li><li>A prominent economist warns of potential stagflation, a combination of slow economic growth and high inflation.</li><li>Insider buying activity has increased in the energy and materials sectors.</li></ul><h2>Policy Impact & Geopolitical Outlook</h2><p>The new administration's policy agenda is expected to have a significant impact on various sectors, with potential winners and losers emerging. Trade tensions and geopolitical risks remain elevated, adding to market uncertainty. Investors should closely monitor policy developments and assess their potential impact on their portfolios.</p>
+<h2>Key News & Events</h2><ul><li>New administration announces plans for infrastructure spending and tax reform.</li><li>Concerns rise about potential trade tensions with China and other key trading partners.</li><li>Regulatory changes are expected in the technology and healthcare sectors.</li><li>Inflation remains elevated, with the CPI rising 0.4% in January.</li><li>The Federal Reserve signals potential interest rate hikes in the coming months.</li></ul><h2>Top Investment Ideas</h2><h2>Notable Signals & Rumors</h2><ul><li>Rumors of increased regulatory scrutiny on technology giants are circulating.</li><li>A prominent economist warns of potential stagflation, a combination of slow economic growth and high inflation.</li><li>Insider buying activity has increased in the energy and materials sectors.</li></ul><h2>Policy Impact & Geopolitical Outlook</h2><p>The new administration's policy agenda is expected to have a significant impact on various sectors, with potential winners and losers emerging. Trade tensions and geopolitical risks remain elevated, adding to market uncertainty. Investors should closely monitor policy developments and assess their potential impact on their portfolios.</p>
 <h2>Deals & Corporate Actions</h2><ul><li>A major pharmaceutical company announces a merger with a biotechnology firm.</li><li>A leading technology company announces a strategic partnership with a government agency.</li><li>An energy company announces a new renewable energy project.</li></ul><h2>Earnings Watch</h2><ul><li>Several major banks are scheduled to report earnings next week.</li><li>Retail companies are expected to report earnings later this month.</li><li>The upcoming earnings season will provide insights into the health of the consumer and the overall economy.</li></ul><h2>Thematic Deep Dive</h2><p>This section provides a deep dive into the potential impact of regulatory changes on various sectors, including technology, healthcare, and energy. We also discuss strategies for managing regulatory risk and identifying investment opportunities in a changing regulatory landscape.</p>
 <h2>Fun Tidbits & Quotes</h2><ul><li>"The only constant in life is change." - Heraclitus</li><li>Did you know that the first stock exchange was established in Amsterdam in 1602?</li></ul><h2>Quirky Sign-Off</h2><p>Stay agile, stay informed, and may your investments weather any storm!</p>
 <h2>Disclaimer</h2><p>The information and recommendations provided in this newsletter are for informational purposes only and should not be construed as financial advice. Investing involves risk, and you could lose money. Consult with a qualified financial advisor before making any investment decisions.</p>
 
 
             <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
-                End of Report.
+                End of Transmission.
             </div>
         </div>
 
         <aside class="cyber-sidebar">
             <div class="sidebar-widget">
-                <div class="sidebar-title">Metadata</div>
-                <div style="font-size: 0.8rem; color: #aaa;">
-                    <div>DATE: <span style="color:#fff">2025-02-07</span></div>
-                    <div>TYPE: <span style="color:#fff">NEWSLETTER</span></div>
-                    <div>CLASS: <span style="color:#fff">UNCLASSIFIED</span></div>
+                <div class="sidebar-title">Intelligence Metadata</div>
+                <div class="stat-row"><span>DATE</span> <span class="stat-val">2025-02-07</span></div>
+                <div class="stat-row"><span>TYPE</span> <span class="stat-val">NEWSLETTER</span></div>
+                <div class="stat-row"><span>CLASS</span> <span class="stat-val">UNCLASSIFIED</span></div>
+                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="94d42b3af89c4c5a99b7709162f78c7908d69b5a21d61311f5dd0240c9a19aea">94d42b3a</span></div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Sentiment Analysis</div>
+                <div class="stat-row"><span>SCORE</span> <span class="stat-val">12/100</span></div>
+                <div class="sentiment-bar">
+                    <div class="sentiment-fill" style="width: 12%;"></div>
+                </div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Detected Entities</div>
+                <div class="tag-cloud">
+                    <span class="tag">CN</span>
                 </div>
             </div>
 
              <div class="sidebar-widget">
-                <div class="sidebar-title">System Status</div>
-                 <div style="display:flex; align-items:center; gap:10px;">
-                    <div style="width:10px; height:10px; background:#00ff00; border-radius:50%; box-shadow: 0 0 5px #00ff00;"></div>
-                    <span style="font-size:0.8rem; color:#00ff00;">ONLINE</span>
+                <div class="sidebar-title">Contributing Agents</div>
+                 <div style="display:flex; flex-direction:column; gap:5px;">
+                    <div style="font-size:0.75rem; color:#666;">System Core</div>
                 </div>
             </div>
         </aside>
     </div>
+
+    <script>
+        // Chart Injection Logic
+        const metricsData = {};
+
+        if (metricsData && Object.keys(metricsData).length > 0) {
+            const ctx = document.getElementById('financialChart');
+            const container = document.getElementById('financialChartContainer');
+
+            // Basic parsing of metrics structure (assuming flat or Year->Val)
+            let labels = [];
+            let values = [];
+            let labelName = "Metric";
+
+            // Try to find a timeseries
+            for (const [key, val] of Object.entries(metricsData)) {
+                if (typeof val === 'object') {
+                    // Likely year -> value
+                    labels = Object.keys(val);
+                    values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
+                    labelName = key;
+                    break;
+                }
+            }
+
+            if (labels.length > 0) {
+                container.style.display = 'block';
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: labelName,
+                            data: values,
+                            backgroundColor: 'rgba(204, 0, 0, 0.5)',
+                            borderColor: '#cc0000',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: true } }
+                    }
+                });
+            }
+        }
+    </script>
 </body>
 </html>

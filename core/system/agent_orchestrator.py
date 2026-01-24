@@ -39,6 +39,7 @@ from core.agents.meta_cognitive_agent import MetaCognitiveAgent
 from core.agents.financial_modeling_agent import FinancialModelingAgent
 from core.agents.portfolio_optimization_agent import PortfolioOptimizationAgent
 from core.agents.quantitative_risk_agent import QuantitativeRiskAgent
+from core.agents.black_swan_agent import BlackSwanAgent
 
 from pydantic import ValidationError
 from core.schemas.config_schema import AgentsYamlConfig
@@ -93,6 +94,7 @@ AGENT_CLASSES = {
     "FinancialModelingAgent": "core.agents.financial_modeling_agent",
     "PortfolioOptimizationAgent": "core.agents.portfolio_optimization_agent",
     "QuantitativeRiskAgent": "core.agents.quantitative_risk_agent",
+    "BlackSwanAgent": BlackSwanAgent,
     "NewsBotAgent": "core.agents.news_bot",
     "NexusAgent": NexusAgent,
     "IngestionAgent": AgentBase,  # Using AgentBase as a placeholder
@@ -125,6 +127,7 @@ AGENT_CLASSES = {
     "financial_modeling_agent": "core.agents.financial_modeling_agent",
     "portfolio_optimization_agent": "core.agents.portfolio_optimization_agent",
     "quantitative_risk_agent": "core.agents.quantitative_risk_agent",
+    "black_swan_agent": BlackSwanAgent,
     "news_bot_agent": "core.agents.news_bot",
 
     # Placeholders for agents that might be missing or under development but referenced in config

@@ -59,3 +59,23 @@
 ## 2026-01-11 - Interactive List Accessibility
 **Learning:** Scrollable lists of clickable items (like news feeds) are often implemented as `div`s with `onClick`, blocking keyboard access. Converting them to `<button>` elements inside a container with `tabIndex="0"` and `role="region"` restores full accessibility without compromising layout.
 **Action:** Always implement clickable list items as buttons and ensure their container is keyboard-scrollable.
+
+## 2026-01-12 - Identifying Debt via Inline Styles
+**Learning:** Components using extensive inline `style` attributes often indicate legacy code or prototypes that lack both design system consistency and accessibility features. These are high-yield targets for refactoring.
+**Action:** Use `grep "style={{"` to find and prioritize components that need both visual and accessible upgrades.
+
+## 2026-02-15 - Micro-Interactions for Long Calculations
+**Learning:** In data-heavy applications, users expect immediate feedback even for operations that take < 2 seconds. A simple spinner or "Analyzing..." text prevents rage clicks and reassures the user the system is working.
+**Action:** Always add a loading state to "Run Analysis" or "Calculate" buttons, even if the backend is fast.
+
+## 2026-05-24 - Terminal Command History Expectations
+**Learning:** Users interacting with a "Terminal" UI component bring strong mental models from real CLIs, specifically expecting Up/Down arrow keys to cycle command history. Without this, the component feels "broken" or "fake" rather than just simple.
+**Action:** When building terminal-like inputs, always implement history state and Up/Down navigation.
+
+## 2026-05-24 - Associating Labels with Meters
+**Learning:** Custom meters (like CPU usage) often have visual labels (e.g., "CPU: 65%") that are separate elements. Using `aria-labelledby` on the progressbar element pointing to the label's ID creates a semantic relationship that screen readers respect.
+**Action:** Always use `id` and `aria-labelledby` to link custom controls to their visual text labels.
+
+## 2026-07-18 - Label Association in Legacy Forms
+**Learning:** Legacy form components often use implicit layouts (e.g., `div` wrapping `label` and `input`) without explicit `htmlFor`/`id` association, breaking accessibility.
+**Action:** When refactoring, always add unique `id`s to inputs and `htmlFor` to labels, even if visual layout seems "obvious".
