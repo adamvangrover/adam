@@ -79,3 +79,7 @@
 ## 2026-07-18 - Label Association in Legacy Forms
 **Learning:** Legacy form components often use implicit layouts (e.g., `div` wrapping `label` and `input`) without explicit `htmlFor`/`id` association, breaking accessibility.
 **Action:** When refactoring, always add unique `id`s to inputs and `htmlFor` to labels, even if visual layout seems "obvious".
+
+## 2027-02-27 - Button Loading State Feedback
+**Learning:** When implementing loading states on buttons, simply disabling the button is insufficient. Users need explicit feedback (spinner + text change) to confirm the action was registered, especially for "simulation" type actions that imply a process.
+**Action:** Use a conditional render inside the button to swap the action icon with a spinner and update the label text.

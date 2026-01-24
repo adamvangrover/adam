@@ -1,7 +1,17 @@
-import React from 'react';
-import { Activity, Play, TrendingUp } from 'lucide-react';
+import React, { useState } from 'react';
+import { Activity, Play, TrendingUp, Loader2 } from 'lucide-react';
 
 const CreditRatingSimulation: React.FC = () => {
+  const [isSimulating, setIsSimulating] = useState(false);
+
+  const handleSimulation = () => {
+    setIsSimulating(true);
+    // Simulate async operation
+    setTimeout(() => {
+      setIsSimulating(false);
+    }, 2000);
+  };
+
   return (
     <div className="glass-panel p-6 rounded-lg mb-6 cyber-border">
       <h3 className="text-lg font-bold text-cyber-cyan mb-6 flex items-center gap-2 tracking-wide">
@@ -42,9 +52,22 @@ const CreditRatingSimulation: React.FC = () => {
             </select>
           </div>
 
-          <button className="w-full px-4 py-2 mt-2 bg-cyber-cyan/10 border border-cyber-cyan/50 text-cyber-cyan font-bold rounded hover:bg-cyber-cyan/20 hover:border-cyber-cyan hover:shadow-[0_0_10px_rgba(6,182,212,0.2)] transition-all uppercase tracking-wider text-xs flex items-center justify-center gap-2 group">
-            <Play className="h-3 w-3 group-hover:scale-110 transition-transform" />
-            Run Simulation
+          <button
+            onClick={handleSimulation}
+            disabled={isSimulating}
+            className="w-full px-4 py-2 mt-2 bg-cyber-cyan/10 border border-cyber-cyan/50 text-cyber-cyan font-bold rounded hover:bg-cyber-cyan/20 hover:border-cyber-cyan hover:shadow-[0_0_10px_rgba(6,182,212,0.2)] disabled:opacity-50 disabled:cursor-not-allowed transition-all uppercase tracking-wider text-xs flex items-center justify-center gap-2 group"
+          >
+            {isSimulating ? (
+              <>
+                <Loader2 className="h-3 w-3 animate-spin" />
+                RUNNING SCENARIO...
+              </>
+            ) : (
+              <>
+                <Play className="h-3 w-3 group-hover:scale-110 transition-transform" />
+                Run Simulation
+              </>
+            )}
           </button>
         </div>
 
