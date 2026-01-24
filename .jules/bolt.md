@@ -39,3 +39,7 @@
 ## 2026-01-08 - [Regex Compilation in Loops]
 **Learning:** `re.search` and `re.findall` inside loops or frequent calls compile the regex pattern implicitly, even if cached. Explicitly pre-compiling patterns to class constants avoids this overhead and also prevents unnecessary string operations like `desc.lower()` when `re.IGNORECASE` can be used.
 **Action:** Always pre-compile regex patterns as module or class constants.
+
+## 2026-02-18 - [Duplicate Scrubber Logic]
+**Learning:** Found `core/data_processing/utils.py` duplicated logic from `core/data_processing/universal_ingestor.py` but missed critical optimizations (like pre-compiled regexes).
+**Action:** When optimizing, check for duplicate utility classes that might have diverged.

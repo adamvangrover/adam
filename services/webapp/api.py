@@ -13,9 +13,29 @@ import functools
 import asyncio
 import re
 import threading
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from .config import config
 from .celery_app import celery
+from .governance import GovernanceMiddleware
+
+# Import the Live Mock Engine for dynamic simulation data
+try:
+    from core.engine.live_mock_engine import live_engine
+    from core.engine.forecasting_engine import forecasting_engine
+    from core.engine.conviction_manager import conviction_manager
+except ImportError as e:
+    # Fallback if core is not in path or other import issues
+    logging.warning(f"Could not import core engines: {e}. Simulation endpoints will be static.")
+    live_engine = None
+    forecasting_engine = None
+    conviction_manager = None
+
+# ---------------------------------------------------------------------------- #
+# Constants
+# ---------------------------------------------------------------------------- #
+
+IP_BLOCK_THRESHOLD = 5
+BLOCK_DURATION_MINUTES = 15
 
 # ---------------------------------------------------------------------------- #
 # Helpers
@@ -76,6 +96,38 @@ def _validate_username(username: str) -> bool:
     if not re.match(r'^[a-zA-Z0-9_-]+$', username):
         return False
 
+    return True
+
+def _validate_portfolio_name(name: str) -> bool:
+    """
+    🛡️ Sentinel: Validate portfolio name.
+    Requires:
+    - Length between 1 and 120 characters
+    - No HTML tags or dangerous characters
+    """
+    if not name or not isinstance(name, str):
+        return False
+    if len(name) < 1 or len(name) > 120:
+        return False
+    # Basic anti-XSS: Don't allow < or >
+    if '<' in name or '>' in name:
+        return False
+    return True
+
+def _validate_asset_symbol(symbol: str) -> bool:
+    """
+    🛡️ Sentinel: Validate asset symbol.
+    Requires:
+    - Length between 1 and 20 characters
+    - Alphanumeric (uppercase preferred, but we'll case-insensitive check and convert later if needed)
+    """
+    if not symbol or not isinstance(symbol, str):
+        return False
+    if len(symbol) < 1 or len(symbol) > 20:
+        return False
+    # Should be alphanumeric
+    if not re.match(r'^[a-zA-Z0-9\.]+$', symbol):
+        return False
     return True
 
 # ---------------------------------------------------------------------------- #
@@ -183,6 +235,14 @@ class TokenBlocklist(db.Model):
     jti = db.Column(db.String(36), nullable=False, index=True)
     created_at = db.Column(db.DateTime, nullable=False)
 
+
+class LoginAttempt(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    ip_address = db.Column(db.String(50), nullable=False, index=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    successful = db.Column(db.Boolean, default=False)
+
+
 # ---------------------------------------------------------------------------- #
 # Application Factory
 # ---------------------------------------------------------------------------- #
@@ -204,6 +264,9 @@ def create_app(config_name='default'):
     # 🛡️ Sentinel: Configured CORS from settings to avoid wildcard access.
     socketio.init_app(app, cors_allowed_origins=app.config.get('CORS_ALLOWED_ORIGINS', []))
     jwt.init_app(app)
+
+    # 🛡️ Governance: Initialize middleware
+    GovernanceMiddleware(app)
 
     # Configure Celery
     celery.conf.update(app.config)
@@ -251,6 +314,85 @@ def create_app(config_name='default'):
     @app.route('/api/hello')
     def hello_world():
         return 'Hello, World!'
+
+    # ---------------------------------------------------------------------------- #
+    # Mission Control / Synthesizer Endpoints
+    # ---------------------------------------------------------------------------- #
+
+    @app.route('/api/synthesizer/confidence', methods=['GET'])
+    @jwt_required()
+    def get_synthesizer_confidence():
+        """
+        Returns the system's aggregated confidence score and market pulse signals.
+        Powered by the LiveMockEngine to simulate real-time volatility.
+        """
+        if live_engine:
+            pulse = live_engine.get_market_pulse()
+            score = live_engine.get_synthesizer_score()
+            return jsonify({
+                "score": score,
+                "pulse": pulse,
+                "timestamp": datetime.utcnow().isoformat()
+            })
+        else:
+            return jsonify({
+                "score": 50,
+                "pulse": {},
+                "status": "Simulation Engine Offline"
+            })
+
+    @app.route('/api/intercom/stream', methods=['GET'])
+    @jwt_required()
+    def get_intercom_stream():
+        """
+        Returns a stream of 'thoughts' from the agent swarm.
+        """
+        if live_engine:
+            thoughts = live_engine.get_agent_stream(limit=10)
+            return jsonify(thoughts)
+        else:
+            return jsonify(["System offline.", "Waiting for agent connection..."])
+
+    @app.route('/api/synthesizer/forecast/<symbol>', methods=['GET'])
+    @jwt_required()
+    def get_forecast(symbol):
+        """
+        Returns historical data and a 30-day probabilistic forecast for the given symbol.
+        """
+        if not forecasting_engine:
+             return jsonify({'error': 'Forecasting Engine Unavailable'}), 503
+
+        # Load history from the generated JSON
+        try:
+            data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'core', 'data', 'generated_history.json')
+            with open(data_path, 'r') as f:
+                history_db = json.load(f)
+
+            symbol = symbol.upper()
+            if symbol not in history_db:
+                return jsonify({'error': 'Symbol not found'}), 404
+
+            history = history_db[symbol]
+            forecast = forecasting_engine.generate_forecast(symbol, history, days=30)
+
+            return jsonify({
+                "history": history[-90:], # Return last 90 days for context
+                "forecast": forecast
+            })
+        except Exception as e:
+            app.logger.error(f"Forecasting error: {e}")
+            return jsonify({'error': str(e)}), 500
+
+    @app.route('/api/synthesizer/conviction', methods=['GET'])
+    @jwt_required()
+    def get_conviction():
+        """
+        Returns the current conviction heatmap of the agent swarm.
+        """
+        if conviction_manager:
+            return jsonify(conviction_manager.get_conviction_map())
+        else:
+            return jsonify({'error': 'Conviction Manager Unavailable'}), 503
 
     @app.route('/api/v23/analyze', methods=['POST'])
     @jwt_required()
@@ -381,15 +523,39 @@ def create_app(config_name='default'):
         """
         Login endpoint.
         """
+        # 🛡️ Sentinel: Rate limiting check
+        ip_address = request.remote_addr
+        cutoff_time = datetime.utcnow() - timedelta(minutes=BLOCK_DURATION_MINUTES)
+
+        # Count failed attempts in the last window
+        failed_attempts = LoginAttempt.query.filter(
+            LoginAttempt.ip_address == ip_address,
+            LoginAttempt.successful == False,
+            LoginAttempt.timestamp > cutoff_time
+        ).count()
+
+        if failed_attempts >= IP_BLOCK_THRESHOLD:
+            # Check if there is a recent successful login to reset counter?
+            # Standard practice is strict block.
+            return jsonify({'error': 'Too many failed login attempts. Please try again later.'}), 429
+
         data = request.get_json()
         username = data.get('username')
         password = data.get('password')
         user = User.query.filter_by(username=username).first()
+
         if user and user.check_password(password):
+            # Log successful attempt
+            db.session.add(LoginAttempt(ip_address=ip_address, successful=True))
+            db.session.commit()
+
             access_token = create_access_token(identity=str(user.id))
             refresh_token = create_refresh_token(identity=str(user.id))
             return jsonify(access_token=access_token, refresh_token=refresh_token)
         else:
+            # Log failed attempt
+            db.session.add(LoginAttempt(ip_address=ip_address, successful=False))
+            db.session.commit()
             return jsonify({'error': 'Invalid credentials'}), 401
 
     @app.route('/api/logout', methods=['POST'])
@@ -627,6 +793,11 @@ def create_app(config_name='default'):
         data = request.get_json()
         if not data or 'name' not in data:
             return jsonify({'error': 'Missing name in request body'}), 400
+
+        # 🛡️ Sentinel: Validate portfolio name
+        if not _validate_portfolio_name(data['name']):
+             return jsonify({'error': 'Invalid portfolio name. Must be 1-120 characters and contain no dangerous characters.'}), 400
+
         current_user_id = get_jwt_identity()
         new_portfolio = Portfolio(name=data['name'], user_id=current_user_id)
         db.session.add(new_portfolio)
@@ -655,6 +826,11 @@ def create_app(config_name='default'):
         data = request.get_json()
         current_user_id = get_jwt_identity()
         portfolio = Portfolio.query.filter_by(id=id, user_id=current_user_id).first_or_404()
+
+        # 🛡️ Sentinel: Validate portfolio name
+        if 'name' in data and not _validate_portfolio_name(data['name']):
+             return jsonify({'error': 'Invalid portfolio name.'}), 400
+
         portfolio.name = data['name']
         db.session.commit()
         return jsonify({'id': portfolio.id, 'name': portfolio.name})
@@ -674,11 +850,27 @@ def create_app(config_name='default'):
         data = request.get_json()
         current_user_id = get_jwt_identity()
         portfolio = Portfolio.query.filter_by(id=portfolio_id, user_id=current_user_id).first_or_404()
+
+        # 🛡️ Sentinel: Validate input
+        if not _validate_asset_symbol(data.get('symbol')):
+             return jsonify({'error': 'Invalid symbol.'}), 400
+
+        try:
+            quantity = float(data.get('quantity', 0))
+            price = float(data.get('purchase_price', 0))
+        except (ValueError, TypeError):
+             return jsonify({'error': 'Invalid quantity or price.'}), 400
+
+        if quantity <= 0:
+             return jsonify({'error': 'Quantity must be positive.'}), 400
+        if price < 0:
+             return jsonify({'error': 'Price cannot be negative.'}), 400
+
         new_asset = PortfolioAsset(
             portfolio_id=portfolio.id,
             symbol=data['symbol'],
-            quantity=data['quantity'],
-            purchase_price=data['purchase_price']
+            quantity=quantity,
+            purchase_price=price
         )
         db.session.add(new_asset)
         db.session.commit()
@@ -691,9 +883,31 @@ def create_app(config_name='default'):
         current_user_id = get_jwt_identity()
         portfolio = Portfolio.query.filter_by(id=portfolio_id, user_id=current_user_id).first_or_404()
         asset = PortfolioAsset.query.filter_by(id=asset_id, portfolio_id=portfolio.id).first_or_404()
-        asset.symbol = data['symbol']
-        asset.quantity = data['quantity']
-        asset.purchase_price = data['purchase_price']
+
+        # 🛡️ Sentinel: Validate input
+        if 'symbol' in data:
+            if not _validate_asset_symbol(data['symbol']):
+                return jsonify({'error': 'Invalid symbol.'}), 400
+            asset.symbol = data['symbol']
+
+        if 'quantity' in data:
+            try:
+                quantity = float(data['quantity'])
+                if quantity <= 0:
+                     return jsonify({'error': 'Quantity must be positive.'}), 400
+                asset.quantity = quantity
+            except (ValueError, TypeError):
+                 return jsonify({'error': 'Invalid quantity.'}), 400
+
+        if 'purchase_price' in data:
+            try:
+                price = float(data['purchase_price'])
+                if price < 0:
+                     return jsonify({'error': 'Price cannot be negative.'}), 400
+                asset.purchase_price = price
+            except (ValueError, TypeError):
+                 return jsonify({'error': 'Invalid price.'}), 400
+
         db.session.commit()
         return jsonify({'id': asset.id, 'symbol': asset.symbol, 'quantity': asset.quantity, 'purchase_price': asset.purchase_price})
 

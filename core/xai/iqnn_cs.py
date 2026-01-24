@@ -104,24 +104,3 @@ class IQNNCS:
                 "CONCLUSION: Warning - The model may be overfitting to noise or using inconsistent reasoning.")
 
         return "\n".join(report_lines)
-
-
-# Example usage/Test block
-if __name__ == "__main__":
-    # Simulate a scenario
-    iqnn = IQNNCS(input_dim=5, num_classes=3, feature_names=["Leverage", "Liquidity", "Vol", "Sentiment", "Macro"])
-
-    # Simulate Class 0 (Low Risk) - consistently cares about Leverage (idx 0) and Liquidity (idx 1)
-    for _ in range(10):
-        attr = np.array([0.8, 0.5, 0.1, 0.1, 0.0]) + np.random.normal(0, 0.05, 5)
-        iqnn.record_prediction(np.random.rand(5), 0, attr)
-
-    # Simulate Class 2 (High Risk) - Inconsistent reasoning (sometimes Vol, sometimes Macro)
-    for _ in range(10):
-        if np.random.rand() > 0.5:
-            attr = np.array([0.1, 0.1, 0.9, 0.1, 0.0])  # Focus on Vol
-        else:
-            attr = np.array([0.1, 0.1, 0.0, 0.1, 0.9])  # Focus on Macro
-        iqnn.record_prediction(np.random.rand(5), 2, attr)
-
-    print(iqnn.generate_explanation_report())

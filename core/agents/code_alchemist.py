@@ -27,6 +27,11 @@ class CodeAlchemist(AgentBase):
     Updated for Adam v23.5 to use AOPL-v1.0 prompts and core settings.
     """
 
+    # Pre-compiled regex patterns for performance
+    TASK_KEYWORDS_PATTERN = re.compile(r"\b\w+\b")
+    CODE_BLOCK_PATTERN = re.compile(r"```(?:\w+\n)?(.*?)```", re.DOTALL)
+    JSON_BLOCK_PATTERN = re.compile(r"(\{[\s\S]*\})")
+
     def __init__(self, config: Dict[str, Any]):
         super().__init__(config)
         self.config = config.copy() if config else {}
@@ -159,7 +164,7 @@ Output: Python code block with architectural notes.
         """
         relevant_knowledge: List[str] = []
         language = str(context.get("language", "")).lower()
-        task_keywords = re.findall(r"\b\w+\b", intent.lower())
+        task_keywords = self.TASK_KEYWORDS_PATTERN.findall(intent.lower())
 
         if language in self.knowledge_base:
             for keyword in task_keywords:
@@ -193,7 +198,7 @@ Output: Python code block with architectural notes.
 
         if llm_result:
             # Extract code from LLM response
-            code_match = re.search(r"```(?:\w+\n)?(.*?)```", llm_result, re.DOTALL)
+            code_match = self.CODE_BLOCK_PATTERN.search(llm_result)
             if code_match:
                 return code_match.group(1).strip()
             return llm_result
@@ -209,7 +214,7 @@ Output: Python code block with architectural notes.
             pass
 
         # Try to find JSON block using regex for objects
-        match = re.search(r"(\{[\s\S]*\})", text)
+        match = self.JSON_BLOCK_PATTERN.search(text)
         if match:
             try:
                 return json.loads(match.group(1))
@@ -305,7 +310,7 @@ Output: Python code block with architectural notes.
         llm_result = await self.llm_plugin.get_completion(prompt)
 
         if llm_result:
-            code_match = re.search(r"```(?:\w+\n)?(.*?)```", llm_result, re.DOTALL)
+            code_match = self.CODE_BLOCK_PATTERN.search(llm_result)
             if code_match:
                 return code_match.group(1).strip()
             # If no block, return result if it looks like code, else original

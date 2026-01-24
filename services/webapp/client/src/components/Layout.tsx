@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import GlobalNav from './GlobalNav';
+import AgentIntercom from './AgentIntercom';
 
 const Layout: React.FC = () => {
   return (
@@ -12,6 +13,7 @@ const Layout: React.FC = () => {
         <main style={{ flexGrow: 1, padding: '20px', overflowY: 'auto', backgroundColor: 'var(--bg-color)' }}>
           <Outlet />
         </main>
+        <AgentIntercom />
       </div>
     </div>
   );

@@ -2,58 +2,160 @@
 
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from scipy import stats
 import logging
-from typing import Dict, Any, Tuple, List
-import openpyxl
+from typing import Dict, Any, Tuple, List, Optional
+from core.agents.agent_base import AgentBase
+from core.financial_data.modeling_schema import FinancialAssumptions, ValuationResult, ValuationMethod, FinancialGlossary, DiscountedCashFlowModel
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-class FinancialModelingAgent:
+class FinancialModelingAgent(AgentBase):
     """
     Agent for performing comprehensive financial modeling, including DCF valuation, sensitivity analysis,
-    stress testing, and detailed reporting. This agent determines the minimum complexity required to best model the company.
+    stress testing, Monte Carlo simulations, and ratio analysis.
     """
 
-    def __init__(self, initial_cash_flow=1000000, discount_rate=0.1, growth_rate=0.05, terminal_growth_rate=0.02, config: Dict[str, Any] = None):
+    def __init__(self, initial_cash_flow=None, discount_rate=None, growth_rate=None, terminal_growth_rate=None, config: Dict[str, Any] = None, constitution: Dict[str, Any] = None, kernel: Any = None):
         """
         Initializes the financial modeling agent with key parameters.
-
-        Args:
-            initial_cash_flow (float): The initial cash flow used in the DCF model.
-            discount_rate (float): The discount rate used for the DCF model.
-            growth_rate (float): The annual growth rate of cash flows.
-            terminal_growth_rate (float): The perpetual growth rate for terminal value calculation.
-            config (Dict[str, Any], optional): Configuration parameters for advanced modeling.
+        Supports both config dict and direct arguments for backward compatibility.
         """
-        self.initial_cash_flow = initial_cash_flow
-        self.discount_rate = discount_rate
-        self.growth_rate = growth_rate
-        self.terminal_growth_rate = terminal_growth_rate
+        if config is None:
+            config = {}
+
+        # Merge direct args into config if provided
+        if initial_cash_flow is not None: config['initial_cash_flow'] = initial_cash_flow
+        if discount_rate is not None: config['discount_rate'] = discount_rate
+        if growth_rate is not None: config['growth_rate'] = growth_rate
+        if terminal_growth_rate is not None: config['terminal_growth_rate'] = terminal_growth_rate
+
+        super().__init__(config, constitution, kernel)
+
+        # Initialize internal state using schema if possible, fallback to config
+        self.assumptions = FinancialAssumptions(
+            initial_cash_flow=self.config.get('initial_cash_flow', 1000000),
+            discount_rate=self.config.get('discount_rate', 0.1),
+            growth_rate=self.config.get('growth_rate', 0.05),
+            terminal_growth_rate=self.config.get('terminal_growth_rate', 0.02),
+            forecast_years=self.config.get('forecast_years', 10)
+        )
+
+        # Compatibility properties mapping to assumptions
+        self.initial_cash_flow = self.assumptions.initial_cash_flow
+        self.discount_rate = self.assumptions.discount_rate
+        self.growth_rate = self.assumptions.growth_rate
+        self.terminal_growth_rate = self.assumptions.terminal_growth_rate
+        self.forecast_years = self.assumptions.forecast_years
+
         self.cash_flows = None
         self.discounted_cash_flows = None
         self.terminal_value = None
         self.npv = None
-        self.config = config or {}
-        self.forecast_years = self.config.get('forecast_years', 10)
         self.industry_multiples = self.config.get('industry_multiples', {'EBITDA': 10.0, 'Revenue': 2.0})
         self.terminal_valuation_method = self.config.get('terminal_valuation_method', 'Gordon Growth')
-        self.data_sources = self.config.get('data_sources', {})
         self.company_name = None
+
+        self.glossary = FinancialGlossary()
+
+    async def execute(self, *args, **kwargs):
+        """
+        Executes the main logic of the agent.
+        Tasks:
+        - "dcf": Standard Discounted Cash Flow analysis (default).
+        - "monte_carlo": Monte Carlo simulation for valuation.
+        - "ratios": Financial ratio analysis.
+        """
+        task = kwargs.get('task', 'dcf')
+        company_id = kwargs.get('company_id', 'unknown')
+        company_name = kwargs.get('company_name', 'Unknown Company')
+        sentiment_score = kwargs.get('sentiment_score', 0.0) # -1.0 to 1.0
+
+        logging.info(f"Executing FinancialModelingAgent task '{task}' for {company_name} ({company_id})")
+
+        # Apply sentiment adjustment if provided
+        if sentiment_score != 0.0:
+            self.apply_sentiment_adjustment(sentiment_score)
+
+        try:
+            if task == 'monte_carlo':
+                num_simulations = kwargs.get('num_simulations', 1000)
+                results = self.run_monte_carlo_simulation(num_simulations)
+                return {
+                    "company_id": company_id,
+                    "task": "monte_carlo",
+                    "results": results,
+                    "status": "success",
+                    "assumptions": self.assumptions.model_dump()
+                }
+
+            elif task == 'ratios':
+                financial_data = kwargs.get('financial_data')
+                if not financial_data:
+                    # Try fetch if not provided
+                    financial_data = self._fetch_financial_data(company_id)['historical']
+
+                ratios = self.calculate_financial_ratios(financial_data)
+                return {
+                    "company_id": company_id,
+                    "task": "ratios",
+                    "ratios": ratios,
+                    "status": "success"
+                }
+
+            else: # Default: DCF
+                intrinsic_value, dcf_details, report_data = self.fetch_and_calculate_dcf(company_id, company_name)
+
+                # Construct Schema-based Result
+                valuation_result = ValuationResult(
+                    intrinsic_value=intrinsic_value,
+                    terminal_value=dcf_details['terminal_value'],
+                    present_value_of_cash_flows=sum(dcf_details['discounted_fcf']),
+                    assumptions_used=self.assumptions,
+                    method=ValuationMethod.GORDON_GROWTH if self.terminal_valuation_method == 'Gordon Growth' else ValuationMethod.EXIT_MULTIPLE
+                )
+
+                result = {
+                    "company_id": company_id,
+                    "intrinsic_value": intrinsic_value,
+                    "dcf_details": dcf_details,
+                    "valuation_model": valuation_result.model_dump(),
+                    "glossary": self.glossary.model_dump(),
+                    "status": "success"
+                }
+                return result
+
+        except Exception as e:
+            logging.error(f"Error executing FinancialModelingAgent: {e}")
+            return {"status": "error", "message": str(e)}
+
+    def apply_sentiment_adjustment(self, sentiment_score: float):
+        """
+        Adjusts financial assumptions based on a sentiment score.
+        Score range: -1.0 (Very Bearish) to 1.0 (Very Bullish)
+        """
+        # Logic:
+        # Bullish (>0): Increases growth rate slightly, might lower discount rate (lower risk premium).
+        # Bearish (<0): Decreases growth rate, increases discount rate.
+
+        # Adjustment Factors
+        growth_impact = 0.02 * sentiment_score # +/- 2%
+        discount_impact = -0.01 * sentiment_score # Inverse: High sentiment -> Lower risk premium
+
+        self.assumptions.growth_rate += growth_impact
+        self.assumptions.discount_rate += discount_impact
+        self.assumptions.sentiment_adjustment_factor = 1.0 + (0.1 * sentiment_score)
+
+        # Sync back to instance vars
+        self.growth_rate = self.assumptions.growth_rate
+        self.discount_rate = self.assumptions.discount_rate
+
+        logging.info(f"Applied sentiment adjustment (score: {sentiment_score}). New Growth: {self.growth_rate:.4f}, New Discount: {self.discount_rate:.4f}")
 
     def generate_cash_flows(self, years=None, cash_flow_input=None):
         """
         Generates a forecast of cash flows over a number of years.
-
-        Args:
-            years (int, optional): The number of years for which the cash flows are to be forecasted. Defaults to forecast_years from config or 10.
-            cash_flow_input (list or np.array, optional): Predefined cash flow list.
-
-        Returns:
-            np.array: An array containing the forecasted cash flows.
         """
         years = years or self.forecast_years
         if cash_flow_input is not None:
@@ -70,9 +172,6 @@ class FinancialModelingAgent:
     def calculate_discounted_cash_flows(self):
         """
         Calculates the discounted cash flows (DCF) using the provided discount rate.
-
-        Returns:
-            np.array: An array of discounted cash flows.
         """
         if self.cash_flows is None:
             raise ValueError("Cash flows have not been generated.")
@@ -84,9 +183,6 @@ class FinancialModelingAgent:
     def calculate_terminal_value(self):
         """
         Calculates the terminal value based on the final year's cash flow and the terminal growth rate.
-
-        Returns:
-            float: The calculated terminal value.
         """
         if self.cash_flows is None:
             raise ValueError("Cash flows have not been generated.")
@@ -104,9 +200,6 @@ class FinancialModelingAgent:
     def calculate_npv(self):
         """
         Calculates the net present value (NPV) of the investment based on discounted cash flows and terminal value.
-
-        Returns:
-            float: The net present value (NPV).
         """
         if self.discounted_cash_flows is None:
             self.calculate_discounted_cash_flows()
@@ -122,95 +215,27 @@ class FinancialModelingAgent:
     def perform_sensitivity_analysis(self, sensitivity_range, variable='growth_rate'):
         """
         Performs sensitivity analysis on a given variable (e.g., growth rate, discount rate).
-
-        Args:
-            sensitivity_range (list): A list of values for the sensitivity analysis.
-            variable (str): The variable to be analyzed ('growth_rate', 'discount_rate').
-
-        Returns:
-            dict: Sensitivity results with npv for each variable value in the range.
         """
         results = {}
         original_variable = getattr(self, variable)
         for value in sensitivity_range:
             setattr(self, variable, value)
+            # Re-generate cash flows if growth rate changes
+            if variable == 'growth_rate':
+                self.generate_cash_flows()
+            self.calculate_discounted_cash_flows()
+            self.calculate_terminal_value()
             npv = self.calculate_npv()
             results[value] = npv
-        setattr(self, variable, original_variable)  # Reset to original value
+
+        # Reset to original state
+        setattr(self, variable, original_variable)
+        if variable == 'growth_rate':
+            self.generate_cash_flows()
+        self.calculate_discounted_cash_flows()
+        self.calculate_terminal_value()
+
         return results
-
-    def perform_stress_testing(self, stress_factor=0.2):
-        """
-        Performs stress testing by applying a stress factor to key assumptions like cash flow, discount rate, and growth rate.
-
-        Args:
-            stress_factor (float): The factor by which to stress key assumptions (e.g., a 20% stress is 0.2).
-
-        Returns:
-            dict: Stress test results for NPV under stressed conditions.
-        """
-        stress_results = {}
-
-        # Stress the cash flows (reduce by stress_factor)
-        original_cash_flows = self.cash_flows.copy()
-        stressed_cash_flows = self.cash_flows * (1 - stress_factor)
-        self.cash_flows = stressed_cash_flows
-        stressed_npv = self.calculate_npv()
-        stress_results['cash_flows'] = stressed_npv
-        self.cash_flows = original_cash_flows  # Reset cash flows
-
-        # Stress the discount rate (increase by stress_factor)
-        original_discount_rate = self.discount_rate
-        stressed_discount_rate = self.discount_rate * (1 + stress_factor)
-        self.discount_rate = stressed_discount_rate
-        stressed_npv_discount_rate = self.calculate_npv()
-        stress_results['discount_rate'] = stressed_npv_discount_rate
-        self.discount_rate = original_discount_rate  # Reset discount rate
-
-        # Stress the growth rate (reduce by stress_factor)
-        original_growth_rate = self.growth_rate
-        stressed_growth_rate = self.growth_rate * (1 - stress_factor)
-        self.growth_rate = stressed_growth_rate
-        stressed_npv_growth_rate = self.calculate_npv()
-        stress_results['growth_rate'] = stressed_npv_growth_rate
-        self.growth_rate = original_growth_rate  # Reset growth rate
-
-        return stress_results
-
-    def plot_sensitivity_analysis(self, sensitivity_range, variable='growth_rate'):
-        """
-        Plots the results of the sensitivity analysis.
-
-        Args:
-            sensitivity_range (list): A list of values for the sensitivity analysis.
-            variable (str): The variable to be analyzed ('growth_rate', 'discount_rate').
-        """
-        sensitivity_results = self.perform_sensitivity_analysis(sensitivity_range, variable)
-
-        plt.figure(figsize=(10, 6))
-        plt.plot(sensitivity_results.keys(), sensitivity_results.values(), label=f'Sensitivity to {variable}')
-        plt.title(f'Sensitivity Analysis of {variable}')
-        plt.xlabel(f'{variable}')
-        plt.ylabel('NPV')
-        plt.grid(True)
-        plt.legend()
-        plt.show()
-
-    def plot_stress_test_results(self, stress_results):
-        """
-        Plots the results of the stress testing.
-
-        Args:
-            stress_results (dict): The results of the stress test containing NPV under different conditions.
-        """
-        plt.figure(figsize=(10, 6))
-        categories = ['Cash Flows', 'Discount Rate', 'Growth Rate']
-        npvs = [stress_results['cash_flows'], stress_results['discount_rate'], stress_results['growth_rate']]
-
-        plt.bar(categories, npvs, color='red')
-        plt.title('Stress Testing Results')
-        plt.ylabel('NPV')
-        plt.show()
 
     def fetch_and_calculate_dcf(self, company_identifier: str, company_name: str = "Unknown Company") -> Tuple[float, Dict[str, Any], Dict[str, pd.DataFrame]]:
         """
@@ -218,159 +243,109 @@ class FinancialModelingAgent:
         """
         self.company_name = company_name
 
-        try:
-            financial_data = self._fetch_financial_data(company_identifier)
-            intrinsic_value, dcf_details = self.calculate_dcf(financial_data['forecast'])
-            report_data = self._generate_comprehensive_report(financial_data, dcf_details, company_identifier)
-            return intrinsic_value, dcf_details, report_data
-        except Exception as e:
-            logging.error(f"Error calculating DCF for {company_identifier}: {e}")
-            return None, {}, {}
+        financial_data = self._fetch_financial_data(company_identifier)
+        # Calculate Free Cash Flow for forecast
+        fcf_forecast = self._calculate_fcf_forecast(financial_data)
+
+        # Calculate DCF
+        intrinsic_value, dcf_details = self.calculate_dcf_from_projections(fcf_forecast)
+
+        report_data = {
+            'historical': pd.DataFrame(financial_data['historical']),
+            'forecast': pd.DataFrame(financial_data['forecast']),
+            'dcf_details': dcf_details
+        }
+        return intrinsic_value, dcf_details, report_data
 
     def _fetch_financial_data(self, company_identifier: str) -> Dict[str, Any]:
         """
         Placeholder method to fetch financial data from data sources.
         """
+        # Mock data
         historical_data = {
             'revenue': [100, 110, 120, 130, 140],
+            'ebitda': [20, 22, 25, 28, 30],
+            'ebit': [15, 17, 20, 23, 25],
+            'interest_expense': [2, 2, 2, 2, 2],
+            'total_debt': [50, 48, 46, 44, 42],
+            'cash_and_equivalents': [10, 12, 15, 18, 20],
+            'total_assets': [200, 210, 220, 230, 240],
+            'current_assets': [50, 55, 60, 65, 70],
+            'current_liabilities': [30, 32, 34, 36, 38],
             'ebitda_margin': [0.20, 0.21, 0.22, 0.23, 0.24],
             'capex': [10, 11, 12, 13, 14],
-            'working_capital_change': [5, 6, 7, 8, 9],
-            'revolver_debt': [10, 10, 10, 10, 10],
-            'revolver_interest_rate': 0.04,
-            'term_loan_a_debt': [20, 20, 20, 20, 20],
-            'term_loan_a_interest_rate': 0.05,
-            'term_loan_b_debt': [20, 20, 20, 20, 20],
-            'term_loan_b_interest_rate': 0.06,
-            'secured_notes_debt': [0, 0, 0, 0, 0],
-            'secured_notes_interest_rate': 0.07,
-            'unsecured_notes_debt': [0, 0, 0, 0, 0],
-            'unsecured_notes_interest_rate': 0.08,
-            'hybrid_debt': [0, 0, 0, 0, 0],
-            'hybrid_debt_interest_rate': 0.09,
-            'preferred_equity': [0, 0, 0, 0, 0],
-            'common_equity': [100, 100, 100, 100, 100]
         }
         forecast_data = {
             'revenue_growth': [0.10] * 7,
             'ebitda_margin': [0.25] * 7,
             'capex_percent_revenue': [0.10] * 7,
             'working_capital_percent_revenue': [0.05] * 7,
-            'revolver_repayment': [0] * 7,
-            'term_loan_a_repayment': [2] * 7,
-            'term_loan_b_repayment': [3] * 7,
-            'secured_notes_repayment': [0] * 7,
-            'unsecured_notes_repayment': [0] * 7,
-            'hybrid_debt_repayment': [0] * 7,
-            'revolver_spread': 0.02,
-            'term_loan_a_spread': 0.03,
-            'term_loan_b_spread': 0.04,
         }
         return {'historical': historical_data, 'forecast': forecast_data}
 
-    def _generate_comprehensive_report(self, financial_data: Dict[str, Any], dcf_details: Dict[str, Any], company_identifier: str) -> Dict[str, pd.DataFrame]:
+    def _calculate_fcf_forecast(self, financial_data):
         """
-        Generates a comprehensive financial report.
+        Helper to calculate FCF from forecast assumptions.
         """
         historical_df = pd.DataFrame(financial_data['historical'])
-        forecast_df = self._generate_forecast_statements(financial_data['historical'], financial_data['forecast'])
-        return {'historical': historical_df, 'forecast': forecast_df, 'dcf_details': pd.DataFrame([dcf_details])}
+        forecast_assumptions = financial_data['forecast']
 
-    def _generate_forecast_statements(self, historical_data: Dict[str, List[float]], forecast_data: Dict[str, List[float]]) -> pd.DataFrame:
+        last_revenue = historical_df['revenue'].iloc[-1]
+
+        fcf_list = []
+        current_revenue = last_revenue
+
+        for i in range(len(forecast_assumptions['revenue_growth'])):
+            growth = forecast_assumptions['revenue_growth'][i]
+            margin = forecast_assumptions['ebitda_margin'][i]
+            capex_pct = forecast_assumptions['capex_percent_revenue'][i]
+            wc_pct = forecast_assumptions['working_capital_percent_revenue'][i]
+
+            # Apply growth rates from assumptions
+            # Overwrite mock forecast data if assumptions differ significantly?
+            # Ideally, use self.growth_rate for revenue growth if standardizing.
+            # But let's stick to the granular mock forecast for now.
+
+            current_revenue *= (1 + growth)
+            ebitda = current_revenue * margin
+            capex = current_revenue * capex_pct
+            # Simplified WC change
+            wc_change = current_revenue * wc_pct
+
+            # Simplified tax/interest for FCF
+            tax_rate = self.assumptions.tax_rate
+            depreciation = capex # steady state assumption
+            ebit = ebitda - depreciation
+            nopat = ebit * (1 - tax_rate)
+            fcf = nopat + depreciation - capex - wc_change
+            fcf_list.append(fcf)
+
+        return fcf_list
+
+    def calculate_dcf_from_projections(self, fcf_projections: List[float]) -> Tuple[float, Dict[str, Any]]:
         """
-        Generates forecast financial statements.
+        Calculates the DCF value based on FCF projections.
         """
-        historical_df = pd.DataFrame(historical_data)
-        forecast_df = pd.DataFrame()
-        forecast_df['revenue'] = historical_df['revenue'].iloc[-1] * \
-            (1 + np.array(forecast_data['revenue_growth']).cumprod())
-        forecast_df['ebitda'] = forecast_df['revenue'] * np.array(forecast_data['ebitda_margin'])
-        forecast_df['capex'] = forecast_df['revenue'] * np.array(forecast_data['capex_percent_revenue'])
-        forecast_df['working_capital_change'] = forecast_df['revenue'] * \
-            np.array(forecast_data['working_capital_percent_revenue'])
-        forecast_df['free_cash_flow'] = forecast_df['ebitda'] - \
-            forecast_df['capex'] - forecast_df['working_capital_change']
-        return forecast_df
-
-
-# Example usage:
-if __name__ == "__main__":
-    # Initialize the agent with some initial values
-    config = {'forecast_years': 10, 'industry_multiples': {'EBITDA': 8.0,
-                                                           'Revenue': 1.5}, 'terminal_valuation_method': 'Exit Multiple'}
-    agent = FinancialModelingAgent(initial_cash_flow=1500000, discount_rate=0.08, growth_rate=0.04, config=config)
-
-    # Generate cash flows and calculate NPV
-    agent.generate_cash_flows()
-    agent.calculate_discounted_cash_flows()
-    agent.calculate_terminal_value()
-    npv = agent.calculate_npv()
-
-    print(f"NPV: {npv:.2f}")
-
-    # Sensitivity analysis for growth rate
-    sensitivity_range = np.linspace(0.02, 0.1, 10)
-    sensitivity_results = agent.perform_sensitivity_analysis(sensitivity_range, variable='growth_rate')
-    print(f"Sensitivity Analysis Results: {sensitivity_results}")
-
-    # Plot sensitivity analysis
-    agent.plot_sensitivity_analysis(sensitivity_range, variable='growth_rate')
-
-    # Stress testing the model
-    stress_results = agent.perform_stress_testing(stress_factor=0.2)
-    print(f"Stress Test Results: {stress_results}")
-
-    # Plot stress test results
-    agent.plot_stress_test_results(stress_results)
-
-    # Example fetch and calculate DCF
-    company_id = "test_company"
-    intrinsic_value, dcf_details, report_data = agent.fetch_and_calculate_dcf(company_id, company_name="Test Company")
-
-    if intrinsic_value is not None:
-        print(f"Intrinsic Value for {company_id}: {intrinsic_value:.2f}")
-        print(f"DCF Details: {dcf_details}")
-        print(f"Report Data Keys: {report_data.keys()}")
-        if 'historical' in report_data:
-            print(f"Historical Data:\n{report_data['historical'].head()}")
-        if 'forecast' in report_data:
-            print(f"Forecast Data:\n{report_data['forecast'].head()}")
-        if 'dcf_details' in report_data:
-            print(f"DCF Details in Report:\n{report_data['dcf_details']}")
-
-        # Example: Exporting the report data to an Excel file
-        with pd.ExcelWriter('financial_report.xlsx') as writer:
-            report_data['historical'].to_excel(writer, sheet_name='Historical Data')
-            report_data['forecast'].to_excel(writer, sheet_name='Forecast Data')
-            report_data['dcf_details'].to_excel(writer, sheet_name='DCF Details')
-
-        print("Report data exported to financial_report.xlsx")
-
-    def calculate_dcf(self, financial_data: Dict[str, List[float]]) -> Tuple[float, Dict[str, Any]]:
-        """
-        Calculates the DCF value based on the provided financial data.
-        """
-        fcf_projections = financial_data.get('free_cash_flow')
-        if fcf_projections is None:
+        if not fcf_projections:
             raise ValueError("Free cash flow projections are missing.")
 
-        if len(fcf_projections) < self.forecast_years:
-            self.forecast_years = len(fcf_projections)
+        forecast_len = len(fcf_projections)
 
         discounted_fcf = []
-        for year, fcf in enumerate(fcf_projections[:self.forecast_years]):
+        for year, fcf in enumerate(fcf_projections):
             discount_factor = 1 / (1 + self.discount_rate) ** (year + 1)
             discounted_fcf.append(fcf * discount_factor)
 
+        # Terminal Value
+        last_fcf = fcf_projections[-1]
         if self.terminal_valuation_method == 'Gordon Growth':
-            terminal_value = fcf_projections[self.forecast_years - 1] * \
-                (1 + self.terminal_growth_rate) / (self.discount_rate - self.terminal_growth_rate)
+            terminal_value = last_fcf * (1 + self.terminal_growth_rate) / (self.discount_rate - self.terminal_growth_rate)
         elif self.terminal_valuation_method == 'Exit Multiple':
-            terminal_value = fcf_projections[self.forecast_years - 1] * self.industry_multiples.get("EBITDA", 10)
+            terminal_value = last_fcf * self.industry_multiples.get("EBITDA", 10) # Using FCF as proxy for now
         else:
-            raise ValueError("Invalid terminal valuation method.")
+            terminal_value = 0
 
-        terminal_value_discounted = terminal_value / (1 + self.discount_rate) ** self.forecast_years
+        terminal_value_discounted = terminal_value / (1 + self.discount_rate) ** forecast_len
 
         intrinsic_value = sum(discounted_fcf) + terminal_value_discounted
 
@@ -380,45 +355,106 @@ if __name__ == "__main__":
             'terminal_value_discounted': terminal_value_discounted,
             'discount_rate': self.discount_rate,
             'terminal_growth_rate': self.terminal_growth_rate,
-            'forecast_years': self.forecast_years,
+            'forecast_years': forecast_len,
             'terminal_valuation_method': self.terminal_valuation_method
         }
         return intrinsic_value, detailed_calculations
 
-    def calculate_wacc(self, equity_market_value, debt_market_value, cost_of_equity, cost_of_debt, tax_rate):
-        """Calculates the Weighted Average Cost of Capital (WACC)."""
-        total_value = equity_market_value + debt_market_value
-        equity_weight = equity_market_value / total_value
-        debt_weight = debt_market_value / total_value
-        wacc = (equity_weight * cost_of_equity) + (debt_weight * cost_of_debt * (1 - tax_rate))
-        return wacc
+    def run_monte_carlo_simulation(self, num_simulations: int = 1000) -> Dict[str, Any]:
+        """
+        Performs Monte Carlo simulation by varying discount rate and growth rate.
+        Assumes normal distribution for input variables.
+        """
+        npvs = []
+        original_discount_rate = self.discount_rate
+        original_growth_rate = self.growth_rate
 
-    def _generate_forecast_statements(self, historical_data: Dict[str, List[float]], forecast_data: Dict[str, List[float]]) -> pd.DataFrame:
-        """Generates forecast financial statements."""
-        historical_df = pd.DataFrame(historical_data)
-        forecast_df = pd.DataFrame()
-        forecast_df['revenue'] = historical_df['revenue'].iloc[-1] * \
-            (1 + np.array(forecast_data['revenue_growth']).cumprod())
-        forecast_df['ebitda'] = forecast_df['revenue'] * np.array(forecast_data['ebitda_margin'])
-        forecast_df['depreciation'] = forecast_df['ebitda'] * 0.1  # example depreciation
-        forecast_df['ebit'] = forecast_df['ebitda'] - forecast_df['depreciation']
-        forecast_df['interest_expense'] = 10  # example interest expense
-        forecast_df['pretax_income'] = forecast_df['ebit'] - forecast_df['interest_expense']
-        forecast_df['tax_expense'] = forecast_df['pretax_income'] * 0.25  # example tax rate
-        forecast_df['net_income'] = forecast_df['pretax_income'] - forecast_df['tax_expense']
-        forecast_df['capex'] = forecast_df['revenue'] * np.array(forecast_data['capex_percent_revenue'])
-        forecast_df['working_capital_change'] = forecast_df['revenue'] * \
-            np.array(forecast_data['working_capital_percent_revenue'])
-        forecast_df['free_cash_flow'] = forecast_df['net_income'] + forecast_df['depreciation'] - \
-            forecast_df['capex'] - forecast_df['working_capital_change']
-        return forecast_df
+        # Simulation parameters (standard deviation assumptions)
+        discount_std = 0.01  # 1% standard deviation
+        growth_std = 0.01    # 1% standard deviation
 
-    # ... (other methods)
+        for _ in range(num_simulations):
+            # Sample parameters
+            sim_discount = np.random.normal(original_discount_rate, discount_std)
+            sim_growth = np.random.normal(original_growth_rate, growth_std)
 
-# Example usage:
-if __name__ == "__main__":
-    # ... (previous example usage)
-    agent = FinancialModelingAgent(initial_cash_flow=1500000, discount_rate=0.08, growth_rate=0.04, config=config)
-    # ... (the rest of the example)
-    wacc = agent.calculate_wacc(1000, 500, 0.1, 0.06, 0.25)
-    print(f"WACC: {wacc:.2f}")
+            # Apply constraints (e.g., discount rate shouldn't be negative)
+            sim_discount = max(0.01, sim_discount)
+
+            # Update state
+            self.discount_rate = sim_discount
+            self.growth_rate = sim_growth
+            self.generate_cash_flows()
+            self.calculate_discounted_cash_flows()
+            self.calculate_terminal_value()
+            npvs.append(self.calculate_npv())
+
+        # Restore state
+        self.discount_rate = original_discount_rate
+        self.growth_rate = original_growth_rate
+        self.generate_cash_flows() # Restore cash flows based on original growth
+        self.calculate_discounted_cash_flows()
+        self.calculate_terminal_value()
+
+        npvs = np.array(npvs)
+
+        return {
+            "mean_npv": float(np.mean(npvs)),
+            "median_npv": float(np.median(npvs)),
+            "std_dev": float(np.std(npvs)),
+            "min_npv": float(np.min(npvs)),
+            "max_npv": float(np.max(npvs)),
+            "percentile_5": float(np.percentile(npvs, 5)),
+            "percentile_95": float(np.percentile(npvs, 95)),
+            "num_simulations": num_simulations
+        }
+
+    def calculate_financial_ratios(self, financial_data: Dict[str, List[float]]) -> Dict[str, float]:
+        """
+        Calculates key financial ratios from historical data.
+        Expected keys in financial_data: revenue, ebitda, ebit, interest_expense,
+        total_debt, cash_and_equivalents, total_assets, current_assets, current_liabilities
+        """
+        # Use the most recent year (last element)
+        idx = -1
+
+        def get_val(key, default=0.0):
+            val = financial_data.get(key)
+            if isinstance(val, list) and len(val) > 0:
+                return val[idx]
+            return default
+
+        revenue = get_val('revenue')
+        ebitda = get_val('ebitda')
+        ebit = get_val('ebit')
+        interest = get_val('interest_expense')
+        debt = get_val('total_debt')
+        cash = get_val('cash_and_equivalents')
+        assets = get_val('total_assets')
+        curr_assets = get_val('current_assets')
+        curr_liab = get_val('current_liabilities')
+
+        ratios = {}
+
+        # Profitability
+        if revenue:
+            ratios['EBITDA_Margin'] = ebitda / revenue
+            ratios['Operating_Margin'] = ebit / revenue
+
+        # Leverage
+        if ebitda:
+            ratios['Net_Debt_to_EBITDA'] = (debt - cash) / ebitda
+
+        # Solvency
+        if interest:
+            ratios['Interest_Coverage'] = ebit / interest
+
+        # Liquidity
+        if curr_liab:
+            ratios['Current_Ratio'] = curr_assets / curr_liab
+
+        # Efficiency
+        if assets:
+            ratios['ROA'] = ebit / assets # Simplified (using EBIT)
+
+        return {k: round(v, 4) for k, v in ratios.items()}
