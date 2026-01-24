@@ -36,6 +36,9 @@ from core.agents.sense_weaver import SenseWeaver
 from core.agents.snc_analyst_agent import SNCAnalystAgent  # Added import
 from core.agents.behavioral_economics_agent import BehavioralEconomicsAgent
 from core.agents.meta_cognitive_agent import MetaCognitiveAgent
+from core.agents.financial_modeling_agent import FinancialModelingAgent
+from core.agents.portfolio_optimization_agent import PortfolioOptimizationAgent
+from core.agents.quantitative_risk_agent import QuantitativeRiskAgent
 
 from pydantic import ValidationError
 from core.schemas.config_schema import AgentsYamlConfig
@@ -87,6 +90,9 @@ AGENT_CLASSES = {
     "SNCAnalystAgent": "core.agents.snc_analyst_agent",
     "BehavioralEconomicsAgent": "core.agents.behavioral_economics_agent",
     "MetaCognitiveAgent": "core.agents.meta_cognitive_agent",
+    "FinancialModelingAgent": "core.agents.financial_modeling_agent",
+    "PortfolioOptimizationAgent": "core.agents.portfolio_optimization_agent",
+    "QuantitativeRiskAgent": "core.agents.quantitative_risk_agent",
     "NewsBotAgent": "core.agents.news_bot",
     "NexusAgent": NexusAgent,
     "IngestionAgent": AgentBase,  # Using AgentBase as a placeholder
@@ -116,16 +122,17 @@ AGENT_CLASSES = {
     "snc_analyst_agent": "core.agents.snc_analyst_agent",
     "behavioral_economics_agent": "core.agents.behavioral_economics_agent",
     "meta_cognitive_agent": "core.agents.meta_cognitive_agent",
+    "financial_modeling_agent": "core.agents.financial_modeling_agent",
+    "portfolio_optimization_agent": "core.agents.portfolio_optimization_agent",
+    "quantitative_risk_agent": "core.agents.quantitative_risk_agent",
     "news_bot_agent": "core.agents.news_bot",
 
     # Placeholders for agents that might be missing or under development but referenced in config
     "echo_agent": AgentBase,
-    "portfolio_optimization_agent": AgentBase,
     "data_visualization_agent": AgentBase,
     "natural_language_generation_agent": AgentBase,
     "machine_learning_model_training_agent": AgentBase,
     "legal_agent": AgentBase,
-    "financial_modeling_agent": AgentBase,
     "supply_chain_risk_agent": AgentBase,
     "algo_trading_agent": AgentBase,
     "discussion_chair_agent": AgentBase,
