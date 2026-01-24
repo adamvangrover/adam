@@ -40,6 +40,10 @@ class OSWMInference:
         ns_t = torch.tensor(np.array(next_states), dtype=torch.float32).unsqueeze(0).to(self.device)
         r_t = torch.tensor(np.array(rewards), dtype=torch.float32).unsqueeze(0).to(self.device)
 
+        # Ensure r_t is [1, T, 1] if it's currently [1, T]
+        if r_t.dim() == 2:
+            r_t = r_t.unsqueeze(2)
+
         self.context_X = torch.cat([s_t, a_t], dim=2)
         self.context_Y = torch.cat([ns_t, r_t], dim=2)
 
@@ -59,8 +63,12 @@ class OSWMInference:
         Predict next state and reward given current state and action.
         """
         # Prepare input
-        s_t = torch.tensor(np.array(state), dtype=torch.float32).view(1, 1, -1).to(self.device)
-        a_t = torch.tensor(np.array(action), dtype=torch.float32).view(1, 1, -1).to(self.device)
+        try:
+            s_t = torch.tensor(np.array(state), dtype=torch.float32).view(1, 1, -1).to(self.device)
+            a_t = torch.tensor(np.array(action), dtype=torch.float32).view(1, 1, -1).to(self.device)
+        except Exception as e:
+            print(f"Error preparing input tensors: {e}")
+            raise
 
         current_X = torch.cat([s_t, a_t], dim=2)
 

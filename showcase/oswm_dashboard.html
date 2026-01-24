@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSWM Second-Level Critique | Strategic Foresight</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background-color: #050505; color: #e0e0e0; font-family: 'Courier New', Courier, monospace; }
+        .cyber-card { background: rgba(20, 20, 30, 0.8); border: 1px solid #33ff00; box-shadow: 0 0 10px rgba(51, 255, 0, 0.2); }
+        .neon-text { color: #33ff00; text-shadow: 0 0 5px rgba(51, 255, 0, 0.8); }
+        .neon-red { color: #ff3333; text-shadow: 0 0 5px rgba(255, 51, 51, 0.8); }
+        .neon-blue { color: #33ccff; text-shadow: 0 0 5px rgba(51, 204, 255, 0.8); }
+        .neon-purple { color: #cc33ff; text-shadow: 0 0 5px rgba(204, 51, 255, 0.8); }
+        .scanline {
+            width: 100%;
+            height: 2px;
+            background: rgba(51, 255, 0, 0.3);
+            position: fixed;
+            top: 0;
+            left: 0;
+            animation: scan 3s linear infinite;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
+        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        th, td { border: 1px solid #333; padding: 4px; text-align: left; }
+        th { color: #33ccff; }
+        .ticker-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; font-size: 0.75rem; }
+    </style>
+</head>
+<body class="p-6">
+    <div class="scanline"></div>
+
+    <header class="mb-8 flex justify-between items-end border-b border-green-900 pb-4">
+        <div>
+            <h1 class="text-4xl font-bold neon-text mb-2">OSWM // SECOND-LEVEL CRITIQUE</h1>
+            <p class="text-xs text-green-700">ONE-SHOT WORLD MODEL • STRATEGIC FORESIGHT • QUANTUM MONTE CARLO • GNN • FEDERATED LEARNING</p>
+        </div>
+        <div class="text-right">
+            <p class="text-xs text-gray-500">SYSTEM STATUS</p>
+            <p id="timestamp" class="text-xl neon-blue">LOADING...</p>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+        <!-- COL 1: CONVICTION & SENTIMENT -->
+        <div class="lg:col-span-1 space-y-6">
+            <!-- CONVICTION GAUGE -->
+            <div class="cyber-card p-6 rounded-lg">
+                <h2 class="text-xl mb-4 font-bold border-b border-gray-700 pb-2">CONVICTION INDEX</h2>
+                <div class="relative h-48 flex items-center justify-center">
+                    <canvas id="convictionChart"></canvas>
+                    <div class="absolute inset-0 flex items-center justify-center flex-col pointer-events-none mt-12">
+                        <span id="convictionValue" class="text-4xl font-bold text-white">--</span>
+                    </div>
+                </div>
+                <p id="critiqueText" class="mt-4 text-xs text-center italic text-yellow-400 p-2 border border-yellow-900 bg-yellow-900/10 rounded">
+                    Awaiting Analysis...
+                </p>
+            </div>
+
+            <!-- LIVE MARKET MONITOR -->
+            <div class="cyber-card p-6 rounded-lg">
+                <h2 class="text-xl mb-4 font-bold border-b border-gray-700 pb-2 text-blue-400">LIVE MARKET MONITOR</h2>
+                <div id="tickerGrid" class="ticker-grid mb-4">
+                    <!-- Populated via JS -->
+                </div>
+                <div class="border-t border-gray-700 pt-2 flex justify-between items-center">
+                    <span class="text-xs text-gray-400">SYSTEMIC CREDIT RATING</span>
+                    <span id="creditRating" class="text-xl font-bold text-white">--</span>
+                </div>
+            </div>
+
+            <!-- WORLD MODEL AUDIT -->
+            <div class="cyber-card p-6 rounded-lg border-green-900/50">
+                <h2 class="text-xl mb-4 font-bold border-b border-green-900 pb-2 text-green-400">WORLD MODEL AUDIT</h2>
+                <div id="auditStats" class="text-xs space-y-2">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- COL 2 & 3: MAIN DASHBOARD -->
+        <div class="lg:col-span-2 space-y-6">
+
+            <!-- ALPHA SIGNALS -->
+            <div class="cyber-card p-6 rounded-lg">
+                <h2 class="text-xl mb-4 font-bold border-b border-gray-700 pb-2 text-purple-400">ALPHA EXTRACTION (DEEP NEURAL NETWORK)</h2>
+                <ul id="alphaList" class="space-y-2 text-sm font-mono min-h-[50px]">
+                    <li class="text-gray-500">Scanning for alpha...</li>
+                </ul>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6">
+                <!-- QUANTUM RISK -->
+                <div class="cyber-card p-6 rounded-lg border-blue-900/50">
+                    <h2 class="text-lg mb-4 font-bold border-b border-blue-900 pb-2 neon-blue">QUANTUM RISK (10M SIMS)</h2>
+                    <div class="space-y-2 text-center">
+                        <div>
+                            <div class="text-xs text-gray-500">VaR (99%)</div>
+                            <div id="var99" class="text-lg font-bold text-red-400">--</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-gray-500">SPEEDUP</div>
+                            <div id="qSpeed" class="text-sm font-bold text-green-400">--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FEDERATED LEARNING -->
+                <div class="cyber-card p-6 rounded-lg border-purple-900/50">
+                    <h2 class="text-lg mb-4 font-bold border-b border-purple-900 pb-2 neon-purple">FEDERATED CONSENSUS</h2>
+                    <div class="space-y-2 text-center">
+                        <div>
+                            <div class="text-xs text-gray-500">ACCURACY</div>
+                            <div id="flAcc" class="text-lg font-bold text-purple-400">--</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-gray-500">LOSS</div>
+                            <div id="flLoss" class="text-sm font-bold text-gray-400">--</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCENARIO SIMULATION -->
+            <div class="cyber-card p-6 rounded-lg">
+                <h2 class="text-xl mb-4 font-bold border-b border-gray-700 pb-2 text-white">SCENARIO SIMULATION (HISTORIC VS FUTURE)</h2>
+                 <div class="overflow-x-auto">
+                    <table class="w-full text-xs">
+                        <thead>
+                            <tr>
+                                <th>SCENARIO</th>
+                                <th>TYPE</th>
+                                <th>DIRECT SHOCK</th>
+                                <th>PROPAGATION</th>
+                            </tr>
+                        </thead>
+                        <tbody id="futureTable">
+                            <!-- JS Populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SYSTEMIC CONTAGION (GNN) -->
+            <div class="cyber-card p-6 rounded-lg border-yellow-900/50">
+                <h2 class="text-xl mb-4 font-bold border-b border-yellow-900 pb-2 text-yellow-400">SYSTEMIC CONTAGION (GNN ANALYSIS)</h2>
+                 <div class="overflow-x-auto">
+                    <table class="w-full text-xs">
+                        <thead>
+                            <tr>
+                                <th>NODE / ENTITY</th>
+                                <th>RISK SCORE</th>
+                                <th>STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gnnTable">
+                            <!-- JS Populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+             <!-- BLACK SWAN SCENARIOS -->
+             <div class="cyber-card p-6 rounded-lg border-red-900/50">
+                <h2 class="text-xl mb-4 font-bold border-b border-red-900 pb-2 neon-red">BLACK SWAN STRESS TEST</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs">
+                        <thead>
+                            <tr>
+                                <th>SCENARIO</th>
+                                <th>IMPLIED PD</th>
+                                <th>D/E RATIO</th>
+                                <th>RATING</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scenarioTable">
+                            <!-- JS Populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- COL 4: HOUSE VIEWS -->
+        <div class="lg:col-span-1">
+             <div class="cyber-card p-6 rounded-lg h-full">
+                <h2 class="text-xl mb-4 font-bold border-b border-gray-700 pb-2 neon-blue">HOUSE VIEWS</h2>
+                <div id="houseViewsList" class="space-y-4">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-12 text-center text-xs text-gray-600 font-mono">
+        <p>GENERATED BY STRATEGIC FORESIGHT AGENT • OSWM V1.0 • arXiv:2409.14084v1</p>
+    </div>
+
+    <script>
+        async function fetchData() {
+            try {
+                const response = await fetch('./data/oswm_insight.json');
+                const data = await response.json();
+                render(data);
+            } catch (e) {
+                console.error("Failed to fetch data", e);
+                document.getElementById('critiqueText').innerText = "ERROR: DATA LINK SEVERED. CHECK TERMINAL.";
+            }
+        }
+
+        function render(data) {
+            // Timestamp
+            document.getElementById('timestamp').innerText = new Date(data.timestamp).toLocaleTimeString();
+
+            // Conviction Chart
+            const ctx = document.getElementById('convictionChart').getContext('2d');
+            const score = data.conviction_index * 100;
+
+            document.getElementById('convictionValue').innerText = score.toFixed(0) + '%';
+
+            let color = '#33ff00';
+            if(score < 60) color = '#ffff00';
+            if(score < 30) color = '#ff3333';
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Conviction', 'Uncertainty'],
+                    datasets: [{
+                        data: [score, 100 - score],
+                        backgroundColor: [color, 'rgba(50,50,50,0.5)'],
+                        borderWidth: 0,
+                        cutout: '75%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // Critique
+            const critiqueEl = document.getElementById('critiqueText');
+            critiqueEl.innerText = data.oswm_critique;
+            if(score < 30) critiqueEl.className = "mt-4 text-xs text-center font-bold text-red-500 p-2 border border-red-900 bg-red-900/20 rounded animate-pulse";
+
+            // Alpha
+            const alphaList = document.getElementById('alphaList');
+            alphaList.innerHTML = '';
+            if (data.alpha_signals && data.alpha_signals.length > 0) {
+                data.alpha_signals.forEach(sig => {
+                    const li = document.createElement('li');
+                    li.className = "flex items-center text-green-400";
+                    li.innerHTML = `<span class="mr-2">⚡</span> ${sig}`;
+                    alphaList.appendChild(li);
+                });
+            } else {
+                alphaList.innerHTML = '<li class="text-gray-600">No signals detected.</li>';
+            }
+
+            // Live Market Monitor
+            const monitor = data.market_monitor || {};
+            const tickers = monitor.tickers || {};
+            const tickerGrid = document.getElementById('tickerGrid');
+            tickerGrid.innerHTML = '';
+
+            for (const [symbol, info] of Object.entries(tickers)) {
+                const price = info.last_price !== undefined ? info.last_price.toFixed(2) : '--';
+                const div = document.createElement('div');
+                div.className = "flex justify-between";
+                div.innerHTML = `<span class="text-gray-400">${symbol}</span> <span class="text-white">${price}</span>`;
+                tickerGrid.appendChild(div);
+            }
+
+            // Credit Rating
+            const rating = monitor.systemic_credit_rating || '--';
+            const ratingEl = document.getElementById('creditRating');
+            ratingEl.innerText = rating;
+            if (rating.startsWith('A')) ratingEl.className = "text-xl font-bold text-green-400";
+            else if (rating.startsWith('B')) ratingEl.className = "text-xl font-bold text-yellow-400";
+            else ratingEl.className = "text-xl font-bold text-red-500";
+
+            // Audit
+            const audit = data.schema_audit || {};
+            const auditStats = document.getElementById('auditStats');
+            auditStats.innerHTML = `
+                <div class="flex justify-between"><span>NODES:</span> <span class="text-white">${audit.total_nodes || 0}</span></div>
+                <div class="flex justify-between"><span>EDGES:</span> <span class="text-white">${audit.total_edges || 0}</span></div>
+                <div class="flex justify-between"><span>DENSITY:</span> <span class="text-white">${(audit.density || 0).toFixed(4)}</span></div>
+                <div class="mt-2 text-gray-500">TOP TYPES:</div>
+            `;
+            (audit.node_types || []).forEach(nt => {
+                const div = document.createElement('div');
+                div.className = "flex justify-between pl-2";
+                div.innerHTML = `<span>${nt[0]}</span> <span class="text-white">${nt[1]}</span>`;
+                auditStats.appendChild(div);
+            });
+
+            // Future Scenarios
+            const futTable = document.getElementById('futureTable');
+            futTable.innerHTML = '';
+            const futures = data.future_scenarios || [];
+            futures.forEach(sc => {
+                const tr = document.createElement('tr');
+                const shock = sc.direct_impacts && sc.direct_impacts[0] ? (sc.direct_impacts[0].shock * 100).toFixed(0) + '%' : 'N/A';
+                const prop = sc.second_order_effects ? sc.second_order_effects.length : 0;
+
+                tr.innerHTML = `
+                    <td>${sc.scenario}</td>
+                    <td class="${sc.type === 'Future' ? 'text-purple-400' : 'text-gray-400'}">${sc.type}</td>
+                    <td>${shock}</td>
+                    <td>${prop} Nodes</td>
+                `;
+                futTable.appendChild(tr);
+            });
+
+            // Quantum Metrics
+            const qm = data.quantum_risk_metrics || {};
+            if (qm.VaR_99) document.getElementById('var99').innerText = '$' + (qm.VaR_99 / 1e6).toFixed(1) + 'M';
+            if (qm.Quantum_Speedup_Factor) document.getElementById('qSpeed').innerText = qm.Quantum_Speedup_Factor;
+
+            // Federated Learning
+            const fl = data.federated_learning_metrics || {};
+            if (fl.consensus_accuracy) document.getElementById('flAcc').innerText = (fl.consensus_accuracy * 100).toFixed(1) + '%';
+            if (fl.avg_loss) document.getElementById('flLoss').innerText = fl.avg_loss.toFixed(4);
+
+            // GNN Risks
+            const gnnTable = document.getElementById('gnnTable');
+            gnnTable.innerHTML = '';
+            const gnn = data.graph_risk_metrics || {};
+            if (gnn.top_risks) {
+                gnn.top_risks.forEach(node => {
+                    const tr = document.createElement('tr');
+                    const risk = node[1].toFixed(2);
+                    tr.innerHTML = `
+                        <td>${node[0]}</td>
+                        <td class="${node[1] > 0.7 ? 'text-red-400' : 'text-gray-300'}">${risk}</td>
+                        <td>${node[1] > 0.7 ? 'CONTAGION' : 'STABLE'}</td>
+                    `;
+                    gnnTable.appendChild(tr);
+                });
+            } else {
+                 gnnTable.innerHTML = '<tr><td colspan="3" class="text-center text-gray-500">No active contagion nodes detected.</td></tr>';
+            }
+
+            // Black Swan Scenarios
+            const table = document.getElementById('scenarioTable');
+            table.innerHTML = '';
+            const scenarios = data.black_swan_scenarios || [];
+            scenarios.forEach(s => {
+                const tr = document.createElement('tr');
+                const pdPct = (s.implied_pd * 100).toFixed(1) + '%';
+                const de = s.projected_debt_to_equity.toFixed(1);
+                const downgrade = s.rating_downgrade ? '<span class="text-red-500 font-bold">DOWNGRADE</span>' : '<span class="text-green-500">STABLE</span>';
+
+                tr.innerHTML = `
+                    <td>${s.scenario_name}</td>
+                    <td class="${s.implied_pd > 0.1 ? 'text-red-400' : 'text-gray-300'}">${pdPct}</td>
+                    <td>${de}x</td>
+                    <td>${downgrade}</td>
+                `;
+                table.appendChild(tr);
+            });
+
+            // House Views
+            const viewsList = document.getElementById('houseViewsList');
+            viewsList.innerHTML = '';
+            for (const [category, view] of Object.entries(data.house_views)) {
+                const item = document.createElement('div');
+                item.className = "border-l-2 border-blue-500 pl-3";
+                item.innerHTML = `
+                    <h3 class="text-xs text-blue-400 font-bold uppercase mb-1">${category}</h3>
+                    <p class="text-xs text-gray-300 leading-snug">${view}</p>
+                `;
+                viewsList.appendChild(item);
+            }
+        }
+
+        fetchData();
+    </script>
+</body>
+</html>
