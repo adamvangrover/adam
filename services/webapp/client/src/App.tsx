@@ -19,12 +19,14 @@ const MarketData = lazy(() => import('./pages/MarketData'));
 const AnalysisTools = lazy(() => import('./pages/AnalysisTools'));
 const PortfolioManagement = lazy(() => import('./pages/PortfolioManagement'));
 const SimulationTools = lazy(() => import('./pages/SimulationTools'));
+const Synthesizer = lazy(() => import('./pages/Synthesizer'));
 
 const App: React.FC = () => {
   return (
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
+          <Route path="synthesizer" element={<Suspense fallback={<Loading />}><Synthesizer /></Suspense>} />
           <Route path="terminal" element={
             <Suspense fallback={<Loading />}>
               <div style={{height: '80vh'}}><Terminal /></div>

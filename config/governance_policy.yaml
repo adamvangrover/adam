@@ -1,0 +1,30 @@
+# Governance Policy for Adam v25.5
+# Defines prohibited and high-risk operations
+
+global_policy:
+  mode: "STRICT"
+  default_action: "ALLOW"
+
+restricted_endpoints:
+  - path: "/api/trade"
+    methods: ["POST", "DELETE"]
+    required_role: "TRADER"
+    risk_level: "HIGH"
+
+  - path: "/api/admin"
+    methods: ["*"]
+    required_role: "ADMIN"
+    risk_level: "CRITICAL"
+
+  - path: "/api/portfolios"
+    methods: ["DELETE"]
+    risk_level: "MEDIUM"
+    confirmation_required: true
+
+blacklisted_ips:
+  - "192.168.1.666"
+
+keywords_flagged:
+  - "DROP TABLE"
+  - "rm -rf"
+  - "shutdown"

@@ -161,3 +161,24 @@ class SwarmLogger:
 
     def log_tool(self, agent_id: str, tool_name: str, params: Dict[str, Any]):
         self.log_event("TOOL_EXECUTION", agent_id, {"tool": tool_name, "parameters": params})
+
+
+class NarrativeLogger:
+    """
+    Logs events as a cohesive story: Event -> Analysis -> Decision -> Outcome.
+    """
+    def __init__(self, logger_name: str = "Narrative"):
+        self.logger = logging.getLogger(logger_name)
+
+    def log_narrative(self, event: str, analysis: str, decision: str, outcome: str):
+        """
+        Log a complete narrative arc.
+        """
+        story = {
+            "chapter": "Execution Arc",
+            "1_Event": event,
+            "2_Analysis": analysis,
+            "3_Decision": decision,
+            "4_Outcome": outcome
+        }
+        self.logger.info(f"NARRATIVE: {json.dumps(story, indent=2)}")
