@@ -67,6 +67,11 @@ class GoldStandardScrubber:
             content = content.encode('utf-8')
         return hashlib.sha256(content).hexdigest()
 
+    # Pre-compiled regex for performance
+    RE_MULTIPLE_NEWLINES = re.compile(r'\n{3,}')
+    RE_HASHTAGS = re.compile(r'#\w+')
+    RE_POTENTIAL_ENTITIES = re.compile(r'\b[A-Z][a-z]{3,}\b')
+
     @staticmethod
     def clean_text(text: str) -> str:
         if not text:
@@ -74,7 +79,7 @@ class GoldStandardScrubber:
         # Normalize line endings and strip nulls
         text = text.replace('\r\n', '\n').replace('\r', '\n').replace('\x00', '')
         # Remove excessive whitespace while preserving paragraph structure
-        return re.sub(r'\n{3,}', '\n\n', text).strip()
+        return GoldStandardScrubber.RE_MULTIPLE_NEWLINES.sub('\n\n', text).strip()
 
     @classmethod
     def assess_conviction(cls, content: Any, artifact_type: str) -> float:
@@ -127,8 +132,8 @@ class GoldStandardScrubber:
                 "char_count": len(content),
                 "line_count": content.count('\n') + 1,
                 # Simple extraction of capitalized terms (potential entities)
-                "tags": list(set(re.findall(r'#\w+', content)))[:5],
-                "potential_entities": list(set(re.findall(r'\b[A-Z][a-z]{3,}\b', content)))[:8]
+                "tags": list(set(GoldStandardScrubber.RE_HASHTAGS.findall(content)))[:5],
+                "potential_entities": list(set(GoldStandardScrubber.RE_POTENTIAL_ENTITIES.findall(content)))[:8]
             })
         elif isinstance(content, dict):
             meta["top_level_keys"] = list(content.keys())
@@ -140,6 +145,8 @@ class GoldStandardScrubber:
 
 class FileHandlers:
     """Encapsulates logic for parsing specific file types."""
+
+    RE_MARKDOWN_HEADER = re.compile(r'^#\s+(.+)$', re.MULTILINE)
 
     @staticmethod
     def handle_json(filepath: str, raw_text: str) -> Optional[GoldStandardArtifact]:
@@ -195,7 +202,7 @@ class FileHandlers:
 
         # Extract title from first H1 header
         title = os.path.basename(filepath)
-        match = re.search(r'^#\s+(.+)$', clean_text, re.MULTILINE)
+        match = FileHandlers.RE_MARKDOWN_HEADER.search(clean_text)
         if match:
             title = match.group(1).strip()
 
