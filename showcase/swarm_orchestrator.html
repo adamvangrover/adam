@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v23.5 :: SWARM ORCHESTRATOR</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary-color: #00f3ff; --accent-color: #bd00ff; --bg-color: #050b14; }
+        body { margin: 0; background: var(--bg-color); color: #e0e0e0; font-family: 'Inter', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        .orbit-container { position: relative; width: 600px; height: 600px; }
+        .core-node {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 150px; height: 150px; border-radius: 50%; background: radial-gradient(circle, #00f3ff 0%, transparent 70%);
+            display: flex; align-items: center; justify-content: center; z-index: 10;
+            box-shadow: 0 0 50px rgba(0, 243, 255, 0.3); animation: pulse 3s infinite;
+        }
+        @keyframes pulse { 0% { box-shadow: 0 0 50px rgba(0, 243, 255, 0.3); } 50% { box-shadow: 0 0 80px rgba(0, 243, 255, 0.6); } 100% { box-shadow: 0 0 50px rgba(0, 243, 255, 0.3); } }
+
+        .satellite {
+            position: absolute; width: 200px; padding: 20px; background: rgba(5, 11, 20, 0.9); border: 1px solid #333;
+            backdrop-filter: blur(10px); cursor: pointer; transition: all 0.3s; text-align: center;
+        }
+        .satellite:hover { border-color: var(--primary-color); transform: scale(1.05); z-index: 20; }
+
+        .sat-title { font-family: 'JetBrains Mono'; color: var(--primary-color); font-size: 0.9rem; margin-bottom: 5px; }
+        .sat-desc { font-size: 0.8rem; color: #888; }
+
+        /* Positions */
+        .sat-legacy { top: 10%; left: 50%; transform: translateX(-50%); border-color: #666; }
+        .sat-v2 { bottom: 10%; left: 20%; border-color: var(--accent-color); }
+        .sat-archive { bottom: 10%; right: 20%; border-color: #ffd700; }
+
+        .connection-line {
+            position: absolute; background: #333; z-index: 1; transform-origin: top left;
+        }
+    </style>
+</head>
+<body>
+    <div style="position: absolute; top: 20px; left: 20px; font-family: 'JetBrains Mono'; font-size: 0.8rem; color: #666;">
+        /// ORCHESTRATION LAYER<br>
+        STATUS: MERGE_COMPLETE<br>
+        MODE: HYBRID
+    </div>
+
+    <div class="orbit-container">
+        <!-- Lines -->
+        <svg style="position: absolute; width: 100%; height: 100%; z-index: 0;">
+            <line x1="50%" y1="50%" x2="50%" y2="20%" stroke="#333" stroke-width="2" />
+            <line x1="50%" y1="50%" x2="30%" y2="80%" stroke="#333" stroke-width="2" />
+            <line x1="50%" y1="50%" x2="70%" y2="80%" stroke="#333" stroke-width="2" />
+        </svg>
+
+        <div class="core-node">
+            <div style="text-align: center;">
+                <div class="mono" style="font-weight: bold; color: black; font-size: 1.2rem;">ADAM</div>
+                <div style="font-size: 0.7rem; color: black;">CORE SYSTEM</div>
+            </div>
+        </div>
+
+        <div class="satellite sat-legacy" onclick="window.location.href='index.html'">
+            <div class="sat-title">BASE SYSTEM</div>
+            <div class="sat-desc">Legacy Mission Control<br>(Standard View)</div>
+        </div>
+
+        <div class="satellite sat-v2" onclick="window.location.href='mission_control_v2.html'">
+            <div class="sat-title" style="color: var(--accent-color);">V2 EVOLUTION</div>
+            <div class="sat-desc">Next-Gen Agent Swarm<br>& Evolution Hub</div>
+        </div>
+
+        <div class="satellite sat-archive" onclick="window.location.href='archive_v2/index.html'">
+            <div class="sat-title" style="color: #ffd700;">DEEP ARCHIVE</div>
+            <div class="sat-desc">50+ Intelligence Artifacts<br>(Recovered & Indexed)</div>
+        </div>
+    </div>
+
+    <script src="js/command_palette.js"></script>
+</body>
+</html>
