@@ -1,6 +1,8 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional, List
 import os
+from pydantic import model_validator
+import logging
 
 
 class Settings(BaseSettings):
@@ -13,7 +15,7 @@ class Settings(BaseSettings):
     # SECURITY: Debug mode MUST be False in production to prevent data leakage.
     debug: bool = False
     log_level: str = "INFO"
-    environment: str = "production"
+    environment: str = "development"
 
     # API Keys
     openai_api_key: Optional[str] = None
@@ -44,6 +46,21 @@ class Settings(BaseSettings):
         extra="ignore",
         case_sensitive=False
     )
+
+    @model_validator(mode='after')
+    def check_security(self):
+        if self.adam_api_key == "default-insecure-key-change-me":
+            if self.environment.lower() == "production":
+                raise ValueError(
+                    "CRITICAL SECURITY ERROR: You are running in PRODUCTION mode with the default insecure API key. "
+                    "Please set ADAM_API_KEY environment variable to a secure value."
+                )
+            else:
+                logging.warning(
+                    "SECURITY WARNING: You are using the default insecure API key. "
+                    "This is acceptable for development, but MUST be changed in production."
+                )
+        return self
 
 
 # Global settings instance
