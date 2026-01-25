@@ -37,6 +37,11 @@ except ImportError as e:
 IP_BLOCK_THRESHOLD = 5
 BLOCK_DURATION_MINUTES = 15
 
+# 🛡️ Sentinel: Pre-calculate dummy hash for timing attack mitigation
+# This ensures that invalid username lookups take roughly the same amount of time
+# as valid ones (by performing a hash check in both cases).
+DUMMY_PASSWORD_HASH = generate_password_hash('dummy_password_for_timing_mitigation')
+
 # ---------------------------------------------------------------------------- #
 # Helpers
 # ---------------------------------------------------------------------------- #
@@ -544,7 +549,17 @@ def create_app(config_name='default'):
         password = data.get('password')
         user = User.query.filter_by(username=username).first()
 
-        if user and user.check_password(password):
+        # 🛡️ Sentinel: Mitigate Timing Attacks (User Enumeration)
+        # We must perform a hash check even if the user is not found to ensure
+        # that the response time is consistent regardless of user existence.
+        if user:
+            authorized = user.check_password(password)
+        else:
+            # Perform a dummy check against a constant hash
+            check_password_hash(DUMMY_PASSWORD_HASH, password if password else '')
+            authorized = False
+
+        if authorized:
             # Log successful attempt
             db.session.add(LoginAttempt(ip_address=ip_address, successful=True))
             db.session.commit()
