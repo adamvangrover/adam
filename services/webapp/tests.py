@@ -295,6 +295,26 @@ class SecurityTestCase(unittest.TestCase):
         finally:
             api.meta_orchestrator = original_meta
 
+    def test_login_timing_mitigation(self):
+        # 🛡️ Sentinel: Ensure login still works correctly with timing mitigation
+        # Test valid user
+        user = User(username='valid_user')
+        user.set_password('CorrectPassword1!')
+        db.session.add(user)
+        db.session.commit()
+
+        response = self.client.post('/api/login',
+                                    data=json.dumps({'username': 'valid_user', 'password': 'CorrectPassword1!'}),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+
+        # Test invalid user (should verify against dummy hash)
+        response = self.client.post('/api/login',
+                                    data=json.dumps({'username': 'non_existent_user', 'password': 'AnyPassword'}),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(json.loads(response.data)['error'], 'Invalid credentials')
+
 
 if __name__ == '__main__':
     unittest.main()

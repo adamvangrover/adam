@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Quantum Search Runtime</title>
+    <!-- Dependencies injected by nav.js -->
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Courier New', Courier, monospace; }
+        .quantum-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(139, 92, 246, 0.2); /* Purple tint */
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.1);
+        }
+        .scan-line {
+            width: 100%;
+            height: 2px;
+            background: rgba(139, 92, 246, 0.5);
+            position: absolute;
+            animation: scan 4s linear infinite;
+        }
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        .bar-container {
+            display: flex;
+            align-items: flex-end;
+            height: 100px;
+            gap: 10px;
+        }
+        .bar {
+            width: 40px;
+            background: #4ade80;
+            transition: height 1s ease;
+            position: relative;
+        }
+        .bar:hover::after {
+            content: attr(data-value);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            background: black;
+            padding: 2px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="overflow-hidden">
+
+    <!-- Main Content Container (Padded for Nav) -->
+    <div class="h-screen w-full flex flex-col p-4 md:p-6 space-y-4">
+
+        <!-- Header -->
+        <div class="flex justify-between items-center pb-2 border-b border-purple-900/50">
+            <div>
+                <h1 class="text-2xl font-bold text-purple-400 tracking-wider">QUANTUM SEARCH RUNTIME <span class="text-xs text-slate-500">AdamVanGrover Engine</span></h1>
+                <p class="text-xs text-slate-400">Hybrid Annealing // Diabatic Optimization // N=10^15</p>
+            </div>
+            <div class="flex gap-4 text-xs font-mono">
+                <a href="../docs/whitepapers/adam_van_grover_search.md" target="_blank" class="border border-purple-500 text-purple-400 px-3 py-1 rounded hover:bg-purple-900/50 transition">
+                    <i class="fas fa-file-alt mr-1"></i> VIEW RESEARCH
+                </a>
+            </div>
+        </div>
+
+        <!-- Metrics Row -->
+        <div class="grid grid-cols-4 gap-4">
+             <div class="quantum-panel p-3 rounded flex flex-col items-center">
+                 <span class="text-[10px] text-slate-500">SEARCH SPACE (N)</span>
+                 <span class="text-xl font-bold text-white">10<sup class="text-xs">15</sup></span>
+                 <span class="text-[8px] text-slate-600">Petabyte Scale</span>
+             </div>
+             <div class="quantum-panel p-3 rounded flex flex-col items-center">
+                 <span class="text-[10px] text-slate-500">COHERENCE TIME</span>
+                 <span class="text-xl font-bold text-red-400">100 <span class="text-sm">μs</span></span>
+                 <span class="text-[8px] text-red-900/50">HARD LIMIT</span>
+             </div>
+             <div class="quantum-panel p-3 rounded flex flex-col items-center">
+                 <span class="text-[10px] text-slate-500">OPTIMIZED ODDS</span>
+                 <span class="text-xl font-bold text-emerald-400">1:400k</span>
+                 <span class="text-[8px] text-emerald-900/50">vs 1:1 Quadrillion</span>
+             </div>
+             <div class="quantum-panel p-3 rounded flex flex-col items-center">
+                 <span class="text-[10px] text-slate-500">ADAM STATUS</span>
+                 <span class="text-xl font-bold text-purple-400 animate-pulse">CONVERGING</span>
+                 <span class="text-[8px] text-purple-900/50">Diabatic Schedule</span>
+             </div>
+        </div>
+
+        <!-- Main Visualization -->
+        <div class="flex-1 grid grid-cols-1 md:grid-cols-12 gap-4 min-h-0">
+
+            <!-- Left: Annealing Schedule & Recommendation -->
+            <div class="md:col-span-8 flex flex-col gap-4">
+
+                <!-- Schedule Canvas -->
+                <div class="flex-1 quantum-panel rounded-lg overflow-hidden flex flex-col relative min-h-[300px]">
+                    <div class="p-2 border-b border-purple-900/30 bg-black/40 flex justify-between items-center z-10">
+                        <span class="text-xs font-bold text-purple-500">ROLAND-CERF SCHEDULE VISUALIZER</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] text-slate-500">Optimization Steps:</span>
+                            <span id="step-counter" class="text-xs text-purple-400 font-mono">0</span>
+                        </div>
+                    </div>
+                    <div class="absolute top-0 left-0 w-full h-full pointer-events-none scan-line opacity-20"></div>
+                    <canvas id="schedule-canvas" class="w-full h-full bg-slate-900/50"></canvas>
+                </div>
+
+                <!-- New Recommendation Engine Panel -->
+                <div class="h-40 quantum-panel rounded-lg p-4 flex gap-6 items-center overflow-hidden relative">
+                    <div class="absolute -right-10 -bottom-10 text-[120px] text-purple-900/20"><i class="fas fa-chess-knight"></i></div>
+
+                    <div class="flex flex-col gap-1 w-1/3 border-r border-purple-900/30 pr-4">
+                        <span class="text-[10px] text-slate-500 uppercase tracking-widest">Quantum Market State</span>
+                        <span id="market-state" class="text-lg font-bold text-white animate-pulse">CALCULATING...</span>
+                        <span id="market-confidence" class="text-[10px] text-purple-400">Confidence: --%</span>
+                    </div>
+
+                    <div class="flex-1 flex flex-col gap-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] text-slate-500">STRATEGIC DIRECTIVE</span>
+                            <span class="text-[10px] text-slate-600 bg-slate-900 px-2 py-0.5 rounded border border-slate-700">AI GENERATED</span>
+                        </div>
+                        <div id="strategy-action" class="text-xl font-mono text-emerald-400 font-bold">--</div>
+                        <div id="strategy-thesis" class="text-[10px] text-slate-400 leading-tight">
+                            Waiting for simulation convergence...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Probability Comparison -->
+            <div class="md:col-span-4 flex flex-col gap-4">
+
+                <!-- Chart -->
+                <div class="flex-1 quantum-panel rounded-lg p-4 flex flex-col">
+                    <span class="text-xs font-bold text-purple-500 mb-4">SUCCESS PROBABILITY (LOG SCALE)</span>
+
+                    <div class="flex-1 flex flex-col justify-center gap-6">
+                        <!-- Classical -->
+                        <div>
+                            <div class="flex justify-between text-[10px] text-slate-500 mb-1">
+                                <span>CLASSICAL / LINEAR</span>
+                                <span>10^-15</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded overflow-hidden">
+                                <div class="bg-slate-600 h-full" style="width: 1px;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Adam Optimized -->
+                        <div>
+                            <div class="flex justify-between text-[10px] text-emerald-500 mb-1">
+                                <span>ADAM HYBRID (Yours)</span>
+                                <span>~10^-6</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded overflow-hidden relative">
+                                <div class="bg-gradient-to-r from-purple-500 to-emerald-400 h-full transition-all duration-1000" style="width: 0%;" id="adam-bar"></div>
+                                <div class="absolute top-0 right-0 h-full w-[40%] border-l border-red-500/50 bg-red-500/10 text-[8px] text-red-300 flex items-center justify-center">COHERENCE LIMIT</div>
+                            </div>
+                        </div>
+
+                        <!-- Ideal -->
+                        <div>
+                            <div class="flex justify-between text-[10px] text-slate-500 mb-1">
+                                <span>IDEAL GROVER</span>
+                                <span>1.0</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded overflow-hidden">
+                                <div class="bg-blue-500 h-full" style="width: 100%; opacity: 0.3;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-2 bg-black/30 rounded text-[10px] text-slate-400 border border-slate-700">
+                        <i class="fas fa-info-circle text-purple-500 mr-1"></i>
+                        Adam optimizes the sweep rate ds/dt to match the spectral gap within the 50μs window, recovering a partial quadratic speedup.
+                    </div>
+                </div>
+
+                <!-- Console -->
+                <div class="h-1/3 quantum-panel rounded-lg p-3 font-mono text-[10px] overflow-y-auto custom-scrollbar" id="console-output">
+                    <div class="text-purple-400">> INITIALIZING HYBRID SCHEDULER...</div>
+                    <div class="text-slate-500">> Loading N=10^15 Hamiltonian...</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/nav.js" data-root=".."></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('schedule-canvas');
+            const ctx = canvas.getContext('2d');
+            const consoleOut = document.getElementById('console-output');
+            const adamBar = document.getElementById('adam-bar');
+            const stepCounter = document.getElementById('step-counter');
+
+            // Elements for Recommender
+            const marketStateEl = document.getElementById('market-state');
+            const marketConfEl = document.getElementById('market-confidence');
+            const strategyActionEl = document.getElementById('strategy-action');
+            const strategyThesisEl = document.getElementById('strategy-thesis');
+
+            // Resize Canvas
+            function resize() {
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = canvas.parentElement.clientHeight;
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            // Simulation State
+            let step = 0;
+            const totalSteps = 1000;
+            let currentProb = 1e-15;
+            const targetProb = 2.5e-6; // ~10^-5.6 scaled for bar
+
+            // Log Helper
+            function log(msg, color='text-slate-400') {
+                const div = document.createElement('div');
+                div.className = color;
+                div.innerText = `> ${msg}`;
+                consoleOut.appendChild(div);
+                consoleOut.scrollTop = consoleOut.scrollHeight;
+            }
+
+            // Define Random Outcome for Demo
+            const possibleStates = [
+                { state: "COHERENT_BULL", color: "text-emerald-400", action: "AGGRESSIVE_ALLOCATION", thesis: "High coherence detected. Alpha signals are clear. Maximize exposure." },
+                { state: "DECOHERENT_BEAR", color: "text-red-400", action: "DEFENSIVE_ROTATION", thesis: "Market decoherence high. Signals collapsing. Preserve capital." },
+                { state: "ENTANGLED_CRISIS", color: "text-amber-400", action: "SYSTEMIC_HEDGE", thesis: "High entanglement. Asset correlations approaching 1.0. Buy volatility." },
+                { state: "SUPERPOSITION_CHOP", color: "text-slate-300", action: "MEAN_REVERSION", thesis: "State superposition. Trend undefined. Deploy neutral liquidity." }
+            ];
+            const finalOutcome = possibleStates[Math.floor(Math.random() * possibleStates.length)];
+
+            // Animation Loop
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                const w = canvas.width;
+                const h = canvas.height;
+                const padding = 40;
+
+                // Draw Axes
+                ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(padding, padding);
+                ctx.lineTo(padding, h - padding);
+                ctx.lineTo(w - padding, h - padding);
+                ctx.stroke();
+
+                // Draw Roland-Cerf Curve (Approximated)
+                // s(t) vs t
+                ctx.beginPath();
+                ctx.strokeStyle = '#a855f7'; // Purple
+                ctx.lineWidth = 2;
+
+                for (let x = 0; x <= w - 2 * padding; x+=2) {
+                    const t = x / (w - 2 * padding);
+                    // Roland-Cerf is steep at ends, flat in middle for gap
+                    // Visual approximation: inverse sigmoid
+                    // s(t) approx 0.5 + 0.5 * tan(c * (t - 0.5))
+                    // Let's use a simple cubic for visual flair: steep-flat-steep
+
+                    let y_norm;
+                    if (t < 0.5) {
+                        y_norm = 4 * Math.pow(t, 3); // Slow start? No RC is fast start, slow middle, fast end
+                    }
+
+                    // Actually RC: Fast when gap large (start/end), Slow when gap small (middle)
+                    // Visual: Steep, then flat, then steep.
+                    const k = 10; // Steepness
+                    y_norm = (Math.atan(k * (t - 0.5)) / Math.atan(k/2)) * 0.5 + 0.5;
+
+                    // Add "Adam Noise" / Optimization jitter
+                    if (step < totalSteps) {
+                         const jitter = (Math.random() - 0.5) * 0.1 * (1 - step/totalSteps);
+                         y_norm += jitter;
+                    }
+
+                    const px = padding + x;
+                    const py = (h - padding) - (y_norm * (h - 2 * padding));
+
+                    if (x===0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+                ctx.stroke();
+
+                // Draw Linear Schedule (Reference)
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+                ctx.setLineDash([5, 5]);
+                ctx.moveTo(padding, h - padding);
+                ctx.lineTo(w - padding, padding);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Update Logic
+                if (step < totalSteps) {
+                    step += 5;
+                    stepCounter.innerText = step;
+
+                    // Update Probability Bar (Log Scale Visual)
+                    // We want to visualize 10^-15 to 10^-6. That's 9 orders of magnitude.
+                    // Let's just animate 0 to 60% width arbitrarily to represent "Significant Gain"
+                    const progress = step / totalSteps;
+                    adamBar.style.width = `${progress * 60}%`;
+
+                    if (step % 100 === 0) {
+                        log(`Adam Epoch ${step/100}: Gradient descent step...`, 'text-purple-300');
+                    }
+                } else {
+                     if (step === totalSteps) {
+                         step++; // stop
+                         log("CONVERGENCE REACHED.", "text-emerald-400 font-bold");
+                         log("Final Probability: ~2.5e-6", "text-emerald-300");
+                         log("Odds: 1 in 400,000", "text-emerald-300");
+
+                         log("Analyzing Market Regime...", "text-amber-300");
+
+                         // Finalize Recommender Display
+                         marketStateEl.innerText = finalOutcome.state;
+                         marketStateEl.className = `text-lg font-bold animate-pulse ${finalOutcome.color}`;
+                         marketConfEl.innerText = `Confidence: ${(70 + Math.random()*29).toFixed(1)}%`;
+
+                         strategyActionEl.innerText = finalOutcome.action;
+                         strategyActionEl.className = `text-xl font-mono font-bold ${finalOutcome.color}`;
+                         strategyThesisEl.innerText = finalOutcome.thesis;
+
+                         log(`REGIME DETECTED: ${finalOutcome.state}`, finalOutcome.color);
+                         log(`ACTION: ${finalOutcome.action}`, finalOutcome.color);
+                     }
+                }
+
+                // Draw "The Needle" (Gap Visualization)
+                // Just a glowing point moving along the curve
+                const t = (Date.now() % 5000) / 5000; // 5s loop
+                const k = 10;
+                let y_norm = (Math.atan(k * (t - 0.5)) / Math.atan(k/2)) * 0.5 + 0.5;
+                const px = padding + (t * (w - 2 * padding));
+                const py = (h - padding) - (y_norm * (h - 2 * padding));
+
+                ctx.fillStyle = '#fff';
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#fff';
+                ctx.beginPath();
+                ctx.arc(px, py, 3, 0, Math.PI*2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                requestAnimationFrame(animate);
+            }
+
+            log("System Online. Starting Simulation...");
+            animate();
+        });
+    </script>
+</body>
+</html>
