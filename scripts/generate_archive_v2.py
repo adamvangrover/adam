@@ -579,8 +579,8 @@ def ingest_html_files():
             out_filename = "newsletter_" + filename.lower() if not filename.lower().startswith("newsletter_") else filename.lower()
             out_path = os.path.join(OUTPUT_DIR, out_filename)
 
-            new_content = content.replace('../../../showcase/js/nav.js', 'js/nav.js')
-            new_content = new_content.replace('data-root="../../.."', 'data-root="."')
+            new_content = content.replace('../../../showcase/js/nav.js', '../../js/nav_v2.js')
+            new_content = new_content.replace('data-root="../../.."', 'data-root="../.."')
 
             with open(out_path, 'w', encoding='utf-8') as f:
                 f.write(new_content)
