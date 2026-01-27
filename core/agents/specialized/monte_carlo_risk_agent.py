@@ -1,6 +1,7 @@
 import logging
 import numpy as np
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional, Literal
+from pydantic import BaseModel, Field, ConfigDict
 from core.agents.agent_base import AgentBase
 from core.schemas.v23_5_schema import SimulationEngine, TradingDynamics, QuantumScenario
 
@@ -8,25 +9,58 @@ from core.schemas.v23_5_schema import SimulationEngine, TradingDynamics, Quantum
 logger = logging.getLogger(__name__)
 
 
+class MonteCarloRequest(BaseModel):
+    """
+    Validates input parameters for the Monte Carlo Risk Agent.
+    Supports GBM (default), Heston, and OU models.
+    """
+    model_config = ConfigDict(extra='ignore')
+
+    # Financials
+    current_ebitda: float = Field(..., description="Current TTM EBITDA")
+    interest_expense: float = Field(0.0, ge=0.0, description="Annual Interest Expense")
+    capex_maintenance: float = Field(0.0, ge=0.0, description="Maintenance Capex")
+
+    # Simulation Configuration
+    model_type: Literal["GBM", "Heston", "OU"] = Field("GBM", description="Stochastic model selection")
+    iterations: int = Field(10000, ge=1000, description="Number of simulation paths")
+    time_horizon: float = Field(1.0, gt=0.0, description="Time horizon in years")
+    dt_steps: int = Field(12, ge=1, description="Number of time steps (12=monthly)")
+
+    # Stochastic Parameters (GBM / Generic)
+    drift: float = Field(0.02, description="Drift (mu) for GBM")
+    volatility: float = Field(0.2, ge=0.0, description="Volatility (sigma)")
+
+    # Heston Specific
+    heston_kappa: float = Field(2.0, ge=0.0, description="Mean reversion speed of variance")
+    heston_theta: float = Field(0.04, ge=0.0, description="Long-run variance")
+    heston_xi: float = Field(0.3, ge=0.0, description="Volatility of volatility")
+    heston_rho: float = Field(-0.5, ge=-1.0, le=1.0, description="Correlation (asset vs vol)")
+    heston_v0: float = Field(0.04, ge=0.0, description="Initial variance")
+
+    # Ornstein-Uhlenbeck Specific
+    ou_theta: float = Field(0.15, ge=0.0, description="Mean reversion speed")
+    ou_mu: float = Field(100.0, description="Long run mean level")
+
+
 class MonteCarloRiskAgent(AgentBase):
     """
     Quantitative Risk Agent using Monte Carlo simulations.
 
     Methodology:
-    1. Models EBITDA as a stochastic process (Geometric Brownian Motion).
-    2. Runs 10,000 iterations over a 12-24 month horizon.
+    1. Models EBITDA as a stochastic process (Geometric Brownian Motion, Heston, or OU).
+    2. Runs iterations (default 10,000) over a defined horizon.
     3. Triggers 'Default' if EBITDA falls below Interest Expense + Maintenance Capex.
 
     Developer Note:
     ---------------
-    Currently uses GBM (Geometric Brownian Motion).
-    Future Roadmap: Implement GARCH(1,1) for volatility clustering and
-    Ornstein-Uhlenbeck processes for mean-reverting sectors (e.g., Commodities).
+    Now supports Heston (stochastic volatility) and OU (mean reversion).
     """
 
     def __init__(self, config: Dict[str, Any]):
         super().__init__(config)
         self.persona = "Quantitative Risk Modeler"
+        # Defaults are now handled in Pydantic, but we can store global overrides here if needed
         self.iterations = 10000
 
     async def execute(self, **kwargs) -> SimulationEngine:
@@ -38,63 +72,81 @@ class MonteCarloRiskAgent(AgentBase):
             ebitda_volatility: Annualized standard deviation of EBITDA (e.g., 0.15 for 15%).
             interest_expense: Annual fixed interest cost.
             capex_maintenance: Essential capex required to keep business running.
+            model_type: "GBM", "Heston", or "OU".
 
         Returns:
             SimulationEngine: Schema object with default probability and scenario placeholders.
         """
-        logger.info(f"Running Monte Carlo Simulation ({self.iterations} paths)...")
+        logger.info(f"Running Monte Carlo Simulation...")
 
-        # Extract parameters with defaults
-        current_ebitda = float(kwargs.get("current_ebitda", 0.0))
-        ebitda_volatility = float(kwargs.get("ebitda_volatility", 0.2))
-        interest_expense = float(kwargs.get("interest_expense", 0.0))
-        capex_maintenance = float(kwargs.get("capex_maintenance", 0.0))
+        # Map legacy keys to new schema if necessary, or rely on caller passing correct keys.
+        # Support alias 'ebitda_volatility' -> 'volatility'
+        if "ebitda_volatility" in kwargs and "volatility" not in kwargs:
+            kwargs["volatility"] = kwargs["ebitda_volatility"]
 
-        # Input Validation / Fallbacks
-        if current_ebitda == 0:
-            logger.warning("Monte Carlo: EBITDA is 0. Cannot model GBM. Returning Default.")
+        try:
+            # Pydantic Validation
+            request = MonteCarloRequest(**kwargs)
+        except Exception as e:
+            logger.error(f"Validation Error: {e}")
+            # Fallback for critical failure (e.g. missing EBITDA)
             return SimulationEngine(
-                monte_carlo_default_prob=1.0,
+                monte_carlo_default_prob="N/A",
                 quantum_scenarios=[],
                 trading_dynamics=TradingDynamics(
-                    short_interest="N/A", liquidity_risk="Critical"
+                    short_interest="N/A", liquidity_risk="High"
+                )
+            )
+
+        logger.info(f"Model: {request.model_type}, Iterations: {request.iterations}")
+
+        # Input Validation / Fallbacks
+        if request.current_ebitda == 0:
+            logger.warning("Monte Carlo: EBITDA is 0. Returning Default.")
+            return SimulationEngine(
+                monte_carlo_default_prob="100.0%",
+                quantum_scenarios=[],
+                trading_dynamics=TradingDynamics(
+                    short_interest="N/A", liquidity_risk="High"
                 )
             )
 
         # 1. Define Distress Threshold (Cash Flow Solvency)
-        # If EBITDA < Interest + Capex, the company is burning cash and relies on Revolver/Cash Balance.
-        # Simplification: We treat this as the "Default Point" for the model.
-        distress_threshold = interest_expense + capex_maintenance
+        distress_threshold = request.interest_expense + request.capex_maintenance
 
         # 2. Vectorized Simulation (NumPy)
-        # Time horizon: 1 year (T=1), Steps=12 (Monthly)
-        T = 1.0
-        # dt = T / 12 # Unused in simple terminal value calc
-        mu = 0.02  # Assume modest 2% drift/growth in base case
-        sigma = ebitda_volatility
+        T = request.time_horizon
+        dt = T / request.dt_steps
 
-        # Generate random shocks: (Iterations, Steps)
-        # S_t = S_0 * exp((mu - 0.5*sigma^2)t + sigma * W_t)
-        # We only care about the terminal value for this simplified solvency check.
+        # Route to appropriate model
+        if request.model_type == "Heston":
+            simulated_paths = self._run_heston_simulation(request, dt)
+        elif request.model_type == "OU":
+            simulated_paths = self._run_ou_simulation(request, dt)
+        else:
+            # Default to GBM
+            simulated_paths = self._run_gbm_simulation(request, dt)
 
-        # Random component: standard normal
-        Z = np.random.normal(0, 1, self.iterations)
+        # We take the terminal value for the simplified check, or check minimum over path?
+        # The original code used terminal value check. For consistency with description:
+        # "Triggers 'Default' if EBITDA falls below Interest Expense..."
+        # Often this checks at any point (barrier) or at maturity.
+        # Given the legacy code did "simulated_ebitda = ... (T=1)" (terminal), I will stick to terminal
+        # for GBM single step, but since we now have dt_steps, let's check minimum over the path (American barrier)
+        # or just terminal. Let's stick to terminal for now to match the "solvency at horizon" logic,
+        # or better, check if it dips below at any measured point (more conservative/defensive).
 
-        # EBITDA at T=1 (Simplified Geometric Brownian Motion for 1 step T=1)
-        simulated_ebitda = current_ebitda * np.exp((mu - 0.5 * sigma**2) * T + sigma * np.sqrt(T) * Z)
+        # Let's use terminal value to start, as implied by the previous "T=1" logic.
+        # Actually, let's check the minimum value across the path for a more rigorous "bank-grade" risk check.
+        # If min(EBITDA_t) < Threshold, then Default.
 
-        # Let's do a more robust check: Did it breach the threshold?
-        # Breaches count
-        breaches = np.sum(simulated_ebitda < distress_threshold)
+        min_ebitda_per_path = np.min(simulated_paths, axis=1)
+        breaches = np.sum(min_ebitda_per_path < distress_threshold)
 
-        pd_ratio = breaches / self.iterations
-        logger.info(f"Simulation Result: {breaches} breaches in {self.iterations} paths. PD: {pd_ratio:.2%}")
+        pd_ratio = breaches / request.iterations
+        logger.info(f"Simulation Result: {breaches} breaches in {request.iterations} paths. PD: {pd_ratio:.2%}")
 
-        # 3. Construct Output (Mapping to v23_5_schema.py)
-        # Note: Quantum scenarios would be injected by the QuantumScenarioAgent in the orchestration layer.
-        # We provide placeholders or basic trading dynamics here.
-
-        # Determine impact string
+        # 3. Construct Output
         if pd_ratio < 0.01:
             impact = "Minimal Impact"
         elif pd_ratio < 0.05:
@@ -102,7 +154,6 @@ class MonteCarloRiskAgent(AgentBase):
         else:
             impact = "Debt Restructuring Likely"
 
-        # Helper for probability buckets
         def get_prob_bucket(p):
             if p < 0.1:
                 return "Low"
@@ -114,7 +165,7 @@ class MonteCarloRiskAgent(AgentBase):
             monte_carlo_default_prob=f"{pd_ratio:.1%}",
             quantum_scenarios=[
                 QuantumScenario(
-                    scenario_name="Base Case (Monte Carlo)",
+                    scenario_name=f"Base Case ({request.model_type})",
                     probability=get_prob_bucket(1.0 - pd_ratio),
                     impact_severity="Moderate",
                     estimated_impact_ev="Neutral"
@@ -127,9 +178,112 @@ class MonteCarloRiskAgent(AgentBase):
                 )
             ],
             trading_dynamics=TradingDynamics(
-                short_interest="See Market Data",  # To be filled by MarketDataAgent
-                liquidity_risk="High" if sigma > 0.3 else "Low"
+                short_interest="See Market Data",
+                liquidity_risk="High" if request.volatility > 0.3 else "Low"
             )
         )
 
         return output
+
+    def _run_gbm_simulation(self, request: MonteCarloRequest, dt: float) -> np.ndarray:
+        """
+        Geometric Brownian Motion.
+        S_{t+1} = S_t * exp((mu - 0.5*sigma^2)dt + sigma * sqrt(dt) * Z)
+        """
+        N = request.iterations
+        M = request.dt_steps
+        S0 = request.current_ebitda
+        mu = request.drift
+        sigma = request.volatility
+
+        # Paths matrix: (Iterations, Steps + 1)
+        paths = np.zeros((N, M + 1))
+        paths[:, 0] = S0
+
+        for t in range(1, M + 1):
+            Z = np.random.standard_normal(N)
+            # Vectorized update
+            paths[:, t] = paths[:, t-1] * np.exp((mu - 0.5 * sigma**2) * dt + sigma * np.sqrt(dt) * Z)
+
+        return paths
+
+    def _run_heston_simulation(self, request: MonteCarloRequest, dt: float) -> np.ndarray:
+        """
+        Heston Stochastic Volatility Model.
+        dS_t = mu * S_t * dt + sqrt(v_t) * S_t * dW_t^S
+        dv_t = kappa * (theta - v_t) * dt + xi * sqrt(v_t) * dW_t^v
+        """
+        N = request.iterations
+        M = request.dt_steps
+        S0 = request.current_ebitda
+
+        mu = request.drift
+        kappa = request.heston_kappa
+        theta = request.heston_theta
+        xi = request.heston_xi
+        rho = request.heston_rho
+        v0 = request.heston_v0
+
+        # Arrays for Price (S) and Volatility (v)
+        S = np.zeros((N, M + 1))
+        v = np.zeros((N, M + 1))
+        S[:, 0] = S0
+        v[:, 0] = v0
+
+        for t in range(1, M + 1):
+            # Generate Correlated Brownian Motions
+            Z1 = np.random.standard_normal(N)
+            Z2 = np.random.standard_normal(N)
+
+            Z_S = Z1
+            Z_v = rho * Z1 + np.sqrt(1 - rho**2) * Z2
+
+            # Previous values
+            S_prev = S[:, t-1]
+            v_prev = v[:, t-1]
+
+            # Ensure variance stays non-negative for the sqrt calculation (Reflection/Truncation)
+            # Using Full Truncation: sqrt(max(0, v_prev))
+            v_prev_plus = np.maximum(v_prev, 0.0)
+
+            # Volatility Process (v_t)
+            # dv_t = kappa * (theta - v_t) * dt + xi * sqrt(v_t) * dW_v
+            dv = kappa * (theta - v_prev_plus) * dt + xi * np.sqrt(v_prev_plus * dt) * Z_v
+            v[:, t] = v_prev + dv
+
+            # Price Process (S_t)
+            # dS_t = mu * S_t * dt + sqrt(v_t) * S_t * dW_S
+            dS = mu * S_prev * dt + np.sqrt(v_prev_plus * dt) * S_prev * Z_S
+            S[:, t] = S_prev + dS
+
+        return S
+
+    def _run_ou_simulation(self, request: MonteCarloRequest, dt: float) -> np.ndarray:
+        """
+        Ornstein-Uhlenbeck Process (Mean Reversion).
+        dX_t = theta * (mu - X_t) * dt + sigma * dW_t
+        """
+        N = request.iterations
+        M = request.dt_steps
+        X0 = request.current_ebitda
+
+        # Note: In OU, 'mu' is the long-run mean level, 'theta' is speed.
+        # We mapped these in Pydantic schema: ou_mu -> Long Run Mean, ou_theta -> Speed
+        long_run_mean = request.ou_mu
+        theta = request.ou_theta
+        sigma = request.volatility
+
+        X = np.zeros((N, M + 1))
+        X[:, 0] = X0
+
+        for t in range(1, M + 1):
+            Z = np.random.standard_normal(N)
+
+            X_prev = X[:, t-1]
+
+            # Update: X_{t+1} = X_t + theta * (mu - X_t) * dt + sigma * sqrt(dt) * Z
+            dX = theta * (long_run_mean - X_prev) * dt + sigma * np.sqrt(dt) * Z
+
+            X[:, t] = X_prev + dX
+
+        return X
