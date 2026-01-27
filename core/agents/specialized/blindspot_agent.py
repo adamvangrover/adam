@@ -64,6 +64,21 @@ class BlindspotAgent(AgentBase):
                         "description": f"Sector '{name}' is trending BULLISH despite NEGATIVE sentiment. Potential bubble or irrational exuberance."
                     })
 
+            indices = pulse.get('indices', {})
+            for symbol, data in indices.items():
+                # Check for "Coiled Spring" (High Volatility, Low Price Movement)
+                # Volatility is usually small (e.g., 0.0005), so we use a relative threshold
+                vol = data.get('volatility', 0)
+                change = abs(data.get('change_percent', 0))
+
+                # Thresholds adjusted for the simulation scale
+                if vol > 0.0008 and change < 0.1:
+                     found_anomalies.append({
+                        "type": "VOLATILITY_COMPRESSION",
+                        "severity": "HIGH",
+                        "description": f"Asset '{symbol}' showing elevated internal volatility ({vol}) with compressed price action. Breakout imminent."
+                    })
+
         self.anomalies = found_anomalies
         return {
             "status": "SCAN_COMPLETE",
