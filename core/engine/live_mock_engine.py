@@ -4,6 +4,7 @@ import time
 import threading
 import os
 from copy import deepcopy
+from core.engine.consensus_engine import ConsensusEngine
 
 class LiveMockEngine:
     """
@@ -28,6 +29,7 @@ class LiveMockEngine:
         self.data_path = os.path.join(os.path.dirname(__file__), 'live_seed_data.json')
         self.state = self._load_seed_data()
         self.last_update = time.time()
+        self.consensus = ConsensusEngine()
         self._initialized = True
 
     def _load_seed_data(self):
@@ -100,18 +102,55 @@ class LiveMockEngine:
 
     def get_synthesizer_score(self):
         """
-        Calculates a 'System Confidence Score' based on market volatility and trends.
+        Calculates a 'System Confidence Score' using the ConsensusEngine.
+        It generates synthetic agent signals based on market data.
         """
         indices = self.state['market_data']['indices']
         spx_change = indices['SPX']['change_percent']
         vix = indices['VIX']['price']
 
-        # Simple heuristic: High SPX & Low VIX = High Confidence
-        base_score = 75
-        score = base_score + (spx_change * 10) - ((vix - 15) * 2)
+        # Generate Synthetic Agent Signals
+        signals = []
 
-        # Clamp 0-100
-        return max(0, min(100, round(score, 1)))
+        # 1. Risk Officer (Conservative)
+        risk_vote = "REJECT" if vix > 18 else "APPROVE"
+        signals.append({
+            "agent": "RiskOfficer",
+            "vote": risk_vote,
+            "confidence": 0.9,
+            "weight": 2.0,
+            "reason": f"VIX is at {vix:.2f}"
+        })
+
+        # 2. Trend Follower (Aggressive)
+        trend_vote = "APPROVE" if spx_change > 0 else "REJECT"
+        signals.append({
+            "agent": "TrendFollower",
+            "vote": trend_vote,
+            "confidence": 0.7 + (abs(spx_change) * 0.1),
+            "weight": 1.5,
+            "reason": f"SPX change is {spx_change:.2f}%"
+        })
+
+        # 3. Macro Sentinel (Random/Cyclical)
+        # Flip a coin based on time (simulating external news flow)
+        macro_bullish = int(time.time()) % 60 < 30
+        signals.append({
+            "agent": "MacroSentinel",
+            "vote": "APPROVE" if macro_bullish else "REJECT",
+            "confidence": 0.6,
+            "weight": 1.0,
+            "reason": "Global macro cycle interpretation"
+        })
+
+        # Run Consensus
+        result = self.consensus.evaluate(signals)
+
+        # Map Consensus Score (-1 to 1) to 0-100 scale
+        # -1 -> 0, 0 -> 50, 1 -> 100
+        normalized_score = ((result['score'] + 1) / 2) * 100
+
+        return max(0, min(100, round(normalized_score, 1)))
 
 # Global singleton access
 live_engine = LiveMockEngine()

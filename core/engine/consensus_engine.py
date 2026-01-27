@@ -4,6 +4,7 @@ import logging
 import os
 import fcntl
 from datetime import datetime
+from core.utils.logging_utils import NarrativeLogger
 
 class ConsensusEngine:
     """
@@ -14,6 +15,7 @@ class ConsensusEngine:
     def __init__(self, threshold: float = 0.6):
         self.threshold = threshold
         self.decision_log = []
+        self.narrative_logger = NarrativeLogger()
 
     def evaluate(self, signals: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
@@ -86,36 +88,27 @@ class ConsensusEngine:
             # Determine path relative to this file
             base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             data_dir = os.path.join(base_dir, 'data')
-            log_path = os.path.join(data_dir, 'decision_log.json')
+            log_path = os.path.join(data_dir, 'decision_log.jsonl')
 
             os.makedirs(data_dir, exist_ok=True)
 
-            mode = 'r+' if os.path.exists(log_path) else 'w+'
-
-            with open(log_path, mode) as f:
+            with open(log_path, 'a') as f:
                 fcntl.flock(f, fcntl.LOCK_EX)
                 try:
-                    content = f.read()
-                    data = []
-                    if content:
-                        try:
-                            data = json.loads(content)
-                        except json.JSONDecodeError:
-                            logging.warning(f"Could not read existing decision log at {log_path}. Starting fresh.")
-
-                    if not isinstance(data, list):
-                        data = []
-
-                    data.append(result)
-
-                    f.seek(0)
-                    f.truncate()
-                    json.dump(data, f, indent=2)
+                    f.write(json.dumps(result) + "\n")
                 finally:
                     fcntl.flock(f, fcntl.LOCK_UN)
 
         except Exception as e:
             logging.error(f"Failed to persist decision log: {e}")
+
+        # Narrative Logging
+        self.narrative_logger.log_narrative(
+            event="Consensus Evaluation",
+            analysis=result['rationale'],
+            decision=result['decision'],
+            outcome=f"Score: {result['score']}"
+        )
 
         logging.info(f"Consensus Reached: {result['decision']} ({result['score']})")
 
