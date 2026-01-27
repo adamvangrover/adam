@@ -202,6 +202,7 @@ class SimulationEngine(BaseModel):
     monte_carlo_default_prob: str
     quantum_scenarios: List[QuantumScenario]
     trading_dynamics: TradingDynamics
+    simulation_metadata: Optional[Dict[str, Any]] = Field(default=None, description="Detailed simulation data for visualization")
 
 # ==============================================================================
 # SECTION 7: DOMAIN MODELS - PHASE 5: SYNTHESIS
