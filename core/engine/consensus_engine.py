@@ -1,6 +1,8 @@
 from typing import List, Dict, Any, Optional
 import json
 import logging
+import os
+import fcntl
 from datetime import datetime
 
 class ConsensusEngine:
@@ -78,8 +80,43 @@ class ConsensusEngine:
     def _log_decision(self, result: Dict[str, Any]):
         """Append to internal log (and ideally persist to disk)."""
         self.decision_log.append(result)
-        # In a real system, we might append to decision_log.json here
-        # For now, we just keep it in memory or log to standard logger
+
+        # Persistence Logic
+        try:
+            # Determine path relative to this file
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            data_dir = os.path.join(base_dir, 'data')
+            log_path = os.path.join(data_dir, 'decision_log.json')
+
+            os.makedirs(data_dir, exist_ok=True)
+
+            mode = 'r+' if os.path.exists(log_path) else 'w+'
+
+            with open(log_path, mode) as f:
+                fcntl.flock(f, fcntl.LOCK_EX)
+                try:
+                    content = f.read()
+                    data = []
+                    if content:
+                        try:
+                            data = json.loads(content)
+                        except json.JSONDecodeError:
+                            logging.warning(f"Could not read existing decision log at {log_path}. Starting fresh.")
+
+                    if not isinstance(data, list):
+                        data = []
+
+                    data.append(result)
+
+                    f.seek(0)
+                    f.truncate()
+                    json.dump(data, f, indent=2)
+                finally:
+                    fcntl.flock(f, fcntl.LOCK_UN)
+
+        except Exception as e:
+            logging.error(f"Failed to persist decision log: {e}")
+
         logging.info(f"Consensus Reached: {result['decision']} ({result['score']})")
 
     def get_log(self) -> List[Dict[str, Any]]:
