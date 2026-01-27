@@ -97,8 +97,9 @@
             cursor: pointer;
             transition: all 0.2s;
             position: relative;
+            border: none; padding: 0; outline: none; /* Button Reset */
         }
-        .dock-item:hover {
+        .dock-item:hover, .dock-item:focus {
             transform: translateY(-5px) scale(1.1);
             background: rgba(255,255,255,0.1);
             box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
@@ -113,7 +114,7 @@
             opacity: 0; pointer-events: none; transition: opacity 0.2s;
             white-space: nowrap;
         }
-        .dock-item:hover::after { opacity: 1; }
+        .dock-item:hover::after, .dock-item:focus::after { opacity: 1; }
 
         .app-dot {
             width: 4px; height: 4px; background: var(--cyan-glow); border-radius: 50%;
@@ -176,111 +177,111 @@
     <!-- Dock -->
     <div class="dock">
         <!-- Core Financial Tools -->
-        <div class="dock-item" onclick="openWindow('cred-arch', 'Credit Architect', 'credit_valuation_architect.html', 1200, 800)" data-title="Credit & Valuation">
+        <button class="dock-item" type="button" aria-label="Credit & Valuation" onclick="openWindow('cred-arch', 'Credit Architect', 'credit_valuation_architect.html', 1200, 800)" data-title="Credit & Valuation">
             <i data-lucide="activity" class="text-blue-500 w-6 h-6"></i>
             <div class="app-dot" id="dot-cred-arch"></div>
-        </div>
-        <div class="dock-item" onclick="openWindow('deep', 'Deep Dive', 'deep_dive.html', 1100, 750)" data-title="Deep Dive Explorer">
+        </button>
+        <button class="dock-item" type="button" aria-label="Deep Dive Explorer" onclick="openWindow('deep', 'Deep Dive', 'deep_dive.html', 1100, 750)" data-title="Deep Dive Explorer">
             <i data-lucide="layers" class="text-emerald-400 w-6 h-6"></i>
             <div class="app-dot" id="dot-deep"></div>
-        </div>
-        <div class="dock-item" onclick="openWindow('dcf', 'DCF Valuator', 'apps/dcf.html', 900, 650)" data-title="DCF Valuator">
+        </button>
+        <button class="dock-item" type="button" aria-label="DCF Valuator" onclick="openWindow('dcf', 'DCF Valuator', 'apps/dcf.html', 900, 650)" data-title="DCF Valuator">
             <i data-lucide="bar-chart-2" class="text-cyan-400 w-6 h-6"></i>
             <div class="app-dot" id="dot-dcf"></div>
-        </div>
-        <div class="dock-item" onclick="openWindow('lbo', 'LBO Modeler', 'apps/lbo.html', 900, 650)" data-title="LBO Modeler">
+        </button>
+        <button class="dock-item" type="button" aria-label="LBO Modeler" onclick="openWindow('lbo', 'LBO Modeler', 'apps/lbo.html', 900, 650)" data-title="LBO Modeler">
             <i data-lucide="layers" class="text-purple-400 w-6 h-6"></i>
             <div class="app-dot" id="dot-lbo"></div>
-        </div>
-        <div class="dock-item" onclick="openWindow('comps', 'Comps Analysis', 'apps/comps.html', 900, 600)" data-title="Comps Analysis">
+        </button>
+        <button class="dock-item" type="button" aria-label="Comps Analysis" onclick="openWindow('comps', 'Comps Analysis', 'apps/comps.html', 900, 600)" data-title="Comps Analysis">
             <i data-lucide="scale" class="text-blue-400 w-6 h-6"></i>
             <div class="app-dot" id="dot-comps"></div>
-        </div>
-        <div class="dock-item" onclick="openWindow('ma', 'M&A Modeler', 'apps/ma_model.html', 900, 700)" data-title="M&A Modeler">
+        </button>
+        <button class="dock-item" type="button" aria-label="M&A Modeler" onclick="openWindow('ma', 'M&A Modeler', 'apps/ma_model.html', 900, 700)" data-title="M&A Modeler">
             <i data-lucide="merge" class="text-teal-400 w-6 h-6"></i>
             <div class="app-dot" id="dot-ma"></div>
-        </div>
+        </button>
 
         <div class="w-[1px] h-8 bg-white/10 mx-2"></div>
 
         <!-- Analysis Tools -->
-        <div class="dock-item" onclick="openWindow('market', 'Market Scrubber', 'apps/market_data.html', 800, 500)" data-title="Market Data">
+        <button class="dock-item" type="button" aria-label="Market Data" onclick="openWindow('market', 'Market Scrubber', 'apps/market_data.html', 800, 500)" data-title="Market Data">
             <i data-lucide="database" class="text-green-400 w-6 h-6"></i>
             <div class="app-dot" id="dot-market"></div>
-        </div>
-        <div class="dock-item" onclick="openWindow('ratios', 'Ratio Calculator', 'apps/ratios.html', 800, 600)" data-title="Ratio Calculator">
+        </button>
+        <button class="dock-item" type="button" aria-label="Ratio Calculator" onclick="openWindow('ratios', 'Ratio Calculator', 'apps/ratios.html', 800, 600)" data-title="Ratio Calculator">
             <i data-lucide="calculator" class="text-orange-400 w-6 h-6"></i>
             <div class="app-dot" id="dot-ratios"></div>
-        </div>
-        <div class="dock-item" onclick="openWindow('loan', 'Loan Amortizer', 'apps/loan.html', 800, 600)" data-title="Loan Amortizer">
+        </button>
+        <button class="dock-item" type="button" aria-label="Loan Amortizer" onclick="openWindow('loan', 'Loan Amortizer', 'apps/loan.html', 800, 600)" data-title="Loan Amortizer">
             <i data-lucide="banknote" class="text-yellow-400 w-6 h-6"></i>
             <div class="app-dot" id="dot-loan"></div>
-        </div>
-        <div class="dock-item" onclick="openWindow('wacc', 'WACC Calc', 'apps/wacc.html', 800, 600)" data-title="WACC Calculator">
+        </button>
+        <button class="dock-item" type="button" aria-label="WACC Calculator" onclick="openWindow('wacc', 'WACC Calc', 'apps/wacc.html', 800, 600)" data-title="WACC Calculator">
             <i data-lucide="percent" class="text-orange-300 w-6 h-6"></i>
             <div class="app-dot" id="dot-wacc"></div>
-        </div>
+        </button>
 
         <div class="w-[1px] h-8 bg-white/10 mx-2"></div>
 
         <!-- Advanced Tools (New) -->
-        <div class="dock-item" onclick="openWindow('bs', 'Black-Scholes', 'apps/black_scholes.html', 800, 600)" data-title="Black-Scholes">
+        <button class="dock-item" type="button" aria-label="Black-Scholes" onclick="openWindow('bs', 'Black-Scholes', 'apps/black_scholes.html', 800, 600)" data-title="Black-Scholes">
             <i data-lucide="sigma" class="text-rose-400 w-6 h-6"></i>
             <div class="app-dot" id="dot-bs"></div>
-        </div>
-        <div class="dock-item" onclick="openWindow('bond', 'Bond Pricer', 'apps/bond_pricer.html', 800, 600)" data-title="Bond Pricer">
+        </button>
+        <button class="dock-item" type="button" aria-label="Bond Pricer" onclick="openWindow('bond', 'Bond Pricer', 'apps/bond_pricer.html', 800, 600)" data-title="Bond Pricer">
             <i data-lucide="scroll" class="text-indigo-400 w-6 h-6"></i>
             <div class="app-dot" id="dot-bond"></div>
-        </div>
-        <div class="dock-item" onclick="openWindow('mc', 'Monte Carlo', 'apps/monte_carlo.html', 850, 600)" data-title="Monte Carlo Sim">
+        </button>
+        <button class="dock-item" type="button" aria-label="Monte Carlo Sim" onclick="openWindow('mc', 'Monte Carlo', 'apps/monte_carlo.html', 850, 600)" data-title="Monte Carlo Sim">
             <i data-lucide="scatter-chart" class="text-pink-400 w-6 h-6"></i>
             <div class="app-dot" id="dot-mc"></div>
-        </div>
-        <div class="dock-item" onclick="openWindow('port', 'Portfolio Opt', 'apps/portfolio.html', 900, 700)" data-title="Portfolio Optimizer">
+        </button>
+        <button class="dock-item" type="button" aria-label="Portfolio Optimizer" onclick="openWindow('port', 'Portfolio Opt', 'apps/portfolio.html', 900, 700)" data-title="Portfolio Optimizer">
             <i data-lucide="pie-chart" class="text-purple-400 w-6 h-6"></i>
             <div class="app-dot" id="dot-port"></div>
-        </div>
-        <div class="dock-item" onclick="openWindow('capstack', 'Capital Stack', 'apps/capital_stack.html', 1000, 700)" data-title="Capital Stack & LGD">
+        </button>
+        <button class="dock-item" type="button" aria-label="Capital Stack & LGD" onclick="openWindow('capstack', 'Capital Stack', 'apps/capital_stack.html', 1000, 700)" data-title="Capital Stack & LGD">
             <i data-lucide="layers-2" class="text-yellow-400 w-6 h-6"></i>
             <div class="app-dot" id="dot-capstack"></div>
-        </div>
+        </button>
 
         <div class="w-[1px] h-8 bg-white/10 mx-2"></div>
 
         <!-- Adam v23.5 Modules -->
-        <div class="dock-item" onclick="openWindow('quantum', 'Quantum Risk', 'apps/quantum_risk.html', 900, 600)" data-title="Quantum Risk Engine">
+        <button class="dock-item" type="button" aria-label="Quantum Risk Engine" onclick="openWindow('quantum', 'Quantum Risk', 'apps/quantum_risk.html', 900, 600)" data-title="Quantum Risk Engine">
             <i data-lucide="atom" class="text-cyan-400 w-6 h-6"></i>
             <div class="app-dot" id="dot-quantum"></div>
-        </div>
-        <div class="dock-item" onclick="openWindow('crisis', 'Crisis Sim', 'apps/crisis_sim.html', 1000, 700)" data-title="Crisis Simulator">
+        </button>
+        <button class="dock-item" type="button" aria-label="Crisis Simulator" onclick="openWindow('crisis', 'Crisis Sim', 'apps/crisis_sim.html', 1000, 700)" data-title="Crisis Simulator">
             <i data-lucide="siren" class="text-red-500 w-6 h-6"></i>
             <div class="app-dot" id="dot-crisis"></div>
-        </div>
-        <div class="dock-item" onclick="openWindow('esg', 'ESG Monitor', 'apps/esg_monitor.html', 900, 650)" data-title="ESG Monitor">
+        </button>
+        <button class="dock-item" type="button" aria-label="ESG Monitor" onclick="openWindow('esg', 'ESG Monitor', 'apps/esg_monitor.html', 900, 650)" data-title="ESG Monitor">
             <i data-lucide="leaf" class="text-green-500 w-6 h-6"></i>
             <div class="app-dot" id="dot-esg"></div>
-        </div>
-        <div class="dock-item" onclick="openWindow('compliance', 'Compliance Audit', 'apps/compliance_audit.html', 800, 600)" data-title="Compliance Audit">
+        </button>
+        <button class="dock-item" type="button" aria-label="Compliance Audit" onclick="openWindow('compliance', 'Compliance Audit', 'apps/compliance_audit.html', 800, 600)" data-title="Compliance Audit">
             <i data-lucide="shield-alert" class="text-blue-500 w-6 h-6"></i>
             <div class="app-dot" id="dot-compliance"></div>
-        </div>
+        </button>
 
         <div class="w-[1px] h-8 bg-white/10 mx-2"></div>
 
         <!-- Utilities -->
-        <div class="dock-item" onclick="openWindow('term', 'Terminal', 'terminal_profile.html', 800, 500)" data-title="Terminal">
+        <button class="dock-item" type="button" aria-label="Terminal" onclick="openWindow('term', 'Terminal', 'terminal_profile.html', 800, 500)" data-title="Terminal">
             <i data-lucide="terminal-square" class="text-gray-300 w-6 h-6"></i>
             <div class="app-dot" id="dot-term"></div>
-        </div>
-        <div class="dock-item" onclick="openNotepad()" data-title="Secure Notepad">
+        </button>
+        <button class="dock-item" type="button" aria-label="Secure Notepad" onclick="openNotepad()" data-title="Secure Notepad">
             <i data-lucide="sticky-note" class="text-yellow-400 w-6 h-6"></i>
-        </div>
-        <div class="dock-item" onclick="toggleFullScreen()" data-title="Toggle Fullscreen">
+        </button>
+        <button class="dock-item" type="button" aria-label="Toggle Fullscreen" onclick="toggleFullScreen()" data-title="Toggle Fullscreen">
             <i data-lucide="monitor" class="text-gray-400 w-6 h-6"></i>
-        </div>
-        <div class="dock-item" onclick="window.location.href='index.html'" data-title="Exit to System">
+        </button>
+        <button class="dock-item" type="button" aria-label="Exit to System" onclick="window.location.href='index.html'" data-title="Exit to System">
             <i data-lucide="log-out" class="text-red-400 w-6 h-6"></i>
-        </div>
+        </button>
     </div>
 
     <script>
