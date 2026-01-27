@@ -100,6 +100,42 @@ async def test_zero_ebitda():
     assert result.monte_carlo_default_prob == "100.0%"
 
 @pytest.mark.asyncio
+async def test_simulation_metadata():
+    """Test that simulation metadata (paths, percentiles, risk metrics) is populated."""
+    agent = MonteCarloRiskAgent(CONFIG)
+
+    result = await agent.execute(
+        current_ebitda=100.0,
+        interest_expense=10.0,
+        capex_maintenance=5.0,
+        model_type="GBM",
+        iterations=1000,
+        volatility=0.2
+    )
+
+    assert result.simulation_metadata is not None
+    meta = result.simulation_metadata
+
+    # Check structure
+    assert "sampled_paths" in meta
+    assert len(meta["sampled_paths"]) == 50 # Capped at 50
+    assert len(meta["sampled_paths"][0]) == 13 # 12 steps + initial
+
+    assert "percentiles" in meta
+    assert "p50" in meta["percentiles"]
+    assert len(meta["percentiles"]["p50"]) == 13
+
+    assert "risk_metrics" in meta
+    risk = meta["risk_metrics"]
+    assert "VaR_95" in risk
+    assert "CVaR_95" in risk
+    assert risk["CVaR_95"] <= risk["VaR_95"] # CVaR is always <= VaR (more negative/less positive), wait.
+    # Logic:
+    # VaR_95 is the 5th percentile value (e.g. 80).
+    # CVaR_95 is the mean of values <= 80 (e.g. 75).
+    # So CVaR <= VaR. Correct.
+
+@pytest.mark.asyncio
 async def test_high_default_probability():
     """Test a scenario where default is likely."""
     agent = MonteCarloRiskAgent(CONFIG)

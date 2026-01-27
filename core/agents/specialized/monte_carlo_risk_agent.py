@@ -161,6 +161,55 @@ class MonteCarloRiskAgent(AgentBase):
                 return "Med"
             return "High"
 
+        # ---------------------------------------------------------
+        # Bank-Grade Enhancements:
+        # 1. Path Sampling (for visualization)
+        # 2. Percentile Cones (1, 5, 50, 95, 99)
+        # 3. Risk Metrics (VaR, CVaR) on Terminal Distribution
+        # ---------------------------------------------------------
+
+        # 1. Path Sampling (Take first 50 paths)
+        sample_size = min(50, request.iterations)
+        sampled_paths = simulated_paths[:sample_size, :].tolist()
+
+        # 2. Percentiles over time
+        # shape: (N, M+1) -> percentiles across axis 0
+        percentile_levels = [1, 5, 50, 95, 99]
+        percentiles_over_time = np.percentile(simulated_paths, percentile_levels, axis=0)
+        # Convert to dict: "p5": [val_t0, val_t1, ...]
+        percentile_dict = {
+            f"p{p}": percentiles_over_time[i].tolist()
+            for i, p in enumerate(percentile_levels)
+        }
+
+        # 3. Risk Metrics on Terminal Distribution (Horizon)
+        terminal_values = simulated_paths[:, -1]
+
+        # VaR (Value at Risk) - e.g. 5th percentile worst outcome
+        # Since these are absolute values, VaR_95 is the 5th percentile value.
+        var_95_val = np.percentile(terminal_values, 5)
+        var_99_val = np.percentile(terminal_values, 1)
+
+        # CVaR (Conditional VaR) - Mean of values below VaR
+        cvar_95_val = terminal_values[terminal_values <= var_95_val].mean()
+        cvar_99_val = terminal_values[terminal_values <= var_99_val].mean()
+
+        simulation_metadata = {
+            "model_type": request.model_type,
+            "iterations": request.iterations,
+            "time_horizon": request.time_horizon,
+            "dt_steps": request.dt_steps,
+            "sampled_paths": sampled_paths,
+            "percentiles": percentile_dict,
+            "risk_metrics": {
+                "VaR_95": float(var_95_val),
+                "VaR_99": float(var_99_val),
+                "CVaR_95": float(cvar_95_val),
+                "CVaR_99": float(cvar_99_val),
+                "Distress_Threshold": float(distress_threshold)
+            }
+        }
+
         output = SimulationEngine(
             monte_carlo_default_prob=f"{pd_ratio:.1%}",
             quantum_scenarios=[
@@ -180,7 +229,8 @@ class MonteCarloRiskAgent(AgentBase):
             trading_dynamics=TradingDynamics(
                 short_interest="See Market Data",
                 liquidity_risk="High" if request.volatility > 0.3 else "Low"
-            )
+            ),
+            simulation_metadata=simulation_metadata
         )
 
         return output
