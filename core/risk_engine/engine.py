@@ -25,7 +25,7 @@ logger = logging.getLogger("RiskEngine_Unified")
 
 class RiskEngine:
     """
-    RiskEngine v3.0 (Unified)
+    RiskEngine v3.1 (Unified)
 
     A comprehensive risk management engine capable of:
     1. Parametric VaR (Variance-Covariance & Simplified).
