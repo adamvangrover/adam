@@ -140,3 +140,8 @@
 **Vulnerability:** The `CodeAlchemist` agent's `deploy_to_local_file` method accepted arbitrary file paths from user input/agent parameters without validation. This allowed an attacker to overwrite any file the process had access to (e.g., source code, configuration) using path traversal (e.g., `../../app.py`).
 **Learning:** Agents that perform file I/O must treat file paths as untrusted input. Relying on default values or assuming "cooperative" usage is dangerous.
 **Prevention:** Implemented a strict `_validate_file_path` method that enforces a safe output directory (sandbox) and prevents traversal out of it using `os.path.abspath` and `startswith`.
+
+## 2026-01-27 - Governance Middleware Security Theater
+**Vulnerability:** The `GovernanceMiddleware` was configured to detect HIGH and CRITICAL risk operations but defaulted to `pass` (allowing the request) instead of blocking them. This creates a false sense of security where policies are defined but not enforced.
+**Learning:** Security middleware that only logs violations without blocking them is "Security Theater". Default behaviors for critical security controls must be "fail-secure" (block by default).
+**Prevention:** Updated `GovernanceMiddleware` to explicitly `abort(403)` for operations flagged as HIGH or CRITICAL risk, ensuring that the governance policy is actively enforced.
