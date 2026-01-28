@@ -17,6 +17,11 @@ class PromptLoader:
     Supports simple text loading, JSON/YAML parsing, and 'Prompt-as-Code' style Markdown with YAML Frontmatter.
     """
 
+    # Pre-compiled regex patterns for performance
+    SYSTEM_PROMPT_PATTERN = re.compile(r"###\s*SYSTEM\s*PROMPT\s*\n(.*?)(?=###\s*USER\s*PROMPT|$)", re.DOTALL | re.IGNORECASE)
+    USER_PROMPT_PATTERN = re.compile(r"###\s*USER\s*PROMPT\s*(?:###\s*TASK\s*PROMPT.*?)?\n(.*)", re.DOTALL | re.IGNORECASE)
+    TASK_PROMPT_PATTERN = re.compile(r"###\s*TASK\s*PROMPT.*?\n(.*)", re.DOTALL | re.IGNORECASE)
+
     @staticmethod
     def get_path(prompt_name: str) -> str:
         """Finds the file path for a given prompt name (without extension)."""
@@ -75,13 +80,13 @@ class PromptLoader:
 
         # Split System/User Prompts based on headers
         # We look for "### SYSTEM PROMPT" and "### USER PROMPT" (or similar variations)
-        system_match = re.search(r"###\s*SYSTEM\s*PROMPT\s*\n(.*?)(?=###\s*USER\s*PROMPT|$)", body, re.DOTALL | re.IGNORECASE)
-        user_match = re.search(r"###\s*USER\s*PROMPT\s*(?:###\s*TASK\s*PROMPT.*?)?\n(.*)", body, re.DOTALL | re.IGNORECASE)
+        system_match = PromptLoader.SYSTEM_PROMPT_PATTERN.search(body)
+        user_match = PromptLoader.USER_PROMPT_PATTERN.search(body)
 
         # Fallback regex if headers are slightly different or order is swapped
         if not user_match:
              # Try just finding the task prompt if user prompt header is missing
-             user_match = re.search(r"###\s*TASK\s*PROMPT.*?\n(.*)", body, re.DOTALL | re.IGNORECASE)
+             user_match = PromptLoader.TASK_PROMPT_PATTERN.search(body)
 
         system_text = system_match.group(1).strip() if system_match else ""
         user_text = user_match.group(1).strip() if user_match else body.replace(system_match.group(0) if system_match else "", "").strip()
