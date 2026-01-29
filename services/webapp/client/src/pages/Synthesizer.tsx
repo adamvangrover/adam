@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Activity, Radio, ShieldAlert, Cpu, TrendingUp, Users } from 'lucide-react';
 import AgentIntercom from '../components/AgentIntercom';
+import NarrativeDashboard from '../components/NarrativeDashboard';
 
 interface MarketPulse {
     indices: Record<string, any>;
@@ -8,8 +9,10 @@ interface MarketPulse {
     timestamp: number;
 }
 
+// Protocol: ADAM-V-NEXT
 const Synthesizer: React.FC = () => {
     const [score, setScore] = useState<number>(0);
+    const [rationale, setRationale] = useState<string>('Initializing neural consensus...');
     const [pulse, setPulse] = useState<MarketPulse | null>(null);
     const [lastUpdate, setLastUpdate] = useState<string>('');
     const [conviction, setConviction] = useState<Record<string, number>>({});
@@ -30,6 +33,9 @@ const Synthesizer: React.FC = () => {
                         const data = await res.json();
                         setScore(data.score);
                         setPulse(data.pulse);
+                        if (data.consensus && data.consensus.rationale) {
+                            setRationale(data.consensus.rationale);
+                        }
                         setLastUpdate(new Date().toLocaleTimeString());
                     }
                 } catch(e) {}
@@ -113,6 +119,11 @@ const Synthesizer: React.FC = () => {
                             display: 'inline-block', fontWeight: 'bold', borderRadius: '4px'
                         }}>
                             {score > 80 ? "BULLISH CONVICTION" : score > 50 ? "CAUTIOUS / HEDGED" : "RISK OFF / DEFENSIVE"}
+                        </div>
+
+                        {/* Rationale Stream */}
+                        <div style={{ marginTop: '20px', fontSize: '0.8rem', color: '#aaa', fontStyle: 'italic', maxWidth: '600px', margin: '20px auto 0' }}>
+                            <span style={{ color: 'var(--primary-color)' }}>&gt; MISSION BRIEF:</span> {rationale}
                         </div>
                     </div>
                 </div>
@@ -277,6 +288,10 @@ const Synthesizer: React.FC = () => {
                 </div>
 
             </div>
+
+            {/* Protocol: ADAM-V-NEXT - Narrative Intelligence Layer */}
+            <NarrativeDashboard />
+
             <AgentIntercom />
         </div>
     );

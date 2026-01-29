@@ -5,6 +5,7 @@ import threading
 import os
 from copy import deepcopy
 from core.engine.consensus_engine import ConsensusEngine
+from core.utils.narrative_weaver import NarrativeWeaver
 
 class LiveMockEngine:
     """
@@ -30,6 +31,7 @@ class LiveMockEngine:
         self.state = self._load_seed_data()
         self.last_update = time.time()
         self.consensus = ConsensusEngine()
+        self.weaver = NarrativeWeaver()
         self._initialized = True
 
     def _load_seed_data(self):
@@ -143,14 +145,44 @@ class LiveMockEngine:
             "reason": "Global macro cycle interpretation"
         })
 
+        # 4. Blindspot Agent (Contrarian Check)
+        # Protocol: ADAM-V-NEXT - Enterprise Integration
+        # Only weighs in if volatility is extremely low (Coiled Spring)
+        if indices['VIX']['price'] < 12.0:
+             signals.append({
+                "agent": "BlindspotScanner",
+                "vote": "REJECT", # Expect volatility spike
+                "confidence": 0.85,
+                "weight": 2.5, # High weight for ignored risks
+                "reason": "Volatility compression detected (VIX < 12)"
+            })
+
         # Run Consensus
         result = self.consensus.evaluate(signals)
 
         # Map Consensus Score (-1 to 1) to 0-100 scale
         # -1 -> 0, 0 -> 50, 1 -> 100
         normalized_score = ((result['score'] + 1) / 2) * 100
+        final_score = max(0, min(100, round(normalized_score, 1)))
 
-        return max(0, min(100, round(normalized_score, 1)))
+        # Protocol: ADAM-V-NEXT - Narrative Intelligence
+        # Use Weaver to generate the Mission Brief
+        sentiment_key = "NEUTRAL"
+        if final_score > 60: sentiment_key = "BULLISH"
+        elif final_score < 40: sentiment_key = "BEARISH"
+
+        narrative_ctx = {
+            "sentiment": sentiment_key,
+            "driver": "Macro Cycle" if macro_bullish else "VIX Volatility",
+            "risk_factor": "Liquidity Compression" if vix < 12 else "Market Noise",
+            "sector": "Broad Market"
+        }
+
+        # Enrich the rationale with the woven story
+        result['rationale'] = self.weaver.weave(narrative_ctx)
+        result['normalized_score'] = final_score
+
+        return result
 
 # Global singleton access
 live_engine = LiveMockEngine()

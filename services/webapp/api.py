@@ -289,6 +289,7 @@ def create_app(config_name='default'):
     jwt.init_app(app)
 
     # 🛡️ Governance: Initialize middleware
+    # Protocol: ADAM-V-NEXT
     GovernanceMiddleware(app)
 
     # Configure Celery
@@ -351,9 +352,15 @@ def create_app(config_name='default'):
         """
         if live_engine:
             pulse = live_engine.get_market_pulse()
-            score = live_engine.get_synthesizer_score()
+            consensus_result = live_engine.get_synthesizer_score()
+
+            # Protocol: ADAM-V-NEXT - Enterprise Payload
+            # Extract normalized score for backward compatibility, pass full object for new UI
+            score_val = consensus_result.get('normalized_score', 50)
+
             return jsonify({
-                "score": score,
+                "score": score_val,
+                "consensus": consensus_result,
                 "pulse": pulse,
                 "timestamp": datetime.utcnow().isoformat()
             })

@@ -11,6 +11,7 @@ class GovernanceMiddleware:
     """
     Middleware to intercept and validate requests against the governance policy.
     Ensures 'High Risk' operations are checked before execution.
+    Protocol: ADAM-V-NEXT
     """
 
     def __init__(self, app=None, policy_path='config/governance_policy.yaml'):
@@ -63,18 +64,29 @@ class GovernanceMiddleware:
                     logging.warning(f"Governance Block: Request contains flagged keyword '{keyword}'")
                     abort(400, description="Request content blocked by governance policy.")
 
+    def reload_policy(self):
+        """
+        Reloads the governance policy from disk.
+        Useful for hot-patching rules without restarting the server.
+        """
+        logging.info("Reloading Governance Policy...")
+        self._load_policy()
+
     def _enforce_rule(self, rule):
         """
         Enforce a specific rule.
+        Protocol: ADAM-V-NEXT - Strict Enforcement with Sentinel Overrides
         """
-        # Role check could be integrated with JWT here, but keeping it simple for now.
-        # Ideally, we inspect get_jwt_identity() or verify_jwt_in_request()
-
         risk = rule.get('risk_level', 'LOW')
+
+        # Strict Block for High Risk operations unless overridden
         if risk in ['HIGH', 'CRITICAL']:
+            logging.warning(f"Governance Alert: High risk operation detected on {request.path} [Risk: {risk}]")
+
             # 🛡️ Sentinel: Support for "Break Glass" Human Override
             # This allows authorized operators to bypass governance blocks in emergencies.
             override_token = request.headers.get('X-Governance-Override')
+            
             if override_token:
                 # 🛡️ Sentinel: Secure Override Verification
                 # We require a signed token to prevent unauthorized overrides.
@@ -119,6 +131,5 @@ class GovernanceMiddleware:
                     logging.warning(f"Governance Override Failed: {e}")
                     # Fall through to block
 
-            logging.warning(f"Governance Alert: High risk operation detected on {request.path}")
-            # 🛡️ Sentinel: Enforce strict blocking for high-risk operations until role-based access control is fully integrated.
+            # 🛡️ Sentinel: Enforce strict blocking for high-risk operations
             abort(403, description="Access denied: High risk operation blocked by governance policy. Provide valid signed 'X-Governance-Override' header to bypass.")

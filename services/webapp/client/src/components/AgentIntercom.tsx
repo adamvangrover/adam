@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Loader2, MessageSquare, Minimize2 } from 'lucide-react';
 
+// Protocol: ADAM-V-NEXT
 const AgentIntercom: React.FC = () => {
   const [thoughts, setThoughts] = useState<string[]>([]);
   const [isCollapsed, setIsCollapsed] = useState(false);
