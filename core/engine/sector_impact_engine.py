@@ -92,7 +92,23 @@ class SectorImpactEngine:
             if shock_val < 0:
                 macro_view['score'] += shock_impact
                 credit_view['score'] += shock_impact
-                macro_view['insight'] += f" [NEGATIVE IMPACT: {shock_val}]"
+
+                # Dynamic Insight Generation (Enhanced Simulation)
+                sim_insight = ""
+                if shock_val < -0.5 and asset.get("sector") == "Financials":
+                     sim_insight = "Systemic banking stress detected. Interbank lending freeze risk."
+                elif shock_val < -0.6 and asset.get("sector") == "Technology":
+                     sim_insight = "Digital infrastructure collapse risk. Critical dependency failure."
+                elif shock_val < -0.4 and asset.get("sector") == "Energy":
+                     sim_insight = "Resource scarcity driving input cost volatility."
+                elif shock_val < -0.7 and asset.get("sector") == "Industrials":
+                     sim_insight = "Global trade paralysis. Supply chain fracture imminent."
+
+                if sim_insight:
+                     macro_view['insight'] += f" [SIMULATION: {sim_insight}]"
+                else:
+                     macro_view['insight'] += f" [NEGATIVE IMPACT: {shock_val}]"
+
             elif shock_val > 0:
                 macro_view['score'] = max(0, macro_view['score'] - shock_impact)
                 credit_view['score'] = max(0, credit_view['score'] - shock_impact)
