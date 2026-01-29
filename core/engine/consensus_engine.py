@@ -8,6 +8,7 @@ from core.utils.logging_utils import NarrativeLogger
 
 class ConsensusEngine:
     """
+    Protocol: ADAM-V-NEXT
     A generic decision-making engine that aggregates signals from multiple agents
     to form a cohesive 'Executive Decision'.
     """

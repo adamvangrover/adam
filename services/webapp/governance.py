@@ -60,15 +60,29 @@ class GovernanceMiddleware:
                     logging.warning(f"Governance Block: Request contains flagged keyword '{keyword}'")
                     abort(400, description="Request content blocked by governance policy.")
 
+    def reload_policy(self):
+        """
+        Reloads the governance policy from disk.
+        Useful for hot-patching rules without restarting the server.
+        """
+        logging.info("Reloading Governance Policy...")
+        self._load_policy()
+
     def _enforce_rule(self, rule):
         """
         Enforce a specific rule.
+        Protocol: ADAM-V-NEXT - Strict Enforcement
         """
-        # Role check could be integrated with JWT here, but keeping it simple for now.
-        # Ideally, we inspect get_jwt_identity() or verify_jwt_in_request()
-
         risk = rule.get('risk_level', 'LOW')
+
+        # Strict Block for High Risk operations unless overridden
         if risk in ['HIGH', 'CRITICAL']:
-            logging.info(f"Governance Alert: High risk operation detected on {request.path}")
-            # In a real system, we might require a specific 'X-Approval-Token' header here.
-            pass
+            logging.warning(f"Governance Alert: High risk operation detected on {request.path} [Risk: {risk}]")
+
+            # Check for Governance Override Header (HMAC signature placeholder)
+            override_token = request.headers.get('X-Governance-Override')
+            if not override_token:
+                abort(403, description=f"Governance Block: {risk} Risk Operation requires approval token.")
+
+            # In a real scenario, we would validate the HMAC token here.
+            logging.info(f"Governance Override accepted for {request.path}")
