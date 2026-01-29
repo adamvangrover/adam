@@ -33,7 +33,7 @@ class SectorImpactEngine:
         except Exception:
             return []
 
-    def analyze_portfolio(self, portfolio: List[Dict[str, Any]], scenario_id: str = None) -> Dict[str, Any]:
+    def analyze_portfolio(self, portfolio: List[Dict[str, Any]], scenario_id: str = None, custom_shocks: Dict[str, float] = None) -> Dict[str, Any]:
         """
         Runs the simulation for the entire portfolio.
         Returns detailed results and a state log.
@@ -48,20 +48,27 @@ class SectorImpactEngine:
         simulation_log = {
             "initial_state": "Baseline",
             "applied_shocks": [],
-            "final_state": "Simulated"
+            "final_state": "Simulated",
+            "detailed_contagion_log": []
         }
 
-        if scenario_id:
+        initial_shocks = {}
+        if custom_shocks:
+            initial_shocks = custom_shocks
+        elif scenario_id:
             scenario = next((s for s in self.scenarios if s['id'] == scenario_id), None)
             if scenario:
                 initial_shocks = scenario.get('shocks', {})
-                contagion_result = self.contagion.simulate_contagion(initial_shocks)
-                sector_shocks = contagion_result['final_impacts']
-                self.active_contagion_log = contagion_result['log']
 
-                simulation_log["applied_shocks"] = [
-                    f"{k}: {v:+}" for k,v in sector_shocks.items() if abs(v) > 0.01
-                ]
+        if initial_shocks:
+            contagion_result = self.contagion.simulate_contagion(initial_shocks)
+            sector_shocks = contagion_result['final_impacts']
+            self.active_contagion_log = contagion_result['log']
+
+            simulation_log["applied_shocks"] = [
+                f"{k}: {v:+}" for k,v in sector_shocks.items() if abs(v) > 0.01
+            ]
+            simulation_log["detailed_contagion_log"] = self.active_contagion_log
 
         for asset in portfolio:
             # 1. Macro Agent View
