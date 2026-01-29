@@ -1,7 +1,7 @@
 import json
 import os
 import networkx as nx
-from typing import Dict, List
+from typing import Dict, List, Any
 
 class ContagionEngine:
     """

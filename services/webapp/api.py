@@ -535,8 +535,10 @@ def create_app(config_name='default'):
 
         # Load Context
         impact_context = {}
+        market_consensus = []
         if impact_engine:
             impact_context = impact_engine.context
+            market_consensus = impact_engine.get_market_consensus_overview()
 
         # Determine Portfolio (Uploaded or Simulated)
         clean_portfolio = []
@@ -573,13 +575,24 @@ def create_app(config_name='default'):
         # 2. Agent Swarm Consensus (Sector Impact Engine)
         detailed_analysis = []
         contagion_log = []
+        portfolio_divergence = 0.0
+        simulation_metadata = {}
 
         if impact_engine and clean_portfolio:
             try:
                 # Run the consensus engine with scenario
-                swarm_results = impact_engine.analyze_portfolio(clean_portfolio, scenario_id=scenario_id)
+                engine_output = impact_engine.analyze_portfolio(clean_portfolio, scenario_id=scenario_id)
+
+                # Handle new output format (dict with log) vs old (list)
+                if isinstance(engine_output, dict):
+                    swarm_results = engine_output.get('results', [])
+                    simulation_metadata = engine_output.get('simulation_log', {})
+                else:
+                    swarm_results = engine_output
+
                 contagion_log = impact_engine.active_contagion_log
 
+                total_divergence = 0
                 # Transform for frontend
                 for res in swarm_results:
                     detailed_analysis.append({
@@ -588,11 +601,13 @@ def create_app(config_name='default'):
                         "insight": f"MACRO: {res['macro_insight']} CREDIT: {res['credit_insight']}",
                         "score": res['consensus_score']
                     })
+                    total_divergence += res.get('consensus_divergence', 0)
 
                 # Calculate average consensus for the main score
                 if swarm_results:
                     avg_score = sum(r['consensus_score'] for r in swarm_results) / len(swarm_results)
                     base_score = avg_score
+                    portfolio_divergence = total_divergence / len(swarm_results)
 
             except Exception as e:
                 app.logger.error(f"Swarm simulation failed: {e}")
@@ -607,7 +622,9 @@ def create_app(config_name='default'):
 
         decision = "APPROVE / MITIGATE" if final_score > 0.6 else "REVIEW"
 
-        rationale = (f"System Confidence: {base_score}%. {market_context}. "
+        consensus_label = "High Consensus" if portfolio_divergence < 15 else "Fragmented View"
+
+        rationale = (f"System Confidence: {base_score}%. {consensus_label} (Div: {portfolio_divergence:.1f}). {market_context}. "
                      f"Analyzed {len(keywords)} risk terms. "
                      f"FIBO entities: {len(fibo_matches)}. "
                      f"{file_analysis}{risk_rationale}")
@@ -622,8 +639,11 @@ def create_app(config_name='default'):
             "fibo_matches": fibo_matches,
             "prompt_library": prompt_lib,
             "simulation_result": simulation_result,
+            "consensus_meta": {"divergence": round(portfolio_divergence, 1), "label": consensus_label},
+            "simulation_metadata": simulation_metadata,
             "detailed_analysis": detailed_analysis,
             "market_context": impact_context,
+            "market_consensus": market_consensus,
             "contagion_log": contagion_log,
             "available_scenarios": impact_engine.scenarios if impact_engine else []
         })
