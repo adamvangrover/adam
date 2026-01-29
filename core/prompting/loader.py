@@ -3,6 +3,7 @@ import os
 import yaml
 import json
 import re
+import functools
 from typing import Tuple, Dict, Any, Optional, Union, List
 from core.utils.logging_utils import get_logger
 
@@ -23,8 +24,12 @@ class PromptLoader:
     TASK_PROMPT_PATTERN = re.compile(r"###\s*TASK\s*PROMPT.*?\n(.*)", re.DOTALL | re.IGNORECASE)
 
     @staticmethod
+    @functools.lru_cache(maxsize=1024)
     def get_path(prompt_name: str) -> str:
-        """Finds the file path for a given prompt name (without extension)."""
+        """
+        Finds the file path for a given prompt name (without extension).
+        Cached to avoid repetitive recursive directory scanning (Bolt Optimization).
+        """
         extensions = ['.md', '.json', '.yaml', '.yml', '.txt']
 
         # Check specific AOPL-v1.0 paths first for efficiency (Analyst OS)
