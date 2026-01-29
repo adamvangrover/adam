@@ -24,12 +24,14 @@ try:
     from core.engine.live_mock_engine import live_engine
     from core.engine.forecasting_engine import forecasting_engine
     from core.engine.conviction_manager import conviction_manager
+    from core.engine.consensus_engine import ConsensusEngine
 except ImportError as e:
     # Fallback if core is not in path or other import issues
     logging.warning(f"Could not import core engines: {e}. Simulation endpoints will be static.")
     live_engine = None
     forecasting_engine = None
     conviction_manager = None
+    ConsensusEngine = None
 
 try:
     from core.risk_engine.engine import RiskEngine
@@ -423,6 +425,23 @@ def create_app(config_name='default'):
             return jsonify(conviction_manager.get_conviction_map())
         else:
             return jsonify({'error': 'Conviction Manager Unavailable'}), 503
+
+    @app.route('/api/consensus', methods=['POST'])
+    @jwt_required()
+    def get_consensus():
+        """
+        Evaluates signals using the ConsensusEngine.
+        """
+        if ConsensusEngine is None:
+             return jsonify({'error': 'Consensus Engine Unavailable'}), 503
+
+        data = request.get_json()
+        signals = data.get('signals', [])
+
+        # Instantiate engine
+        engine = ConsensusEngine()
+        result = engine.evaluate(signals)
+        return jsonify(result)
 
     @app.route('/api/v23/analyze', methods=['POST'])
     @jwt_required()

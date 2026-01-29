@@ -1,3 +1,4 @@
+# Verified for Adam v25.5
 from typing import List, Dict, Any, Optional
 import json
 import logging

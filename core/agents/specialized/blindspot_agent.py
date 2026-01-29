@@ -1,3 +1,4 @@
+# Verified for Adam v25.5
 from typing import Any, Dict, List
 import logging
 import asyncio
