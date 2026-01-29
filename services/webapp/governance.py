@@ -2,12 +2,16 @@ import yaml
 import os
 import re
 import logging
+import hmac
+import hashlib
+import time
 from flask import request, jsonify, abort
 
 class GovernanceMiddleware:
     """
     Middleware to intercept and validate requests against the governance policy.
     Ensures 'High Risk' operations are checked before execution.
+    Protocol: ADAM-V-NEXT
     """
 
     def __init__(self, app=None, policy_path='config/governance_policy.yaml'):
@@ -71,7 +75,7 @@ class GovernanceMiddleware:
     def _enforce_rule(self, rule):
         """
         Enforce a specific rule.
-        Protocol: ADAM-V-NEXT - Strict Enforcement
+        Protocol: ADAM-V-NEXT - Strict Enforcement with Sentinel Overrides
         """
         risk = rule.get('risk_level', 'LOW')
 
@@ -79,10 +83,53 @@ class GovernanceMiddleware:
         if risk in ['HIGH', 'CRITICAL']:
             logging.warning(f"Governance Alert: High risk operation detected on {request.path} [Risk: {risk}]")
 
-            # Check for Governance Override Header (HMAC signature placeholder)
+            # 🛡️ Sentinel: Support for "Break Glass" Human Override
+            # This allows authorized operators to bypass governance blocks in emergencies.
             override_token = request.headers.get('X-Governance-Override')
-            if not override_token:
-                abort(403, description=f"Governance Block: {risk} Risk Operation requires approval token.")
+            
+            if override_token:
+                # 🛡️ Sentinel: Secure Override Verification
+                # We require a signed token to prevent unauthorized overrides.
+                # In a real system, this secret would be strictly managed (e.g. Vault).
+                secret_key = os.environ.get('GOVERNANCE_OVERRIDE_SECRET', 'dev-secret-do-not-use-in-prod').encode()
 
-            # In a real scenario, we would validate the HMAC token here.
-            logging.info(f"Governance Override accepted for {request.path}")
+                # Format expected: "timestamp:signature"
+                try:
+                    ts_str, signature = override_token.split(':', 1)
+                    timestamp = int(ts_str)
+
+                    # Replay attack prevention (token valid for 5 minutes)
+                    if abs(time.time() - timestamp) > 300:
+                         raise ValueError("Token expired")
+
+                    # Verify signature
+                    payload = f"{ts_str}:{request.path}".encode()
+                    expected_signature = hmac.new(secret_key, payload, hashlib.sha256).hexdigest()
+
+                    if not hmac.compare_digest(signature, expected_signature):
+                         raise ValueError("Invalid signature")
+
+                    # Import HMMParser lazily to avoid circular dependencies if any
+                    try:
+                        from core.system.hmm_protocol import HMMParser
+                        log_entry = HMMParser.generate_log(
+                            action_taken=f"OVERRIDE_GOVERNANCE_BLOCK ({request.method} {request.path})",
+                            impact_analysis={
+                                "Risk Level": risk,
+                                "User IP": request.remote_addr,
+                                "Override Token Provided": "YES (VERIFIED)"
+                            },
+                            audit_link="LOG-FILE"
+                        )
+                        logging.info(f"\n{log_entry}")
+                    except ImportError:
+                        # Fallback logging if core is not available
+                        logging.warning(f"AUDIT: Governance Override used for {request.path} by {request.remote_addr}")
+
+                    return  # ALLOW the request
+                except (ValueError, AttributeError) as e:
+                    logging.warning(f"Governance Override Failed: {e}")
+                    # Fall through to block
+
+            # 🛡️ Sentinel: Enforce strict blocking for high-risk operations
+            abort(403, description="Access denied: High risk operation blocked by governance policy. Provide valid signed 'X-Governance-Override' header to bypass.")
