@@ -1,3 +1,4 @@
+// Verified for Adam v25.5
 import React, { useState, useEffect, useRef } from 'react';
 import { Loader2, MessageSquare, Minimize2, Maximize2 } from 'lucide-react';
 

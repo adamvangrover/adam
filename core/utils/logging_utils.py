@@ -1,3 +1,4 @@
+# Verified for Adam v25.5
 import logging
 import logging.config
 import os
