@@ -28,17 +28,14 @@ class TestGovernance(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_restricted_request(self):
-        # /api/trade POST is HIGH RISK but default policy action is ALLOW in the yaml I wrote?
-        # Let's check the code: _enforce_rule logs but doesn't abort unless we add logic.
-        # My implementation of _enforce_rule was:
-        # if risk in ['HIGH', 'CRITICAL']: logging.info(...) pass
-        # So it should ALLOW but Log.
+        # /api/trade POST is HIGH RISK.
+        # Protocol: ADAM-V-NEXT - Strict Enforcement check.
+        # Should now return 403 Forbidden.
 
         with self.assertLogs() as captured:
             response = self.client.post('/api/trade')
-            self.assertEqual(response.status_code, 200)
-            # Check if log warning appeared
-            self.assertTrue(any("High risk operation detected" in r for r in captured.output))
+            self.assertEqual(response.status_code, 403)
+            self.assertIn("Governance Block", response.get_data(as_text=True))
 
     def test_blacklisted_keyword(self):
         response = self.client.post('/api/post_data', data="Please DROP TABLE users")

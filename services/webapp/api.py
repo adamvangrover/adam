@@ -13,6 +13,7 @@ import functools
 import asyncio
 import re
 import threading
+import pandas as pd
 from datetime import datetime, timezone, timedelta
 from .config import config
 from .celery_app import celery
@@ -32,12 +33,34 @@ except ImportError as e:
     conviction_manager = None
     ConsensusEngine = None
 
+try:
+    from core.risk_engine.engine import RiskEngine
+    risk_engine = RiskEngine()
+except ImportError as e:
+    logging.warning(f"Could not import RiskEngine: {e}")
+    risk_engine = None
+
+try:
+    from core.engine.bsl_generator import BSLPortfolioGenerator
+    from core.engine.sector_impact_engine import SectorImpactEngine
+    bsl_gen = BSLPortfolioGenerator()
+    impact_engine = SectorImpactEngine()
+except ImportError as e:
+    logging.warning(f"Could not import BSL/Impact Engines: {e}")
+    bsl_gen = None
+    impact_engine = None
+
 # ---------------------------------------------------------------------------- #
 # Constants
 # ---------------------------------------------------------------------------- #
 
 IP_BLOCK_THRESHOLD = 5
 BLOCK_DURATION_MINUTES = 15
+
+# 🛡️ Sentinel: Pre-calculate dummy hash for timing attack mitigation
+# This ensures that invalid username lookups take roughly the same amount of time
+# as valid ones (by performing a hash check in both cases).
+DUMMY_PASSWORD_HASH = generate_password_hash('dummy_password_for_timing_mitigation')
 
 # ---------------------------------------------------------------------------- #
 # Helpers
@@ -268,6 +291,7 @@ def create_app(config_name='default'):
     jwt.init_app(app)
 
     # 🛡️ Governance: Initialize middleware
+    # Protocol: ADAM-V-NEXT
     GovernanceMiddleware(app)
 
     # Configure Celery
@@ -330,9 +354,15 @@ def create_app(config_name='default'):
         """
         if live_engine:
             pulse = live_engine.get_market_pulse()
-            score = live_engine.get_synthesizer_score()
+            consensus_result = live_engine.get_synthesizer_score()
+
+            # Protocol: ADAM-V-NEXT - Enterprise Payload
+            # Extract normalized score for backward compatibility, pass full object for new UI
+            score_val = consensus_result.get('normalized_score', 50)
+
             return jsonify({
-                "score": score,
+                "score": score_val,
+                "consensus": consensus_result,
                 "pulse": pulse,
                 "timestamp": datetime.utcnow().isoformat()
             })
@@ -452,6 +482,198 @@ def create_app(config_name='default'):
         else:
             return jsonify({'status': 'Mock Result', 'analysis': 'Core not integrated or MetaOrchestrator not ready.'})
 
+    @app.route('/api/v23/crisis_response', methods=['POST'])
+    @jwt_required()
+    def crisis_response():
+        """
+        Crisis Risk Response Module Endpoint.
+        Accepts a prompt, file, and scenario selection.
+        Returns consensus analysis, contagion logs, and scenario data.
+        """
+        prompt_text = request.form.get('prompt', '')
+        scenario_id = request.form.get('scenario', None)
+        file = request.files.get('file')
+
+        # 1. Parse Input
+        extracted_text = prompt_text
+        file_analysis = "No file provided."
+        portfolio_items = []
+
+        if file:
+            filename = file.filename.lower()
+            try:
+                if filename.endswith(('.xls', '.xlsx')):
+                    df = pd.read_excel(file)
+                    file_text = df.to_string()
+                    extracted_text += "\n" + file_text
+                    file_analysis = f"Parsed Excel file: {len(df)} rows."
+                    portfolio_items = df.to_dict('records')
+                elif filename.endswith('.csv'):
+                    df = pd.read_csv(file)
+                    file_text = df.to_string()
+                    extracted_text += "\n" + file_text
+                    file_analysis = f"Parsed CSV file: {len(df)} rows."
+                    portfolio_items = df.to_dict('records')
+                elif filename.endswith(('.pdf', '.doc', '.docx')):
+                    # Placeholder for complex doc parsing without extra libs
+                    file_analysis = "Document received. Text extraction simulated for non-text formats."
+                    extracted_text += f"\n[Content of {filename}]"
+            except Exception as e:
+                file_analysis = f"Error parsing file: {str(e)}"
+                app.logger.error(f"File parse error: {e}")
+
+        # 2. Keyword & FIBO Extraction (Simulated/Heuristic)
+        keywords = []
+        fibo_matches = []
+
+        # Simple mapping for demonstration
+        fibo_map = {
+            "loan": "fibo-fbc-fi-fi:Loan",
+            "syndicated": "fibo-loan-ln-ln:SyndicatedLoan",
+            "credit": "fibo-fbc-da-dbt:CreditAgreement",
+            "risk": "fibo-fnd-arr-rt:Risk",
+            "covenant": "fibo-loan-ln-covenant:Covenant",
+            "default": "fibo-loan-ln-ln:Default",
+            "collateral": "fibo-loan-ln-ln:Collateral",
+            "entity": "fibo-be-le-lei:LegalEntity"
+        }
+
+        text_lower = extracted_text.lower()
+        for term, fibo_id in fibo_map.items():
+            if term in text_lower:
+                keywords.append(term)
+                fibo_matches.append({"term": term.title(), "fibo_id": fibo_id})
+
+        # 3. Load Prompt Library Artifact
+        prompt_lib = {}
+        try:
+            lib_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+                                  'core', 'prompting', 'crisis_response_prompts.json')
+            if os.path.exists(lib_path):
+                with open(lib_path, 'r') as f:
+                    prompt_lib = json.load(f)
+        except Exception as e:
+            app.logger.error(f"Failed to load prompt library: {e}")
+
+        # 4. Simulation & Risk Engine Integration
+        market_context = "Market Pulse Offline"
+        base_score = 50
+
+        # Load Context
+        impact_context = {}
+        market_consensus = []
+        if impact_engine:
+            impact_context = impact_engine.context
+            market_consensus = impact_engine.get_market_consensus_overview()
+
+        # Determine Portfolio (Uploaded or Simulated)
+        clean_portfolio = []
+        if portfolio_items:
+            # Use uploaded
+            for i, item in enumerate(portfolio_items):
+                item_lower = {k.lower(): v for k,v in item.items()}
+                val = item_lower.get('value') or item_lower.get('amount') or item_lower.get('market_value') or 0
+                vol = item_lower.get('volatility') or item_lower.get('vol') or 0.2
+
+                clean_portfolio.append({
+                    "id": item_lower.get('symbol') or item_lower.get('id') or f"Asset_{i}",
+                    "name": item_lower.get('name', f"Asset_{i}"),
+                    "sector": item_lower.get('sector', "Unknown"),
+                    "market_value": float(val),
+                    "volatility": float(vol),
+                    "leverage": float(item_lower.get('leverage', 4.0)),
+                    "rating": item_lower.get('rating', 'B')
+                })
+        elif bsl_gen:
+            # Use simulated BSL portfolio if no file provided
+            clean_portfolio = bsl_gen.generate_portfolio(size=15) # Generate 15 for snapshot
+            file_analysis = "Using Simulated BSL Market Portfolio (50 Names)."
+
+        # 1. Quantitative Risk (Real Engine)
+        risk_rationale = ""
+        if risk_engine and clean_portfolio:
+            try:
+                metrics = risk_engine.calculate_portfolio_risk(portfolio=clean_portfolio)
+                risk_rationale = f" | Portfolio VaR (Daily): ${metrics.get('VaR_Daily', 0):,.2f}"
+            except Exception as e:
+                risk_rationale = f" | Risk Calc Error: {str(e)}"
+
+        # 2. Agent Swarm Consensus (Sector Impact Engine)
+        detailed_analysis = []
+        contagion_log = []
+        portfolio_divergence = 0.0
+        simulation_metadata = {}
+
+        if impact_engine and clean_portfolio:
+            try:
+                # Run the consensus engine with scenario
+                engine_output = impact_engine.analyze_portfolio(clean_portfolio, scenario_id=scenario_id)
+
+                # Handle new output format (dict with log) vs old (list)
+                if isinstance(engine_output, dict):
+                    swarm_results = engine_output.get('results', [])
+                    simulation_metadata = engine_output.get('simulation_log', {})
+                else:
+                    swarm_results = engine_output
+
+                contagion_log = impact_engine.active_contagion_log
+
+                total_divergence = 0
+                # Transform for frontend
+                for res in swarm_results:
+                    detailed_analysis.append({
+                        "asset": res['asset'],
+                        "prompt": f"Sector: {res['sector']}",
+                        "insight": f"MACRO: {res['macro_insight']} CREDIT: {res['credit_insight']}",
+                        "score": res['consensus_score']
+                    })
+                    total_divergence += res.get('consensus_divergence', 0)
+
+                # Calculate average consensus for the main score
+                if swarm_results:
+                    avg_score = sum(r['consensus_score'] for r in swarm_results) / len(swarm_results)
+                    base_score = avg_score
+                    portfolio_divergence = total_divergence / len(swarm_results)
+
+            except Exception as e:
+                app.logger.error(f"Swarm simulation failed: {e}")
+
+        # Final Conviction Logic
+        # Normalize LiveEngine score (0-100) to 0.0-1.0
+        final_score = base_score / 100.0
+
+        # Boost if strong FIBO alignment
+        boost = len(fibo_matches) * 0.01
+        final_score = min(0.99, final_score + boost)
+
+        decision = "APPROVE / MITIGATE" if final_score > 0.6 else "REVIEW"
+
+        consensus_label = "High Consensus" if portfolio_divergence < 15 else "Fragmented View"
+
+        rationale = (f"System Confidence: {base_score}%. {consensus_label} (Div: {portfolio_divergence:.1f}). {market_context}. "
+                     f"Analyzed {len(keywords)} risk terms. "
+                     f"FIBO entities: {len(fibo_matches)}. "
+                     f"{file_analysis}{risk_rationale}")
+
+        simulation_result = {
+            "score": round(final_score, 2),
+            "decision": decision,
+            "rationale": rationale
+        }
+
+        return jsonify({
+            "fibo_matches": fibo_matches,
+            "prompt_library": prompt_lib,
+            "simulation_result": simulation_result,
+            "consensus_meta": {"divergence": round(portfolio_divergence, 1), "label": consensus_label},
+            "simulation_metadata": simulation_metadata,
+            "detailed_analysis": detailed_analysis,
+            "market_context": impact_context,
+            "market_consensus": market_consensus,
+            "contagion_log": contagion_log,
+            "available_scenarios": impact_engine.scenarios if impact_engine else []
+        })
+
     # ---------------------------------------------------------------------------- #
     # Agent Endpoints
     # ---------------------------------------------------------------------------- #
@@ -563,7 +785,17 @@ def create_app(config_name='default'):
         password = data.get('password')
         user = User.query.filter_by(username=username).first()
 
-        if user and user.check_password(password):
+        # 🛡️ Sentinel: Mitigate Timing Attacks (User Enumeration)
+        # We must perform a hash check even if the user is not found to ensure
+        # that the response time is consistent regardless of user existence.
+        if user:
+            authorized = user.check_password(password)
+        else:
+            # Perform a dummy check against a constant hash
+            check_password_hash(DUMMY_PASSWORD_HASH, password if password else '')
+            authorized = False
+
+        if authorized:
             # Log successful attempt
             db.session.add(LoginAttempt(ip_address=ip_address, successful=True))
             db.session.commit()

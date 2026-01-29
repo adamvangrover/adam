@@ -1,12 +1,8 @@
 // Verified for Adam v25.5
 import React, { useState, useEffect, useRef } from 'react';
-import { Loader2, MessageSquare, Minimize2, Maximize2 } from 'lucide-react';
+import { Loader2, MessageSquare, Minimize2 } from 'lucide-react';
 
-interface AgentThought {
-  timestamp?: string;
-  content?: string;
-}
-
+// Protocol: ADAM-V-NEXT
 const AgentIntercom: React.FC = () => {
   const [thoughts, setThoughts] = useState<string[]>([]);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -54,8 +50,11 @@ const AgentIntercom: React.FC = () => {
 
   if (isCollapsed) {
       return (
-          <div
+          <button
+            type="button"
             onClick={() => setIsCollapsed(false)}
+            aria-label="Open Agent Intercom"
+            title="Open Agent Intercom"
             style={{
               position: 'fixed', bottom: '20px', right: '20px',
               background: 'rgba(0,0,0,0.9)', border: '1px solid var(--primary-color)',
@@ -65,7 +64,7 @@ const AgentIntercom: React.FC = () => {
             }}
           >
               <MessageSquare size={24} />
-          </div>
+          </button>
       );
   }
 
@@ -94,6 +93,8 @@ const AgentIntercom: React.FC = () => {
           </div>
           <button
             onClick={() => setIsCollapsed(true)}
+            aria-label="Minimize Agent Intercom"
+            title="Minimize Agent Intercom"
             style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer' }}
           >
               <Minimize2 size={16} />
@@ -101,7 +102,13 @@ const AgentIntercom: React.FC = () => {
       </div>
 
       {/* Feed */}
-      <div ref={scrollRef} style={{ flexGrow: 1, overflowY: 'auto', padding: '10px', fontSize: '0.8rem' }}>
+      <div
+        ref={scrollRef}
+        role="log"
+        aria-live="polite"
+        aria-label="Agent Thoughts Feed"
+        style={{ flexGrow: 1, overflowY: 'auto', padding: '10px', fontSize: '0.8rem' }}
+      >
           {thoughts.length === 0 ? (
               <div style={{ textAlign: 'center', color: '#666', marginTop: '50px' }}>
                   <Loader2 className="animate-spin" style={{ margin: '0 auto 10px' }} />

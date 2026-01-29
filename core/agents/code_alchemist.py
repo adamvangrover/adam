@@ -36,6 +36,10 @@ class CodeAlchemist(AgentBase):
         super().__init__(config)
         self.config = config.copy() if config else {}
 
+        # 🛡️ Sentinel: Define a safe output directory for generated code
+        # Allow configuration, defaulting to 'downloads'
+        self.safe_output_dir = os.path.join(os.getcwd(), self.config.get("safe_output_dir", 'downloads'))
+
         # Load capabilities from config or settings
         self.validation_tool_url = self.config.get("validation_tool_url")
         self.optimization_strategies = self.config.get(
@@ -123,10 +127,15 @@ Output: Python code block with architectural notes.
         elif action == "optimize_code":
             return await self.optimize_code(kwargs.get("code", ""), **kwargs)
         elif action == "deploy_code":
+            # 🛡️ Sentinel: Fix duplicate argument error
+            deploy_kwargs = kwargs.copy()
+            code_arg = deploy_kwargs.pop("code", "")
+            method_arg = deploy_kwargs.pop("deployment_method", "local_file")
+
             return await self.deploy_code(
-                kwargs.get("code", ""),
-                kwargs.get("deployment_method", "local_file"),
-                **kwargs,
+                code_arg,
+                method_arg,
+                **deploy_kwargs,
             )
         else:
             logger.warning(f"CodeAlchemist: Unknown action: {action}")
@@ -325,7 +334,15 @@ Output: Python code block with architectural notes.
         Assists in deploying code using various methods.
         """
         if deployment_method == "local_file":
-            file_path = kwargs.get("file_path", "generated_code.py")
+            # 🛡️ Sentinel: Secure path handling
+            raw_path = kwargs.get("file_path", "generated_code.py")
+
+            # If path is relative, resolve it against the safe directory
+            if not os.path.isabs(raw_path):
+                file_path = os.path.join(self.safe_output_dir, raw_path)
+            else:
+                file_path = raw_path
+
             return await self.deploy_to_local_file(code, file_path)
         elif deployment_method == "api_endpoint":
             api_endpoint = kwargs.get("api_endpoint")
@@ -353,12 +370,42 @@ Output: Python code block with architectural notes.
     async def deploy_to_local_file(self, code: str, file_path: str) -> bool:
         loop = asyncio.get_running_loop()
         try:
-            await loop.run_in_executor(None, self._write_file_sync, file_path, code)
-            logger.info(f"Code deployed to local file: {file_path}")
+            # 🛡️ Sentinel: Validate file path to prevent path traversal
+            validated_path = self._validate_file_path(file_path)
+
+            await loop.run_in_executor(None, self._write_file_sync, validated_path, code)
+            logger.info(f"Code deployed to local file: {validated_path}")
             return True
         except Exception as e:
             logger.error(f"Error deploying code to local file: {e}")
             return False
+
+    def _validate_file_path(self, file_path: str) -> str:
+        """
+        🛡️ Sentinel: Validates that the file path is within the safe output directory.
+        Prevents Path Traversal attacks.
+        """
+        # Ensure safe directory exists
+        if not os.path.exists(self.safe_output_dir):
+            try:
+                os.makedirs(self.safe_output_dir, exist_ok=True)
+            except OSError as e:
+                raise ValueError(f"Could not create safe output directory: {e}")
+
+        # Resolve paths to absolute
+        abs_safe_dir = os.path.abspath(self.safe_output_dir)
+        abs_target_path = os.path.abspath(file_path)
+
+        # 🛡️ Sentinel: Prevent sibling directory bypass (e.g. /app/downloads_evil)
+        # by ensuring the safe directory path ends with a separator
+        if not abs_safe_dir.endswith(os.sep):
+            abs_safe_dir += os.sep
+
+        # Check if target is inside safe directory
+        if not abs_target_path.startswith(abs_safe_dir):
+            raise ValueError(f"Security Violation: Access denied to path {file_path}. Writes are restricted to {self.safe_output_dir}")
+
+        return abs_target_path
 
     def _write_file_sync(self, file_path: str, code: str):
         with open(file_path, "w", encoding="utf-8") as f:

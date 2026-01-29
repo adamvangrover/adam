@@ -166,6 +166,7 @@ class SwarmLogger:
 
 class NarrativeLogger:
     """
+    Protocol: ADAM-V-NEXT
     Logs events as a cohesive story: Event -> Analysis -> Decision -> Outcome.
     """
     def __init__(self, logger_name: str = "Narrative"):

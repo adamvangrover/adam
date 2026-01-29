@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Protocol: ADAM-V-NEXT -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM v25.5 :: WAR ROOM</title>
@@ -157,6 +158,31 @@
           ]
         };
 
+        // --- API Integration ---
+        async function fetchLiveData() {
+            try {
+                const res = await fetch('/api/synthesizer/confidence');
+                if (res.ok) {
+                    const data = await res.json();
+
+                    // Update internal data model with live pulse
+                    if(data.pulse && data.pulse.indices) {
+                         SEED_DATA.market_data.indices = data.pulse.indices;
+                    }
+
+                    // Update System Health Coherence based on Score
+                    if(data.score) {
+                         document.getElementById('coh-val').innerText = data.score + '%';
+                         document.getElementById('coh-bar').style.width = data.score + '%';
+                    }
+
+                    console.log("WarRoom: Live Data Sync Complete");
+                }
+            } catch(e) {
+                console.log("WarRoom: Live Data Offline, using simulation.");
+            }
+        }
+
         // --- Q1: Ticker Logic ---
         function renderTicker() {
             const container = document.getElementById('ticker-feed');
@@ -286,13 +312,15 @@
         }
 
         // Init & Loops
+        fetchLiveData(); // Initial fetch
         renderTicker();
         renderNews();
         renderAgents();
         drawRadar(); // Draw once, maybe animate later
         updateHealth();
 
-        setInterval(renderTicker, 2000); // Fast ticker updates
+        setInterval(fetchLiveData, 5000); // Sync with backend every 5s
+        setInterval(renderTicker, 2000); // Fast ticker updates (interp)
         setInterval(drawRadar, 3000); // Radar fluctuations
         setInterval(updateHealth, 1000); // Health heartbeat
 

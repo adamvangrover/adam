@@ -81,25 +81,38 @@ class CrisisSimulationMetaAgent(AgentBase):
                 # The graph returns 'final_report' (str)
                 final_report = result_state.get("final_report", "Graph Execution Complete")
 
-                # Create a synthetic log entry since the graph doesn't produce it yet
-                synthetic_log = [
-                    CrisisLogEntry(
-                        timestamp="T+0",
-                        event_description=f"Simulation initialized for scenario: {scenario}",
-                        risk_id_cited="SYS-INIT",
-                        status="Active"
-                    ),
-                    CrisisLogEntry(
-                        timestamp="T+End",
-                        event_description="Simulation completed by v23 Graph Engine.",
-                        risk_id_cited="SYS-END",
-                        status="Resolved"
-                    )
-                ]
+                # Extract log from graph state if available
+                graph_log = result_state.get("crisis_simulation_log", [])
+
+                if graph_log:
+                    # Convert dicts to Pydantic models
+                    structured_log = []
+                    for entry in graph_log:
+                        try:
+                            # Ensure it matches schema
+                            structured_log.append(CrisisLogEntry(**entry))
+                        except Exception as e:
+                            logging.warning(f"Failed to parse log entry: {e}")
+                else:
+                    # Fallback to synthetic log
+                    structured_log = [
+                        CrisisLogEntry(
+                            timestamp="T+0",
+                            event_description=f"Simulation initialized for scenario: {scenario}",
+                            risk_id_cited="SYS-INIT",
+                            status="Active"
+                        ),
+                        CrisisLogEntry(
+                            timestamp="T+End",
+                            event_description="Simulation completed by v23 Graph Engine (No details returned).",
+                            risk_id_cited="SYS-END",
+                            status="Resolved"
+                        )
+                    ]
 
                 return CrisisSimulationOutput(
                     executive_summary=final_report,
-                    crisis_simulation_log=synthetic_log,
+                    crisis_simulation_log=structured_log,
                     recommendations="Review the detailed graph trace in 'final_report' for mitigation strategies."
                 )
             except Exception as e:

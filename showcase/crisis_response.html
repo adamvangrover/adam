@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v23.5 | Crisis Risk Response</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #050505; font-family: 'Inter', sans-serif; color: #e2e8f0; overflow-x: hidden; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .glass { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .scan-line {
+            position: fixed; top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(to bottom, rgba(0, 243, 255, 0), rgba(0, 243, 255, 0.2), rgba(0, 243, 255, 0));
+            opacity: 0.1; animation: scan 8s linear infinite; pointer-events: none; z-index: 9999;
+        }
+        @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        .btn-glow:hover { box-shadow: 0 0 15px rgba(0, 243, 255, 0.3); }
+        .spinner { border: 2px solid rgba(255,255,255,0.1); border-left-color: #00f3ff; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+    <div class="scan-line"></div>
+
+    <!-- Header -->
+    <header class="h-16 border-b border-slate-800 bg-[#0a0a0a]/90 backdrop-blur-md flex items-center justify-between px-6 z-50">
+        <div class="flex items-center gap-4">
+            <h1 class="text-lg font-bold tracking-tight mono text-white">ADAM <span class="text-[#00f3ff]">v23.5</span> <span class="text-slate-500 mx-2">|</span> Crisis Risk Response Module</h1>
+        </div>
+        <div class="flex items-center gap-6 text-xs font-mono">
+            <div class="flex items-center gap-2 text-slate-400">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> SYSTEM ONLINE
+            </div>
+            <a href="index.html" class="text-slate-400 hover:text-white transition"><i class="fas fa-times"></i> EXIT</a>
+        </div>
+    </header>
+
+    <main class="flex-1 p-6 grid grid-cols-12 gap-6 overflow-hidden">
+
+        <!-- Left Panel: Input Vector -->
+        <div class="col-span-4 flex flex-col gap-6">
+            <div class="glass rounded-xl p-6 flex flex-col gap-4 flex-1">
+                <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+                    <h2 class="text-sm font-bold text-[#00f3ff] mono uppercase tracking-wider"><i class="fas fa-satellite-dish mr-2"></i> Input Vector</h2>
+                    <span class="text-[10px] bg-slate-800 px-2 py-1 rounded text-slate-400">AWAITING SIGNAL</span>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="text-xs font-mono text-slate-400">SIMULATION SCENARIO</label>
+                    <select id="scenarioInput" class="w-full bg-[#050505] border border-slate-700 rounded px-3 py-2 text-sm font-mono text-slate-300 focus:outline-none focus:border-[#00f3ff] transition">
+                        <option value="">-- Select Risk Scenario --</option>
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="text-xs font-mono text-slate-400">CONTEXT / PROMPT</label>
+                    <textarea id="promptInput" class="w-full bg-[#050505] border border-slate-700 rounded p-3 text-sm font-mono text-slate-300 focus:outline-none focus:border-[#00f3ff] transition h-40 resize-none custom-scrollbar">crisis risk response module on broadly syndicated loan market portfolio and credit risk and enterprise risk management and fibo ontologies</textarea>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="text-xs font-mono text-slate-400">PORTFOLIO ARTIFACT (PDF/XLS)</label>
+                    <div class="relative group">
+                        <input type="file" id="fileInput" class="hidden" accept=".pdf,.doc,.docx,.xls,.xlsx,.csv">
+                        <label for="fileInput" class="flex items-center justify-center w-full h-32 border-2 border-dashed border-slate-700 rounded bg-[#0a0a0a] cursor-pointer hover:border-[#00f3ff] hover:bg-slate-800/50 transition flex-col gap-2 group-hover:text-white text-slate-500">
+                            <i class="fas fa-cloud-upload-alt text-2xl mb-1"></i>
+                            <span class="text-xs font-mono" id="fileName">DRAG & DROP OR CLICK</span>
+                            <span class="text-[10px] text-slate-600">SECURE UPLOAD :: ENCRYPTED</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mt-auto pt-4">
+                    <button id="analyzeBtn" class="w-full bg-[#00f3ff]/10 border border-[#00f3ff] text-[#00f3ff] py-3 rounded font-mono text-sm font-bold tracking-wider hover:bg-[#00f3ff] hover:text-black transition btn-glow flex items-center justify-center gap-2">
+                        <span id="btnText">INITIATE SIMULATION</span>
+                        <div id="btnSpinner" class="spinner hidden"></div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Intelligence Output -->
+        <div class="col-span-8 flex flex-col gap-6 overflow-y-auto custom-scrollbar pr-2">
+
+            <!-- Live Context & Ontology -->
+            <div class="glass rounded-xl p-6">
+                <!-- Market Context Banner -->
+                <div id="contextBanner" class="hidden mb-6 p-4 bg-slate-900/50 border border-slate-700 rounded-lg">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-xs font-bold text-amber-400 uppercase tracking-widest">LIVE MARKET SNAPSHOT (Spring 2025)</h3>
+                        <span class="text-[10px] text-slate-500" id="contextDate"></span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 text-xs font-mono text-slate-300" id="contextThemes">
+                        <!-- JS Populated -->
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-sm font-bold text-emerald-400 mono uppercase tracking-wider"><i class="fas fa-project-diagram mr-2"></i> Ontology Alignment (FIBO)</h2>
+                    <div class="flex gap-2 text-[10px] font-mono">
+                        <span class="bg-emerald-900/30 text-emerald-400 px-2 py-1 rounded border border-emerald-900">SEMANTIC WEB: ACTIVE</span>
+                    </div>
+                </div>
+                <div id="ontologyOutput" class="flex flex-wrap gap-2 min-h-[30px]">
+                    <span class="text-xs text-slate-500 font-mono italic p-2">Waiting for input analysis...</span>
+                </div>
+            </div>
+
+            <!-- Market Consensus Matrix -->
+            <div class="glass rounded-xl p-6 hidden" id="consensusMatrixPanel">
+                <div class="flex items-center justify-between border-b border-slate-700 pb-2 mb-4">
+                     <h2 class="text-sm font-bold text-slate-200 mono uppercase tracking-wider"><i class="fas fa-layer-group mr-2"></i> Industry Consensus State</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" id="consensusGrid">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <!-- Prompt Library -->
+            <div class="glass rounded-xl p-6 flex flex-col gap-4">
+                 <div class="flex items-center justify-between border-b border-slate-700 pb-2">
+                    <h2 class="text-sm font-bold text-amber-400 mono uppercase tracking-wider"><i class="fas fa-code mr-2"></i> Generated Prompt Library</h2>
+                    <button class="text-[10px] text-slate-400 hover:text-white uppercase font-mono" onclick="copyPromptLib()"><i class="fas fa-copy"></i> Copy JSON</button>
+                </div>
+                <pre id="promptLibOutput" class="bg-[#0a0a0a] p-4 rounded text-xs font-mono text-slate-300 overflow-x-auto border border-slate-800 h-64">
+// JSON Prompt Artifact will appear here...
+                </pre>
+            </div>
+
+            <!-- High Conviction Output -->
+            <div class="glass rounded-xl p-6 border-t-2 border-t-[#00f3ff]">
+                 <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-sm font-bold text-white mono uppercase tracking-wider"><i class="fas fa-brain mr-2"></i> High Conviction Consensus</h2>
+                    <span id="consensusScore" class="text-xl font-bold mono text-[#00f3ff]">--%</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-8">
+                    <!-- Gauge Visualization (CSS) -->
+                    <div class="flex flex-col gap-4 justify-center">
+                        <div class="w-full bg-slate-800 rounded-full h-4 overflow-hidden relative">
+                            <div id="scoreBar" class="h-full bg-gradient-to-r from-red-500 via-yellow-500 to-[#00f3ff] w-0 transition-all duration-1000 ease-out"></div>
+                        </div>
+                        <div class="flex justify-between text-[10px] font-mono text-slate-500">
+                            <span>REJECT</span>
+                            <span>REVIEW</span>
+                            <span>APPROVE</span>
+                        </div>
+                    </div>
+
+                    <!-- Narrative -->
+                    <div class="flex flex-col gap-2">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Executive Decision</span>
+                        <div id="decisionOutput" class="text-sm leading-relaxed text-slate-200 font-mono">
+                            System awaiting data ingestion for conviction synthesis.
+                        </div>
+                         <!-- Consensus Agreement -->
+                        <div id="consensusMeta" class="hidden mt-2 pt-2 border-t border-slate-700">
+                             <div class="flex justify-between items-center">
+                                <span class="text-[10px] text-slate-500 uppercase">Swarm Agreement</span>
+                                <span id="consensusLabel" class="text-[10px] font-bold text-[#00f3ff]"></span>
+                             </div>
+                             <div class="w-full bg-slate-800 rounded-full h-1 mt-1">
+                                <div id="divergenceBar" class="h-full bg-[#00f3ff] rounded-full transition-all"></div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contagion & Detailed Analysis -->
+            <div class="glass rounded-xl p-6 hidden" id="analysisPanel">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-sm font-bold text-indigo-400 mono uppercase tracking-wider"><i class="fas fa-network-wired mr-2"></i> Systemic Risk & Contagion</h2>
+                </div>
+
+                <!-- Simulation State Log -->
+                <div id="simStateLog" class="mb-4 p-4 bg-slate-800/50 border border-slate-700 rounded text-xs font-mono text-slate-300 hidden">
+                    <div class="font-bold mb-2 uppercase text-[#00f3ff]">Simulation State Transition:</div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-slate-700 px-2 py-1 rounded">BASELINE</span>
+                        <i class="fas fa-arrow-right text-slate-500"></i>
+                        <span class="bg-slate-700 px-2 py-1 rounded text-white" id="simAppliedShocks">SHOCKS APPLIED</span>
+                        <i class="fas fa-arrow-right text-slate-500"></i>
+                         <span class="bg-slate-700 px-2 py-1 rounded">FINAL STATE</span>
+                    </div>
+                    <ul id="shockList" class="list-disc pl-4 space-y-1 text-slate-400"></ul>
+                </div>
+
+                <!-- Contagion Log -->
+                <div id="contagionLog" class="mb-6 p-4 bg-red-900/10 border border-red-900/30 rounded text-xs font-mono text-red-300 hidden">
+                    <div class="font-bold mb-2 uppercase text-red-500">Contagion Propagation Log:</div>
+                    <ul id="contagionList" class="list-disc pl-4 space-y-1"></ul>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs font-mono">
+                        <thead class="bg-slate-800 text-slate-400 uppercase">
+                            <tr>
+                                <th class="p-3 rounded-tl-lg">Asset</th>
+                                <th class="p-3">Sector Context</th>
+                                <th class="p-3">Agent Consensus Insight</th>
+                                <th class="p-3 rounded-tr-lg text-right">Risk Score</th>
+                            </tr>
+                        </thead>
+                        <tbody id="analysisTable" class="text-slate-300 divide-y divide-slate-800">
+                            <!-- JS Populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const fileNameDisplay = document.getElementById('fileName');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const promptInput = document.getElementById('promptInput');
+        const scenarioInput = document.getElementById('scenarioInput');
+
+        // Pre-fetch Scenarios (Self-invoking)
+        (async () => {
+            // First call to init and get scenarios (empty prompt)
+            try {
+                const res = await fetch('/api/v23/crisis_response', { method: 'POST' });
+                const data = await res.json();
+                if(data.available_scenarios) {
+                    data.available_scenarios.forEach(s => {
+                        const opt = document.createElement('option');
+                        opt.value = s.id;
+                        opt.textContent = s.name;
+                        scenarioInput.appendChild(opt);
+                    });
+                }
+            } catch(e) { console.log("Scenario init failed", e); }
+        })();
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                fileNameDisplay.textContent = e.target.files[0].name;
+                fileNameDisplay.classList.add('text-[#00f3ff]');
+            }
+        });
+
+        analyzeBtn.addEventListener('click', async () => {
+            const prompt = promptInput.value;
+            const file = fileInput.files[0];
+
+            if (!prompt && !file) {
+                alert("Please provide input context or a file.");
+                return;
+            }
+
+            // UI Loading State
+            document.getElementById('btnText').textContent = "PROCESSING...";
+            document.getElementById('btnSpinner').classList.remove('hidden');
+            analyzeBtn.disabled = true;
+            analyzeBtn.classList.add('opacity-50');
+
+            // Construct FormData
+            const formData = new FormData();
+            formData.append('prompt', prompt);
+            formData.append('scenario', scenarioInput.value);
+            if (file) {
+                formData.append('file', file);
+            }
+
+            try {
+                const response = await fetch('/api/v23/crisis_response', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error("Analysis Failed");
+
+                const data = await response.json();
+                renderResults(data);
+
+            } catch (error) {
+                console.error(error);
+                alert("Error connecting to Analysis Engine. Ensure API is online.");
+            } finally {
+                // Reset UI
+                document.getElementById('btnText').textContent = "INITIATE SIMULATION";
+                document.getElementById('btnSpinner').classList.add('hidden');
+                analyzeBtn.disabled = false;
+                analyzeBtn.classList.remove('opacity-50');
+            }
+        });
+
+        function renderResults(data) {
+            // 1. Ontology
+            const ontContainer = document.getElementById('ontologyOutput');
+            ontContainer.innerHTML = '';
+            if (data.fibo_matches && data.fibo_matches.length > 0) {
+                data.fibo_matches.forEach(item => {
+                    const pill = document.createElement('div');
+                    pill.className = 'bg-slate-800 border border-slate-700 rounded px-3 py-1 flex flex-col gap-0.5';
+                    pill.innerHTML = `
+                        <span class="text-[10px] text-slate-500 uppercase tracking-wider">${item.term}</span>
+                        <span class="text-xs font-mono text-emerald-400">${item.fibo_id}</span>
+                    `;
+                    ontContainer.appendChild(pill);
+                });
+            } else {
+                ontContainer.innerHTML = '<span class="text-xs text-slate-500 font-mono">No specific FIBO terms detected.</span>';
+            }
+
+            // 2. Prompt Library
+            const promptLibEl = document.getElementById('promptLibOutput');
+            if (data.prompt_library) {
+                promptLibEl.textContent = JSON.stringify(data.prompt_library, null, 2);
+            }
+
+            // 3. Consensus Output
+            if (data.simulation_result) {
+                const score = data.simulation_result.score; // 0.0 to 1.0 or similar
+                // Normalize score to percentage
+                let pct = 0;
+                if (typeof score === 'number') {
+                     // Assume -1 to 1 range from ConsensusEngine, or 0-100
+                     if(score <= 1 && score >= -1) pct = ((score + 1) / 2) * 100;
+                     else pct = score * 100;
+                }
+
+                document.getElementById('consensusScore').textContent = pct.toFixed(1) + '%';
+                document.getElementById('scoreBar').style.width = pct + '%';
+
+                const decisionEl = document.getElementById('decisionOutput');
+                decisionEl.innerHTML = `
+                    <p class="mb-2"><span class="text-[#00f3ff]">DECISION:</span> ${data.simulation_result.decision}</p>
+                    <p class="text-slate-400 text-xs">${data.simulation_result.rationale || "No rationale provided."}</p>
+                `;
+
+                // Render Consensus Meta
+                if (data.consensus_meta) {
+                    const metaEl = document.getElementById('consensusMeta');
+                    const labelEl = document.getElementById('consensusLabel');
+                    const barEl = document.getElementById('divergenceBar');
+
+                    metaEl.classList.remove('hidden');
+                    labelEl.textContent = data.consensus_meta.label;
+
+                    // Invert divergence for the bar (Low div = Full bar)
+                    const div = data.consensus_meta.divergence;
+                    const width = Math.max(0, 100 - div);
+                    barEl.style.width = width + '%';
+
+                    if (data.consensus_meta.label === "High Consensus") {
+                        labelEl.className = "text-[10px] font-bold text-emerald-400";
+                        barEl.className = "h-full bg-emerald-400 rounded-full transition-all";
+                    } else {
+                        labelEl.className = "text-[10px] font-bold text-amber-400";
+                        barEl.className = "h-full bg-amber-400 rounded-full transition-all";
+                    }
+                }
+            }
+
+            // 3.5 Market Context
+            if (data.market_context && data.market_context.themes) {
+                const banner = document.getElementById('contextBanner');
+                const themeGrid = document.getElementById('contextThemes');
+                banner.classList.remove('hidden');
+                themeGrid.innerHTML = '';
+
+                document.getElementById('contextDate').innerText = `AS OF: ${data.market_context.snapshot_date || 'Unknown'}`;
+
+                data.market_context.themes.slice(0, 4).forEach(t => {
+                    const div = document.createElement('div');
+                    div.className = 'border-l-2 border-slate-600 pl-2';
+                    div.innerHTML = `
+                        <div class="text-[10px] text-amber-500 font-bold">${t.name}</div>
+                        <div class="text-[9px] text-slate-400 truncate" title="${t.description}">${t.description}</div>
+                    `;
+                    themeGrid.appendChild(div);
+                });
+            }
+
+            // 3.6 Consensus Matrix
+            if (data.market_consensus && data.market_consensus.length > 0) {
+                document.getElementById('consensusMatrixPanel').classList.remove('hidden');
+                const grid = document.getElementById('consensusGrid');
+                grid.innerHTML = '';
+
+                data.market_consensus.forEach(sector => {
+                    const el = document.createElement('div');
+                    // Style based on label
+                    let borderClass = "border-slate-700";
+                    let textClass = "text-slate-400";
+                    let bgClass = "bg-slate-800/50";
+
+                    if (sector.consensus_label === "High Consensus") {
+                        borderClass = "border-emerald-500/50";
+                        textClass = "text-emerald-400";
+                        bgClass = "bg-emerald-900/10";
+                    } else if (sector.consensus_label === "Highly Polarized") {
+                        borderClass = "border-red-500/50";
+                        textClass = "text-red-400";
+                        bgClass = "bg-red-900/10";
+                    } else { // Fragmented
+                        borderClass = "border-amber-500/50";
+                        textClass = "text-amber-400";
+                        bgClass = "bg-amber-900/10";
+                    }
+
+                    el.className = `border ${borderClass} ${bgClass} rounded p-3 flex flex-col gap-1`;
+                    el.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-bold text-white uppercase">${sector.sector}</span>
+                            <span class="text-[9px] ${textClass} border border-current px-1 rounded uppercase">${sector.consensus_label}</span>
+                        </div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <div class="h-1 flex-1 bg-slate-700 rounded-full overflow-hidden">
+                                <div class="h-full ${textClass.replace('text', 'bg')}" style="width: ${Math.max(0, 100 - sector.divergence)}%"></div>
+                            </div>
+                            <span class="text-[9px] text-slate-500 mono">DIV: ${sector.divergence}</span>
+                        </div>
+                    `;
+                    grid.appendChild(el);
+                });
+            }
+
+            // 4. Detailed Analysis & Contagion
+            const analysisTable = document.getElementById('analysisTable');
+            const analysisPanel = document.getElementById('analysisPanel');
+            const contagionLog = document.getElementById('contagionLog');
+            const contagionList = document.getElementById('contagionList');
+            const simStateLog = document.getElementById('simStateLog');
+            const shockList = document.getElementById('shockList');
+
+            if (data.detailed_analysis && data.detailed_analysis.length > 0) {
+                analysisTable.innerHTML = '';
+                analysisPanel.classList.remove('hidden');
+
+                // Render Simulation State Log
+                if (data.simulation_metadata && data.simulation_metadata.applied_shocks && data.simulation_metadata.applied_shocks.length > 0) {
+                    simStateLog.classList.remove('hidden');
+                    shockList.innerHTML = '';
+                    data.simulation_metadata.applied_shocks.forEach(shock => {
+                        const li = document.createElement('li');
+                        li.textContent = shock;
+                        // Color code based on shock direction
+                        if (shock.includes('+')) li.className = "text-emerald-400";
+                        else if (shock.includes('-')) li.className = "text-red-400";
+                        shockList.appendChild(li);
+                    });
+                } else {
+                    simStateLog.classList.add('hidden');
+                }
+
+                // Render Contagion
+                if (data.contagion_log && data.contagion_log.length > 0) {
+                    contagionLog.classList.remove('hidden');
+                    contagionList.innerHTML = '';
+                    data.contagion_log.forEach(msg => {
+                        const li = document.createElement('li');
+                        li.textContent = msg;
+                        contagionList.appendChild(li);
+                    });
+                } else {
+                    contagionLog.classList.add('hidden');
+                }
+
+                data.detailed_analysis.forEach(row => {
+                    const tr = document.createElement('tr');
+                    // Color code score
+                    const scoreColor = row.score > 80 ? 'text-red-400' : row.score > 50 ? 'text-yellow-400' : 'text-emerald-400';
+
+                    // Securely construct cells
+                    const tdAsset = document.createElement('td');
+                    tdAsset.className = "p-3 font-bold text-white";
+                    tdAsset.textContent = row.asset;
+
+                    const tdPrompt = document.createElement('td');
+                    tdPrompt.className = "p-3 text-slate-500";
+                    tdPrompt.textContent = row.prompt;
+
+                    const tdInsight = document.createElement('td');
+                    tdInsight.className = "p-3 text-slate-300";
+                    tdInsight.textContent = row.insight;
+
+                    const tdScore = document.createElement('td');
+                    tdScore.className = `p-3 text-right font-bold ${scoreColor}`;
+                    tdScore.textContent = row.score;
+
+                    tr.appendChild(tdAsset);
+                    tr.appendChild(tdPrompt);
+                    tr.appendChild(tdInsight);
+                    tr.appendChild(tdScore);
+
+                    analysisTable.appendChild(tr);
+                });
+            }
+        }
+
+        function copyPromptLib() {
+            const text = document.getElementById('promptLibOutput').textContent;
+            navigator.clipboard.writeText(text).then(() => alert("JSON copied to clipboard"));
+        }
+    </script>
+</body>
+</html>

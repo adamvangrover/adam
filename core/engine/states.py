@@ -340,9 +340,11 @@ class CrisisSimulationState(TypedDict, total=False):
 
     # Internal Reasoning
     macro_variables: Dict[str, float]  # { "rates": 0.08, "gdp": -0.02 }
+    sector_shocks: Dict[str, float]  # { "Technology": -0.5, "Energy": 0.2 }
     first_order_impacts: List[str]
     second_order_impacts: List[str]
     estimated_loss: float
+    crisis_simulation_log: List[Dict[str, Any]]
 
     critique_notes: List[str]
     iteration_count: int
@@ -560,9 +562,11 @@ def init_crisis_state(scenario: str, portfolio: Dict) -> CrisisSimulationState:
         "scenario_description": scenario,
         "portfolio_data": portfolio,
         "macro_variables": {},
+        "sector_shocks": {},
         "first_order_impacts": [],
         "second_order_impacts": [],
         "estimated_loss": 0.0,
+        "crisis_simulation_log": [],
         "critique_notes": [],
         "iteration_count": 0,
         "is_realistic": False,
