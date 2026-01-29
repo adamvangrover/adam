@@ -1,9 +1,35 @@
 from typing import Any, Dict, List
 import logging
 import asyncio
+import os
+import threading
 from core.agents.agent_base import AgentBase
-# We don't strictly need real Neo4j for this additive step, mock query logic is fine if driver is missing.
-from services.webapp.api import get_neo4j_driver
+
+# Local helper to avoid circular dependency with services.webapp.api
+_neo4j_driver = None
+_neo4j_lock = threading.Lock()
+
+def get_neo4j_driver():
+    global _neo4j_driver
+    if _neo4j_driver:
+        return _neo4j_driver
+
+    with _neo4j_lock:
+        if _neo4j_driver:
+            return _neo4j_driver
+        try:
+            from neo4j import GraphDatabase
+            uri = os.environ.get('NEO4J_URI', 'bolt://neo4j:7687')
+            user = os.environ.get('NEO4J_USER', 'neo4j')
+            password = os.environ.get('NEO4J_PASSWORD')
+            auth = (user, password) if password else None
+            _neo4j_driver = GraphDatabase.driver(uri, auth=auth)
+            return _neo4j_driver
+        except ImportError:
+            return None
+        except Exception as e:
+            logging.getLogger(__name__).error(f"Failed to initialize Neo4j driver: {e}")
+            return None
 
 class BlindspotAgent(AgentBase):
     """
