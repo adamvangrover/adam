@@ -82,14 +82,19 @@ class NeuroQuantumWorker(SwarmWorker):
         # Add Hidden/Output Nodes
         net.add_neuron("risk_accumulator", tau=5.0, bias=-0.5)
         net.add_neuron("market_stability", tau=10.0, bias=0.5)
+        net.add_neuron("market_growth", tau=8.0, bias=0.0)
 
         # Connect Inputs to Neurons
         # (weight_mean, uncertainty) -> quantum synapse
         net.add_synapse("input_risk", "risk_accumulator", 1.0, 0.2)
         net.add_synapse("input_stability", "market_stability", 0.8, 0.1)
+        net.add_synapse("input_opportunity", "market_growth", 1.0, 0.2)
+        net.add_synapse("input_volatility", "risk_accumulator", 0.5, 0.3)
+        net.add_synapse("input_volatility", "market_stability", -0.5, 0.3)
 
         # Cross connections
         net.add_synapse("risk_accumulator", "market_stability", -2.0, 0.5) # High risk destabilizes market (inhibitory)
+        net.add_synapse("market_growth", "risk_accumulator", -0.5, 0.1) # Growth slightly mitigates risk perception
 
         # 2. Frame Context & Script
         input_vector = self.framer.frame_context(context)
