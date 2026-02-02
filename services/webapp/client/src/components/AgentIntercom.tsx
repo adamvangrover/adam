@@ -2,9 +2,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Loader2, MessageSquare, Minimize2 } from 'lucide-react';
 
+interface Thought {
+  id: string;
+  text: string;
+}
+
 // Protocol: ADAM-V-NEXT
 const AgentIntercom: React.FC = () => {
-  const [thoughts, setThoughts] = useState<string[]>([]);
+  const [thoughts, setThoughts] = useState<Thought[]>([]);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -20,7 +25,7 @@ const AgentIntercom: React.FC = () => {
         const res = await fetch('/api/intercom/stream', { headers });
         if (res.ok) {
           const data = await res.json();
-          // Assuming data is string[] for now based on API logic
+          // Bolt Optimization: data is Thought[] with stable IDs
           setThoughts(prev => {
              // Avoid duplicates if possible or just replace if it's a window
              // For simplicity, we just take the new list if different
@@ -115,9 +120,9 @@ const AgentIntercom: React.FC = () => {
                   <div>ESTABLISHING NEURAL LINK...</div>
               </div>
           ) : (
-              thoughts.map((t, i) => (
-                  <div key={i} style={{ marginBottom: '10px', borderLeft: '2px solid #333', paddingLeft: '8px', opacity: 0.8 }}>
-                      <span style={{ color: '#00f3ff' }}>&gt;</span> {t}
+              thoughts.map((t) => (
+                  <div key={t.id} style={{ marginBottom: '10px', borderLeft: '2px solid #333', paddingLeft: '8px', opacity: 0.8 }}>
+                      <span style={{ color: '#00f3ff' }}>&gt;</span> {t.text}
                   </div>
               ))
           )}

@@ -43,5 +43,11 @@ class TestAPIIntegration(unittest.TestCase):
              print("\nIntercom Data:", data)
              self.assertTrue(len(data) > 0)
 
+             # Bolt Validation: Ensure response contains objects with IDs
+             first_thought = data[0]
+             self.assertIsInstance(first_thought, dict)
+             self.assertIn('id', first_thought)
+             self.assertIn('text', first_thought)
+
 if __name__ == '__main__':
     unittest.main()
