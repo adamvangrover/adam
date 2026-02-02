@@ -98,6 +98,8 @@ class StateSynthesizer:
             return MarketRegime.GEOPOLITICAL_ESCALATION
         elif "soft landing" in p_lower:
             return MarketRegime.GOLDILOCKS
+        elif "bifurcated" in p_lower or "infrastructure realization" in p_lower:
+            return MarketRegime.BIFURCATED_NORMALIZATION
 
         # Fallback to Entropy-based classification
         # High quantum entropy -> Chaos/Escalation
