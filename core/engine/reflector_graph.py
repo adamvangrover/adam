@@ -2,6 +2,9 @@
 
 import logging
 from typing import Literal, Dict, Any
+
+logger = logging.getLogger(__name__)
+
 try:
     from langgraph.graph import StateGraph, END, START
     from langgraph.checkpoint.memory import MemorySaver

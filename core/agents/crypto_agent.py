@@ -2,6 +2,7 @@
 
 import json
 import datetime
+import logging
 import requests
 import numpy as np
 from web3 import Web3

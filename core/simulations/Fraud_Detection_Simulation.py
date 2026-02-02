@@ -1,6 +1,7 @@
 # core/simulations/Fraud_Detection_Simulation.py
 
 import json
+from datetime import datetime
 from utils.api_communication import APICommunication
 from core.agents.anomaly_detection_agent import AnomalyDetectionAgent
 from core.agents.machine_learning_model_training_agent import MachineLearningModelTrainingAgent

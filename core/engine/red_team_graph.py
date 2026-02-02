@@ -3,6 +3,8 @@ import logging
 import random
 from typing import Dict, Any, Literal
 
+logger = logging.getLogger(__name__)
+
 try:
     from langgraph.graph import StateGraph, END
     HAS_LANGGRAPH = True
@@ -18,8 +20,6 @@ except ImportError:
     END = "END"
     logger.warning("LangGraph not installed. Graphs will be disabled.")
 from core.engine.states import RedTeamState
-
-logger = logging.getLogger(__name__)
 
 # --- Nodes ---
 
