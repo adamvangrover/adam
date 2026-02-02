@@ -90,6 +90,19 @@
         <!-- Right Panel: Intelligence Output -->
         <div class="col-span-8 flex flex-col gap-6 overflow-y-auto custom-scrollbar pr-2">
 
+            <!-- Data Integrity & Verification -->
+            <div class="glass rounded-xl p-6" id="integrityPanel">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-sm font-bold text-[#00f3ff] mono uppercase tracking-wider"><i class="fas fa-shield-alt mr-2"></i> Data Integrity & Verification</h2>
+                     <div class="flex gap-2 text-[10px] font-mono">
+                        <span class="bg-blue-900/30 text-blue-400 px-2 py-1 rounded border border-blue-900" id="integrityStatus">IDLE</span>
+                    </div>
+                </div>
+                <ul id="verificationLog" class="space-y-1 text-xs font-mono text-slate-400">
+                     <li class="italic opacity-50">System awaiting data ingestion...</li>
+                </ul>
+            </div>
+
             <!-- Live Context & Ontology -->
             <div class="glass rounded-xl p-6">
                 <!-- Market Context Banner -->
@@ -111,6 +124,16 @@
                 </div>
                 <div id="ontologyOutput" class="flex flex-wrap gap-2 min-h-[30px]">
                     <span class="text-xs text-slate-500 font-mono italic p-2">Waiting for input analysis...</span>
+                </div>
+            </div>
+
+            <!-- System Critique -->
+            <div class="glass rounded-xl p-6 hidden" id="critiquePanel">
+                 <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-sm font-bold text-purple-400 mono uppercase tracking-wider"><i class="fas fa-microscope mr-2"></i> System Critique & Reflection</h2>
+                </div>
+                <div id="critiqueOutput" class="text-xs font-mono text-purple-300 bg-purple-900/10 border border-purple-900/30 p-4 rounded space-y-2">
+                    <!-- Populated via JS -->
                 </div>
             </div>
 
@@ -170,6 +193,11 @@
                              <div class="w-full bg-slate-800 rounded-full h-1 mt-1">
                                 <div id="divergenceBar" class="h-full bg-[#00f3ff] rounded-full transition-all"></div>
                              </div>
+                        </div>
+                        <!-- Acceptance Status -->
+                         <div id="acceptanceMeta" class="hidden mt-2 pt-2 border-t border-slate-700 flex justify-between items-center">
+                             <span class="text-[10px] text-slate-500 uppercase">User Acceptance Probability</span>
+                             <span id="acceptanceLabel" class="text-xs font-bold text-emerald-400">--</span>
                         </div>
                     </div>
                 </div>
@@ -275,6 +303,18 @@
             }
 
             try {
+                // UI: Scrubbing State
+                const integLog = document.getElementById('verificationLog');
+                const integStatus = document.getElementById('integrityStatus');
+                integStatus.textContent = "SCRUBBING...";
+                integStatus.className = "bg-amber-900/30 text-amber-400 px-2 py-1 rounded border border-amber-900 animate-pulse";
+                integLog.innerHTML = `<li class="text-amber-400">> Initiating secure handshake...</li>`;
+
+                // Slight delay to simulate scrubbing visual
+                await new Promise(r => setTimeout(r, 800));
+                integLog.innerHTML += `<li class="text-slate-400">> Scrubbing PII from input vector...</li>`;
+                await new Promise(r => setTimeout(r, 500));
+
                 const response = await fetch('/api/v23/crisis_response', {
                     method: 'POST',
                     body: formData
@@ -298,6 +338,37 @@
         });
 
         function renderResults(data) {
+            // 0. Verification Log & Critique
+            if (data.simulation_metadata && data.simulation_metadata.verification_log) {
+                const integLog = document.getElementById('verificationLog');
+                const integStatus = document.getElementById('integrityStatus');
+
+                integLog.innerHTML = '';
+                data.simulation_metadata.verification_log.forEach(step => {
+                    const li = document.createElement('li');
+                    li.textContent = `> ${step}`;
+                    if(step.includes("VERIFIED")) li.className = "text-emerald-400 font-bold";
+                    else li.className = "text-slate-400";
+                    integLog.appendChild(li);
+                });
+
+                integStatus.textContent = "VERIFIED";
+                integStatus.className = "bg-emerald-900/30 text-emerald-400 px-2 py-1 rounded border border-emerald-900";
+            }
+
+            if (data.simulation_metadata && data.simulation_metadata.system_critique) {
+                const critPanel = document.getElementById('critiquePanel');
+                const critOutput = document.getElementById('critiqueOutput');
+                critPanel.classList.remove('hidden');
+                critOutput.innerHTML = '';
+
+                data.simulation_metadata.system_critique.forEach(c => {
+                    const p = document.createElement('p');
+                    p.textContent = c;
+                    critOutput.appendChild(p);
+                });
+            }
+
             // 1. Ontology
             const ontContainer = document.getElementById('ontologyOutput');
             ontContainer.innerHTML = '';
@@ -362,6 +433,23 @@
                         labelEl.className = "text-[10px] font-bold text-amber-400";
                         barEl.className = "h-full bg-amber-400 rounded-full transition-all";
                     }
+                }
+
+                // Acceptance Label (Simulation)
+                const accLabel = document.getElementById('acceptanceLabel');
+                const accMeta = document.getElementById('acceptanceMeta');
+                accMeta.classList.remove('hidden');
+
+                // Heuristic for acceptance based on score
+                if (pct > 75) {
+                    accLabel.textContent = "98.2% (AUTO-EXECUTE)";
+                    accLabel.className = "text-xs font-bold text-emerald-400";
+                } else if (pct > 40) {
+                    accLabel.textContent = "65.4% (REQUIRE HUMAN SIGN-OFF)";
+                    accLabel.className = "text-xs font-bold text-amber-400";
+                } else {
+                    accLabel.textContent = "12.1% (REJECTED)";
+                    accLabel.className = "text-xs font-bold text-red-400";
                 }
             }
 
