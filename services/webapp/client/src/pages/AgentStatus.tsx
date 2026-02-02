@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { dataManager, DataManifest } from '../utils/DataManager';
+import { Search } from 'lucide-react';
 
 const AgentStatus: React.FC = () => {
   const [agents, setAgents] = useState<DataManifest['agents']>([]);
@@ -17,15 +18,31 @@ const AgentStatus: React.FC = () => {
   return (
     <div style={{ padding: '20px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-        <h2 className="text-cyan mono-font">/// AGENT REGISTRY</h2>
-        <input
-            type="text"
-            placeholder="FILTER AGENTS..."
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="cyber-input"
-            style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid #333', color: '#fff', padding: '5px 10px' }}
-        />
+        <h2 className="text-cyan mono-font">{'///'} AGENT REGISTRY</h2>
+        <div style={{ position: 'relative', width: '300px' }}>
+            <Search
+                size={16}
+                color="#666"
+                style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }}
+                aria-hidden="true"
+            />
+            <input
+                type="text"
+                aria-label="Filter agents"
+                placeholder="FILTER AGENTS..."
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                className="cyber-input"
+                style={{
+                    width: '100%',
+                    background: 'rgba(0,0,0,0.3)',
+                    border: '1px solid #333',
+                    color: '#fff',
+                    padding: '8px 10px 8px 35px', // Added left padding for icon
+                    borderRadius: '2px'
+                }}
+            />
+        </div>
       </div>
 
       <div style={{ overflowX: 'auto' }}>
