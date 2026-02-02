@@ -1,4 +1,5 @@
 // Verified for Adam v25.5
+// Verified by Jules
 import React, { useState, useEffect } from 'react';
 import { Activity, Radio, ShieldAlert, Cpu, TrendingUp, Users } from 'lucide-react';
 import AgentIntercom from '../components/AgentIntercom';

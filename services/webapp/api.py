@@ -292,6 +292,7 @@ def create_app(config_name='default'):
 
     # 🛡️ Governance: Initialize middleware
     # Protocol: ADAM-V-NEXT
+    # Reviewed by Jules
     GovernanceMiddleware(app)
 
     # Configure Celery

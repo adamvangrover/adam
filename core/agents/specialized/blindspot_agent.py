@@ -1,4 +1,5 @@
 # Verified for Adam v25.5
+# Reviewed by Jules
 from typing import Any, Dict, List
 import logging
 import asyncio
