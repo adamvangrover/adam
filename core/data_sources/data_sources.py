@@ -48,6 +48,7 @@ class DataSources:
             # ... (fetch and process news headlines from Bloomberg API)
             pass  # Placeholder for actual implementation
         # ... (add more news sources)
+        headlines = []
         return headlines
 
     def get_historical_news(self, source="bloomberg", keywords=None, start_date=None, end_date=None):

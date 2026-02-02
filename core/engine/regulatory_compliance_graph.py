@@ -10,6 +10,9 @@ It uses a cyclical approach to ensure no violation is missed and interpretations
 
 import logging
 from typing import Literal, Dict, Any
+
+logger = logging.getLogger(__name__)
+
 try:
     from langgraph.graph import StateGraph, END, START
     from langgraph.checkpoint.memory import MemorySaver
@@ -29,8 +32,6 @@ except ImportError:
     logger.warning("LangGraph not installed. Graphs will be disabled.")
 
 from core.engine.states import ComplianceState
-
-logger = logging.getLogger(__name__)
 
 # --- Mock Utilities ---
 

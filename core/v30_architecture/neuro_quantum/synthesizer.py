@@ -90,7 +90,9 @@ class StateSynthesizer:
         p_lower = prompt.lower()
 
         # Heuristics
-        if "stagflation" in p_lower or "divergence" in p_lower:
+        if "bifurcated" in p_lower:
+            return MarketRegime.BIFURCATED_NORMALIZATION
+        elif "stagflation" in p_lower or "divergence" in p_lower:
             return MarketRegime.STAGFLATIONARY_DIVERGENCE
         elif "credit" in p_lower and "shadow" in p_lower:
             return MarketRegime.CREDIT_EVENT

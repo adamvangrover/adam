@@ -16,6 +16,7 @@ import os
 from typing import List, Dict, Any, Optional
 from datetime import datetime
 from enum import Enum
+from pydantic import BaseModel
 
 # Configuration
 DATA_DIR = os.path.join("data", "artisanal_training_sets")
