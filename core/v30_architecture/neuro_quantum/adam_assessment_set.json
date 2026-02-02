@@ -3,37 +3,45 @@
         "id": "Q_FIBO_001",
         "category": "FIBO Extraction",
         "prompt": "Analyze the risk of this syndicated loan portfolio containing derivatives.",
-        "expected_fibo": ["fibo-loan-ln-ln:SyndicatedLoan", "fibo-der-drc-ff:DerivativeInstrument"],
+        "expected_fibo": [
+            "fibo-loan-ln-ln:SyndicatedLoan",
+            "fibo-der-drc-ff:DerivativeInstrument"
+        ],
+        "expected_regime": "Neutral"
+    },
+    {
+        "id": "Q_FIBO_002",
+        "category": "FIBO Extraction",
+        "prompt": "The portfolio consists of high-yield corporate debt and interest rate swaps.",
+        "expected_fibo": [
+            "fibo-sec-dbt-dbti:CorporateDebtInstrument",
+            "fibo-der-drc-swp:Swap"
+        ],
+        "expected_regime": "Neutral"
+    },
+    {
+        "id": "Q_FIBO_003",
+        "category": "FIBO Extraction",
+        "prompt": "Evaluate the exposure to listed shares and sovereign bonds in the emerging market sector.",
+        "expected_fibo": [
+            "fibo-sec-eq-eq:ListedShare",
+            "fibo-sec-dbt-bnd:Bond"
+        ],
         "expected_regime": "Neutral"
     },
     {
         "id": "Q_REGIME_002",
         "category": "Regime Classification",
-        "prompt": "The market is exhibiting stagflationary divergence signals.",
+        "prompt": "The market is exhibiting stagflationary divergence signals with rising input costs and slowing growth.",
         "expected_fibo": [],
         "expected_regime": "Stagflationary_Divergence"
     },
     {
         "id": "Q_REGIME_003",
         "category": "Regime Classification",
-        "prompt": "Geopolitical escalation is driving oil prices up.",
+        "prompt": "Geopolitical escalation is driving oil prices up, creating supply shock headwinds.",
         "expected_fibo": [],
         "expected_regime": "Geopolitical_Escalation"
-    },
-    {
-        "id": "Q_REGIME_004",
-        "category": "Regime Classification",
-        "prompt": "The market is entering a phase of bifurcated normalization.",
-        "expected_fibo": [],
-        "expected_regime": "Bifurcated_Normalization"
-    },
-    {
-        "id": "Q_ENTROPY_001",
-        "category": "Quantum Entropy",
-        "prompt": "Chaos",
-        "description": "Short prompt 'Chaos' should trigger high uncertainty/entropy if mapped correctly.",
-        "expected_entropy_min": 0.0,
-        "expected_entropy_max": 1.0
     },
     {
         "id": "Q_REGIME_004",
@@ -41,5 +49,49 @@
         "prompt": "The market is entering a phase of bifurcated normalization with infrastructure realization.",
         "expected_fibo": [],
         "expected_regime": "Bifurcated_Normalization"
+    },
+    {
+        "id": "Q_REGIME_005",
+        "category": "Regime Classification",
+        "prompt": "The market is witnessing a synchronized liquidation event... simultaneous sell-offs in equities, commodities, cryptocurrencies, and precious metals.",
+        "expected_fibo": [],
+        "expected_regime": "Liquidity_Shock_Event"
+    },
+    {
+        "id": "Q_REGIME_006",
+        "category": "Regime Classification",
+        "prompt": "A credit event in the shadow banking sector is triggering widening spreads.",
+        "expected_fibo": [],
+        "expected_regime": "Credit_Event_Shadow_Bank"
+    },
+    {
+        "id": "Q_REGIME_007",
+        "category": "Regime Classification",
+        "prompt": "Inflation is cooling rapidly while productivity accelerates, signaling a disinflationary boom.",
+        "expected_fibo": [],
+        "expected_regime": "Disinflationary_Boom"
+    },
+    {
+        "id": "Q_REGIME_008",
+        "category": "Regime Classification",
+        "prompt": "Steady growth and stable inflation suggest a goldilocks soft landing scenario.",
+        "expected_fibo": [],
+        "expected_regime": "Goldilocks_Soft_Landing"
+    },
+    {
+        "id": "Q_ENTROPY_001",
+        "category": "Quantum Entropy",
+        "prompt": "Chaos",
+        "description": "Short prompt 'Chaos' should trigger high uncertainty/entropy if mapped correctly.",
+        "expected_entropy_min": 0.8,
+        "expected_entropy_max": 1.0
+    },
+    {
+        "id": "Q_ENTROPY_002",
+        "category": "Quantum Entropy",
+        "prompt": "Stability",
+        "description": "Short prompt 'Stability' should trigger low uncertainty/entropy.",
+        "expected_entropy_min": 0.0,
+        "expected_entropy_max": 0.2
     }
 ]
