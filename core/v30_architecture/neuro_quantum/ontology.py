@@ -35,6 +35,7 @@ class MarketRegime(Enum):
     GEOPOLITICAL_ESCALATION = "Geopolitical_Escalation"
     GOLDILOCKS = "Goldilocks_Soft_Landing"
     DISINFLATION = "Disinflationary_Boom"
+    BIFURCATED_NORMALIZATION = "Bifurcated_Normalization"
     DEFAULT = "Neutral"
 
 @dataclass
