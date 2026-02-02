@@ -2,6 +2,9 @@
 
 import logging
 from typing import Literal, Dict, Any
+
+logger = logging.getLogger(__name__)
+
 try:
     from langgraph.graph import StateGraph, END, START
     from langgraph.checkpoint.memory import MemorySaver
@@ -20,8 +23,6 @@ except ImportError:
     class MemorySaver: pass
     logger.warning("LangGraph not installed. Graphs will be disabled.")
 from core.engine.states import ReflectorState
-
-logger = logging.getLogger(__name__)
 
 # --- Mock Logic for Nodes ---
 

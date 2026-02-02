@@ -1,6 +1,7 @@
 # core/simulations/Merger_Acquisition_Simulation.py
 
 import json
+from datetime import datetime
 from utils.api_communication import APICommunication
 from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent
 from core.agents.industry_specialist_agent import IndustrySpecialistAgent
