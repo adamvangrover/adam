@@ -780,6 +780,8 @@ def generate_archive():
             if year not in grouped: grouped[year] = []
             grouped[year].append(item)
 
+    tags_html = "".join([f'<span class="tag-cloud-item" onclick="setSearch(\'${t[0]}\')">${t[0]}</span>' for t in ticker_counts])
+
     archive_html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -900,7 +902,7 @@ def generate_archive():
             <div class="filter-group">
                 <label class="filter-label">Top Entities</label>
                 <div>
-                    {"".join([f'<span class="tag-cloud-item" onclick="setSearch(\'${t[0]}\')">${t[0]}</span>' for t in ticker_counts])}
+                    {tags_html}
                 </div>
             </div>
         </aside>
