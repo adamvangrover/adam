@@ -3,6 +3,7 @@ import random
 import time
 import threading
 import os
+import uuid
 from copy import deepcopy
 from core.engine.consensus_engine import ConsensusEngine
 from core.utils.narrative_weaver import NarrativeWeaver
@@ -37,13 +38,22 @@ class LiveMockEngine:
     def _load_seed_data(self):
         try:
             with open(self.data_path, 'r') as f:
-                return json.load(f)
+                data = json.load(f)
+
+                # Bolt Optimization: Convert legacy string thoughts to objects with IDs
+                # This enables stable key rendering on the frontend
+                thoughts = data.get('agent_thoughts', [])
+                if thoughts and isinstance(thoughts[0], str):
+                    data['agent_thoughts'] = [
+                        {"id": str(uuid.uuid4()), "text": t} for t in thoughts
+                    ]
+                return data
         except Exception as e:
             # Fallback if file not found
             return {
                 "market_data": {"indices": {"SPX": {"price": 5000, "change_percent": 0.0}}},
                 "headlines": [],
-                "agent_thoughts": ["System initialized."]
+                "agent_thoughts": [{"id": str(uuid.uuid4()), "text": "System initialized."}]
             }
 
     def _drift_value(self, value, volatility=0.001):
@@ -95,7 +105,14 @@ class LiveMockEngine:
         if random.random() < 0.2 and headlines:
             topic = random.choice(headlines)['title']
             action = random.choice(["Analyzing impact of", "Correlating", "Hedging against", "Ignoring noise from"])
-            new_thought = f"{action} '{topic}'..."
+            new_thought_text = f"{action} '{topic}'..."
+
+            # Bolt Optimization: Generate unique ID for new thoughts
+            new_thought = {
+                "id": str(uuid.uuid4()),
+                "text": new_thought_text
+            }
+
             thoughts.insert(0, new_thought)
             if len(thoughts) > 20: # Keep buffer size managed
                 thoughts.pop()

@@ -90,14 +90,20 @@ class StateSynthesizer:
         p_lower = prompt.lower()
 
         # Heuristics
-        if "stagflation" in p_lower or "divergence" in p_lower:
+        if "bifurcated" in p_lower:
+            return MarketRegime.BIFURCATED_NORMALIZATION
+        elif "stagflation" in p_lower or "divergence" in p_lower:
             return MarketRegime.STAGFLATIONARY_DIVERGENCE
+        elif "liquidity" in p_lower or "crash" in p_lower or "dislocation" in p_lower or "liquidation" in p_lower:
+            return MarketRegime.LIQUIDITY_SHOCK
         elif "credit" in p_lower and "shadow" in p_lower:
             return MarketRegime.CREDIT_EVENT
         elif "geopolitical" in p_lower or "war" in p_lower:
             return MarketRegime.GEOPOLITICAL_ESCALATION
         elif "soft landing" in p_lower:
             return MarketRegime.GOLDILOCKS
+        elif "bifurcated" in p_lower or "infrastructure realization" in p_lower:
+            return MarketRegime.BIFURCATED_NORMALIZATION
 
         # Fallback to Entropy-based classification
         # High quantum entropy -> Chaos/Escalation
