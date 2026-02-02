@@ -145,3 +145,8 @@
 **Vulnerability:** The `GovernanceMiddleware` was configured to detect HIGH and CRITICAL risk operations but defaulted to `pass` (allowing the request) instead of blocking them. This creates a false sense of security where policies are defined but not enforced.
 **Learning:** Security middleware that only logs violations without blocking them is "Security Theater". Default behaviors for critical security controls must be "fail-secure" (block by default).
 **Prevention:** Updated `GovernanceMiddleware` to explicitly `abort(403)` for operations flagged as HIGH or CRITICAL risk, ensuring that the governance policy is actively enforced.
+
+## 2026-02-01 - Path Traversal in MCP Server
+**Vulnerability:** The `ingest_file` tool in the MCP Server (`server/mcp_server.py`) accepted absolute paths without validation, allowing users to ingest arbitrary files from the server's filesystem.
+**Learning:** Tools exposed via protocols like MCP must implement their own input validation, as they act as a bridge between external inputs and internal capabilities.
+**Prevention:** Implemented strict path validation using `os.path.realpath` and `os.path.commonpath` to restrict file access to specific allowed directories (`data/` and `docs/`).

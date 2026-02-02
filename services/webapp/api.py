@@ -18,6 +18,7 @@ from datetime import datetime, timezone, timedelta
 from .config import config
 from .celery_app import celery
 from .governance import GovernanceMiddleware
+from core.security.permission_manager import PermissionManager, Permission, Role
 
 # Import the Live Mock Engine for dynamic simulation data
 try:
@@ -163,6 +164,7 @@ def _validate_asset_symbol(symbol: str) -> bool:
 db = SQLAlchemy()
 socketio = SocketIO()
 jwt = JWTManager()
+permission_manager = None
 agent_orchestrator = None
 meta_orchestrator = None
 _neo4j_driver = None
@@ -279,6 +281,7 @@ def create_app(config_name='default'):
     """
     global agent_orchestrator
     global meta_orchestrator
+    global permission_manager
 
     app = Flask(__name__)
     app.config.from_object(config[config_name])
@@ -294,6 +297,9 @@ def create_app(config_name='default'):
     # Protocol: ADAM-V-NEXT
     # Reviewed by Jules
     GovernanceMiddleware(app)
+
+    # 🛡️ Sentinel: Initialize Permission Manager
+    permission_manager = PermissionManager(db_session=db.session)
 
     # Configure Celery
     celery.conf.update(app.config)
@@ -335,12 +341,51 @@ def create_app(config_name='default'):
         return response
 
     # ---------------------------------------------------------------------------- #
+    # Decorators
+    # ---------------------------------------------------------------------------- #
+
+    def require_permission(permission: Permission):
+        """
+        Decorator to enforce permission checks on endpoints.
+        Usage: @require_permission(Permission.ADMIN_SYSTEM)
+        """
+        def decorator(fn):
+            @functools.wraps(fn)
+            @jwt_required()
+            def wrapper(*args, **kwargs):
+                current_user_id = get_jwt_identity()
+                user = User.query.get(current_user_id)
+                if not user:
+                     return jsonify({'error': 'User not found'}), 401
+
+                # Check permissions
+                if not permission_manager.has_permission(user.role, permission):
+                    app.logger.warning(f"Access Denied: User {user.username} (Role: {user.role}) attempted {permission.value}")
+                    return jsonify({'error': f'Access Denied: Missing permission {permission.value}'}), 403
+
+                return fn(*args, **kwargs)
+            return wrapper
+        return decorator
+
+    # ---------------------------------------------------------------------------- #
     # API Endpoints
     # ---------------------------------------------------------------------------- #
 
     @app.route('/api/hello')
     def hello_world():
         return 'Hello, World!'
+
+    @app.route('/api/admin/audit_logs', methods=['GET'])
+    @require_permission(Permission.VIEW_AUDIT_LOGS)
+    def get_audit_logs():
+        """
+        Example Admin Endpoint protected by PermissionManager.
+        """
+        # Mock logs
+        return jsonify([
+            {"id": 1, "action": "LOGIN", "user": "admin", "timestamp": "2026-02-01T12:00:00"},
+            {"id": 2, "action": "TRADE", "user": "trader1", "timestamp": "2026-02-01T12:05:00"}
+        ])
 
     # ---------------------------------------------------------------------------- #
     # Mission Control / Synthesizer Endpoints

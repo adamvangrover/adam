@@ -20,7 +20,12 @@ class EACIMiddleware:
     ]
 
     def __init__(self, permission_manager=None):
-        self.permission_manager = permission_manager # Placeholder for Identity Provider integration
+        if permission_manager is None:
+            # Lazy load default permission manager
+            from core.security.permission_manager import PermissionManager
+            self.permission_manager = PermissionManager()
+        else:
+            self.permission_manager = permission_manager
 
     def sanitize_input(self, prompt: str) -> str:
         """
@@ -36,7 +41,8 @@ class EACIMiddleware:
         """
         Injects security context and permissions into the prompt envelope.
         """
-        permissions = self._get_permissions(user_role)
+        # Convert set of enums to list of strings for JSON serialization
+        permissions = [p.value for p in self.permission_manager.get_role_permissions(user_role)]
 
         # In HNASP, this would update the 'meta.security_context' field
         security_context = {
@@ -49,16 +55,6 @@ class EACIMiddleware:
             "sanitized_prompt": prompt,
             "security_context": security_context
         }
-
-    def _get_permissions(self, role: str) -> list:
-        # Simple RBAC map
-        rbac_map = {
-            "ADMIN": ["*"],
-            "PORTFOLIO_MANAGER": ["view_data", "run_valuation", "execute_trade"],
-            "ANALYST": ["view_data", "run_valuation"],
-            "GUEST": ["view_data"]
-        }
-        return rbac_map.get(role, [])
 
     def validate_tool_access(self, tool_name: str, security_context: Dict[str, Any]) -> bool:
         """
