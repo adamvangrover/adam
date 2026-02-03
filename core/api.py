@@ -1,6 +1,13 @@
 from flask import Flask, request, jsonify
 import logging
 import secrets
+import warnings
+
+# 🛡️ Sentinel: Deprecation Warning
+logger = logging.getLogger(__name__)
+logger.warning("SECURITY WARNING: This module (core/api.py) is DEPRECATED and unsafe.")
+logger.warning("Please use services/webapp/api.py or core/api/main.py instead.")
+warnings.warn("core/api.py is deprecated and will be removed.", DeprecationWarning, stacklevel=2)
 from core.system.agent_orchestrator import AgentOrchestrator
 from core.system.echo import Echo
 from core.utils.api_utils import (
