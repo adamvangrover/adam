@@ -89,7 +89,7 @@ const Synthesizer: React.FC = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', borderBottom: '2px solid #333', paddingBottom: '20px' }}>
                 <div>
                     <h1 style={{ margin: 0, fontSize: '2.5rem', letterSpacing: '4px', textTransform: 'uppercase' }}>
-                        Synthesizer <span style={{ color: 'var(--primary-color)' }}>//</span> Mission Control
+                        Synthesizer <span style={{ color: 'var(--primary-color)' }}>{'//'}</span> Mission Control
                     </h1>
                     <div style={{ color: '#888', marginTop: '5px' }}>SYSTEM AGGREGATION NODE :: ACTIVE</div>
                 </div>
@@ -103,14 +103,23 @@ const Synthesizer: React.FC = () => {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '20px' }}>
 
                 {/* 1. The Core Confidence Gauge */}
-                <div className="glass-panel" style={{ gridColumn: 'span 2', padding: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(circle at center, rgba(20,40,50,0.4) 0%, rgba(0,0,0,0.8) 100%)' }}>
+                <div
+                    className="glass-panel"
+                    role="meter"
+                    aria-label="Global Confidence Score"
+                    aria-valuenow={score}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuetext={`${score.toFixed(1)}% - ${score > 80 ? "Bullish Conviction" : score > 50 ? "Cautious / Hedged" : "Risk Off / Defensive"}`}
+                    style={{ gridColumn: 'span 2', padding: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(circle at center, rgba(20,40,50,0.4) 0%, rgba(0,0,0,0.8) 100%)' }}
+                >
                     <div style={{ textAlign: 'center', position: 'relative' }}>
-                        <div style={{ fontSize: '1rem', color: '#888', letterSpacing: '2px', marginBottom: '10px' }}>GLOBAL CONFIDENCE SCORE</div>
+                        <div style={{ fontSize: '1rem', color: '#888', letterSpacing: '2px', marginBottom: '10px' }} aria-hidden="true">GLOBAL CONFIDENCE SCORE</div>
                         <div style={{
                             fontSize: '6rem', fontWeight: 'bold',
                             color: getScoreColor(score),
                             textShadow: `0 0 20px ${getScoreColor(score)}`
-                        }}>
+                        }} aria-hidden="true">
                             {score.toFixed(1)}%
                         </div>
 
@@ -225,7 +234,19 @@ const Synthesizer: React.FC = () => {
                     {forecastData ? (
                         <div style={{ marginTop: '20px', height: '300px', position: 'relative' }}>
                              {/* Simple SVG Chart */}
-                             <svg width="100%" height="100%" viewBox="0 0 1000 300" preserveAspectRatio="none">
+                             <svg
+                                width="100%"
+                                height="100%"
+                                viewBox="0 0 1000 300"
+                                preserveAspectRatio="none"
+                                role="img"
+                                aria-labelledby="forecastTitle forecastDesc"
+                             >
+                                <title id="forecastTitle">Probabilistic Price Forecast Chart</title>
+                                <desc id="forecastDesc">
+                                    A chart showing the predicted price movement for SPX over the next 30 days.
+                                    The white line represents the mean forecast, and the shaded blue area represents the 95% confidence interval.
+                                </desc>
                                 {/* Defs for gradient */}
                                 <defs>
                                     <linearGradient id="fanGradient" x1="0" x2="0" y1="0" y2="1">
