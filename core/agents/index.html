@@ -3,370 +3,690 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v23.5 | agents</title>
+    <title>Index of /core/agents</title>
     <link rel="stylesheet" href="../../showcase/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Fallback styles if stylesheet is missing */
-        body { background-color: #050b14; color: #06b6d4; font-family: monospace; margin: 0; padding: 0; }
-        .header { border-bottom: 1px solid #06b6d4; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .breadcrumb { font-size: 1.2em; color: #e2e8f0; }
-        .badge { border: 1px solid #06b6d4; padding: 5px 10px; border-radius: 4px; font-size: 0.8em; text-transform: uppercase; }
-        .container { display: flex; height: calc(100vh - 80px); }
-        .sidebar { width: 300px; border-right: 1px solid #334155; padding: 20px; overflow-y: auto; background: rgba(5, 11, 20, 0.95); }
-        .main-stage { flex: 1; padding: 30px; overflow-y: auto; }
-        .file-item { padding: 8px; cursor: pointer; display: block; color: #94a3b8; text-decoration: none; }
-        .file-item:hover { color: #06b6d4; background: rgba(6, 182, 212, 0.1); }
-        .folder { color: #fbbf24; font-weight: bold; }
-        .footer { border-top: 1px solid #334155; padding: 10px; text-align: center; font-size: 0.8em; color: #64748b; background: #020617; }
-        .nav-links a { margin-left: 15px; color: #06b6d4; text-decoration: none; border: 1px solid #06b6d4; padding: 5px 10px; transition: all 0.2s; }
-        .nav-links a:hover { background: #06b6d4; color: #000; }
-        pre { background: #0f172a; padding: 15px; border-radius: 6px; overflow-x: auto; border: 1px solid #1e293b; }
-        h1, h2, h3 { color: #f8fafc; text-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
-        .card { background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; padding: 20px; margin-bottom: 20px; border-radius: 8px; }
-        .glitch { position: relative; }
-        .module-doc { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #334155; }
-        .doc-text { color: #94a3b8; font-style: italic; }
+        .file-list { list-style: none; padding: 0; }
+        .file-item { padding: 8px 12px; border-bottom: 1px solid var(--panel-border); display: flex; align-items: center; justify-content: space-between; transition: background 0.2s; }
+        .file-item:hover { background: rgba(255, 255, 255, 0.05); }
+        .file-icon { margin-right: 10px; width: 20px; text-align: center; display: inline-block; }
+        .file-name { flex-grow: 1; font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-primary); }
+        .file-tag { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; margin-left: 10px; }
+        .tag-dir { background: rgba(6, 182, 212, 0.1); color: var(--primary-color); border: 1px solid var(--primary-color); }
+        .tag-html { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); border: 1px solid var(--warning-color); }
+        .tag-py { background: rgba(16, 185, 129, 0.1); color: var(--success-color); border: 1px solid var(--success-color); }
+        .readme-container { margin-top: 30px; padding: 20px; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--panel-border); border-radius: 4px; }
+        .readme-title { color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; border-bottom: 1px solid var(--panel-border); padding-bottom: 5px; }
+        .readme-body { font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted); white-space: pre-wrap; overflow-x: auto; line-height: 1.5; }
     </style>
-    <!-- Mermaid JS -->
-    <script type="module">
-        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
-    </script>
 </head>
 <body>
-    <div class="header">
+    <div class="scan-line"></div>
+
+    <header class="cyber-header" style="padding: 15px 20px; border-bottom: 1px solid var(--primary-color); background: rgba(5, 11, 20, 0.95); display: flex; justify-content: space-between; align-items: center;">
         <div>
-            <h1 style="margin:0; display:inline-block;" class="glitch">ADAM v23.5</h1>
-            <span class="breadcrumb" style="margin-left: 20px;">/core/agents</span>
+            <h1 class="mono" style="margin: 0; font-size: 1.2rem; color: var(--primary-color);">ADAM REPO BROWSER</h1>
+            <div class="mono" style="font-size: 0.8rem; color: var(--text-muted);">PATH: <span style="color: var(--text-primary);">/core/agents</span></div>
         </div>
-        <div class="nav-links">
-            <a href="../index.html">[UP LEVEL]</a>
-            <a href="../../index.html">[ROOT]</a>
-            <a href="#" onclick="window.toggleRuntime()">[LIVE RUNTIME]</a>
-            <a href="https://github.com/your-repo/adam" target="_blank">[GITHUB]</a>
+        <div style="text-align: right;">
+            <div class="cyber-badge badge-cyan">SYSTEM ONLINE</div>
         </div>
-        <span class="badge">SYSTEM ONLINE</span>
+    </header>
+
+    <div style="padding: 20px; max-width: 1200px; margin: 0 auto;">
+        <nav style="margin-bottom: 20px; display: flex; gap: 10px;">
+            <a href="../" class="cyber-btn">&uarr; UP LEVEL</a>
+            <a href="../../index.html" class="cyber-btn">ROOT</a>
+            <a href="../../showcase/index.html" class="cyber-btn" style="border-color: var(--accent-color); color: var(--accent-color);">MISSION CONTROL</a>
+        </nav>
+
+        <main class="glass-panel" style="padding: 0; overflow: hidden; border-radius: 4px;">
+            <div style="padding: 10px 15px; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--panel-border); color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">
+                Directory Contents
+            </div>
+            <ul class="file-list">
+
+                <li class="file-item">
+                    <a href="analytics/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">analytics/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="architect_agent/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">architect_agent/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="developer_swarm/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">developer_swarm/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="governance/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">governance/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="industry_specialists/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">industry_specialists/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="mcp_servers_v23/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">mcp_servers_v23/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="meta_agents/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">meta_agents/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="metacognition/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">metacognition/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="mixins/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">mixins/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="orchestrators/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">orchestrators/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="skills/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">skills/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="specialized/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">specialized/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="sub_agents/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">sub_agents/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="templates/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">templates/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="AGENTS.md" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📝</span>
+                        <span class="file-name">AGENTS.md</span>
+
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="AGENT_CATALOG.md" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📝</span>
+                        <span class="file-name">AGENT_CATALOG.md</span>
+
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="AGENT_DEVELOPMENT.md" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📝</span>
+                        <span class="file-name">AGENT_DEVELOPMENT.md</span>
+
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="RAG_AGENT_README.md" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📝</span>
+                        <span class="file-name">RAG_AGENT_README.md</span>
+
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="__init__.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">__init__.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="adaptive_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">adaptive_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="agent_base.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">agent_base.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="agent_forge.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">agent_forge.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="algo_trading_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">algo_trading_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="alternative_data_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">alternative_data_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="anomaly_detection_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">anomaly_detection_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="archive_manager_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">archive_manager_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="behavioral_economics_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">behavioral_economics_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="black_swan_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">black_swan_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="catalyst_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">catalyst_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="code_alchemist.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">code_alchemist.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="critique_swarm.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">critique_swarm.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="crypto_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">crypto_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="cyclical_reasoning_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">cyclical_reasoning_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="data_retrieval_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">data_retrieval_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="data_verification_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">data_verification_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="data_visualization_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">data_visualization_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="directory_manifest.jsonld" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">directory_manifest.jsonld</span>
+
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="discussion_chair_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">discussion_chair_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="echo_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">echo_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="event_driven_risk_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">event_driven_risk_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="evolutionary_optimizer.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">evolutionary_optimizer.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="financial_modeling_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">financial_modeling_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="fundamental_analyst_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">fundamental_analyst_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="geopolitical_risk_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">geopolitical_risk_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="hnasp_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">hnasp_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="industry_specialist_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">industry_specialist_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="knowledge_contribution_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">knowledge_contribution_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="legal_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">legal_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="lexica_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">lexica_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="lingua_maestro.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">lingua_maestro.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="machine_learning_model_training_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">machine_learning_model_training_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="macroeconomic_analysis_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">macroeconomic_analysis_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="market_making_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">market_making_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="market_sentiment_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">market_sentiment_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="meta_19_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">meta_19_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="meta_cognitive_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">meta_cognitive_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="model.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🖥️</span>
+                        <span class="file-name">model.html</span>
+                        <span class="file-tag tag-html">DASHBOARD</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="natural_language_generation_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">natural_language_generation_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="news_bot.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">news_bot.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="newsletter_layout_specialist_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">newsletter_layout_specialist_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="portfolio_optimization_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">portfolio_optimization_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="prediction_market_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">prediction_market_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="profile_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">profile_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="prompt_generation_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">prompt_generation_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="prompt_tuner.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">prompt_tuner.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="quantitative_risk_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">quantitative_risk_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="query_understanding_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">query_understanding_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="rag_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">rag_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="red_team_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">red_team_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="reflector_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">reflector_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="regulatory_compliance_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">regulatory_compliance_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="report_generator_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">report_generator_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="result_aggregation_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">result_aggregation_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="risk_assessment_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">risk_assessment_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="sense_weaver.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">sense_weaver.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="snc_analyst_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">snc_analyst_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="strategic_foresight_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">strategic_foresight_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="supply_chain_risk_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">supply_chain_risk_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="technical_analyst_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">technical_analyst_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+            </ul>
+        </main>
+
+
     </div>
 
-    <div class="container">
-        <div class="sidebar">
-            <h3>Directory Structure</h3>
-            <a href="../index.html" class="file-item folder">📂 .. (Parent)</a>
-<a href="AGENTS.md" class="file-item">📝 AGENTS.md</a>
-<a href="AGENT_CATALOG.md" class="file-item">📝 AGENT_CATALOG.md</a>
-<a href="AGENT_DEVELOPMENT.md" class="file-item">📝 AGENT_DEVELOPMENT.md</a>
-<a href="RAG_AGENT_README.md" class="file-item">📝 RAG_AGENT_README.md</a>
-<a href="__init__.py" class="file-item">📄 __init__.py</a>
-<a href="agent_base.py" class="file-item">📄 agent_base.py</a>
-<a href="agent_forge.py" class="file-item">📄 agent_forge.py</a>
-<a href="algo_trading_agent.py" class="file-item">📄 algo_trading_agent.py</a>
-<a href="alternative_data_agent.py" class="file-item">📄 alternative_data_agent.py</a>
-<a href="anomaly_detection_agent.py" class="file-item">📄 anomaly_detection_agent.py</a>
-<a href="architect_agent/index.html" class="file-item folder">📂 architect_agent</a>
-<a href="archive_manager_agent.py" class="file-item">📄 archive_manager_agent.py</a>
-<a href="behavioral_economics_agent.py" class="file-item">📄 behavioral_economics_agent.py</a>
-<a href="catalyst_agent.py" class="file-item">📄 catalyst_agent.py</a>
-<a href="code_alchemist.py" class="file-item">📄 code_alchemist.py</a>
-<a href="crypto_agent.py" class="file-item">📄 crypto_agent.py</a>
-<a href="cyclical_reasoning_agent.py" class="file-item">📄 cyclical_reasoning_agent.py</a>
-<a href="data_retrieval_agent.py" class="file-item">📄 data_retrieval_agent.py</a>
-<a href="data_verification_agent.py" class="file-item">📄 data_verification_agent.py</a>
-<a href="data_visualization_agent.py" class="file-item">📄 data_visualization_agent.py</a>
-<a href="developer_swarm/index.html" class="file-item folder">📂 developer_swarm</a>
-<a href="discussion_chair_agent.py" class="file-item">📄 discussion_chair_agent.py</a>
-<a href="echo_agent.py" class="file-item">📄 echo_agent.py</a>
-<a href="event_driven_risk_agent.py" class="file-item">📄 event_driven_risk_agent.py</a>
-<a href="financial_modeling_agent.py" class="file-item">📄 financial_modeling_agent.py</a>
-<a href="fundamental_analyst_agent.py" class="file-item">📄 fundamental_analyst_agent.py</a>
-<a href="geopolitical_risk_agent.py" class="file-item">📄 geopolitical_risk_agent.py</a>
-<a href="industry_specialist_agent.py" class="file-item">📄 industry_specialist_agent.py</a>
-<a href="industry_specialists/index.html" class="file-item folder">📂 industry_specialists</a>
-<a href="knowledge_contribution_agent.py" class="file-item">📄 knowledge_contribution_agent.py</a>
-<a href="legal_agent.py" class="file-item">📄 legal_agent.py</a>
-<a href="lexica_agent.py" class="file-item">📄 lexica_agent.py</a>
-<a href="lingua_maestro.py" class="file-item">📄 lingua_maestro.py</a>
-<a href="machine_learning_model_training_agent.py" class="file-item">📄 machine_learning_model_training_agent.py</a>
-<a href="macroeconomic_analysis_agent.py" class="file-item">📄 macroeconomic_analysis_agent.py</a>
-<a href="market_sentiment_agent.py" class="file-item">📄 market_sentiment_agent.py</a>
-<a href="meta_19_agent.py" class="file-item">📄 meta_19_agent.py</a>
-<a href="meta_agents/index.html" class="file-item folder">📂 meta_agents</a>
-<a href="meta_cognitive_agent.py" class="file-item">📄 meta_cognitive_agent.py</a>
-<a href="model.html" class="file-item">📄 model.html</a>
-<a href="natural_language_generation_agent.py" class="file-item">📄 natural_language_generation_agent.py</a>
-<a href="news_bot.py" class="file-item">📄 news_bot.py</a>
-<a href="newsletter_layout_specialist_agent.py" class="file-item">📄 newsletter_layout_specialist_agent.py</a>
-<a href="orchestrators/index.html" class="file-item folder">📂 orchestrators</a>
-<a href="portfolio_optimization_agent.py" class="file-item">📄 portfolio_optimization_agent.py</a>
-<a href="prediction_market_agent.py" class="file-item">📄 prediction_market_agent.py</a>
-<a href="prompt_generation_agent.py" class="file-item">📄 prompt_generation_agent.py</a>
-<a href="prompt_tuner.py" class="file-item">📄 prompt_tuner.py</a>
-<a href="query_understanding_agent.py" class="file-item">📄 query_understanding_agent.py</a>
-<a href="rag_agent.py" class="file-item">📄 rag_agent.py</a>
-<a href="red_team_agent.py" class="file-item">📄 red_team_agent.py</a>
-<a href="reflector_agent.py" class="file-item">📄 reflector_agent.py</a>
-<a href="regulatory_compliance_agent.py" class="file-item">📄 regulatory_compliance_agent.py</a>
-<a href="report_generator_agent.py" class="file-item">📄 report_generator_agent.py</a>
-<a href="result_aggregation_agent.py" class="file-item">📄 result_aggregation_agent.py</a>
-<a href="risk_assessment_agent.py" class="file-item">📄 risk_assessment_agent.py</a>
-<a href="sense_weaver.py" class="file-item">📄 sense_weaver.py</a>
-<a href="snc_analyst_agent.py" class="file-item">📄 snc_analyst_agent.py</a>
-<a href="specialized/index.html" class="file-item folder">📂 specialized</a>
-<a href="sub_agents/index.html" class="file-item folder">📂 sub_agents</a>
-<a href="supply_chain_risk_agent.py" class="file-item">📄 supply_chain_risk_agent.py</a>
-<a href="technical_analyst_agent.py" class="file-item">📄 technical_analyst_agent.py</a>
-        </div>
-        <div class="main-stage" id="main-content">
-            <div class="card">
-                <h2>Overview</h2>
-                <div id="readme-content">
-                    <p>No README.md found. See Module Documentation below.</p>
-                </div>
-            </div>
-
-            <div class="card"><h2>Class Structure</h2><pre class="mermaid">
-classDiagram
-    class AgentBase {
-        agent_base.py
-    }
-    class AgentForge {
-        agent_forge.py
-    }
-    class AlgoTradingAgent {
-        algo_trading_agent.py
-    }
-    class AlternativeDataAgent {
-        alternative_data_agent.py
-    }
-    class AnomalyDetectionAgent {
-        anomaly_detection_agent.py
-    }
-    class ArchiveManagerAgent {
-        archive_manager_agent.py
-    }
-    class BehavioralEconomicsAgent {
-        behavioral_economics_agent.py
-    }
-    class CatalystAgent {
-        catalyst_agent.py
-    }
-    class CodeAlchemist {
-        code_alchemist.py
-    }
-    class CryptoAgent {
-        crypto_agent.py
-    }
-    class CyclicalReasoningAgent {
-        cyclical_reasoning_agent.py
-    }
-    class DataRetrievalAgent {
-        data_retrieval_agent.py
-    }
-    class DataVerificationAgent {
-        data_verification_agent.py
-    }
-    class DiscussionChairAgent {
-        discussion_chair_agent.py
-    }
-    class DiscussionChairAgent {
-        discussion_chair_agent.py
-    }
-    class DiscussionChairAgent {
-        discussion_chair_agent.py
-    }
-    class EchoAgent {
-        echo_agent.py
-    }
-    class EventDrivenRiskAgent {
-        event_driven_risk_agent.py
-    }
-    class FinancialModelingAgent {
-        financial_modeling_agent.py
-    }
-    class DCFCalculator {
-        fundamental_analyst_agent.py
-    }
-    class FundamentalAnalystAgent {
-        fundamental_analyst_agent.py
-    }
-    class MockSKFunction {
-        fundamental_analyst_agent.py
-    }
-    class MockSKSkillsCollection {
-        fundamental_analyst_agent.py
-    }
-    class MockKernel {
-        fundamental_analyst_agent.py
-    }
-    class MockSKResult {
-        fundamental_analyst_agent.py
-    }
-    class GeopoliticalRiskAgent {
-        geopolitical_risk_agent.py
-    }
-    class IndustrySpecialistAgent {
-        industry_specialist_agent.py
-    }
-    class LegalAgent {
-        legal_agent.py
-    }
-    class LexicaAgent {
-        lexica_agent.py
-    }
-    class LinguaMaestro {
-        lingua_maestro.py
-    }
-    class MachineLearningModelTrainingAgent {
-        machine_learning_model_training_agent.py
-    }
-    class MacroeconomicAnalysisAgent {
-        macroeconomic_analysis_agent.py
-    }
-    class MarketSentimentAgent {
-        market_sentiment_agent.py
-    }
-    class Meta19Agent {
-        meta_19_agent.py
-    }
-    class MetaCognitiveAgent {
-        meta_cognitive_agent.py
-    }
-    class NaturalLanguageGenerationAgent {
-        natural_language_generation_agent.py
-    }
-    class NewsBot {
-        news_bot.py
-    }
-    class NewsletterLayoutSpecialist {
-        newsletter_layout_specialist_agent.py
-    }
-    class LSTMModel {
-        portfolio_optimization_agent.py
-    }
-    class AIPoweredPortfolioOptimizationAgent {
-        portfolio_optimization_agent.py
-    }
-    class PredictionMarketAgent {
-        prediction_market_agent.py
-    }
-    class PromptGenerationAgent {
-        prompt_generation_agent.py
-    }
-    class PromptTuner {
-        prompt_tuner.py
-    }
-    class QueryUnderstandingAgent {
-        query_understanding_agent.py
-    }
-    class QueryUnderstandingAgent {
-        query_understanding_agent.py
-    }
-    class RAGAgent {
-        rag_agent.py
-    }
-    class Document {
-        rag_agent.py
-    }
-    class RedTeamAgent {
-        red_team_agent.py
-    }
-    class ReflectorAgent {
-        reflector_agent.py
-    }
-    class ReportGeneratorAgent {
-        report_generator_agent.py
-    }
-    class ResultAggregationAgent {
-        result_aggregation_agent.py
-    }
-    class RiskAssessmentAgent {
-        risk_assessment_agent.py
-    }
-    class SenseWeaver {
-        sense_weaver.py
-    }
-    class SNCRating {
-        snc_analyst_agent.py
-    }
-    class SNCAnalystAgent {
-        snc_analyst_agent.py
-    }
-    class MockSKFunction {
-        snc_analyst_agent.py
-    }
-    class MockSKSkillsCollection {
-        snc_analyst_agent.py
-    }
-    class MockKernel {
-        snc_analyst_agent.py
-    }
-    class MockSKResult {
-        snc_analyst_agent.py
-    }
-    class SupplyChainRiskAgent {
-        supply_chain_risk_agent.py
-    }
-    class TechnicalAnalystAgent {
-        technical_analyst_agent.py
-    }
-</pre></div>
-
-            <div class="card"><h2>Module Documentation</h2><div class="module-doc"><h3>agent_base.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>agent_forge.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>algo_trading_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>alternative_data_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>anomaly_detection_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>archive_manager_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>behavioral_economics_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>catalyst_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>code_alchemist.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>crypto_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>cyclical_reasoning_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>data_retrieval_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>data_verification_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>discussion_chair_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>echo_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>event_driven_risk_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>financial_modeling_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>fundamental_analyst_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>geopolitical_risk_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>industry_specialist_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>legal_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>lexica_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>lingua_maestro.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>machine_learning_model_training_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>macroeconomic_analysis_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>market_sentiment_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>meta_19_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>meta_cognitive_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>natural_language_generation_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>news_bot.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>newsletter_layout_specialist_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>portfolio_optimization_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>prediction_market_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>prompt_generation_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>prompt_tuner.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>query_understanding_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>rag_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>red_team_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>reflector_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>report_generator_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>result_aggregation_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>risk_assessment_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>sense_weaver.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>snc_analyst_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>supply_chain_risk_agent.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>technical_analyst_agent.py</h3><p class="doc-text">No description available.</p></div></div>
-
-            <div id="runtime-panel" style="display:none; border-top: 1px solid #06b6d4; margin-top: 20px; padding-top: 20px;">
-                <h3>Runtime Diagnostics</h3>
-                <pre>Mock Mode: ACTIVE
-Agent Swarm: STANDBY</pre>
-            </div>
-        </div>
-    </div>
-
-    <div class="footer">
+    <footer style="margin-top: 50px; text-align: center; color: var(--text-muted); font-size: 0.8rem; padding-bottom: 20px;">
         ADAM AUTO-GENERATED SHOWCASE | REF: agents
-    </div>
-
-    <script>
-    // AUTO-GENERATED: Showcase Runtime
-    (function() {
-        const CONFIG = {
-            mockMode: true,
-            rootPath: "../../index.html",
-            currentDir: "agents"
-        };
-
-        // 1. Navigation Handler
-        function initNav() {
-            console.log("Nav initialized for " + CONFIG.currentDir);
-        }
-
-        // 2. Data Loader (Graceful Fallback)
-        async function loadData() {
-            try {
-                // Attempt to load local descriptor
-                const response = await fetch('./AGENTS.md');
-                if(response.ok) {
-                    const text = await response.text();
-                    // Simple text render for now, simulated markdown
-                    document.getElementById('readme-content').innerHTML = '<pre>' + text + '</pre>';
-                }
-            } catch (e) {
-                console.warn("No local documentation found.");
-            }
-        }
-
-        // 3. Runtime Toggle
-        window.toggleRuntime = function() {
-            const panel = document.getElementById('runtime-panel');
-            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-        };
-
-        document.addEventListener('DOMContentLoaded', () => {
-            initNav();
-            // loadData(); // Disabled to prefer generated content
-        });
-    })();
-    </script>
-
-    <!-- Adam Global Nav -->
-    <script src="../../showcase/js/nav.js" data-root="../.."></script>
+    </footer>
 </body>
 </html>
