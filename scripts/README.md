@@ -1,33 +1,35 @@
-# Scripts Directory
+# Adam Script Registry
 
-This directory contains utility scripts for the Adam v24 system.
+This directory contains the operational tools for running, testing, and maintaining the Adam system.
 
-## Benchmarking
+## 🏃 Execution
 
-### `benchmark_adam.py`
+*   **`run_adam.py`**: **The Main Entry Point.** Runs the CLI or launches the core engine.
+    ```bash
+    python scripts/run_adam.py --query "Analyze AAPL"
+    ```
+*   **`swarm_showcase.py`**: Runs a visual demo of the Swarm agents in action (console animation).
 
-This script establishes performance baselines for the Unified Knowledge Graph (UKG) by measuring both data ingestion and graph traversal speeds. It logs results to `logs/swarm_telemetry.jsonl`.
+## 🧪 Simulation & Testing
 
-**Usage:**
+*   **`run_simple_simulation.py`**: A lightweight test of the simulation engine.
+*   **`run_llm_driven_simulation.py`**: Launches a complex, multi-agent scenario driven by LLMs.
+*   **`benchmark_adam.py`**: Measures throughput and latency of the Knowledge Graph.
 
+## 🛠️ Data Generation
+
+*   **`generate_ui_data.py`**: Creates mock JSON data for the frontend dashboard (useful for offline dev).
+*   **`generate_market_mayhem_archive.py`**: Generates historical scenarios for the "Market Mayhem" game.
+*   **`fetch_market_data.py`**: Connects to external APIs (FMP, Yahoo) to populate the local DB.
+
+## 🧹 Maintenance
+
+*   **`initialize_comprehensive_memory.py`**: Resets and seeds the vector database.
+*   **`archive_ui_artifacts.py`**: Backs up generated reports to the `archive/` folder.
+
+## ⚠️ Important Note
+Always run scripts from the **repository root** to ensure imports work correctly:
 ```bash
-python3 scripts/benchmark_adam.py
+export PYTHONPATH=.
+python scripts/script_name.py
 ```
-
-**Benchmarks Run:**
-
-1.  **UKG Ingestion:** Measures the time to ingest a risk state containing 5000 covenants.
-2.  **UKG Path Query:** Measures the time to find a symbolic path between the root Legal Entity and a deeply nested Covenant node.
-
-**Output:**
-
-- Console output showing the commit hash and execution time for each benchmark.
-- Appends structured JSON log entries to `logs/swarm_telemetry.jsonl` with `BENCHMARK_START` and `BENCHMARK_RESULT` events.
-
-**Metrics Tracked:**
-
-- `git_hash`: Commit hash for historical tracking.
-- `benchmark_name`: Name of the specific test (e.g., `UKG_Ingestion`, `UKG_PathQuery`).
-- `duration_seconds`: Execution time.
-- `iterations`: Workload size (e.g., number of covenants).
-- `status`: `SUCCESS` or `FAILED`.

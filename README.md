@@ -1,8 +1,18 @@
-# Adam v23.5: The Neuro-Symbolic Financial Sovereign
+# Adam v26.0: The Neuro-Symbolic Financial Sovereign
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/) [![Docker Image](https://img.shields.io/badge/docker-ready-blue)](https://hub.docker.com/) [![FinanceBench](https://img.shields.io/badge/FinanceBench-99%25-green)](https://arxiv.org/abs/2311.11944)
 
-> **Adam v23.5 operates as a Neuro-Symbolic 'System 2' cognitive engine, upgrading financial AI from a hallucinating chatbot to a fiduciary architect. We fuse deep fundamental analysis with deterministic stochastic risk modeling to deliver calculated conviction rather than conversational filler.**
+> **Adam v26.0 operates as a Neuro-Symbolic 'System 2' cognitive engine, upgrading financial AI from a hallucinating chatbot to a fiduciary architect. We fuse deep fundamental analysis with deterministic stochastic risk modeling to deliver calculated conviction rather than conversational filler.**
+
+---
+
+## 📚 Quick Links
+
+*   [**🚀 Launch Neural Dashboard**](showcase/index.html)
+*   [**⚡ Getting Started**](docs/getting_started.md)
+*   [**🛠️ Setup Guide**](docs/setup_guide.md)
+*   [**🎓 Tutorials & Walkthroughs**](docs/tutorials.md)
+*   [**📖 Full Documentation**](docs/)
 
 ---
 
@@ -10,15 +20,13 @@
 
 The era of the generic LLM "wrapper" is over. Institutional finance faces an **Epistemological Crisis**: stochastic LLMs cannot guarantee truth, making them dangerous for capital allocation. Investors demand **Systems of Agency**—platforms capable of rigorous, end-to-end due diligence with auditability and deterministic reliability.
 
-**Adam v23.5** solves this by introducing a **Cyclical Reasoning Architecture**. Unlike linear "Chain-of-Thought" agents that are fast but prone to errors, Adam employs a graph-based planner that forces the AI to "think before it speaks." It doesn't just answer; it **Drafts**, **Critiques**, **Simulates**, and **Refines** its own analysis before presenting it to you.
-
-[**🚀 Launch Neural Dashboard**](showcase/index.html) | [📖 Read the Documentation](docs/)
+**Adam v26.0** solves this by introducing a **Cyclical Reasoning Architecture**. Unlike linear "Chain-of-Thought" agents that are fast but prone to errors, Adam employs a graph-based planner that forces the AI to "think before it speaks." It doesn't just answer; it **Drafts**, **Critiques**, **Simulates**, and **Refines** its own analysis before presenting it to you.
 
 ---
 
 ## 🧠 Architecture: Hybrid Cognitive Engine
 
-Adam v23.5 utilizes a **Hybrid Architecture** that combines the responsiveness of asynchronous message passing with the depth of cyclical graph reasoning.
+Adam v26.0 utilizes a **Hybrid Architecture** that combines the responsiveness of asynchronous message passing with the depth of cyclical graph reasoning.
 
 ### 1. The "System 2" Reasoning Engine (Brain)
 Located in `core/engine/`, this component handles complex, high-stakes analysis (Deep Dives, Risk assessments). It uses **LangGraph** to model reasoning as a state machine.
@@ -119,7 +127,6 @@ git clone https://github.com/adamvangrover/adam.git
 cd adam
 
 # 2. Sync dependencies with uv (10-100x faster than pip)
-# If you don't have uv, you can use: pip install -r requirements.txt
 uv sync
 
 # 3. Activate the virtual environment
@@ -132,9 +139,11 @@ python scripts/swarm_showcase.py --target .
 # Open showcase/index.html in your browser to see the Neural Dashboard.
 ```
 
+For detailed instructions, see the [Getting Started Guide](docs/getting_started.md) and [Setup Guide](docs/setup_guide.md).
+
 ### Deployment
 
-For full deployment instructions, including Docker and Cloud setup, please refer to the [Deployment Guide](showcase/deployment.html) or `docs/deployment.md`.
+For full deployment instructions, including Docker and Cloud setup, please refer to the [Setup Guide](docs/setup_guide.md) or `docs/deployment.md`.
 
 -----
 
