@@ -16,11 +16,36 @@
 
 ---
 
+## 📂 Directory Structure
+
+A high-level overview of the repository layout:
+
+```text
+adam/
+├── core/                   # The "Brain" of the system
+│   ├── agents/             # Specialized autonomous agents (Risk, Fundemental)
+│   ├── engine/             # System 2 Reasoning Engine (Planner, Graph)
+│   ├── data_processing/    # Universal Ingestor & ETL pipelines
+│   └── system/             # System 1 Async Swarm infrastructure
+├── services/
+│   └── webapp/             # React/Flask "Neural Dashboard"
+├── showcase/               # Static HTML visualizers and demos
+├── docs/                   # Documentation, tutorials, and guides
+├── scripts/                # Utility scripts for running and testing
+├── server/                 # MCP Server implementation
+└── tests/                  # Unit and integration tests
+```
+
+---
+
 ## 📉 The "Epistemological Crisis" in Financial AI
 
 The era of the generic LLM "wrapper" is over. Institutional finance faces an **Epistemological Crisis**: stochastic LLMs cannot guarantee truth, making them dangerous for capital allocation. Investors demand **Systems of Agency**—platforms capable of rigorous, end-to-end due diligence with auditability and deterministic reliability.
 
-**Adam v26.0** solves this by introducing a **Cyclical Reasoning Architecture**. Unlike linear "Chain-of-Thought" agents that are fast but prone to errors, Adam employs a graph-based planner that forces the AI to "think before it speaks." It doesn't just answer; it **Drafts**, **Critiques**, **Simulates**, and **Refines** its own analysis before presenting it to you.
+**Adam v26.0** solves this by introducing a **Cyclical Reasoning Architecture** (System 2) that complements the traditional Async Swarm (System 1).
+
+*   **System 1 (The Swarm):** Fast, intuitive, and massively parallel. Ideal for news monitoring and data ingestion.
+*   **System 2 (The Graph):** Slow, deliberate, and logical. Forces the AI to "think before it speaks" by drafting, critiquing, and refining its analysis.
 
 ---
 
@@ -144,6 +169,18 @@ For detailed instructions, see the [Getting Started Guide](docs/getting_started.
 ### Deployment
 
 For full deployment instructions, including Docker and Cloud setup, please refer to the [Setup Guide](docs/setup_guide.md) or `docs/deployment.md`.
+
+-----
+
+## ❓ Troubleshooting
+
+Encountering issues? Here are some quick fixes:
+
+*   **`uv` not found:** Ensure it is installed (`curl -LsSf https://astral.sh/uv/install.sh | sh`) and in your PATH.
+*   **API Key Errors:** Check your `.env` file and ensure `OPENAI_API_KEY` is set.
+*   **Docker Port Conflicts:** Ensure port 5000 is free or modify `docker-compose.yml`.
+
+For a comprehensive guide, check the [Troubleshooting Page](docs/troubleshooting.md).
 
 -----
 
