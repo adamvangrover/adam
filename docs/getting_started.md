@@ -45,9 +45,29 @@ OPENAI_API_KEY=sk-your-key-here
 # Optional: Set other keys if needed (e.g., SERPER_API_KEY for search)
 ```
 
-### 4. Verify Installation
+### 4. VS Code Configuration (Recommended)
 
-Activate the environment and run a quick test.
+To get the best development experience with type checking and auto-completion:
+
+1.  **Install Extensions:**
+    *   Python (ms-python.python)
+    *   Pylance (ms-python.vscode-pylance)
+    *   Ruff (charliermarsh.ruff) - *Fast linting*
+
+2.  **Configure `.vscode/settings.json`:**
+    Create or update this file to point VS Code to the `uv` virtual environment.
+
+    ```json
+    {
+      "python.defaultInterpreterPath": ".venv/bin/python",
+      "python.analysis.typeCheckingMode": "strict",
+      "python.analysis.extraPaths": ["core", "services"]
+    }
+    ```
+
+### 5. Sanity Check
+
+Activate the environment and run a quick test to ensure everything is connected.
 
 ```bash
 source .venv/bin/activate
@@ -56,7 +76,9 @@ source .venv/bin/activate
 python scripts/run_adam.py --query "Hello, Adam."
 ```
 
-You should see a response indicating the system is operational.
+**Expected Output:**
+You should see logs initializing the `MetaOrchestrator` and a response similar to:
+`[Adam]: System is online. How can I assist you with your financial analysis today?`
 
 ## Running the System
 

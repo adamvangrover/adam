@@ -53,8 +53,73 @@ Click "Execute Simulation". Watch as the **Risk Gauge** updates in real-time, sh
 
 (Advanced) Learn how to add a new specialist to the swarm.
 
-1.  **Create the Agent File**: Create `core/agents/specialized/my_agent.py`.
-2.  **Define the Class**: Inherit from `BaseAgent`.
-3.  **Register the Tool**: Add your agent to `core/engine/neuro_symbolic_planner.py`.
+### 1. Create the Agent File
+Create a new file `core/agents/specialized/crypto_analyst.py`.
 
-*See `core/README.md` for detailed API documentation.*
+```python
+from typing import Dict, Any
+from core.agents.templates.v26_template_agent import TemplateAgentV26, AgentInput, AgentOutput
+
+class CryptoAnalystAgent(TemplateAgentV26):
+    """Specialized agent for Cryptocurrency analysis."""
+
+    def __init__(self):
+        super().__init__(agent_name="CryptoAnalyst")
+
+    async def execute(self, input_data: AgentInput) -> AgentOutput:
+        self.logger.info(f"Analyzing crypto: {input_data.query}")
+
+        # Logic to fetch crypto price (mocked here)
+        price = 65000  # BTC Price
+
+        return AgentOutput(
+            answer=f"The current price is ${price}.",
+            sources=["CoinGecko API"],
+            confidence=0.99,
+            metadata={"ticker": "BTC"}
+        )
+```
+
+### 2. Register the Agent
+Add your agent to the `NeuroSymbolicPlanner` registry in `core/engine/neuro_symbolic_planner.py` (or the relevant registry file).
+
+### 3. Test It
+Run the agent directly via the CLI:
+```bash
+python scripts/run_adam.py --agent "CryptoAnalyst" --query "Check Bitcoin price"
+```
+
+---
+
+## Tutorial 4: Debugging Agent Failures
+
+If an agent fails or "hallucinates", follow these steps to diagnose the issue.
+
+### 1. Enable Verbose Logging
+Run the system with the `--debug` flag to see full tracebacks and raw LLM inputs/outputs.
+
+```bash
+python scripts/run_adam.py --debug --query "Complex query that fails"
+```
+
+### 2. Inspect the "Thought Trace"
+Look for the `[Planner]` logs.
+*   Did the planner understand the intent?
+*   Did it select the correct tool?
+
+**Example Log:**
+```text
+[Planner] Selected tools: ['search_news', 'fetch_10k'] -> Correct
+[Tool:search_news] Error: API Key invalid -> Root Cause identified
+```
+
+### 3. Check "Confidence Scores"
+If an agent returns a generic answer, check the `confidence` score in the JSON output. If it's `< 0.5`, the Consensus Engine likely rejected the specific analysis and fell back to a general response.
+
+### 4. Replay with `pytest`
+Create a reproduction test case in `tests/repro_issue.py` to isolate the failure without running the full system.
+
+```bash
+python scripts/run_adam.py --mode replay --log-id <ID>
+```
+*(Note: Replay mode requires a saved log file)*
