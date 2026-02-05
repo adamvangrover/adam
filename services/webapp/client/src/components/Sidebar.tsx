@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 
 const navItems = [
   { path: '/', label: 'Mission Control', icon: '🚀' },
+  { path: '/prompt-alpha', label: 'Prompt Alpha', icon: '🧠' },
   { path: '/synthesizer', label: 'Synthesizer', icon: '🎛️' },
   { path: '/terminal', label: 'UFOs Terminal', icon: '💻' },
   { path: '/market-data', label: 'Market Intelligence', icon: '📈' },
