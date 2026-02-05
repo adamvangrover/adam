@@ -1,4 +1,3 @@
-from core.utils.logging_utils import setup_logging
 import os
 import sys
 import logging
@@ -8,6 +7,8 @@ from flask_cors import CORS
 
 # Ensure root is in path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+
+from core.utils.logging_utils import setup_logging
 
 
 # Safe Import for Orchestrators
@@ -39,6 +40,7 @@ SHOWCASE_DIR = os.path.join(BASE_DIR, 'showcase')
 
 # Global State
 meta_orchestrator = None
+simulation_engine = None
 # LOG_BUFFER removed to prevent sensitive data exposure
 # LOG_BUFFER = deque(maxlen=50)
 
@@ -73,6 +75,15 @@ def init_orchestrator():
         logger.info("MetaOrchestrator Initialized Successfully.")
     except Exception as e:
         logger.fatal(f"Failed to initialize MetaOrchestrator: {e}")
+
+    # Initialize Crisis Adjudicator Engine
+    global simulation_engine
+    try:
+        from core.engine.adjudicator_engine import AdjudicatorEngine
+        simulation_engine = AdjudicatorEngine()
+        logger.info("AdjudicatorEngine Initialized Successfully.")
+    except Exception as e:
+        logger.error(f"Failed to initialize AdjudicatorEngine: {e}")
 
 
 @app.route('/')
@@ -127,6 +138,37 @@ async def chat():
     except Exception as e:
         logging.error(f"Error processing query: {e}", exc_info=True)
         return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/simulation/start', methods=['POST'])
+def start_simulation():
+    if not simulation_engine:
+        return jsonify({"error": "Simulation Engine not available"}), 503
+    simulation_engine.reset()
+    return jsonify({"status": "Simulation Started", "state": simulation_engine.get_state()})
+
+
+@app.route('/api/simulation/state', methods=['GET'])
+def get_simulation_state():
+    if not simulation_engine:
+         return jsonify({"error": "Simulation Engine not available"}), 503
+    return jsonify(simulation_engine.get_state())
+
+
+@app.route('/api/simulation/action', methods=['POST'])
+def submit_action():
+    if not simulation_engine:
+         return jsonify({"error": "Simulation Engine not available"}), 503
+
+    data = request.json
+    inject_id = data.get('inject_id')
+    option_id = data.get('option_id')
+
+    if not inject_id or not option_id:
+        return jsonify({"error": "Missing inject_id or option_id"}), 400
+
+    simulation_engine.resolve_action(inject_id, option_id)
+    return jsonify({"status": "Action Resolved", "state": simulation_engine.get_state()})
 
 if __name__ == '__main__':
     setup_logging()
