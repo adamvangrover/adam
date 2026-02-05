@@ -3,204 +3,634 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v23.5 | core</title>
+    <title>Index of /core</title>
     <link rel="stylesheet" href="../showcase/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Fallback styles if stylesheet is missing */
-        body { background-color: #050b14; color: #06b6d4; font-family: monospace; margin: 0; padding: 0; }
-        .header { border-bottom: 1px solid #06b6d4; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .breadcrumb { font-size: 1.2em; color: #e2e8f0; }
-        .badge { border: 1px solid #06b6d4; padding: 5px 10px; border-radius: 4px; font-size: 0.8em; text-transform: uppercase; }
-        .container { display: flex; height: calc(100vh - 80px); }
-        .sidebar { width: 300px; border-right: 1px solid #334155; padding: 20px; overflow-y: auto; background: rgba(5, 11, 20, 0.95); }
-        .main-stage { flex: 1; padding: 30px; overflow-y: auto; }
-        .file-item { padding: 8px; cursor: pointer; display: block; color: #94a3b8; text-decoration: none; }
-        .file-item:hover { color: #06b6d4; background: rgba(6, 182, 212, 0.1); }
-        .folder { color: #fbbf24; font-weight: bold; }
-        .footer { border-top: 1px solid #334155; padding: 10px; text-align: center; font-size: 0.8em; color: #64748b; background: #020617; }
-        .nav-links a { margin-left: 15px; color: #06b6d4; text-decoration: none; border: 1px solid #06b6d4; padding: 5px 10px; transition: all 0.2s; }
-        .nav-links a:hover { background: #06b6d4; color: #000; }
-        pre { background: #0f172a; padding: 15px; border-radius: 6px; overflow-x: auto; border: 1px solid #1e293b; }
-        h1, h2, h3 { color: #f8fafc; text-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
-        .card { background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; padding: 20px; margin-bottom: 20px; border-radius: 8px; }
-        .glitch { position: relative; }
-        .module-doc { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #334155; }
-        .doc-text { color: #94a3b8; font-style: italic; }
+        .file-list { list-style: none; padding: 0; }
+        .file-item { padding: 8px 12px; border-bottom: 1px solid var(--panel-border); display: flex; align-items: center; justify-content: space-between; transition: background 0.2s; }
+        .file-item:hover { background: rgba(255, 255, 255, 0.05); }
+        .file-icon { margin-right: 10px; width: 20px; text-align: center; display: inline-block; }
+        .file-name { flex-grow: 1; font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-primary); }
+        .file-tag { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; margin-left: 10px; }
+        .tag-dir { background: rgba(6, 182, 212, 0.1); color: var(--primary-color); border: 1px solid var(--primary-color); }
+        .tag-html { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); border: 1px solid var(--warning-color); }
+        .tag-py { background: rgba(16, 185, 129, 0.1); color: var(--success-color); border: 1px solid var(--success-color); }
+        .readme-container { margin-top: 30px; padding: 20px; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--panel-border); border-radius: 4px; }
+        .readme-title { color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; border-bottom: 1px solid var(--panel-border); padding-bottom: 5px; }
+        .readme-body { font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted); white-space: pre-wrap; overflow-x: auto; line-height: 1.5; }
     </style>
-    <!-- Mermaid JS -->
-    <script type="module">
-        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
-    </script>
 </head>
 <body>
-    <div class="header">
+    <div class="scan-line"></div>
+
+    <header class="cyber-header" style="padding: 15px 20px; border-bottom: 1px solid var(--primary-color); background: rgba(5, 11, 20, 0.95); display: flex; justify-content: space-between; align-items: center;">
         <div>
-            <h1 style="margin:0; display:inline-block;" class="glitch">ADAM v23.5</h1>
-            <span class="breadcrumb" style="margin-left: 20px;">/core</span>
+            <h1 class="mono" style="margin: 0; font-size: 1.2rem; color: var(--primary-color);">ADAM REPO BROWSER</h1>
+            <div class="mono" style="font-size: 0.8rem; color: var(--text-muted);">PATH: <span style="color: var(--text-primary);">/core</span></div>
         </div>
-        <div class="nav-links">
-            <a href="../index.html">[UP LEVEL]</a>
-            <a href="../index.html">[ROOT]</a>
-            <a href="#" onclick="window.toggleRuntime()">[LIVE RUNTIME]</a>
-            <a href="https://github.com/your-repo/adam" target="_blank">[GITHUB]</a>
+        <div style="text-align: right;">
+            <div class="cyber-badge badge-cyan">SYSTEM ONLINE</div>
         </div>
-        <span class="badge">SYSTEM ONLINE</span>
+    </header>
+
+    <div style="padding: 20px; max-width: 1200px; margin: 0 auto;">
+        <nav style="margin-bottom: 20px; display: flex; gap: 10px;">
+            <a href="../" class="cyber-btn">&uarr; UP LEVEL</a>
+            <a href="../index.html" class="cyber-btn">ROOT</a>
+            <a href="../showcase/index.html" class="cyber-btn" style="border-color: var(--accent-color); color: var(--accent-color);">MISSION CONTROL</a>
+        </nav>
+
+        <main class="glass-panel" style="padding: 0; overflow: hidden; border-radius: 4px;">
+            <div style="padding: 10px 15px; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--panel-border); color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">
+                Directory Contents
+            </div>
+            <ul class="file-list">
+
+                <li class="file-item">
+                    <a href="adk_patterns/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">adk_patterns/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="advisory/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">advisory/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="agents/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">agents/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="analysis/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">analysis/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="api/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">api/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="capability_monitoring/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">capability_monitoring/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="compliance/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">compliance/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="data/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">data/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="data_access/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">data_access/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="data_processing/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">data_processing/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="data_sources/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">data_sources/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="embeddings/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">embeddings/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="engine/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">engine/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="execution_router/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">execution_router/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="family_office/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">family_office/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="financial_data/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">financial_data/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="financial_suite/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">financial_suite/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="future_state/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">future_state/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="gold_standard/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">gold_standard/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="governance/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">governance/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="hnasp/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">hnasp/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="infrastructure/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">infrastructure/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="institutional_radar/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">institutional_radar/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="interfaces/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">interfaces/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="learning/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">learning/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="libraries_and_archives/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">libraries_and_archives/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="llm/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">llm/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="manifests/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">manifests/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="market_data/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">market_data/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="mcp/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">mcp/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="memory/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">memory/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="newsletter_layout/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">newsletter_layout/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="oswm/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">oswm/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="pricing_engine/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">pricing_engine/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="procedures/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">procedures/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="product/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">product/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="prompting/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">prompting/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="quantitative/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">quantitative/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="rag/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">rag/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="research/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">research/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="risk_engine/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">risk_engine/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="rust_pricing/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">rust_pricing/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="schemas/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">schemas/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="security/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">security/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="simulation/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">simulation/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="simulations/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">simulations/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="strategy/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">strategy/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="swarms/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">swarms/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="system/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">system/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="tests/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">tests/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="tools/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">tools/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="trading/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">trading/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="training/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">training/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="unified_banking/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">unified_banking/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="unified_ledger/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">unified_ledger/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="utils/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">utils/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="v22_quantum_pipeline/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">v22_quantum_pipeline/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="v23_graph_engine/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">v23_graph_engine/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="v24_architecture/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">v24_architecture/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="v30_architecture/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">v30_architecture/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="vectorstore/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">vectorstore/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="vertical_risk_agent/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">vertical_risk_agent/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="workflows/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">workflows/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="world_simulation/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">world_simulation/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="xai/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">xai/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="AGENTS.md" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📝</span>
+                        <span class="file-name">AGENTS.md</span>
+
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="__init__.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">__init__.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="api.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">api.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="directory_manifest.jsonld" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">directory_manifest.jsonld</span>
+
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="llm_plugin.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">llm_plugin.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="main.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">main.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="settings.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">settings.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+            </ul>
+        </main>
+
+
     </div>
 
-    <div class="container">
-        <div class="sidebar">
-            <h3>Directory Structure</h3>
-            <a href="../index.html" class="file-item folder">📂 .. (Parent)</a>
-<a href="AGENTS.md" class="file-item">📝 AGENTS.md</a>
-<a href="__init__.py" class="file-item">📄 __init__.py</a>
-<a href="advisory/index.html" class="file-item folder">📂 advisory</a>
-<a href="agents/index.html" class="file-item folder">📂 agents</a>
-<a href="analysis/index.html" class="file-item folder">📂 analysis</a>
-<a href="api/index.html" class="file-item folder">📂 api</a>
-<a href="api.py" class="file-item">📄 api.py</a>
-<a href="capability_monitoring/index.html" class="file-item folder">📂 capability_monitoring</a>
-<a href="data_access/index.html" class="file-item folder">📂 data_access</a>
-<a href="data_processing/index.html" class="file-item folder">📂 data_processing</a>
-<a href="data_sources/index.html" class="file-item folder">📂 data_sources</a>
-<a href="embeddings/index.html" class="file-item folder">📂 embeddings</a>
-<a href="engine/index.html" class="file-item folder">📂 engine</a>
-<a href="execution_router/index.html" class="file-item folder">📂 execution_router</a>
-<a href="family_office/index.html" class="file-item folder">📂 family_office</a>
-<a href="financial_data/index.html" class="file-item folder">📂 financial_data</a>
-<a href="gold_standard/index.html" class="file-item folder">📂 gold_standard</a>
-<a href="learning/index.html" class="file-item folder">📂 learning</a>
-<a href="llm/index.html" class="file-item folder">📂 llm</a>
-<a href="llm_plugin.py" class="file-item">📄 llm_plugin.py</a>
-<a href="main.py" class="file-item">📄 main.py</a>
-<a href="market_data/index.html" class="file-item folder">📂 market_data</a>
-<a href="mcp/index.html" class="file-item folder">📂 mcp</a>
-<a href="memory/index.html" class="file-item folder">📂 memory</a>
-<a href="newsletter_layout/index.html" class="file-item folder">📂 newsletter_layout</a>
-<a href="pricing_engine/index.html" class="file-item folder">📂 pricing_engine</a>
-<a href="prompting/index.html" class="file-item folder">📂 prompting</a>
-<a href="rag/index.html" class="file-item folder">📂 rag</a>
-<a href="risk_engine/index.html" class="file-item folder">📂 risk_engine</a>
-<a href="schemas/index.html" class="file-item folder">📂 schemas</a>
-<a href="settings.py" class="file-item">📄 settings.py</a>
-<a href="simulations/index.html" class="file-item folder">📂 simulations</a>
-<a href="strategy/index.html" class="file-item folder">📂 strategy</a>
-<a href="system/index.html" class="file-item folder">📂 system</a>
-<a href="tools/index.html" class="file-item folder">📂 tools</a>
-<a href="trading/index.html" class="file-item folder">📂 trading</a>
-<a href="utils/index.html" class="file-item folder">📂 utils</a>
-<a href="v22_quantum_pipeline/index.html" class="file-item folder">📂 v22_quantum_pipeline</a>
-<a href="v23_graph_engine/index.html" class="file-item folder">📂 v23_graph_engine</a>
-<a href="vectorstore/index.html" class="file-item folder">📂 vectorstore</a>
-<a href="vertical_risk_agent/index.html" class="file-item folder">📂 vertical_risk_agent</a>
-<a href="world_simulation/index.html" class="file-item folder">📂 world_simulation</a>
-<a href="xai/index.html" class="file-item folder">📂 xai</a>
-        </div>
-        <div class="main-stage" id="main-content">
-            <div class="card">
-                <h2>Overview</h2>
-                <div id="readme-content">
-                    <p>No README.md found. See Module Documentation below.</p>
-                </div>
-            </div>
-
-            <div class="card"><h2>Class Structure</h2><pre class="mermaid">
-classDiagram
-    class LLMPluginError {
-        llm_plugin.py
-    }
-    class LLMConfigurationError {
-        llm_plugin.py
-    }
-    class LLMAPIError {
-        llm_plugin.py
-    }
-    class BaseLLM {
-        llm_plugin.py
-    }
-    class MockLLM {
-        llm_plugin.py
-    }
-    class OpenAILLM {
-        llm_plugin.py
-    }
-    class HuggingFaceLLM {
-        llm_plugin.py
-    }
-    class CohereLLM {
-        llm_plugin.py
-    }
-    class PromptTemplate {
-        llm_plugin.py
-    }
-    class CacheManager {
-        llm_plugin.py
-    }
-    class LLMPlugin {
-        llm_plugin.py
-    }
-    class Settings {
-        settings.py
-    }
-</pre></div>
-
-            <div class="card"><h2>Module Documentation</h2><div class="module-doc"><h3>api.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>llm_plugin.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>main.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>settings.py</h3><p class="doc-text">No description available.</p></div></div>
-
-            <div id="runtime-panel" style="display:none; border-top: 1px solid #06b6d4; margin-top: 20px; padding-top: 20px;">
-                <h3>Runtime Diagnostics</h3>
-                <pre>Mock Mode: ACTIVE
-Agent Swarm: STANDBY</pre>
-            </div>
-        </div>
-    </div>
-
-    <div class="footer">
+    <footer style="margin-top: 50px; text-align: center; color: var(--text-muted); font-size: 0.8rem; padding-bottom: 20px;">
         ADAM AUTO-GENERATED SHOWCASE | REF: core
-    </div>
-
-    <script>
-    // AUTO-GENERATED: Showcase Runtime
-    (function() {
-        const CONFIG = {
-            mockMode: true,
-            rootPath: "../index.html",
-            currentDir: "core"
-        };
-
-        // 1. Navigation Handler
-        function initNav() {
-            console.log("Nav initialized for " + CONFIG.currentDir);
-        }
-
-        // 2. Data Loader (Graceful Fallback)
-        async function loadData() {
-            try {
-                // Attempt to load local descriptor
-                const response = await fetch('./AGENTS.md');
-                if(response.ok) {
-                    const text = await response.text();
-                    // Simple text render for now, simulated markdown
-                    document.getElementById('readme-content').innerHTML = '<pre>' + text + '</pre>';
-                }
-            } catch (e) {
-                console.warn("No local documentation found.");
-            }
-        }
-
-        // 3. Runtime Toggle
-        window.toggleRuntime = function() {
-            const panel = document.getElementById('runtime-panel');
-            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-        };
-
-        document.addEventListener('DOMContentLoaded', () => {
-            initNav();
-            // loadData(); // Disabled to prefer generated content
-        });
-    })();
-    </script>
-
-    <!-- Adam Global Nav -->
-    <script src="../showcase/js/nav.js" data-root=".."></script>
+    </footer>
 </body>
 </html>

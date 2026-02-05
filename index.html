@@ -1,446 +1,197 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adam System :: ROOT</title>
-    <link rel="stylesheet" href="./showcase/css/style.css">
+    <title>ADAM v23.5 :: SYSTEM ROOT</title>
+    <link rel="stylesheet" href="showcase/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        .readme-content { padding: 20px; }
-        .readme-content h1 { font-size: 1.5rem; margin-bottom: 1rem; color: var(--primary-color); }
-        .readme-content h2 { font-size: 1.25rem; margin-top: 1.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--panel-border); padding-bottom: 0.25rem; }
-        .readme-content p { margin-bottom: 1rem; line-height: 1.6; color: var(--text-secondary); }
-        .readme-content pre { background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 4px; overflow-x: auto; border: 1px solid var(--panel-border); }
-        .readme-content code { font-family: var(--font-mono); color: var(--accent-color); }
-
-        .file-icon { display: inline-block; width: 20px; text-align: center; margin-right: 8px; color: var(--text-muted); }
-        .dir-icon { color: var(--primary-color); }
+        .portal-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--panel-border);
+            border-radius: 4px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+        .portal-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
+            transform: translateY(-5px);
+        }
+        .portal-title {
+            font-family: var(--font-mono);
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        .portal-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .dir-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 30px;
+        }
+        .dir-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--panel-border);
+            border-radius: 4px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .dir-item:hover {
+            background: rgba(255,255,255,0.08);
+            color: var(--text-primary);
+            border-color: var(--primary-color);
+        }
     </style>
 </head>
 <body>
     <div class="scan-line"></div>
     <div class="scan-glow"></div>
 
-    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
-
-        <!-- Header -->
-        <header style="margin-bottom: 40px; border-bottom: 1px solid var(--panel-border); padding-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <header class="cyber-header" style="padding: 20px 40px; border-bottom: 1px solid var(--primary-color); background: rgba(5, 11, 20, 0.95);">
+        <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto;">
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <h1 class="glitch-text" data-text="ADAM v23.5" style="font-size: 2.5rem; margin: 0; color: var(--primary-color); letter-spacing: 2px;">ADAM v23.5</h1>
+                <div style="border-left: 1px solid #333; padding-left: 20px; height: 40px; display: flex; flex-direction: column; justify-content: center;">
+                    <span class="mono" style="font-size: 0.9rem; color: var(--text-primary);">UNIFIED FINANCIAL INTELLIGENCE</span>
+                    <span class="mono" style="font-size: 0.7rem; color: var(--text-muted);">SYSTEM STATUS: ONLINE</span>
+                </div>
+            </div>
             <div>
-                <h1 class="glitch-text" data-text="ADAM v23.5" style="font-size: 2rem; margin: 0; color: var(--primary-color);">ADAM v23.5</h1>
-                <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">
-                    PATH: <span style="color: var(--text-primary);">/ROOT</span>
-                </div>
+                <a href="https://github.com/adamvangrover/adam" target="_blank" class="cyber-btn">GITHUB REPOSITORY</a>
             </div>
-            <div style="text-align: right;">
-                <div class="cyber-badge badge-cyan">SYSTEM ONLINE</div>
-                <div style="margin-top: 5px; font-size: 0.7rem; color: var(--text-muted);">Mode: SHOWCASE</div>
-            </div>
-        </header>
+        </div>
+    </header>
 
-        <!-- Navigation -->
-        <nav style="margin-bottom: 30px; display: flex; gap: 10px;">
-            <a href="./index.html" class="cyber-btn">&uarr; UP LEVEL</a>
-            <a href="./index.html" class="cyber-btn">ROOT</a>
-            <button onclick="toggleRuntime()" class="cyber-btn">LIVE RUNTIME</button>
-            <a href="https://github.com/adamvangrover/adam" class="cyber-btn" target="_blank">GITHUB</a>
-        </nav>
+    <div style="max-width: 1400px; margin: 0 auto; padding: 40px;">
 
-        <div style="display: grid; grid-template-columns: 250px 1fr; gap: 20px;">
+        <p style="font-size: 1.1rem; color: var(--text-primary); max-width: 800px; margin-bottom: 50px; line-height: 1.6;">
+            <strong>Adam</strong> is an autonomous financial analysis system utilizing neuro-symbolic reasoning, knowledge graphs, and multi-agent swarms to model market dynamics, assess risk, and generate actionable intelligence.
+        </p>
 
-            <!-- Sidebar / File Explorer -->
-            <aside class="glass-panel" style="padding: 20px; border-radius: 4px; height: fit-content;">
-                <h3 style="margin-top: 0; font-size: 0.9rem; text-transform: uppercase; color: var(--text-secondary); border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 15px;">
-                    Directory Contents
-                </h3>
-                <ul style="list-style: none; padding: 0; margin: 0; font-family: var(--font-mono); font-size: 0.85rem;">
-                    <li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="architecture/index.html" style="color: var(--primary-color);">architecture/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="archive/index.html" style="color: var(--primary-color);">archive/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="artifacts/index.html" style="color: var(--primary-color);">artifacts/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="chatbot/index.html" style="color: var(--primary-color);">chatbot/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="config/index.html" style="color: var(--primary-color);">config/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="core/index.html" style="color: var(--primary-color);">core/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="data/index.html" style="color: var(--primary-color);">data/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="docs/index.html" style="color: var(--primary-color);">docs/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="downloads/index.html" style="color: var(--primary-color);">downloads/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="evals/index.html" style="color: var(--primary-color);">evals/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="experimental/index.html" style="color: var(--primary-color);">experimental/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="financial_digital_twin/index.html" style="color: var(--primary-color);">financial_digital_twin/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="logs/index.html" style="color: var(--primary-color);">logs/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="prompt_library/index.html" style="color: var(--primary-color);">prompt_library/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="prompts/index.html" style="color: var(--primary-color);">prompts/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="prototype/index.html" style="color: var(--primary-color);">prototype/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="research/index.html" style="color: var(--primary-color);">research/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="scripts/index.html" style="color: var(--primary-color);">scripts/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="services/index.html" style="color: var(--primary-color);">services/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="showcase/index.html" style="color: var(--primary-color);">showcase/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="src/index.html" style="color: var(--primary-color);">src/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="technical_specification/index.html" style="color: var(--primary-color);">technical_specification/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="tests/index.html" style="color: var(--primary-color);">tests/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="tinker_lab/index.html" style="color: var(--primary-color);">tinker_lab/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="verification/index.html" style="color: var(--primary-color);">verification/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="webapp/index.html" style="color: var(--primary-color);">webapp/</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="=13" style="color: var(--text-secondary);">=13</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="AGENTS.md" style="color: var(--text-secondary);">AGENTS.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="Architectural_Review_Refined.md" style="color: var(--text-secondary);">Architectural_Review_Refined.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="CONTRIBUTING.md" style="color: var(--text-secondary);">CONTRIBUTING.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="Dockerfile" style="color: var(--text-secondary);">Dockerfile</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="Dockerfile.core" style="color: var(--text-secondary);">Dockerfile.core</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="Dockerfile.modern" style="color: var(--text-secondary);">Dockerfile.modern</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="LICENSE" style="color: var(--text-secondary);">LICENSE</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="MANIFEST.in" style="color: var(--text-secondary);">MANIFEST.in</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="Makefile" style="color: var(--text-secondary);">Makefile</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="README.md" style="color: var(--text-secondary);">README.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="README3.md" style="color: var(--text-secondary);">README3.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="ROADMAP_AGENTS_EXPANSION.md" style="color: var(--text-secondary);">ROADMAP_AGENTS_EXPANSION.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="ROADMAP_AGENTS_EXPANSION_V23.md" style="color: var(--text-secondary);">ROADMAP_AGENTS_EXPANSION_V23.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="UI Mockups.md" style="color: var(--text-secondary);">UI Mockups.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="VERSIONING.md" style="color: var(--text-secondary);">VERSIONING.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="adam_v22_seed.json" style="color: var(--text-secondary);">adam_v22_seed.json</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="app.py" style="color: var(--text-secondary);">app.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="debug_import.py" style="color: var(--text-secondary);">debug_import.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="docker-compose.yml" style="color: var(--text-secondary);">docker-compose.yml</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="imports.txt" style="color: var(--text-secondary);">imports.txt</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="index2.html" style="color: var(--text-secondary);">index2.html</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="index3.html" style="color: var(--text-secondary);">index3.html</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="index4.html" style="color: var(--text-secondary);">index4.html</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="mkdocs.yml" style="color: var(--text-secondary);">mkdocs.yml</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="pyproject.toml" style="color: var(--text-secondary);">pyproject.toml</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="readme.html" style="color: var(--text-secondary);">readme.html</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="readme2.md" style="color: var(--text-secondary);">readme2.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="requirements.txt" style="color: var(--text-secondary);">requirements.txt</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="run_adam.sh" style="color: var(--text-secondary);">run_adam.sh</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="run_ui.sh" style="color: var(--text-secondary);">run_ui.sh</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="server.pid" style="color: var(--text-secondary);">server.pid</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="setup.py" style="color: var(--text-secondary);">setup.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="tinker_lab_summary.md" style="color: var(--text-secondary);">tinker_lab_summary.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="verification_chat.png" style="color: var(--text-secondary);">verification_chat.png</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="version_control.json" style="color: var(--text-secondary);">version_control.json</a></li>
-                </ul>
-            </aside>
+        <!-- Main Portals -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-bottom: 60px;">
 
-            <!-- Main Content -->
-            <main>
-                <!-- Runtime Overlay (Hidden by default) -->
-                <div id="runtime-panel" class="glass-panel fade-in" style="display: none; padding: 20px; margin-bottom: 20px; border-color: var(--success-color);">
-                    <h3 style="color: var(--success-color); margin-top: 0;">Live System Interface</h3>
-                    <p style="font-size: 0.9rem;">Connecting to Orchestrator at localhost:5001...</p>
-                    <div style="background: black; padding: 10px; border-radius: 4px; font-family: var(--font-mono); height: 100px; overflow-y: auto; font-size: 0.8rem; color: #0f0;">
-                        > Connecting...<br>
-                        > Error: API Unreachable (Mock Mode Active)<br>
-                        > System Status: STANDBY
+            <!-- Showcase -->
+            <div class="portal-card" style="border-color: var(--accent-color);">
+                <div>
+                    <div class="portal-title" style="color: var(--accent-color);">
+                        <span style="font-size: 1.5rem; margin-right: 10px;">🚀</span> MISSION CONTROL
                     </div>
+                    <p class="portal-desc">
+                        Access the interactive dashboards, simulations, and live agent feeds. This is the primary interface for "Showcase Mode".
+                    </p>
                 </div>
+                <a href="showcase/index.html" class="cyber-btn" style="text-align: center; border-color: var(--accent-color); color: var(--accent-color);">LAUNCH DASHBOARD &rarr;</a>
+            </div>
 
-                <!-- Readme Content -->
-                <div class="glass-panel" style="border-radius: 4px;">
-                    <div class="readme-content"><p>'````markdown
-'README content formatted as a Markdown file.</p>
-<h1>Adam v23.5: Your AI-Powered Partner</h1>
-<blockquote>
-<p><strong>Note:</strong> This document describes the current active version of the Adam system (v23.0). For details on the legacy stable version, please see the v21.0 Documentation.</p>
-</blockquote>
-<hr />
-<ul>
-<li><strong>Cyclical Reasoning Graph:</strong> A self-correcting neuro-symbolic engine.</li>
-<li><strong>Neural Dashboard:</strong> Real-time visualization of agent thought processes.</li>
-<li><strong>Hybrid Architecture:</strong> Combining v21's reliability with v22's speed and v23's intelligence.</li>
-<li><strong>Gold Standard Data Pipeline:</strong> A rigorous "universal ingestion" process that scrubs and certifies all system knowledge.</li>
-</ul>
-<h2>🧠 Adam v23.0: The Adaptive Hive Mind</h2>
-<p><strong>Mission: Autonomous Financial Analysis &amp; Adaptive Reasoning</strong></p>
-<p>Adam has evolved. v23.0 introduces the <strong>"Adaptive System" architecture</strong>—a self-correcting, neuro-symbolic engine designed to perform deep financial deep dives, risk assessments, and market simulations with human-like reasoning and machine-speed execution. Unlike traditional chatbots, Adam "thinks" in graphs, critiquing its own work before presenting it to you.</p>
-<p><a href="#">🚀 Launch Neural Dashboard</a> | <a href="#">📖 Read the User Guide</a> | <a href="#">⚡ Quick Start</a></p>
-<hr />
-<h2>🚀 Mission Control</h2>
-<p><a href="./showcase/neural_dashboard.html"><strong>Launch Neural Dashboard</strong></a>
-Monitor real-time agent reasoning, knowledge graph updates, and risk simulations.</p>
-<h3>🏗️ System Architecture</h3>
-<p>Adam v23.0 moves beyond linear chains to a dynamic, graph-based execution model. The system creates a <strong>"Cyclical Reasoning Graph"</strong> for every query, allowing it to draft, critique, and refine its own analysis before presenting results.</p>
-<pre><code class="language-mermaid">graph TD
-    User[User / API] --&gt;|Query| Meta[Meta Orchestrator]
-
-    subgraph &quot;The Brain (v23 Graph Engine)&quot;
-        Meta --&gt; Planner[Neuro-Symbolic Planner]
-        Planner --&gt;|Generates Path| Graph[Dynamic Reasoning Graph]
-
-        Graph --&gt; Node1[Data Retrieval]
-        Graph --&gt; Node2[Analysis Agent]
-        Graph --&gt; Node3[Risk Simulation]
-
-        Node1 --&gt;|Evidence| Critic[Self-Correction Loop]
-        Node2 --&gt;|Draft| Critic
-        Node3 --&gt;|Scenarios| Critic
-
-        Critic --&gt;|Refinement Needed| Graph
-        Critic --&gt;|Approved| Synthesis[Final Synthesis]
-    end
-
-    subgraph &quot;Memory &amp; Knowledge&quot;
-        KG[(Unified Knowledge Graph)]
-        Vec[(Vector Store)]
-    end
-
-    Node1 &lt;--&gt; KG
-    Node1 &lt;--&gt; Vec
-
-    Synthesis --&gt;|Final Report| Output[JSON / HTML / PDF]
-````
-
-#### Core Components
-
-  * **Meta Orchestrator** (`core/engine/meta_orchestrator.py`): The central &quot;cortex&quot; that routes tasks, manages state, and orchestrates the swarm of specialized agents.
-  * **Neuro-Symbolic Planner** (`core/engine/neuro_symbolic_planner.py`): Combines the creativity of LLMs with the logical rigor of Knowledge Graphs to plan execution paths that are both novel and grounded in fact.
-  * **Cyclical Reasoning Engine** (`core/engine/cyclical_reasoning_graph.py`): A feedback loop (Draft -\&gt; Critique -\&gt; Refine) that ensures high conviction. It detects logical fallacies or missing data and automatically schedules remedial tasks.
-
------
-
-### 📊 Data &amp; The Gold Standard Pipeline
-
-Garbage in, garbage out. Adam v23.0 utilizes a rigorous **Gold Standard Data Pipeline** (&quot;The Universal Ingestor&quot;) to ensure all insights are based on verified, high-quality data.
-
-  * **Ingestion Sources:** Financial news APIs, SEC filings (XBRL), market data feeds (Bloomberg/AlphaVantage connectors), and government statistics.
-  * **Scrubbing &amp; Validation:** Every data point is scored for &quot;Conviction&quot; (0-100%) based on source reliability and cross-verification against the Knowledge Graph.
-  * **Unified Format:** Data is normalized into a standard JSONL format for agent consumption.
-
-[View Data Pipeline Documentation](https://www.google.com/search?q=%23)
-
------
-
-### 💡 Example Outputs
-
-### 3. Gold Standard Data Pipeline
-A new &quot;Universal Ingestor&quot; ensures that every piece of data in the system is high-quality.
-
-*   **Ingest &amp; Scrub:** Recursively scans reports, prompts, code, and data.
-*   **Conviction Scoring:** Automatically assesses the quality and &quot;conviction&quot; of data (0-100%).
-*   **Unified Access:** All data is normalized into a standard JSONL format accessible by any agent.
-*   [Read the Pipeline Documentation](./docs/GOLD_STANDARD_PIPELINE.md)
-Adam doesn't just chat; it produces structured, professional-grade financial artifacts ready for investment committees.
-
-#### 1\. Strategic Deep Dive (JSON Snippet)
-
-*Generated by the Omniscient Analyst (v23.5) - Full Template*
-
-```json
-{
-  &quot;report_id&quot;: &quot;RPT-NVDA-2025-03&quot;,
-  &quot;entity&quot;: &quot;NVIDIA Corp&quot;,
-  &quot;conviction_score&quot;: 94.5,
-  &quot;strategic_synthesis&quot;: {
-    &quot;outlook&quot;: &quot;Bullish&quot;,
-    &quot;key_driver&quot;: &quot;Sovereign AI adoption and B200 backlog saturation.&quot;,
-    &quot;risks&quot;: [&quot;Supply chain concentration (TSMC)&quot;, &quot;Geopolitical export controls&quot;]
-  },
-  &quot;valuation_models&quot;: {
-    &quot;dcf_implied_price&quot;: 1450.00,
-    &quot;peer_multiple_target&quot;: 1380.00,
-    &quot;sensitivity_analysis&quot;: &quot;High sensitivity to datacenter capex reduction.&quot;
-  },
-  &quot;generated_at&quot;: &quot;2025-03-15T14:30:00Z&quot;
-}
-</code></pre>
-<h4>2. Risk Assessment Matrix</h4>
-<p><em>Adam automatically generates risk matrices for portfolio stress testing using the Monte Carlo Risk Agent.</em></p>
-<table>
-<thead>
-<tr>
-<th style="text-align: left;">Risk Category</th>
-<th style="text-align: left;">Probability</th>
-<th style="text-align: left;">Impact</th>
-<th style="text-align: left;">Mitigation Strategy</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align: left;"><strong>Market</strong></td>
-<td style="text-align: left;">Medium</td>
-<td style="text-align: left;">High</td>
-<td style="text-align: left;">Hedge via inverse ETFs on semiconductor indices (SOXS).</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Credit</strong></td>
-<td style="text-align: left;">Low</td>
-<td style="text-align: left;">High</td>
-<td style="text-align: left;">Monitor debt-to-equity ratios quarterly; currently stable at 0.8x.</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Geopolitical</strong></td>
-<td style="text-align: left;">High</td>
-<td style="text-align: left;">Severe</td>
-<td style="text-align: left;">Diversify supply chain exposure outside of APAC region; monitor Taiwan Strait tensions.</td>
-</tr>
-<tr>
-<td style="text-align: left;"><strong>Regulatory</strong></td>
-<td style="text-align: left;">Medium</td>
-<td style="text-align: left;">Medium</td>
-<td style="text-align: left;">Track DOJ antitrust probes into AI hardware bundling.</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<ol>
-<li>
-<p><strong>Run Adam:</strong>
-    <code>bash
-    python scripts/run_adam.py</code></p>
-</li>
-<li>
-<p><strong>View the Showcase:</strong>
-    Open <code>showcase/index.html</code> in your browser.</p>
-</li>
-</ol>
-<h2>💰 Financial Engineering Platform (v23.5)</h2>
-<p>A modular, portable, and configurable Financial Engine for DCF Valuation, VC/LBO Sponsor Modeling, and Regulatory Credit Risk Analysis (SNC/Rating).</p>
-<h3>🚀 Launch Dashboard</h3>
-<p><a href="./showcase/financial_engineering.html"><strong>Launch Financial Engine (Client Side)</strong></a>
-Interactive dashboard for valuation, credit ratings, and sensitivity analysis.</p>
-<h3>🐍 Python Core</h3>
-<p>The core logic is available in <code>src/</code> and can be run as a Streamlit app.</p>
-<pre><code class="language-bash"># Run the Interactive Streamlit App
-streamlit run app.py
-</code></pre>
-<h3>Modules</h3>
-<ul>
-<li><strong><code>src/core_valuation.py</code></strong>: Discounted Cash Flow (DCF), WACC, and Terminal Value logic.</li>
-<li><strong><code>src/credit_risk.py</code></strong>: Credit Sponsor Model, Downside Sensitivity, and Regulatory Ratings (SNC).</li>
-<li><strong><code>src/config.py</code></strong>: Global financial assumptions (Tax rates, Risk-free rates).</li>
-</ul>
-<h2>📂 Repository Structure</h2>
-<ul>
-<li><code>core/engine/</code>: The heart of the new system.<ul>
-<li><code>cyclical_reasoning_graph.py</code>: The self-correcting analysis loop.</li>
-<li><code>neuro_symbolic_planner.py</code>: The logic for pathfinding in the KG.</li>
-<li><code>meta_orchestrator.py</code>: The central brain routing tasks.</li>
-</ul>
-</li>
-<li><code>core/data_processing/</code>: Data ingestion and standardisation.<ul>
-<li><code>universal_ingestor.py</code>: The Gold Standard Pipeline.</li>
-</ul>
-</li>
-<li><code>showcase/</code>: The "Mission Control" UI assets.</li>
-<li><code>data/</code>: Knowledge base and artisanal training sets.</li>
-<li><code>docs/</code>: Comprehensive documentation.</li>
-</ul>
-<h3>🚀 Key Capabilities</h3>
-<ul>
-<li><strong>Cyclical Reasoning:</strong> Unlike standard chatbots, Adam iterates. If data is missing, it creates a sub-task to find it. If logic is flawed, it self-corrects.</li>
-<li><strong>Quantum Risk Modeling:</strong> (v23.5) Uses simulated quantum annealing (via <code>core/v22_quantum_pipeline/</code>) to model "Black Swan" events and their impact on complex portfolios.</li>
-<li><strong>Traceability:</strong> Every conclusion is back-linked to source documents in the Knowledge Graph (PROV-O ontology compliant).</li>
-<li><strong>Multi-Modal Output:</strong> Generates interactive HTML dashboards (<code>showcase/</code>), PDF reports, and raw JSON data streams.</li>
-<li><strong>Specialized Agent Swarms:</strong><ul>
-<li><em>Fundamental Analyst:</em> Deep value investing analysis.</li>
-<li><em>Technical Analyst:</em> Chart patterns and momentum indicators.</li>
-<li><em>SNC Analyst:</em> Regulatory credit risk grading (Shared National Credit).</li>
-</ul>
-</li>
-</ul>
-<hr />
-<h3>🛠️ Getting Started</h3>
-<h4>Prerequisites</h4>
-<ul>
-<li>Python 3.10+</li>
-<li>Node.js (Required for the Neural Dashboard UI)</li>
-<li>API Keys: OpenAI (or compatible LLM provider), Neo4j (optional for full Knowledge Graph).</li>
-</ul>
-<h4>Quick Start Guide</h4>
-<ol>
-<li>
-<p><strong>Clone and Enter Repository</strong>
-    <code>bash
-    git clone https://github.com/adamvangrover/adam.git
-    cd adam</code></p>
-</li>
-<li>
-<p><strong>One-Click Launch</strong>
-    Run the automated launcher script. It checks for Docker or Python, installs dependencies, and starts the system.
-    <code>bash
-    ./run_adam.sh</code></p>
-<p><em>Alternatively, for manual setup:</em>
-<code>bash
-pip install -e .           # Install as a package
-python core/main.py        # Run the engine</code></p>
-</li>
-<li>
-<p><strong>Configure API Keys (Optional but Recommended)</strong>
-    The launcher creates a <code>.env</code> file if missing. Edit it to add your keys:
-    <code>bash
-    OPENAI_API_KEY=sk-...</code></p>
-</li>
-<li>
-<p><strong>Open Mission Control</strong></p>
-<ul>
-<li><strong>UI:</strong> <code>http://localhost:80</code> (Docker) or <code>http://localhost:3000</code> (Local)</li>
-<li><strong>Neural Dashboard:</strong> <code>showcase/index.html</code></li>
-</ul>
-</li>
-</ol>
-<h4>Developer Experience</h4>
-<p>We provide standard tooling for developers:</p>
-<ul>
-<li><strong>Install Dependencies:</strong> <code>make install</code></li>
-<li><strong>Run Tests:</strong> <code>make test</code></li>
-<li><strong>Lint Code:</strong> <code>make lint</code></li>
-<li><strong>CI/CD:</strong> Automated testing via GitHub Actions is configured in <code>.github/workflows/ci.yml</code>.</li>
-</ul>
-<p>See <a href="CONTRIBUTING.md">CONTRIBUTING.md</a> for more details.</p>
-<hr />
-<h3>📂 Repository Structure</h3>
-<p>A high-level overview of the "Hive Mind" structure:</p>
-<table>
-<thead>
-<tr>
-<th style="text-align: left;">Directory</th>
-<th style="text-align: left;">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align: left;"><code>core/engine/</code></td>
-<td style="text-align: left;"><strong>The Brain.</strong> Contains the cyclical graph, neuro-symbolic planner, and meta-orchestrator.</td>
-</tr>
-<tr>
-<td style="text-align: left;"><code>core/agents/</code></td>
-<td style="text-align: left;"><strong>The Workforce.</strong> Specialized agents (Analyst, Risk, Legal, Industry Specialists).</td>
-</tr>
-<tr>
-<td style="text-align: left;"><code>core/simulations/</code></td>
-<td style="text-align: left;"><strong>The Simulator.</strong> Modules for running stress tests (e.g., Fraud_Detection, Stress_Testing).</td>
-</tr>
-<tr>
-<td style="text-align: left;"><code>core/data_processing/</code></td>
-<td style="text-align: left;"><strong>The Stomach.</strong> Universal Ingestor and data quality scrubbers.</td>
-</tr>
-<tr>
-<td style="text-align: left;"><code>showcase/</code></td>
-<td style="text-align: left;"><strong>The Face.</strong> UI assets for the Neural Dashboard and demos.</td>
-</tr>
-<tr>
-<td style="text-align: left;"><code>data/</code></td>
-<td style="text-align: left;"><strong>The Memory.</strong> Knowledge base (<code>knowledge_graph.json</code>), seeds, and artisanal training sets.</td>
-</tr>
-<tr>
-<td style="text-align: left;"><code>config/</code></td>
-<td style="text-align: left;"><strong>The DNA.</strong> System configuration YAMLs and the Prompt Library.</td>
-</tr>
-<tr>
-<td style="text-align: left;"><code>docs/</code></td>
-<td style="text-align: left;"><strong>The Manual.</strong> Comprehensive documentation and architecture visions.</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h3>📚 Resources &amp; Documentation</h3>
-<ul>
-<li><strong>Architecture Vision:</strong> <a href="https://github.com/adamvangrover/adam/tree/main/docs/v23_architecture_vision.md">Adam v23.0 "Adaptive Hive" Vision</a></li>
-<li><strong>Pipeline Details:</strong> [Gold Standard Data Pipeline]((https://github.com/adamvangrover/adam/tree/main/docs/GOLD_STANDARD_PIPELINE.md)</li>
-<li><strong>API Reference:</strong> <a href="https://github.com/adamvangrover/adam/tree/main/docs/api.md">API Documentation</a></li>
-<li><strong>User Manual:</strong> <a href="https://github.com/adamvangrover/adam/tree/main/docs/user_guide.md">Comprehensive User Guide</a></li>
-<li><strong>Demo Guide:</strong> <a href="https://github.com/adamvangrover/adam/tree/main/docs/SHOWCASE_GUIDE.md">Showcase Walkthrough</a></li>
-<li><strong>Prompt Library:</strong> <a href="https://github.com/adamvangrover/adam/tree/main/prompt_library/Adam_v23.5_System_Prompt.md">v23.5 Autonomous Analyst Prompt</a></li>
-</ul>
-<hr />
-<h3>🤝 Contributing</h3>
-<p>We welcome contributions from the community! Whether it's a new agent skill, a data connector, or a UI enhancement.</p>
-<ol>
-<li>Read our <a href="https://github.com/adamvangrover/adam/tree/main">Contribution Guidelines</a>.</li>
-<li>Fork the repo and create your branch (<code>git checkout -b feature/amazing-feature</code>).</li>
-<li>Commit your changes (<code>git commit -m 'Add some amazing feature'</code>).</li>
-<li>Push to the branch (<code>git push origin feature/amazing-feature</code>).</li>
-<li>Open a Pull Request.</li>
-</ol>
-<hr />
-<h3>📄 License</h3>
-<p>Distributed under the MIT License. See <code>LICENSE</code> for more information.</p>
-<pre><code></code></pre>
-<h2>⚡ Modernization &amp; Optimization (v23.5+)</h2>
-<p>As part of the 2025 Strategic Technical Modernization, the following high-performance components have been added:</p>
-<ul>
-<li><strong>Modern Build System:</strong> <code>pyproject.toml</code> and <code>uv</code> support for hermetic builds.</li>
-<li><strong>Optimization Service:</strong> A dedicated stateful microservice (<code>src/adam/api</code>) providing "Optimizer as a Service" via FastAPI and Redis.</li>
-<li><strong>State-of-the-Art Optimizers:</strong><ul>
-<li><strong>AdamW:</strong> Decoupled Weight Decay.</li>
-<li><strong>Lion:</strong> Evolved Sign Momentum (Google ADK).</li>
-<li><strong>Adam-mini:</strong> Memory-efficient block-wise optimization (2025 Frontier).</li>
-</ul>
-</li>
-</ul>
-<h3>Quick Start (Modern Stack)</h3>
-<ol>
-<li>
-<p><strong>Build with Docker:</strong>
-    <code>bash
-    docker build -f Dockerfile.modern -t adam-optimizer .</code></p>
-</li>
-<li>
-<p><strong>Run the API:</strong>
-    <code>bash
-    docker run -p 8000:8000 -e REDIS_URL=redis://host.docker.internal:6379/0 adam-optimizer</code></p>
-</li>
-</ol>
-<p>For details, see <a href="docs/modernization_report.md">Modernization Report</a>.</p></div>
+            <!-- Docs -->
+            <div class="portal-card">
+                <div>
+                    <div class="portal-title">
+                        <span style="font-size: 1.5rem; margin-right: 10px;">📚</span> DOCUMENTATION
+                    </div>
+                    <p class="portal-desc">
+                        Comprehensive guides on Architecture, API usage, Agent capabilities, and the Gold Standard Data Pipeline.
+                    </p>
                 </div>
-            </main>
+                <a href="docs/index.html" class="cyber-btn" style="text-align: center;">READ DOCS &rarr;</a>
+            </div>
+
+            <!-- Core -->
+            <div class="portal-card">
+                <div>
+                    <div class="portal-title">
+                        <span style="font-size: 1.5rem; margin-right: 10px;">🧠</span> CORE ENGINE
+                    </div>
+                    <p class="portal-desc">
+                        Explore the Python source code driving the agents, reasoning graphs, and data ingestion pipelines.
+                    </p>
+                </div>
+                <a href="core/index.html" class="cyber-btn" style="text-align: center;">BROWSE SOURCE &rarr;</a>
+            </div>
+
+             <!-- Live App -->
+             <div class="portal-card" style="border-color: var(--success-color);">
+                <div>
+                    <div class="portal-title" style="color: var(--success-color);">
+                        <span style="font-size: 1.5rem; margin-right: 10px;">🖥️</span> WEB CLIENT
+                    </div>
+                    <p class="portal-desc">
+                        Source code for the React-based frontend application (Analyst OS). Requires build step to run in production mode.
+                    </p>
+                </div>
+                <a href="services/webapp/client/public/index.html" class="cyber-btn" style="text-align: center; border-color: var(--success-color); color: var(--success-color);">VIEW CLIENT SOURCE &rarr;</a>
+            </div>
+
         </div>
 
-        <!-- Footer -->
-        <footer style="margin-top: 50px; border-top: 1px solid var(--panel-border); padding-top: 20px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">
-            ADAM AUTO-GENERATED SHOWCASE | <span class="mono">REF: ROOT</span>
-        </footer>
+        <!-- Directory Map -->
+        <h2 class="mono" style="color: var(--text-secondary); border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 20px;">
+            /// REPOSITORY MAP
+        </h2>
+
+        <div class="dir-grid">
+            <a href="core/index.html" class="dir-item"><span style="margin-right: 8px;">📂</span> core/</a>
+            <a href="data/index.html" class="dir-item"><span style="margin-right: 8px;">📂</span> data/</a>
+            <a href="docs/index.html" class="dir-item"><span style="margin-right: 8px;">📂</span> docs/</a>
+            <a href="showcase/index.html" class="dir-item"><span style="margin-right: 8px;">📂</span> showcase/</a>
+            <a href="config/index.html" class="dir-item"><span style="margin-right: 8px;">📂</span> config/</a>
+            <a href="scripts/index.html" class="dir-item"><span style="margin-right: 8px;">📂</span> scripts/</a>
+            <a href="tests/index.html" class="dir-item"><span style="margin-right: 8px;">📂</span> tests/</a>
+            <a href="research/index.html" class="dir-item"><span style="margin-right: 8px;">📂</span> research/</a>
+            <a href="services/index.html" class="dir-item"><span style="margin-right: 8px;">📂</span> services/</a>
+            <a href="prompt_library/index.html" class="dir-item"><span style="margin-right: 8px;">📂</span> prompt_library/</a>
+            <a href="webapp/index.html" class="dir-item"><span style="margin-right: 8px;">📂</span> webapp/</a>
+            <a href="tinker_lab/index.html" class="dir-item"><span style="margin-right: 8px;">📂</span> tinker_lab/</a>
+            <a href="artifacts/index.html" class="dir-item"><span style="margin-right: 8px;">📂</span> artifacts/</a>
+            <a href="experimental/index.html" class="dir-item"><span style="margin-right: 8px;">📂</span> experimental/</a>
+        </div>
+
+        <div style="margin-top: 40px; padding: 20px; background: rgba(0,0,0,0.3); border-radius: 4px; border: 1px solid var(--panel-border);">
+            <div class="mono" style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 10px;">README.md</div>
+            <pre style="color: var(--text-secondary); font-family: var(--font-mono); font-size: 0.9rem; overflow-x: auto;">
+# Adam v23.5: The Adaptive Hive Mind
+
+**Mission:** Autonomous Financial Analysis & Adaptive Reasoning
+
+Adam has evolved. v23.0 introduces the **"Adaptive System" architecture**—a self-correcting, neuro-symbolic engine designed to perform financial deep dives, risk assessments, and market simulations with human-like reasoning and machine-speed execution.
+
+Unlike traditional chatbots, Adam "thinks" in graphs, critiquing its own work before presenting it to you.
+            </pre>
+            <a href="README.md" class="cyber-btn" style="margin-top: 15px; display: inline-block;">VIEW FULL README &rarr;</a>
+        </div>
+
     </div>
 
-    <script>
-        function toggleRuntime() {
-            const panel = document.getElementById('runtime-panel');
-            if (panel.style.display === 'none') {
-                panel.style.display = 'block';
-            } else {
-                panel.style.display = 'none';
-            }
-        }
-    </script>
+    <footer style="border-top: 1px solid var(--panel-border); padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-top: 60px;">
+        ADAM v23.5 | SYSTEM ROOT ACCESS | <a href="showcase/index.html" style="color: var(--primary-color);">LAUNCH DASHBOARD</a>
+    </footer>
 
-    <!-- Adam Global Nav -->
-    <script src="showcase/js/nav.js" data-root="."></script>
+    <!-- Global Nav Script (Optional) -->
+    <script>
+        // Simple scanline effect enhancement
+        document.addEventListener('DOMContentLoaded', () => {
+           console.log("System Online");
+        });
+    </script>
 </body>
 </html>
