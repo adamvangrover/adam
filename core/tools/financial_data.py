@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Any, Optional
+from typing import List, Dict, Any, Optional
 import datetime
 
 logger = logging.getLogger(__name__)
