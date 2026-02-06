@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { dataManager, DataManifest } from '../utils/DataManager';
 import { Search } from 'lucide-react';
+import AuditLogViewer from '../components/AuditLogViewer';
 
 const AgentStatus: React.FC = () => {
   const [agents, setAgents] = useState<DataManifest['agents']>([]);
@@ -77,6 +78,11 @@ const AgentStatus: React.FC = () => {
       </div>
       <div style={{ marginTop: '20px', fontSize: '0.8rem', color: '#666' }}>
           TOTAL AGENTS ONLINE: {filteredAgents.length}
+      </div>
+
+      <div style={{ marginTop: '50px', borderTop: '1px solid #333', paddingTop: '20px' }}>
+          <h2 className="text-cyan mono-font" style={{marginBottom: '20px'}}>{'///'} LIVE AUDIT STREAM</h2>
+          <AuditLogViewer />
       </div>
     </div>
   );

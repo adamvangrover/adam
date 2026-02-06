@@ -1,31 +1,43 @@
-# Core Components
+# Core Components & Agent Guidelines
 
-This directory contains the core components of the ADAM system. These components provide the fundamental building blocks for creating and running autonomous agents.
+This directory (`core/`) contains the "System 2" brain of Adam.
 
-## Subdirectories
+## ⚠️ Critical Engineering Standards
 
-*   **`agents/`:** This directory contains the autonomous agents that perform specific tasks.
-    *   **`metacognition/`**: Contains modules for Adaptive Conviction, State Anchors, and Tool RAG (Protocol Paradox implementation).
-*   **`analysis/`:** This directory contains modules for performing various types of analysis, such as fundamental and technical analysis.
-*   **`data_access/`:** This directory contains modules for accessing data from various sources.
-*   **`data_sources/`:** This directory contains modules for specific data sources, such as APIs and databases.
-*   **`embeddings/`:** This directory contains modules for creating and managing embeddings.
-*   **`llm/`:** This directory contains the language model engine that provides natural language processing capabilities.
-*   **`rag/`:** This directory contains the retrieval-augmented generation (RAG) components.
-*   **`simulations/`:** This directory contains environments for testing and evaluating the agents' performance.
-*   **`system/`:** This directory contains the central infrastructure that supports the agents, including the main loop, data management, and communication.
-*   **`tools/`:** This directory contains tools that can be used by the agents.
-*   **`utils/`:** This directory contains utility functions that are used throughout the system.
-*   **`vectorstore/`:** This directory contains the vector store for storing and retrieving embeddings.
-*   **`world_simulation/`:** This directory contains the world simulation components.
+Agents working in this directory must adhere to strict standards to ensure the stability of the financial reasoning engine.
 
-## Interacting with Core Components
+### 1. Strict Typing
+*   **Pydantic Everywhere:** All data structures, especially Agent State and Tool Inputs/Outputs, must be defined using `pydantic.BaseModel`.
+*   **Type Hints:** All functions must have type hints for arguments and return values.
 
-When interacting with the core components, please adhere to the following principles:
+```python
+from pydantic import BaseModel, Field
 
-*   **Abstraction:** Interact with the components through their public APIs. Avoid directly accessing their internal implementation details.
-*   **Configuration:** Use the configuration files in the `config/` directory to configure the behavior of the core components.
-*   **Logging:** Use the logging system to record important events and debug issues.
-*   **Metacognition:** Agents implementing `AdaptiveAgent` capabilities should utilize the `measure_conviction` and `create_anchor` methods to ensure robust A2A communication.
+class StockQuery(BaseModel):
+    ticker: str = Field(..., description="The stock ticker symbol (e.g., AAPL)")
+    depth: str = Field("standard", description="Analysis depth: standard or deep_dive")
+```
 
-By following these guidelines, you can help to ensure that the ADAM system remains stable, modular, and easy to maintain.
+### 2. No Hallucinations (Grounding)
+*   **Source Citation:** Every analytical claim made by an agent must cite a source (e.g., "According to the 2023 10-K...").
+*   **Confidence Scores:** When uncertain, agents must output a low confidence score (0-100) or flag the data as "Unverified".
+
+### 3. Graceful Degradation
+*   **Dependency Checks:** If a heavy library (e.g., `torch`, `spacy`) is missing, the module must not crash on import. Use `try/except ImportError` blocks and provide a mocked or simplified fallback.
+*   **API Failures:** If an external API (OpenAI, FMP) fails, the agent should return a structured error state, not raise an unhandled exception.
+
+### 4. LangGraph State Management
+*   The `core/engine` uses `langgraph`.
+*   All graph nodes must accept `state` as input and return a dictionary of state updates.
+*   Do not mutate the state in place; return the diff.
+
+## Directory Structure
+
+*   **`agents/`:** Specialized workers (Fundamental, Risk, Legal).
+*   **`engine/`:** The orchestrator and graph definitions.
+*   **`data_processing/`:** The "Universal Ingestor" (ETL).
+
+## Testing
+Before submitting changes to `core/`:
+1.  Run the relevant unit tests in `tests/`.
+2.  Run `python scripts/run_adam.py --query "test query"` to ensure the graph compiles and runs.

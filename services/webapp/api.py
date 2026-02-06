@@ -388,6 +388,94 @@ def create_app(config_name='default'):
         ])
 
     # ---------------------------------------------------------------------------- #
+    # Credit Sentinel Endpoints (4-Layered Framework)
+    # ---------------------------------------------------------------------------- #
+
+    @app.route('/api/credit_sentinel/analyze', methods=['POST'])
+    @jwt_required()
+    def credit_sentinel_analyze():
+        """
+        Runs the 4-Layer Evaluation Framework on the provided data.
+        """
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        # Import Core Modules (Lazy load to ensure path is set)
+        try:
+            from core.evaluation.judge import AuditorAgent
+            from core.evaluation.symbolic import SymbolicVerifier
+
+            # If the input is just financials, wrap it in a mock state
+            # Ensure minimal structure exists
+            state = data if "balance_sheet" in data else {"balance_sheet": {}, "income_statement": {}, "quant_analysis": ""}
+
+            # Layer 2: Auditor
+            auditor = AuditorAgent()
+            audit_logs = auditor.evaluate_with_llm(state)
+
+            # Layer 3: Symbolic
+            verifier = SymbolicVerifier()
+            # Combine text analysis
+            combined_text = (state.get("quant_analysis") or "") + "\n" + (state.get("legal_analysis") or "")
+            verification_flags = verifier.verify(combined_text)
+
+            return jsonify({
+                "audit_logs": audit_logs,
+                "verification_flags": verification_flags
+            })
+
+        except ImportError as e:
+             return jsonify({'error': f'Core modules not found: {e}'}), 503
+        except Exception as e:
+             app.logger.error(f"Credit Sentinel Analyze Error: {e}")
+             return jsonify({'error': str(e)}), 500
+
+    @app.route('/api/credit_sentinel/sensitivity', methods=['POST'])
+    @jwt_required()
+    def credit_sentinel_sensitivity():
+        """
+        Runs the Red Team Sensitivity Analysis.
+        """
+        data = request.get_json()
+        if not data:
+             return jsonify({'error': 'No data provided'}), 400
+
+        try:
+            from core.evaluation.red_team import ZombieFactory
+
+            # Ensure minimal structure
+            state = data if "balance_sheet" in data else {"balance_sheet": {}, "income_statement": {}}
+
+            scenarios = ZombieFactory.generate_sensitivity_scenarios(state)
+
+            # Calculate simple metrics for each scenario to help frontend plotting
+            results = []
+            for s in scenarios:
+                ebitda = s["income_statement"].get("consolidated_ebitda", 0)
+                debt = s["balance_sheet"].get("total_debt", 0)
+                interest = s["income_statement"].get("interest_expense", 0)
+
+                leverage = debt / ebitda if ebitda > 0 else 0
+                coverage = ebitda / interest if interest > 0 else 0
+
+                results.append({
+                    "scenario_id": s.get("scenario_id"),
+                    "leverage": leverage,
+                    "coverage": coverage,
+                    "ebitda": ebitda,
+                    "interest": interest
+                })
+
+            return jsonify(results)
+
+        except ImportError as e:
+             return jsonify({'error': f'Core modules not found: {e}'}), 503
+        except Exception as e:
+             app.logger.error(f"Credit Sentinel Sensitivity Error: {e}")
+             return jsonify({'error': str(e)}), 500
+
+    # ---------------------------------------------------------------------------- #
     # Mission Control / Synthesizer Endpoints
     # ---------------------------------------------------------------------------- #
 

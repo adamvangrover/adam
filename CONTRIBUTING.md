@@ -1,6 +1,6 @@
-# Contributing to Adam v23.5
+# Contributing to Adam v26.0
 
-Thank you for your interest in contributing to Adam v23.5 ("The Adaptive Hive Mind")! We welcome contributions to enhance this advanced financial analytics system.
+Thank you for your interest in contributing to Adam v26.0 ("The Neuro-Symbolic Sovereign")! We welcome contributions to enhance this advanced financial analytics system.
 
 ## 🚀 Getting Started
 
@@ -39,8 +39,8 @@ Thank you for your interest in contributing to Adam v23.5 ("The Adaptive Hive Mi
 ### Frontend Setup
 1.  **Install Dependencies:**
     ```bash
-    cd services/webapp/client
-    npm install --legacy-peer-deps
+    cd webapp
+    pnpm install
     ```
 
 ## 🧪 Running Tests
@@ -53,21 +53,19 @@ PYTHONPATH=. pytest tests/
 
 # Run specific integration tests
 PYTHONPATH=. python -m pytest tests/test_agent_orchestrator.py
-PYTHONPATH=. python -m pytest tests/test_v23_5_pipeline.py
 ```
 
 ## 📂 Project Structure
 
 - **core/**: The brain of the system. Contains agents, engines, and shared logic.
     - **core/agents/**: Agent definitions (e.g., `RiskAssessmentAgent`).
-    - **core/engine/**: Graph engines (`MetaOrchestrator`, `NeuroSymbolicPlanner`).
-    - **core/system/v22_async/**: Asynchronous message-passing infrastructure.
+    - **core/engine/**: System 2 Reasoning Engine (`NeuroSymbolicPlanner`).
     - **core/data_processing/**: Ingestion and ETL pipelines.
     - **core/schemas/**: Pydantic data models.
 - **tests/**: Unit and integration tests.
-- **services/webapp/**: The React-based frontend and Flask API.
+- **webapp/**: The React-based "Neural Dashboard".
 - **showcase/**: Static HTML visualizers.
-- **docs/**: Documentation.
+- **docs/**: Documentation and Tutorials.
 
 ## 🎨 Coding Standards
 
@@ -81,8 +79,8 @@ To maintain the quality and reliability of the "Financial Sovereign", please adh
 - **Error Handling:** Use specific exception types and ensure errors are logged via `core.utils.logging_utils`.
 
 ### Architecture
-- **Hybrid Model:** Respect the distinction between the **Graph Engine** (synchronous/stateful reasoning) and the **Async Swarm** (stateless/parallel execution).
-- **LangGraph:** Use `LangGraph` for complex, multi-step agent workflows that require state persistence.
+- **System 2 First:** New agents should be designed for the Graph Engine (stateful/reasoning) rather than just the Async Swarm.
+- **Grounding:** All analytical outputs must cite sources. Hallucinations are considered critical bugs.
 
 ## 🤝 Contribution Workflow
 
