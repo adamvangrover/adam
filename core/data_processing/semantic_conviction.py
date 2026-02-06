@@ -1,6 +1,7 @@
 import logging
 import random
 from typing import List, Tuple
+import numpy as np
 from core.schemas.v23_5_schema import IngestedArtifact
 
 # Try to import sentence_transformers, mock if unavailable
