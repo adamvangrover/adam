@@ -106,3 +106,5 @@ class VerticalRiskGraphState(TypedDict):
 
     # Explainability
     status: str
+    audit_logs: Optional[List[Dict[str, Any]]]
+    verification_flags: Optional[List[str]]
