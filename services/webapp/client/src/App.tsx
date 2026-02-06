@@ -36,6 +36,7 @@ const App: React.FC = () => {
               <div style={{height: '80vh'}}><Terminal /></div>
             </Suspense>
           } />
+          <Route path="prompt-alpha" element={<Suspense fallback={<Loading />}><PromptAlpha /></Suspense>} />
           <Route path="market-data" element={<Suspense fallback={<Loading />}><MarketData /></Suspense>} />
           <Route path="analysis-tools" element={<Suspense fallback={<Loading />}><AnalysisTools /></Suspense>} />
           <Route path="knowledge-graph" element={<Suspense fallback={<Loading />}><KnowledgeGraph /></Suspense>} />

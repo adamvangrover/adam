@@ -10,6 +10,7 @@ from flask_cors import CORS
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
 from core.utils.logging_utils import setup_logging
+from core.prompting.scanner import PromptScanner
 
 
 # Safe Import for Orchestrators
@@ -21,7 +22,14 @@ except ImportError as e:
     MetaOrchestrator = None
     AgentOrchestrator = None
 
-app = Flask(__name__)
+# Configuration
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# SHOWCASE_DIR = os.path.join(BASE_DIR, 'showcase')
+SHOWCASE_DIR = os.path.join(BASE_DIR, 'services/webapp/client/build')
+STATIC_DIR = os.path.join(SHOWCASE_DIR, 'static')
+
+# Initialize Flask with explicit static folder to avoid default behavior
+app = Flask(__name__, static_folder=STATIC_DIR, static_url_path='/static')
 
 # Security: Configure CORS
 # Default to localhost for development. In production, set ALLOWED_ORIGINS env var.
@@ -34,10 +42,6 @@ allowed_origins_str = os.environ.get(
 allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",")]
 
 CORS(app, resources={r"/*": {"origins": allowed_origins}})
-
-# Configuration
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-SHOWCASE_DIR = os.path.join(BASE_DIR, 'showcase')
 
 # Global State
 meta_orchestrator = None
@@ -94,7 +98,28 @@ def serve_index():
 
 @app.route('/<path:path>')
 def serve_static(path):
-    return send_from_directory(SHOWCASE_DIR, path)
+    # Fallback catch-all for SPA client-side routing
+    # Check if file exists in root (e.g. manifest.json, favicon.ico)
+    if os.path.exists(os.path.join(SHOWCASE_DIR, path)):
+        return send_from_directory(SHOWCASE_DIR, path)
+    return send_from_directory(SHOWCASE_DIR, 'index.html')
+
+
+@app.route('/api/prompts', methods=['GET'])
+def get_prompts():
+    """
+    Returns the list of prompts with ROI scores.
+    Optional query param: ?context=keyword1,keyword2
+    """
+    try:
+        context_str = request.args.get('context', '')
+        context = [k.strip() for k in context_str.split(',')] if context_str else None
+
+        prompts = PromptScanner.scan(context=context)
+        return jsonify(prompts)
+    except Exception as e:
+        logging.error(f"Error scanning prompts: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route('/api/state', methods=['GET'])
@@ -201,6 +226,7 @@ if __name__ == '__main__':
     setup_log_capture()
     init_orchestrator()
     print(f"Serving Adam v23.5 from {SHOWCASE_DIR}")
+    print(f"Static Dir: {STATIC_DIR}")
     host = os.environ.get('HOST', '127.0.0.1')
     port = int(os.environ.get('PORT', 5000))
     print(f"Access the Live Interface at http://{host}:{port}")

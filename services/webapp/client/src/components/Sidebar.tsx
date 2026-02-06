@@ -6,6 +6,7 @@ const navItems = [
   { path: '/prompt-alpha', label: 'Prompt Alpha', icon: '🧠' },
   { path: '/synthesizer', label: 'Synthesizer', icon: '🎛️' },
   { path: '/terminal', label: 'UFOs Terminal', icon: '💻' },
+  { path: '/prompt-alpha', label: 'Prompt Alpha', icon: '⚡' },
   { path: '/market-data', label: 'Market Intelligence', icon: '📈' },
   { path: '/knowledge-graph', label: 'Knowledge Graph', icon: '🕸️' },
   { path: '/agents', label: 'Agent Status', icon: '🤖' },
