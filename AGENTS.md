@@ -13,6 +13,7 @@ This document is the absolute source of truth for creating, modifying, and debug
 *   [Communication Protocols](#communication-protocols)
 *   [Debugging & Tracing](#debugging--tracing)
 *   [Best Practices](#best-practices)
+*   [Swarm Protocols](#swarm-protocols--inter-agent-communication)
 
 ---
 
@@ -134,3 +135,21 @@ To add a tool:
 3.  Restart the server.
 
 Refer to `docs/architecture.md` for more details.
+
+---
+
+## Swarm Protocols & Inter-Agent Communication
+
+To prevent "Graph Spaghetti" and circular dependencies, follow these rules:
+
+1.  **No Direct Calls**:
+    *   Do NOT instantiate `AgentB` inside `AgentA`.
+    *   *Bad:* `result = RiskAgent().execute(...)` inside `LegalAgent`.
+    *   *Good:* Return a request to the `MetaOrchestrator` to run `RiskAgent` next.
+
+2.  **Use the Orchestrator**:
+    *   If an agent needs info from another domain, it should signal this in its output `metadata`.
+    *   Example: `metadata={"next_step": "consult_legal", "query": "Check covenants"}`.
+
+3.  **Conflict Resolution**:
+    *   If two agents (e.g., Risk and Growth) provide conflicting advice, the `ConsensusEngine` will arbitrate based on their `confidence` scores and the user's risk profile.

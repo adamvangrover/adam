@@ -34,6 +34,21 @@ The era of the "LLM Wrapper" is over. Institutional finance faces an **Epistemol
 
 **Result:** Adam "thinks before he speaks," drafting, critiquing, and refining analysis before presenting it to the user.
 
+### System Architecture
+
+```mermaid
+graph TD
+    User[User / Analyst] -->|HTTP| Web[Web App (React/Flask)]
+    Web -->|MCP| Server[MCP Server (Python)]
+    Server -->|Router| Orchestrator[Meta Orchestrator]
+    Orchestrator -->|Fast Path| Swarm[System 1: Async Swarm]
+    Orchestrator -->|Slow Path| Planner[System 2: Neuro-Symbolic Planner]
+    Planner -->|Task| AgentA[Fundamental Agent]
+    Planner -->|Task| AgentB[Risk Agent]
+    AgentA -->|Data| Sentinel[Credit Sentinel]
+    AgentB -->|Data| Sentinel
+```
+
 ---
 
 ## 📂 Directory Structure
@@ -42,7 +57,7 @@ A high-level overview of the repository layout:
 
 ```text
 adam/
-├── core/                   # The "Brain" (System 2 Engine & Agents)
+├── core/                   # The "Brain" (See core/README.md)
 │   ├── agents/             # Specialized autonomous agents
 │   ├── engine/             # Neuro-Symbolic Planner & Orchestrator
 │   ├── credit_sentinel/    # Distressed Debt Analysis Module

@@ -37,3 +37,15 @@ To create a new agent:
 4.  Register the agent in `core/engine/neuro_symbolic_planner.py`.
 
 See `docs/agent_development.md` for a full walkthrough.
+
+## 🚦 Quick Reference: Dos and Don'ts
+
+| Category | Do ✅ | Don't ❌ |
+| :--- | :--- | :--- |
+| **Communication** | Route requests via `MetaOrchestrator`. | Instantiate other agents directly (`RiskAgent().execute()`). |
+| **I/O** | Use strict Pydantic models. | Pass raw Dictionaries or JSON strings. |
+| **Tools** | Use `mcp.tool()` definitions. | Hardcode API calls inside the agent logic. |
+| **Grounding** | Cite sources in `AgentOutput.sources`. | Hallucinate facts or omit citations. |
+| **Config** | Load constants from `config/`. | Magic numbers in code (e.g., `threshold = 0.8`). |
+
+*Refer to the [Agent Developer Bible](../../AGENTS.md) for detailed protocols.*

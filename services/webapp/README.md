@@ -77,3 +77,22 @@ The Flask backend provides the following API endpoints:
 *   `POST /api/simulations/<simulation_name>`: Starts a simulation.
 *   `GET /api/tasks/<task_id>`: Returns the status of a Celery task.
 *   `GET /api/knowledge_graph`: Returns the knowledge graph data from Neo4j.
+
+## 📡 Agent Intercom (Live Streams)
+
+The frontend visualizes the "Agent's Mind" via the **Intercom System**.
+
+### Architecture
+1.  **Backend:** Agents emit "Thought" events (e.g., `fetching_data`, `reasoning`, `tool_call`) to a Redis Pub/Sub channel.
+2.  **API:** The Flask server exposes a Server-Sent Events (SSE) endpoint at `/api/intercom/stream`.
+3.  **Frontend:** `AgentIntercom.tsx` subscribes to this stream and renders thoughts as a scrolling terminal log.
+
+### Event Format
+```json
+{
+  "agent": "RiskAnalyst",
+  "action": "THOUGHT",
+  "content": "Calculating Debt/EBITDA ratio...",
+  "timestamp": "2023-10-27T10:00:00Z"
+}
+```

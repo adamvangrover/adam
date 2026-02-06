@@ -123,3 +123,55 @@ Create a reproduction test case in `tests/repro_issue.py` to isolate the failure
 python scripts/run_adam.py --mode replay --log-id <ID>
 ```
 *(Note: Replay mode requires a saved log file)*
+
+---
+
+## Tutorial 5: Adding a New Tool to the MCP Server
+
+The **Model Context Protocol (MCP)** standardizes how agents interact with external data and logic.
+
+### 1. Define the Tool Logic
+Open `server/server.py` and define your function using the `@mcp.tool()` decorator.
+
+```python
+# server/server.py
+
+@mcp.tool()
+def calculate_beta(ticker: str, index: str = "SPY") -> str:
+    """
+    Calculates the Beta of a stock against an index.
+    """
+    # ... logic to fetch data and calculate ...
+    beta = 1.25
+    return json.dumps({"ticker": ticker, "beta": beta})
+```
+
+### 2. Register the Tool Manifest
+Add the tool's signature to `mcp.json` so clients know it exists.
+
+```json
+// mcp.json
+{
+  "name": "calculate_beta",
+  "description": "Calculates the Beta of a stock against an index.",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "ticker": { "type": "string" },
+      "index": { "type": "string", "default": "SPY" }
+    },
+    "required": ["ticker"]
+  }
+}
+```
+
+### 3. Restart the Server
+Restart the MCP server to load the new tool.
+
+```bash
+# If running via Docker
+docker-compose restart app
+
+# If running locally
+python server/server.py
+```
