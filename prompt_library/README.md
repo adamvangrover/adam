@@ -4,32 +4,33 @@ Welcome to the **Adam Operational Prompt Library**. This is the central cortex o
 
 > **"Code defines the body; Prompts define the mind."**
 
+---
+
 ## 🗂️ Library Structure
 
 We follow a strict hierarchical structure to ensure prompts are modular, reusable, and versioned.
 
-### 1. `AOPL-v1.0/` (Legacy)
-Retained for backward compatibility.
+### 1. Root Files (Master Prompts)
+*   `Adam_v26.0_System_Prompt.md`: **The Master Prompt**. This is the entry point for the "Apex Architect" model. It combines system instructions, personality vectors (HNASP), and tool definitions.
 
 ### 2. `AOPL-v2.0/` (Current Standard)
 The foundational prompt sets for the v26 "Neuro-Symbolic Sovereign".
-*   **`system_architecture/`**: High-level meta-prompts.
-    *   `AWO_System_Prompt.md`: Defines the "Architect" persona and meta-cognition.
-    *   `MetaOrchestrator.md`: Routing logic for the central brain.
-*   **`professional_outcomes/`**: Domain-specific expert personas.
-    *   `credit_analysis.md`: Instructions for Shared National Credit (SNC) analysis.
-    *   `market_analysis.md`: Guidelines for macro-economic trend spotting.
-*   **`learning/`**: Prompts for autonomous self-improvement.
 
-### 3. Root Files
-*   **`Adam_v26.0_System_Prompt.md`**: **The Master Prompt**. This is the entry point for the "Apex Architect" model. It combines system instructions, personality vectors (HNASP), and tool definitions.
+| Directory | Description |
+| :--- | :--- |
+| `system_architecture/` | High-level meta-prompts (Meta Orchestrator, Planner). |
+| `professional_outcomes/` | Domain-specific expert personas (Credit Analyst, Market Watcher). |
+| `learning/` | Prompts for autonomous self-improvement and reflection. |
+
+### 3. `AOPL-v1.0/` (Legacy)
+Retained for backward compatibility. Do not use for new agents.
 
 ---
 
 ## 🚀 Usage Guide
 
 ### Loading Prompts in Code
-Adam uses a dynamic loader to fetch prompts. Do not hardcode strings in Python files.
+Adam uses a dynamic loader to fetch prompts. **Do not hardcode strings in Python files.**
 
 ```python
 from core.utils.prompt_utils import load_prompt
@@ -76,7 +77,6 @@ Tell the model what NOT to do.
 
 ## 🛠️ Contribution Workflow
 
-1.  **Create**: Draft your prompt in a `.md` file.
-2.  **Categorize**: Place it in the appropriate `AOPL-v2.0/` subdirectory.
-3.  **Test**: Run it against the `tests/test_prompt_framework.py` suite.
-4.  **PR**: Submit your PR with the tag `[PROMPT]`.
+1.  **Draft**: Create a new `.md` file in the appropriate `AOPL-v2.0/` subdirectory.
+2.  **Test**: Run it against the `tests/test_prompt_framework.py` suite.
+3.  **PR**: Submit your PR with the tag `[PROMPT]`.

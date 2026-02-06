@@ -44,6 +44,17 @@ except ImportError:
     print("Warning: MetaOrchestrator import failed. Orchestration tools will fail.")
     MetaOrchestrator = None
 
+# Import Credit Sentinel
+try:
+    from core.credit_sentinel.agents.ratio_calculator import RatioCalculator
+    from core.credit_sentinel.models.distress_classifier import DistressClassifier
+    from core.credit_sentinel.agents.risk_analyst import RiskAnalyst, AgentInput
+    CREDIT_SENTINEL_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: Credit Sentinel import failed: {e}")
+    CREDIT_SENTINEL_AVAILABLE = False
+
+
 # Global Orchestrator Singleton
 _orchestrator = None
 
@@ -162,6 +173,53 @@ def get_architecture_docs() -> str:
         """
 
 # --- Tools ---
+
+@mcp.tool()
+def analyze_distressed_debt(ticker: str) -> str:
+    """
+    Analyzes a company for signs of financial distress using the Credit Sentinel module.
+    Returns a comprehensive JSON report including ratios, distress probability, and qualitative analysis.
+    """
+    if not CREDIT_SENTINEL_AVAILABLE:
+        return json.dumps({"error": "Credit Sentinel module not available."})
+
+    try:
+        # 1. Mock Data Fetch (Replace with UniversalIngestor in prod)
+        financials = {
+            'ebitda': 500,
+            'total_debt': 2500,
+            'interest_expense': 300,
+            'total_assets': 5000,
+            'total_liabilities': 3000,
+            'total_equity': 2000,
+            'current_assets': 1000,
+            'current_liabilities': 800,
+            'net_income': 100
+        }
+
+        # 2. Calculate Ratios
+        calc = RatioCalculator()
+        ratios = calc.calculate_all(financials)
+
+        # 3. Predict Distress
+        classifier = DistressClassifier()
+        prediction = classifier.predict_distress(ratios)
+
+        # 4. Qualitative Analysis (Agent)
+        analyst = RiskAnalyst()
+        context = {
+            "financials": financials,
+            "ratios": ratios,
+            "distress_prediction": prediction
+        }
+        agent_input = AgentInput(query=f"Analyze distress risk for {ticker}", context=context)
+        report = analyst.execute(agent_input)
+
+        return report.model_dump_json(indent=2)
+
+    except Exception as e:
+        return json.dumps({"error": str(e)})
+
 
 @mcp.tool()
 def calculate_credit_exposure(entity_id: str, amount: float) -> str:

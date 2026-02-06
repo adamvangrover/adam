@@ -10,6 +10,7 @@ A dictionary of terms used within the Adam v26.0 ecosystem.
 ## C
 *   **Consensus Engine:** The module that aggregates conflicting opinions from multiple agents to form a single executive decision.
 *   **Conviction Score:** A 0-100% metric indicating how confident an agent is in its conclusion. Below 85% usually triggers a review or "Low Conviction" flag.
+*   **Credit Sentinel:** The specialized module in `core/credit_sentinel/` dedicated to distressed debt and credit risk analysis.
 
 ## G
 *   **Graph Engine (System 2):** The synchronous, stateful part of the system (using LangGraph) designed for deep reasoning and planning.
@@ -21,6 +22,7 @@ A dictionary of terms used within the Adam v26.0 ecosystem.
 
 ## M
 *   **Meta Orchestrator:** The central router that receives user queries and decides which subsystem (Graph vs. Swarm) should handle them.
+*   **Model Context Protocol (MCP):** The open standard used by Adam to define and execute external tools (APIs, Database queries).
 
 ## N
 *   **Neuro-Symbolic:** AI that combines Neural Networks (LLMs) for intuition with Symbolic Logic (Rules/Code) for precision.
