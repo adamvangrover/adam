@@ -7,6 +7,7 @@ from pathlib import Path
 
 # Configuration
 AGENTS_DIR = "core/agents"
+MCP_TOOLS_FILE = "core/mcp/tools.json"
 OUTPUT_FILE = "showcase/js/mock_agents_rich.js"
 EXISTING_FILE = "showcase/js/mock_agents_rich.js"
 
@@ -21,49 +22,88 @@ AGENT_TYPE_MAP = {
     "Compliance": "Governance Agent"
 }
 
-def load_existing_data(filepath):
+def load_mcp_tools():
     """
-    Attempts to load the existing JS file and parse the agents list.
-    Since it's loose JS, we use some regex heuristics to convert to JSON.
+    Loads the MCP tools definition file.
     """
-    if not os.path.exists(filepath):
+    if not os.path.exists(MCP_TOOLS_FILE):
+        print(f"Warning: {MCP_TOOLS_FILE} not found.")
+        return []
+    try:
+        with open(MCP_TOOLS_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"Error reading tools file: {e}")
         return []
 
-    try:
-        with open(filepath, 'r', encoding='utf-8') as f:
-            content = f.read()
+ALL_TOOLS = load_mcp_tools()
 
-        # Extract the array content: window.MOCK_DATA.agents = [...];
-        match = re.search(r'window\.MOCK_DATA\.agents\s*=\s*(\[.*\]);', content, re.DOTALL)
-        if not match:
-            # Try finding just the list if the assignment varies
-            match = re.search(r'(\[\s*\{.*\}\s*\])', content, re.DOTALL)
+def extract_skills_from_docstring(docstring):
+    """
+    Parses docstring for sections like ## Skills or ## Capabilities
+    and extracts list items.
+    """
+    skills = []
+    if not docstring:
+        return skills
 
-        if match:
-            json_str = match.group(1)
-            # lax parsing:
-            # 1. quote keys: name: -> "name":
-            # Avoid replacing inside strings.
-            # This is hard with regex.
-            # Alternative: Use Python AST literal_eval if we transform syntax?
+    lines = docstring.split('\n')
+    in_skills_section = False
 
-            # Transform to Python syntax
-            py_str = json_str.replace('true', 'True').replace('false', 'False').replace('null', 'None')
-            # Quote keys?
-            # Let's rely on the fact that we might not need to parse it perfectly to merge.
-            # Actually, to merge, we need the names.
+    for line in lines:
+        stripped = line.strip()
+        # Check for headers
+        if stripped.startswith('#'):
+            # Check if it is a skills header
+            lower_header = stripped.lower()
+            if "skill" in lower_header or "capability" in lower_header or "feature" in lower_header:
+                in_skills_section = True
+            else:
+                in_skills_section = False
+            continue
 
-            # Fallback: Simple text scan for names to avoid over-engineering JS parser
-            names = re.findall(r'name:\s*"([^"]+)"', content)
+        if in_skills_section:
+            # Check for list items
+            if stripped.startswith('- ') or stripped.startswith('* '):
+                skill = stripped[2:].strip()
+                if skill:
+                    skills.append(skill)
+            # Check for numbered list
+            elif re.match(r'^\d+\.', stripped):
+                skill = re.sub(r'^\d+\.\s*', '', stripped).strip()
+                if skill:
+                    skills.append(skill)
+            elif stripped == "":
+                continue
+            else:
+                # If we hit a non-list line that isn't empty, maybe end of section?
+                pass
 
-            # If we want to preserve the FULL object, we might just append NEW objects to the array string
-            # rather than parsing/serializing the whole thing.
-            return content, set(names)
+    return skills
 
-    except Exception as e:
-        print(f"Error reading existing file: {e}")
+def map_tools_to_agent(agent_name, docstring, all_tools):
+    """
+    Heuristic mapping of tools to agents.
+    """
+    agent_tools = []
+    text_corpus = (agent_name + " " + docstring).lower()
 
-    return "", set()
+    for tool in all_tools:
+        # Simple keyword matching
+        keywords = tool['name'].split('_')
+        score = 0
+        for kw in keywords:
+            if kw in text_corpus:
+                score += 1
+
+        # If significant overlap or specific matches
+        if score >= 1:
+            agent_tools.append({
+                "name": tool['name'],
+                "description": tool.get('description', '')
+            })
+
+    return agent_tools
 
 def parse_agent_file(filepath):
     """
@@ -87,7 +127,10 @@ def parse_agent_file(filepath):
         "reasoning_process": "Standard logic execution.",
         "markdown_copy": "",
         "yaml_config": "",
-        "json_config": ""
+        "json_config": "",
+        "skills": [],
+        "tools": [],
+        "mcp_connection": ""
     }
 
     class_found = False
@@ -96,7 +139,8 @@ def parse_agent_file(filepath):
             # Assume the first class is the agent
             if "Agent" in node.name:
                 agent_info["name"] = node.name
-                agent_info["docstring"] = ast.get_docstring(node) or "No documentation provided."
+                docstring = ast.get_docstring(node) or "No documentation provided."
+                agent_info["docstring"] = docstring
 
                 # Infer type
                 for key, val in AGENT_TYPE_MAP.items():
@@ -108,17 +152,18 @@ def parse_agent_file(filepath):
 
                 class_found = True
 
+                # Extract Skills
+                agent_info["skills"] = extract_skills_from_docstring(docstring)
+
                 # Try to find methods like 'execute' to infer workflow
                 for item in node.body:
                     if isinstance(item, ast.FunctionDef) and item.name == 'execute':
                         agent_info["workflow"].append("1. Receive task input")
                         if ast.get_docstring(item):
                             agent_info["task_description"] = ast.get_docstring(item)
-                        # Analyze body for calls
                         step = 2
                         for stmt in item.body:
                             if isinstance(stmt, ast.Assign) or isinstance(stmt, ast.Expr):
-                                # Crude step extraction
                                 if hasattr(stmt, 'value') and isinstance(stmt.value, ast.Call):
                                     func_name = "unknown_func"
                                     if isinstance(stmt.value.func, ast.Name):
@@ -140,19 +185,24 @@ def parse_agent_file(filepath):
     agent_info["yaml_config"] = f"agent:\n  name: {agent_info['name']}\n  enabled: true"
     agent_info["json_config"] = json.dumps({"agent": agent_info['name'], "enabled": True}, indent=2)
 
+    # MCP
+    agent_info["mcp_connection"] = f"mcp://{agent_info['name'].lower()}.adam.internal"
+    agent_info["tools"] = map_tools_to_agent(agent_info["name"], agent_info["docstring"], ALL_TOOLS)
+
     return agent_info
 
 def generate_js_entry(agent):
     """
     Generates a JS object string for the agent.
     """
-    # Helper to dump json and strip outer braces to embed in the object
     def js_val(v):
         return json.dumps(v)
 
     workflow_js = js_val(agent.get('workflow', []))
     context_js = js_val(agent.get('context_awareness', []))
     plugins_js = js_val(agent.get('environment_plugin', []))
+    skills_js = js_val(agent.get('skills', []))
+    tools_js = js_val(agent.get('tools', []))
 
     return f"""    {{
         name: {js_val(agent.get('name'))},
@@ -169,84 +219,11 @@ def generate_js_entry(agent):
         yaml_config: {js_val(agent.get('yaml_config'))},
         json_config: {js_val(agent.get('json_config'))},
         markdown_copy: {js_val(agent.get('markdown_copy'))},
-        portable_prompt: {js_val(agent.get('portable_prompt'))}
+        portable_prompt: {js_val(agent.get('portable_prompt'))},
+        skills: {skills_js},
+        tools: {tools_js},
+        mcp_connection: {js_val(agent.get('mcp_connection'))}
     }}"""
-
-def main():
-    print("Scanning for agents...")
-
-    # Load existing content to preserve it
-    existing_content, existing_names = load_existing_data(EXISTING_FILE)
-
-    new_agents = []
-
-    for root, _, files in os.walk(AGENTS_DIR):
-        for file in files:
-            if file.endswith(".py") and file != "__init__.py" and "test" not in file:
-                filepath = os.path.join(root, file)
-                agent_data = parse_agent_file(filepath)
-
-                if agent_data:
-                    # Check if already exists (fuzzy match name)
-                    # The existing file uses "Risk_Assessment_Agent" (underscores) vs "RiskAssessmentAgent" (CamelCase)
-                    # We need to normalize for check.
-                    name = agent_data["name"]
-
-                    # Heuristic: Convert CamelCase to Underscore for comparison if needed,
-                    # but the existing file seems to mix them or use Underscores for display names.
-                    # Let's check both.
-
-                    is_duplicate = False
-                    for existing in existing_names:
-                        if name == existing or name.replace("_", "") == existing.replace("_", ""):
-                            is_duplicate = True
-                            break
-
-                    if not is_duplicate:
-                        print(f"Found new agent: {name}")
-                        new_agents.append(agent_data)
-                    else:
-                        print(f"Skipping existing agent: {name}")
-
-    if not new_agents:
-        print("No new agents found to add.")
-        return
-
-    # If we have existing content, we insert into the array
-    if existing_content:
-        # Find the closing bracket of the array
-        last_bracket = existing_content.rfind('];')
-        if last_bracket == -1:
-            last_bracket = existing_content.rfind(']')
-
-        if last_bracket != -1:
-            # Prepare new entries
-            entries_str = ",\n".join([generate_js_entry(a) for a in new_agents])
-
-            # Insert before the closing bracket
-            # Ensure we have a comma if the list wasn't empty
-            insertion_point = last_bracket
-            prefix = ""
-            if "{" in existing_content[0:last_bracket]: # simplistic check if array is not empty
-                prefix = ",\n"
-
-            new_content = existing_content[:insertion_point] + prefix + entries_str + existing_content[insertion_point:]
-
-            # Fix helper function append if it got cut off or something?
-            # The regex grab might have been just the array.
-            # Wait, load_existing_data returns the FULL content.
-            pass
-        else:
-            # Fallback regen
-            print("Could not find array end in existing file. Regenerating.")
-            new_content = generate_full_file(new_agents)
-    else:
-        new_content = generate_full_file(new_agents)
-
-    with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
-        f.write(new_content)
-
-    print(f"Updated {OUTPUT_FILE} with {len(new_agents)} new agents.")
 
 def generate_full_file(agents):
     entries = ",\n".join([generate_js_entry(a) for a in agents])
@@ -261,6 +238,33 @@ window.MOCK_DATA.getAgent = function(name) {{
     return window.MOCK_DATA.agents.find(a => a.name === name);
 }};
 """
+
+def main():
+    print("Scanning for agents...")
+
+    # We will regenerate the full file to ensure everything is consistent
+    new_agents = []
+
+    for root, _, files in os.walk(AGENTS_DIR):
+        for file in files:
+            if file.endswith(".py") and file != "__init__.py" and "test" not in file:
+                filepath = os.path.join(root, file)
+                agent_data = parse_agent_file(filepath)
+
+                if agent_data:
+                    print(f"Processed: {agent_data['name']}")
+                    new_agents.append(agent_data)
+
+    if not new_agents:
+        print("No agents found.")
+        return
+
+    new_content = generate_full_file(new_agents)
+
+    with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
+        f.write(new_content)
+
+    print(f"Updated {OUTPUT_FILE} with {len(new_agents)} agents.")
 
 if __name__ == "__main__":
     main()
