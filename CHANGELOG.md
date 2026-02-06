@@ -1,5 +1,14 @@
 # Changelog
 
+## v26.0 - Protocol ARCHITECT_INFINITE (Day 1)
+
+### Jules' Log
+> "I noticed we lack a unified understanding of market states across our agent fleet. Our `AlgoTradingAgent` was firing blindly regardless of whether the market was trending or chopping. I researched quantitative finance patterns and found that identifying the 'Market Regime' is a critical first step for any robust strategy. I have built `MarketRegimeAgent` to bridge this gap, using Hurst Exponent and ADX to classify the market environment."
+
+### Added
+- **New Organ**: `core/agents/specialized/market_regime_agent.py` - A specialized agent that classifies market conditions into `STRONG_TREND`, `MEAN_REVERSION`, or `HIGH_VOLATILITY_CRASH_RISK` using statistical metrics.
+- **Tests**: `tests/test_market_regime_agent.py` - Unit tests verifying regime classification against synthetic data patterns (Sine Wave, Linear Trend, Random Walk Explosion).
+
 ## v23.5 - Autonomous Remediation & Enhancement
 
 ### Architecture
