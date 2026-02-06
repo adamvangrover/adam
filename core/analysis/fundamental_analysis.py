@@ -2,7 +2,7 @@
 
 import pandas as pd
 import numpy as np
-from langchain.agents import Tool
+from langchain.agents import Tool, tool
 from langchain.tools.python.tool import PythonAstREPLTool
 
 # Define a REPL tool for advanced analysis
