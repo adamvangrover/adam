@@ -21,11 +21,13 @@ const PortfolioManagement = lazy(() => import('./pages/PortfolioManagement'));
 const SimulationTools = lazy(() => import('./pages/SimulationTools'));
 const Synthesizer = lazy(() => import('./pages/Synthesizer'));
 const PromptAlpha = lazy(() => import('./pages/PromptAlpha'));
+const CreditSentinel = lazy(() => import('./pages/CreditSentinel'));
 
 const App: React.FC = () => {
   return (
       <Routes>
         <Route path="/prompt-alpha" element={<Suspense fallback={<Loading />}><PromptAlpha /></Suspense>} />
+        <Route path="/credit-sentinel" element={<Suspense fallback={<Loading />}><CreditSentinel /></Suspense>} />
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="synthesizer" element={<Suspense fallback={<Loading />}><Synthesizer /></Suspense>} />

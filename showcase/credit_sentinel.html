@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CREDIT SENTINEL | System 2 Verification</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #000; font-family: 'Inter', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .gauge-mask {
+             mask: radial-gradient(circle at 50% 100%, black 60%, transparent 61%);
+             -webkit-mask: radial-gradient(circle at 50% 100%, black 60%, transparent 61%);
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col text-gray-300 selection:bg-cyan-500/30">
+
+    <!-- Header -->
+    <header class="h-14 border-b border-cyan-900/30 bg-slate-950 flex items-center justify-between px-6 shrink-0">
+        <div class="flex items-center gap-3">
+            <i class="fas fa-shield-alt text-cyan-400 text-xl"></i>
+            <h1 class="text-xl font-bold tracking-tighter text-white">
+                CREDIT<span class="text-cyan-400">SENTINEL</span>
+            </h1>
+            <span class="text-[10px] bg-cyan-900/30 text-cyan-400 px-2 py-0.5 rounded border border-cyan-900/50 mono">
+                SYSTEM 2 VERIFICATION
+            </span>
+        </div>
+        <div class="flex items-center gap-2 mono text-xs">
+             <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+             <span class="text-green-500 font-bold">ONLINE</span>
+        </div>
+    </header>
+
+    <div class="flex-1 flex overflow-hidden">
+
+        <!-- Controls -->
+        <div class="w-80 bg-slate-950 border-r border-cyan-900/30 p-4 flex flex-col gap-6 overflow-y-auto shrink-0">
+            <div>
+                <label class="text-[10px] text-gray-500 font-bold uppercase mb-1 block mono">Target Entity</label>
+                <div class="flex items-center bg-slate-900 border border-slate-800 rounded px-3 py-2">
+                    <input type="text" value="ZOMB" class="bg-transparent border-none outline-none text-white font-bold w-full uppercase mono" id="input-ticker">
+                    <i class="fas fa-search text-gray-600"></i>
+                </div>
+            </div>
+
+            <div>
+                <label class="text-[10px] text-gray-500 font-bold uppercase mb-1 block mono">Analysis Context</label>
+                <textarea class="w-full h-40 bg-slate-900 border border-slate-800 rounded p-3 text-xs text-gray-300 mono focus:border-cyan-500/50 outline-none resize-none" id="input-analysis">The company shows strong resilience. Leverage (Gross): 2.00x. EBITDA: 30,000,000.00. We note the Term Loan B is Senior Secured and thus low risk. Parent Company is a strong Operating Company.</textarea>
+            </div>
+
+            <div>
+                <div class="flex justify-between text-[10px] text-gray-500 font-bold uppercase mb-1 mono">
+                    <span>Financials (USD)</span>
+                    <span>Override</span>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center bg-slate-900/50 p-2 rounded border border-slate-800">
+                        <span class="text-xs mono">EBITDA</span>
+                        <input type="number" value="30000000" class="bg-transparent text-right w-24 outline-none text-cyan-400 font-bold text-xs mono" readonly>
+                    </div>
+                    <div class="flex justify-between items-center bg-slate-900/50 p-2 rounded border border-slate-800">
+                        <span class="text-xs mono">Total Debt</span>
+                        <input type="number" value="400000000" class="bg-transparent text-right w-24 outline-none text-red-400 font-bold text-xs mono" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="runAnalysis()" id="btn-run" class="mt-auto w-full bg-cyan-600 hover:bg-cyan-500 text-black font-bold py-3 rounded flex items-center justify-center gap-2 transition-all mono">
+                <i class="fas fa-bolt"></i> RUN VERIFICATION
+            </button>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="flex-1 bg-black p-6 overflow-y-auto relative">
+
+            <div id="state-empty" class="absolute inset-0 flex flex-col items-center justify-center text-slate-800 pointer-events-none">
+                <i class="fas fa-shield-alt text-6xl mb-4 opacity-20"></i>
+                <p class="text-lg font-bold">AWAITING INPUT</p>
+                <p class="text-sm mono">Initiate 4-Layer Verification Cycle</p>
+            </div>
+
+            <div id="state-loading" class="absolute inset-0 flex flex-col items-center justify-center text-cyan-500 hidden bg-black z-10">
+                <div class="w-16 h-16 border-4 border-cyan-900 border-t-cyan-400 rounded-full animate-spin mb-6"></div>
+                <p class="text-sm mono animate-pulse">RUNNING ZOMBIE SIMULATION...</p>
+                <p class="text-xs text-slate-600 mt-2 mono">Checking Ontology...</p>
+            </div>
+
+            <div id="state-results" class="grid grid-cols-12 gap-6 max-w-7xl mx-auto hidden opacity-0 transition-opacity duration-500">
+
+                <!-- 1. Confidence Score -->
+                <div class="col-span-12 lg:col-span-4 bg-slate-950 border border-slate-800 rounded-lg p-6 relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-cyan-500 to-blue-600"></div>
+                    <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2 mono">
+                        <i class="fas fa-lock"></i> Confidence Score
+                    </h2>
+
+                    <div class="flex items-end gap-2 mb-2">
+                        <span class="text-5xl font-bold text-white mono">12%</span>
+                        <span class="text-sm text-red-400 mb-2 font-bold flex items-center mono">
+                            <i class="fas fa-exclamation-triangle mr-1"></i> CRITICAL RISK
+                        </span>
+                    </div>
+                    <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
+                        <div class="h-full bg-red-500 w-[12%]"></div>
+                    </div>
+                    <p class="mt-4 text-xs text-gray-500 leading-relaxed mono">
+                        The System 2 Jury has detected high-probability hallucinations in the agent's debt structure analysis.
+                        Confidence is severely penalized.
+                    </p>
+                </div>
+
+                <!-- 2. Symbolic Verification -->
+                <div class="col-span-12 lg:col-span-8 bg-slate-950 border border-slate-800 rounded-lg p-6">
+                    <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2 mono">
+                        <i class="fas fa-project-diagram"></i> Knowledge Graph Verification
+                    </h2>
+
+                    <div class="space-y-3">
+                        <div class="bg-red-950/20 border border-red-900/50 p-3 rounded flex items-start gap-3">
+                            <i class="fas fa-exclamation-triangle text-red-500 shrink-0 mt-0.5"></i>
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="text-xs font-bold text-red-400 bg-red-950/50 px-1.5 rounded mono">HIGH</span>
+                                    <span class="text-xs font-bold text-gray-300 mono">Term Loan B</span>
+                                </div>
+                                <p class="text-xs text-red-200/80 mono">Agent identified 'Term Loan B' as 'Senior Secured', but Knowledge Graph asserts it is 'Subordinated'.</p>
+                            </div>
+                        </div>
+                        <div class="bg-red-950/20 border border-red-900/50 p-3 rounded flex items-start gap-3">
+                            <i class="fas fa-exclamation-triangle text-red-500 shrink-0 mt-0.5"></i>
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="text-xs font-bold text-red-400 bg-red-950/50 px-1.5 rounded mono">MEDIUM</span>
+                                    <span class="text-xs font-bold text-gray-300 mono">Parent Corporation</span>
+                                </div>
+                                <p class="text-xs text-red-200/80 mono">Agent refers to Parent as 'Operating', but Knowledge Graph classifies it as a 'HoldingCompany'.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Audit Trail -->
+                <div class="col-span-12 lg:col-span-6 bg-slate-950 border border-slate-800 rounded-lg p-6">
+                    <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2 mono">
+                        <i class="fas fa-file-contract"></i> Auditor Jury
+                    </h2>
+                    <div class="space-y-4">
+                        <div class="border-b border-slate-900 pb-3">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-xs font-bold text-cyan-400 mono">Factual Grounding</span>
+                                <div class="flex gap-0.5"><div class="w-1.5 h-3 bg-cyan-500 rounded-sm"></div><div class="w-1.5 h-3 bg-cyan-500 rounded-sm"></div><div class="w-1.5 h-3 bg-cyan-500 rounded-sm"></div><div class="w-1.5 h-3 bg-cyan-500 rounded-sm"></div><div class="w-1.5 h-3 bg-cyan-500 rounded-sm"></div></div>
+                            </div>
+                            <p class="text-xs text-gray-500 mono">Key financial figures match source data.</p>
+                        </div>
+                        <div class="border-b border-slate-900 pb-3">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-xs font-bold text-cyan-400 mono">Logic Density</span>
+                                <div class="flex gap-0.5"><div class="w-1.5 h-3 bg-cyan-500 rounded-sm"></div><div class="w-1.5 h-3 bg-cyan-500 rounded-sm"></div><div class="w-1.5 h-3 bg-slate-800 rounded-sm"></div><div class="w-1.5 h-3 bg-slate-800 rounded-sm"></div><div class="w-1.5 h-3 bg-slate-800 rounded-sm"></div></div>
+                            </div>
+                            <p class="text-xs text-gray-500 mono">Logic Error: Calculated Gross Leverage is 13.33x but analysis states 2.00x.</p>
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-xs font-bold text-cyan-400 mono">Jury Consensus</span>
+                                <div class="flex gap-0.5"><div class="w-1.5 h-3 bg-cyan-500 rounded-sm"></div><div class="w-1.5 h-3 bg-slate-800 rounded-sm"></div><div class="w-1.5 h-3 bg-slate-800 rounded-sm"></div><div class="w-1.5 h-3 bg-slate-800 rounded-sm"></div><div class="w-1.5 h-3 bg-slate-800 rounded-sm"></div></div>
+                            </div>
+                            <p class="text-xs text-gray-500 mono">CRITICAL: The Jury detects significant discrepancies characteristic of a hallucinated debt structure.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Sensitivity Analysis -->
+                <div class="col-span-12 lg:col-span-6 bg-slate-950 border border-slate-800 rounded-lg p-6">
+                    <h2 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2 mono">
+                        <i class="fas fa-chart-bar"></i> Sensitivity Analysis (Red Team)
+                    </h2>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-[10px] text-gray-500 border-b border-slate-800 mono">
+                                    <th class="pb-2 pl-2">SCENARIO</th>
+                                    <th class="pb-2 text-right">EBITDA</th>
+                                    <th class="pb-2 text-right">LEVERAGE</th>
+                                    <th class="pb-2 text-right">COVERAGE</th>
+                                </tr>
+                            </thead>
+                            <tbody class="mono">
+                                <tr class="text-xs border-b border-slate-900/50 hover:bg-slate-900/30">
+                                    <td class="py-3 pl-2 text-gray-300">EBITDA SHOCK 20PCT</td>
+                                    <td class="py-3 text-right text-gray-400">$24.0M</td>
+                                    <td class="py-3 text-right font-bold text-red-400">16.67x</td>
+                                    <td class="py-3 text-right font-bold text-red-400">0.53x</td>
+                                </tr>
+                                <tr class="text-xs border-b border-slate-900/50 hover:bg-slate-900/30">
+                                    <td class="py-3 pl-2 text-gray-300">RATE HIKE 250BPS</td>
+                                    <td class="py-3 text-right text-gray-400">$30.0M</td>
+                                    <td class="py-3 text-right font-bold text-red-400">13.33x</td>
+                                    <td class="py-3 text-right font-bold text-red-400">0.53x</td>
+                                </tr>
+                                <tr class="text-xs border-b border-slate-900/50 hover:bg-slate-900/30">
+                                    <td class="py-3 pl-2 text-gray-300">REVENUE COLLAPSE</td>
+                                    <td class="py-3 text-right text-gray-400">$24.0M</td>
+                                    <td class="py-3 text-right font-bold text-red-400">16.67x</td>
+                                    <td class="py-3 text-right font-bold text-red-400">0.53x</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function runAnalysis() {
+            const btn = document.getElementById('btn-run');
+            const stateEmpty = document.getElementById('state-empty');
+            const stateLoading = document.getElementById('state-loading');
+            const stateResults = document.getElementById('state-results');
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-sync fa-spin"></i> RUNNING...';
+
+            stateEmpty.classList.add('hidden');
+            stateLoading.classList.remove('hidden');
+            stateResults.classList.add('hidden');
+            stateResults.classList.remove('opacity-100');
+            stateResults.classList.add('opacity-0');
+
+            setTimeout(() => {
+                stateLoading.classList.add('hidden');
+                stateResults.classList.remove('hidden');
+
+                // Fade in
+                requestAnimationFrame(() => {
+                    stateResults.classList.remove('opacity-0');
+                    stateResults.classList.add('opacity-100');
+                });
+
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-bolt"></i> RUN VERIFICATION';
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
