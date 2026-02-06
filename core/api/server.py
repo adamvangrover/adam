@@ -2,6 +2,7 @@ import os
 import sys
 import logging
 import asyncio
+import json
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 
@@ -169,6 +170,31 @@ def submit_action():
 
     simulation_engine.resolve_action(inject_id, option_id)
     return jsonify({"status": "Action Resolved", "state": simulation_engine.get_state()})
+
+
+@app.route('/api/traces', methods=['GET'])
+def get_traces():
+    """
+    Returns the execution traces for the audit dashboard.
+    Reads from the local JSONL file.
+    """
+    trace_file = "demo_trace.jsonl" # In production, this would be configurable or a DB query
+    traces = []
+
+    if os.path.exists(trace_file):
+        try:
+            with open(trace_file, 'r') as f:
+                for line in f:
+                    if line.strip():
+                        traces.append(json.loads(line))
+            # Return most recent traces first
+            traces.reverse()
+        except Exception as e:
+            logging.error(f"Error reading trace file: {e}")
+            return jsonify({"error": "Failed to read traces"}), 500
+
+    return jsonify({"traces": traces})
+
 
 if __name__ == '__main__':
     setup_logging()

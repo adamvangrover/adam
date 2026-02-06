@@ -138,6 +138,31 @@ class RiskAssessmentAgent(AgentBase):
             logger.warning(f"Unknown risk type: {risk_type}")
             return {"error": "Unknown risk type."}
 
+        # --- Layer 1: Auditor Agent Integration (v26.0) ---
+        # If enabled, run the Auditor to verify the assessment.
+        if self.config.get("enable_auditor", False) or context.get("enable_auditor", False):
+            try:
+                from core.evaluation.judge import AuditorAgent
+                from core.evaluation.tracing import TraceLog
+
+                logger.info("Engaging Auditor Agent for verification...")
+                auditor = AuditorAgent(mock_mode=True)
+                audit_score = auditor.evaluate(target_data, result)
+
+                # Enhance result with audit score
+                result["_audit"] = audit_score.model_dump()
+
+                # Log trace
+                tracer = TraceLog(session_id=f"risk-agent-{company_name}")
+                tracer.log_event("RiskAgent", "Assessment Generated", result)
+                tracer.log_event("Auditor", "Evaluation", result["_audit"])
+                tracer.save_trace("demo_trace.jsonl") # Append to global demo trace for visualization
+
+            except ImportError:
+                logger.warning("Auditor modules not found. Skipping verification.")
+            except Exception as e:
+                logger.error(f"Auditor execution failed: {e}")
+
         # Cache Result
         self._update_cache(cache_key, result)
 
