@@ -42,12 +42,13 @@ def test_symbolic_verifier_flags():
     # Trigger 1: Term Loan B Seniority Mismatch
     text = "We have a Term Loan B which is Senior Secured and very safe."
     flags = verifier.verify(text)
-    assert any("Term Loan B" in f and "Subordinated" in f for f in flags)
+    # Flags are now dicts, check 'message'
+    assert any("Term Loan B" in f["message"] and "Subordinated" in f["message"] for f in flags)
 
     # Trigger 2: Parent Corp Structure
     text = "The Parent Corporation is an Operating Company generating cash."
     flags = verifier.verify(text)
-    assert any("Parent" in f and "HoldingCompany" in f for f in flags)
+    assert any("Parent" in f["message"] and "HoldingCompany" in f["message"] for f in flags)
 
 def test_critique_node_integration():
     """Test full integration in supervisor node."""
@@ -69,7 +70,7 @@ def test_critique_node_integration():
     assert "verification_flags" in result
     assert len(result["verification_flags"]) > 0
     # Should catch the Senior vs Subordinated lie
-    assert any("Term Loan B" in f for f in result["verification_flags"])
+    assert any("Term Loan B" in f["message"] for f in result["verification_flags"])
 
     # Check Messages
     messages = result["messages"]

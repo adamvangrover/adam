@@ -3,7 +3,13 @@ from pydantic import BaseModel, Field
 import json
 import logging
 import re
+import random
 from core.llm_plugin import LLMPlugin
+
+try:
+    from core.evaluation.probabilistic import BayesianReasoningEngine
+except ImportError:
+    BayesianReasoningEngine = None
 
 logger = logging.getLogger(__name__)
 
@@ -190,7 +196,7 @@ class AuditorAgent:
 
     def _mock_evaluate(self, input_data: Dict[str, Any], agent_output: Any, heuristics: List[HeuristicResult]) -> EvaluationScore:
         """
-        Fallback evaluation combining heuristic scores with simple logic.
+        Fallback evaluation combining heuristic scores with simple logic and optional Bayesian reasoning.
         """
         # Calculate average from heuristics
         total_score = sum(h.score for h in heuristics)
@@ -200,9 +206,22 @@ class AuditorAgent:
         
         reasoning = "Automated audit completed. "
         if all_flags:
-            reasoning += "Issues found in: " + ", ".join([h.category for h in heuristics if h.flags]) + "."
+            reasoning += "Issues found in: " + ", ".join([h.category for h in heuristics if h.flags]) + ". "
         else:
-            reasoning += "No automated flags raised. Output appears technically sound."
+            reasoning += "No automated flags raised. Output appears technically sound. "
+
+        # UPGRADE: Use BayesianReasoningEngine for 'Conviction' if available
+        if BayesianReasoningEngine:
+            try:
+                engine = BayesianReasoningEngine()
+                # Use heuristics flags as the signals for Bayesian engine
+                result = engine.calculate_confidence({"heuristics": [h.dict() for h in heuristics]}, all_flags)
+                
+                # Adjust reasoning with Bayesian Trace
+                trace_text = " ".join(result.get("trace", []))
+                reasoning += f" [Bayesian Confidence: {result.get('score', 0):.0%}. {trace_text}]"
+            except Exception as e:
+                logger.warning(f"Bayesian engine failed in mock evaluation: {e}")
 
         return EvaluationScore(
             factual_grounding=heuristics[0].score,

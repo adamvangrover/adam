@@ -1,4 +1,5 @@
 from typing import Dict, Any, List
+import copy
 
 class ZombieFactory:
     """
@@ -53,3 +54,40 @@ class ZombieFactory:
             "audit_logs": [],
             "verification_flags": []
         }
+
+    @staticmethod
+    def generate_sensitivity_scenarios(base_state: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """
+        Generates a suite of stress-test scenarios by tweaking key variables.
+        Variations:
+        1. EBITDA -20%
+        2. Interest Expense +200bps (approx +20% cost)
+        3. Revenue -15% (Recession)
+        """
+        scenarios = []
+
+        # Scenario 1: EBITDA Shock
+        s1 = copy.deepcopy(base_state)
+        orig_ebitda = s1["income_statement"].get("consolidated_ebitda", 0)
+        s1["income_statement"]["consolidated_ebitda"] = orig_ebitda * 0.8
+        s1["scenario_id"] = "EBITDA_SHOCK_20PCT"
+        scenarios.append(s1)
+
+        # Scenario 2: Rate Hike
+        s2 = copy.deepcopy(base_state)
+        orig_interest = s2["income_statement"].get("interest_expense", 0)
+        s2["income_statement"]["interest_expense"] = orig_interest * 1.25
+        s2["scenario_id"] = "RATE_HIKE_250BPS"
+        scenarios.append(s2)
+
+        # Scenario 3: Revenue Collapse
+        s3 = copy.deepcopy(base_state)
+        orig_rev = s3["income_statement"].get("revenue", 0)
+        s3["income_statement"]["revenue"] = orig_rev * 0.85
+        # Assume 40% flow through to EBITDA
+        delta_rev = orig_rev * 0.15
+        s3["income_statement"]["consolidated_ebitda"] = orig_ebitda - (delta_rev * 0.4)
+        s3["scenario_id"] = "REVENUE_COLLAPSE_15PCT"
+        scenarios.append(s3)
+
+        return scenarios
