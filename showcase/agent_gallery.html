@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v23.5 | Agent Gallery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* --- Core Theme Overrides --- */
+        body { background-color: #050505; font-family: 'Inter', sans-serif; overflow: hidden; color: #e2e8f0; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Cyberpunk Aesthetic */
+        .scan-line {
+            position: fixed; top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(to bottom, rgba(0, 255, 136, 0), rgba(0, 255, 136, 0.2), rgba(0, 255, 136, 0));
+            opacity: 0.15; animation: scan 6s linear infinite; pointer-events: none; z-index: 9999;
+        }
+        @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
+
+        .neon-text { text-shadow: 0 0 5px rgba(0, 255, 136, 0.5), 0 0 10px rgba(0, 255, 136, 0.3); }
+        .neon-border { border: 1px solid rgba(0, 255, 136, 0.3); box-shadow: 0 0 10px rgba(0, 255, 136, 0.1); }
+
+        /* Agent Card */
+        .agent-card {
+            background: rgba(10, 15, 20, 0.8);
+            border: 1px solid #1e293b;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .agent-card:hover {
+            transform: translateY(-2px);
+            border-color: #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.15);
+        }
+        .agent-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, #00ff88, transparent);
+            transform: scaleX(0); transition: transform 0.5s ease;
+        }
+        .agent-card:hover::before { transform: scaleX(1); }
+
+        /* Telemetry Bars */
+        .telemetry-bar {
+            height: 4px; background: #1e293b; border-radius: 2px; overflow: hidden; position: relative;
+        }
+        .telemetry-fill {
+            height: 100%; background: #00ff88; width: 0%; transition: width 0.5s ease;
+            box-shadow: 0 0 5px #00ff88;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        /* Custom Badges */
+        .tech-badge {
+            font-size: 10px; font-family: 'JetBrains Mono', monospace;
+            padding: 2px 6px; border-radius: 2px; border: 1px solid;
+            text-transform: uppercase;
+        }
+        .badge-cyan { border-color: #06b6d4; color: #67e8f9; background: rgba(6, 182, 212, 0.1); }
+        .badge-pink { border-color: #ec4899; color: #f9a8d4; background: rgba(236, 72, 153, 0.1); }
+
+        /* Modal Backdrop */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col selection:bg-emerald-500/30">
+    <div class="scan-line"></div>
+
+    <!-- Header -->
+    <header class="h-16 border-b border-slate-800 bg-[#0a0a0c]/95 backdrop-blur flex items-center justify-between px-6 shrink-0 z-40">
+        <div class="flex items-center gap-4">
+            <i class="fas fa-network-wired text-[#00ff88] text-xl"></i>
+            <h1 class="text-xl font-bold tracking-tight mono text-white">AGENT <span class="text-[#00ff88]">GALLERY</span></h1>
+        </div>
+        <div class="flex items-center gap-6 font-mono text-xs">
+            <div class="text-slate-400">ACTIVE NODES: <span class="text-[#00ff88]" id="agent-count">--</span></div>
+            <div class="text-slate-400">SYSTEM LOAD: <span class="text-cyan-400" id="sys-load">42%</span></div>
+            <div class="text-[10px] text-slate-500" id="cache-status">CACHE: CHECKING...</div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto p-6 custom-scrollbar bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')]">
+
+        <!-- Filters -->
+        <div class="mb-8 flex flex-wrap justify-between items-center gap-4 sticky top-0 z-30 py-4 bg-[#050505]/90 border-b border-slate-800 -mx-6 px-6 -mt-6 backdrop-blur-md">
+            <div class="flex gap-2" id="filters">
+                <button class="px-4 py-1.5 rounded bg-[#00ff88]/10 border border-[#00ff88]/50 text-[#00ff88] text-xs font-bold mono hover:bg-[#00ff88]/20 transition active-filter" onclick="filter('ALL', this)">ALL SYSTEMS</button>
+                <button class="px-4 py-1.5 rounded bg-slate-800/50 border border-slate-700 text-slate-400 text-xs font-bold mono hover:text-white transition" onclick="filter('Risk', this)">RISK ENGINE</button>
+                <button class="px-4 py-1.5 rounded bg-slate-800/50 border border-slate-700 text-slate-400 text-xs font-bold mono hover:text-white transition" onclick="filter('Analyst', this)">ANALYST CORE</button>
+                <button class="px-4 py-1.5 rounded bg-slate-800/50 border border-slate-700 text-slate-400 text-xs font-bold mono hover:text-white transition" onclick="filter('Agent', this)">GENERAL</button>
+            </div>
+
+            <div class="relative">
+                <input type="text" id="search-agent" placeholder="SEARCH PROTOCOLS..." class="bg-black/50 border border-slate-700 rounded px-4 py-1.5 text-xs text-[#00ff88] focus:outline-none focus:border-[#00ff88] w-64 mono transition">
+                <i class="fas fa-search absolute right-3 top-2 text-slate-600 text-xs pointer-events-none"></i>
+            </div>
+        </div>
+
+        <!-- Grid -->
+        <div id="agents-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Cards Injected via JS -->
+        </div>
+
+    </main>
+
+    <!-- MCP Modal -->
+    <div id="mcp-modal" class="fixed inset-0 modal-backdrop z-50 hidden flex items-center justify-center p-4">
+        <div class="w-full max-w-2xl bg-[#0a0f14] border border-[#00ff88]/30 rounded-lg shadow-[0_0_50px_rgba(0,255,136,0.1)] overflow-hidden flex flex-col max-h-[90vh]">
+
+            <!-- Header -->
+            <div class="p-4 border-b border-slate-800 bg-[#05080a] flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-plug text-[#00ff88]"></i>
+                    <h3 class="text-lg font-bold text-white mono">MCP INTEGRATION</h3>
+                </div>
+                <button onclick="closeMCPModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+
+            <!-- Body -->
+            <div class="p-6 overflow-y-auto space-y-6">
+
+                <!-- Connection String -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mono mb-2 uppercase">Connection Endpoint</label>
+                    <div class="flex gap-2">
+                        <code id="mcp-string" class="flex-1 bg-black border border-slate-700 p-3 rounded text-[#00ff88] mono text-sm truncate">mcp://...</code>
+                        <button onclick="copyToClipboard('mcp-string')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white px-4 rounded transition"><i class="fas fa-copy"></i></button>
+                    </div>
+                </div>
+
+                <!-- Tools List -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mono mb-2 uppercase">Exposed Tools</label>
+                    <div class="bg-black/50 border border-slate-800 rounded p-4 h-64 overflow-y-auto custom-scrollbar">
+                        <ul id="mcp-tools-list" class="space-y-3">
+                            <!-- Tools injected here -->
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-blue-900/10 border border-blue-500/20 p-3 rounded flex items-start gap-3">
+                    <i class="fas fa-info-circle text-blue-400 mt-0.5"></i>
+                    <p class="text-xs text-blue-300 leading-relaxed">
+                        This agent adheres to the Model Context Protocol (MCP) v1.0.
+                        Use the endpoint above to connect it to any MCP-compliant client (e.g., Claude Desktop, Zed, Adam IDE).
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="p-4 border-t border-slate-800 bg-[#05080a] flex justify-end">
+                <button onclick="closeMCPModal()" class="px-6 py-2 bg-[#00ff88]/10 hover:bg-[#00ff88]/20 border border-[#00ff88]/50 text-[#00ff88] rounded mono text-sm font-bold transition">DONE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Note: We are now handling data loading more dynamically -->
+    <script src="js/mock_agents_rich.js"></script>
+    <script>
+        let allAgents = [];
+        let currentFilter = 'ALL';
+
+        const CACHE_KEY = 'agent_gallery_cache_v1';
+
+        // --- Init ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initGallery();
+        });
+
+        async function initGallery() {
+            // 1. Check Cache (Fast Load)
+            const cached = localStorage.getItem(CACHE_KEY);
+            if (cached) {
+                try {
+                    allAgents = JSON.parse(cached);
+                    updateUI('CACHE HIT');
+                } catch (e) {
+                    console.error("Cache corrupted", e);
+                }
+            }
+
+            // 2. Fetch/Update (Graceful Fallback)
+            try {
+                // In a real scenario, this would be a fetch() call.
+                // Here we verify window.MOCK_DATA which mimics the "fetched" fresh data.
+                // We wrap it in a small delay to simulate async network
+                await new Promise(r => setTimeout(r, 100)); // Minimal delay
+
+                if (window.MOCK_DATA && window.MOCK_DATA.agents) {
+                    const freshData = window.MOCK_DATA.agents;
+
+                    // Simple "hash" check or length check to see if update needed
+                    if (JSON.stringify(freshData) !== JSON.stringify(allAgents)) {
+                        allAgents = freshData;
+                        localStorage.setItem(CACHE_KEY, JSON.stringify(allAgents));
+                        updateUI('UPDATED');
+                    } else {
+                        updateUI('SYNCED');
+                    }
+                }
+            } catch (e) {
+                console.warn("Background fetch failed, using fallback.", e);
+                updateUI('OFFLINE MODE');
+            }
+
+            startTelemetrySimulation();
+        }
+
+        function updateUI(status) {
+            document.getElementById('agent-count').innerText = allAgents.length;
+            document.getElementById('cache-status').innerText = `STATUS: ${status}`;
+
+            // Only re-render if we have data
+            if (allAgents.length > 0) {
+                renderGrid();
+            }
+        }
+
+        // --- Rendering ---
+        function renderGrid() {
+            const grid = document.getElementById('agents-grid');
+            grid.innerHTML = '';
+
+            const filtered = allAgents.filter(a => {
+                if (currentFilter === 'ALL') return true;
+                return a.type && a.type.includes(currentFilter);
+            });
+
+            filtered.forEach(agent => {
+                const card = document.createElement('div');
+                card.className = 'agent-card rounded-lg p-5 flex flex-col h-72';
+
+                // Skills Tags (Max 3)
+                const skillsHtml = (agent.skills || []).slice(0, 3).map(s =>
+                    `<span class="tech-badge badge-cyan truncate">${s}</span>`
+                ).join('');
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 class="text-white font-bold mono truncate text-lg" title="${agent.name}">${formatName(agent.name)}</h3>
+                            <span class="text-[10px] text-slate-400 uppercase tracking-widest">${agent.type}</span>
+                        </div>
+                        <div class="h-2 w-2 rounded-full bg-[#00ff88] shadow-[0_0_8px_#00ff88] animate-pulse"></div>
+                    </div>
+
+                    <p class="text-slate-400 text-xs leading-relaxed line-clamp-3 mb-4 flex-1 font-mono">
+                        ${agent.docstring || 'System unit operational. No further data.'}
+                    </p>
+
+                    <div class="flex gap-2 mb-4 flex-wrap">
+                        ${skillsHtml}
+                        ${(agent.skills?.length > 3) ? `<span class="text-[10px] text-slate-600 self-center">+${agent.skills.length - 3}</span>` : ''}
+                    </div>
+
+                    <!-- Telemetry -->
+                    <div class="space-y-2 mb-4 bg-black/30 p-2 rounded border border-slate-800">
+                        <div class="flex justify-between text-[10px] mono text-slate-500">
+                            <span>CPU THREAD</span>
+                            <span class="cpu-val text-[#00ff88]">0%</span>
+                        </div>
+                        <div class="telemetry-bar"><div class="telemetry-fill cpu-bar bg-[#00ff88]"></div></div>
+
+                        <div class="flex justify-between text-[10px] mono text-slate-500 mt-1">
+                            <span>MEM ALLOC</span>
+                            <span class="mem-val text-cyan-400">0 MB</span>
+                        </div>
+                        <div class="telemetry-bar"><div class="telemetry-fill mem-bar bg-cyan-400"></div></div>
+                    </div>
+
+                    <button onclick="openMCPModal('${agent.name}')" class="w-full py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white rounded mono text-xs font-bold transition flex items-center justify-center gap-2">
+                        <i class="fas fa-network-wired"></i> CONNECT MCP
+                    </button>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        // --- MCP Modal Logic ---
+        function openMCPModal(agentName) {
+            const agent = allAgents.find(a => a.name === agentName);
+            if (!agent) return;
+
+            document.getElementById('mcp-string').innerText = agent.mcp_connection || `mcp://${agent.name.toLowerCase()}.adam.internal`;
+
+            const list = document.getElementById('mcp-tools-list');
+            list.innerHTML = '';
+
+            if (agent.tools && agent.tools.length > 0) {
+                agent.tools.forEach(t => {
+                    list.innerHTML += `
+                        <li class="border-b border-slate-800 pb-2 last:border-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <i class="fas fa-wrench text-slate-500 text-xs"></i>
+                                <span class="text-white text-sm font-bold mono">${t.name}</span>
+                            </div>
+                            <p class="text-xs text-slate-400 pl-5">${t.description || 'No description available.'}</p>
+                        </li>
+                    `;
+                });
+            } else {
+                list.innerHTML = `<li class="text-slate-500 italic text-sm text-center py-4">No specific tools exposed for this agent.</li>`;
+            }
+
+            document.getElementById('mcp-modal').classList.remove('hidden');
+        }
+
+        function closeMCPModal() {
+            document.getElementById('mcp-modal').classList.add('hidden');
+        }
+
+        // --- Utilities ---
+        function formatName(name) {
+            return name.replace(/_/g, ' ').replace(/([a-z])([A-Z])/g, '$1 $2').trim();
+        }
+
+        function filter(type, btn) {
+            currentFilter = type;
+            document.querySelectorAll('#filters button').forEach(b => b.classList.remove('active-filter', 'bg-[#00ff88]/10', 'text-[#00ff88]', 'border-[#00ff88]/50'));
+            document.querySelectorAll('#filters button').forEach(b => b.classList.add('bg-slate-800/50', 'text-slate-400', 'border-slate-700'));
+
+            btn.classList.remove('bg-slate-800/50', 'text-slate-400', 'border-slate-700');
+            btn.classList.add('active-filter', 'bg-[#00ff88]/10', 'text-[#00ff88]', 'border-[#00ff88]/50');
+
+            renderGrid();
+        }
+
+        function copyToClipboard(id) {
+            const text = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(text);
+            alert('Copied to clipboard');
+        }
+
+        // --- Telemetry Simulation ---
+        function startTelemetrySimulation() {
+            setInterval(() => {
+                // Update System Load
+                const sysLoad = Math.floor(Math.random() * 40) + 30;
+                document.getElementById('sys-load').innerText = sysLoad + "%";
+
+                // Update Cards
+                const cards = document.querySelectorAll('.agent-card');
+                cards.forEach(card => {
+                    if (Math.random() > 0.7) return; // Only update some cards each tick
+
+                    const cpu = Math.floor(Math.random() * 90) + 5;
+                    const mem = Math.floor(Math.random() * 512) + 64;
+
+                    card.querySelector('.cpu-val').innerText = cpu + "%";
+                    card.querySelector('.cpu-bar').style.width = cpu + "%";
+
+                    card.querySelector('.mem-val').innerText = mem + " MB";
+                    card.querySelector('.mem-bar').style.width = Math.min(100, (mem / 1024) * 100) + "%";
+                });
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
