@@ -1,95 +1,129 @@
 # Adam v26.0 Setup Guide
 
-This document provides detailed instructions for installing Adam on various platforms and configuring it for production.
+This document provides definitive instructions for setting up the Adam environment. We strictly support **`uv`** for dependency management.
 
-## Table of Contents
-*   [System Requirements](#system-requirements)
-*   [Local Development Setup](#local-development-setup)
-    *   [Linux/macOS](#linuxmacos)
-    *   [Windows](#windows)
+---
+
+## 📋 Table of Contents
+*   [Prerequisites](#prerequisites)
+*   [Environment Variables](#environment-variables)
+*   [Installation (Local)](#installation-local)
 *   [Docker Deployment](#docker-deployment)
 *   [Troubleshooting](#troubleshooting)
 
-## System Requirements
+---
 
-*   **OS:** Linux (Ubuntu 22.04+ recommended), macOS (Ventura+), or Windows 11 (WSL2).
-*   **Memory:** 16GB RAM minimum (32GB recommended for running local LLMs).
-*   **Storage:** 10GB free space.
-*   **Python:** Version 3.10, 3.11, or 3.12.
+## Prerequisites
 
-## Local Development Setup
+*   **Operating System:**
+    *   **Linux:** Ubuntu 22.04 LTS (Recommended)
+    *   **macOS:** Ventura or newer (Apple Silicon supported)
+    *   **Windows:** WSL2 (Ubuntu 22.04) ONLY. Native Windows is not actively supported.
+*   **Python:** 3.10+
+*   **Tools:** `uv`, `git`, `curl`, `make` (optional)
 
-### Linux/macOS
+---
 
-1.  **Install System Dependencies:**
+## Environment Variables
+
+Adam requires a `.env` file in the project root to store secrets.
+
+1.  **Copy the Template:**
     ```bash
-    # Ubuntu
-    sudo apt update && sudo apt install git curl build-essential libpq-dev
-
-    # macOS (Homebrew)
-    brew install git curl postgresql
+    cp .env.example .env
     ```
 
-2.  **Install uv (Package Manager):**
-    ```bash
-    curl -LsSf https://astral.sh/uv/install.sh | sh
+2.  **Configure Keys:**
+    Open `.env` and set the following:
+
+    ```ini
+    # --- LLM Providers ---
+    OPENAI_API_KEY=sk-...         # Required for Planner/Reasoning
+    ANTHROPIC_API_KEY=sk-ant...   # Optional (Recommended for Coding)
+
+    # --- Financial Data ---
+    FMP_API_KEY=...               # Financial Modeling Prep (Market Data)
+    SEC_API_KEY=...               # Optional (for 10-K fetching)
+
+    # --- Infrastructure ---
+    POSTGRES_URI=postgresql://user:pass@localhost:5432/adam
+    REDIS_URL=redis://localhost:6379/0
     ```
 
-3.  **Clone and Sync:**
-    ```bash
-    git clone https://github.com/adamvangrover/adam.git
-    cd adam
-    uv sync
-    ```
+---
 
-4.  **Activate Environment:**
-    ```bash
-    source .venv/bin/activate
-    ```
+## Installation (Local)
 
-### Windows
+### 1. Install `uv`
+If you haven't already:
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+*Restart your shell after installation.*
 
-We strongly recommend using **WSL2 (Windows Subsystem for Linux)** for the best experience. If you must use native Windows:
+### 2. Clone the Repository
+```bash
+git clone https://github.com/adamvangrover/adam.git
+cd adam
+```
 
-1.  **Install Python:** Download and install Python 3.10+ from python.org.
-2.  **Install uv:**
-    ```powershell
-    pip install uv
-    ```
-3.  **Clone and Sync:**
-    ```powershell
-    git clone https://github.com/adamvangrover/adam.git
-    cd adam
-    uv sync
-    ```
-4.  **Activate Environment:**
-    ```powershell
-    .venv\Scripts\activate
-    ```
+### 3. Sync Dependencies
+This command creates the virtual environment (`.venv`) and installs all locked dependencies.
+```bash
+uv sync
+```
+
+### 4. Activate Environment
+```bash
+source .venv/bin/activate
+```
+
+### 5. Verify Installation
+Run the help command to ensure the CLI is working.
+```bash
+python scripts/run_adam.py --help
+```
+
+---
 
 ## Docker Deployment
 
-Adam is container-ready.
+For production or isolated testing, use Docker Compose.
 
-1.  **Build the Image:**
-    ```bash
-    docker build -t adam-v26 .
-    ```
+```bash
+# 1. Build and Start
+docker-compose up --build -d
 
-2.  **Run the Container:**
-    ```bash
-    docker run -d -p 5000:5000 --env-file .env adam-v26
-    ```
+# 2. View Logs
+docker-compose logs -f app
 
-    *Note: Ensure your `.env` file is properly configured before running.*
+# 3. Stop
+docker-compose down
+```
+
+The Web Interface will be available at `http://localhost:80` (or `http://localhost:3000` depending on configuration).
+
+---
 
 ## Troubleshooting
 
-### "Command not found: uv"
-Ensure `~/.cargo/bin` or the installation directory is in your PATH. Try restarting your shell.
+### 1. `uv: command not found`
+*   **Cause:** The installer didn't update your PATH.
+*   **Fix:** Add `export PATH="$HOME/.cargo/bin:$PATH"` to your `~/.bashrc` or `~/.zshrc`.
 
-### "Missing dependency: docling"
-Some libraries require system-level tools. On Linux, try `sudo apt install libmagic1`.
+### 2. `libmagic` Error (ImportError: failed to find libmagic)
+*   **Cause:** The `python-magic` library requires a system-level dependency for file type detection.
+*   **Fix:**
+    *   **Ubuntu:** `sudo apt-get install libmagic1`
+    *   **macOS:** `brew install libmagic`
 
-### "OpenAI API Error"
-Check your `.env` file. Ensure `OPENAI_API_KEY` is set and has credits.
+### 3. Docker "Port Already in Use"
+*   **Cause:** Another service is running on port 5000 or 5432.
+*   **Fix:**
+    1.  Find the process: `sudo lsof -i :5000`
+    2.  Kill it: `kill -9 <PID>`
+    3.  Or, change the port mapping in `docker-compose.yml`.
+
+### 4. LLM "Rate Limit Exceeded"
+*   **Cause:** You ran out of OpenAI credits.
+*   **Fix:** Check your billing status or switch to a local model in `config/models.yaml`.

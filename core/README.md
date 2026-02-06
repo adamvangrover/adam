@@ -1,39 +1,74 @@
 # Adam Core Engine
 
-The `core/` directory is the heart of the Adam system, containing the "System 2" reasoning engine, agents, and data processing pipelines.
+The `core/` directory is the heart of the Adam system, implementing the "System 2" reasoning engine, agents, and specialized financial modules.
 
-## 🧠 System 2 Reasoning Engine
+---
 
-Adam v26.0 moves beyond simple "Chain-of-Thought" prompting to a **Cyclical Reasoning Architecture** (System 2). This is implemented using `LangGraph` in `core/engine/`.
+## 🧠 The Reasoning Engine (`core/engine/`)
 
-### Key Concepts
+The engine moves beyond simple "Chain-of-Thought" prompting to a **Cyclical Reasoning Architecture** implemented with `LangGraph`.
 
-*   **Neuro-Symbolic Planner:** (`core/engine/neuro_symbolic_planner.py`) Decomposes high-level goals into a Directed Acyclic Graph (DAG) of tasks.
-*   **Meta Orchestrator:** (`core/engine/meta_orchestrator.py`) The central router that directs queries to the appropriate execution engine (System 2 Graph vs. Async Swarm).
-*   **Consensus Engine:** (`core/engine/consensus_engine.py`) Aggregates signals from multiple agents to form a final "Executive Decision".
+### 1. Neuro-Symbolic Planner
+*   **File:** `core/engine/neuro_symbolic_planner.py`
+*   **Function:** Decomposes a high-level user query (e.g., "Analyze AAPL") into a Directed Acyclic Graph (DAG) of executable tasks.
+*   **Logic:** Uses an LLM to generate the plan, but validates the graph structure with symbolic logic (NetworkX) to ensure no cycles or impossible paths.
+
+### 2. Meta Orchestrator
+*   **File:** `core/engine/meta_orchestrator.py`
+*   **Function:** The central router. It receives the user input and decides:
+    *   **Fast Path (System 1):** Route to Swarm for news/data.
+    *   **Slow Path (System 2):** Route to Planner for deep analysis.
+*   **Pattern:** Uses semantic routing (embedding similarity) to classify intent.
+
+### 3. Consensus Engine
+*   **File:** `core/engine/consensus_engine.py`
+*   **Function:** Aggregates outputs from multiple agents.
+*   **Algorithm:**
+    *   If agents agree (Variance < Threshold) -> **Pass**.
+    *   If agents disagree -> **Trigger Debate** (Adversarial Loop).
+
+---
+
+## 🛡️ The Credit Sentinel (`core/credit_sentinel/`)
+
+The **Credit Sentinel** is Adam's flagship module for Distressed Debt and Credit Risk analysis.
+
+### Architecture
+It functions as a "Sub-Graph" within the main system.
+
+1.  **Ingestion:** Fetches 10-K/10-Q (XBRL) and Earnings Transcripts.
+2.  **Ratio Calculator (`agents/ratio_calculator.py`):** Deterministic Python functions for EBITDA, Net Debt, Interest Coverage.
+3.  **Risk Analyst (`agents/risk_analyst.py`):** An LLM agent that reads the MD&A section to identify qualitative risks (Litigation, Management Tone).
+4.  **Synthesizer:** Merges Quantitative and Qualitative data into a **SNC Rating** (Shared National Credit).
+
+### Key Files
+*   `models/distress_classifier.py`: Random Forest model for predicting bankruptcy probability.
+*   `data_ingestion/financial_statements.py`: Handlers for SEC EDGAR API.
+
+---
 
 ## 📂 Directory Structure
 
 | Directory | Description |
 | :--- | :--- |
-| `agents/` | Contains the specialized agents (e.g., Risk Analyst, Fundamental Analyst). |
-| `analysis/` | Tools for deep financial analysis (Fundamental, Technical, Sentinel). |
-| `data_processing/` | The "Universal Ingestor" pipeline for scrubbing and normalizing data. |
-| `engine/` | The core reasoning logic, including the Planner, Orchestrator, and Graph definitions. |
-| `simulations/` | Environments for running scenarios (e.g., Crisis Simulation). |
-| `system/` | System-level utilities, logging, and the Async Swarm infrastructure. |
+| `agents/` | General-purpose agents (Fundamental, Technical, Sentinel). |
+| `credit_sentinel/` | Specialized module for credit risk. |
+| `engine/` | The core reasoning logic (Planner, Orchestrator, Graph). |
+| `data_processing/` | The "Universal Ingestor" pipeline. |
+| `system/` | System-level utilities and Async Swarm infrastructure. |
 
-## 🚀 Getting Started with Core
+---
 
-To interact with the core engine directly (for development or debugging), you can use the `scripts/run_adam.py` entry point or the provided Jupyter notebooks.
+## 🚀 Developer Guide
 
-### Running a Deep Dive
+To run the core engine in isolation (without the webapp):
 
 ```bash
-# From the repository root
-python scripts/run_adam.py --mode deep_dive --ticker AAPL
+# Run the Interactive CLI
+python scripts/run_adam.py
+
+# Run a specific agent test
+python scripts/run_adam.py --agent "RiskAnalyst" --query "Assess liquidity for TSLA"
 ```
 
-## ⚠️ Agents & Developers
-
-Please refer to `AGENTS.md` in this directory for specific coding standards and "Rules of Engagement" when modifying the core engine.
+**Note:** Always refer to `AGENTS.md` in the root directory for coding standards.
