@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSwarmStore, Agent } from '../../stores/swarmStore';
-import { Cpu, Zap, Activity, AlertCircle } from 'lucide-react';
+import { Cpu, Zap, Activity } from 'lucide-react';
 
 const AgentCell: React.FC<{ agent: Agent }> = ({ agent }) => {
   const getStatusColor = (status: string) => {

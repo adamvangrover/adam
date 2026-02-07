@@ -1,90 +1,96 @@
-import logging
-import random
-from typing import List, Tuple
-from core.schemas.v23_5_schema import IngestedArtifact
+import numpy as np
+from typing import List, Union
 
-# Try to import sentence_transformers, mock if unavailable
-try:
-    from sentence_transformers import CrossEncoder
-    SENTENCE_TRANSFORMERS_AVAILABLE = True
-except ImportError:
-    SENTENCE_TRANSFORMERS_AVAILABLE = False
-
-logger = logging.getLogger(__name__)
-
-class SemanticConvictionEngine:
+def calculate_conviction(scores: Union[List[float], np.ndarray]) -> float:
     """
-    Implements Semantic Conviction Scoring using Cross-Encoders.
-    Calculates the probability that a Claim is entailed by a Source.
+    Calculates a conviction score based on a list of individual scores.
     """
+    if not scores:
+        return 0.0
 
-    def __init__(self, model_name: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"):
-        self.model_name = model_name
-        self.model = None
-        if SENTENCE_TRANSFORMERS_AVAILABLE:
-            try:
-                # In a real environment, we would load the model here.
-                # self.model = CrossEncoder(model_name)
-                # For this environment, we might not have internet or the model weights.
-                # So we will wrap it in a try-except block or mock it if instantiation fails.
-                self.model = CrossEncoder(model_name)
-            except Exception as e:
-                logger.warning(f"Failed to load CrossEncoder model: {e}. Falling back to mock logic.")
-                self.model = None
+    # Ensure scores is a numpy array
+    scores_array = np.array(scores)
+
+    # Calculate the mean score
+    mean_score = np.mean(scores_array)
+
+    # Calculate the standard deviation
+    std_dev = np.std(scores_array)
+
+    # A simple conviction metric: mean - (0.5 * std_dev)
+    # This penalizes high variance in the scores.
+    conviction = mean_score - (0.5 * std_dev)
+
+    # Normalize to 0-1 range
+    return max(0.0, min(1.0, conviction))
+
+def softmax(x: np.ndarray) -> np.ndarray:
+    """Compute softmax values for each sets of scores in x."""
+    e_x = np.exp(x - np.max(x))
+    return e_x / e_x.sum(axis=0)
+
+def semantic_conviction(logits: np.ndarray) -> float:
+    """
+    Calculates semantic conviction from logits.
+    """
+    probabilities = softmax(logits)
+    entropy = -np.sum(probabilities * np.log(probabilities + 1e-9))
+    max_entropy = np.log(len(logits))
+    normalized_entropy = entropy / max_entropy
+    conviction = 1.0 - normalized_entropy
+    return conviction
+
+def get_semantic_conviction(scores: List[float]) -> float:
+    """
+    Wrapper for semantic conviction calculation.
+    """
+    try:
+        # Check if scores is a list of lists or just a list
+        if isinstance(scores[0], list):
+             # Flatten the list if it is a list of lists
+            flat_scores = [item for sublist in scores for item in sublist]
+            scores_array = np.array(flat_scores)
         else:
-            logger.warning("sentence-transformers not installed. Using heuristic fallback.")
+            scores_array = np.array(scores)
 
-    def calculate_conviction(self, claim: str, source_text: str) -> float:
-        """
-        Calculates the conviction score (0.0 to 1.0) for a claim against a source.
-        """
-        if self.model:
-            try:
-                # The model returns a logit or a score. We might need to normalize it via sigmoid if it's not already.
-                # ms-marco models usually output raw logits.
-                scores = self.model.predict([(claim, source_text)])
-                # Simple normalization for demonstration (logits can be negative)
-                # Ideally use a sigmoid function: 1 / (1 + exp(-x))
-                import math
-                logit = float(scores[0]) if isinstance(scores, (list, tuple, np.ndarray)) else float(scores)
-                score = 1 / (1 + math.exp(-logit))
-                return score
-            except Exception as e:
-                logger.error(f"Error during Cross-Encoder prediction: {e}")
-                return self._heuristic_fallback(claim, source_text)
+        # Assuming scores are logits for semantic conviction
+        # If they are just raw scores, we might need to interpret them differently
+        # For this example, let's treat them as logits if they are not normalized
+
+        # Determine if we should treat as probabilities or logits
+        # Simple heuristic: if any value > 1 or < 0, treat as logits
+        if np.any(scores_array > 1.0) or np.any(scores_array < 0.0):
+             return semantic_conviction(scores_array)
         else:
-            return self._heuristic_fallback(claim, source_text)
+             # Already probabilities? Or just scores?
+             # Let's use simple variance based conviction
+             return calculate_conviction(scores)
 
-    def _heuristic_fallback(self, claim: str, source_text: str) -> float:
-        """
-        A robust fallback that uses basic overlap if the heavy model is missing.
-        """
-        # Simple Jaccard similarity or keyword overlap
-        claim_words = set(claim.lower().split())
-        source_words = set(source_text.lower().split())
+    except Exception as e:
+        print(f"Error calculating semantic conviction: {e}")
+        return 0.0
 
-        if not claim_words:
-            return 0.0
+def hybrid_conviction(
+    semantic_score: float,
+    statistical_score: float,
+    semantic_weight: float = 0.5
+) -> float:
+    """
+    Combines semantic and statistical conviction scores.
+    """
+    return (semantic_score * semantic_weight) + (statistical_score * (1 - semantic_weight))
 
-        intersection = claim_words.intersection(source_words)
-        overlap_score = len(intersection) / len(claim_words)
+def test_semantic_conviction():
+    # Test case 1: High conviction (one high score)
+    logits1 = np.array([10.0, 1.0, 1.0])
+    print(f"Logits: {logits1}, Conviction: {semantic_conviction(logits1)}")
 
-        # Boost if numbers match (simple extraction)
-        claim_nums = [s for s in claim.split() if s.replace('.', '', 1).isdigit()]
-        source_nums = [s for s in source_text.split() if s.replace('.', '', 1).isdigit()]
+    # Test case 2: Low conviction (uniform scores)
+    logits2 = np.array([1.0, 1.0, 1.0])
+    print(f"Logits: {logits2}, Conviction: {semantic_conviction(logits2)}")
 
-        num_match_bonus = 0.0
-        for num in claim_nums:
-            if num in source_nums:
-                num_match_bonus += 0.2
+    scores = [0.8, 0.9, 0.7, 0.85]
+    print(f"Scores: {scores}, Conviction: {calculate_conviction(scores)}")
 
-        final_score = min(1.0, overlap_score + num_match_bonus)
-        return final_score
-
-    def verify_artifact(self, artifact: IngestedArtifact, trusted_source: str) -> IngestedArtifact:
-        """
-        Verifies an ingested artifact against a trusted source and updates its conviction score.
-        """
-        score = self.calculate_conviction(artifact.content[:500], trusted_source[:2000]) # Limit length for perf
-        artifact.conviction_score = score
-        return artifact
+if __name__ == "__main__":
+    test_semantic_conviction()

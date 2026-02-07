@@ -1,124 +1,80 @@
-import logging
-import numpy as np
-from typing import Dict, List, Optional
-from core.schemas.v23_5_schema import IntentCategory, RoutingResult
+from typing import List, Dict, Optional, Callable, Any
+from enum import Enum
+import re
 
-logger = logging.getLogger(__name__)
-
-# Try to import sentence_transformers
-try:
-    from sentence_transformers import SentenceTransformer, util
-    SENTENCE_TRANSFORMERS_AVAILABLE = True
-except ImportError:
-    SENTENCE_TRANSFORMERS_AVAILABLE = False
+class IntentCategory(Enum):
+    """
+    Categories of user intent.
+    """
+    FINANCIAL_ANALYSIS = "financial_analysis"
+    MARKET_DATA = "market_data"
+    GENERAL_KNOWLEDGE = "general_knowledge"
+    UNKNOWN = "unknown"
 
 class SemanticRouter:
     """
-    Routes user queries to specific Intent Categories using Vector Embeddings.
-    Replaces brittle keyword matching with semantic similarity.
+    Routes user queries to the appropriate agent or tool based on semantic intent.
     """
-
-    def __init__(self, model_name: str = "all-MiniLM-L6-v2", threshold: float = 0.65):
-        self.threshold = threshold
-        self.model = None
+    def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
+        """
+        Initializes the SemanticRouter.
+        """
         self.routes: Dict[IntentCategory, Any] = {}
+        # In a real implementation, we would load the model here
+        # self.model = SentenceTransformer(model_name)
+        self.model = None
 
-        # Define seed phrases for each category
-        self.intent_definitions = {
-            IntentCategory.DEEP_DIVE: [
-                "comprehensive analysis", "full report", "deep dive", "strategic review",
-                "detailed breakdown", "extensive research", "thorough investigation"
-            ],
-            IntentCategory.RISK_ALERT: [
-                "risk exposure", "liquidity crisis", "credit check", "compliance alert",
-                "volatility warning", "default probability", "stress test"
-            ],
-            IntentCategory.MARKET_UPDATE: [
-                "stock price", "market update", "latest news", "ticker symbol",
-                "current value", "trading volume", "price check"
-            ],
-            IntentCategory.COMPLIANCE_CHECK: [
-                "regulatory compliance", "money laundering check", "KYC verification",
-                "sanctions list", "legal audit"
-            ]
-        }
+    def add_route(self, category: IntentCategory, handler: Callable):
+        """
+        Adds a route for a specific intent category.
+        """
+        self.routes[category] = handler
 
-        if SENTENCE_TRANSFORMERS_AVAILABLE:
-            try:
-                self.model = SentenceTransformer(model_name)
-                self._initialize_routes()
-            except Exception as e:
-                logger.warning(f"Failed to load SentenceTransformer: {e}. Using fallback.")
-                self.model = None
+    def route(self, query: str) -> Callable:
+        """
+        Determines the intent of the query and returns the appropriate handler.
+        """
+        intent = self._determine_intent(query)
+        handler = self.routes.get(intent)
+
+        if handler:
+            return handler
         else:
-            logger.warning("sentence-transformers not available. Using fallback.")
+            return self._default_handler
 
-    def _initialize_routes(self):
+    def _determine_intent(self, query: str) -> IntentCategory:
         """
-        Pre-computes embeddings for the route definitions.
-        """
-        if not self.model:
-            return
-
-        for category, phrases in self.intent_definitions.items():
-            embeddings = self.model.encode(phrases)
-            self.routes[category] = embeddings
-
-    def route(self, query: str) -> RoutingResult:
-        """
-        Classifies the query into an IntentCategory.
-        """
-        if not self.model:
-            return self._heuristic_route(query)
-
-        try:
-            query_vec = self.model.encode(query)
-            best_category = IntentCategory.UNCERTAIN
-            max_score = 0.0
-
-            # Calculate cosine similarity against all categories
-            for category, embeddings in self.routes.items():
-                scores = util.cos_sim(query_vec, embeddings)
-                category_max = float(scores.max())
-
-                if category_max > max_score:
-                    max_score = category_max
-                    best_category = category
-
-            if max_score < self.threshold:
-                return RoutingResult(
-                    intent=IntentCategory.UNCERTAIN,
-                    confidence_score=max_score,
-                    routing_metadata={"reason": "Below confidence threshold"}
-                )
-
-            return RoutingResult(
-                intent=best_category,
-                confidence_score=max_score,
-                routing_metadata={"model": "SemanticRouter"}
-            )
-
-        except Exception as e:
-            logger.error(f"Error in semantic routing: {e}")
-            return self._heuristic_route(query)
-
-    def _heuristic_route(self, query: str) -> RoutingResult:
-        """
-        Fallback logic using keyword matching (Legacy Logic).
+        Uses heuristics or a model to determine the intent of the query.
         """
         query_lower = query.lower()
 
-        for category, phrases in self.intent_definitions.items():
-            for phrase in phrases:
-                if phrase in query_lower:
-                    return RoutingResult(
-                        intent=category,
-                        confidence_score=0.5, # Low confidence for heuristic
-                        routing_metadata={"reason": "Keyword Match Fallback"}
-                    )
+        if any(keyword in query_lower for keyword in ["price", "stock", "market", "trade", "volume"]):
+            return IntentCategory.MARKET_DATA
+        elif any(keyword in query_lower for keyword in ["analyze", "report", "fundamental", "financials", "balance sheet"]):
+            return IntentCategory.FINANCIAL_ANALYSIS
+        elif any(keyword in query_lower for keyword in ["what is", "who is", "explain"]):
+            return IntentCategory.GENERAL_KNOWLEDGE
+        else:
+            return IntentCategory.UNKNOWN
 
-        return RoutingResult(
-            intent=IntentCategory.UNCERTAIN,
-            confidence_score=0.0,
-            routing_metadata={"reason": "No keyword match"}
-        )
+    def _default_handler(self, query: str) -> str:
+        """
+        Default handler for unknown intents.
+        """
+        return f"I'm not sure how to handle that query. (Intent: UNKNOWN)"
+
+# Example usage
+if __name__ == "__main__":
+    router = SemanticRouter()
+
+    def market_data_handler(query):
+        return f"Handling market data query: {query}"
+
+    def analysis_handler(query):
+        return f"Handling analysis query: {query}"
+
+    router.add_route(IntentCategory.MARKET_DATA, market_data_handler)
+    router.add_route(IntentCategory.FINANCIAL_ANALYSIS, analysis_handler)
+
+    print(router.route("What is the stock price of AAPL?")("What is the stock price of AAPL?"))
+    print(router.route("Analyze the Q3 earnings report for TSLA")("Analyze the Q3 earnings report for TSLA"))
