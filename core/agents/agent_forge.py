@@ -1,6 +1,7 @@
 # core/agents/agent_forge.py
 import logging
 import os
+import json
 from typing import Any, Dict, List, Optional
 from pathlib import Path
 import importlib

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import time
 import sys
 import os
@@ -23,10 +24,13 @@ def run_benchmark():
     print(f"Starting Adam Benchmark (Commit: {git_hash})...")
     logger.log_event("BENCHMARK_START", "BenchmarkRunner", {"git_hash": git_hash})
 
-    # Setup Benchmark - UKG Ingestion
+    ukg_bench = UnifiedKnowledgeGraph()
+    n_covenants_bench = 5000 # Moderate load for CI/Dev
+
+    # -------------------------------------------------------------------------
+    # Benchmark 1: UKG Ingestion
+    # -------------------------------------------------------------------------
     try:
-        ukg_bench = UnifiedKnowledgeGraph()
-        n_covenants_bench = 5000 # Moderate load for CI/Dev
         risk_state_bench = {
             "ticker": "BENCH_TEST",
             "balance_sheet": {"fiscal_year": "2023", "total_debt": 1000},
@@ -44,9 +48,8 @@ def run_benchmark():
         end_time = time.time()
 
         duration = end_time - start_time
-        print(f"Time taken: {duration:.4f} seconds")
+        print(f"Ingestion Time: {duration:.4f} seconds")
 
-        # Log Result
         logger.log_event("BENCHMARK_RESULT", "BenchmarkRunner", {
             "git_hash": git_hash,
             "benchmark_name": "UKG_Ingestion",
@@ -56,14 +59,54 @@ def run_benchmark():
         })
 
     except Exception as e:
-        print(f"Benchmark Failed: {e}")
+        print(f"Ingestion Benchmark Failed: {e}")
         logger.log_event("BENCHMARK_RESULT", "BenchmarkRunner", {
             "git_hash": git_hash,
             "benchmark_name": "UKG_Ingestion",
             "status": "FAILED",
             "error": str(e)
         })
+        # If ingestion fails, query benchmark is moot
         sys.exit(1)
+
+    # -------------------------------------------------------------------------
+    # Benchmark 2: UKG Query (Pathfinding)
+    # -------------------------------------------------------------------------
+    try:
+        # Find path from the Entity to the last Covenant
+        # Nodes created: LegalEntity::BENCH_TEST -> CreditFacility::... -> Covenant::BENCH_TEST::Cov_...
+        start_node = "LegalEntity::BENCH_TEST"
+        target_node = f"Covenant::BENCH_TEST::Cov_{n_covenants_bench-1}"
+
+        print(f"Benchmarking UKG Query (Path from {start_node} to {target_node})...")
+
+        start_time = time.time()
+        path = ukg_bench.find_symbolic_path(start_node, target_node)
+        end_time = time.time()
+
+        duration = end_time - start_time
+        print(f"Query Time: {duration:.4f} seconds")
+
+        if not path:
+            raise Exception("Path not found (Query returned None)")
+
+        logger.log_event("BENCHMARK_RESULT", "BenchmarkRunner", {
+            "git_hash": git_hash,
+            "benchmark_name": "UKG_PathQuery",
+            "iterations": 1,
+            "duration_seconds": duration,
+            "status": "SUCCESS"
+        })
+
+    except Exception as e:
+        print(f"Query Benchmark Failed: {e}")
+        logger.log_event("BENCHMARK_RESULT", "BenchmarkRunner", {
+            "git_hash": git_hash,
+            "benchmark_name": "UKG_PathQuery",
+            "status": "FAILED",
+            "error": str(e)
+        })
+        # Don't exit here, just log failure
 
 if __name__ == "__main__":
     # Configure basic logging to stdout for immediate feedback

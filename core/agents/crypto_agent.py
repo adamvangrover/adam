@@ -1,6 +1,7 @@
 # core/agents/crypto_agent.py
 
 import json
+import logging
 import datetime
 import requests
 import numpy as np

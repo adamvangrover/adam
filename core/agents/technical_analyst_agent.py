@@ -49,14 +49,17 @@ class TechnicalAnalystAgent:
 
     def calculate_rsi(self, prices, period=14):
         # ... (calculate RSI)
+        rsi = None
         return rsi
 
     def prepare_training_data(self, df):
         # ... (prepare features and labels for training)
+        features, labels = None, None
         return features, labels
 
     def load_model(self, model_path):
         # ... (load model from file)
+        model = None
         return model
 
     def save_model(self, model, model_path):

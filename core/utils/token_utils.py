@@ -1,5 +1,7 @@
 # core/utils/token_utils.py
 
+import os
+import yaml
 import tiktoken  # Use tiktoken for accurate token counting
 import logging
 
