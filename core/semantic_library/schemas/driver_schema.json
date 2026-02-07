@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Driver",
+  "description": "Schema for a driver entity",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "description": { "type": "string" },
+    "type": { "enum": ["Macroeconomic", "Fundamental", "Technical", "Geopolitical", "CompanySpecific", "IndustrySpecific", "Unknown"] },
+    "impactPotential": { "enum": ["High", "Medium", "Low", "Unknown", null] },
+    "timeHorizon": { "enum": ["Short-term", "Medium-term", "Long-term", "Varies", "Unknown", null] },
+    "metrics": { "type": "object", "additionalProperties": { "type": "string" } },
+    "relatedMacroFactorIds": { "type": "array", "items": { "type": "string" } }
+  },
+  "required": ["id", "name", "description", "type"]
+}

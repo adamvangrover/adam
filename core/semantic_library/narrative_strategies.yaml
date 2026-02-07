@@ -1,0 +1,164 @@
+# semantic_library/narrative_strategies.yaml
+# Version: 2.0
+# Description: Defines strategies for analyzing data and generating different types of narratives.
+
+strategies:
+  - strategy_id: STRAT_COMPANY_FINANCIAL_IMPACT_OVERVIEW # Renamed and enhanced
+    description: "Provides an overview of a company, identifies key active drivers, and assesses their probabilistic first-order financial impacts."
+    target_audience: "Investor / Analyst needing quantitative insights"
+    information_gathering_plan: # Steps for ReasoningEngine
+      - step: "GET_COMPANY_DETAILS"
+        source: "knowledge_graph"
+        details: "Fetch company node properties (name, industry, financials, etc.)."
+      - step: "IDENTIFY_ACTIVE_DRIVERS"
+        source: "knowledge_graph_and_driver_detection_patterns" # Uses drivers_knowledge_base.yaml
+        details: "Determine active drivers for the company based on detection_patterns and KG links. Prioritize top 3-5 by potential significance."
+      - step: "CALCULATE_PROBABILISTIC_IMPACTS"
+        source: "drivers_knowledge_base.impact_model"
+        details: "For each active driver, calculate its first_order_impacts on relevant target_variables, considering probabilities and effect_functions."
+    analytical_steps: # Further analysis on gathered/calculated data
+      - step: "AGGREGATE_IMPACTS"
+        details: "Summarize key positive and negative potential impacts across drivers. Identify potential conflicting or compounding effects (conceptual for now)."
+      - step: "ASSESS_OVERALL_SENTIMENT_AND_RISK_BALANCE"
+        details: "Qualitatively assess if the balance of impacts points to a net positive, negative, or neutral outlook based on probabilities and magnitudes."
+    narrative_flow: # High-level structure for the LLM output
+      - section: "EXECUTIVE_SUMMARY"
+        llm_instructions: "Start with a 2-3 sentence executive summary covering the company, overall sentiment from analysis, and mention of 1-2 most critical drivers."
+      - section: "COMPANY_CONTEXT"
+        llm_instructions: "Briefly describe the company, its industry, and current key financial metrics (e.g., Revenue, P/E) as context."
+      - section: "KEY_ACTIVE_DRIVERS_IDENTIFIED"
+        llm_instructions: "List the key active drivers identified (e.g., top 3-5). For each, briefly state its nature using 'narrative_logic.key_insights_to_extract' from drivers_knowledge_base.yaml. This section should *not* detail the calculated impacts yet, just introduce the drivers."
+      - section: "QUANTITATIVE_IMPACT_ANALYSIS" # New or refined section name
+        llm_instructions:
+          - "This section presents the calculated probabilistic first-order impacts of the key active drivers."
+          - "For each key active driver (or for each significant calculated impact):"
+          - "  State the driver name (and ID)."
+          - "  Describe the specific impact: 'Impacts {target_variable} by an estimated {calculated_impact_value} (e.g., a change of X units, or new value of Y).'"
+          - "  State the likelihood: 'This impact has an assessed probability of {probability_of_occurrence*100}%.'"
+          - "  Specify the timeframe: 'Expected over {time_horizon}.'"
+          - "  Mention any key conditions: 'This assessment assumes {conditions_evaluated}.'"
+          - "  Use probabilistic_language_rules to phrase statements about uncertainty naturally within the description."
+          - "  Incorporate relevant 'explanation_patterns_llm' from the driver's 'narrative_logic' to provide context for the numbers."
+          - "  Present this information clearly, perhaps using bullet points for multiple impacts from a single driver, or sub-sections per driver."
+          - "  Focus on the *calculated* impacts provided by the ReasoningEngine."
+      - section: "SYNTHESIS_AND_OUTLOOK"
+        llm_instructions:
+          - "Synthesize the combined potential effects of these drivers."
+          - "Discuss any significant second or third-order effects if they were identified and are material (from driver's impact_model)."
+          - "Provide a balanced overall outlook, explicitly mentioning key uncertainties or dependencies."
+    llm_persona_and_tone:
+      persona: "Objective Financial Analyst"
+      tone: "Neutral, data-driven, cautious but insightful."
+      complexity: "Moderate (assume familiarity with basic financial terms)"
+    probabilistic_language_rules: # Guidance for LLM on expressing uncertainty
+      - condition: "probability >= 0.75"
+        phrase_template: "is highly likely to result in {impact_description}"
+      - condition: "probability >= 0.50 && probability < 0.75"
+        phrase_template: "is likely to cause {impact_description}"
+      - condition: "probability >= 0.25 && probability < 0.50"
+        phrase_template: "could potentially lead to {impact_description}"
+      - condition: "probability < 0.25"
+        phrase_template: "there is a slight chance of {impact_description}"
+    overall_llm_instructions:
+      - "The final narrative should be coherent, well-structured according to the narrative_flow, and provide actionable insights."
+      - "Clearly differentiate between observed data, model-driven probabilistic impacts, and qualitative assessments."
+      - "Focus on the 'why' behind the numbers and the 'so what' for the company."
+      - "Total length should be appropriate for an analytical summary (e.g., 4-6 paragraphs or equivalent bulleted sections)."
+
+  - strategy_id: STRAT_RISK_DEEP_DIVE # Formerly TPL_RISK_FOCUS_SUMMARY
+    description: "A detailed analysis focusing on key risks, their probabilistic impacts, and potential mitigating factors for a company."
+    target_audience: "Risk Manager / Due Diligence Analyst"
+    information_gathering_plan:
+      - step: "GET_COMPANY_DETAILS"
+      - step: "IDENTIFY_ACTIVE_RISK_DRIVERS"
+        details: "Identify drivers with 'risk' tag or predominantly negative 'impact_model' outcomes. Prioritize by (impact_magnitude * probability)."
+      - step: "CALCULATE_RISK_IMPACTS"
+        details: "Quantify probabilistic first-order impacts of these risk drivers."
+      - step: "IDENTIFY_MITIGATING_FACTORS_OR_OPPORTUNITIES"
+        details: "Look for drivers that counteract identified risks, or company strengths/strategies that mitigate them."
+    analytical_steps:
+      - step: "ASSESS_NET_RISK_EXPOSURE"
+        details: "Evaluate the company's overall vulnerability considering both risks and mitigants."
+    narrative_flow:
+      - section: "RISK_SUMMARY_STATEMENT"
+      - section: "DETAILED_RISK_DRIVER_ANALYSIS" # For each key risk driver
+        llm_instructions:
+          - "Describe the risk driver."
+          - "Detail its probabilistic negative impacts (magnitude, likelihood, timeframe)."
+          - "Mention data points supporting this risk assessment."
+      - section: "MITIGATING_FACTORS_AND_CONTROLS"
+        llm_instructions: "Discuss any company actions, strengths, or positive counter-drivers that may mitigate these risks. Assess effectiveness if possible."
+      - section: "OVERALL_RISK_PROFILE_AND_RECOMMENDATIONS" # Optional recommendations
+    llm_persona_and_tone:
+      persona: "Prudent Risk Analyst"
+      tone: "Objective, critical, focused on downside."
+    probabilistic_language_rules: # (Can inherit from a global set or be strategy-specific)
+      - condition: "probability >= 0.70"
+        phrase_template: "poses a significant threat of {impact_description}"
+      - condition: "probability >= 0.40 && probability < 0.70"
+        phrase_template: "presents a moderate risk of {impact_description}"
+      - condition: "probability < 0.40"
+        phrase_template: "there is a potential, though less likely, risk of {impact_description}"
+    overall_llm_instructions:
+      - "Clearly articulate each significant risk and its potential consequences."
+      - "Be specific about the sources and nature of uncertainty."
+
+  - strategy_id: STRAT_COMPARATIVE_ANALYSIS_BASIC
+    description: "A basic comparative analysis of two companies on key metrics and drivers."
+    target_audience: "Analyst / Investor"
+    # This strategy would require the ReasoningEngine to handle context for two companies.
+    # The `information_gathering_plan` and `analytical_steps` would need to be adapted.
+    # The LLM prompt would need to be structured to compare and contrast.
+    information_gathering_plan:
+      - step: "GET_COMPANY_DETAILS_COMPANY_A"
+        # parameters: { company_id: "{company_A_id}" } # Passed in at runtime
+        details: "Fetch details for Company A."
+      - step: "GET_COMPANY_DETAILS_COMPANY_B"
+        # parameters: { company_id: "{company_B_id}" }
+        details: "Fetch details for Company B."
+      - step: "IDENTIFY_ACTIVE_DRIVERS_COMPANY_A"
+      - step: "IDENTIFY_ACTIVE_DRIVERS_COMPANY_B"
+      - step: "CALCULATE_PROBABILISTIC_IMPACTS_COMPANY_A"
+      - step: "CALCULATE_PROBABILISTIC_IMPACTS_COMPANY_B"
+    analytical_steps:
+      - step: "COMPARE_KEY_FINANCIALS"
+        details: "Compare P/E, revenue growth, margins etc. for Company A vs Company B."
+      - step: "COMPARE_COMMON_DRIVERS_IMPACT"
+        details: "Identify common active drivers and compare their calculated impacts on both companies."
+      - step: "IDENTIFY_UNIQUE_DRIVERS_IMPACT"
+        details: "Highlight drivers uniquely impacting one company but not the other and their significance."
+      - step: "ASSESS_RELATIVE_STRENGTHS_WEAKNESSES"
+        details: "Based on financials and driver impacts, provide a qualitative assessment."
+    narrative_flow:
+      - section: "INTRODUCTION_COMPARISON_PAIR"
+        llm_instructions: "Introduce Company A ({company_A_name}) and Company B ({company_B_name}) and the purpose of this comparison."
+      - section: "FINANCIAL_SNAPSHOT_COMPARISON"
+        llm_instructions:
+          - "Present a table or comparative statements of key financials (e.g., P/E, Revenue, Growth Rate, Debt/Equity)."
+          - "Highlight key differences."
+      - section: "SHARED_DRIVERS_AND_DIFFERENTIAL_IMPACT"
+        llm_instructions:
+          - "Discuss key drivers affecting both companies (e.g., {shared_driver_1.name})."
+          - "Explain how the *calculated probabilistic impact* of these shared drivers might differ for each company and why (e.g., due to different sensitivities, market positions defined in their respective contexts)."
+          - "Example: 'While both companies are affected by DRV001, its impact on Company A's P/E is calculated at X% (Prob: Y%), whereas for Company B it's Z% (Prob: W%). This difference is likely due to...'"
+      - section: "COMPANY_SPECIFIC_DRIVERS_AND_IMPACTS"
+        llm_instructions:
+          - "Highlight significant drivers and their calculated impacts that are unique or more pronounced for Company A."
+          - "Do the same for Company B."
+      - section: "COMPARATIVE_OUTLOOK_AND_CONCLUSION"
+        llm_instructions: "Based on the comparative analysis of financials and driver impacts, provide a summary outlook for each company relative to the other. Which company appears better positioned given current drivers? What are key differentiating factors?"
+    llm_persona_and_tone:
+      persona: "Comparative Analyst"
+      tone: "Objective, analytical, highlighting contrasts."
+    probabilistic_language_rules: # Can inherit or be specific
+      - condition: "probability >= 0.70"
+        phrase_template: "is very likely to experience {impact_description}"
+      - condition: "probability >= 0.50 && probability < 0.70"
+        phrase_template: "will probably see {impact_description}"
+      - condition: "probability < 0.50"
+        phrase_template: "may face {impact_description}"
+    overall_llm_instructions:
+      - "Focus on clear comparisons and contrasts."
+      - "Use data and calculated impacts to support assertions."
+      - "Conclude with a relative positioning statement."
+...

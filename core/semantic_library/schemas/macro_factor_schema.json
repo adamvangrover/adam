@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MacroEnvironmentFactor",
+  "description": "Schema for a macroeconomic factor",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "currentValue": { "type": ["string", "number", "null"] },
+    "trend": { "enum": ["Increasing", "Decreasing", "Stable", "Improving", "Elevated", "Unknown", null] },
+    "impactNarrative": { "type": ["string", "null"] },
+    "source": { "type": ["string", "null"] }
+  },
+  "required": ["id", "name"]
+}
