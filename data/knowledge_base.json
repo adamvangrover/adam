@@ -675,5 +675,39 @@
         ]
       }
     }
+  },
+  "AgentLearning": {
+    "ReinforcementLearning": {
+      "hyperparameters": {
+        "learning_rate": {
+          "description": "Step size for Q-value updates (alpha)",
+          "default": 0.1,
+          "range": [
+            0.01,
+            0.5
+          ]
+        },
+        "discount_factor": {
+          "description": "Importance of future rewards (gamma)",
+          "default": 0.95,
+          "range": [
+            0.8,
+            0.99
+          ]
+        },
+        "exploration_rate": {
+          "description": "Probability of random action (epsilon)",
+          "default": 1.0,
+          "decay": 0.995
+        }
+      },
+      "states": {
+        "market_volatility": {
+          "low": 0,
+          "medium": 1,
+          "high": 2
+        }
+      }
+    }
   }
 }

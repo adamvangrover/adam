@@ -23,6 +23,7 @@ const Synthesizer = lazy(() => import('./pages/Synthesizer'));
 const PromptAlpha = lazy(() => import('./pages/PromptAlpha'));
 const CreditSentinel = lazy(() => import('./pages/CreditSentinel'));
 const MarketMayhem = lazy(() => import('./pages/MarketMayhem'));
+const TradingTerminal = lazy(() => import('./pages/TradingTerminal'));
 
 const App: React.FC = () => {
   return (
@@ -48,6 +49,7 @@ const App: React.FC = () => {
           <Route path="portfolio-management" element={<Suspense fallback={<Loading />}><PortfolioManagement /></Suspense>} />
           <Route path="simulation-tools" element={<Suspense fallback={<Loading />}><SimulationTools /></Suspense>} />
           <Route path="market-mayhem" element={<Suspense fallback={<Loading />}><MarketMayhem /></Suspense>} />
+          <Route path="trading-terminal" element={<Suspense fallback={<Loading />}><TradingTerminal /></Suspense>} />
         </Route>
       </Routes>
   );
