@@ -18,6 +18,7 @@ from datetime import datetime, timezone, timedelta
 from .config import config
 from .celery_app import celery
 from .governance import GovernanceMiddleware
+from services.webapp.blueprints.quantum_blueprint import quantum_bp
 from core.security.permission_manager import PermissionManager, Permission, Role
 
 # Import the Live Mock Engine for dynamic simulation data
@@ -370,6 +371,8 @@ def create_app(config_name='default'):
     # ---------------------------------------------------------------------------- #
     # API Endpoints
     # ---------------------------------------------------------------------------- #
+
+    app.register_blueprint(quantum_bp, url_prefix='/api/quantum')
 
     @app.route('/api/hello')
     def hello_world():
