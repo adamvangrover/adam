@@ -16,10 +16,13 @@ import logging
 import random
 from typing import Literal, Dict, Any, List
 from core.utils.graph_utils import StateGraph, END, START, MemorySaver, HAS_LANGGRAPH
-
+from core.engine.sector_impact_engine import SectorImpactEngine
 from core.engine.states import CrisisSimulationState
 
 logger = logging.getLogger(__name__)
+
+# Initialize the engine
+sector_engine = SectorImpactEngine()
 
 # --- Mock Logic (To be replaced by CrisisSimulationPlugin / LLM) ---
 
@@ -42,32 +45,26 @@ def mock_decompose_scenario(scenario: str) -> Dict[str, float]:
 
     return variables
 
+def derive_sector_shocks(scenario: str) -> Dict[str, float]:
+    """Maps scenario keywords to specific sector shocks."""
+    shocks = {}
+    s = scenario.lower()
 
-def mock_simulate_impact(portfolio: Dict, macro_vars: Dict) -> tuple[List[str], float]:
-    """Calculates direct hits."""
-    impacts = []
-    loss = 0.0
+    if "tech" in s or "cyber" in s or "ai" in s:
+        shocks["Technology"] = -0.5
+    if "energy" in s or "oil" in s:
+        shocks["Energy"] = -0.4
+    if "estate" in s or "housing" in s or "rate" in s:
+        shocks["Real Estate"] = -0.6
+        shocks["Financials"] = -0.3
+    if "consumer" in s or "retail" in s:
+        shocks["Consumer Discretionary"] = -0.4
 
-    if "interest_rate_bps" in macro_vars:
-        impacts.append("Cost of debt increases for leveraged assets.")
-        loss += 1.5  # Mock $M
-    if "gdp_growth" in macro_vars:
-        impacts.append("Revenue forecast downgrade across cyclical sectors.")
-        loss += 3.2
+    # Default shock if nothing specific found but it's a crisis
+    if not shocks:
+        shocks["Financials"] = -0.2
 
-    return impacts, loss
-
-
-def mock_simulate_cascade(first_order: List[str]) -> List[str]:
-    """Calculates knock-on effects."""
-    cascades = []
-    if any("debt" in i for i in first_order):
-        cascades.append("Liquidity crunch: Revolving credit lines drawn down.")
-        cascades.append("Covenant breach risk for Entity A.")
-    if any("Revenue" in i for i in first_order):
-        cascades.append("Supply chain partners delaying payments (DSO increase).")
-
-    return cascades
+    return shocks
 
 # --- Nodes ---
 
@@ -75,34 +72,86 @@ def mock_simulate_cascade(first_order: List[str]) -> List[str]:
 def decompose_node(state: CrisisSimulationState) -> Dict[str, Any]:
     print("--- Node: Decompose Scenario ---")
     vars = mock_decompose_scenario(state["scenario_description"])
+    shocks = derive_sector_shocks(state["scenario_description"])
+
     return {
         "macro_variables": vars,
-        "human_readable_status": f"Decomposed scenario into {len(vars)} macro variables."
+        "sector_shocks": shocks,
+        "human_readable_status": f"Decomposed scenario into {len(vars)} macro variables and {len(shocks)} sector shocks."
     }
 
 
 def simulate_direct_node(state: CrisisSimulationState) -> Dict[str, Any]:
     print("--- Node: Simulate Direct Impact ---")
-    impacts, loss = mock_simulate_impact(state["portfolio_data"], state["macro_variables"])
+
+    portfolio = state.get("portfolio_data", [])
+    # Ensure portfolio is a list of dicts, if it's not, we might need to handle it.
+    if isinstance(portfolio, dict) and "positions" in portfolio:
+        portfolio = portfolio["positions"]
+    elif not isinstance(portfolio, list):
+        # Fallback for mock portfolio if empty or malformed
+        portfolio = [{"name": "Generic Asset", "sector": "Financials", "leverage": 3.0, "rating": "BBB"}]
+
+    shocks = state.get("sector_shocks", {})
+
+    # Run the engine
+    engine_result = sector_engine.analyze_portfolio(portfolio, custom_shocks=shocks)
+
+    # Extract First Order Impacts (Direct Insights)
+    impacts = []
+    loss = 0.0
+    for r in engine_result["results"]:
+        # Only log significant negative impacts
+        if "NEGATIVE" in r["macro_insight"] or "Critical" in r["credit_insight"]:
+            impacts.append(f"{r['asset']}: {r['macro_insight']} | {r['credit_insight']}")
+
+        # Simple loss model based on score (0-100 where 100 is bad)
+        # Assume portfolio size of 100M per asset for simplicity
+        risk_delta = r["consensus_score"] - 30.0 # Baseline risk approx 30
+        if risk_delta > 0:
+            loss += (risk_delta / 100.0) * 10.0 # $10M exposure
+
+    # Extract Contagion Log for next step
+    # engine_result["simulation_log"]["detailed_contagion_log"] is List[str]
+    raw_log = engine_result["simulation_log"].get("detailed_contagion_log", [])
+
+    # Format into CrisisLogEntry dicts
+    structured_log = []
+    for i, event in enumerate(raw_log):
+        structured_log.append({
+            "timestamp": f"T+{i+1}:00",
+            "event_description": event,
+            "risk_id_cited": "SYS-CONTAGION",
+            "status": "Escalating"
+        })
+
     return {
         "first_order_impacts": impacts,
         "estimated_loss": loss,
-        "human_readable_status": f"Simulated direct impacts. Loss estimate: ${loss}M"
+        "crisis_simulation_log": structured_log, # Pass to state
+        "human_readable_status": f"Simulated direct impacts. Loss estimate: ${loss:.2f}M"
     }
 
 
 def simulate_cascade_node(state: CrisisSimulationState) -> Dict[str, Any]:
     print("--- Node: Simulate Cascade ---")
-    cascades = mock_simulate_cascade(state["first_order_impacts"])
+
+    # Read the log from the previous step
+    log_entries = state.get("crisis_simulation_log", [])
+    cascades = [entry["event_description"] for entry in log_entries]
+
+    # If no contagion, maybe add some generic ones if loss is high
+    if not cascades and state["estimated_loss"] > 20.0:
+         cascades.append("Liquidity crunch: Revolving credit lines drawn down.")
 
     # Intensify loss based on cascades
-    additional_loss = len(cascades) * 0.5
+    additional_loss = len(cascades) * 1.5
     total_loss = state["estimated_loss"] + additional_loss
 
     return {
         "second_order_impacts": cascades,
         "estimated_loss": total_loss,
-        "human_readable_status": f"Simulated cascading effects. Total Risk: ${total_loss}M"
+        "human_readable_status": f"Simulated cascading effects. Total Risk: ${total_loss:.2f}M"
     }
 
 
@@ -116,7 +165,7 @@ def critique_simulation_node(state: CrisisSimulationState) -> Dict[str, Any]:
     needs_refinement = False
 
     # Critique Logic
-    if loss < 1.0 and iteration < 2:
+    if loss < 5.0 and iteration < 2:
         critique_notes.append("Scenario seems too mild. Intensify shocks.")
         is_realistic = False
         needs_refinement = True
@@ -139,13 +188,14 @@ def refine_node(state: CrisisSimulationState) -> Dict[str, Any]:
     print("--- Node: Refine/Intensify ---")
     # Intensify logic
     current_vars = state["macro_variables"]
-    new_vars = current_vars.copy()
+    current_shocks = state.get("sector_shocks", {})
 
-    for k, v in new_vars.items():
-        new_vars[k] = v * 1.5  # Increase shock by 50%
+    new_vars = {k: v * 1.5 for k, v in current_vars.items()}
+    new_shocks = {k: v * 1.5 for k, v in current_shocks.items()}
 
     return {
         "macro_variables": new_vars,
+        "sector_shocks": new_shocks,
         "needs_refinement": False,  # Reset flag
         "human_readable_status": "Intensified scenario parameters."
     }

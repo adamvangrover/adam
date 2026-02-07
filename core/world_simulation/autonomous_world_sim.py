@@ -1,178 +1,248 @@
-# core/world_simulation/autonomous_world_sim.py
-
+import mesa
 import random
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from typing import Dict, List, Any, Callable
 from mesa import Agent, Model
 from mesa.time import RandomActivation
 from mesa.datacollection import DataCollector
 
+# --- Configuration & Schemas ---
 
-class MarketAgent(Agent):
-    def __init__(self, unique_id, model, volatility, risk_aversion):
+DEFAULT_CONFIG = {
+    'num_traders': 50,
+    'num_economic_agents': 3,
+    'num_political_agents': 2,
+    'volatility': 0.05, 
+    'initial_cash': 10_000,
+    'stock_symbols': ['AAPL', 'GOOG', 'TSLA', 'AMZN'],
+    'economic_indicators': ['GDP_Growth', 'Inflation', 'Interest_Rate'],
+    'geopolitical_risks': ['Political_Instability', 'Trade_Tension']
+}
+
+# --- Agents ---
+
+class SmartTrader(Agent):
+    """
+    A trader that learns from history and adapts its risk aversion.
+    Merges 'MarketAgent' memory with 'TraderAgent' strategy execution.
+    """
+    def __init__(self, unique_id: int, model: Model, initial_cash: float, risk_aversion: float):
         super().__init__(unique_id, model)
-        self.volatility = volatility
+        self.wealth = initial_cash
+        self.portfolio = {ticker: 0 for ticker in model.stock_symbols}
         self.risk_aversion = risk_aversion
-        self.portfolio = {'cash': 1000}
-        self.memory = []  # Store past actions and outcomes
+        self.memory = []  # Stores (action, result_wealth) tuples
 
     def step(self):
-        current_prices = self.model.stock_prices
-        economic_indicators = self.model.economic_indicators
-        geopolitical_risks = self.model.geopolitical_risks
+        # 1. Update Strategy based on Performance (Learning)
+        self._adapt_strategy()
 
-        self.memory.append({
-            'prices': current_prices.copy(),
-            'indicators': economic_indicators.copy(),
-            'risks': geopolitical_risks.copy(),
-            'portfolio': self.portfolio.copy()
-        })
-
-        if random.random() < (1 - self.risk_aversion):  # More risk-averse = less likely to trade
-            for symbol in current_prices:
-                price = current_prices[symbol][-1]
-                if random.random() < (1 / len(current_prices)):  # Randomly choose a stock
-                    quantity = int(random.uniform(-50, 50))  # Buy or sell
-                    if quantity > 0 and self.portfolio['cash'] >= price * quantity:
-                        self.buy_stock(symbol, quantity)
-                    elif quantity < 0 and symbol in self.portfolio and self.portfolio.get(symbol, 0) >= abs(quantity):
-                        self.sell_stock(symbol, abs(quantity))
-
-        # Example of learning from memory (simplified)
-        if len(self.memory) > 10:
-            recent_outcomes = [m['portfolio']['cash'] for m in self.memory[-10:]]
-            if recent_outcomes[-1] > recent_outcomes[0]:
-                self.risk_aversion = max(0, self.risk_aversion - 0.01)  # Less risk averse if doing well.
+        # 2. Decide Action (Buy/Sell/Hold)
+        # Higher risk aversion = lower probability of trading
+        if random.random() > self.risk_aversion:
+            ticker = random.choice(self.model.stock_symbols)
+            # Simple heuristic: Buy if recent price dip, Sell if spike (Mean Reversion)
+            # In a real impl, this would be a pluggable Strategy function
+            price_trend = self.model.get_price_trend(ticker)
+            
+            if price_trend < -0.02: # Buy the dip
+                self._trade(ticker, "buy")
+            elif price_trend > 0.02: # Sell the rip
+                self._trade(ticker, "sell")
             else:
-                self.risk_aversion = min(1, self.risk_aversion + 0.01)  # More risk averse if doing poorly.
+                # Random noise trade
+                if random.random() < 0.5: self._trade(ticker, "buy")
 
-    def buy_stock(self, symbol, quantity):
-        price = self.model.stock_prices[symbol][-1]
-        cost = price * quantity
-        self.portfolio['cash'] -= cost
-        if symbol in self.portfolio:
-            self.portfolio[symbol] += quantity
-        else:
-            self.portfolio[symbol] = quantity
-        self.model.stock_prices[symbol][-1] = price * (1 + (quantity / 10000) * self.volatility)
+    def _adapt_strategy(self):
+        """Adjusts risk aversion based on recent portfolio performance."""
+        if len(self.memory) > 5:
+            start_wealth = self.memory[-5]
+            current_wealth = self.wealth + self._calculate_portfolio_value()
+            
+            if current_wealth < start_wealth:
+                # Lost money -> Become more conservative
+                self.risk_aversion = min(0.95, self.risk_aversion + 0.05)
+            else:
+                # Made money -> Become more aggressive
+                self.risk_aversion = max(0.05, self.risk_aversion - 0.02)
+        
+        self.memory.append(self.wealth + self._calculate_portfolio_value())
 
-    def sell_stock(self, symbol, quantity):
-        price = self.model.stock_prices[symbol][-1]
-        self.portfolio['cash'] += price * quantity
-        self.portfolio[symbol] -= quantity
-        self.model.stock_prices[symbol][-1] = price * (1 - (quantity / 10000) * self.volatility)
+    def _calculate_portfolio_value(self):
+        val = 0
+        for ticker, qty in self.portfolio.items():
+            val += qty * self.model.stock_prices[ticker]
+        return val
 
+    def _trade(self, ticker: str, action: str):
+        price = self.model.stock_prices[ticker]
+        # Trade size scaled by confidence (inverse of risk_aversion)
+        max_trade_size = 50 * (1 - self.risk_aversion) 
+        quantity = int(random.uniform(1, max(2, max_trade_size)))
 
-class EconomicAgent(Agent):
-    def __init__(self, unique_id, model, volatility):
+        if action == "buy":
+            cost = price * quantity
+            if self.wealth >= cost:
+                self.wealth -= cost
+                self.portfolio[ticker] += quantity
+                self.model.register_trade(ticker, quantity, "buy") # Impact Price
+        
+        elif action == "sell":
+            if self.portfolio[ticker] >= quantity:
+                revenue = price * quantity
+                self.wealth += revenue
+                self.portfolio[ticker] -= quantity
+                self.model.register_trade(ticker, quantity, "sell") # Impact Price
+
+class MacroAgent(Agent):
+    """
+    Simulates external Macroeconomic or Political shocks.
+    Merges EconomicAgent and PoliticalAgent into one systematic driver.
+    """
+    def __init__(self, unique_id: int, model: Model, agent_type: str, volatility: float):
         super().__init__(unique_id, model)
+        self.type = agent_type # 'economic' or 'political'
         self.volatility = volatility
 
     def step(self):
-        for indicator in self.model.economic_indicators:
-            change = random.uniform(-0.1 * self.volatility, 0.1 * self.volatility)
-            self.model.economic_indicators[indicator].append(self.model.economic_indicators[indicator][-1] + change)
+        target_dict = (self.model.economic_indicators if self.type == 'economic' 
+                       else self.model.geopolitical_risks)
+        
+        for key in target_dict:
+            # Random walk with mean reversion tendencies
+            change = random.uniform(-0.1, 0.1) * self.volatility
+            current = target_dict[key]
+            
+            # Keep percentages roughly between 0 and 10 (or 0 and 1)
+            new_val = current + change
+            if self.type == 'political': 
+                new_val = max(0.0, min(1.0, new_val))
+            
+            target_dict[key] = new_val
 
+# --- The Autonomous World ---
 
-class PoliticalAgent(Agent):
-    def __init__(self, unique_id, model, volatility):
-        super().__init__(unique_id, model)
-        self.volatility = volatility
-
-    def step(self):
-        for risk in self.model.geopolitical_risks:
-            change = random.uniform(-0.1 * self.volatility, 0.1 * self.volatility)
-            self.model.geopolitical_risks[risk].append(max(0, min(1, self.model.geopolitical_risks[risk][-1] + change)))
-
-
-class WorldSimulationModel(Model):
-    def __init__(self, config):
+class AutonomousMarket(Model):
+    """
+    The central simulation engine.
+    Manages global state, order matching impacts, and data collection.
+    """
+    def __init__(self, config: Dict[str, Any] = DEFAULT_CONFIG):
         super().__init__()
-        self.num_market_agents = config.get('num_market_agents', 100)
-        self.num_economic_agents = config.get('num_economic_agents', 5)
-        self.num_political_agents = config.get('num_political_agents', 3)
+        self.config = config
+        self.stock_symbols = config['stock_symbols']
         self.schedule = RandomActivation(self)
-        self.volatility = config.get('volatility', 0.05)
-        self.stock_prices = {symbol: [random.uniform(100, 200)]
-                             for symbol in config.get('stock_symbols', ['AAPL', 'MSFT', 'GOOG'])}
-        self.economic_indicators = {indicator: [random.uniform(0, 10)] for indicator in config.get(
-            'economic_indicators', ['GDP_growth', 'inflation', 'interest_rates'])}
-        self.geopolitical_risks = {risk: [random.uniform(0, 1)] for risk in config.get(
-            'geopolitical_risks', ['political_stability', 'trade_war_risk'])}
+        self.running = True
+        
+        # Global State
+        self.stock_prices = {s: random.uniform(100, 200) for s in self.stock_symbols}
+        self.price_history = {s: [100.0] * 5 for s in self.stock_symbols} # Init with dummy history
+        
+        self.economic_indicators = {k: random.uniform(1, 5) for k in config['economic_indicators']}
+        self.geopolitical_risks = {k: random.uniform(0.1, 0.3) for k in config['geopolitical_risks']}
 
-        for i in range(self.num_market_agents):
-            risk_aversion = random.uniform(0, 1)
-            agent = MarketAgent(i, self, self.volatility, risk_aversion)
-            self.schedule.add(agent)
+        # Initialize Agents
+        self._init_agents()
 
-        for i in range(self.num_economic_agents):
-            agent = EconomicAgent(self.num_market_agents + i, self, self.volatility)
-            self.schedule.add(agent)
-
-        for i in range(self.num_political_agents):
-            agent = PoliticalAgent(self.num_market_agents + self.num_economic_agents + i, self, self.volatility)
-            self.schedule.add(agent)
-
+        # Data Collector
         self.datacollector = DataCollector(
             model_reporters={
-                "Stock Prices": lambda m: {k: v[-1] for k, v in m.stock_prices.items()},
-                "Economic Indicators": lambda m: m.economic_indicators,
-                "Geopolitical Risks": lambda m: m.geopolitical_risks
+                "Prices": lambda m: m.stock_prices.copy(),
+                "Economics": lambda m: m.economic_indicators.copy(),
+                "Risks": lambda m: m.geopolitical_risks.copy()
             },
-            agent_reporters={"Portfolio": lambda a: a.portfolio}
+            agent_reporters={"Wealth": lambda a: getattr(a, "wealth", 0)}
         )
 
+    def _init_agents(self):
+        # 1. Traders
+        for i in range(self.config['num_traders']):
+            a = SmartTrader(i, self, self.config['initial_cash'], random.uniform(0.2, 0.8))
+            self.schedule.add(a)
+        
+        # 2. Macro Agents
+        offset = self.config['num_traders']
+        for i in range(self.config['num_economic_agents']):
+            self.schedule.add(MacroAgent(offset + i, self, 'economic', self.config['volatility']))
+        
+        for i in range(self.config['num_political_agents']):
+            self.schedule.add(MacroAgent(offset + 100 + i, self, 'political', self.config['volatility']))
+
+    def register_trade(self, ticker, quantity, side):
+        """
+        Price Impact Model:
+        Price moves proportional to volume and market volatility.
+        """
+        impact_factor = (quantity / 10000) * self.config['volatility']
+        
+        if side == "buy":
+            self.stock_prices[ticker] *= (1 + impact_factor)
+        else:
+            self.stock_prices[ticker] *= (1 - impact_factor)
+
+    def get_price_trend(self, ticker):
+        """Returns % change over last 3 steps."""
+        hist = self.price_history[ticker]
+        if len(hist) < 3: return 0.0
+        return (hist[-1] - hist[-3]) / hist[-3]
+
     def step(self):
+        # 1. Save current prices to history before modification
+        for s in self.stock_symbols:
+            self.price_history[s].append(self.stock_prices[s])
+            if len(self.price_history[s]) > 20: self.price_history[s].pop(0)
+
+        # 2. Agents act (Traders trade, Macro agents shift indicators)
         self.schedule.step()
+        
+        # 3. Collect Data
         self.datacollector.collect(self)
 
-    def initialize_from_adam(self, adam_data):
-        if 'stock_prices' in adam_data:
-            self.stock_prices = {symbol: [price] for symbol, price in adam_data['stock_prices'].items()}
-        if 'economic_indicators' in adam_data:
-            self.economic_indicators = {indicator: [value]
-                                        for indicator, value in adam_data['economic_indicators'].items()}
-        if 'geopolitical_risks' in adam_data:
-            self.geopolitical_risks = {risk: [value] for risk, value in adam_data['geopolitical_risks'].items()}
-        # Add more data integration as needed.
+# --- Execution & Visualization ---
 
-# --- Standalone Execution ---
+def run_simulation():
+    print("Initializing Autonomous World...")
+    sim = AutonomousMarket()
+    
+    steps = 100
+    print(f"Running for {steps} steps...")
+    for _ in range(steps):
+        sim.step()
 
-
-if __name__ == "__main__":
-    config = {
-        'num_market_agents': 100,
-        'num_economic_agents': 5,
-        'num_political_agents': 3,
-        'volatility': 0.1,  # Adjust volatility as needed
-        'stock_symbols': ['AAPL', 'MSFT', 'GOOG', 'AMZN', 'TSLA'],  # Add more stock symbols
-        # Add more economic indicators
-        'economic_indicators': ['GDP_growth', 'inflation', 'interest_rates', 'unemployment'],
-        # Add more geopolitical risks
-        'geopolitical_risks': ['political_stability', 'trade_war_risk', 'regulatory_changes']
-    }
-    model = WorldSimulationModel(config)
-
-    # Example standalone simulation
-    for i in range(100):  # Example: Run for 100 steps
-        model.step()
-
-    # --- Data Analysis and Visualization ---
-    # Example: Plot stock price trends
-    model_data = model.datacollector.get_model_vars_dataframe()
-    agent_data = model.datacollector.get_agent_vars_dataframe()
-
-    # Plot stock prices
-    for stock in config['stock_symbols']:
-        plt.plot(model_data['Stock Prices'][stock].values, label=stock)
+    # Data Extraction
+    model_df = sim.datacollector.get_model_vars_dataframe()
+    
+    # Visualization
+    plt.figure(figsize=(12, 6))
+    
+    # Plot 1: Stock Prices
+    plt.subplot(1, 2, 1)
+    # We need to unpack the dictionary column 'Prices'
+    price_data = pd.DataFrame(model_df["Prices"].tolist())
+    for col in price_data.columns:
+        plt.plot(price_data[col], label=col)
+    plt.title("Stock Price Dynamics")
     plt.xlabel("Step")
-    plt.ylabel("Price")
-    plt.title("Stock Price Trends")
+    plt.ylabel("Price ($)")
     plt.legend()
+    plt.grid(True, alpha=0.3)
+
+    # Plot 2: Economic Indicators
+    plt.subplot(1, 2, 2)
+    econ_data = pd.DataFrame(model_df["Economics"].tolist())
+    for col in econ_data.columns:
+        plt.plot(econ_data[col], label=col, linestyle="--")
+    plt.title("Macroeconomic Indicators")
+    plt.xlabel("Step")
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+
+    plt.tight_layout()
     plt.show()
 
-    # Analyze agent portfolio performance (example)
-    final_portfolios = agent_data.xs(99, level="Step")['Portfolio']
-    print("Final Portfolio Values:")
-    print(final_portfolios)
+    print("Simulation Complete.")
 
-    # ... Add more analysis and visualization as needed ...
+if __name__ == "__main__":
+    run_simulation()

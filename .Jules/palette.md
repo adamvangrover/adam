@@ -83,3 +83,11 @@
 ## 2027-02-27 - Button Loading State Feedback
 **Learning:** When implementing loading states on buttons, simply disabling the button is insufficient. Users need explicit feedback (spinner + text change) to confirm the action was registered, especially for "simulation" type actions that imply a process.
 **Action:** Use a conditional render inside the button to swap the action icon with a spinner and update the label text.
+
+## 2025-05-27 - Styled Keyboard Shortcuts in Inputs
+**Learning:** Embedding shortcut hints (like `[CTRL+K]`) directly in placeholder text lowers legibility and lacks visual hierarchy. Using an absolutely positioned, styled `<kbd>` element inside the input container reinforces the "Cyberpunk" aesthetic while keeping the input text clean.
+**Action:** Extract shortcut hints from placeholders into distinct `<kbd>` components positioned at the right edge of the input.
+
+## 2027-02-27 - Icon Affordance in Search
+**Learning:** Search inputs often lack visual affordance when they are just plain text boxes. Adding a standard "Search" icon (magnifying glass) inside the input not only clarifies intent but also fits standard user expectations.
+**Action:** When adding search inputs, always include a visual icon and ensure accessibility with `aria-label` or `aria-labelledby`.

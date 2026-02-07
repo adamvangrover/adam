@@ -146,6 +146,7 @@ class AdamNavigator {
             { name: 'Data Vault', icon: 'fa-database', link: 'data.html' },
             { name: 'App Deploy', icon: 'fa-rocket', link: 'deployment.html' },
             { name: 'Quantum Infra', icon: 'fa-network-wired', link: 'quantum_infrastructure.html' },
+            { name: 'Quantum Search', icon: 'fa-search-location', link: 'quantum_search.html' },
             { name: 'Evolution Hub', icon: 'fa-dna', link: 'evolution.html' },
             { type: 'divider' },
             { name: 'Root Directory', icon: 'fa-folder-tree', link: 'ROOT' }
@@ -470,15 +471,35 @@ class AdamNavigator {
         }
 
         container.classList.remove('hidden');
-        container.innerHTML = results.map(r => `
-            <a href="${r.link}" class="block px-4 py-2 hover:bg-slate-700 border-b border-slate-700 last:border-0 transition-colors">
-                <div class="flex justify-between">
-                    <span class="text-xs text-cyan-400 font-bold font-mono">${r.type || 'FILE'}</span>
-                    <i class="fas fa-chevron-right text-[10px] text-slate-600" aria-hidden="true"></i>
-                </div>
-                <div class="text-sm text-white font-medium">${r.title}</div>
-            </a>
-        `).join('');
+        container.innerHTML = '';
+
+        results.forEach(r => {
+            const link = document.createElement('a');
+            link.href = r.link;
+            link.className = 'block px-4 py-2 hover:bg-slate-700 border-b border-slate-700 last:border-0 transition-colors';
+
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'flex justify-between';
+
+            const typeSpan = document.createElement('span');
+            typeSpan.className = 'text-xs text-cyan-400 font-bold font-mono';
+            typeSpan.textContent = r.type || 'FILE';
+
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-chevron-right text-[10px] text-slate-600';
+            icon.setAttribute('aria-hidden', 'true');
+
+            headerDiv.appendChild(typeSpan);
+            headerDiv.appendChild(icon);
+
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'text-sm text-white font-medium';
+            titleDiv.textContent = r.title;
+
+            link.appendChild(headerDiv);
+            link.appendChild(titleDiv);
+            container.appendChild(link);
+        });
     }
 
     /**
@@ -487,7 +508,13 @@ class AdamNavigator {
     _renderSafeMode(error) {
         const safeNav = document.createElement('div');
         safeNav.style = "position:fixed; top:0; left:0; width:100%; height:40px; background:#ef4444; color:white; z-index:9999; display:flex; align-items:center; justify-content:center; font-family:monospace; font-size:12px; font-weight:bold;";
-        safeNav.innerHTML = `<i class="fas fa-exclamation-triangle" style="margin-right:10px"></i> NAV SYSTEM FAILURE: ${error.message}`;
+
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-exclamation-triangle';
+        icon.style.marginRight = '10px';
+
+        safeNav.appendChild(icon);
+        safeNav.appendChild(document.createTextNode(` NAV SYSTEM FAILURE: ${error.message}`));
         document.body.prepend(safeNav);
     }
 }

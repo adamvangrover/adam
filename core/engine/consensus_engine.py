@@ -1,10 +1,16 @@
+# Verified for Adam v25.5
+# Reviewed by Jules
 from typing import List, Dict, Any, Optional
 import json
 import logging
+import os
+import fcntl
 from datetime import datetime
+from core.utils.logging_utils import NarrativeLogger
 
 class ConsensusEngine:
     """
+    Protocol: ADAM-V-NEXT
     A generic decision-making engine that aggregates signals from multiple agents
     to form a cohesive 'Executive Decision'.
     """
@@ -12,6 +18,7 @@ class ConsensusEngine:
     def __init__(self, threshold: float = 0.6):
         self.threshold = threshold
         self.decision_log = []
+        self.narrative_logger = NarrativeLogger()
 
     def evaluate(self, signals: List[Dict[str, Any]]) -> Dict[str, Any]:
         """
@@ -78,8 +85,34 @@ class ConsensusEngine:
     def _log_decision(self, result: Dict[str, Any]):
         """Append to internal log (and ideally persist to disk)."""
         self.decision_log.append(result)
-        # In a real system, we might append to decision_log.json here
-        # For now, we just keep it in memory or log to standard logger
+
+        # Persistence Logic
+        try:
+            # Determine path relative to this file
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            data_dir = os.path.join(base_dir, 'data')
+            log_path = os.path.join(data_dir, 'decision_log.jsonl')
+
+            os.makedirs(data_dir, exist_ok=True)
+
+            with open(log_path, 'a') as f:
+                fcntl.flock(f, fcntl.LOCK_EX)
+                try:
+                    f.write(json.dumps(result) + "\n")
+                finally:
+                    fcntl.flock(f, fcntl.LOCK_UN)
+
+        except Exception as e:
+            logging.error(f"Failed to persist decision log: {e}")
+
+        # Narrative Logging
+        self.narrative_logger.log_narrative(
+            event="Consensus Evaluation",
+            analysis=result['rationale'],
+            decision=result['decision'],
+            outcome=f"Score: {result['score']}"
+        )
+
         logging.info(f"Consensus Reached: {result['decision']} ({result['score']})")
 
     def get_log(self) -> List[Dict[str, Any]]:

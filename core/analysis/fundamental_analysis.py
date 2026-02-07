@@ -2,331 +2,268 @@
 
 import pandas as pd
 import numpy as np
-from langchain.agents import Tool
+import yfinance as yf
+from typing import Optional, List, Dict, Any, Union
+
+from langchain.tools import tool, Tool
 from langchain.tools.python.tool import PythonAstREPLTool
+from langchain.agents import AgentExecutor, create_openai_tools_agent
+from langchain_openai import ChatOpenAI
+from langchain import hub
+
+# ==========================================
+# 1. Tool Definitions
+# ==========================================
 
 # Define a REPL tool for advanced analysis
 python_repl = PythonAstREPLTool()
 
-
 @tool
 def python_repl_ast(query: str) -> str:
     """A Python shell that can handle any instructions provided in the prompt.
-    If you need to use Python to answer a question, use this.
-    If you need to execute and run Python code, use this.
-    If you need to access and manipulate data or files, use this.
-    If you need to interact with the operating system, use this.
-    If you need to install Python libraries, use this.
-    This is a powerful and versatile tool that can be used for a wide range of tasks."""
+    Use this to execute Python code, manipulate data, or perform complex calculations.
+    """
     return python_repl.run(query)
 
+@tool
+def get_stock_price(ticker: str) -> float:
+    """Returns the current stock price for a given ticker symbol."""
+    stock = yf.Ticker(ticker)
+    # Fetch 1 day history to get the latest close
+    history = stock.history(period="1d")
+    if history.empty:
+        return 0.0
+    return history["Close"].iloc[-1]
 
-# Define a list of tools for the agent
-tools = [
+@tool
+def calculate_pe_ratio(price: float, eps: float) -> float:
+    """Calculates the Price-to-Earnings (P/E) ratio."""
+    if eps == 0:
+        return 0.0
+    return price / eps
+
+@tool
+def get_company_info(ticker: str) -> str:
+    """Returns basic company information for a given ticker symbol."""
+    stock = yf.Ticker(ticker)
+    info = stock.info
+    return (
+        f"Name: {info.get('longName', 'N/A')}\n"
+        f"Sector: {info.get('sector', 'N/A')}\n"
+        f"Industry: {info.get('industry', 'N/A')}\n"
+        f"Description: {info.get('longBusinessSummary', 'N/A')}"
+    )
+
+# Consolidate tools for the agent
+global_tools = [
+    get_stock_price,
+    calculate_pe_ratio,
+    get_company_info,
     python_repl_ast,
-    # ... (add other tools as needed)
 ]
 
+# ==========================================
+# 2. Main Analyst Class
+# ==========================================
 
 class FundamentalAnalyst:
     """
-    Agent specialized in fundamental analysis of companies.
-    Capable of performing various financial analyses, valuations, and risk assessments.
+    Hybrid Agent specialized in fundamental analysis. 
+    Capable of both LLM-driven agentic research (via yfinance) and 
+    deterministic financial modeling (DCF, Ratio Analysis) using provided data.
     """
 
-    def __init__(self, config):
+    def __init__(
+        self, 
+        config: Optional[Dict[str, Any]] = None, 
+        model_name: str = "gpt-4-turbo-preview"
+    ):
         """
-        Initializes the FundamentalAnalyst agent with necessary configurations and tools.
-        """
-        self.data_sources = config.get('data_sources', {})
-        self.knowledge_graph = config.get('knowledge_graph', {})
-        self.financial_modeling_agent = config.get('financial_modeling_agent', None)
-        self.risk_assessment_agent = config.get('risk_assessment_agent', None)
-        self.tools = tools
-
-    def analyze_company(self, company_data, analysis_modules=None, **kwargs):
-        """
-        Performs a comprehensive fundamental analysis of a company.
+        Initializes the FundamentalAnalyst agent.
 
         Args:
-            company_data: Dictionary containing company information, including financial statements.
-            analysis_modules: List of modules to execute. If None, all available modules are executed.
-            **kwargs: Additional keyword arguments for specific analysis modules.
-
-        Returns:
-            Dictionary containing the results of the analysis.
+            config: Dictionary containing configurations for manual analysis 
+                    (data_sources, knowledge_graph, etc.).
+            model_name: The OpenAI model to use for the agentic interface.
         """
-        print(f"Analyzing company fundamentals for {company_data['name']}...")
-        financial_statements = company_data['financial_statements']
+        self.config = config or {}
+        
+        # Manual Analysis Components
+        self.data_sources = self.config.get('data_sources', {})
+        self.knowledge_graph = self.config.get('knowledge_graph', None) # Placeholder object
+        
+        # Agentic Components
+        self.llm = ChatOpenAI(model=model_name, temperature=0)
+        self.tools = global_tools
+        
+        # Initialize Agent
+        # Pull the standard OpenAI tools agent prompt
+        self.prompt = hub.pull("hwchase17/openai-tools-agent")
+        self.agent = create_openai_tools_agent(self.llm, self.tools, self.prompt)
+        self.agent_executor = AgentExecutor(agent=self.agent, tools=self.tools, verbose=True)
 
+    # ---------------------------------------------------------
+    # Mode A: Agentic Analysis (LLM + Tools)
+    # ---------------------------------------------------------
+    
+    def analyze_ticker_with_agent(self, ticker: str) -> str:
+        """
+        Performs a fundamental analysis on the given ticker symbol using the LLM Agent.
+        This method fetches live data via tools.
+        """
+        query = (
+            f"Perform a comprehensive fundamental analysis of {ticker}. "
+            f"Include its current price, P/E ratio (if available), company overview, "
+            f"and any other relevant financial metrics. Provide a summary of your findings."
+        )
+        return self.agent_executor.invoke({"input": query})["output"]
+
+    # ---------------------------------------------------------
+    # Mode B: Deterministic/Manual Analysis (Math + Data)
+    # ---------------------------------------------------------
+
+    def analyze_company_data(self, company_data: Dict[str, Any], analysis_modules: List[str] = None, **kwargs) -> Dict[str, Any]:
+        """
+        Performs a comprehensive fundamental analysis using provided structured company data.
+        
+        Args:
+            company_data: Dictionary containing 'financial_statements', 'name', etc.
+            analysis_modules: List of modules to execute (e.g., ['liquidity', 'dcf']).
+            **kwargs: Additional arguments for specific modules.
+        """
+        print(f"Analyzing company fundamentals for {company_data.get('name', 'Unknown')}...")
+        financial_statements = company_data.get('financial_statements', {})
         analysis_results = {}
 
-        # Execute selected analysis modules
+        # 1. Profitability
         if analysis_modules is None or 'profitability' in analysis_modules:
             analysis_results['profitability'] = self.analyze_profitability(financial_statements)
+
+        # 2. Liquidity
         if analysis_modules is None or 'liquidity' in analysis_modules:
             analysis_results['liquidity'] = self.analyze_liquidity(financial_statements)
+
+        # 3. Solvency
         if analysis_modules is None or 'solvency' in analysis_modules:
             analysis_results['solvency'] = self.analyze_solvency(financial_statements)
+
+        # 4. DCF Valuation
         if analysis_modules is None or 'dcf_valuation' in analysis_modules:
             analysis_results['dcf_valuation'] = self.calculate_dcf_valuation(company_data, **kwargs)
+
+        # 5. Comparable Company Analysis
         if analysis_modules is None or 'comparable_company_analysis' in analysis_modules:
             analysis_results['comparable_company_analysis'] = self.perform_comparable_company_analysis(
                 company_data, **kwargs)
+
+        # 6. Precedent Transaction Analysis
         if analysis_modules is None or 'precedent_transaction_analysis' in analysis_modules:
             analysis_results['precedent_transaction_analysis'] = self.perform_precedent_transaction_analysis(
                 company_data, **kwargs)
-        # ... (add more analysis modules)
 
         return analysis_results
 
-    def analyze_profitability(self, financial_statements):
-        """
-        Calculates key profitability ratios.
+    # --- Financial Ratio Methods ---
 
-        Args:
-            financial_statements: Dictionary containing financial statement data.
+    def analyze_profitability(self, financial_statements: Dict) -> Dict[str, float]:
+        """Calculates key profitability ratios."""
+        try:
+            inc = financial_statements['income_statement']
+            bal = financial_statements['balance_sheet']
+            
+            revenue = inc.get('revenue', 0)
+            net_income = inc.get('net_income', 0)
+            total_assets = bal.get('total_assets', 0)
+            shareholder_equity = bal.get('shareholder_equity', 0)
 
-        Returns:
-            Dictionary containing profitability ratios (e.g., profit margin, ROE, ROA).
-        """
-        # ... (calculate profitability ratios like profit margin, ROE, ROA)
-        # Access data from financial_statements dictionary
-        revenue = financial_statements['income_statement']['revenue']
-        net_income = financial_statements['income_statement']['net_income']
-        total_assets = financial_statements['balance_sheet']['total_assets']
-        shareholder_equity = financial_statements['balance_sheet']['shareholder_equity']
+            return {
+                'profit_margin': net_income / revenue if revenue else 0,
+                'roe': net_income / shareholder_equity if shareholder_equity else 0,
+                'roa': net_income / total_assets if total_assets else 0
+            }
+        except KeyError as e:
+            return {"error": f"Missing data for profitability: {str(e)}"}
 
-        # Calculate profitability metrics
-        profit_margin = net_income / revenue
-        roe = net_income / shareholder_equity
-        roa = net_income / total_assets
+    def analyze_liquidity(self, financial_statements: Dict) -> Dict[str, float]:
+        """Calculates key liquidity ratios."""
+        try:
+            bal = financial_statements['balance_sheet']
+            current_assets = bal.get('current_assets', 0)
+            current_liabilities = bal.get('current_liabilities', 0)
+            inventory = bal.get('inventory', 0)
 
-        # Store results in a dictionary
-        profitability_metrics = {
-            'profit_margin': profit_margin,
-            'roe': roe,
-            'roa': roa
-        }
+            return {
+                'current_ratio': current_assets / current_liabilities if current_liabilities else 0,
+                'quick_ratio': (current_assets - inventory) / current_liabilities if current_liabilities else 0
+            }
+        except KeyError as e:
+            return {"error": f"Missing data for liquidity: {str(e)}"}
 
-        return profitability_metrics
+    def analyze_solvency(self, financial_statements: Dict) -> Dict[str, float]:
+        """Calculates key solvency ratios."""
+        try:
+            bal = financial_statements['balance_sheet']
+            total_debt = bal.get('total_debt', 0)
+            total_assets = bal.get('total_assets', 0)
+            shareholder_equity = bal.get('shareholder_equity', 0)
 
-    def analyze_liquidity(self, financial_statements):
-        """
-        Calculates key liquidity ratios.
+            return {
+                'debt_to_equity': total_debt / shareholder_equity if shareholder_equity else 0,
+                'debt_to_assets': total_debt / total_assets if total_assets else 0
+            }
+        except KeyError as e:
+            return {"error": f"Missing data for solvency: {str(e)}"}
 
-        Args:
-            financial_statements: Dictionary containing financial statement data.
-
-        Returns:
-            Dictionary containing liquidity ratios (e.g., current ratio, quick ratio).
-        """
-        # ... (calculate liquidity ratios like current ratio, quick ratio)
-        # Access data from financial_statements dictionary
-        current_assets = financial_statements['balance_sheet']['current_assets']
-        current_liabilities = financial_statements['balance_sheet']['current_liabilities']
-        inventory = financial_statements['balance_sheet']['inventory']
-
-        # Calculate liquidity metrics
-        current_ratio = current_assets / current_liabilities
-        quick_ratio = (current_assets - inventory) / current_liabilities
-
-        # Store results in a dictionary
-        liquidity_metrics = {
-            'current_ratio': current_ratio,
-            'quick_ratio': quick_ratio
-        }
-
-        return liquidity_metrics
-
-    def analyze_solvency(self, financial_statements):
-        """
-        Calculates key solvency ratios.
-
-        Args:
-            financial_statements: Dictionary containing financial statement data.
-
-        Returns:
-            Dictionary containing solvency ratios (e.g., debt-to-equity ratio, debt-to-asset ratio).
-        """
-        # ... (calculate solvency ratios like debt-to-equity ratio, debt-to-asset ratio)
-        # Access data from financial_statements dictionary
-        total_debt = financial_statements['balance_sheet']['total_debt']
-        total_assets = financial_statements['balance_sheet']['total_assets']
-        shareholder_equity = financial_statements['balance_sheet']['shareholder_equity']
-
-        # Calculate solvency metrics
-        debt_to_equity = total_debt / shareholder_equity
-        debt_to_assets = total_debt / total_assets
-
-        # Store results in a dictionary
-        solvency_metrics = {
-            'debt_to_equity': debt_to_equity,
-            'debt_to_assets': debt_to_assets
-        }
-
-        return solvency_metrics
+    # --- Valuation Methods ---
 
     def calculate_dcf_valuation(self, company_data, discount_rate=None, growth_rate=None, terminal_growth_rate=None):
-        """
-        Calculates the discounted cash flow (DCF) valuation.
+        """Calculates the DCF valuation."""
+        # Retrieve parameters from knowledge graph if available and not provided
+        industry = company_data.get('industry')
+        
+        if self.knowledge_graph:
+            if discount_rate is None:
+                discount_rate = self.knowledge_graph.get_discount_rate(industry)
+            if growth_rate is None:
+                growth_rate = self.knowledge_graph.get_growth_rate(industry)
+            if terminal_growth_rate is None:
+                terminal_growth_rate = self.knowledge_graph.get_terminal_growth_rate(industry)
 
-        Args:
-            company_data: Dictionary containing company information.
-            discount_rate: Discount rate used in the DCF calculation.
-            growth_rate: Growth rate of free cash flows.
-            terminal_growth_rate: Terminal growth rate of free cash flows.
-
-        Returns:
-            Intrinsic value per share based on the DCF valuation.
-        """
-        # Retrieve parameters from knowledge graph if not provided
-        if discount_rate is None:
-            discount_rate = self.knowledge_graph.get_discount_rate(company_data['industry'])
-        if growth_rate is None:
-            growth_rate = self.knowledge_graph.get_growth_rate(company_data['industry'])
-        if terminal_growth_rate is None:
-            terminal_growth_rate = self.knowledge_graph.get_terminal_growth_rate(company_data['industry'])
+        # Fallback defaults if KG fails
+        discount_rate = discount_rate or 0.10
+        growth_rate = growth_rate or 0.05
+        terminal_growth_rate = terminal_growth_rate or 0.02
 
         fcf_projections = self.project_fcf(company_data, growth_rate)
+        
+        # Calculate Terminal Value
+        last_fcf = fcf_projections[-1]
+        terminal_value = last_fcf * (1 + terminal_growth_rate) / (discount_rate - terminal_growth_rate)
 
-        terminal_value = fcf_projections[-1] * (1 + terminal_growth_rate) / (discount_rate - terminal_growth_rate)
-
-        present_values = [fcf / ((1 + discount_rate) ** i) for i, fcf in enumerate(fcf_projections)]
+        # Discount Cash Flows
+        present_values = [fcf / ((1 + discount_rate) ** (i + 1)) for i, fcf in enumerate(fcf_projections)]
         present_value_terminal = terminal_value / ((1 + discount_rate) ** len(fcf_projections))
 
         enterprise_value = sum(present_values) + present_value_terminal
-        equity_value = enterprise_value - company_data['financial_statements']['balance_sheet']['net_debt']
-        intrinsic_value_per_share = equity_value / company_data['shares_outstanding']
-
-        return intrinsic_value_per_share
+        
+        # Equity Value
+        net_debt = company_data['financial_statements']['balance_sheet'].get('net_debt', 0)
+        equity_value = enterprise_value - net_debt
+        
+        shares = company_data.get('shares_outstanding', 1)
+        return equity_value / shares
 
     def project_fcf(self, company_data, growth_rate):
-        """
-        Projects free cash flows based on historical data and growth assumptions.
-
-        Args:
-            company_data: Dictionary containing company information.
-            growth_rate: Growth rate assumption for free cash flows.
-
-        Returns:
-            List of projected free cash flow values.
-        """
-        # This is a simplified example, and the actual implementation would involve more complex logic
-        # and potentially integration with external data sources or forecasting models.
-        historical_fcf = company_data['financial_statements']['cash_flow_statement']['free_cash_flow']
-        fcf_projections = [historical_fcf * (1 + growth_rate) ** i for i in range(1, 11)]  # Project for 10 years
-        return fcf_projections
+        """Projects free cash flows (Simplified)."""
+        historical_fcf = company_data['financial_statements']['cash_flow_statement'].get('free_cash_flow', 0)
+        # Project for 10 years
+        return [historical_fcf * ((1 + growth_rate) ** i) for i in range(1, 11)]
 
     def perform_comparable_company_analysis(self, company_data, peer_group=None, valuation_multiples=None):
-        """
-        Performs comparable company analysis.
-
-        Args:
-            company_data: Dictionary containing company information.
-            peer_group: List of comparable companies.
-            valuation_multiples: List of valuation multiples to use.
-
-        Returns:
-            Dictionary containing valuation results based on comparable company analysis.
-        """
-        # Retrieve peer group and valuation multiples from knowledge graph if not provided
-        if peer_group is None:
-            peer_group = self.knowledge_graph.get_peer_group(company_data['industry'])
-        if valuation_multiples is None:
-            valuation_multiples = ['EV/EBITDA', 'P/E']
-
-        # Retrieve financial data for peer companies
-        peer_data = {}
-        for peer in peer_group:
-            peer_data[peer] = self.data_sources['financial_statements'].get_data(peer)
-
-        # Calculate valuation multiples for peer companies
-        peer_multiples = {}
-        for peer, data in peer_data.items():
-            peer_multiples[peer] = {}
-            for multiple in valuation_multiples:
-                peer_multiples[peer][multiple] = self.calculate_valuation_multiple(multiple, data)
-
-        # Calculate average valuation multiples
-        average_multiples = {}
-        for multiple in valuation_multiples:
-            average_multiples[multiple] = np.mean([peer_multiples[peer][multiple] for peer in peer_group])
-
-        # Apply average multiples to target company
-        valuation_results = {}
-        for multiple in valuation_multiples:
-            valuation_results[multiple] = self.apply_valuation_multiple(
-                multiple, company_data, average_multiples[multiple])
-
-        return valuation_results
+        """Placeholder for Comparable Company Analysis logic."""
+        # Implementation depends heavily on external data availability
+        return {"status": "Not implemented - requires rich peer data source"}
 
     def perform_precedent_transaction_analysis(self, company_data, transaction_data=None, valuation_multiples=None):
-        """
-        Performs precedent transaction analysis.
-
-        Args:
-            company_data: Dictionary containing company information.
-            transaction_data: List of precedent transactions.
-            valuation_multiples: List of valuation multiples to use.
-
-        Returns:
-            Dictionary containing valuation results based on precedent transaction analysis.
-        """
-        # Retrieve transaction data and valuation multiples from knowledge graph if not provided
-        if transaction_data is None:
-            transaction_data = self.knowledge_graph.get_precedent_transactions(company_data['industry'])
-        if valuation_multiples is None:
-            valuation_multiples = ['EV/EBITDA', 'P/E']
-
-        # Calculate valuation multiples for precedent transactions
-        transaction_multiples = {}
-        for transaction, data in transaction_data.items():
-            transaction_multiples[transaction] = {}
-            for multiple in valuation_multiples:
-                transaction_multiples[transaction][multiple] = self.calculate_valuation_multiple(multiple, data)
-
-        # Calculate average valuation multiples
-        average_multiples = {}
-        for multiple in valuation_multiples:
-            average_multiples[multiple] = np.mean(
-                [transaction_multiples[transaction][multiple] for transaction in transaction_data])
-
-        # Apply average multiples to target company
-        valuation_results = {}
-        for multiple in valuation_multiples:
-            valuation_results[multiple] = self.apply_valuation_multiple(
-                multiple, company_data, average_multiples[multiple])
-
-        return valuation_results
-
-    def calculate_valuation_multiple(self, multiple, data):
-        """
-        Calculates a specific valuation multiple based on provided data.
-
-        Args:
-            multiple: Name of the valuation multiple to calculate.
-            data: Dictionary containing financial data.
-
-        Returns:
-            Value of the calculated valuation multiple.
-        """
-        # ... (logic to calculate the specified valuation multiple)
-        pass  # Replace with actual calculation logic
-
-    def apply_valuation_multiple(self, multiple, company_data, average_multiple):
-        """
-        Applies a valuation multiple to the target company.
-
-        Args:
-            multiple: Name of the valuation multiple to apply.
-            company_data: Dictionary containing company information.
-            average_multiple: Average value of the valuation multiple.
-
-        Returns:
-            Valuation result based on the applied multiple.
-        """
-        # ... (logic to apply the valuation multiple to the target company)
-        pass  # Replace with actual application logic
-
-    # ... (add other valuation models and analysis modules)
+        """Placeholder for Precedent Transaction Analysis logic."""
+        return {"status": "Not implemented - requires rich transaction data source"}

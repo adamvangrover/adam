@@ -1,67 +1,105 @@
 import logging
-from typing import Dict, Any, Optional
 import datetime
+import random
+import yfinance as yf
+import pandas as pd
+from typing import Dict, Any, List, Optional
 
 logger = logging.getLogger(__name__)
 
-class FinancialTools:
+class FinancialToolkit:
     """
-    Registry of live financial tools.
-    Implements the 'Check-then-Fetch' pattern.
+    A unified registry for live financial data.
+    Implements 'Check-then-Fetch' caching to minimize API hits.
     """
 
     def __init__(self):
-        self.cache = {} # Simple in-memory cache
+        # In-memory cache: { ticker: {"data": info, "expiry": timestamp} }
+        self._cache: Dict[str, Any] = {}
 
-    def get_ticker_data(self, ticker: str) -> Dict[str, Any]:
+    def get_company_info(self, ticker: str, force_refresh: bool = False) -> Dict[str, Any]:
         """
-        Fetches basic price and volume data.
+        Retrieves company profile and current price data.
         """
-        # 1. Check Cache (or Internal Knowledge Graph)
-        if ticker in self.cache:
+        ticker = ticker.upper()
+        
+        # 1. Check Cache
+        if not force_refresh and ticker in self._cache:
             logger.info(f"Cache hit for {ticker}")
-            return self.cache[ticker]
+            return self._cache[ticker]
 
-        # 2. Fetch from External API
-        # In a real scenario, use yfinance or alpha_vantage
+        # 2. Fetch from yfinance
         logger.info(f"Fetching live data for {ticker}...")
         try:
-            # Mocking the external call
-            data = self._mock_yfinance_fetch(ticker)
-            self.cache[ticker] = data
-            return data
+            stock = yf.Ticker(ticker)
+            info = stock.info
+            
+            # Ensure we have a timestamp for the fetch
+            info['last_updated'] = datetime.datetime.now().isoformat()
+            
+            self._cache[ticker] = info
+            return info
         except Exception as e:
             logger.error(f"Failed to fetch data for {ticker}: {e}")
-            return {"error": str(e)}
+            return {"symbol": ticker, "error": str(e)}
 
-    def _mock_yfinance_fetch(self, ticker: str) -> Dict[str, Any]:
+    def get_historical_data(self, ticker: str, period: str = "1mo") -> pd.DataFrame:
         """
-        Simulates yfinance.Ticker(ticker).info
+        Retrieves historical stock data. 
+        Note: DataFrames are generally not cached here to ensure freshness of intervals.
         """
-        import random
-        base_price = 100.0
-        if ticker == "AAPL": base_price = 175.0
-        if ticker == "TSLA": base_price = 240.0
+        try:
+            stock = yf.Ticker(ticker.upper())
+            return stock.history(period=period)
+        except Exception as e:
+            logger.error(f"Error fetching history for {ticker}: {e}")
+            return pd.DataFrame()
 
-        return {
-            "symbol": ticker,
-            "price": base_price + random.uniform(-5, 5),
-            "volume": random.randint(1000000, 10000000),
-            "timestamp": datetime.datetime.now().isoformat()
-        }
+    def get_financials(self, ticker: str) -> Dict[str, pd.DataFrame]:
+        """
+        Retrieves core financial statements.
+        """
+        try:
+            stock = yf.Ticker(ticker.upper())
+            return {
+                "income_statement": stock.financials,
+                "balance_sheet": stock.balance_sheet,
+                "cash_flow": stock.cashflow
+            }
+        except Exception as e:
+            logger.error(f"Error fetching financials for {ticker}: {e}")
+            return {}
 
     def search_news(self, query: str) -> List[Dict[str, Any]]:
         """
         Searches for recent news articles.
         """
-        # 1. Check Internal KG for recent articles?
-        # 2. Call Tavily/Serper
         logger.info(f"Searching news for: {query}")
+        # Placeholder for external API (Tavily, Serper, or Google News)
         return [
             {
-                "title": f"Market Update on {query}",
-                "url": "https://finance.yahoo.com/...",
-                "snippet": f"Analysts discuss the impact of recent events on {query}...",
-                "source": "Bloomberg"
+                "title": f"Market Update: {query}",
+                "source": "Financial Times",
+                "summary": f"Latest analysis regarding {query} shows market volatility...",
+                "url": "https://example.com/finance-news"
+            },
+            {
+                "title": f"{query} Institutional Holdings Change",
+                "source": "Reuters",
+                "summary": "Major funds adjusted their positions in response to recent reports.",
+                "url": "https://example.com/reuters-update"
             }
         ]
+
+    def get_treasury_yields(self) -> Dict[str, float]:
+        """
+        Retrieves current US Treasury yields.
+        """
+        # In production, this would scrape Treasury.gov or use a macro API
+        return {
+            "3M": 5.45,
+            "2Y": 4.88,
+            "10Y": 4.50,
+            "30Y": 4.65,
+            "timestamp": datetime.datetime.now().isoformat()
+        }

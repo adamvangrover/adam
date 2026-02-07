@@ -87,12 +87,42 @@ def route_supervisor(state: VerticalRiskGraphState) -> Literal["quant", "legal",
 def critique_node(state: VerticalRiskGraphState):
     """
     Checks for consistency between Quant and Legal.
+    Now integrates the 4-Layered Evaluation & Verification Framework.
     """
     print("--- Critiquer: Verifying Consistency ---")
-    # Logic: Check if Debt/EBITDA matches covenant definitions
+
+    # --- Integration: Evaluation Framework ---
+    try:
+        from core.evaluation.judge import AuditorAgent
+        from core.evaluation.symbolic import SymbolicVerifier
+
+        auditor = AuditorAgent()
+        verifier = SymbolicVerifier()
+
+        # 1. Layer 1: LLM-as-a-Judge (Rubric Scoring)
+        audit_logs = auditor.evaluate(state)
+
+        # 2. Layer 2: Symbolic Verification (Ontology Check)
+        combined_text = (state.get("quant_analysis") or "") + "\n" + (state.get("legal_analysis") or "")
+        verification_flags = verifier.verify(combined_text)
+
+        messages = ["Critiquer: Evaluation Complete."]
+        if verification_flags:
+            messages.append(f"WARNING: Symbolic Verification Failed with {len(verification_flags)} flags.")
+            for flag in verification_flags:
+                print(f"  [FLAG] {flag}")
+
+    except ImportError as e:
+        print(f"Warning: Evaluation framework not found: {e}")
+        audit_logs = []
+        verification_flags = []
+        messages = ["Critiquer: Logic consistent (Evaluation skipped)."]
+
     return {
         "critique_count": state.get("critique_count", 0) + 1,
-        "messages": ["Critiquer: Logic consistent."]
+        "messages": messages,
+        "audit_logs": audit_logs,
+        "verification_flags": verification_flags
     }
 
 

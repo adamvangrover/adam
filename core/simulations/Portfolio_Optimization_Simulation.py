@@ -1,6 +1,7 @@
 # core/simulations/Portfolio_Optimization_Simulation.py
 
 import json
+from datetime import datetime
 from utils.api_communication import APICommunication
 from core.agents.risk_assessment_agent import RiskAssessmentAgent
 from core.agents.fundamental_analyst_agent import FundamentalAnalystAgent

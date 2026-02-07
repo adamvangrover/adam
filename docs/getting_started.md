@@ -1,127 +1,113 @@
-# Getting Started with Adam v17.0
+# Getting Started with Adam v26.0
 
-This guide will walk you through the process of setting up Adam v17.0 and running your first analysis.
+This guide will walk you through setting up the Adam environment and running your first analysis.
 
 ## Prerequisites
 
-*   Python 3.7+
-*   pip (Python package installer)
+*   **Python 3.10+**: Ensure you have a compatible Python version installed.
+*   **uv**: We use `uv` for fast, reproducible dependency management.
+    *   Install uv: `curl -LsSf https://astral.sh/uv/install.sh | sh` (or `pip install uv`)
+*   **Docker** (Optional but recommended for full stack deployment).
+*   **API Keys**: You will need an OpenAI API key for the core reasoning engine.
 
 ## Installation
 
-1.  **Clone the Repository:**
+### 1. Clone the Repository
 
-    ```bash
-    git clone [https://github.com/adamvangrover/adam.git](https://github.com/adamvangrover/adam.git)  # Replace with your actual repo URL if different
-    cd adam
-    ```
+```bash
+git clone https://github.com/adamvangrover/adam.git
+cd adam
+```
 
-2.  **Navigate to the Core Directory:**
+### 2. Environment Setup with `uv`
 
-    ```bash
-    cd core
-    ```
+Adam uses a `pyproject.toml` and `uv.lock` to manage dependencies strictly.
 
-3.  **Install Required Packages:**
+```bash
+# Create and sync the virtual environment
+uv sync
+```
 
-    ```bash
-    pip install -r requirements.txt  # If a requirements file exists (recommended)
-    # Or install individual packages:
-    pip install numpy pandas matplotlib  # Example packages - adjust as needed
-    ```
+This command will create a `.venv` directory and install all required packages (including dev dependencies).
 
-4.  **Knowledge Base Setup:**
+### 3. Configure Environment Variables
 
-    *   The Knowledge Base is stored in the `data/knowledge_base.json` file. A sample file has been provided. You can customize this file with your own data.  Ensure the `data/` directory is at the root of your Adam project, alongside the `core/` directory.
+Copy the example environment file and add your keys.
 
-## Running an Analysis
+```bash
+cp .env.example .env
+```
 
-The following sections will demonstrate how to perform a basic stock analysis using Adam v17.0.
+Open `.env` and set your `OPENAI_API_KEY`:
 
-## Example 1: Analyzing Tech Innovators Inc. (Simulated)
+```properties
+OPENAI_API_KEY=sk-your-key-here
+# Optional: Set other keys if needed (e.g., SERPER_API_KEY for search)
+```
 
-This example demonstrates how to use Adam v17.0 to analyze the *simulated* performance of "Tech Innovators Inc."  Remember, this example uses simulated data.  Real-world data integration will be covered in a later section.
+### 4. VS Code Configuration (Recommended)
 
-1.  **Import Necessary Modules:**
+To get the best development experience with type checking and auto-completion:
 
-    ```python
-    from core.market_sentiment_agent import MarketSentimentAgent
-    from core.fundamental_analyst_agent import FundamentalAnalystAgent
-    from core.technical_analyst_agent import TechnicalAnalystAgent
-    import json
-    import matplotlib.pyplot as plt
-    import os  # For creating the output directory
-    ```
+1.  **Install Extensions:**
+    *   Python (ms-python.python)
+    *   Pylance (ms-python.vscode-pylance)
+    *   Ruff (charliermarsh.ruff) - *Fast linting*
 
-2.  **Load the Knowledge Base:**
+2.  **Configure `.vscode/settings.json`:**
+    Create or update this file to point VS Code to the `uv` virtual environment.
 
-    ```python
-    with open("../data/knowledge_base.json", "r") as f:  # Adjust path if necessary
-        knowledge_base = json.load(f)
-    ```
-
-3.  **Initialize Agents:**
-
-    ```python
-    sentiment_agent = MarketSentimentAgent(knowledge_base)
-    fundamental_analyst = FundamentalAnalystAgent(knowledge_base)
-    technical_analyst = TechnicalAnalystAgent(knowledge_base)
-    ```
-
-4.  **Simulate Data (Placeholder):**
-
-    ```python
-    # In a real-world scenario, this data would come from a live data feed.
-    # For this example, we'll use simulated data.
-    simulated_stock_data = {
-        "price_history": [100, 105, 110, 108, 112, 115, 120],
-        "earnings_per_share": 10,
-        "analyst_sentiment": "positive"
+    ```json
+    {
+      "python.defaultInterpreterPath": ".venv/bin/python",
+      "python.analysis.typeCheckingMode": "strict",
+      "python.analysis.extraPaths": ["core", "services"]
     }
     ```
 
-5.  **Perform Analysis:**
+### 5. Sanity Check
 
-    ```python
-    sentiment_result = sentiment_agent.analyze(simulated_stock_data["analyst_sentiment"])
-    fundamental_result = fundamental_analyst.analyze(simulated_stock_data["earnings_per_share"])
-    technical_result = technical_analyst.analyze(simulated_stock_data["price_history"])
+Activate the environment and run a quick test to ensure everything is connected.
+
+```bash
+source .venv/bin/activate
+# Windows: .venv\Scripts\activate
+
+python scripts/run_adam.py --query "Hello, Adam."
+```
+
+**Expected Output:**
+You should see logs initializing the `MetaOrchestrator` and a response similar to:
+`[Adam]: System is online. How can I assist you with your financial analysis today?`
+
+## Running the System
+
+### Option A: The Neural Dashboard (Recommended)
+
+To see Adam in action, we recommend launching the showcase dashboard.
+
+1.  **Launch the Frontend:**
+    Open `showcase/index.html` in your browser. This provides a visual interface to the pre-generated data and simulation capabilities.
+
+2.  **Run the Live Backend (Optional):**
+    For live interaction, you can start the Flask server:
+    ```bash
+    python app.py
     ```
 
-6.  **Access Knowledge Base Information:**
+### Option B: Command Line Interface (CLI)
 
-    ```python
-    pe_ratio_definition = knowledge_base["PriceToEarningsRatio"]["definition"]
-    print(f"Price-to-Earnings Ratio Definition: {pe_ratio_definition}")
+You can interact with agents directly via the CLI for quick queries or debugging.
 
-    analyst_sentiment_interpretation = knowledge_base["AnalystSentiment"]["interpretation"][simulated_stock_data["analyst_sentiment"]]
-    print(f"Analyst Sentiment Interpretation: {analyst_sentiment_interpretation}")
-    ```
+```bash
+# Interactive Mode
+python scripts/run_adam.py
 
-7.  **Visualize Results:**
-
-    ```python
-    # Create the output directory if it doesn't exist
-    output_dir = "../outputs"
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
-    plt.plot(simulated_stock_data["price_history"])
-    plt.xlabel("Time")
-    plt.ylabel("Stock Price")
-    plt.title("Tech Innovators Inc. (Simulated)")
-    plt.savefig(os.path.join(output_dir, "tech_innovators_price.png"))  # Save to output directory
-    plt.show()
-    ```
-
-8.  **Output Summary:**
-
-    ```python
-    print("Market Sentiment Analysis:", sentiment_result)
-    print("Fundamental Analysis:", fundamental_result)
-    print("Technical Analysis:", technical_result)
-    ```
+# Single Shot
+python scripts/run_adam.py --query "Analyze the credit risk of Tesla"
+```
 
 ## Next Steps
 
-Explore the other agents and modules within the `core/` directory.  Contribute to the project by adding new agents, improving documentation, or providing feedback.  Stay tuned for updates on real-world data integration and more advanced features.
+*   Check out the [Tutorials](tutorials.md) to learn how to run specific analyses.
+*   Read the [Setup Guide](setup_guide.md) for advanced configuration.

@@ -340,9 +340,11 @@ class CrisisSimulationState(TypedDict, total=False):
 
     # Internal Reasoning
     macro_variables: Dict[str, float]  # { "rates": 0.08, "gdp": -0.02 }
+    sector_shocks: Dict[str, float]  # { "Technology": -0.5, "Energy": 0.2 }
     first_order_impacts: List[str]
     second_order_impacts: List[str]
     estimated_loss: float
+    crisis_simulation_log: List[Dict[str, Any]]
 
     critique_notes: List[str]
     iteration_count: int
@@ -560,9 +562,11 @@ def init_crisis_state(scenario: str, portfolio: Dict) -> CrisisSimulationState:
         "scenario_description": scenario,
         "portfolio_data": portfolio,
         "macro_variables": {},
+        "sector_shocks": {},
         "first_order_impacts": [],
         "second_order_impacts": [],
         "estimated_loss": 0.0,
+        "crisis_simulation_log": [],
         "critique_notes": [],
         "iteration_count": 0,
         "is_realistic": False,
@@ -654,4 +658,54 @@ def init_surveillance_state(sector: str = "General") -> SurveillanceState:
         "final_report": None,
         "iteration_count": 0,
         "human_readable_status": "Initializing Surveillance..."
+    }
+
+
+class DoubleCrisisState(TypedDict, total=False):
+    """
+    State for the High-Fidelity Double Crisis Simulation (Sovereign + Counterparty).
+
+    Attributes:
+        turn (int): Current simulation turn/hour.
+        lcr (float): Liquidity Coverage Ratio (%).
+        cet1 (float): Common Equity Tier 1 Ratio (%).
+        sovereign_spread (float): Spread on Sovereign Z bonds (bps).
+        repo_haircut (float): Haircut on Sovereign Z collateral (%).
+        counterparty_cds (float): CDS spread for Counterparty Alpha (bps).
+        intraday_liquidity (float): Available cash buffer ($M).
+        market_trust (float): Hidden variable tracking market confidence (0-100).
+        injects (List[Dict[str, Any]]): Active injects/events.
+        history (List[str]): Log of events.
+        game_over (bool): Whether the simulation has ended.
+        score (Dict[str, float]): Final performance metrics.
+    """
+    turn: int
+    lcr: float
+    cet1: float
+    sovereign_spread: float
+    repo_haircut: float
+    counterparty_cds: float
+    intraday_liquidity: float
+    market_trust: float
+    injects: List[Dict[str, Any]]
+    history: List[str]
+    game_over: bool
+    score: Dict[str, float]
+
+
+def init_double_crisis_state() -> DoubleCrisisState:
+    """Initializes the Double Crisis Simulation State."""
+    return {
+        "turn": 0,
+        "lcr": 115.0,
+        "cet1": 13.5,
+        "sovereign_spread": 450.0,  # 4.5% Yield = 450bps
+        "repo_haircut": 2.0,
+        "counterparty_cds": 150.0,
+        "intraday_liquidity": 5000.0,  # $5B
+        "market_trust": 100.0,
+        "injects": [],
+        "history": ["Simulation Initialized."],
+        "game_over": False,
+        "score": {}
     }

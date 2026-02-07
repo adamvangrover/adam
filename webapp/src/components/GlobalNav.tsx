@@ -104,7 +104,7 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ isOffline }) => {
             ref={searchInputRef}
             type="text"
             className="block w-full pl-10 pr-10 py-2 border border-cyber-slate/50 rounded-sm leading-5 bg-cyber-slate/30 text-cyber-text placeholder-cyber-text/30 focus:outline-none focus:bg-cyber-slate/50 focus:border-cyber-cyan/50 focus:ring-1 focus:ring-cyber-cyan/30 sm:text-sm font-mono transition-all"
-            placeholder="SEARCH SYSTEM KNOWLEDGE [CTRL+K]..."
+            placeholder="SEARCH SYSTEM KNOWLEDGE..."
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
@@ -118,6 +118,13 @@ const GlobalNav: React.FC<GlobalNavProps> = ({ isOffline }) => {
             role="combobox"
             aria-autocomplete="list"
           />
+          {!searchTerm && (
+            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+              <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono font-medium text-cyber-cyan/50 bg-cyber-cyan/5 border border-cyber-cyan/20 rounded shadow-[0_0_5px_rgba(6,182,212,0.1)]">
+                CTRL+K
+              </kbd>
+            </div>
+          )}
           {searchTerm && (
             <button
               onClick={() => {

@@ -1,5 +1,4 @@
 import numpy as np
-import random
 import json
 import os
 from datetime import datetime, timedelta
@@ -43,21 +42,20 @@ class ForecastingEngine:
             daily_vol = 0.015 # Default fallback
             daily_drift = 0.0005
 
-        # Monte Carlo Simulation
-        # shape: (simulations, days)
-        simulation_paths = np.zeros((simulations, days))
+        # Monte Carlo Simulation (Bolt Optimized: Vectorized)
+        # Generate all shocks at once: shape (simulations, days)
+        # Reuse array for simulation paths to minimize allocations
+        simulation_paths = np.random.normal(0, daily_vol, (simulations, days))
 
-        for i in range(simulations):
-            path = [last_price]
-            current = last_price
-            for _ in range(days):
-                shock = random.gauss(0, daily_vol)
-                price = current * np.exp(daily_drift + shock)
-                path.append(price)
-                current = price
-            simulation_paths[i, :] = path[1:]
+        # Cumulative sum of log returns (In-place optimization)
+        simulation_paths += daily_drift
+        np.cumsum(simulation_paths, axis=1, out=simulation_paths)
 
-        # Calculate Percentiles
+        # Calculate price paths (In-place)
+        np.exp(simulation_paths, out=simulation_paths)
+        simulation_paths *= last_price
+
+        # Calculate Percentiles (Vectorized)
         mean_path = np.mean(simulation_paths, axis=0)
         upper_95 = np.percentile(simulation_paths, 97.5, axis=0)
         lower_95 = np.percentile(simulation_paths, 2.5, axis=0)
@@ -71,11 +69,11 @@ class ForecastingEngine:
         return {
             "symbol": symbol,
             "dates": dates,
-            "mean": [round(x, 2) for x in mean_path],
-            "upper_95": [round(x, 2) for x in upper_95],
-            "lower_95": [round(x, 2) for x in lower_95],
-            "upper_80": [round(x, 2) for x in upper_80],
-            "lower_80": [round(x, 2) for x in lower_80]
+            "mean": np.round(mean_path, 2).tolist(),
+            "upper_95": np.round(upper_95, 2).tolist(),
+            "lower_95": np.round(lower_95, 2).tolist(),
+            "upper_80": np.round(upper_80, 2).tolist(),
+            "lower_80": np.round(lower_80, 2).tolist()
         }
 
 # Singleton for ease of import

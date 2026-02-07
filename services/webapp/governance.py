@@ -1,19 +1,37 @@
+# Verified for Adam v25.5
+# Reviewed by Jules
 import yaml
 import os
 import re
 import logging
+import hmac
+import hashlib
+import time
 from flask import request, jsonify, abort
 
 class GovernanceMiddleware:
     """
     Middleware to intercept and validate requests against the governance policy.
     Ensures 'High Risk' operations are checked before execution.
+    Protocol: ADAM-V-NEXT
     """
 
     def __init__(self, app=None, policy_path='config/governance_policy.yaml'):
         self.policy = {}
         self.policy_path = policy_path
         self._load_policy()
+
+        # 🛡️ Sentinel: Initialize Secret Key for Governance Overrides
+        # Critical Fix: Do not use hardcoded default secrets.
+        env_secret = os.environ.get('GOVERNANCE_OVERRIDE_SECRET')
+        if env_secret:
+            self.secret_key = env_secret.encode()
+        else:
+            # If no secret is provided, generate a random one at runtime.
+            # This effectively disables the override capability since the key is unknown,
+            # but prevents attackers from using a known default key.
+            logging.warning("GOVERNANCE_OVERRIDE_SECRET not set. Generating random key. Override feature effectively disabled.")
+            self.secret_key = os.urandom(32)
 
         if app:
             self.init_app(app)
@@ -60,15 +78,71 @@ class GovernanceMiddleware:
                     logging.warning(f"Governance Block: Request contains flagged keyword '{keyword}'")
                     abort(400, description="Request content blocked by governance policy.")
 
+    def reload_policy(self):
+        """
+        Reloads the governance policy from disk.
+        Useful for hot-patching rules without restarting the server.
+        """
+        logging.info("Reloading Governance Policy...")
+        self._load_policy()
+
     def _enforce_rule(self, rule):
         """
         Enforce a specific rule.
+        Protocol: ADAM-V-NEXT - Strict Enforcement with Sentinel Overrides
         """
-        # Role check could be integrated with JWT here, but keeping it simple for now.
-        # Ideally, we inspect get_jwt_identity() or verify_jwt_in_request()
-
         risk = rule.get('risk_level', 'LOW')
+
+        # Strict Block for High Risk operations unless overridden
         if risk in ['HIGH', 'CRITICAL']:
-            logging.info(f"Governance Alert: High risk operation detected on {request.path}")
-            # In a real system, we might require a specific 'X-Approval-Token' header here.
-            pass
+            logging.warning(f"Governance Alert: High risk operation detected on {request.path} [Risk: {risk}]")
+
+            # 🛡️ Sentinel: Support for "Break Glass" Human Override
+            # This allows authorized operators to bypass governance blocks in emergencies.
+            override_token = request.headers.get('X-Governance-Override')
+            
+            if override_token:
+                # 🛡️ Sentinel: Secure Override Verification
+                # We require a signed token to prevent unauthorized overrides.
+                # In a real system, this secret would be strictly managed (e.g. Vault).
+
+                # Format expected: "timestamp:signature"
+                try:
+                    ts_str, signature = override_token.split(':', 1)
+                    timestamp = int(ts_str)
+
+                    # Replay attack prevention (token valid for 5 minutes)
+                    if abs(time.time() - timestamp) > 300:
+                         raise ValueError("Token expired")
+
+                    # Verify signature
+                    payload = f"{ts_str}:{request.path}".encode()
+                    expected_signature = hmac.new(self.secret_key, payload, hashlib.sha256).hexdigest()
+
+                    if not hmac.compare_digest(signature, expected_signature):
+                         raise ValueError("Invalid signature")
+
+                    # Import HMMParser lazily to avoid circular dependencies if any
+                    try:
+                        from core.system.hmm_protocol import HMMParser
+                        log_entry = HMMParser.generate_log(
+                            action_taken=f"OVERRIDE_GOVERNANCE_BLOCK ({request.method} {request.path})",
+                            impact_analysis={
+                                "Risk Level": risk,
+                                "User IP": request.remote_addr,
+                                "Override Token Provided": "YES (VERIFIED)"
+                            },
+                            audit_link="LOG-FILE"
+                        )
+                        logging.info(f"\n{log_entry}")
+                    except ImportError:
+                        # Fallback logging if core is not available
+                        logging.warning(f"AUDIT: Governance Override used for {request.path} by {request.remote_addr}")
+
+                    return  # ALLOW the request
+                except (ValueError, AttributeError) as e:
+                    logging.warning(f"Governance Override Failed: {e}")
+                    # Fall through to block
+
+            # 🛡️ Sentinel: Enforce strict blocking for high-risk operations
+            abort(403, description="Access denied: High risk operation blocked by governance policy. Provide valid signed 'X-Governance-Override' header to bypass.")

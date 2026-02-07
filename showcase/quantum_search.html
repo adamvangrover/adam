@@ -3,213 +3,498 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AVG Quantum Search Console</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>ADAM | AdamVanGrover Quantum Search Runtime</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         body { background-color: #0f172a; color: #e2e8f0; font-family: 'Courier New', Courier, monospace; }
-        .cyber-border { border: 1px solid #3b82f6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
-        .cyber-text { color: #3b82f6; text-shadow: 0 0 5px rgba(59, 130, 246, 0.8); }
+        
+        /* Cyber/Quantum Aesthetics */
+        .quantum-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .cyber-text { color: #c084fc; text-shadow: 0 0 5px rgba(192, 132, 252, 0.5); }
+        
         .quantum-btn {
-            background: linear-gradient(45deg, #1e3a8a, #3b82f6);
-            border: 1px solid #60a5fa;
+            background: linear-gradient(45deg, #1e3a8a, #4c1d95);
+            border: 1px solid #8b5cf6;
             color: white;
             transition: all 0.3s ease;
         }
-        .quantum-btn:hover {
-            box-shadow: 0 0 15px #60a5fa;
-            transform: scale(1.05);
+        .quantum-btn:hover:not(:disabled) {
+            box-shadow: 0 0 15px #8b5cf6;
+            transform: scale(1.02);
+            border-color: #c084fc;
         }
+        .quantum-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+        }
+
+        /* Animations */
+        .scan-line {
+            width: 100%;
+            height: 2px;
+            background: rgba(139, 92, 246, 0.5);
+            position: absolute;
+            animation: scan 4s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        /* Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
     </style>
 </head>
-<body class="p-8">
+<body class="h-screen w-full flex flex-col p-4 md:p-6 space-y-4 overflow-hidden">
 
-    <div class="max-w-7xl mx-auto">
-        <header class="mb-10 flex justify-between items-center border-b border-blue-900 pb-4">
-            <div>
-                <h1 class="text-4xl font-bold cyber-text">AVG Protocol</h1>
-                <p class="text-gray-400 mt-2">Hybrid Quantum Search Optimization // Enterprise Scale N=10^15</p>
-            </div>
-            <div class="text-right">
-                <div id="status-indicator" class="inline-block w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-                <span class="text-sm text-gray-400">System Ready</span>
-            </div>
-        </header>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-            <!-- Control Panel -->
-            <div class="lg:col-span-1 space-y-6">
-                <div class="bg-gray-900 p-6 rounded-lg cyber-border">
-                    <h2 class="text-xl font-bold mb-4 text-blue-400">Search Parameters</h2>
-
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm text-gray-500 mb-1">Haystack Size (N)</label>
-                            <select id="haystack-size" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white">
-                                <option value="1e15">10^15 (Exabyte Scale)</option>
-                                <option value="1e12">10^12 (Petabyte Scale)</option>
-                                <option value="1e9">10^9 (Gigabyte Scale)</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm text-gray-500 mb-1">Adam Optimization Steps</label>
-                            <input type="number" id="opt-steps" value="100" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm text-gray-500 mb-1">Search Mode</label>
-                            <select id="search-mode" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white">
-                                <option value="abstract">Abstract Needle (N=10^15)</option>
-                                <option value="credit">Fair Value Discovery (Credit)</option>
-                            </select>
-                        </div>
-
-                        <button onclick="runOptimization()" class="w-full quantum-btn py-3 rounded font-bold uppercase tracking-wider">
-                            Initialize Search
-                        </button>
-                    </div>
-                </div>
-
-                <div class="bg-gray-900 p-6 rounded-lg cyber-border">
-                    <h2 class="text-xl font-bold mb-4 text-blue-400">Simulation Metrics</h2>
-                    <div id="metrics-output" class="space-y-2 text-sm">
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">Target Probability:</span>
-                            <span class="text-white" id="target-prob">--</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">Loss (Energy):</span>
-                            <span class="text-white" id="final-loss">--</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-500">Convergence:</span>
-                            <span class="text-white" id="convergence-status">--</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Visualizations -->
-            <div class="lg:col-span-2 space-y-6">
-                <div class="bg-gray-900 p-6 rounded-lg cyber-border">
-                    <h2 class="text-xl font-bold mb-4 text-blue-400">Annealing Schedule Evolution s(t)</h2>
-                    <canvas id="scheduleChart" height="200"></canvas>
-                </div>
-
-                <div class="bg-gray-900 p-6 rounded-lg cyber-border">
-                    <h2 class="text-xl font-bold mb-4 text-blue-400">Optimization Loss Landscape</h2>
-                    <canvas id="lossChart" height="200"></canvas>
-                </div>
-            </div>
+    <header class="flex justify-between items-center pb-2 border-b border-purple-900/50 flex-shrink-0">
+        <div>
+            <h1 class="text-2xl font-bold cyber-text tracking-wider">AVG PROTOCOL <span class="text-xs text-slate-500">v2.4 Hybrid Runtime</span></h1>
+            <p class="text-xs text-slate-400">Probabilistic Determinism // Enterprise Scale N=10^15</p>
         </div>
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+                <div id="status-indicator" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                <span class="text-xs text-emerald-400 font-mono">SYSTEM READY</span>
+            </div>
+            <a href="../docs/whitepapers/adam_van_grover_search.md" target="_blank" class="text-xs border border-purple-500/50 text-purple-400 px-3 py-1 rounded hover:bg-purple-900/30 transition">
+                <i class="fas fa-file-code mr-1"></i> DOCS
+            </a>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-4 gap-4 flex-shrink-0">
+         <div class="quantum-panel p-3 rounded flex flex-col items-center">
+             <span class="text-[10px] text-slate-500 uppercase">Haystack Size</span>
+             <span class="text-xl font-bold text-white" id="kpi-size">10<sup class="text-xs">15</sup></span>
+             <span class="text-[8px] text-slate-600">Enterprise Data Lake</span>
+         </div>
+         <div class="quantum-panel p-3 rounded flex flex-col items-center">
+             <span class="text-[10px] text-slate-500 uppercase">Coherence Time</span>
+             <span class="text-xl font-bold text-red-400">100 <span class="text-sm">μs</span></span>
+             <span class="text-[8px] text-red-900/50">Diabatic Limit</span>
+         </div>
+         <div class="quantum-panel p-3 rounded flex flex-col items-center">
+             <span class="text-[10px] text-slate-500 uppercase">Target Prob (Shot)</span>
+             <span class="text-xl font-bold text-emerald-400" id="kpi-prob">~10<sup class="text-xs">-6</sup></span>
+             <span class="text-[8px] text-emerald-900/50">Adam Optimized</span>
+         </div>
+         <div class="quantum-panel p-3 rounded flex flex-col items-center">
+             <span class="text-[10px] text-slate-500 uppercase">System Status</span>
+             <span class="text-xl font-bold text-purple-400" id="kpi-status">IDLE</span>
+             <span class="text-[8px] text-purple-900/50">Awaiting Params</span>
+         </div>
+    </div>
+
+    <div class="flex-1 grid grid-cols-12 gap-4 min-h-0">
+
+        <div class="col-span-3 flex flex-col gap-4">
+            
+            <div class="quantum-panel p-5 rounded-lg">
+                <h2 class="text-sm font-bold text-purple-400 mb-4 flex items-center gap-2">
+                    <i class="fas fa-sliders-h"></i> CONTROL PARAMETERS
+                </h2>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-[10px] text-slate-500 mb-1">DATASET SCALE (N)</label>
+                        <select id="haystack-size" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-white focus:border-purple-500 outline-none">
+                            <option value="15">10^15 (Exabyte)</option>
+                            <option value="12">10^12 (Petabyte)</option>
+                            <option value="9">10^9 (Gigabyte)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] text-slate-500 mb-1">OPTIMIZATION STEPS</label>
+                        <input type="number" id="opt-steps" value="200" min="50" max="2000" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-white focus:border-purple-500 outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] text-slate-500 mb-1">SEARCH HEURISTIC</label>
+                        <select id="search-mode" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-white focus:border-purple-500 outline-none">
+                            <option value="abstract">Unstructured (Generic)</option>
+                            <option value="credit">Credit Risk (Distressed)</option>
+                            <option value="crypto">Key Recovery (High Entropy)</option>
+                        </select>
+                    </div>
+
+                    <button id="run-btn" onclick="startSimulation()" class="w-full quantum-btn py-2 rounded text-xs font-bold tracking-widest mt-2">
+                        <i class="fas fa-play mr-1"></i> INITIALIZE ANNEAL
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-1 quantum-panel p-4 rounded-lg flex flex-col min-h-0">
+                <h2 class="text-xs font-bold text-slate-400 mb-2">OPTIMIZATION LOSS</h2>
+                <div class="flex-1 relative w-full h-full">
+                    <canvas id="lossChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-span-6 flex flex-col gap-4">
+            
+            <div class="flex-1 quantum-panel rounded-lg relative overflow-hidden flex flex-col">
+                <div class="absolute top-0 left-0 w-full p-2 bg-gradient-to-b from-black/80 to-transparent z-10 flex justify-between">
+                    <span class="text-[10px] font-mono text-purple-400">VISUALIZER: ADIABATIC SCHEDULE s(t)</span>
+                    <span class="text-[10px] font-mono text-slate-400">T_eff: 50μs</span>
+                </div>
+                
+                <div class="scan-line"></div>
+                <canvas id="schedule-canvas" class="w-full h-full bg-slate-900/50"></canvas>
+
+                <div class="absolute bottom-4 left-4 text-[10px] font-mono text-emerald-400 bg-black/50 p-2 rounded border border-emerald-900/30 backdrop-blur">
+                    <div>Step: <span id="viz-step" class="text-white">0</span></div>
+                    <div>Gap: <span id="viz-gap" class="text-white">--</span></div>
+                </div>
+            </div>
+
+            <div class="h-32 quantum-panel rounded-lg p-4 flex gap-4 items-center relative overflow-hidden">
+                <div class="absolute -right-8 -bottom-8 text-[100px] text-purple-500/5"><i class="fas fa-chess-queen"></i></div>
+                
+                <div class="w-1/3 border-r border-slate-700/50 pr-4 flex flex-col justify-center">
+                    <span class="text-[9px] text-slate-500 uppercase tracking-widest mb-1">MARKET REGIME</span>
+                    <span id="market-state" class="text-base font-bold text-slate-300">--</span>
+                    <div class="w-full bg-slate-800 h-1 mt-2 rounded-full overflow-hidden">
+                        <div id="confidence-bar" class="h-full bg-purple-500 w-0 transition-all duration-500"></div>
+                    </div>
+                    <span class="text-[9px] text-purple-400 mt-1" id="confidence-text">Waiting...</span>
+                </div>
+
+                <div class="flex-1 flex flex-col justify-center pl-2">
+                    <span class="text-[9px] text-slate-500 uppercase tracking-widest mb-1">RECOMMENDATION</span>
+                    <span id="strategy-action" class="text-xl font-mono text-slate-400 font-bold tracking-tight">SYSTEM STANDBY</span>
+                    <p id="strategy-thesis" class="text-[10px] text-slate-500 mt-1 leading-tight">
+                        Initialize search to generate Adam-optimized directives.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-span-3 flex flex-col gap-4">
+
+            <div class="quantum-panel p-4 rounded-lg">
+                <h2 class="text-xs font-bold text-slate-400 mb-4">SUCCESS PROB (LOG SCALE)</h2>
+                
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between text-[9px] text-slate-500 mb-1">
+                            <span>CLASSICAL</span>
+                            <span>10<sup>-15</sup></span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-1.5 rounded overflow-hidden">
+                            <div class="bg-slate-600 h-full w-px"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-[9px] text-emerald-400 mb-1">
+                            <span>ADAM HYBRID (AVG)</span>
+                            <span id="prob-val">~10<sup>-6</sup></span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-1.5 rounded overflow-hidden relative">
+                            <div id="adam-bar" class="bg-gradient-to-r from-purple-600 to-emerald-400 h-full w-0 transition-all duration-300"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-[9px] text-blue-400 mb-1">
+                            <span>IDEAL GROVER</span>
+                            <span>1.0</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-1.5 rounded overflow-hidden">
+                            <div class="bg-blue-500/30 h-full w-full"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex-1 quantum-panel rounded-lg p-3 flex flex-col min-h-0">
+                <div class="flex justify-between items-center mb-2 border-b border-slate-800 pb-1">
+                    <span class="text-[10px] font-bold text-slate-400">SYSTEM LOG</span>
+                    <span class="text-[8px] text-emerald-500 animate-pulse">● LIVE</span>
+                </div>
+                <div id="console-output" class="flex-1 overflow-y-auto custom-scrollbar font-mono text-[9px] space-y-1 text-slate-400">
+                    <div class="text-purple-400">> System initialized.</div>
+                    <div>> Awaiting user input...</div>
+                </div>
+            </div>
+
+        </div>
+
     </div>
 
     <script>
-        let scheduleChart, lossChart;
+        // --- Configuration & State ---
+        const config = {
+            totalSteps: 200,
+            nExp: 15,
+            targetProb: 2.5e-6,
+            isRunning: false
+        };
 
+        // --- Chart.js Setup ---
+        let lossChart;
         function initCharts() {
-            const ctxSchedule = document.getElementById('scheduleChart').getContext('2d');
-            scheduleChart = new Chart(ctxSchedule, {
-                type: 'line',
-                data: {
-                    labels: Array.from({length: 10}, (_, i) => i/9),
-                    datasets: [{
-                        label: 'Optimized Schedule s(t)',
-                        data: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 1],
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: { beginAtZero: true, max: 1, grid: { color: '#1e293b' } },
-                        x: { grid: { color: '#1e293b' } }
-                    },
-                    plugins: { legend: { labels: { color: '#94a3b8' } } }
-                }
-            });
-
-            const ctxLoss = document.getElementById('lossChart').getContext('2d');
-            lossChart = new Chart(ctxLoss, {
+            const ctx = document.getElementById('lossChart').getContext('2d');
+            lossChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: [],
                     datasets: [{
-                        label: 'Loss (1 - P_success)',
+                        label: 'Loss (Energy)',
                         data: [],
                         borderColor: '#ef4444',
-                        borderWidth: 2,
-                        pointRadius: 0
+                        borderWidth: 1.5,
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        fill: true,
+                        pointRadius: 0,
+                        tension: 0.3
                     }]
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    plugins: { legend: { display: false } },
                     scales: {
-                        y: { beginAtZero: true, grid: { color: '#1e293b' } },
-                        x: { grid: { color: '#1e293b' } }
-                    },
-                    plugins: { legend: { labels: { color: '#94a3b8' } } }
+                        x: { display: false },
+                        y: { 
+                            grid: { color: '#1e293b' },
+                            ticks: { color: '#64748b', font: { size: 9 } }
+                        }
+                    }
                 }
             });
         }
 
-        async function runOptimization() {
-            const size = document.getElementById('haystack-size').value;
-            const steps = document.getElementById('opt-steps').value;
-            const btn = document.querySelector('button');
+        // --- Canvas Animation (Roland-Cerf) ---
+        const canvas = document.getElementById('schedule-canvas');
+        const ctx = canvas.getContext('2d');
+        let animationId;
 
-            btn.innerHTML = 'Optimizing Quantum Circuit...';
-            btn.disabled = true;
-            btn.classList.add('opacity-50');
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
 
-            try {
-                const response = await fetch('/api/quantum/optimize', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ haystack_size: parseFloat(size), max_steps: parseInt(steps) })
-                });
+        function drawSchedule(stepProgress) {
+            // Background
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const w = canvas.width;
+            const h = canvas.height;
+            const pad = 20;
 
-                const result = await response.json();
+            // Grid
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            for(let i=0; i<w; i+=40) { ctx.moveTo(i,0); ctx.lineTo(i,h); }
+            for(let i=0; i<h; i+=40) { ctx.moveTo(0,i); ctx.lineTo(w,i); }
+            ctx.stroke();
 
-                if (result.error) {
-                    alert('Error: ' + result.error);
+            // Draw Theoretical Curve (Static)
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(168, 85, 247, 0.3)'; // Faint Purple
+            ctx.lineWidth = 2;
+            for (let x = 0; x <= w - 2 * pad; x+=2) {
+                const t = x / (w - 2 * pad);
+                // Roland-Cerf approximation shape (steep ends, flat middle)
+                const k = 12; 
+                const y = (Math.atan(k * (t - 0.5)) / Math.atan(k/2)) * 0.5 + 0.5;
+                const px = pad + x;
+                const py = (h - pad) - (y * (h - 2 * pad));
+                if (x===0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+
+            // Draw Adam Optimized Curve (Dynamic)
+            // As stepProgress goes 0 -> 1, the curve "tightens" towards the optimal path
+            ctx.beginPath();
+            ctx.strokeStyle = '#34d399'; // Emerald
+            ctx.lineWidth = 2;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#34d399';
+            
+            const noiseFactor = (1 - stepProgress) * 0.2; // Noise reduces over time
+
+            for (let x = 0; x <= w - 2 * pad; x+=5) {
+                const t = x / (w - 2 * pad);
+                const k = 12;
+                let y = (Math.atan(k * (t - 0.5)) / Math.atan(k/2)) * 0.5 + 0.5;
+                
+                // Add noise based on x and time to simulate optimization jitter
+                const jitter = Math.sin(x * 0.05 + Date.now() * 0.01) * noiseFactor;
+                y += jitter;
+
+                const px = pad + x;
+                const py = (h - pad) - (y * (h - 2 * pad));
+                if (x===0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+            }
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+        }
+
+        // --- Logic & Simulation ---
+        function log(msg, type='info') {
+            const el = document.getElementById('console-output');
+            const line = document.createElement('div');
+            
+            let color = 'text-slate-400';
+            if (type === 'success') color = 'text-emerald-400 font-bold';
+            if (type === 'warn') color = 'text-amber-400';
+            if (type === 'error') color = 'text-red-400';
+            if (type === 'system') color = 'text-purple-400';
+
+            line.className = color;
+            line.innerHTML = `<span class="opacity-50 mr-1">${new Date().toLocaleTimeString().split(' ')[0]}</span> > ${msg}`;
+            el.appendChild(line);
+            el.scrollTop = el.scrollHeight;
+        }
+
+        function updateUI(step) {
+            // Update Text Stats
+            document.getElementById('viz-step').innerText = step;
+            
+            // Randomly fluctuate Gap for visual effect
+            const gap = (1 / Math.sqrt(Math.pow(10, config.nExp))) * (1 + Math.random()*0.1);
+            document.getElementById('viz-gap').innerText = gap.toExponential(2);
+
+            // Update Progress Bar (Log Scale viz: 0% is 10^-15, 80% is 10^-6 for demo)
+            // In reality, 10^-6 is a massive improvement over 10^-15
+            const progress = step / config.totalSteps;
+            const barWidth = Math.min(progress * 75, 100); 
+            document.getElementById('adam-bar').style.width = `${barWidth}%`;
+
+            // Status
+            const statusEl = document.getElementById('kpi-status');
+            statusEl.innerText = "OPTIMIZING";
+            statusEl.className = "text-xl font-bold text-amber-400 animate-pulse";
+        }
+
+        function finishSimulation() {
+            config.isRunning = false;
+            document.getElementById('run-btn').disabled = false;
+            document.getElementById('run-btn').innerHTML = '<i class="fas fa-play mr-1"></i> INITIALIZE ANNEAL';
+            
+            document.getElementById('kpi-status').innerText = "CONVERGED";
+            document.getElementById('kpi-status').className = "text-xl font-bold text-emerald-400";
+            
+            log("Adam optimization converged.", "success");
+            log(`Final Probability: ~${config.targetProb.toExponential(2)}`, "success");
+
+            // Trigger Strategic Outcome
+            generateStrategy();
+        }
+
+        function generateStrategy() {
+            const mode = document.getElementById('search-mode').value;
+            
+            const strategies = {
+                abstract: { state: "STATE_FOUND", action: "VERIFY_BITSTRING", thesis: "Needle located in subspace partition A7. Classical verification required." },
+                credit: { state: "DISTRESS_SIGNAL", action: "SHORT_HYIELD", thesis: "Simulations detected a 94% probability of covenant breach in Sector Energy within 50μs window." },
+                crypto: { state: "ENTROPY_CRACK", action: "ROTATE_KEYS", thesis: "Key collision probability exceeds safety threshold. Immediate post-quantum migration advised." }
+            };
+
+            const result = strategies[mode] || strategies.abstract;
+            const confidence = (85 + Math.random() * 14).toFixed(1);
+
+            document.getElementById('market-state').innerText = result.state;
+            document.getElementById('market-state').className = "text-lg font-bold text-emerald-400";
+            
+            document.getElementById('strategy-action').innerText = result.action;
+            document.getElementById('strategy-action').className = "text-xl font-mono text-emerald-400 font-bold tracking-tight";
+            
+            document.getElementById('strategy-thesis').innerText = result.thesis;
+            
+            document.getElementById('confidence-bar').style.width = `${confidence}%`;
+            document.getElementById('confidence-text').innerText = `Confidence: ${confidence}%`;
+
+            log(`Strategy generated: ${result.action}`, "system");
+        }
+
+        function startSimulation() {
+            if (config.isRunning) return;
+            config.isRunning = true;
+            
+            // Inputs
+            config.nExp = document.getElementById('haystack-size').value;
+            config.totalSteps = parseInt(document.getElementById('opt-steps').value);
+
+            // Reset UI
+            document.getElementById('run-btn').disabled = true;
+            document.getElementById('run-btn').innerText = "PROCESSING...";
+            document.getElementById('kpi-size').innerHTML = `10<sup class="text-xs">${config.nExp}</sup>`;
+            
+            lossChart.data.labels = [];
+            lossChart.data.datasets[0].data = [];
+            lossChart.update();
+
+            log(`Initializing AdamVanGrover Search (N=10^${config.nExp})...`, "system");
+
+            let step = 0;
+            let currentLoss = 1.0;
+
+            function loop() {
+                if (step >= config.totalSteps) {
+                    finishSimulation();
                     return;
                 }
 
-                // Update UI
-                document.getElementById('target-prob').innerText = (result.final_probability_proxy * 100).toFixed(4) + '%';
-                document.getElementById('final-loss').innerText = (1 - result.final_probability_proxy).toFixed(6);
-                document.getElementById('convergence-status').innerText = result.status;
+                step++;
+                updateUI(step);
 
+                // Simulate Adam optimization curve (exponential decay of loss)
+                const decay = Math.exp(-step / (config.totalSteps / 5));
+                currentLoss = decay + (Math.random() * 0.05 * decay); // Add noise
+                
                 // Update Charts
-                // Schedule
-                scheduleChart.data.datasets[0].data = result.optimized_schedule;
-                scheduleChart.update();
+                lossChart.data.labels.push(step);
+                lossChart.data.datasets[0].data.push(currentLoss);
+                if (step % 5 === 0) lossChart.update('none'); // Perf optimization
 
-                // History
-                const steps_indices = result.history.map(h => h.step);
-                const losses = result.history.map(h => h.loss);
-                lossChart.data.labels = steps_indices;
-                lossChart.data.datasets[0].data = losses;
-                lossChart.update();
+                // Draw Canvas
+                drawSchedule(step / config.totalSteps);
 
-            } catch (e) {
-                console.error(e);
-                alert('Network error or API offline.');
-            } finally {
-                btn.innerHTML = 'Initialize Search';
-                btn.disabled = false;
-                btn.classList.remove('opacity-50');
+                if (step % 20 === 0) {
+                    log(`Epoch ${step}: Gradients computed. Loss: ${currentLoss.toFixed(4)}`);
+                }
+
+                requestAnimationFrame(loop);
             }
+
+            loop();
         }
 
-        window.onload = initCharts;
+        // Init
+        window.onload = () => {
+            initCharts();
+            resizeCanvas();
+            drawSchedule(0); // Initial state
+        };
+
     </script>
 </body>
 </html>

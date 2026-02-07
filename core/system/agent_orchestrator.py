@@ -40,6 +40,7 @@ from core.agents.financial_modeling_agent import FinancialModelingAgent
 from core.agents.portfolio_optimization_agent import PortfolioOptimizationAgent
 from core.agents.quantitative_risk_agent import QuantitativeRiskAgent
 from core.agents.black_swan_agent import BlackSwanAgent
+from core.agents.specialized.blindspot_agent import BlindspotAgent
 
 from pydantic import ValidationError
 from core.schemas.config_schema import AgentsYamlConfig
@@ -128,6 +129,8 @@ AGENT_CLASSES = {
     "portfolio_optimization_agent": "core.agents.portfolio_optimization_agent",
     "quantitative_risk_agent": "core.agents.quantitative_risk_agent",
     "black_swan_agent": BlackSwanAgent,
+    "BlindspotAgent": BlindspotAgent,
+    "blindspot_agent": BlindspotAgent,
     "news_bot_agent": "core.agents.news_bot",
 
     # Placeholders for agents that might be missing or under development but referenced in config

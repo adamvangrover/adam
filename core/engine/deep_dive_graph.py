@@ -1,5 +1,8 @@
 import logging
 from typing import Dict, Any, List
+
+logger = logging.getLogger(__name__)
+
 try:
     from langgraph.graph import StateGraph, END, START
     from langgraph.checkpoint.memory import MemorySaver
@@ -24,8 +27,6 @@ from core.engine.strategy_utils import determine_ma_posture, synthesize_verdict
 from core.engine.entity_utils import assess_management, assess_competitive_position
 from core.engine.snc_utils import map_financials_to_rating, calculate_leverage
 from core.vertical_risk_agent.generative_risk import GenerativeRiskEngine
-
-logger = logging.getLogger(__name__)
 
 # --- Mock Data Fetcher ---
 

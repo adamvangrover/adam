@@ -44,6 +44,7 @@ class DataSources:
             return None
 
     def get_financial_news_headlines(self, source="bloomberg", keywords=None, sentiment=None):
+        headlines = []
         if source == "bloomberg":
             # ... (fetch and process news headlines from Bloomberg API)
             pass  # Placeholder for actual implementation

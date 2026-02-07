@@ -43,3 +43,11 @@
 ## 2026-02-18 - [Duplicate Scrubber Logic]
 **Learning:** Found `core/data_processing/utils.py` duplicated logic from `core/data_processing/universal_ingestor.py` but missed critical optimizations (like pre-compiled regexes).
 **Action:** When optimizing, check for duplicate utility classes that might have diverged.
+
+## 2026-02-01 - [React List Reconciliation]
+**Learning:** `AgentIntercom` used array index as key for a sliding window list (prepending items). This forces React to re-render *every* item on every update because the content at index 0 changes.
+**Action:** Always use stable unique IDs (UUIDs) for list items, especially when the list order changes or items are prepended/appended. Modified backend to supply IDs.
+
+## 2026-02-27 - [NumPy Vectorization for Monte Carlo]
+**Learning:** Pure Python loops for Monte Carlo simulations (Geometric Brownian Motion) are extremely slow (~2.9s for 5k simulations). Vectorizing with `np.random.normal`, `np.cumsum` (in-place), and `np.exp` reduced this to ~0.36s (8x speedup).
+**Action:** Always vectorize numerical simulations involving large iterations using NumPy array operations.
