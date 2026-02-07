@@ -1,7 +1,6 @@
 # core/world_simulation/autonomous_world_sim.py
 
 import random
-import numpy as np
 import matplotlib.pyplot as plt
 from mesa import Agent, Model
 from mesa.time import RandomActivation

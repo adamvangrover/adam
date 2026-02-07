@@ -1,6 +1,5 @@
 import logging
-import numpy as np
-from typing import Dict, List, Optional, Any
+from typing import Dict, Any
 from core.schemas.v23_5_schema import IntentCategory, RoutingResult
 
 logger = logging.getLogger(__name__)

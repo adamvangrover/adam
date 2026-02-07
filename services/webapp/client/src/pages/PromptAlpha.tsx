@@ -17,10 +17,9 @@ import { AlphaAlert } from '../components/promptAlpha/AlphaAlert';
 
 // Icons
 import { 
-  Search, RefreshCw, Cpu, Wifi, Activity, Database, Zap, Terminal, 
+  Search, Cpu, Activity, Database, Zap, Terminal,
   Layout, Network, Hexagon, BarChart2, ChevronLeft, ChevronRight, 
-  Filter, ArrowUp, ArrowDown, Grid, List, Play, Eye, Share2, 
-  Settings, Radio, Layers, Lock, ShieldCheck
+  ArrowUp, ArrowDown, Grid, List, Play, Eye, Radio
 } from 'lucide-react';
 
 const PromptAlpha: React.FC = () => {
@@ -33,7 +32,6 @@ const PromptAlpha: React.FC = () => {
   const selectPrompt = usePromptStore((state) => state.selectPrompt);
   const preferences = usePromptStore((state) => state.preferences);
   const updatePreferences = usePromptStore((state) => state.updatePreferences);
-  const feeds = usePromptStore((state) => state.feeds);
   const { alphaPoints, rank } = useUserStore();
 
   // 3. UI State

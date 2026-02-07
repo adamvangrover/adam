@@ -22,6 +22,7 @@ const Vault: React.FC = () => {
 
   return (
     <div style={{ padding: '20px' }}>
+      {/* eslint-disable-next-line react/jsx-no-comment-textnodes */}
       <h2 className="text-cyan mono-font" style={{ borderBottom: '1px solid var(--primary-color)', paddingBottom: '10px' }}>/// SECURE DATA VAULT</h2>
 
       {items.length === 0 && <div className="text-muted" style={{ marginTop: '20px' }}>Loading archives from Manifest...</div>}
