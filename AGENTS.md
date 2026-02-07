@@ -9,6 +9,7 @@ This document is the absolute source of truth for creating, modifying, and debug
 ## 🧭 Navigation
 
 *   [The Prime Directive: Bifurcation](#the-prime-directive-bifurcation)
+*   [Pheromones & Memory Hooks](#pheromones--memory-hooks-mandatory)
 *   [Architecture: System 1 vs. System 2](#architecture-system-1-vs-system-2)
 *   [Communication Protocols](#communication-protocols)
 *   [Debugging & Tracing](#debugging--tracing)
@@ -39,6 +40,22 @@ This repository supports two conflicting goals: **Reliability** and **Velocity**
     *   **Experimentation:** Feel free to monkey-patch or use bleeding-edge libraries.
 
 **CRITICAL RULE:** Do not import "Lab" code into "Product" modules. The Product must be stable.
+
+---
+
+## Pheromones & Memory Hooks (MANDATORY)
+
+**"Those who cannot remember the past are condemned to repeat it."**
+
+Before writing a single line of code, you **MUST** consult the **[Agent Knowledge Base](docs/AGENTS_KNOWLEDGE_BASE.md)**.
+
+This document aggregates critical lessons from Sentinel (Security), Bolt (Architecture), Palette (UX), and the Swarm (Async).
+
+### The Pre-Flight Checklist
+1.  **Security Check:** Are you handling user input? (Check `docs/AGENTS_KNOWLEDGE_BASE.md#security`)
+2.  **Graph Check:** Are you modifying the Knowledge Graph? (Check `docs/AGENTS_KNOWLEDGE_BASE.md#architecture`)
+3.  **Frontend Check:** Are you touching the UI? (Check `docs/AGENTS_KNOWLEDGE_BASE.md#ux`)
+4.  **Logging:** If you discover a new "trap", log it in `docs/AGENTS_KNOWLEDGE_BASE.md` immediately.
 
 ---
 

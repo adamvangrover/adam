@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, AlertTriangle, FileText, Activity, Server, Zap, Lock, ChevronRight, BarChart3, Network } from 'lucide-react';
+import { Shield, AlertTriangle, FileText, Activity, Zap, Lock, BarChart3, Network } from 'lucide-react';
 
 // Types matching the backend
 interface AuditLog {

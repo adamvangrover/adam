@@ -17,10 +17,9 @@ import { AlphaAlert } from '../components/promptAlpha/AlphaAlert';
 
 // Icons
 import { 
-  Search, RefreshCw, Cpu, Wifi, Activity, Database, Zap, Terminal, 
+  Search, Cpu, Activity, Database, Zap, Terminal,
   Layout, Network, Hexagon, BarChart2, ChevronLeft, ChevronRight, 
-  Filter, ArrowUp, ArrowDown, Grid, List, Play, Eye, Share2, 
-  Settings, Radio, Layers, Lock, ShieldCheck
+  ArrowUp, ArrowDown, Grid, List, Play, Eye
 } from 'lucide-react';
 
 const PromptAlpha: React.FC = () => {
@@ -33,7 +32,6 @@ const PromptAlpha: React.FC = () => {
   const selectPrompt = usePromptStore((state) => state.selectPrompt);
   const preferences = usePromptStore((state) => state.preferences);
   const updatePreferences = usePromptStore((state) => state.updatePreferences);
-  const feeds = usePromptStore((state) => state.feeds);
   const { alphaPoints, rank } = useUserStore();
 
   // 3. UI State
@@ -395,7 +393,7 @@ const PromptAlpha: React.FC = () => {
                  <>
                    <div className="p-3 border-b border-cyan-900/20 text-[10px] font-bold text-cyan-500 uppercase flex justify-between">
                      <span>Global Wire</span>
-                     <Radio size={12} className="animate-pulse" />
+                     <div className="animate-pulse w-3 h-3 bg-red-500 rounded-full" />
                    </div>
                    <div className="flex-1 overflow-hidden">
                       <NewsWire />
