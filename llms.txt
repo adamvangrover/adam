@@ -1,0 +1,109 @@
+# Adam: Project Context for LLMs
+
+## Project Summary
+> **Adam** is a Neuro-Symbolic Financial Sovereign (v26.0) designed to provide calculated conviction for high-stakes capital allocation by fusing a Neural Swarm (System 1) with a Neuro-Symbolic Graph (System 2).
+
+**Latest Version:** v26.0
+**License:** MIT
+**Documentation:** [Link to full docs]
+
+## Why use Adam?
+* **Problem:** Standard LLMs hallucinate and lack the rigor required for institutional financial due diligence.
+* **Solution:** Adam implements a "System 2" architecture using a Neuro-Symbolic Planner that "thinks before it speaks," drafting, critiquing, and refining analysis.
+* **Key Differentiator:** Bifurcation of "Fast" (Swarm) and "Slow" (Graph) cognitive paths, ensuring both real-time responsiveness and deep analytical depth.
+
+## Installation
+```bash
+# Clone the repository
+git clone https://github.com/adamvangrover/adam.git
+cd adam
+
+# Install dependencies using uv (recommended)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+uv sync
+
+# Activate environment
+source .venv/bin/activate
+```
+
+## Core Concepts & Terminology
+*   **MetaOrchestrator:** The central nervous system that routes queries to the appropriate cognitive engine.
+*   **System 1 (Swarm):** Async, fire-and-forget agents for perception and news monitoring (Fast).
+*   **System 2 (Graph):** Stateful, directed acyclic graphs for complex reasoning and planning (Slow).
+*   **MCP (Model Context Protocol):** Standard for tool integration.
+*   **Deep Dive:** A comprehensive 5-phase financial analysis workflow.
+
+## Usage Examples (Few-Shot Prompts)
+
+### Example 1: Basic Initialization & Query
+Initialize the Meta Orchestrator and run a simple market query.
+
+```python
+import asyncio
+from core.engine.meta_orchestrator import MetaOrchestrator
+
+async def main():
+    # Initialize the brain
+    orchestrator = MetaOrchestrator()
+
+    # Execute a simple query
+    # The orchestrator automatically routes this to the appropriate engine
+    result = await orchestrator.route_request("What is the current price of AAPL?")
+    print(result)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+### Example 2: Triggering a Deep Dive
+Perform a comprehensive analysis on a specific ticker. The "deep dive" keyword triggers the specific graph flow.
+
+```python
+import asyncio
+from core.engine.meta_orchestrator import MetaOrchestrator
+
+async def main():
+    orchestrator = MetaOrchestrator()
+
+    # "Deep dive" triggers the System 2 Neuro-Symbolic Graph
+    # Context can be used to inject specific parameters
+    context = {"force_reflection": True}
+    result = await orchestrator.route_request("Perform a deep dive analysis on TSLA", context=context)
+
+    print(result)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+### Example 3: Swarm Intelligence
+Use the async swarm to gather information in parallel.
+
+```python
+import asyncio
+from core.engine.meta_orchestrator import MetaOrchestrator
+
+async def main():
+    orchestrator = MetaOrchestrator()
+
+    # "Swarm" keyword activates the Hive Mind for parallel data gathering
+    result = await orchestrator.route_request("Swarm scan for breaking news on NVIDIA")
+    print(result)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+## API Reference (Condensed)
+
+### `core.engine.meta_orchestrator.MetaOrchestrator`
+*   `__init__(legacy_orchestrator=None)`: Initializes the orchestrator and sub-engines.
+*   `route_request(query: str, context: Optional[Dict] = None) -> Any`:
+    *   Analyzes query complexity.
+    *   Routes to engines: Swarm, Deep Dive, Red Team, Crisis, etc.
+    *   Returns the result (Dict or String).
+
+## Best Practices for LLMs
+*   **Async/Await:** Adam is fundamentally asynchronous. Always use `await` when calling `route_request`.
+*   **Context Injection:** Use the `context` dictionary to pass meta-parameters like `force_reflection` or `force_route`.
+*   **Keywords:** The `MetaOrchestrator` uses keyword heuristics (e.g., "deep dive", "swarm", "red team") to route queries. Include these in your query string for deterministic routing.
