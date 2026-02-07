@@ -3,231 +3,354 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v23.5 | system</title>
+    <title>Index of /core/system</title>
     <link rel="stylesheet" href="../../showcase/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Fallback styles if stylesheet is missing */
-        body { background-color: #050b14; color: #06b6d4; font-family: monospace; margin: 0; padding: 0; }
-        .header { border-bottom: 1px solid #06b6d4; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .breadcrumb { font-size: 1.2em; color: #e2e8f0; }
-        .badge { border: 1px solid #06b6d4; padding: 5px 10px; border-radius: 4px; font-size: 0.8em; text-transform: uppercase; }
-        .container { display: flex; height: calc(100vh - 80px); }
-        .sidebar { width: 300px; border-right: 1px solid #334155; padding: 20px; overflow-y: auto; background: rgba(5, 11, 20, 0.95); }
-        .main-stage { flex: 1; padding: 30px; overflow-y: auto; }
-        .file-item { padding: 8px; cursor: pointer; display: block; color: #94a3b8; text-decoration: none; }
-        .file-item:hover { color: #06b6d4; background: rgba(6, 182, 212, 0.1); }
-        .folder { color: #fbbf24; font-weight: bold; }
-        .footer { border-top: 1px solid #334155; padding: 10px; text-align: center; font-size: 0.8em; color: #64748b; background: #020617; }
-        .nav-links a { margin-left: 15px; color: #06b6d4; text-decoration: none; border: 1px solid #06b6d4; padding: 5px 10px; transition: all 0.2s; }
-        .nav-links a:hover { background: #06b6d4; color: #000; }
-        pre { background: #0f172a; padding: 15px; border-radius: 6px; overflow-x: auto; border: 1px solid #1e293b; }
-        h1, h2, h3 { color: #f8fafc; text-shadow: 0 0 10px rgba(6, 182, 212, 0.5); }
-        .card { background: rgba(30, 41, 59, 0.5); border: 1px solid #334155; padding: 20px; margin-bottom: 20px; border-radius: 8px; }
-        .glitch { position: relative; }
-        .module-doc { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #334155; }
-        .doc-text { color: #94a3b8; font-style: italic; }
+        .file-list { list-style: none; padding: 0; }
+        .file-item { padding: 8px 12px; border-bottom: 1px solid var(--panel-border); display: flex; align-items: center; justify-content: space-between; transition: background 0.2s; }
+        .file-item:hover { background: rgba(255, 255, 255, 0.05); }
+        .file-icon { margin-right: 10px; width: 20px; text-align: center; display: inline-block; }
+        .file-name { flex-grow: 1; font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-primary); }
+        .file-tag { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; margin-left: 10px; }
+        .tag-dir { background: rgba(6, 182, 212, 0.1); color: var(--primary-color); border: 1px solid var(--primary-color); }
+        .tag-html { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); border: 1px solid var(--warning-color); }
+        .tag-py { background: rgba(16, 185, 129, 0.1); color: var(--success-color); border: 1px solid var(--success-color); }
+        .readme-container { margin-top: 30px; padding: 20px; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--panel-border); border-radius: 4px; }
+        .readme-title { color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; border-bottom: 1px solid var(--panel-border); padding-bottom: 5px; }
+        .readme-body { font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted); white-space: pre-wrap; overflow-x: auto; line-height: 1.5; }
     </style>
-    <!-- Mermaid JS -->
-    <script type="module">
-        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
-    </script>
 </head>
 <body>
-    <div class="header">
+    <div class="scan-line"></div>
+
+    <header class="cyber-header" style="padding: 15px 20px; border-bottom: 1px solid var(--primary-color); background: rgba(5, 11, 20, 0.95); display: flex; justify-content: space-between; align-items: center;">
         <div>
-            <h1 style="margin:0; display:inline-block;" class="glitch">ADAM v23.5</h1>
-            <span class="breadcrumb" style="margin-left: 20px;">/core/system</span>
+            <h1 class="mono" style="margin: 0; font-size: 1.2rem; color: var(--primary-color);">ADAM REPO BROWSER</h1>
+            <div class="mono" style="font-size: 0.8rem; color: var(--text-muted);">PATH: <span style="color: var(--text-primary);">/core/system</span></div>
         </div>
-        <div class="nav-links">
-            <a href="../index.html">[UP LEVEL]</a>
-            <a href="../../index.html">[ROOT]</a>
-            <a href="#" onclick="window.toggleRuntime()">[LIVE RUNTIME]</a>
-            <a href="https://github.com/your-repo/adam" target="_blank">[GITHUB]</a>
+        <div style="text-align: right;">
+            <div class="cyber-badge badge-cyan">SYSTEM ONLINE</div>
         </div>
-        <span class="badge">SYSTEM ONLINE</span>
+    </header>
+
+    <div style="padding: 20px; max-width: 1200px; margin: 0 auto;">
+        <nav style="margin-bottom: 20px; display: flex; gap: 10px;">
+            <a href="../" class="cyber-btn">&uarr; UP LEVEL</a>
+            <a href="../../index.html" class="cyber-btn">ROOT</a>
+            <a href="../../showcase/index.html" class="cyber-btn" style="border-color: var(--accent-color); color: var(--accent-color);">MISSION CONTROL</a>
+        </nav>
+
+        <main class="glass-panel" style="padding: 0; overflow: hidden; border-radius: 4px;">
+            <div style="padding: 10px 15px; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--panel-border); color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">
+                Directory Contents
+            </div>
+            <ul class="file-list">
+
+                <li class="file-item">
+                    <a href="brokers/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">brokers/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="learning/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">learning/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="message_bus/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">message_bus/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="microservices/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">microservices/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="reasoning/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">reasoning/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="v22_async/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">v22_async/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="__init__.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">__init__.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="agent_improvement_pipeline.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">agent_improvement_pipeline.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="agent_orchestrator.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">agent_orchestrator.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="aof_guardrail.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">aof_guardrail.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="boot_protocol.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">boot_protocol.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="bootstrap.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">bootstrap.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="capabilities.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">capabilities.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="data_manager.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">data_manager.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="directory_manifest.jsonld" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">directory_manifest.jsonld</span>
+
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="echo.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">echo.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="error_handler.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">error_handler.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="hmm_protocol.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">hmm_protocol.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="hybrid_orchestrator.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">hybrid_orchestrator.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="interaction_loop.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">interaction_loop.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="kg_cache.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">kg_cache.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="knowledge_base.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">knowledge_base.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="memory_consolidator.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">memory_consolidator.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="memory_manager.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">memory_manager.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="message_broker.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">message_broker.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="monitoring.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">monitoring.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="nexus_zero_orchestrator.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">nexus_zero_orchestrator.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="plugin_manager.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">plugin_manager.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="provenance_logger.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">provenance_logger.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="pubsub_broker.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">pubsub_broker.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="red_teaming_framework.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">red_teaming_framework.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="repo_graph.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">repo_graph.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="resource_manager.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">resource_manager.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="system_boot_logger.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">system_boot_logger.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="system_controller.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">system_controller.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="task_scheduler.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">task_scheduler.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="temporal_engine.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">temporal_engine.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+            </ul>
+        </main>
+
+
     </div>
 
-    <div class="container">
-        <div class="sidebar">
-            <h3>Directory Structure</h3>
-            <a href="../index.html" class="file-item folder">📂 .. (Parent)</a>
-<a href="__init__.py" class="file-item">📄 __init__.py</a>
-<a href="agent_improvement_pipeline.py" class="file-item">📄 agent_improvement_pipeline.py</a>
-<a href="agent_orchestrator.py" class="file-item">📄 agent_orchestrator.py</a>
-<a href="brokers/index.html" class="file-item folder">📂 brokers</a>
-<a href="data_manager.py" class="file-item">📄 data_manager.py</a>
-<a href="echo.py" class="file-item">📄 echo.py</a>
-<a href="error_handler.py" class="file-item">📄 error_handler.py</a>
-<a href="hybrid_orchestrator.py" class="file-item">📄 hybrid_orchestrator.py</a>
-<a href="interaction_loop.py" class="file-item">📄 interaction_loop.py</a>
-<a href="kg_cache.py" class="file-item">📄 kg_cache.py</a>
-<a href="knowledge_base.py" class="file-item">📄 knowledge_base.py</a>
-<a href="learning/index.html" class="file-item folder">📂 learning</a>
-<a href="memory_consolidator.py" class="file-item">📄 memory_consolidator.py</a>
-<a href="memory_manager.py" class="file-item">📄 memory_manager.py</a>
-<a href="message_broker.py" class="file-item">📄 message_broker.py</a>
-<a href="monitoring.py" class="file-item">📄 monitoring.py</a>
-<a href="plugin_manager.py" class="file-item">📄 plugin_manager.py</a>
-<a href="reasoning/index.html" class="file-item folder">📂 reasoning</a>
-<a href="red_teaming_framework.py" class="file-item">📄 red_teaming_framework.py</a>
-<a href="repo_graph.py" class="file-item">📄 repo_graph.py</a>
-<a href="resource_manager.py" class="file-item">📄 resource_manager.py</a>
-<a href="system_controller.py" class="file-item">📄 system_controller.py</a>
-<a href="task_scheduler.py" class="file-item">📄 task_scheduler.py</a>
-<a href="v22_async/index.html" class="file-item folder">📂 v22_async</a>
-<a href="v23_graph_engine/index.html" class="file-item folder">📂 v23_graph_engine</a>
-        </div>
-        <div class="main-stage" id="main-content">
-            <div class="card">
-                <h2>Overview</h2>
-                <div id="readme-content">
-                    <p>No README.md found. See Module Documentation below.</p>
-                </div>
-            </div>
-
-            <div class="card"><h2>Class Structure</h2><pre class="mermaid">
-classDiagram
-    class AgentImprovementPipeline {
-        agent_improvement_pipeline.py
-    }
-    class AgentOrchestrator {
-        agent_orchestrator.py
-    }
-    class DataManager {
-        data_manager.py
-    }
-    class Echo {
-        echo.py
-    }
-    class AdamError {
-        error_handler.py
-    }
-    class DataNotFoundError {
-        error_handler.py
-    }
-    class AgentNotFoundError {
-        error_handler.py
-    }
-    class InvalidInputError {
-        error_handler.py
-    }
-    class ConfigurationError {
-        error_handler.py
-    }
-    class FileReadError {
-        error_handler.py
-    }
-    class WorkflowExecutionError {
-        error_handler.py
-    }
-    class AgentExecutionError {
-        error_handler.py
-    }
-    class LLMPluginError {
-        error_handler.py
-    }
-    class HybridOrchestrator {
-        hybrid_orchestrator.py
-    }
-    class InteractionLoop {
-        interaction_loop.py
-    }
-    class KGCache {
-        kg_cache.py
-    }
-    class KnowledgeBase {
-        knowledge_base.py
-    }
-    class MemoryConsolidator {
-        memory_consolidator.py
-    }
-    class MemoryManager {
-        memory_manager.py
-    }
-    class VectorMemoryManager {
-        memory_manager.py
-    }
-    class MessageBroker {
-        message_broker.py
-    }
-    class Monitoring {
-        monitoring.py
-    }
-    class PluginManager {
-        plugin_manager.py
-    }
-    class RedTeamingFramework {
-        red_teaming_framework.py
-    }
-    class RepoGraphBuilder {
-        repo_graph.py
-    }
-    class ResourceManager {
-        resource_manager.py
-    }
-    class TaskScheduler {
-        task_scheduler.py
-    }
-</pre></div>
-
-            <div class="card"><h2>Module Documentation</h2><div class="module-doc"><h3>agent_improvement_pipeline.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>agent_orchestrator.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>data_manager.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>echo.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>error_handler.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>hybrid_orchestrator.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>interaction_loop.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>kg_cache.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>knowledge_base.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>memory_consolidator.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>memory_manager.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>message_broker.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>monitoring.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>plugin_manager.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>red_teaming_framework.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>repo_graph.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>resource_manager.py</h3><p class="doc-text">No description available.</p></div><div class="module-doc"><h3>task_scheduler.py</h3><p class="doc-text">No description available.</p></div></div>
-
-            <div id="runtime-panel" style="display:none; border-top: 1px solid #06b6d4; margin-top: 20px; padding-top: 20px;">
-                <h3>Runtime Diagnostics</h3>
-                <pre>Mock Mode: ACTIVE
-Agent Swarm: STANDBY</pre>
-            </div>
-        </div>
-    </div>
-
-    <div class="footer">
+    <footer style="margin-top: 50px; text-align: center; color: var(--text-muted); font-size: 0.8rem; padding-bottom: 20px;">
         ADAM AUTO-GENERATED SHOWCASE | REF: system
-    </div>
-
-    <script>
-    // AUTO-GENERATED: Showcase Runtime
-    (function() {
-        const CONFIG = {
-            mockMode: true,
-            rootPath: "../../index.html",
-            currentDir: "system"
-        };
-
-        // 1. Navigation Handler
-        function initNav() {
-            console.log("Nav initialized for " + CONFIG.currentDir);
-        }
-
-        // 2. Data Loader (Graceful Fallback)
-        async function loadData() {
-            try {
-                // Attempt to load local descriptor
-                const response = await fetch('./AGENTS.md');
-                if(response.ok) {
-                    const text = await response.text();
-                    // Simple text render for now, simulated markdown
-                    document.getElementById('readme-content').innerHTML = '<pre>' + text + '</pre>';
-                }
-            } catch (e) {
-                console.warn("No local documentation found.");
-            }
-        }
-
-        // 3. Runtime Toggle
-        window.toggleRuntime = function() {
-            const panel = document.getElementById('runtime-panel');
-            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-        };
-
-        document.addEventListener('DOMContentLoaded', () => {
-            initNav();
-            // loadData(); // Disabled to prefer generated content
-        });
-    })();
-    </script>
-
-    <!-- Adam Global Nav -->
-    <script src="../../showcase/js/nav.js" data-root="../.."></script>
+    </footer>
 </body>
 </html>

@@ -49,8 +49,15 @@ const Sidebar: React.FC = () => {
 
       <div className="mt-auto p-6 border-t border-cyber-cyan/10">
         <div className="bg-cyber-slate/30 rounded p-3 border border-cyber-cyan/10">
-          <div className="text-[10px] text-cyber-text/50 mb-1">SYSTEM RESOURCE</div>
-          <div className="h-1 w-full bg-cyber-black rounded-full overflow-hidden mb-1">
+          <div className="text-[10px] text-cyber-text/50 mb-1" id="resource-usage-label">SYSTEM RESOURCE</div>
+          <div
+            className="h-1 w-full bg-cyber-black rounded-full overflow-hidden mb-1"
+            role="progressbar"
+            aria-valuenow={65}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-labelledby="resource-usage-label"
+          >
             <div className="h-full bg-cyber-cyan w-[65%] shadow-[0_0_5px_rgba(6,182,212,0.5)]"></div>
           </div>
           <div className="flex justify-between text-[10px] text-cyber-cyan">

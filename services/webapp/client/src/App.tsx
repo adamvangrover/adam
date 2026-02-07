@@ -19,17 +19,25 @@ const MarketData = lazy(() => import('./pages/MarketData'));
 const AnalysisTools = lazy(() => import('./pages/AnalysisTools'));
 const PortfolioManagement = lazy(() => import('./pages/PortfolioManagement'));
 const SimulationTools = lazy(() => import('./pages/SimulationTools'));
+const Synthesizer = lazy(() => import('./pages/Synthesizer'));
+const PromptAlpha = lazy(() => import('./pages/PromptAlpha'));
+const CreditSentinel = lazy(() => import('./pages/CreditSentinel'));
+const MarketMayhem = lazy(() => import('./pages/MarketMayhem'));
 
 const App: React.FC = () => {
   return (
       <Routes>
+        <Route path="/prompt-alpha" element={<Suspense fallback={<Loading />}><PromptAlpha /></Suspense>} />
+        <Route path="/credit-sentinel" element={<Suspense fallback={<Loading />}><CreditSentinel /></Suspense>} />
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
+          <Route path="synthesizer" element={<Suspense fallback={<Loading />}><Synthesizer /></Suspense>} />
           <Route path="terminal" element={
             <Suspense fallback={<Loading />}>
               <div style={{height: '80vh'}}><Terminal /></div>
             </Suspense>
           } />
+          <Route path="prompt-alpha" element={<Suspense fallback={<Loading />}><PromptAlpha /></Suspense>} />
           <Route path="market-data" element={<Suspense fallback={<Loading />}><MarketData /></Suspense>} />
           <Route path="analysis-tools" element={<Suspense fallback={<Loading />}><AnalysisTools /></Suspense>} />
           <Route path="knowledge-graph" element={<Suspense fallback={<Loading />}><KnowledgeGraph /></Suspense>} />
@@ -39,6 +47,7 @@ const App: React.FC = () => {
           <Route path="deep-dive/:id" element={<Suspense fallback={<Loading />}><DeepDive /></Suspense>} />
           <Route path="portfolio-management" element={<Suspense fallback={<Loading />}><PortfolioManagement /></Suspense>} />
           <Route path="simulation-tools" element={<Suspense fallback={<Loading />}><SimulationTools /></Suspense>} />
+          <Route path="market-mayhem" element={<Suspense fallback={<Loading />}><MarketMayhem /></Suspense>} />
         </Route>
       </Routes>
   );

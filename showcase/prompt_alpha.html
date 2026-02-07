@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROMPT ALPHA | High-Frequency Prompt Trading</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* --- Custom Styles for Prompt Alpha --- */
+        body { 
+            background-color: #050b14; 
+            font-family: 'Inter', sans-serif; 
+            overflow: hidden; 
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .tech-font { font-family: 'Share Tech Mono', monospace; }
+
+        /* Ticker Tape */
+        .ticker-wrap {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 30px;
+            background-color: #0f172a;
+            border-top: 1px solid #1e293b;
+            overflow: hidden;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+        }
+        .ticker {
+            display: inline-block;
+            white-space: nowrap;
+            padding-right: 100%;
+            animation: ticker 30s linear infinite;
+        }
+        .ticker-item {
+            display: inline-block;
+            padding: 0 2rem;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .ticker-item .symbol { color: #38bdf8; font-weight: bold; }
+        .ticker-item .up { color: #10b981; }
+        .ticker-item .down { color: #ef4444; }
+
+        @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+
+        /* Dot Matrix / Dot Printer Effect */
+        .dot-matrix {
+            background-image: radial-gradient(#334155 1px, transparent 1px);
+            background-size: 4px 4px;
+            font-family: 'Share Tech Mono', monospace;
+            color: #cbd5e1;
+            text-shadow: 0 0 2px rgba(203, 213, 225, 0.5);
+        }
+        .paper-tear {
+            position: relative;
+            border-bottom: 2px dashed #334155;
+        }
+        .paper-tear::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.5));
+            z-index: 10;
+        }
+
+        /* Scanline Overlay */
+        .crt-scanline {
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0,0,0,0.2) 50%,
+                rgba(0,0,0,0.2)
+            );
+            background-size: 100% 4px;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 10;
+            opacity: 0.3;
+        }
+
+        /* Scrollbar override for lists */
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; }
+
+        /* Alpha Score Badge */
+        .alpha-badge {
+            clip-path: polygon(10% 0, 100% 0, 100% 100%, 0% 100%);
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col text-slate-200 selection:bg-cyan-900 selection:text-white">
+
+    <!-- Header -->
+    <header class="h-14 border-b border-slate-800 bg-[#0f172a]/95 backdrop-blur flex items-center justify-between px-4 z-40 shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-gradient-to-br from-cyan-500 to-blue-600 rounded flex items-center justify-center text-white font-bold text-lg shadow-[0_0_15px_rgba(6,182,212,0.5)]">
+                α
+            </div>
+            <div>
+                <h1 class="text-lg font-bold tracking-tighter tech-font text-white leading-none">PROMPT ALPHA</h1>
+                <div class="text-[10px] text-cyan-500 font-mono tracking-widest">HIGH-FREQUENCY INTELLIGENCE</div>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-6">
+            <div class="hidden md:flex items-center gap-4 text-xs font-mono text-slate-400">
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <span>MARKET OPEN</span>
+                </div>
+                <div>Vol: <span class="text-white">2.4M</span></div>
+                <div>Gas: <span class="text-white">12 gwei</span></div>
+            </div>
+            <a href="index.html" class="text-xs font-mono text-slate-500 hover:text-white transition border border-slate-700 px-3 py-1 rounded hover:border-slate-500">
+                EXIT TERMINAL
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 flex overflow-hidden pb-[30px] relative">
+        <div class="crt-scanline"></div>
+
+        <!-- Left Column: Market Movers (The Feed) -->
+        <div class="w-80 border-r border-slate-800 flex flex-col bg-[#0b1221]">
+            <div class="p-3 border-b border-slate-800 bg-[#0f172a]/50 flex justify-between items-center">
+                <span class="text-xs font-bold text-slate-400 font-mono">MARKET MOVERS</span>
+                <div class="flex gap-2 text-[10px]">
+                    <button class="px-2 py-0.5 bg-cyan-900/30 text-cyan-400 border border-cyan-800 rounded active">ALL</button>
+                    <button class="px-2 py-0.5 text-slate-500 hover:text-white">HOT</button>
+                    <button class="px-2 py-0.5 text-slate-500 hover:text-white">NEW</button>
+                </div>
+            </div>
+            
+            <!-- List Container -->
+            <div id="market-movers-list" class="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1">
+                <!-- Javascript will populate this -->
+                <div class="p-4 text-center text-slate-500 text-xs font-mono animate-pulse">
+                    Initializing Feed...<br>Connecting to Reddit Node...
+                </div>
+            </div>
+        </div>
+
+        <!-- Center Column: Trading Desk (Detail View) -->
+        <div class="flex-1 flex flex-col bg-[#050b14] relative">
+            
+            <!-- Prompt Display Area -->
+            <div class="flex-1 p-6 overflow-y-auto custom-scrollbar">
+                <div id="trading-desk-empty" class="h-full flex flex-col items-center justify-center text-slate-600">
+                    <i class="fas fa-chart-line text-4xl mb-4 opacity-50"></i>
+                    <p class="font-mono text-sm">Select a prompt to analyze alpha.</p>
+                </div>
+
+                <div id="trading-desk-content" class="hidden max-w-3xl mx-auto">
+                    <!-- Title & Meta -->
+                    <div class="mb-6 flex justify-between items-start">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-[10px] font-mono border border-slate-700 text-slate-400 px-1.5 rounded">REDDIT</span>
+                                <span class="text-[10px] font-mono bg-slate-800 text-slate-300 px-1.5 rounded" id="detail-author">u/user</span>
+                            </div>
+                            <h2 class="text-2xl font-bold text-white mb-2 leading-tight" id="detail-title">Prompt Title Here</h2>
+                            <div class="flex items-center gap-4 text-xs text-slate-400 font-mono">
+                                <span><i class="fas fa-arrow-up text-emerald-500"></i> <span id="detail-upvotes">1.2k</span></span>
+                                <span><i class="far fa-clock"></i> <span id="detail-time">2h ago</span></span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[10px] text-slate-500 font-mono uppercase mb-1">Alpha Score</div>
+                            <div class="text-4xl font-bold text-cyan-400 tech-font" id="detail-score">94.2</div>
+                        </div>
+                    </div>
+
+                    <!-- The Prompt Code Block -->
+                    <div class="bg-[#0d1117] border border-slate-700 rounded-lg p-1 relative group mb-6 shadow-2xl shadow-black/50">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-t-lg opacity-50"></div>
+                        <div class="p-4 font-mono text-sm text-slate-300 whitespace-pre-wrap leading-relaxed selection:bg-cyan-900 selection:text-white" id="detail-body">
+                            [Prompt content will appear here...]
+                        </div>
+                    </div>
+
+                    <!-- Analysis Grid -->
+                    <div class="grid grid-cols-2 gap-4 mb-8">
+                        <div class="bg-slate-900/50 border border-slate-800 p-3 rounded">
+                            <div class="text-[10px] text-slate-500 font-mono uppercase mb-2">Complexity Factors</div>
+                            <div class="flex flex-wrap gap-2" id="detail-tags">
+                                <!-- Tags injected via JS -->
+                            </div>
+                        </div>
+                        <div class="bg-slate-900/50 border border-slate-800 p-3 rounded flex items-center justify-between">
+                            <div>
+                                <div class="text-[10px] text-slate-500 font-mono uppercase">Est. Token Cost</div>
+                                <div class="text-lg font-mono text-white" id="detail-tokens">~450</div>
+                            </div>
+                            <i class="fas fa-coins text-slate-700 text-2xl"></i>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Action Bar (Sticky Bottom) -->
+            <div class="h-16 border-t border-slate-800 bg-[#0f172a] flex items-center justify-between px-6 shrink-0" id="action-bar">
+                <div class="flex gap-4">
+                    <button onclick="PromptAlpha.buy()" class="cyber-btn bg-emerald-500/10 border-emerald-500 text-emerald-400 hover:bg-emerald-500 hover:text-black flex items-center gap-2 px-6">
+                        <i class="fas fa-shopping-cart"></i> BUY (COPY)
+                    </button>
+                    <button onclick="PromptAlpha.test()" class="cyber-btn bg-cyan-500/10 border-cyan-500 text-cyan-400 hover:bg-cyan-500 hover:text-black flex items-center gap-2">
+                        <i class="fas fa-play"></i> TEST
+                    </button>
+                </div>
+                <div class="flex gap-4">
+                     <button onclick="PromptAlpha.short()" class="text-xs font-mono text-red-400 hover:text-red-300 flex items-center gap-2 px-4 py-2 border border-transparent hover:border-red-900 rounded transition">
+                        <i class="fas fa-arrow-down"></i> SHORT (HIDE)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Morning Briefing / Portfolio -->
+        <div class="w-80 border-l border-slate-800 bg-[#0f172a] flex flex-col">
+            
+            <!-- Tabs -->
+            <div class="flex border-b border-slate-800">
+                <button id="tab-briefing" class="flex-1 py-3 text-xs font-bold font-mono text-cyan-400 border-b-2 border-cyan-500 bg-slate-800/50 transition" onclick="PromptAlpha.switchTab('briefing')">BRIEFING</button>
+                <button id="tab-portfolio" class="flex-1 py-3 text-xs font-bold font-mono text-slate-500 hover:text-slate-300 border-b-2 border-transparent transition" onclick="PromptAlpha.switchTab('portfolio')">PORTFOLIO</button>
+            </div>
+
+            <!-- Right Panel Content -->
+            <div id="right-panel-content" class="flex-1 overflow-y-auto custom-scrollbar relative shadow-inner">
+                <!-- Content injected via JS -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer Ticker -->
+    <div class="ticker-wrap">
+        <div class="ticker" id="ticker-content">
+            <!-- Populated by JS -->
+            <span class="ticker-item">CONNECTING TO FEED...</span>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Test Modal -->
+    <div id="test-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center">
+        <div class="bg-slate-900 border border-slate-700 w-[600px] rounded-lg shadow-2xl p-6 relative">
+             <button onclick="document.getElementById('test-modal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-500 hover:text-white"><i class="fas fa-times"></i></button>
+             <h3 class="text-lg font-bold text-white mb-4 mono"><i class="fas fa-vial text-cyan-400 mr-2"></i> TEST ENVIRONMENT</h3>
+             <div class="mb-4">
+                 <label class="block text-xs font-mono text-slate-500 mb-1">SYSTEM PROMPT (THE ALPHA)</label>
+                 <textarea id="test-prompt-input" class="w-full bg-slate-800 border border-slate-700 rounded p-3 text-xs text-slate-300 font-mono h-32 focus:outline-none focus:border-cyan-500"></textarea>
+             </div>
+             <div class="mb-4">
+                 <label class="block text-xs font-mono text-slate-500 mb-1">USER INPUT (TEST CASE)</label>
+                 <textarea class="w-full bg-slate-800 border border-slate-700 rounded p-3 text-xs text-slate-300 font-mono h-16 focus:outline-none focus:border-cyan-500" placeholder="Enter input for the prompt..."></textarea>
+             </div>
+             <div class="flex justify-end gap-3">
+                 <button onclick="window.open('https://chatgpt.com', '_blank')" class="px-4 py-2 bg-slate-800 text-slate-300 text-xs font-mono rounded hover:bg-slate-700">OPEN IN CHATGPT</button>
+                 <button class="px-4 py-2 bg-cyan-600 text-white text-xs font-mono rounded hover:bg-cyan-500">RUN SIMULATION</button>
+             </div>
+        </div>
+    </div>
+
+    <script src="js/prompt_alpha.js"></script>
+</body>
+</html>

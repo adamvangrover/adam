@@ -1,13 +1,16 @@
-from core.utils.logging_utils import setup_logging
 import os
 import sys
 import logging
 import asyncio
+import json
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 
 # Ensure root is in path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+
+from core.utils.logging_utils import setup_logging
+from core.prompting.scanner import PromptScanner
 
 
 # Safe Import for Orchestrators
@@ -19,7 +22,14 @@ except ImportError as e:
     MetaOrchestrator = None
     AgentOrchestrator = None
 
-app = Flask(__name__)
+# Configuration
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# SHOWCASE_DIR = os.path.join(BASE_DIR, 'showcase')
+SHOWCASE_DIR = os.path.join(BASE_DIR, 'services/webapp/client/build')
+STATIC_DIR = os.path.join(SHOWCASE_DIR, 'static')
+
+# Initialize Flask with explicit static folder to avoid default behavior
+app = Flask(__name__, static_folder=STATIC_DIR, static_url_path='/static')
 
 # Security: Configure CORS
 # Default to localhost for development. In production, set ALLOWED_ORIGINS env var.
@@ -33,12 +43,9 @@ allowed_origins = [origin.strip() for origin in allowed_origins_str.split(",")]
 
 CORS(app, resources={r"/*": {"origins": allowed_origins}})
 
-# Configuration
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-SHOWCASE_DIR = os.path.join(BASE_DIR, 'showcase')
-
 # Global State
 meta_orchestrator = None
+simulation_engine = None
 # LOG_BUFFER removed to prevent sensitive data exposure
 # LOG_BUFFER = deque(maxlen=50)
 
@@ -74,6 +81,15 @@ def init_orchestrator():
     except Exception as e:
         logger.fatal(f"Failed to initialize MetaOrchestrator: {e}")
 
+    # Initialize Crisis Adjudicator Engine
+    global simulation_engine
+    try:
+        from core.engine.adjudicator_engine import AdjudicatorEngine
+        simulation_engine = AdjudicatorEngine()
+        logger.info("AdjudicatorEngine Initialized Successfully.")
+    except Exception as e:
+        logger.error(f"Failed to initialize AdjudicatorEngine: {e}")
+
 
 @app.route('/')
 def serve_index():
@@ -82,7 +98,28 @@ def serve_index():
 
 @app.route('/<path:path>')
 def serve_static(path):
-    return send_from_directory(SHOWCASE_DIR, path)
+    # Fallback catch-all for SPA client-side routing
+    # Check if file exists in root (e.g. manifest.json, favicon.ico)
+    if os.path.exists(os.path.join(SHOWCASE_DIR, path)):
+        return send_from_directory(SHOWCASE_DIR, path)
+    return send_from_directory(SHOWCASE_DIR, 'index.html')
+
+
+@app.route('/api/prompts', methods=['GET'])
+def get_prompts():
+    """
+    Returns the list of prompts with ROI scores.
+    Optional query param: ?context=keyword1,keyword2
+    """
+    try:
+        context_str = request.args.get('context', '')
+        context = [k.strip() for k in context_str.split(',')] if context_str else None
+
+        prompts = PromptScanner.scan(context=context)
+        return jsonify(prompts)
+    except Exception as e:
+        logging.error(f"Error scanning prompts: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route('/api/state', methods=['GET'])
@@ -128,11 +165,68 @@ async def chat():
         logging.error(f"Error processing query: {e}", exc_info=True)
         return jsonify({"error": str(e)}), 500
 
+
+@app.route('/api/simulation/start', methods=['POST'])
+def start_simulation():
+    if not simulation_engine:
+        return jsonify({"error": "Simulation Engine not available"}), 503
+    simulation_engine.reset()
+    return jsonify({"status": "Simulation Started", "state": simulation_engine.get_state()})
+
+
+@app.route('/api/simulation/state', methods=['GET'])
+def get_simulation_state():
+    if not simulation_engine:
+         return jsonify({"error": "Simulation Engine not available"}), 503
+    return jsonify(simulation_engine.get_state())
+
+
+@app.route('/api/simulation/action', methods=['POST'])
+def submit_action():
+    if not simulation_engine:
+         return jsonify({"error": "Simulation Engine not available"}), 503
+
+    data = request.json
+    inject_id = data.get('inject_id')
+    option_id = data.get('option_id')
+
+    if not inject_id or not option_id:
+        return jsonify({"error": "Missing inject_id or option_id"}), 400
+
+    simulation_engine.resolve_action(inject_id, option_id)
+    return jsonify({"status": "Action Resolved", "state": simulation_engine.get_state()})
+
+
+@app.route('/api/traces', methods=['GET'])
+def get_traces():
+    """
+    Returns the execution traces for the audit dashboard.
+    Reads from the local JSONL file.
+    """
+    trace_file = "demo_trace.jsonl" # In production, this would be configurable or a DB query
+    traces = []
+
+    if os.path.exists(trace_file):
+        try:
+            with open(trace_file, 'r') as f:
+                for line in f:
+                    if line.strip():
+                        traces.append(json.loads(line))
+            # Return most recent traces first
+            traces.reverse()
+        except Exception as e:
+            logging.error(f"Error reading trace file: {e}")
+            return jsonify({"error": "Failed to read traces"}), 500
+
+    return jsonify({"traces": traces})
+
+
 if __name__ == '__main__':
     setup_logging()
     setup_log_capture()
     init_orchestrator()
     print(f"Serving Adam v23.5 from {SHOWCASE_DIR}")
+    print(f"Static Dir: {STATIC_DIR}")
     host = os.environ.get('HOST', '127.0.0.1')
     port = int(os.environ.get('PORT', 5000))
     print(f"Access the Live Interface at http://{host}:{port}")

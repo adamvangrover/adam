@@ -1,7 +1,9 @@
 import logging
 import random
 import math
+import time
 from typing import Dict, List, Any, Tuple
+import numpy as np
 
 class QuantumMonteCarloBridge:
     """
@@ -28,6 +30,9 @@ class QuantumMonteCarloBridge:
         Runs the simulation and returns probability distribution.
         """
         logging.info(f"Running Job {job_id} with {shots} shots...")
+
+        # Simulate QPU latency
+        time.sleep(0.1)
 
         # Simulate Quantum Amplitude Estimation result
         # Return a distribution of potential losses
@@ -59,4 +64,23 @@ class QuantumMonteCarloBridge:
                 "distribution_shape": "Fat-Tailed (Quantum Amplitude Estimation)",
                 "confidence_interval": [simulated_loss_distribution[int(shots*0.05)], var_95]
             }
+        }
+
+    def optimize_portfolio(self, assets: list, returns: np.ndarray, covariance: np.ndarray):
+        """
+        Simulates QAOA (Quantum Approximate Optimization Algorithm) for portfolio optimization.
+        """
+        logging.info("Running QAOA for Portfolio Optimization...")
+
+        # Mock result: purely random weights that sum to 1
+        n = len(assets)
+        weights = np.random.random(n)
+        weights /= weights.sum()
+
+        allocation = {asset: w for asset, w in zip(assets, weights)}
+
+        return {
+            "method": "QAOA",
+            "allocation": allocation,
+            "energy": -0.5 # Mock hamiltonian energy
         }

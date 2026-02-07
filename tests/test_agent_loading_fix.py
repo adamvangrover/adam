@@ -1,104 +1,84 @@
 
-from core.system.agent_orchestrator import AgentOrchestrator
 import unittest
 from unittest.mock import MagicMock, patch
 import sys
 import os
 import logging
+import importlib
 
 # Ensure the project root is in the python path
 sys.path.append(os.getcwd())
 
-# Mock missing dependencies and side-effects
-sys.modules['textblob'] = MagicMock()
-sys.modules['core.data_sources.financial_news_api'] = MagicMock()
-
-# Mock all agent modules
-agent_modules = [
-    'market_sentiment_agent', 'macroeconomic_analysis_agent', 'geopolitical_risk_agent',
-    'industry_specialist_agent', 'fundamental_analyst_agent', 'technical_analyst_agent',
-    'risk_assessment_agent', 'newsletter_layout_specialist_agent', 'data_verification_agent',
-    'lexica_agent', 'archive_manager_agent', 'agent_forge', 'prompt_tuner', 'code_alchemist',
-    'lingua_maestro', 'sense_weaver', 'snc_analyst_agent', 'behavioral_economics_agent',
-    'meta_cognitive_agent', 'NewsBot'
-]
-
-for agent in agent_modules:
-    mock_module = MagicMock()
-    # Ensure the module has the agent class as an attribute
-    # e.g. MarketSentimentAgent inside market_sentiment_agent module
-
-    # We need to correctly map module name to class name based on AGENT_CLASSES or conventions
-    # For now, let's assume class name = capitalized(agent_name) or just "MarketSentimentAgent" for market_sentiment_agent
-
-    # Actually, AGENT_CLASSES maps "MarketSentimentAgent" -> "core.agents.market_sentiment_agent"
-    # So the agent name "MarketSentimentAgent" is what we look for in the module.
-
-    # Construct a Mock Class
-    MockAgentClass = MagicMock()
-    # make instance of it not fail
-    MockAgentClass.return_value = MagicMock()
-
-    # We need to set this class on the mocked module
-    # But which name?
-    # For 'market_sentiment_agent', the class is 'MarketSentimentAgent'
-    # We can infer it from the list iteration or just hardcode for the one we test.
-
-    sys.modules[f'core.agents.{agent}'] = mock_module
-
-# Specifically set up MarketSentimentAgent for the test
-mock_ms_module = sys.modules['core.agents.market_sentiment_agent']
-mock_ms_class = MagicMock()
-setattr(mock_ms_module, 'MarketSentimentAgent', mock_ms_class)
-
-sys.modules['financial_digital_twin.nexus_agent'] = MagicMock()
-
-
 class TestAgentLoadingBug(unittest.TestCase):
-    @patch('core.system.agent_orchestrator.RabbitMQClient')
+    def setUp(self):
+        # Create a dictionary of mocks to patch into sys.modules
+        self.modules_to_patch = {}
+
+        # Mock missing dependencies
+        self.modules_to_patch['textblob'] = MagicMock()
+        self.modules_to_patch['core.data_sources.financial_news_api'] = MagicMock()
+        self.modules_to_patch['financial_digital_twin.nexus_agent'] = MagicMock()
+
+        # Mock all agent modules
+        agent_modules = [
+            'market_sentiment_agent', 'macroeconomic_analysis_agent', 'geopolitical_risk_agent',
+            'industry_specialist_agent', 'fundamental_analyst_agent', 'technical_analyst_agent',
+            'risk_assessment_agent', 'newsletter_layout_specialist_agent', 'data_verification_agent',
+            'lexica_agent', 'archive_manager_agent', 'agent_forge', 'prompt_tuner', 'code_alchemist',
+            'lingua_maestro', 'sense_weaver', 'snc_analyst_agent', 'behavioral_economics_agent',
+            'meta_cognitive_agent', 'NewsBot'
+        ]
+
+        for agent in agent_modules:
+            mock_module = MagicMock()
+            MockAgentClass = MagicMock()
+            MockAgentClass.return_value = MagicMock()
+            self.modules_to_patch[f'core.agents.{agent}'] = mock_module
+
+        # Specifically set up MarketSentimentAgent
+        mock_ms_module = MagicMock()
+        mock_ms_class = MagicMock()
+        setattr(mock_ms_module, 'MarketSentimentAgent', mock_ms_class)
+        self.modules_to_patch['core.agents.market_sentiment_agent'] = mock_ms_module
+
+    @patch('core.system.agent_orchestrator.MessageBroker')
     @patch('core.system.agent_orchestrator.load_config')
     @patch('core.system.agent_orchestrator.get_api_key')
-    @patch('core.system.agent_orchestrator.LLMPlugin')  # Mock LLMPlugin
-    def test_agent_loading_success(self, mock_llm_plugin, mock_get_api_key, mock_load_config, mock_rabbitmq):
-        # Setup mocks
-        mock_load_config.return_value = {}  # Empty config initially
-        mock_get_api_key.return_value = "fake_key"
+    @patch('core.system.agent_orchestrator.LLMPlugin')
+    def test_agent_loading_success(self, mock_llm_plugin, mock_get_api_key, mock_load_config, mock_message_broker):
+        # Apply patches to sys.modules
+        with patch.dict(sys.modules, self.modules_to_patch):
+            # Import AgentOrchestrator INSIDE the test to ensure it uses the patched modules
+            # We might need to reload it if it was already imported
+            import core.system.agent_orchestrator
+            importlib.reload(core.system.agent_orchestrator)
+            from core.system.agent_orchestrator import AgentOrchestrator
 
-        orchestrator = AgentOrchestrator()
+            # Setup mocks
+            mock_load_config.return_value = {}  # Empty config initially
+            mock_get_api_key.return_value = "fake_key"
 
-        # Inject a config that should trigger loading of MarketSentimentAgent
-        orchestrator.config = {
-            "agents": [
-                {
-                    "name": "MarketSentimentAgent",
-                    "description": "Analyzes market sentiment."
-                }
-            ]
-        }
+            # Mock MessageBroker.get_instance()
+            mock_broker_instance = MagicMock()
+            mock_message_broker.get_instance.return_value = mock_broker_instance
 
-        # Call load_agents
-        orchestrator.load_agents()
+            orchestrator = AgentOrchestrator()
 
-        # Verify that the agent was loaded successfully
-        self.assertIn("MarketSentimentAgent", orchestrator.agents)
+            # Inject a config that should trigger loading of MarketSentimentAgent
+            orchestrator.config = {
+                "agents": [
+                    {
+                        "name": "MarketSentimentAgent",
+                        "description": "Analyzes market sentiment."
+                    }
+                ]
+            }
 
-        # Verify that the class was instantiated
-        # We need to check if the mocked class was called
-        # Since we patched imports after AgentOrchestrator import, relying on sys.modules might be tricky
-        # because AgentOrchestrator might have already imported the real modules if they existed.
-        # But we mocked them before AgentOrchestrator import (except textblob etc).
-        # Actually, AgentOrchestrator imports happen at top level.
-        # So sys.modules need to be set BEFORE `from core.system.agent_orchestrator import ...`
+            # Call load_agents
+            orchestrator.load_agents()
 
-        # In this script, we did set sys.modules before import.
-
-        # Since AgentOrchestrator imports MarketSentimentAgent at top level:
-        # from core.agents.market_sentiment_agent import MarketSentimentAgent
-        # It should pick up our mock if sys.modules was set.
-
-        # However, the fix uses `globals()[agent_name]` first.
-        # If AgentOrchestrator imported it, it's in its globals.
-        # If the import succeeded (using our mock), then it should work.
+            # Verify that the agent was loaded successfully
+            self.assertIn("MarketSentimentAgent", orchestrator.agents)
 
 
 if __name__ == '__main__':

@@ -60,12 +60,24 @@ class GoldStandardScrubber:
         'formatting_bonus': 0.15
     }
 
+    # Bolt Optimization: Move keywords to class constant
+    HIGH_IMPACT_KEYWORDS = (
+        "confidential", "proprietary", "strategy", "roadmap",
+        "quarterly report", "financial statement", "10-k", "10-q",
+        "risk assessment", "audit", "compliance"
+    )
+
     @staticmethod
     def compute_file_hash(content: Union[str, bytes]) -> str:
         """Generates SHA256 hash for change detection."""
         if isinstance(content, str):
             content = content.encode('utf-8')
         return hashlib.sha256(content).hexdigest()
+
+    # Pre-compiled regex for performance
+    RE_MULTIPLE_NEWLINES = re.compile(r'\n{3,}')
+    RE_HASHTAGS = re.compile(r'#\w+')
+    RE_POTENTIAL_ENTITIES = re.compile(r'\b[A-Z][a-z]{3,}\b')
 
     @staticmethod
     def clean_text(text: str) -> str:
@@ -74,7 +86,21 @@ class GoldStandardScrubber:
         # Normalize line endings and strip nulls
         text = text.replace('\r\n', '\n').replace('\r', '\n').replace('\x00', '')
         # Remove excessive whitespace while preserving paragraph structure
-        return re.sub(r'\n{3,}', '\n\n', text).strip()
+        return GoldStandardScrubber.RE_MULTIPLE_NEWLINES.sub('\n\n', text).strip()
+
+    @staticmethod
+    def is_high_impact(content: str, artifact_type: str) -> bool:
+        """Determines if the content is 'high impact' and warrants a deeper scan."""
+        # Check first 2KB for keywords
+        head = content[:2048].lower()
+
+        if any(kw in head for kw in GoldStandardScrubber.HIGH_IMPACT_KEYWORDS):
+            return True
+
+        if artifact_type in ["report", "newsletter"]:
+            return True
+
+        return False
 
     @classmethod
     def assess_conviction(cls, content: Any, artifact_type: str) -> float:
@@ -118,7 +144,7 @@ class GoldStandardScrubber:
         return min(round(score, 2), 1.0)
 
     @staticmethod
-    def extract_metadata(content: Any) -> Dict[str, Any]:
+    def extract_metadata(content: Any, artifact_type: str = "") -> Dict[str, Any]:
         """Extracts statistical metadata."""
         meta = {"processed_at": datetime.now().isoformat()}
 
@@ -126,9 +152,23 @@ class GoldStandardScrubber:
             meta.update({
                 "char_count": len(content),
                 "line_count": content.count('\n') + 1,
+            })
+
+            # Bolt Optimization: Adaptive Scanning
+            scan_limit = 10000  # Default QUICK scan
+            if GoldStandardScrubber.is_high_impact(content, artifact_type):
+                scan_limit = 100000  # DEEP scan for high impact docs
+                meta['scan_strategy'] = "DEEP"
+            else:
+                meta['scan_strategy'] = "QUICK"
+
+            # Use sliced content for expensive regex operations
+            scan_content = content[:scan_limit]
+
+            meta.update({
                 # Simple extraction of capitalized terms (potential entities)
-                "tags": list(set(re.findall(r'#\w+', content)))[:5],
-                "potential_entities": list(set(re.findall(r'\b[A-Z][a-z]{3,}\b', content)))[:8]
+                "tags": list(set(GoldStandardScrubber.RE_HASHTAGS.findall(scan_content)))[:5],
+                "potential_entities": list(set(GoldStandardScrubber.RE_POTENTIAL_ENTITIES.findall(scan_content)))[:8]
             })
         elif isinstance(content, dict):
             meta["top_level_keys"] = list(content.keys())
@@ -140,6 +180,8 @@ class GoldStandardScrubber:
 
 class FileHandlers:
     """Encapsulates logic for parsing specific file types."""
+
+    RE_MARKDOWN_HEADER = re.compile(r'^#\s+(.+)$', re.MULTILINE)
 
     @staticmethod
     def handle_json(filepath: str, raw_text: str) -> Optional[GoldStandardArtifact]:
@@ -163,7 +205,7 @@ class FileHandlers:
             content=data,
             artifact_type=a_type.value,
             title=title,
-            metadata=GoldStandardScrubber.extract_metadata(data),
+            metadata=GoldStandardScrubber.extract_metadata(data, a_type.value),
             content_hash=GoldStandardScrubber.compute_file_hash(raw_text)
         )
 
@@ -195,7 +237,7 @@ class FileHandlers:
 
         # Extract title from first H1 header
         title = os.path.basename(filepath)
-        match = re.search(r'^#\s+(.+)$', clean_text, re.MULTILINE)
+        match = FileHandlers.RE_MARKDOWN_HEADER.search(clean_text)
         if match:
             title = match.group(1).strip()
 
@@ -210,7 +252,7 @@ class FileHandlers:
             content=clean_text,
             artifact_type=a_type.value,
             title=title,
-            metadata=GoldStandardScrubber.extract_metadata(clean_text),
+            metadata=GoldStandardScrubber.extract_metadata(clean_text, a_type.value),
             content_hash=GoldStandardScrubber.compute_file_hash(raw_text)
         )
 

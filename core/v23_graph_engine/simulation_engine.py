@@ -10,10 +10,17 @@ from typing import Dict, List, Optional, Any
 from core.system.provenance_logger import ProvenanceLogger, ActivityType
 
 class CrisisSimulationEngine:
+    # Compiled patterns
+    RE_TITLE = re.compile(r"^# PROMPT:\s*(.*)", re.MULTILINE)
+    RE_MARKET_IMPACT = re.compile(r"\*\*Market Impact:\*\*(.*?)(##|$)", re.DOTALL)
+    RE_IMPACT_LINE = re.compile(r"\*\s*\*\*(.*?):\*\*\s*(.*)")
+    RE_IMPACT_DETAILS = re.compile(r"([A-Z]+)\s*([+-]?\d+%)")
+
     def __init__(self, knowledge_graph: Optional[nx.DiGraph] = None, logger: Optional[ProvenanceLogger] = None):
         self.kg = knowledge_graph if knowledge_graph else nx.DiGraph()
         self.logger = logger if logger else ProvenanceLogger()
         self.active_scenarios = []
+        self._regex_cache = {}
 
     def load_scenario_from_markdown(self, filepath: str) -> Dict[str, Any]:
         """Parses a structured markdown prompt file into a scenario dictionary."""
@@ -33,18 +40,28 @@ class CrisisSimulationEngine:
 
     def _extract_title(self, content: str) -> str:
         # Matches "# PROMPT: Title"
-        match = re.search(r"^# PROMPT:\s*(.*)", content, re.MULTILINE)
+        match = self.RE_TITLE.search(content)
         return match.group(1).strip() if match else "UNKNOWN"
+
+    def _get_regex(self, label: str, is_list: bool = False) -> re.Pattern:
+        key = (label, is_list)
+        if key not in self._regex_cache:
+            if is_list:
+                pattern = r"\*\*?" + re.escape(label) + r":?\*\*?\s*\[(.*)\]"
+            else:
+                pattern = r"\*\*?" + re.escape(label) + r":?\*\*?\s*(.*)"
+            self._regex_cache[key] = re.compile(pattern, re.IGNORECASE)
+        return self._regex_cache[key]
 
     def _extract_field(self, content: str, label: str) -> str:
         # Matches "**Label:** Value"
-        pattern = r"\*\*?" + re.escape(label) + r":?\*\*?\s*(.*)"
-        match = re.search(pattern, content, re.IGNORECASE)
+        regex = self._get_regex(label, is_list=False)
+        match = regex.search(content)
         return match.group(1).strip() if match else "UNKNOWN"
 
     def _extract_list(self, content: str, label: str) -> List[str]:
-        pattern = r"\*\*?" + re.escape(label) + r":?\*\*?\s*\[(.*)\]"
-        match = re.search(pattern, content, re.IGNORECASE)
+        regex = self._get_regex(label, is_list=True)
+        match = regex.search(content)
         if match:
             return [x.strip() for x in match.group(1).split(',')]
         return []
@@ -52,7 +69,7 @@ class CrisisSimulationEngine:
     def _parse_shocks(self, content: str) -> List[Dict[str, Any]]:
         # Heuristic parsing of "Market Impact" section
         shocks = []
-        impact_section = re.search(r"\*\*Market Impact:\*\*(.*?)(##|$)", content, re.DOTALL)
+        impact_section = self.RE_MARKET_IMPACT.search(content)
         if impact_section:
             lines = impact_section.group(1).strip().split('\n')
             for line in lines:
@@ -63,12 +80,12 @@ class CrisisSimulationEngine:
                     # 2. optional whitespace
                     # 3. **Category:**
                     # 4. Details
-                    match = re.match(r"\*\s*\*\*(.*?):\*\*\s*(.*)", line.strip())
+                    match = self.RE_IMPACT_LINE.match(line.strip())
                     if match:
                         category = match.group(1)
                         details = match.group(2)
                         # Parse details like "NDX -15%"
-                        impacts = re.findall(r"([A-Z]+)\s*([+-]?\d+%)", details)
+                        impacts = self.RE_IMPACT_DETAILS.findall(details)
                         for ticker, change in impacts:
                             shocks.append({
                                 "target": ticker,

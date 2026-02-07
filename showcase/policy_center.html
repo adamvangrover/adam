@@ -3,59 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Policy Center - Governance</title>
+    <title>ADAM | Policy Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-900 text-slate-200 p-8 font-sans">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
-    <header class="mb-10 text-center">
-        <h1 class="text-4xl font-bold text-white mb-2">Policy Center</h1>
-        <p class="text-slate-400">Active Governance Rules & Compliance Limits</p>
+    <style>
+        :root {
+            --bg-dark: #020408;
+            --panel-bg: rgba(15, 23, 42, 0.95);
+            --border-color: #334155;
+            --accent-blue: #3b82f6;
+        }
+        body { background-color: var(--bg-dark); color: #e2e8f0; font-family: 'Inter', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .glass-panel { background: var(--panel-bg); backdrop-filter: blur(12px); border: 1px solid var(--border-color); }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen bg-[#050b14] relative overflow-x-hidden">
+
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40 sticky top-0">
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="text-slate-400 hover:text-white transition"><i class="fas fa-arrow-left"></i></a>
+            <div class="w-8 h-8 bg-blue-900/50 rounded flex items-center justify-center border border-blue-500/30">
+                <i class="fas fa-shield-alt text-blue-400"></i>
+            </div>
+            <h1 class="text-xl font-bold tracking-tight mono">POLICY <span class="text-blue-400">CENTER</span> <span class="text-slate-500 font-normal">| Compliance-as-Code</span></h1>
+        </div>
+        <div class="flex items-center gap-4 text-xs font-mono">
+             <span class="text-emerald-400"><i class="fas fa-lock mr-1"></i> ENFORCED</span>
+             <span class="text-slate-500">core/compliance/snc_validators.py</span>
+        </div>
     </header>
 
-    <div class="max-w-4xl mx-auto space-y-8">
+    <main class="flex-1 p-6 max-w-7xl mx-auto w-full">
 
-        <!-- SNC Validators Section -->
-        <section>
-            <h2 class="text-2xl font-bold text-cyan-400 mb-4 border-b border-cyan-500/30 pb-2">Credit Policy (SNC)</h2>
-            <div id="snc-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Injected via JS -->
+        <div class="grid grid-cols-12 gap-6">
+
+            <div class="col-span-12 lg:col-span-4 space-y-6">
+                <div class="glass-panel p-6 rounded-lg border-t-4 border-blue-500">
+                    <h2 class="text-lg font-bold text-white mono mb-4">GLOBAL GUARDRAILS</h2>
+                    <p class="text-xs text-slate-400 mb-6">These limits apply to all SNC deals unless a specific sector override exists.</p>
+
+                    <div id="global-rules" class="space-y-4">
+                        </div>
+                </div>
+
+                <div class="glass-panel p-6 rounded-lg">
+                    <h3 class="text-sm font-bold text-slate-300 mono mb-3">SYSTEM STATUS</h3>
+                    <div class="flex items-center justify-between py-2 border-b border-slate-800">
+                        <span class="text-xs text-slate-500">Validation Engine</span>
+                        <span class="text-xs text-emerald-400 font-bold">ACTIVE</span>
+                    </div>
+                    <div class="flex items-center justify-between py-2 border-b border-slate-800">
+                        <span class="text-xs text-slate-500">Last Update</span>
+                        <span class="text-xs text-slate-400" id="timestamp">Now</span>
+                    </div>
+                    <div class="flex items-center justify-between py-2">
+                        <span class="text-xs text-slate-500">Strict Mode</span>
+                        <span class="text-xs text-emerald-400 font-bold">ENABLED</span>
+                    </div>
+                </div>
+
+                 <div class="glass-panel p-6 rounded-lg border-t-4 border-purple-500">
+                    <h2 class="text-lg font-bold text-white mono mb-4">GOVERNANCE RULES</h2>
+                    <div id="gov-container">
+                        <ul id="gov-list" class="space-y-3 text-xs text-slate-400">
+                            </ul>
+                    </div>
+                 </div>
+
             </div>
-        </section>
 
-        <!-- General Governance -->
-        <section>
-            <h2 class="text-2xl font-bold text-purple-400 mb-4 border-b border-purple-500/30 pb-2">System Governance</h2>
-            <div id="gov-container" class="bg-slate-800 p-6 rounded border border-slate-700">
-                <ul id="gov-list" class="space-y-3 text-sm">
-                    <!-- Injected via JS -->
-                </ul>
+            <div class="col-span-12 lg:col-span-8">
+                <div class="glass-panel p-6 rounded-lg min-h-[600px]">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-lg font-bold text-white mono">SECTOR SPECIFIC LIMITS</h2>
+                        <div class="text-xs text-slate-500">Overrides & Special Allowances</div>
+                    </div>
+
+                    <div id="sector-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        </div>
+                </div>
             </div>
-        </section>
 
-    </div>
+        </div>
+    </main>
 
     <script>
+        const METRIC_LABELS = {
+            "MAX_DEBT_TO_EQUITY": "Max Debt/Equity",
+            "MIN_PROFIT_MARGIN": "Min Profit Margin",
+            "MIN_CURRENT_RATIO": "Min Current Ratio",
+            "MIN_INTEREST_COVERAGE": "Min Interest Coverage"
+        };
+
+        const SECTOR_ICONS = {
+            "Energy": "fa-bolt",
+            "Technology": "fa-microchip",
+            "Real Estate": "fa-building",
+            "Financials": "fa-landmark",
+            "General": "fa-globe"
+        };
+
         async function loadPolicy() {
             try {
                 const res = await fetch('data/policy_data.json');
                 const data = await res.json();
+                renderDashboard(data);
+                renderGovernance(data);
+            } catch (e) {
+                console.error("Error loading policy data:", e);
+            }
+        }
 
-                // Render SNC
-                const sncContainer = document.getElementById('snc-container');
-                data.snc_rules.forEach(rule => {
-                    const card = document.createElement('div');
-                    card.className = "bg-slate-800 p-4 rounded border-l-4 border-cyan-500 shadow-lg";
-                    card.innerHTML = `
-                        <div class="font-bold text-white mb-1">${rule.name}</div>
-                        <div class="text-xs text-slate-400 uppercase tracking-wider mb-2">Limit: ${rule.value}</div>
-                        <p class="text-sm text-slate-300">${rule.description}</p>
-                    `;
-                    sncContainer.appendChild(card);
-                });
-
-                // Render Governance
-                const govList = document.getElementById('gov-list');
+        function renderGovernance(data) {
+             const govList = document.getElementById('gov-list');
+             if (data.governance_rules) {
                 data.governance_rules.forEach(rule => {
                     const li = document.createElement('li');
                     li.className = "flex items-start";
@@ -65,12 +129,73 @@
                     `;
                     govList.appendChild(li);
                 });
+             }
+        }
 
-            } catch (e) {
-                console.error(e);
+        function renderDashboard(data) {
+            // Global Rules
+            const globalContainer = document.getElementById('global-rules');
+            if (data.global_limits) {
+                globalContainer.innerHTML = Object.entries(data.global_limits).map(([key, val]) => `
+                    <div class="group">
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-slate-400">${METRIC_LABELS[key] || key}</span>
+                            <span class="font-bold text-white mono">${key.includes('PERCENT') || key.includes('MARGIN') ? (val*100).toFixed(0)+'%' : val}</span>
+                        </div>
+                        <div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-blue-500 w-3/4 opacity-50"></div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Sector Grid
+            const sectorContainer = document.getElementById('sector-grid');
+            if (data.sector_overrides) {
+                sectorContainer.innerHTML = Object.entries(data.sector_overrides).map(([sector, details]) => {
+                    // If details is a string (e.g. "Standard Global Limits apply"), handle it
+                    // Based on script, it's an object with "overrides" and "effective_limits"
+
+                    const icon = SECTOR_ICONS[sector] || "fa-folder";
+                    const overrides = details.overrides || {};
+                    const effective = details.effective_limits || {};
+
+                    const hasOverrides = Object.keys(overrides).length > 0;
+
+                    return `
+                        <div class="bg-slate-900/50 border border-slate-700 p-4 rounded hover:border-blue-500/50 transition relative overflow-hidden group">
+                            ${hasOverrides ? '<div class="absolute top-0 right-0 bg-blue-900/30 text-blue-400 text-[10px] px-2 py-0.5 rounded-bl">CUSTOM RULE</div>' : ''}
+
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-8 h-8 rounded bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-blue-400 transition">
+                                    <i class="fas ${icon}"></i>
+                                </div>
+                                <h3 class="font-bold text-slate-200 mono">${sector.toUpperCase()}</h3>
+                            </div>
+
+                            <div class="space-y-3">
+                                ${Object.entries(effective).map(([key, val]) => {
+                                    const isOverridden = overrides.hasOwnProperty(key);
+                                    const label = METRIC_LABELS[key] || key;
+                                    const displayVal = (key.includes('MARGIN')) ? (val*100).toFixed(0)+'%' : val;
+
+                                    return `
+                                        <div class="flex justify-between items-center text-xs">
+                                            <span class="text-slate-500">${label}</span>
+                                            <span class="mono ${isOverridden ? 'text-blue-400 font-bold' : 'text-slate-400'}">
+                                                ${displayVal} ${isOverridden ? '<i class="fas fa-asterisk text-[8px] align-top ml-0.5"></i>' : ''}
+                                            </span>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
             }
         }
-        loadPolicy();
+
+        document.addEventListener('DOMContentLoaded', loadPolicy);
     </script>
 </body>
 </html>

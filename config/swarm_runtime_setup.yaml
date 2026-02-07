@@ -1,0 +1,92 @@
+# Adam Swarm Runtime Configuration
+# Version: 3.0.1
+# Environment: Production / Lab / Dev
+
+system:
+  id: "adam_swarm_prime"
+  mode: "autonomous" # Options: autonomous, human_in_the_loop, observer
+  log_level: "INFO"
+  max_concurrency: 10
+
+infrastructure:
+  container_orchestration: "docker-compose" # or kubernetes
+  network_bridge: "adam_net"
+  
+  services:
+    - name: "knowledge_graph"
+      image: "neo4j:5.11"
+      port: 7687
+      enabled: true
+      
+    - name: "vector_store"
+      image: "qdrant/qdrant:latest"
+      port: 6333
+      enabled: true
+      
+    - name: "redis_broker"
+      image: "redis:alpine"
+      port: 6379
+      enabled: true
+
+microservices:
+  - name: "mcp_server"
+    path: "core/v30_architecture/python_intelligence/mcp/server.py"
+    protocol: "json-rpc"
+    auto_restart: true
+
+  - name: "rust_pricing_engine"
+    path: "core/v30_architecture/rust_core/target/release/pricing_engine"
+    protocol: "grpc"
+    performance_mode: "high_frequency"
+
+llm_interface:
+  provider: "openai" # or gemini, anthropic, local_llama
+  model: "gpt-4-turbo-preview"
+  context_window: 128000
+  embedding_model: "text-embedding-3-small"
+  
+  fallbacks:
+    - provider: "gemini"
+      model: "gemini-pro"
+
+agents:
+  meta_agents:
+    - "ArchitectAgent"
+    - "RiskConsensusEngine"
+  
+  specialists:
+    - name: "MarketMayhemGenerator"
+      config_path: "config/market_mayhem_config.yaml"
+    - name: "FinancialTwinBuilder"
+      ontology: "artifacts/ontologies/adam_credit_risk.ttl"
+
+data_pipelines:
+  structured:
+    format: "parquet"
+    location: "data/market_data/"
+    frequency: "tick"
+  
+  unstructured:
+    format: "jsonl"
+    location: "core/libraries_and_archives/reports/"
+    vectorization: true
+
+dashboards:
+  framework: "react_tailwind"
+  theme: "dark_mode_financial"
+  refresh_rate: "500ms"
+  components:
+    - "RiskTopography"
+    - "ConvictionMeter"
+    - "TerminalWidget"
+
+simulation_lab:
+  enabled: true
+  scenarios_dir: "artifacts/simulation/scenarios/"
+  output_dir: "data/simulated_JSONL_output/"
+  validation: "strict" # Enforce schema validation on outputs
+
+reporting:
+  format: "markdown"
+  templates: "core/newsletter_layout/templates/"
+  verification: true # Use CheckSecurity and CheckFact agents

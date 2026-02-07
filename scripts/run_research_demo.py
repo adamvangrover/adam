@@ -1,94 +1,207 @@
-import os
 import sys
+import os
 import json
 import logging
+import random
+import torch
+import numpy as np
+import asyncio
 
-# Ensure repo root is in path
+# Ensure core is in path
 sys.path.append(os.getcwd())
 
-from core.research.federated_learning.federated_coordinator import FederatedCoordinator
-from core.research.gnn.graph_risk_engine import GraphRiskEngine
-from core.oswm.inference import OSWMInference
+# Imports based on verified file structure from main branch
+# We use try-except to handle potential missing dependencies in a diverse environment
+try:
+    from core.research.gnn.engine import GraphRiskEngine
+    # Explainer might be optional or in development
+    try:
+        from core.research.gnn.explainer import GNNExplainer
+    except ImportError:
+        GNNExplainer = None
 
-OUTPUT_FILE = "showcase/data/research_output.json"
+    from core.research.federated_learning.fl_coordinator import FederatedCoordinator
+    from core.research.oswm.inference import OSWMInference
+    from core.agents.strategic_foresight_agent import StrategicForesightAgent
+    from core.simulations.quantum_monte_carlo import QuantumMonteCarloBridge
+    from core.xai.iqnn_cs import IQNNCS
+except ImportError as e:
+    print(f"Warning: Some modules could not be imported: {e}")
 
-def run_federated_demo():
-    print("--- Running Federated Learning Demo ---")
-    coordinator = FederatedCoordinator(num_clients=3)
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger("ResearchDemo")
 
-    # Run 5 rounds
-    history = []
-    for i in range(5):
-        weights = coordinator.start_round()
-        # Mock validation
-        val_acc = 0.8 + (i * 0.02) # Improving
-        print(f"Round {i+1}: Global Model Updated (Acc: {val_acc:.2f})")
-        history.append({"round": i+1, "accuracy": val_acc})
+def run_advanced_gnn_analysis():
+    logger.info("--- Starting Advanced GNN Risk Analysis (GAT + Explainer) ---")
+    try:
+        # Use GAT model for better topological feature extraction
+        engine = GraphRiskEngine(model_type="GAT")
+        logger.info(f"Graph Engine initialized with {engine.num_nodes} nodes.")
+        logger.info("Model Architecture: Graph Attention Network (GAT)")
 
-    return history
+        risk_scores = engine.predict_risk()
 
-def run_gnn_demo():
-    print("\n--- Running GNN Risk Engine Demo ---")
-    engine = GraphRiskEngine()
+        # Explain the riskiest node 
+        if risk_scores:
+            sorted_risk = sorted(risk_scores.items(), key=lambda x: x[1], reverse=True)
+            top_risky_node, top_score = sorted_risk[0]
 
-    nodes = [
-        {"id": "Bank_A", "assets": 100},
-        {"id": "Bank_B", "assets": 50},
-        {"id": "HedgeFund_C", "assets": 200},
-        {"id": "Crypto_D", "assets": 10}
-    ]
+            logger.info(f"Explaining top risky node: {top_risky_node} (Score: {top_score:.4f})")
+            
+            # Use the merged Explain method if available
+            if hasattr(engine, 'explain_risk'):
+                mask_adj, mask_feat = engine.explain_risk(top_risky_node)
 
-    edges = [
-        {"source": "Bank_A", "target": "HedgeFund_C", "weight": 0.8},
-        {"source": "Bank_B", "target": "Bank_A", "weight": 0.3},
-        {"source": "HedgeFund_C", "target": "Crypto_D", "weight": 0.9}
-    ]
+                if mask_feat is not None:
+                    # Summarize feature importance from the mask tensor
+                    # Taking the mean importance across the node features
+                    avg_importance = torch.mean(mask_feat, dim=0).detach().numpy()
+                    logger.info(f"  Explanation Generated. Top Feature Indices: {np.argsort(avg_importance)[-3:]}")
+            
+            return sorted_risk
+        return []
 
-    risks = engine.predict_risk(nodes, edges)
-    print("Predicted Contagion Risks:")
-    for node, score in risks.items():
-        print(f"  {node}: {score:.4f}")
+    except Exception as e:
+        logger.error(f"GNN Analysis failed: {e}", exc_info=True)
+        return []
 
-    return risks
+def run_xai_analysis(gnn_results):
+    logger.info("--- Starting XAI Analysis (IQNN-CS) ---")
+    try:
+        # Simulate Explainable AI for the GNN results
+        feature_names = ["Type", "RiskScore", "Debt", "Impact", "Sentiment"]
+        iqnn = IQNNCS(input_dim=5, num_classes=2, feature_names=feature_names)
 
-def run_oswm_demo():
-    print("\n--- Running One-Shot World Model Demo ---")
-    inference = OSWMInference()
+        # Generate synthetic attributions based on GNN risk scores
+        # This mocks the data that would normally come from the model
+        if not gnn_results:
+             gnn_results = [("MockBank_A", 0.8), ("MockHedge_B", 0.3)]
 
-    initial_state = {"step": 0, "gdp": 100.0, "inflation": 0.02}
-    print(f"Initial State: {initial_state}")
+        for node, score in gnn_results:
+            if score > 0.7:
+                attr = np.array([0.1, 0.1, 0.5, 0.3, 0.0]) + np.random.normal(0, 0.05, 5)
+                predicted_class = 1
+            else:
+                attr = np.array([0.1, 0.1, 0.1, 0.1, 0.6]) + np.random.normal(0, 0.05, 5)
+                predicted_class = 0
 
-    actions = ["stimulate_economy", "raise_rates", "stimulate_economy"]
-    trajectory = [initial_state]
+            iqnn.record_prediction(np.random.rand(5), predicted_class, attr)
 
-    current_state = initial_state
-    for action in actions:
-        print(f"Action: {action}")
-        next_state = inference.predict_next_state(current_state, action)
-        print(f"  Result: {next_state}")
-        trajectory.append(next_state)
-        current_state = next_state
+        report = iqnn.generate_explanation_report()
+        logger.info("XAI Report Generated.")
+        return report
+    except Exception as e:
+        logger.error(f"XAI Analysis failed: {e}")
+        return {}
 
-    return trajectory
+def run_federated_learning_simulation():
+    logger.info("--- Starting FinGraphFL Simulation (Privacy + MSGuard) ---")
+    try:
+        # Simulate 3 banks with different sector biases
+        client_configs = [
+            {"id": "Bank_Tech (High Vol)", "sector_bias": {1: 1.0}},
+            {"id": "Bank_Energy (High Debt)", "sector_bias": {0: 1.0}},
+            {"id": "Bank_Retail (Stable)", "sector_bias": {0: -0.5, 1: -0.5}}
+        ]
+
+        # Initialize Coordinator in FinGraphFL mode
+        coordinator = FederatedCoordinator(
+            num_clients=3, 
+            input_dim=10, 
+            client_configs=client_configs,
+            mode="FinGraphFL" 
+        )
+
+        history = []
+        for round_num in range(1, 4): # Short run for demo
+            loss, acc = coordinator.run_round(round_num)
+            history.append({"round": round_num, "loss": loss, "accuracy": acc})
+
+        logger.info("FinGraphFL Simulation Complete.")
+        return history
+    except Exception as e:
+        logger.error(f"Federated Learning failed: {e}")
+        return []
+
+def run_oswm_simulation():
+    logger.info("--- Starting One-Shot World Model Simulation ---")
+    try:
+        # Initialize the Agent (which handles OSWM pretraining internally)
+        agent = StrategicForesightAgent(config={})
+        
+        # Generate a Strategic Market Briefing
+        # execute is likely async, so we run it in the event loop
+        briefing = asyncio.run(agent.execute(ticker="SPY", horizon=10))
+
+        logger.info(f"Strategic Briefing Status: {briefing.get('status', 'UNKNOWN')}")
+        if 'narrative' in briefing:
+            logger.info(f"Narrative: {briefing['narrative']}")
+
+        return briefing
+    except Exception as e:
+        logger.error(f"OSWM Simulation failed: {e}")
+        # Return a mock if real execution fails
+        return {"status": "FAILED", "error": str(e), "trajectory": []}
+
+def run_quantum_simulation():
+    logger.info("--- Starting Quantum Monte Carlo Simulation ---")
+    try:
+        bridge = QuantumMonteCarloBridge()
+
+        result = bridge.run_simulation(portfolio_value=1_000_000, volatility=0.15)
+
+        assets = ["AAPL", "GOOGL", "MSFT", "AMZN"]
+        opt_result = bridge.optimize_portfolio(assets, np.array([]), np.array([]))
+
+        logger.info(f"QAOA Allocation: {opt_result.get('allocation', {})}")
+
+        return {"var_result": result, "optimization": opt_result}
+    except Exception as e:
+        logger.error(f"Quantum Simulation failed: {e}")
+        return {}
 
 def main():
-    logging.basicConfig(level=logging.INFO)
+    logger.info("Initializing Advanced Research Modules...")
 
-    fed_results = run_federated_demo()
-    gnn_results = run_gnn_demo()
-    oswm_results = run_oswm_demo()
+    # 1. Advanced GNN (GAT + Explainer)
+    gnn_results = run_advanced_gnn_analysis()
 
-    output = {
-        "federated_learning": fed_results,
-        "gnn_risk": gnn_results,
-        "oswm_trajectory": oswm_results
+    # 2. XAI (IQNN-CS)
+    xai_report = run_xai_analysis(gnn_results)
+
+    # 3. FinGraphFL (Federated Learning with Privacy)
+    fl_history = run_federated_learning_simulation()
+
+    # 4. OSWM (One-Shot World Model)
+    oswm_briefing = run_oswm_simulation()
+
+    # 5. Quantum (QAOA)
+    quantum_results = run_quantum_simulation()
+
+    # Output structure
+    output_data = {
+        "gnn_risk_analysis": {
+            "model": "GAT",
+            "top_risky_nodes": gnn_results[:10] if gnn_results else []
+        },
+        "xai_report": xai_report,
+        "federated_learning": {
+            "mode": "FinGraphFL",
+            "training_history": fl_history
+        },
+        "oswm_simulation": {
+            "briefing": oswm_briefing
+        },
+        "quantum_simulation": quantum_results
     }
 
-    os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
-    with open(OUTPUT_FILE, 'w') as f:
-        json.dump(output, f, indent=2)
+    # Save to file
+    os.makedirs("showcase/data", exist_ok=True)
+    with open("showcase/data/research_output.json", "w") as f:
+        json.dump(output_data, f, indent=2)
 
-    print(f"\nResearch output saved to {OUTPUT_FILE}")
+    logger.info("Research demo complete. Data saved to showcase/data/research_output.json")
 
 if __name__ == "__main__":
     main()

@@ -88,7 +88,18 @@ try:
 except ImportError:
     INGESTOR_AVAILABLE = False
 
-# 5. External Libs
+# 5. Security & Governance
+try:
+    from core.security.governance import GovernanceEnforcer, GovernanceError, ApprovalRequired
+    from core.security.eaci_middleware import EACIMiddleware
+    GOVERNANCE_AVAILABLE = True
+    # Initialize middleware (mocking permission manager for now)
+    eaci = EACIMiddleware(permission_manager=None)
+except ImportError:
+    GOVERNANCE_AVAILABLE = False
+    eaci = None
+
+# 6. External Libs
 try:
     import yfinance as yf
 except ImportError:
@@ -230,6 +241,14 @@ def plan_workflow(start_node: str, target_node: str) -> str:
     Generates a Neuro-Symbolic Plan (Graph Traversal) from start concept to target concept.
     Example: start="Apple Inc.", target="CreditRating"
     """
+    # 🛡️ Sentinel: Input Sanitization
+    if GOVERNANCE_AVAILABLE and eaci:
+        try:
+            eaci.sanitize_input(start_node)
+            eaci.sanitize_input(target_node)
+        except ValueError as ve:
+            return json.dumps({"error": str(ve)})
+
     if not PLANNER_AVAILABLE:
         return json.dumps({"error": "Neuro-Symbolic Planner not available."})
     try:
@@ -248,6 +267,46 @@ def ingest_file(filepath: str) -> str:
     """
     if not INGESTOR_AVAILABLE:
         return json.dumps({"error": "Universal Ingestor not available."})
+
+    # 🛡️ Sentinel: Prevent Path Traversal
+    # Restrict ingestion to specific safe directories (data/ and docs/)
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    allowed_dirs = [
+        os.path.abspath(os.path.join(project_root, "data")),
+        os.path.abspath(os.path.join(project_root, "docs"))
+    ]
+
+    # Resolve the absolute path of the requested file
+    abs_path = os.path.realpath(filepath)
+
+    is_safe = False
+    for safe_dir in allowed_dirs:
+        # Check if the file is within the safe directory
+        # commonpath raises ValueError if paths are on different drives, which is fine (safe fail)
+        try:
+            if os.path.commonpath([safe_dir, abs_path]) == safe_dir:
+                is_safe = True
+                break
+        except ValueError:
+            continue
+
+    if not is_safe:
+        return json.dumps({"error": "Access denied: File path outside allowed directories."})
+
+    # 🛡️ Sentinel: Enterprise Validation (File Size & Type)
+    # 1. Size Limit (10MB)
+    try:
+        if os.path.getsize(abs_path) > 10 * 1024 * 1024:
+             return json.dumps({"error": "Validation Error: File size exceeds 10MB limit."})
+    except OSError:
+         return json.dumps({"error": "Validation Error: Could not read file size."})
+
+    # 2. Extension Whitelist
+    ALLOWED_EXTENSIONS = {'.txt', '.md', '.json', '.csv', '.xlsx', '.pdf', '.py', '.log'}
+    _, ext = os.path.splitext(abs_path)
+    if ext.lower() not in ALLOWED_EXTENSIONS:
+        return json.dumps({"error": f"Validation Error: File type '{ext}' not allowed. Allowed: {list(ALLOWED_EXTENSIONS)}"})
+
     try:
         ingestor = UniversalIngestor()
         ingestor.process_file(filepath)
@@ -292,12 +351,29 @@ def execute_python_sandbox(code: str) -> str:
     Executes Python code in a secure, isolated sandbox.
     
     Security Features:
+    - Governance Enforcer: Checks for risk patterns (recursion, loops, imports).
     - Static Analysis (AST) prevents dangerous imports and access to private attributes.
     - Process Isolation contains memory and crashes.
     - Restricted Globals limits accessible functions to safe subsets (math, json, pandas).
     - Timeouts prevent infinite loops.
     """
     try:
+        # 🛡️ Sentinel: Governance Enforcement
+        if GOVERNANCE_AVAILABLE:
+            try:
+                GovernanceEnforcer.validate(code, context="mcp_tool")
+            except ApprovalRequired as ae:
+                return json.dumps({
+                    "status": "approval_required",
+                    "error": str(ae),
+                    "score": GovernanceEnforcer.analyze_risk(code).get("score")
+                })
+            except GovernanceError as ge:
+                return json.dumps({
+                    "status": "blocked",
+                    "error": str(ge)
+                })
+
         from core.security.sandbox import SecureSandbox
         result = SecureSandbox.execute(code)
         return json.dumps(result)

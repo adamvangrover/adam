@@ -2,44 +2,74 @@ import os
 import sys
 import json
 import logging
+import time
 
-# Ensure repo root is in path
-sys.path.append(os.getcwd())
+# Add project root to path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from core.vertical_risk_agent.generative_risk import GenerativeRiskEngine
+try:
+    from core.vertical_risk_agent.generative_risk import GenerativeRiskEngine
+except ImportError as e:
+    print(f"Error importing engine: {e}")
+    sys.exit(1)
 
 OUTPUT_FILE = "showcase/data/mock_scenario_lab_data.json"
 
-def main():
+def serialize_scenario(scenario):
+    """Helper to handle Pydantic V1/V2 serialization differences."""
+    if hasattr(scenario, 'model_dump'):
+        return scenario.model_dump()
+    elif hasattr(scenario, 'dict'):
+        return scenario.dict()
+    else:
+        return scenario.__dict__
+
+def run_generative_lab():
     logging.basicConfig(level=logging.INFO)
     print("Initializing Generative Scenario Lab...")
 
-    engine = GenerativeRiskEngine()
+    try:
+        engine = GenerativeRiskEngine()
+    except Exception as e:
+        print(f"Failed to initialize engine: {e}")
+        return
 
-    # Generate batch
-    # We generate a mix of regimes for the showcase
-    scenarios = []
-
-    # 50 Normal
-    scenarios.extend(engine.generate_scenarios(n_samples=50, regime="normal"))
-
-    # 30 Stress
-    scenarios.extend(engine.generate_scenarios(n_samples=30, regime="stress"))
-
-    # 20 Crash
-    scenarios.extend(engine.generate_scenarios(n_samples=20, regime="crash"))
-
-    output = {
-        "generated_at": str(os.times()),
-        "count": len(scenarios),
-        "scenarios": [s.model_dump() for s in scenarios]
+    all_scenarios = []
+    
+    # Define regimes and sample counts
+    # We use a weighted distribution to provide a realistic mix for the showcase UI
+    regime_counts = {
+        "normal": 50,
+        "stress": 30,
+        "crash": 20
     }
 
-    os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
-    with open(OUTPUT_FILE, 'w') as f:
-        json.dump(output, f, indent=2)
+    for regime, count in regime_counts.items():
+        print(f"Generating {count} scenarios for regime: {regime}...")
+        try:
+            scenarios = engine.generate_scenarios(n_samples=count, regime=regime)
+            for s in scenarios:
+                s_dict = serialize_scenario(s)
+                all_scenarios.append(s_dict)
+        except Exception as e:
+            print(f"Error generating scenarios for {regime}: {e}")
 
-    print(f"Scenario Lab data saved to {OUTPUT_FILE}")
+    os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
+
+    final_output = {
+        "metadata": {
+            "engine": "APEX Generative Risk Engine v23.5",
+            "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "total_scenarios": len(all_scenarios),
+            "regime_distribution": regime_counts
+        },
+        "scenarios": all_scenarios
+    }
+
+    with open(OUTPUT_FILE, "w") as f:
+        json.dump(final_output, f, indent=2)
+
+    print(f"Scenario Lab data generated at {OUTPUT_FILE}")
 
 if __name__ == "__main__":
-    main()
+    run_generative_lab()

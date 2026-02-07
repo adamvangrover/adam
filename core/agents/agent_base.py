@@ -13,6 +13,7 @@ from core.utils.logging_utils import SwarmLogger
 # HNASP Imports
 from core.schemas.hnasp import HNASPState, Meta, PersonaState, LogicLayer, ContextStream, PersonaDynamics, SecurityContext, PersonaIdentities, Identity, EPAVector
 from core.agents.mixins.memory_mixin import MemoryMixin
+from core.system.boot_protocol import BootProtocol
 
 # JsonLogic
 try:
@@ -34,11 +35,11 @@ except ImportError:
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-class AgentBase(ABC, MemoryMixin):
+class AgentBase(ABC, MemoryMixin, BootProtocol):
     """
     Abstract base class for all agents in the system.
     Defines the common interface and behavior expected of all agents.
-    This version incorporates MCP, A2A, Semantic Kernel, HNASP, and Memory persistence.
+    This version incorporates MCP, A2A, Semantic Kernel, HNASP, Memory persistence, and Boot Protocol.
     """
 
     def __init__(self, config: Dict[str, Any], constitution: Optional[Dict[str, Any]] = None, kernel: Optional[Kernel] = None):
@@ -443,3 +444,18 @@ class AgentBase(ABC, MemoryMixin):
         except Exception as e:
             logging.error(f"Error executing Semantic Kernel skill: {e}")
             raise
+
+    def boot(self):
+        """
+        Standard boot sequence for the agent.
+        Logs the highest conviction prompt/status to the system version control log.
+        Subclasses can override this to calculate specific prompts/conviction.
+        """
+        # Default implementation: Log a generic boot status
+        agent_id = self.config.get("agent_id", self.name)
+        # Placeholder conviction logic (mock for now, or derived from HNASP state in future)
+        prompt = f"System initialization for {agent_id}"
+        conviction = 0.95
+
+        self.report_boot_status(agent_id, prompt, conviction)
+        logging.info(f"Agent {agent_id} booted successfully.")

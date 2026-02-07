@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOURCE LEAK: VIX_DAMPENER_V4.py</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Fira Code', monospace;
+            margin: 0;
+            padding: 20px;
+            font-size: 14px;
+        }
+        .editor-container {
+            max-width: 900px;
+            margin: 0 auto;
+            border: 1px solid #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .title-bar {
+            background: #252526;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+        .filename {
+            color: #e0e0e0;
+            font-weight: bold;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+        .circle { width: 12px; height: 12px; border-radius: 50%; }
+        .red { background: #ff5f56; }
+        .yellow { background: #ffbd2e; }
+        .green { background: #27c93f; }
+
+        .code-area {
+            background: #1e1e1e;
+            padding: 20px;
+            counter-reset: line;
+            white-space: pre;
+            overflow-x: auto;
+        }
+        .line {
+            display: block;
+            line-height: 1.5;
+        }
+        .line::before {
+            counter-increment: line;
+            content: counter(line);
+            display: inline-block;
+            width: 30px;
+            margin-right: 15px;
+            color: #555;
+            text-align: right;
+            border-right: 1px solid #333;
+            padding-right: 10px;
+        }
+
+        /* Syntax Highlighting (Monokai-ish) */
+        .kw { color: #569cd6; font-weight: bold; } /* Keyword */
+        .str { color: #ce9178; } /* String */
+        .num { color: #b5cea8; } /* Number */
+        .comment { color: #6a9955; font-style: italic; } /* Comment */
+        .func { color: #dcdcaa; } /* Function */
+        .var { color: #9cdcfe; } /* Variable */
+        .err {
+            color: #f44336;
+            text-decoration: underline wavy #f44336;
+            font-weight: bold;
+        }
+
+        .output-panel {
+            background: #111;
+            border-top: 1px solid #333;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            color: #ccc;
+            height: 200px;
+            overflow-y: auto;
+        }
+        .log-error { color: #f44336; }
+        .log-warn { color: #ffeb3b; }
+
+        .back-link {
+            color: #569cd6;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <a href="macro_glitch_monitor.html" class="back-link">&lt; // RETURN TO MONITOR</a>
+
+    <div class="editor-container">
+        <div class="title-bar">
+            <div class="controls">
+                <div class="circle red"></div>
+                <div class="circle yellow"></div>
+                <div class="circle green"></div>
+            </div>
+            <div class="filename">VIX_DAMPENER_V4.py (LEAKED)</div>
+            <div style="font-size: 0.8rem; color: #888;">READ-ONLY</div>
+        </div>
+
+        <div class="code-area">
+<span class="line"><span class="kw">import</span> numpy <span class="kw">as</span> np</span>
+<span class="line"><span class="kw">from</span> liquidity_pool <span class="kw">import</span> DarkPool_Injector</span>
+<span class="line"></span>
+<span class="line"><span class="comment"># ALGO: VOLATILITY SUPPRESSION PROTOCOL (GAMMA_CLAMPER)</span></span>
+<span class="line"><span class="comment"># OBJECTIVE: KEEP VIX < 20.0 TO PREVENT MARGIN CASCADES</span></span>
+<span class="line"></span>
+<span class="line"><span class="kw">class</span> <span class="func">RealityPatch</span>:</span>
+<span class="line">    <span class="kw">def</span> <span class="func">__init__</span>(<span class="var">self</span>):</span>
+<span class="line">        <span class="var">self</span>.target_spx = <span class="num">7000</span></span>
+<span class="line">        <span class="var">self</span>.vix_ceiling = <span class="num">19.5</span></span>
+<span class="line">        <span class="var">self</span>.reserves = <span class="num">0.0</span> <span class="comment"># WARNING: Reserves Depleted</span></span>
+<span class="line"></span>
+<span class="line">    <span class="kw">def</span> <span class="func">execute_mean_reversion</span>(<span class="var">self</span>, <span class="var">current_price</span>):</span>
+<span class="line">        <span class="comment"># Force buy 0DTE Calls if price drops > 0.5%</span></span>
+<span class="line">        <span class="kw">if</span> <span class="var">current_price</span> < <span class="var">self</span>.target_spx:</span>
+<span class="line">            <span class="var">notional</span> = <span class="var">self</span>.calculate_leverage_needed()</span>
+<span class="line">            </span>
+<span class="line">            <span class="kw">try</span>:</span>
+<span class="line">                <span class="func">DarkPool_Injector</span>.<span class="func">inject_liquidity</span>(<span class="var">notional</span>)</span>
+<span class="line">            <span class="kw">except</span> <span class="func">LiquidityCrisisError</span> <span class="kw">as</span> <span class="var">e</span>:</span>
+<span class="line">                <span class="func">print</span>(<span class="str">f"CRITICAL: {e}"</span>)</span>
+<span class="line">                <span class="var">self</span>.trigger_circuit_breaker()</span>
+<span class="line"></span>
+<span class="line">    <span class="kw">def</span> <span class="func">calculate_leverage_needed</span>(<span class="var">self</span>):</span>
+<span class="line">        <span class="comment"># Recursive leverage loop to maintain peg</span></span>
+<span class="line">        <span class="var">volatility</span> = <span class="func">get_real_time_vix</span>()</span>
+<span class="line">        </span>
+<span class="line">        <span class="kw">if</span> <span class="var">volatility</span> > <span class="var">self</span>.vix_ceiling:</span>
+<span class="line">            <span class="comment"># LOGIC ERROR: Cannot suppress VIX when Bond Vol (MOVE) > 130</span></span>
+<span class="line">            <span class="kw">if</span> <span class="func">MOVE_Index</span>() > <span class="num">130</span>:</span>
+<span class="line">                <span class="kw">raise</span> <span class="func">SystemExit</span>(<span class="str">"BOND MARKET REVOLT DETECTED"</span>)</span>
+<span class="line">            </span>
+<span class="line">            <span class="kw">return</span> <span class="var">np</span>.<span class="var">inf</span> <span class="comment"># Infinite leverage required</span></span>
+<span class="line">        </span>
+<span class="line">        <span class="kw">return</span> <span class="num">5000000000</span></span>
+<span class="line"></span>
+<span class="line"><span class="comment"># --- RUNTIME EXECUTION ---</span></span>
+<span class="line"><span class="var">patch</span> = <span class="func">RealityPatch</span>()</span>
+<span class="line"><span class="var">patch</span>.<span class="func">execute_mean_reversion</span>(<span class="num">6942.00</span>)</span>
+        </div>
+
+        <div class="output-panel" id="console-output">
+            > python3 VIX_DAMPENER_V4.py<br>
+            [INIT] Starting Reality Patch v4.2...<br>
+            [INFO] Target SPX: 7,000<br>
+            [WARN] Reserve Tank Empty. Switching to Unsecured Margin.<br>
+            [ACTION] Buy Order: $5.0B 0DTE Calls @ Market...<br>
+        </div>
+    </div>
+
+    <script>
+        const output = document.getElementById('console-output');
+        const errors = [
+            "<span class='log-error'>Error: Insufficient Collateral (Code 4002)</span>",
+            "<span class='log-warn'>Warning: Counterparty Risk Elevated (GS, MS, JPM)</span>",
+            "<span class='log-error'>CRITICAL: BOND MARKET REVOLT DETECTED</span>",
+            "<span class='log-error'>FATAL: Stack Overflow in leverage_loop()</span>",
+            "> System Halted. VIX Unchained."
+        ];
+
+        let i = 0;
+        setInterval(() => {
+            if (i < errors.length) {
+                output.innerHTML += errors[i] + "<br>";
+                output.scrollTop = output.scrollHeight;
+                i++;
+            }
+        }, 1200);
+    </script>
+</body>
+</html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AVG Distressed Credit Pricing Console</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; }
+        .cyber-border { border: 1px solid #ef4444; box-shadow: 0 0 10px rgba(239, 68, 68, 0.3); }
+        .cyber-text { color: #ef4444; text-shadow: 0 0 5px rgba(239, 68, 68, 0.6); }
+        .risk-pass { color: #10b981; }
+        .risk-special { color: #f59e0b; }
+        .risk-sub { color: #f97316; }
+        .risk-doubtful { color: #ef4444; }
+        .risk-loss { color: #991b1b; font-weight: bold; }
+    </style>
+</head>
+<body class="p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-10 flex justify-between items-center border-b border-red-900 pb-4">
+            <div>
+                <h1 class="text-4xl font-bold cyber-text">AVG Distress Simulator</h1>
+                <p class="text-gray-400 mt-2">Capital Structure Pricing, Collateral Pools & Expected Loss</p>
+            </div>
+            <div class="text-right">
+                <div class="inline-block px-3 py-1 rounded border border-red-500 text-red-400 text-sm">
+                    LIVE SIMULATION
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+            <!-- Controls -->
+            <div class="lg:col-span-4 space-y-6">
+                <!-- Inputs -->
+                <div class="bg-gray-900 p-6 rounded-lg cyber-border space-y-4">
+                    <h2 class="text-xl font-bold mb-4 text-red-400">Model Inputs</h2>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">EBITDA ($M)</label>
+                            <input type="number" id="ebitda" value="50" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-500 mb-1">EV Multiple (x)</label>
+                            <input type="number" id="ev-multiple" value="6.0" step="0.5" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white text-sm">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">Accounting Standard</label>
+                        <select id="accounting-std" class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white text-sm">
+                            <option value="IFRS9">IFRS 9 / CECL (Expected Loss)</option>
+                            <option value="GAAP_Legacy">GAAP Legacy (Incurred Loss)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">Industry Risk (1-10)</label>
+                        <input type="range" id="industry-risk" min="1" max="10" value="5" class="w-full">
+                    </div>
+                </div>
+
+                <!-- Collateral Pools -->
+                <div class="bg-gray-900 p-6 rounded-lg cyber-border">
+                    <h2 class="text-xl font-bold mb-4 text-red-400">Collateral Pools ($M)</h2>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <label class="text-xs">Accounts Receivable</label>
+                            <input type="number" id="col-ar" value="30" class="w-20 bg-gray-800 border border-gray-700 rounded p-1 text-sm text-right">
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <label class="text-xs">Inventory</label>
+                            <input type="number" id="col-inv" value="20" class="w-20 bg-gray-800 border border-gray-700 rounded p-1 text-sm text-right">
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <label class="text-xs">PP&E / Real Estate</label>
+                            <input type="number" id="col-ppe" value="100" class="w-20 bg-gray-800 border border-gray-700 rounded p-1 text-sm text-right">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cap Stack -->
+                <div class="bg-gray-900 p-6 rounded-lg cyber-border">
+                    <h2 class="text-xl font-bold mb-4 text-red-400">Capital Stack ($M)</h2>
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-3 gap-1">
+                            <div><label class="text-xs text-gray-500">Tranche</label></div>
+                            <div class="text-right"><label class="text-xs text-gray-500">Amt</label></div>
+                            <div class="text-right"><label class="text-xs text-gray-500">Rate</label></div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-1 items-center">
+                            <div class="text-sm">Senior</div>
+                            <input type="number" id="debt-senior" value="200" class="bg-gray-800 border border-gray-700 rounded p-1 text-sm text-right">
+                            <input type="number" id="rate-senior" value="0.07" step="0.01" class="bg-gray-800 border border-gray-700 rounded p-1 text-sm text-right">
+                        </div>
+                        <div class="grid grid-cols-3 gap-1 items-center">
+                            <div class="text-sm">Junior</div>
+                            <input type="number" id="debt-junior" value="100" class="bg-gray-800 border border-gray-700 rounded p-1 text-sm text-right">
+                            <input type="number" id="rate-junior" value="0.12" step="0.01" class="bg-gray-800 border border-gray-700 rounded p-1 text-sm text-right">
+                        </div>
+                        <div class="grid grid-cols-3 gap-1 items-center">
+                            <div class="text-sm">Mezzanine</div>
+                            <input type="number" id="debt-mez" value="50" class="bg-gray-800 border border-gray-700 rounded p-1 text-sm text-right">
+                            <input type="number" id="rate-mez" value="0.15" step="0.01" class="bg-gray-800 border border-gray-700 rounded p-1 text-sm text-right">
+                        </div>
+                    </div>
+                    <button onclick="runSimulation()" class="w-full mt-6 bg-red-900 hover:bg-red-800 text-white font-bold py-2 rounded transition">
+                        Run Pricing & Loss Model
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dashboard -->
+            <div class="lg:col-span-8 space-y-6">
+
+                <!-- Metrics -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-gray-900 p-4 rounded border border-gray-800">
+                        <h3 class="text-gray-500 text-xs uppercase">Leverage Ratio</h3>
+                        <div class="text-2xl font-bold mt-1" id="metric-leverage">--</div>
+                    </div>
+                    <div class="bg-gray-900 p-4 rounded border border-gray-800">
+                        <h3 class="text-gray-500 text-xs uppercase">PD (1-Year)</h3>
+                        <div class="text-2xl font-bold mt-1" id="metric-pd">--</div>
+                    </div>
+                    <div class="bg-gray-900 p-4 rounded border border-gray-800">
+                        <h3 class="text-gray-500 text-xs uppercase">SNC Rating</h3>
+                        <div class="text-2xl font-bold mt-1" id="metric-snc">--</div>
+                    </div>
+                </div>
+
+                <!-- Waterfall Chart -->
+                <div class="bg-gray-900 p-6 rounded-lg border border-gray-800">
+                    <h2 class="text-lg font-bold mb-4">Restructuring Waterfall Recovery</h2>
+                    <canvas id="waterfallChart" height="150"></canvas>
+                </div>
+
+                <!-- Detailed Analysis Table -->
+                <div class="bg-gray-900 p-6 rounded-lg border border-gray-800 overflow-x-auto">
+                    <h2 class="text-lg font-bold mb-4">Tranche Risk & Pricing Analysis</h2>
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-gray-500 text-sm border-b border-gray-800">
+                                <th class="pb-2">Tranche</th>
+                                <th class="pb-2 text-right">Principal</th>
+                                <th class="pb-2 text-right">Est. LGD</th>
+                                <th class="pb-2 text-right">Expected Loss (EL)</th>
+                                <th class="pb-2 text-right">Recovery %</th>
+                                <th class="pb-2 text-right">Implied Price</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pricing-table-body" class="text-sm">
+                            <!-- Rows injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let waterfallChart;
+
+        async function runSimulation() {
+            // Gather Inputs
+            const ebitda = parseFloat(document.getElementById('ebitda').value) * 1_000_000;
+            const evMultiple = parseFloat(document.getElementById('ev-multiple').value);
+            const industryRisk = parseInt(document.getElementById('industry-risk').value);
+            const accounting = document.getElementById('accounting-std').value;
+
+            const collateral = [
+                { name: "AR", value: parseFloat(document.getElementById('col-ar').value) * 1_000_000, haircut: 0.8 },
+                { name: "Inventory", value: parseFloat(document.getElementById('col-inv').value) * 1_000_000, haircut: 0.5 },
+                { name: "PPE", value: parseFloat(document.getElementById('col-ppe').value) * 1_000_000, haircut: 0.7 }
+            ];
+
+            const capStructure = [
+                {
+                    name: "Senior Secured",
+                    amount: parseFloat(document.getElementById('debt-senior').value) * 1_000_000,
+                    rate: parseFloat(document.getElementById('rate-senior').value),
+                    seniority: 1,
+                    security: "Secured",
+                    secured_by: "PPE" // Simplified mapping for simulation
+                },
+                {
+                    name: "Junior Unsecured",
+                    amount: parseFloat(document.getElementById('debt-junior').value) * 1_000_000,
+                    rate: parseFloat(document.getElementById('rate-junior').value),
+                    seniority: 2,
+                    security: "Unsecured"
+                },
+                {
+                    name: "Mezzanine",
+                    amount: parseFloat(document.getElementById('debt-mez').value) * 1_000_000,
+                    rate: parseFloat(document.getElementById('rate-mez').value),
+                    seniority: 3,
+                    security: "Unsecured"
+                }
+            ];
+
+            const payload = {
+                ebitda: ebitda,
+                enterprise_value_multiple: evMultiple,
+                industry_risk: industryRisk,
+                accounting_standard: accounting,
+                capital_structure: capStructure,
+                collateral: collateral
+            };
+
+            const result = performClientSideSimulation(payload);
+            updateDashboard(result);
+        }
+
+        function performClientSideSimulation(data) {
+            // JS Port of Python Logic
+            const totalDebt = data.capital_structure.reduce((sum, t) => sum + t.amount, 0);
+            const interest = data.capital_structure.reduce((sum, t) => sum + (t.amount * t.rate), 0);
+            const leverage = totalDebt / data.ebitda;
+            const coverage = data.ebitda / interest;
+
+            // PD
+            const score = (leverage * 0.5) + ((10 - coverage) * 0.5) + (data.industry_risk * 0.3);
+            const pd = 1 / (1 + Math.exp(-(score - 8)));
+
+            let snc = "Pass", sncClass = "risk-pass";
+            if (pd >= 0.01) { snc = "Special Mention"; sncClass = "risk-special"; }
+            if (pd >= 0.05) { snc = "Substandard"; sncClass = "risk-sub"; }
+            if (pd >= 0.20) { snc = "Doubtful"; sncClass = "risk-doubtful"; }
+            if (pd >= 0.50) { snc = "Loss"; sncClass = "risk-loss"; }
+
+            // EL & LGD Logic (Simplified JS version)
+            // Total Liquidation Value
+            const totalColLiq = data.collateral.reduce((sum, c) => sum + (c.value * c.haircut), 0);
+            let remainingCol = totalColLiq;
+
+            const tranches = data.capital_structure.map(t => {
+                let cov = 0;
+                // Simplified: Senior takes all collateral first
+                if (remainingCol >= t.amount) {
+                    cov = t.amount;
+                    remainingCol -= t.amount;
+                } else {
+                    cov = remainingCol;
+                    remainingCol = 0;
+                }
+
+                const lgd = 1.0 - (cov / t.amount);
+                let el = 0;
+                if (data.accounting_standard === "GAAP_Legacy") {
+                    el = pd > 0.5 ? pd * lgd * t.amount : 0;
+                } else {
+                    el = pd * lgd * t.amount;
+                }
+
+                return { ...t, lgd: lgd, el: el };
+            });
+
+            // Waterfall
+            const ev = data.ebitda * data.enterprise_value_multiple;
+            let remainingEv = ev;
+
+            const waterfall = tranches.map(t => {
+                let rec = 0;
+                if (remainingEv >= t.amount) {
+                    rec = t.amount;
+                    remainingEv -= t.amount;
+                } else {
+                    rec = remainingEv;
+                    remainingEv = 0;
+                }
+                const rec_pct = t.amount > 0 ? rec / t.amount : 0;
+                return {
+                    ...t,
+                    recovery_amount: rec,
+                    recovery_pct: rec_pct,
+                    price: rec_pct * 100
+                };
+            });
+
+            return {
+                metrics: { leverage, pd, snc, sncClass },
+                waterfall: waterfall,
+                ev: ev
+            };
+        }
+
+        function updateDashboard(result) {
+            document.getElementById('metric-leverage').innerText = result.metrics.leverage.toFixed(2) + 'x';
+            document.getElementById('metric-pd').innerText = (result.metrics.pd * 100).toFixed(1) + '%';
+
+            const sncEl = document.getElementById('metric-snc');
+            sncEl.innerText = result.metrics.snc;
+            sncEl.className = "text-2xl font-bold mt-1 " + result.metrics.sncClass;
+
+            const tbody = document.getElementById('pricing-table-body');
+            tbody.innerHTML = '';
+            result.waterfall.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-gray-800 hover:bg-gray-800";
+                tr.innerHTML = `
+                    <td class="py-2 text-white">${row.name}</td>
+                    <td class="py-2 text-right text-gray-300">$${(row.amount/1e6).toFixed(0)}M</td>
+                    <td class="py-2 text-right text-gray-400">${(row.lgd * 100).toFixed(0)}%</td>
+                    <td class="py-2 text-right text-red-400">$${(row.el/1e6).toFixed(1)}M</td>
+                    <td class="py-2 text-right font-mono ${row.recovery_pct < 1 ? 'text-yellow-400' : 'text-green-400'}">${(row.recovery_pct * 100).toFixed(1)}%</td>
+                    <td class="py-2 text-right font-bold text-white">${row.price.toFixed(1)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            const ctx = document.getElementById('waterfallChart').getContext('2d');
+            if (waterfallChart) waterfallChart.destroy();
+
+            waterfallChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: result.waterfall.map(r => r.name).concat("Equity Residue"),
+                    datasets: [{
+                        label: 'Recovered Value ($M)',
+                        data: result.waterfall.map(r => r.recovery_amount/1e6).concat((result.ev - result.waterfall.reduce((a,b)=>a+b.recovery_amount, 0))/1e6),
+                        backgroundColor: ['#3b82f6', '#8b5cf6', '#ec4899', '#10b981']
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    scales: {
+                        x: { grid: { color: '#333' } },
+                        y: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        runSimulation();
+    </script>
+</body>
+</html>

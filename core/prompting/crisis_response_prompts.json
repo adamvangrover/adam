@@ -1,0 +1,49 @@
+{
+  "library_meta": {
+    "name": "Crisis Response & Risk Simulation",
+    "version": "1.0",
+    "ontology_alignment": "FIBO-v2"
+  },
+  "prompts": [
+    {
+      "id": "CRS-SIM-001",
+      "name": "Kinetic Crisis Simulation",
+      "category": "Simulation",
+      "description": "Simulates the cascading impact of a specific risk vector on a portfolio.",
+      "template": "You are a Chief Risk Officer utilizing the Crisis Risk Response Module. Based on the following context:\n\n{{CONTEXT}}\n\nAnd the provided risk artifact analysis:\n\n{{ARTIFACT_ANALYSIS}}\n\nPerform a kinetic simulation of the risk scenario. \n1. Identify the primary risk vector and map it to FIBO classes (e.g., fibo-fbc-fi-fi:Loan).\n2. Simulate the T+0 to T+30 impact timeline.\n3. Calculate the potential VaR degradation.\n4. Propose immediate mitigation strategies aligned with Enterprise Risk Management protocols.",
+      "inputs": ["CONTEXT", "ARTIFACT_ANALYSIS"]
+    },
+    {
+      "id": "CRD-RSK-002",
+      "name": "Syndicated Loan Credit Analysis",
+      "category": "Credit Risk",
+      "description": "Analyzes a broadly syndicated loan portfolio for covenant breaches and credit deterioration.",
+      "template": "Analyze the following Broadly Syndicated Loan (BSL) portfolio data:\n\n{{PORTFOLIO_DATA}}\n\nFocus on the following key metrics:\n- Covenant Compliance (Maintenance vs. Incurrence)\n- EBITDA Adjustments accuracy\n- 'J. Crew' trap vulnerabilities\n\nMap all identified entities to their FIBO equivalents (e.g., fibo-loan-ln-ln:SyndicatedLoan). Provide a conviction score (0-100) on the portfolio's resilience.",
+      "inputs": ["PORTFOLIO_DATA"]
+    },
+    {
+      "id": "FIBO-MAP-003",
+      "name": "FIBO Ontology Entity Extractor",
+      "category": "Data Engineering",
+      "description": "Extracts and maps entities from unstructured text to the Financial Industry Business Ontology.",
+      "template": "Extract all financial entities from the text below and map them to the Financial Industry Business Ontology (FIBO).\n\nText:\n{{INPUT_TEXT}}\n\nOutput Format (JSON):\n[\n  { \"entity\": \"Term found\", \"fibo_class\": \"fibo-namespace:ClassName\", \"confidence\": 0.95 }\n]",
+      "inputs": ["INPUT_TEXT"]
+    },
+    {
+      "id": "SOV-AI-004",
+      "name": "Sovereign AI Risk Assessment",
+      "category": "Geopolitical Risk",
+      "description": "Evaluates national security implications of AI infrastructure and energy dependencies.",
+      "template": "Assess the 'Sovereign AI' readiness of the following entity/jurisdiction:\n\n{{ENTITY_DATA}}\n\nKey Dimensions:\n1. Compute Sovereignty (Domestic H100 equivalent supply)\n2. Energy Resilience (GW baseload for data centers)\n3. Model Autonomy (Reliance on foreign foundation models)\n\nMap risks to FIBO Geopolitical ontology where possible.",
+      "inputs": ["ENTITY_DATA"]
+    },
+    {
+      "id": "AGT-LAB-005",
+      "name": "Agentic Labor Disruption Model",
+      "category": "Macro Strategy",
+      "description": "Projects the deflationary impact of agentic AI on white-collar sectors.",
+      "template": "Model the impact of 'Agentic AI' deployment on the following sector:\n\nSector: {{SECTOR}}\nCurrent OpEx Structure: {{OPEX_DATA}}\n\nForecast:\n1. Wage Deflation Curve (T+1 to T+5 years)\n2. Margin Expansion potential\n3. Social Unrest Risk Premium (0-100)\n\nProvide a 'Net Benefit' score.",
+      "inputs": ["SECTOR", "OPEX_DATA"]
+    }
+  ]
+}

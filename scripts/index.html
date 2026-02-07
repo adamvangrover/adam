@@ -1,102 +1,778 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adam System :: scripts</title>
+    <title>Index of /scripts</title>
     <link rel="stylesheet" href="../showcase/css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        .readme-content { padding: 20px; }
-        .readme-content h1 { font-size: 1.5rem; margin-bottom: 1rem; color: var(--primary-color); }
-        .readme-content h2 { font-size: 1.25rem; margin-top: 1.5rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--panel-border); padding-bottom: 0.25rem; }
-        .readme-content p { margin-bottom: 1rem; line-height: 1.6; color: var(--text-secondary); }
-        .readme-content pre { background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 4px; overflow-x: auto; border: 1px solid var(--panel-border); }
-        .readme-content code { font-family: var(--font-mono); color: var(--accent-color); }
-
-        .file-icon { display: inline-block; width: 20px; text-align: center; margin-right: 8px; color: var(--text-muted); }
-        .dir-icon { color: var(--primary-color); }
+        .file-list { list-style: none; padding: 0; }
+        .file-item { padding: 8px 12px; border-bottom: 1px solid var(--panel-border); display: flex; align-items: center; justify-content: space-between; transition: background 0.2s; }
+        .file-item:hover { background: rgba(255, 255, 255, 0.05); }
+        .file-icon { margin-right: 10px; width: 20px; text-align: center; display: inline-block; }
+        .file-name { flex-grow: 1; font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-primary); }
+        .file-tag { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; margin-left: 10px; }
+        .tag-dir { background: rgba(6, 182, 212, 0.1); color: var(--primary-color); border: 1px solid var(--primary-color); }
+        .tag-html { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); border: 1px solid var(--warning-color); }
+        .tag-py { background: rgba(16, 185, 129, 0.1); color: var(--success-color); border: 1px solid var(--success-color); }
+        .readme-container { margin-top: 30px; padding: 20px; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--panel-border); border-radius: 4px; }
+        .readme-title { color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; border-bottom: 1px solid var(--panel-border); padding-bottom: 5px; }
+        .readme-body { font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted); white-space: pre-wrap; overflow-x: auto; line-height: 1.5; }
     </style>
 </head>
 <body>
     <div class="scan-line"></div>
-    <div class="scan-glow"></div>
 
-    <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+    <header class="cyber-header" style="padding: 15px 20px; border-bottom: 1px solid var(--primary-color); background: rgba(5, 11, 20, 0.95); display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1 class="mono" style="margin: 0; font-size: 1.2rem; color: var(--primary-color);">ADAM REPO BROWSER</h1>
+            <div class="mono" style="font-size: 0.8rem; color: var(--text-muted);">PATH: <span style="color: var(--text-primary);">/scripts</span></div>
+        </div>
+        <div style="text-align: right;">
+            <div class="cyber-badge badge-cyan">SYSTEM ONLINE</div>
+        </div>
+    </header>
 
-        <!-- Header -->
-        <header style="margin-bottom: 40px; border-bottom: 1px solid var(--panel-border); padding-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <h1 class="glitch-text" data-text="ADAM v23.5" style="font-size: 2rem; margin: 0; color: var(--primary-color);">ADAM v23.5</h1>
-                <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">
-                    PATH: <span style="color: var(--text-primary);">/scripts</span>
-                </div>
-            </div>
-            <div style="text-align: right;">
-                <div class="cyber-badge badge-cyan">SYSTEM ONLINE</div>
-                <div style="margin-top: 5px; font-size: 0.7rem; color: var(--text-muted);">Mode: SHOWCASE</div>
-            </div>
-        </header>
-
-        <!-- Navigation -->
-        <nav style="margin-bottom: 30px; display: flex; gap: 10px;">
-            <a href="../index.html" class="cyber-btn">&uarr; UP LEVEL</a>
+    <div style="padding: 20px; max-width: 1200px; margin: 0 auto;">
+        <nav style="margin-bottom: 20px; display: flex; gap: 10px;">
+            <a href="../" class="cyber-btn">&uarr; UP LEVEL</a>
             <a href="../index.html" class="cyber-btn">ROOT</a>
-            <button onclick="toggleRuntime()" class="cyber-btn">LIVE RUNTIME</button>
-            <a href="https://github.com/adamvangrover/adam" class="cyber-btn" target="_blank">GITHUB</a>
+            <a href="../showcase/index.html" class="cyber-btn" style="border-color: var(--accent-color); color: var(--accent-color);">MISSION CONTROL</a>
         </nav>
 
-        <div style="display: grid; grid-template-columns: 250px 1fr; gap: 20px;">
+        <main class="glass-panel" style="padding: 0; overflow: hidden; border-radius: 4px;">
+            <div style="padding: 10px 15px; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--panel-border); color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase;">
+                Directory Contents
+            </div>
+            <ul class="file-list">
 
-            <!-- Sidebar / File Explorer -->
-            <aside class="glass-panel" style="padding: 20px; border-radius: 4px; height: fit-content;">
-                <h3 style="margin-top: 0; font-size: 0.9rem; text-transform: uppercase; color: var(--text-secondary); border-bottom: 1px solid var(--panel-border); padding-bottom: 10px; margin-bottom: 15px;">
-                    Directory Contents
-                </h3>
-                <ul style="list-style: none; padding: 0; margin: 0; font-family: var(--font-mono); font-size: 0.85rem;">
-                    <li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="migration/index.html" style="color: var(--primary-color);">migration/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="poc/index.html" style="color: var(--primary-color);">poc/</a></li><li style="margin-bottom: 6px;"><span class="dir-icon">📂</span> <a href="setup_agents/index.html" style="color: var(--primary-color);">setup_agents/</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="AGENTS.md" style="color: var(--text-secondary);">AGENTS.md</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="analyze_simulation_results.py" style="color: var(--text-secondary);">analyze_simulation_results.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="archive_html.py" style="color: var(--text-secondary);">archive_html.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="archive_ui_artifacts.py" style="color: var(--text-secondary);">archive_ui_artifacts.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="create_agent.py" style="color: var(--text-secondary);">create_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="create_data_source.py" style="color: var(--text-secondary);">create_data_source.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="daily_headlines.py" style="color: var(--text-secondary);">daily_headlines.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="data_processing.py" style="color: var(--text-secondary);">data_processing.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="extract_xai_reasoning.py" style="color: var(--text-secondary);">extract_xai_reasoning.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="generate_newsletter.py" style="color: var(--text-secondary);">generate_newsletter.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="generate_repo_structure.py" style="color: var(--text-secondary);">generate_repo_structure.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="generate_showcase.py" style="color: var(--text-secondary);">generate_showcase.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="generate_ui_data.py" style="color: var(--text-secondary);">generate_ui_data.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="generate_ui_data_v2.py" style="color: var(--text-secondary);">generate_ui_data_v2.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="load_omni_graph.py" style="color: var(--text-secondary);">load_omni_graph.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="main.py" style="color: var(--text-secondary);">main.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="rag_agent_example.py" style="color: var(--text-secondary);">rag_agent_example.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="report_generation.py" style="color: var(--text-secondary);">report_generation.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="run_adam.py" style="color: var(--text-secondary);">run_adam.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="run_llm_driven_simulation.py" style="color: var(--text-secondary);">run_llm_driven_simulation.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="run_simple_simulation.py" style="color: var(--text-secondary);">run_simple_simulation.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="run_simulations.sh " style="color: var(--text-secondary);">run_simulations.sh </a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="run_v22_seed_pipeline.py" style="color: var(--text-secondary);">run_v22_seed_pipeline.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="scan_agents_for_ui.py" style="color: var(--text-secondary);">scan_agents_for_ui.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="setup_agent.py" style="color: var(--text-secondary);">setup_agent.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="setup_and_run.sh" style="color: var(--text-secondary);">setup_and_run.sh</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="startup_helper.py" style="color: var(--text-secondary);">startup_helper.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="test_new_agents.py" style="color: var(--text-secondary);">test_new_agents.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="test_new_agents_isolated.py" style="color: var(--text-secondary);">test_new_agents_isolated.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="test_sentiment_graph.py" style="color: var(--text-secondary);">test_sentiment_graph.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="upgrade_ui_architecture.py" style="color: var(--text-secondary);">upgrade_ui_architecture.py</a></li><li style="margin-bottom: 6px;"><span class="file-icon">📄</span> <a href="version_data.py" style="color: var(--text-secondary);">version_data.py</a></li>
-                </ul>
-            </aside>
+                <li class="file-item">
+                    <a href="migration/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">migration/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
 
-            <!-- Main Content -->
-            <main>
-                <!-- Runtime Overlay (Hidden by default) -->
-                <div id="runtime-panel" class="glass-panel fade-in" style="display: none; padding: 20px; margin-bottom: 20px; border-color: var(--success-color);">
-                    <h3 style="color: var(--success-color); margin-top: 0;">Live System Interface</h3>
-                    <p style="font-size: 0.9rem;">Connecting to Orchestrator at localhost:5001...</p>
-                    <div style="background: black; padding: 10px; border-radius: 4px; font-family: var(--font-mono); height: 100px; overflow-y: auto; font-size: 0.8rem; color: #0f0;">
-                        > Connecting...<br>
-                        > Error: API Unreachable (Mock Mode Active)<br>
-                        > System Status: STANDBY
+                <li class="file-item">
+                    <a href="poc/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">poc/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="setup_agents/index.html" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📂</span>
+                        <span class="file-name">setup_agents/</span>
+                        <span class="file-tag tag-dir">DIR</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="AGENTS.md" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📝</span>
+                        <span class="file-name">AGENTS.md</span>
+
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="README.md" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📝</span>
+                        <span class="file-name">README.md</span>
+
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="analyze_simulation_results.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">analyze_simulation_results.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="archive_html.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">archive_html.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="archive_ui_artifacts.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">archive_ui_artifacts.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="benchmark_adam.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">benchmark_adam.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="boot_system.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">boot_system.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="build_market_data.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">build_market_data.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="create_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">create_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="create_data_source.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">create_data_source.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="daily_headlines.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">daily_headlines.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="data_processing.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">data_processing.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="debug_api.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">debug_api.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="demo_phase3.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">demo_phase3.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="demo_v23_5_sovereignty.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">demo_v23_5_sovereignty.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="extract_xai_reasoning.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">extract_xai_reasoning.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="feed_live_data_to_ukg.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">feed_live_data_to_ukg.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="fetch_historical_data.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">fetch_historical_data.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="fetch_market_data.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">fetch_market_data.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="generate_agent_gallery.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">generate_agent_gallery.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="generate_audit_defense_file.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">generate_audit_defense_file.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="generate_directory_indexes.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">generate_directory_indexes.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="generate_full_market_critique.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">generate_full_market_critique.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="generate_market_mayhem_archive.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">generate_market_mayhem_archive.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="generate_market_snapshot.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">generate_market_snapshot.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="generate_mock_prompts.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">generate_mock_prompts.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="generate_newsletters.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">generate_newsletters.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="generate_nexus_simulation.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">generate_nexus_simulation.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="generate_omni_data.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">generate_omni_data.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="generate_oswm_critique.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">generate_oswm_critique.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="generate_policy_view.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">generate_policy_view.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="generate_quantum_provenance.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">generate_quantum_provenance.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="generate_quantum_search_data.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">generate_quantum_search_data.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="generate_repo_structure.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">generate_repo_structure.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="generate_retail_alpha.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">generate_retail_alpha.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="generate_runtime_training_data.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">generate_runtime_training_data.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="generate_sector_outlook.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">generate_sector_outlook.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="generate_showcase.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">generate_showcase.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="generate_system_graph.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">generate_system_graph.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="generate_ui_data.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">generate_ui_data.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="generate_ui_data_v2.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">generate_ui_data_v2.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="generate_ui_manifest.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">generate_ui_manifest.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="generate_war_room_data.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">generate_war_room_data.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="initialize_comprehensive_memory.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">initialize_comprehensive_memory.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="launch_system_pulse.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">launch_system_pulse.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="load_omni_graph.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">load_omni_graph.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="main.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">main.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="maintenance_inject_nav.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">maintenance_inject_nav.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="rag_agent_example.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">rag_agent_example.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="report_generation.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">report_generation.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="run_adam.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">run_adam.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="run_adamv23.sh" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">run_adamv23.sh</span>
+
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="run_autonomous_update.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">run_autonomous_update.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="run_daily_ingestion.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">run_daily_ingestion.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="run_generative_lab.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">run_generative_lab.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="run_gold_standard_poc.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">run_gold_standard_poc.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="run_llm_driven_simulation.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">run_llm_driven_simulation.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="run_odyssey_ui.sh" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">run_odyssey_ui.sh</span>
+
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="run_quarterly_trend_analysis_demo.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">run_quarterly_trend_analysis_demo.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="run_research_demo.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">run_research_demo.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="run_simple_simulation.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">run_simple_simulation.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="run_simulations.sh " style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">run_simulations.sh </span>
+
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="run_stable_tests.sh" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">run_stable_tests.sh</span>
+
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="run_unified_banking_simulation.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">run_unified_banking_simulation.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="run_v22_seed_pipeline.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">run_v22_seed_pipeline.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="scan_agents_for_ui.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">scan_agents_for_ui.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="setup_agent.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">setup_agent.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="setup_and_run.sh" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">setup_and_run.sh</span>
+
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="setup_interactive.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">setup_interactive.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="simulate_future_scenarios.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">simulate_future_scenarios.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="simulate_singularity.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">simulate_singularity.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="start_adam_v2.sh" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">start_adam_v2.sh</span>
+
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="start_docker.sh" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name">start_docker.sh</span>
+
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="startup_helper.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">startup_helper.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="swarm_showcase.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">swarm_showcase.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="swarm_showcase_v23.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">swarm_showcase_v23.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="test_new_agents.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">test_new_agents.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="test_new_agents_isolated.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">test_new_agents_isolated.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="test_sentiment_graph.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">test_sentiment_graph.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="upgrade_ui_architecture.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">upgrade_ui_architecture.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="verify_quantum_frontend.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">verify_quantum_frontend.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="version_data.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">version_data.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+            </ul>
+        </main>
+
+
+                    <div class="readme-container">
+                        <div class="readme-title">📄 README.md Preview</div>
+                        <div class="readme-body"><pre># Scripts Directory
+
+This directory contains utility scripts for the Adam v24 system.
+
+## Benchmarking
+
+### `benchmark_adam.py`
+
+This script establishes performance baselines for the Unified Knowledge Graph (UKG) by measuring both data ingestion and graph traversal speeds. It logs results to `logs/swarm_telemetry.jsonl`.
+
+**Usage:**
+
+```bash
+python3 scripts/benchmark_adam.py
+```
+
+**Benchmarks Run:**
+
+1.  **UKG Ingestion:** Measures the time to ingest a risk state containing 5000 covenants.
+2.  **UKG Path Query:** Measures the time to find a symbolic path between the root Legal Entity and a deeply nested Covenant node.
+
+**Output:**
+
+- Console output showing the commit hash and execution time for each benchmark.
+- Appends structured JSON log entries to `logs/swarm_telemetry.jsonl` with `BENCHMARK_START` and `BENCHMARK_RESULT` events.
+
+**Metrics Tracked:**
+
+- `git_hash`: Commit hash for historical tracking.
+- `benchmark_name`: Name of the specific test (e.g., `UKG_Ingestion`, `UKG_PathQuery`).
+- `duration_seconds`: Execution time.
+- `iterations`: Workload size (e.g., number of covenants).
+- `status`: `SUCCESS` or `FAILED`.
+</pre></div>
                     </div>
-                </div>
 
-                <!-- Readme Content -->
-                <div class="glass-panel" style="border-radius: 4px;">
-                    <div class="readme-content" style="text-align: center; color: var(--text-muted); padding: 40px;">No README found in this directory.</div>
-                </div>
-            </main>
-        </div>
-
-        <!-- Footer -->
-        <footer style="margin-top: 50px; border-top: 1px solid var(--panel-border); padding-top: 20px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">
-            ADAM AUTO-GENERATED SHOWCASE | <span class="mono">REF: scripts</span>
-        </footer>
     </div>
 
-    <script>
-        function toggleRuntime() {
-            const panel = document.getElementById('runtime-panel');
-            if (panel.style.display === 'none') {
-                panel.style.display = 'block';
-            } else {
-                panel.style.display = 'none';
-            }
-        }
-    </script>
-
-    <!-- Adam Global Nav -->
-    <script src="../showcase/js/nav.js" data-root=".."></script>
+    <footer style="margin-top: 50px; text-align: center; color: var(--text-muted); font-size: 0.8rem; padding-bottom: 20px;">
+        ADAM AUTO-GENERATED SHOWCASE | REF: scripts
+    </footer>
 </body>
 </html>

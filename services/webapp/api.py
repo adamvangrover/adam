@@ -13,9 +13,56 @@ import functools
 import asyncio
 import re
 import threading
-from datetime import datetime, timezone
+import pandas as pd
+from datetime import datetime, timezone, timedelta
 from .config import config
 from .celery_app import celery
+from .governance import GovernanceMiddleware
+from services.webapp.blueprints.quantum_blueprint import quantum_bp
+from core.security.permission_manager import PermissionManager, Permission, Role
+
+# Import the Live Mock Engine for dynamic simulation data
+try:
+    from core.engine.live_mock_engine import live_engine
+    from core.engine.forecasting_engine import forecasting_engine
+    from core.engine.conviction_manager import conviction_manager
+    from core.engine.consensus_engine import ConsensusEngine
+except ImportError as e:
+    # Fallback if core is not in path or other import issues
+    logging.warning(f"Could not import core engines: {e}. Simulation endpoints will be static.")
+    live_engine = None
+    forecasting_engine = None
+    conviction_manager = None
+    ConsensusEngine = None
+
+try:
+    from core.risk_engine.engine import RiskEngine
+    risk_engine = RiskEngine()
+except ImportError as e:
+    logging.warning(f"Could not import RiskEngine: {e}")
+    risk_engine = None
+
+try:
+    from core.engine.bsl_generator import BSLPortfolioGenerator
+    from core.engine.sector_impact_engine import SectorImpactEngine
+    bsl_gen = BSLPortfolioGenerator()
+    impact_engine = SectorImpactEngine()
+except ImportError as e:
+    logging.warning(f"Could not import BSL/Impact Engines: {e}")
+    bsl_gen = None
+    impact_engine = None
+
+# ---------------------------------------------------------------------------- #
+# Constants
+# ---------------------------------------------------------------------------- #
+
+IP_BLOCK_THRESHOLD = 5
+BLOCK_DURATION_MINUTES = 15
+
+# 🛡️ Sentinel: Pre-calculate dummy hash for timing attack mitigation
+# This ensures that invalid username lookups take roughly the same amount of time
+# as valid ones (by performing a hash check in both cases).
+DUMMY_PASSWORD_HASH = generate_password_hash('dummy_password_for_timing_mitigation')
 
 # ---------------------------------------------------------------------------- #
 # Helpers
@@ -78,6 +125,38 @@ def _validate_username(username: str) -> bool:
 
     return True
 
+def _validate_portfolio_name(name: str) -> bool:
+    """
+    🛡️ Sentinel: Validate portfolio name.
+    Requires:
+    - Length between 1 and 120 characters
+    - No HTML tags or dangerous characters
+    """
+    if not name or not isinstance(name, str):
+        return False
+    if len(name) < 1 or len(name) > 120:
+        return False
+    # Basic anti-XSS: Don't allow < or >
+    if '<' in name or '>' in name:
+        return False
+    return True
+
+def _validate_asset_symbol(symbol: str) -> bool:
+    """
+    🛡️ Sentinel: Validate asset symbol.
+    Requires:
+    - Length between 1 and 20 characters
+    - Alphanumeric (uppercase preferred, but we'll case-insensitive check and convert later if needed)
+    """
+    if not symbol or not isinstance(symbol, str):
+        return False
+    if len(symbol) < 1 or len(symbol) > 20:
+        return False
+    # Should be alphanumeric
+    if not re.match(r'^[a-zA-Z0-9\.]+$', symbol):
+        return False
+    return True
+
 # ---------------------------------------------------------------------------- #
 # Initialize Extensions
 # ---------------------------------------------------------------------------- #
@@ -86,6 +165,7 @@ def _validate_username(username: str) -> bool:
 db = SQLAlchemy()
 socketio = SocketIO()
 jwt = JWTManager()
+permission_manager = None
 agent_orchestrator = None
 meta_orchestrator = None
 _neo4j_driver = None
@@ -183,6 +263,14 @@ class TokenBlocklist(db.Model):
     jti = db.Column(db.String(36), nullable=False, index=True)
     created_at = db.Column(db.DateTime, nullable=False)
 
+
+class LoginAttempt(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    ip_address = db.Column(db.String(50), nullable=False, index=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    successful = db.Column(db.Boolean, default=False)
+
+
 # ---------------------------------------------------------------------------- #
 # Application Factory
 # ---------------------------------------------------------------------------- #
@@ -194,6 +282,7 @@ def create_app(config_name='default'):
     """
     global agent_orchestrator
     global meta_orchestrator
+    global permission_manager
 
     app = Flask(__name__)
     app.config.from_object(config[config_name])
@@ -204,6 +293,14 @@ def create_app(config_name='default'):
     # 🛡️ Sentinel: Configured CORS from settings to avoid wildcard access.
     socketio.init_app(app, cors_allowed_origins=app.config.get('CORS_ALLOWED_ORIGINS', []))
     jwt.init_app(app)
+
+    # 🛡️ Governance: Initialize middleware
+    # Protocol: ADAM-V-NEXT
+    # Reviewed by Jules
+    GovernanceMiddleware(app)
+
+    # 🛡️ Sentinel: Initialize Permission Manager
+    permission_manager = PermissionManager(db_session=db.session)
 
     # Configure Celery
     celery.conf.update(app.config)
@@ -245,12 +342,243 @@ def create_app(config_name='default'):
         return response
 
     # ---------------------------------------------------------------------------- #
+    # Decorators
+    # ---------------------------------------------------------------------------- #
+
+    def require_permission(permission: Permission):
+        """
+        Decorator to enforce permission checks on endpoints.
+        Usage: @require_permission(Permission.ADMIN_SYSTEM)
+        """
+        def decorator(fn):
+            @functools.wraps(fn)
+            @jwt_required()
+            def wrapper(*args, **kwargs):
+                current_user_id = get_jwt_identity()
+                user = User.query.get(current_user_id)
+                if not user:
+                     return jsonify({'error': 'User not found'}), 401
+
+                # Check permissions
+                if not permission_manager.has_permission(user.role, permission):
+                    app.logger.warning(f"Access Denied: User {user.username} (Role: {user.role}) attempted {permission.value}")
+                    return jsonify({'error': f'Access Denied: Missing permission {permission.value}'}), 403
+
+                return fn(*args, **kwargs)
+            return wrapper
+        return decorator
+
+    # ---------------------------------------------------------------------------- #
     # API Endpoints
     # ---------------------------------------------------------------------------- #
+
+    app.register_blueprint(quantum_bp, url_prefix='/api/quantum')
 
     @app.route('/api/hello')
     def hello_world():
         return 'Hello, World!'
+
+    @app.route('/api/admin/audit_logs', methods=['GET'])
+    @require_permission(Permission.VIEW_AUDIT_LOGS)
+    def get_audit_logs():
+        """
+        Example Admin Endpoint protected by PermissionManager.
+        """
+        # Mock logs
+        return jsonify([
+            {"id": 1, "action": "LOGIN", "user": "admin", "timestamp": "2026-02-01T12:00:00"},
+            {"id": 2, "action": "TRADE", "user": "trader1", "timestamp": "2026-02-01T12:05:00"}
+        ])
+
+    # ---------------------------------------------------------------------------- #
+    # Credit Sentinel Endpoints (4-Layered Framework)
+    # ---------------------------------------------------------------------------- #
+
+    @app.route('/api/credit_sentinel/analyze', methods=['POST'])
+    @jwt_required()
+    def credit_sentinel_analyze():
+        """
+        Runs the 4-Layer Evaluation Framework on the provided data.
+        """
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        # Import Core Modules (Lazy load to ensure path is set)
+        try:
+            from core.evaluation.judge import AuditorAgent
+            from core.evaluation.symbolic import SymbolicVerifier
+
+            # If the input is just financials, wrap it in a mock state
+            # Ensure minimal structure exists
+            state = data if "balance_sheet" in data else {"balance_sheet": {}, "income_statement": {}, "quant_analysis": ""}
+
+            # Layer 2: Auditor
+            auditor = AuditorAgent()
+            audit_logs = auditor.evaluate_with_llm(state)
+
+            # Layer 3: Symbolic
+            verifier = SymbolicVerifier()
+            # Combine text analysis
+            combined_text = (state.get("quant_analysis") or "") + "\n" + (state.get("legal_analysis") or "")
+            verification_flags = verifier.verify(combined_text)
+
+            return jsonify({
+                "audit_logs": audit_logs,
+                "verification_flags": verification_flags
+            })
+
+        except ImportError as e:
+             return jsonify({'error': f'Core modules not found: {e}'}), 503
+        except Exception as e:
+             app.logger.error(f"Credit Sentinel Analyze Error: {e}")
+             return jsonify({'error': str(e)}), 500
+
+    @app.route('/api/credit_sentinel/sensitivity', methods=['POST'])
+    @jwt_required()
+    def credit_sentinel_sensitivity():
+        """
+        Runs the Red Team Sensitivity Analysis.
+        """
+        data = request.get_json()
+        if not data:
+             return jsonify({'error': 'No data provided'}), 400
+
+        try:
+            from core.evaluation.red_team import ZombieFactory
+
+            # Ensure minimal structure
+            state = data if "balance_sheet" in data else {"balance_sheet": {}, "income_statement": {}}
+
+            scenarios = ZombieFactory.generate_sensitivity_scenarios(state)
+
+            # Calculate simple metrics for each scenario to help frontend plotting
+            results = []
+            for s in scenarios:
+                ebitda = s["income_statement"].get("consolidated_ebitda", 0)
+                debt = s["balance_sheet"].get("total_debt", 0)
+                interest = s["income_statement"].get("interest_expense", 0)
+
+                leverage = debt / ebitda if ebitda > 0 else 0
+                coverage = ebitda / interest if interest > 0 else 0
+
+                results.append({
+                    "scenario_id": s.get("scenario_id"),
+                    "leverage": leverage,
+                    "coverage": coverage,
+                    "ebitda": ebitda,
+                    "interest": interest
+                })
+
+            return jsonify(results)
+
+        except ImportError as e:
+             return jsonify({'error': f'Core modules not found: {e}'}), 503
+        except Exception as e:
+             app.logger.error(f"Credit Sentinel Sensitivity Error: {e}")
+             return jsonify({'error': str(e)}), 500
+
+    # ---------------------------------------------------------------------------- #
+    # Mission Control / Synthesizer Endpoints
+    # ---------------------------------------------------------------------------- #
+
+    @app.route('/api/synthesizer/confidence', methods=['GET'])
+    @jwt_required()
+    def get_synthesizer_confidence():
+        """
+        Returns the system's aggregated confidence score and market pulse signals.
+        Powered by the LiveMockEngine to simulate real-time volatility.
+        """
+        if live_engine:
+            pulse = live_engine.get_market_pulse()
+            consensus_result = live_engine.get_synthesizer_score()
+
+            # Protocol: ADAM-V-NEXT - Enterprise Payload
+            # Extract normalized score for backward compatibility, pass full object for new UI
+            score_val = consensus_result.get('normalized_score', 50)
+
+            return jsonify({
+                "score": score_val,
+                "consensus": consensus_result,
+                "pulse": pulse,
+                "timestamp": datetime.utcnow().isoformat()
+            })
+        else:
+            return jsonify({
+                "score": 50,
+                "pulse": {},
+                "status": "Simulation Engine Offline"
+            })
+
+    @app.route('/api/intercom/stream', methods=['GET'])
+    @jwt_required()
+    def get_intercom_stream():
+        """
+        Returns a stream of 'thoughts' from the agent swarm.
+        """
+        if live_engine:
+            thoughts = live_engine.get_agent_stream(limit=10)
+            return jsonify(thoughts)
+        else:
+            return jsonify(["System offline.", "Waiting for agent connection..."])
+
+    @app.route('/api/synthesizer/forecast/<symbol>', methods=['GET'])
+    @jwt_required()
+    def get_forecast(symbol):
+        """
+        Returns historical data and a 30-day probabilistic forecast for the given symbol.
+        """
+        if not forecasting_engine:
+             return jsonify({'error': 'Forecasting Engine Unavailable'}), 503
+
+        # Load history from the generated JSON
+        try:
+            data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'core', 'data', 'generated_history.json')
+            with open(data_path, 'r') as f:
+                history_db = json.load(f)
+
+            symbol = symbol.upper()
+            if symbol not in history_db:
+                return jsonify({'error': 'Symbol not found'}), 404
+
+            history = history_db[symbol]
+            forecast = forecasting_engine.generate_forecast(symbol, history, days=30)
+
+            return jsonify({
+                "history": history[-90:], # Return last 90 days for context
+                "forecast": forecast
+            })
+        except Exception as e:
+            app.logger.error(f"Forecasting error: {e}")
+            return jsonify({'error': str(e)}), 500
+
+    @app.route('/api/synthesizer/conviction', methods=['GET'])
+    @jwt_required()
+    def get_conviction():
+        """
+        Returns the current conviction heatmap of the agent swarm.
+        """
+        if conviction_manager:
+            return jsonify(conviction_manager.get_conviction_map())
+        else:
+            return jsonify({'error': 'Conviction Manager Unavailable'}), 503
+
+    @app.route('/api/consensus', methods=['POST'])
+    @jwt_required()
+    def get_consensus():
+        """
+        Evaluates signals using the ConsensusEngine.
+        """
+        if ConsensusEngine is None:
+             return jsonify({'error': 'Consensus Engine Unavailable'}), 503
+
+        data = request.get_json()
+        signals = data.get('signals', [])
+
+        # Instantiate engine
+        engine = ConsensusEngine()
+        result = engine.evaluate(signals)
+        return jsonify(result)
 
     @app.route('/api/v23/analyze', methods=['POST'])
     @jwt_required()
@@ -290,6 +618,198 @@ def create_app(config_name='default'):
                 return jsonify({'error': 'An internal error occurred during analysis.'}), 500
         else:
             return jsonify({'status': 'Mock Result', 'analysis': 'Core not integrated or MetaOrchestrator not ready.'})
+
+    @app.route('/api/v23/crisis_response', methods=['POST'])
+    @jwt_required()
+    def crisis_response():
+        """
+        Crisis Risk Response Module Endpoint.
+        Accepts a prompt, file, and scenario selection.
+        Returns consensus analysis, contagion logs, and scenario data.
+        """
+        prompt_text = request.form.get('prompt', '')
+        scenario_id = request.form.get('scenario', None)
+        file = request.files.get('file')
+
+        # 1. Parse Input
+        extracted_text = prompt_text
+        file_analysis = "No file provided."
+        portfolio_items = []
+
+        if file:
+            filename = file.filename.lower()
+            try:
+                if filename.endswith(('.xls', '.xlsx')):
+                    df = pd.read_excel(file)
+                    file_text = df.to_string()
+                    extracted_text += "\n" + file_text
+                    file_analysis = f"Parsed Excel file: {len(df)} rows."
+                    portfolio_items = df.to_dict('records')
+                elif filename.endswith('.csv'):
+                    df = pd.read_csv(file)
+                    file_text = df.to_string()
+                    extracted_text += "\n" + file_text
+                    file_analysis = f"Parsed CSV file: {len(df)} rows."
+                    portfolio_items = df.to_dict('records')
+                elif filename.endswith(('.pdf', '.doc', '.docx')):
+                    # Placeholder for complex doc parsing without extra libs
+                    file_analysis = "Document received. Text extraction simulated for non-text formats."
+                    extracted_text += f"\n[Content of {filename}]"
+            except Exception as e:
+                file_analysis = f"Error parsing file: {str(e)}"
+                app.logger.error(f"File parse error: {e}")
+
+        # 2. Keyword & FIBO Extraction (Simulated/Heuristic)
+        keywords = []
+        fibo_matches = []
+
+        # Simple mapping for demonstration
+        fibo_map = {
+            "loan": "fibo-fbc-fi-fi:Loan",
+            "syndicated": "fibo-loan-ln-ln:SyndicatedLoan",
+            "credit": "fibo-fbc-da-dbt:CreditAgreement",
+            "risk": "fibo-fnd-arr-rt:Risk",
+            "covenant": "fibo-loan-ln-covenant:Covenant",
+            "default": "fibo-loan-ln-ln:Default",
+            "collateral": "fibo-loan-ln-ln:Collateral",
+            "entity": "fibo-be-le-lei:LegalEntity"
+        }
+
+        text_lower = extracted_text.lower()
+        for term, fibo_id in fibo_map.items():
+            if term in text_lower:
+                keywords.append(term)
+                fibo_matches.append({"term": term.title(), "fibo_id": fibo_id})
+
+        # 3. Load Prompt Library Artifact
+        prompt_lib = {}
+        try:
+            lib_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+                                  'core', 'prompting', 'crisis_response_prompts.json')
+            if os.path.exists(lib_path):
+                with open(lib_path, 'r') as f:
+                    prompt_lib = json.load(f)
+        except Exception as e:
+            app.logger.error(f"Failed to load prompt library: {e}")
+
+        # 4. Simulation & Risk Engine Integration
+        market_context = "Market Pulse Offline"
+        base_score = 50
+
+        # Load Context
+        impact_context = {}
+        market_consensus = []
+        if impact_engine:
+            impact_context = impact_engine.context
+            market_consensus = impact_engine.get_market_consensus_overview()
+
+        # Determine Portfolio (Uploaded or Simulated)
+        clean_portfolio = []
+        if portfolio_items:
+            # Use uploaded
+            for i, item in enumerate(portfolio_items):
+                item_lower = {k.lower(): v for k,v in item.items()}
+                val = item_lower.get('value') or item_lower.get('amount') or item_lower.get('market_value') or 0
+                vol = item_lower.get('volatility') or item_lower.get('vol') or 0.2
+
+                clean_portfolio.append({
+                    "id": item_lower.get('symbol') or item_lower.get('id') or f"Asset_{i}",
+                    "name": item_lower.get('name', f"Asset_{i}"),
+                    "sector": item_lower.get('sector', "Unknown"),
+                    "market_value": float(val),
+                    "volatility": float(vol),
+                    "leverage": float(item_lower.get('leverage', 4.0)),
+                    "rating": item_lower.get('rating', 'B')
+                })
+        elif bsl_gen:
+            # Use simulated BSL portfolio if no file provided
+            clean_portfolio = bsl_gen.generate_portfolio(size=15) # Generate 15 for snapshot
+            file_analysis = "Using Simulated BSL Market Portfolio (50 Names)."
+
+        # 1. Quantitative Risk (Real Engine)
+        risk_rationale = ""
+        if risk_engine and clean_portfolio:
+            try:
+                metrics = risk_engine.calculate_portfolio_risk(portfolio=clean_portfolio)
+                risk_rationale = f" | Portfolio VaR (Daily): ${metrics.get('VaR_Daily', 0):,.2f}"
+            except Exception as e:
+                risk_rationale = f" | Risk Calc Error: {str(e)}"
+
+        # 2. Agent Swarm Consensus (Sector Impact Engine)
+        detailed_analysis = []
+        contagion_log = []
+        portfolio_divergence = 0.0
+        simulation_metadata = {}
+
+        if impact_engine and clean_portfolio:
+            try:
+                # Run the consensus engine with scenario
+                engine_output = impact_engine.analyze_portfolio(clean_portfolio, scenario_id=scenario_id)
+
+                # Handle new output format (dict with log) vs old (list)
+                if isinstance(engine_output, dict):
+                    swarm_results = engine_output.get('results', [])
+                    simulation_metadata = engine_output.get('simulation_log', {})
+                else:
+                    swarm_results = engine_output
+
+                contagion_log = impact_engine.active_contagion_log
+
+                total_divergence = 0
+                # Transform for frontend
+                for res in swarm_results:
+                    detailed_analysis.append({
+                        "asset": res['asset'],
+                        "prompt": f"Sector: {res['sector']}",
+                        "insight": f"MACRO: {res['macro_insight']} CREDIT: {res['credit_insight']}",
+                        "score": res['consensus_score']
+                    })
+                    total_divergence += res.get('consensus_divergence', 0)
+
+                # Calculate average consensus for the main score
+                if swarm_results:
+                    avg_score = sum(r['consensus_score'] for r in swarm_results) / len(swarm_results)
+                    base_score = avg_score
+                    portfolio_divergence = total_divergence / len(swarm_results)
+
+            except Exception as e:
+                app.logger.error(f"Swarm simulation failed: {e}")
+
+        # Final Conviction Logic
+        # Normalize LiveEngine score (0-100) to 0.0-1.0
+        final_score = base_score / 100.0
+
+        # Boost if strong FIBO alignment
+        boost = len(fibo_matches) * 0.01
+        final_score = min(0.99, final_score + boost)
+
+        decision = "APPROVE / MITIGATE" if final_score > 0.6 else "REVIEW"
+
+        consensus_label = "High Consensus" if portfolio_divergence < 15 else "Fragmented View"
+
+        rationale = (f"System Confidence: {base_score}%. {consensus_label} (Div: {portfolio_divergence:.1f}). {market_context}. "
+                     f"Analyzed {len(keywords)} risk terms. "
+                     f"FIBO entities: {len(fibo_matches)}. "
+                     f"{file_analysis}{risk_rationale}")
+
+        simulation_result = {
+            "score": round(final_score, 2),
+            "decision": decision,
+            "rationale": rationale
+        }
+
+        return jsonify({
+            "fibo_matches": fibo_matches,
+            "prompt_library": prompt_lib,
+            "simulation_result": simulation_result,
+            "consensus_meta": {"divergence": round(portfolio_divergence, 1), "label": consensus_label},
+            "simulation_metadata": simulation_metadata,
+            "detailed_analysis": detailed_analysis,
+            "market_context": impact_context,
+            "market_consensus": market_consensus,
+            "contagion_log": contagion_log,
+            "available_scenarios": impact_engine.scenarios if impact_engine else []
+        })
 
     # ---------------------------------------------------------------------------- #
     # Agent Endpoints
@@ -381,15 +901,49 @@ def create_app(config_name='default'):
         """
         Login endpoint.
         """
+        # 🛡️ Sentinel: Rate limiting check
+        ip_address = request.remote_addr
+        cutoff_time = datetime.utcnow() - timedelta(minutes=BLOCK_DURATION_MINUTES)
+
+        # Count failed attempts in the last window
+        failed_attempts = LoginAttempt.query.filter(
+            LoginAttempt.ip_address == ip_address,
+            LoginAttempt.successful == False,
+            LoginAttempt.timestamp > cutoff_time
+        ).count()
+
+        if failed_attempts >= IP_BLOCK_THRESHOLD:
+            # Check if there is a recent successful login to reset counter?
+            # Standard practice is strict block.
+            return jsonify({'error': 'Too many failed login attempts. Please try again later.'}), 429
+
         data = request.get_json()
         username = data.get('username')
         password = data.get('password')
         user = User.query.filter_by(username=username).first()
-        if user and user.check_password(password):
+
+        # 🛡️ Sentinel: Mitigate Timing Attacks (User Enumeration)
+        # We must perform a hash check even if the user is not found to ensure
+        # that the response time is consistent regardless of user existence.
+        if user:
+            authorized = user.check_password(password)
+        else:
+            # Perform a dummy check against a constant hash
+            check_password_hash(DUMMY_PASSWORD_HASH, password if password else '')
+            authorized = False
+
+        if authorized:
+            # Log successful attempt
+            db.session.add(LoginAttempt(ip_address=ip_address, successful=True))
+            db.session.commit()
+
             access_token = create_access_token(identity=str(user.id))
             refresh_token = create_refresh_token(identity=str(user.id))
             return jsonify(access_token=access_token, refresh_token=refresh_token)
         else:
+            # Log failed attempt
+            db.session.add(LoginAttempt(ip_address=ip_address, successful=False))
+            db.session.commit()
             return jsonify({'error': 'Invalid credentials'}), 401
 
     @app.route('/api/logout', methods=['POST'])
@@ -627,6 +1181,11 @@ def create_app(config_name='default'):
         data = request.get_json()
         if not data or 'name' not in data:
             return jsonify({'error': 'Missing name in request body'}), 400
+
+        # 🛡️ Sentinel: Validate portfolio name
+        if not _validate_portfolio_name(data['name']):
+             return jsonify({'error': 'Invalid portfolio name. Must be 1-120 characters and contain no dangerous characters.'}), 400
+
         current_user_id = get_jwt_identity()
         new_portfolio = Portfolio(name=data['name'], user_id=current_user_id)
         db.session.add(new_portfolio)
@@ -655,6 +1214,11 @@ def create_app(config_name='default'):
         data = request.get_json()
         current_user_id = get_jwt_identity()
         portfolio = Portfolio.query.filter_by(id=id, user_id=current_user_id).first_or_404()
+
+        # 🛡️ Sentinel: Validate portfolio name
+        if 'name' in data and not _validate_portfolio_name(data['name']):
+             return jsonify({'error': 'Invalid portfolio name.'}), 400
+
         portfolio.name = data['name']
         db.session.commit()
         return jsonify({'id': portfolio.id, 'name': portfolio.name})
@@ -674,11 +1238,27 @@ def create_app(config_name='default'):
         data = request.get_json()
         current_user_id = get_jwt_identity()
         portfolio = Portfolio.query.filter_by(id=portfolio_id, user_id=current_user_id).first_or_404()
+
+        # 🛡️ Sentinel: Validate input
+        if not _validate_asset_symbol(data.get('symbol')):
+             return jsonify({'error': 'Invalid symbol.'}), 400
+
+        try:
+            quantity = float(data.get('quantity', 0))
+            price = float(data.get('purchase_price', 0))
+        except (ValueError, TypeError):
+             return jsonify({'error': 'Invalid quantity or price.'}), 400
+
+        if quantity <= 0:
+             return jsonify({'error': 'Quantity must be positive.'}), 400
+        if price < 0:
+             return jsonify({'error': 'Price cannot be negative.'}), 400
+
         new_asset = PortfolioAsset(
             portfolio_id=portfolio.id,
             symbol=data['symbol'],
-            quantity=data['quantity'],
-            purchase_price=data['purchase_price']
+            quantity=quantity,
+            purchase_price=price
         )
         db.session.add(new_asset)
         db.session.commit()
@@ -691,9 +1271,31 @@ def create_app(config_name='default'):
         current_user_id = get_jwt_identity()
         portfolio = Portfolio.query.filter_by(id=portfolio_id, user_id=current_user_id).first_or_404()
         asset = PortfolioAsset.query.filter_by(id=asset_id, portfolio_id=portfolio.id).first_or_404()
-        asset.symbol = data['symbol']
-        asset.quantity = data['quantity']
-        asset.purchase_price = data['purchase_price']
+
+        # 🛡️ Sentinel: Validate input
+        if 'symbol' in data:
+            if not _validate_asset_symbol(data['symbol']):
+                return jsonify({'error': 'Invalid symbol.'}), 400
+            asset.symbol = data['symbol']
+
+        if 'quantity' in data:
+            try:
+                quantity = float(data['quantity'])
+                if quantity <= 0:
+                     return jsonify({'error': 'Quantity must be positive.'}), 400
+                asset.quantity = quantity
+            except (ValueError, TypeError):
+                 return jsonify({'error': 'Invalid quantity.'}), 400
+
+        if 'purchase_price' in data:
+            try:
+                price = float(data['purchase_price'])
+                if price < 0:
+                     return jsonify({'error': 'Price cannot be negative.'}), 400
+                asset.purchase_price = price
+            except (ValueError, TypeError):
+                 return jsonify({'error': 'Invalid price.'}), 400
+
         db.session.commit()
         return jsonify({'id': asset.id, 'symbol': asset.symbol, 'quantity': asset.quantity, 'purchase_price': asset.purchase_price})
 

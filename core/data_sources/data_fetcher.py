@@ -253,6 +253,26 @@ class DataFetcher:
         """
         try:
             logger.info(f"Fetching realtime snapshot for {ticker_symbol}...")
+
+            if yf is None:
+                # Simulated Fallback if yfinance is missing
+                import random
+                price = 100.0 + random.uniform(-5, 5)
+                return {
+                    "symbol": ticker_symbol,
+                    "last_price": price,
+                    "previous_close": price * 0.99,
+                    "open": price * 0.995,
+                    "day_high": price * 1.01,
+                    "day_low": price * 0.98,
+                    "year_high": price * 1.2,
+                    "year_low": price * 0.8,
+                    "market_cap": 1_000_000_000,
+                    "currency": "USD",
+                    "timestamp": time.time(),
+                    "simulated": True
+                }
+
             ticker = yf.Ticker(ticker_symbol)
             fi = ticker.fast_info
 

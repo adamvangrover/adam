@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ADAM v26 :: CRISIS SIMULATOR</title>
+    <style>
+        :root {
+            --bg-color: #0a0a0f;
+            --panel-bg: #11111a;
+            --text-main: #e0e0e0;
+            --text-dim: #888;
+            --accent-red: #ff3333;
+            --accent-green: #33ff33;
+            --accent-blue: #33ccff;
+            --border: 1px solid #333;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Courier New', monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+        h1 { margin: 0 0 20px 0; color: var(--accent-blue); text-transform: uppercase; letter-spacing: 2px; }
+        .grid {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+        .panel {
+            background: var(--panel-bg);
+            border: var(--border);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .panel-header {
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: var(--accent-blue);
+        }
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        .metric-label { color: var(--text-dim); }
+        .metric-val { font-weight: bold; }
+        .val-red { color: var(--accent-red); }
+        .val-green { color: var(--accent-green); }
+
+        #inject-feed {
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid #222;
+            padding: 10px;
+            background: #000;
+        }
+        .inject-item {
+            border-left: 3px solid var(--accent-blue);
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #1a1a20;
+        }
+        .inject-critical { border-color: var(--accent-red); }
+        .inject-title { font-weight: bold; margin-bottom: 5px; }
+        .inject-msg { font-size: 0.9em; line-height: 1.4; }
+
+        .btn {
+            background: #222;
+            color: white;
+            border: 1px solid #444;
+            padding: 10px;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 5px;
+            text-align: left;
+            transition: background 0.2s;
+        }
+        .btn:hover { background: #333; border-color: var(--accent-blue); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        #start-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        .big-btn {
+            font-size: 2em;
+            padding: 20px 40px;
+            background: var(--accent-blue);
+            color: #000;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="start-overlay">
+        <button class="big-btn" onclick="startSimulation()">INITIALIZE SIMULATION</button>
+    </div>
+
+    <h1>Systemic Contagion Simulator <span style="font-size:0.5em; float:right" id="status-indicator">OFFLINE</span></h1>
+
+    <div class="grid">
+        <!-- Left: Metrics -->
+        <div class="panel">
+            <div class="panel-header">DASHBOARD</div>
+
+            <div class="metric">
+                <span class="metric-label">LCR Ratio</span>
+                <span class="metric-val" id="val-lcr">--%</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">CET1 Capital</span>
+                <span class="metric-val" id="val-cet1">--%</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Sov. Spread</span>
+                <span class="metric-val" id="val-spread">-- bps</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Repo Haircut</span>
+                <span class="metric-val" id="val-haircut">--%</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Intraday Liq.</span>
+                <span class="metric-val" id="val-liquidity">-- M</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Cpty CDS</span>
+                <span class="metric-val" id="val-cds">-- bps</span>
+            </div>
+            <br>
+            <div class="panel-header">LOGS</div>
+            <div id="log-feed" style="font-size:0.8em; color:#666; overflow-y:auto; flex:1">
+                Waiting for initialization...
+            </div>
+        </div>
+
+        <!-- Center: Narrative -->
+        <div class="panel">
+            <div class="panel-header">INJECT FEED</div>
+            <div id="inject-feed"></div>
+        </div>
+
+        <!-- Right: Actions -->
+        <div class="panel">
+            <div class="panel-header">DECISION MATRIX</div>
+            <div id="action-container">
+                <p style="color:#666; text-align:center">No pending decisions.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/simulation';
+
+        async function startSimulation() {
+            try {
+                const res = await fetch(`${API_BASE}/start`, { method: 'POST' });
+                const data = await res.json();
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    return;
+                }
+                document.getElementById('start-overlay').style.display = 'none';
+                updateUI(data.state);
+                startPolling();
+            } catch (e) {
+                alert('Connection failed. Is the server running?');
+            }
+        }
+
+        async function fetchState() {
+            const res = await fetch(`${API_BASE}/state`);
+            const data = await res.json();
+            updateUI(data);
+        }
+
+        function updateUI(state) {
+            if (!state) return;
+
+            document.getElementById('status-indicator').innerText = "LIVE | TURN " + state.turn;
+            document.getElementById('status-indicator').style.color = "#33ff33";
+
+            // Metrics
+            setVal('val-lcr', state.lcr.toFixed(1) + '%', state.lcr < 100);
+            setVal('val-cet1', state.cet1.toFixed(2) + '%', state.cet1 < 10);
+            setVal('val-spread', state.sovereign_spread.toFixed(0), state.sovereign_spread > 500);
+            setVal('val-haircut', state.repo_haircut.toFixed(1) + '%', state.repo_haircut > 5);
+            setVal('val-liquidity', '$' + state.intraday_liquidity.toFixed(0), state.intraday_liquidity < 0);
+            setVal('val-cds', state.counterparty_cds.toFixed(0), state.counterparty_cds > 500);
+
+            // Logs
+            const logFeed = document.getElementById('log-feed');
+            logFeed.innerHTML = state.history.map(l => `<div>> ${l}</div>`).join('');
+            logFeed.scrollTop = logFeed.scrollHeight;
+
+            // Injects
+            const injectFeed = document.getElementById('inject-feed');
+            // Clear current feed to avoid duplicates or use smart diffing?
+            // For simplicity, redraw.
+            injectFeed.innerHTML = state.injects.map(i => `
+                <div class="inject-item ${i.type === 'Critical' ? 'inject-critical' : ''}">
+                    <div class="inject-title">[${i.type}] ${i.title}</div>
+                    <div class="inject-msg">${i.message}</div>
+                </div>
+            `).join('');
+            injectFeed.scrollTop = injectFeed.scrollHeight;
+
+            // Actions (Take the first active inject)
+            const actionContainer = document.getElementById('action-container');
+            if (state.injects.length > 0) {
+                const active = state.injects[0]; // Just handle one at a time
+                actionContainer.innerHTML = `
+                    <div style="margin-bottom:10px; color:var(--accent-blue)">Responding to: ${active.title}</div>
+                    ${active.options.map(opt => `
+                        <button class="btn" onclick="submitAction('${active.id}', '${opt.id}')">
+                            <div style="font-weight:bold">${opt.text}</div>
+                            <div style="font-size:0.8em; color:#888">${opt.consequence}</div>
+                        </button>
+                    `).join('')}
+                `;
+            } else {
+                if (state.game_over) {
+                    actionContainer.innerHTML = `<div style="text-align:center; color:var(--accent-red); font-size:1.5em; margin-top:20px">SIMULATION ENDED</div>`;
+                } else {
+                    actionContainer.innerHTML = `<p style="color:#666; text-align:center">Monitoring feed...</p>`;
+                }
+            }
+        }
+
+        function setVal(id, text, isBad) {
+            const el = document.getElementById(id);
+            el.innerText = text;
+            el.className = 'metric-val ' + (isBad ? 'val-red' : 'val-green');
+        }
+
+        async function submitAction(injectId, optionId) {
+            const res = await fetch(`${API_BASE}/action`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ inject_id: injectId, option_id: optionId })
+            });
+            const data = await res.json();
+            updateUI(data.state);
+        }
+
+        function startPolling() {
+            setInterval(fetchState, 2000);
+        }
+    </script>
+</body>
+</html>
