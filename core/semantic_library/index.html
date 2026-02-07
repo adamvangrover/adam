@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" /> <!-- Example, adjust as needed -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Semantic Library - Conceptual Overview</title>
+    <style>
+      body { font-family: sans-serif; margin: 20px; line-height: 1.6; background-color: #f9f9f9; color: #333; }
+      header { background-color: #333; color: white; padding: 1em; text-align: center; margin-bottom: 20px; }
+      nav ul { list-style-type: none; padding: 0; text-align: center; }
+      nav ul li { display: inline; margin-right: 20px; }
+      nav a { text-decoration: none; color: #333; font-weight: bold; }
+      nav a:hover { color: #007bff; }
+      .container { background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+      h1, h2, h3 { color: #333; }
+      pre { background-color: #eee; padding: 10px; border-radius: 4px; overflow-x: auto; }
+      .file-link { display: inline-block; margin: 5px; padding: 8px 12px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px; }
+      .file-link:hover { background-color: #0056b3; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Semantic Library - Conceptual Overview</h1>
+    </header>
+
+    <nav>
+      <ul>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#structure">Structure</a></li>
+        <li><a href="#files">Key Files</a></li>
+        <li><a href="#usage">Usage</a></li>
+      </ul>
+    </nav>
+
+    <div class="container">
+      <section id="overview">
+        <h2>Overview</h2>
+        <p>This page provides a conceptual entry point and documentation for the <strong>Semantic Library</strong>.</p>
+        <p>The Semantic Library is the declarative core of the Narrative Library project. It serves as a centralized,
+           self-contained knowledge base and configuration hub that defines the "what" and "how" of
+           understanding financial and market dynamics and generating explainable narratives.</p>
+        <p>Refer to the <a href="README.md" class="file-link">Semantic Library README</a> for comprehensive details.</p>
+        <p><em>Note: This HTML file is a static conceptual overview placed within the semantic library for documentation purposes.
+           It is not the active, data-driven frontend of the main application (which is a React app located in the <code>/frontend</code> directory).</em></p>
+      </section>
+
+      <section id="structure">
+        <h2>Library Structure</h2>
+        <p>The library is primarily composed of YAML and JSON configuration files:</p>
+        <pre>
+semantic_library/
+├── README.md
+├── drivers_knowledge_base.yaml
+├── narrative_strategies.yaml
+├── domain_ontology.yaml
+├── simulation_environment_definitions.yaml
+├── index.html (this file)
+└── schemas/
+    ├── company_schema.json
+    ├── driver_schema.json
+    ├── industry_schema.json
+    └── macro_factor_schema.json
+        </pre>
+      </section>
+
+      <section id="files">
+        <h2>Key Files (Links to Raw Content - Conceptual)</h2>
+        <p>Direct links to view the raw content of the key configuration files (these links assume the files are browsable in a repository context):</p>
+        <ul>
+            <li><a href="drivers_knowledge_base.yaml" class="file-link">drivers_knowledge_base.yaml</a></li>
+            <li><a href="narrative_strategies.yaml" class="file-link">narrative_strategies.yaml</a></li>
+            <li><a href="domain_ontology.yaml" class="file-link">domain_ontology.yaml</a></li>
+            <li><a href="simulation_environment_definitions.yaml" class="file-link">simulation_environment_definitions.yaml</a></li>
+            <li><a href="schemas/company_schema.json" class="file-link">schemas/company_schema.json</a></li>
+            <!-- Add other schema links as needed -->
+        </ul>
+      </section>
+
+      <section id="usage">
+        <h2>Intended Usage</h2>
+        <p>The `ReasoningEngine` (Python backend component) is the primary consumer of this library. It loads these
+           configuration files to:</p>
+        <ul>
+          <li>Understand domain entities and relationships (via `domain_ontology.yaml` and `schemas/`).</li>
+          <li>Identify active "drivers" and their potential impacts (via `drivers_knowledge_base.yaml`).</li>
+          <li>Select and apply narrative strategies for generating explanations (via `narrative_strategies.yaml`).</li>
+          <li>(Future) Set up and run simulations based on `simulation_environment_definitions.yaml`.</li>
+        </ul>
+        <p>This declarative approach allows for easier modification and extension of the system's knowledge
+           and explanatory capabilities without deep code changes in the engine itself.</p>
+      </section>
+    </div>
+
+    <footer>
+      <p style="text-align:center; margin-top: 30px; font-size: 0.9em; color: #777;">
+        Semantic Library - Part of the Narrative Library Project
+      </p>
+    </footer>
+
+  </body>
+</html>

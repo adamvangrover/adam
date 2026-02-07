@@ -1,0 +1,203 @@
+# semantic_library/simulation_environment_definitions.yaml
+# Version: 1.0
+# Description: Defines parameters and base states for different simulation environments
+#              or "world models" to facilitate what-if analysis and scenario testing.
+
+# --- NOTES ON STRUCTURE ---
+# Each environment defines a baseline against which changes or events can be applied.
+# The ReasoningEngine would use these definitions to:
+# 1. Set up an initial state for a simulation.
+# 2. Apply specific scenario shocks or events.
+# 3. Observe how drivers (from drivers_knowledge_base.yaml) behave differently
+#    or how their impacts are modified under this environment.
+# 4. Generate narratives specific to the simulation outcomes.
+
+# Key sections for each environment:
+# - environment_id: Unique identifier.
+# - description: What this environment represents.
+# - base_macro_factors: Default values/trends for global macroeconomic factors.
+# - event_definitions: A catalog of potential exogenous events specific to or
+#   more likely in this environment, and their direct impacts.
+# - modification_rules_for_drivers: How parameters of drivers (defined in
+#   drivers_knowledge_base.yaml) should be altered when this environment is active.
+#   This allows for context-sensitive driver behavior.
+
+environments:
+  - environment_id: BASELINE_CURRENT_MARKET_2024_Q3
+    description: "Represents the current assumed market conditions as of Q3 2024 (example)."
+    tags: ["baseline", "current"]
+    base_macro_factors: # Overrides or sets defaults for global macro factors
+      - factor_id: MACRO_IR # Official Interest Rate
+        currentValue: 5.25 # %
+        trend: Stable
+        source: "Baseline Assumption Q3 2024"
+      - factor_id: MACRO_GDP # GDP Growth Rate
+        currentValue: 2.0 # % annualised
+        trend: Increasing
+        source: "Baseline Assumption Q3 2024"
+      - factor_id: MACRO_INFL # Inflation Rate
+        currentValue: 2.8 # % YoY
+        trend: Stable # Assuming it has stabilized
+        source: "Baseline Assumption Q3 2024"
+      - factor_id: MACRO_SC # Global Supply Chain Index
+        currentValue: 0.5 # (Scale e.g. -2 to 2, 0.5 means slight pressure but improving)
+        trend: Improving
+        source: "Baseline Assumption Q3 2024"
+    event_definitions: [] # No specific unique events for baseline, or list common ones
+    modification_rules_for_drivers: [] # No modifications for baseline, uses defaults from drivers_knowledge_base
+
+  - environment_id: SCENARIO_RECESSION_MILD_2025_H1
+    description: "Simulates a mild recessionary environment in the first half of 2025."
+    tags: ["recession", "scenario", "downside"]
+    base_macro_factors:
+      - factor_id: MACRO_IR
+        currentValue: 4.0 # Assumes some rate cuts in response
+        trend: Decreasing
+        source: "Recession Scenario V1"
+      - factor_id: MACRO_GDP
+        currentValue: -0.5 # Negative GDP growth
+        trend: Decreasing
+        source: "Recession Scenario V1"
+      - factor_id: MACRO_INFL
+        currentValue: 1.5
+        trend: Decreasing
+        source: "Recession Scenario V1"
+      - factor_id: MACRO_UNEMP # Unemployment Rate (assuming MACRO_UNEMP is defined in ontology)
+        currentValue: 5.5 # %
+        trend: Increasing
+        source: "Recession Scenario V1"
+      - factor_id: MACRO_CS # Consumer Sentiment Index
+        currentValue: 55.0 # Lower sentiment
+        trend: Decreasing
+        source: "Recession Scenario V1"
+    event_definitions: # Events more likely or specific to this scenario
+      - event_id: EVT_GOV_STIMULUS_PKG_SMALL
+        description: "Small government stimulus package announced."
+        probability_in_scenario: 0.4 # Likelihood of this event occurring within this scenario
+        direct_impacts: # What this event directly changes
+          - target_variable: "MACRO_GDP.trend_modifier" # Temporary boost
+            change_value: "+0.2pct_points_qoq_for_2q"
+            duration: "6 months"
+      - event_id: EVT_MAJOR_BANK_DOWNGRADE
+        description: "A major financial institution is downgraded."
+        probability_in_scenario: 0.2
+        direct_impacts:
+          - target_variable: "market.financial_sector_sentiment"
+            change_value: "-0.3 (on a -1 to 1 scale)"
+            duration: "3 months"
+          - target_driver_activation: "DRV_CREDIT_CRUNCH_RISK" # Assumed driver ID
+            activation_probability_boost: "+0.3"
+    modification_rules_for_drivers: # How driver parameters are changed in this environment
+      - driver_id: DRV001 # Interest Rate Sensitivity
+        comment: "Sensitivity to rate changes might be asymmetric in recession."
+        # No specific parameter changes here, but could alter 'sensitivity_factor' in its impact_model
+      - driver_id: DRV_CONSUMER_SPENDING_TRENDS # Assumed ID for a consumer spending driver
+        impact_model_parameter_override:
+          target_variables: ["company.financials.revenue_forecast_next_12m"] # Path to specific parameter
+          first_order_impacts: # Identify which impact by its target or a unique ID if multiple affect same var
+            - target: "company.financials.revenue_forecast_next_12m" # Assuming this matches a defined impact
+              parameters: # Override parameters for the effect_function
+                growth_factor_adjustment: -0.05 # e.g. reduce base growth expectations by 5%
+        narrative_logic_override:
+          explanation_patterns_llm: # Add or override LLM guidance
+            - "Emphasize downside risks to consumer demand due to recessionary pressures."
+
+  - environment_id: SCENARIO_TECH_AI_BOOM_2025
+    description: "Simulates a continued boom in AI and related technology sectors in 2025."
+    tags: ["bullish", "tech_sector", "AI", "scenario"]
+    base_macro_factors:
+      - factor_id: MACRO_GDP # Higher GDP driven by tech
+        currentValue: 3.5
+        trend: Increasing
+      - factor_id: MACRO_VC_FUNDING # Venture Capital Funding (new factor)
+        currentValue: "High" # Qualitative or quantitative
+        trend: Increasing
+    event_definitions:
+      - event_id: EVT_AI_BREAKTHROUGH_ANNOUNCED
+        description: "Significant AI research breakthrough announced by a major player."
+        probability_in_scenario: 0.6
+        direct_impacts:
+          - target_driver_activation: "DRV_AI_ADOPTION_ACCELERATION" # New conceptual driver
+            activation_probability_boost: "+0.5"
+    modification_rules_for_drivers:
+      - driver_id: DRV006 # Innovation Pipeline Strength
+        comment: "Higher impact of innovation in a tech boom."
+        impact_model_parameter_override:
+          first_order_impacts:
+            - target: "company.valuation.pe_ratio" # Example path
+              parameters:
+                # e.g., increase the sensitivity of P/E to innovation metrics
+                innovation_beta_multiplier: 1.5
+      - driver_id: DRV_TALENT_ACQUISITION_DIFFICULTY # New conceptual driver
+        comment: "Increased difficulty and cost of acquiring tech talent."
+        # This driver might become more active or its impact parameters change.
+        # For example, its 'detection_patterns' might be met more easily,
+        # or its 'impact_model' on 'company.financials.operating_costs' has higher parameters.
+        activation_threshold_modifier: # Modify when this driver is detected
+          detection_pattern_id: "PATTERN_SALARY_INFLATION_TECH" # Assumed ID of a pattern
+          threshold_change_pct: -20 # Easier to trigger (20% lower threshold)
+
+# This structure allows for defining various baseline and alternative scenarios.
+# The ReasoningEngine, when running a simulation for a specific environment:
+# 1. Starts with the environment's base_macro_factors.
+# 2. Applies modification_rules_for_drivers to the general drivers_knowledge_base.
+# 3. Can stochastically trigger events from event_definitions.
+# 4. Then proceeds with identifying active drivers and calculating impacts as usual,
+#    but now within the context of the simulated environment.
+
+  - environment_id: SCENARIO_SUPPLY_SHOCK_OIL_2025
+    description: "Simulates a significant oil supply shock in 2025 due to geopolitical events in a major producing region."
+    tags: ["geopolitics", "energy_crisis", "inflation_risk", "scenario"]
+    base_macro_factors:
+      - factor_id: MACRO_OIL_PRICE # Assuming a new MacroFactor for Oil Price (e.g., WTI $/bbl)
+        currentValue: 120 # Spike in oil price
+        trend: SharplyIncreasing
+        source: "Oil Shock Scenario V1"
+      - factor_id: MACRO_INFL # Inflation Rate
+        currentValue: 5.5 # Spike in inflation due to energy costs
+        trend: Increasing
+        source: "Oil Shock Scenario V1"
+      - factor_id: MACRO_GDP # GDP Growth Rate
+        currentValue: 0.5 # Reduced GDP growth due to higher energy costs and inflation
+        trend: Decreasing
+        source: "Oil Shock Scenario V1"
+      - factor_id: MACRO_SC # Global Supply Chain Index
+        currentValue: 1.2 # Increased pressure on supply chains
+        trend: Worsening
+        source: "Oil Shock Scenario V1"
+    event_definitions:
+      - event_id: EVT_OIL_PRODUCER_OUTPUT_HALT
+        description: "Major oil producer X halts 5M bpd output."
+        probability_in_scenario: 0.85 # Core event of this scenario
+        direct_impacts:
+          - target_variable: "MACRO_OIL_PRICE.shock_factor" # A multiplier or additive factor
+            change_value: "+40_USD_bbl_spike" # How the engine interprets this needs defining
+            duration: "3-6 months"
+      - event_id: EVT_STRATEGIC_PETROLEUM_RESERVE_RELEASE
+        description: "Coordinated release of strategic petroleum reserves by major consuming nations."
+        probability_in_scenario: 0.5 # Counter-measure
+        direct_impacts:
+          - target_variable: "MACRO_OIL_PRICE.shock_factor"
+            change_value: "-15_USD_bbl_dampening"
+            duration: "1-3 months"
+            delay: "1 month" # Takes time to implement and have effect
+    modification_rules_for_drivers:
+      - driver_id: DRV004 # Supply Chain Disruption
+        comment: "Exacerbated by high energy costs affecting logistics."
+        impact_model_parameter_override:
+          first_order_impacts:
+            - target: "company.financials.cogs_pct_revenue" # Path to specific parameter
+              parameters: # Override parameters for the effect_function
+                change_amount: 0.0075 # Increase from 0.0050 due to higher energy costs
+            - target: "company.operations.production_lead_time_days"
+              parameters:
+                change_amount: "Uniform(10, 45)" # Mean 27.5, up from Uniform(5,30)
+        narrative_logic_override:
+          explanation_patterns_llm:
+            - "The oil supply shock significantly worsens existing supply chain disruptions (DRV004), particularly impacting logistics and input costs."
+      - driver_id: DRV_ENERGY_COST_PASS_THROUGH # New conceptual driver for this scenario
+        # This driver would need to be fully defined in drivers_knowledge_base.yaml.
+        # It would model how companies can (or cannot) pass on higher energy costs.
+        comment: "Ability of companies to pass through higher energy costs becomes critical."
+        activation_relevance_multiplier: 2.0 # This driver becomes twice as relevant/likely to be active
+...
