@@ -5,3 +5,5 @@ from .Merger_Acquisition_Simulation import MergerAcquisitionSimulation
 from .Portfolio_Optimization_Simulation import PortfolioOptimizationSimulation
 from .Regulatory_Compliance_Simulation import RegulatoryComplianceSimulation
 from .Stress_Testing_Simulation import StressTestingSimulation
+from .adam_van_grover_search import AdamVanGroverSearch
+from .distressed_credit_pricing_simulation import DistressedCreditPricingSimulation

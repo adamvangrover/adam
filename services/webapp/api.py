@@ -17,6 +17,7 @@ from datetime import datetime, timezone, timedelta
 from .config import config
 from .celery_app import celery
 from .governance import GovernanceMiddleware
+from services.webapp.blueprints.quantum_blueprint import quantum_bp
 
 # Import the Live Mock Engine for dynamic simulation data
 try:
@@ -310,6 +311,8 @@ def create_app(config_name='default'):
     # ---------------------------------------------------------------------------- #
     # API Endpoints
     # ---------------------------------------------------------------------------- #
+
+    app.register_blueprint(quantum_bp, url_prefix='/api/quantum')
 
     @app.route('/api/hello')
     def hello_world():

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified Credit & Quantum Recovery Console</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background-color: #0f172a; color: #e2e8f0; font-family: 'Inter', sans-serif; }
+        .cyber-border { border: 1px solid #6366f1; box-shadow: 0 0 10px rgba(99, 102, 241, 0.3); }
+        .cyber-text { color: #818cf8; text-shadow: 0 0 5px rgba(99, 102, 241, 0.6); }
+        .tab-btn { @apply px-4 py-2 text-sm font-medium text-gray-400 border-b-2 border-transparent hover:text-white hover:border-gray-300; }
+        .tab-btn.active { @apply text-indigo-400 border-indigo-400; }
+        .input-group { @apply mb-4; }
+        .input-label { @apply block text-xs text-gray-500 mb-1; }
+        .input-field { @apply w-full bg-gray-800 border border-gray-700 rounded p-2 text-white text-sm focus:border-indigo-500 focus:outline-none; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-8 flex justify-between items-center border-b border-indigo-900 pb-4">
+            <div>
+                <h1 class="text-3xl font-bold cyber-text">Unified Credit & Quantum Recovery</h1>
+                <p class="text-gray-400 mt-1 text-sm">AVG Protocol // Asset-Based // Cash Flow // Derivatives</p>
+            </div>
+            <div class="flex space-x-2">
+                <span class="px-2 py-1 bg-indigo-900 text-indigo-300 text-xs rounded border border-indigo-700">AVG V2.0</span>
+                <span class="px-2 py-1 bg-green-900 text-green-300 text-xs rounded border border-green-700">Quantum Link: ACTIVE</span>
+            </div>
+        </header>
+
+        <!-- Tabs -->
+        <div class="flex space-x-4 mb-6 border-b border-gray-800">
+            <button class="tab-btn active" onclick="switchTab('lbo')">Distressed LBO</button>
+            <button class="tab-btn" onclick="switchTab('abl')">ABL & Working Capital</button>
+            <button class="tab-btn" onclick="switchTab('quantum')">Quantum Recovery Search</button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+            <!-- Sidebar: Universal Inputs -->
+            <div class="lg:col-span-4 space-y-6">
+                <div class="bg-gray-900 p-5 rounded-lg cyber-border">
+                    <h2 class="text-lg font-bold mb-4 text-indigo-400">Financial Profile</h2>
+
+                    <div class="input-group">
+                        <label class="input-label">LTM EBITDA ($M)</label>
+                        <input type="number" id="ebitda" value="50" class="input-field">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">CapEx ($M)</label>
+                        <input type="number" id="capex" value="5" class="input-field">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Tax Rate (%)</label>
+                        <input type="number" id="tax_rate" value="25" class="input-field">
+                    </div>
+                </div>
+
+                <!-- Debt Stack -->
+                <div class="bg-gray-900 p-5 rounded-lg border border-gray-800">
+                    <h2 class="text-lg font-bold mb-4 text-indigo-400">Capital Structure</h2>
+                    <div id="debt-stack" class="space-y-3">
+                        <div class="grid grid-cols-3 gap-2 text-xs text-gray-500">
+                            <span>Tranche</span><span>Amt ($M)</span><span>Rate</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <input type="text" value="Senior" class="bg-transparent text-gray-300 text-sm border-none" disabled>
+                            <input type="number" id="debt-senior" value="150" class="input-field">
+                            <input type="number" id="rate-senior" value="0.06" step="0.01" class="input-field">
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <input type="text" value="Junior" class="bg-transparent text-gray-300 text-sm border-none" disabled>
+                            <input type="number" id="debt-junior" value="100" class="input-field">
+                            <input type="number" id="rate-junior" value="0.10" step="0.01" class="input-field">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Panel -->
+            <div class="lg:col-span-8 space-y-6">
+
+                <!-- TAB: LBO / Cash Flow -->
+                <div id="tab-lbo" class="tab-content block">
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-gray-800 p-4 rounded border-l-4 border-blue-500">
+                            <div class="text-xs text-gray-400">Leverage (Total Debt / EBITDA)</div>
+                            <div class="text-2xl font-bold" id="metric-leverage">--</div>
+                        </div>
+                        <div class="bg-gray-800 p-4 rounded border-l-4 border-green-500">
+                            <div class="text-xs text-gray-400">DSCR</div>
+                            <div class="text-2xl font-bold" id="metric-dscr">--</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-900 p-6 rounded-lg border border-gray-800">
+                        <h3 class="text-lg font-bold mb-4">Sensitivity Analysis</h3>
+                        <p class="text-gray-400 text-sm mb-4">Simulating EBITDA compression impact on covenants.</p>
+                        <!-- Placeholder Chart -->
+                        <canvas id="lboChart" height="150"></canvas>
+                    </div>
+                </div>
+
+                <!-- TAB: ABL -->
+                <div id="tab-abl" class="tab-content hidden">
+                    <div class="bg-gray-900 p-6 rounded-lg border border-gray-800 mb-6">
+                        <h3 class="text-lg font-bold mb-4">Borrowing Base Calculator</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="border-b border-gray-700 text-gray-500">
+                                    <tr>
+                                        <th class="py-2">Asset</th>
+                                        <th class="py-2 text-right">Book Val ($M)</th>
+                                        <th class="py-2 text-right">Ineligible</th>
+                                        <th class="py-2 text-right">Adv Rate</th>
+                                        <th class="py-2 text-right">Availability</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b border-gray-800">
+                                        <td class="py-2">A/R</td>
+                                        <td><input type="number" id="abl-ar" value="40" class="bg-transparent text-right w-full text-white border-b border-gray-700 focus:border-indigo-500"></td>
+                                        <td class="text-right">5.0</td>
+                                        <td class="text-right">85%</td>
+                                        <td class="text-right font-mono text-green-400" id="avail-ar">--</td>
+                                    </tr>
+                                    <tr class="border-b border-gray-800">
+                                        <td class="py-2">Inventory</td>
+                                        <td><input type="number" id="abl-inv" value="30" class="bg-transparent text-right w-full text-white border-b border-gray-700 focus:border-indigo-500"></td>
+                                        <td class="text-right">2.0</td>
+                                        <td class="text-right">60%</td>
+                                        <td class="text-right font-mono text-green-400" id="avail-inv">--</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 font-bold text-indigo-400">TOTAL</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="text-right font-bold text-xl text-indigo-400" id="avail-total">--</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 p-4 rounded text-sm text-gray-300">
+                        <span class="font-bold">Liquidity Check:</span>
+                        Total Debt <span id="liquidity-debt-val" class="font-mono">--</span> vs.
+                        Borrowing Base <span id="liquidity-bb-val" class="font-mono">--</span>.
+                        Status: <span id="liquidity-status" class="font-bold">--</span>
+                    </div>
+                </div>
+
+                <!-- TAB: Quantum -->
+                <div id="tab-quantum" class="tab-content hidden">
+                    <div class="bg-gray-900 p-6 rounded-lg border border-indigo-500 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-2 opacity-20">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 text-indigo-300">AVG Optimal Restructuring Search</h3>
+                        <p class="text-sm text-gray-400 mb-6 w-3/4">Using quantum annealing to explore 10^12 restructuring scenarios. Objective: Maximize Consensus Enterprise Value.</p>
+
+                        <div class="grid grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="text-xs uppercase text-gray-500 mb-2">Baseline (Litigation)</h4>
+                                <div class="text-xl font-bold text-red-400">$<span id="q-base">--</span>M</div>
+                                <div class="text-xs text-gray-500 mt-1">High Friction Costs</div>
+                            </div>
+                            <div>
+                                <h4 class="text-xs uppercase text-gray-500 mb-2">AVG Optimized (Consensual)</h4>
+                                <div class="text-xl font-bold text-green-400">$<span id="q-opt">--</span>M</div>
+                                <div class="text-xs text-gray-500 mt-1">Found via Hybrid Search</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6">
+                            <button onclick="runQuantumSearch()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded shadow-lg shadow-indigo-500/50 transition">
+                                Initiate Quantum Search
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 bg-gray-900 p-6 rounded-lg border border-gray-800">
+                        <h3 class="text-lg font-bold mb-4">Probability of Successful Restructuring</h3>
+                        <canvas id="quantumChart" height="100"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global State & Charts
+        let lboChart, quantumChart;
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Trigger recalculation for visual updates
+            recalc();
+        }
+
+        function recalc() {
+            // Inputs
+            const ebitda = parseFloat(document.getElementById('ebitda').value);
+            const debtSen = parseFloat(document.getElementById('debt-senior').value);
+            const rateSen = parseFloat(document.getElementById('rate-senior').value);
+            const debtJun = parseFloat(document.getElementById('debt-junior').value);
+            const rateJun = parseFloat(document.getElementById('rate-junior').value);
+
+            const totalDebt = debtSen + debtJun;
+            const interest = (debtSen * rateSen) + (debtJun * rateJun);
+            const capex = parseFloat(document.getElementById('capex').value);
+
+            // LBO Metrics
+            const leverage = totalDebt / ebitda;
+            const dscr = (ebitda - capex) / interest;
+
+            document.getElementById('metric-leverage').innerText = leverage.toFixed(2) + 'x';
+            document.getElementById('metric-dscr').innerText = dscr.toFixed(2) + 'x';
+
+            // ABL Metrics
+            const ar = parseFloat(document.getElementById('abl-ar').value);
+            const inv = parseFloat(document.getElementById('abl-inv').value);
+
+            const availAr = (ar - 5.0) * 0.85;
+            const availInv = (inv - 2.0) * 0.60;
+            const totalAvail = Math.max(0, availAr) + Math.max(0, availInv);
+
+            document.getElementById('avail-ar').innerText = availAr.toFixed(1);
+            document.getElementById('avail-inv').innerText = availInv.toFixed(1);
+            document.getElementById('avail-total').innerText = totalAvail.toFixed(1);
+
+            document.getElementById('liquidity-debt-val').innerText = totalDebt.toFixed(1);
+            document.getElementById('liquidity-bb-val').innerText = totalAvail.toFixed(1);
+
+            const liqEl = document.getElementById('liquidity-status');
+            if (totalAvail >= totalDebt) {
+                liqEl.innerText = "COVERED";
+                liqEl.className = "font-bold text-green-400";
+            } else {
+                liqEl.innerText = "DEFICIT ($" + (totalDebt - totalAvail).toFixed(1) + "M)";
+                liqEl.className = "font-bold text-red-400";
+            }
+
+            updateLBOChart(leverage);
+        }
+
+        function updateLBOChart(currentLev) {
+            const ctx = document.getElementById('lboChart').getContext('2d');
+            if (lboChart) lboChart.destroy();
+
+            lboChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Current', 'Stress (-10% EBITDA)', 'Severe (-25% EBITDA)'],
+                    datasets: [{
+                        label: 'Projected Leverage',
+                        data: [
+                            currentLev,
+                            currentLev / 0.9,
+                            currentLev / 0.75
+                        ],
+                        backgroundColor: ['#3b82f6', '#f59e0b', '#ef4444']
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    scales: { x: { grid: { color: '#333' } } }
+                }
+            });
+        }
+
+        function runQuantumSearch() {
+            // Simulate API call to QuantumRetrievalAgent
+            const ebitda = parseFloat(document.getElementById('ebitda').value);
+            const ev = ebitda * 5.0; // Assume 5x multiple
+
+            // Populate
+            document.getElementById('q-base').innerText = (ev * 0.8).toFixed(1);
+
+            // Animation simulation
+            let progress = 0;
+            const optVal = ev * 0.95;
+            const el = document.getElementById('q-opt');
+
+            const interval = setInterval(() => {
+                progress += Math.random() * 5;
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    el.innerText = optVal.toFixed(1);
+                    drawQuantumChart();
+                } else {
+                    el.innerText = "Scanning...";
+                }
+            }, 50);
+        }
+
+        function drawQuantumChart() {
+            const ctx = document.getElementById('quantumChart').getContext('2d');
+            if (quantumChart) quantumChart.destroy();
+
+            // Simulated Probability density function of recovery
+            quantumChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 20}, (_, i) => i * 5),
+                    datasets: [{
+                        label: 'AVG Recovery Probability Density',
+                        data: [0,0,1,2,5,10,25,40,60,80,95,90,70,50,30,15,5,2,1,0],
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { title: { display: true, text: 'Recovery %' }, grid: { color: '#333' } },
+                        y: { display: false }
+                    }
+                }
+            });
+        }
+
+        // Init
+        document.querySelectorAll('input').forEach(i => i.addEventListener('input', recalc));
+        recalc();
+    </script>
+</body>
+</html>
