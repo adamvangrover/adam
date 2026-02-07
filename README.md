@@ -158,4 +158,4 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
-**For AI Agents & LLMs:** Please refer to [llms.txt](llms.txt) for optimized context.
+**For AI Agents & LLMs:** Please refer to [llms.txt](llms.txt) (optimized) or [llms-full.txt](llms-full.txt) (comprehensive) for context.

@@ -5,7 +5,8 @@
 
 **Latest Version:** v26.0
 **License:** MIT
-**Documentation:** [Link to full docs]
+**Documentation:** [docs/getting_started.md](docs/getting_started.md)
+**Full Context (Frontier Models):** [llms-full.txt](llms-full.txt) (For GPT-4, Claude 3.5 Sonnet)
 
 ## Why use Adam?
 * **Problem:** Standard LLMs hallucinate and lack the rigor required for institutional financial due diligence.
@@ -28,10 +29,41 @@ source .venv/bin/activate
 
 ## Core Concepts & Terminology
 *   **MetaOrchestrator:** The central nervous system that routes queries to the appropriate cognitive engine.
-*   **System 1 (Swarm):** Async, fire-and-forget agents for perception and news monitoring (Fast).
-*   **System 2 (Graph):** Stateful, directed acyclic graphs for complex reasoning and planning (Slow).
+*   **System 1 (Swarm):** Async, fire-and-forget agents for perception and news monitoring (Fast). Implemented via `HiveMind`.
+*   **System 2 (Graph):** Stateful, directed acyclic graphs for complex reasoning and planning (Slow). Implemented via `NeuroSymbolicPlanner`.
 *   **MCP (Model Context Protocol):** Standard for tool integration.
 *   **Deep Dive:** A comprehensive 5-phase financial analysis workflow.
+*   **Routing Keywords:** Specific terms that trigger specialized agents (e.g., `DEEP_DIVE`, `SWARM`, `RED_TEAM`, `CRISIS`, `ESG`, `COMPLIANCE`, `SURVEILLANCE`).
+
+## Safety & Governance
+Adam employs rigorous safety checks for institutional deployment:
+*   **Governance Middleware:** All critical operations pass through `services/webapp/governance.py`, which enforces IP blacklists, keyword scanning, and high-risk operation blocks.
+*   **Break Glass Protocol:** Emergency overrides require a signed `X-Governance-Override` header with an HMAC-SHA256 signature.
+*   **Secure Deserialization:** `core.security.safe_unpickler` is mandated to prevent pickle-based RCE vulnerabilities.
+
+## Structured Output (Artifacts)
+The primary output of a Deep Dive is the **HyperDimensionalKnowledgeGraph** (HDKG).
+
+```json
+{
+  "v23_knowledge_graph": {
+    "nodes": {
+      "equity_analysis": {
+        "valuation_engine": {
+          "dcf_model": { "intrinsic_value_estimate": 150.0 },
+          "multiples_analysis": { "verdict": "Undervalued" }
+        }
+      },
+      "strategic_synthesis": {
+        "final_verdict": {
+          "recommendation": "Buy",
+          "conviction_level": 8
+        }
+      }
+    }
+  }
+}
+```
 
 ## Usage Examples (Few-Shot Prompts)
 
@@ -48,8 +80,11 @@ async def main():
 
     # Execute a simple query
     # The orchestrator automatically routes this to the appropriate engine
-    result = await orchestrator.route_request("What is the current price of AAPL?")
-    print(result)
+    try:
+        result = await orchestrator.route_request("What is the current price of AAPL?")
+        print(result)
+    except Exception as e:
+        print(f"Error: {e}")
 
 if __name__ == "__main__":
     asyncio.run(main())
@@ -76,19 +111,27 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-### Example 3: Swarm Intelligence
-Use the async swarm to gather information in parallel.
+### Example 3: Advanced Swarm Control
+Directly interface with the `HiveMind` for high-throughput tasks.
 
 ```python
 import asyncio
-from core.engine.meta_orchestrator import MetaOrchestrator
+from core.engine.swarm.hive_mind import HiveMind
 
 async def main():
-    orchestrator = MetaOrchestrator()
+    # Initialize 10 parallel workers
+    swarm = HiveMind(worker_count=10)
+    await swarm.initialize()
 
-    # "Swarm" keyword activates the Hive Mind for parallel data gathering
-    result = await orchestrator.route_request("Swarm scan for breaking news on NVIDIA")
-    print(result)
+    # Dispatch a parallel scanning task
+    task_payload = {"target": "NVIDIA", "depth": "comprehensive"}
+    await swarm.disperse_task("SCAN_NEWS", task_payload, intensity=8.0)
+
+    # Gather results
+    results = await swarm.gather_results()
+    print(results)
+
+    await swarm.shutdown()
 
 if __name__ == "__main__":
     asyncio.run(main())
@@ -103,7 +146,19 @@ if __name__ == "__main__":
     *   Routes to engines: Swarm, Deep Dive, Red Team, Crisis, etc.
     *   Returns the result (Dict or String).
 
+### Routing Keywords
+Use these keywords in your query to target specific engines:
+*   **DEEP_DIVE**: "deep dive", "full analysis", "valuation"
+*   **SWARM**: "swarm", "scan", "parallel", "hive"
+*   **RED_TEAM**: "attack", "red team", "vulnerability"
+*   **CRISIS**: "crisis", "shock", "stress test"
+*   **ESG**: "esg", "sustainability"
+*   **COMPLIANCE**: "compliance", "kyc", "regulation"
+*   **SURVEILLANCE**: "surveillance", "watch", "zombie"
+
 ## Best Practices for LLMs
 *   **Async/Await:** Adam is fundamentally asynchronous. Always use `await` when calling `route_request`.
 *   **Context Injection:** Use the `context` dictionary to pass meta-parameters like `force_reflection` or `force_route`.
-*   **Keywords:** The `MetaOrchestrator` uses keyword heuristics (e.g., "deep dive", "swarm", "red team") to route queries. Include these in your query string for deterministic routing.
+*   **Keywords:** The `MetaOrchestrator` uses keyword heuristics. Include relevant **Routing Keywords** (e.g., "deep dive", "swarm") in your query string for deterministic routing.
+*   **Error Handling:** Wrap `route_request` in `try/except` blocks to handle potential routing failures or timeouts gracefully.
+*   **Initialization:** Ensure `MetaOrchestrator` is initialized within an `asyncio` event loop context if required by specific sub-components.
