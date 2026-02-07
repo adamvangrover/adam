@@ -22,6 +22,7 @@ const SimulationTools = lazy(() => import('./pages/SimulationTools'));
 const Synthesizer = lazy(() => import('./pages/Synthesizer'));
 const PromptAlpha = lazy(() => import('./pages/PromptAlpha'));
 const CreditSentinel = lazy(() => import('./pages/CreditSentinel'));
+const MarketMayhem = lazy(() => import('./pages/MarketMayhem'));
 
 const App: React.FC = () => {
   return (
@@ -46,6 +47,7 @@ const App: React.FC = () => {
           <Route path="deep-dive/:id" element={<Suspense fallback={<Loading />}><DeepDive /></Suspense>} />
           <Route path="portfolio-management" element={<Suspense fallback={<Loading />}><PortfolioManagement /></Suspense>} />
           <Route path="simulation-tools" element={<Suspense fallback={<Loading />}><SimulationTools /></Suspense>} />
+          <Route path="market-mayhem" element={<Suspense fallback={<Loading />}><MarketMayhem /></Suspense>} />
         </Route>
       </Routes>
   );
