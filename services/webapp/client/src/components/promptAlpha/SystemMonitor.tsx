@@ -1,5 +1,5 @@
 import React from 'react';
-import { Cpu, MemoryStick, Activity, Server, Shield, Brain, Globe, Database } from 'lucide-react';
+import { Cpu, Activity, Server, Shield, Brain, Globe, Database } from 'lucide-react';
 
 const AGENTS = [
   { name: 'RiskAnalyst', type: 'Specialized', status: 'Active', load: 88, icon: Shield },

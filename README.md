@@ -11,6 +11,7 @@
 *   [**🚀 Launch Neural Dashboard**](showcase/index.html)
 *   [**⚡ Setup Guide**](docs/setup_guide.md)
 *   [**🤖 Agent Developer Bible**](AGENTS.md)
+*   [**🧠 Agent Knowledge Base**](docs/AGENTS_KNOWLEDGE_BASE.md)
 *   [**📖 Architecture Overview**](docs/architecture.md)
 *   [**🎓 Tutorials**](docs/tutorials.md)
 
@@ -148,7 +149,7 @@ Adam unifies three critical domains into a single cognitive architecture:
 
 We are building the open-source standard for institutional AI.
 
-*   **Directives:** Please read [AGENTS.md](AGENTS.md) before writing a single line of code.
+*   **Directives:** Please read [AGENTS.md](AGENTS.md) and the [Agent Knowledge Base](docs/AGENTS_KNOWLEDGE_BASE.md) before writing a single line of code.
 *   **Process:** Read [CONTRIBUTING.md](CONTRIBUTING.md) for pull request guidelines.
 
 ### License
