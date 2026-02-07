@@ -21,6 +21,18 @@ class GovernanceMiddleware:
         self.policy_path = policy_path
         self._load_policy()
 
+        # 🛡️ Sentinel: Initialize Secret Key for Governance Overrides
+        # Critical Fix: Do not use hardcoded default secrets.
+        env_secret = os.environ.get('GOVERNANCE_OVERRIDE_SECRET')
+        if env_secret:
+            self.secret_key = env_secret.encode()
+        else:
+            # If no secret is provided, generate a random one at runtime.
+            # This effectively disables the override capability since the key is unknown,
+            # but prevents attackers from using a known default key.
+            logging.warning("GOVERNANCE_OVERRIDE_SECRET not set. Generating random key. Override feature effectively disabled.")
+            self.secret_key = os.urandom(32)
+
         if app:
             self.init_app(app)
 
@@ -93,7 +105,6 @@ class GovernanceMiddleware:
                 # 🛡️ Sentinel: Secure Override Verification
                 # We require a signed token to prevent unauthorized overrides.
                 # In a real system, this secret would be strictly managed (e.g. Vault).
-                secret_key = os.environ.get('GOVERNANCE_OVERRIDE_SECRET', 'dev-secret-do-not-use-in-prod').encode()
 
                 # Format expected: "timestamp:signature"
                 try:
@@ -106,7 +117,7 @@ class GovernanceMiddleware:
 
                     # Verify signature
                     payload = f"{ts_str}:{request.path}".encode()
-                    expected_signature = hmac.new(secret_key, payload, hashlib.sha256).hexdigest()
+                    expected_signature = hmac.new(self.secret_key, payload, hashlib.sha256).hexdigest()
 
                     if not hmac.compare_digest(signature, expected_signature):
                          raise ValueError("Invalid signature")

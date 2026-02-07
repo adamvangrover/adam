@@ -1,7 +1,14 @@
 import unittest
 import json
+import os
+import time
+import hmac
+import hashlib
+from flask import Flask
+from werkzeug.exceptions import Forbidden
 from unittest.mock import patch
 from .api import create_app, db, User
+from .governance import GovernanceMiddleware
 
 
 class ApiTestCase(unittest.TestCase):
@@ -257,6 +264,56 @@ class SecurityTestCase(unittest.TestCase):
         db.session.remove()
         db.drop_all()
         self.app_context.pop()
+
+    def test_governance_override_secure(self):
+        """
+        🛡️ Sentinel: Verify that the governance override mechanism is secure.
+        1. Ensure random key generation (override disabled) when env var is missing.
+        2. Ensure explicit key via env var works.
+        """
+        # Save original env
+        original_secret = os.environ.get('GOVERNANCE_OVERRIDE_SECRET')
+        if original_secret:
+            del os.environ['GOVERNANCE_OVERRIDE_SECRET']
+
+        try:
+            # Case 1: No Env Var -> Random Key -> Default Secret Fails
+            app = Flask(__name__)
+            # Point to the real config file so we have restricted endpoints
+            middleware = GovernanceMiddleware(app, policy_path='config/governance_policy.yaml')
+
+            # Try to use the old insecure default
+            default_secret = b'dev-secret-do-not-use-in-prod'
+            timestamp = int(time.time())
+            path = '/api/admin/test'
+            payload = f"{timestamp}:{path}".encode()
+            signature = hmac.new(default_secret, payload, hashlib.sha256).hexdigest()
+            token = f"{timestamp}:{signature}"
+
+            with app.test_request_context(path, method='POST', headers={'X-Governance-Override': token}):
+                with self.assertRaises(Forbidden):
+                    middleware.check_governance()
+
+            # Case 2: Set Env Var -> Correct Secret Works
+            secure_secret = 'my-secure-test-secret'
+            os.environ['GOVERNANCE_OVERRIDE_SECRET'] = secure_secret
+
+            # Re-init middleware to pick up new secret
+            middleware = GovernanceMiddleware(app, policy_path='config/governance_policy.yaml')
+
+            signature = hmac.new(secure_secret.encode(), payload, hashlib.sha256).hexdigest()
+            valid_token = f"{timestamp}:{signature}"
+
+            with app.test_request_context(path, method='POST', headers={'X-Governance-Override': valid_token}):
+                # Should not raise
+                middleware.check_governance()
+
+        finally:
+            # Restore env
+            if original_secret:
+                os.environ['GOVERNANCE_OVERRIDE_SECRET'] = original_secret
+            elif 'GOVERNANCE_OVERRIDE_SECRET' in os.environ:
+                del os.environ['GOVERNANCE_OVERRIDE_SECRET']
 
     @patch('services.webapp.api.meta_orchestrator')
     def test_analyze_error_leak(self, mock_meta):
