@@ -4,6 +4,7 @@ import logging
 import os
 from jinja2 import Template
 from core.agents.agent_base import AgentBase
+from core.agents.mixins.audit_mixin import AuditMixin
 from core.schemas.meta_agent_schemas import (
     DidacticArchitectInput,
     DidacticArchitectOutput,
@@ -12,7 +13,7 @@ from core.schemas.meta_agent_schemas import (
     AudienceLevel
 )
 
-class DidacticArchitectAgent(AgentBase):
+class DidacticArchitectAgent(AgentBase, AuditMixin):
     """
     The Didactic Architect Agent is a meta-agent designed to build modular,
     self-contained, portable, and complementary tutorials and setups.
@@ -21,6 +22,7 @@ class DidacticArchitectAgent(AgentBase):
 
     def __init__(self, config: Dict[str, Any], **kwargs):
         super().__init__(config, **kwargs)
+        AuditMixin.__init__(self)
         self.output_dir = config.get("output_dir", "docs/tutorials")
 
     async def execute(self, input_data: DidacticArchitectInput) -> DidacticArchitectOutput:
@@ -46,7 +48,78 @@ class DidacticArchitectAgent(AgentBase):
             portable_configs=portable_configs
         )
 
+        # Log completion
+        self.log_decision(
+            activity_type="TutorialGeneration",
+            details={"topic": input_data.topic, "audience": input_data.target_audience.value},
+            outcome={"title": title, "sections_count": len(sections)}
+        )
+
         return output
+
+    async def plan_curriculum(self, audit_path: str, architecture_path: str) -> List[str]:
+        """
+        Generates a learning path based on system failures (Audit) and new features (Architecture).
+        """
+        lessons = []
+
+        # 1. Analyze Failures
+        audit_analysis = await self.analyze_audit_logs(audit_path)
+        if "Failures Detected" in audit_analysis:
+            lessons.append("Troubleshooting Common Failures")
+
+        # 2. Analyze Architecture
+        try:
+            with open(architecture_path, 'r') as f:
+                arch_content = f.read()
+            if "vertical_risk_agent" in arch_content:
+                lessons.append("Mastering Vertical Risk Analysis")
+            if "infrastructure" in arch_content:
+                lessons.append("System Observability & Capacity Planning")
+        except FileNotFoundError:
+            pass
+
+        self.log_decision(
+            activity_type="CurriculumPlanning",
+            details={"audit_source": audit_path},
+            outcome={"lessons": lessons}
+        )
+        return lessons
+
+    async def analyze_audit_logs(self, audit_file_path: str = "core/libraries_and_archives/reports/Audit_Defense_File.md") -> str:
+        """
+        Analyzes the Audit Defense File to identify recurring failures or patterns
+        that require new documentation.
+        """
+        try:
+            with open(audit_file_path, 'r') as f:
+                content = f.read()
+
+            # Simple heuristic analysis
+            failure_count = content.count("Status: FAILURE") + content.count("status': 'FAILURE'")
+            warning_count = content.count("WARNING")
+
+            report = f"# Self-Improvement Analysis\n\n"
+            report += f"Analyzed {audit_file_path}\n"
+            report += f"- Failures Detected: {failure_count}\n"
+            report += f"- Warnings Detected: {warning_count}\n\n"
+
+            if failure_count > 0:
+                report += "## Recommendation\n"
+                report += "Generate a troubleshooting guide for recent failures.\n"
+
+            # Log this meta-analysis
+            self.log_decision(
+                activity_type="SelfImprovementAnalysis",
+                details={"source": audit_file_path},
+                outcome={"failures": failure_count, "recommendation": "See report"}
+            )
+
+            return report
+
+        except FileNotFoundError:
+            logging.warning(f"Audit file not found: {audit_file_path}")
+            return "Audit file not found."
 
     def _read_context_files(self, file_paths: List[str]) -> Dict[str, str]:
         """

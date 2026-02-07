@@ -1,51 +1,51 @@
 import os
-import subprocess
+import sys
+import threading
 import time
+from http.server import SimpleHTTPRequestHandler, HTTPServer
 from playwright.sync_api import sync_playwright
 
+# Server configuration
+PORT = 8124
+SERVER_URL = f"http://localhost:{PORT}/showcase/system_brain.html"
+
+def start_server():
+    """Starts a simple HTTP server in a background thread."""
+    root_dir = os.getcwd()
+    class Handler(SimpleHTTPRequestHandler):
+        def log_message(self, format, *args):
+            pass
+
+    httpd = HTTPServer(('localhost', PORT), Handler)
+    httpd.serve_forever()
+
 def verify_system_brain():
-    server = subprocess.Popen(["python3", "-m", "http.server", "8000"], cwd="showcase")
-    time.sleep(2)
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page()
 
-    try:
-        with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
-            page = browser.new_page()
+        print(f"Navigating to {SERVER_URL}")
+        page.goto(SERVER_URL)
 
-            # Capture console logs
-            page.on("console", lambda msg: print(f"Browser Console: {msg.text}"))
+        # Wait for Chart.js canvases to be present
+        try:
+            page.wait_for_selector("#memoryChart", timeout=5000)
+            print("Memory Chart found")
+            page.wait_for_selector("#agent-list li", timeout=5000)
+            print("Agent list populated")
+        except Exception as e:
+            print(f"Timeout waiting for elements: {e}")
 
-            print("Navigating to system_brain.html...")
-            page.goto("http://localhost:8000/system_brain.html")
+        os.makedirs("verification", exist_ok=True)
+        screenshot_path = "verification/system_brain.png"
+        page.screenshot(path=screenshot_path)
+        print(f"Screenshot saved to {screenshot_path}")
 
-            time.sleep(2)
-            os.makedirs("verification_artifacts", exist_ok=True)
-            page.screenshot(path="verification_artifacts/debug_load.png")
-            print("Captured debug_load.png")
-
-            try:
-                # Force fill to bypass strict visibility checks if overlay is issue
-                print("Searching for 'generate'...")
-                page.fill("#search-input", "generate", force=True)
-                page.keyboard.press("Enter") # Search is input event, but just in case
-            except Exception as e:
-                print(f"Fill failed: {e}")
-
-            time.sleep(2)
-            page.screenshot(path="verification_artifacts/debug_after_search.png")
-
-            # Check if inspector opened
-            if page.locator("#inspector").get_attribute("class").find("translate-x-full") == -1:
-                 print("Inspector is OPEN (translate-x-full removed).")
-            else:
-                 print("Inspector is CLOSED.")
-
-            # Check content
-            content = page.text_content("#insp-content")
-            print(f"Inspector Content Preview: {content[:100]}")
-
-    finally:
-        server.terminate()
+        browser.close()
 
 if __name__ == "__main__":
+    server_thread = threading.Thread(target=start_server, daemon=True)
+    server_thread.start()
+    time.sleep(1)
     verify_system_brain()
+    sys.exit(0)

@@ -86,7 +86,23 @@ def generate_markdown_report(logs: List[Dict[str, Any]]) -> str:
 
         # Outcome
         outcome = log.get('outcome', {})
-        md += f"- **Outcome:**\n"
+
+        # Specialized Formatting for Risk Agents
+        if isinstance(outcome, dict):
+            if "sensitivity_table_markdown" in outcome:
+                md += "- **Sensitivity Analysis (Black Swan):**\n\n"
+                md += outcome["sensitivity_table_markdown"] + "\n\n"
+
+            if "simulation_results" in outcome:
+                results = outcome.get("simulation_results", {})
+                if isinstance(results, dict) and "results" in results:
+                    metrics = results.get("results", {})
+                    md += "- **Quantum Simulation Results:**\n"
+                    md += f"  - **Expected Value:** {metrics.get('expected_value'):.2f}\n"
+                    md += f"  - **VaR 99%:** {metrics.get('var_99'):.2f}\n"
+                    md += f"  - **Confidence Interval:** {metrics.get('confidence_interval')}\n\n"
+
+        md += f"- **Outcome (Raw):**\n"
         md += "```json\n"
         md += json.dumps(outcome, indent=2)
         md += "\n```\n"

@@ -78,7 +78,6 @@
 <body class="h-screen flex flex-col selection:bg-emerald-500/30">
     <div class="scan-line"></div>
 
-    <!-- Header -->
     <header class="h-16 border-b border-slate-800 bg-[#0a0a0c]/95 backdrop-blur flex items-center justify-between px-6 shrink-0 z-40">
         <div class="flex items-center gap-4">
             <i class="fas fa-network-wired text-[#00ff88] text-xl"></i>
@@ -91,16 +90,16 @@
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="flex-1 overflow-y-auto p-6 custom-scrollbar bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')]">
 
-        <!-- Filters -->
         <div class="mb-8 flex flex-wrap justify-between items-center gap-4 sticky top-0 z-30 py-4 bg-[#050505]/90 border-b border-slate-800 -mx-6 px-6 -mt-6 backdrop-blur-md">
             <div class="flex gap-2" id="filters">
                 <button class="px-4 py-1.5 rounded bg-[#00ff88]/10 border border-[#00ff88]/50 text-[#00ff88] text-xs font-bold mono hover:bg-[#00ff88]/20 transition active-filter" onclick="filter('ALL', this)">ALL SYSTEMS</button>
                 <button class="px-4 py-1.5 rounded bg-slate-800/50 border border-slate-700 text-slate-400 text-xs font-bold mono hover:text-white transition" onclick="filter('Risk', this)">RISK ENGINE</button>
                 <button class="px-4 py-1.5 rounded bg-slate-800/50 border border-slate-700 text-slate-400 text-xs font-bold mono hover:text-white transition" onclick="filter('Analyst', this)">ANALYST CORE</button>
                 <button class="px-4 py-1.5 rounded bg-slate-800/50 border border-slate-700 text-slate-400 text-xs font-bold mono hover:text-white transition" onclick="filter('Agent', this)">GENERAL</button>
+                <button class="px-4 py-1.5 rounded bg-slate-800/50 border border-slate-700 text-slate-400 text-xs font-bold mono hover:text-white transition" onclick="filter('Meta-Agent', this)">META-AGENTS</button>
+                 <button class="px-4 py-1.5 rounded bg-slate-800/50 border border-slate-700 text-slate-400 text-xs font-bold mono hover:text-white transition" onclick="filter('Governance', this)">GOVERNANCE</button>
             </div>
 
             <div class="relative">
@@ -109,18 +108,14 @@
             </div>
         </div>
 
-        <!-- Grid -->
         <div id="agents-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            <!-- Cards Injected via JS -->
-        </div>
+            </div>
 
     </main>
 
-    <!-- MCP Modal -->
     <div id="mcp-modal" class="fixed inset-0 modal-backdrop z-50 hidden flex items-center justify-center p-4">
         <div class="w-full max-w-2xl bg-[#0a0f14] border border-[#00ff88]/30 rounded-lg shadow-[0_0_50px_rgba(0,255,136,0.1)] overflow-hidden flex flex-col max-h-[90vh]">
 
-            <!-- Header -->
             <div class="p-4 border-b border-slate-800 bg-[#05080a] flex justify-between items-center">
                 <div class="flex items-center gap-3">
                     <i class="fas fa-plug text-[#00ff88]"></i>
@@ -129,10 +124,8 @@
                 <button onclick="closeMCPModal()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
             </div>
 
-            <!-- Body -->
             <div class="p-6 overflow-y-auto space-y-6">
 
-                <!-- Connection String -->
                 <div>
                     <label class="block text-xs font-bold text-slate-500 mono mb-2 uppercase">Connection Endpoint</label>
                     <div class="flex gap-2">
@@ -141,13 +134,11 @@
                     </div>
                 </div>
 
-                <!-- Tools List -->
                 <div>
                     <label class="block text-xs font-bold text-slate-500 mono mb-2 uppercase">Exposed Tools</label>
                     <div class="bg-black/50 border border-slate-800 rounded p-4 h-64 overflow-y-auto custom-scrollbar">
                         <ul id="mcp-tools-list" class="space-y-3">
-                            <!-- Tools injected here -->
-                        </ul>
+                            </ul>
                     </div>
                 </div>
 
@@ -161,15 +152,12 @@
 
             </div>
 
-            <!-- Footer -->
             <div class="p-4 border-t border-slate-800 bg-[#05080a] flex justify-end">
                 <button onclick="closeMCPModal()" class="px-6 py-2 bg-[#00ff88]/10 hover:bg-[#00ff88]/20 border border-[#00ff88]/50 text-[#00ff88] rounded mono text-sm font-bold transition">DONE</button>
             </div>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <!-- Note: We are now handling data loading more dynamically -->
     <script src="js/mock_agents_rich.js"></script>
     <script>
         let allAgents = [];
@@ -238,7 +226,10 @@
 
             const filtered = allAgents.filter(a => {
                 if (currentFilter === 'ALL') return true;
-                return a.type && a.type.includes(currentFilter);
+                // Handle both 'type' (main branch) and 'category' (feature branch) fields if present
+                const typeMatch = a.type && a.type.includes(currentFilter);
+                const catMatch = a.category && a.category.includes(currentFilter);
+                return typeMatch || catMatch;
             });
 
             filtered.forEach(agent => {
@@ -246,29 +237,31 @@
                 card.className = 'agent-card rounded-lg p-5 flex flex-col h-72';
 
                 // Skills Tags (Max 3)
-                const skillsHtml = (agent.skills || []).slice(0, 3).map(s =>
-                    `<span class="tech-badge badge-cyan truncate">${s}</span>`
-                ).join('');
+                // Handle both simple string array (main) and object array (feature) for skills
+                const skills = agent.skills || [];
+                const skillsHtml = skills.slice(0, 3).map(s => {
+                    const name = typeof s === 'string' ? s : s.name;
+                    return `<span class="tech-badge badge-cyan truncate">${name}</span>`
+                }).join('');
 
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-4">
                         <div>
                             <h3 class="text-white font-bold mono truncate text-lg" title="${agent.name}">${formatName(agent.name)}</h3>
-                            <span class="text-[10px] text-slate-400 uppercase tracking-widest">${agent.type}</span>
+                            <span class="text-[10px] text-slate-400 uppercase tracking-widest">${agent.type || agent.category || 'AGENT'}</span>
                         </div>
                         <div class="h-2 w-2 rounded-full bg-[#00ff88] shadow-[0_0_8px_#00ff88] animate-pulse"></div>
                     </div>
 
                     <p class="text-slate-400 text-xs leading-relaxed line-clamp-3 mb-4 flex-1 font-mono">
-                        ${agent.docstring || 'System unit operational. No further data.'}
+                        ${agent.docstring || agent.description || 'System unit operational. No further data.'}
                     </p>
 
                     <div class="flex gap-2 mb-4 flex-wrap">
                         ${skillsHtml}
-                        ${(agent.skills?.length > 3) ? `<span class="text-[10px] text-slate-600 self-center">+${agent.skills.length - 3}</span>` : ''}
+                        ${(skills.length > 3) ? `<span class="text-[10px] text-slate-600 self-center">+${skills.length - 3}</span>` : ''}
                     </div>
 
-                    <!-- Telemetry -->
                     <div class="space-y-2 mb-4 bg-black/30 p-2 rounded border border-slate-800">
                         <div class="flex justify-between text-[10px] mono text-slate-500">
                             <span>CPU THREAD</span>
@@ -302,15 +295,20 @@
             const list = document.getElementById('mcp-tools-list');
             list.innerHTML = '';
 
-            if (agent.tools && agent.tools.length > 0) {
-                agent.tools.forEach(t => {
+            const tools = agent.tools || agent.skills || []; // Fallback to skills if tools not defined
+
+            if (tools.length > 0) {
+                tools.forEach(t => {
+                    const name = typeof t === 'string' ? t : t.name;
+                    const desc = typeof t === 'string' ? 'Capability available.' : (t.description || 'No description available.');
+                    
                     list.innerHTML += `
                         <li class="border-b border-slate-800 pb-2 last:border-0">
                             <div class="flex items-center gap-2 mb-1">
                                 <i class="fas fa-wrench text-slate-500 text-xs"></i>
-                                <span class="text-white text-sm font-bold mono">${t.name}</span>
+                                <span class="text-white text-sm font-bold mono">${name}</span>
                             </div>
-                            <p class="text-xs text-slate-400 pl-5">${t.description || 'No description available.'}</p>
+                            <p class="text-xs text-slate-400 pl-5">${desc}</p>
                         </li>
                     `;
                 });

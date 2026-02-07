@@ -1,8 +1,8 @@
-import os
-import ast
 import json
 import re
+import os
 import sys
+import ast
 from pathlib import Path
 
 # Configuration
@@ -11,15 +11,13 @@ MCP_TOOLS_FILE = "core/mcp/tools.json"
 OUTPUT_FILE = "showcase/js/mock_agents_rich.js"
 EXISTING_FILE = "showcase/js/mock_agents_rich.js"
 
-# Metadata mappings
+# Map for inferring agent types from class names
 AGENT_TYPE_MAP = {
-    "Analyst": "Analysis Agent",
-    "Specialist": "Specialized Agent",
-    "Orchestrator": "Orchestrator",
-    "Risk": "Risk Agent",
-    "Trading": "Execution Agent",
-    "Bot": "Intelligence Agent",
-    "Compliance": "Governance Agent"
+    "Architect": "Meta-Agent",
+    "Meta": "Meta-Agent",
+    "Guardian": "Governance",
+    "Compliance": "Governance",
+    "Risk": "Risk Engine"
 }
 
 def load_mcp_tools():
@@ -130,7 +128,8 @@ def parse_agent_file(filepath):
         "json_config": "",
         "skills": [],
         "tools": [],
-        "mcp_connection": ""
+        "mcp_connection": "",
+        "portable_prompt": ""
     }
 
     class_found = False
@@ -177,17 +176,9 @@ def parse_agent_file(filepath):
     if not class_found:
         return None
 
-    # Generate Mock Data for missing rich fields
-    agent_info["markdown_copy"] = f"# {agent_info['name']}\n\n## Overview\n{agent_info['docstring']}\n"
-    agent_info["portable_prompt"] = f"### SYSTEM PROMPT: {agent_info['name']} ###\n\n# MISSION\n{agent_info['docstring']}"
-
-    # Generate Configs
-    agent_info["yaml_config"] = f"agent:\n  name: {agent_info['name']}\n  enabled: true"
-    agent_info["json_config"] = json.dumps({"agent": agent_info['name'], "enabled": True}, indent=2)
-
     # MCP
-    agent_info["mcp_connection"] = f"mcp://{agent_info['name'].lower()}.adam.internal"
-    agent_info["tools"] = map_tools_to_agent(agent_info["name"], agent_info["docstring"], ALL_TOOLS)
+    agent_info["mcp_connection"] = f"mcp://{agent_info.get('name', 'agent').lower()}.adam.internal"
+    agent_info["tools"] = map_tools_to_agent(agent_info.get("name", ""), agent_info.get("docstring", ""), ALL_TOOLS)
 
     return agent_info
 
@@ -245,6 +236,10 @@ def main():
     # We will regenerate the full file to ensure everything is consistent
     new_agents = []
 
+    if not os.path.exists(AGENTS_DIR):
+        print(f"Directory not found: {AGENTS_DIR}")
+        return
+
     for root, _, files in os.walk(AGENTS_DIR):
         for file in files:
             if file.endswith(".py") and file != "__init__.py" and "test" not in file:
@@ -261,6 +256,7 @@ def main():
 
     new_content = generate_full_file(new_agents)
 
+    os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
     with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
         f.write(new_content)
 

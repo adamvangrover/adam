@@ -2,6 +2,9 @@ import torch
 import numpy as np
 
 class OSWMInference:
+    """
+    Handles inference for the One-Shot World Model.
+    """
     def __init__(self, model, device='cpu'):
         self.model = model
         self.device = device

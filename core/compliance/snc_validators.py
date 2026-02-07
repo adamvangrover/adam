@@ -193,3 +193,50 @@ def evaluate_compliance(financial_data: Dict[str, Any], sector_name: str = "Gene
         return SNCCreditPolicyResult(passed=False, violations=violations, risk_level=RiskLevel.HIGH)
 
     return SNCCreditPolicyResult(passed=True, violations=[], risk_level=RiskLevel.LOW)
+
+
+class RatingUpgradeGuardrail(BaseModel):
+    """
+    Prevents rating upgrades if policy limits are breached.
+    """
+    current_rating: str
+    proposed_rating: str
+    compliance_result: SNCCreditPolicyResult
+
+    @model_validator(mode='after')
+    def prevent_unjustified_upgrade(self) -> 'RatingUpgradeGuardrail':
+        # Simple logic: Rating improvement blocked if compliance failed
+        # Assumption: If they are different, it's a change.
+        # If compliance failed, ANY change is blocked to be safe (conservative policy).
+        if self.current_rating != self.proposed_rating and not self.compliance_result.passed:
+             # Remove "Value error, " prefix if present in violations for cleaner message
+             cleaned_violations = [v.replace("Value error, ", "") for v in self.compliance_result.violations]
+             raise ValueError(f"Compliance Block: Cannot change rating from {self.current_rating} to {self.proposed_rating} while policy violations exist: {cleaned_violations}")
+        return self
+
+
+def validate_deal(financial_data: Dict[str, Any], sector_name: str, market_data: Dict[str, Any] = None, current_rating: str = "NR", proposed_rating: str = "NR") -> SNCCreditPolicyResult:
+    """
+    Comprehensive validation wrapper combining financial health, stress buffers, and rating logic.
+    """
+    # 1. Evaluate Financial & Market Compliance
+    result = evaluate_compliance(financial_data, sector_name, market_data)
+
+    # 2. Check Rating Logic
+    try:
+        RatingUpgradeGuardrail(
+            current_rating=current_rating,
+            proposed_rating=proposed_rating,
+            compliance_result=result
+        )
+    except Exception as e:
+        # Append logic violation
+        msg = str(e)
+        if "Value error, " in msg:
+            msg = msg.split("Value error, ")[1]
+
+        result.passed = False
+        result.violations.append(msg)
+        result.risk_level = RiskLevel.CRITICAL
+
+    return result
