@@ -1,0 +1,19 @@
+[
+  {
+    "scenario_id": "STRESS_001",
+    "input": {
+        "financial_data": {
+            "key_ratios": {"debt_to_equity_ratio": 2.5, "interest_coverage_ratio": 1.5},
+            "total_debt": 1000,
+            "ebitda": 200,
+            "interest_expense": 133,
+            "revenue": 1000,
+            "total_equity": 400
+        }
+    },
+    "expected_checks": [
+        {"field": "base_pd", "operator": "lt", "value": 0.50},
+        {"field": "sensitivity_analysis", "operator": "contains_scenario", "value": "Rate Shock"}
+    ]
+  }
+]

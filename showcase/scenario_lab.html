@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scenario Lab - Generative Risk Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-200 p-8 font-mono">
+
+    <header class="mb-10 flex justify-between items-center border-b border-slate-700 pb-4">
+        <div>
+            <h1 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500">SCENARIO LAB</h1>
+            <p class="text-slate-400 text-sm">Generative Risk Engine & VAE Latent Space Explorer</p>
+        </div>
+        <div class="flex space-x-4">
+            <button onclick="window.location.reload()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded text-xs border border-slate-600">REFRESH</button>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+        <!-- Controls -->
+        <div class="lg:col-span-1 space-y-6">
+            <div class="bg-slate-800 p-4 rounded border border-slate-700">
+                <h3 class="text-sm font-bold text-pink-400 mb-4 uppercase">Risk Regime</h3>
+                <div class="space-y-2">
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="radio" name="regime" value="normal" checked class="text-pink-500 bg-slate-900 border-slate-600">
+                        <span>Normal (Gaussian)</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="radio" name="regime" value="stress" class="text-pink-500 bg-slate-900 border-slate-600">
+                        <span>Stress (High Vol)</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="radio" name="regime" value="crash" class="text-pink-500 bg-slate-900 border-slate-600">
+                        <span>Crash (Tail Risk)</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 p-4 rounded border border-slate-700">
+                <h3 class="text-sm font-bold text-purple-400 mb-4 uppercase">Generation Params</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs text-slate-500 block mb-1">Scenario Count</label>
+                        <input type="range" min="10" max="1000" value="100" class="w-full accent-purple-500">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-500 block mb-1">Correlation Strength</label>
+                        <input type="range" min="0" max="100" value="50" class="w-full accent-purple-500">
+                    </div>
+                </div>
+            </div>
+
+            <button class="w-full py-3 bg-pink-600 hover:bg-pink-500 text-white font-bold rounded uppercase tracking-wider transition-colors shadow-lg shadow-pink-500/20">
+                Generate Batch
+            </button>
+        </div>
+
+        <!-- Visualization -->
+        <div class="lg:col-span-3 space-y-6">
+            <!-- Heatmap / Scatter -->
+            <div class="bg-slate-800 p-4 rounded border border-slate-700 h-96 relative">
+                <h3 class="absolute top-4 left-4 text-xs font-bold text-slate-500 uppercase">Latent Space Projection (GDP vs Inflation)</h3>
+                <canvas id="scatterChart"></canvas>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-3 gap-4">
+                <div class="bg-slate-800 p-4 rounded border border-slate-700 text-center">
+                    <div class="text-xs text-slate-500 uppercase">Mean GDP Growth</div>
+                    <div class="text-2xl font-bold text-emerald-400" id="stat-gdp">--%</div>
+                </div>
+                <div class="bg-slate-800 p-4 rounded border border-slate-700 text-center">
+                    <div class="text-xs text-slate-500 uppercase">Tail Events</div>
+                    <div class="text-2xl font-bold text-red-400" id="stat-tail">--</div>
+                </div>
+                <div class="bg-slate-800 p-4 rounded border border-slate-700 text-center">
+                    <div class="text-xs text-slate-500 uppercase">Max Drawdown</div>
+                    <div class="text-2xl font-bold text-orange-400" id="stat-dd">--%</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        async function loadData() {
+            try {
+                const res = await fetch('data/mock_scenario_lab_data.json');
+                const data = await res.json();
+
+                renderChart(data.scenarios);
+                updateStats(data.scenarios);
+            } catch (e) {
+                console.warn("Using fallback data");
+                const mock = Array.from({length: 100}, () => ({
+                    risk_factors: {
+                        gdp_growth: (Math.random() * 6 - 2),
+                        inflation: (Math.random() * 5 + 1)
+                    },
+                    is_tail_event: Math.random() > 0.9
+                }));
+                renderChart(mock);
+                updateStats(mock);
+            }
+        }
+
+        function renderChart(scenarios) {
+            const ctx = document.getElementById('scatterChart').getContext('2d');
+            const points = scenarios.map(s => ({
+                x: s.risk_factors.inflation,
+                y: s.risk_factors.gdp_growth,
+                r: s.is_tail_event ? 8 : 4
+            }));
+
+            new Chart(ctx, {
+                type: 'bubble',
+                data: {
+                    datasets: [{
+                        label: 'Generated Scenarios',
+                        data: points,
+                        backgroundColor: context => {
+                            const val = context.raw?.y;
+                            return val < 0 ? 'rgba(239, 68, 68, 0.7)' : 'rgba(52, 211, 153, 0.7)';
+                        },
+                        borderColor: 'rgba(255,255,255,0.1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Inflation (%)', color: '#64748b' }, grid: { color: '#334155' } },
+                        y: { title: { display: true, text: 'GDP Growth (%)', color: '#64748b' }, grid: { color: '#334155' } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function updateStats(scenarios) {
+            const avgGdp = scenarios.reduce((acc, s) => acc + s.risk_factors.gdp_growth, 0) / scenarios.length;
+            const tails = scenarios.filter(s => s.is_tail_event).length;
+
+            document.getElementById('stat-gdp').innerText = avgGdp.toFixed(2) + '%';
+            document.getElementById('stat-tail').innerText = tails;
+            document.getElementById('stat-dd').innerText = (Math.min(...scenarios.map(s => s.risk_factors.gdp_growth)) * 1.5).toFixed(1) + '%';
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

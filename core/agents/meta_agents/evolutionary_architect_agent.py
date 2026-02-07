@@ -3,7 +3,10 @@ from typing import Any, Dict, List, Optional
 import logging
 import uuid
 import ast
+import random
+import copy
 from core.agents.agent_base import AgentBase
+from core.agents.mixins.audit_mixin import AuditMixin
 from core.schemas.meta_agent_schemas import (
     EvolutionaryArchitectInput,
     EvolutionaryArchitectOutput,
@@ -11,7 +14,7 @@ from core.schemas.meta_agent_schemas import (
     EvolutionGoal
 )
 
-class EvolutionaryArchitectAgent(AgentBase):
+class EvolutionaryArchitectAgent(AgentBase, AuditMixin):
     """
     The Evolutionary Architect Agent is a meta-agent predisposed for action.
     It drives the codebase forward by proposing additive enhancements, refactors,
@@ -21,6 +24,7 @@ class EvolutionaryArchitectAgent(AgentBase):
 
     def __init__(self, config: Dict[str, Any], **kwargs):
         super().__init__(config, **kwargs)
+        AuditMixin.__init__(self)
         self.max_iterations = config.get("max_iterations", 5)
 
     async def execute(self, input_data: EvolutionaryArchitectInput) -> EvolutionaryArchitectOutput:
@@ -57,7 +61,65 @@ class EvolutionaryArchitectAgent(AgentBase):
             status="proposed" if safety_score > 0.8 else "flagged"
         )
 
+        # Log Decision
+        self.log_decision(
+            activity_type="CodeEvolution",
+            details={"goal": input_data.goal_type.value, "proposal_id": proposal_id},
+            outcome=output.model_dump() if hasattr(output, 'model_dump') else output.__dict__
+        )
+
         return output
+
+    async def optimize_config_genetic(self, base_config: Dict[str, Any], generations: int = 5) -> Dict[str, Any]:
+        """
+        Runs a Genetic Algorithm to evolve agent configuration parameters (e.g., Temperature).
+        """
+        population_size = 10
+        population = [base_config]
+
+        # Initialize Population
+        for _ in range(population_size - 1):
+            mutated = copy.deepcopy(base_config)
+            # Mutate temperature
+            if 'llm_config' in mutated:
+                current_temp = mutated['llm_config'].get('temperature', 0.7)
+                mutated['llm_config']['temperature'] = max(0.0, min(1.0, current_temp + random.uniform(-0.1, 0.1)))
+            population.append(mutated)
+
+        best_config = base_config
+        best_score = 0.0
+
+        for gen in range(generations):
+            scores = []
+            for candidate in population:
+                # Simulate Evaluation (Fitness Function)
+                # In reality, this would run a benchmark task
+                temp = candidate.get('llm_config', {}).get('temperature', 0.7)
+                # Mock fitness: pretend 0.4 is optimal
+                fitness = 1.0 - abs(temp - 0.4)
+                scores.append((fitness, candidate))
+
+            # Selection
+            scores.sort(key=lambda x: x[0], reverse=True)
+            best_score, best_config = scores[0]
+
+            logging.info(f"Generation {gen}: Best Fitness {best_score:.4f} (Temp: {best_config.get('llm_config', {}).get('temperature'):.2f})")
+
+            # Crossover / Next Gen
+            top_performers = [s[1] for s in scores[:3]]
+            new_population = top_performers[:]
+
+            while len(new_population) < population_size:
+                parent = random.choice(top_performers)
+                child = copy.deepcopy(parent)
+                # Mutation
+                curr_temp = child['llm_config']['temperature']
+                child['llm_config']['temperature'] = max(0.0, min(1.0, curr_temp + random.uniform(-0.05, 0.05)))
+                new_population.append(child)
+
+            population = new_population
+
+        return best_config
 
     async def _generate_changes_real(self, input_data: EvolutionaryArchitectInput) -> List[ProposedChange]:
         """

@@ -5,6 +5,9 @@ import uuid
 from typing import Optional, Dict, Any, List
 
 from core.agents.agent_base import AgentBase
+from core.agents.mixins.audit_mixin import AuditMixin
+from core.infrastructure.semantic_cache import SemanticCache
+
 try:
     from semantic_kernel import Kernel, KernelArguments
 except ImportError:
@@ -21,7 +24,7 @@ from core.prompting.base_prompt_plugin import BasePromptPlugin
 # Initialize logger
 logger = logging.getLogger(__name__)
 
-class RepoGuardianAgent(AgentBase):
+class RepoGuardianAgent(AgentBase, AuditMixin):
     """
     The RepoGuardian Agent serves as an automated code reviewer and gatekeeper.
     It analyzes proposed changes against repository standards and provides
@@ -30,6 +33,8 @@ class RepoGuardianAgent(AgentBase):
 
     def __init__(self, config: Dict[str, Any], constitution: Optional[Dict[str, Any]] = None, kernel: Optional[Kernel] = None):
         super().__init__(config, constitution, kernel)
+        AuditMixin.__init__(self)
+        self.cache = SemanticCache()
         self.tools = GitTools()
         self.analyzer = StaticAnalyzer()
         self.scanner = SecurityScanner()
@@ -67,6 +72,13 @@ class RepoGuardianAgent(AgentBase):
 
             logger.info(f"RepoGuardian starting review for PR {pr.pr_id} by {pr.author}")
 
+            # Check Cache
+            input_hash = self.cache.compute_data_hash({"pr_id": pr.pr_id, "diff_hash": str(hash(str(pr.files)))})
+            cached_decision = self.cache.get("RepoGuardianReview", input_hash, "v1_heuristic")
+            if cached_decision:
+                logger.info("Cache Hit: Returning previously computed review decision.")
+                return ReviewDecision(**cached_decision)
+
             # 2. Heuristic Analysis (Pre-LLM)
             heuristic_comments, analysis_results = self._run_heuristics(pr)
 
@@ -83,6 +95,16 @@ class RepoGuardianAgent(AgentBase):
                 decision.status = ReviewDecisionStatus.REJECT if any(c.message.startswith("SECURITY") for c in critical_issues) else ReviewDecisionStatus.REQUEST_CHANGES
                 decision.summary += "\n\n[AUTOMATED] Decision downgraded due to critical heuristic failures."
                 decision.score = max(0, decision.score - (25 * len(critical_issues)))
+
+            # Log Decision via AuditMixin
+            self.log_decision(
+                activity_type="CodeReview",
+                details={"pr_id": pr.pr_id, "author": pr.author, "score": decision.score},
+                outcome=decision.model_dump()
+            )
+
+            # Cache Decision
+            self.cache.set("RepoGuardianReview", input_hash, "v1_heuristic", decision.model_dump())
 
             logger.info(f"Review complete for PR {pr.pr_id}: {decision.status}")
             return decision

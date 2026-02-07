@@ -15,9 +15,13 @@ import os
 import asyncio
 import json
 from typing import List, Dict, Any, Optional
+from core.mcp.tool_registry import ToolRegistry
 
 # Ensure core is importable
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../..")))
+
+# Initialize Dynamic Registry
+tool_registry = ToolRegistry()
 
 # Import Core Engines
 try:
@@ -330,6 +334,24 @@ def get_agent_status(agent_name: str) -> str:
     else:
         return f"Agent '{agent_name}' is NOT FOUND."
 
+# --- Dynamic Tool Exposure ---
+@mcp.resource("system://tools/registry")
+def get_tool_registry() -> str:
+    """Returns a list of dynamically registered agent skills."""
+    return json.dumps(tool_registry.list_tools(), indent=2)
+
+@mcp.tool()
+def execute_dynamic_tool(tool_name: str, args_json: str) -> str:
+    """
+    Executes a tool from the dynamic registry.
+    args_json must be a JSON string of arguments.
+    """
+    try:
+        args = json.loads(args_json)
+        result = tool_registry.execute_tool(tool_name, args)
+        return str(result)
+    except Exception as e:
+        return f"Error executing {tool_name}: {str(e)}"
 
 if __name__ == "__main__":
     # Ensure DB exists

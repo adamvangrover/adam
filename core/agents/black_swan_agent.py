@@ -1,4 +1,6 @@
 from core.agents.agent_base import AgentBase
+from core.infrastructure.semantic_cache import SemanticCache
+from core.system.state_manager import StateManager
 from typing import Dict, Any, List, Optional
 import logging
 import math
@@ -25,6 +27,11 @@ class BlackSwanAgent(AgentBase):
     Counterfactual 'Black Swan' Engine.
     Autonomously generates stress scenarios and calculates 'Probability of Default' sensitivity.
     """
+
+    def __init__(self, config=None, **kwargs):
+        super().__init__(config, **kwargs)
+        self.cache = SemanticCache()
+        self.state_manager = StateManager()
 
     DEFAULT_SCENARIOS = [
         Scenario(
@@ -67,6 +74,26 @@ class BlackSwanAgent(AgentBase):
         financial_data = kwargs.get('financial_data', {})
         scenarios_input = kwargs.get('scenarios')
 
+        # Snapshot State (Rewind Button)
+        snap_id = self.state_manager.save_snapshot(
+            agent_id=self.config.get('name', 'BlackSwanAgent'),
+            step_description="Pre-Analysis Execution",
+            memory=getattr(self, 'memory', {}),
+            context=kwargs
+        )
+        logging.info(f"State saved. Snapshot ID: {snap_id}")
+
+        # Check Cache
+        input_hash = SemanticCache.compute_data_hash({
+            "financials": financial_data,
+            "scenarios": str(scenarios_input)
+        })
+        cached = self.cache.get("BlackSwanAnalysis", input_hash, "v1_heuristic")
+        if cached:
+            logging.info("Cache Hit: Returning cached sensitivity analysis.")
+            cached["_cache_hit"] = True
+            return cached
+
         # Parse Scenarios
         scenarios = self.DEFAULT_SCENARIOS
         if scenarios_input and isinstance(scenarios_input, list):
@@ -105,11 +132,23 @@ class BlackSwanAgent(AgentBase):
                 projected_interest_coverage=stressed_financials.get('key_ratios', {}).get('interest_coverage_ratio', 0.0)
             ))
 
+        # Generate Sensitivity Table (Markdown)
+        md_table = "| Scenario | Implied PD | Debt/Equity | ICR | Downgrade Trigger? |\n"
+        md_table += "|---|---|---|---|---|\n"
+        md_table += f"| **Baseline** | {base_pd:.2%} | {financial_data.get('key_ratios', {}).get('debt_to_equity_ratio', 0.0):.2f}x | {financial_data.get('key_ratios', {}).get('interest_coverage_ratio', 0.0):.2f}x | - |\n"
+
+        for r in results:
+             md_table += f"| {r.scenario_name} | {r.implied_pd:.2%} | {r.projected_debt_to_equity:.2f}x | {r.projected_interest_coverage:.2f}x | {'**YES**' if r.rating_downgrade else 'No'} |\n"
+
         output = {
             "base_pd": base_pd,
             "sensitivity_analysis": [r.model_dump() for r in results],
+            "sensitivity_table_markdown": md_table,
             "recommendation": "Review scenarios with Rating Downgrade flag." if any(r.rating_downgrade for r in results) else "Resilient to standard stress."
         }
+
+        # Cache Output
+        self.cache.set("BlackSwanAnalysis", input_hash, "v1_heuristic", output)
 
         return output
 

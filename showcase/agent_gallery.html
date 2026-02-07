@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Gallery - Analyst OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-200 p-8">
+
+    <header class="mb-10 text-center">
+        <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Agent Gallery</h1>
+        <p class="mt-2 text-slate-400">The Specialized Swarm</p>
+    </header>
+
+    <!-- MCP Modal -->
+    <div id="mcp-modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50">
+        <div class="bg-slate-800 border border-cyan-500/50 rounded-lg p-8 max-w-lg w-full relative shadow-2xl shadow-cyan-500/20">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">&times;</button>
+            <h2 class="text-2xl font-bold text-cyan-400 mb-2" id="modal-title">Agent Connection</h2>
+            <p class="text-slate-400 text-sm mb-6">Use the Model Context Protocol (MCP) to integrate this agent's skills into your workflow.</p>
+
+            <div class="bg-slate-900 p-4 rounded border border-slate-700 mb-4">
+                <label class="text-xs text-slate-500 uppercase font-bold">MCP Connection String</label>
+                <div class="flex items-center mt-1">
+                    <code class="flex-1 text-emerald-400 font-mono text-sm" id="modal-uri">mcp://core.agents.Unknown</code>
+                    <button class="ml-2 text-slate-400 hover:text-white" onclick="copyURI()">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div id="modal-tools" class="space-y-2">
+                <!-- Tool list injected here -->
+            </div>
+        </div>
+    </div>
+
+    <div id="gallery-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Cards injected by JS -->
+    </div>
+
+    <script>
+        async function loadGallery() {
+            try {
+                // Fetch Agent Data AND System Brain Data for Telemetry
+                const [agentsRes, brainRes] = await Promise.all([
+                    fetch('data/agent_gallery_data.json'),
+                    fetch('js/mock_system_brain_data.js').then(r => r.text()) // Brain data is JS file window assignment
+                ]);
+
+                const agents = await agentsRes.json();
+
+                // Parse System Brain Data (Mock)
+                let systemData = {};
+                try {
+                    // Extract JSON object from "window.SYSTEM_BRAIN_DATA = {...};"
+                    const jsonStr = (await brainRes).match(/window\.SYSTEM_BRAIN_DATA = ({[\s\S]*});/)[1];
+                    systemData = JSON.parse(jsonStr);
+                } catch(e) { console.warn("Could not load system brain data", e); }
+
+                const container = document.getElementById('gallery-container');
+
+                agents.forEach(agent => {
+                    const card = document.createElement('div');
+                    card.className = "bg-slate-800/80 backdrop-blur border border-slate-700 rounded-lg p-6 hover:border-cyan-500/50 hover:shadow-lg hover:shadow-cyan-500/10 transition-all group relative overflow-hidden";
+
+                    // Telemetry Mock (Random variation around system average)
+                    const cpuLoad = (Math.random() * 15 + 5).toFixed(1);
+                    const memLoad = (Math.random() * 200 + 100).toFixed(0);
+
+                    let badgeColor = "bg-slate-700 text-slate-300";
+                    let badgeBorder = "border-slate-600";
+
+                    if (agent.category === "Meta-Agent") { badgeColor = "bg-purple-900/30 text-purple-300"; badgeBorder = "border-purple-500/50"; }
+                    if (agent.category === "Governance") { badgeColor = "bg-red-900/30 text-red-300"; badgeBorder = "border-red-500/50"; }
+                    if (agent.category === "Risk Engine") { badgeColor = "bg-orange-900/30 text-orange-300"; badgeBorder = "border-orange-500/50"; }
+
+                    card.innerHTML = `
+                        <!-- Scanline Effect -->
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 translate-y-[-100%] group-hover:translate-y-[100%] transition-all duration-1000 pointer-events-none"></div>
+
+                        <div class="flex justify-between items-start mb-4 relative z-10">
+                            <div>
+                                <h2 class="text-xl font-bold text-white tracking-tight">${agent.name}</h2>
+                                <div class="flex items-center space-x-2 mt-1">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                    <span class="text-xs text-emerald-400 font-mono">ONLINE</span>
+                                </div>
+                            </div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded border ${badgeColor} ${badgeBorder}">${agent.category}</span>
+                        </div>
+
+                        <p class="text-slate-400 text-sm mb-6 h-12 overflow-hidden leading-relaxed">${agent.description || "No description available."}</p>
+
+                        <!-- Telemetry Grid -->
+                        <div class="grid grid-cols-2 gap-2 mb-6 text-xs font-mono">
+                            <div class="bg-slate-900/50 p-2 rounded border border-slate-700/50">
+                                <div class="text-slate-500 mb-1">CPU THREAD</div>
+                                <div class="text-cyan-400">${cpuLoad}%</div>
+                                <div class="w-full bg-slate-700 h-1 mt-1 rounded-full overflow-hidden">
+                                    <div class="bg-cyan-500 h-full" style="width: ${cpuLoad}%"></div>
+                                </div>
+                            </div>
+                            <div class="bg-slate-900/50 p-2 rounded border border-slate-700/50">
+                                <div class="text-slate-500 mb-1">MEM ALLOC</div>
+                                <div class="text-purple-400">${memLoad} MB</div>
+                                <div class="w-full bg-slate-700 h-1 mt-1 rounded-full overflow-hidden">
+                                    <div class="bg-purple-500 h-full" style="width: 45%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-slate-700 pt-4 relative z-10">
+                            <div class="flex justify-between items-center mb-3">
+                                <h3 class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Capabilities</h3>
+                                <button onclick="openMCP('${agent.name}', ${JSON.stringify(agent.skills).replace(/"/g, '&quot;')})" class="text-[10px] flex items-center text-cyan-400 hover:text-cyan-300 transition-colors">
+                                    <span class="mr-1">CONNECT MCP</span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                </button>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                ${agent.skills.slice(0, 3).map(s => `<span class="bg-slate-900 text-slate-300 text-xs px-2 py-1 rounded border border-slate-700 hover:border-slate-500 transition-colors cursor-default" title="${s.description}">${s.name}</span>`).join('')}
+                                ${agent.skills.length > 3 ? `<span class="text-xs text-slate-500 py-1">+${agent.skills.length - 3} more</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (e) {
+                console.error("Failed to load gallery:", e);
+                document.getElementById('gallery-container').innerHTML = "<p class='text-red-500'>Error loading agent data.</p>";
+            }
+        }
+
+        function openMCP(name, skills) {
+            const modal = document.getElementById('mcp-modal');
+            document.getElementById('modal-title').innerText = name;
+            document.getElementById('modal-uri').innerText = `mcp://core.agents.${name}`;
+
+            const toolList = document.getElementById('modal-tools');
+            toolList.innerHTML = '';
+
+            skills.forEach(skill => {
+                const tool = document.createElement('div');
+                tool.className = "flex items-center justify-between text-sm p-2 hover:bg-slate-700/50 rounded transition-colors";
+                tool.innerHTML = `
+                    <div class="flex items-center">
+                        <span class="text-cyan-400 font-mono mr-3">ƒ</span>
+                        <span class="text-slate-200">${skill.name}</span>
+                    </div>
+                    <span class="text-xs text-slate-500 italic">${skill.description}</span>
+                `;
+                toolList.appendChild(tool);
+            });
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('mcp-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function copyURI() {
+            const uri = document.getElementById('modal-uri').innerText;
+            navigator.clipboard.writeText(uri);
+            alert("Copied to clipboard!");
+        }
+
+        document.addEventListener('DOMContentLoaded', loadGallery);
+    </script>
+</body>
+</html>

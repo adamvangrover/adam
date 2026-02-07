@@ -37,6 +37,7 @@ from core.agents.snc_analyst_agent import SNCAnalystAgent  # Added import
 from core.agents.behavioral_economics_agent import BehavioralEconomicsAgent
 from core.agents.meta_cognitive_agent import MetaCognitiveAgent
 from core.agents.black_swan_agent import BlackSwanAgent
+from core.agents.quantum_monte_carlo_agent import QuantumMonteCarloAgent
 
 from pydantic import ValidationError
 from core.schemas.config_schema import AgentsYamlConfig
@@ -119,6 +120,8 @@ AGENT_CLASSES = {
     "behavioral_economics_agent": "core.agents.behavioral_economics_agent",
     "meta_cognitive_agent": "core.agents.meta_cognitive_agent",
     "black_swan_agent": BlackSwanAgent,
+    "quantum_monte_carlo_agent": QuantumMonteCarloAgent,
+    "QuantumMonteCarloAgent": QuantumMonteCarloAgent,
     "news_bot_agent": "core.agents.news_bot",
 
     # Placeholders for agents that might be missing or under development but referenced in config
@@ -745,6 +748,60 @@ class AgentOrchestrator:
             else:
                 logging.critical("No fallback agent available.")
                 return None
+
+    def assemble_expert_committee(self, context: Dict[str, Any]) -> List[str]:
+        """
+        Dynamically assembles a team of expert agents based on the deal context.
+        """
+        committee = []
+
+        # Core Agents always included
+        committee.append("SNCAnalystAgent")
+        committee.append("RiskAssessmentAgent")
+
+        sector = context.get("sector", "").lower()
+        deal_type = context.get("deal_type", "").lower()
+
+        # Sector Specialists
+        if "energy" in sector or "oil" in sector:
+            # Energy is geopolitical
+            committee.append("GeopoliticalRiskAgent")
+            committee.append("IndustrySpecialistAgent")
+
+        elif "tech" in sector or "software" in sector:
+            committee.append("TechnicalAnalystAgent")
+            committee.append("IndustrySpecialistAgent")
+
+        # Deal Type Specialists
+        if "distressed" in deal_type or "restructuring" in deal_type:
+            committee.append("LegalAgent")  # Placeholder, but logical
+            committee.append("BlackSwanAgent")  # Stress testing is critical
+
+        if "lbo" in deal_type or "acquisition" in deal_type:
+            committee.append("FinancialModelingAgent")
+
+        # Add Black Swan if high volatility detected in context
+        if context.get("vix_level", 0) > 25:
+            if "BlackSwanAgent" not in committee:
+                committee.append("BlackSwanAgent")
+
+        # Filter to only agents that are actually loaded/available
+        # We check self.get_agent(a) (loaded) OR a in AGENT_CLASSES (can be loaded)
+        valid_committee = []
+        for agent_name in committee:
+            if self.get_agent(agent_name):
+                valid_committee.append(agent_name)
+            elif agent_name in AGENT_CLASSES:
+                # If not loaded but in classes, we might want to load it dynamically?
+                # For now, just listing it implies the orchestrator *could* use it.
+                # But to be safe for execution, let's assume if it's in AGENT_CLASSES it's valid to request.
+                valid_committee.append(agent_name)
+
+        # Deduplicate
+        valid_committee = list(dict.fromkeys(valid_committee))
+
+        logging.info(f"Assembled Expert Committee for {sector}/{deal_type}: {valid_committee}")
+        return valid_committee
 
 
 def get_orchestrator() -> AgentOrchestrator:
