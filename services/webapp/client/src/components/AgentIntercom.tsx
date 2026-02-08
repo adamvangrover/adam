@@ -16,7 +16,11 @@ const AgentIntercom: React.FC = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Poll for new thoughts every 2 seconds
+    // Bolt Optimization: Use recursive setTimeout instead of setInterval to prevent
+    // request pile-up if the server or network is slow.
+    let timeoutId: ReturnType<typeof setTimeout>;
+    let isMounted = true;
+
     const fetchThoughts = async () => {
       try {
         const token = localStorage.getItem('token');
@@ -24,6 +28,8 @@ const AgentIntercom: React.FC = () => {
         if (token) headers['Authorization'] = `Bearer ${token}`;
 
         const res = await fetch('/api/intercom/stream', { headers });
+        if (!isMounted) return;
+
         if (res.ok) {
           const data = await res.json();
           // Bolt Optimization: data is Thought[] with stable IDs
@@ -38,13 +44,20 @@ const AgentIntercom: React.FC = () => {
             setIsConnected(false);
         }
       } catch (e) {
-        setIsConnected(false);
+        if (isMounted) setIsConnected(false);
+      } finally {
+        if (isMounted) {
+            timeoutId = setTimeout(fetchThoughts, 2000);
+        }
       }
     };
 
     fetchThoughts();
-    const interval = setInterval(fetchThoughts, 2000);
-    return () => clearInterval(interval);
+
+    return () => {
+        isMounted = false;
+        if (timeoutId) clearTimeout(timeoutId);
+    };
   }, []);
 
   useEffect(() => {
