@@ -147,12 +147,19 @@ class SwarmLogger:
             "details": details
         }
 
+        def default_serializer(obj):
+            if hasattr(obj, "model_dump"):
+                return obj.model_dump()
+            if hasattr(obj, "dict"):
+                return obj.dict()
+            return str(obj)
+
         try:
             with open(self.log_file, "a") as f:
-                f.write(json.dumps(entry) + "\n")
+                f.write(json.dumps(entry, default=default_serializer) + "\n")
 
             # Also log to standard logging for visibility
-            logging.info(f"[{event_type}] {agent_id}: {json.dumps(details)}")
+            logging.info(f"[{event_type}] {agent_id}: {json.dumps(details, default=default_serializer)}")
 
         except Exception as e:
             # Fallback to standard logging if file write fails

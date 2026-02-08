@@ -2,8 +2,6 @@
 
 import csv
 import os
-# from core.utils.data_utils import send_message # send_message is not used in this file
-
 import logging
 import pandas as pd
 import numpy as np
@@ -20,6 +18,9 @@ import json
 # Placeholder for message queue interaction (replace with real implementation later)
 # from core.system.message_queue import MessageQueue
 from unittest.mock import patch  # Added for example usage
+
+# New Imports
+from core.schemas.agent_schema import AgentInput, AgentOutput
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -61,6 +62,8 @@ class FundamentalAnalystAgent(AgentBase):
     This agent analyzes financial statements, calculates key financial ratios,
     performs valuation modeling (DCF and comparables), and assesses financial health.
     It relies on DataRetrievalAgent for fetching company data via A2A communication.
+
+    Updated to support standard AgentInput/AgentOutput interface.
     """
 
     def __init__(self, config: Dict[str, Any], kernel: Optional[Kernel] = None):
@@ -80,37 +83,61 @@ class FundamentalAnalystAgent(AgentBase):
         # The 'peers' key in self.config (e.g., ['DataRetrievalAgent']) is used by AgentOrchestrator
         # to set up connections via self.add_peer_agent(peer_instance)
 
-    async def execute(self, company_id: str) -> Dict[str, Any]:
+    async def execute(self, input_data: Union[str, AgentInput, Dict[str, Any]]) -> Union[Dict[str, Any], AgentOutput]:
         """
         Performs fundamental analysis on a given company.
+        Supports both legacy string/dict input and new AgentInput schema.
         """
+        # 1. Input Normalization
+        company_id = ""
+        is_standard_mode = False
+
+        if isinstance(input_data, AgentInput):
+            company_id = input_data.query.strip() # Assuming query contains the ticker/company
+            is_standard_mode = True
+            # Update context if provided
+            if input_data.context:
+                self.set_context(input_data.context)
+        elif isinstance(input_data, str):
+            company_id = input_data.strip()
+        elif isinstance(input_data, dict):
+             # Handle dict input (e.g. from legacy orchestrator passing dict)
+             company_id = input_data.get("company_id") or input_data.get("company_name") or input_data.get("query", "")
+             if not company_id:
+                 logging.warning(f"Could not extract company_id from dict input: {input_data}")
+                 return {"error": "Invalid input format"}
+        else:
+            error_msg = f"Unsupported input type: {type(input_data)}"
+            logging.error(error_msg)
+            return {"error": error_msg}
+
         logging.info(f"Executing fundamental analysis for company_id: {company_id}")
         logging.debug(f"FAA_XAI:EXECUTE_INPUT: company_id='{company_id}'")
 
-        # Retrieve past analysis
-        history = self.memory_manager.query_history(company_id, limit=3)
-        history_context = ""
-        if history:
-            history_context = "\nPast Analysis (Same Company):\n" + "\n".join(
-                [f"- {h['timestamp']}: {h['analysis_summary'][:200]}..." for h in history])
-
-        # Retrieve similar analysis
-        if hasattr(self.memory_manager, 'search_similar'):
-            similar_docs = self.memory_manager.search_similar(f"Analysis of {company_id}", limit=2)
-            # Filter out self
-            similar_docs = [d for d in similar_docs if d['company_id'] != company_id]
-            if similar_docs:
-                similar_context = "\nSimilar Past Analyses (Peers/Context):\n" + "\n".join(
-                    [f"- {d['company_id']} ({d.get('similarity_score', 0):.2f}): {d['analysis_summary'][:200]}..." for d in similar_docs])
-                history_context += similar_context
-
-        logging.info(f"Retrieved {len(history)} past analysis records for {company_id}")
-
         try:
+            # Retrieve past analysis
+            history = self.memory_manager.query_history(company_id, limit=3)
+            history_context = ""
+            if history:
+                history_context = "\nPast Analysis (Same Company):\n" + "\n".join(
+                    [f"- {h['timestamp']}: {h['analysis_summary'][:200]}..." for h in history])
+
+            # Retrieve similar analysis
+            if hasattr(self.memory_manager, 'search_similar'):
+                similar_docs = self.memory_manager.search_similar(f"Analysis of {company_id}", limit=2)
+                # Filter out self
+                similar_docs = [d for d in similar_docs if d['company_id'] != company_id]
+                if similar_docs:
+                    similar_context = "\nSimilar Past Analyses (Peers/Context):\n" + "\n".join(
+                        [f"- {d['company_id']} ({d.get('similarity_score', 0):.2f}): {d['analysis_summary'][:200]}..." for d in similar_docs])
+                    history_context += similar_context
+
+            logging.info(f"Retrieved {len(history)} past analysis records for {company_id}")
+
             company_data = await self.retrieve_company_data(company_id)
             if company_data is None:
                 logging.error(f"Failed to retrieve company data for {company_id} via A2A.")
-                return {"error": f"Could not retrieve data for company {company_id}"}
+                return self._format_output({"error": f"Could not retrieve data for company {company_id}"}, is_standard_mode, company_id)
 
             logging.debug(f"FAA_XAI:EXECUTE_COMPANY_DATA_KEYS: {list(company_data.keys())}")
 
@@ -167,11 +194,33 @@ class FundamentalAnalystAgent(AgentBase):
                 "error": None
             }
             logging.debug(f"FAA_XAI:EXECUTE_OUTPUT: {result_package}")
-            return result_package
+
+            return self._format_output(result_package, is_standard_mode, company_id)
 
         except Exception as e:
             logging.exception(f"Error during fundamental analysis of {company_id}: {e}")
-            return {"error": f"An error occurred during analysis: {e}"}
+            return self._format_output({"error": f"An error occurred during analysis: {e}"}, is_standard_mode, company_id)
+
+    def _format_output(self, result: Dict[str, Any], is_standard_mode: bool, company_id: str) -> Union[Dict[str, Any], AgentOutput]:
+        """Helper to format output based on input mode."""
+        if not is_standard_mode:
+            return result
+
+        # Standard Mode: Wrap in AgentOutput
+        error = result.get("error")
+        if error:
+             return AgentOutput(
+                answer=f"Analysis failed: {error}",
+                confidence=0.0,
+                metadata={"error": error, "raw_result": result}
+            )
+
+        return AgentOutput(
+            answer=result.get("analysis_summary", "No summary generated."),
+            sources=[f"Company Data for {company_id}"], # Placeholder for actual source tracking
+            confidence=0.9 if result.get("financial_ratios") else 0.5,
+            metadata=result
+        )
 
     async def retrieve_company_data(self, company_id: str) -> Optional[Dict[str, Any]]:
         """
@@ -742,6 +791,15 @@ if __name__ == '__main__':
             analysis_result_sk_fail = await agent_with_kernel_and_mock_a2a.execute("FAIL_TEST")
             print(f"Analysis Result (FAIL_TEST): {analysis_result_sk_fail}")
             assert "Could not retrieve data for company FAIL_TEST" in analysis_result_sk_fail.get("error", "")
+
+            # NEW: Test with AgentInput
+            print("\n--- Test with AgentInput (ABC_TEST) ---")
+            input_obj = AgentInput(query="ABC_TEST")
+            analysis_result_obj = await agent_with_kernel_and_mock_a2a.execute(input_obj)
+            print(f"Analysis Result (AgentOutput): {type(analysis_result_obj)}")
+            assert isinstance(analysis_result_obj, AgentOutput)
+            assert "Analysis failed" not in analysis_result_obj.answer
+            assert analysis_result_obj.confidence > 0.0
 
     if __name__ == '__main__':
         asyncio.run(run_tests())
