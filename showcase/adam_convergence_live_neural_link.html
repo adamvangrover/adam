@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM-CONVERGENCE: Live Neural Link</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#0A0A0F',
+                        surface: '#151522',
+                        accent: {
+                            cyan: '#00F5FF',
+                            green: '#00FF9F',
+                            purple: '#A855F7',
+                        },
+                        code: {
+                            bg: '#0D0D17',
+                            keyword: '#FF79C6',
+                            string: '#F1FA8C',
+                            comment: '#6272A4',
+                            function: '#50FA7B',
+                            variable: '#8BE9FD',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0A0A0F;
+            background-image:
+                radial-gradient(circle at 50% 0%, rgba(0, 245, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 0% 100%, rgba(168, 85, 247, 0.05) 0%, transparent 50%);
+            background-attachment: fixed;
+            color: #E0E0E0;
+        }
+
+        .glass-panel {
+            background: rgba(21, 21, 34, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+        }
+
+        .code-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .code-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(0, 245, 255, 0.3);
+        }
+
+        pre {
+            scrollbar-width: thin;
+            scrollbar-color: #333 #0D0D17;
+        }
+
+        pre::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        pre::-webkit-scrollbar-track {
+            background: #0D0D17;
+        }
+
+        pre::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
+        }
+
+        .syntax-keyword { color: #FF79C6; font-weight: 500; }
+        .syntax-string { color: #F1FA8C; }
+        .syntax-comment { color: #6272A4; font-style: italic; }
+        .syntax-function { color: #50FA7B; }
+        .syntax-type { color: #8BE9FD; }
+        .syntax-decorator { color: #BD93F9; }
+        .syntax-number { color: #BD93F9; }
+
+        @keyframes pulse-cyan {
+            0% { box-shadow: 0 0 0 0 rgba(0, 245, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 245, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 245, 255, 0); }
+        }
+
+        .pulse-indicator {
+            animation: pulse-cyan 2s infinite;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen selection:bg-accent-cyan selection:text-black">
+
+    <header class="sticky top-0 z-50 py-6 px-4 mb-12 glass-panel border-b border-accent-cyan/10">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <div class="h-3 w-3 rounded-full bg-accent-cyan pulse-indicator"></div>
+                <h1 class="font-display text-2xl md:text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-accent-cyan to-accent-purple">
+                    ADAM-CONVERGENCE
+                </h1>
+            </div>
+            <div class="text-xs font-mono text-accent-cyan/60 uppercase tracking-widest bg-accent-cyan/5 px-3 py-1 rounded-full border border-accent-cyan/20">
+                Live Neural Link Vertical Slice
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 pb-24 space-y-16">
+
+        <!-- Python Backend Group -->
+        <div class="space-y-8">
+            <div class="flex items-center gap-4 opacity-50">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent to-accent-green"></div>
+                <span class="font-mono text-sm font-bold text-accent-green">BACKEND // PYTHON</span>
+                <div class="h-px flex-1 bg-gradient-to-l from-transparent to-accent-green"></div>
+            </div>
+
+            <!-- backend/neural_link.py -->
+            <section class="code-card glass-panel rounded-2xl overflow-hidden group">
+                <div class="px-6 py-4 bg-white/5 border-b border-white/5 flex items-center justify-between">
+                    <h2 class="font-mono text-sm text-accent-green/90 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM11 7h2v6h-2V7zm0 8h2v2h-2v-2z"/></svg>
+                        backend/neural_link.py
+                    </h2>
+                    <span class="text-[10px] font-mono text-white/30 uppercase tracking-tighter">python_intelligence/bridge</span>
+                </div>
+                <div class="relative">
+                    <pre class="p-6 overflow-x-auto bg-code-bg font-mono text-sm leading-relaxed"><code class="block text-white/90">
+<span class="syntax-keyword">import</span> random
+<span class="syntax-keyword">import</span> time
+<span class="syntax-keyword">import</span> os
+<span class="syntax-keyword">from</span> typing <span class="syntax-keyword">import</span> TypedDict, List, Optional
+
+<span class="syntax-comment"># --- Type Definitions ---</span>
+<span class="syntax-keyword">class</span> <span class="syntax-type">MarketAsset</span>(TypedDict):
+    symbol: <span class="syntax-type">str</span>
+    name: <span class="syntax-type">str</span>
+    current_price: <span class="syntax-type">float</span>
+    previous_price: <span class="syntax-type">float</span>
+    volume: <span class="syntax-type">int</span>
+    change_percent: <span class="syntax-type">float</span>
+
+<span class="syntax-keyword">class</span> <span class="syntax-type">MarketEvent</span>(TypedDict):
+    timestamp: <span class="syntax-type">float</span>
+    event_type: <span class="syntax-type">str</span>
+    symbol: <span class="syntax-type">str</span>
+    description: <span class="syntax-type">str</span>
+    severity: <span class="syntax-type">str</span> <span class="syntax-comment"># 'low', 'medium', 'high'</span>
+
+<span class="syntax-keyword">def</span> <span class="syntax-function">load_secure_credentials</span>():
+    <span class="syntax-string">"""Simulates loading secure keys with zero-destruction intent."""</span>
+    api_key = os.environ.get(<span class="syntax-string">"MARKET_API_KEY"</span>, <span class="syntax-string">"DUMMY_KEY_777"</span>)
+    <span class="syntax-keyword">return</span> {<span class="syntax-string">"api_key"</span>: api_key}
+
+<span class="syntax-keyword">def</span> <span class="syntax-function">fetch_market_data</span>() -> List[MarketAsset]:
+    <span class="syntax-comment"># Logic for real-time asset tracking</span>
+    <span class="syntax-keyword">return</span> [
+        {<span class="syntax-string">"symbol"</span>: <span class="syntax-string">"AAPL"</span>, <span class="syntax-string">"current_price"</span>: <span class="syntax-number">150.25</span>, <span class="syntax-string">"change_percent"</span>: <span class="syntax-number">0.45</span>},
+        {<span class="syntax-string">"symbol"</span>: <span class="syntax-string">"AMZN"</span>, <span class="syntax-string">"current_price"</span>: <span class="syntax-number">3300.10</span>, <span class="syntax-string">"change_percent"</span>: <span class="syntax-number">-1.2</span>}
+    ]
+
+<span class="syntax-keyword">def</span> <span class="syntax-function">process_market_event</span>(asset: MarketAsset) -> Optional[MarketEvent]:
+    <span class="syntax-keyword">if</span> random.random() < <span class="syntax-number">0.15</span>:
+        <span class="syntax-keyword">return</span> {
+            <span class="syntax-string">"timestamp"</span>: time.time(),
+            <span class="syntax-string">"event_type"</span>: <span class="syntax-string">"flash_crash"</span>,
+            <span class="syntax-string">"severity"</span>: <span class="syntax-string">"high"</span>
+        }
+    <span class="syntax-keyword">return</span> <span class="syntax-keyword">None</span></code></pre>
+                </div>
+            </section>
+
+            <!-- backend/monitoring_agent.py -->
+            <section class="code-card glass-panel rounded-2xl overflow-hidden group">
+                <div class="px-6 py-4 bg-white/5 border-b border-white/5 flex items-center justify-between">
+                    <h2 class="font-mono text-sm text-accent-green/90 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>
+                        backend/monitoring_agent.py
+                    </h2>
+                    <span class="text-[10px] font-mono text-white/30 uppercase tracking-tighter">security/monitoring_agent</span>
+                </div>
+                <div class="relative">
+                    <pre class="p-6 overflow-x-auto bg-code-bg font-mono text-sm leading-relaxed"><code class="block text-white/90">
+<span class="syntax-keyword">from</span> collections <span class="syntax-keyword">import</span> deque
+<span class="syntax-keyword">from</span> neural_link <span class="syntax-keyword">import</span> fetch_market_data, process_market_event
+
+<span class="syntax-decorator">@dataclass</span>
+<span class="syntax-keyword">class</span> <span class="syntax-type">AgentStatus</span>:
+    timestamp: <span class="syntax-type">float</span>
+    status: <span class="syntax-type">str</span>
+    active_alerts_count: <span class="syntax-type">int</span>
+
+<span class="syntax-keyword">def</span> <span class="syntax-function">monitor_market_for_mayhem</span>():
+    <span class="syntax-comment"># Main loop logic for monitoring signals</span>
+    assets = fetch_market_data()
+    <span class="syntax-keyword">for</span> asset <span class="syntax-keyword">in</span> assets:
+        event = process_market_event(asset)
+        <span class="syntax-keyword">if</span> event:
+            _active_alerts.append(event)
+            <span class="syntax-function">print</span>(f<span class="syntax-string">"MAYHEM DETECTED: {event['event_type']}"</span>)
+                    </code></pre>
+                </div>
+            </section>
+        </div>
+
+        <!-- Frontend Group -->
+        <div class="space-y-8">
+            <div class="flex items-center gap-4 opacity-50">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent to-accent-cyan"></div>
+                <span class="font-mono text-sm font-bold text-accent-cyan">FRONTEND // TYPESCRIPT</span>
+                <div class="h-px flex-1 bg-gradient-to-l from-transparent to-accent-cyan"></div>
+            </div>
+
+            <!-- frontend/components/NeuralFeedWidget.tsx -->
+            <section class="code-card glass-panel rounded-2xl overflow-hidden group">
+                <div class="px-6 py-4 bg-white/5 border-b border-white/5 flex items-center justify-between">
+                    <h2 class="font-mono text-sm text-accent-cyan/90 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z"/></svg>
+                        frontend/components/NeuralFeedWidget.tsx
+                    </h2>
+                    <span class="text-[10px] font-mono text-white/30 uppercase tracking-tighter">react/ui-kit</span>
+                </div>
+                <div class="relative">
+                    <pre class="p-6 overflow-x-auto bg-code-bg font-mono text-sm leading-relaxed"><code class="block text-white/90">
+<span class="syntax-keyword">import</span> React, { useEffect, useState } <span class="syntax-keyword">from</span> <span class="syntax-string">'react'</span>;
+
+<span class="syntax-keyword">interface</span> <span class="syntax-type">MarketEvent</span> {
+  timestamp: <span class="syntax-type">number</span>;
+  event_type: <span class="syntax-type">string</span>;
+  severity: <span class="syntax-string">'low'</span> | <span class="syntax-string">'medium'</span> | <span class="syntax-string">'high'</span>;
+}
+
+<span class="syntax-keyword">export const</span> <span class="syntax-function">NeuralFeedWidget</span> = ({ backendApiBaseUrl }: Props) => {
+  <span class="syntax-keyword">const</span> [marketData, setMarketData] = <span class="syntax-function">useState</span>&lt;<span class="syntax-type">MarketAsset</span>[]&gt;([]);
+
+  <span class="syntax-function">useEffect</span>(() => {
+    <span class="syntax-keyword">const</span> interval = <span class="syntax-function">setInterval</span>(fetchData, <span class="syntax-number">5000</span>);
+    <span class="syntax-keyword">return</span> () => <span class="syntax-function">clearInterval</span>(interval);
+  }, []);
+
+  <span class="syntax-keyword">return</span> (
+    &lt;<span class="syntax-keyword">div</span> <span class="syntax-keyword">className</span>=<span class="syntax-string">"p-8 bg-slate-900/50 rounded-3xl"</span>&gt;
+      &lt;<span class="syntax-keyword">h3</span>&gt;Market Mayhem Neural Feed&lt;/<span class="syntax-keyword">h3</span>&gt;
+      <span class="syntax-comment">{/* Render live signals... */}</span>
+    &lt;/<span class="syntax-keyword">div</span>&gt;
+  );
+};</code></pre>
+                </div>
+            </section>
+
+            <!-- frontend/app/page.tsx -->
+            <section class="code-card glass-panel rounded-2xl overflow-hidden group">
+                <div class="px-6 py-4 bg-white/5 border-b border-white/5 flex items-center justify-between">
+                    <h2 class="font-mono text-sm text-accent-cyan/90 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        frontend/app/page.tsx
+                    </h2>
+                    <span class="text-[10px] font-mono text-white/30 uppercase tracking-tighter">nextjs/pages</span>
+                </div>
+                <div class="relative">
+                    <pre class="p-6 overflow-x-auto bg-code-bg font-mono text-sm leading-relaxed"><code class="block text-white/90">
+<span class="syntax-keyword">import</span> { NeuralFeedWidget } <span class="syntax-keyword">from</span> <span class="syntax-string">'../components/NeuralFeedWidget'</span>;
+
+<span class="syntax-keyword">export default function</span> <span class="syntax-function">Home</span>() {
+  <span class="syntax-keyword">return</span> (
+    &lt;<span class="syntax-keyword">main</span> <span class="syntax-keyword">className</span>=<span class="syntax-string">"min-h-screen bg-gray-955 flex items-center py-20"</span>&gt;
+      &lt;<span class="syntax-keyword">h1</span> <span class="syntax-keyword">className</span>=<span class="syntax-string">"text-4xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400"</span>&gt;
+        Adam's Market Mayhem Dashboard
+      &lt;/<span class="syntax-keyword">h1</span>&gt;
+      &lt;<span class="syntax-function">NeuralFeedWidget</span> /&gt;
+    &lt;/<span class="syntax-keyword">main</span>&gt;
+  );
+}</code></pre>
+                </div>
+            </section>
+        </div>
+
+        <!-- LIVE SYSTEM TELEMETRY -->
+        <div class="space-y-8">
+            <div class="flex items-center gap-4 opacity-50">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent to-accent-purple"></div>
+                <span class="font-mono text-sm font-bold text-accent-purple">RUNTIME // TELEMETRY</span>
+                <div class="h-px flex-1 bg-gradient-to-l from-transparent to-accent-purple"></div>
+            </div>
+
+            <section class="code-card glass-panel rounded-2xl overflow-hidden group">
+                <div class="px-6 py-4 bg-white/5 border-b border-white/5 flex items-center justify-between">
+                    <h2 class="font-mono text-sm text-accent-purple/90 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                        system_state_capture.json
+                    </h2>
+                    <span class="text-[10px] font-mono text-white/30 uppercase tracking-tighter">live_metrics</span>
+                </div>
+                <div class="relative">
+                    <pre class="p-6 overflow-x-auto bg-code-bg font-mono text-sm leading-relaxed"><code class="block text-white/90">
+{
+  <span class="syntax-string">"timestamp"</span>: <span class="syntax-string">"2026-02-08T02:14:40.569945"</span>,
+  <span class="syntax-string">"environment"</span>: {
+    <span class="syntax-string">"python_version"</span>: <span class="syntax-string">"3.12.12"</span>,
+    <span class="syntax-string">"system_id"</span>: <span class="syntax-string">"ADAM-v23.5-Apex"</span>,
+    <span class="syntax-string">"os_kernel"</span>: <span class="syntax-string">"Linux devbox 6.8.0 #1 SMP PREE..."</span>
+  },
+  <span class="syntax-string">"model_limitations"</span>: {
+    <span class="syntax-string">"divergence_source"</span>: <span class="syntax-string">"Adam-v30.1-Apex-Liquid"</span>,
+    <span class="syntax-string">"valuation_delta"</span>: {
+    "v23_intrinsic": 128.0,
+    "v30_intrinsic": 115.0,
+    "variance": "-10.1%",
+    "driver": "WACC expansion (10.5% -> 11.2%) driven by 'Fed Credibility Vacuum' risk premium."
+}
+  },
+  <span class="syntax-string">"recent_logs"</span>: [
+    "def some_function():",
+    "    try:",
+    "        #... (code that might raise an exception)",
+    "    except Exception as e:",
+    "        logging.error(f\"An error occurred: {e}\")"
+]
+}</code></pre>
+                </div>
+            </section>
+        </div>
+        <!-- END LIVE SYSTEM TELEMETRY -->
+    </main>
+
+    <script>
+        // Subtle interactivity: Highlight active code sections on scroll
+        const sections = document.querySelectorAll('section');
+        const observerOptions = {
+            threshold: 0.2
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('ring-1', 'ring-accent-cyan/20');
+                } else {
+                    entry.target.classList.remove('ring-1', 'ring-accent-cyan/20');
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => observer.observe(section));
+    </script>
+</body>
+</html>
