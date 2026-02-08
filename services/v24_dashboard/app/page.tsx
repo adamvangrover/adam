@@ -1,4 +1,5 @@
 import TerminalWidget from '../TerminalWidget';
+import NeuralFeedWidget from '../components/NeuralFeedWidget';
 
 export default function Home() {
   return (
@@ -10,15 +11,15 @@ export default function Home() {
       </div>
 
       <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="border border-gray-700 rounded p-4">
+        <div className="border border-gray-700 rounded p-4 h-96">
           <h2 className="text-xl mb-4 font-bold text-cyan-500">System Terminal</h2>
           <TerminalWidget />
         </div>
 
-        <div className="border border-gray-700 rounded p-4">
-          <h2 className="text-xl mb-4 font-bold text-cyan-500">Market Data</h2>
-          <div className="h-64 bg-black/50 rounded flex items-center justify-center text-gray-500">
-            Awaiting Rust Core Stream...
+        <div className="border border-gray-700 rounded p-4 h-96 flex flex-col">
+          <h2 className="text-xl mb-4 font-bold text-cyan-500">Market Data & Intelligence</h2>
+          <div className="flex-1 bg-black/50 rounded overflow-hidden relative">
+            <NeuralFeedWidget />
           </div>
         </div>
       </div>
