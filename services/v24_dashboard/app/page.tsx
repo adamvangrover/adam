@@ -19,19 +19,22 @@ export default function Home() {
       </div>
 
       <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="border border-gray-700 rounded p-4 bg-gray-900/50">
+        {/* System Terminal */}
+        <div className="border border-gray-700 rounded p-4 h-96 bg-gray-900/50 flex flex-col">
           <h2 className="text-xl mb-4 font-bold text-cyan-500">System Terminal</h2>
           <TerminalWidget />
         </div>
 
-        <div className="border border-gray-700 rounded p-4 bg-gray-900/50">
+        {/* Market Data Stream (Rust Core Placeholder) */}
+        <div className="border border-gray-700 rounded p-4 h-96 bg-gray-900/50 flex flex-col">
           <h2 className="text-xl mb-4 font-bold text-cyan-500">Market Data</h2>
-          <div className="h-64 bg-black/50 rounded flex items-center justify-center text-gray-500 border border-gray-800">
+          <div className="flex-1 bg-black/50 rounded flex items-center justify-center text-gray-500 border border-gray-800">
             <span className="animate-pulse">Awaiting Rust Core Stream...</span>
           </div>
         </div>
       </div>
 
+      {/* Neural Intelligence Feed (Python Core) */}
       <div className="w-full mt-4 border border-gray-700 rounded p-4 bg-gray-900/50">
         <h2 className="text-xl mb-4 font-bold text-green-500">Neural Intelligence Feed (V30)</h2>
         <NeuralFeedWidget />

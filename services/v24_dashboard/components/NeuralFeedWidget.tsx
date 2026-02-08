@@ -1,6 +1,7 @@
-"use client";
+'use client';
 import React, { useEffect, useState, useRef } from 'react';
 
+// Define TypeScript Interface matching Pydantic backend model
 interface Thought {
   timestamp: string;
   agent_name: string;
@@ -11,26 +12,36 @@ interface Thought {
 const NeuralFeedWidget: React.FC = () => {
   const [thoughts, setThoughts] = useState<Thought[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [status, setStatus] = useState<string>('Connecting...');
+
+  // Auto-scroll to bottom whenever new thoughts arrive
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [thoughts]);
 
   useEffect(() => {
-    // Create WebSocket connection
+    // WebSocket Connection
     const ws = new WebSocket('ws://localhost:8000/ws/stream');
 
     ws.onopen = () => {
-      console.log('Connected to Neural Link');
+      console.log('Neural Link: Connected');
+      setStatus('Connected');
     };
 
     ws.onmessage = (event) => {
       try {
-        const data: Thought = JSON.parse(event.data);
-        setThoughts((prev) => [...prev, data].slice(-50)); // Keep last 50 thoughts
+        const thought: Thought = JSON.parse(event.data);
+        setThoughts((prev) => [...prev.slice(-49), thought]); // Keep last 50 items
       } catch (err) {
-        console.error('Failed to parse thought:', err);
+        console.error('Neural Link: Error parsing data', err);
       }
     };
 
     ws.onclose = () => {
-      console.log('Disconnected from Neural Link');
+      console.log('Neural Link: Disconnected');
+      setStatus('Disconnected');
     };
 
     ws.onerror = (error) => {
@@ -42,50 +53,54 @@ const NeuralFeedWidget: React.FC = () => {
     };
   }, []);
 
-  // Auto-scroll to bottom
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [thoughts]);
+  // Determine color based on conviction score with visual flair
+  const getConvictionColor = (score: number) => {
+    // Backend sends 0-100 or 0.0-1.0? Assuming 0-100 based on usage below, 
+    // but code handles normalization if needed.
+    const normalizedScore = score <= 1 ? score * 100 : score;
+    
+    if (normalizedScore >= 80) return 'text-green-400 shadow-[0_0_8px_rgba(74,222,128,0.4)]';
+    if (normalizedScore >= 50) return 'text-cyan-400';
+    return 'text-red-400';
+  };
 
   return (
-    <div className="flex flex-col h-64 w-full bg-black border border-green-900 rounded-lg overflow-hidden font-mono text-xs shadow-[0_0_10px_rgba(0,255,0,0.1)]">
-      <div className="flex items-center justify-between px-3 py-1 bg-green-900/20 border-b border-green-900/50">
-        <span className="text-green-500 font-bold tracking-wider">NEURAL_LINK_V30</span>
+    <div className="flex flex-col h-full w-full bg-black/90 font-mono text-xs rounded border border-gray-700 p-2 overflow-hidden shadow-lg shadow-green-900/10">
+      {/* Header Bar */}
+      <div className="flex justify-between items-center border-b border-gray-700 pb-2 mb-2 bg-gray-900/30 px-2 -mx-2 -mt-2 pt-2">
+        <span className="text-cyan-400 font-bold tracking-wider">NEURAL LINK v30.1</span>
         <div className="flex items-center space-x-2">
-          <div className={`w-2 h-2 rounded-full ${thoughts.length > 0 ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
-          <span className="text-green-700">LIVE</span>
+          <span className={`text-[10px] uppercase ${status === 'Connected' ? 'text-green-500' : 'text-red-500'}`}>
+            {status}
+          </span>
+          <div className={`w-2 h-2 rounded-full ${status === 'Connected' ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
         </div>
       </div>
 
-      <div
-        ref={scrollRef}
-        className="flex-1 overflow-y-auto p-2 space-y-1 scrollbar-thin scrollbar-thumb-green-900 scrollbar-track-black"
-      >
+      {/* Feed Stream */}
+      <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-1 pr-1 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
         {thoughts.length === 0 && (
-          <div className="text-green-900 italic text-center mt-20">Waiting for neural signals...</div>
+          <div className="flex flex-col items-center justify-center h-full text-gray-600 italic space-y-2">
+            <span className="animate-pulse">Awaiting neural signals...</span>
+          </div>
         )}
-
-        {thoughts.map((thought, idx) => {
-          const isHighConviction = thought.conviction_score >= 80;
-          const isLowConviction = thought.conviction_score < 50;
-
-          let colorClass = "text-green-400"; // Default
-          if (isLowConviction) colorClass = "text-red-500";
-          else if (isHighConviction) colorClass = "text-emerald-300 shadow-[0_0_5px_rgba(16,185,129,0.5)]";
-
-          return (
-            <div key={idx} className="flex space-x-2 animate-in fade-in duration-300">
-              <span className="text-green-800 shrink-0">[{new Date(thought.timestamp).toLocaleTimeString()}]</span>
-              <span className="text-cyan-600 font-semibold shrink-0">@{thought.agent_name}:</span>
-              <span className={`${colorClass} break-words`}>
-                {thought.content}
-                <span className="text-xs opacity-50 ml-2">({thought.conviction_score}%)</span>
-              </span>
-            </div>
-          );
-        })}
+        
+        {thoughts.map((thought, idx) => (
+          <div key={idx} className="flex gap-2 border-b border-gray-800/50 pb-1 hover:bg-white/5 transition-colors animate-in fade-in slide-in-from-bottom-1 duration-300">
+            <span className="text-gray-500 w-16 shrink-0">
+              [{new Date(thought.timestamp).toLocaleTimeString([], {hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit"})}]
+            </span>
+            <span className="text-blue-400 font-bold w-28 shrink-0 truncate" title={thought.agent_name}>
+              {thought.agent_name}
+            </span>
+            <span className="text-gray-300 flex-1 break-words">
+              {thought.content}
+            </span>
+            <span className={`${getConvictionColor(thought.conviction_score)} font-bold w-10 text-right shrink-0`}>
+              {Math.round(thought.conviction_score <= 1 ? thought.conviction_score * 100 : thought.conviction_score)}%
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   );

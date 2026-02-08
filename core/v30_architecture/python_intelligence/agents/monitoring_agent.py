@@ -1,8 +1,13 @@
 import asyncio
 import random
+import logging
 import sys
 import os
 from datetime import datetime
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("MonitoringAgent")
 
 # Ensure we can import from the bridge by adding the repo root to sys.path
 # This assumes the script is run from the repo root or its own directory
@@ -25,9 +30,15 @@ class MonitoringAgent:
 
     async def start(self):
         self.running = True
+        logger.info(f"{self.name} initialized. Starting heartbeat...")
         while self.running:
-            thought = self.generate_thought()
-            await emitter.broadcast(thought)
+            try:
+                thought = self.generate_thought()
+                await emitter.broadcast(thought)
+                logger.info(f"Emitted: {thought.content} ({thought.conviction_score})")
+            except Exception as e:
+                logger.error(f"Error in agent loop: {e}")
+            
             await asyncio.sleep(2)
 
     def stop(self):
@@ -35,11 +46,13 @@ class MonitoringAgent:
 
     def generate_thought(self) -> Thought:
         actions = [
-            "Scanning market data...",
-            "Optimizing portfolio...",
-            "Analyzing sentiment...",
-            "Detecting anomalies...",
-            "Rebalancing assets...",
+            "Scanning market data feeds...",
+            "Optimizing portfolio allocation...",
+            "Analyzing sentiment vectors...",
+            "Detecting market anomalies...",
+            "Rebalancing asset weights...",
+            "Synchronizing with Quantum Core...",
+            "Validating risk metrics...",
             "Verifying data integrity..."
         ]
 
@@ -69,5 +82,5 @@ async def startup_event():
 
 if __name__ == "__main__":
     import uvicorn
-    print(f"Starting {agent.name} and Neural Link...")
+    logger.info(f"Starting {agent.name} and Neural Link...")
     uvicorn.run(app, host="0.0.0.0", port=8000)
