@@ -44,6 +44,14 @@ class GovernanceMiddleware:
             logging.warning(f"Governance policy not found at {self.policy_path}. Defaulting to ALLOW all.")
             self.policy = {"global_policy": {"default_action": "ALLOW"}}
 
+        # Initialize Ledger
+        try:
+            from core.governance.immutable_ledger import ImmutableLedger
+            self.ledger = ImmutableLedger()
+        except ImportError:
+            self.ledger = None
+            logging.warning("ImmutableLedger could not be imported. Audit trails disabled.")
+
     def init_app(self, app):
         """Register the before_request hook."""
         app.before_request(self.check_governance)
@@ -138,6 +146,19 @@ class GovernanceMiddleware:
                     except ImportError:
                         # Fallback logging if core is not available
                         logging.warning(f"AUDIT: Governance Override used for {request.path} by {request.remote_addr}")
+
+                    # Write to Immutable Ledger
+                    if self.ledger:
+                        self.ledger.log_entry(
+                            actor=f"IP:{request.remote_addr}",
+                            action=f"GOVERNANCE_OVERRIDE",
+                            details={
+                                "path": request.path,
+                                "method": request.method,
+                                "risk_level": risk,
+                                "token_timestamp": timestamp
+                            }
+                        )
 
                     return  # ALLOW the request
                 except (ValueError, AttributeError) as e:

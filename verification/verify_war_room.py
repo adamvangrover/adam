@@ -15,7 +15,7 @@ def run():
         page.wait_for_selector("#ticker-feed .ticker-row")
 
         # Take a screenshot
-        screenshot_path = "verification/war_room_v2_final.png"
+        screenshot_path = "verification/war_room_v2.png"
         page.screenshot(path=screenshot_path)
         print(f"Screenshot saved to {screenshot_path}")
 

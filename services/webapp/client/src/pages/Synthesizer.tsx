@@ -19,6 +19,7 @@ const Synthesizer: React.FC = () => {
     const [lastUpdate, setLastUpdate] = useState<string>('');
     const [conviction, setConviction] = useState<Record<string, number>>({});
     const [forecastData, setForecastData] = useState<any>(null);
+    const [dataSource, setDataSource] = useState<string>('LIVE'); // 'LIVE' or 'SCENARIO_2008'
 
     // Initial Data Fetch
     useEffect(() => {
@@ -30,7 +31,12 @@ const Synthesizer: React.FC = () => {
             // 1. Confidence (Polled)
             const fetchConfidence = async () => {
                 try {
-                    const res = await fetch('/api/synthesizer/confidence', { headers });
+                    // Switch endpoint based on source
+                    const endpoint = dataSource === 'SCENARIO_2008'
+                        ? '/api/synthesizer/scenario?id=2008_CRASH'
+                        : '/api/synthesizer/confidence';
+
+                    const res = await fetch(endpoint, { headers });
                     if (res.ok) {
                         const data = await res.json();
                         setScore(data.score);
@@ -93,7 +99,15 @@ const Synthesizer: React.FC = () => {
                     </h1>
                     <div style={{ color: '#888', marginTop: '5px' }}>SYSTEM AGGREGATION NODE :: ACTIVE</div>
                 </div>
-                <div style={{ textAlign: 'right' }}>
+                <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: '5px', alignItems: 'flex-end' }}>
+                    <select
+                        value={dataSource}
+                        onChange={(e) => setDataSource(e.target.value)}
+                        style={{ background: '#333', color: '#fff', border: '1px solid #555', padding: '5px', fontFamily: 'inherit' }}
+                    >
+                        <option value="LIVE">LIVE STREAM</option>
+                        <option value="SCENARIO_2008">SCENARIO: 2008 CRASH</option>
+                    </select>
                     <div style={{ fontSize: '0.8rem', color: '#666' }}>LAST SYNC</div>
                     <div style={{ color: '#0ff', fontSize: '1.2rem' }}>{lastUpdate}</div>
                 </div>
