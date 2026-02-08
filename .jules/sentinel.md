@@ -150,3 +150,8 @@
 **Vulnerability:** The `ingest_file` tool in the MCP Server (`server/mcp_server.py`) accepted absolute paths without validation, allowing users to ingest arbitrary files from the server's filesystem.
 **Learning:** Tools exposed via protocols like MCP must implement their own input validation, as they act as a bridge between external inputs and internal capabilities.
 **Prevention:** Implemented strict path validation using `os.path.realpath` and `os.path.commonpath` to restrict file access to specific allowed directories (`data/` and `docs/`).
+
+## 2026-02-08 - Secure WebSocket Origins
+**Vulnerability:** The V30 Neural Mesh and Neural Link WebSocket endpoints (`/ws/mesh`, `/ws/stream`) were configured with `allow_origins=["*"]`, permitting any website to connect and hijack the session (Cross-Site WebSocket Hijacking - CSWSH).
+**Learning:** `CORSMiddleware` in FastAPI/Starlette handles HTTP CORS headers but does NOT automatically enforce Origin validation for WebSocket handshakes. Manual validation of the `Origin` header is required within the WebSocket endpoint.
+**Prevention:** Always validate the `Origin` header in WebSocket endpoints against a strict whitelist. Do not rely solely on middleware designed for HTTP.

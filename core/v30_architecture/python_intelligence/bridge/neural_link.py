@@ -2,6 +2,7 @@ import asyncio
 import json
 import logging
 import uvicorn
+import os
 from typing import List
 from datetime import datetime
 from pydantic import BaseModel
@@ -55,10 +56,13 @@ class NeuralEmitter:
 app = FastAPI()
 emitter = NeuralEmitter()
 
+# 🛡️ Sentinel: Restrict CORS to known frontend origins to prevent CSWSH
+allowed_origins = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000").split(",")
+
 # CORS for frontend access
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for dev simplicity
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -66,6 +70,14 @@ app.add_middleware(
 
 @app.websocket("/ws/stream")
 async def websocket_endpoint(websocket: WebSocket):
+    # 🛡️ Sentinel: Manual Origin Check for WebSockets
+    # CORSMiddleware doesn't always block WebSockets, so we enforce it here.
+    origin = websocket.headers.get("origin")
+    if origin and origin not in allowed_origins:
+        logger.warning(f"Blocking connection from unauthorized origin: {origin}")
+        await websocket.close(code=1008)  # Policy Violation
+        return
+
     await emitter.connect(websocket)
     try:
         while True:
