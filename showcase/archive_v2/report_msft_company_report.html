@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v23.5 :: Microsoft (MSFT)</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --paper-bg: #fdfbf7;
+            --ink-color: #1a1a1a;
+            --accent-red: #cc0000;
+            --cyber-black: #050b14;
+            --cyber-blue: #00f3ff;
+            --cyber-glass: rgba(0, 243, 255, 0.1);
+        }
+        body { margin: 0; background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }
+
+        .newsletter-wrapper {
+            max-width: 1200px;
+            margin: 40px auto;
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 40px;
+            padding: 20px;
+        }
+        @media (max-width: 800px) {
+            .newsletter-wrapper { grid-template-columns: 1fr; }
+        }
+
+        .paper-sheet {
+            background: var(--paper-bg);
+            color: var(--ink-color);
+            padding: 60px;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        /* Typography */
+        h1.title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            border-bottom: 4px solid var(--ink-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            letter-spacing: -1px;
+            line-height: 1.1;
+        }
+        h2, h3 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            color: var(--accent-red);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        h2 { font-size: 1.2rem; }
+        h3 { font-size: 1.0rem; color: #333; }
+
+        p, li { line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
+
+        /* Sidebar */
+        .cyber-sidebar {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .sidebar-widget {
+            border: 1px solid #333;
+            background: rgba(5, 11, 20, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.05);
+        }
+        .sidebar-title {
+            color: var(--cyber-blue);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Sentiment Meter */
+        .sentiment-track {
+            height: 6px; background: #333; border-radius: 3px; overflow: hidden; margin-top: 10px;
+        }
+        .sentiment-bar {
+            height: 100%; background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00);
+            width: 87%;
+            transition: width 1s ease-in-out;
+        }
+
+        /* Ticker Tag */
+        .ticker-tag {
+            display: inline-block;
+            background: rgba(0, 243, 255, 0.1);
+            color: var(--cyber-blue);
+            padding: 4px 8px;
+            margin: 2px;
+            font-size: 0.75rem;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 2px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .ticker-tag:hover { background: var(--cyber-blue); color: #000; }
+
+        /* Adam Critique */
+        .adam-critique {
+            background: #0f172a;
+            border-left: 4px solid var(--cyber-blue);
+            color: #94a3b8;
+            padding: 20px;
+            margin-top: 40px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .cyber-btn {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            padding: 6px 12px;
+            border: 1px solid #444;
+            color: #e0e0e0;
+            background: rgba(0,0,0,0.8);
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .cyber-btn:hover { border-color: var(--cyber-blue); color: var(--cyber-blue); }
+
+        /* Provenance Badge */
+        .provenance-badge {
+            font-size: 0.6rem; color: #555; margin-top: 10px; border-top: 1px solid #222; padding-top: 5px;
+        }
+
+        .chart-container {
+            position: relative; height: 200px; width: 100%; margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div style="max-width: 1400px; margin: 0 auto; padding: 20px;">
+        <a href="index.html" class="cyber-btn">&larr; BACK TO ARCHIVE</a>
+    </div>
+
+    <div class="newsletter-wrapper">
+        <!-- Main Content (Paper Style) -->
+        <div class="paper-sheet">
+            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px;">
+                <span>2025-02-21</span>
+                <span>TYPE: REPORT</span>
+            </div>
+
+            <h1 class="title">Microsoft (MSFT)</h1>
+
+            <p style="font-size: 1.2rem; font-style: italic; color: #444; border-bottom: 1px solid #eee; padding-bottom: 20px;">
+                Microsoft is a multinational technology company that develops, manufactures, licenses, supports, and sells computer software, consumer electronics, personal computers, and related services. Its best-k...
+            </p>
+
+            <div id="dynamic-chart-area"></div>
+
+            <h2>Company Overview</h2><p>Microsoft is a multinational technology company that develops, manufactures, licenses, supports, and sells computer software, consumer electronics, personal computers, and related services. Its best-known software products are the Microsoft Windows line of operating systems, the Microsoft Office suite, and the Internet Explorer and Edge web browsers. Its flagship hardware products are the Xbox video game consoles and the Microsoft Surface lineup of touchscreen personal computers.</p><h2>Financial Performance</h2><ul><li><strong>Revenue:</strong> {'2022': '198.27 billion USD', '2023': '214.91 billion USD', '2024': '230.00 billion USD (estimated)'}</li><li><strong>Net Income:</strong> {'2022': '72.74 billion USD', '2023': '72.44 billion USD', '2024': '82.00 billion USD (estimated)'}</li><li><strong>EPS:</strong> {'2022': '9.65 USD', '2023': '9.74 USD', '2024': '11.00 USD (estimated)'}</li><li><strong>P/E Ratio:</strong> {'current': '28.50'}</li><li><strong>Market Cap:</strong> {'current': '2.15 trillion USD'}</li><li><strong>Debt-to-Equity Ratio:</strong> {'current': '0.45'}</li><li><strong>Operating Margin:</strong> {'2022': '42.00%', '2023': '41.00%'}</li></ul><h2>Valuation</h2><ul><li><strong>DCF Valuation:</strong> {'base_case': '300 USD', 'bear_case': '250 USD', 'bull_case': '350 USD'}</li><li><strong>EV/EBITDA Multiple:</strong> {'current': '22.00'}</li><li><strong>Price/Sales Ratio:</strong> {'current': '10.00'}</li></ul><h2>Risk Assessment</h2><h2>Future Outlook</h2><h2>Investment Thesis</h2><p>Microsoft is a high-quality company with a strong track record of growth and innovation. Its diversified business model and competitive advantages position it well for continued success. However, investors should be mindful of the potential risks and challenges facing the company. Overall, Microsoft remains a compelling investment opportunity for long-term investors, especially those seeking exposure to the technology sector and the growth of cloud computing and AI.</p>
+
+            <div class="adam-critique">
+                <strong style="color: var(--cyber-blue);">/// ADAM SYSTEM CRITIQUE</strong><br><br>
+                Institutional Grade Analysis.
+            </div>
+        </div>
+
+        <!-- Sidebar (Cyber Style) -->
+        <aside class="cyber-sidebar">
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Market Sentiment <span>87</span></div>
+                <div class="sentiment-track">
+                    <div class="sentiment-bar"></div>
+                </div>
+                <div style="font-size:0.7rem; color:#666; margin-top:5px; display:flex; justify-content:space-between;">
+                    <span>PANIC</span><span>NEUTRAL</span><span>EUPHORIA</span>
+                </div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Entities Tracked</div>
+                <div>
+                    <span class="ticker-tag">MSFT</span>
+                </div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Contributing Agents</div>
+                <div style="font-size:0.8rem; color:#888;">
+                    System Orchestrator
+                </div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Highlights</div>
+                <ul style="font-size:0.8rem; color:#aaa; padding-left:20px; line-height:1.5;">
+
+                </ul>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Provenance</div>
+                <div class="provenance-badge">
+                    HASH: <span style="color: var(--cyber-blue)">1bf6aa92</span><br>
+                    SRC: msft_company_report.json<br>
+                    MODEL: v23.5 (Legacy Compatible)
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // Inject Data for potential JS usage
+        window.REPORT_METRICS = {"Revenue": {"2022": "198.27 billion USD", "2023": "214.91 billion USD", "2024": "230.00 billion USD (estimated)"}, "Net Income": {"2022": "72.74 billion USD", "2023": "72.44 billion USD", "2024": "82.00 billion USD (estimated)"}, "EPS": {"2022": "9.65 USD", "2023": "9.74 USD", "2024": "11.00 USD (estimated)"}, "Operating Margin": {"2022": "42.00%", "2023": "41.00%"}};
+
+        // Simple Chart Generation if metrics exist
+        if (window.REPORT_METRICS && Object.keys(window.REPORT_METRICS).length > 0) {
+            const chartArea = document.getElementById('dynamic-chart-area');
+
+            // Loop through metrics and create charts
+            for (const [key, value] of Object.entries(window.REPORT_METRICS)) {
+                if (typeof value === 'object' && value !== null) {
+                    const container = document.createElement('div');
+                    container.className = 'chart-container';
+                    const canvas = document.createElement('canvas');
+                    container.appendChild(canvas);
+
+                    // Title
+                    const title = document.createElement('h3');
+                    title.innerText = key;
+                    title.style.color = '#333';
+                    title.style.fontSize = '0.9rem';
+                    chartArea.appendChild(title);
+                    chartArea.appendChild(container);
+
+                    // Parse Data
+                    const labels = Object.keys(value);
+                    const dataPoints = Object.values(value).map(v => {
+                        if (typeof v === 'string') return parseFloat(v.replace(/[^0-9.]/g, ''));
+                        return v;
+                    });
+
+                    new Chart(canvas, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: key,
+                                data: dataPoints,
+                                backgroundColor: 'rgba(204, 0, 0, 0.5)',
+                                borderColor: 'rgba(204, 0, 0, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                y: { grid: { color: '#ddd' } },
+                                x: { grid: { display: false } }
+                            }
+                        }
+                    });
+                }
+            }
+        }
+    </script>
+</body>
+</html>
