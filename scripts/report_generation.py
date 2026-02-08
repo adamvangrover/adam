@@ -100,6 +100,72 @@ def generate_market_summary_report(market_data):
 
 #... (add other report generation functions as needed)
 
+def generate_integration_report(log_data):
+    """
+    Generates an integration report from the integration log.
+
+    Args:
+        log_data (dict): The integration log data.
+
+    Returns:
+        str: The generated report as a string.
+    """
+    if 'v23_integration_log' in log_data:
+        log_data = log_data['v23_integration_log']
+
+    meta = log_data.get('meta', {})
+    delta = log_data.get('delta_analysis', {})
+    synthesis = log_data.get('revised_strategic_synthesis', {})
+
+    # Helper to safely format floats if they exist
+    def fmt_currency(val):
+        try:
+            return f"${float(val):.2f}"
+        except (ValueError, TypeError):
+            return str(val)
+
+    report = f"""# Adam v23.5 Integration Report
+Generated: {meta.get('timestamp', 'N/A')}
+System ID: {meta.get('system_id', 'N/A')}
+Source Model: {meta.get('source_model', 'N/A')}
+
+## 1. Delta Analysis
+
+### Valuation Divergence
+- **Variance**: {delta.get('valuation_divergence', {}).get('variance', 'N/A')}
+- **Intrinsic Value (v23)**: {fmt_currency(delta.get('valuation_divergence', {}).get('v23_intrinsic', 0))}
+- **Intrinsic Value (v30)**: {fmt_currency(delta.get('valuation_divergence', {}).get('v30_intrinsic', 0))}
+- **Driver**: {delta.get('valuation_divergence', {}).get('driver', 'N/A')}
+
+### Risk Vector Update
+- **Previous Assessment**: {delta.get('risk_vector_update', {}).get('previous_assessment', 'N/A')}
+- **New Intelligence**: {delta.get('risk_vector_update', {}).get('new_intelligence', 'N/A')}
+- **Implication**: {delta.get('risk_vector_update', {}).get('implication', 'N/A')}
+
+## 2. Revised Strategic Synthesis
+
+### Status
+{synthesis.get('status', 'N/A')}
+
+### Outlook
+**{synthesis.get('outlook', 'N/A')}**
+
+### Adjusted Price Levels
+- **Sovereign Floor**: {synthesis.get('adjusted_price_levels', {}).get('sovereign_floor', 'N/A')}
+- **Mean Reversion Zone**: {synthesis.get('adjusted_price_levels', {}).get('mean_reversion_zone', 'N/A')}
+- **Speculative Ceiling**: {synthesis.get('adjusted_price_levels', {}).get('speculative_ceiling', 'N/A')}
+
+### Final Directive
+**Action**: {synthesis.get('final_directive', {}).get('action', 'N/A')}
+
+**Rationale**:
+{synthesis.get('final_directive', {}).get('rationale', 'N/A')}
+
+**Monitor**:
+{synthesis.get('final_directive', {}).get('monitor', 'N/A')}
+"""
+    return report
+
 if __name__ == "__main__":
     #... (example usage of the report generation functions)
     pass

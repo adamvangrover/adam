@@ -45,12 +45,15 @@ except ImportError as e:
 try:
     from core.engine.bsl_generator import BSLPortfolioGenerator
     from core.engine.sector_impact_engine import SectorImpactEngine
+    from core.engine.scenario_engine import ScenarioEngine
     bsl_gen = BSLPortfolioGenerator()
     impact_engine = SectorImpactEngine()
+    scenario_engine = ScenarioEngine()
 except ImportError as e:
-    logging.warning(f"Could not import BSL/Impact Engines: {e}")
+    logging.warning(f"Could not import BSL/Impact/Scenario Engines: {e}")
     bsl_gen = None
     impact_engine = None
+    scenario_engine = None
 
 # ---------------------------------------------------------------------------- #
 # Constants
@@ -509,6 +512,37 @@ def create_app(config_name='default'):
                 "pulse": {},
                 "status": "Simulation Engine Offline"
             })
+
+    @app.route('/api/synthesizer/scenario', methods=['GET'])
+    @jwt_required()
+    def get_scenario_data():
+        """
+        Returns data from the ScenarioEngine (e.g., 2008 Crash Replay).
+        """
+        scenario_id = request.args.get('id', '2008_CRASH')
+
+        if scenario_engine:
+            if scenario_engine.active_scenario is None or scenario_engine.active_scenario['name'] != scenario_id:
+                 scenario_engine.set_scenario(scenario_id)
+
+            pulse = scenario_engine.get_pulse()
+
+            # Mock consensus for scenario (always low confidence in crash)
+            consensus_result = {
+                "decision": "SELL/REJECT",
+                "score": -0.95,
+                "rationale": "SCENARIO OVERRIDE: Historical Replay indicates systemic failure.",
+                "normalized_score": 5.0
+            }
+
+            return jsonify({
+                "score": 5.0,
+                "consensus": consensus_result,
+                "pulse": pulse,
+                "timestamp": datetime.utcnow().isoformat()
+            })
+        else:
+             return jsonify({'error': 'Scenario Engine Unavailable'}), 503
 
     @app.route('/api/intercom/stream', methods=['GET'])
     @jwt_required()

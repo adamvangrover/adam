@@ -10,12 +10,17 @@ class CritiqueSwarm:
         self.agents = {
             "RedTeam": self._red_team_critique,
             "ModelRisk": self._model_risk_critique,
-            "Contrarian": self._contrarian_critique
+            "Contrarian": self._contrarian_critique,
+            "ConsensusReview": self._consensus_critique
         }
 
     def critique(self, briefing: Dict[str, Any], sim_data: Dict[str, Any]) -> List[Dict[str, str]]:
         critiques = []
         for name, func in self.agents.items():
+            # ConsensusReview handles a different signature or context
+            if name == "ConsensusReview":
+                continue
+
             result = func(briefing, sim_data)
             if result:
                 critiques.append({
@@ -69,3 +74,35 @@ class CritiqueSwarm:
             "perspective": "Geopolitical Realist",
             "text": "The briefing is too optimistic about diplomatic channels. Current alliance fracture points suggest coordination costs will be 30-40% higher than baseline."
         }
+
+    def critique_consensus(self, consensus_result: Dict[str, Any]) -> List[Dict[str, str]]:
+        """
+        Specialized entry point for critiquing a ConsensusEngine result.
+        """
+        result = self._consensus_critique(consensus_result, {})
+        return [result] if result else []
+
+    def _consensus_critique(self, consensus_result: Dict[str, Any], _):
+        """
+        Analyzes the consensus rationale for overconfidence or weak signal support.
+        """
+        score = consensus_result.get("score", 0)
+        rationale = consensus_result.get("rationale", "")
+
+        # Check for Overconfidence in Neutral markets
+        if abs(score) > 0.8 and "No signals provided" in rationale:
+             return {
+                "agent": "ConsensusReview",
+                "perspective": "Logical Consistency",
+                "critique": "High confidence score derived despite lack of underlying signals. Suspected hallucination or default bias."
+            }
+
+        # Check for 'Groupthink' (e.g., all agents agree too perfectly)
+        if abs(score) > 0.95:
+             return {
+                "agent": "ConsensusReview",
+                "perspective": "Groupthink Monitor",
+                "critique": "Near-perfect consensus detected (>0.95). In complex adaptive systems, this often precedes a phase shift. Recommend re-sampling with higher volatility parameters."
+            }
+
+        return None

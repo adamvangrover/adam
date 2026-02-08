@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
 import { dataManager } from '../utils/DataManager';
+import { debounce } from '../utils/debounce';
 
 // Helper to generate mock graph
 const generateMockGraph = (n = 20) => {
@@ -27,7 +28,11 @@ const KnowledgeGraph: React.FC = () => {
             });
         }
     };
-    window.addEventListener('resize', handleResize);
+
+    // Bolt Optimization: Debounce resize to prevent canvas thrashing
+    const debouncedResize = debounce(handleResize, 200);
+
+    window.addEventListener('resize', debouncedResize);
     handleResize();
 
     // Fetch Data
@@ -47,7 +52,7 @@ const KnowledgeGraph: React.FC = () => {
     };
     loadData();
 
-    return () => window.removeEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', debouncedResize);
   }, []);
 
   return (

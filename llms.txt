@@ -1,0 +1,300 @@
+# Adam: Project Context for LLMs
+
+## Project Summary
+Adam is a Neuro-Symbolic Financial Sovereign (v26.0) designed to provide calculated conviction for high-stakes capital allocation by fusing a Neural Swarm (System 1) with a Neuro-Symbolic Graph (System 2).
+
+**Latest Version:** v26.0
+**License:** MIT
+**Documentation:** [docs/getting_started.md](docs/getting_started.md)
+**Full Context (Frontier Models):** [llms-full.txt](llms-full.txt) (For GPT-4, Claude 3.5 Sonnet)
+
+## Why use Adam?
+*   **Problem:** Standard LLMs hallucinate and lack the rigor required for institutional financial due diligence.
+*   **Solution:** Adam implements a "System 2" architecture using a Neuro-Symbolic Planner that "thinks before it speaks," drafting, critiquing, and refining analysis.
+*   **Key Differentiator:** Bifurcation of "Fast" (Swarm) and "Slow" (Graph) cognitive paths, ensuring both real-time responsiveness and deep analytical depth.
+
+## Installation
+```bash
+# Standard installation
+git clone https://github.com/adamvangrover/adam.git
+cd adam
+curl -LsSf https://astral.sh/uv/install.sh | sh
+uv sync
+source .venv/bin/activate
+```
+
+## Core Concepts & Terminology
+*   **MetaOrchestrator:** The central nervous system that routes queries to the appropriate cognitive engine (Swarm, Deep Dive, etc.).
+*   **System 1 (Swarm):** Asynchronous, parallelized "fire-and-forget" agents for perception and news monitoring (Fast Path).
+*   **System 2 (Graph):** Stateful, directed acyclic graphs (DAGs) for complex reasoning, planning, and criticism (Slow Path).
+*   **Deep Dive:** A comprehensive 5-phase financial analysis workflow (Entity, Fundamentals, Peers, Credit/Risk, Synthesis).
+*   **Ingestion Engine:** Scalable data pipeline supporting in-memory (10MB), persistent (1GB), and distributed (100GB+) ingestion strategies.
+*   **MCP:** Model Context Protocol used for tool integration.
+*   **Routing Keywords:** Specific terms that trigger specialized agents (e.g., `DEEP_DIVE`, `SWARM`, `RED_TEAM`, `CRISIS`, `ESG`, `COMPLIANCE`, `SURVEILLANCE`).
+
+## Safety & Governance
+Adam employs rigorous safety checks for institutional deployment:
+*   **Governance Middleware:** All critical operations pass through `services/webapp/governance.py`, which enforces IP blacklists, keyword scanning, and high-risk operation blocks.
+*   **Break Glass Protocol:** Emergency overrides require a signed `X-Governance-Override` header with an HMAC-SHA256 signature.
+*   **Secure Deserialization:** `core.security.safe_unpickler` is mandated to prevent pickle-based RCE vulnerabilities.
+
+## Structured Output (Artifacts)
+The primary output of a Deep Dive is the **HyperDimensionalKnowledgeGraph** (HDKG).
+
+```json
+{
+  "v23_knowledge_graph": {
+    "nodes": {
+      "equity_analysis": {
+        "valuation_engine": {
+          "dcf_model": { "intrinsic_value_estimate": 150.0 },
+          "multiples_analysis": { "verdict": "Undervalued" }
+        }
+      },
+      "strategic_synthesis": {
+        "final_verdict": {
+          "recommendation": "Buy",
+          "conviction_level": 8
+        }
+      }
+    }
+  }
+}
+```
+
+## Usage Examples (Few-Shot Prompts)
+
+### Example 1: Basic Initialization & Query
+Initialize the Meta Orchestrator and run a simple market query.
+```python
+import asyncio
+from core.engine.meta_orchestrator import MetaOrchestrator
+
+async def main():
+    # Initialize the brain
+    orchestrator = MetaOrchestrator()
+
+    # Execute a simple query
+    # The orchestrator automatically routes this to the appropriate engine
+    try:
+        result = await orchestrator.route_request("What is the current price of AAPL?")
+        print(result)
+    except Exception as e:
+        print(f"Error: {e}")
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+### Example 2: Triggering a Deep Dive
+Perform a comprehensive analysis on a specific ticker using the "Deep Dive" trigger.
+```python
+import asyncio
+from core.engine.meta_orchestrator import MetaOrchestrator
+
+async def main():
+    orchestrator = MetaOrchestrator()
+
+    # "Deep dive" keyword triggers the System 2 Neuro-Symbolic Graph
+    # Context can be used to inject specific parameters
+    context = {"force_reflection": True}
+    result = await orchestrator.route_request("Perform a deep dive analysis on TSLA", context=context)
+    print(result)
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+### Example 3.1: Swarm Intelligence
+Use the async swarm to gather information in parallel.
+### Example 3.2: Advanced Swarm Control
+Directly interface with the `HiveMind` for high-throughput tasks.
+
+```python
+import asyncio
+from core.engine.swarm.hive_mind import HiveMind
+
+async def main():
+    # Initialize 10 parallel workers
+    swarm = HiveMind(worker_count=10)
+    await swarm.initialize()
+
+    # Dispatch a parallel scanning task
+    task_payload = {"target": "NVIDIA", "depth": "comprehensive"}
+    await swarm.disperse_task("SCAN_NEWS", task_payload, intensity=8.0)
+
+    # Gather results
+    results = await swarm.gather_results()
+    print(results)
+
+    await swarm.shutdown()
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+### Example 4: Scalable Data Ingestion
+Ingest large datasets using the tiered Ingestion Engine.
+```python
+from core.data_processing.ingestion_engine import IngestionEngine
+
+# Initialize engine (Auto-detects strategy based on data size)
+engine = IngestionEngine(mode="auto")
+
+# 1. Ingest Small Data (In-Memory Graph)
+small_data = [{"symbol": "AAPL", "sector": "Technology"}]
+result_mem = engine.ingest(small_data)
+print(f"Memory Ingestion: {result_mem}")
+
+# 2. Ingest Large Corpus (Persistent Vector Store)
+# Automatically chunks and embeds large files
+result_large = engine.ingest("data/raw/sec_filings_2024.txt")
+print(f"Persistent Ingestion: {result_large}")
+```
+
+## API Reference (Condensed)
+
+### `core.engine.meta_orchestrator.MetaOrchestrator`
+*   `__init__(legacy_orchestrator=None)`: Initializes the orchestrator and sub-engines (Planner, HiveMind, SemanticRouter).
+*   `route_request(query: str, context: Optional[Dict] = None) -> Any`:
+    *   Analyzes query complexity (Low, Medium, High, Deep Dive, Swarm, etc.).
+    *   Routes to appropriate engine.
+    *   Returns the result (Dict or String).
+
+### Routing Keywords
+Use these keywords in your query to target specific engines:
+*   **DEEP_DIVE**: "deep dive", "full analysis", "valuation"
+*   **SWARM**: "swarm", "scan", "parallel", "hive"
+*   **RED_TEAM**: "attack", "red team", "vulnerability"
+*   **CRISIS**: "crisis", "shock", "stress test"
+*   **ESG**: "esg", "sustainability"
+*   **COMPLIANCE**: "compliance", "kyc", "regulation"
+*   **SURVEILLANCE**: "surveillance", "watch", "zombie"
+
+## Best Practices for LLMs
+*   **Async/Await:** Adam is fundamentally asynchronous. Always use `await` when calling `route_request`.
+*   **Context Injection:** Use the `context` dictionary to pass meta-parameters like `force_reflection`, `force_route`, or `repo_context`.
+*   **Keywords:** The `MetaOrchestrator` uses keyword heuristics (e.g., "deep dive", "swarm", "red team") to route queries efficiently. Include these in your query string for deterministic routing.
+*   **Error Handling:** Wrap `route_request` calls in `try/except` blocks as network operations or agent failures can occur.
+*   **Initialization:** Ensure `MetaOrchestrator` is initialized within an `asyncio` event loop context if required by specific sub-components.
+
+
+Adam: Neuro-Symbolic Financial Sovereign (v26.0)
+
+Adam is an open-source, neuro-symbolic AI framework designed for high-stakes financial analysis. It fuses a "System 1" Neural Swarm for real-time market perception with a "System 2" Symbolic Graph for deep reasoning, effectively eliminating hallucinations in institutional capital allocation.
+
+Project Summary
+
+Adam provides calculated conviction for financial decision-making. Unlike standard LLMs, Adam employs a Neuro-Symbolic Planner to draft, critique, and refine analyses before presentation.
+
+Version: v26.0
+
+License: MIT
+
+Documentation: docs/getting_started.md
+
+Context: llms-full.txt (Optimized for GPT-4o, Claude 3.5 Sonnet)
+
+Cognitive Architecture
+
+MetaOrchestrator: The central nervous system. It analyzes query complexity and routes requests to the appropriate cognitive engine (Swarm vs. Deep Dive).
+
+System 1 (Swarm / HiveMind): Asynchronous, parallelized "fire-and-forget" agents for real-time perception, news monitoring, and sentiment analysis (The "Fast" Path).
+
+System 2 (Graph / Planner): Stateful, directed acyclic graphs (DAGs) for complex reasoning, multi-step planning, and logical consistency (The "Slow" Path). Implemented via NeuroSymbolicPlanner.
+
+Core Capabilities
+
+Deep Dive Analysis: A rigorous 5-phase workflow: Entity Identification → Fundamental Analysis → Peer Comparison → Credit/Risk Assessment → Strategic Synthesis.
+
+Scalable Ingestion: Processes data ranging from small in-memory JSON (10MB) to massive distributed corpora (100GB+) via a tiered IngestionEngine.
+
+Governance & Safety: Strict safety guardrails including services/webapp/governance.py for keyword scanning and core.security.safe_unpickler to prevent RCE.
+
+Break Glass Protocol: Emergency overrides require a signed X-Governance-Override header with a valid HMAC-SHA256 signature.
+
+Usage Examples
+
+1. Basic Market Query (Automated Routing)
+
+import asyncio
+from core.engine.meta_orchestrator import MetaOrchestrator
+
+async def main():
+    orchestrator = MetaOrchestrator()
+    try:
+        # Routes automatically to System 1 or System 2
+        result = await orchestrator.route_request("What is the current price of AAPL?")
+        print(result)
+    except Exception as e:
+        print(f"Error: {e}")
+
+if __name__ == "__main__":
+    asyncio.run(main())
+
+
+2. System 2 Deep Dive
+
+# The "Deep Dive" keyword triggers the Symbolic Graph & Planner
+context = {"force_reflection": True}
+result = await orchestrator.route_request("Perform a deep dive analysis on TSLA", context=context)
+
+
+3. Advanced Swarm Control
+
+from core.engine.swarm.hive_mind import HiveMind
+
+async def main():
+    swarm = HiveMind(worker_count=10)
+    await swarm.initialize()
+    
+    # Dispatch parallel news scanning
+    await swarm.disperse_task("SCAN_NEWS", {"target": "NVIDIA"}, intensity=8.0)
+    results = await swarm.gather_results()
+    await swarm.shutdown()
+
+
+4. Scalable Data Ingestion
+
+from core.data_processing.ingestion_engine import IngestionEngine
+
+engine = IngestionEngine(mode="auto")
+# Supports structured JSON or massive text corpora
+engine.ingest("data/raw/sec_filings_2024.txt")
+
+
+API Reference & Keywords
+
+Routing Keywords
+
+Include these in your query to engage specific specialized agents:
+
+DEEP_DIVE: "valuation", "full analysis", "deep dive"
+
+SWARM: "swarm", "scan", "parallel", "hive"
+
+RED_TEAM: "attack", "red team", "vulnerability", "stress test"
+
+CRISIS: "crisis", "shock", "black swan"
+
+ESG / COMPLIANCE: "sustainability", "kyc", "regulation"
+
+SURVEILLANCE: "watch", "zombie", "surveillance"
+
+Best Practices
+
+Async/Await: Adam is fundamentally asynchronous. Always await the route_request.
+
+Context Injection: Use the context dictionary to pass meta-parameters like force_reflection or repo_context.
+
+Structured Artifacts: Deep Dive outputs return a HyperDimensionalKnowledgeGraph (HDKG) containing DCF models and Buy/Sell conviction levels.
+
+Error Handling: Wrap calls in try/except blocks to handle governance blocks or network timeouts gracefully.
+
+Installation
+
+git clone [https://github.com/adamvangrover/adam.git](https://github.com/adamvangrover/adam.git)
+cd adam
+curl -LsSf [https://astral.sh/uv/install.sh](https://astral.sh/uv/install.sh) | sh
+uv sync
+source .venv/bin/activate

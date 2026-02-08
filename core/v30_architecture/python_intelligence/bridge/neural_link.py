@@ -1,12 +1,12 @@
-from typing import List
-from datetime import datetime
-from pydantic import BaseModel
-from fastapi import FastAPI, WebSocket
-from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
 import asyncio
 import json
 import logging
+import uvicorn
+from typing import List
+from datetime import datetime
+from pydantic import BaseModel
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -31,8 +31,9 @@ class NeuralEmitter:
         logger.info(f"Client connected. Total connections: {len(self.active_connections)}")
 
     def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
-        logger.info(f"Client disconnected. Total connections: {len(self.active_connections)}")
+        if websocket in self.active_connections:
+            self.active_connections.remove(websocket)
+            logger.info(f"Client disconnected. Total connections: {len(self.active_connections)}")
 
     async def broadcast(self, thought: Thought):
         """
@@ -71,14 +72,16 @@ async def websocket_endpoint(websocket: WebSocket):
             # Keep connection alive, maybe receive commands later
             data = await websocket.receive_text()
             logger.info(f"Received from client: {data}")
-    except Exception:
+    except WebSocketDisconnect:
+        emitter.disconnect(websocket)
+    except Exception as e:
+        logger.error(f"WebSocket error: {e}")
         emitter.disconnect(websocket)
 
 # Helper for agents to emit thoughts (in-process or via HTTP/RPC in future)
 # For now, we'll expose a simple function to inject thoughts into the event loop
 async def emit_thought(thought: Thought):
     await emitter.broadcast(thought)
-
 
 if __name__ == "__main__":
     # Self-contained execution for testing

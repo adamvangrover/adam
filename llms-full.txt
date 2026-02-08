@@ -1,0 +1,189 @@
+# Adam: Comprehensive Project Context for Frontier Models (System 2)
+
+> **Note:** This file `llms-full.txt` is an aggregated context file designed for high-capacity Frontier Models (GPT-4, Claude 3.5 Sonnet). It contains the full "Developer's Bible" (`AGENTS.md`), Architecture details, and Setup Guide. For a lightweight summary, see `llms.txt`.
+
+---
+
+## Part 1: The Developer's Bible (AGENTS.md)
+<!-- INCLUDE AGENTS.md CONTENT HERE -->
+# AGENTS.md: The Developer's Bible
+
+> **"If it isn't in AGENTS.md, it doesn't exist."**
+
+## 1. Prime Directive: Bifurcation
+The codebase is strictly divided into two paths. DO NOT CROSS THE STREAMS.
+
+*   **Path A: The Product (Reliability)**
+    *   **Scope:** `core/`, `services/webapp/`, `scripts/`
+    *   **Philosophy:** "Measure twice, cut once." High test coverage, strict typing, zero hallucinations.
+    *   **Key Agents:** `FundamentalAnalyst`, `RiskManager`, `Governance`.
+
+*   **Path B: The Lab (Velocity)**
+    *   **Scope:** `experimental/`, `tinker_lab/`, `prototype/`
+    *   **Philosophy:** "Move fast and break things." rapid iteration, experimental prompts, mock data allowed.
+    *   **Key Agents:** `IdeaGenerator`, `ChaosMonkey`.
+
+## 2. The Pheromone Protocol (Memory)
+Agents MUST leave pheromone trails (logs/artifacts) for others to follow.
+*   **Structured Logs:** All agents must log to `logs/swarm_telemetry.jsonl`.
+*   **Knowledge Base:** Before starting a task, read `docs/AGENTS_KNOWLEDGE_BASE.md`.
+*   **Post-Task:** Update the Knowledge Base with new findings.
+
+## 3. Neuro-Symbolic Architecture
+Adam is NOT a chatbot. He is a **Neuro-Symbolic Sovereign**.
+*   **System 1 (Swarm):** Fast, async, intuitive. (e.g., News scanning, sentiment analysis).
+*   **System 2 (Graph):** Slow, deliberate, logical. (e.g., DCF Valuation, Legal Review).
+*   **The Bridge:** The `MetaOrchestrator` routes between System 1 and System 2.
+
+## 4. Security & Governance
+*   **Safe Deserialization:** NEVER use `pickle.load`. Use `core.security.safe_unpickler.safe_load`.
+*   **Governance Middleware:** All high-risk actions (Trade Execution, Config Change) must pass through `services/webapp/governance.py`.
+*   **Override Protocol:** Emergency overrides require a signed HMAC token.
+
+---
+
+## Part 2: System Architecture (docs/architecture.md)
+<!-- INCLUDE docs/architecture.md CONTENT HERE -->
+# Adam v26.0 Architecture: The Neuro-Symbolic Graph
+
+## Overview
+Adam represents a paradigm shift from "Chat with PDF" to "Autonomous Financial Analysis."
+The system is built on a **Hub-and-Spoke** topology, centered around the `MetaOrchestrator`.
+
+## Core Components
+
+### 1. The Brain: MetaOrchestrator (`core/engine/meta_orchestrator.py`)
+*   **Function:** Intent classification and dynamic routing.
+*   **Logic:**
+    *   If `query` contains "deep dive" -> Route to `DeepDiveGraph`.
+    *   If `query` contains "news" or "scan" -> Route to `HiveMind` (Swarm).
+    *   If `query` is generic -> Route to `SemanticRouter`.
+
+### 2. System 1: The Hive Mind (`core/engine/swarm/`)
+*   **Type:** Asynchronous Event Loop (Python `asyncio`).
+*   **Workers:** 5-20 lightweight agents.
+*   **Role:** High-throughput data ingestion, pattern recognition, and noise filtering.
+
+### 3. System 2: The Planner (`core/engine/neuro_symbolic_planner.py`)
+*   **Type:** Directed Acyclic Graph (DAG) via `LangGraph`.
+*   **Role:** Multi-step reasoning, self-correction, and report generation.
+*   **Phases:**
+    1.  **Plan:** Deconstruct the query into steps.
+    2.  **Execute:** Dispatch agents for each step.
+    3.  **Reflect:** Critique the output.
+    4.  **Refine:** Loop back if quality is low.
+
+### 4. The Body: MCP Server (`server/`)
+*   **Protocol:** Model Context Protocol (MCP).
+*   **Role:** Standardized interface for external tools (Search, Database, Terminal).
+
+## Data Flow
+1.  **User Query** -> `MetaOrchestrator`
+2.  `MetaOrchestrator` -> **Context Enrichment** (RAG)
+3.  `MetaOrchestrator` -> **Route Selection** (Fast vs. Slow)
+4.  **Execution Engine** (Swarm or Graph) performs work.
+5.  **Synthesizer** aggregates results into `HyperDimensionalKnowledgeGraph`.
+6.  **Response** sent to User.
+
+---
+
+## Part 3: Setup & Deployment (docs/setup_guide.md)
+<!-- INCLUDE docs/setup_guide.md CONTENT HERE -->
+# Adam v26.0 Setup Guide
+
+This document provides definitive instructions for setting up the Adam environment. We strictly support **`uv`** for dependency management.
+
+## Prerequisites
+*   **OS:** Linux (Ubuntu 22.04), macOS (Ventura+), or WSL2.
+*   **Python:** 3.10+
+*   **Manager:** `uv` (from Astral).
+
+## Installation
+
+### 1. Install `uv`
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+### 2. Clone & Sync
+```bash
+git clone https://github.com/adamvangrover/adam.git
+cd adam
+uv sync
+source .venv/bin/activate
+```
+
+### 3. Environment Variables
+Copy `.env.example` to `.env` and configure:
+*   `OPENAI_API_KEY`: Required for Planner.
+*   `FMP_API_KEY`: Required for Market Data.
+*   `GOVERNANCE_OVERRIDE_SECRET`: Optional (for security overrides).
+
+## Docker Deployment
+```bash
+docker-compose up --build -d
+```
+Access the dashboard at `http://localhost:80`.
+
+---
+
+## Part 4: Structured Output Schema (JSON Definition)
+
+### HyperDimensionalKnowledgeGraph (HDKG)
+The core artifact produced by Adam's System 2 analysis.
+
+```json
+{
+  "$schema": "http://adam-financial.ai/schemas/v23.5/hdkg.json",
+  "type": "object",
+  "properties": {
+    "v23_knowledge_graph": {
+      "type": "object",
+      "properties": {
+        "meta": {
+          "target": "string",
+          "generated_at": "datetime",
+          "model_version": "Adam-v23.5-Apex-Architect"
+        },
+        "nodes": {
+          "description": "Strict Domain Analysis",
+          "properties": {
+            "entity_ecosystem": { "type": "object", "description": "Legal & Management Analysis" },
+            "equity_analysis": {
+              "type": "object",
+              "properties": {
+                "fundamentals": { "revenue_cagr_3yr": "string" },
+                "valuation_engine": {
+                  "dcf_model": { "intrinsic_value_estimate": "float" },
+                  "multiples_analysis": { "verdict": "string" }
+                }
+              }
+            },
+            "credit_analysis": {
+              "type": "object",
+              "properties": {
+                "snc_rating_model": { "overall_borrower_rating": "string" },
+                "covenant_risk_analysis": { "headroom_assessment": "string" }
+              }
+            },
+            "simulation_engine": { "type": "object", "description": "Monte Carlo & Quantum Scenarios" },
+            "strategic_synthesis": {
+              "type": "object",
+              "properties": {
+                "final_verdict": {
+                  "recommendation": "Strong Buy | Buy | Hold | Sell",
+                  "conviction_level": "int (1-10)"
+                }
+              }
+            }
+          }
+        },
+        "edges": {
+          "type": "array",
+          "description": "Semantic relationships between nodes"
+        }
+      }
+    }
+  }
+}
+```

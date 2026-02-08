@@ -155,3 +155,7 @@ We are building the open-source standard for institutional AI.
 ### License
 
 Distributed under the MIT License. See `LICENSE` for more information.
+
+---
+
+**For AI Agents and LLMs,** please see [llms.txt](llms.txt) (optimized) or [llms-full.txt](llms-full.txt) (comprehensive) for context.*
