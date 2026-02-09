@@ -16,13 +16,13 @@ const StatusPanel: React.FC<StatusPanelProps> = ({ metrics }) => {
     <div className="flex gap-4 text-xs font-mono text-gray-300">
       <div className="flex flex-col items-center">
         <span className="text-[10px] text-gray-500 uppercase">CPU</span>
-        <span className={metrics.cpu_usage > 70 ? 'text-red-400' : 'text-green-400'}>
+        <span className={(metrics.cpu_usage || 0) > 70 ? 'text-red-400' : 'text-green-400'}>
           {metrics.cpu_usage || 0}%
         </span>
       </div>
       <div className="flex flex-col items-center">
         <span className="text-[10px] text-gray-500 uppercase">MEM</span>
-        <span className={metrics.memory_usage > 80 ? 'text-orange-400' : 'text-blue-400'}>
+        <span className={(metrics.memory_usage || 0) > 80 ? 'text-orange-400' : 'text-blue-400'}>
           {metrics.memory_usage || 0}%
         </span>
       </div>
@@ -32,7 +32,7 @@ const StatusPanel: React.FC<StatusPanelProps> = ({ metrics }) => {
       </div>
       <div className="flex flex-col items-center">
         <span className="text-[10px] text-gray-500 uppercase">PING</span>
-        <span className={metrics.mesh_latency_ms > 100 ? 'text-red-400' : 'text-gray-400'}>
+        <span className={(metrics.mesh_latency_ms || 0) > 100 ? 'text-red-400' : 'text-gray-400'}>
           {metrics.mesh_latency_ms || 0}ms
         </span>
       </div>
