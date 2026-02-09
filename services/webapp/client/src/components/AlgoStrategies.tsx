@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 
 const AlgoStrategies = () => {
-    const [strategies, setStrategies] = useState([
+    const [strategies] = useState([
         { id: 1, name: 'Momentum Alpha', type: 'Trend Following', roi: 12.5, drawdown: 3.2, status: 'Active' },
         { id: 2, name: 'Mean Reversion Gamma', type: 'Mean Reversion', roi: 8.1, drawdown: 1.5, status: 'Active' },
         { id: 3, name: 'Adaptive Volatility', type: 'Reinforcement Learning', roi: 15.3, drawdown: 4.8, status: 'Active' },
         { id: 4, name: 'Arbitrage Delta', type: 'Arbitrage', roi: 5.2, drawdown: 0.8, status: 'Paused' }
     ]);
 
-    const [trades, setTrades] = useState([
+    const [trades] = useState([
         { id: 101, strategy: 'Momentum Alpha', symbol: 'NVDA', action: 'BUY', price: 135.20, time: '10:30 AM' },
         { id: 102, strategy: 'Adaptive Volatility', symbol: 'SPY', action: 'SELL', price: 585.50, time: '11:15 AM' },
         { id: 103, strategy: 'Mean Reversion Gamma', symbol: 'TSLA', action: 'BUY', price: 242.00, time: '01:45 PM' }

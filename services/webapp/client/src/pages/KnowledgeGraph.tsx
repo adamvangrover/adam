@@ -58,7 +58,7 @@ const KnowledgeGraph: React.FC = () => {
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: '0 20px 20px 20px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '60px' }}>
-        <h2 className="text-cyan mono-font">/// KNOWLEDGE GRAPH VISUALIZER</h2>
+        <h2 className="text-cyan mono-font">{'///'} KNOWLEDGE GRAPH VISUALIZER</h2>
         <div style={{ fontSize: '0.8rem', color: '#666' }}>
             NODES: {graphData.nodes.length} | EDGES: {graphData.links.length}
         </div>

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 
 const RoboAdvisor = () => {
-    const [allocation, setAllocation] = useState([
+    const [allocation] = useState([
         { id: 1, name: 'Equities', target: 50, current: 42, color: 'bg-blue-500' },
         { id: 2, name: 'Fixed Income', target: 30, current: 35, color: 'bg-purple-500' },
         { id: 3, name: 'Crypto', target: 10, current: 12, color: 'bg-orange-500' },
         { id: 4, name: 'Cash', target: 10, current: 11, color: 'bg-green-500' }
     ]);
 
-    const [riskProfile, setRiskProfile] = useState('Moderate'); // Conservative, Moderate, Aggressive
+    const [riskProfile] = useState('Moderate'); // Conservative, Moderate, Aggressive
 
     return (
         <div className="bg-gray-800 p-6 rounded-lg shadow-lg text-white">
