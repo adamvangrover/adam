@@ -20,19 +20,16 @@ logger = logging.getLogger("SwarmRunner")
 
 # --- Agent Definitions ---
 
-class BaseAgent:
-    def __init__(self, name: str, role: str):
-        self.name = name
-        self.role = role
-
-    async def emit(self, packet_type: str, payload: dict):
-        packet = NeuralPacket(
-            source_agent=self.name,
-            packet_type=packet_type,
-            payload=payload
-        )
-        await emit_packet(packet)
-        logger.debug(f"{self.name} emitted: {packet_type}")
+try:
+    from core.v30_architecture.python_intelligence.agents.base_agent import BaseAgent
+    from core.v30_architecture.python_intelligence.agents.quantitative_analyst import QuantitativeAnalyst
+except ImportError:
+    # Fallback for local execution
+    import sys
+    import os
+    sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+    from base_agent import BaseAgent
+    from quantitative_analyst import QuantitativeAnalyst
 
 class MarketScanner(BaseAgent):
     def __init__(self):
@@ -119,7 +116,7 @@ class SystemHealth(BaseAgent):
 
 # --- Swarm Orchestration ---
 
-agents = [MarketScanner(), RiskGuardian(), SystemHealth()]
+agents = [MarketScanner(), RiskGuardian(), SystemHealth(), QuantitativeAnalyst()]
 
 @app.on_event("startup")
 async def start_swarm():

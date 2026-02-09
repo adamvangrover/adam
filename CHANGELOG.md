@@ -1,5 +1,16 @@
 # Changelog
 
+## v26.1 - Protocol ARCHITECT_INFINITE (Day 2)
+
+### Jules' Log
+> "I noticed we lack a real-time quantitative analysis capability in the V30 architecture. The `NewsBot` and other agents were mocked or relied on static data. I researched real-time market data integration patterns and built `QuantitativeAnalyst` to bridge this gap. This agent now fetches live market data using `yfinance` and calculates RSI, SMA, and Bollinger Bands to emit actionable `technical_analysis` signals into the Neural Mesh."
+
+### Added
+- **New Organ**: `core/v30_architecture/python_intelligence/agents/quantitative_analyst.py` - A specialized V30 agent that performs real-time technical analysis on market data (SPY, QQQ, BTC-USD, etc.).
+- **Refactor**: `core/v30_architecture/python_intelligence/agents/base_agent.py` - Extracted `BaseAgent` from `swarm_runner.py` to a shared module for reusability.
+- **Integration**: Updated `core/v30_architecture/python_intelligence/agents/swarm_runner.py` to include `QuantitativeAnalyst` in the active swarm.
+- **Tests**: `tests/test_quantitative_analyst.py` - Unit tests verifying data fetching, indicator calculation, and packet emission using mocked `yfinance` and `NeuralMesh`.
+
 ## v26.0 - Protocol ARCHITECT_INFINITE (Day 1)
 
 ### Jules' Log
