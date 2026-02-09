@@ -1,8 +1,9 @@
 from __future__ import annotations
-from typing import Any, Dict, Tuple, Optional
+from typing import Any, Dict, Tuple, Optional, Union, List
 import logging
 import asyncio
 from core.agents.agent_base import AgentBase
+from core.schemas.agent_schema import AgentInput, AgentOutput
 from core.data_sources.financial_news_api import SimulatedFinancialNewsAPI
 from core.data_sources.prediction_market_api import SimulatedPredictionMarketAPI
 from core.data_sources.social_media_api import SimulatedSocialMediaAPI
@@ -32,14 +33,39 @@ class MarketSentimentAgent(AgentBase):
         self.web_traffic_api = SimulatedWebTrafficAPI()
         self.data_fetcher = DataFetcher()
 
-    async def execute(self, **kwargs) -> Dict[str, Any]:
+    async def execute(self, input_data: Union[str, AgentInput, Dict[str, Any]] = None, **kwargs) -> Union[Dict[str, Any], AgentOutput]:
         """
         Executes the sentiment analysis.
+        Supports both legacy string/dict input and new AgentInput schema.
 
         Returns:
-            Dict containing the sentiment score and analysis details.
+            Dict containing the sentiment score and analysis details, or AgentOutput.
         """
-        logging.info("MarketSentimentAgent execution started.")
+        # 1. Input Normalization
+        query = ""
+        is_standard_mode = False
+
+        # Handle explicit input_data argument
+        if input_data is not None:
+            if isinstance(input_data, AgentInput):
+                query = input_data.query
+                is_standard_mode = True
+                if input_data.context:
+                    self.set_context(input_data.context)
+            elif isinstance(input_data, str):
+                query = input_data
+            elif isinstance(input_data, dict):
+                query = input_data.get("query", "")
+                if "context" in input_data:
+                    self.set_context(input_data["context"])
+                # Merge input_data into kwargs for backward compatibility if needed
+                kwargs.update(input_data)
+
+        # Fallback: Check kwargs for legacy usage where execute(param=val) was called
+        # The agent base wraps execute, so args/kwargs are passed through.
+        # But if input_data matches one of the expected types, we used it.
+
+        logging.info(f"MarketSentimentAgent execution started. Mode: {'Standard' if is_standard_mode else 'Legacy'}")
 
         overall_sentiment, details = await self.analyze_sentiment()
 
@@ -53,15 +79,42 @@ class MarketSentimentAgent(AgentBase):
         if hasattr(self, 'message_broker') and self.message_broker:
             await self.send_message("system_monitor", result)  # Example target
 
+        if is_standard_mode:
+            return self._format_output(result, query)
+
         return result
+
+    def _format_output(self, result: Dict[str, Any], query: str) -> AgentOutput:
+        """Helper to format output to AgentOutput."""
+        sentiment_score = result.get("sentiment_score", 0.0)
+        details = result.get("details", {})
+
+        # Construct a textual answer
+        answer = f"Market Sentiment Analysis for '{query}':\n"
+        answer += f"Overall Sentiment Score: {sentiment_score:.2f} (0.0 Bearish - 1.0 Bullish)\n\n"
+
+        if "credit_override" in details:
+            answer += f"WARNING: Credit Dominance Rule Triggered: {details['credit_override']}\n"
+            answer += "Sentiment has been overridden to reflect systemic risk.\n\n"
+
+        answer += "Breakdown:\n"
+        answer += f"- News: {details.get('news_sentiment', 'N/A')}\n"
+        answer += f"- Prediction Markets: {details.get('prediction_market_sentiment', 'N/A')}\n"
+        answer += f"- Social Media: {details.get('social_media_sentiment', 'N/A')}\n"
+        answer += f"- Web Traffic: {details.get('web_traffic_sentiment', 'N/A')}\n"
+
+        return AgentOutput(
+            answer=answer,
+            sources=["SimulatedFinancialNewsAPI", "SimulatedPredictionMarketAPI", "SimulatedSocialMediaAPI"],
+            confidence=0.8, # Placeholder confidence
+            metadata=result
+        )
 
     async def analyze_sentiment(self) -> Tuple[float, Dict[str, float]]:
         """
         Analyzes sentiment from configured sources.
         """
         # 1. News
-        # Assuming get_headlines is synchronous/simulated.
-        # If it were real I/O, we'd wrap it.
         try:
             headlines, news_sentiment = self.news_api.get_headlines()
         except Exception as e:
@@ -282,7 +335,14 @@ if __name__ == "__main__":
             'sentiment_threshold': 0.5
         }
         agent = MarketSentimentAgent(config)
-        result = await agent.execute()
-        print(f"Result: {result}")
+
+        print("--- Test Standard Mode ---")
+        input_obj = AgentInput(query="Market Check")
+        result = await agent.execute(input_obj)
+        print(f"Result (Standard): {result}")
+
+        print("\n--- Test Legacy Mode ---")
+        result_legacy = await agent.execute() # Using default None input, relies on internal logic (or lack of kwargs)
+        print(f"Result (Legacy): {result_legacy}")
 
     asyncio.run(main())
