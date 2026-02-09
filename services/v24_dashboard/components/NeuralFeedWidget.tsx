@@ -2,11 +2,15 @@
 import React, { useEffect, useState, useRef } from 'react';
 
 // Define TypeScript Interface matching Pydantic backend model
-interface Thought {
+interface ThoughtPayload {
   timestamp: string;
   agent_name: string;
   content: string;
   conviction_score: number;
+}
+
+interface Thought extends ThoughtPayload {
+  id: string; // Added for frontend optimization
 }
 
 const NeuralFeedWidget: React.FC = () => {
@@ -32,7 +36,12 @@ const NeuralFeedWidget: React.FC = () => {
 
     ws.onmessage = (event) => {
       try {
-        const thought: Thought = JSON.parse(event.data);
+        const thoughtPayload: ThoughtPayload = JSON.parse(event.data);
+        // Add unique ID for React list key optimization
+        const thought: Thought = {
+          ...thoughtPayload,
+          id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substr(2, 9)
+        };
         setThoughts((prev) => [...prev.slice(-49), thought]); // Keep last 50 items
       } catch (err) {
         console.error('Neural Link: Error parsing data', err);
@@ -85,8 +94,8 @@ const NeuralFeedWidget: React.FC = () => {
           </div>
         )}
         
-        {thoughts.map((thought, idx) => (
-          <div key={idx} className="flex gap-2 border-b border-gray-800/50 pb-1 hover:bg-white/5 transition-colors animate-in fade-in slide-in-from-bottom-1 duration-300">
+        {thoughts.map((thought) => (
+          <div key={thought.id} className="flex gap-2 border-b border-gray-800/50 pb-1 hover:bg-white/5 transition-colors animate-in fade-in slide-in-from-bottom-1 duration-300">
             <span className="text-gray-500 w-16 shrink-0">
               [{new Date(thought.timestamp).toLocaleTimeString([], {hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit"})}]
             </span>
