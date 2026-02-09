@@ -73,7 +73,7 @@ const Synthesizer: React.FC = () => {
             return () => clearInterval(interval);
         };
         fetchAll();
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Helper for color coding score
     const getScoreColor = (s: number) => {

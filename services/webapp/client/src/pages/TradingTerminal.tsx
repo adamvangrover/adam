@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import AlgoStrategies from '../components/AlgoStrategies';
 import RoboAdvisor from '../components/RoboAdvisor';
 // Import other components if needed (Terminal, MarketSentiment) - Assuming they exist or are mocked for now.
