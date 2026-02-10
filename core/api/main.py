@@ -1,7 +1,8 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from core.api.routers import agents
+from core.api.deps import verify_api_key
 from core.settings import settings
 from contextlib import asynccontextmanager
 import logging
@@ -60,7 +61,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(agents.router, prefix="/api/v1/agents", tags=["agents"])
+# 🛡️ Sentinel: Enforce API Key Authentication on Agents API
+app.include_router(
+    agents.router,
+    prefix="/api/v1/agents",
+    tags=["agents"],
+    dependencies=[Depends(verify_api_key)]
+)
 
 
 @app.get("/")
