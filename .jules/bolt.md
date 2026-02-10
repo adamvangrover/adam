@@ -51,3 +51,7 @@
 ## 2026-02-27 - [NumPy Vectorization for Monte Carlo]
 **Learning:** Pure Python loops for Monte Carlo simulations (Geometric Brownian Motion) are extremely slow (~2.9s for 5k simulations). Vectorizing with `np.random.normal`, `np.cumsum` (in-place), and `np.exp` reduced this to ~0.36s (8x speedup).
 **Action:** Always vectorize numerical simulations involving large iterations using NumPy array operations.
+
+## 2026-03-05 - [Yahoo Finance Batching]
+**Learning:** `yf.Ticker(symbol).history()` in a loop is purely sequential and network-bound. `yf.download(tickers, ...)` uses threads internally and is ~4.5x faster (0.33s vs 1.49s for 5 tickers).
+**Action:** Always use `yf.download` with a list of tickers for multi-asset analysis, but handle the resulting MultiIndex DataFrame carefully (top level is Ticker if `group_by='ticker'`).
