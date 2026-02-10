@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v24.0 :: LIQUIDITY STRESS TEST</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            background: #050b14;
+            color: #e0e0e0;
+            font-family: 'JetBrains Mono', monospace;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            padding: 20px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(5, 11, 20, 0.9);
+            z-index: 10;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: #00f3ff;
+            letter-spacing: 2px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid #00f3ff;
+            color: #00f3ff;
+            padding: 8px 16px;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        button:hover {
+            background: rgba(0, 243, 255, 0.2);
+        }
+
+        button.danger {
+            border-color: #ff3333;
+            color: #ff3333;
+            background: rgba(255, 51, 51, 0.1);
+        }
+
+        button.danger:hover {
+            background: rgba(255, 51, 51, 0.2);
+        }
+
+        #canvas-container {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        .overlay {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border: 1px solid #333;
+            border-left: 3px solid #00f3ff;
+            max-width: 300px;
+            pointer-events: none;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.8rem;
+        }
+
+        .val { font-weight: bold; }
+        .green { color: #0aff60; }
+        .red { color: #ff3333; }
+        .yellow { color: #f59e0b; }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <h1>LIQUIDITY MESH v4.2</h1>
+        <div style="font-size: 0.7rem; color: #666;">PRIMARY DEALER INTERBANK NETWORK</div>
+    </div>
+    <div class="controls">
+        <button id="resetBtn">RESET NETWORK</button>
+        <button id="shockBtn" class="danger">INJECT SYSTEMIC SHOCK</button>
+    </div>
+</header>
+
+<div id="canvas-container">
+    <canvas id="simCanvas"></canvas>
+    <div class="overlay">
+        <div class="metric">
+            <span>SYSTEM STABILITY:</span>
+            <span id="stabilityVal" class="val green">100%</span>
+        </div>
+        <div class="metric">
+            <span>COLLATERAL VELOCITY:</span>
+            <span id="velocityVal" class="val">NORMAL</span>
+        </div>
+        <div class="metric">
+            <span>STRESSED NODES:</span>
+            <span id="stressedVal" class="val">0/24</span>
+        </div>
+        <div style="margin-top: 10px; font-size: 0.7rem; color: #888; border-top: 1px dashed #444; padding-top: 5px;">
+            > Click nodes to simulate counterparty default.<br>
+            > Monitor contagion spread.
+        </div>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    const container = document.getElementById('canvas-container');
+
+    let width, height;
+    let nodes = [];
+    let links = [];
+    let animationId;
+
+    // Simulation params
+    const NODE_COUNT = 24;
+    const CONNECTION_RADIUS = 250;
+    const SHOCK_DECAY = 0.98;
+    const RECOVERY_RATE = 0.005;
+
+    function resize() {
+        width = container.clientWidth;
+        height = container.clientHeight;
+        canvas.width = width;
+        canvas.height = height;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    class Node {
+        constructor(id, x, y, isPrimary) {
+            this.id = id;
+            this.x = x;
+            this.y = y;
+            this.vx = (Math.random() - 0.5) * 0.5;
+            this.vy = (Math.random() - 0.5) * 0.5;
+            this.isPrimary = isPrimary;
+            this.health = 1.0; // 1.0 = healthy, 0.0 = default
+            this.radius = isPrimary ? 8 : 5;
+            this.connections = [];
+        }
+
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+
+            // Bounce
+            if (this.x < 0 || this.x > width) this.vx *= -1;
+            if (this.y < 0 || this.y > height) this.vy *= -1;
+
+            // Recovery
+            if (this.health < 1.0) {
+                this.health += RECOVERY_RATE;
+                if (this.health > 1.0) this.health = 1.0;
+            }
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+
+            // Color based on health
+            if (this.health > 0.8) {
+                ctx.fillStyle = this.isPrimary ? '#00f3ff' : '#ffffff';
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.isPrimary ? '#00f3ff' : '#ffffff';
+            } else if (this.health > 0.4) {
+                ctx.fillStyle = '#f59e0b'; // Yellow warning
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#f59e0b';
+            } else {
+                ctx.fillStyle = '#ff3333'; // Red critical
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = '#ff3333';
+            }
+
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            // Draw ring for primary dealers
+            if (this.isPrimary) {
+                ctx.strokeStyle = `rgba(0, 243, 255, ${this.health})`;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+        }
+    }
+
+    function init() {
+        nodes = [];
+        links = [];
+
+        // Create nodes
+        for (let i = 0; i < NODE_COUNT; i++) {
+            nodes.push(new Node(
+                i,
+                Math.random() * width,
+                Math.random() * height,
+                i < 6 // First 6 are primary dealers (hubs)
+            ));
+        }
+
+        // Create links
+        // Primary dealers connect to each other more strongly
+        // Others connect to nearest neighbors
+    }
+
+    function calculateLinks() {
+        links = [];
+        for (let i = 0; i < nodes.length; i++) {
+            for (let j = i + 1; j < nodes.length; j++) {
+                const a = nodes[i];
+                const b = nodes[j];
+                const dx = a.x - b.x;
+                const dy = a.y - b.y;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+
+                if (dist < CONNECTION_RADIUS) {
+                    links.push({ a, b, dist });
+                }
+            }
+        }
+    }
+
+    function propagateShock() {
+        // Shock spreads through links
+        links.forEach(link => {
+            const healthDiff = link.a.health - link.b.health;
+            if (Math.abs(healthDiff) > 0.1) {
+                // Flow from healthy to sick (liquidity drain)
+                // Or rather, sick node infects healthy node (contagion)
+                if (link.a.health < link.b.health) {
+                    link.b.health -= 0.005; // Contagion rate
+                } else {
+                    link.a.health -= 0.005;
+                }
+            }
+        });
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+
+        // Draw links
+        calculateLinks();
+        propagateShock();
+
+        links.forEach(link => {
+            const avgHealth = (link.a.health + link.b.health) / 2;
+            ctx.beginPath();
+            ctx.moveTo(link.a.x, link.a.y);
+            ctx.lineTo(link.b.x, link.b.y);
+
+            if (avgHealth < 0.5) {
+                ctx.strokeStyle = `rgba(255, 51, 51, ${1 - avgHealth})`;
+            } else {
+                ctx.strokeStyle = `rgba(0, 243, 255, ${0.1 * avgHealth})`;
+            }
+            ctx.stroke();
+        });
+
+        // Update and draw nodes
+        let totalHealth = 0;
+        let stressedCount = 0;
+
+        nodes.forEach(node => {
+            node.update();
+            node.draw();
+            totalHealth += node.health;
+            if (node.health < 0.6) stressedCount++;
+        });
+
+        // Update UI
+        const avgHealth = (totalHealth / NODE_COUNT) * 100;
+        const stabilityEl = document.getElementById('stabilityVal');
+        stabilityEl.innerText = avgHealth.toFixed(1) + '%';
+
+        if (avgHealth > 80) {
+            stabilityEl.className = 'val green';
+            document.getElementById('velocityVal').innerText = 'OPTIMAL';
+            document.getElementById('velocityVal').className = 'val green';
+        } else if (avgHealth > 50) {
+            stabilityEl.className = 'val yellow';
+            document.getElementById('velocityVal').innerText = 'CONSTRAINED';
+            document.getElementById('velocityVal').className = 'val yellow';
+        } else {
+            stabilityEl.className = 'val red';
+            document.getElementById('velocityVal').innerText = 'FROZEN';
+            document.getElementById('velocityVal').className = 'val red';
+        }
+
+        document.getElementById('stressedVal').innerText = `${stressedCount}/${NODE_COUNT}`;
+
+        requestAnimationFrame(animate);
+    }
+
+    // Interaction
+    canvas.addEventListener('click', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        // Find clicked node
+        nodes.forEach(node => {
+            const dx = node.x - x;
+            const dy = node.y - y;
+            if (dx*dx + dy*dy < node.radius * node.radius * 4) { // larger hit area
+                node.health = 0.1; // SHOCK!
+                node.vx += (Math.random() - 0.5) * 5;
+                node.vy += (Math.random() - 0.5) * 5;
+            }
+        });
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', init);
+
+    document.getElementById('shockBtn').addEventListener('click', () => {
+        // Shock random 3 nodes
+        for(let i=0; i<3; i++) {
+            const idx = Math.floor(Math.random() * nodes.length);
+            nodes[idx].health = 0.0;
+        }
+    });
+
+    init();
+    animate();
+
+</script>
+</body>
+</html>
