@@ -80,7 +80,7 @@ app = FastAPI(title="Neural Mesh v2.0")
 mesh = MeshEmitter()
 
 # 🛡️ Sentinel: Restrict CORS to known frontend origins to prevent CSWSH
-allowed_origins = os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000").split(",")
+allowed_origins = [origin.strip() for origin in os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000").split(",")]
 
 app.add_middleware(
     CORSMiddleware,
@@ -95,7 +95,17 @@ async def websocket_mesh(websocket: WebSocket):
     # 🛡️ Sentinel: Manual Origin Check for WebSockets
     # CORSMiddleware doesn't always block WebSockets, so we enforce it here.
     origin = websocket.headers.get("origin")
-    if origin and origin not in allowed_origins:
+    is_allowed = False
+
+    if "*" in allowed_origins:
+        is_allowed = True
+    elif origin is None:
+        # Allow non-browser clients (e.g. server-to-server) which don't send Origin
+        is_allowed = True
+    elif origin in allowed_origins:
+        is_allowed = True
+
+    if not is_allowed:
         logger.warning(f"Blocking connection from unauthorized origin: {origin}")
         await websocket.close(code=1008)  # Policy Violation
         return
