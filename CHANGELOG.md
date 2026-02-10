@@ -1,5 +1,15 @@
 # Changelog
 
+## v26.3 - Protocol ARCHITECT_INFINITE (Day 4)
+
+### Jules' Log
+> "I noticed we lack a dedicated risk monitoring capability in the V30 architecture. While `QuantitativeAnalyst` provides signals, there was no independent oversight of portfolio exposure. I researched quantitative risk metrics and built `RiskGuardian` to bridge this gap, implementing Value at Risk (VaR), Conditional VaR (CVaR), and Volatility tracking using `numpy` and `scipy`."
+
+### Added
+- **New Organ**: `core/v30_architecture/python_intelligence/agents/risk_guardian.py` - A specialized V30 agent that calculates portfolio risk metrics (VaR, CVaR, Sharpe Ratio) in real-time.
+- **Integration**: Updated `core/v30_architecture/python_intelligence/agents/swarm_runner.py` to replace the dummy `RiskGuardian` with the fully implemented agent.
+- **Tests**: `tests/test_risk_guardian.py` - Unit tests verifying the mathematical accuracy of risk metrics and correct event emission.
+
 ## v26.2 - Protocol ARCHITECT_INFINITE (Day 3)
 
 ### Jules' Log
