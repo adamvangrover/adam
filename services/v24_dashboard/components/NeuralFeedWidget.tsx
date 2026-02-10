@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, memo } from 'react';
 
 // Define TypeScript Interface matching Pydantic backend model
 interface ThoughtPayload {
@@ -12,6 +12,38 @@ interface ThoughtPayload {
 interface Thought extends ThoughtPayload {
   id: string; // Added for frontend optimization
 }
+
+// Determine color based on conviction score with visual flair
+// Moved outside component to avoid recreation on every render
+const getConvictionColor = (score: number) => {
+  // Backend sends 0-100 or 0.0-1.0? Assuming 0-100 based on usage below,
+  // but code handles normalization if needed.
+  const normalizedScore = score <= 1 ? score * 100 : score;
+
+  if (normalizedScore >= 80) return 'text-green-400 shadow-[0_0_8px_rgba(74,222,128,0.4)]';
+  if (normalizedScore >= 50) return 'text-cyan-400';
+  return 'text-red-400';
+};
+
+// Memoized item component to prevent re-renders of existing items
+const ThoughtItem = memo(({ thought }: { thought: Thought }) => (
+  <div className="flex gap-2 border-b border-gray-800/50 pb-1 hover:bg-white/5 transition-colors animate-in fade-in slide-in-from-bottom-1 duration-300">
+    <span className="text-gray-500 w-16 shrink-0">
+      [{new Date(thought.timestamp).toLocaleTimeString([], {hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit"})}]
+    </span>
+    <span className="text-blue-400 font-bold w-28 shrink-0 truncate" title={thought.agent_name}>
+      {thought.agent_name}
+    </span>
+    <span className="text-gray-300 flex-1 break-words">
+      {thought.content}
+    </span>
+    <span className={`${getConvictionColor(thought.conviction_score)} font-bold w-10 text-right shrink-0`}>
+      {Math.round(thought.conviction_score <= 1 ? thought.conviction_score * 100 : thought.conviction_score)}%
+    </span>
+  </div>
+));
+
+ThoughtItem.displayName = 'ThoughtItem';
 
 const NeuralFeedWidget: React.FC = () => {
   const [thoughts, setThoughts] = useState<Thought[]>([]);
@@ -62,17 +94,6 @@ const NeuralFeedWidget: React.FC = () => {
     };
   }, []);
 
-  // Determine color based on conviction score with visual flair
-  const getConvictionColor = (score: number) => {
-    // Backend sends 0-100 or 0.0-1.0? Assuming 0-100 based on usage below, 
-    // but code handles normalization if needed.
-    const normalizedScore = score <= 1 ? score * 100 : score;
-    
-    if (normalizedScore >= 80) return 'text-green-400 shadow-[0_0_8px_rgba(74,222,128,0.4)]';
-    if (normalizedScore >= 50) return 'text-cyan-400';
-    return 'text-red-400';
-  };
-
   return (
     <div className="flex flex-col h-full w-full bg-black/90 font-mono text-xs rounded border border-gray-700 p-2 overflow-hidden shadow-lg shadow-green-900/10">
       {/* Header Bar */}
@@ -95,20 +116,7 @@ const NeuralFeedWidget: React.FC = () => {
         )}
         
         {thoughts.map((thought) => (
-          <div key={thought.id} className="flex gap-2 border-b border-gray-800/50 pb-1 hover:bg-white/5 transition-colors animate-in fade-in slide-in-from-bottom-1 duration-300">
-            <span className="text-gray-500 w-16 shrink-0">
-              [{new Date(thought.timestamp).toLocaleTimeString([], {hour12: false, hour: "2-digit", minute: "2-digit", second: "2-digit"})}]
-            </span>
-            <span className="text-blue-400 font-bold w-28 shrink-0 truncate" title={thought.agent_name}>
-              {thought.agent_name}
-            </span>
-            <span className="text-gray-300 flex-1 break-words">
-              {thought.content}
-            </span>
-            <span className={`${getConvictionColor(thought.conviction_score)} font-bold w-10 text-right shrink-0`}>
-              {Math.round(thought.conviction_score <= 1 ? thought.conviction_score * 100 : thought.conviction_score)}%
-            </span>
-          </div>
+          <ThoughtItem key={thought.id} thought={thought} />
         ))}
       </div>
     </div>
