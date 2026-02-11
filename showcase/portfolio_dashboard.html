@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM :: PORTFOLIO ANALYTICS</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #0b1120; color: #cbd5e1; font-family: 'Inter', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(51, 65, 85, 0.5);
+            backdrop-filter: blur(12px);
+        }
+        select { background-image: none; } /* Reset default arrow */
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header class="h-16 border-b border-slate-700 flex items-center justify-between px-6 bg-slate-900 z-10">
+        <div class="flex items-center gap-4">
+            <a href="house_view_library.html" class="text-slate-400 hover:text-white"><i class="fas fa-arrow-left"></i> Strategy</a>
+            <h1 class="text-xl font-bold text-white tracking-tight">PORTFOLIO <span class="text-cyan-400">COMMAND</span></h1>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <span class="text-xs text-slate-500 mono">LAST REBALANCE: 2026-03-01</span>
+            <div class="h-4 w-px bg-slate-700"></div>
+            <select id="portfolio-select" class="bg-slate-800 border border-slate-600 text-white text-sm rounded px-3 py-1 focus:outline-none focus:border-cyan-500">
+                <option value="aggressive">Aggressive Growth (AI/Crypto)</option>
+                <option value="balanced">Balanced (60/40 Optimized)</option>
+                <option value="defensive">Defensive (Yield/Gold)</option>
+            </select>
+        </div>
+    </header>
+
+    <main class="flex-1 flex overflow-hidden">
+
+        <!-- Left Sidebar: Stats -->
+        <aside class="w-80 border-r border-slate-700 p-6 flex flex-col gap-6 bg-slate-900/50 overflow-y-auto">
+
+            <div class="glass-panel p-4 rounded-lg">
+                <h3 class="text-xs text-slate-400 uppercase tracking-widest mb-1">Total Return (YTD)</h3>
+                <div class="text-3xl font-bold text-emerald-400 mono" id="stat-return">+0.0%</div>
+            </div>
+
+            <div class="glass-panel p-4 rounded-lg">
+                <h3 class="text-xs text-slate-400 uppercase tracking-widest mb-1">Sharpe Ratio</h3>
+                <div class="text-xl font-bold text-white mono" id="stat-sharpe">0.00</div>
+            </div>
+
+            <div class="glass-panel p-4 rounded-lg">
+                <h3 class="text-xs text-slate-400 uppercase tracking-widest mb-1">Max Drawdown</h3>
+                <div class="text-xl font-bold text-red-400 mono" id="stat-drawdown">-0.0%</div>
+            </div>
+
+            <div class="mt-auto">
+                <h3 class="text-xs text-slate-500 mb-2">Current Allocation</h3>
+                <canvas id="allocationChart" height="200"></canvas>
+            </div>
+
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col p-6 gap-6 overflow-y-auto">
+
+            <!-- Chart Section -->
+            <div class="glass-panel rounded-xl p-6 relative min-h-[400px]">
+                <h2 class="text-lg font-bold text-white mb-4">Performance Simulation</h2>
+                <div class="absolute top-6 right-6 flex gap-2">
+                    <button class="px-3 py-1 text-xs bg-slate-700 hover:bg-slate-600 rounded text-white transition">1M</button>
+                    <button class="px-3 py-1 text-xs bg-cyan-600 text-white rounded transition">YTD</button>
+                    <button class="px-3 py-1 text-xs bg-slate-700 hover:bg-slate-600 rounded text-white transition">1Y</button>
+                </div>
+                <div class="w-full h-[350px]">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Holdings Table -->
+            <div class="glass-panel rounded-xl p-0 overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-700 flex justify-between items-center">
+                    <h2 class="text-lg font-bold text-white">Top Holdings</h2>
+                    <span class="text-xs text-slate-500 italic">Live Pricing Simulation</span>
+                </div>
+                <table class="w-full text-sm text-left">
+                    <thead class="text-xs text-slate-400 uppercase bg-slate-800/50">
+                        <tr>
+                            <th class="px-6 py-3">Ticker</th>
+                            <th class="px-6 py-3">Name</th>
+                            <th class="px-6 py-3">Sector</th>
+                            <th class="px-6 py-3 text-right">Weight</th>
+                            <th class="px-6 py-3 text-right">P/L</th>
+                        </tr>
+                    </thead>
+                    <tbody id="holdings-body" class="divide-y divide-slate-700/50">
+                        <!-- Injected JS -->
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+        // --- Mock Data ---
+        const PORTFOLIOS = {
+            aggressive: {
+                return: "+28.4%",
+                sharpe: "1.85",
+                drawdown: "-12.2%",
+                performance: [100, 105, 103, 110, 115, 112, 122, 128],
+                allocation: [40, 30, 20, 10], // Tech, Crypto, Growth, Cash
+                allocationLabels: ['AI Tech', 'Crypto', 'Growth', 'Cash'],
+                holdings: [
+                    { ticker: 'NVDA', name: 'Nvidia Corp', sector: 'Semiconductors', weight: '15.0%', pl: '+45%' },
+                    { ticker: 'BTC', name: 'Bitcoin', sector: 'Crypto', weight: '12.0%', pl: '+32%' },
+                    { ticker: 'PLTR', name: 'Palantir', sector: 'Software', weight: '8.0%', pl: '+18%' },
+                    { ticker: 'MSTR', name: 'MicroStrategy', sector: 'Software', weight: '5.0%', pl: '+55%' }
+                ]
+            },
+            balanced: {
+                return: "+12.1%",
+                sharpe: "2.10",
+                drawdown: "-4.5%",
+                performance: [100, 102, 103, 104, 106, 107, 109, 112],
+                allocation: [50, 30, 10, 10], // Equity, Fixed Income, Alts, Cash
+                allocationLabels: ['Global Equity', 'Bonds', 'Real Assets', 'Cash'],
+                holdings: [
+                    { ticker: 'VTI', name: 'Total Stock Mkt', sector: 'Equity ETF', weight: '30.0%', pl: '+12%' },
+                    { ticker: 'BND', name: 'Total Bond Mkt', sector: 'Fixed Income', weight: '25.0%', pl: '+3%' },
+                    { ticker: 'GLD', name: 'Gold Trust', sector: 'Commodity', weight: '10.0%', pl: '+8%' },
+                    { ticker: 'MSFT', name: 'Microsoft', sector: 'Tech', weight: '5.0%', pl: '+15%' }
+                ]
+            },
+            defensive: {
+                return: "+6.8%",
+                sharpe: "3.20",
+                drawdown: "-1.1%",
+                performance: [100, 100.5, 101, 102, 103, 104, 105, 106.8],
+                allocation: [20, 60, 10, 10],
+                allocationLabels: ['Equity', 'Govt Bonds', 'Gold', 'Cash'],
+                holdings: [
+                    { ticker: 'SHV', name: 'Short Treasury', sector: 'Fixed Income', weight: '40.0%', pl: '+4%' },
+                    { ticker: 'XLU', name: 'Utilities Select', sector: 'Utilities', weight: '15.0%', pl: '+6%' },
+                    { ticker: 'JNJ', name: 'Johnson & Johnson', sector: 'Healthcare', weight: '10.0%', pl: '+2%' },
+                    { ticker: 'GLD', name: 'Gold', sector: 'Commodity', weight: '10.0%', pl: '+8%' }
+                ]
+            }
+        };
+
+        // --- Charts ---
+        let perfChart = null;
+        let allocChart = null;
+
+        function initCharts() {
+            // Performance Chart
+            const ctxP = document.getElementById('performanceChart').getContext('2d');
+            perfChart = new Chart(ctxP, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+                    datasets: [{
+                        label: 'Portfolio Value',
+                        data: [], // Filled dynamically
+                        borderColor: '#06b6d4',
+                        backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                    }
+                }
+            });
+
+            // Allocation Chart
+            const ctxA = document.getElementById('allocationChart').getContext('2d');
+            allocChart = new Chart(ctxA, {
+                type: 'doughnut',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: ['#06b6d4', '#3b82f6', '#6366f1', '#8b5cf6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: true, position: 'bottom', labels: { color: '#94a3b8', font: { size: 10 } } } }
+                }
+            });
+        }
+
+        function updateDashboard(portfolioKey) {
+            const data = PORTFOLIOS[portfolioKey];
+
+            // Stats
+            document.getElementById('stat-return').innerText = data.return;
+            document.getElementById('stat-sharpe').innerText = data.sharpe;
+            document.getElementById('stat-drawdown').innerText = data.drawdown;
+
+            // Performance Chart
+            perfChart.data.datasets[0].data = data.performance;
+            perfChart.update();
+
+            // Allocation Chart
+            allocChart.data.labels = data.allocationLabels;
+            allocChart.data.datasets[0].data = data.allocation;
+            allocChart.update();
+
+            // Holdings
+            const tbody = document.getElementById('holdings-body');
+            tbody.innerHTML = '';
+            data.holdings.forEach(h => {
+                const plColor = h.pl.includes('+') ? 'text-emerald-400' : 'text-red-400';
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-800/50 transition">
+                        <td class="px-6 py-3 font-mono text-white">${h.ticker}</td>
+                        <td class="px-6 py-3 text-slate-300">${h.name}</td>
+                        <td class="px-6 py-3 text-slate-400">${h.sector}</td>
+                        <td class="px-6 py-3 text-right font-mono">${h.weight}</td>
+                        <td class="px-6 py-3 text-right font-mono ${plColor}">${h.pl}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // --- Init ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            updateDashboard('aggressive');
+
+            document.getElementById('portfolio-select').addEventListener('change', (e) => {
+                updateDashboard(e.target.value);
+            });
+        });
+
+    </script>
+</body>
+</html>
