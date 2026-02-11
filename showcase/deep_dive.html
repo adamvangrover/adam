@@ -404,6 +404,7 @@
     </div>
 
     <script src="js/mock_data.js"></script>
+    <script src="js/deep_dive_data.js"></script>
     <!-- <script src="js/app.js"></script> --> <!-- Disabled to use internal logic for this deep dive specific page -->
     <script>
         // --- CHARTS CONFIG ---
@@ -939,6 +940,10 @@
 
         // --- APP LOGIC ---
         document.addEventListener('DOMContentLoaded', () => {
+            if (window.DEEP_DIVE_DATA) {
+                // Merge generated reports
+                window.DEEP_DIVE_DATA.forEach(r => ENHANCED_REPORTS.unshift(r));
+            }
             renderSidebar(ENHANCED_REPORTS);
             
             // Search Listener
