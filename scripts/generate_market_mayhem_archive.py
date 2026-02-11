@@ -14,6 +14,7 @@ SOURCE_DIRS = [
     "core/libraries_and_archives/reports",
     "core/libraries_and_archives/generated_content"
 ]
+SHOWCASE_DIR = "showcase"
 ARCHIVE_FILE = "showcase/market_mayhem_archive.html"
 
 # --- Analysis Helpers ---
@@ -36,7 +37,6 @@ def analyze_sentiment(text):
 
     # Scale: 0 (All Neg) to 100 (All Pos)
     # Base is 50.
-    # Logic: Score = (Pos / Total) * 100
     score = (pos_count / total_matches) * 100
     return int(score)
 
@@ -125,6 +125,7 @@ def parse_date(date_str):
         "%d %B %Y",        # 15 March 2025
         "%Y%m%d",          # 20251210
         "%b_%d_%Y",        # nov_01_2025
+        "%m%d%Y",          # 09192025
     ]
 
     for fmt in formats:
@@ -182,7 +183,6 @@ def parse_json_file(filepath):
                 try:
                     data = json.loads(content)
                 except json.JSONDecodeError:
-                     # print(f"Error parsing JSON/YAML {filepath}: {ye}")
                      return None
 
         if not data: return None
@@ -429,6 +429,76 @@ def parse_markdown_file(filepath):
 
     except Exception as e:
         print(f"Error parsing MD {filepath}: {e}")
+        return None
+
+def parse_html_file(filepath):
+    """Parses metadata from existing HTML files in showcase."""
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        filename = os.path.basename(filepath)
+
+        # Skip indices and dashboards
+        if filename in ["index.html", "market_mayhem_archive.html", "daily_briefings_library.html",
+                        "market_pulse_library.html", "house_view_library.html", "portfolio_dashboard.html",
+                        "data.html", "reports.html", "agents.html", "chat.html"]:
+            return None
+
+        # Extract Title
+        title_match = re.search(r'<title>(?:ADAM v23\.5 :: )?(.*?)</title>', content, re.IGNORECASE)
+        title = title_match.group(1).strip() if title_match else filename.replace('.html', '').replace('_', ' ')
+
+        # Determine Date (Filename Priority -> Content Regex)
+        date = "2025-01-01" # Default
+
+        # 1. MMXXXXYYYY format (e.g. MM09192025)
+        mm_match = re.search(r'MM(\d{2})(\d{2})(\d{4})', filename)
+        if mm_match:
+            date = f"{mm_match.group(3)}-{mm_match.group(1)}-{mm_match.group(2)}"
+        else:
+            # 2. Standard patterns
+            date_match = re.search(r'(\d{4})[-_]?(\d{2})[-_]?(\d{2})', filename)
+            if date_match:
+                date = f"{date_match.group(1)}-{date_match.group(2)}-{date_match.group(3)}"
+            else:
+                # 3. Content search
+                content_date = re.search(r'(\w+ \d{1,2}, \d{4})', content)
+                if content_date:
+                    date = parse_date(content_date.group(1))
+
+        # Determine Type
+        type_ = "NEWSLETTER"
+        lower_title = title.lower()
+        if "deep dive" in lower_title or "deep_dive" in filename: type_ = "DEEP_DIVE"
+        elif "industry" in lower_title: type_ = "INDUSTRY_REPORT"
+        elif "company" in lower_title: type_ = "COMPANY_REPORT"
+        elif "pulse" in lower_title: type_ = "MARKET_PULSE"
+        elif "glitch" in lower_title: type_ = "CYBER_GLITCH"
+        elif "outlook" in lower_title or "strategy" in lower_title: type_ = "STRATEGY"
+        elif "snc" in lower_title: type_ = "GUIDE"
+
+        # Sentiment Analysis
+        sentiment = analyze_sentiment(content)
+        entities = extract_entities(content)
+        prov_hash = calculate_provenance(content)
+
+        return {
+            "title": title,
+            "date": date,
+            "summary": "Report content.",
+            "type": type_,
+            "full_body": "", # No need to re-render body for existing HTML
+            "sentiment_score": sentiment,
+            "entities": entities,
+            "provenance_hash": prov_hash,
+            "filename": filename,
+            "is_sourced": False, # Do not overwrite existing HTML
+            "metrics_json": "{}"
+        }
+
+    except Exception as e:
+        print(f"Error parsing HTML {filepath}: {e}")
         return None
 
 # --- Static Data ---
@@ -737,7 +807,7 @@ def get_all_data():
         item['metrics_json'] = "{}"
         all_items.append(item)
 
-    # 2. Scan Directories
+    # 2. Scan Directories (Source)
     for source_dir in SOURCE_DIRS:
         if not os.path.exists(source_dir): continue
         files = glob.glob(os.path.join(source_dir, "*"))
@@ -747,6 +817,13 @@ def get_all_data():
             elif filepath.endswith(".md"): item = parse_markdown_file(filepath)
             elif filepath.endswith(".txt"): item = parse_txt_file(filepath)
 
+            if item: all_items.append(item)
+
+    # 3. Scan Showcase for existing HTML Artifacts (Data Vault, Glitches, Newsletters)
+    if os.path.exists(SHOWCASE_DIR):
+        files = glob.glob(os.path.join(SHOWCASE_DIR, "*.html"))
+        for filepath in files:
+            item = parse_html_file(filepath)
             if item: all_items.append(item)
 
     # Deduplicate based on title/date
@@ -759,10 +836,12 @@ def generate_archive():
 
     sorted_items = get_all_data()
 
-    # 3. Generate HTML Reports
-    print(f"Generating {len(sorted_items)} report pages...")
+    # 3. Generate HTML Reports (Only for sourced items)
+    print(f"Generating report pages for sourced items...")
+    count = 0
     for item in sorted_items:
         if not item.get("is_sourced", False): continue
+        count += 1
 
         # Build Entity HTML
         entity_html = ""
@@ -802,6 +881,7 @@ def generate_archive():
 
         with open(out_path, "w", encoding='utf-8') as f:
             f.write(content)
+    print(f"Generated {count} sourced pages.")
 
     # 4. Generate Main Archive Page (Cyber Dashboard)
 
@@ -918,6 +998,18 @@ def generate_archive():
 
     <div class="dashboard-grid">
         <aside class="filters-panel">
+            <div class="filter-group">
+                <label class="filter-label">Special Collections</label>
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <a href="daily_briefings_library.html" class="cyber-btn" style="text-align:center;">DAILY BRIEFINGS</a>
+                    <a href="market_pulse_library.html" class="cyber-btn" style="text-align:center;">MARKET PULSE</a>
+                    <a href="house_view_library.html" class="cyber-btn" style="text-align:center;">HOUSE VIEW</a>
+                    <a href="portfolio_dashboard.html" class="cyber-btn" style="text-align:center; border-color: #33ff00; color: #33ff00;">PORTFOLIO DASHBOARD</a>
+                    <a href="data.html" class="cyber-btn" style="text-align:center; border-color: #888; color: #aaa;">DATA VAULT</a>
+                    <a href="macro_glitch_monitor.html" class="cyber-btn" style="text-align:center; border-color: #ff00ff; color: #ff00ff;">GLITCH MONITOR</a>
+                </div>
+            </div>
+
             <div class="filter-group">
                 <label class="filter-label">Search Intelligence</label>
                 <input type="text" id="searchInput" placeholder="Keywords..." class="filter-select" onkeyup="applyFilters()">
