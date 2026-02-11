@@ -96,6 +96,14 @@
                 </li>
 
                 <li class="file-item">
+                    <a href="README.md" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📝</span>
+                        <span class="file-name">README.md</span>
+
+                    </a>
+                </li>
+
+                <li class="file-item">
                     <a href="__init__.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
                         <span class="file-icon">🐍</span>
                         <span class="file-name">__init__.py</span>
@@ -312,6 +320,14 @@
                 </li>
 
                 <li class="file-item">
+                    <a href="state_manager.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">state_manager.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
                     <a href="system_boot_logger.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
                         <span class="file-icon">🐍</span>
                         <span class="file-name">system_boot_logger.py</span>
@@ -346,6 +362,58 @@
             </ul>
         </main>
 
+
+                    <div class="readme-container">
+                        <div class="readme-title">📄 README.md Preview</div>
+                        <div class="readme-body"><pre># Adam System 1: The Swarm Infrastructure
+
+The `core/system/` directory contains the low-level infrastructure that powers the &quot;System 1&quot; (Fast) cognitive capabilities of Adam. It handles asynchronous execution, event routing, and memory management.
+
+## 🐝 The Swarm Architecture
+
+Unlike the &quot;System 2&quot; Planner which is deliberate and sequential, the Swarm is designed for **speed, concurrency, and reactivity**.
+
+### Key Components
+
+*   **`v22_async/`**: The heart of the Swarm.
+    *   **`AsyncAgentBase`**: The base class for all lightweight workers. It supports non-blocking I/O and fire-and-forget patterns.
+    *   **Event Loop**: A custom asyncio loop that manages thousands of concurrent micro-tasks (e.g., fetching 50 news feeds simultaneously).
+*   **`message_broker.py`**: The nervous system.
+    *   Implements a Pub/Sub mechanism allowing agents to subscribe to topics (e.g., `market.news.aapl`) without knowing who publishes them.
+*   **`memory_manager.py`**: The hippocampus.
+    *   Manages short-term context windows and commits important facts to the long-term Vector DB.
+
+## 🚀 Usage Pattern
+
+System 1 is typically used for:
+1.  **Data Ingestion:** Scrapers and API pollers.
+2.  **Monitoring:** &quot;Watchdogs&quot; that trigger alerts on specific conditions (e.g., &quot;Price &lt; $150&quot;).
+3.  **Pre-processing:** Cleaning and normalizing data before handing it to System 2.
+
+### Example: Async Agent
+
+```python
+from core.system.v22_async.agent import AsyncAgentBase
+
+class NewsWatcher(AsyncAgentBase):
+    async def run(self):
+        while True:
+            news = await self.fetch_latest()
+            if &quot;crisis&quot; in news.title:
+                # Fire and forget - don&#x27;t wait for a response
+                await self.publish(&quot;risk.alert&quot;, news)
+```
+
+## ⚠️ Comparison with System 2
+
+| Feature | System 1 (Swarm) | System 2 (Engine) |
+| :--- | :--- | :--- |
+| **Speed** | Milliseconds | Seconds/Minutes |
+| **Logic** | Heuristic / Reflexive | Reasoning / Deliberate |
+| **State** | Stateless (mostly) | Stateful (Graph) |
+| **Use Case** | Monitoring, Fetching | Analysis, Planning |
+</pre></div>
+                    </div>
 
     </div>
 
