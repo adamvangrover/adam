@@ -23,6 +23,7 @@ logger = logging.getLogger("SwarmRunner")
 try:
     from core.v30_architecture.python_intelligence.agents.base_agent import BaseAgent
     from core.v30_architecture.python_intelligence.agents.quantitative_analyst import QuantitativeAnalyst
+    from core.v30_architecture.python_intelligence.agents.risk_guardian import RiskGuardian
 except ImportError:
     # Fallback for local execution
     import sys
@@ -30,6 +31,7 @@ except ImportError:
     sys.path.append(os.path.dirname(os.path.abspath(__file__)))
     from base_agent import BaseAgent
     from quantitative_analyst import QuantitativeAnalyst
+    from risk_guardian import RiskGuardian
 
 class MarketScanner(BaseAgent):
     def __init__(self):
@@ -59,39 +61,6 @@ class MarketScanner(BaseAgent):
 
             await asyncio.sleep(random.uniform(0.5, 1.5))
 
-class RiskGuardian(BaseAgent):
-    def __init__(self):
-        super().__init__("RiskGuardian-V30", "risk_management")
-
-    async def run(self):
-        while True:
-            try:
-                # 10% chance of alert
-                if random.random() < 0.1:
-                    alert_type = random.choice(["Volatility Spike", "Liquidity Gap", "Correlation Break"])
-                    severity = random.choice(["LOW", "MEDIUM", "HIGH", "CRITICAL"])
-
-                    payload = {
-                        "alert": alert_type,
-                        "severity": severity,
-                        "recommendation": "Monitor closely." if severity != "CRITICAL" else "Reduce exposure immediately."
-                    }
-
-                    await self.emit("risk_alert", payload)
-                else:
-                    # Routine thought
-                    thought = random.choice([
-                        "Scanning cross-asset correlations...",
-                        "Validating VaR models...",
-                        "Checking credit spreads...",
-                        "Monitoring social sentiment divergence..."
-                    ])
-                    await self.emit("thought", {"content": thought, "conviction": round(random.uniform(0.7, 0.99), 2)})
-
-            except Exception as e:
-                logger.error(f"Error in RiskGuardian: {e}")
-
-            await asyncio.sleep(random.uniform(2.0, 5.0))
 
 class SystemHealth(BaseAgent):
     def __init__(self):
