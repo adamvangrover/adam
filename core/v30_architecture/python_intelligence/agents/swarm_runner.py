@@ -24,6 +24,7 @@ try:
     from core.v30_architecture.python_intelligence.agents.base_agent import BaseAgent
     from core.v30_architecture.python_intelligence.agents.quantitative_analyst import QuantitativeAnalyst
     from core.v30_architecture.python_intelligence.agents.risk_guardian import RiskGuardian
+    from core.v30_architecture.python_intelligence.agents.market_scanner import MarketScanner
 except ImportError:
     # Fallback for local execution
     import sys
@@ -32,35 +33,7 @@ except ImportError:
     from base_agent import BaseAgent
     from quantitative_analyst import QuantitativeAnalyst
     from risk_guardian import RiskGuardian
-
-class MarketScanner(BaseAgent):
-    def __init__(self):
-        super().__init__("MarketScanner-V1", "data_acquisition")
-
-    async def run(self):
-        assets = ["BTC-USD", "SPY", "VIX", "ETH-USD"]
-        prices = {k: random.uniform(100, 50000) for k in assets}
-
-        while True:
-            try:
-                asset = random.choice(assets)
-                change = random.uniform(-2.5, 2.5)
-                prices[asset] *= (1 + change/100)
-
-                payload = {
-                    "symbol": asset,
-                    "price": round(prices[asset], 2),
-                    "change_pct": round(change, 2),
-                    "volume": int(random.uniform(1000, 100000))
-                }
-
-                await self.emit("market_data", payload)
-
-            except Exception as e:
-                logger.error(f"Error in MarketScanner: {e}")
-
-            await asyncio.sleep(random.uniform(0.5, 1.5))
-
+    from market_scanner import MarketScanner
 
 class SystemHealth(BaseAgent):
     def __init__(self):
@@ -72,7 +45,7 @@ class SystemHealth(BaseAgent):
                 payload = {
                     "cpu_usage": round(random.uniform(20, 80), 1),
                     "memory_usage": round(random.uniform(30, 60), 1),
-                    "active_agents": 3,
+                    "active_agents": 4,
                     "mesh_latency_ms": int(random.uniform(5, 50))
                 }
 
