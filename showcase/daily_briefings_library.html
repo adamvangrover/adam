@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM :: DAILY BRIEFING ARCHIVE</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --term-green: #33ff00;
+            --term-dim: #1a8000;
+            --border-color: #333;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--term-green);
+            font-family: 'JetBrains Mono', monospace;
+            margin: 0;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        header {
+            border-bottom: 2px solid var(--term-dim);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+            text-shadow: 0 0 10px var(--term-dim);
+        }
+        .subtitle {
+            color: var(--term-dim);
+            font-size: 0.9rem;
+        }
+        .report-list {
+            list-style: none;
+            padding: 0;
+        }
+        .report-item {
+            border: 1px solid var(--border-color);
+            margin-bottom: 10px;
+            padding: 15px;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 20, 0, 0.3);
+        }
+        .report-item:hover {
+            border-color: var(--term-green);
+            background: rgba(0, 50, 0, 0.5);
+            transform: translateX(10px);
+            box-shadow: 0 0 15px rgba(51, 255, 0, 0.2);
+        }
+        .report-date {
+            color: var(--term-dim);
+            font-size: 0.8rem;
+            margin-right: 20px;
+            min-width: 100px;
+        }
+        .report-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            flex-grow: 1;
+        }
+        .access-btn {
+            background: transparent;
+            border: 1px solid var(--term-green);
+            color: var(--term-green);
+            padding: 5px 15px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        .access-btn:hover {
+            background: var(--term-green);
+            color: #000;
+        }
+        .loading {
+            text-align: center;
+            padding: 50px;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--term-dim);
+            text-decoration: none;
+            border: 1px solid var(--term-dim);
+            padding: 5px 10px;
+        }
+        .back-link:hover {
+            color: var(--term-green);
+            border-color: var(--term-green);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="market_mayhem_archive.html" class="back-link">&lt; RETURN TO MAIN ARCHIVE</a>
+
+    <header>
+        <div>
+            <h1>DAILY BRIEFINGS</h1>
+            <div class="subtitle">>> SYSTEM STATUS: ONLINE</div>
+            <div class="subtitle">>> ACCESS LEVEL: CLASSIFIED</div>
+        </div>
+        <div style="text-align: right;">
+            <div id="clock" class="subtitle"></div>
+        </div>
+    </header>
+
+    <div id="content-area">
+        <div class="loading">>> FETCHING MANIFEST...</div>
+    </div>
+</div>
+
+<script>
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('clock').innerText = now.toISOString().replace('T', ' ').substring(0, 19) + " UTC";
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    async function loadManifest() {
+        try {
+            const response = await fetch('data/report_manifest.json');
+            const data = await response.json();
+
+            const container = document.getElementById('content-area');
+            container.innerHTML = '<ul class="report-list" id="list"></ul>';
+            const list = document.getElementById('list');
+
+            const briefings = data.filter(item => item.type === 'DAILY_BRIEFING');
+
+            if (briefings.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:50px;">>> NO BRIEFINGS FOUND IN ARCHIVE.</div>';
+                return;
+            }
+
+            briefings.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'report-item';
+                li.innerHTML = `
+                    <span class="report-date">[ ${item.date !== 'Unknown' ? item.date : 'NO DATE'} ]</span>
+                    <span class="report-title">${item.title.toUpperCase()}</span>
+                    <a href="${item.path}" class="access-btn">ACCESS</a>
+                `;
+                list.appendChild(li);
+            });
+
+        } catch (error) {
+            console.error(error);
+            document.getElementById('content-area').innerHTML = '<div style="color:red; text-align:center;">>> ERROR LOADING MANIFEST DATA.</div>';
+        }
+    }
+
+    loadManifest();
+</script>
+
+</body>
+</html>
