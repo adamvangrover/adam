@@ -56,9 +56,25 @@
                 </li>
 
                 <li class="file-item">
+                    <a href="README.md" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">📝</span>
+                        <span class="file-name">README.md</span>
+
+                    </a>
+                </li>
+
+                <li class="file-item">
                     <a href="__init__.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
                         <span class="file-icon">🐍</span>
                         <span class="file-name">__init__.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="adjudicator_engine.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">adjudicator_engine.py</span>
                         <span class="file-tag tag-py">CODE</span>
                     </a>
                 </li>
@@ -256,6 +272,14 @@
                 </li>
 
                 <li class="file-item">
+                    <a href="refinement_loop.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">refinement_loop.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
                     <a href="reflector_graph.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
                         <span class="file-icon">🐍</span>
                         <span class="file-name">reflector_graph.py</span>
@@ -275,6 +299,14 @@
                     <a href="risk_consensus_engine.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
                         <span class="file-icon">🐍</span>
                         <span class="file-name">risk_consensus_engine.py</span>
+                        <span class="file-tag tag-py">CODE</span>
+                    </a>
+                </li>
+
+                <li class="file-item">
+                    <a href="scenario_engine.py" style="display: flex; align-items: center; width: 100%; color: inherit; text-decoration: none;">
+                        <span class="file-icon">🐍</span>
+                        <span class="file-name">scenario_engine.py</span>
                         <span class="file-tag tag-py">CODE</span>
                     </a>
                 </li>
@@ -362,6 +394,45 @@
             </ul>
         </main>
 
+
+                    <div class="readme-container">
+                        <div class="readme-title">📄 README.md Preview</div>
+                        <div class="readme-body"><pre># Adam System 2: The Reasoning Engine
+
+The `core/engine/` directory contains the cognitive architecture of Adam v26.0. Unlike traditional &quot;Chain of Thought&quot; systems that are linear, this engine uses a **Cyclical, Graph-Based** approach to reasoning.
+
+## 🧠 Key Components
+
+### 1. Neuro-Symbolic Planner (`neuro_symbolic_planner.py`)
+**The Architect.**
+*   **Role:** Decomposes a high-level user query (e.g., &quot;Analyze Apple&#x27;s credit risk&quot;) into a Directed Acyclic Graph (DAG) of executable tasks.
+*   **Logic:** It uses a &quot;Symbolic&quot; understanding of available tools (Agents) and a &quot;Neural&quot; (LLM) intuition to connect them.
+*   **Output:** A `TaskGraph` that defines dependencies (e.g., &quot;Must fetch 10-K before calculating EBITDA&quot;).
+
+### 2. Meta Orchestrator (`meta_orchestrator.py`)
+**The Router.**
+*   **Role:** The entry point for all queries. It decides the &quot;Depth of Thought&quot; required.
+*   **Path A (Fast):** Routes to `core/system/v22_async` (Swarm) for simple lookups.
+*   **Path B (Deep):** Routes to the `NeuroSymbolicPlanner` for complex analysis.
+*   **Path C (Crisis):** Routes to `AdjudicatorEngine` for simulation scenarios.
+
+### 3. Consensus Engine (`consensus_engine.py`)
+**The Judge.**
+*   **Role:** Resolves conflicts between agents.
+*   **Mechanism:** If the `RiskAgent` says &quot;Sell&quot; but the `GrowthAgent` says &quot;Buy&quot;, the Consensus Engine weighs their &quot;Conviction Scores&quot; (0-100) and produces a final Executive Decision.
+
+### 4. Graph Definitions
+*   **`cyclical_reasoning_graph.py`**: Defines the `LangGraph` state machine for the main reasoning loop (Plan -&gt; Execute -&gt; Critique -&gt; Refine).
+*   **`crisis_simulation_graph.py`**: A specialized graph for macro-economic stress testing.
+
+## 🔄 The Reasoning Loop
+
+1.  **Draft:** Agents generate an initial analysis.
+2.  **Critique:** A dedicated &quot;Critic Node&quot; reviews the output for logical fallacies or missing citations.
+3.  **Refine:** If the critique fails, the graph loops back to the execution phase with specific feedback.
+4.  **Finalize:** Once the critique passes (or max iterations reached), the result is synthesized.
+</pre></div>
+                    </div>
 
     </div>
 

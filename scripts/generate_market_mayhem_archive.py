@@ -722,13 +722,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
 # --- Main Generation ---
 
-def generate_archive():
-    print("Starting Enhanced Archive Generation...")
-
+def get_all_data():
+    """Gather all newsletter and report data."""
     all_items = []
 
     # 1. Add Static Data (ensure processing)
     for item in NEWSLETTER_DATA:
+        # Create a copy to avoid modifying the original global list repeatedly if called multiple times
+        item = item.copy()
         full_text = f"{item['title']} {item['summary']} {item.get('full_body', '')}"
         item['sentiment_score'] = analyze_sentiment(full_text)
         item['entities'] = extract_entities(full_text)
@@ -751,6 +752,12 @@ def generate_archive():
     # Deduplicate based on title/date
     unique_items = {f"{i['date']}_{i['title']}": i for i in all_items}.values()
     sorted_items = sorted(unique_items, key=lambda x: x['date'], reverse=True)
+    return sorted_items
+
+def generate_archive():
+    print("Starting Enhanced Archive Generation...")
+
+    sorted_items = get_all_data()
 
     # 3. Generate HTML Reports
     print(f"Generating {len(sorted_items)} report pages...")
