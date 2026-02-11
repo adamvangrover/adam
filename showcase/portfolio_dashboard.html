@@ -29,8 +29,19 @@
         </div>
 
         <div class="flex items-center gap-4">
-            <span class="text-xs text-slate-500 mono">LAST REBALANCE: 2026-03-01</span>
+            <!-- Time Controls -->
+            <div class="flex items-center gap-3 bg-slate-800 rounded-lg px-3 py-1 border border-slate-700">
+                <button id="play-btn" class="text-cyan-400 hover:text-white transition"><i class="fas fa-play"></i></button>
+                <div class="text-xs font-mono w-24 text-center text-white" id="display-date">LOADING...</div>
+                <input type="range" id="time-slider" min="0" max="100" value="100" class="w-32 h-1 bg-slate-600 rounded-lg appearance-none cursor-pointer accent-cyan-500">
+            </div>
+
             <div class="h-4 w-px bg-slate-700"></div>
+
+            <div class="hidden md:block text-xs font-mono text-cyan-200 uppercase" id="market-narrative">SYSTEM INITIALIZING...</div>
+
+            <div class="h-4 w-px bg-slate-700"></div>
+
             <select id="portfolio-select" class="bg-slate-800 border border-slate-600 text-white text-sm rounded px-3 py-1 focus:outline-none focus:border-cyan-500">
                 <option value="aggressive">Aggressive Growth (AI/Crypto)</option>
                 <option value="balanced">Balanced (60/40 Optimized)</option>
@@ -109,48 +120,41 @@
     </main>
 
     <script>
-        // --- Mock Data ---
-        const PORTFOLIOS = {
+        // --- Data State ---
+        let HISTORY_DATA = [];
+        let CURRENT_INDEX = 0;
+        let ACTIVE_PORTFOLIO = 'aggressive';
+
+        // --- Static Configs ---
+        const PORTFOLIO_CONFIG = {
             aggressive: {
-                return: "+28.4%",
-                sharpe: "1.85",
-                drawdown: "-12.2%",
-                performance: [100, 105, 103, 110, 115, 112, 122, 128],
-                allocation: [40, 30, 20, 10], // Tech, Crypto, Growth, Cash
                 allocationLabels: ['AI Tech', 'Crypto', 'Growth', 'Cash'],
+                allocation: [40, 30, 20, 10],
                 holdings: [
-                    { ticker: 'NVDA', name: 'Nvidia Corp', sector: 'Semiconductors', weight: '15.0%', pl: '+45%' },
-                    { ticker: 'BTC', name: 'Bitcoin', sector: 'Crypto', weight: '12.0%', pl: '+32%' },
-                    { ticker: 'PLTR', name: 'Palantir', sector: 'Software', weight: '8.0%', pl: '+18%' },
-                    { ticker: 'MSTR', name: 'MicroStrategy', sector: 'Software', weight: '5.0%', pl: '+55%' }
+                    { ticker: 'NVDA', name: 'Nvidia Corp', sector: 'Semiconductors', weight: '15.0%' },
+                    { ticker: 'BTC', name: 'Bitcoin', sector: 'Crypto', weight: '12.0%' },
+                    { ticker: 'PLTR', name: 'Palantir', sector: 'Software', weight: '8.0%' },
+                    { ticker: 'MSTR', name: 'MicroStrategy', sector: 'Software', weight: '5.0%' }
                 ]
             },
             balanced: {
-                return: "+12.1%",
-                sharpe: "2.10",
-                drawdown: "-4.5%",
-                performance: [100, 102, 103, 104, 106, 107, 109, 112],
-                allocation: [50, 30, 10, 10], // Equity, Fixed Income, Alts, Cash
                 allocationLabels: ['Global Equity', 'Bonds', 'Real Assets', 'Cash'],
+                allocation: [50, 30, 10, 10],
                 holdings: [
-                    { ticker: 'VTI', name: 'Total Stock Mkt', sector: 'Equity ETF', weight: '30.0%', pl: '+12%' },
-                    { ticker: 'BND', name: 'Total Bond Mkt', sector: 'Fixed Income', weight: '25.0%', pl: '+3%' },
-                    { ticker: 'GLD', name: 'Gold Trust', sector: 'Commodity', weight: '10.0%', pl: '+8%' },
-                    { ticker: 'MSFT', name: 'Microsoft', sector: 'Tech', weight: '5.0%', pl: '+15%' }
+                    { ticker: 'VTI', name: 'Total Stock Mkt', sector: 'Equity ETF', weight: '30.0%' },
+                    { ticker: 'BND', name: 'Total Bond Mkt', sector: 'Fixed Income', weight: '25.0%' },
+                    { ticker: 'GLD', name: 'Gold Trust', sector: 'Commodity', weight: '10.0%' },
+                    { ticker: 'MSFT', name: 'Microsoft', sector: 'Tech', weight: '5.0%' }
                 ]
             },
             defensive: {
-                return: "+6.8%",
-                sharpe: "3.20",
-                drawdown: "-1.1%",
-                performance: [100, 100.5, 101, 102, 103, 104, 105, 106.8],
-                allocation: [20, 60, 10, 10],
                 allocationLabels: ['Equity', 'Govt Bonds', 'Gold', 'Cash'],
+                allocation: [20, 60, 10, 10],
                 holdings: [
-                    { ticker: 'SHV', name: 'Short Treasury', sector: 'Fixed Income', weight: '40.0%', pl: '+4%' },
-                    { ticker: 'XLU', name: 'Utilities Select', sector: 'Utilities', weight: '15.0%', pl: '+6%' },
-                    { ticker: 'JNJ', name: 'Johnson & Johnson', sector: 'Healthcare', weight: '10.0%', pl: '+2%' },
-                    { ticker: 'GLD', name: 'Gold', sector: 'Commodity', weight: '10.0%', pl: '+8%' }
+                    { ticker: 'SHV', name: 'Short Treasury', sector: 'Fixed Income', weight: '40.0%' },
+                    { ticker: 'XLU', name: 'Utilities Select', sector: 'Utilities', weight: '15.0%' },
+                    { ticker: 'JNJ', name: 'Johnson & Johnson', sector: 'Healthcare', weight: '10.0%' },
+                    { ticker: 'GLD', name: 'Gold', sector: 'Commodity', weight: '10.0%' }
                 ]
             }
         };
@@ -165,14 +169,16 @@
             perfChart = new Chart(ctxP, {
                 type: 'line',
                 data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+                    labels: [],
                     datasets: [{
                         label: 'Portfolio Value',
-                        data: [], // Filled dynamically
+                        data: [],
                         borderColor: '#06b6d4',
                         backgroundColor: 'rgba(6, 182, 212, 0.1)',
                         tension: 0.4,
-                        fill: true
+                        fill: true,
+                        pointRadius: 0,
+                        pointHoverRadius: 4
                     }]
                 },
                 options: {
@@ -182,7 +188,8 @@
                     scales: {
                         y: { grid: { color: '#334155' }, ticks: { color: '#94a3b8' } },
                         x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
-                    }
+                    },
+                    animation: { duration: 0 } // Disable animation for slider performance
                 }
             });
 
@@ -205,48 +212,171 @@
             });
         }
 
-        function updateDashboard(portfolioKey) {
-            const data = PORTFOLIOS[portfolioKey];
+        async function loadData() {
+            try {
+                const response = await fetch('data/portfolio_history.json');
+                HISTORY_DATA = await response.json();
 
-            // Stats
-            document.getElementById('stat-return').innerText = data.return;
-            document.getElementById('stat-sharpe').innerText = data.sharpe;
-            document.getElementById('stat-drawdown').innerText = data.drawdown;
+                // Initialize with full data
+                CURRENT_INDEX = HISTORY_DATA.length - 1;
 
-            // Performance Chart
-            perfChart.data.datasets[0].data = data.performance;
+                // Update Slider Range
+                const slider = document.getElementById('time-slider');
+                slider.max = HISTORY_DATA.length - 1;
+                slider.value = CURRENT_INDEX;
+
+                updateDashboard();
+
+                // Expose for external control (slider)
+                window.HISTORY_DATA = HISTORY_DATA;
+                window.updateDashboard = updateDashboard;
+
+            } catch (e) {
+                console.error("Failed to load portfolio history:", e);
+                // Fallback or alert?
+            }
+        }
+
+        function calculateStats(historySlice, pKey) {
+            if (historySlice.length === 0) return { ret: "0%", sharpe: "0.00", dd: "0%" };
+
+            const startVal = historySlice[0].portfolios[pKey].value;
+            const endVal = historySlice[historySlice.length - 1].portfolios[pKey].value;
+            const ret = ((endVal - startVal) / startVal) * 100;
+
+            // Drawdown
+            let maxVal = -Infinity;
+            let maxDD = 0;
+            for (const day of historySlice) {
+                const val = day.portfolios[pKey].value;
+                if (val > maxVal) maxVal = val;
+                const dd = (val - maxVal) / maxVal;
+                if (dd < maxDD) maxDD = dd;
+            }
+
+            // Fake Sharpe (based on return sign/magnitude for simulation)
+            const sharpe = ret > 0 ? (1 + Math.random()).toFixed(2) : (Math.random() - 0.5).toFixed(2);
+
+            return {
+                ret: (ret > 0 ? "+" : "") + ret.toFixed(1) + "%",
+                sharpe: sharpe,
+                dd: (maxDD * 100).toFixed(1) + "%"
+            };
+        }
+
+        function updateDashboard(indexOverride) {
+            if (indexOverride !== undefined) CURRENT_INDEX = indexOverride;
+            if (HISTORY_DATA.length === 0) return;
+
+            const idx = Math.min(CURRENT_INDEX, HISTORY_DATA.length - 1);
+            const currentDay = HISTORY_DATA[idx];
+            const pKey = ACTIVE_PORTFOLIO;
+
+            // Slice history for chart (last 90 days or from start)
+            const lookback = 90;
+            const startIdx = Math.max(0, idx - lookback);
+            const historySlice = HISTORY_DATA.slice(startIdx, idx + 1);
+
+            // Update Stats
+            // We calculate YTD return relative to start of history (or Jan 1st if we had logic)
+            // For simplicity: relative to start of generated history
+            const fullHistorySlice = HISTORY_DATA.slice(0, idx + 1);
+            const stats = calculateStats(fullHistorySlice, pKey);
+
+            document.getElementById('stat-return').innerText = stats.ret;
+            document.getElementById('stat-return').className = `text-3xl font-bold mono ${stats.ret.includes('-') ? 'text-red-400' : 'text-emerald-400'}`;
+
+            document.getElementById('stat-sharpe').innerText = stats.sharpe;
+            document.getElementById('stat-drawdown').innerText = stats.dd;
+
+            // Update Perf Chart
+            perfChart.data.labels = historySlice.map(d => d.date);
+            perfChart.data.datasets[0].data = historySlice.map(d => d.portfolios[pKey].value);
             perfChart.update();
 
-            // Allocation Chart
-            allocChart.data.labels = data.allocationLabels;
-            allocChart.data.datasets[0].data = data.allocation;
+            // Update Allocation Chart
+            const config = PORTFOLIO_CONFIG[pKey];
+            allocChart.data.labels = config.allocationLabels;
+            allocChart.data.datasets[0].data = config.allocation;
             allocChart.update();
 
-            // Holdings
+            // Update Holdings (Simulate P/L based on daily return noise)
             const tbody = document.getElementById('holdings-body');
             tbody.innerHTML = '';
-            data.holdings.forEach(h => {
-                const plColor = h.pl.includes('+') ? 'text-emerald-400' : 'text-red-400';
+
+            // Simulate P/L based on total return roughly
+            const totalRetVal = parseFloat(stats.ret.replace('%', ''));
+
+            config.holdings.forEach(h => {
+                // Add some variance to holding P/L based on ticker name hash or similar for consistency?
+                // Just randomize slightly around total return
+                const variance = (Math.random() - 0.5) * 20;
+                let itemPL = totalRetVal + variance;
+                if (h.ticker === 'BTC') itemPL *= 1.5; // Crypto moves more
+
+                const plStr = (itemPL > 0 ? "+" : "") + itemPL.toFixed(1) + "%";
+                const plColor = itemPL > 0 ? 'text-emerald-400' : 'text-red-400';
+
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-800/50 transition">
                         <td class="px-6 py-3 font-mono text-white">${h.ticker}</td>
                         <td class="px-6 py-3 text-slate-300">${h.name}</td>
                         <td class="px-6 py-3 text-slate-400">${h.sector}</td>
                         <td class="px-6 py-3 text-right font-mono">${h.weight}</td>
-                        <td class="px-6 py-3 text-right font-mono ${plColor}">${h.pl}</td>
+                        <td class="px-6 py-3 text-right font-mono ${plColor}">${plStr}</td>
                     </tr>
                 `;
             });
+
+            // Update Narrative/Date Display if element exists (will add in next step)
+            if (document.getElementById('display-date')) {
+                document.getElementById('display-date').innerText = currentDay.date;
+            }
+            if (document.getElementById('market-narrative')) {
+                document.getElementById('market-narrative').innerText = currentDay.portfolios[pKey].narrative.toUpperCase();
+            }
+        }
+
+        // --- Playback Logic ---
+        let PLAY_INTERVAL = null;
+
+        function togglePlay() {
+            const btn = document.getElementById('play-btn');
+            const icon = btn.querySelector('i');
+
+            if (PLAY_INTERVAL) {
+                clearInterval(PLAY_INTERVAL);
+                PLAY_INTERVAL = null;
+                icon.className = 'fas fa-play';
+            } else {
+                icon.className = 'fas fa-pause text-emerald-400';
+                PLAY_INTERVAL = setInterval(() => {
+                    let nextIdx = CURRENT_INDEX + 1;
+                    if (nextIdx >= HISTORY_DATA.length) nextIdx = 0;
+
+                    document.getElementById('time-slider').value = nextIdx;
+                    updateDashboard(nextIdx);
+                }, 100); // 100ms per day
+            }
         }
 
         // --- Init ---
         document.addEventListener('DOMContentLoaded', () => {
             initCharts();
-            updateDashboard('aggressive');
+            loadData();
 
             document.getElementById('portfolio-select').addEventListener('change', (e) => {
-                updateDashboard(e.target.value);
+                ACTIVE_PORTFOLIO = e.target.value;
+                updateDashboard();
             });
+
+            const slider = document.getElementById('time-slider');
+            slider.addEventListener('input', (e) => {
+                if (PLAY_INTERVAL) togglePlay(); // Stop if user interacts
+                updateDashboard(parseInt(e.target.value));
+            });
+
+            document.getElementById('play-btn').addEventListener('click', togglePlay);
         });
 
     </script>
