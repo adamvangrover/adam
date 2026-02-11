@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam's Weekly Dispatch: The Great Disconnect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source_Code_Pro:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0a101f; color: #cdd6f4; }
+        .glass-pane { background: rgba(23, 33, 58, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .nav-link.active { background-color: #89b4fa; color: #0a101f; }
+        .prompt-code { font-family: 'Source Code Pro', monospace; }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .accordion-header.open + .accordion-content { max-height: 500px; }
+        .accordion-header.open .accordion-arrow { transform: rotate(180deg); }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="relative min-h-screen md:flex">
+        <div class="md:hidden flex justify-between items-center p-4 glass-pane sticky top-0 z-20">
+            <h1 class="text-xl font-bold text-blue-300">Adam's Dispatch</h1>
+            <button id="mobile-nav-toggle" class="text-white focus:outline-none"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg></button>
+        </div>
+        <aside id="sidebar" class="glass-pane w-64 p-6 space-y-6 fixed top-0 left-0 h-full z-30 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out">
+            <div class="flex items-center space-x-2">
+                 <div class="p-2 bg-blue-500 rounded-lg"><svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M12 6V4m0 16v-2M12 12a2 2 0 100-4 2 2 0 000 4z" /></svg></div>
+                 <h1 class="text-xl font-bold text-blue-300">Adam's Dispatch</h1>
+                 <br><a href="market_mayhem_archive.html" class="text-xs text-gray-400 hover:text-white">&larr; Archive</a>
+            </div>
+            <nav id="nav-menu" class="flex flex-col space-y-2">
+                <a href="#summary" class="nav-link px-4 py-2 rounded-lg font-medium transition-colors hover:bg-blue-400 hover:text-gray-900">Market Summary</a>
+                <a href="#risks" class="nav-link px-4 py-2 rounded-lg font-medium transition-colors hover:bg-blue-400 hover:text-gray-900">Triad of Risk</a>
+                <a href="#briefing" class="nav-link px-4 py-2 rounded-lg font-medium transition-colors hover:bg-blue-400 hover:text-gray-900">Intelligence Briefing</a>
+                <a href="#pce-sim" class="nav-link px-4 py-2 rounded-lg font-medium transition-colors hover:bg-blue-400 hover:text-gray-900">PCE Simulation</a>
+                <a href="#copilot" class="nav-link px-4 py-2 rounded-lg font-medium transition-colors hover:bg-blue-400 hover:text-gray-900">Copilot Corner</a>
+            </nav>
+        </aside>
+        <main class="flex-1 p-6 md:p-10 bg-black bg-opacity-20">
+            <header class="mb-8 border-b border-gray-700 pb-4">
+                <h1 class="text-4xl font-bold text-blue-300">The Great Disconnect</h1>
+                <p class="text-lg text-gray-400">September 19, 2025</p>
+            </header>
+            <div class="space-y-12">
+                <section id="summary" class="scroll-mt-20">
+                    <h2 class="text-2xl font-semibold mb-4 text-rose-300">Market Mayhem: A Tighter Summary</h2>
+                    <div class="glass-pane p-6 rounded-lg space-y-4 text-gray-300">
+                        <p>This week, the disconnect between Wall Street's euphoria and the economy's underlying strain became a chasm. The market is pricing for perfection. Yet, a triad of risks—stubborn inflation, a weak labor market, and profit compression from tariffs—is signaling a repricing event.</p>
+                        <p class="font-semibold text-blue-300">The rally is fragile and narrow. Low VIX is a sign of profound complacency.</p>
+                        <p class="bg-red-900 bg-opacity-50 border-l-4 border-red-500 p-4 rounded-r-lg"><span class="font-bold text-red-300">Critical Takeaway:</span> Existing models are likely understating near-term default risk.</p>
+                    </div>
+                </section>
+                <section id="risks" class="scroll-mt-20">
+                    <h2 class="text-2xl font-semibold mb-4 text-amber-300">The Triad of Risk</h2>
+                    <div class="space-y-4">
+                        <div class="glass-pane rounded-lg">
+                            <button class="accordion-header w-full flex justify-between items-center p-4 text-left font-semibold text-lg text-amber-400"><span>1. Inflation's Stubborn Core</span><svg class="accordion-arrow h-5 w-5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></button>
+                            <div class="accordion-content px-4 pb-4 text-gray-300"><p>Core inflation remains over 100bps above target. The Fed is prioritizing employment, a tightrope act that could fail if inflation re-accelerates.</p></div>
+                        </div>
+                        <div class="glass-pane rounded-lg">
+                            <button class="accordion-header w-full flex justify-between items-center p-4 text-left font-semibold text-lg text-amber-400"><span>2. Labor Market Revision</span><svg class="accordion-arrow h-5 w-5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></button>
+                            <div class="accordion-content px-4 pb-4 text-gray-300"><p>Payrolls were likely overstated by 911,000 jobs through March 2025. The slowdown is deeper and began earlier than understood.</p></div>
+                        </div>
+                        <div class="glass-pane rounded-lg">
+                            <button class="accordion-header w-full flex justify-between items-center p-4 text-left font-semibold text-lg text-amber-400"><span>3. Tariff Toll (FedEx)</span><svg class="accordion-arrow h-5 w-5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></button>
+                            <div class="accordion-content px-4 pb-4 text-gray-300"><p>FedEx forecasts a $1 billion headwind from tariffs. This provides a quantifiable measure of the margin compression affecting the corporate sector.</p></div>
+                        </div>
+                    </div>
+                </section>
+                <section id="briefing" class="scroll-mt-20">
+                    <h2 class="text-2xl font-semibold mb-4 text-green-300">Intelligence Briefing</h2>
+                    <div class="glass-pane p-6 rounded-lg space-y-8 text-gray-300">
+                        <div><h3 class="text-xl font-semibold mb-3 text-green-400">Deconstructing the Macro-Financial Environment</h3><p>Market breadth is poor. The BLS revision forces model recalibration. The Fed is gambling on inflation subsiding.</p></div>
+                    </div>
+                </section>
+                <section id="pce-sim" class="scroll-mt-20">
+                     <h2 class="text-2xl font-semibold mb-4 text-cyan-300">Adam's World Model Simulation</h2>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="glass-pane p-6 rounded-lg"><h3 class="font-semibold text-lg mb-4 text-cyan-400">Simulation Output</h3><div class="flex justify-around items-center text-center"><div><p class="text-3xl font-bold text-cyan-300">+0.32%</p><p class="text-sm text-gray-400">Adam Consensus</p></div><div class="h-16 border-l border-gray-600"></div><div><p class="text-3xl font-bold text-gray-500">+0.30%</p><p class="text-sm text-gray-400">Market Consensus</p></div></div></div>
+                        <div class="glass-pane p-6 rounded-lg"><h3 class="font-semibold text-lg mb-4 text-cyan-400">Scenario Analysis</h3><div class="relative h-52"><canvas id="pceChart"></canvas></div></div>
+                    </div>
+                </section>
+                <section id="copilot" class="scroll-mt-20">
+                    <h2 class="text-2xl font-semibold mb-4 text-teal-300">Adam's Copilot Corner</h2>
+                    <div class="glass-pane rounded-lg overflow-hidden">
+                        <div class="p-4 bg-gray-900 bg-opacity-50"><p class="font-semibold text-teal-300">🏛️ AI COPILOT PROMPT: Regulatory QA/QC</p></div>
+                        <div class="p-6 prompt-code text-sm text-gray-300 bg-gray-800 bg-opacity-40 whitespace-pre-wrap">Act as a senior credit risk examiner. Perform a rigorous QA/QC check on the provided internal credit monitoring report.</div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('mobile-nav-toggle').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('-translate-x-full'));
+            document.querySelectorAll('.accordion-header').forEach(header => header.addEventListener('click', () => header.classList.toggle('open')));
+            new Chart(document.getElementById('pceChart').getContext('2d'), {
+                type: 'bar', data: { labels: ['Cooler', 'Hot', 'Volcker'], datasets: [{ data: [55, 35, 10], backgroundColor: ['#38bdf8', '#fbbf24', '#fb7185'] }] },
+                options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false } } }
+            });
+        });
+    </script>
+</body>
+</html>

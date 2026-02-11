@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v23.5 :: MARKET MAYHEM (NOV)</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper-bg: #fdfbf7;
+            --ink-color: #1a1a1a;
+            --accent-red: #cc0000;
+        }
+
+        /* Override base styles for a "Digital Paper" feel within the cyber frame */
+        .newsletter-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: var(--paper-bg);
+            color: var(--ink-color);
+            padding: 60px;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        /* Cyber overlay effects */
+        .cyber-badge-overlay {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            box-shadow: 0 0 15px var(--primary-glow);
+            z-index: 10;
+        }
+
+        h1.title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            border-bottom: 4px solid var(--ink-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            letter-spacing: -1px;
+            line-height: 1.1;
+        }
+
+        .meta-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            font-family: var(--font-sans);
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            color: var(--accent-red);
+            border-left: 4px solid var(--accent-red);
+            padding-left: 15px;
+        }
+
+        h3 {
+            font-family: var(--font-sans);
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        p {
+            line-height: 1.8;
+            margin-bottom: 20px;
+            font-size: 1.05rem;
+        }
+
+        ul {
+            margin-bottom: 20px;
+        }
+        li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        /* Data Viz Placeholders */
+        .chart-placeholder {
+            width: 100%;
+            height: 250px;
+            background: #eee;
+            border: 1px dashed #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            color: #666;
+            margin: 30px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Table Styling */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+        }
+        .data-table th {
+            text-align: left;
+            border-bottom: 2px solid #000;
+            padding: 10px;
+            background: #f4f4f4;
+        }
+        .data-table td {
+            border-bottom: 1px solid #ddd;
+            padding: 10px;
+        }
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Sidebar/Grid Layout for Desktop */
+        @media (min-width: 1000px) {
+            .content-grid {
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: 40px;
+            }
+            .sidebar {
+                border-left: 1px solid #ddd;
+                padding-left: 30px;
+            }
+        }
+
+        .sidebar-widget {
+            background: #f9f9f9;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid #eee;
+        }
+        .sidebar-widget h4 {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: #666;
+            margin-top: 0;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+        }
+        .metric-val {
+            font-weight: bold;
+        }
+        .positive { color: #10b981; }
+        .negative { color: #ef4444; }
+
+        .back-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div class="scan-line"></div>
+    <div class="scan-glow"></div>
+
+    <a href="market_mayhem_archive.html" class="cyber-btn back-link">&larr; BACK TO ARCHIVE</a>
+
+    <div class="newsletter-container">
+        <div class="cyber-badge-overlay">
+            SECURE TRANSMISSION // ADAM v23.5
+        </div>
+
+        <h1 class="title">THE YIELD CURVE SNAP</h1>
+
+        <div class="meta-header">
+            <div><strong>Date:</strong> November 14, 2025</div>
+            <div><strong>Source:</strong> Apex Financial Architect</div>
+            <div><strong>Clearance:</strong> UHNW / Institutional</div>
+        </div>
+
+        <div class="content-grid">
+            <div class="main-column">
+                <p style="font-size: 1.2rem; font-style: italic; color: #444; border-bottom: 1px solid #eee; padding-bottom: 20px;">
+                    <strong>Executive Summary:</strong> The Treasury market is in open revolt. The 10-Year yield has breached 5.0% for the first time in the current cycle, signaling a total loss of faith in the "Soft Landing" narrative.
+                    We advise immediate rotation into <strong>Floating Rate</strong> instruments and short-duration cash equivalents.
+                </p>
+
+                <h2>I. The Sovereign Debt Crisis</h2>
+
+                <h3>1.1 The 5% Threshold</h3>
+                <p>
+                    Psychological support at 4.8% was shattered this morning. The "Bear Steepening" indicates that the market is pricing in structural inflation, not growth.
+                    Foreign buyers (Japan, China) are net sellers, leaving the Fed as the buyer of last resort—a position they cannot afford to take while fighting inflation.
+                </p>
+
+                <div class="chart-placeholder">
+                    [CHART: US 10Y YIELD vs FOREIGN HOLDINGS]
+                    <br><span style="font-size: 0.8rem; margin-top: 10px;">Data Source: Adam v23.5 Knowledge Graph</span>
+                </div>
+
+                <h3>1.2 Commercial Real Estate Contagion</h3>
+                <p>
+                    With the risk-free rate at 5%, cap rates on Class B office space (currently ~6%) are mathematically insolvent.
+                    We expect a wave of "Keys-in-Mail" events from major REITs in Q4 2025. Avoid regional banks with high CRE exposure.
+                </p>
+
+                <h2>II. Strategic Rotation: "Cash is King" (Again)</h2>
+                <p>The "T-Bill and Chill" strategy yields a risk-free 5.5%. Equity risk premiums are effectively negative.</p>
+
+                <ul>
+                    <li><strong>Action:</strong> Reduce Equity exposure to 40%.</li>
+                    <li><strong>Action:</strong> Increase Short-Duration Treasuries (SHV) to 30%.</li>
+                    <li><strong>Action:</strong> Maintain Gold hedge (10%).</li>
+                </ul>
+
+                <h2>III. Sector Watch: Utilities & Staples</h2>
+                <p>
+                    As yields rise, "bond proxy" sectors like Utilities are getting hammered.
+                    However, this creates a buying opportunity for high-quality staples with pricing power (e.g., PG, KO).
+                </p>
+
+                <h2>Appendix A: Credit Warning List</h2>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Ticker</th>
+                            <th>Name</th>
+                            <th>Sector</th>
+                            <th>Risk Score</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>KRE</td>
+                            <td>Regional Banking ETF</td>
+                            <td>Financials</td>
+                            <td><span class="cyber-badge badge-red" style="color:red">CRITICAL</span></td>
+                            <td>SHORT/AVOID</td>
+                        </tr>
+                        <tr>
+                            <td>VNO</td>
+                            <td>Vornado Realty</td>
+                            <td>Real Estate</td>
+                            <td><span class="cyber-badge badge-red" style="color:red">HIGH</span></td>
+                            <td>SELL</td>
+                        </tr>
+                        <tr>
+                            <td>TLT</td>
+                            <td>20Y Treasury ETF</td>
+                            <td>Fixed Income</td>
+                            <td><span class="cyber-badge badge-amber" style="color:orange">ELEVATED</span></td>
+                            <td>REDUCE</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="sidebar">
+                <div class="sidebar-widget">
+                    <h4>Simulated Performance (MTD)</h4>
+                    <div class="metric-row">
+                        <span>Adam v23.5:</span>
+                        <span class="metric-val positive">+1.2%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span>S&P 500:</span>
+                        <span class="metric-val negative">-4.5%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span>Alpha:</span>
+                        <span class="metric-val positive">+5.7%</span>
+                    </div>
+                </div>
+
+                <div class="sidebar-widget">
+                    <h4>Market Pulse</h4>
+                    <div class="metric-row">
+                        <span>US 10Y:</span>
+                        <span class="metric-val negative">5.02%</span>
+                    </div>
+                    <div class="metric-row">
+                        <span>VIX:</span>
+                        <span class="metric-val negative">24.50</span>
+                    </div>
+                    <div class="metric-row">
+                        <span>DXY:</span>
+                        <span class="metric-val positive">106.5</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 60px; font-size: 0.8rem; color: #999; border-top: 1px solid #eee; padding-top: 20px;">
+            <p><strong>Disclaimer:</strong> The information provided in this report is for informational purposes only and does not constitute financial advice. Investing involves risk, including the loss of principal. Prepared by Adam v23.5.</p>
+        </div>
+    </div>
+</body>
+</html>
