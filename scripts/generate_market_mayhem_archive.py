@@ -4,6 +4,7 @@ import glob
 import json
 import yaml
 import hashlib
+import html
 from datetime import datetime
 from collections import Counter
 
@@ -962,8 +963,12 @@ def generate_archive():
     # Inject Items
     for year in sorted(grouped.keys(), reverse=True):
         for item in grouped[year]:
+            # Escape title and summary to prevent breaking HTML attributes
+            safe_title = html.escape(item['title'].lower())
+            safe_summary = html.escape(item['summary'].lower())
+
             archive_html += f"""
-            <div class="archive-item type-{item['type']}" data-year="{year}" data-type="{item['type']}" data-title="{item['title'].lower()} {item['summary'].lower()}">
+            <div class="archive-item type-{item['type']}" data-year="{year}" data-type="{item['type']}" data-title="{safe_title} {safe_summary}">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">{item['date']}</span>
@@ -979,8 +984,9 @@ def generate_archive():
 
     # Historical
     for item in historical:
+         safe_title = html.escape(item['title'].lower())
          archive_html += f"""
-            <div class="archive-item type-HISTORICAL" data-year="HISTORICAL" data-type="HISTORICAL" data-title="{item['title'].lower()}">
+            <div class="archive-item type-HISTORICAL" data-year="HISTORICAL" data-type="HISTORICAL" data-title="{safe_title}">
                 <div style="flex-grow: 1;">
                      <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">{item['date']}</span>
