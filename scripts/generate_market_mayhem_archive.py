@@ -11,7 +11,8 @@ from collections import Counter
 OUTPUT_DIR = "showcase"
 SOURCE_DIRS = [
     "core/libraries_and_archives/newsletters",
-    "core/libraries_and_archives/reports"
+    "core/libraries_and_archives/reports",
+    "core/libraries_and_archives/generated_content"
 ]
 ARCHIVE_FILE = "showcase/market_mayhem_archive.html"
 
@@ -189,7 +190,7 @@ def parse_json_file(filepath):
         # Extract Title
         title = data.get('title') or data.get('topic') or data.get('report_title')
         if not title:
-            company = data.get('company')
+            company = data.get('company') or data.get('company_name')
             if company:
                 title = f"{company} Report"
             else:
@@ -389,6 +390,16 @@ def parse_markdown_file(filepath):
         else:
             summary = "Market analysis and strategic insights."
 
+        # Extract New Metadata (Conviction/Critique)
+        conviction_match = re.search(r'\*\*Conviction:\*\* .*?(\d+)/100', content)
+        conviction_score = int(conviction_match.group(1)) if conviction_match else 50
+
+        critique_match = re.search(r'\*\*Critique:\*\* (.*?)\n', content)
+        critique_text = critique_match.group(1) if critique_match else "No automated critique available."
+
+        quality_match = re.search(r'\*\*Quality Score:\*\* (\d+)/100', content)
+        quality_score = int(quality_match.group(1)) if quality_match else 100
+
         if title_match:
              content = content.replace(title_match.group(0), "", 1).strip()
 
@@ -410,7 +421,10 @@ def parse_markdown_file(filepath):
             "provenance_hash": prov_hash,
             "filename": filename.replace('.md', '.html').replace('.json', '.html'),
             "is_sourced": True,
-            "metrics_json": "{}"
+            "metrics_json": "{}",
+            "conviction": conviction_score,
+            "critique": critique_text,
+            "quality": quality_score
         }
 
     except Exception as e:
@@ -632,6 +646,22 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             </div>
 
              <div class="sidebar-widget">
+                <div class="sidebar-title">Agent Conviction</div>
+                 <div class="stat-row"><span>CONFIDENCE</span> <span class="stat-val">{conviction}/100</span></div>
+                 <div class="sentiment-bar">
+                    <div class="sentiment-fill" style="width: {conviction}%; background: {conviction_color};"></div>
+                </div>
+            </div>
+
+             <div class="sidebar-widget" style="border-color: #555;">
+                <div class="sidebar-title">Peer Critique</div>
+                 <div style="font-size: 0.75rem; color: #ccc; font-style: italic;">
+                    "{critique}"
+                </div>
+                <div class="stat-row" style="margin-top:10px;"><span>QUALITY SCORE</span> <span class="stat-val">{quality}/100</span></div>
+            </div>
+
+             <div class="sidebar-widget">
                 <div class="sidebar-title">Contributing Agents</div>
                  <div style="display:flex; flex-direction:column; gap:5px;">
                     {agent_html}
@@ -749,6 +779,9 @@ def generate_archive():
 
         out_path = os.path.join(OUTPUT_DIR, item['filename'])
 
+        conviction = item.get("conviction", 50)
+        conviction_color = "#00ff00" if conviction > 70 else ("#ffff00" if conviction > 40 else "#ff0000")
+
         content = HTML_TEMPLATE.format(
             title=item["title"],
             date=item["date"],
@@ -760,7 +793,11 @@ def generate_archive():
             prov_short=item.get("provenance_hash", "UNKNOWN")[:8],
             entity_html=entity_html,
             agent_html=agent_html,
-            metrics_json=item.get("metrics_json", "{}")
+            metrics_json=item.get("metrics_json", "{}"),
+            conviction=conviction,
+            conviction_color=conviction_color,
+            critique=item.get("critique", "No critique available."),
+            quality=item.get("quality", 100)
         )
 
         with open(out_path, "w", encoding='utf-8') as f:

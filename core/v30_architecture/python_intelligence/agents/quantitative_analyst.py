@@ -39,6 +39,83 @@ class QuantitativeAnalyst(BaseAgent):
             # Wait a bit before next analysis (Batch processing allows longer intervals)
             await asyncio.sleep(random.uniform(15.0, 30.0))
 
+    def analyze_historical(self, symbol: str, df: pd.DataFrame):
+        """
+        Synchronous method to analyze historical DataFrame slice.
+        Returns a dict with metrics and conviction score.
+        """
+        if df.empty or len(df) < 20:
+            return {"error": "Insufficient data"}
+
+        try:
+            # RSI
+            rsi = ta.momentum.RSIIndicator(close=df["Close"], window=14)
+            current_rsi = rsi.rsi().iloc[-1]
+
+            # SMA
+            sma_50 = ta.trend.SMAIndicator(close=df["Close"], window=50)
+            current_sma_50 = sma_50.sma_indicator().iloc[-1]
+
+            # Bollinger Bands
+            bb = ta.volatility.BollingerBands(close=df["Close"], window=20, window_dev=2)
+            bb_high = bb.bollinger_hband().iloc[-1]
+            bb_low = bb.bollinger_lband().iloc[-1]
+            current_price = df["Close"].iloc[-1]
+
+            # MACD
+            macd = ta.trend.MACD(close=df["Close"])
+            current_macd = macd.macd().iloc[-1]
+            current_signal = macd.macd_signal().iloc[-1]
+
+            # Conviction Logic
+            conviction = 50 # Base
+            reasons = []
+
+            # RSI Logic
+            if current_rsi > 70:
+                conviction -= 20
+                reasons.append(f"RSI Overbought ({current_rsi:.1f})")
+            elif current_rsi < 30:
+                conviction += 20
+                reasons.append(f"RSI Oversold ({current_rsi:.1f})")
+
+            # Trend Logic
+            if current_price > current_sma_50:
+                conviction += 10
+                reasons.append("Above 50 SMA")
+            else:
+                conviction -= 10
+                reasons.append("Below 50 SMA")
+
+            # MACD Logic
+            if current_macd > current_signal:
+                conviction += 15
+                reasons.append("MACD Bullish Crossover")
+            else:
+                conviction -= 15
+                reasons.append("MACD Bearish Crossover")
+
+            # Clamp Conviction 0-100
+            conviction = max(0, min(100, conviction))
+
+            signal = "NEUTRAL"
+            if conviction > 65: signal = "BULLISH"
+            if conviction < 35: signal = "BEARISH"
+
+            return {
+                "symbol": symbol,
+                "price": round(float(current_price), 2),
+                "rsi": round(float(current_rsi), 2),
+                "signal": signal,
+                "conviction": conviction,
+                "reasons": reasons,
+                "timestamp": df.index[-1]
+            }
+
+        except Exception as e:
+            logger.error(f"Historical analysis failed for {symbol}: {e}")
+            return {"error": str(e)}
+
     async def analyze_all_tickers(self):
         try:
             # Run blocking yfinance call in a thread
