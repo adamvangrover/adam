@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Prompt Alpha Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --bg-dark: #020408;
+            --panel-glass: rgba(10, 15, 30, 0.85);
+            --cyan-glow: #00f0ff;
+            --green-glow: #10b981;
+            --purple-glow: #bc13fe;
+            --grid-line: rgba(16, 185, 129, 0.05); /* Green Matrix style */
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+            background-image:
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 20px 20px;
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: var(--panel-glass);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            transition: border-color 0.3s ease;
+        }
+        .glass-panel:hover {
+            border-color: rgba(16, 185, 129, 0.5);
+        }
+
+        /* Ticker Tape Animation */
+        .ticker-container {
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+        }
+        .ticker-content {
+            display: inline-block;
+            animation: ticker 30s linear infinite;
+        }
+        @keyframes ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--green-glow); }
+
+        .alpha-high { color: var(--green-glow); }
+        .alpha-med { color: #fbbf24; } /* Amber */
+        .alpha-low { color: #f87171; } /* Red */
+    </style>
+</head>
+<body class="h-screen flex flex-col p-4 text-xs">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4 border-b border-green-900/50 pb-2 flex-shrink-0">
+        <h1 class="text-lg font-bold text-white tracking-widest flex items-center group cursor-default">
+            <i data-lucide="terminal" class="w-5 h-5 mr-2 text-green-400 group-hover:text-green-200 transition-colors"></i>
+            PROMPT ALPHA <span class="text-[10px] ml-2 px-2 py-0.5 border border-green-500/50 rounded text-green-300 shadow-[0_0_10px_rgba(16,185,129,0.3)]">v1.0</span>
+        </h1>
+
+        <!-- Ticker -->
+        <div class="flex-grow mx-8 h-6 bg-black/50 border border-green-900/30 rounded overflow-hidden flex items-center relative">
+            <div class="ticker-container text-[10px] font-mono text-green-400/80" id="ticker-tape">
+                // INITIALIZING FEED... // WAITING FOR ALPHA SIGNAL... // SYSTEM READY //
+            </div>
+        </div>
+
+        <div class="flex gap-2">
+            <div class="flex items-center gap-2 mr-4 bg-gray-900/50 px-2 rounded border border-gray-800">
+                <span class="text-[10px] text-gray-400 uppercase font-semibold">Feed:</span>
+                <select id="feed-source" class="bg-transparent border-none text-green-400 focus:ring-0 py-1 text-[10px] outline-none">
+                    <option value="simulation">SIMULATION (SYNTHETIC)</option>
+                    <option value="reddit" disabled>REDDIT (OFFLINE)</option>
+                </select>
+            </div>
+
+            <button id="btn-sim" onclick="app.toggleSimulation()" class="px-3 py-1 bg-green-900/20 border border-green-500/30 text-green-400 rounded hover:bg-green-500/30 hover:text-white transition-all text-[10px] font-bold flex items-center gap-1 animate-pulse">
+                <i data-lucide="play" class="w-3 h-3"></i> LIVE
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-12 gap-4 flex-grow overflow-hidden">
+
+        <!-- Left Panel: Feed -->
+        <aside class="col-span-4 flex flex-col gap-3 overflow-hidden">
+            <div class="glass-panel p-2 rounded flex justify-between items-center shrink-0">
+                <span class="text-gray-400 font-bold uppercase text-[10px]">Incoming Stream</span>
+                <span class="text-green-500 text-[10px]" id="feed-status">ACTIVE</span>
+            </div>
+
+            <div class="glass-panel flex-grow overflow-y-auto custom-scrollbar p-0 rounded" id="feed-list">
+                <!-- Feed Items Injected Here -->
+            </div>
+        </aside>
+
+        <!-- Center Panel: Detail View -->
+        <main class="col-span-5 flex flex-col gap-3 overflow-hidden">
+             <div class="glass-panel p-3 rounded flex-grow flex flex-col relative overflow-hidden">
+                <div class="flex justify-between items-start mb-4 border-b border-gray-800 pb-2">
+                    <div class="mr-2 overflow-hidden">
+                        <h2 class="text-sm font-bold text-white mb-1 truncate" id="detail-title">Select a Prompt</h2>
+                        <div class="flex gap-2 text-[10px] text-gray-500 font-mono" id="detail-meta">
+                            <span>ID: --</span> | <span>Author: --</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 shrink-0">
+                        <button onclick="app.copyCurrentPrompt()" class="text-[10px] bg-green-900/20 hover:bg-green-900/40 text-green-400 border border-green-500/30 px-2 py-1 rounded transition whitespace-nowrap">
+                            <i data-lucide="copy" class="w-3 h-3 inline mr-1"></i> COPY
+                        </button>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold font-mono" id="detail-score">--</div>
+                            <div class="text-[9px] text-gray-500 uppercase">Alpha Score</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-grow overflow-y-auto custom-scrollbar bg-black/30 p-3 rounded border border-gray-800 font-mono text-gray-300 text-[11px] whitespace-pre-wrap" id="detail-content">
+                    // WAITING FOR SELECTION...
+                </div>
+
+                <div class="mt-3 pt-3 border-t border-gray-800 grid grid-cols-3 gap-2">
+                    <div class="bg-gray-900/50 p-2 rounded border border-gray-800">
+                        <div class="text-[9px] text-gray-500 uppercase">Length</div>
+                        <div class="text-green-400 font-bold" id="metric-length">--</div>
+                    </div>
+                    <div class="bg-gray-900/50 p-2 rounded border border-gray-800">
+                        <div class="text-[9px] text-gray-500 uppercase">Variables</div>
+                        <div class="text-green-400 font-bold" id="metric-vars">--</div>
+                    </div>
+                    <div class="bg-gray-900/50 p-2 rounded border border-gray-800">
+                        <div class="text-[9px] text-gray-500 uppercase">Structure</div>
+                        <div class="text-green-400 font-bold" id="metric-struct">--</div>
+                    </div>
+                </div>
+             </div>
+        </main>
+
+        <!-- Right Panel: Analytics -->
+        <aside class="col-span-3 flex flex-col gap-3 overflow-hidden">
+            <div class="glass-panel p-3 rounded h-48 flex flex-col">
+                <h3 class="text-[10px] font-bold text-gray-400 uppercase mb-2 flex items-center gap-2">
+                    <i data-lucide="bar-chart-2" class="w-3 h-3"></i> Alpha Distribution
+                </h3>
+                <div class="flex-grow relative">
+                    <canvas id="alpha-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="glass-panel p-3 rounded flex-grow flex flex-col">
+                <h3 class="text-[10px] font-bold text-gray-400 uppercase mb-2 flex items-center gap-2">
+                    <i data-lucide="activity" class="w-3 h-3"></i> System Status
+                </h3>
+                <div class="space-y-2 text-[10px] font-mono">
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Buffer Size</span>
+                        <span class="text-white" id="stat-buffer">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">Avg Alpha</span>
+                        <span class="text-green-400" id="stat-avg">0.0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">High Alpha (>80)</span>
+                        <span class="text-green-400" id="stat-high">0</span>
+                    </div>
+                    <div class="h-px bg-gray-800 my-2"></div>
+                    <div class="text-gray-500">Core Agents:</div>
+                    <div class="flex items-center gap-2 text-green-500">
+                        <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                        <span>RiskAnalyst</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-green-500">
+                        <div class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                        <span>ConsensusEngine</span>
+                    </div>
+                </div>
+
+                <div class="mt-auto pt-4">
+                    <div class="bg-black/40 border border-green-900/50 p-2 rounded text-[9px] text-green-600 font-mono">
+                        > SYSTEM_OPTIMAL<br>
+                        > LATENCY: 12ms<br>
+                        > MEMORY: 45MB
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        /**
+         * ALPHA CALCULATOR LOGIC
+         * Ported from services/webapp/client/src/utils/alphaCalculator.ts
+         */
+        const STRUCTURAL_KEYWORDS = [
+            /system:/i, /user:/i, /assistant:/i, /step-by-step/i, /think step/i,
+            /return format/i, /json/i, /constraint/i, /context:/i, /example:/i
+        ];
+
+        function calculatePromptAlpha(promptText) {
+            if (!promptText) return { score: 0, lengthScore: 0, variableScore: 0, structureScore: 0 };
+
+            // 1. Length Score
+            const length = promptText.length;
+            const lengthScore = Math.min(100, (Math.log(length + 1) / Math.log(2000)) * 40);
+
+            // 2. Variable Density
+            const variableMatches = promptText.match(/\{\{.*?\}\}|\{.*?\}/g) || [];
+            const variableCount = variableMatches.length;
+            const variableScore = Math.min(30, variableCount * 5);
+
+            // 3. Structural Keywords
+            let keywordCount = 0;
+            STRUCTURAL_KEYWORDS.forEach(regex => {
+                if (regex.test(promptText)) keywordCount++;
+            });
+            const structureScore = Math.min(40, keywordCount * 5);
+
+            // Total
+            let totalScore = lengthScore + variableScore + structureScore;
+            totalScore = Math.min(100, Math.max(0, totalScore));
+
+            return {
+                score: Math.round(totalScore),
+                lengthScore: Math.round(lengthScore),
+                variableScore: Math.round(variableScore),
+                structureScore: Math.round(structureScore),
+                raw: { length, variableCount, keywordCount }
+            };
+        }
+
+        /**
+         * SYNTHETIC GENERATOR
+         * Ported from services/webapp/client/src/utils/simulationEngine.ts
+         */
+        const TOPICS = [
+            "Quantum Physics", "Market Analysis", "Code Refactoring", "Creative Writing",
+            "Legal Contract", "Medical Diagnosis", "Cybersecurity Audit", "DeFi Protocol",
+            "Neural Architecture", "Supply Chain Optimization", "Climate Modeling"
+        ];
+        const ROLES = [
+            "Senior Architect", "Quant Analyst", "Legal Counsel", "Security Researcher",
+            "Prompt Engineer", "AI Ethicist", "Rust Developer", "Data Scientist"
+        ];
+        const TEMPLATES = [
+            "Act as a {{ROLE}}. Your task is to {{TASK}}. constraints: {{CONSTRAINTS}}.",
+            "System: You are an expert in {{TOPIC}}.\nUser: Explain {{TASK}} step-by-step.",
+            "Generate a {{TOPIC}} report in JSON format. Fields: {{FIELDS}}.",
+            "Analyze the following text for {{TOPIC}} bias:\n[Context]\n{{TASK}}",
+            "Write a python script to {{TASK}}. Ensure high performance and type safety.",
+            "Construct a knowledge graph for {{TOPIC}} focusing on key entities.",
+            "Simulate a debate between a {{ROLE}} and a regulator regarding {{TOPIC}}."
+        ];
+        const TASKS = [
+            "Optimizing weights for layer 4", "Backpropagating error gradients",
+            "Fetching live market data", "Sanitizing user input", "Computing Alpha coefficients",
+            "Rebalancing portfolio", "Validating JSON schema", "Encrypting payload",
+            "Compressing context window", "Pruning low-confidence nodes",
+            "Synthesizing narrative", "Running Monte Carlo simulation"
+        ];
+
+        function randomChoice(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+        function generateRandomString(len) {
+            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ';
+            let result = '';
+            for (let i = 0; i < len; i++) result += chars.charAt(Math.floor(Math.random() * chars.length));
+            return result;
+        }
+
+        function generateSyntheticPrompt() {
+            const topic = randomChoice(TOPICS);
+            const role = randomChoice(ROLES);
+            const baseTemplate = randomChoice(TEMPLATES);
+
+            let content = baseTemplate
+                .replace('{{ROLE}}', role)
+                .replace('{{TOPIC}}', topic)
+                .replace('{{TASK}}', `analyze ${generateRandomString(10)}`)
+                .replace('{{CONSTRAINTS}}', 'no hallucinations, return JSON')
+                .replace('{{FIELDS}}', 'id, score, reason, confidence');
+
+            if (Math.random() > 0.5) content += `\n\nContext:\n${generateRandomString(Math.floor(Math.random() * 500))}`;
+            if (Math.random() > 0.7) content = "System: " + content + "\nStep-by-step reasoning:\n1. ";
+
+            const metrics = calculatePromptAlpha(content);
+
+            return {
+                id: `synth-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+                title: `SYNTH: ${topic} - ${role}`,
+                content: content,
+                timestamp: Date.now(),
+                author: 'Ghost_in_Shell',
+                alphaScore: metrics.score,
+                metrics: {
+                    length: metrics.lengthScore,
+                    variableDensity: metrics.variableScore,
+                    structuralKeywords: metrics.structureScore,
+                },
+                tags: ['simulation', topic.toLowerCase().replace(' ', '-')]
+            };
+        }
+
+        /**
+         * APP CONTROLLER
+         */
+        const app = {
+            prompts: [],
+            isSimulating: false,
+            simInterval: null,
+            chartInstance: null,
+            selectedPromptId: null,
+
+            init: function() {
+                this.initChart();
+                this.toggleSimulation(); // Start automatically
+                lucide.createIcons();
+            },
+
+            toggleSimulation: function() {
+                this.isSimulating = !this.isSimulating;
+                const btn = document.getElementById('btn-sim');
+                const status = document.getElementById('feed-status');
+
+                if (this.isSimulating) {
+                    btn.classList.add('animate-pulse', 'text-white', 'bg-green-500/30');
+                    btn.innerHTML = '<i data-lucide="pause" class="w-3 h-3"></i> PAUSE';
+                    status.innerText = "ACTIVE";
+                    status.classList.replace('text-red-500', 'text-green-500');
+
+                    this.simInterval = setInterval(() => {
+                        this.addPrompt(generateSyntheticPrompt());
+                    }, 2000); // New prompt every 2s
+                } else {
+                    btn.classList.remove('animate-pulse', 'text-white', 'bg-green-500/30');
+                    btn.innerHTML = '<i data-lucide="play" class="w-3 h-3"></i> LIVE';
+                    status.innerText = "PAUSED";
+                    status.classList.replace('text-green-500', 'text-red-500');
+                    clearInterval(this.simInterval);
+                }
+                lucide.createIcons();
+            },
+
+            addPrompt: function(prompt) {
+                this.prompts.unshift(prompt);
+                if(this.prompts.length > 50) this.prompts.pop(); // Keep buffer small
+
+                this.renderFeed();
+                this.updateStats();
+                this.updateChart();
+                this.updateTicker(prompt);
+
+                // Auto-select first if none selected
+                if (!this.selectedPromptId) {
+                    this.selectPrompt(prompt.id);
+                }
+            },
+
+            selectPrompt: function(id) {
+                this.selectedPromptId = id;
+                const p = this.prompts.find(x => x.id === id);
+                if (!p) return;
+
+                document.getElementById('detail-title').innerText = p.title;
+                document.getElementById('detail-meta').innerHTML = `<span>ID: ${p.id.split('-')[2]}</span> | <span>Author: ${p.author}</span> | <span>${new Date(p.timestamp).toLocaleTimeString()}</span>`;
+
+                const scoreEl = document.getElementById('detail-score');
+                scoreEl.innerText = p.alphaScore;
+
+                // Color Logic
+                scoreEl.className = "text-2xl font-bold font-mono " + this.getScoreColor(p.alphaScore);
+
+                document.getElementById('detail-content').innerText = p.content;
+                document.getElementById('metric-length').innerText = p.metrics.length;
+                document.getElementById('metric-vars').innerText = p.metrics.variableDensity;
+                document.getElementById('metric-struct').innerText = p.metrics.structuralKeywords;
+
+                // Highlight in list
+                document.querySelectorAll('.feed-item').forEach(el => el.classList.remove('bg-green-900/20', 'border-green-500/30'));
+                const item = document.getElementById(`item-${id}`);
+                if (item) item.classList.add('bg-green-900/20', 'border-green-500/30');
+            },
+
+            renderFeed: function() {
+                const list = document.getElementById('feed-list');
+                list.innerHTML = this.prompts.map(p => `
+                    <div id="item-${p.id}" onclick="app.selectPrompt('${p.id}')" class="feed-item p-2 border-b border-gray-800 cursor-pointer hover:bg-gray-800 transition-colors flex justify-between items-center group">
+                        <div class="overflow-hidden">
+                            <div class="font-bold text-[10px] text-gray-300 truncate w-40">${p.title}</div>
+                            <div class="text-[9px] text-gray-500 font-mono">${new Date(p.timestamp).toLocaleTimeString()}</div>
+                        </div>
+                        <div class="font-mono font-bold text-sm ${this.getScoreColor(p.alphaScore)}">${p.alphaScore}</div>
+                    </div>
+                `).join('');
+
+                // Maintain selection highlight
+                if(this.selectedPromptId) {
+                     const item = document.getElementById(`item-${this.selectedPromptId}`);
+                     if (item) item.classList.add('bg-green-900/20', 'border-green-500/30');
+                }
+            },
+
+            updateTicker: function(p) {
+                const tape = document.getElementById('ticker-tape');
+                // Simple append for now, simpler than full marquee logic
+                const span = document.createElement('span');
+                span.className = "mx-4";
+                span.innerHTML = `<span class="text-gray-500">[${new Date().toLocaleTimeString()}]</span> <span class="${this.getScoreColor(p.alphaScore)} font-bold">ALPHA DETECTED: ${p.alphaScore}</span> // ${p.title} //`;
+
+                // Keep ticker clean
+                if(tape.children.length > 5) tape.removeChild(tape.children[0]);
+                tape.appendChild(span);
+            },
+
+            updateStats: function() {
+                document.getElementById('stat-buffer').innerText = this.prompts.length;
+
+                const avg = this.prompts.reduce((a,b) => a + b.alphaScore, 0) / (this.prompts.length || 1);
+                document.getElementById('stat-avg').innerText = avg.toFixed(1);
+
+                const high = this.prompts.filter(p => p.alphaScore > 80).length;
+                document.getElementById('stat-high').innerText = high;
+            },
+
+            initChart: function() {
+                const ctx = document.getElementById('alpha-chart').getContext('2d');
+                this.chartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['0-20', '21-40', '41-60', '61-80', '81-100'],
+                        datasets: [{
+                            label: 'Frequency',
+                            data: [0,0,0,0,0],
+                            backgroundColor: 'rgba(16, 185, 129, 0.5)',
+                            borderColor: '#10b981',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { grid: { display: false }, ticks: { color: '#6b7280', font: {size: 9} } },
+                            y: { display: false }
+                        }
+                    }
+                });
+            },
+
+            updateChart: function() {
+                if(!this.chartInstance) return;
+
+                const buckets = [0,0,0,0,0];
+                this.prompts.forEach(p => {
+                    if (p.alphaScore <= 20) buckets[0]++;
+                    else if (p.alphaScore <= 40) buckets[1]++;
+                    else if (p.alphaScore <= 60) buckets[2]++;
+                    else if (p.alphaScore <= 80) buckets[3]++;
+                    else buckets[4]++;
+                });
+
+                this.chartInstance.data.datasets[0].data = buckets;
+                this.chartInstance.update();
+            },
+
+            getScoreColor: function(score) {
+                if(score >= 80) return "alpha-high";
+                if(score >= 50) return "alpha-med";
+                return "alpha-low";
+            },
+
+            copyCurrentPrompt: function() {
+                 const text = document.getElementById('detail-content').innerText;
+                 navigator.clipboard.writeText(text);
+                 alert('Prompt copied to clipboard');
+            }
+        };
+
+        window.onload = function() {
+            app.init();
+        };
+    </script>
+</body>
+</html>

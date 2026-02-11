@@ -102,6 +102,18 @@ This directory contains the **Model Context Protocol (MCP)** server for Adam. It
 ### 5. Utilities
 *   `execute_python_sandbox(code)`: Secure execution environment for ad-hoc analysis.
 
+## 🛡️ Security &amp; Sandboxing
+
+The **Secure Sandbox** is a critical component for executing untrusted (LLM-generated) code.
+
+### Features
+*   **AST Analysis:** Code is parsed before execution. Dangerous imports (e.g., `os`, `sys`, `subprocess`) are rejected at the syntax level.
+*   **Process Isolation:** Execution happens in a separate process with limited permissions.
+*   **Resource Limits:** Strict timeouts and memory caps prevent denial-of-service attacks.
+*   **Allowlist:** Only specific, safe libraries (`pandas`, `numpy`, `math`) are available in the global scope.
+
+**⚠️ Warning:** Never disable the sandbox in production.
+
 ## 📚 Resources
 *   `adam://project/manifest`: Capabilities summary.
 *   `adam://docs/{filename}`: Read any system documentation dynamically.
