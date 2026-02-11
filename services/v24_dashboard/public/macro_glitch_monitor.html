@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MACRO GLITCH MONITOR // V.2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #050510;
+            --neon-blue: #00f3ff;
+            --neon-red: #ff003c;
+            --neon-green: #00ff41;
+            --grid-color: rgba(0, 243, 255, 0.1);
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--neon-blue);
+            font-family: 'JetBrains Mono', monospace;
+            margin: 0;
+            padding: 20px;
+            overflow: hidden;
+            height: 100vh;
+            background-image:
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Glitch Animation */
+        .glitch {
+            position: relative;
+            color: var(--neon-red);
+            font-size: 2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            animation: glitch-anim 2s infinite;
+        }
+        @keyframes glitch-anim {
+            0% { text-shadow: 2px 0 var(--neon-blue), -2px 0 var(--neon-green); }
+            2% { text-shadow: 2px 0 var(--neon-blue), -2px 0 var(--neon-green); }
+            4% { text-shadow: 2px 0 var(--neon-blue), -2px 0 var(--neon-green); }
+            5% { text-shadow: -2px 0 var(--neon-blue), 2px 0 var(--neon-green); }
+            100% { text-shadow: 2px 0 var(--neon-blue), -2px 0 var(--neon-green); }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 80px 1fr 1fr;
+            gap: 20px;
+            height: calc(100vh - 40px);
+        }
+
+        .header {
+            grid-column: 1 / -1;
+            border: 1px solid var(--neon-blue);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            background: rgba(0, 243, 255, 0.05);
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .panel {
+            border: 1px solid var(--neon-blue);
+            background: rgba(0, 10, 20, 0.8);
+            padding: 15px;
+            position: relative;
+        }
+        .panel h3 {
+            margin-top: 0;
+            border-bottom: 1px solid var(--neon-blue);
+            padding-bottom: 5px;
+            font-size: 0.9rem;
+            color: #fff;
+        }
+
+        .panel-red {
+            border-color: var(--neon-red);
+            box-shadow: 0 0 10px rgba(255, 0, 60, 0.2);
+        }
+        .panel-red h3 { border-bottom-color: var(--neon-red); color: var(--neon-red); }
+
+        /* Modules */
+        .reality-gap {
+            grid-column: 1 / 2;
+            grid-row: 2 / 3;
+        }
+        .snc-breach {
+            grid-column: 2 / 3;
+            grid-row: 2 / 3;
+        }
+        .mandate-7030 {
+            grid-column: 3 / 4;
+            grid-row: 2 / 3;
+        }
+        .terminal-log {
+            grid-column: 1 / 3;
+            grid-row: 3 / 4;
+            font-size: 0.8rem;
+            color: #888;
+            overflow-y: auto;
+        }
+        .system-status {
+            grid-column: 3 / 4;
+            grid-row: 3 / 4;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* Specific Vis Elements */
+        .big-number { font-size: 3rem; font-weight: bold; }
+        .gap-display { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 20px; }
+
+        .ticker-item {
+            padding: 10px;
+            border-bottom: 1px dashed #333;
+            color: var(--neon-red);
+        }
+
+        .btn-back {
+            color: var(--neon-blue);
+            text-decoration: none;
+            border: 1px solid var(--neon-blue);
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+        .btn-back:hover { background: var(--neon-blue); color: #000; }
+
+        /* Blink Animation */
+        .blink { animation: blinker 1s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
+
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-grid">
+        <div class="header">
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <span class="glitch">MACRO_GLITCH</span>
+                <span style="color: #fff; font-size: 0.8rem;">// MONITORING SYSTEM v4.0</span>
+            </div>
+            <div>
+                <span class="blink" style="color: var(--neon-red); margin-right: 20px;">⚠ CRITICAL ERROR DETECTED</span>
+                <a href="newsletter_market_mayhem_feb_02_2026.html" class="btn-back">EXIT</a>
+            </div>
+        </div>
+
+        <div class="panel reality-gap">
+            <h3>REALITY GAP (PRICE vs FUNDAMENTALS)</h3>
+            <div class="gap-display">
+                <div>
+                    <div style="font-size: 0.8rem; color: #aaa;">SPX PRICE</div>
+                    <div class="big-number" style="color: #fff;">6,942</div>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 0.8rem; color: #aaa;">FAIR VALUE</div>
+                    <div class="big-number" style="color: var(--neon-red);">5,120</div>
+                </div>
+            </div>
+            <div style="margin-top: 20px; height: 10px; background: #333; position: relative;">
+                <div style="position: absolute; left: 0; top: 0; height: 100%; width: 75%; background: var(--neon-blue);"></div>
+                <div style="position: absolute; right: 0; top: 0; height: 100%; width: 25%; background: var(--neon-red);"></div>
+                <div style="position: absolute; left: 75%; top: -5px; height: 20px; width: 2px; background: #fff;"></div>
+            </div>
+            <div style="text-align: center; margin-top: 10px; color: var(--neon-red);">DIVERGENCE: +35.6% (EXTREME)</div>
+        </div>
+
+        <div class="panel panel-red snc-breach">
+            <h3>SNC BREACH FEED (LIVE)</h3>
+            <div id="ticker-box" style="height: 150px; overflow: hidden;">
+                <!-- JS will populate -->
+            </div>
+        </div>
+
+        <div class="panel mandate-7030">
+            <h3>70/30 MANDATE ALLOCATION</h3>
+            <canvas id="allocationChart"></canvas>
+            <div style="text-align: center; margin-top: 10px; font-size: 0.8rem;">
+                <span style="color: var(--neon-green);">● QUALITY (70%)</span>
+                <span style="color: var(--neon-red); margin-left: 10px;">● CHAOS (30%)</span>
+            </div>
+        </div>
+
+        <div class="panel terminal-log">
+            <h3>SYSTEM LOG</h3>
+            <div id="log-output" style="font-family: 'Courier New', monospace;">
+                > INITIALIZING MACRO_GLITCH_MONITOR...<br>
+                > CONNECTING TO CONSENSUS_ENGINE... [OK]<br>
+                > READING VIX STREAM... 24.5 [WARNING]<br>
+                > CHECKING YIELD CURVE... 10Y > 2Y [RESET CONFIRMED]<br>
+                > SCANNING CREDIT SPREADS... WIDENING<br>
+                > DETECTED 4 NEW ZOMBIE PROCESSORS IN LAST 1HR<br>
+                > EXECUTING ORDER 70/30...<br>
+            </div>
+        </div>
+
+        <div class="panel system-status panel-red">
+            <h3 style="width: 100%; text-align: left;">THREAT LEVEL</h3>
+            <div style="font-size: 4rem; color: var(--neon-red); font-weight: bold;">DEFCON 2</div>
+            <div style="color: #fff;">LIQUIDITY EVAPORATION EVENT IMMINENT</div>
+            <div style="margin-top: 20px; border: 1px solid var(--neon-red); padding: 5px; width: 80%;">
+                VIX: 24.5 (+12%)
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 70/30 Chart
+        const ctx = document.getElementById('allocationChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Cash Flow / Quality', 'Distressed / Volatility'],
+                datasets: [{
+                    data: [70, 30],
+                    backgroundColor: ['#00ff41', '#ff003c'],
+                    borderColor: '#000',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                cutout: '60%',
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // Ticker Feed
+        const tickerData = [
+            "ALERT: Titan Industrial (ICR 0.8x) missed coupon payment.",
+            "WARNING: HY Spread widened to 550bps.",
+            "ALERT: Apex Logistics downgrade to CCC-.",
+            "NOTICE: LBO volume down 90% YoY.",
+            "CRITICAL: Dark Pool liquidity at 5-year low."
+        ];
+
+        const tickerBox = document.getElementById('ticker-box');
+
+        function updateTicker() {
+            tickerBox.innerHTML = '';
+            tickerData.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'ticker-item';
+                div.innerText = `[${new Date().toLocaleTimeString()}] ${item}`;
+                tickerBox.appendChild(div);
+            });
+        }
+        updateTicker();
+
+        // Simulate Log
+        const logOutput = document.getElementById('log-output');
+        const logs = [
+            "Analyzing SPX/NDX correlation... BROKEN",
+            "Fed Liquidity Pump... FAILED",
+            "Retail Sentiment... MAX FEAR",
+            "Safe Haven Flows... GOLD, BTC UP"
+        ];
+
+        let i = 0;
+        setInterval(() => {
+            if (i < logs.length) {
+                logOutput.innerHTML += `> ${logs[i]}<br>`;
+                logOutput.scrollTop = logOutput.scrollHeight;
+                i++;
+            }
+        }, 1500);
+
+    </script>
+</body>
+</html>

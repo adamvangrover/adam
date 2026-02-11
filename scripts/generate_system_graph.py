@@ -7,7 +7,10 @@ from pathlib import Path
 
 # Configuration
 REPO_ROOT = "."
-OUTPUT_FILE = "showcase/data/system_knowledge_graph.json"
+OUTPUT_FILES = [
+    "showcase/data/system_knowledge_graph.json",
+    "services/v24_dashboard/public/data/system_knowledge_graph.json"
+]
 IGNORE_DIRS = {".git", ".venv", "node_modules", "__pycache__", "dist", "build", "env", "venv", "verification_artifacts"}
 IGNORE_FILES = {".DS_Store"}
 HOUSE_VIEW_DIR = "core/libraries_and_archives"
@@ -346,11 +349,13 @@ def generate_graph():
         "edges": edges
     }
 
-    os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
-    with open(OUTPUT_FILE, "w") as f:
-        json.dump(output, f, indent=2)
+    for output_file in OUTPUT_FILES:
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
+        with open(output_file, "w") as f:
+            json.dump(output, f, indent=2)
+        logger.info(f"Saved graph to {output_file}")
 
-    logger.info(f"Graph generated: {len(nodes)} nodes, {len(edges)} edges. Saved to {OUTPUT_FILE}")
+    logger.info(f"Graph generated: {len(nodes)} nodes, {len(edges)} edges.")
 
 if __name__ == "__main__":
     generate_graph()
