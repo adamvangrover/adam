@@ -1,0 +1,1899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v26.0 :: SYSTEM MAP</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #00f3ff;
+            --accent-color: #0aff60;
+            --bg-color: #050b14;
+            --panel-bg: rgba(5, 11, 20, 0.8);
+            --text-primary: #e0e0e0;
+            --text-muted: #888;
+            --panel-border: #333;
+        }
+        body { margin: 0; background: var(--bg-color); color: var(--text-primary); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Header */
+        .cyber-header {
+            height: 60px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; border-bottom: 1px solid var(--primary-color);
+            background: rgba(5, 11, 20, 0.95); position: sticky; top: 0; z-index: 100;
+        }
+
+        .scan-line { position: fixed; top: 0; left: 0; width: 100%; height: 2px; background: rgba(0, 243, 255, 0.1); animation: scan 3s linear infinite; pointer-events: none; z-index: 999; }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+
+        .cyber-btn {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 6px 12px;
+            border: 1px solid #444; color: var(--text-primary); background: rgba(0,0,0,0.3);
+            border-radius: 2px; text-transform: uppercase; text-decoration: none; display: inline-block;
+        }
+        .cyber-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
+
+        /* Grid */
+        .grid-container {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding: 40px;
+        }
+
+        .dir-card {
+            background: rgba(255, 255, 255, 0.03); border: 1px solid var(--panel-border);
+            border-radius: 4px; padding: 20px; transition: all 0.2s;
+        }
+        .dir-card:hover { border-color: var(--primary-color); background: rgba(255, 255, 255, 0.05); }
+
+        .dir-title {
+            font-family: 'JetBrains Mono', monospace; color: var(--accent-color);
+            border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; font-size: 0.9rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .file-list { list-style: none; padding: 0; margin: 0; }
+        .file-item { margin-bottom: 8px; font-size: 0.85rem; display: flex; align-items: center; }
+        .file-item a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .file-item a:hover { color: var(--primary-color); }
+        .file-icon { margin-right: 8px; opacity: 0.7; font-size: 0.8rem; }
+
+        /* Search */
+        .search-bar {
+            padding: 20px 40px; background: rgba(0,0,0,0.3); border-bottom: 1px solid #333;
+            display: flex; justify-content: center;
+        }
+        #search-input {
+            width: 100%; max-width: 600px; padding: 12px 20px;
+            background: rgba(0,0,0,0.5); border: 1px solid #444; color: white;
+            font-family: 'JetBrains Mono', monospace; font-size: 1rem; border-radius: 4px;
+        }
+        #search-input:focus { outline: none; border-color: var(--primary-color); }
+    </style>
+</head>
+<body>
+    <div class="scan-line"></div>
+
+    <header class="cyber-header">
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <h1 class="mono" style="margin: 0; font-size: 1.5rem; color: var(--primary-color); letter-spacing: 2px;">ADAM v26.0</h1>
+            <div class="mono" style="font-size: 0.8rem; color: #666; border-left: 1px solid #333; padding-left: 10px;">SYSTEM MAP</div>
+        </div>
+        <nav style="display: flex; gap: 10px;">
+            <a href="../index.html" class="cyber-btn">&uarr; ROOT</a>
+            <a href="index.html" class="cyber-btn">LEGACY SHOWCASE</a>
+            <a href="neural_dashboard.html" class="cyber-btn" style="border-color: var(--accent-color); color: var(--accent-color);">DASHBOARD</a>
+        </nav>
+    </header>
+
+    <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Search system artifacts (e.g., 'report', 'dashboard', 'agent')..." onkeyup="filterFiles()">
+    </div>
+
+    <div class="grid-container" id="grid">
+
+        <div class="dir-card">
+            <div class="dir-title">
+                <span>📂 ROOT</span>
+                <span style="font-size:0.7rem; opacity:0.5;">5 files</span>
+            </div>
+            <ul class="file-list">
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../index2.html">index2.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../index23.html">index23.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../index3.html">index3.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../index4.html">index4.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../readme.html">readme.html</a>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="dir-card">
+            <div class="dir-title">
+                <span>🧠 core/agents</span>
+                <span style="font-size:0.7rem; opacity:0.5;">1 files</span>
+            </div>
+            <ul class="file-list">
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../core/agents/model.html">model.html</a>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="dir-card">
+            <div class="dir-title">
+                <span>🧠 core/libraries_and_archives/newsletters</span>
+                <span style="font-size:0.7rem; opacity:0.5;">2 files</span>
+            </div>
+            <ul class="file-list">
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../core/libraries_and_archives/newsletters/MM06292025.html">MM06292025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../core/libraries_and_archives/newsletters/MM09192025.html">MM09192025.html</a>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="dir-card">
+            <div class="dir-title">
+                <span>🧠 core/libraries_and_archives/reports/snc_exam_results</span>
+                <span style="font-size:0.7rem; opacity:0.5;">1 files</span>
+            </div>
+            <ul class="file-list">
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../core/libraries_and_archives/reports/snc_exam_results/SNC_Guide.html">SNC_Guide.html</a>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="dir-card">
+            <div class="dir-title">
+                <span>🧠 core/newsletter_layout/templates</span>
+                <span style="font-size:0.7rem; opacity:0.5;">2 files</span>
+            </div>
+            <ul class="file-list">
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../core/newsletter_layout/templates/default.html">default.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../core/newsletter_layout/templates/modern.html">modern.html</a>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="dir-card">
+            <div class="dir-title">
+                <span>📂 docs/ui_archive_v1</span>
+                <span style="font-size:0.7rem; opacity:0.5;">33 files</span>
+            </div>
+            <ul class="file-list">
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/chatbot_index.html">chatbot_index.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">🤖</span>
+                    <a href="../docs/ui_archive_v1/core_agents_model.html">core_agents_model.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/core_libraries_and_archives_newsletters_MM06292025.html">core_libraries_and_archives_newsletters_MM06292025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/core_libraries_and_archives_newsletters_MM09192025.html">core_libraries_and_archives_newsletters_MM09192025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="../docs/ui_archive_v1/core_libraries_and_archives_reports_snc_exam_results_SNC_Guide.html">core_libraries_and_archives_reports_snc_exam_results_SNC_Guide.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/core_newsletter_layout_templates_default.html">core_newsletter_layout_templates_default.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/core_newsletter_layout_templates_modern.html">core_newsletter_layout_templates_modern.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/docs_chatbot-ui_index.html">docs_chatbot-ui_index.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/financial_digital_twin_fibo.html">financial_digital_twin_fibo.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/navigator.html">navigator.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/prompt_library_credit_lifecycle_index.html">prompt_library_credit_lifecycle_index.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/prompts_ICRPL.html">prompts_ICRPL.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/prompts_adam.html">prompts_adam.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/prompts_copilot.html">prompts_copilot.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/prompts_copilot2.html">prompts_copilot2.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/prompts_copilot3.html">prompts_copilot3.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/prompts_index.html">prompts_index.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/prompts_lib.html">prompts_lib.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/prompts_prompt_library.html">prompts_prompt_library.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/root_index.html">root_index.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/root_navigator.html">root_navigator.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/services_webapp_client_public_index.html">services_webapp_client_public_index.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">🖥️</span>
+                    <a href="../docs/ui_archive_v1/showcase_dashboard.html">showcase_dashboard.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/webapp_mockups_3d.html">webapp_mockups_3d.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/webapp_mockups_dash.html">webapp_mockups_dash.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/webapp_mockups_index.html">webapp_mockups_index.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/webapp_mockups_lab.html">webapp_mockups_lab.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/webapp_mockups_llm.html">webapp_mockups_llm.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/webapp_mockups_mission.html">webapp_mockups_mission.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/webapp_mockups_pd.html">webapp_mockups_pd.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/webapp_mockups_prompt.html">webapp_mockups_prompt.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="../docs/ui_archive_v1/webapp_mockups_report.html">webapp_mockups_report.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../docs/ui_archive_v1/webapp_mockups_v22.html">webapp_mockups_v22.html</a>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="dir-card">
+            <div class="dir-title">
+                <span>📂 financial_digital_twin</span>
+                <span style="font-size:0.7rem; opacity:0.5;">1 files</span>
+            </div>
+            <ul class="file-list">
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../financial_digital_twin/fibo.html">fibo.html</a>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="dir-card">
+            <div class="dir-title">
+                <span>📂 notebooks</span>
+                <span style="font-size:0.7rem; opacity:0.5;">1 files</span>
+            </div>
+            <ul class="file-list">
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../notebooks/ICAT.html">ICAT.html</a>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="dir-card">
+            <div class="dir-title">
+                <span>📂 prompts</span>
+                <span style="font-size:0.7rem; opacity:0.5;">7 files</span>
+            </div>
+            <ul class="file-list">
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../prompts/ICRPL.html">ICRPL.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../prompts/adam.html">adam.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../prompts/copilot.html">copilot.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../prompts/copilot2.html">copilot2.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../prompts/copilot3.html">copilot3.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../prompts/lib.html">lib.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../prompts/prompt_library.html">prompt_library.html</a>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="dir-card">
+            <div class="dir-title">
+                <span>⚙️ services/v24_dashboard/public</span>
+                <span style="font-size:0.7rem; opacity:0.5;">6 files</span>
+            </div>
+            <ul class="file-list">
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../services/v24_dashboard/public/crisis_simulator.html">crisis_simulator.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../services/v24_dashboard/public/macro_glitch_monitor.html">macro_glitch_monitor.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../services/v24_dashboard/public/market_mayhem.html">market_mayhem.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../services/v24_dashboard/public/system_knowledge_graph.html">system_knowledge_graph.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../services/v24_dashboard/public/terminal.html">terminal.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="../services/v24_dashboard/public/war_room_v2.html">war_room_v2.html</a>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="dir-card">
+            <div class="dir-title">
+                <span>🚀 showcase</span>
+                <span style="font-size:0.7rem; opacity:0.5;">208 files</span>
+            </div>
+            <ul class="file-list">
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="1987-10-23_Market_Mayhem.html">1987-10-23_Market_Mayhem.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="1987-10-23_market_mayhem.html">1987-10-23_market_mayhem.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="2008-09-19_Market_Mayhem.html">2008-09-19_Market_Mayhem.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="2008-09-19_market_mayhem.html">2008-09-19_market_mayhem.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="2020-03-20_Market_Mayhem.html">2020-03-20_Market_Mayhem.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="2020-03-20_market_mayhem.html">2020-03-20_market_mayhem.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="2022 Year in Review: Navigating a Turbulent Market.html">2022 Year in Review: Navigating a Turbulent Market.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="2023 Year in Review: A Year of Recovery and Resilience.html">2023 Year in Review: A Year of Recovery and Resilience.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="2024 Year in Review: Navigating Uncertainty and Transition.html">2024 Year in Review: Navigating Uncertainty and Transition.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">🤖</span>
+                    <a href="Agent_Alignment_Log_20251212.html">Agent_Alignment_Log_20251212.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="Alphabet_Inc_Credit_Risk_Rating_Report_20250309.html">Alphabet_Inc_Credit_Risk_Rating_Report_20250309.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="Deep_Dive_20251210.html">Deep_Dive_20251210.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="Equity_Research_20251210.html">Equity_Research_20251210.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="FE.html">FE.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="FE25.html">FE25.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="House_View_20251210.html">House_View_20251210.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="Industry_Report_20251210.html">Industry_Report_20251210.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="LULU_Deep_Dive.html">LULU_Deep_Dive.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="MM04042025.html">MM04042025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="MM05022025.html">MM05022025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="MM08292025.html">MM08292025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="MM10312025.html">MM10312025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="MM11132025.html">MM11132025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="MM12022025.html">MM12022025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="Market_Mayhem_20251209.html">Market_Mayhem_20251209.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="Market_Mayhem_20251210.html">Market_Mayhem_20251210.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="Model_Performance_Review_Q3_2025.html">Model_Performance_Review_Q3_2025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="Q1 2025 and Full Year Outlook: Navigating a Bifurcated Market.html">Q1 2025 and Full Year Outlook: Navigating a Bifurcated Market.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="Tech_Watch_20251210.html">Tech_Watch_20251210.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="Weekly_Recap_20251210.html">Weekly_Recap_20251210.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="aapl_CRAS_20250303.html">aapl_CRAS_20250303.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="aapl_snc_20250303.html">aapl_snc_20250303.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="adam_convergence_live_neural_link.html">adam_convergence_live_neural_link.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">🤖</span>
+                    <a href="agent_gallery.html">agent_gallery.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">🤖</span>
+                    <a href="agents.html">agents.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">🤖</span>
+                    <a href="agents2.html">agents2.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">🤖</span>
+                    <a href="agents_v2.html">agents_v2.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="ai_thematic_report.html">ai_thematic_report.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="amzn_company_report.html">amzn_company_report.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="analyst_os.html">analyst_os.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="analyst_os_v5.html">analyst_os_v5.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="analyst_os_vCredit.html">analyst_os_vCredit.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="avg_market.html">avg_market.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="avg_schedule.html">avg_schedule.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="avg_search.html">avg_search.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="brief.html">brief.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="chat.html">chat.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="codex.html">codex.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="credit_analyst_workstation.html">credit_analyst_workstation.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="credit_architect.html">credit_architect.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="credit_sentinel.html">credit_sentinel.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="credit_valuation_architect.html">credit_valuation_architect.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="crisis_response.html">crisis_response.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="crisis_simulator.html">crisis_simulator.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="crypto_outlook_2026.html">crypto_outlook_2026.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="crypto_price_target_report_20250311.html">crypto_price_target_report_20250311.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="daily_briefing.html">daily_briefing.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="daily_briefing_2026_02_28.html">daily_briefing_2026_02_28.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="daily_briefing_2026_03_01.html">daily_briefing_2026_03_01.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="daily_briefings_library.html">daily_briefings_library.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">🖥️</span>
+                    <a href="dashboard.html">dashboard.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="data.html">data.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="deep_dive.html">deep_dive.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="deep_dive_20251210.html">deep_dive_20251210.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="deployment.html">deployment.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="distressed_lbo.html">distressed_lbo.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="equity_research_20251210.html">equity_research_20251210.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="evolution.html">evolution.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="evolution_v2.html">evolution_v2.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="financial_engineering.html">financial_engineering.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="financial_twin.html">financial_twin.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">🖥️</span>
+                    <a href="full_market_dashboard.html">full_market_dashboard.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="future_lens.html">future_lens.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="geopolitics_market_impact_20250224.html">geopolitics_market_impact_20250224.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="geopolitics_thematic_report.html">geopolitics_thematic_report.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="googl_company_report.html">googl_company_report.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="graph.html">graph.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="house_view_20251210.html">house_view_20251210.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="house_view_2026_01_15.html">house_view_2026_01_15.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="house_view_2026_03_01.html">house_view_2026_03_01.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="house_view_library.html">house_view_library.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="index2.html">index2.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="industry_report_20251210.html">industry_report_20251210.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="institutional_radar.html">institutional_radar.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="jan30_liquidity_monitor.html">jan30_liquidity_monitor.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="knowledge_graph.html">knowledge_graph.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="leak_algo_logic.html">leak_algo_logic.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="liquidity_visualizer.html">liquidity_visualizer.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="live_house_view.html">live_house_view.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="live_market_pulse.html">live_market_pulse.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="lmt_company_report_20250224.html">lmt_company_report_20250224.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="macro_glitch_monitor.html">macro_glitch_monitor.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="macro_strategy.html">macro_strategy.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="market_coding_correlation.html">market_coding_correlation.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="market_mayhem_20251209.html">market_mayhem_20251209.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="market_mayhem_20251210.html">market_mayhem_20251210.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="market_mayhem_archive.html">market_mayhem_archive.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="market_mayhem_newsletter_july_2025.html">market_mayhem_newsletter_july_2025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="market_pulse_20250315.html">market_pulse_20250315.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="market_pulse_20250519.html">market_pulse_20250519.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="market_pulse_20250602.html">market_pulse_20250602.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="market_pulse_2026_02_20.html">market_pulse_2026_02_20.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="market_pulse_2026_03_05.html">market_pulse_2026_03_05.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="market_pulse_library.html">market_pulse_library.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="markets.html">markets.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="mission_control.html">mission_control.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="mission_control_v2.html">mission_control_v2.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="mm04042025.html">mm04042025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="mm05022025.html">mm05022025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="mm08292025.html">mm08292025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="mm10312025.html">mm10312025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="mm11132025.html">mm11132025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="mm12022025.html">mm12022025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="monte_carlo_visualizer.html">monte_carlo_visualizer.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="msft_company_report.html">msft_company_report.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="msft_company_report_20250224.html">msft_company_report_20250224.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">🖥️</span>
+                    <a href="narrative_dashboard_preview.html">narrative_dashboard_preview.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="navigator.html">navigator.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">🖥️</span>
+                    <a href="neural_dashboard.html">neural_dashboard.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_2025_02_07.html">newsletter_2025_02_07.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_2025_02_14.html">newsletter_2025_02_14.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_2025_02_21.html">newsletter_2025_02_21.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_2025_03_03.html">newsletter_2025_03_03.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_flash_nov_01_2025.html">newsletter_flash_nov_01_2025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem.html">newsletter_market_mayhem.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_apr_04_2025.html">newsletter_market_mayhem_apr_04_2025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_apr_2025.html">newsletter_market_mayhem_apr_2025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_aug_2025.html">newsletter_market_mayhem_aug_2025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_aug_29_2025.html">newsletter_market_mayhem_aug_29_2025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_dec_02_2025.html">newsletter_market_mayhem_dec_02_2025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_dec_2024.html">newsletter_market_mayhem_dec_2024.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_feb_01_2026.html">newsletter_market_mayhem_feb_01_2026.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_feb_02_2026.html">newsletter_market_mayhem_feb_02_2026.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_feb_06_2026.html">newsletter_market_mayhem_feb_06_2026.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_feb_14_2026.html">newsletter_market_mayhem_feb_14_2026.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_feb_2025.html">newsletter_market_mayhem_feb_2025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_jan_14_2026.html">newsletter_market_mayhem_jan_14_2026.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_jan_2025.html">newsletter_market_mayhem_jan_2025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_jan_2026.html">newsletter_market_mayhem_jan_2026.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_jan_31_2026.html">newsletter_market_mayhem_jan_31_2026.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_jul_2025.html">newsletter_market_mayhem_jul_2025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_jul_2025_v2.html">newsletter_market_mayhem_jul_2025_v2.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_jun_2022.html">newsletter_market_mayhem_jun_2022.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_jun_2025.html">newsletter_market_mayhem_jun_2025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_jun_29_2025.html">newsletter_market_mayhem_jun_29_2025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_mar_15_2026.html">newsletter_market_mayhem_mar_15_2026.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_mar_2000.html">newsletter_market_mayhem_mar_2000.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_mar_2020.html">newsletter_market_mayhem_mar_2020.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_mar_2025.html">newsletter_market_mayhem_mar_2025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_mar_2026.html">newsletter_market_mayhem_mar_2026.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_may_02_2025.html">newsletter_market_mayhem_may_02_2025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_may_2025.html">newsletter_market_mayhem_may_2025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_nov.html">newsletter_market_mayhem_nov.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_nov_13_2025.html">newsletter_market_mayhem_nov_13_2025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_oct.html">newsletter_market_mayhem_oct.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_oct_1929.html">newsletter_market_mayhem_oct_1929.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_oct_1987.html">newsletter_market_mayhem_oct_1987.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_oct_2025.html">newsletter_market_mayhem_oct_2025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_oct_31_2025.html">newsletter_market_mayhem_oct_31_2025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_sep_19_2025.html">newsletter_market_mayhem_sep_19_2025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_sep_2008.html">newsletter_market_mayhem_sep_2008.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_market_mayhem_sep_2025.html">newsletter_market_mayhem_sep_2025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="newsletter_weekly_sep_21_2025.html">newsletter_weekly_sep_21_2025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="nexus.html">nexus.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="nvda_company_report_20250225.html">nvda_company_report_20250225.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="nvda_company_report_20250226.html">nvda_company_report_20250226.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="nvda_company_report_20250226_final.html">nvda_company_report_20250226_final.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="os.html">os.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">🖥️</span>
+                    <a href="oswm_dashboard.html">oswm_dashboard.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="policy_center.html">policy_center.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">🖥️</span>
+                    <a href="portfolio_dashboard.html">portfolio_dashboard.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="prompt_alpha.html">prompt_alpha.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="prompts.html">prompts.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="quantum_infrastructure.html">quantum_infrastructure.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="quantum_search.html">quantum_search.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="report_2026_strategic_outlook.html">report_2026_strategic_outlook.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="report_great_bifurcation_2026.html">report_great_bifurcation_2026.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="report_zombie_processors_2026.html">report_zombie_processors_2026.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="reports.html">reports.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="research.html">research.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="retail_alpha.html">retail_alpha.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="risk_topography.html">risk_topography.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="robo_advisor.html">robo_advisor.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="scenario_lab.html">scenario_lab.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="sector_swarm.html">sector_swarm.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="snc_cover.html">snc_cover.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="snc_credit_heatmap.html">snc_credit_heatmap.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="software_industry_report.html">software_industry_report.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="software_industry_report_20250225.html">software_industry_report_20250225.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="strategy_7030_mandate.html">strategy_7030_mandate.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="swarm_orchestrator.html">swarm_orchestrator.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="system_brain.html">system_brain.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="system_knowledge_graph.html">system_knowledge_graph.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="tech_watch_20251210.html">tech_watch_20251210.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="terminal.html">terminal.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="terminal_profile.html">terminal_profile.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="top_10_meme_coins.html">top_10_meme_coins.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="trading.html">trading.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="ufos_terminal.html">ufos_terminal.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="unified_analyst_os.html">unified_analyst_os.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="unified_banking.html">unified_banking.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">🖥️</span>
+                    <a href="unified_banking_dashboard.html">unified_banking_dashboard.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="unified_credit_console.html">unified_credit_console.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="war_room.html">war_room.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="war_room_v2.html">war_room_v2.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">🖥️</span>
+                    <a href="wargame_dashboard.html">wargame_dashboard.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="weekly_macro_pulse_nov_2024.html">weekly_macro_pulse_nov_2024.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="weekly_recap_20251210.html">weekly_recap_20251210.html</a>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="dir-card">
+            <div class="dir-title">
+                <span>🚀 showcase/apps</span>
+                <span style="font-size:0.7rem; opacity:0.5;">18 files</span>
+            </div>
+            <ul class="file-list">
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="apps/black_scholes.html">black_scholes.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="apps/bond_pricer.html">bond_pricer.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="apps/capital_stack.html">capital_stack.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="apps/compliance_audit.html">compliance_audit.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="apps/comps.html">comps.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="apps/crisis_sim.html">crisis_sim.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="apps/dcf.html">dcf.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="apps/esg_monitor.html">esg_monitor.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="apps/lbo.html">lbo.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="apps/loan.html">loan.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="apps/ma_model.html">ma_model.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="apps/market_data.html">market_data.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="apps/monte_carlo.html">monte_carlo.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="apps/portfolio.html">portfolio.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="apps/prompt_alpha.html">prompt_alpha.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="apps/quantum_risk.html">quantum_risk.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="apps/ratios.html">ratios.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="apps/wacc.html">wacc.html</a>
+                </li>
+
+            </ul>
+        </div>
+
+        <div class="dir-card">
+            <div class="dir-title">
+                <span>🚀 showcase/archive_v2</span>
+                <span style="font-size:0.7rem; opacity:0.5;">42 files</span>
+            </div>
+            <ul class="file-list">
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/1987-10-23_market_mayhem.html">1987-10-23_market_mayhem.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/2008-09-19_market_mayhem.html">2008-09-19_market_mayhem.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/2020-03-20_market_mayhem.html">2020-03-20_market_mayhem.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/brief.html">brief.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/deep_dive_20251210.html">deep_dive_20251210.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/equity_research_20251210.html">equity_research_20251210.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/house_view_20251210.html">house_view_20251210.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="archive_v2/industry_report_20251210.html">industry_report_20251210.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/market_mayhem_20251209.html">market_mayhem_20251209.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/market_mayhem_20251210.html">market_mayhem_20251210.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/market_mayhem_newsletter_july_2025.html">market_mayhem_newsletter_july_2025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/market_pulse_20250315.html">market_pulse_20250315.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/market_pulse_20250519.html">market_pulse_20250519.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/market_pulse_20250602.html">market_pulse_20250602.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/mm04042025.html">mm04042025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/mm05022025.html">mm05022025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/mm08292025.html">mm08292025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/mm10312025.html">mm10312025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/mm11132025.html">mm11132025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/mm12022025.html">mm12022025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/newsletter_2025_02_07.html">newsletter_2025_02_07.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/newsletter_2025_02_14.html">newsletter_2025_02_14.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/newsletter_2025_02_21.html">newsletter_2025_02_21.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/newsletter_2025_03_03.html">newsletter_2025_03_03.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/newsletter_mm06292025.html">newsletter_mm06292025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/newsletter_mm09192025.html">newsletter_mm09192025.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="archive_v2/report_aapl_cras_20250303.html">report_aapl_cras_20250303.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="archive_v2/report_aapl_snc_20250303.html">report_aapl_snc_20250303.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="archive_v2/report_alphabet_inc_credit_risk_rating_report_20250309.html">report_alphabet_inc_credit_risk_rating_report_20250309.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="archive_v2/report_crypto_price_target_report_20250311.html">report_crypto_price_target_report_20250311.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="archive_v2/report_geopolitics_market_impact_20250224.html">report_geopolitics_market_impact_20250224.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="archive_v2/report_lmt_company_report_20250224.html">report_lmt_company_report_20250224.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="archive_v2/report_msft_company_report.html">report_msft_company_report.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="archive_v2/report_msft_company_report_20250224.html">report_msft_company_report_20250224.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="archive_v2/report_nvda_company_report_20250225.html">report_nvda_company_report_20250225.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="archive_v2/report_nvda_company_report_20250226.html">report_nvda_company_report_20250226.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="archive_v2/report_nvda_company_report_20250226_final.html">report_nvda_company_report_20250226_final.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="archive_v2/report_software_industry_report.html">report_software_industry_report.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📊</span>
+                    <a href="archive_v2/report_top_10_meme_coins.html">report_top_10_meme_coins.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/tech_watch_20251210.html">tech_watch_20251210.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/weekly_macro_pulse_nov_2024.html">weekly_macro_pulse_nov_2024.html</a>
+                </li>
+
+                <li class="file-item">
+                    <span class="file-icon">📄</span>
+                    <a href="archive_v2/weekly_recap_20251210.html">weekly_recap_20251210.html</a>
+                </li>
+
+            </ul>
+        </div>
+
+    </div>
+
+    <footer style="border-top: 1px solid var(--panel-border); padding: 40px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">
+        ADAM v26.0 | SYSTEM INDEX GENERATED AUTOMATICALLY
+    </footer>
+
+    <script>
+        function filterFiles() {
+            const input = document.getElementById('search-input');
+            const filter = input.value.toUpperCase();
+            const grid = document.getElementById('grid');
+            const cards = grid.getElementsByClassName('dir-card');
+
+            for (let i = 0; i < cards.length; i++) {
+                let card = cards[i];
+                let items = card.getElementsByClassName('file-item');
+                let cardVisible = false;
+
+                for (let j = 0; j < items.length; j++) {
+                    let item = items[j];
+                    let text = item.textContent || item.innerText;
+                    if (text.toUpperCase().indexOf(filter) > -1) {
+                        item.style.display = "";
+                        cardVisible = true;
+                    } else {
+                        item.style.display = "none";
+                    }
+                }
+
+                if (cardVisible) {
+                    card.style.display = "";
+                } else {
+                    card.style.display = "none";
+                }
+            }
+        }
+    </script>
+</body>
+</html>
