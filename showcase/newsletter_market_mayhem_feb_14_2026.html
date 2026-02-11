@@ -5,18 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADAM v23.5 :: MARKET MAYHEM</title>
     <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/nav.js" defer></script>
     <style>
         :root {
             --paper-bg: #fdfbf7;
             --ink-color: #1a1a1a;
             --accent-red: #cc0000;
+            --cyber-black: #050b14;
+            --cyber-blue: #00f3ff;
+            --cyber-green: #00ff00;
         }
+        body { margin: 0; background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }
 
-        /* Override base styles for a "Digital Paper" feel within the cyber frame */
-        .newsletter-container {
-            max-width: 900px;
+        .newsletter-wrapper {
+            max-width: 1200px;
             margin: 40px auto;
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 40px;
+            padding: 20px;
+        }
+        @media (max-width: 768px) { .newsletter-wrapper { grid-template-columns: 1fr; } }
+
+        .paper-sheet {
             background: var(--paper-bg);
             color: var(--ink-color);
             padding: 60px;
@@ -25,383 +40,324 @@
             position: relative;
         }
 
-        /* Cyber overlay effects */
-        .cyber-badge-overlay {
-            position: absolute;
-            top: -15px;
-            right: -15px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
-            padding: 8px 16px;
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            box-shadow: 0 0 15px var(--primary-glow);
-            z-index: 10;
-        }
-
         h1.title {
-            font-family: 'Playfair Display', serif;
-            font-size: 3.5rem;
-            border-bottom: 4px solid var(--ink-color);
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-            letter-spacing: -1px;
-            line-height: 1.1;
+            font-family: 'Playfair Display', serif; font-size: 3rem; border-bottom: 4px solid var(--ink-color);
+            padding-bottom: 20px; margin-bottom: 30px; letter-spacing: -1px; line-height: 1.1;
         }
-
-        .meta-header {
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid #ccc;
-            padding-bottom: 20px;
-            margin-bottom: 40px;
-            font-family: var(--font-sans);
-            font-size: 0.9rem;
-            color: #555;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
         h2 {
-            font-family: var(--font-sans);
-            font-weight: 700;
-            font-size: 1.5rem;
-            margin-top: 40px;
-            margin-bottom: 15px;
-            color: var(--accent-red);
-            border-left: 4px solid var(--accent-red);
-            padding-left: 15px;
+            font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1.2rem; margin-top: 40px;
+            margin-bottom: 15px; color: var(--accent-red); text-transform: uppercase; letter-spacing: 1px;
         }
+        p { line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
+        li { line-height: 1.6; margin-bottom: 10px; }
 
-        h3 {
-            font-family: var(--font-sans);
-            font-weight: 600;
-            font-size: 1.1rem;
-            margin-top: 25px;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        p {
-            line-height: 1.8;
-            margin-bottom: 20px;
-            font-size: 1.05rem;
-        }
-
-        ul {
-            margin-bottom: 20px;
-        }
-        li {
-            margin-bottom: 10px;
-            line-height: 1.6;
-        }
-
-        /* Data Viz Placeholders */
-        .chart-placeholder {
-            width: 100%;
-            height: 250px;
-            background: #eee;
-            border: 1px dashed #999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: var(--font-mono);
-            color: #666;
-            margin: 30px 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Table Styling */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 30px 0;
-            font-family: var(--font-sans);
-            font-size: 0.9rem;
-        }
-        .data-table th {
-            text-align: left;
-            border-bottom: 2px solid #000;
-            padding: 10px;
-            background: #f4f4f4;
-        }
-        .data-table td {
-            border-bottom: 1px solid #ddd;
-            padding: 10px;
-        }
-        .data-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        /* Sidebar/Grid Layout for Desktop */
-        @media (min-width: 1000px) {
-            .content-grid {
-                display: grid;
-                grid-template-columns: 2fr 1fr;
-                gap: 40px;
-            }
-            .sidebar {
-                border-left: 1px solid #ddd;
-                padding-left: 30px;
-            }
-        }
-
+        /* Cyber HUD Sidebar */
+        .cyber-sidebar { font-family: 'JetBrains Mono', monospace; }
         .sidebar-widget {
-            background: #f9f9f9;
-            padding: 20px;
-            margin-bottom: 30px;
-            border: 1px solid #eee;
+            border: 1px solid #333; background: rgba(5, 11, 20, 0.8); padding: 15px; margin-bottom: 20px;
+            backdrop-filter: blur(5px);
         }
-        .sidebar-widget h4 {
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            color: #666;
-            margin-top: 0;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+        .sidebar-title {
+            color: var(--cyber-blue); font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid #333;
+            padding-bottom: 8px; margin-bottom: 12px; letter-spacing: 1px;
         }
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; color: #aaa; }
+        .stat-val { color: #fff; font-weight: bold; }
 
-        .metric-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-        }
-        .metric-val {
-            font-weight: bold;
-        }
-        .positive { color: #10b981; }
-        .negative { color: #ef4444; }
+        .sentiment-bar { height: 4px; background: #333; margin-top: 5px; border-radius: 2px; overflow: hidden; }
+        .sentiment-fill { height: 100%; background: var(--cyber-blue); }
 
-        .back-link {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 100;
+        .tag-cloud { display: flex; flex-wrap: wrap; gap: 5px; }
+        .tag { background: #222; color: #ccc; padding: 2px 6px; font-size: 0.7rem; border-radius: 3px; border: 1px solid #444; }
+        .tag.ticker { color: var(--cyber-green); border-color: var(--cyber-green); }
+        .tag.agent { color: var(--cyber-blue); border-color: var(--cyber-blue); }
+
+        .cyber-btn {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 8px 16px; border: 1px solid #444;
+            color: #e0e0e0; background: rgba(0,0,0,0.8); text-decoration: none; display: inline-block;
         }
+        .cyber-btn:hover { border-color: var(--cyber-blue); color: var(--cyber-blue); }
     </style>
 </head>
 <body>
-    <div class="scan-line"></div>
-    <div class="scan-glow"></div>
+    <div style="max-width: 1400px; margin: 0 auto; padding: 20px; display:flex; justify-content:space-between; align-items:center;">
+        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
+    </div>
 
-    <a href="market_mayhem_archive.html" class="cyber-btn back-link">&larr; BACK TO ARCHIVE</a>
+    <div class="newsletter-wrapper">
+        <div class="paper-sheet">
+            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px;">
+                <span>2026-02-14</span>
+                <span>ID: 55f9c27e</span>
+            </div>
 
-    <div class="newsletter-container">
-        <div class="cyber-badge-overlay">
-            SECURE TRANSMISSION // ADAM v23.5
-        </div>
+            <h1 class="title">MARKET MAYHEM</h1>
 
-        <h1 class="title">MARKET MAYHEM</h1>
+            <!-- Dynamic Chart Injection Area if metrics exist -->
+            <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
+                <canvas id="financialChart"></canvas>
+            </div>
 
-        <div class="meta-header">
-            <div><strong>Date:</strong> February 14, 2026</div>
-            <div><strong>Source:</strong> Apex Financial Architect</div>
-            <div><strong>Clearance:</strong> UHNW / Institutional</div>
-        </div>
 
-        <div class="content-grid">
-            <div class="main-column">
-                <h2 style="margin-top:0;">📡 The Vibe Check: The "Trapdoor Opens"</h2>
-                <p style="font-size: 1.1rem; color: #333;">
-                    The "Hallucination Premium" we identified in January has begun to unwind. The S&P 500 has shed 300 points, testing support at <strong>6,650</strong>. The narrative has shifted from "Immaculate Disinflation" to "Stagflationary Siege."
+
+
+
+<div class="content-grid">
+<div class="main-column">
+<h2 style="margin-top:0;">📡 The Vibe Check: The "Trapdoor Opens"</h2>
+<p style="font-size: 1.1rem; color: #333;">
+                    The "Hallucination Premium" we identified in January has begun to unwind. The S&amp;P 500 has shed 300 points, testing support at <strong>6,650</strong>. The narrative has shifted from "Immaculate Disinflation" to "Stagflationary Siege."
                 </p>
-                <p>
+<p>
                     Liquidity is evaporating. The 10-year yield has pierced 5.1%, driven by the relentless inflationary pressure of <strong>Operation Absolute Resolve</strong> and the resulting "Energy Shock" (see below). The "Great Divergence" is now a convergence—downwards.
                 </p>
-                <p style="border-bottom: 1px solid #eee; padding-bottom: 20px;">
+<p style="border-bottom: 1px solid #eee; padding-bottom: 20px;">
                     We are moving from "Hedging" to "Active Defense." The "Fractured Ouroboros" event we predicted is here: supply chains are snapping, and the valuation fantasy is colliding with physical reality.
                 </p>
-
-                <h2>🗞️ Headlines from the Edge</h2>
-                <p>
-                    <strong>1. The Venezuelan Embargo</strong><br>
+<h2>🗞️ Headlines from the Edge</h2>
+<p>
+<strong>1. The Venezuelan Embargo</strong><br/>
                     Retaliatory sanctions following "Operation Absolute Resolve" have taken 2.5 million barrels per day offline. Tankers are idling in the Caribbean, and Gulf Coast refiners are running dry. Brent Crude has surged to <strong>$98/bbl</strong>. The energy risk premium is permanent.
                 </p>
-                <p>
-                    <strong>2. The AI CapEx Cliff</strong><br>
+<p>
+<strong>2. The AI CapEx Cliff</strong><br/>
                     Major Hyperscalers (Google, Meta) have hinted at a "strategic pause" in AI infrastructure spending, citing energy bottlenecks. NVDA is down 8% on the news. The infinite growth narrative has hit a power wall.
                 </p>
-
-                <h2>I. Macroeconomic Architecture</h2>
-
-                <h3>1.1 The Energy Tax</h3>
-                <p>
+<h2>I. Macroeconomic Architecture</h2>
+<h3>1.1 The Energy Tax</h3>
+<p>
                     With oil nearing $100, the consumer is being squeezed. Discretionary spending has collapsed (-4% MoM). This is textbook stagflation: rising costs into slowing growth.
                 </p>
-
-                <div class="chart-placeholder">
+<div class="chart-placeholder">
                     [CHART: BRENT CRUDE vs CONSUMER SENTIMENT]
-                    <br><span style="font-size: 0.8rem; margin-top: 10px;">Data Source: Adam v23.5 Knowledge Graph</span>
-                </div>
+                    <br/><span style="font-size: 0.8rem; margin-top: 10px;">Data Source: Adam v23.5 Knowledge Graph</span>
+</div>
+<h2>II. The New Asset Allocation: 80/20 Bunker</h2>
+<p>We are increasing our defensive posture.</p>
+<ul>
+<li><strong>The Fortress (80%):</strong> Short-Term Treasuries (40%), Physical Gold (20%), Energy/Commodities (20%).</li>
+<li><strong>The Hunt (20%):</strong> Sovereign Cyber-Defense (10%), Distressed Opportunities (10%).</li>
+</ul>
+<h2>📂 Deep Dive Annex: AlphaWave (AWAV)</h2>
+<p><strong>The Zero-Trust Moat</strong></p>
+<ul>
+<li><strong>Verdict:</strong> Strong Buy (Defensive Growth).</li>
+<li><strong>The Thesis:</strong> As geopolitical fragmentation accelerates, "Sovereign Cyber-Defense" is the only secular growth story left. AlphaWave's "Neural Shield" is the standard for critical infrastructure protection.</li>
+<li><strong>🚨 Live Catalyst:</strong> The company just secured the <strong>"Project Aegis"</strong> digital contract with the DoD. This is a 10-year, recurring revenue government contract that creates a valuation floor.</li>
+</ul>
+<h3>The "Hunt" Conviction List</h3>
+<table class="data-table">
+<thead>
+<tr>
+<th>Ticker</th>
+<th>Name</th>
+<th>Sector</th>
+<th>Conviction</th>
+<th>Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VOLT</td>
+<td>Volta Motors</td>
+<td>EV / Auto</td>
+<td><span class="cyber-badge badge-blue">HOLD</span></td>
+<td>$165.00</td>
+</tr>
+<tr>
+<td>AWAV</td>
+<td>AlphaWave</td>
+<td>Cyber</td>
+<td><span class="cyber-badge badge-green">HIGH</span></td>
+<td>$500.00</td>
+</tr>
+<tr>
+<td>CRML</td>
+<td>Critical Metals</td>
+<td>Materials</td>
+<td><span class="cyber-badge badge-green">HIGH</span></td>
+<td>$62.00</td>
+</tr>
+<tr>
+<td>BK</td>
+<td>BNY Mellon</td>
+<td>Financials</td>
+<td><span class="cyber-badge badge-blue">HOLD</span></td>
+<td>$92.00</td>
+</tr>
+<tr>
+<td>PLTR</td>
+<td>Palantir</td>
+<td>Defense</td>
+<td><span class="cyber-badge badge-green">HIGH</span></td>
+<td>$75.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sidebar">
+<div class="sidebar-widget">
+<h4>Simulated Performance (YTD)</h4>
+<div class="metric-row">
+<span>Adam v23.5:</span>
+<span class="metric-val positive">+28.2%</span>
+</div>
+<div class="metric-row">
+<span>Benchmark (60/40):</span>
+<span class="metric-val negative">-2.1%</span>
+</div>
+<div class="metric-row">
+<span>Alpha:</span>
+<span class="metric-val positive">+30.3%</span>
+</div>
+<h4 style="margin-top: 20px;">Key Movers (Feb)</h4>
+<div class="metric-row" style="flex-direction: column; gap: 4px;">
+<div style="font-weight: bold; color: #333;">Critical Metals (CRML)</div>
+<div style="font-size: 0.8rem; color: #10b981;">+38% (Tanbreez News)</div>
+</div>
+<div class="metric-row" style="flex-direction: column; gap: 4px; margin-top: 10px;">
+<div style="font-weight: bold; color: #333;">Nasdaq 100 (Short)</div>
+<div style="font-size: 0.8rem; color: #10b981;">+12% ROI</div>
+</div>
+</div>
+<div class="sidebar-widget">
+<h4>Market Pulse</h4>
+<div class="metric-row">
+<span>Street View:</span>
+<span class="metric-val negative">PANIC</span>
+</div>
+<div class="metric-row">
+<span>Internal:</span>
+<span class="metric-val positive">DEFENSIVE</span>
+</div>
+<h4 style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 10px;">Scenario Radar</h4>
+<div class="metric-row">
+<span>Caribbean Blockade:</span>
+<span class="metric-val negative">ACTIVE</span>
+</div>
+<div class="metric-row">
+<span>Cyber Paralysis:</span>
+<span class="metric-val negative">HIGH PROB</span>
+</div>
+<div class="metric-row">
+<span>Stagflation:</span>
+<span class="metric-val negative">CONFIRMED</span>
+</div>
+</div>
+<div class="sidebar-widget">
+<h4>Live Ticker (Sim)</h4>
+<div class="metric-row">
+<span>BTC-USD</span>
+<span class="metric-val negative">$98,450</span>
+</div>
+<div class="metric-row">
+<span>GOLD</span>
+<span class="metric-val positive">$4,350</span>
+</div>
+<div class="metric-row">
+<span>BRENT</span>
+<span class="metric-val positive">$98.20</span>
+</div>
+</div>
+<div class="sidebar-widget" style="background: #000; color: #0f0; font-family: 'JetBrains Mono'; padding: 10px;">
+<div style="border-bottom: 1px solid #333; margin-bottom: 5px; font-size: 0.7rem;">SYSTEM LOG</div>
+<div style="font-size: 0.7rem; opacity: 0.8;">
+                        &gt; DETECTED: CARIBBEAN BLOCKADE.<br/>
+                        &gt; ALERT: SUPPLY CHAIN RUPTURE.<br/>
+                        &gt; EXECUTING: 'DEFCON 2' PROTOCOL.<br/>
+                        &gt; ALLOCATION: MAX DEFENSE.<br/>
+                        &gt; GENERATING REPORT...
+                    </div>
+</div>
+</div>
+</div>
 
-                <h2>II. The New Asset Allocation: 80/20 Bunker</h2>
-                <p>We are increasing our defensive posture.</p>
 
-                <ul>
-                    <li><strong>The Fortress (80%):</strong> Short-Term Treasuries (40%), Physical Gold (20%), Energy/Commodities (20%).</li>
-                    <li><strong>The Hunt (20%):</strong> Sovereign Cyber-Defense (10%), Distressed Opportunities (10%).</li>
-                </ul>
 
-                <h2>📂 Deep Dive Annex: AlphaWave (AWAV)</h2>
-                <p><strong>The Zero-Trust Moat</strong></p>
-                <ul>
-                    <li><strong>Verdict:</strong> Strong Buy (Defensive Growth).</li>
-                    <li><strong>The Thesis:</strong> As geopolitical fragmentation accelerates, "Sovereign Cyber-Defense" is the only secular growth story left. AlphaWave's "Neural Shield" is the standard for critical infrastructure protection.</li>
-                    <li><strong>🚨 Live Catalyst:</strong> The company just secured the <strong>"Project Aegis"</strong> digital contract with the DoD. This is a 10-year, recurring revenue government contract that creates a valuation floor.</li>
-                </ul>
-
-                <h3>The "Hunt" Conviction List</h3>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Ticker</th>
-                            <th>Name</th>
-                            <th>Sector</th>
-                            <th>Conviction</th>
-                            <th>Target</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>VOLT</td>
-                            <td>Volta Motors</td>
-                            <td>EV / Auto</td>
-                            <td><span class="cyber-badge badge-blue">HOLD</span></td>
-                            <td>$165.00</td>
-                        </tr>
-                        <tr>
-                            <td>AWAV</td>
-                            <td>AlphaWave</td>
-                            <td>Cyber</td>
-                            <td><span class="cyber-badge badge-green">HIGH</span></td>
-                            <td>$500.00</td>
-                        </tr>
-                        <tr>
-                            <td>CRML</td>
-                            <td>Critical Metals</td>
-                            <td>Materials</td>
-                            <td><span class="cyber-badge badge-green">HIGH</span></td>
-                            <td>$62.00</td>
-                        </tr>
-                        <tr>
-                            <td>BK</td>
-                            <td>BNY Mellon</td>
-                            <td>Financials</td>
-                            <td><span class="cyber-badge badge-blue">HOLD</span></td>
-                            <td>$92.00</td>
-                        </tr>
-                        <tr>
-                            <td>PLTR</td>
-                            <td>Palantir</td>
-                            <td>Defense</td>
-                            <td><span class="cyber-badge badge-green">HIGH</span></td>
-                            <td>$75.00</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="sidebar">
-                <div class="sidebar-widget">
-                    <h4>Simulated Performance (YTD)</h4>
-                    <div class="metric-row">
-                        <span>Adam v23.5:</span>
-                        <span class="metric-val positive">+28.2%</span>
-                    </div>
-                    <div class="metric-row">
-                        <span>Benchmark (60/40):</span>
-                        <span class="metric-val negative">-2.1%</span>
-                    </div>
-                    <div class="metric-row">
-                        <span>Alpha:</span>
-                        <span class="metric-val positive">+30.3%</span>
-                    </div>
-
-                    <h4 style="margin-top: 20px;">Key Movers (Feb)</h4>
-                    <div class="metric-row" style="flex-direction: column; gap: 4px;">
-                        <div style="font-weight: bold; color: #333;">Critical Metals (CRML)</div>
-                        <div style="font-size: 0.8rem; color: #10b981;">+38% (Tanbreez News)</div>
-                    </div>
-                    <div class="metric-row" style="flex-direction: column; gap: 4px; margin-top: 10px;">
-                        <div style="font-weight: bold; color: #333;">Nasdaq 100 (Short)</div>
-                        <div style="font-size: 0.8rem; color: #10b981;">+12% ROI</div>
-                    </div>
-                </div>
-
-                <div class="sidebar-widget">
-                    <h4>Market Pulse</h4>
-                    <div class="metric-row">
-                        <span>Street View:</span>
-                        <span class="metric-val negative">PANIC</span>
-                    </div>
-                    <div class="metric-row">
-                        <span>Internal:</span>
-                        <span class="metric-val positive">DEFENSIVE</span>
-                    </div>
-
-                    <h4 style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 10px;">Scenario Radar</h4>
-                    <div class="metric-row">
-                        <span>Caribbean Blockade:</span>
-                        <span class="metric-val negative">ACTIVE</span>
-                    </div>
-                    <div class="metric-row">
-                        <span>Cyber Paralysis:</span>
-                        <span class="metric-val negative">HIGH PROB</span>
-                    </div>
-                    <div class="metric-row">
-                        <span>Stagflation:</span>
-                        <span class="metric-val negative">CONFIRMED</span>
-                    </div>
-                </div>
-
-                <div class="sidebar-widget">
-                    <h4>Live Ticker (Sim)</h4>
-                    <div class="metric-row">
-                        <span>BTC-USD</span>
-                        <span class="metric-val negative">$98,450</span>
-                    </div>
-                    <div class="metric-row">
-                        <span>GOLD</span>
-                        <span class="metric-val positive">$4,350</span>
-                    </div>
-                    <div class="metric-row">
-                        <span>BRENT</span>
-                        <span class="metric-val positive">$98.20</span>
-                    </div>
-                </div>
-
-                <div class="sidebar-widget" style="background: #000; color: #0f0; font-family: 'JetBrains Mono'; padding: 10px;">
-                    <div style="border-bottom: 1px solid #333; margin-bottom: 5px; font-size: 0.7rem;">SYSTEM LOG</div>
-                    <div style="font-size: 0.7rem; opacity: 0.8;">
-                        > DETECTED: CARIBBEAN BLOCKADE.<br>
-                        > ALERT: SUPPLY CHAIN RUPTURE.<br>
-                        > EXECUTING: 'DEFCON 2' PROTOCOL.<br>
-                        > ALLOCATION: MAX DEFENSE.<br>
-                        > GENERATING REPORT...
-                    </div>
-                </div>
+            <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
+                End of Transmission.
             </div>
         </div>
 
-        <div style="margin-top: 60px; font-size: 0.8rem; color: #999; border-top: 1px solid #eee; padding-top: 20px;">
-            <p><strong>Disclaimer:</strong> The information provided in this report is for informational purposes only and does not constitute financial advice. Investing involves risk, including the loss of principal. Prepared by Adam v23.5.</p>
-        </div>
+        <aside class="cyber-sidebar">
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Intelligence Metadata</div>
+                <div class="stat-row"><span>DATE</span> <span class="stat-val">2026-02-14</span></div>
+                <div class="stat-row"><span>TYPE</span> <span class="stat-val">NEWSLETTER</span></div>
+                <div class="stat-row"><span>CLASS</span> <span class="stat-val">UNCLASSIFIED</span></div>
+                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="55f9c27ebc1bc1c43d06c6b407b387ebbf284793a0b3a5aaf960d8a4ced177ee">55f9c27e</span></div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Sentiment Analysis</div>
+                <div class="stat-row"><span>SCORE</span> <span class="stat-val">71/100</span></div>
+                <div class="sentiment-bar">
+                    <div class="sentiment-fill" style="width: 71%;"></div>
+                </div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Detected Entities</div>
+                <div class="tag-cloud">
+                    <span class="tag">US</span>
+                </div>
+            </div>
+
+             <div class="sidebar-widget">
+                <div class="sidebar-title">Contributing Agents</div>
+                 <div style="display:flex; flex-direction:column; gap:5px;">
+                    <div style="font-size:0.75rem; color:#666;">System Core</div>
+                </div>
+            </div>
+        </aside>
     </div>
 
     <script>
-        // Simple animation to make the page feel alive
-        document.addEventListener('DOMContentLoaded', () => {
-            const logs = document.querySelector('.sidebar-widget:last-child div:last-child');
-            const newLog = document.createElement('div');
-            newLog.innerHTML = "> TRANSMISSION SECURE.";
-            setTimeout(() => { logs.appendChild(newLog); }, 1000);
-        });
+        // Chart Injection Logic
+        const metricsData = {};
+
+        if (metricsData && Object.keys(metricsData).length > 0) {
+            const ctx = document.getElementById('financialChart');
+            const container = document.getElementById('financialChartContainer');
+
+            // Basic parsing of metrics structure (assuming flat or Year->Val)
+            let labels = [];
+            let values = [];
+            let labelName = "Metric";
+
+            // Try to find a timeseries
+            for (const [key, val] of Object.entries(metricsData)) {
+                if (typeof val === 'object') {
+                    // Likely year -> value
+                    labels = Object.keys(val);
+                    values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
+                    labelName = key;
+                    break;
+                }
+            }
+
+            if (labels.length > 0) {
+                container.style.display = 'block';
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: labelName,
+                            data: values,
+                            backgroundColor: 'rgba(204, 0, 0, 0.5)',
+                            borderColor: '#cc0000',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: true } }
+                    }
+                });
+            }
+        }
     </script>
 </body>
 </html>

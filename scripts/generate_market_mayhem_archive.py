@@ -6,12 +6,14 @@ import yaml
 import hashlib
 from datetime import datetime
 from collections import Counter
+from bs4 import BeautifulSoup
 
 # --- Configuration ---
 OUTPUT_DIR = "showcase"
 SOURCE_DIRS = [
     "core/libraries_and_archives/newsletters",
     "core/libraries_and_archives/reports",
+    "core/libraries_and_archives/restored_newsletters",
     "core/libraries_and_archives/generated_content"
 ]
 SHOWCASE_DIR = "showcase"
@@ -116,7 +118,7 @@ def parse_date(date_str):
 
     if isinstance(date_str, (datetime,)):
         return date_str.strftime("%Y-%m-%d")
-    date_str = str(date_str)
+    date_str = str(date_str).strip()
 
     formats = [
         "%Y-%m-%d",
@@ -130,17 +132,30 @@ def parse_date(date_str):
 
     for fmt in formats:
         try:
-            return datetime.strptime(date_str.strip(), fmt).strftime("%Y-%m-%d")
+            return datetime.strptime(date_str, fmt).strftime("%Y-%m-%d")
         except ValueError:
             continue
 
+    # Regex Parsing with prioritization
+
+    # Check for MMDDYYYY (8 digits) specifically if it looks like month is first
+    # But YYYYMMDD is also 8 digits.
+    # Logic: if first 4 digits are > 1900, assume YYYYMMDD.
+    # If first 2 digits are <= 12, assume MMDDYYYY?
+
+    match_us = re.search(r'^(\d{2})[-_]?(\d{2})[-_]?(\d{4})$', date_str)
+    if match_us:
+        # MMDDYYYY or DDMMYYYY
+        return f"{match_us.group(3)}-{match_us.group(1)}-{match_us.group(2)}"
+
+    match_iso = re.search(r'^(\d{4})[-_]?(\d{2})[-_]?(\d{2})$', date_str)
+    if match_iso:
+         return f"{match_iso.group(1)}-{match_iso.group(2)}-{match_iso.group(3)}"
+
+    # Fallback to loose search
     match = re.search(r'(\d{4})[-_]?(\d{2})[-_]?(\d{2})', date_str)
     if match:
         return f"{match.group(1)}-{match.group(2)}-{match.group(3)}"
-
-    match_us = re.search(r'(\d{2})[-_]?(\d{2})[-_]?(\d{4})', date_str)
-    if match_us:
-        return f"{match_us.group(3)}-{match_us.group(1)}-{match_us.group(2)}"
 
     return date_str
 
@@ -208,9 +223,15 @@ def parse_json_file(filepath):
         elif date_match:
             date_str = parse_date(date_match.group(1).replace('_', '-'))
         else:
-             date_match_2 = re.search(r'(\d{4})[-_]?(\d{2})[-_]?(\d{2})', filename)
+             # Stricter Year Check (19xx or 20xx) to avoid matching MMDDYYYY as YYYYMMDD
+             date_match_2 = re.search(r'((?:19|20)\d{2})[-_]?(\d{2})[-_]?(\d{2})', filename)
              if date_match_2:
                  date_str = f"{date_match_2.group(1)}-{date_match_2.group(2)}-{date_match_2.group(3)}"
+             else:
+                 # Check for MMDDYYYY
+                 match_us = re.search(r'(\d{2})(\d{2})(\d{4})', filename)
+                 if match_us:
+                     date_str = f"{match_us.group(3)}-{match_us.group(1)}-{match_us.group(2)}"
 
         # Construct Body
         body_html = ""
@@ -244,7 +265,14 @@ def parse_json_file(filepath):
 
                     if 'metrics' in section:
                          # Capture metrics for this section for the body, but also potential chart
-                         body_html += format_dict_as_html(section['metrics'], 3)
+                         metrics_data = section['metrics']
+                         if isinstance(metrics_data, dict):
+                             body_html += format_dict_as_html(metrics_data, 3)
+                         elif isinstance(metrics_data, list):
+                             body_html += "<ul>"
+                             for m in metrics_data:
+                                 body_html += f"<li>{m}</li>"
+                             body_html += "</ul>"
 
 
         # Schema 2: 'analysis' dict
@@ -301,7 +329,8 @@ def parse_json_file(filepath):
             "provenance_hash": prov_hash,
             "filename": out_filename,
             "is_sourced": True,
-            "metrics_json": metrics_json
+            "metrics_json": metrics_json,
+            "source_priority": 2  # Higher priority than restored HTML
         }
     except Exception as e:
         print(f"Error processing {filepath}: {e}")
@@ -346,7 +375,8 @@ def parse_txt_file(filepath):
             "provenance_hash": prov_hash,
             "filename": filename.replace('.txt', '.html'),
             "is_sourced": True,
-            "metrics_json": "{}"
+            "metrics_json": "{}",
+            "source_priority": 2
         }
     except Exception as e:
         print(f"Error parsing TXT {filepath}: {e}")
@@ -364,11 +394,25 @@ def parse_markdown_file(filepath):
 
         date_match = re.search(r'\*\*Date:\*\* (.*?)$', content, re.MULTILINE)
         if not date_match:
-             date_match = re.search(r'(\d{4})[-_]?(\d{2})[-_]?(\d{2})', filename)
-             if date_match:
-                 raw_date = f"{date_match.group(1)}-{date_match.group(2)}-{date_match.group(3)}"
+             # Try to find date in Title (e.g., "Newsletter - July 14, 2025")
+             date_in_title = re.search(r'(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4}', title, re.IGNORECASE)
+             if date_in_title:
+                 raw_date = date_in_title.group(0)
              else:
-                 raw_date = "2025-01-01"
+                 # Try MMDDYYYY logic first for filename parsing if needed, but parse_date handles standard formats
+                 # If filename is MM04042025.md (04042025 matches YYYYMMDD with loose regex)
+
+                 # Stricter YYYYMMDD check
+                 date_match = re.search(r'((?:19|20)\d{2})[-_]?(\d{2})[-_]?(\d{2})', filename)
+                 if date_match:
+                     raw_date = f"{date_match.group(1)}-{date_match.group(2)}-{date_match.group(3)}"
+                 else:
+                     # Check for MMDDYYYY in filename
+                     match_us = re.search(r'(\d{2})(\d{2})(\d{4})', filename)
+                     if match_us:
+                         raw_date = f"{match_us.group(3)}-{match_us.group(1)}-{match_us.group(2)}"
+                     else:
+                         raw_date = "2025-01-01"
         else:
             raw_date = date_match.group(1)
 
@@ -422,6 +466,7 @@ def parse_markdown_file(filepath):
             "filename": filename.replace('.md', '.html').replace('.json', '.html'),
             "is_sourced": True,
             "metrics_json": "{}",
+            "source_priority": 2,
             "conviction": conviction_score,
             "critique": critique_text,
             "quality": quality_score
@@ -432,32 +477,97 @@ def parse_markdown_file(filepath):
         return None
 
 def parse_html_file(filepath):
-    """Parses metadata from existing HTML files in showcase."""
+    """Parses existing HTML files (legacy or generated) to extract metadata."""
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
             content = f.read()
+            # Reset file pointer for BS4
+            f.seek(0)
+            soup = BeautifulSoup(f, 'html.parser')
 
         filename = os.path.basename(filepath)
 
-        # Skip indices and dashboards
+        # Skip indices and dashboards if they are in the source list but not content
         if filename in ["index.html", "market_mayhem_archive.html", "daily_briefings_library.html",
                         "market_pulse_library.html", "house_view_library.html", "portfolio_dashboard.html",
                         "data.html", "reports.html", "agents.html", "chat.html"]:
             return None
 
-        # Extract Title
+        # --- Strategy 1: Extract from Legacy Newsletter Structure ---
+        container = soup.find('div', class_='newsletter-container')
+        if container:
+            # Extract Title
+            title_tag = soup.find('h1', class_='title')
+            title = title_tag.get_text(strip=True) if title_tag else "Untitled Newsletter"
+
+            # Extract Date
+            date_str = "2025-01-01"
+            meta_div = soup.find('div', class_='meta-header')
+            if meta_div:
+                for div in meta_div.find_all('div'):
+                    text = div.get_text(strip=True)
+                    if text.startswith("Date:"):
+                        date_str = parse_date(text.replace("Date:", "").strip())
+                        break
+            
+            # Extract Summary
+            summary = "Market analysis."
+            summary_p = soup.find('p', style=lambda s: s and 'italic' in s)
+            if summary_p:
+                summary = summary_p.get_text(strip=True).replace("Executive Summary:", "").strip()
+
+            # Extract Type
+            type_badge = soup.find('div', class_='cyber-badge-overlay')
+            type_ = "NEWSLETTER"
+            if type_badge:
+                badge_text = type_badge.get_text(strip=True)
+                if "WEEKLY" in badge_text: type_ = "WEEKLY_RECAP"
+                elif "MONTHLY" in badge_text: type_ = "NEWSLETTER"
+                elif "FLASH" in badge_text: type_ = "MARKET_PULSE"
+
+            # Extract Body (cleaning up)
+            for match in container.find_all(['h1', 'div'], class_=['title', 'meta-header', 'cyber-badge-overlay', 'back-link']):
+                match.decompose()
+            disclaimers = container.find_all('div', style=lambda s: s and 'border-top' in s)
+            for disc in disclaimers: disc.decompose()
+            
+            body_html = "".join([str(x) for x in container.contents])
+            
+            full_text = soup.get_text()
+            sentiment = analyze_sentiment(full_text)
+            entities = extract_entities(full_text)
+            prov_hash = calculate_provenance(full_text)
+
+            return {
+                "title": title,
+                "date": date_str,
+                "summary": summary,
+                "type": type_,
+                "full_body": body_html,
+                "sentiment_score": sentiment,
+                "entities": entities,
+                "provenance_hash": prov_hash,
+                "filename": filename,
+                "is_sourced": True, # Recovered content can be treated as sourced
+                "metrics_json": "{}",
+                "source_priority": 1 # Lower priority than MD/JSON
+            }
+
+        # --- Strategy 2: Extract from Generated/Generic HTML ---
+        
+        # Title
         title_match = re.search(r'<title>(?:ADAM v23\.5 :: )?(.*?)</title>', content, re.IGNORECASE)
         title = title_match.group(1).strip() if title_match else filename.replace('.html', '').replace('_', ' ')
 
-        # Determine Date (Filename Priority -> Content Regex)
-        date = "2025-01-01" # Default
-
+        # Date Logic (Filename Priority -> Content Regex)
+        date = "2025-01-01" 
+        
         # 1. MMXXXXYYYY format (e.g. MM09192025)
         mm_match = re.search(r'MM(\d{2})(\d{2})(\d{4})', filename)
         if mm_match:
             date = f"{mm_match.group(3)}-{mm_match.group(1)}-{mm_match.group(2)}"
         else:
-            # 2. Standard patterns
+            # 2. Standard patterns in filename
             date_match = re.search(r'(\d{4})[-_]?(\d{2})[-_]?(\d{2})', filename)
             if date_match:
                 date = f"{date_match.group(1)}-{date_match.group(2)}-{date_match.group(3)}"
@@ -467,7 +577,7 @@ def parse_html_file(filepath):
                 if content_date:
                     date = parse_date(content_date.group(1))
 
-        # Determine Type
+        # Type Logic
         type_ = "NEWSLETTER"
         lower_title = title.lower()
         if "deep dive" in lower_title or "deep_dive" in filename: type_ = "DEEP_DIVE"
@@ -478,7 +588,7 @@ def parse_html_file(filepath):
         elif "outlook" in lower_title or "strategy" in lower_title: type_ = "STRATEGY"
         elif "snc" in lower_title: type_ = "GUIDE"
 
-        # Sentiment Analysis
+        # Analysis
         sentiment = analyze_sentiment(content)
         entities = extract_entities(content)
         prov_hash = calculate_provenance(content)
@@ -488,12 +598,12 @@ def parse_html_file(filepath):
             "date": date,
             "summary": "Report content.",
             "type": type_,
-            "full_body": "", # No need to re-render body for existing HTML
+            "full_body": "", # No need to re-render body for existing HTML if we aren't regenerating it
             "sentiment_score": sentiment,
             "entities": entities,
             "provenance_hash": prov_hash,
             "filename": filename,
-            "is_sourced": False, # Do not overwrite existing HTML
+            "is_sourced": False, # Do not overwrite existing HTML unless it was the legacy kind
             "metrics_json": "{}"
         }
 
@@ -515,31 +625,10 @@ NEWSLETTER_DATA = [
         <h3>1. Executive Intelligence Summary: The Architecture of the New Regime</h3>
         <p>As markets open on January 12, 2026, the global financial system has decisively exited the post-pandemic transitional phase and entered a new, distinct market regime: the <strong>Reflationary Agentic Boom</strong>. This paradigm is defined by a paradoxical but potent combination of accelerating economic growth in the United States, sticky inflation floors driven by geopolitical fragmentation and tariffs, and a technological productivity shock moving from generative experimentation to "agentic" execution.</p>
         <p>The prevailing narrative of late 2024 and 2025—that the Federal Reserve's tightening cycle would inevitably induce a recession—has been falsified by the data. Instead, the US economy is tracking toward a robust 2.5% to 2.6% real GDP growth rate for 2026. This resilience is not merely a cyclical rebound but a structural shift powered by three pillars: the fiscal impulse of anticipated tax cuts, the capital expenditure (Capex) super-cycle associated with "Sovereign AI," and the integration of digital assets into the institutional balance sheet via new accounting standards.</p>
-
-        <h3>2. Macroeconomic Dynamics: The "No Landing" Reality</h3>
-        <p>The defining macroeconomic surprise of 2026 is the persistent exceptionalism of the United States economy. While consensus forecasts in 2024 predicted a hard landing, the actual trajectory has been one of re-acceleration. Current data indicates that the US is poised to outperform all other major developed economies.</p>
-        <p><strong>The Inflation Paradox:</strong> While growth is robust, the inflation battle has morphed rather than ended. We are currently witnessing a clash between two opposing secular forces: the inflationary pressure of geopolitical fragmentation and tariffs, versus the deflationary pressure of technological automation.</p>
-
-        <h3>3. The Sovereign AI Paradigm</h3>
-        <p>The most significant thematic evolution in 2026 is the shift from corporate AI adoption to "Sovereign AI." This concept posits that artificial intelligence infrastructure—data centers, foundation models, and the energy grids that power them—is not merely a commercial asset but a critical component of national security. Nations are building "AI Factories" to secure their digital borders.</p>
-        <p><strong>Implication:</strong> The "Sovereign AI Capex Floor" provides a baseline of demand for hardware (NVDA) and operating systems (PLTR) that is inelastic to interest rates.</p>
-
-        <h3>4. The Agentic Technology Revolution</h3>
-        <p>We are witnessing the transition from "Generative AI"—tools that create content—to "Agentic AI"—systems that execute work. This "Binary Big Bang" is reshaping labor markets and corporate efficiency. By automating cognitive labor, companies are reducing their operating leverage and suppressing wage inflation in white-collar sectors. This "Tech Deflation" is the counterweight to "Tariff Inflation".</p>
-
-        <h3>5. The New Crypto-Financial Architecture</h3>
-        <p>The year 2026 marks the definitive integration of cryptocurrency into the global financial architecture. The implementation of FASB ASU 2023-08 has unlocked corporate treasuries, allowing Bitcoin to be held at fair value. Combined with rumors of sovereign wealth accumulation (Qatar, Peru), this has established a valuation floor for Bitcoin above $100,000.</p>
-
-        <h3>8. Strategic Asset Allocation: The "Barbell" Strategy</h3>
-        <p>Given the confluence of "No Landing" growth, sticky inflation, and the Agentic Boom, a "Barbell" asset allocation strategy is optimal:</p>
-        <ul>
-            <li><strong>Leg 1 (Agentic Growth):</strong> Overweight AI Infrastructure (NVDA) and Sovereign Operating Systems (PLTR).</li>
-            <li><strong>Leg 2 (Sovereignty Hedge):</strong> Overweight Bitcoin (BTC) and Industrial Commodities (Copper).</li>
-            <li><strong>Underweight:</strong> Regional Banks and Consumer Discretionary firms reliant on cheap debt.</li>
-        </ul>
-        """
+        """,
+        "source_priority": 3 # Highest priority (Static)
     },
-     {
+    {
         "date": "2008-09-19",
         "title": "MARKET MAYHEM: THE LEHMAN MOMENT",
         "summary": "\"Existential Panic\". There are decades where nothing happens; and there are weeks where decades happen. This was one of those weeks. A 158-year-old bank vanished, the world's largest insurer was nationalized, and the money market broke the buck.",
@@ -550,7 +639,8 @@ NEWSLETTER_DATA = [
         <p><strong>The Week Wall Street Died.</strong> On Monday, September 15th, Lehman Brothers filed for the largest bankruptcy in U.S. history ($600B+ assets). The government let them fail, hoping to reduce moral hazard. The result was global panic.</p>
         <p>By Tuesday, AIG—the insurer of the world's financial system via CDS—was on the brink. The Fed stepped in with an $85B revolving credit facility, effectively nationalizing the company.</p>
         <p><strong>The Real Panic:</strong> The Reserve Primary Fund, a money market fund considered 'as good as cash', broke the buck (NAV fell to $0.97) due to Lehman exposure. This triggered a $140B run on money market funds, freezing the commercial paper market. The gears of capitalism have ground to a halt.</p>
-        """
+        """,
+        "source_priority": 3
     },
     {
         "date": "1987-10-23",
@@ -563,7 +653,8 @@ NEWSLETTER_DATA = [
         <p><strong>The Crash.</strong> Monday, October 19th, will live in infamy. The Dow Jones Industrial Average collapsed 508 points, losing 22.6% of its value in a single session. Volume on the NYSE reached an unprecedented 604 million shares, leaving the ticker tape hours behind.</p>
         <p><strong>The Culprit:</strong> Program trading. 'Portfolio Insurance' strategies, designed to sell futures as the market falls to hedge portfolios, kicked in simultaneously. This selling pressure crushed the futures market, which dragged down the spot market in a vicious spiral.</p>
         <p><strong>The Aftermath:</strong> Alan Greenspan's Fed has issued a statement: 'The Federal Reserve, consistent with its responsibilities as the Nation's central bank, affirmed today its readiness to serve as a source of liquidity to support the economic and financial system.' The bleeding has stopped, but the scar remains.</p>
-        """
+        """,
+        "source_priority": 3
     },
      {
         "date": "2020-03-20",
@@ -577,7 +668,8 @@ NEWSLETTER_DATA = [
         <p>Volatility is off the charts. The VIX closed at 82.69 on March 16th, surpassing the 2008 peak. Credit spreads have blown out, and liquidity in the Treasury market—usually the deepest in the world—has evaporated.</p>
         <p><strong>Oil Shock:</strong> Demand destruction is so severe that WTI crude futures are trading at imminent risk of turning negative due to storage capacity constraints. (Update: They did, hitting -$37.63 in April).</p>
         <p><strong>Central Bank Response:</strong> The Fed has unleashed 'Unlimited QE', buying corporate bonds for the first time in history. The mantra is 'Don't Fight the Fed', but the economic data is catastrophic.</p>
-        """
+        """,
+        "source_priority": 3
     }
 ]
 
@@ -679,7 +771,6 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
             <h1 class="title">{title}</h1>
 
-            <!-- Dynamic Chart Injection Area if metrics exist -->
             <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
                 <canvas id="financialChart"></canvas>
             </div>
@@ -816,19 +907,61 @@ def get_all_data():
             if filepath.endswith(".json"): item = parse_json_file(filepath)
             elif filepath.endswith(".md"): item = parse_markdown_file(filepath)
             elif filepath.endswith(".txt"): item = parse_txt_file(filepath)
+            elif filepath.endswith(".html"): item = parse_html_file(filepath) # Handle recovered legacy HTML in source dirs
 
             if item: all_items.append(item)
 
     # 3. Scan Showcase for existing HTML Artifacts (Data Vault, Glitches, Newsletters)
+    # This captures files that might not be in source dirs but exist in the output folder
     if os.path.exists(SHOWCASE_DIR):
         files = glob.glob(os.path.join(SHOWCASE_DIR, "*.html"))
         for filepath in files:
             item = parse_html_file(filepath)
             if item: all_items.append(item)
 
-    # Deduplicate based on title/date
-    unique_items = {f"{i['date']}_{i['title']}": i for i in all_items}.values()
-    sorted_items = sorted(unique_items, key=lambda x: x['date'], reverse=True)
+    # Deduplicate
+    # We group by Date. If multiple items have the same date, we pick the one with highest priority.
+    # If same priority, we pick the first one or try to merge unique types.
+
+    grouped_by_date = {}
+    for item in all_items:
+        date = item['date']
+        if date not in grouped_by_date:
+            grouped_by_date[date] = []
+        grouped_by_date[date].append(item)
+
+    final_items = []
+    for date, items in grouped_by_date.items():
+        # Sort by priority (descending)
+        # Priority: Static (3) > Source MD/JSON (2) > Recovered HTML (1) > Existing Showcase HTML (0)
+        # Default source_priority for existing showcase HTML is effectively 0 or handled by is_sourced=False
+        
+        # Ensure priority exists
+        for i in items:
+            if 'source_priority' not in i: i['source_priority'] = 0 if not i.get('is_sourced', False) else 1
+
+        items.sort(key=lambda x: x.get('source_priority', 0), reverse=True)
+
+        # Logic: We might want multiple items for the same day if they are different types (e.g. Newsletter vs Deep Dive)
+        # But duplicates of the SAME content should be removed.
+        
+        unique_types = {}
+        for item in items:
+            t = item['type']
+            # Use title as a secondary key to allow multiple distinct reports of same type on same day
+            key = f"{t}_{item['title']}"
+            
+            if key not in unique_types:
+                unique_types[key] = item
+            else:
+                # If same type/title, pick higher priority
+                if item.get('source_priority', 0) > unique_types[key].get('source_priority', 0):
+                    unique_types[key] = item
+
+        for item in unique_types.values():
+            final_items.append(item)
+
+    sorted_items = sorted(final_items, key=lambda x: x['date'], reverse=True)
     return sorted_items
 
 def generate_archive():
@@ -836,11 +969,17 @@ def generate_archive():
 
     sorted_items = get_all_data()
 
-    # 3. Generate HTML Reports (Only for sourced items)
+    # 3. Generate HTML Reports (Only for sourced items that need generation)
     print(f"Generating report pages for sourced items...")
     count = 0
     for item in sorted_items:
-        if not item.get("is_sourced", False): continue
+        if not item.get("is_sourced", False) or not item.get("full_body"): 
+            continue
+        
+        # Only generate if it's a priority item (not just scraping existing showcase html)
+        if item.get("source_priority", 0) < 2:
+            continue
+
         count += 1
 
         # Build Entity HTML
@@ -886,8 +1025,13 @@ def generate_archive():
     # 4. Generate Main Archive Page (Cyber Dashboard)
 
     # Prepare data for Chart.js
-    dates = [i['date'] for i in sorted_items][::-1]
-    sentiments = [i['sentiment_score'] for i in sorted_items][::-1]
+    # Filter to ensure we have valid dates for sorting
+    chart_items = [i for i in sorted_items if i['date'] and i['date'] != "2025-01-01"] # Filter out defaults for chart clarity if needed, or keep
+    # Sort chronological for chart
+    chart_items.sort(key=lambda x: x['date'])
+    
+    dates = [i['date'] for i in chart_items]
+    sentiments = [i['sentiment_score'] for i in chart_items]
 
     # Top Entities
     all_tickers = []
@@ -904,7 +1048,7 @@ def generate_archive():
             if year not in grouped: grouped[year] = []
             grouped[year].append(item)
 
-    tags_html = "".join([f'<span class="tag-cloud-item" onclick="setSearch(\'${t[0]}\')">${t[0]}</span>' for t in ticker_counts])
+    tags_html = "".join([f'<span class="tag-cloud-item" onclick="setSearch(\'{t[0]}\')">{t[0]}</span>' for t in ticker_counts])
 
     archive_html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -993,7 +1137,7 @@ def generate_archive():
             <i class="fas fa-archive text-cyan-400"></i>
             <h1 class="mono" style="margin: 0; font-size: 1.2rem; letter-spacing: 1px;">MARKET MAYHEM ARCHIVE</h1>
         </div>
-        <div class="mono" style="font-size: 0.8rem; color: #666;">v23.5.0</div>
+        <div class="mono" style="font-size: 0.8rem; color: #666;">v24.0.2</div>
     </header>
 
     <div class="dashboard-grid">
@@ -1054,8 +1198,12 @@ def generate_archive():
     # Inject Items
     for year in sorted(grouped.keys(), reverse=True):
         for item in grouped[year]:
+            # sanitize for data attributes
+            safe_title = item['title'].replace('"', "'").lower()
+            safe_summary = item['summary'].replace('"', "'").lower()
+            
             archive_html += f"""
-            <div class="archive-item type-{item['type']}" data-year="{year}" data-type="{item['type']}" data-title="{item['title'].lower()} {item['summary'].lower()}">
+            <div class="archive-item type-{item['type']}" data-year="{year}" data-type="{item['type']}" data-title="{safe_title} {safe_summary}">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">{item['date']}</span>
@@ -1071,8 +1219,10 @@ def generate_archive():
 
     # Historical
     for item in historical:
+         safe_title = item['title'].replace('"', "'").lower()
+         safe_summary = item['summary'].replace('"', "'").lower()
          archive_html += f"""
-            <div class="archive-item type-HISTORICAL" data-year="HISTORICAL" data-type="HISTORICAL" data-title="{item['title'].lower()}">
+            <div class="archive-item type-HISTORICAL" data-year="HISTORICAL" data-type="HISTORICAL" data-title="{safe_title} {safe_summary}">
                 <div style="flex-grow: 1;">
                      <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">{item['date']}</span>

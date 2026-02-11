@@ -3,125 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v23.5 :: MARKET MAYHEM (ARCHIVE)</title>
+    <title>ADAM v23.5 :: MARKET MAYHEM</title>
     <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/nav.js" defer></script>
     <style>
         :root {
-            --paper-bg: #fff;
+            --paper-bg: #fdfbf7;
             --ink-color: #1a1a1a;
-            --accent-red: #d90429;
+            --accent-red: #cc0000;
+            --cyber-black: #050b14;
+            --cyber-blue: #00f3ff;
+            --cyber-green: #00ff00;
         }
+        body { margin: 0; background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }
 
-        .newsletter-container {
-            max-width: 900px;
+        .newsletter-wrapper {
+            max-width: 1200px;
             margin: 40px auto;
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 40px;
+            padding: 20px;
+        }
+        @media (max-width: 768px) { .newsletter-wrapper { grid-template-columns: 1fr; } }
+
+        .paper-sheet {
             background: var(--paper-bg);
             color: var(--ink-color);
             padding: 60px;
-            font-family: 'Georgia', serif;
+            font-family: 'Georgia', 'Times New Roman', serif;
             box-shadow: 0 0 50px rgba(0,0,0,0.5);
             position: relative;
         }
 
-        .cyber-badge-overlay {
-            position: absolute;
-            top: -15px;
-            right: -15px;
-            background: #222;
-            border: 1px solid #666;
-            color: #ccc;
-            padding: 8px 16px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.8rem;
-            box-shadow: 0 0 5px rgba(0,0,0,0.5);
-            z-index: 10;
-        }
-
         h1.title {
-            font-family: 'Playfair Display', serif;
-            font-size: 3.5rem;
-            border-bottom: 4px solid var(--ink-color);
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-            letter-spacing: -1px;
-            line-height: 1.1;
+            font-family: 'Playfair Display', serif; font-size: 3rem; border-bottom: 4px solid var(--ink-color);
+            padding-bottom: 20px; margin-bottom: 30px; letter-spacing: -1px; line-height: 1.1;
         }
-
-        .meta-header {
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid #ccc;
-            padding-bottom: 20px;
-            margin-bottom: 40px;
-            font-family: 'Arial', sans-serif;
-            font-size: 0.9rem;
-            color: #555;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
         h2 {
-            font-family: 'Arial', sans-serif;
-            font-weight: 700;
-            font-size: 1.5rem;
-            margin-top: 40px;
-            margin-bottom: 15px;
-            color: var(--accent-red);
-            border-left: 4px solid var(--accent-red);
-            padding-left: 15px;
+            font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1.2rem; margin-top: 40px;
+            margin-bottom: 15px; color: var(--accent-red); text-transform: uppercase; letter-spacing: 1px;
         }
-
         p { line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
+        li { line-height: 1.6; margin-bottom: 10px; }
+
+        /* Cyber HUD Sidebar */
+        .cyber-sidebar { font-family: 'JetBrains Mono', monospace; }
+        .sidebar-widget {
+            border: 1px solid #333; background: rgba(5, 11, 20, 0.8); padding: 15px; margin-bottom: 20px;
+            backdrop-filter: blur(5px);
+        }
+        .sidebar-title {
+            color: var(--cyber-blue); font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid #333;
+            padding-bottom: 8px; margin-bottom: 12px; letter-spacing: 1px;
+        }
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; color: #aaa; }
+        .stat-val { color: #fff; font-weight: bold; }
+
+        .sentiment-bar { height: 4px; background: #333; margin-top: 5px; border-radius: 2px; overflow: hidden; }
+        .sentiment-fill { height: 100%; background: var(--cyber-blue); }
+
+        .tag-cloud { display: flex; flex-wrap: wrap; gap: 5px; }
+        .tag { background: #222; color: #ccc; padding: 2px 6px; font-size: 0.7rem; border-radius: 3px; border: 1px solid #444; }
+        .tag.ticker { color: var(--cyber-green); border-color: var(--cyber-green); }
+        .tag.agent { color: var(--cyber-blue); border-color: var(--cyber-blue); }
+
+        .cyber-btn {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 8px 16px; border: 1px solid #444;
+            color: #e0e0e0; background: rgba(0,0,0,0.8); text-decoration: none; display: inline-block;
+        }
+        .cyber-btn:hover { border-color: var(--cyber-blue); color: var(--cyber-blue); }
     </style>
 </head>
-<body style="background: #050b14;">
-    <a href="market_mayhem_archive.html" class="cyber-btn" style="position:fixed; top:20px; left:20px; color:#fff; font-family:'JetBrains Mono'; text-decoration:none;">&larr; BACK TO ARCHIVE</a>
+<body>
+    <div style="max-width: 1400px; margin: 0 auto; padding: 20px; display:flex; justify-content:space-between; align-items:center;">
+        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
+    </div>
 
-    <div class="newsletter-container">
-        <div class="cyber-badge-overlay">
-            ARCHIVE RECONSTRUCTION // SIMULATED
-        </div>
+    <div class="newsletter-wrapper">
+        <div class="paper-sheet">
+            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px;">
+                <span>2022-06-15</span>
+                <span>ID: 8136e618</span>
+            </div>
 
-        <h1 class="title">MARKET MAYHEM</h1>
+            <h1 class="title">MARKET MAYHEM</h1>
 
-        <div class="meta-header">
-            <div><strong>Date:</strong> June 15, 2022</div>
-            <div><strong>Source:</strong> Apex Financial Architect</div>
-            <div><strong>Context:</strong> The Inflation Shock</div>
-        </div>
+            <!-- Dynamic Chart Injection Area if metrics exist -->
+            <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
+                <canvas id="financialChart"></canvas>
+            </div>
 
-        <h2 style="margin-top:0;">📡 The Vibe Check: Transitory is Dead</h2>
-        <p>
+
+
+
+
+<h2 style="margin-top:0;">📡 The Vibe Check: Transitory is Dead</h2>
+<p>
             The verdict is in, and it is ugly. May CPI hit <strong>8.6%</strong>, shattering the "Peak Inflation" narrative. The Fed is officially behind the curve, and the market knows it.
         </p>
-        <p>
-            The S&P 500 has plunged into a confirmed Bear Market (-20% from highs). The "Fed Put" has become the "Fed Call"—they are calling for pain to kill demand.
+<p>
+            The S&amp;P 500 has plunged into a confirmed Bear Market (-20% from highs). The "Fed Put" has become the "Fed Call"—they are calling for pain to kill demand.
         </p>
-        <p>
-            <strong>The Signal:</strong> Liquidity is being drained at a record pace. Don't fight the Fed.
+<p>
+<strong>The Signal:</strong> Liquidity is being drained at a record pace. Don't fight the Fed.
         </p>
-
-        <h2>🗞️ Headlines from the Edge</h2>
-        <p>
-            <strong>1. 75 Basis Points.</strong><br>
+<h2>🗞️ Headlines from the Edge</h2>
+<p>
+<strong>1. 75 Basis Points.</strong><br/>
             The market is suddenly pricing in a 75bps hike at tomorrow's FOMC meeting. This would be the largest move since 1994. Powell is taking the gloves off.
         </p>
-        <p>
-            <strong>2. Crypto Winter.</strong><br>
+<p>
+<strong>2. Crypto Winter.</strong><br/>
             Bitcoin has crashed below $20,000 as Celsius Network pauses withdrawals. The leverage flush in the digital asset space is systemic.
         </p>
-
-        <h2>I. The End of Easy Money</h2>
-        <p>
+<h2>I. The End of Easy Money</h2>
+<p>
             For a decade, "Don't Fight the Fed" meant "Buy Stocks." Now it means "Sell Stocks." The regime of Zero Interest Rate Policy (ZIRP) is over.
         </p>
-
-        <h2>II. Conviction: Long Dollar (DXY)</h2>
-        <p>
+<h2>II. Conviction: Long Dollar (DXY)</h2>
+<p>
             Cash is no longer trash; it is the only safe haven. We are rotating into short-duration Treasuries and US Dollars.
         </p>
 
+
+            <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
+                End of Transmission.
+            </div>
+        </div>
+
+        <aside class="cyber-sidebar">
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Intelligence Metadata</div>
+                <div class="stat-row"><span>DATE</span> <span class="stat-val">2022-06-15</span></div>
+                <div class="stat-row"><span>TYPE</span> <span class="stat-val">NEWSLETTER</span></div>
+                <div class="stat-row"><span>CLASS</span> <span class="stat-val">UNCLASSIFIED</span></div>
+                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="8136e618801a1a63da4dc3a6254b27c0823cd5fdbe05e836fb3f09f8bfb85112">8136e618</span></div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Sentiment Analysis</div>
+                <div class="stat-row"><span>SCORE</span> <span class="stat-val">0/100</span></div>
+                <div class="sentiment-bar">
+                    <div class="sentiment-fill" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Detected Entities</div>
+                <div class="tag-cloud">
+                    <span class="tag">US</span>
+                </div>
+            </div>
+
+             <div class="sidebar-widget">
+                <div class="sidebar-title">Contributing Agents</div>
+                 <div style="display:flex; flex-direction:column; gap:5px;">
+                    <div style="font-size:0.75rem; color:#666;">System Core</div>
+                </div>
+            </div>
+        </aside>
     </div>
+
+    <script>
+        // Chart Injection Logic
+        const metricsData = {};
+
+        if (metricsData && Object.keys(metricsData).length > 0) {
+            const ctx = document.getElementById('financialChart');
+            const container = document.getElementById('financialChartContainer');
+
+            // Basic parsing of metrics structure (assuming flat or Year->Val)
+            let labels = [];
+            let values = [];
+            let labelName = "Metric";
+
+            // Try to find a timeseries
+            for (const [key, val] of Object.entries(metricsData)) {
+                if (typeof val === 'object') {
+                    // Likely year -> value
+                    labels = Object.keys(val);
+                    values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
+                    labelName = key;
+                    break;
+                }
+            }
+
+            if (labels.length > 0) {
+                container.style.display = 'block';
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: labelName,
+                            data: values,
+                            backgroundColor: 'rgba(204, 0, 0, 0.5)',
+                            borderColor: '#cc0000',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: true } }
+                    }
+                });
+            }
+        }
+    </script>
 </body>
 </html>

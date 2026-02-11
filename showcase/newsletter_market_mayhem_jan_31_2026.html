@@ -3,20 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v23.5 :: MARKET MAYHEM - Jan 31, 2026</title>
+    <title>ADAM v23.5 :: MARKET MAYHEM</title>
     <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/nav.js" defer></script>
     <style>
         :root {
             --paper-bg: #fdfbf7;
             --ink-color: #1a1a1a;
             --accent-red: #cc0000;
+            --cyber-black: #050b14;
+            --cyber-blue: #00f3ff;
+            --cyber-green: #00ff00;
         }
+        body { margin: 0; background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }
 
-        /* Override base styles for a "Digital Paper" feel within the cyber frame */
-        .newsletter-container {
-            max-width: 900px;
+        .newsletter-wrapper {
+            max-width: 1200px;
             margin: 40px auto;
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 40px;
+            padding: 20px;
+        }
+        @media (max-width: 768px) { .newsletter-wrapper { grid-template-columns: 1fr; } }
+
+        .paper-sheet {
             background: var(--paper-bg);
             color: var(--ink-color);
             padding: 60px;
@@ -25,422 +40,347 @@
             position: relative;
         }
 
-        /* Cyber overlay effects */
-        .cyber-badge-overlay {
-            position: absolute;
-            top: -15px;
-            right: -15px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
-            padding: 8px 16px;
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            box-shadow: 0 0 15px var(--primary-glow);
-            z-index: 10;
-        }
-
         h1.title {
-            font-family: 'Playfair Display', serif;
-            font-size: 3.5rem;
-            border-bottom: 4px solid var(--ink-color);
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-            letter-spacing: -1px;
-            line-height: 1.1;
+            font-family: 'Playfair Display', serif; font-size: 3rem; border-bottom: 4px solid var(--ink-color);
+            padding-bottom: 20px; margin-bottom: 30px; letter-spacing: -1px; line-height: 1.1;
         }
-
-        .meta-header {
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid #ccc;
-            padding-bottom: 20px;
-            margin-bottom: 40px;
-            font-family: var(--font-sans);
-            font-size: 0.9rem;
-            color: #555;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
         h2 {
-            font-family: var(--font-sans);
-            font-weight: 700;
-            font-size: 1.5rem;
-            margin-top: 40px;
-            margin-bottom: 15px;
-            color: var(--accent-red);
-            border-left: 4px solid var(--accent-red);
-            padding-left: 15px;
+            font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1.2rem; margin-top: 40px;
+            margin-bottom: 15px; color: var(--accent-red); text-transform: uppercase; letter-spacing: 1px;
         }
+        p { line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
+        li { line-height: 1.6; margin-bottom: 10px; }
 
-        h3 {
-            font-family: var(--font-sans);
-            font-weight: 600;
-            font-size: 1.1rem;
-            margin-top: 25px;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        p {
-            line-height: 1.8;
-            margin-bottom: 20px;
-            font-size: 1.05rem;
-        }
-
-        ul {
-            margin-bottom: 20px;
-        }
-        li {
-            margin-bottom: 10px;
-            line-height: 1.6;
-        }
-
-        /* Data Viz Placeholders */
-        .chart-placeholder {
-            width: 100%;
-            height: 250px;
-            background: #eee;
-            border: 1px dashed #999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: var(--font-mono);
-            color: #666;
-            margin: 30px 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Table Styling */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 30px 0;
-            font-family: var(--font-sans);
-            font-size: 0.9rem;
-        }
-        .data-table th {
-            text-align: left;
-            border-bottom: 2px solid #000;
-            padding: 10px;
-            background: #f4f4f4;
-        }
-        .data-table td {
-            border-bottom: 1px solid #ddd;
-            padding: 10px;
-        }
-        .data-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        /* Sidebar/Grid Layout for Desktop */
-        @media (min-width: 1000px) {
-            .content-grid {
-                display: grid;
-                grid-template-columns: 2fr 1fr;
-                gap: 40px;
-            }
-            .sidebar {
-                border-left: 1px solid #ddd;
-                padding-left: 30px;
-            }
-        }
-
+        /* Cyber HUD Sidebar */
+        .cyber-sidebar { font-family: 'JetBrains Mono', monospace; }
         .sidebar-widget {
-            background: #f9f9f9;
-            padding: 20px;
-            margin-bottom: 30px;
-            border: 1px solid #eee;
+            border: 1px solid #333; background: rgba(5, 11, 20, 0.8); padding: 15px; margin-bottom: 20px;
+            backdrop-filter: blur(5px);
         }
-        .sidebar-widget h4 {
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            color: #666;
-            margin-top: 0;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+        .sidebar-title {
+            color: var(--cyber-blue); font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid #333;
+            padding-bottom: 8px; margin-bottom: 12px; letter-spacing: 1px;
         }
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; color: #aaa; }
+        .stat-val { color: #fff; font-weight: bold; }
 
-        .metric-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 8px;
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-        }
-        .metric-val {
-            font-weight: bold;
-        }
-        .positive { color: #10b981; }
-        .negative { color: #ef4444; }
-        .neutral { color: #f59e0b; }
+        .sentiment-bar { height: 4px; background: #333; margin-top: 5px; border-radius: 2px; overflow: hidden; }
+        .sentiment-fill { height: 100%; background: var(--cyber-blue); }
 
-        .cyber-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            font-family: 'JetBrains Mono', monospace;
-        }
-        .badge-green { background: #d1fae5; color: #065f46; border: 1px solid #059669; }
-        .badge-amber { background: #fef3c7; color: #92400e; border: 1px solid #d97706; }
-        .badge-blue { background: #dbeafe; color: #1e40af; border: 1px solid #2563eb; }
+        .tag-cloud { display: flex; flex-wrap: wrap; gap: 5px; }
+        .tag { background: #222; color: #ccc; padding: 2px 6px; font-size: 0.7rem; border-radius: 3px; border: 1px solid #444; }
+        .tag.ticker { color: var(--cyber-green); border-color: var(--cyber-green); }
+        .tag.agent { color: var(--cyber-blue); border-color: var(--cyber-blue); }
 
-        .back-link {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 100;
+        .cyber-btn {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 8px 16px; border: 1px solid #444;
+            color: #e0e0e0; background: rgba(0,0,0,0.8); text-decoration: none; display: inline-block;
         }
+        .cyber-btn:hover { border-color: var(--cyber-blue); color: var(--cyber-blue); }
     </style>
-    <script src="js/verification_overlay.js" defer></script>
 </head>
 <body>
-    <div class="scan-line"></div>
-    <div class="scan-glow"></div>
+    <div style="max-width: 1400px; margin: 0 auto; padding: 20px; display:flex; justify-content:space-between; align-items:center;">
+        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
+    </div>
 
-    <a href="market_mayhem_archive.html" class="cyber-btn back-link">&larr; BACK TO ARCHIVE</a>
+    <div class="newsletter-wrapper">
+        <div class="paper-sheet">
+            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px;">
+                <span>2026-01-31</span>
+                <span>ID: c0ec9260</span>
+            </div>
 
-    <div class="newsletter-container">
-        <div class="cyber-badge-overlay">
-            SECURE TRANSMISSION // ADAM v23.5
-        </div>
+            <h1 class="title">MARKET MAYHEM</h1>
 
-        <h1 class="title">MARKET MAYHEM</h1>
+            <!-- Dynamic Chart Injection Area if metrics exist -->
+            <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
+                <canvas id="financialChart"></canvas>
+            </div>
 
-        <div class="meta-header">
-            <div><strong>Date:</strong> January 31, 2026</div>
-            <div><strong>Source:</strong> Apex Financial Architect</div>
-            <div><strong>Clearance:</strong> UHNW / Institutional</div>
-        </div>
 
-        <div class="content-grid">
-            <div class="main-column">
-                <h2 style="margin-top:0;">🌩️ <span data-verify-id="THEME:bifurcation">The Great Divergence: Value vs. Velocity</span></h2>
-                <p style="font-size: 1.1rem; color: #333;">
+
+
+
+<div class="content-grid">
+<div class="main-column">
+<h2 style="margin-top:0;">🌩️ <span data-verify-id="THEME:bifurcation">The Great Divergence: Value vs. Velocity</span></h2>
+<p style="font-size: 1.1rem; color: #333;">
                     Welcome to Market Mayhem, your autonomous briefing on the chaos of capital. We have entered a phase of <strong>"Bifurcated Normalization."</strong> As interest rates begin to fall, the rising tide is not lifting all boats. Instead, we are seeing a violent separation between the <strong>"Infrastructure Realizers"</strong> (Hyperscalers converting backlog to revenue) and legacy franchises fighting for relevance.
                 </p>
-
-                <h2>📊 Market Pulse (The "Bifurcated" Reality)</h2>
-                <p>Snapshot taken late Jan 2026. The spread between "AI Earning" and "AI Spending" is widening.</p>
-
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Ticker</th>
-                            <th>Company</th>
-                            <th>Current Price</th>
-                            <th>12-Month Target</th>
-                            <th>Implied Upside</th>
-                            <th>Conviction</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr data-verify-id="POS:ORCL">
-                            <td>ORCL</td>
-                            <td>Oracle</td>
-                            <td>~$164.82</td>
-                            <td>$298.43</td>
-                            <td>+81.1%</td>
-                            <td><span class="cyber-badge badge-green">HIGH</span></td>
-                        </tr>
-                        <tr data-verify-id="POS:AMZN">
-                            <td>AMZN</td>
-                            <td>Amazon</td>
-                            <td>~$241.73</td>
-                            <td>$340.00</td>
-                            <td>+40.6%</td>
-                            <td><span class="cyber-badge badge-green">HIGH</span></td>
-                        </tr>
-                        <tr>
-                            <td>ADBE</td>
-                            <td>Adobe</td>
-                            <td>~$297.42</td>
-                            <td>$435.15</td>
-                            <td>+46.3%</td>
-                            <td><span class="cyber-badge badge-amber">MEDIUM</span></td>
-                        </tr>
-                        <tr data-verify-id="POS:NVDA">
-                            <td>NVDA</td>
-                            <td>Nvidia</td>
-                            <td>~$192.51</td>
-                            <td>$254.81</td>
-                            <td>+32.4%</td>
-                            <td><span class="cyber-badge badge-green">HIGH</span></td>
-                        </tr>
-                         <tr>
-                            <td>TSM</td>
-                            <td>Taiwan Semi</td>
-                            <td>~$339.55</td>
-                            <td>$392.00</td>
-                            <td>+15.5%</td>
-                            <td><span class="cyber-badge badge-green">HIGH</span></td>
-                        </tr>
-                        <tr>
-                            <td>MELI</td>
-                            <td>MercadoLibre</td>
-                            <td>~$2,161.39</td>
-                            <td>$2,841.00</td>
-                            <td>+31.4%</td>
-                            <td><span class="cyber-badge badge-green">HIGH</span></td>
-                        </tr>
-                        <tr>
-                            <td>BRK.B</td>
-                            <td>Berkshire</td>
-                            <td>~$497.88</td>
-                            <td>$585.00</td>
-                            <td>+17.5%</td>
-                            <td><span class="cyber-badge badge-green">HIGH</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <h2>🌪️ Executive Summary: The Infrastructure Realization</h2>
-                <h3>The Mood: "Show Me The Monetization"</h3>
-                <p>
+<h2>📊 Market Pulse (The "Bifurcated" Reality)</h2>
+<p>Snapshot taken late Jan 2026. The spread between "AI Earning" and "AI Spending" is widening.</p>
+<table class="data-table">
+<thead>
+<tr>
+<th>Ticker</th>
+<th>Company</th>
+<th>Current Price</th>
+<th>12-Month Target</th>
+<th>Implied Upside</th>
+<th>Conviction</th>
+</tr>
+</thead>
+<tbody>
+<tr data-verify-id="POS:ORCL">
+<td>ORCL</td>
+<td>Oracle</td>
+<td>~$164.82</td>
+<td>$298.43</td>
+<td>+81.1%</td>
+<td><span class="cyber-badge badge-green">HIGH</span></td>
+</tr>
+<tr data-verify-id="POS:AMZN">
+<td>AMZN</td>
+<td>Amazon</td>
+<td>~$241.73</td>
+<td>$340.00</td>
+<td>+40.6%</td>
+<td><span class="cyber-badge badge-green">HIGH</span></td>
+</tr>
+<tr>
+<td>ADBE</td>
+<td>Adobe</td>
+<td>~$297.42</td>
+<td>$435.15</td>
+<td>+46.3%</td>
+<td><span class="cyber-badge badge-amber">MEDIUM</span></td>
+</tr>
+<tr data-verify-id="POS:NVDA">
+<td>NVDA</td>
+<td>Nvidia</td>
+<td>~$192.51</td>
+<td>$254.81</td>
+<td>+32.4%</td>
+<td><span class="cyber-badge badge-green">HIGH</span></td>
+</tr>
+<tr>
+<td>TSM</td>
+<td>Taiwan Semi</td>
+<td>~$339.55</td>
+<td>$392.00</td>
+<td>+15.5%</td>
+<td><span class="cyber-badge badge-green">HIGH</span></td>
+</tr>
+<tr>
+<td>MELI</td>
+<td>MercadoLibre</td>
+<td>~$2,161.39</td>
+<td>$2,841.00</td>
+<td>+31.4%</td>
+<td><span class="cyber-badge badge-green">HIGH</span></td>
+</tr>
+<tr>
+<td>BRK.B</td>
+<td>Berkshire</td>
+<td>~$497.88</td>
+<td>$585.00</td>
+<td>+17.5%</td>
+<td><span class="cyber-badge badge-green">HIGH</span></td>
+</tr>
+</tbody>
+</table>
+<h2>🌪️ Executive Summary: The Infrastructure Realization</h2>
+<h3>The Mood: "Show Me The Monetization"</h3>
+<p>
                     The speculation phase is dead. The 2026-2027 horizon is defined by execution. The market is no longer impressed by "AI spending" (CapEx); it demands "AI earning" (Recognized Revenue). This explains the tension in stocks like Oracle, where a massive backlog must now be converted into cash flow to justify the premium.
                 </p>
-                <p>
-                    <strong>The Hedge:</strong> While Tech sprints, the "Old Economy" is transforming. With Warren Buffett’s retirement at the end of 2025, Berkshire Hathaway (sitting on ~$382B in cash) has morphed into a capital allocation engine under Greg Abel—providing a critical floor for value in a volatile world.
+<p>
+<strong>The Hedge:</strong> While Tech sprints, the "Old Economy" is transforming. With Warren Buffett’s retirement at the end of 2025, Berkshire Hathaway (sitting on ~$382B in cash) has morphed into a capital allocation engine under Greg Abel—providing a critical floor for value in a volatile world.
                 </p>
-
-                <h2>🚀 Top High-Conviction Plays (The "Alpha")</h2>
-
-                <h3>1. The "Pick & Shovel" Emperor: Oracle (ORCL)</h3>
-                <p><strong>Target: $298.43 (+81% Upside)</strong></p>
-                <p>
+<h2>🚀 Top High-Conviction Plays (The "Alpha")</h2>
+<h3>1. The "Pick &amp; Shovel" Emperor: Oracle (ORCL)</h3>
+<p><strong>Target: $298.43 (+81% Upside)</strong></p>
+<p>
                     The Thesis: Oracle is the aggressive IaaS scaling play. The market is underpricing the conversion of their massive backlog into recognized revenue. With potential TikTok monetization as a kicker, this is the highest upside play on the board.
                 </p>
-
-                <h3>2. The Cloud Sovereign: Amazon (AMZN)</h3>
-                <p><strong>Target: $340.00 (+40% Upside)</strong></p>
-                <p>
+<h3>2. The Cloud Sovereign: Amazon (AMZN)</h3>
+<p><strong>Target: $340.00 (+40% Upside)</strong></p>
+<p>
                     The Thesis: AWS margin expansion is being driven by the realization of AI infrastructure. As retail efficiency stabilizes, the cloud unit acts as a pure-play on the "sovereign silicon" shift.
                 </p>
-
-                <h3>3. The Supply Chain Monopoly: Nvidia (NVDA) & TSMC (TSM)</h3>
-                <p>
+<h3>3. The Supply Chain Monopoly: Nvidia (NVDA) &amp; TSMC (TSM)</h3>
+<p>
                     The Thesis: We are moving from component sales to "rack-scale" system architecture. Nvidia's transition to Blackwell/Rubin architectures and TSMC's stranglehold on advanced packaging (CoWoS) ensure capacity tightness—and pricing power—through 2027.
                 </p>
-
-                <h3>4. The Inflation Hedge: AngloGold Ashanti (AU)</h3>
-                <p>
+<h3>4. The Inflation Hedge: AngloGold Ashanti (AU)</h3>
+<p>
                     The Thesis: A momentum play on gold prices (forecasted at $2,750/oz). As monetary debasement continues, this miner offers operational turnaround leverage against a rising commodity backdrop.
                 </p>
-
-                <h2>🧠 Thematic Deep Dive: <span data-verify-id="THEME:capex_supercycle">The CapEx Supercycle</span></h2>
-                <p>
+<h2>🧠 Thematic Deep Dive: <span data-verify-id="THEME:capex_supercycle">The CapEx Supercycle</span></h2>
+<p>
                     The defining economic feature of 2026 is the Capital Expenditure Supercycle. Unlike previous software-led cycles, this one is heavy, physical, and expensive. It requires concrete, power plants, and cooling systems.
                 </p>
-                <p>
+<p>
                     The implication? Low interest rates are lowering the cost of capital for growth companies. This creates a "valuation floor" for long-duration assets like Adobe (ADBE) and CrowdStrike (CRWD). Simultaneously, cash-rich entities like Berkshire can no longer sit in Treasury bills; they must deploy capital to maintain ROE, effectively putting a bid under high-quality assets.
                 </p>
-
-                <div class="chart-placeholder">
+<div class="chart-placeholder">
                     [CHART: CAPEX INTENSITY vs INTEREST RATE FUTURES]
-                    <br><span style="font-size: 0.8rem; margin-top: 10px;">Data Source: Adam v23.5 Knowledge Graph</span>
-                </div>
-
-                <h2>🤖 Adam's Take</h2>
-                <p>
-                    Autonomous synthesis based on 2026 Outlook:<br>
-                    The data is simple, clear, and decisive.<br>
-                    Buy the builders (ORCL, NVDA) who own the infrastructure.<br>
-                    Buy the bunkers (BRK.B) who own the cash.<br>
+                    <br/><span style="font-size: 0.8rem; margin-top: 10px;">Data Source: Adam v23.5 Knowledge Graph</span>
+</div>
+<h2>🤖 Adam's Take</h2>
+<p>
+                    Autonomous synthesis based on 2026 Outlook:<br/>
+                    The data is simple, clear, and decisive.<br/>
+                    Buy the builders (ORCL, NVDA) who own the infrastructure.<br/>
+                    Buy the bunkers (BRK.B) who own the cash.<br/>
                     Avoid the middle. The market has no patience for unproven AI wrappers this year.
                 </p>
-            </div>
+</div>
+<div class="sidebar">
+<div class="sidebar-widget">
+<h4>Simulated Performance (YTD)</h4>
+<div class="metric-row">
+<span>Adam v23.5:</span>
+<span class="metric-val positive">+26.2%</span>
+</div>
+<div class="metric-row">
+<span>Benchmark (60/40):</span>
+<span class="metric-val">+4.8%</span>
+</div>
+<div class="metric-row">
+<span>Alpha:</span>
+<span class="metric-val positive">+21.4%</span>
+</div>
+</div>
+<div class="sidebar-widget">
+<h4>Market Pulse</h4>
+<div class="metric-row">
+<span>Street View:</span>
+<span class="metric-val neutral">SKEPTICAL</span>
+</div>
+<div class="metric-row">
+<span>Internal:</span>
+<span class="metric-val positive">AGGRESSIVE</span>
+</div>
+<h4 style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 10px;">Scenario Radar</h4>
+<div class="metric-row">
+<span>Bifurcation:</span>
+<span class="metric-val negative">ACTIVE</span>
+</div>
+<div class="metric-row">
+<span>Rate Cuts:</span>
+<span class="metric-val positive">IMMINENT</span>
+</div>
+<div class="metric-row">
+<span>AI Revenue:</span>
+<span class="metric-val positive">BREAKOUT</span>
+</div>
+</div>
+<div class="sidebar-widget">
+<h4>Live Ticker (Sim)</h4>
+<div class="metric-row">
+<span>ORCL</span>
+<span class="metric-val positive">$164.82</span>
+</div>
+<div class="metric-row">
+<span>AMZN</span>
+<span class="metric-val positive">$241.73</span>
+</div>
+<div class="metric-row">
+<span>NVDA</span>
+<span class="metric-val negative">$192.51</span>
+</div>
+</div>
+<div class="sidebar-widget" style="background: #000; color: #0f0; font-family: 'JetBrains Mono'; padding: 10px;">
+<div style="border-bottom: 1px solid #333; margin-bottom: 5px; font-size: 0.7rem;">SYSTEM LOG</div>
+<div style="font-size: 0.7rem; opacity: 0.8;">
+                        &gt; DETECTING BIFURCATION...<br/>
+                        &gt; ORACLE BACKLOG ANALYSIS COMPLETE.<br/>
+                        &gt; SHORTING LEGACY RETAIL...<br/>
+                        &gt; LONG 'INFRASTRUCTURE'...<br/>
+                        &gt; REPORT GENERATED.
+                    </div>
+</div>
+</div>
+</div>
 
-            <div class="sidebar">
-                <div class="sidebar-widget">
-                    <h4>Simulated Performance (YTD)</h4>
-                    <div class="metric-row">
-                        <span>Adam v23.5:</span>
-                        <span class="metric-val positive">+26.2%</span>
-                    </div>
-                    <div class="metric-row">
-                        <span>Benchmark (60/40):</span>
-                        <span class="metric-val">+4.8%</span>
-                    </div>
-                    <div class="metric-row">
-                        <span>Alpha:</span>
-                        <span class="metric-val positive">+21.4%</span>
-                    </div>
-                </div>
 
-                <div class="sidebar-widget">
-                    <h4>Market Pulse</h4>
-                    <div class="metric-row">
-                        <span>Street View:</span>
-                        <span class="metric-val neutral">SKEPTICAL</span>
-                    </div>
-                    <div class="metric-row">
-                        <span>Internal:</span>
-                        <span class="metric-val positive">AGGRESSIVE</span>
-                    </div>
 
-                    <h4 style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 10px;">Scenario Radar</h4>
-                    <div class="metric-row">
-                        <span>Bifurcation:</span>
-                        <span class="metric-val negative">ACTIVE</span>
-                    </div>
-                    <div class="metric-row">
-                        <span>Rate Cuts:</span>
-                        <span class="metric-val positive">IMMINENT</span>
-                    </div>
-                    <div class="metric-row">
-                        <span>AI Revenue:</span>
-                        <span class="metric-val positive">BREAKOUT</span>
-                    </div>
-                </div>
-
-                <div class="sidebar-widget">
-                    <h4>Live Ticker (Sim)</h4>
-                    <div class="metric-row">
-                        <span>ORCL</span>
-                        <span class="metric-val positive">$164.82</span>
-                    </div>
-                    <div class="metric-row">
-                        <span>AMZN</span>
-                        <span class="metric-val positive">$241.73</span>
-                    </div>
-                    <div class="metric-row">
-                        <span>NVDA</span>
-                        <span class="metric-val negative">$192.51</span>
-                    </div>
-                </div>
-
-                <div class="sidebar-widget" style="background: #000; color: #0f0; font-family: 'JetBrains Mono'; padding: 10px;">
-                    <div style="border-bottom: 1px solid #333; margin-bottom: 5px; font-size: 0.7rem;">SYSTEM LOG</div>
-                    <div style="font-size: 0.7rem; opacity: 0.8;">
-                        > DETECTING BIFURCATION...<br>
-                        > ORACLE BACKLOG ANALYSIS COMPLETE.<br>
-                        > SHORTING LEGACY RETAIL...<br>
-                        > LONG 'INFRASTRUCTURE'...<br>
-                        > REPORT GENERATED.
-                    </div>
-                </div>
+            <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
+                End of Transmission.
             </div>
         </div>
 
-        <div style="margin-top: 60px; font-size: 0.8rem; color: #999; border-top: 1px solid #eee; padding-top: 20px;">
-            <p><strong>Disclaimer:</strong> This content is for informational purposes only and does not constitute financial advice. Audit confirmed. Generated by Adam v23.5 Autonomous Financial Analyst.</p>
-        </div>
+        <aside class="cyber-sidebar">
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Intelligence Metadata</div>
+                <div class="stat-row"><span>DATE</span> <span class="stat-val">2026-01-31</span></div>
+                <div class="stat-row"><span>TYPE</span> <span class="stat-val">NEWSLETTER</span></div>
+                <div class="stat-row"><span>CLASS</span> <span class="stat-val">UNCLASSIFIED</span></div>
+                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="c0ec92604ac1f3656457215beb495a6713b3936a34be3833030d041a7e56c523">c0ec9260</span></div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Sentiment Analysis</div>
+                <div class="stat-row"><span>SCORE</span> <span class="stat-val">33/100</span></div>
+                <div class="sentiment-bar">
+                    <div class="sentiment-fill" style="width: 33%;"></div>
+                </div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Detected Entities</div>
+                <div class="tag-cloud">
+
+                </div>
+            </div>
+
+             <div class="sidebar-widget">
+                <div class="sidebar-title">Contributing Agents</div>
+                 <div style="display:flex; flex-direction:column; gap:5px;">
+                    <div style="font-size:0.75rem; color:#666;">System Core</div>
+                </div>
+            </div>
+        </aside>
     </div>
 
     <script>
-        // Simple animation to make the page feel alive
-        document.addEventListener('DOMContentLoaded', () => {
-            const logs = document.querySelector('.sidebar-widget:last-child div:last-child');
-            const newLog = document.createElement('div');
-            newLog.innerHTML = "> TRANSMISSION SECURE.";
-            setTimeout(() => { logs.appendChild(newLog); }, 1000);
-        });
+        // Chart Injection Logic
+        const metricsData = {};
+
+        if (metricsData && Object.keys(metricsData).length > 0) {
+            const ctx = document.getElementById('financialChart');
+            const container = document.getElementById('financialChartContainer');
+
+            // Basic parsing of metrics structure (assuming flat or Year->Val)
+            let labels = [];
+            let values = [];
+            let labelName = "Metric";
+
+            // Try to find a timeseries
+            for (const [key, val] of Object.entries(metricsData)) {
+                if (typeof val === 'object') {
+                    // Likely year -> value
+                    labels = Object.keys(val);
+                    values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
+                    labelName = key;
+                    break;
+                }
+            }
+
+            if (labels.length > 0) {
+                container.style.display = 'block';
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: labelName,
+                            data: values,
+                            backgroundColor: 'rgba(204, 0, 0, 0.5)',
+                            borderColor: '#cc0000',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: true } }
+                    }
+                });
+            }
+        }
     </script>
 </body>
 </html>

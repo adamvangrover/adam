@@ -3,196 +3,220 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MARKET MAYHEM: OCT 29, 1929</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <title>ADAM v23.5 :: MARKET MAYHEM</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/nav.js" defer></script>
     <style>
         :root {
-            --paper-bg: #f4eecf;
-            --ink-color: #2c241b;
-            --accent-red: #8b0000;
+            --paper-bg: #fdfbf7;
+            --ink-color: #1a1a1a;
+            --accent-red: #cc0000;
+            --cyber-black: #050b14;
+            --cyber-blue: #00f3ff;
+            --cyber-green: #00ff00;
         }
+        body { margin: 0; background: var(--cyber-black); color: #e0e0e0; font-family: 'Inter', sans-serif; }
 
-        body {
-            margin: 0;
-            background: #1a1a1a;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            color: var(--ink-color);
-        }
-
-        .newsletter-container {
-            max-width: 900px;
+        .newsletter-wrapper {
+            max-width: 1200px;
             margin: 40px auto;
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 40px;
+            padding: 20px;
+        }
+        @media (max-width: 768px) { .newsletter-wrapper { grid-template-columns: 1fr; } }
+
+        .paper-sheet {
             background: var(--paper-bg);
+            color: var(--ink-color);
             padding: 60px;
+            font-family: 'Georgia', 'Times New Roman', serif;
             box-shadow: 0 0 50px rgba(0,0,0,0.5);
             position: relative;
-            background-image: url('https://www.transparenttextures.com/patterns/aged-paper.png'); /* Fallback texture idea */
         }
 
-        /* Vintage Header */
         h1.title {
-            font-family: 'Cinzel', serif;
-            font-size: 4rem;
-            text-align: center;
-            border-bottom: 4px double var(--ink-color);
-            border-top: 4px double var(--ink-color);
-            padding: 20px 0;
-            margin-bottom: 10px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+            font-family: 'Playfair Display', serif; font-size: 3rem; border-bottom: 4px solid var(--ink-color);
+            padding-bottom: 20px; margin-bottom: 30px; letter-spacing: -1px; line-height: 1.1;
         }
-
-        .meta-header {
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--ink-color);
-            padding-bottom: 10px;
-            margin-bottom: 40px;
-            font-style: italic;
-            font-size: 1.1rem;
-        }
-
         h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: 2rem;
-            margin-top: 40px;
-            margin-bottom: 15px;
-            border-bottom: 1px solid var(--ink-color);
+            font-family: 'Inter', sans-serif; font-weight: 700; font-size: 1.2rem; margin-top: 40px;
+            margin-bottom: 15px; color: var(--accent-red); text-transform: uppercase; letter-spacing: 1px;
         }
+        p { line-height: 1.8; margin-bottom: 20px; font-size: 1.05rem; }
+        li { line-height: 1.6; margin-bottom: 10px; }
 
-        p {
-            line-height: 1.6;
-            margin-bottom: 20px;
-            font-size: 1.1rem;
-            text-align: justify;
+        /* Cyber HUD Sidebar */
+        .cyber-sidebar { font-family: 'JetBrains Mono', monospace; }
+        .sidebar-widget {
+            border: 1px solid #333; background: rgba(5, 11, 20, 0.8); padding: 15px; margin-bottom: 20px;
+            backdrop-filter: blur(5px);
         }
+        .sidebar-title {
+            color: var(--cyber-blue); font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid #333;
+            padding-bottom: 8px; margin-bottom: 12px; letter-spacing: 1px;
+        }
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; color: #aaa; }
+        .stat-val { color: #fff; font-weight: bold; }
 
-        .column-layout {
-            column-count: 2;
-            column-gap: 40px;
-            column-rule: 1px solid #ccc;
-        }
+        .sentiment-bar { height: 4px; background: #333; margin-top: 5px; border-radius: 2px; overflow: hidden; }
+        .sentiment-fill { height: 100%; background: var(--cyber-blue); }
 
-        .pull-quote {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
-            font-style: italic;
-            text-align: center;
-            margin: 30px 0;
-            padding: 20px;
-            border-top: 2px solid var(--ink-color);
-            border-bottom: 2px solid var(--ink-color);
-        }
+        .tag-cloud { display: flex; flex-wrap: wrap; gap: 5px; }
+        .tag { background: #222; color: #ccc; padding: 2px 6px; font-size: 0.7rem; border-radius: 3px; border: 1px solid #444; }
+        .tag.ticker { color: var(--cyber-green); border-color: var(--cyber-green); }
+        .tag.agent { color: var(--cyber-blue); border-color: var(--cyber-blue); }
 
-        .ticker-box {
-            background: #e8e4c9;
-            border: 2px solid var(--ink-color);
-            padding: 15px;
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 1.2rem;
+        .cyber-btn {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 8px 16px; border: 1px solid #444;
+            color: #e0e0e0; background: rgba(0,0,0,0.8); text-decoration: none; display: inline-block;
         }
-
-        .back-link {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: #000;
-            color: #fff;
-            padding: 10px 20px;
-            text-decoration: none;
-            font-family: monospace;
-            z-index: 100;
-        }
+        .cyber-btn:hover { border-color: var(--cyber-blue); color: var(--cyber-blue); }
     </style>
 </head>
 <body>
-    <a href="market_mayhem_archive.html" class="back-link">&larr; RETURN TO ARCHIVE</a>
+    <div style="max-width: 1400px; margin: 0 auto; padding: 20px; display:flex; justify-content:space-between; align-items:center;">
+        <a href="market_mayhem_archive.html" class="cyber-btn">&larr; RETURN TO ARCHIVE</a>
+        <div style="font-family:'JetBrains Mono'; font-size:0.7rem; color:#666;">SECURE CONNECTION ESTABLISHED</div>
+    </div>
 
-    <div class="newsletter-container">
-        <div style="text-align:center; font-style:italic; margin-bottom:10px;">Vol. I, No. 1 &mdash; "The End of an Era"</div>
-
-        <h1 class="title">MARKET MAYHEM</h1>
-
-        <div class="meta-header">
-            <div><strong>Date:</strong> October 29, 1929</div>
-            <div><strong>Location:</strong> Wall Street, NYC</div>
-            <div><strong>Price:</strong> Two Cents</div>
-        </div>
-
-        <div class="ticker-box">
-            LATEST TICKER: RCA 26... GE 210... US STEEL 174... (TAPE 2 HOURS LATE)
-        </div>
-
-        <h2 style="text-align:center; font-size: 2.5rem; margin-top:0;">PANIC!</h2>
-        <h3 style="text-align:center; font-family:'Playfair Display', serif; font-style:italic; margin-top:0;">16 Million Shares Dumped on Market &mdash; Billions in Paper Wealth Evaporates</h3>
-
-        <div class="column-layout">
-            <p>
-                <strong>NEW YORK &mdash;</strong> The "New Era" of permanent prosperity has come to a shattering, calamitous end. Today, in a frenzy of selling that overwhelmed the ticker tape and broke the spirit of the speculator class, the stock market collapsed.
-            </p>
-            <p>
-                From the opening bell, a terrified deluge of sell orders flooded the floor of the Exchange. Prices did not merely decline; they melted away. RCA, the darling of the age, plummeted 26 points. General Electric shed 28. Even the mighty U.S. Steel was not spared.
-            </p>
-            <p>
-                "It is a slaughter of the innocents," remarked one weeping trader outside 11 Wall Street. The margin clerks have been busy all afternoon, sending out the dreaded calls that no one can answer.
-            </p>
-
-            <div class="pull-quote">
-                "The ticker is running four hours late. No one knows the price of anything. We are flying blind into the abyss."
+    <div class="newsletter-wrapper">
+        <div class="paper-sheet">
+            <div style="display:flex; justify-content:space-between; font-family:'JetBrains Mono'; font-size:0.8rem; color:#666; margin-bottom:20px;">
+                <span>1929-10-29</span>
+                <span>ID: 00f7f994</span>
             </div>
 
-            <p>
-                Rumors swirl of suicides, though few are confirmed. Crowds have gathered at Trinity Church, praying for salvation not of their souls, but of their portfolios. The bankers&mdash;Morgan, Mitchell, Potter&mdash;met at noon, but this time, there was no bid to stop the bleeding. The pool has dried up.
+            <h1 class="title">MARKET MAYHEM</h1>
+
+            <!-- Dynamic Chart Injection Area if metrics exist -->
+            <div id="financialChartContainer" style="display:none; margin-bottom: 30px;">
+                <canvas id="financialChart"></canvas>
+            </div>
+
+
+<div style="text-align:center; font-style:italic; margin-bottom:10px;">Vol. I, No. 1 — "The End of an Era"</div>
+
+
+<div class="ticker-box">
+            LATEST TICKER: RCA 26... GE 210... US STEEL 174... (TAPE 2 HOURS LATE)
+        </div>
+<h2 style="text-align:center; font-size: 2.5rem; margin-top:0;">PANIC!</h2>
+<h3 style="text-align:center; font-family:'Playfair Display', serif; font-style:italic; margin-top:0;">16 Million Shares Dumped on Market — Billions in Paper Wealth Evaporates</h3>
+<div class="column-layout">
+<p>
+<strong>NEW YORK —</strong> The "New Era" of permanent prosperity has come to a shattering, calamitous end. Today, in a frenzy of selling that overwhelmed the ticker tape and broke the spirit of the speculator class, the stock market collapsed.
             </p>
-            <p>
+<p>
+                From the opening bell, a terrified deluge of sell orders flooded the floor of the Exchange. Prices did not merely decline; they melted away. RCA, the darling of the age, plummeted 26 points. General Electric shed 28. Even the mighty U.S. Steel was not spared.
+            </p>
+<p>
+                "It is a slaughter of the innocents," remarked one weeping trader outside 11 Wall Street. The margin clerks have been busy all afternoon, sending out the dreaded calls that no one can answer.
+            </p>
+<div class="pull-quote">
+                "The ticker is running four hours late. No one knows the price of anything. We are flying blind into the abyss."
+            </div>
+<p>
+                Rumors swirl of suicides, though few are confirmed. Crowds have gathered at Trinity Church, praying for salvation not of their souls, but of their portfolios. The bankers—Morgan, Mitchell, Potter—met at noon, but this time, there was no bid to stop the bleeding. The pool has dried up.
+            </p>
+<p>
                 President Hoover assures us that "the fundamental business of the country is on a sound and prosperous basis." But looking at the sea of red ink and broken dreams on the floor today, one wonders if the fundamental business of the country was merely gambling all along.
             </p>
-        </div>
+</div>
 
-        <div style="margin-top: 40px; border-top: 4px double var(--ink-color); padding-top: 20px;">
-            <h3 style="text-align:center; font-family:'Cinzel', serif;">MARKET STATISTICS</h3>
-            <table style="width:100%; border-collapse:collapse; margin-top:20px;">
-                <tr style="border-bottom: 1px solid #000;">
-                    <th style="text-align:left;">Security</th>
-                    <th style="text-align:right;">Open</th>
-                    <th style="text-align:right;">High</th>
-                    <th style="text-align:right;">Low</th>
-                    <th style="text-align:right;">Close</th>
-                    <th style="text-align:right;">Change</th>
-                </tr>
-                <tr>
-                    <td>Indus. Avg.</td>
-                    <td style="text-align:right;">252.38</td>
-                    <td style="text-align:right;">252.38</td>
-                    <td style="text-align:right;">230.07</td>
-                    <td style="text-align:right;">230.07</td>
-                    <td style="text-align:right; color:darkred;">-11.7%</td>
-                </tr>
-                <tr>
-                    <td>Gen. Motors</td>
-                    <td style="text-align:right;">39.25</td>
-                    <td style="text-align:right;">39.25</td>
-                    <td style="text-align:right;">33.50</td>
-                    <td style="text-align:right;">33.50</td>
-                    <td style="text-align:right; color:darkred;">-5.75</td>
-                </tr>
-                <tr>
-                    <td>Radio (RCA)</td>
-                    <td style="text-align:right;">40.25</td>
-                    <td style="text-align:right;">40.25</td>
-                    <td style="text-align:right;">26.00</td>
-                    <td style="text-align:right;">26.00</td>
-                    <td style="text-align:right; color:darkred;">-14.25</td>
-                </tr>
-            </table>
-        </div>
-
-        <div style="margin-top: 60px; text-align:center; font-size: 0.9rem; font-style:italic;">
+<div style="margin-top: 60px; text-align:center; font-size: 0.9rem; font-style:italic;">
             Printed by The Adam Press, 1929.
         </div>
+
+
+            <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; font-style: italic; color: #666;">
+                End of Transmission.
+            </div>
+        </div>
+
+        <aside class="cyber-sidebar">
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Intelligence Metadata</div>
+                <div class="stat-row"><span>DATE</span> <span class="stat-val">1929-10-29</span></div>
+                <div class="stat-row"><span>TYPE</span> <span class="stat-val">NEWSLETTER</span></div>
+                <div class="stat-row"><span>CLASS</span> <span class="stat-val">UNCLASSIFIED</span></div>
+                <div class="stat-row"><span>PROVENANCE</span> <span class="stat-val" title="00f7f9947fe3b8ee7abe31407308568a144301eb761dc43a4fbb1cdcc536b35c">00f7f994</span></div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Sentiment Analysis</div>
+                <div class="stat-row"><span>SCORE</span> <span class="stat-val">0/100</span></div>
+                <div class="sentiment-bar">
+                    <div class="sentiment-fill" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Detected Entities</div>
+                <div class="tag-cloud">
+                    <span class="tag">US</span>
+                </div>
+            </div>
+
+             <div class="sidebar-widget">
+                <div class="sidebar-title">Contributing Agents</div>
+                 <div style="display:flex; flex-direction:column; gap:5px;">
+                    <div style="font-size:0.75rem; color:#666;">System Core</div>
+                </div>
+            </div>
+        </aside>
     </div>
+
+    <script>
+        // Chart Injection Logic
+        const metricsData = {};
+
+        if (metricsData && Object.keys(metricsData).length > 0) {
+            const ctx = document.getElementById('financialChart');
+            const container = document.getElementById('financialChartContainer');
+
+            // Basic parsing of metrics structure (assuming flat or Year->Val)
+            let labels = [];
+            let values = [];
+            let labelName = "Metric";
+
+            // Try to find a timeseries
+            for (const [key, val] of Object.entries(metricsData)) {
+                if (typeof val === 'object') {
+                    // Likely year -> value
+                    labels = Object.keys(val);
+                    values = Object.values(val).map(v => parseFloat(v.replace(/[^0-9.-]/g, '')));
+                    labelName = key;
+                    break;
+                }
+            }
+
+            if (labels.length > 0) {
+                container.style.display = 'block';
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: labelName,
+                            data: values,
+                            backgroundColor: 'rgba(204, 0, 0, 0.5)',
+                            borderColor: '#cc0000',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: true } }
+                    }
+                });
+            }
+        }
+    </script>
 </body>
 </html>
