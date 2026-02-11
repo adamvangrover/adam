@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADAM v23.5 :: MARKET MAYHEM ARCHIVE</title>
+    <title>ADAM v24.1 :: MARKET MAYHEM ARCHIVE</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -77,6 +77,9 @@
         .type-DEEP_DIVE { border-left-color: #cc0000; }
         .type-MARKET_PULSE { border-left-color: #00f3ff; }
         .type-HISTORICAL { border-left-color: #666; }
+        .type-STRATEGY { border-left-color: #9900ff; }
+        .type-GUIDE { border-left-color: #33ff00; }
+        .type-COMPANY_REPORT { border-left-color: #ff9900; }
     </style>
 </head>
 <body>
@@ -85,7 +88,7 @@
             <i class="fas fa-archive text-cyan-400"></i>
             <h1 class="mono" style="margin: 0; font-size: 1.2rem; letter-spacing: 1px;">MARKET MAYHEM ARCHIVE</h1>
         </div>
-        <div class="mono" style="font-size: 0.8rem; color: #666;">v23.5.0</div>
+        <div class="mono" style="font-size: 0.8rem; color: #666;">v24.1.0 (MERGED)</div>
     </header>
 
     <div class="dashboard-grid">
@@ -97,6 +100,8 @@
                     <a href="market_pulse_library.html" class="cyber-btn" style="text-align:center;">MARKET PULSE</a>
                     <a href="house_view_library.html" class="cyber-btn" style="text-align:center;">HOUSE VIEW</a>
                     <a href="portfolio_dashboard.html" class="cyber-btn" style="text-align:center; border-color: #33ff00; color: #33ff00;">PORTFOLIO DASHBOARD</a>
+                    <a href="data.html" class="cyber-btn" style="text-align:center; border-color: #888; color: #aaa;">DATA VAULT</a>
+                    <a href="macro_glitch_monitor.html" class="cyber-btn" style="text-align:center; border-color: #ff00ff; color: #ff00ff;">GLITCH MONITOR</a>
                 </div>
             </div>
 
@@ -122,13 +127,16 @@
                     <option value="DEEP_DIVE">Deep Dive</option>
                     <option value="COMPANY_REPORT">Company Report</option>
                     <option value="MARKET_PULSE">Market Pulse</option>
+                    <option value="STRATEGY">Strategy</option>
                 </select>
             </div>
 
             <div class="filter-group">
                 <label class="filter-label">Top Entities</label>
                 <div>
-
+                    <span class="tag-cloud-item" onclick="setSearch('$CPU')">$CPU</span>
+                    <span class="tag-cloud-item" onclick="setSearch('$NVDA')">$NVDA</span>
+                    <span class="tag-cloud-item" onclick="setSearch('$BTC')">$BTC</span>
                 </div>
             </div>
         </aside>
@@ -140,215 +148,267 @@
 
             <div id="archiveGrid">
 
-            <div class="archive-item type-NEWSLETTER" data-year="2026" data-type="NEWSLETTER" data-title="the great bifurcation market analysis.">
+            <div class="archive-item type-NEWSLETTER" data-year="2026" data-type="NEWSLETTER" data-title="adam v24.0 :: market mayhem :: march 2026 report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-03-15</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 0</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 90</span>
                     </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">THE GREAT BIFURCATION</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market analysis.</p>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">ADAM v24.0 :: MARKET MAYHEM :: MARCH 2026</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
                 </div>
                 <a href="newsletter_market_mayhem_mar_15_2026.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-NEWSLETTER" data-year="2026" data-type="NEWSLETTER" data-title="market mayhem market analysis.">
+            <div class="archive-item type-NEWSLETTER" data-year="2026" data-type="NEWSLETTER" data-title="adam v24.0 :: market mayhem: absolute resolve report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2026-03-15</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 80</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">ADAM v24.0 :: MARKET MAYHEM: ABSOLUTE RESOLVE</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="newsletter_market_mayhem_mar_2026.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-MARKET_PULSE" data-year="2026" data-type="MARKET_PULSE" data-title="market pulse: the quantum leap report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2026-03-05</span>
+                        <span class="type-badge">MARKET_PULSE</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 100</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Market Pulse: The Quantum Leap</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="market_pulse_2026_03_05.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-NEWSLETTER" data-year="2026" data-type="NEWSLETTER" data-title="adam v24.0 :: daily briefing report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2026-03-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 80</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">ADAM v24.0 :: DAILY BRIEFING</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="daily_briefing_2026_03_01.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-NEWSLETTER" data-year="2026" data-type="NEWSLETTER" data-title="adam :: house view march 2026 report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2026-03-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 100</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">ADAM :: House View March 2026</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="house_view_2026_03_01.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-MARKET_PULSE" data-year="2026" data-type="MARKET_PULSE" data-title="market pulse: energy renaissance report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-20</span>
+                        <span class="type-badge">MARKET_PULSE</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 100</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Market Pulse: Energy Renaissance</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="market_pulse_2026_02_20.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-NEWSLETTER" data-year="2026" data-type="NEWSLETTER" data-title="market mayhem report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-14</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 71</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 88</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market analysis.</p>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
                 </div>
-                <a href="newsletter_market_mayhem_feb_14_2026.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+                <a href="newsletter_market_mayhem.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-NEWSLETTER" data-year="2026" data-type="NEWSLETTER" data-title="market mayhem market analysis.">
+            <div class="archive-item type-NEWSLETTER" data-year="2026" data-type="NEWSLETTER" data-title="adam v24.0 :: daily briefing report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-10</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 80</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">ADAM v24.0 :: DAILY BRIEFING</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="daily_briefing.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-NEWSLETTER" data-year="2026" data-type="NEWSLETTER" data-title="market mayhem: vol. 2026.02.06 report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-02</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 90</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Market Mayhem: Vol. 2026.02.06</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="newsletter_market_mayhem_feb_06_2026.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-NEWSLETTER" data-year="2026" data-type="NEWSLETTER" data-title="market mayhem: bifurcated normalization report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2026-02-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 92</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Market Mayhem: Bifurcated Normalization</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="newsletter_market_mayhem_feb_01_2026.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-NEWSLETTER" data-year="2026" data-type="NEWSLETTER" data-title="market mayhem - jan 31, 2026 report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-01-31</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 33</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 82</span>
                     </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market analysis.</p>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM - Jan 31, 2026</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
                 </div>
                 <a href="newsletter_market_mayhem_jan_31_2026.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-NEWSLETTER" data-year="2026" data-type="NEWSLETTER" data-title="market mayhem market analysis.">
+            <div class="archive-item type-NEWSLETTER" data-year="2026" data-type="NEWSLETTER" data-title="jan 30 liquidity event monitor report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2026-01-30</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 62</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Jan 30 Liquidity Event Monitor</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="jan30_liquidity_monitor.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-NEWSLETTER" data-year="2026" data-type="NEWSLETTER" data-title="adam :: house view jan 2026 report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2026-01-15</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 66</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">ADAM :: House View Jan 2026</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
+                </div>
+                <a href="house_view_2026_01_15.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-NEWSLETTER" data-year="2026" data-type="NEWSLETTER" data-title="market mayhem report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-01-14</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 40</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 79</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market analysis.</p>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
                 </div>
                 <a href="newsletter_market_mayhem_jan_14_2026.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-ANNUAL_STRATEGY" data-year="2026" data-type="ANNUAL_STRATEGY" data-title="global macro-strategic outlook 2026: the reflationary agentic boom as markets open on january 12, 2026, the global financial system has entered a new regime: the reflationary agentic boom.">
+            <div class="archive-item type-STRATEGY" data-year="2026" data-type="STRATEGY" data-title="global macro-strategic outlook 2026: the reflationary agentic boom report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2026-01-12</span>
-                        <span class="type-badge">ANNUAL_STRATEGY</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 77</span>
+                        <span class="type-badge">STRATEGY</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 75</span>
                     </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">GLOBAL MACRO-STRATEGIC OUTLOOK 2026: THE REFLATIONARY AGENTIC BOOM</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">As markets open on January 12, 2026, the global financial system has entered a new regime: the Reflationary Agentic Boom.</p>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">GLOBAL MACRO-STRATEGIC OUTLOOK 2026</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">The Reflationary Agentic Boom. Report content.</p>
                 </div>
-                <a href="newsletter_market_mayhem_jan_2026.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+                <a href="Daily_Briefing_2026_03_27.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-AGENT_NOTE" data-year="2025" data-type="AGENT_NOTE" data-title="agent alignment log: protocol v23.5 (december 12, 2025) market analysis and strategic insights.">
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="agent alignment log: protocol v23.5 (december 12, 2025) report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-12-12</span>
-                        <span class="type-badge">AGENT_NOTE</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 0</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 93</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Agent Alignment Log: Protocol v23.5 (December 12, 2025)</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market analysis and strategic insights.</p>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
                 </div>
-                <a href="Agent_Alignment_Log_20251212.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+                <a href="Market_Pulse_2026_03_27.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-TECH_WATCH" data-year="2025" data-type="TECH_WATCH" data-title="💻 tech sector watch: december 10, 2025 market analysis and strategic insights.">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-12-10</span>
-                        <span class="type-badge">TECH_WATCH</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 50</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">💻 Tech Sector Watch: December 10, 2025</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market analysis and strategic insights.</p>
-                </div>
-                <a href="Tech_Watch_20251210.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="🌩️ market mayhem: december 10, 2025 market analysis and strategic insights.">
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem: december 10, 2025 report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-12-10</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 50</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 100</span>
                     </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">🌩️ Market Mayhem: December 10, 2025</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market analysis and strategic insights.</p>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">🌩️ Market Mayhem: Tech Sector Watch</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
                 </div>
-                <a href="Market_Mayhem_20251210.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+                <a href="Daily_Briefing_2026_03_23.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-WEEKLY_RECAP" data-year="2025" data-type="WEEKLY_RECAP" data-title="market mayhem newsletter - december 10, 2025  the mood: anxious anticipation
-
-welcome to the "great calibration". the markets are currently caught in a pincer movement.
-
-while the broader indices are taking a breather, the internal rotation is v...">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-12-10</span>
-                        <span class="type-badge">WEEKLY_RECAP</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 42</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Market Mayhem Newsletter - December 10, 2025</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;"> The Mood: Anxious Anticipation
-
-Welcome to the "Great Calibration". The markets are currently caught in a pincer movement.
-
-While the broader indices are taking a breather, the internal rotation is v...</p>
-                </div>
-                <a href="Weekly_Recap_20251210.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-DEEP_DIVE" data-year="2025" data-type="DEEP_DIVE" data-title="🤿 deep dive report: december 10, 2025 market analysis and strategic insights.">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-12-10</span>
-                        <span class="type-badge">DEEP_DIVE</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 0</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">🤿 Deep Dive Report: December 10, 2025</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market analysis and strategic insights.</p>
-                </div>
-                <a href="Deep_Dive_20251210.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-INDUSTRY_REPORT" data-year="2025" data-type="INDUSTRY_REPORT" data-title="🏭 industry report: december 10, 2025 market analysis and strategic insights.">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-12-10</span>
-                        <span class="type-badge">INDUSTRY_REPORT</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 50</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">🏭 Industry Report: December 10, 2025</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market analysis and strategic insights.</p>
-                </div>
-                <a href="Industry_Report_20251210.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="🌩️ market mayhem: december 09, 2025 market analysis and strategic insights.">
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="🌩️ market mayhem: december 09, 2025 report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-12-09</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 50</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 97</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">🌩️ Market Mayhem: December 09, 2025</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market analysis and strategic insights.</p>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
                 </div>
-                <a href="Market_Mayhem_20251209.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+                <a href="market_mayhem_20251209.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem newsletter - december 2, 2025  the mood: anxious anticipation
-
-welcome to the "great calibration" of late 2025. the markets are currently caught in a pincer movement: on one flank, we have the "ai roi reckoning" triggered by the i...">
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem: the great calibration">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-12-02</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 40</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 88</span>
                     </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Market Mayhem Newsletter - December 2, 2025</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;"> The Mood: Anxious Anticipation
-
-Welcome to the "Great Calibration" of late 2025. The markets are currently caught in a pincer movement: on one flank, we have the "AI ROI Reckoning" triggered by the I...</p>
-                </div>
-                <a href="MM12022025.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-WEEKLY_RECAP" data-year="2025" data-type="WEEKLY_RECAP" data-title="the great calibration welcome to the "great calibration". pincer movement: "ai roi reckoning" (ibm ceo skepticism) vs macro slowdown (ism 48.2). energy is the lone safe harbor. crypto winter is back.">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-12-02</span>
-                        <span class="type-badge">WEEKLY_RECAP</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 0</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">THE GREAT CALIBRATION</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Welcome to the "Great Calibration". Pincer movement: "AI ROI Reckoning" (IBM CEO skepticism) vs Macro slowdown (ISM 48.2). Energy is the lone safe harbor. Crypto winter is back.</p>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Market Mayhem: The Great Calibration</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Welcome to the "Great Calibration". Pincer movement: "AI ROI Reckoning". Energy is the lone safe harbor.</p>
                 </div>
                 <a href="newsletter_market_mayhem_dec_02_2025.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-DEEP_DIVE" data-year="2025" data-type="DEEP_DIVE" data-title="lululemon athletica (lulu) lululemon athletica inc. (lulu) currently stands at a pivotal strategic inflection point, representing a classic case study of a "fallen angel" within the consumer discretionary sector. for over a decade, the entity operated as a hyper-growth compounder, protected by a perceived "wide moat" built on...">
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="lululemon athletica (lulu) report">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-12-01</span>
-                        <span class="type-badge">DEEP_DIVE</span>
+                        <span class="type-badge">COMPANY_REPORT</span>
                         <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 45</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">LULULEMON ATHLETICA (LULU)</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Lululemon Athletica Inc. (LULU) currently stands at a pivotal strategic inflection point, representing a classic case study of a "Fallen Angel" within the Consumer Discretionary sector. For over a decade, the entity operated as a hyper-growth compounder, protected by a perceived "Wide Moat" built on...</p>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Deep Dive Company Report.</p>
                 </div>
                 <a href="LULU_Deep_Dive.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="the yield curve snap the treasury market is in open revolt. the 10-year yield has breached 5.0% for the first time in the current cycle, signaling a total loss of faith in the "soft landing" narrative.
-                    we advise immediate rotation intofloating rateinstruments and short-duration cash equivalents.">
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem (nov)">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-11-14</span>
@@ -356,109 +416,25 @@ Welcome to the "Great Calibration" of late 2025. The markets are currently caugh
                         <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 20</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">THE YIELD CURVE SNAP</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">The Treasury market is in open revolt. The 10-Year yield has breached 5.0% for the first time in the current cycle, signaling a total loss of faith in the "Soft Landing" narrative.
-                    We advise immediate rotation intoFloating Rateinstruments and short-duration cash equivalents.</p>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">The Treasury market is in open revolt. The 10-Year yield has breached 5.0%.</p>
                 </div>
                 <a href="newsletter_market_mayhem_nov.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="mm11132025 market analysis and strategic insights.">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-11-13</span>
-                        <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 52</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MM11132025</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market analysis and strategic insights.</p>
-                </div>
-                <a href="MM11132025.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-WEEKLY_RECAP" data-year="2025" data-type="WEEKLY_RECAP" data-title="the shutdown hangover: growth fears the narrative pivoted abruptly from inflation to growth. the end of the record-long 43-day federal government shutdown was met with a sharp, risk-off repricing. 800-point drop in the dow.">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-11-13</span>
-                        <span class="type-badge">WEEKLY_RECAP</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 50</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">THE SHUTDOWN HANGOVER: GROWTH FEARS</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">The narrative pivoted abruptly from inflation to growth. The end of the record-long 43-day federal government shutdown was met with a sharp, risk-off repricing. 800-point drop in the Dow.</p>
-                </div>
-                <a href="newsletter_market_mayhem_nov_13_2025.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-MARKET_PULSE" data-year="2025" data-type="MARKET_PULSE" data-title="flash: fed emergency meeting rumors bond market dislocation triggers rumors of emergency liquidity injection. vix spikes to 30.">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-11-01</span>
-                        <span class="type-badge">MARKET_PULSE</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 0</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">FLASH: FED EMERGENCY MEETING RUMORS</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Bond market dislocation triggers rumors of emergency liquidity injection. VIX spikes to 30.</p>
-                </div>
-                <a href="newsletter_flash_nov_01_2025.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem newsletter - october 31, 2025  the mood: spooky volatility
-
-happy halloween, traders! the market decided to dress up as a bear this week, giving investors a fright with the s&p 500 closing at a devilishly precise 6,666. the driver...">
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem newsletter - october 31, 2025 report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-10-31</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 50</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 33</span>
                     </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Market Mayhem Newsletter - October 31, 2025</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;"> The Mood: Spooky Volatility
-
-Happy Halloween, traders! The market decided to dress up as a Bear this week, giving investors a fright with the S&P 500 closing at a devilishly precise 6,666. The driver...</p>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">SPOOKY VOLATILITY: S&P 6666</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Happy Halloween! The market dressed as a Bear. S&P closed at 6,666.</p>
                 </div>
                 <a href="MM10312025.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-WEEKLY_RECAP" data-year="2025" data-type="WEEKLY_RECAP" data-title="spooky volatility: s&p 6666 happy halloween! the market dressed as a bear. s&p closed at 6,666. double whammy of "china jitters" and "big tech fatigue". "fear trade" (gold, btc) is alive.">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-10-31</span>
-                        <span class="type-badge">WEEKLY_RECAP</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 33</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">SPOOKY VOLATILITY: S&P 6666</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Happy Halloween! The market dressed as a Bear. S&P closed at 6,666. Double whammy of "China Jitters" and "Big Tech Fatigue". "Fear Trade" (Gold, BTC) is alive.</p>
-                </div>
-                <a href="newsletter_market_mayhem_oct_31_2025.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-PERFORMANCE_REVIEW" data-year="2025" data-type="PERFORMANCE_REVIEW" data-title="model performance review: q3 2025 market analysis and strategic insights.">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-10-15</span>
-                        <span class="type-badge">PERFORMANCE_REVIEW</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 0</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Model Performance Review: Q3 2025</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market analysis and strategic insights.</p>
-                </div>
-                <a href="Model_Performance_Review_Q3_2025.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem market analysis.">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-10-15</span>
-                        <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 33</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market analysis.</p>
-                </div>
-                <a href="newsletter_market_mayhem_oct_2025.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="energy wars: midnight hammer geopolitical tensions have exploded with "operation midnight hammer," driving brent crude past $95.
-                    this supply shock will act as a tax on the global consumer and reignite headline inflation.energy volatilityis now the primary trade.">
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem (oct) report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-10-14</span>
@@ -466,417 +442,285 @@ Happy Halloween, traders! The market decided to dress up as a Bear this week, gi
                         <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 0</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">ENERGY WARS: MIDNIGHT HAMMER</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Geopolitical tensions have exploded with "Operation Midnight Hammer," driving Brent Crude past $95.
-                    This supply shock will act as a tax on the global consumer and reignite headline inflation.Energy Volatilityis now the primary trade.</p>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Geopolitical tensions have exploded with "Operation Midnight Hammer".</p>
                 </div>
                 <a href="newsletter_market_mayhem_oct.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-WEEKLY_RECAP" data-year="2025" data-type="WEEKLY_RECAP" data-title="weekly intel: oil breakout technical breakout in crude. $90 is the next stop. energy sector upgrading to overweight.">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-09-21</span>
-                        <span class="type-badge">WEEKLY_RECAP</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 0</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">WEEKLY INTEL: OIL BREAKOUT</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Technical breakout in crude. $90 is the next stop. Energy sector upgrading to Overweight.</p>
-                </div>
-                <a href="newsletter_weekly_sep_21_2025.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem newsletter - august 29, 2025  the mood: dog days of defiance
-
-the "summer slump" never really arrived, did it? as we wrap up august, the markets are showing remarkable resilience. the theme of the week is "defiance"—defying the s...">
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem (aug 29)">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-08-29</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 16</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Market Mayhem Newsletter - August 29, 2025</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;"> The Mood: Dog Days of Defiance
-
-The "Summer Slump" never really arrived, did it? As we wrap up August, the markets are showing remarkable resilience. The theme of the week is "Defiance"—defying the s...</p>
-                </div>
-                <a href="MM08292025.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-WEEKLY_RECAP" data-year="2025" data-type="WEEKLY_RECAP" data-title="dog days of defiance the theme is "defiance". defying seasonal weakness, defying "higher for longer". the "soft landing" narrative got a massive boost from jackson hole. tech is leading, but small caps (iwm) are waking up.">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-08-29</span>
-                        <span class="type-badge">WEEKLY_RECAP</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 0</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 94</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">DOG DAYS OF DEFIANCE</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">The theme is "Defiance". Defying seasonal weakness, defying "Higher for Longer". The "Soft Landing" narrative got a massive boost from Jackson Hole. Tech is leading, but Small Caps (IWM) are waking up.</p>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">The theme is "Defiance". Defying seasonal weakness, defying "Higher for Longer".</p>
                 </div>
                 <a href="newsletter_market_mayhem_aug_29_2025.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem newsletter - july 14, 2025 the markets navigated the past week with a sense of cautious optimism, digesting mixed economic signals as we head into the thick of summer 2025. while inflation data showed signs of moderation in som...">
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem newsletter - july 14, 2025">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-07-14</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 54</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 86</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Market Mayhem Newsletter - July 14, 2025</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">The markets navigated the past week with a sense of cautious optimism, digesting mixed economic signals as we head into the thick of Summer 2025. While inflation data showed signs of moderation in som...</p>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
                 </div>
                 <a href="market_mayhem_newsletter_july_2025.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market pulse // 2025-06-02 market analysis and strategic insights.">
+            <div class="archive-item type-MARKET_PULSE" data-year="2025" data-type="MARKET_PULSE" data-title="market pulse // 2025-06-02">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-06-02</span>
-                        <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 50</span>
+                        <span class="type-badge">MARKET_PULSE</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 95</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET PULSE // 2025-06-02</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market analysis and strategic insights.</p>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
                 </div>
                 <a href="market_pulse_20250602.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market pulse // 2025-05-19 market analysis and strategic insights.">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-05-19</span>
-                        <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 0</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET PULSE // 2025-05-19</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market analysis and strategic insights.</p>
-                </div>
-                <a href="market_pulse_20250519.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem newsletter - may 2, 2025  the mood: sell in may? not today.
-
-the age-old wall street adage "sell in may and go away" is being tested this week. despite a hot cpi print and a hawkish fed, the "ai bid" refuses to die. the s&p 5...">
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem (may 2)">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-05-02</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 38</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Market Mayhem Newsletter - May 2, 2025</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;"> The Mood: Sell in May? Not Today.
-
-The age-old Wall Street adage "Sell in May and Go Away" is being tested this week. Despite a hot CPI print and a hawkish Fed, the "AI Bid" refuses to die. The S&P 5...</p>
-                </div>
-                <a href="MM05022025.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-WEEKLY_RECAP" data-year="2025" data-type="WEEKLY_RECAP" data-title="sell in may? not today. the "ai bid" refuses to die. s&p 500 held 6,150. oil is the spoiler, spiking above $80 on hormuz tensions. market pricing "higher for longer" but equity investors don't care as long as earnings hold up.">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-05-02</span>
-                        <span class="type-badge">WEEKLY_RECAP</span>
                         <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 50</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">SELL IN MAY? NOT TODAY.</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">The "AI Bid" refuses to die. S&P 500 held 6,150. Oil is the spoiler, spiking above $80 on Hormuz tensions. Market pricing "Higher for Longer" but equity investors don't care as long as earnings hold up.</p>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">The "AI Bid" refuses to die. S&P 500 held 6,150. Oil is the spoiler.</p>
                 </div>
                 <a href="newsletter_market_mayhem_may_02_2025.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem newsletter - april 4, 2025  the mood: spring awakening
-
-hello q2! the first quarter is in the books, and the bulls are clearly in charge. the s&p 500 is knocking on the door of the psychological 6,000 level. can we break throug...">
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="market mayhem (april 4)">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-04-04</span>
                         <span class="type-badge">NEWSLETTER</span>
                         <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 66</span>
                     </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Market Mayhem Newsletter - April 4, 2025</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;"> The Mood: Spring Awakening
-
-Hello Q2! The first quarter is in the books, and the bulls are clearly in charge. The S&P 500 is knocking on the door of the psychological 6,000 level. Can we break throug...</p>
-                </div>
-                <a href="MM04042025.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-WEEKLY_RECAP" data-year="2025" data-type="WEEKLY_RECAP" data-title="spring awakening: the goldilocks data hello q2! the first quarter is in the books, and the bulls are clearly in charge. the s&p 500 is knocking on the door of the psychological 6,000 level. the catalyst was the "goldilocks" jobs report—not too hot, not too cold.">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-04-04</span>
-                        <span class="type-badge">WEEKLY_RECAP</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 50</span>
-                    </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">SPRING AWAKENING: THE GOLDILOCKS DATA</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Hello Q2! The first quarter is in the books, and the bulls are clearly in charge. The S&P 500 is knocking on the door of the psychological 6,000 level. The catalyst was the "Goldilocks" Jobs Report—not too hot, not too cold.</p>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Hello Q2! The first quarter is in the books, and the bulls are clearly in charge.</p>
                 </div>
                 <a href="newsletter_market_mayhem_apr_04_2025.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-MARKET_OUTLOOK" data-year="2025" data-type="MARKET_OUTLOOK" data-title="q1 2025 and full year outlook: navigating a bifurcated market the first quarter of 2025 has presented a bifurcated market landscape, characterized by diverging trends across sectors and regions. while some sectors, such as technology and healthcare, have shown c...">
+            <div class="archive-item type-DEEP_DIVE" data-year="2025" data-type="DEEP_DIVE" data-title="adam v23.5 | deep dive explorer report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-04-01</span>
-                        <span class="type-badge">MARKET_OUTLOOK</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 78</span>
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">DEEP_DIVE</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 27</span>
                     </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Q1 2025 and Full Year Outlook: Navigating a Bifurcated Market</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">The first quarter of 2025 has presented a bifurcated market landscape, characterized by diverging trends across sectors and regions. While some sectors, such as technology and healthcare, have shown c...</p>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">ADAM v23.5 | Deep Dive Explorer</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">System Feature.</p>
                 </div>
-                <a href="Q1 2025 and Full Year Outlook: Navigating a Bifurcated Market.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+                <a href="deep_dive.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-MARKET_PULSE" data-year="2025" data-type="MARKET_PULSE" data-title="market pulse: the great rotation    macro: cpi prints hot at 3.4%, forcing the fed to pause cuts. yields spike, pressuring long-duration tech.
-   sector rotation: capital fleeing "overcrowded ai" (software) into "real world ai" (ener...">
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="unified credit & quantum recovery console report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-03-15</span>
-                        <span class="type-badge">MARKET_PULSE</span>
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 40</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Unified Credit & Quantum Recovery Console</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">System Feature.</p>
+                </div>
+                <a href="unified_credit_console.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam :: retail alpha report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 100</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">ADAM :: RETAIL ALPHA</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">System Feature.</p>
+                </div>
+                <a href="retail_alpha.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-GUIDE" data-year="2025" data-type="GUIDE" data-title="snc exam preparation guide for bank analysts report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">GUIDE</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 92</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">SNC Exam Preparation Guide for Bank Analysts</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Reference Material.</p>
+                </div>
+                <a href="SNC_Guide.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam v25.5 :: future lens report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
                         <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 50</span>
                     </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Market Pulse: The Great Rotation</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">   Macro: CPI prints hot at 3.4%, forcing the Fed to pause cuts. Yields spike, pressuring long-duration tech.
-   Sector Rotation: Capital fleeing "Overcrowded AI" (Software) into "Real World AI" (Ener...</p>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">ADAM v25.5 :: FUTURE LENS</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">System Feature.</p>
                 </div>
-                <a href="market_pulse_20250315.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+                <a href="future_lens.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="banking crisis 2.0? new york community bank (nycb) echoes. is it idiosyncratic or systemic? fed creates new backstop facility.">
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam v23.5 | app deploy report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-03-14</span>
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 50</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">ADAM v23.5 | APP DEPLOY</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">System Feature.</p>
+                </div>
+                <a href="deployment.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam | avg market scanner report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 50</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">ADAM | AVG Market Scanner</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">System Feature.</p>
+                </div>
+                <a href="avg_market.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam system | mission control report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 50</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">ADAM System | Mission Control</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">System Feature.</p>
+                </div>
+                <a href="index2.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam v25.5 :: war room report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 40</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">ADAM v25.5 :: WAR ROOM</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">System Feature.</p>
+                </div>
+                <a href="war_room_v2.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam | trading terminal report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
                         <span class="type-badge">NEWSLETTER</span>
                         <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 0</span>
                     </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">BANKING CRISIS 2.0?</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">New York Community Bank (NYCB) echoes. Is it idiosyncratic or systemic? Fed creates new backstop facility.</p>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">ADAM | Trading Terminal</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">System Feature.</p>
                 </div>
-                <a href="newsletter_market_mayhem_mar_2025.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+                <a href="trading.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="top 10 meme coins: analysis and price targets market report from 2025-03-11">
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam analyst os | corporate credit & valuation engine report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-03-11</span>
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
+                        <span class="type-badge">NEWSLETTER</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 40</span>
+                    </div>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">ADAM Analyst OS | Corporate Credit & Valuation Engine</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">System Feature.</p>
+                </div>
+                <a href="analyst_os_vCredit.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+            </div>
+
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam | nexus simulation report content.">
+                <div style="flex-grow: 1;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
                         <span class="type-badge">NEWSLETTER</span>
                         <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 50</span>
                     </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Top 10 Meme Coins: Analysis and Price Targets</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market Report from 2025-03-11</p>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">ADAM | NEXUS Simulation</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">System Feature.</p>
                 </div>
-                <a href="top_10_meme_coins.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+                <a href="nexus.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-COMPANY_REPORT" data-year="2025" data-type="COMPANY_REPORT" data-title="untitled report market report from 2025-03-09">
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam - live terminal (pyscript) report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-03-09</span>
-                        <span class="type-badge">COMPANY_REPORT</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 50</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Untitled Report</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market Report from 2025-03-09</p>
-                </div>
-                <a href="Alphabet_Inc_Credit_Risk_Rating_Report_20250309.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam v19.0 daily financial briefing - march 3, 2025 market report from 2025-03-03">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-03-03</span>
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
                         <span class="type-badge">NEWSLETTER</span>
                         <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 50</span>
                     </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Adam v19.0 Daily Financial Briefing - March 3, 2025</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market Report from 2025-03-03</p>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Adam - Live Terminal (PyScript)</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">System Feature.</p>
                 </div>
-                <a href="newsletter_2025_03_03.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+                <a href="terminal.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-COMPANY_REPORT" data-year="2025" data-type="COMPANY_REPORT" data-title="untitled report market report from 2025-03-03">
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="analyst os // credit & valuation architect v6.2 report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-03-03</span>
-                        <span class="type-badge">COMPANY_REPORT</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 50</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Untitled Report</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market Report from 2025-03-03</p>
-                </div>
-                <a href="aapl_snc_20250303.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-COMPANY_REPORT" data-year="2025" data-type="COMPANY_REPORT" data-title="nvidia corporation (nvda) report nvidia's q4 fy25 results were exceptional, exceeding expectations.  however, considering potential headwinds and incorporating a moderate shock in the out years, we revise our price target to $315 while maintaining a "strong buy" rating.">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-02-26</span>
-                        <span class="type-badge">COMPANY_REPORT</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 100</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Nvidia Corporation (NVDA) Report</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Nvidia's Q4 FY25 results were exceptional, exceeding expectations.  However, considering potential headwinds and incorporating a moderate shock in the out years, we revise our price target to $315 while maintaining a "Strong Buy" rating.</p>
-                </div>
-                <a href="nvda_company_report_20250226.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-COMPANY_REPORT" data-year="2025" data-type="COMPANY_REPORT" data-title="nvidia corporation (nvda) report nvidia is a leading designer of graphics processing units (gpus) with a strong position in gaming, data centers, ai, and automotive.  despite competitive pressures and geopolitical risks, the company's technological leadership and diversified business model position it for continued growth.">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-02-25</span>
-                        <span class="type-badge">COMPANY_REPORT</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 100</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Nvidia Corporation (NVDA) Report</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Nvidia is a leading designer of graphics processing units (GPUs) with a strong position in gaming, data centers, AI, and automotive.  Despite competitive pressures and geopolitical risks, the company's technological leadership and diversified business model position it for continued growth.</p>
-                </div>
-                <a href="nvda_company_report_20250225.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-MARKET_OUTLOOK" data-year="2025" data-type="MARKET_OUTLOOK" data-title="enterprise software market outlook: the rise of the ai-powered cloud the enterprise software market is undergoing a period of dynamic growth, fueled by the convergence of cloud computing, artificial intelligence, and the increasing complexity of modern business operati...">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-02-25</span>
-                        <span class="type-badge">MARKET_OUTLOOK</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 98</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Enterprise Software Market Outlook: The Rise of the AI-Powered Cloud</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">The enterprise software market is undergoing a period of dynamic growth, fueled by the convergence of cloud computing, artificial intelligence, and the increasing complexity of modern business operati...</p>
-                </div>
-                <a href="software_industry_report_20250225.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="geopolitics and financial markets - navigating uncertainty and risk market report from 2025-02-24">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-02-24</span>
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 0</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 94</span>
                     </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Geopolitics and Financial Markets - Navigating Uncertainty and Risk</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market Report from 2025-02-24</p>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Analyst OS // Credit & Valuation Architect v6.2</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">System Feature.</p>
                 </div>
-                <a href="geopolitics_market_impact_20250224.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+                <a href="credit_valuation_architect.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-COMPANY_REPORT" data-year="2025" data-type="COMPANY_REPORT" data-title="microsoft corporation (msft) report microsoft demonstrates robust financial performance driven by cloud and productivity growth. despite challenges in gaming and regulatory scrutiny, strategic ai investments and the activision blizzard acquisition position it for continued market leadership.">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-02-24</span>
-                        <span class="type-badge">COMPANY_REPORT</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 97</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Microsoft Corporation (MSFT) Report</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Microsoft demonstrates robust financial performance driven by cloud and productivity growth. Despite challenges in gaming and regulatory scrutiny, strategic AI investments and the Activision Blizzard acquisition position it for continued market leadership.</p>
-                </div>
-                <a href="msft_company_report_20250224.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam v15.4 newsletter - february 21, 2025 market sentiment is currently mixed, with investors weighing positive corporate earnings against lingering concerns about inflation and potential interest rate hikes. the s&p 500 is up 0.5% on the day...">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-02-21</span>
-                        <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 42</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Adam v15.4 Newsletter - February 21, 2025</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market sentiment is currently mixed, with investors weighing positive corporate earnings against lingering concerns about inflation and potential interest rate hikes. The S&P 500 is up 0.5% on the day...</p>
-                </div>
-                <a href="newsletter_2025_02_21.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-COMPANY_REPORT" data-year="2025" data-type="COMPANY_REPORT" data-title="alphabet inc. (googl) report alphabet inc. is a multinational technology conglomerate holding company headquartered in mountain view, california. it was created through a restructuring of google on october 2, 2015, and became the...">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-02-21</span>
-                        <span class="type-badge">COMPANY_REPORT</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 100</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Alphabet Inc. (GOOGL) Report</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Alphabet Inc. is a multinational technology conglomerate holding company headquartered in Mountain View, California. It was created through a restructuring of Google on October 2, 2015, and became the...</p>
-                </div>
-                <a href="googl_company_report.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam v15.4 newsletter - february 14, 2025 market sentiment is recovering as inflation shows signs of moderating and corporate earnings remain strong. the s&p 500 is up 0.8% for the week, while the nasdaq has gained 1.2%. investors are cautiou...">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-02-14</span>
-                        <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 42</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Adam v15.4 Newsletter - February 14, 2025</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market sentiment is recovering as inflation shows signs of moderating and corporate earnings remain strong. The S&P 500 is up 0.8% for the week, while the Nasdaq has gained 1.2%. Investors are cautiou...</p>
-                </div>
-                <a href="newsletter_2025_02_14.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam v15.4 newsletter - february 7, 2025 market volatility has increased this week as investors grapple with uncertainty surrounding the new administration's policy agenda and potential changes to the regulatory landscape. concerns about pot...">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-02-07</span>
-                        <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 12</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Adam v15.4 Newsletter - February 7, 2025</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market volatility has increased this week as investors grapple with uncertainty surrounding the new administration's policy agenda and potential changes to the regulatory landscape. Concerns about pot...</p>
-                </div>
-                <a href="newsletter_2025_02_07.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="2025 outlook: the year of volatility regime shift. the era of 'great moderation' is officially dead. prepare for higher-for-longer rates and geopolitical chaos.">
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="adam v25.5 | quantum financial engine report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-14</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 25</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 34</span>
                     </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">2025 OUTLOOK: THE YEAR OF VOLATILITY</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Regime shift. The era of 'Great Moderation' is officially dead. Prepare for higher-for-longer rates and geopolitical chaos.</p>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">ADAM v25.5 | Quantum Financial Engine</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">System Feature.</p>
                 </div>
-                <a href="newsletter_market_mayhem_jan_2025.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+                <a href="FE25.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="role: automated media producer (adam v22.0 architecture) market analysis and strategic insights.">
+            <div class="archive-item type-NEWSLETTER" data-year="2025" data-type="NEWSLETTER" data-title="prompt alpha | high-frequency prompt trading report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
                         <span class="type-badge">NEWSLETTER</span>
                         <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 50</span>
                     </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">ROLE: Automated Media Producer (Adam v22.0 Architecture)</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market analysis and strategic insights.</p>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">PROMPT ALPHA | High-Frequency Prompt Trading</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">System Feature.</p>
                 </div>
-                <a href="brief.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+                <a href="prompt_alpha.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-MARKET_OUTLOOK" data-year="2025" data-type="MARKET_OUTLOOK" data-title="2024 year in review: navigating uncertainty and transition 2024 was a year of uncertainty and transition for the financial markets. after a strong recovery in 2023, market volatility increased as investors grappled with mixed economic signals, geopolitical ri...">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2025-01-01</span>
-                        <span class="type-badge">MARKET_OUTLOOK</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 82</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">2024 Year in Review: Navigating Uncertainty and Transition</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">2024 was a year of uncertainty and transition for the financial markets. After a strong recovery in 2023, market volatility increased as investors grappled with mixed economic signals, geopolitical ri...</p>
-                </div>
-                <a href="2024 Year in Review: Navigating Uncertainty and Transition.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-MARKET_PULSE" data-year="2024" data-type="MARKET_PULSE" data-title="weekly macro pulse - november 2024 market analysis and strategic insights.">
-                <div style="flex-grow: 1;">
-                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2024-11-12</span>
-                        <span class="type-badge">MARKET_PULSE</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 44</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Weekly Macro Pulse - November 2024</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market analysis and strategic insights.</p>
-                </div>
-                <a href="weekly_macro_pulse_nov_2024.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-MARKET_OUTLOOK" data-year="2024" data-type="MARKET_OUTLOOK" data-title="2023 year in review: a year of recovery and resilience 2023 proved to be a year of recovery and resilience for the financial markets.  after a challenging 2022, major stock indices rebounded, with the s&p 500 gaining approximately 20%. the technology sect...">
+            <div class="archive-item type-MARKET_OUTLOOK" data-year="2024" data-type="MARKET_OUTLOOK" data-title="2023 year in review: a year of recovery and resilience">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2024-01-01</span>
@@ -884,12 +728,12 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                         <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 91</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">2023 Year in Review: A Year of Recovery and Resilience</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">2023 proved to be a year of recovery and resilience for the financial markets.  After a challenging 2022, major stock indices rebounded, with the S&P 500 gaining approximately 20%. The technology sect...</p>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">2023 proved to be a year of recovery and resilience for the financial markets.</p>
                 </div>
                 <a href="2023 Year in Review: A Year of Recovery and Resilience.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-MARKET_OUTLOOK" data-year="2023" data-type="MARKET_OUTLOOK" data-title="2022 year in review: navigating a turbulent market 2022 was a challenging year for investors, marked by heightened volatility, rising inflation, and geopolitical tensions. major stock indices experienced significant declines, with the s&p 500 ending t...">
+            <div class="archive-item type-MARKET_OUTLOOK" data-year="2023" data-type="MARKET_OUTLOOK" data-title="2022 year in review: navigating a turbulent market">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2023-01-01</span>
@@ -897,83 +741,67 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                         <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 73</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">2022 Year in Review: Navigating a Turbulent Market</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">2022 was a challenging year for investors, marked by heightened volatility, rising inflation, and geopolitical tensions. Major stock indices experienced significant declines, with the S&P 500 ending t...</p>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">2022 was a challenging year for investors, marked by heightened volatility.</p>
                 </div>
                 <a href="2022 Year in Review: Navigating a Turbulent Market.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-NEWSLETTER" data-year="2022" data-type="NEWSLETTER" data-title="market mayhem market analysis.">
+            <div class="archive-item type-NEWSLETTER" data-year="2022" data-type="NEWSLETTER" data-title="market mayhem (archive) report content.">
                 <div style="flex-grow: 1;">
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2022-06-15</span>
                         <span class="type-badge">NEWSLETTER</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 0</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: 87</span>
                     </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market analysis.</p>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM (ARCHIVE)</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
                 </div>
                 <a href="newsletter_market_mayhem_jun_2022.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
             <div class="archive-item type-HISTORICAL" data-year="HISTORICAL" data-type="HISTORICAL" data-title="market mayhem: the great shut-in">
                 <div style="flex-grow: 1;">
-                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                      <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2020-03-20</span>
                         <span class="type-badge">HISTORICAL</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM: THE GREAT SHUT-IN</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">"Lockdown". The global economy has come to a screeching halt. With "15 Days to Slow the Spread" in effect, markets are pricing in a depression-level GDP contraction.</p>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">"Lockdown". The global economy has come to a screeching halt.</p>
                 </div>
                  <a href="newsletter_market_mayhem_mar_2020.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-HISTORICAL" data-year="HISTORICAL" data-type="HISTORICAL" data-title="market mayhem newsletter - march 20, 2020">
+            <div class="archive-item type-HISTORICAL" data-year="HISTORICAL" data-type="HISTORICAL" data-title="alphabet inc. (googl) report">
                 <div style="flex-grow: 1;">
-                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2020-03-20</span>
+                      <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                        <span class="mono" style="font-size:0.7rem; color:#888;">2015-10-02</span>
                         <span class="type-badge">HISTORICAL</span>
                     </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Market Mayhem Newsletter - March 20, 2020</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">   Mood: "Lockdown"
-   Driver: COVID-19 Pandemic
-   Theme: "The Great Shut-In" — The global economy has come to a screeching halt. With "15 Days to Slow the Spread" in effect, markets are pricing in a...</p>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Alphabet Inc. (GOOGL) Report</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
                 </div>
-                 <a href="2020-03-20_Market_Mayhem.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
+                 <a href="googl_company_report.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
             <div class="archive-item type-HISTORICAL" data-year="HISTORICAL" data-type="HISTORICAL" data-title="market mayhem: the lehman moment">
                 <div style="flex-grow: 1;">
-                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                      <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2008-09-19</span>
                         <span class="type-badge">HISTORICAL</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM: THE LEHMAN MOMENT</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">"Existential Panic". There are decades where nothing happens; and there are weeks where decades happen. This was one of those weeks. A 158-year-old bank vanished, the world's largest insurer was nationalized, and the money market broke the buck.</p>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">"Existential Panic". A 158-year-old bank vanished.</p>
                 </div>
                  <a href="newsletter_market_mayhem_sep_2008.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-HISTORICAL" data-year="HISTORICAL" data-type="HISTORICAL" data-title="market mayhem newsletter - september 19, 2008">
-                <div style="flex-grow: 1;">
-                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">2008-09-19</span>
-                        <span class="type-badge">HISTORICAL</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Market Mayhem Newsletter - September 19, 2008</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">   Mood: "Existential Panic"
-   Driver: Systemic Failure
-   Theme: "The Week Wall Street Broke" — There are decades where nothing happens; and there are weeks where decades happen. This was one of tho...</p>
-                </div>
-                 <a href="2008-09-19_Market_Mayhem.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
             <div class="archive-item type-HISTORICAL" data-year="HISTORICAL" data-type="HISTORICAL" data-title="market mayhem">
                 <div style="flex-grow: 1;">
-                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                      <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">2000-03-14</span>
                         <span class="type-badge">HISTORICAL</span>
                     </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM</h3>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM (ARCHIVE)</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">Market analysis.</p>
                 </div>
                  <a href="newsletter_market_mayhem_mar_2000.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
@@ -981,38 +809,24 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
 
             <div class="archive-item type-HISTORICAL" data-year="HISTORICAL" data-type="HISTORICAL" data-title="market mayhem: black monday aftermath">
                 <div style="flex-grow: 1;">
-                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                      <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">1987-10-23</span>
                         <span class="type-badge">HISTORICAL</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM: BLACK MONDAY AFTERMATH</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">"Shell-Shocked". On October 19th, the Dow Jones Industrial Average fell 22.6% in a single day. 508 points. It was the largest one-day percentage drop in history.</p>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">"Shell-Shocked". The Dow Jones Industrial Average fell 22.6% in a single day.</p>
                 </div>
                  <a href="newsletter_market_mayhem_oct_1987.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
 
-            <div class="archive-item type-HISTORICAL" data-year="HISTORICAL" data-type="HISTORICAL" data-title="market mayhem newsletter - october 23, 1987">
+            <div class="archive-item type-HISTORICAL" data-year="HISTORICAL" data-type="HISTORICAL" data-title="market mayhem: oct 29, 1929">
                 <div style="flex-grow: 1;">
-                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
-                        <span class="mono" style="font-size:0.7rem; color:#888;">1987-10-23</span>
-                        <span class="type-badge">HISTORICAL</span>
-                    </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">Market Mayhem Newsletter - October 23, 1987</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">   Mood: "Shell-Shocked"
-   Driver: Program Trading
-   Theme: "Black Monday" — On October 19th, the Dow Jones Industrial Average fell 22.6% in a single day. 508 points. It was the largest one-day perc...</p>
-                </div>
-                 <a href="1987-10-23_Market_Mayhem.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
-            </div>
-
-            <div class="archive-item type-HISTORICAL" data-year="HISTORICAL" data-type="HISTORICAL" data-title="market mayhem">
-                <div style="flex-grow: 1;">
-                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
+                      <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">1929-10-29</span>
                         <span class="type-badge">HISTORICAL</span>
                     </div>
-                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM</h3>
-                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Market analysis.</p>
+                    <h3 style="margin:0 0 5px 0; font-size:1.1rem;">MARKET MAYHEM: OCT 29, 1929</h3>
+                    <p style="margin:0; font-size:0.85rem; color:#aaa;">Report content.</p>
                 </div>
                  <a href="newsletter_market_mayhem_oct_1929.html" class="cyber-btn" style="align-self:center;">ACCESS</a>
             </div>
@@ -1022,13 +836,13 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
     </div>
 
     <script>
-        // Chart Initialization
+        // Chart Initialization (Refined Data)
         const ctx = document.getElementById('sentimentChart').getContext('2d');
         const chartData = {
-            labels: ["1929-10-29", "1987-10-23", "1987-10-23", "2000-03-14", "2008-09-19", "2008-09-19", "2020-03-20", "2020-03-20", "2022-06-15", "2023-01-01", "2024-01-01", "2024-11-12", "2025-01-01", "2025-01-01", "2025-01-14", "2025-02-07", "2025-02-14", "2025-02-21", "2025-02-21", "2025-02-24", "2025-02-24", "2025-02-25", "2025-02-25", "2025-02-26", "2025-03-03", "2025-03-03", "2025-03-09", "2025-03-11", "2025-03-14", "2025-03-15", "2025-04-01", "2025-04-04", "2025-04-04", "2025-05-02", "2025-05-02", "2025-05-19", "2025-06-02", "2025-07-14", "2025-08-29", "2025-08-29", "2025-09-21", "2025-10-14", "2025-10-15", "2025-10-15", "2025-10-31", "2025-10-31", "2025-11-01", "2025-11-13", "2025-11-13", "2025-11-14", "2025-12-01", "2025-12-02", "2025-12-02", "2025-12-09", "2025-12-10", "2025-12-10", "2025-12-10", "2025-12-10", "2025-12-10", "2025-12-12", "2026-01-12", "2026-01-14", "2026-01-31", "2026-02-14", "2026-03-15"],
+            labels: ["2025-04-04", "2025-05-02", "2025-08-29", "2025-10-31", "2025-11-13", "2025-12-02", "1929-10-29", "1987-10-23", "1987-10-23", "2000-03-14", "2008-09-19", "2008-09-19", "2015-10-02", "2020-03-20", "2020-03-20", "2022-06-15", "2023-01-01", "2024-01-01", "2024-11-12", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-01-01", "2025-02-07", "2025-02-14", "2025-02-21", "2025-02-21", "2025-02-21", "2025-02-21", "2025-02-21", "2025-02-21", "2025-02-24", "2025-02-24", "2025-02-24", "2025-02-25", "2025-02-25", "2025-02-26", "2025-03-03", "2025-03-03", "2025-03-09", "2025-03-11", "2025-03-11", "2025-03-15", "2025-03-15", "2025-04-01", "2025-04-04", "2025-05-02", "2025-05-19", "2025-06-02", "2025-06-27", "2025-06-29", "2025-07-14", "2025-08-29", "2025-09-19", "2025-10-14", "2025-10-15", "2025-10-15", "2025-10-31", "2025-11-13", "2025-11-14", "2025-12-01", "2025-12-02", "2025-12-09", "2025-12-10", "2025-12-10", "2025-12-10", "2025-12-10", "2025-12-10", "2025-12-10", "2025-12-10", "2025-12-12", "2026-01-12", "2026-01-14", "2026-01-15", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-10", "2026-02-14", "2026-02-20", "2026-02-28", "2026-03-01", "2026-03-01", "2026-03-05", "2026-03-15", "2026-03-15"],
             datasets: [{
                 label: 'Market Sentiment Index',
-                data: [0, 25, 85, 66, 22, 57, 40, 85, 0, 73, 91, 44, 82, 50, 25, 12, 42, 100, 42, 97, 0, 98, 100, 100, 50, 50, 50, 50, 0, 50, 78, 50, 66, 50, 38, 0, 50, 54, 0, 16, 0, 0, 33, 0, 33, 50, 0, 50, 52, 20, 45, 0, 40, 50, 50, 0, 42, 50, 50, 0, 77, 40, 33, 71, 0],
+                data: [94, 90, 93, 90, 92, 87, 66, 88, 85, 94, 90, 57, 100, 95, 85, 87, 73, 91, 73, 60, 50, 34, 94, 50, 82, 50, 40, 0, 40, 50, 50, 84, 77, 8, 78, 66, 50, 50, 100, 66, 92, 56, 83, 50, 100, 33, 100, 80, 100, 27, 22, 16, 0, 0, 78, 0, 0, 25, 0, 90, 0, 50, 85, 80, 50, 100, 75, 34, 25, 91, 94, 0, 50, 85, 97, 50, 90, 0, 0, 94, 78, 100, 90, 88, 50, 90, 0, 50, 50, 95, 100, 80, 0, 66, 33, 0, 0, 90, 50, 0, 0, 50, 100, 0, 0, 0, 50, 91, 77, 100, 75, 50, 90, 76, 91, 85, 75, 50, 45, 0, 100, 9, 12, 76, 100, 50, 50, 0, 88, 91, 0, 82, 50, 54, 14, 41, 60, 94, 80, 100, 100, 46, 50, 97, 0, 98, 100, 97, 50, 50, 50, 50, 50, 94, 97, 78, 95, 91, 97, 95, 58, 55, 86, 94, 16, 75, 90, 0, 91, 93, 62, 45, 88, 97, 96, 96, 100, 100, 98, 94, 100, 100, 93, 75, 79, 66, 62, 82, 92, 90, 80, 88, 100, 100, 100, 80, 100, 80, 90],
                 borderColor: '#00f3ff',
                 backgroundColor: 'rgba(0, 243, 255, 0.1)',
                 tension: 0.4,
@@ -1064,7 +878,7 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
             items.forEach(item => {
                 const itemYear = item.dataset.year;
                 const itemType = item.dataset.type;
-                const itemText = item.dataset.title;
+                const itemText = item.dataset.title.toLowerCase();
 
                 let matchSearch = itemText.includes(search);
                 let matchYear = year === 'ALL' || itemYear === year;
