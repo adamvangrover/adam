@@ -201,5 +201,60 @@ class LiveMockEngine:
 
         return result
 
+    def get_geopolitical_event(self):
+        """
+        Generates a geopolitical event string and its stability impact.
+        Format: "[SovereignName][INTERNAL_MEMO]: EVENT_TYPE: Details..."
+        """
+        # Lazy load sovereigns
+        if not hasattr(self, 'nexus_sovereigns'):
+            try:
+                # Try to load from generated simulation data
+                path = os.path.join(os.path.dirname(__file__), '../../showcase/data/nexus_simulation.json')
+                if os.path.exists(path):
+                    with open(path, 'r') as f:
+                        data = json.load(f)
+                        self.nexus_sovereigns = [n['label'] for n in data['graph']['nodes']]
+                else:
+                    self.nexus_sovereigns = ["NorthAm-Market-1", "EuroZone-Digital-2", "AsiaPac-Resource-3"]
+            except Exception as e:
+                # Fallback
+                self.nexus_sovereigns = ["NorthAm-Market-1", "EuroZone-Digital-2", "AsiaPac-Resource-3"]
+
+        sov = random.choice(self.nexus_sovereigns)
+
+        event_types = [
+            ("Cyber Operation", -0.05, "Targeting critical infrastructure"),
+            ("Military Maneuver", -0.1, "Mobilizing assets near contested zone"),
+            ("Trade Sanction", -0.02, "Imposing tariffs on key exports"),
+            ("Diplomatic Summit", 0.05, "Hosting peace talks"),
+            ("Energy Crisis", -0.08, "Experiencing supply chain disruptions"),
+            ("Strategic Alliance", 0.03, "Signing mutual defense treaty"),
+            ("Civil Unrest", -0.07, "Protests erupting in capital"),
+            ("Currency Devaluation", -0.04, "Central bank intervenes to stabilize currency"),
+            ("Ransomware Attack", -0.06, "Paralyzing national banking systems"),
+            ("Data Leak", -0.03, "Exposing sensitive government communications"),
+            ("Flash Crash", -0.09, "Algo-trading glitch causes market plummet"),
+            ("Liquidity Crisis", -0.07, "Interbank lending freezes unexpectedly"),
+            ("Satellite outage", -0.04, "Global GPS network disruption reported"),
+            ("AI Hallucination", -0.02, "Automated defense systems trigger false alarm")
+        ]
+
+        etype, impact, detail_base = random.choice(event_types)
+
+        # Add slight variation to details
+        if random.random() < 0.5:
+            detail = detail_base + "."
+        else:
+            target = random.choice(self.nexus_sovereigns)
+            detail = f"{detail_base} involving {target}."
+
+        text = f"[{sov}][INTERNAL_MEMO]: {etype.upper()}: {detail}"
+
+        return {
+            "text": text,
+            "stability_delta": impact
+        }
+
 # Global singleton access
 live_engine = LiveMockEngine()

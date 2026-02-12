@@ -202,25 +202,13 @@
             });
         }
 
+        let lastEventText = "";
+
         function initStream(streamData) {
             const container = document.getElementById('intel-stream');
-            let index = 0;
-
             // Initial batch
             renderStreamBatch(streamData.slice(-10).reverse(), container);
-
-            // Simulate live feed
-            setInterval(() => {
-                const item = streamData[Math.floor(Math.random() * streamData.length)];
-                const el = document.createElement('div');
-                el.className = 'stream-item text-green-400';
-                el.innerText = item;
-                container.prepend(el);
-
-                if(container.children.length > 50) {
-                    container.removeChild(container.lastChild);
-                }
-            }, 2000);
+            if (streamData.length > 0) lastEventText = streamData[streamData.length - 1];
         }
 
         function renderStreamBatch(items, container) {
@@ -302,7 +290,53 @@
             if(network) network.unselectAll();
         }
 
-        document.addEventListener('DOMContentLoaded', initNexus);
+        async function pollLiveFeed() {
+            try {
+                // Add timestamp to prevent caching
+                const res = await fetch('data/nexus_live.json?t=' + new Date().getTime());
+                if (!res.ok) return;
+                const liveData = await res.json();
+
+                // Update Stream
+                if (liveData.stream && liveData.stream.length > 0) {
+                    const latestEvent = liveData.stream[liveData.stream.length - 1];
+                    if (latestEvent && latestEvent !== lastEventText) {
+                        const container = document.getElementById('intel-stream');
+                        const el = document.createElement('div');
+                        el.className = 'stream-item text-green-400';
+                        el.innerText = latestEvent;
+                        container.prepend(el);
+                        if(container.children.length > 50) container.removeChild(container.lastChild);
+
+                        lastEventText = latestEvent;
+                    }
+                }
+
+                // Update Chart
+                if (chart && liveData.metrics && liveData.metrics.global_stability !== undefined) {
+                    const stability = liveData.metrics.global_stability;
+
+                    // Add new data point
+                    chart.data.datasets[0].data.push(stability);
+                    chart.data.labels.push('');
+
+                    // Remove old
+                    if (chart.data.datasets[0].data.length > 20) {
+                        chart.data.datasets[0].data.shift();
+                        chart.data.labels.shift();
+                    }
+                    chart.update('none'); // 'none' for smooth animation
+                }
+
+            } catch (e) {
+                // Silent fail polling
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initNexus();
+            setInterval(pollLiveFeed, 2000);
+        });
 
     </script>
 </body>
