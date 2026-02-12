@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, field_validator, ValidationInfo, model_validator
+from pydantic import BaseModel, Field, model_validator
 from typing import Optional, List, Dict, Any, ClassVar
 from enum import Enum
 
@@ -45,6 +45,10 @@ class FinancialHealthCheck(BaseModel):
         SectorType.REAL_ESTATE: {
             "MAX_DEBT_TO_EQUITY": 5.0,  # High leverage is standard
             "MIN_INTEREST_COVERAGE": 1.1
+        },
+        SectorType.FINANCIALS: {
+            "MAX_DEBT_TO_EQUITY": 8.0,  # Banks/Insurance operate with high leverage naturally
+            "MIN_CURRENT_RATIO": 0.8
         }
     }
 
@@ -72,6 +76,43 @@ class FinancialHealthCheck(BaseModel):
              raise ValueError(f"Coverage Breach ({sector.value}): Interest Coverage {self.interest_coverage_ratio:.2f} is below limit of {min_ic}")
 
         return self
+
+    @classmethod
+    def get_policy_manifest(cls) -> Dict[str, Any]:
+        """
+        Exports the policy configuration for visualization.
+        """
+        manifest = {
+            "global_limits": {
+                "MAX_DEBT_TO_EQUITY": cls.MAX_DEBT_TO_EQUITY,
+                "MIN_PROFIT_MARGIN": cls.MIN_PROFIT_MARGIN,
+                "MIN_CURRENT_RATIO": cls.MIN_CURRENT_RATIO,
+                "MIN_INTEREST_COVERAGE": cls.MIN_INTEREST_COVERAGE
+            },
+            "sector_overrides": {},
+            "governance_rules": [
+                "Strict capital buffer requirements when VIX > 20",
+                "No rating upgrades permitted if financial health check fails",
+                "SNC participants must maintain minimum liquidity ratios",
+                "Real Estate sector allows higher leverage due to asset backing"
+            ]
+        }
+
+        for sector, overrides in cls.SECTOR_LIMITS.items():
+            # Calculate effective limits for this sector
+            effective = {
+                "MAX_DEBT_TO_EQUITY": overrides.get("MAX_DEBT_TO_EQUITY", cls.MAX_DEBT_TO_EQUITY),
+                "MIN_PROFIT_MARGIN": overrides.get("MIN_PROFIT_MARGIN", cls.MIN_PROFIT_MARGIN),
+                "MIN_CURRENT_RATIO": overrides.get("MIN_CURRENT_RATIO", cls.MIN_CURRENT_RATIO),
+                "MIN_INTEREST_COVERAGE": overrides.get("MIN_INTEREST_COVERAGE", cls.MIN_INTEREST_COVERAGE)
+            }
+
+            manifest["sector_overrides"][sector.value] = {
+                "overrides": overrides,
+                "effective_limits": effective
+            }
+
+        return manifest
 
 class StressTestBuffers(BaseModel):
     """
@@ -106,14 +147,10 @@ class RegulatoryGuardrails(BaseModel):
     """
     rating_upgrade_requested: bool = False
     proposed_rating: str
-
     financials: FinancialHealthCheck
-
-    # Rule: Cannot upgrade rating if financials are in breach
 
     def validate_policy(self) -> List[str]:
         violations = []
-        # Validation happens at model instantiation mostly
         return violations
 
 class SNCCreditPolicyResult(BaseModel):
@@ -206,10 +243,7 @@ class RatingUpgradeGuardrail(BaseModel):
     @model_validator(mode='after')
     def prevent_unjustified_upgrade(self) -> 'RatingUpgradeGuardrail':
         # Simple logic: Rating improvement blocked if compliance failed
-        # Assumption: If they are different, it's a change.
-        # If compliance failed, ANY change is blocked to be safe (conservative policy).
         if self.current_rating != self.proposed_rating and not self.compliance_result.passed:
-             # Remove "Value error, " prefix if present in violations for cleaner message
              cleaned_violations = [v.replace("Value error, ", "") for v in self.compliance_result.violations]
              raise ValueError(f"Compliance Block: Cannot change rating from {self.current_rating} to {self.proposed_rating} while policy violations exist: {cleaned_violations}")
         return self
