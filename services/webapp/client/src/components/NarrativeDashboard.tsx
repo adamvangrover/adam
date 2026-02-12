@@ -4,17 +4,43 @@ import { BookOpen, TrendingUp, AlertTriangle } from 'lucide-react';
 // Protocol: ADAM-V-NEXT - Narrative Intelligence UI
 const NarrativeDashboard: React.FC = () => {
     const [narratives, setNarratives] = useState<any[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        // Mock data loading - in real world this comes from /api/synthesizer/narratives
-        const mockNarratives = [
-            { theme: "AI BUBBLE", sentiment: "BULLISH", volume: 85, headline: "AI Chip Demand Outstrips Supply" },
-            { theme: "ENERGY CRISIS", sentiment: "BEARISH", volume: 62, headline: "Oil Spikes on Geopolitical Tension" },
-            { theme: "FED PIVOT", sentiment: "NEUTRAL", volume: 45, headline: "Minutes Show Consensus on Pause" }
-        ];
+        const fetchNarratives = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const headers: any = {};
+                if (token) headers['Authorization'] = `Bearer ${token}`;
 
-        setNarratives(mockNarratives);
+                const res = await fetch('/api/synthesizer/narratives', { headers });
+                if (res.ok) {
+                    const data = await res.json();
+                    setNarratives(data);
+                } else {
+                    // Fallback handled by API, but just in case
+                    console.error("Failed to fetch narratives");
+                }
+            } catch (e) {
+                console.error("Narrative fetch error", e);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchNarratives();
+        // Poll every 10 seconds
+        const interval = setInterval(fetchNarratives, 10000);
+        return () => clearInterval(interval);
     }, []);
+
+    if (loading && narratives.length === 0) {
+        return (
+            <div className="glass-panel" style={{ padding: '20px', marginTop: '20px', fontFamily: "'JetBrains Mono', monospace", color: '#666' }}>
+                INITIALIZING NARRATIVE INTELLIGENCE...
+            </div>
+        );
+    }
 
     return (
         <div className="glass-panel" style={{ padding: '20px', marginTop: '20px', fontFamily: "'JetBrains Mono', monospace" }}>
