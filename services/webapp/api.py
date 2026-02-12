@@ -514,6 +514,71 @@ def create_app(config_name='default'):
                 "status": "Simulation Engine Offline"
             })
 
+    @app.route('/api/synthesizer/narratives', methods=['GET'])
+    @jwt_required()
+    def get_narratives():
+        """
+        Returns narrative intelligence data derived from the system's decision logs.
+        Protocol: ADAM-V-NEXT
+        """
+        # Default mock data (Graceful Degradation)
+        mock_narratives = [
+            {"theme": "AI BUBBLE", "sentiment": "BULLISH", "volume": 85, "headline": "AI Chip Demand Outstrips Supply"},
+            {"theme": "ENERGY CRISIS", "sentiment": "BEARISH", "volume": 62, "headline": "Oil Spikes on Geopolitical Tension"},
+            {"theme": "FED PIVOT", "sentiment": "NEUTRAL", "volume": 45, "headline": "Minutes Show Consensus on Pause"}
+        ]
+
+        try:
+            # Locate decision_log.jsonl relative to repo root
+            repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            log_path = os.path.join(repo_root, 'core', 'data', 'decision_log.jsonl')
+
+            if not os.path.exists(log_path):
+                 return jsonify(mock_narratives)
+
+            narratives = []
+            # Read last 5 lines
+            with open(log_path, 'r') as f:
+                lines = f.readlines()
+                for line in lines[-5:]:
+                    try:
+                        entry = json.loads(line)
+                        rationale = entry.get('rationale', '')
+                        decision = entry.get('decision', 'HOLD')
+                        score = entry.get('score', 0)
+
+                        # Heuristic Extraction for Frontend Display
+                        theme = "MARKET CONSENSUS"
+                        if "AI" in rationale: theme = "AI SECTOR"
+                        elif "Oil" in rationale or "Energy" in rationale: theme = "ENERGY"
+                        elif "Yield" in rationale or "Fed" in rationale: theme = "MACRO / FED"
+
+                        sentiment = "NEUTRAL"
+                        if "BUY" in decision or "APPROVE" in decision: sentiment = "BULLISH"
+                        elif "SELL" in decision or "REJECT" in decision: sentiment = "BEARISH"
+
+                        # Extract a "headline" from rationale (first sentence)
+                        headline = rationale.split('.')[0] + "." if '.' in rationale else rationale[:50] + "..."
+
+                        narratives.append({
+                            "theme": theme,
+                            "sentiment": sentiment,
+                            "volume": int(abs(score) * 100) if abs(score) <= 1 else int(score), # Normalize score
+                            "headline": headline
+                        })
+                    except json.JSONDecodeError:
+                        continue
+
+            # If log parsing yielded nothing, fallback
+            if not narratives:
+                return jsonify(mock_narratives)
+
+            return jsonify(narratives[::-1]) # Return latest first
+
+        except Exception as e:
+            app.logger.warning(f"Narrative fetch failed, using mock: {e}")
+            return jsonify(mock_narratives)
+
     @app.route('/api/synthesizer/scenario', methods=['GET'])
     @jwt_required()
     def get_scenario_data():

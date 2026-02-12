@@ -15,8 +15,10 @@ class QuantumRetrievalAgent(AgentBase, AuditMixin):
     Enhanced to support Credit & Restructuring Search.
     """
 
-    def __init__(self, name="QuantumRetrievalAgent"):
-        super().__init__(name=name)
+    def __init__(self, name="QuantumRetrievalAgent", config=None):
+        if config is None:
+            config = {"agent_id": name, "name": name}
+        super().__init__(config=config)
         self.optimizer = AdamOptimizer(learning_rate=0.05)
         self.credit_engine = ComprehensiveCreditSimulation()
         self.description = "Specialized agent for probabilistic search and credit restructuring optimization."
@@ -86,8 +88,21 @@ class QuantumRetrievalAgent(AgentBase, AuditMixin):
             }
         }
 
-    def process_request(self, request):
+    async def execute(self, *args, **kwargs) -> dict:
         """Standard AgentBase entry point."""
+        # Map args/kwargs to request format
+        request = kwargs.get('request', kwargs)
+
+        query_type = request.get("type", "search")
+
+        if query_type == "credit_restructuring":
+            return self.search_optimal_restructuring(request.get("inputs", {}))
+        else:
+            size = request.get("size", 1e15)
+            return self.find_needle(haystack_size=size)
+
+    def process_request(self, request):
+        """Deprecated synchronous entry point."""
         query_type = request.get("type", "search")
 
         if query_type == "credit_restructuring":

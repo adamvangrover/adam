@@ -1,25 +1,49 @@
-
-from playwright.sync_api import sync_playwright
+import time
+import subprocess
 import os
+from playwright.sync_api import sync_playwright
 
-def run():
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
+def verify_war_room():
+    # Start HTTP server
+    # Use port 8000
+    proc = subprocess.Popen(["python3", "-m", "http.server", "8000"], cwd="showcase")
+    time.sleep(3) # Wait for server
 
-        # Load the HTML file directly
-        file_path = os.path.abspath("showcase/war_room_v2.html")
-        page.goto(f"file://{file_path}")
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.set_viewport_size({"width": 1920, "height": 1080})
 
-        # Wait for the ticker to render
-        page.wait_for_selector("#ticker-feed .ticker-row")
+            # Navigate
+            url = "http://localhost:8000/war_room_v2.html"
+            print(f"Navigating to {url}")
+            page.goto(url)
 
-        # Take a screenshot
-        screenshot_path = "verification/war_room_v2.png"
-        page.screenshot(path=screenshot_path)
-        print(f"Screenshot saved to {screenshot_path}")
+            # Wait for dynamic content
+            print("Waiting for dynamic content...")
+            page.wait_for_timeout(5000)
 
-        browser.close()
+            # Check for key elements
+            if page.locator("#ticker-feed").is_visible():
+                print("[PASS] Ticker Feed Visible")
+            else:
+                print("[FAIL] Ticker Feed Not Visible")
+
+            if page.locator("#riskCanvas").is_visible():
+                print("[PASS] Risk Radar Canvas Visible")
+            else:
+                print("[FAIL] Risk Radar Canvas Not Visible")
+
+            # Screenshot
+            os.makedirs("verification_screenshots", exist_ok=True)
+            path = "verification_screenshots/war_room_v2.png"
+            page.screenshot(path=path)
+            print(f"Screenshot saved to {path}")
+    except Exception as e:
+        print(f"Verification failed: {e}")
+    finally:
+        proc.terminate()
 
 if __name__ == "__main__":
-    run()
+    verify_war_room()
