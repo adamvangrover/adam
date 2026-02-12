@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/cyber_glitch.css">
+    <script src="../js/repo_data.js"></script>
+    <style>
+        body {
+            background: #000;
+            color: #ccc;
+            font-family: 'Share Tech Mono', monospace;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .file-item {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .file-item:hover {
+            background: rgba(0, 243, 255, 0.1);
+            color: #fff;
+        }
+        .file-icon {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Toolbar -->
+    <div class="flex items-center gap-2 border-b border-gray-700 pb-2 mb-2">
+        <button id="btn-up" class="p-2 hover:text-cyan-400"><i class="fas fa-arrow-up"></i></button>
+        <div class="flex-1 bg-gray-900 border border-gray-700 px-3 py-1 text-sm text-cyan-500 font-mono" id="path-bar">/</div>
+        <input type="text" id="search-input" placeholder="Search..." class="bg-gray-900 border border-gray-700 px-2 py-1 text-sm text-white focus:outline-none focus:border-cyan-500 w-48">
+    </div>
+
+    <!-- Main View -->
+    <div id="file-grid" class="flex-1 overflow-auto grid grid-cols-4 md:grid-cols-6 gap-4 content-start">
+        <!-- Injected Items -->
+    </div>
+
+    <!-- Status Bar -->
+    <div class="border-t border-gray-700 pt-2 mt-2 text-xs text-gray-500 flex justify-between">
+        <span id="item-count">0 items</span>
+        <span>ADAM FS v30.0</span>
+    </div>
+
+    <script>
+        // Init state
+        let currentPath = '';
+        let fileSystem = {}; // Virtual tree
+        
+        // Icon mapping
+        const icons = {
+            'folder': 'fa-folder text-yellow-500',
+            'html': 'fa-html5 text-orange-500',
+            'js': 'fa-js text-yellow-300',
+            'css': 'fa-css3-alt text-blue-500',
+            'py': 'fa-python text-blue-400',
+            'json': 'fa-file-code text-green-400',
+            'md': 'fa-file-alt text-gray-400',
+            'txt': 'fa-file-alt text-gray-500',
+            'default': 'fa-file text-gray-500'
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.REPO_DATA && window.REPO_DATA.nodes) {
+                buildFileSystem(window.REPO_DATA.nodes);
+                renderPath('');
+            } else {
+                document.getElementById('file-grid').innerHTML = '<div class="p-4 text-red-500">Error: REPO_DATA not found.</div>';
+            }
+        });
+
+        function buildFileSystem(nodes) {
+            fileSystem = { files: [], children: {} }; // Root
+            
+            nodes.forEach(node => {
+                if (!node.path) return;
+                
+                const parts = node.path.split('/');
+                let current = fileSystem;
+                
+                // Navigate/Create folders
+                for (let i = 0; i < parts.length - 1; i++) {
+                    const part = parts[i];
+                    if (!current.children[part]) {
+                        current.children[part] = { name: part, type: 'folder', children: {}, files: [] };
+                    }
+                    current = current.children[part];
+                }
+                
+                // Add file to leaf
+                const fileName = parts[parts.length - 1];
+                if (fileName) { // Ensure not empty
+                    const ext = fileName.split('.').pop();
+                    current.files.push({
+                        name: fileName,
+                        path: node.path,
+                        type: 'file',
+                        ext: ext,
+                        node: node
+                    });
+                }
+            });
+        }
+
+        function getDir(path) {
+            if (!path) return fileSystem;
+            const parts = path.split('/');
+            let current = fileSystem;
+            for (const part of parts) {
+                if (current.children && current.children[part]) {
+                    current = current.children[part];
+                } else {
+                    return null;
+                }
+            }
+            return current;
+        }
+
+        function renderPath(path) {
+            currentPath = path;
+            document.getElementById('path-bar').innerText = '/' + path;
+            
+            const dir = getDir(path);
+            const grid = document.getElementById('file-grid');
+            grid.innerHTML = '';
+            
+            if (!dir) {
+                grid.innerHTML = '<div class="col-span-full text-center text-red-500">Directory not found</div>';
+                return;
+            }
+
+            // Render Folders
+            const folders = Object.keys(dir.children).sort();
+            folders.forEach(folderName => {
+                const el = createItem(folderName, 'folder', 'folder');
+                el.ondblclick = () => navigate(folderName);
+                grid.appendChild(el);
+            });
+
+            // Render Files
+            const files = dir.files.sort((a, b) => a.name.localeCompare(b.name));
+            files.forEach(file => {
+                const el = createItem(file.name, file.ext, 'file', file.path);
+                el.ondblclick = () => openFile(file);
+                grid.appendChild(el);
+            });
+
+            document.getElementById('item-count').innerText = `${folders.length + files.length} items`;
+        }
+
+        function createItem(name, type, category, fullPath) {
+            const el = document.createElement('div');
+            el.className = 'file-item flex flex-col items-center p-4 rounded hover:bg-white/5';
+            
+            let iconClass = icons[type] || icons['default'];
+            if (category === 'folder') iconClass = icons['folder'];
+
+            el.innerHTML = `
+                <i class="fas ${iconClass} file-icon mb-2 text-3xl"></i>
+                <span class="text-xs text-center break-all line-clamp-2">${name}</span>
+            `;
+            return el;
+        }
+
+        function navigate(folderName) {
+            const newPath = currentPath ? `${currentPath}/${folderName}` : folderName;
+            renderPath(newPath);
+        }
+
+        function up() {
+            if (!currentPath) return;
+            const parts = currentPath.split('/');
+            parts.pop();
+            renderPath(parts.join('/'));
+        }
+
+        function openFile(file) {
+            // Determine if we can open it
+            // If it's HTML, open in new window
+            // If text, maybe show in a modal or new window (repo/index.html logic)
+            // For now, simple logic:
+            
+            if (file.ext === 'html') {
+                // If path starts with showcase/, we can open it relatively?
+                // window.parent.wm.openWindow(...)
+                // Path is e.g. "showcase/reports.html". 
+                // We are in "showcase/apps/file_explorer.html".
+                // So "../../" + path?
+                
+                // Let's resolve the path relative to showcase/
+                let url = '';
+                if (file.path.startsWith('showcase/')) {
+                    url = file.path.replace('showcase/', '');
+                } else {
+                    // It's outside showcase. 
+                    // e.g. "core/reports.html" (unlikely).
+                    // We can try to open it via the repo browser or raw content?
+                    // For now, let's just use the full relative path from root.
+                    // Since we are in showcase/apps/, root is ../../
+                    url = '../../' + file.path;
+                }
+                
+                if (window.parent && window.parent.wm) {
+                    window.parent.wm.openWindow('file_' + file.name, file.name, url, 800, 600);
+                } else {
+                    window.open(url, '_blank');
+                }
+            } else {
+                alert(`Cannot open ${file.name} directly. Use Terminal or Code Editor.`);
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('btn-up').onclick = up;
+        
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            if (!term) {
+                renderPath(currentPath);
+                return;
+            }
+            
+            // Search global flat list
+            const grid = document.getElementById('file-grid');
+            grid.innerHTML = '';
+            
+            window.REPO_DATA.nodes.forEach(node => {
+                if (node.path && node.path.toLowerCase().includes(term)) {
+                    const ext = node.path.split('.').pop();
+                    const el = createItem(node.path, ext, 'file', node.path);
+                    
+                    // Mock file object
+                    const file = { name: node.path.split('/').pop(), path: node.path, ext: ext };
+                    el.ondblclick = () => openFile(file);
+                    grid.appendChild(el);
+                }
+            });
+        });
+
+    </script>
+</body>
+</html>
