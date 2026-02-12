@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Monitor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/cyber_glitch.css">
+    <style>
+        body {
+            background: rgba(0, 0, 0, 0.8);
+            color: #0ff;
+            font-family: 'Share Tech Mono', monospace;
+            overflow: hidden;
+            padding: 10px;
+        }
+        .chart-container {
+            position: relative;
+            height: 60px; /* Smaller charts to fit 3 in 300px height */
+            width: 100%;
+            margin-bottom: 8px;
+        }
+        .metric-label {
+            font-size: 0.7rem;
+            color: #888;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
+        }
+        /* Custom scrollbar just in case */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #0ff; }
+    </style>
+</head>
+<body>
+    <div class="flex justify-between items-center mb-2 border-b border-cyan-500/30 pb-1">
+        <span class="text-sm font-bold tracking-widest">SYSTEM RESOURCES</span>
+        <span class="text-xs text-green-400 animate-pulse">ONLINE</span>
+    </div>
+
+    <div class="metric-label">
+        <span>CPU LOAD</span>
+        <span id="cpu-val">0%</span>
+    </div>
+    <div class="chart-container">
+        <canvas id="cpuChart"></canvas>
+    </div>
+
+    <div class="metric-label">
+        <span>MEMORY USAGE</span>
+        <span id="mem-val">0GB</span>
+    </div>
+    <div class="chart-container">
+        <canvas id="memChart"></canvas>
+    </div>
+
+    <div class="metric-label">
+        <span>NEURAL COHERENCE</span>
+        <span id="neural-val">0%</span>
+    </div>
+    <div class="chart-container">
+        <canvas id="neuralChart"></canvas>
+    </div>
+
+    <script>
+        const ctxCpu = document.getElementById('cpuChart').getContext('2d');
+        const ctxMem = document.getElementById('memChart').getContext('2d');
+        const ctxNeural = document.getElementById('neuralChart').getContext('2d');
+
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { display: false },
+                y: { display: false, min: 0, max: 100 }
+            },
+            elements: {
+                point: { radius: 0 },
+                line: { tension: 0.4, borderWidth: 1 }
+            },
+            animation: false
+        };
+
+        const createChart = (ctx, color) => new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array(20).fill(''),
+                datasets: [{
+                    data: Array(20).fill(50),
+                    borderColor: color,
+                    backgroundColor: color + '33', // heavy transparency
+                    fill: true
+                }]
+            },
+            options: commonOptions
+        });
+
+        const cpuChart = createChart(ctxCpu, '#00f3ff');
+        const memChart = createChart(ctxMem, '#ff0055');
+        const neuralChart = createChart(ctxNeural, '#00ff00');
+
+        setInterval(() => {
+            const updateChart = (chart, min, max) => {
+                const val = Math.floor(Math.random() * (max - min + 1) + min);
+                chart.data.datasets[0].data.shift();
+                chart.data.datasets[0].data.push(val);
+                chart.update();
+                return val;
+            };
+
+            const cpu = updateChart(cpuChart, 5, 45);
+            document.getElementById('cpu-val').innerText = cpu + '%';
+
+            const mem = updateChart(memChart, 30, 60);
+            document.getElementById('mem-val').innerText = (mem / 2).toFixed(1) + ' GB / 32 GB';
+
+            const neural = updateChart(neuralChart, 88, 99);
+            document.getElementById('neural-val').innerText = neural + '%';
+
+        }, 1000);
+    </script>
+</body>
+</html>
