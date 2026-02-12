@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM OS v30.0</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/cyber_glitch.css">
+
+    <style>
+        body {
+            background-color: #000;
+            background-image: 
+                linear-gradient(rgba(0, 20, 20, 0.9), rgba(0, 5, 10, 0.9)),
+                url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop'); /* Cyberpunk city bg fallback */
+            background-size: cover;
+            background-position: center;
+            font-family: 'Share Tech Mono', monospace;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* Desktop Grid */
+        #os-desktop {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10;
+        }
+
+        /* Desktop Icons */
+        .desktop-icon {
+            width: 90px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            padding: 10px;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+            margin-bottom: 20px;
+        }
+        .desktop-icon:hover {
+            background: rgba(0, 243, 255, 0.1);
+            border-color: rgba(0, 243, 255, 0.3);
+        }
+        .desktop-icon i {
+            font-size: 2rem;
+            color: #ccc;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        .desktop-icon span {
+            font-size: 0.75rem;
+            color: #fff;
+            text-align: center;
+            text-shadow: 0 0 2px #000;
+            background: rgba(0,0,0,0.5);
+            padding: 2px 4px;
+        }
+
+        /* Taskbar */
+        #taskbar {
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 48px;
+            background: rgba(10, 15, 20, 0.95);
+            border-top: 1px solid #333;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            z-index: 9000;
+            gap: 10px;
+        }
+
+        /* Boot Screen */
+        #boot-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1s;
+        }
+    </style>
+</head>
+<body>
+    <div class="crt-overlay"></div>
+
+    <!-- Boot Screen -->
+    <div id="boot-screen">
+        <div class="text-6xl font-bold text-white mb-4 tracking-tighter glitch-text" data-text="ADAM OS">ADAM OS</div>
+        <div class="text-cyan-500 font-mono text-sm mb-8">SYSTEM V30.0 // INITIALIZING NEURAL MESH</div>
+        <div class="loading-bar-container">
+            <div class="loading-bar"></div>
+        </div>
+        <div class="mt-4 text-xs text-gray-500 font-mono">LOADING MODULES: [KERNEL] [GRAPH] [RISK] [SENTIMENT]</div>
+    </div>
+
+    <!-- Desktop Area -->
+    <div id="os-desktop" class="p-6 flex flex-col flex-wrap content-start h-full pb-16">
+        <!-- Icons -->
+        <div class="desktop-icon" ondblclick="wm.openWindow('nexus', 'Nexus Simulation', 'nexus.html', 1000, 600)">
+            <i class="fas fa-globe-americas text-amber-500"></i>
+            <span>Nexus</span>
+        </div>
+
+        <div class="desktop-icon" ondblclick="wm.openWindow('cortex', 'System Cortex', 'system_knowledge_graph.html', 1100, 700)">
+            <i class="fas fa-brain text-purple-500"></i>
+            <span>Cortex</span>
+        </div>
+
+        <div class="desktop-icon" ondblclick="wm.openWindow('warroom', 'War Room', 'war_room_v2.html', 1200, 800)">
+            <i class="fas fa-crosshairs text-red-500"></i>
+            <span>War Room</span>
+        </div>
+
+        <div class="desktop-icon" ondblclick="wm.openWindow('terminal', 'System Terminal', 'terminal.html', 800, 500)">
+            <i class="fas fa-terminal text-green-500"></i>
+            <span>Terminal</span>
+        </div>
+
+        <div class="desktop-icon" ondblclick="wm.openWindow('scenarios', 'Scenario Lab', 'scenario_lab.html', 1000, 600)">
+            <i class="fas fa-vial text-cyan-500"></i>
+            <span>Scenario Lab</span>
+        </div>
+
+        <div class="desktop-icon" ondblclick="wm.openWindow('workflow', 'Workflows', 'workflows.html', 900, 600)">
+            <i class="fas fa-project-diagram text-blue-400"></i>
+            <span>Workflows</span>
+        </div>
+
+        <div class="desktop-icon mt-10 hover-glitch" ondblclick="wm.openWindow('docs', 'Archives', 'reports.html', 800, 600)">
+            <i class="fas fa-folder text-yellow-200"></i>
+            <span>Archives</span>
+        </div>
+
+        <!-- New Apps -->
+        <div class="desktop-icon" ondblclick="wm.openWindow('files', 'File Explorer', 'apps/file_explorer.html', 800, 600)">
+            <i class="fas fa-folder-open text-yellow-400"></i>
+            <span>Files</span>
+        </div>
+
+        <div class="desktop-icon" ondblclick="wm.openWindow('sys_mon', 'System Monitor', 'widgets/sys_monitor.html', 500, 300)">
+            <i class="fas fa-microchip text-red-400"></i>
+            <span>Sys Mon</span>
+        </div>
+
+        <div class="desktop-icon" ondblclick="wm.openWindow('agent_feed', 'Agent Feed', 'apps/agent_feed.html', 400, 600)">
+            <i class="fas fa-network-wired text-green-400"></i>
+            <span>Feed</span>
+        </div>
+    </div>
+
+    <!-- Taskbar -->
+    <div id="taskbar">
+        <div id="start-btn" class="h-8 w-8 bg-cyan-900 flex items-center justify-center border border-cyan-500 cursor-pointer hover:bg-cyan-800 hover-glitch">
+            <i class="fas fa-fingerprint text-cyan-400"></i>
+        </div>
+        <div class="h-6 w-px bg-gray-700 mx-2"></div>
+        
+        <!-- Open Apps Container -->
+        <div id="taskbar-apps" class="flex items-center gap-2 flex-1">
+            <!-- Injected by JS -->
+        </div>
+
+        <div class="h-6 w-px bg-gray-700 mx-2"></div>
+        <div id="sys-clock" class="text-xs font-mono text-cyan-500 crt-flicker">00:00</div>
+    </div>
+
+    <script src="js/os_start_menu.js"></script>
+    <script src="js/adam_os.js"></script>
+</body>
+</html>
