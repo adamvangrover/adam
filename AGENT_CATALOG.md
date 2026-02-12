@@ -1027,3 +1027,20 @@ This document provides a comprehensive catalog of all the agents in the ADAM sys
 *   **Compute and Resource Requirements:** Low.
 *   **Dependencies:** None.
 *   **Developer Notes:** Implemented for v26.0 "Reflationary Agentic Boom" update.
+
+---
+
+## `macro_liquidity_agent`
+
+*   **File:** `core/agents/specialized/macro_liquidity_agent.py`
+*   **Description:** This agent assesses global macro liquidity conditions by analyzing bond yields, credit spreads, currency strength (DXY), and commodity proxies (Gold). It calculates a "Liquidity Stress Index" (0-100) and determines the current liquidity regime (e.g., Expansionary, Neutral, Tightening, Crisis). It fills the gap in fundamental macro analysis for risk management.
+*   **Configuration:** `config/agents.yaml`
+    *   `tickers`: Dictionary overriding default tickers for TNX, IRX, HYG, LQD, DXY, GOLD.
+*   **Architecture and Base Agent:** Inherits from `core.agents.agent_base.AgentBase`.
+*   **Agent Forge and Lifecycle:** Created on demand for macro risk assessments.
+*   **Model Context Protocol (MCP):** Exposes `execute` which returns `MacroLiquidityOutput` (score, regime, trace).
+*   **Tools and Hooks:**
+    *   **Tools:** `DataFetcher` (yfinance).
+*   **Compute and Resource Requirements:** Low to Medium (Real-time data fetching).
+*   **Dependencies:** `yfinance`, `pandas`, `pydantic`.
+*   **Developer Notes:** Implemented as part of "Protocol ARCHITECT_INFINITE" (Day 1) to provide "System 2" macro awareness.

@@ -48,6 +48,8 @@
 ### Added
 - **New Organ**: `core/agents/specialized/market_regime_agent.py` - A specialized agent that classifies market conditions into `STRONG_TREND`, `MEAN_REVERSION`, or `HIGH_VOLATILITY_CRASH_RISK` using statistical metrics.
 - **Tests**: `tests/test_market_regime_agent.py` - Unit tests verifying regime classification against synthetic data patterns (Sine Wave, Linear Trend, Random Walk Explosion).
+- **New Organ**: `core/agents/specialized/macro_liquidity_agent.py` - A specialized agent that calculates a "Liquidity Stress Index" using real-time bond yields and spreads.
+- **Tests**: `tests/test_macro_liquidity_agent.py` - Unit tests verifying liquidity scoring in Crisis, Neutral, and Expansionary scenarios.
 
 ## v23.5 - Autonomous Remediation & Enhancement
 
