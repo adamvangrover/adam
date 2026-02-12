@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Feed</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/cyber_glitch.css">
+    <script src="../js/agent_feed_data.js"></script>
+    <style>
+        body {
+            background: #000;
+            color: #ccc;
+            font-family: 'Share Tech Mono', monospace;
+            padding: 10px;
+        }
+        .feed-item {
+            border-left: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        .feed-item:hover {
+            background: rgba(0, 243, 255, 0.05);
+            border-left-color: #0ff;
+        }
+        .new-item {
+            animation: slideIn 0.5s ease-out;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #111; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+    </style>
+</head>
+<body>
+    <div class="flex items-center gap-2 border-b border-gray-700 pb-2 mb-4 sticky top-0 bg-black z-10 pt-2">
+        <div class="relative w-full">
+            <i class="fas fa-search absolute left-3 top-2.5 text-gray-500"></i>
+            <input type="text" placeholder="Filter stream..." class="w-full bg-gray-900 border border-gray-700 text-sm text-white pl-10 pr-4 py-2 focus:outline-none focus:border-cyan-500">
+        </div>
+        <div class="flex gap-1">
+            <button class="bg-cyan-900/50 hover:bg-cyan-700 text-cyan-400 p-2 border border-cyan-800 w-10 h-10 flex items-center justify-center transition-colors" title="Pause Stream"><i class="fas fa-pause"></i></button>
+            <button class="bg-cyan-900/50 hover:bg-cyan-700 text-cyan-400 p-2 border border-cyan-800 w-10 h-10 flex items-center justify-center transition-colors" title="Clear"><i class="fas fa-trash"></i></button>
+        </div>
+    </div>
+
+    <div id="feed-container" class="space-y-3 pb-4">
+        <!-- Feed items injected here -->
+    </div>
+
+    <script>
+        const feedContainer = document.getElementById('feed-container');
+        const MAX_ITEMS = 50;
+        let isPaused = false;
+
+        function addFeedItem(data) {
+            const item = document.createElement('div');
+            item.className = 'feed-item p-3 bg-gray-900/30 border border-gray-800 relative new-item';
+            item.innerHTML = `
+                <div class="flex justify-between items-start mb-1">
+                    <div class="flex items-center gap-2">
+                        <i class="fas ${data.agent.icon} ${data.agent.color}"></i>
+                        <span class="font-bold text-sm ${data.agent.color}">${data.agent.name}</span>
+                    </div>
+                    <span class="text-xs text-gray-600 font-mono">${data.timestamp}</span>
+                </div>
+                <div class="text-sm text-gray-300 pl-6 border-l border-gray-800 ml-1">
+                    ${data.text}
+                </div>
+            `;
+            
+            feedContainer.prepend(item); // Add to top
+
+            // Limit items
+            if (feedContainer.children.length > MAX_ITEMS) {
+                feedContainer.lastElementChild.remove();
+            }
+        }
+
+        // Generate initial items
+        if (window.AGENT_FEED_DATA) {
+            for (let i = 0; i < 5; i++) {
+                addFeedItem(window.AGENT_FEED_DATA.generate());
+            }
+        }
+
+        // Live stream
+        setInterval(() => {
+            if (!isPaused && window.AGENT_FEED_DATA) {
+                // Random chance to add item
+                if (Math.random() > 0.3) {
+                    addFeedItem(window.AGENT_FEED_DATA.generate());
+                }
+            }
+        }, 2000);
+
+        // Controls
+        const pauseBtn = document.querySelector('button[title="Pause Stream"]');
+        if (pauseBtn) {
+            pauseBtn.onclick = function() {
+                isPaused = !isPaused;
+                this.innerHTML = isPaused ? '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>';
+                this.classList.toggle('bg-red-900/50');
+            };
+        }
+
+        const clearBtn = document.querySelector('button[title="Clear"]');
+        if (clearBtn) {
+            clearBtn.onclick = () => {
+                feedContainer.innerHTML = '';
+            };
+        }
+
+        // Filter
+        const filterInput = document.querySelector('input');
+        if (filterInput) {
+            filterInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase();
+                Array.from(feedContainer.children).forEach(child => {
+                    const text = child.innerText.toLowerCase();
+                    child.style.display = text.includes(term) ? 'block' : 'none';
+                });
+            });
+        }
+    </script>
+</body>
+</html>
