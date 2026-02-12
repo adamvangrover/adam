@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM-CONVERGENCE: Live Neural Link</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#0A0A0F',
+                        surface: '#151522',
+                        accent: {
+                            cyan: '#00F5FF',
+                            green: '#00FF9F',
+                            purple: '#A855F7',
+                        },
+                        code: {
+                            bg: '#0D0D17',
+                            keyword: '#FF79C6',
+                            string: '#F1FA8C',
+                            comment: '#6272A4',
+                            function: '#50FA7B',
+                            variable: '#8BE9FD',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0A0A0F;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(0, 245, 255, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 0% 100%, rgba(168, 85, 247, 0.05) 0%, transparent 50%);
+            background-attachment: fixed;
+            color: #E0E0E0;
+        }
+
+        .glass-panel {
+            background: rgba(21, 21, 34, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+        }
+
+        .code-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .code-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(0, 245, 255, 0.3);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0D0D17; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+
+        /* Syntax Highlighting */
+        .syntax-keyword { color: #FF79C6; font-weight: 500; }
+        .syntax-string { color: #F1FA8C; }
+        .syntax-comment { color: #6272A4; font-style: italic; }
+        .syntax-function { color: #50FA7B; }
+        .syntax-type { color: #8BE9FD; }
+        .syntax-number { color: #BD93F9; }
+
+        @keyframes pulse-cyan {
+            0% { box-shadow: 0 0 0 0 rgba(0, 245, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 245, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 245, 255, 0); }
+        }
+        .pulse-indicator { animation: pulse-cyan 2s infinite; }
+        
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="antialiased min-h-screen selection:bg-accent-cyan selection:text-black font-sans">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 py-6 px-4 mb-8 glass-panel border-b border-accent-cyan/10">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <div class="h-3 w-3 rounded-full bg-accent-cyan pulse-indicator"></div>
+                <h1 class="font-display text-2xl md:text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-accent-cyan to-accent-purple">
+                    ADAM-CONVERGENCE
+                </h1>
+            </div>
+            <div class="flex items-center gap-4">
+                <button id="toggleFeed" class="flex items-center gap-2 px-4 py-2 rounded-lg font-mono text-xs font-bold uppercase transition-all bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/50">
+                    Stop Feed
+                </button>
+                <div class="text-xs font-mono text-accent-cyan/60 uppercase tracking-widest bg-accent-cyan/5 px-3 py-1 rounded-full border border-accent-cyan/20">
+                    Live Neural Link v24.0.1
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 pb-24 space-y-16">
+
+        <!-- LIVE DEMO SECTION -->
+        <div class="space-y-6">
+            <div class="flex items-center gap-4 opacity-70">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent to-accent-purple"></div>
+                <span class="font-mono text-sm font-bold text-accent-purple animate-pulse">LIVE EXECUTION ENVIRONMENT</span>
+                <div class="h-px flex-1 bg-gradient-to-l from-transparent to-accent-purple"></div>
+            </div>
+
+            <!-- Dashboard Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Left: Market Watch -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- System Status Bar -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="bg-surface/60 border border-white/5 p-3 rounded-xl flex items-center gap-3">
+                            <div class="text-emerald-400 font-mono text-xs">CORE: ONLINE</div>
+                        </div>
+                        <div class="bg-surface/60 border border-white/5 p-3 rounded-xl flex items-center gap-3">
+                            <div class="text-accent-cyan font-mono text-xs">LATENCY: 12ms</div>
+                        </div>
+                        <div class="bg-surface/60 border border-white/5 p-3 rounded-xl flex items-center gap-3">
+                            <div class="text-accent-purple font-mono text-xs">ENCRYPTION: AES-256</div>
+                        </div>
+                        <div class="bg-surface/60 border border-white/5 p-3 rounded-xl flex items-center gap-3">
+                            <div class="text-amber-400 font-mono text-xs">AGENTS: 5/5</div>
+                        </div>
+                    </div>
+
+                    <div id="asset-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Assets injected via JS -->
+                    </div>
+
+                    <!-- Simulated Graph Area -->
+                    <div class="bg-surface/40 border border-white/5 rounded-xl p-6 h-48 flex items-center justify-center relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5"></div>
+                        <div class="text-center z-10">
+                            <p class="text-slate-500 font-mono text-sm mb-2">Neural Prediction Confidence</p>
+                            <div class="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan to-accent-purple">
+                                94.8%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Neural Event Stream -->
+                <div class="bg-surface/60 backdrop-blur-xl border border-white/5 rounded-2xl overflow-hidden h-[600px] flex flex-col">
+                    <div class="p-4 border-b border-white/5 bg-white/5 flex items-center justify-between">
+                        <h3 class="font-mono text-sm font-bold text-accent-cyan">NEURAL_EVENT_STREAM</h3>
+                        <div class="flex gap-2 items-center">
+                            <div class="h-2 w-2 rounded-full bg-red-500 animate-pulse"></div>
+                            <span class="text-[10px] text-slate-400 uppercase">Live</span>
+                        </div>
+                    </div>
+                    <div id="event-log" class="flex-1 overflow-y-auto p-4 space-y-3 font-mono text-xs">
+                        <div class="text-center text-slate-500 py-10">Initializing Neural Link...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CODE ARTIFACTS SECTION -->
+        <div class="space-y-12">
+            <div class="flex items-center gap-4 opacity-50">
+                <div class="h-px flex-1 bg-gradient-to-r from-transparent to-accent-green"></div>
+                <span class="font-mono text-sm font-bold text-accent-green">SOURCE ARTIFACTS // PYTHON BACKEND</span>
+                <div class="h-px flex-1 bg-gradient-to-l from-transparent to-accent-green"></div>
+            </div>
+
+            <!-- backend/neural_link.py -->
+            <section class="code-card glass-panel rounded-2xl overflow-hidden group border border-white/5">
+                <div class="px-6 py-4 bg-white/5 border-b border-white/5 flex items-center justify-between">
+                    <h2 class="font-mono text-sm text-accent-green/90">backend/neural_link.py</h2>
+                    <span class="text-[10px] font-mono text-white/30 uppercase">python_intelligence/bridge</span>
+                </div>
+                <pre class="p-6 overflow-x-auto bg-code-bg font-mono text-sm text-white/80">
+<span class="syntax-keyword">import</span> random, time, os
+<span class="syntax-keyword">from</span> typing <span class="syntax-keyword">import</span> TypedDict, List, Optional
+
+<span class="syntax-keyword">class</span> <span class="syntax-type">MarketAsset</span>(TypedDict):
+    symbol: <span class="syntax-type">str</span>; current_price: <span class="syntax-type">float</span>; volume: <span class="syntax-type">int</span>
+
+<span class="syntax-keyword">def</span> <span class="syntax-function">fetch_market_data</span>() -> List[MarketAsset]:
+    <span class="syntax-comment"># Logic for real-time asset tracking</span>
+    <span class="syntax-keyword">return</span> [
+        {<span class="syntax-string">"symbol"</span>: <span class="syntax-string">"AAPL"</span>, <span class="syntax-string">"current_price"</span>: <span class="syntax-number">150.25</span>},
+        {<span class="syntax-string">"symbol"</span>: <span class="syntax-string">"AMZN"</span>, <span class="syntax-string">"current_price"</span>: <span class="syntax-number">3300.10</span>}
+    ]
+
+<span class="syntax-keyword">def</span> <span class="syntax-function">process_market_event</span>(asset: MarketAsset):
+    <span class="syntax-keyword">if</span> random.random() < <span class="syntax-number">0.15</span>:
+        <span class="syntax-keyword">return</span> {<span class="syntax-string">"event"</span>: <span class="syntax-string">"flash_crash"</span>, <span class="syntax-string">"severity"</span>: <span class="syntax-string">"high"</span>}</pre>
+            </section>
+
+            <!-- frontend/components/NeuralFeedWidget.tsx -->
+            <section class="code-card glass-panel rounded-2xl overflow-hidden group border border-white/5">
+                <div class="px-6 py-4 bg-white/5 border-b border-white/5 flex items-center justify-between">
+                    <h2 class="font-mono text-sm text-accent-cyan/90">frontend/components/NeuralFeedWidget.tsx</h2>
+                    <span class="text-[10px] font-mono text-white/30 uppercase">react/ui-kit</span>
+                </div>
+                <pre class="p-6 overflow-x-auto bg-code-bg font-mono text-sm text-white/80">
+<span class="syntax-keyword">export const</span> <span class="syntax-function">NeuralFeedWidget</span> = () => {
+  <span class="syntax-keyword">const</span> [data, setData] = <span class="syntax-function">useState</span>([]);
+  <span class="syntax-function">useEffect</span>(() => {
+    <span class="syntax-keyword">const</span> interval = <span class="syntax-function">setInterval</span>(fetchData, <span class="syntax-number">1500</span>);
+    <span class="syntax-keyword">return</span> () => <span class="syntax-function">clearInterval</span>(interval);
+  }, []);
+  <span class="syntax-keyword">return</span> &lt;<span class="syntax-keyword">div</span>&gt;{/* Live Feed Render */}&lt;/<span class="syntax-keyword">div</span>&gt;;
+};</pre>
+            </section>
+        </div>
+
+    </main>
+
+    <!-- LIVE LOGIC SCRIPT -->
+    <script>
+        // --- Configuration ---
+        const INITIAL_ASSETS = [
+            { symbol: "AAPL", name: "Apple Inc.", current_price: 150.25, previous_price: 149.50, volume: 1000000, trend: 'up' },
+            { symbol: "AMZN", name: "Amazon.com", current_price: 3300.10, previous_price: 3340.00, volume: 500000, trend: 'down' },
+            { symbol: "MSFT", name: "Microsoft", current_price: 290.00, previous_price: 288.00, volume: 800000, trend: 'up' },
+            { symbol: "GOOGL", name: "Alphabet", current_price: 2800.50, previous_price: 2790.00, volume: 300000, trend: 'neutral' },
+            { symbol: "TSLA", name: "Tesla", current_price: 950.00, previous_price: 980.00, volume: 1200000, trend: 'down' },
+        ];
+        
+        const EVENT_TYPES = ['flash_crash', 'liquidity_spike', 'whale_movement', 'regulatory_ping', 'sentiment_shift'];
+        
+        let state = {
+            assets: JSON.parse(JSON.stringify(INITIAL_ASSETS)),
+            events: [],
+            isLive: true
+        };
+
+        // --- Logic ---
+        function tick() {
+            if (!state.isLive) return;
+
+            // 1. Update Asset Prices
+            state.assets = state.assets.map(asset => {
+                const volatility = 0.005; 
+                const change = (Math.random() - 0.5) * 2 * volatility * asset.current_price;
+                const newPrice = asset.current_price + change;
+                const changePercent = ((newPrice - asset.previous_price) / asset.previous_price) * 100;
+                
+                return {
+                    ...asset,
+                    current_price: newPrice,
+                    change_percent: changePercent,
+                    trend: change > 0 ? 'up' : 'down'
+                };
+            });
+
+            renderAssets();
+
+            // 2. Generate Random Market Events
+            if (Math.random() < 0.3) { 
+                const targetAsset = state.assets[Math.floor(Math.random() * state.assets.length)];
+                const eventType = EVENT_TYPES[Math.floor(Math.random() * EVENT_TYPES.length)];
+                
+                let severity = 'low';
+                if (['flash_crash', 'whale_movement'].includes(eventType)) severity = 'high';
+                else if (['liquidity_spike'].includes(eventType)) severity = 'medium';
+
+                const newEvent = {
+                    id: Date.now(),
+                    timestamp: new Date().toLocaleTimeString(),
+                    event_type: eventType,
+                    symbol: targetAsset.symbol,
+                    description: `Anomaly detected. Deviation: ${(Math.random() * 5).toFixed(2)}σ`,
+                    severity
+                };
+
+                state.events.unshift(newEvent);
+                if (state.events.length > 20) state.events.pop();
+                renderEvents();
+            }
+        }
+
+        // --- Renderers ---
+        function renderAssets() {
+            const grid = document.getElementById('asset-grid');
+            grid.innerHTML = state.assets.map(asset => {
+                const isUp = asset.change_percent >= 0;
+                const colorClass = isUp ? 'text-emerald-400' : 'text-rose-400';
+                const arrow = isUp ? '↑' : '↓';
+                return `
+                    <div class="bg-surface/50 border border-white/5 rounded-xl p-4 flex justify-between items-center hover:border-accent-cyan/30 transition-all duration-300">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-mono text-lg font-bold text-white">${asset.symbol}</h3>
+                                <span class="text-xs text-slate-400">${asset.name}</span>
+                            </div>
+                            <div class="text-2xl font-bold text-white mt-1">$${asset.current_price.toFixed(2)}</div>
+                        </div>
+                        <div class="text-right ${colorClass}">
+                            <div class="font-mono font-bold flex items-center justify-end gap-1">
+                                <span>${arrow}</span> ${Math.abs(asset.change_percent).toFixed(2)}%
+                            </div>
+                            <div class="text-xs text-slate-500 font-mono mt-1">Vol: ${(asset.volume/1000).toFixed(0)}K</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderEvents() {
+            const log = document.getElementById('event-log');
+            if (state.events.length === 0) return;
+            
+            log.innerHTML = state.events.map(event => {
+                let colorClass = 'border-blue-500 bg-blue-500/10 text-blue-400';
+                if (event.severity === 'high') colorClass = 'border-rose-500 bg-rose-500/10 text-rose-400';
+                else if (event.severity === 'medium') colorClass = 'border-amber-500 bg-amber-500/10 text-amber-400';
+
+                return `
+                    <div class="p-3 rounded-lg border-l-2 ${colorClass} fade-in">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="font-bold uppercase text-[10px] tracking-wider">[${event.severity}] ${event.event_type}</span>
+                            <span class="text-[10px] text-slate-500 opacity-60">${event.timestamp}</span>
+                        </div>
+                        <div class="text-slate-300">
+                            <span class="text-white font-bold">${event.symbol}</span>: ${event.description}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAssets();
+            const interval = setInterval(tick, 1500);
+
+            // Toggle Button Logic
+            const btn = document.getElementById('toggleFeed');
+            btn.addEventListener('click', () => {
+                state.isLive = !state.isLive;
+                if(state.isLive) {
+                    btn.innerText = "STOP FEED";
+                    btn.classList.replace('bg-rose-500/10', 'bg-emerald-500/10');
+                    btn.classList.replace('text-rose-400', 'text-emerald-400');
+                    btn.classList.replace('border-rose-500/50', 'border-emerald-500/50');
+                    btn.classList.replace('hover:bg-rose-500/20', 'hover:bg-emerald-500/20');
+                } else {
+                    btn.innerText = "START FEED";
+                    btn.classList.replace('bg-emerald-500/10', 'bg-rose-500/10');
+                    btn.classList.replace('text-emerald-400', 'text-rose-400');
+                    btn.classList.replace('border-emerald-500/50', 'border-rose-500/50');
+                    btn.classList.replace('hover:bg-emerald-500/20', 'hover:bg-rose-500/20');
+                }
+            });
+
+            // Intersection Observer for code highlights
+            const sections = document.querySelectorAll('section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('ring-1', 'ring-accent-cyan/20');
+                    else entry.target.classList.remove('ring-1', 'ring-accent-cyan/20');
+                });
+            }, { threshold: 0.2 });
+            sections.forEach(section => observer.observe(section));
+        });
+    </script>
+</body>
+</html>
