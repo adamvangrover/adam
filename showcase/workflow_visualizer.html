@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Workflow Orchestrator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Mermaid.js -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'dark',
+            securityLevel: 'loose',
+            themeVariables: {
+                primaryColor: '#0f172a',
+                primaryTextColor: '#4ade80',
+                primaryBorderColor: '#4ade80',
+                lineColor: '#0ea5e9',
+                secondaryColor: '#1e293b',
+                tertiaryColor: '#1e293b'
+            }
+        });
+        window.mermaid = mermaid;
+    </script>
+    <style>
+        body { background-color: #000; color: #e2e8f0; font-family: 'Inter', sans-serif; }
+        .cyber-border { border: 1px solid #334155; box-shadow: 0 0 10px rgba(74, 222, 128, 0.1); }
+        .cyber-glow { text-shadow: 0 0 5px rgba(74, 222, 128, 0.5); }
+        .scanline {
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px;
+            pointer-events: none;
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 10;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        .node rect, .node circle, .node ellipse, .node polygon {
+            stroke-width: 2px !important;
+        }
+        .node.active rect, .node.active circle, .node.active ellipse, .node.active polygon {
+            fill: #064e3b !important;
+            stroke: #4ade80 !important;
+            stroke-width: 3px !important;
+            filter: drop-shadow(0 0 8px #4ade80);
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden relative">
+    <div class="scanline"></div>
+
+    <!-- Header -->
+    <header class="h-16 border-b border-slate-800 flex items-center justify-between px-6 bg-slate-900 z-20">
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="text-slate-400 hover:text-white transition"><i class="fas fa-chevron-left"></i></a>
+            <h1 class="text-xl font-bold tracking-tight text-white"><span class="text-emerald-400">ADAM</span> | Workflow Orchestrator</h1>
+        </div>
+        <div class="flex items-center gap-4 text-xs font-mono text-slate-500">
+            <div class="flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                SYSTEM ONLINE
+            </div>
+            <div>v3.4.1</div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex overflow-hidden z-20">
+        <!-- Sidebar -->
+        <aside class="w-80 border-r border-slate-800 bg-slate-900/50 flex flex-col">
+            <div class="p-4 border-b border-slate-800">
+                <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Available Scenarios</h2>
+                <input type="text" placeholder="Filter..." class="w-full bg-slate-800 border border-slate-700 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-emerald-500 transition">
+            </div>
+            <div id="scenario-list" class="flex-1 overflow-y-auto p-2 space-y-1">
+                <!-- Scenarios injected here -->
+            </div>
+        </aside>
+
+        <!-- Visualization Area -->
+        <main class="flex-1 flex flex-col bg-black relative">
+            <div id="toolbar" class="h-12 border-b border-slate-800 flex items-center justify-between px-4 bg-slate-900/30">
+                <h2 id="current-scenario-title" class="font-mono text-emerald-400 font-bold">Select a Scenario</h2>
+                <div class="flex gap-2">
+                    <button id="btn-simulate" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded text-sm font-medium transition disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fas fa-play mr-2"></i>Simulate
+                    </button>
+                    <button id="btn-reset" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1 rounded text-sm font-medium transition">
+                        <i class="fas fa-undo mr-2"></i>Reset
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-1 flex">
+                <!-- Graph Container -->
+                <div class="flex-1 overflow-auto flex items-center justify-center p-8 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9IiMxZTI5M2IiLz48L3N2Zz4=')]">
+                    <div id="mermaid-container" class="w-full h-full flex items-center justify-center"></div>
+                </div>
+
+                <!-- Live Log Panel -->
+                <div class="w-96 border-l border-slate-800 bg-slate-900/80 flex flex-col">
+                    <div class="p-3 border-b border-slate-800 bg-slate-900">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase"><i class="fas fa-terminal mr-2"></i>Execution Log</h3>
+                    </div>
+                    <div id="execution-log" class="flex-1 overflow-y-auto p-4 font-mono text-xs space-y-2">
+                        <div class="text-slate-500 italic">Waiting for simulation start...</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Nav Script -->
+    <script src="js/nav.js"></script>
+
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
+        let scenarios = [];
+        let currentScenario = null;
+        let simulationInterval = null;
+
+        // Fetch Scenarios
+        async function loadScenarios() {
+            try {
+                const response = await fetch('data/workflow_scenarios.json');
+                scenarios = await response.json();
+                renderScenarioList();
+
+                // Load first by default
+                if(scenarios.length > 0) loadScenario(scenarios[0]);
+            } catch (e) {
+                console.error("Failed to load scenarios:", e);
+                document.getElementById('scenario-list').innerHTML = `<div class="p-4 text-red-400 text-sm">Error loading scenarios.</div>`;
+            }
+        }
+
+        function renderScenarioList() {
+            const list = document.getElementById('scenario-list');
+            list.innerHTML = '';
+            scenarios.forEach(s => {
+                const item = document.createElement('div');
+                item.className = 'p-3 hover:bg-slate-800 rounded cursor-pointer border border-transparent hover:border-slate-700 group transition';
+                item.innerHTML = `
+                    <div class="font-bold text-slate-300 group-hover:text-emerald-400 text-sm">${s.title}</div>
+                    <div class="text-xs text-slate-500 truncate mt-1">${s.description}</div>
+                `;
+                item.onclick = () => loadScenario(s);
+                list.appendChild(item);
+            });
+        }
+
+        async function loadScenario(scenario) {
+            currentScenario = scenario;
+            document.getElementById('current-scenario-title').innerText = scenario.title.toUpperCase();
+            document.getElementById('execution-log').innerHTML = `<div class="text-slate-500 italic">Ready to simulate.</div>`;
+
+            // Render Graph
+            const container = document.getElementById('mermaid-container');
+            container.innerHTML = `<div class="mermaid">${scenario.mermaid_graph}</div>`;
+
+            try {
+                await mermaid.run({ nodes: container.querySelectorAll('.mermaid') });
+            } catch(e) {
+                console.error("Mermaid render error:", e);
+            }
+        }
+
+        function log(message, type="info") {
+            const logContainer = document.getElementById('execution-log');
+            const entry = document.createElement('div');
+            const time = new Date().toLocaleTimeString([], {hour12: false});
+
+            let color = "text-slate-300";
+            if(type === "success") color = "text-emerald-400";
+            if(type === "error") color = "text-red-400";
+            if(type === "agent") color = "text-cyan-400";
+
+            entry.className = `border-l-2 pl-2 ${type === 'agent' ? 'border-cyan-500' : 'border-slate-700'} py-1 animate-fadeIn`;
+            entry.innerHTML = `<span class="text-slate-600">[${time}]</span> <span class="${color}">${message}</span>`;
+
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        // Simulation Logic
+        function startSimulation() {
+            if(!currentScenario || !currentScenario.steps) return;
+
+            const btn = document.getElementById('btn-simulate');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Running...';
+
+            document.getElementById('execution-log').innerHTML = '';
+            log(`Initializing workflow: ${currentScenario.title}...`, "info");
+
+            let stepIndex = 0;
+            const steps = currentScenario.steps || [];
+
+            // Reset node styles
+            document.querySelectorAll('.node').forEach(n => n.classList.remove('active'));
+
+            simulationInterval = setInterval(() => {
+                if(stepIndex >= steps.length) {
+                    clearInterval(simulationInterval);
+                    log("Workflow execution complete.", "success");
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-play mr-2"></i>Simulate';
+                    return;
+                }
+
+                const step = steps[stepIndex];
+
+                // Highlight Node
+                const nodeId = step.id; // Assuming step ID matches Mermaid node ID roughly
+                // Mermaid generated IDs can be tricky (e.g. flow-Plan-234), so we try a partial match
+                const nodes = document.querySelectorAll('.node');
+                nodes.forEach(n => {
+                     // Check if the node's text content or ID matches our step ID
+                     if(n.id.includes(nodeId) || n.textContent.includes(nodeId)) {
+                         n.classList.add('active');
+                         setTimeout(() => n.classList.remove('active'), 1500);
+                     }
+                });
+
+                log(`<strong>${step.agent}</strong>: ${step.action}`, "agent");
+                log(`<span class="text-slate-500 text-[10px]">${step.details}</span>`, "info");
+
+                stepIndex++;
+            }, 2000); // 2 seconds per step
+        }
+
+        document.getElementById('btn-simulate').onclick = startSimulation;
+        document.getElementById('btn-reset').onclick = () => {
+            if(simulationInterval) clearInterval(simulationInterval);
+            loadScenario(currentScenario);
+            document.getElementById('btn-simulate').disabled = false;
+            document.getElementById('btn-simulate').innerHTML = '<i class="fas fa-play mr-2"></i>Simulate';
+        };
+
+        // Init
+        loadScenarios();
+
+    </script>
+</body>
+</html>

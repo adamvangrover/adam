@@ -1,0 +1,98 @@
+[
+  {
+    "id": "deep_dive",
+    "title": "Deep Dive Research",
+    "description": "Multi-agent research loop for in-depth topic analysis and report generation.",
+    "mermaid_graph": "graph TD;\n  Start(Start) --> Plan[Planner Agent];\n  Plan --> Search[Search Agent];\n  Search --> Analyze[Analyst Agent];\n  Analyze --> Review{Reviewer Agent};\n  Review -- Needs More Info --> Search;\n  Review -- Approved --> Finalize[Writer Agent];\n  Finalize --> End(End);",
+    "steps": [
+      {
+        "id": "Plan",
+        "agent": "PlannerAgent",
+        "action": "Generate Research Plan",
+        "details": "Decomposing '{{topic}}' into sub-questions and search queries."
+      },
+      {
+        "id": "Search",
+        "agent": "SearchAgent",
+        "action": "Execute Queries",
+        "details": "Retrieving data from knowledge base and external APIs."
+      },
+      {
+        "id": "Analyze",
+        "agent": "AnalystAgent",
+        "action": "Synthesize Findings",
+        "details": "Cross-referencing data points and identifying key trends."
+      },
+      {
+        "id": "Review",
+        "agent": "ReviewerAgent",
+        "action": "Quality Control",
+        "details": "Checking for citation accuracy and logical consistency."
+      },
+      {
+        "id": "Finalize",
+        "agent": "WriterAgent",
+        "action": "Draft Report",
+        "details": "Compiling findings into a structured 'Deep Dive' artifact."
+      }
+    ]
+  },
+  {
+    "id": "crisis_response",
+    "title": "Crisis Response Protocol",
+    "description": "Rapid response workflow for detected security incidents and anomalies.",
+    "mermaid_graph": "graph TD;\n  Start(Alert Received) --> Triage[Triage Agent];\n  Triage -->|Severity: High| Contain[Containment Agent];\n  Triage -->|Severity: Low| Log[Audit Logger];\n  Contain --> Investigate[Forensic Agent];\n  Investigate --> Report[Incident Reporter];\n  Report --> Notify[Notification Agent];\n  Notify --> End(Close Ticket);",
+    "steps": [
+      {
+        "id": "Triage",
+        "agent": "TriageAgent",
+        "action": "Assess Severity",
+        "details": "Analyzing alert metadata to determine risk level."
+      },
+      {
+        "id": "Contain",
+        "agent": "ContainmentAgent",
+        "action": "Isolate Node",
+        "details": "Executing kill-switch on affected sub-systems."
+      },
+      {
+        "id": "Investigate",
+        "agent": "ForensicAgent",
+        "action": "Analyze Root Cause",
+        "details": "Tracing execution logs and memory dumps."
+      },
+      {
+        "id": "Report",
+        "agent": "IncidentReporter",
+        "action": "Generate Incident Report",
+        "details": "Documenting timeline and impact for governance review."
+      }
+    ]
+  },
+  {
+    "id": "code_audit",
+    "title": "Smart Contract Audit",
+    "description": "Automated security verification for new smart contract deployments.",
+    "mermaid_graph": "graph LR;\n  Start(Deploy Request) --> Static[Static Analysis];\n  Static --> Fuzz[Fuzz Testing];\n  Fuzz --> Formal[Formal Verification];\n  Formal --> Gas[Gas Optimization];\n  Gas --> Sign[Sign Off];\n  Sign --> Deploy(Deploy to Mainnet);",
+    "steps": [
+      {
+        "id": "Static",
+        "agent": "SlitherBot",
+        "action": "Static Analysis",
+        "details": "Scanning for common vulnerabilities (reentrancy, overflow)."
+      },
+      {
+        "id": "Fuzz",
+        "agent": "FuzzerBot",
+        "action": "Stress Test",
+        "details": "Injecting random inputs to find edge cases."
+      },
+      {
+        "id": "Formal",
+        "agent": "LogicProver",
+        "action": "Verify Invariants",
+        "details": "Mathematically proving contract properties."
+      }
+    ]
+  }
+]
