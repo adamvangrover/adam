@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Workflows</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #050505;
+            color: #d4d4d8;
+            font-family: 'JetBrains Mono', monospace;
+            overflow: hidden;
+        }
+        .workflow-card {
+            background: rgba(20, 20, 25, 0.9);
+            border: 1px solid #333;
+            transition: all 0.2s;
+        }
+        .workflow-card:hover {
+            border-color: #00f3ff;
+            background: rgba(20, 20, 25, 1);
+        }
+        .status-dot {
+            width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px;
+        }
+        .status-active { background: #10b981; box-shadow: 0 0 5px #10b981; }
+        .status-idle { background: #6b7280; }
+        .status-error { background: #ef4444; box-shadow: 0 0 5px #ef4444; }
+        
+        .btn-run {
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid #00f3ff;
+            color: #00f3ff;
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-run:hover {
+            background: rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="p-6">
+    <header class="flex justify-between items-center mb-8 border-b border-zinc-800 pb-4">
+        <h1 class="text-xl font-bold tracking-wider text-cyan-400"><i class="fas fa-project-diagram mr-3"></i>WORKFLOW ORCHESTRATOR</h1>
+        <div class="text-xs text-zinc-500">SYSTEM STATUS: <span class="text-green-400">OPTIMAL</span></div>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Workflow 1 -->
+        <div class="workflow-card p-5 rounded">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="font-bold text-white">Daily Market Scan</h3>
+                <span class="text-xs bg-zinc-800 px-2 py-1 rounded text-zinc-400">08:00 EST</span>
+            </div>
+            <p class="text-xs text-zinc-400 mb-6 h-12">
+                Ingests global market data, processes sentiment analysis, and updates the knowledge graph.
+            </p>
+            <div class="flex justify-between items-center">
+                <div class="text-xs"><span class="status-dot status-idle"></span>IDLE</div>
+                <button class="btn-run" onclick="runWorkflow('scan')"><i class="fas fa-play mr-2"></i>RUN</button>
+            </div>
+        </div>
+
+        <!-- Workflow 2 -->
+        <div class="workflow-card p-5 rounded">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="font-bold text-white">Risk Assessment</h3>
+                <span class="text-xs bg-zinc-800 px-2 py-1 rounded text-zinc-400">CONTINUOUS</span>
+            </div>
+            <p class="text-xs text-zinc-400 mb-6 h-12">
+                Monitors portfolio VaR and liquidity constraints. Triggers alerts on threshold breach.
+            </p>
+            <div class="flex justify-between items-center">
+                <div class="text-xs"><span class="status-dot status-active"></span>ACTIVE</div>
+                <button class="btn-run" onclick="runWorkflow('risk')"><i class="fas fa-sync fa-spin mr-2"></i>MONITORING</button>
+            </div>
+        </div>
+
+        <!-- Workflow 3 -->
+        <div class="workflow-card p-5 rounded">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="font-bold text-white">Newsletter Gen</h3>
+                <span class="text-xs bg-zinc-800 px-2 py-1 rounded text-zinc-400">17:00 EST</span>
+            </div>
+            <p class="text-xs text-zinc-400 mb-6 h-12">
+                Synthesizes daily insights into 'Market Mayhem' HTML newsletter format.
+            </p>
+            <div class="flex justify-between items-center">
+                <div class="text-xs"><span class="status-dot status-idle"></span>IDLE</div>
+                <button class="btn-run" onclick="runWorkflow('newsletter')"><i class="fas fa-play mr-2"></i>RUN</button>
+            </div>
+        </div>
+
+        <!-- Workflow 4 -->
+        <div class="workflow-card p-5 rounded">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="font-bold text-white">Deep Dive Research</h3>
+                <span class="text-xs bg-zinc-800 px-2 py-1 rounded text-zinc-400">ON DEMAND</span>
+            </div>
+            <p class="text-xs text-zinc-400 mb-6 h-12">
+                Spawns research agents to investigate specific tickers or themes (e.g., 'Semiconductors').
+            </p>
+            <div class="flex justify-between items-center">
+                <div class="text-xs"><span class="status-dot status-idle"></span>IDLE</div>
+                <button class="btn-run" onclick="runWorkflow('research')"><i class="fas fa-search mr-2"></i>INITIATE</button>
+            </div>
+        </div>
+
+        <!-- Workflow 5 -->
+        <div class="workflow-card p-5 rounded">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="font-bold text-white">System Diagnostics</h3>
+                <span class="text-xs bg-zinc-800 px-2 py-1 rounded text-zinc-400">WEEKLY</span>
+            </div>
+            <p class="text-xs text-zinc-400 mb-6 h-12">
+                Checks agent health, database integrity, and bridge connectivity.
+            </p>
+            <div class="flex justify-between items-center">
+                <div class="text-xs"><span class="status-dot status-error"></span>ALERT</div>
+                <button class="btn-run" onclick="runWorkflow('diag')"><i class="fas fa-wrench mr-2"></i>DIAGNOSE</button>
+            </div>
+        </div>
+
+        <!-- Workflow 6 -->
+        <div class="workflow-card p-5 rounded">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="font-bold text-white">Alpha Search</h3>
+                <span class="text-xs bg-zinc-800 px-2 py-1 rounded text-zinc-400">ALGORITHMIC</span>
+            </div>
+            <p class="text-xs text-zinc-400 mb-6 h-12">
+                Runs 'Prompt Alpha' logic to identify high-probability trade setups.
+            </p>
+            <div class="flex justify-between items-center">
+                <div class="text-xs"><span class="status-dot status-active"></span>SCANNING</div>
+                <button class="btn-run" onclick="runWorkflow('alpha')"><i class="fas fa-chart-line mr-2"></i>VIEW</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function runWorkflow(id) {
+            console.log(`Workflow triggered: ${id}`);
+            // In a real app, this would call an API
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin mr-2"></i>STARTING...`;
+            btn.style.color = '#fbbf24';
+            btn.style.borderColor = '#fbbf24';
+            
+            setTimeout(() => {
+                btn.innerHTML = `<i class="fas fa-check mr-2"></i>QUEUED`;
+                btn.style.color = '#34d399';
+                btn.style.borderColor = '#34d399';
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.color = '';
+                    btn.style.borderColor = '';
+                }, 2000);
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
