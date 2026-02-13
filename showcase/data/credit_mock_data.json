@@ -1,0 +1,79 @@
+{
+  "Acme Corp": {
+    "borrower_details": {
+      "name": "Acme Corp",
+      "industry": "Widgets",
+      "rating": "BBB-"
+    },
+    "documents": [
+      {
+        "doc_id": "doc_123",
+        "title": "Acme Corp - 2025 Annual Report",
+        "page_count": 50,
+        "chunks": [
+          {
+            "chunk_id": "chunk_001",
+            "type": "header",
+            "page": 1,
+            "bbox": [50, 20, 300, 50],
+            "content": "Acme Corp - Annual Report 2025"
+          },
+          {
+            "chunk_id": "chunk_456",
+            "type": "narrative",
+            "page": 3,
+            "bbox": [50, 100, 550, 150],
+            "content": "Revenue grew by 15% year-over-year, driven primarily by the launch of the new 'Super Widget' product line in the APAC region."
+          },
+          {
+            "chunk_id": "chunk_457",
+            "type": "narrative",
+            "page": 3,
+            "bbox": [50, 160, 550, 200],
+            "content": "Despite inflationary pressures, gross margins remained stable at 42% due to strategic pricing adjustments and supply chain optimizations."
+          },
+          {
+            "chunk_id": "chunk_789",
+            "type": "financial_table",
+            "page": 12,
+            "bbox": [50, 300, 550, 500],
+            "content": "Consolidated Balance Sheet",
+            "content_json": {
+              "total_assets": 1250.5,
+              "total_liabilities": 800.2,
+              "total_equity": 450.3,
+              "ebitda": 320.0,
+              "total_debt": 600.0,
+              "interest_expense": 45.0
+            }
+          },
+          {
+            "chunk_id": "chunk_999",
+            "type": "risk_factor",
+            "page": 20,
+            "bbox": [50, 600, 550, 650],
+            "content": "The company faces significant exposure to foreign exchange risk, particularly in the Eurozone, which could impact future earnings if not hedged effectively."
+          }
+        ]
+      }
+    ],
+    "market_data": {
+      "sector_outlook": "Bullish",
+      "peer_comparison": "Outperforming",
+      "news_sentiment": 0.8
+    },
+    "knowledge_graph": {
+      "nodes": [
+        {"id": "Acme Corp", "label": "Borrower", "group": "corporation"},
+        {"id": "Acme Holdings", "label": "Parent", "group": "corporation"},
+        {"id": "John Doe", "label": "CEO", "group": "person"},
+        {"id": "Widget Factory 1", "label": "Collateral", "group": "property"}
+      ],
+      "edges": [
+        {"from": "Acme Corp", "to": "Acme Holdings", "label": "SUBSIDIARY_OF"},
+        {"from": "John Doe", "to": "Acme Corp", "label": "MANAGES"},
+        {"from": "Acme Corp", "to": "Widget Factory 1", "label": "OWNS"}
+      ]
+    }
+  }
+}

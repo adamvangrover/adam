@@ -7,105 +7,268 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/cyber_glitch.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
-            background-color: #0a0a12;
+            background-color: #050505;
             color: #e0e0e0;
             font-family: 'Inter', sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            overflow-x: hidden;
         }
-        h1, h2, h3 {
+        h1, h2, h3, h4 {
             font-family: 'JetBrains Mono', monospace;
             color: #00ff9d;
+            margin-top: 0;
         }
+
+        /* Top Status Bar */
+        .status-bar {
+            background: #000;
+            border-bottom: 1px solid #333;
+            padding: 5px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: #666;
+            z-index: 1000;
+        }
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .led {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00ff9d;
+            box-shadow: 0 0 5px #00ff9d;
+            animation: pulse 2s infinite;
+        }
+
+        /* Main Header */
+        header {
+            padding: 20px 40px;
+            border-bottom: 1px solid #333;
+            background: rgba(10, 15, 20, 0.95);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        .header-title h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+            text-shadow: 0 0 5px rgba(0, 255, 157, 0.3);
+        }
+
+        /* Layout */
         .container {
             display: grid;
-            grid-template-columns: 250px 1fr 1fr;
+            grid-template-columns: 280px 1fr 400px;
             gap: 20px;
-            max-width: 1600px;
-            margin: 0 auto;
-        }
-        .sidebar {
-            background: rgba(20, 20, 30, 0.8);
+            height: calc(100vh - 120px);
             padding: 20px;
-            border-right: 1px solid #333;
-            height: 90vh;
+            box-sizing: border-box;
         }
-        .ticker-list {
-            list-style: none;
-            padding: 0;
-        }
-        .ticker-item {
-            padding: 10px;
-            cursor: pointer;
-            border-bottom: 1px solid #333;
-            font-family: 'JetBrains Mono', monospace;
-            transition: background 0.2s;
-        }
-        .ticker-item:hover, .ticker-item.active {
-            background: rgba(0, 255, 157, 0.1);
-            color: #00ff9d;
-        }
+
+        /* Panels */
         .panel {
             background: rgba(20, 20, 30, 0.6);
             border: 1px solid #333;
-            padding: 20px;
-            border-radius: 4px;
+            border-radius: 2px;
             overflow-y: auto;
-            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, #00ff9d, transparent);
+            opacity: 0.3;
         }
         .panel-header {
-            border-bottom: 1px solid #00ff9d;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
+            padding: 15px 20px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(5px);
+        }
+        .panel-content {
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        /* Sidebar Tickers */
+        .ticker-list { list-style: none; padding: 0; margin: 0; }
+        .ticker-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #222;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.2s;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+        .ticker-item:hover { background: rgba(0, 255, 157, 0.05); padding-left: 25px; }
+        .ticker-item.active {
+            background: rgba(0, 255, 157, 0.1);
+            color: #00ff9d;
+            border-left: 3px solid #00ff9d;
+        }
+        .ticker-status { font-size: 0.7em; color: #666; }
+
+        /* Metrics */
         .metric-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
             gap: 15px;
+            margin-bottom: 25px;
         }
         .metric-card {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.03);
             padding: 15px;
-            border-radius: 4px;
+            border: 1px solid #333;
+            transition: transform 0.2s;
         }
-        .metric-label {
-            font-size: 0.8em;
-            color: #888;
+        .metric-card:hover { border-color: #00ff9d; transform: translateY(-2px); }
+        .metric-label { font-size: 0.75em; color: #888; margin-bottom: 5px; text-transform: uppercase; }
+        .metric-value { font-size: 1.1em; font-weight: bold; font-family: 'JetBrains Mono', monospace; }
+
+        .chart-container {
+            height: 300px;
+            width: 100%;
+            margin-bottom: 30px;
+            border: 1px solid #333;
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            box-sizing: border-box;
         }
-        .metric-value {
+
+        /* Risk Memo Styles */
+        .memo-container {
+            font-family: 'Courier New', Courier, monospace;
+            background: #111;
+            padding: 20px;
+            border: 1px solid #444;
+            position: relative;
+        }
+        .memo-header {
+            border-bottom: 2px solid #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+        }
+        .stamp {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            border: 3px solid;
+            padding: 5px 10px;
             font-size: 1.2em;
             font-weight: bold;
+            transform: rotate(-10deg);
+            opacity: 0.8;
+            letter-spacing: 2px;
+        }
+        .stamp.pass { color: #00ff9d; border-color: #00ff9d; }
+        .stamp.warn { color: #ffaa00; border-color: #ffaa00; }
+        .stamp.fail { color: #ff0055; border-color: #ff0055; }
+
+        /* Audit Timeline */
+        .audit-timeline {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            border-left: 2px solid #333;
+            margin-left: 10px;
+        }
+        .audit-item {
+            margin-bottom: 20px;
+            padding-left: 20px;
+            position: relative;
+        }
+        .audit-item::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 5px;
+            width: 10px;
+            height: 10px;
+            background: #000;
+            border: 2px solid #444;
+            border-radius: 50%;
+        }
+        .audit-item.success::before { border-color: #00ff9d; background: #00ff9d; }
+        .audit-item.warning::before { border-color: #ffaa00; background: #ffaa00; }
+
+        .audit-time { font-size: 0.7em; color: #666; font-family: 'JetBrains Mono', monospace; }
+        .audit-action { color: #ccc; font-weight: bold; font-size: 0.9em; margin: 3px 0; }
+        .audit-detail { color: #888; font-size: 0.8em; line-height: 1.4; }
+
+        /* Utilities */
+        .badge {
+            padding: 3px 8px;
+            font-size: 0.7em;
+            border-radius: 2px;
+            background: #333;
+            color: #fff;
             font-family: 'JetBrains Mono', monospace;
         }
-        .pass { color: #00ff9d; }
-        .fail { color: #ff0055; }
-        .warning { color: #ffaa00; }
+        .text-green { color: #00ff9d; }
+        .text-red { color: #ff0055; }
+        .text-yellow { color: #ffaa00; }
 
-        pre {
-            background: #111;
-            padding: 15px;
-            border-radius: 4px;
-            overflow-x: auto;
-            font-size: 0.9em;
+        @keyframes pulse {
+            0% { opacity: 0.5; box-shadow: 0 0 0 #00ff9d; }
+            50% { opacity: 1; box-shadow: 0 0 10px #00ff9d; }
+            100% { opacity: 0.5; box-shadow: 0 0 0 #00ff9d; }
         }
     </style>
 </head>
 <body>
+    <div class="crt-overlay"></div>
 
-    <header style="margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 20px;">
-        <h1>ADAM | SOVEREIGN CREDIT SENTINEL</h1>
-        <p style="color: #888;">Glass Box Transparency Engine // v1.0.0</p>
+    <div class="status-bar">
+        <div class="status-indicator">
+            <div class="led"></div>
+            <span>ADAM SOVEREIGN NETWORK: ONLINE</span>
+        </div>
+        <div>
+            <span>LATENCY: 12ms</span> |
+            <span>SECURE NODES: 5</span> |
+            <span>ENCRYPTION: AES-256</span>
+        </div>
+    </div>
+
+    <header>
+        <div class="header-title">
+            <h1 class="glitch-text" data-text="ADAM | SOVEREIGN CREDIT">ADAM | SOVEREIGN CREDIT</h1>
+            <p style="color: #888; margin: 0;">Glass Box Transparency Engine // v1.1.0 // <span style="color: #00ff9d;">CYBERPUNK PROTOCOL</span></p>
+        </div>
+        <div class="header-controls">
+            <a href="index.html" class="badge" style="text-decoration: none; border: 1px solid #444; padding: 8px 15px;">&larr; EXIT TO MAIN</a>
+        </div>
     </header>
 
     <div class="container">
         <!-- Sidebar: Ticker Selection -->
-        <div class="sidebar">
-            <h3>COVERAGE UNIVERSE</h3>
+        <div class="panel sidebar">
+            <div class="panel-header">
+                <h3>TARGETS</h3>
+                <span class="badge">LIVE</span>
+            </div>
             <ul class="ticker-list" id="tickerList">
                 <!-- Populated by JS -->
             </ul>
@@ -115,41 +278,57 @@
         <div class="panel">
             <div class="panel-header">
                 <h3>QUANTITATIVE SPREAD</h3>
-                <span class="badge" id="fiscalYear">FY --</span>
+                <span class="badge" id="fiscalYear" style="background: rgba(0, 255, 157, 0.1); color: #00ff9d; border: 1px solid #00ff9d;">FY --</span>
             </div>
+            <div class="panel-content" id="quantContent">
+                <div class="chart-container">
+                    <canvas id="financialChart"></canvas>
+                </div>
 
-            <div id="quantContent">
-                <p>Select a ticker to view analysis.</p>
+                <h4 style="color: #00ff9d; border-bottom: 1px solid #333; padding-bottom: 5px; margin-bottom: 15px;">GROWTH VELOCITY</h4>
+                <div id="growthMetrics" class="metric-grid">
+                    <!-- Populated by JS -->
+                </div>
+
+                <h4 style="color: #00ff9d; border-bottom: 1px solid #333; padding-bottom: 5px; margin-bottom: 15px;">KEY RATIOS</h4>
+                <div id="ratioMetrics" class="metric-grid">
+                     <!-- Populated by JS -->
+                </div>
+
+                <div id="validationBox" style="margin-top: 20px; padding: 15px; border: 1px dashed #444; background: rgba(0,0,0,0.3);">
+                    <!-- Validation -->
+                </div>
             </div>
         </div>
 
         <!-- Right Panel: Risk & Audit -->
         <div class="panel">
             <div class="panel-header">
-                <h3>RISK OFFICER MEMO</h3>
-                <span class="badge" id="riskStatus">--</span>
+                <h3>RISK ASSESSMENT</h3>
             </div>
+            <div class="panel-content">
+                <div id="riskContent" class="memo-container">
+                    <!-- Memo Content -->
+                </div>
 
-            <div id="riskContent">
-                <!-- Content -->
-            </div>
-
-            <h3 style="margin-top: 40px; border-top: 1px solid #333; padding-top: 20px;">AUDIT LOG</h3>
-            <div id="auditContent">
-                <!-- Content -->
+                <h3 style="margin-top: 30px; border-top: 1px solid #333; padding-top: 20px; font-size: 1rem;">SYSTEM EVENT LOG</h3>
+                <ul id="auditContent" class="audit-timeline">
+                    <!-- Audit Content -->
+                </ul>
             </div>
         </div>
     </div>
 
     <script>
         const TICKERS = ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA"];
+        let chartInstance = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             const list = document.getElementById('tickerList');
             TICKERS.forEach(ticker => {
                 const li = document.createElement('li');
                 li.className = 'ticker-item';
-                li.textContent = ticker;
+                li.innerHTML = `<span>${ticker}</span><span class="ticker-status">SECURE</span>`;
                 li.onclick = () => loadTicker(ticker, li);
                 list.appendChild(li);
             });
@@ -166,11 +345,12 @@
             element.classList.add('active');
 
             try {
-                // Fetch Artifacts
+                // Fetch Artifacts with cache busting
+                const ts = new Date().getTime();
                 const [spread, memo, audit] = await Promise.all([
-                    fetch(`data/sovereign_artifacts/${ticker}_spread.json`).then(r => r.json()),
-                    fetch(`data/sovereign_artifacts/${ticker}_memo.json`).then(r => r.json()),
-                    fetch(`data/sovereign_artifacts/${ticker}_audit.json`).then(r => r.json())
+                    fetch(`data/sovereign_artifacts/${ticker}_spread.json?t=${ts}`).then(r => r.json()),
+                    fetch(`data/sovereign_artifacts/${ticker}_memo.json?t=${ts}`).then(r => r.json()),
+                    fetch(`data/sovereign_artifacts/${ticker}_audit.json?t=${ts}`).then(r => r.json())
                 ]);
 
                 renderQuant(spread);
@@ -186,57 +366,116 @@
         function renderQuant(data) {
             document.getElementById('fiscalYear').textContent = `FY ${data.fiscal_year}`;
 
-            let metricsHtml = '<div class="metric-grid">';
-            for (const [key, val] of Object.entries(data.metrics)) {
-                metricsHtml += `
-                    <div class="metric-card">
-                        <div class="metric-label">${key}</div>
-                        <div class="metric-value">$${val.toLocaleString()} M</div>
-                    </div>`;
-            }
-            metricsHtml += '</div>';
+            // 1. Chart Rendering
+            const ctx = document.getElementById('financialChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
 
-            let ratiosHtml = '<h4 style="margin-top: 20px; color: #00ff9d;">KEY RATIOS</h4><div class="metric-grid">';
+            const history = data.history || [];
+            const labels = history.map(h => h.fiscal_year);
+            const revenues = history.map(h => h.revenue / 1000); // in Billions
+            const ebitdas = history.map(h => h.ebitda / 1000);
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Revenue ($B)',
+                            data: revenues,
+                            borderColor: '#00ff9d',
+                            backgroundColor: 'rgba(0, 255, 157, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'EBITDA ($B)',
+                            data: ebitdas,
+                            borderColor: '#00ccff',
+                            backgroundColor: 'rgba(0, 204, 255, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: '#ccc', font: { family: 'JetBrains Mono' } } },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#666' }, grid: { color: '#333' } },
+                        y: { ticks: { color: '#666' }, grid: { color: '#333' } }
+                    }
+                }
+            });
+
+            // 2. Growth Metrics
+            const growthDiv = document.getElementById('growthMetrics');
+            let growthHtml = '';
+            if (data.growth_metrics) {
+                for (const [key, val] of Object.entries(data.growth_metrics)) {
+                    const colorClass = val >= 0 ? 'text-green' : 'text-red';
+                    growthHtml += `
+                        <div class="metric-card">
+                            <div class="metric-label">${key}</div>
+                            <div class="metric-value ${colorClass}">${val}%</div>
+                        </div>`;
+                }
+            }
+            growthDiv.innerHTML = growthHtml;
+
+            // 3. Ratios
+            const ratioDiv = document.getElementById('ratioMetrics');
+            let ratioHtml = '';
             for (const [key, val] of Object.entries(data.ratios)) {
-                ratiosHtml += `
+                ratioHtml += `
                     <div class="metric-card">
                         <div class="metric-label">${key}</div>
                         <div class="metric-value">${val}x</div>
                     </div>`;
             }
-            ratiosHtml += '</div>';
+            ratioDiv.innerHTML = ratioHtml;
 
-            const validationClass = data.validation.identity_check === "PASS" ? "pass" : "fail";
-            const validationHtml = `
-                <div style="margin-top: 20px; padding: 10px; border: 1px solid #333; border-radius: 4px;">
-                    <div class="metric-label">ACCOUNTING IDENTITY CHECK</div>
-                    <div class="metric-value ${validationClass}">
-                        ${data.validation.identity_check} (Delta: ${data.validation.identity_delta.toFixed(2)})
-                    </div>
+            // 4. Validation
+            const validationClass = data.validation.identity_check === "PASS" ? "text-green" : "text-red";
+            document.getElementById('validationBox').innerHTML = `
+                <div class="metric-label">CRYPTOGRAPHIC ACCOUNTING VERIFICATION</div>
+                <div class="metric-value ${validationClass}">
+                    ${data.validation.identity_check} <span style="font-size:0.8em; color:#666;">(Delta: ${data.validation.identity_delta.toFixed(2)})</span>
                 </div>
             `;
-
-            document.getElementById('quantContent').innerHTML = metricsHtml + ratiosHtml + validationHtml;
         }
 
         function renderRisk(data) {
-            const statusColor = data.recommendation === "APPROVE" ? "pass" : "warning";
-            document.getElementById('riskStatus').textContent = data.recommendation;
-            document.getElementById('riskStatus').className = statusColor;
+            const statusColor = data.recommendation === "APPROVE" ? "pass" : "warn";
 
             let html = `
-                <h4>EXECUTIVE SUMMARY</h4>
-                <p>${data.executive_summary}</p>
+                <div class="memo-header">
+                    <div style="font-size: 0.8em; color: #666;">CLASSIFIED // INTERNAL USE ONLY</div>
+                    <div style="font-size: 1.2em; font-weight: bold; margin-top: 5px;">${data.title.toUpperCase()}</div>
+                    <div style="font-size: 0.8em; color: #888;">DATE: ${data.date}</div>
+                </div>
+                <div class="stamp ${statusColor}">${data.recommendation}</div>
 
-                <h4>COVENANT ANALYSIS</h4>
-                <ul style="list-style: none; padding: 0;">
+                <div style="margin-bottom: 15px;">
+                    <div class="metric-label">EXECUTIVE SUMMARY</div>
+                    <p style="font-size: 0.9em; line-height: 1.4; color: #ddd;">${data.executive_summary}</p>
+                </div>
+
+                <div class="metric-label">COVENANT ANALYSIS</div>
+                <ul style="list-style: none; padding: 0; margin-top: 5px;">
             `;
 
             for (const [test, result] of Object.entries(data.covenant_analysis)) {
-                const color = result === "PASS" ? "pass" : "fail";
-                html += `<li style="margin-bottom: 5px;">
-                    <span style="display: inline-block; width: 150px; color: #888;">${test.replace('_', ' ').toUpperCase()}</span>
-                    <span class="metric-value ${color}">${result}</span>
+                const color = result === "PASS" ? "text-green" : "text-red";
+                html += `<li style="margin-bottom: 5px; font-size: 0.9em; display: flex; justify-content: space-between; border-bottom: 1px dotted #333; padding-bottom: 2px;">
+                    <span style="color: #888;">${test.replace('_', ' ').toUpperCase()}</span>
+                    <span class="${color} font-bold">${result}</span>
                 </li>`;
             }
             html += '</ul>';
@@ -245,8 +484,43 @@
         }
 
         function renderAudit(data) {
-            let html = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
-            document.getElementById('auditContent').innerHTML = html;
+            const list = document.getElementById('auditContent');
+            list.innerHTML = '';
+
+            const events = [
+                {
+                    time: data.timestamp,
+                    agent: "ORCHESTRATOR",
+                    action: "PIPELINE_INIT",
+                    status: "success",
+                    detail: "Pipeline execution started"
+                },
+                {
+                    time: data.timestamp, // In real system, would be slightly later
+                    agent: "QUANT_AGENT",
+                    action: data.quant_audit.action,
+                    status: data.quant_audit.status === "SUCCESS" ? "success" : "warning",
+                    detail: data.quant_audit.details
+                },
+                {
+                    time: data.timestamp,
+                    agent: "RISK_OFFICER",
+                    action: data.risk_audit.action,
+                    status: data.risk_audit.status === "SUCCESS" ? "success" : "warning",
+                    detail: data.risk_audit.details
+                }
+            ];
+
+            events.forEach(event => {
+                const li = document.createElement('li');
+                li.className = `audit-item ${event.status}`;
+                li.innerHTML = `
+                    <div class="audit-time">${event.time}</div>
+                    <div class="audit-action">${event.agent} :: ${event.action}</div>
+                    <div class="audit-detail">${event.detail}</div>
+                `;
+                list.appendChild(li);
+            });
         }
     </script>
 </body>

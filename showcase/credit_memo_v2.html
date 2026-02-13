@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM | Enterprise Credit Analysis</title>
+    <link rel="stylesheet" href="css/credit_memo_v2.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+</head>
+<body>
+    <div class="crt-overlay"></div>
+
+    <div id="app-container">
+        <!-- Header -->
+        <header>
+            <div class="brand">ADAM <span>CREDIT</span></div>
+            <div class="header-nav">
+                <span style="color: #666; font-size: 0.8rem;">PROTOCOL: <span style="color: var(--neon-cyan)">SOVEREIGN_AI_V2</span></span>
+            </div>
+            <div class="user-profile">
+                <i class="fas fa-user-circle" style="color: #444; margin-right: 5px;"></i>
+                <span style="font-size: 0.8rem; color: #888;">CREDIT_OFFICER_01</span>
+            </div>
+        </header>
+
+        <!-- Left Sidebar: Controls -->
+        <aside class="left-panel">
+            <div class="control-group">
+                <label class="control-label">Target Entity</label>
+                <select id="borrower-select">
+                    <!-- Populated dynamically -->
+                    <option value="" disabled selected>-- Select Ticker --</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label">Analysis Mode</label>
+                <select id="analysis-mode">
+                    <option value="full">Full Credit Memo (10-K)</option>
+                    <option value="flash">Flash Update (Earnings)</option>
+                    <option value="covenant">Covenant Compliance</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label">Model Config</label>
+                <select id="model-select">
+                    <option value="gpt-4">Azure OpenAI GPT-4 (Private)</option>
+                    <option value="claude-3">Anthropic Claude 3 (Secure)</option>
+                </select>
+            </div>
+
+            <button id="generate-btn" class="primary">
+                <i class="fas fa-bolt" style="margin-right: 5px;"></i> EXECUTE ANALYSIS
+            </button>
+
+            <div style="height: 1px; background: #333; margin: 10px 0;"></div>
+
+            <div class="control-group">
+                <label class="control-label">Tools</label>
+                <button id="edit-btn" class="secondary" title="Enable Editing">
+                    <i class="fas fa-pen"></i> EDIT MODE
+                </button>
+                <button id="export-btn" class="secondary" title="Export PDF">
+                    <i class="fas fa-file-pdf"></i> EXPORT REPORT
+                </button>
+            </div>
+
+            <div style="flex: 1;"></div> <!-- Spacer -->
+
+            <div class="system-status" style="border-top: 1px solid #333; paddingTop: 10px;">
+                <div style="font-size: 0.7rem; color: #555; margin-bottom: 5px;">SYSTEM HEALTH</div>
+                <div style="display: flex; align-items: center; gap: 10px; font-size: 0.75rem; color: #888;">
+                    <span><span class="status-dot"></span> VPC</span>
+                    <span><span class="status-dot"></span> AUDIT</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content: Memo -->
+        <main>
+            <div id="memo-container">
+                <div id="memo-placeholder" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #444; text-align: center;">
+                    <i class="fas fa-file-invoice-dollar" style="font-size: 3rem; margin-bottom: 20px; color: #222;"></i>
+                    <h2 style="border: none; color: #666;">Awaiting Target Selection</h2>
+                    <p>Select a ticker to initiate autonomous credit analysis.</p>
+                </div>
+
+                <div id="memo-content" class="memo-paper" style="display: none;">
+                    <!-- Injected Content -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Panel: Evidence & Logs -->
+        <aside class="right-panel">
+            <!-- Evidence Viewer -->
+            <div class="panel-header">
+                <span><i class="fas fa-eye"></i> Evidence Verification</span>
+                <span id="doc-id-label" style="color: var(--neon-cyan)">[NO DOC]</span>
+            </div>
+            <div id="evidence-viewer">
+                <div id="pdf-mock-canvas">
+                    <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666; font-size: 0.8rem;">
+                        Select a citation to verify source.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Risk Quant / Charts Panel (Collapsible/Tabbed) -->
+             <div class="panel-header" style="border-top: 1px solid #333;">
+                <span><i class="fas fa-chart-line"></i> Risk Quant</span>
+                <span style="color: var(--neon-magenta)">MODEL</span>
+            </div>
+            <div id="risk-quant-panel" style="flex: 1; overflow-y: auto; padding: 10px; background-color: #050505;">
+                <div style="text-align: center; color: #666; font-size: 0.8rem; padding: 20px;">
+                    Select a ticker to enable models.
+                </div>
+            </div>
+
+            <!-- Agent Terminal -->
+            <div class="panel-header" style="border-top: 1px solid #333;">
+                <span><i class="fas fa-terminal"></i> Agent Trace</span>
+                <span style="color: var(--neon-green)">LIVE</span>
+            </div>
+            <div id="agent-terminal">
+                <!-- Logs injected here -->
+            </div>
+        </aside>
+
+        <!-- Footer -->
+        <footer>
+            <span>© 2026 ADAM FINANCIAL SYSTEMS | SOVEREIGN ARCHITECTURE</span>
+            <span>v2.4.1-RC3</span>
+        </footer>
+    </div>
+
+    <script src="js/credit_memo_v2.js"></script>
+</body>
+</html>
