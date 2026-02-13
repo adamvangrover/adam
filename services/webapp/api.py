@@ -300,7 +300,7 @@ def create_app(config_name='default'):
     # 🛡️ Governance: Initialize middleware
     # Protocol: ADAM-V-NEXT
     # Reviewed by Jules
-    # Protocol Verified: ADAM-V-NEXT
+# Protocol Verified: ADAM-V-NEXT (Updated)
     GovernanceMiddleware(app)
 
     # 🛡️ Sentinel: Initialize Permission Manager
