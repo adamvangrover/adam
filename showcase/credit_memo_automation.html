@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Credit Memo Automation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="css/credit_memo.css" rel="stylesheet">
+</head>
+<body class="bg-[#050b14] text-slate-300 font-sans overflow-hidden h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="h-16 border-b border-slate-700/50 flex items-center justify-between px-6 bg-[#0f172a]/90 backdrop-blur-md z-40">
+        <div class="flex items-center gap-4">
+            <a href="index.html" class="text-slate-400 hover:text-white transition"><i class="fas fa-arrow-left"></i></a>
+            <div class="w-8 h-8 bg-blue-900/50 rounded flex items-center justify-center border border-blue-500/30">
+                <i class="fas fa-file-invoice-dollar text-blue-400"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold tracking-tight text-white font-mono">CREDIT MEMO <span class="text-blue-400">AUTOMATION</span></h1>
+                <div class="text-[10px] text-slate-500 font-mono tracking-wider">ENTERPRISE GRADE | SOVEREIGN AI</div>
+            </div>
+        </div>
+        <div class="flex items-center gap-6 text-xs font-mono">
+             <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="text-emerald-400">SYSTEM ONLINE</span>
+             </div>
+             <div class="border-l border-slate-700 pl-6">
+                <span class="text-slate-500 block">MODEL VERSION</span>
+                <span class="text-white">GPT-4-32k (v2.1.4)</span>
+             </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex overflow-hidden">
+
+        <!-- Sidebar: Report Library -->
+        <div class="w-64 bg-[#0a101d] border-r border-slate-700/50 flex flex-col">
+            <div class="p-4 border-b border-slate-800">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Report Library</h3>
+                <input type="text" placeholder="Filter..." class="w-full bg-[#1e293b] text-slate-300 text-xs px-2 py-1 rounded border border-slate-700 focus:border-blue-500 outline-none">
+            </div>
+            <div class="flex-1 overflow-y-auto" id="library-list">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <!-- Left: Credit Memo Document -->
+        <div class="flex-1 flex flex-col border-r border-slate-700/50">
+            <div class="h-12 border-b border-slate-800 bg-[#0a101d] flex items-center justify-between px-4">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest"><i class="fas fa-file-alt mr-2"></i>Generated Memo</span>
+                <div class="flex gap-2">
+                    <button class="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded transition"><i class="fas fa-download mr-1"></i> Export PDF</button>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-8 bg-[#0f172a] relative">
+                <!-- Paper Effect -->
+                <div class="max-w-3xl mx-auto bg-white text-slate-900 p-12 min-h-full shadow-2xl relative" id="memo-container">
+                    <!-- Placeholder / Initial State -->
+                    <div class="flex flex-col items-center justify-center h-full text-slate-400 opacity-50">
+                        <i class="fas fa-file-invoice fa-3x mb-4"></i>
+                        <p>Select a report from the library to view.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Evidence & Audit -->
+        <div class="w-1/3 flex flex-col bg-[#050b14]">
+
+            <!-- Top Right: Evidence Viewer (Mock PDF) -->
+            <div class="h-3/5 flex flex-col border-b border-slate-700/50">
+                <div class="h-12 border-b border-slate-800 bg-[#0a101d] flex items-center justify-between px-4">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest"><i class="fas fa-eye mr-2"></i>Evidence Viewer</span>
+                    <span id="doc-title" class="text-xs text-blue-400 font-mono">Waiting for selection...</span>
+                </div>
+
+                <div class="flex-1 bg-[#1e293b] relative overflow-hidden flex items-center justify-center" id="pdf-viewer">
+                    <div class="text-center text-slate-500">
+                        <i class="fas fa-search fa-3x mb-4 opacity-50"></i>
+                        <p class="text-sm">Click a citation pin <span class="bg-blue-100 text-blue-800 px-1 rounded text-xs mx-1">[Ref]</span> to verify source.</p>
+                    </div>
+
+                    <!-- Simulated PDF Page -->
+                    <div id="mock-pdf-page" class="hidden absolute inset-4 bg-white shadow-lg p-8 overflow-hidden transition-all duration-300">
+                        <h3 class="text-sm font-bold text-slate-400 uppercase mb-4 border-b pb-2">Source Document Preview</h3>
+                        <div class="space-y-4 opacity-30 blur-[1px] select-none text-[8px] text-justify font-serif text-slate-800">
+                            <!-- Filler text to look like a document -->
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                            <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+                             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                            <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                        </div>
+
+                        <!-- Highlight Box -->
+                        <div id="highlight-box" class="absolute border-2 border-yellow-500/80 bg-yellow-400/20 transition-all duration-500">
+                            <div class="absolute -top-6 left-0 bg-yellow-500 text-black text-[10px] font-bold px-2 py-0.5 rounded-t">
+                                EVIDENCE MATCH (98%)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Right: Audit Log -->
+            <div class="h-2/5 flex flex-col bg-[#020408]">
+                 <div class="h-12 border-b border-slate-800 bg-[#0a101d] flex items-center justify-between px-4">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest"><i class="fas fa-terminal mr-2"></i>Live Audit Stream</span>
+                    <span class="text-[10px] text-emerald-500 font-mono"><i class="fas fa-circle text-[6px] mr-1"></i>RECORDING</span>
+                </div>
+
+                <div class="flex-1 overflow-auto p-0 font-mono text-xs">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-[#0f172a] text-slate-500 sticky top-0">
+                            <tr>
+                                <th class="p-3 border-b border-slate-800">Timestamp</th>
+                                <th class="p-3 border-b border-slate-800">Action</th>
+                                <th class="p-3 border-b border-slate-800">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="audit-table-body" class="text-slate-400 divide-y divide-slate-800/50">
+                            <!-- Injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script src="js/credit_memo.js"></script>
+</body>
+</html>
