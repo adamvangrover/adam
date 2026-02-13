@@ -171,6 +171,17 @@ class EdgarSource:
             "company_name": "NVIDIA Corporation",
             "history": [
                 {
+                    "fiscal_year": 2021,
+                    "revenue": 16675,
+                    "ebitda": 4532,
+                    "total_debt": 6965,
+                    "cash_equivalents": 11561,
+                    "interest_expense": 184,
+                    "total_assets": 28791,
+                    "total_liabilities": 11898,
+                    "total_equity": 16893
+                },
+                {
                     "fiscal_year": 2022,
                     "revenue": 26914,
                     "ebitda": 11216,
@@ -191,17 +202,82 @@ class EdgarSource:
                     "total_assets": 41182,
                     "total_liabilities": 19081,
                     "total_equity": 22101
+                }
+            ]
+        },
+        "TSLA": {
+            "company_name": "Tesla, Inc.",
+            "history": [
+                {
+                    "fiscal_year": 2021,
+                    "revenue": 53823,
+                    "ebitda": 9600,
+                    "total_debt": 6834,
+                    "cash_equivalents": 17576,
+                    "interest_expense": 371,
+                    "total_assets": 62131,
+                    "total_liabilities": 30548,
+                    "total_equity": 30189
                 },
                 {
-                    "fiscal_year": 2024,
-                    "revenue": 60922,
-                    "ebitda": 34480,
-                    "total_debt": 8461,
-                    "cash_equivalents": 25984,
-                    "interest_expense": 257,
-                    "total_assets": 65728,
-                    "total_liabilities": 22750,
-                    "total_equity": 42978
+                    "fiscal_year": 2022,
+                    "revenue": 81462,
+                    "ebitda": 17660,
+                    "total_debt": 3099,
+                    "cash_equivalents": 22185,
+                    "interest_expense": 191,
+                    "total_assets": 82338,
+                    "total_liabilities": 36440,
+                    "total_equity": 44704
+                },
+                {
+                    "fiscal_year": 2023,
+                    "revenue": 96773,
+                    "ebitda": 14997,
+                    "total_debt": 4350,
+                    "cash_equivalents": 29072,
+                    "interest_expense": 156,
+                    "total_assets": 106618,
+                    "total_liabilities": 43009,
+                    "total_equity": 62634
+                }
+            ]
+        },
+        "META": {
+            "company_name": "Meta Platforms, Inc.",
+            "history": [
+                {
+                    "fiscal_year": 2021,
+                    "revenue": 117929,
+                    "ebitda": 54720,
+                    "total_debt": 13876,
+                    "cash_equivalents": 16601,
+                    "interest_expense": 0,
+                    "total_assets": 165987,
+                    "total_liabilities": 41108,
+                    "total_equity": 124879
+                },
+                {
+                    "fiscal_year": 2022,
+                    "revenue": 116609,
+                    "ebitda": 40380,
+                    "total_debt": 26402,
+                    "cash_equivalents": 14681,
+                    "interest_expense": 109,
+                    "total_assets": 185727,
+                    "total_liabilities": 60014,
+                    "total_equity": 125713
+                },
+                {
+                    "fiscal_year": 2023,
+                    "revenue": 134902,
+                    "ebitda": 62310,
+                    "total_debt": 37043,
+                    "cash_equivalents": 41862,
+                    "interest_expense": 371,
+                    "total_assets": 229623,
+                    "total_liabilities": 76016,
+                    "total_equity": 153607
                 }
             ]
         }

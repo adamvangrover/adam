@@ -68,7 +68,7 @@
         /* Layout */
         .container {
             display: grid;
-            grid-template-columns: 280px 1fr 400px;
+            grid-template-columns: 240px 1fr 300px 300px;
             gap: 20px;
             height: calc(100vh - 120px);
             padding: 20px;
@@ -146,6 +146,35 @@
         .metric-card:hover { border-color: #00ff9d; transform: translateY(-2px); }
         .metric-label { font-size: 0.75em; color: #888; margin-bottom: 5px; text-transform: uppercase; }
         .metric-value { font-size: 1.1em; font-weight: bold; font-family: 'JetBrains Mono', monospace; }
+
+        /* Slider Styles */
+        .slider-container {
+            margin-bottom: 15px;
+        }
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8em;
+            color: #ccc;
+            margin-bottom: 5px;
+        }
+        input[type=range] {
+            width: 100%;
+            -webkit-appearance: none;
+            background: #333;
+            height: 4px;
+            border-radius: 2px;
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #00ff9d;
+            cursor: pointer;
+            box-shadow: 0 0 5px #00ff9d;
+        }
 
         .chart-container {
             height: 300px;
@@ -235,10 +264,197 @@
             50% { opacity: 1; box-shadow: 0 0 10px #00ff9d; }
             100% { opacity: 0.5; box-shadow: 0 0 0 #00ff9d; }
         }
+
+        /* Reports Overlay */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .overlay.active { display: flex; }
+        .report-modal {
+            width: 80%;
+            height: 85%;
+            background: #111;
+            border: 1px solid #333;
+            box-shadow: 0 0 20px rgba(0, 255, 157, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #0a0a0a;
+        }
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex-grow: 1;
+            font-family: 'Courier New', Courier, monospace;
+            color: #ddd;
+        }
+        .modal-body h2 {
+            color: #00ff9d;
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+            margin-top: 0;
+        }
+        .report-section {
+            margin-bottom: 30px;
+            border: 1px dashed #333;
+            padding: 15px;
+        }
+        .editable-area {
+            min-height: 100px;
+            outline: none;
+            white-space: pre-wrap;
+            color: #aaa;
+            line-height: 1.5;
+        }
+        .editable-area:focus {
+            color: #fff;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .btn-report {
+            background: #333;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8em;
+            transition: all 0.2s;
+        }
+        .btn-report:hover {
+            border-color: #00ff9d;
+            color: #00ff9d;
+        }
+
+        @media print {
+            body * { visibility: hidden; }
+            .overlay, .overlay * { visibility: visible; }
+            .overlay { position: absolute; left: 0; top: 0; background: white; color: black; }
+            .report-modal { border: none; width: 100%; height: auto; box-shadow: none; background: white; color: black; }
+            .modal-header button { display: none; }
+            .modal-body { color: black; }
+            h2 { color: black; border-color: black; }
+            .report-section { border-color: #ccc; }
+            .editable-area { color: black; }
+        }
     </style>
 </head>
 <body>
     <div class="crt-overlay"></div>
+
+    <!-- Report Overlay -->
+    <div class="overlay" id="reportOverlay">
+        <div class="report-modal">
+            <div class="modal-header">
+                <h3>DETAILED ANALYST REPORTS</h3>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-report" onclick="switchTab('tabExecutive')">EXECUTIVE</button>
+                    <button class="btn-report" onclick="switchTab('tabCredit')">CREDIT</button>
+                    <button class="btn-report" onclick="switchTab('tabEquity')">EQUITY</button>
+                    <div style="width: 20px;"></div>
+                    <button class="btn-report" onclick="downloadJSON()">DOWNLOAD</button>
+                    <button class="btn-report" onclick="document.getElementById('uploadInput').click()">UPLOAD</button>
+                    <input type="file" id="uploadInput" style="display: none;" onchange="uploadJSON(this)">
+                    <button class="btn-report" onclick="window.print()">PRINT</button>
+                    <button class="btn-report" onclick="toggleReport()" style="color: #ff0055;">X</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <!-- Executive Tab -->
+                <div id="tabExecutive" class="report-tab active">
+                    <div class="report-section">
+                        <h2>EXECUTIVE SUMMARY</h2>
+                        <div id="execSummary" class="editable-area" contenteditable="true">Loading...</div>
+                    </div>
+                    <div class="report-section">
+                        <h2>SWOT ANALYSIS</h2>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div>
+                                <h4 style="color: #00ff9d;">STRENGTHS</h4>
+                                <ul id="swotStrengths" contenteditable="true"></ul>
+                                <h4 style="color: #ffaa00;">OPPORTUNITIES</h4>
+                                <ul id="swotOpportunities" contenteditable="true"></ul>
+                            </div>
+                            <div>
+                                <h4 style="color: #ff0055;">WEAKNESSES</h4>
+                                <ul id="swotWeaknesses" contenteditable="true"></ul>
+                                <h4 style="color: #ff5555;">THREATS</h4>
+                                <ul id="swotThreats" contenteditable="true"></ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="report-section">
+                        <h2>SOURCE CITATIONS (RAG)</h2>
+                        <ul id="citationsList" style="font-size: 0.8em; color: #888;"></ul>
+                    </div>
+                </div>
+
+                <!-- Credit Tab -->
+                <div id="tabCredit" class="report-tab" style="display: none;">
+                    <div class="report-section">
+                        <h2>PROBABILITY OF DEFAULT (Z-SCORE MODEL)</h2>
+                        <div id="riskReportText" class="editable-area" contenteditable="true" style="margin-bottom: 20px;"></div>
+
+                        <div style="background: rgba(255,255,255,0.05); padding: 15px;">
+                            <h4>INTERACTIVE Z-SCORE CALCULATOR</h4>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.8em;">
+                                <div>WORKING CAPITAL / ASSETS (A): <input type="number" step="0.01" id="inputZ_A" style="background:#222; border:1px solid #444; color:#fff; width:60px;"></div>
+                                <div>RETAINED EARNINGS / ASSETS (B): <input type="number" step="0.01" id="inputZ_B" style="background:#222; border:1px solid #444; color:#fff; width:60px;"></div>
+                                <div>EBIT / ASSETS (C): <input type="number" step="0.01" id="inputZ_C" style="background:#222; border:1px solid #444; color:#fff; width:60px;"></div>
+                                <div>MV EQUITY / LIABILITIES (D): <input type="number" step="0.01" id="inputZ_D" style="background:#222; border:1px solid #444; color:#fff; width:60px;"></div>
+                                <div>SALES / ASSETS (E): <input type="number" step="0.01" id="inputZ_E" style="background:#222; border:1px solid #444; color:#fff; width:60px;"></div>
+                            </div>
+                            <div style="margin-top: 10px; font-weight: bold; color: #00ff9d;">
+                                CALCULATED Z-SCORE: <span id="calcZScore">--</span>
+                                <span id="calcZRating" style="margin-left: 10px; color: #ccc;">(Rating: --)</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="report-section">
+                        <h2>CAPITAL STRUCTURE & LGD</h2>
+                        <table style="width: 100%; text-align: left; font-size: 0.9em; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid #444; color: #888;">
+                                    <th>TRANCHE</th>
+                                    <th>AMOUNT ($M)</th>
+                                    <th>PRIORITY</th>
+                                    <th>RECOVERY EST.</th>
+                                </tr>
+                            </thead>
+                            <tbody id="capStructureTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Equity Tab -->
+                <div id="tabEquity" class="report-tab" style="display: none;">
+                    <div class="report-section">
+                        <h2>VALUATION OUTLOOK</h2>
+                        <div id="valuationReportText" class="editable-area" contenteditable="true"></div>
+                    </div>
+                    <div class="report-section">
+                        <h2>SCENARIO DISTRIBUTION</h2>
+                        <div style="height: 250px;">
+                            <canvas id="scenarioChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="status-bar">
         <div class="status-indicator">
@@ -257,7 +473,8 @@
             <h1 class="glitch-text" data-text="ADAM | SOVEREIGN CREDIT">ADAM | SOVEREIGN CREDIT</h1>
             <p style="color: #888; margin: 0;">Glass Box Transparency Engine // v1.1.0 // <span style="color: #00ff9d;">CYBERPUNK PROTOCOL</span></p>
         </div>
-        <div class="header-controls">
+        <div class="header-controls" style="display: flex; gap: 15px;">
+            <button class="btn-report" onclick="toggleReport()">VIEW REPORTS</button>
             <a href="index.html" class="badge" style="text-decoration: none; border: 1px solid #444; padding: 8px 15px;">&larr; EXIT TO MAIN</a>
         </div>
     </header>
@@ -301,10 +518,104 @@
             </div>
         </div>
 
+        <!-- Valuation & Risk Panel (New) -->
+        <div class="panel">
+            <div class="panel-header">
+                <h3>VALUATION & RISK</h3>
+                <span class="badge">INTERACTIVE</span>
+            </div>
+            <div class="panel-content">
+                <!-- Forward System View -->
+                <h4 style="color: #a020f0; border-bottom: 1px solid #333; padding-bottom: 5px; margin-bottom: 15px;">FORWARD SYSTEM VIEW</h4>
+                <div class="metric-grid" style="grid-template-columns: 1fr 1fr;">
+                    <div class="metric-card" style="border-left: 3px solid #a020f0;">
+                         <div class="metric-label">CONVICTION SCORE</div>
+                         <div id="convictionScore" class="metric-value" style="font-size: 1.5em; color: #a020f0;">--/100</div>
+                    </div>
+                     <div class="metric-card" style="border-left: 3px solid #fff;">
+                         <div class="metric-label">CREDIT RATING</div>
+                         <div id="creditRating" class="metric-value" style="font-size: 1.5em; color: #fff;">--</div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <div class="metric-label" style="margin-bottom: 5px;">PRICE TARGETS (12M)</div>
+                    <div style="display: flex; justify-content: space-between; font-family: 'JetBrains Mono'; font-size: 0.85em; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 4px;">
+                        <div style="text-align: center;">
+                            <div style="color: #ff0055;">BEAR</div>
+                            <div id="bearTarget" style="font-weight: bold;">$--</div>
+                        </div>
+                        <div style="text-align: center; border-left: 1px solid #444; border-right: 1px solid #444; padding: 0 15px;">
+                            <div style="color: #ccc;">BASE</div>
+                            <div id="baseTarget" style="font-weight: bold; color: #fff;">$--</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="color: #00ff9d;">BULL</div>
+                            <div id="bullTarget" style="font-weight: bold;">$--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DCF Section -->
+                <h4 style="color: #00ccff; border-bottom: 1px solid #333; padding-bottom: 5px; margin-bottom: 15px;">DISCOUNTED CASH FLOW</h4>
+
+                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="color: #888;">IMPLIED SHARE PRICE</span>
+                        <span id="dcfSharePrice" style="color: #00ff9d; font-size: 1.2em; font-weight: bold;">$--.--</span>
+                    </div>
+                     <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #888;">ENTERPRISE VALUE</span>
+                        <span id="dcfEnterpriseValue" style="color: #e0e0e0;">$-- B</span>
+                    </div>
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>WACC</span>
+                        <span id="waccVal">9.0%</span>
+                    </div>
+                    <input type="range" min="5.0" max="15.0" step="0.1" value="9.0" id="waccSlider">
+                </div>
+
+                <div class="slider-container">
+                    <div class="slider-label">
+                        <span>TERMINAL GROWTH</span>
+                        <span id="growthVal">3.0%</span>
+                    </div>
+                    <input type="range" min="0.0" max="6.0" step="0.1" value="3.0" id="growthSlider">
+                </div>
+
+                <!-- Risk Model Section -->
+                <h4 style="color: #ffaa00; border-bottom: 1px solid #333; padding-bottom: 5px; margin-bottom: 15px; margin-top: 30px;">RISK MODELING</h4>
+
+                <div class="metric-grid" style="grid-template-columns: 1fr 1fr;">
+                    <div class="metric-card" style="border-left: 3px solid #ffaa00;">
+                        <div class="metric-label">PROBABILITY OF DEFAULT</div>
+                        <div id="pdCategory" class="metric-value" style="font-size: 0.9em;">--</div>
+                        <div id="zScore" style="font-size: 0.7em; color: #666; margin-top: 5px;">Z-Score: --</div>
+                    </div>
+                    <div class="metric-card" style="border-left: 3px solid #ff0055;">
+                        <div class="metric-label">LOSS GIVEN DEFAULT</div>
+                        <div id="lgdValue" class="metric-value">--%</div>
+                        <div id="coverageRatio" style="font-size: 0.7em; color: #666; margin-top: 5px;">Coverage: --x</div>
+                    </div>
+                </div>
+
+                 <div style="margin-top: 20px; padding: 10px; border: 1px solid #333; background: #000;">
+                    <div class="metric-label" style="color: #00ccff; margin-bottom: 5px;">AI GENERATED OUTLOOK</div>
+                    <p id="aiOutlook" style="font-size: 0.8em; line-height: 1.4; color: #aaa; margin: 0;">
+                        Initializing neural pathway...
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
         <!-- Right Panel: Risk & Audit -->
         <div class="panel">
             <div class="panel-header">
-                <h3>RISK ASSESSMENT</h3>
+                <h3>MEMO & LOGS</h3>
             </div>
             <div class="panel-content">
                 <div id="riskContent" class="memo-container">
@@ -320,8 +631,112 @@
     </div>
 
     <script>
-        const TICKERS = ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA"];
+        const TICKERS = ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "TSLA", "META"];
         let chartInstance = null;
+
+        // Global State for DCF Recalculation
+        let currentDCFState = {
+            base_fcf: 0,
+            mock_shares: 0,
+            debt_net_cash: 0, // Debt - Cash
+            original_data: null, // Store full artifact for export
+            report_data: null // Store report artifact
+        };
+
+        let scenarioChartInstance = null;
+
+        function toggleReport() {
+            const overlay = document.getElementById('reportOverlay');
+            overlay.classList.toggle('active');
+
+            // If opening and report data exists, render tabs
+            if (overlay.classList.contains('active') && currentDCFState.report_data) {
+                renderReportTabs(currentDCFState.report_data);
+            }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.report-tab').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.report-tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).style.display = 'block';
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // Z-Score Calculator Logic
+        document.addEventListener('input', (e) => {
+            if (e.target.id.startsWith('inputZ_')) {
+                calcZScore();
+            }
+        });
+
+        function calcZScore() {
+            const A = parseFloat(document.getElementById('inputZ_A').value) || 0;
+            const B = parseFloat(document.getElementById('inputZ_B').value) || 0;
+            const C = parseFloat(document.getElementById('inputZ_C').value) || 0;
+            const D = parseFloat(document.getElementById('inputZ_D').value) || 0;
+            const E = parseFloat(document.getElementById('inputZ_E').value) || 0;
+
+            const z = (1.2 * A) + (1.4 * B) + (3.3 * C) + (0.6 * D) + (1.0 * E);
+            document.getElementById('calcZScore').innerText = z.toFixed(2);
+
+            let rating = "CCC";
+            if (z > 3.0) rating = "AAA";
+            else if (z > 2.8) rating = "AA";
+            else if (z > 2.5) rating = "A";
+            else if (z > 2.0) rating = "BBB";
+            else if (z > 1.8) rating = "BB";
+            else if (z > 1.2) rating = "B";
+
+            const ratingSpan = document.getElementById('calcZRating');
+            ratingSpan.innerText = `(Rating: ${rating})`;
+            ratingSpan.style.color = z > 1.8 ? '#00ff9d' : '#ff0055';
+        }
+
+        function downloadJSON() {
+            // Capture current edits
+            if (!currentDCFState.original_data) return;
+
+            const data = currentDCFState.original_data;
+
+            // Update rationale from text areas
+            if (data.valuation && data.valuation.risk_model) {
+                data.valuation.risk_model.rationale = document.getElementById('riskReportText').innerText;
+            }
+            if (data.valuation && data.valuation.forward_view) {
+                data.valuation.forward_view.rationale = document.getElementById('valuationReportText').innerText;
+            }
+
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${data.ticker}_Report_Export.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function uploadJSON(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    // Update global state and re-render
+                    renderQuant(data);
+                    renderRisk(data);
+                    renderAudit(data);
+                    renderValuation(data);
+                    alert("Report Loaded Successfully.");
+                } catch (err) {
+                    console.error("Upload failed", err);
+                    alert("Invalid JSON file.");
+                }
+            };
+            reader.readAsText(file);
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             const list = document.getElementById('tickerList');
@@ -335,8 +750,22 @@
 
             // Load first by default
             if (TICKERS.length > 0) {
-                loadTicker(TICKERS[0], list.firstChild);
+                loadTicker(TICKERS[0], list.firstElementChild);
             }
+
+            // Slider Listeners
+            const waccSlider = document.getElementById('waccSlider');
+            const growthSlider = document.getElementById('growthSlider');
+
+            waccSlider.addEventListener('input', (e) => {
+                document.getElementById('waccVal').textContent = e.target.value + "%";
+                recalcDCF();
+            });
+
+            growthSlider.addEventListener('input', (e) => {
+                document.getElementById('growthVal').textContent = e.target.value + "%";
+                recalcDCF();
+            });
         });
 
         async function loadTicker(ticker, element) {
@@ -347,20 +776,110 @@
             try {
                 // Fetch Artifacts with cache busting
                 const ts = new Date().getTime();
-                const [spread, memo, audit] = await Promise.all([
+                const [spread, memo, audit, report] = await Promise.all([
                     fetch(`data/sovereign_artifacts/${ticker}_spread.json?t=${ts}`).then(r => r.json()),
                     fetch(`data/sovereign_artifacts/${ticker}_memo.json?t=${ts}`).then(r => r.json()),
-                    fetch(`data/sovereign_artifacts/${ticker}_audit.json?t=${ts}`).then(r => r.json())
+                    fetch(`data/sovereign_artifacts/${ticker}_audit.json?t=${ts}`).then(r => r.json()),
+                    fetch(`data/sovereign_artifacts/${ticker}_report.json?t=${ts}`).then(r => r.ok ? r.json() : null)
                 ]);
 
                 renderQuant(spread);
                 renderRisk(memo);
                 renderAudit(audit);
+                renderValuation(spread);
+
+                if (report) {
+                    currentDCFState.report_data = report;
+                }
 
             } catch (e) {
                 console.error("Error loading data:", e);
                 alert("Failed to load artifacts. Ensure you have run 'scripts/run_sovereign_pipeline.py'.");
             }
+        }
+
+        function renderReportTabs(report) {
+            // Executive Summary
+            document.getElementById('execSummary').innerText = report.executive_summary;
+
+            // SWOT
+            renderList('swotStrengths', report.swot.Strengths);
+            renderList('swotWeaknesses', report.swot.Weaknesses);
+            renderList('swotOpportunities', report.swot.Opportunities);
+            renderList('swotThreats', report.swot.Threats);
+
+            // Citations
+            const citeList = document.getElementById('citationsList');
+            citeList.innerHTML = '';
+            report.citations.forEach(c => {
+                const li = document.createElement('li');
+                li.innerText = `[${c.doc_id}] ${c.source} (${c.relevance})`;
+                citeList.appendChild(li);
+            });
+
+            // Cap Structure
+            const capTable = document.getElementById('capStructureTable');
+            capTable.innerHTML = '';
+            report.cap_structure.forEach(tranche => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="padding: 8px;">${tranche.tranche}</td>
+                    <td style="padding: 8px;">$${tranche.amount.toLocaleString()}</td>
+                    <td style="padding: 8px;">${tranche.priority}</td>
+                    <td style="padding: 8px; color: ${tranche.recovery_est > 90 ? '#00ff9d' : '#ffaa00'}">${tranche.recovery_est}%</td>
+                `;
+                capTable.appendChild(tr);
+            });
+
+            // Scenario Chart
+            const ctx = document.getElementById('scenarioChart').getContext('2d');
+            if (scenarioChartInstance) scenarioChartInstance.destroy();
+
+            const scenarios = report.scenarios;
+            scenarioChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: scenarios.map(s => s.case),
+                    datasets: [{
+                        label: 'Price Target ($)',
+                        data: scenarios.map(s => s.price_target),
+                        backgroundColor: ['#ff0055', '#cccccc', '#00ff9d'],
+                        borderColor: '#333',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                afterLabel: function(context) {
+                                    return scenarios[context.dataIndex].description;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { grid: { color: '#333' }, ticks: { color: '#888' } },
+                        x: { grid: { display: false }, ticks: { color: '#ccc' } }
+                    }
+                }
+            });
+
+            // Init Z-Score Calculator inputs if needed
+            // (Mock implementation: fill random values or pull from spread if available, currently just interactive placeholder)
+        }
+
+        function renderList(elementId, items) {
+            const ul = document.getElementById(elementId);
+            ul.innerHTML = '';
+            items.forEach(item => {
+                const li = document.createElement('li');
+                li.innerText = item;
+                ul.appendChild(li);
+            });
         }
 
         function renderQuant(data) {
@@ -371,9 +890,29 @@
             if (chartInstance) chartInstance.destroy();
 
             const history = data.history || [];
-            const labels = history.map(h => h.fiscal_year);
-            const revenues = history.map(h => h.revenue / 1000); // in Billions
-            const ebitdas = history.map(h => h.ebitda / 1000);
+            let labels = history.map(h => h.fiscal_year);
+            let revenues = history.map(h => h.revenue / 1000); // in Billions
+            let ebitdas = history.map(h => h.ebitda / 1000);
+
+            // Add Projections if available
+            if (data.valuation && data.valuation.forward_view && data.valuation.forward_view.projections) {
+                const projs = data.valuation.forward_view.projections;
+                projs.forEach(p => {
+                    labels.push(p.fiscal_year + " (E)");
+                    revenues.push(p.revenue / 1000);
+                    ebitdas.push(p.ebitda / 1000);
+                });
+            }
+
+            // Identify split point for dashed lines (historical vs projected)
+            // Historical length
+            const histLen = history.length;
+
+            // We need a dataset that spans the whole range, but we want to style the end part differently.
+            // Chart.js segment styling is the clean way, or just one continuous line for now to keep it simple but functional.
+            // Let's use segment styling for dashed projection.
+
+            const segmentStyle = (ctx) => ctx.p0DataIndex >= histLen - 1 ? [5, 5] : undefined;
 
             chartInstance = new Chart(ctx, {
                 type: 'line',
@@ -387,7 +926,10 @@
                             backgroundColor: 'rgba(0, 255, 157, 0.1)',
                             borderWidth: 2,
                             tension: 0.4,
-                            fill: true
+                            fill: true,
+                            segment: {
+                                borderDash: segmentStyle
+                            }
                         },
                         {
                             label: 'EBITDA ($B)',
@@ -396,7 +938,10 @@
                             backgroundColor: 'rgba(0, 204, 255, 0.1)',
                             borderWidth: 2,
                             tension: 0.4,
-                            fill: true
+                            fill: true,
+                            segment: {
+                                borderDash: segmentStyle
+                            }
                         }
                     ]
                 },
@@ -481,6 +1026,108 @@
             html += '</ul>';
 
             document.getElementById('riskContent').innerHTML = html;
+        }
+
+        function renderValuation(data) {
+            const val = data.valuation;
+
+            // Update Sliders to match server defaults
+            document.getElementById('waccSlider').value = (val.dcf.wacc * 100).toFixed(1);
+            document.getElementById('waccVal').textContent = (val.dcf.wacc * 100).toFixed(1) + "%";
+            document.getElementById('growthSlider').value = (val.dcf.growth_rate * 100).toFixed(1);
+            document.getElementById('growthVal').textContent = (val.dcf.growth_rate * 100).toFixed(1) + "%";
+
+            // Set Global State for Client-Side Recalc
+            currentDCFState.base_fcf = val.dcf.base_fcf;
+            currentDCFState.mock_shares = val.dcf.mock_shares;
+
+            // Calculate Net Debt (Debt - Cash)
+            // Note: Data format: data.metrics['Total Debt']
+            const debt = data.metrics['Total Debt'];
+            const cash = data.metrics['Cash'];
+            currentDCFState.debt_net_cash = debt - cash;
+
+            // Initial Render
+            recalcDCF();
+
+            // Risk Gauges
+            const pdColor = val.risk_model.pd_category === "Safe" ? "#00ff9d" : (val.risk_model.pd_category === "Distress" ? "#ff0055" : "#ffaa00");
+            const pdElem = document.getElementById('pdCategory');
+            pdElem.textContent = val.risk_model.pd_category;
+            pdElem.style.color = pdColor;
+
+            document.getElementById('zScore').textContent = `Z-Score: ${val.risk_model.z_score}`;
+
+            document.getElementById('lgdValue').textContent = (val.risk_model.lgd * 100).toFixed(0) + "%";
+            document.getElementById('coverageRatio').textContent = `Coverage: ${val.risk_model.asset_coverage}x`;
+
+            // Forward System View
+            if (val.forward_view) {
+                document.getElementById('convictionScore').textContent = `${val.forward_view.conviction_score}/100`;
+                document.getElementById('creditRating').textContent = val.risk_model.credit_rating || "--";
+
+                const targets = val.forward_view.price_targets;
+                document.getElementById('bullTarget').textContent = `$${targets.bull}`;
+                document.getElementById('baseTarget').textContent = `$${targets.base}`;
+                document.getElementById('bearTarget').textContent = `$${targets.bear}`;
+            }
+
+            // AI Outlook Generation (Mock)
+            let outlook = "";
+            if (val.risk_model.z_score > 3.0) {
+                outlook = `System detects high structural stability. Z-Score of ${val.risk_model.z_score} indicates minimal default probability. Balance sheet robust with ${val.risk_model.asset_coverage}x asset coverage. Recommendation: MAINTAIN OVERWEIGHT.`;
+            } else if (val.risk_model.z_score > 1.8) {
+                outlook = `Warning: Financials entering grey zone. Z-Score degradation to ${val.risk_model.z_score} suggests monitoring required. Leverage coverage at ${val.risk_model.asset_coverage}x is adequate but tightening.`;
+            } else {
+                outlook = `CRITICAL ALERT: Distress signals active. Z-Score ${val.risk_model.z_score} implies high default probability. Immediate covenant review recommended.`;
+            }
+            document.getElementById('aiOutlook').textContent = outlook;
+
+            // Populate Report Rationale
+            if (val.risk_model && val.risk_model.rationale) {
+                document.getElementById('riskReportText').innerText = val.risk_model.rationale;
+            }
+            if (val.forward_view && val.forward_view.rationale) {
+                document.getElementById('valuationReportText').innerText = val.forward_view.rationale;
+            }
+
+            // Store Original Data for Export
+            currentDCFState.original_data = data;
+        }
+
+        function recalcDCF() {
+            // Client-side DCF Engine
+            const wacc = parseFloat(document.getElementById('waccSlider').value) / 100;
+            const growth_rate = parseFloat(document.getElementById('growthSlider').value) / 100;
+
+            const base_fcf = currentDCFState.base_fcf;
+
+            let projected_fcf = [];
+            let pv_fcf = 0;
+
+            for (let i = 1; i <= 5; i++) {
+                 // Degrading growth logic matches python: 5% -> 3% base assumption
+                 // But here we use the slider for terminal, let's just use linear interpolation
+                 // from 5% down to the terminal rate set by slider
+                 const g = 0.05 - ((0.05 - growth_rate) * (i-1) / 4);
+
+                 const fcf = base_fcf * Math.pow((1 + g), i);
+                 projected_fcf.push(fcf);
+                 pv_fcf += fcf / Math.pow((1 + wacc), i);
+            }
+
+            // Terminal Value
+            const last_fcf = projected_fcf[4];
+            const terminal_val = (last_fcf * (1 + growth_rate)) / (wacc - growth_rate);
+            const pv_terminal = terminal_val / Math.pow((1 + wacc), 5);
+
+            const ev = pv_fcf + pv_terminal;
+            const equity_val = ev - currentDCFState.debt_net_cash;
+            const share_price = equity_val / currentDCFState.mock_shares;
+
+            // Update DOM
+            document.getElementById('dcfSharePrice').textContent = "$" + share_price.toFixed(2);
+            document.getElementById('dcfEnterpriseValue').textContent = "$" + (ev / 1000).toFixed(1) + " B";
         }
 
         function renderAudit(data) {
