@@ -21,15 +21,19 @@ def audit_citation_density(memo_text):
 def audit_financial_math(spread_json):
     """
     Control 04: Accounting Identity Check.
+    Validates the fundamental accounting equation: Assets = Liabilities + Equity.
     """
-    data = json.loads(spread_json)
-    assets = data.get('total_assets', 0)
-    liabilities = data.get('total_liabilities', 0)
-    equity = data.get('total_equity', 0)
+    try:
+        data = json.loads(spread_json)
+        assets = data.get('total_assets', 0)
+        liabilities = data.get('total_liabilities', 0)
+        equity = data.get('total_equity', 0)
 
-    if abs(assets - (liabilities + equity)) > 1.0:
-        return False, f"Balance Sheet Mismatch: {assets - (liabilities + equity)}"
-    return True, "Passed"
+        if abs(assets - (liabilities + equity)) > 1.0:
+            return False, f"Balance Sheet Mismatch: {assets - (liabilities + equity)}"
+        return True, "Passed"
+    except json.JSONDecodeError:
+        return False, "Invalid JSON format"
 
 def audit_tone_check(memo_text):
     """
@@ -39,6 +43,7 @@ def audit_tone_check(memo_text):
     emotive_words = ["amazing", "terrible", "skyrocketed", "plummeted", "fantastic", "horrible", "insane"]
     found_words = []
     for word in emotive_words:
+        # Use regex to find whole words only, case-insensitive
         if re.search(r'\b' + re.escape(word) + r'\b', memo_text.lower()):
             found_words.append(word)
 
@@ -49,7 +54,7 @@ def audit_tone_check(memo_text):
 def audit_absolute_statements(memo_text):
     """
     Control 06: Risk Management.
-    Flags absolute claims like 'guaranteed', 'impossible'.
+    Flags absolute claims like 'guaranteed', 'impossible' which create liability.
     """
     absolute_terms = ["guaranteed", "impossible", "certainly", "undoubtedly", "always", "never"]
     found_terms = []

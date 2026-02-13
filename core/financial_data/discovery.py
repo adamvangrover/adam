@@ -1,6 +1,10 @@
 import logging
 from typing import List, Optional
-import yfinance as yf
+try:
+    import yfinance as yf
+except ImportError:
+    yf = None
+
 from .schema import MarketTicker
 
 logger = logging.getLogger(__name__)
@@ -14,6 +18,8 @@ class MarketDiscoveryAgent:
 
     def __init__(self):
         self.logger = logger
+        if yf is None:
+            self.logger.warning("yfinance is not installed. MarketDiscoveryAgent functionality will be limited.")
 
     def search_universe(self, query: str, limit: int = 20) -> List[MarketTicker]:
         """
@@ -26,6 +32,10 @@ class MarketDiscoveryAgent:
         Returns:
             List of validated MarketTicker objects.
         """
+        if yf is None:
+            self.logger.error("yfinance is not installed. Cannot perform search.")
+            return []
+
         self.logger.info(f"Searching universe for: '{query}'")
         try:
             # yfinance Search returns a list of dictionaries in 'quotes'

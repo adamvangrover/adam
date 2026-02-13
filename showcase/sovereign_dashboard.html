@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sovereign Credit Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/cyber_glitch.css">
+    <style>
+        body {
+            background-color: #0a0a12;
+            color: #e0e0e0;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            font-family: 'JetBrains Mono', monospace;
+            color: #00ff9d;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 250px 1fr 1fr;
+            gap: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        .sidebar {
+            background: rgba(20, 20, 30, 0.8);
+            padding: 20px;
+            border-right: 1px solid #333;
+            height: 90vh;
+        }
+        .ticker-list {
+            list-style: none;
+            padding: 0;
+        }
+        .ticker-item {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #333;
+            font-family: 'JetBrains Mono', monospace;
+            transition: background 0.2s;
+        }
+        .ticker-item:hover, .ticker-item.active {
+            background: rgba(0, 255, 157, 0.1);
+            color: #00ff9d;
+        }
+        .panel {
+            background: rgba(20, 20, 30, 0.6);
+            border: 1px solid #333;
+            padding: 20px;
+            border-radius: 4px;
+            overflow-y: auto;
+            max-height: 90vh;
+        }
+        .panel-header {
+            border-bottom: 1px solid #00ff9d;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .metric-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .metric-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .metric-label {
+            font-size: 0.8em;
+            color: #888;
+        }
+        .metric-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .pass { color: #00ff9d; }
+        .fail { color: #ff0055; }
+        .warning { color: #ffaa00; }
+
+        pre {
+            background: #111;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+    <header style="margin-bottom: 30px; border-bottom: 1px solid #333; padding-bottom: 20px;">
+        <h1>ADAM | SOVEREIGN CREDIT SENTINEL</h1>
+        <p style="color: #888;">Glass Box Transparency Engine // v1.0.0</p>
+    </header>
+
+    <div class="container">
+        <!-- Sidebar: Ticker Selection -->
+        <div class="sidebar">
+            <h3>COVERAGE UNIVERSE</h3>
+            <ul class="ticker-list" id="tickerList">
+                <!-- Populated by JS -->
+            </ul>
+        </div>
+
+        <!-- Middle Panel: Quantitative Analysis -->
+        <div class="panel">
+            <div class="panel-header">
+                <h3>QUANTITATIVE SPREAD</h3>
+                <span class="badge" id="fiscalYear">FY --</span>
+            </div>
+
+            <div id="quantContent">
+                <p>Select a ticker to view analysis.</p>
+            </div>
+        </div>
+
+        <!-- Right Panel: Risk & Audit -->
+        <div class="panel">
+            <div class="panel-header">
+                <h3>RISK OFFICER MEMO</h3>
+                <span class="badge" id="riskStatus">--</span>
+            </div>
+
+            <div id="riskContent">
+                <!-- Content -->
+            </div>
+
+            <h3 style="margin-top: 40px; border-top: 1px solid #333; padding-top: 20px;">AUDIT LOG</h3>
+            <div id="auditContent">
+                <!-- Content -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const TICKERS = ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA"];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const list = document.getElementById('tickerList');
+            TICKERS.forEach(ticker => {
+                const li = document.createElement('li');
+                li.className = 'ticker-item';
+                li.textContent = ticker;
+                li.onclick = () => loadTicker(ticker, li);
+                list.appendChild(li);
+            });
+
+            // Load first by default
+            if (TICKERS.length > 0) {
+                loadTicker(TICKERS[0], list.firstChild);
+            }
+        });
+
+        async function loadTicker(ticker, element) {
+            // Update UI State
+            document.querySelectorAll('.ticker-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+
+            try {
+                // Fetch Artifacts
+                const [spread, memo, audit] = await Promise.all([
+                    fetch(`data/sovereign_artifacts/${ticker}_spread.json`).then(r => r.json()),
+                    fetch(`data/sovereign_artifacts/${ticker}_memo.json`).then(r => r.json()),
+                    fetch(`data/sovereign_artifacts/${ticker}_audit.json`).then(r => r.json())
+                ]);
+
+                renderQuant(spread);
+                renderRisk(memo);
+                renderAudit(audit);
+
+            } catch (e) {
+                console.error("Error loading data:", e);
+                alert("Failed to load artifacts. Ensure you have run 'scripts/run_sovereign_pipeline.py'.");
+            }
+        }
+
+        function renderQuant(data) {
+            document.getElementById('fiscalYear').textContent = `FY ${data.fiscal_year}`;
+
+            let metricsHtml = '<div class="metric-grid">';
+            for (const [key, val] of Object.entries(data.metrics)) {
+                metricsHtml += `
+                    <div class="metric-card">
+                        <div class="metric-label">${key}</div>
+                        <div class="metric-value">$${val.toLocaleString()} M</div>
+                    </div>`;
+            }
+            metricsHtml += '</div>';
+
+            let ratiosHtml = '<h4 style="margin-top: 20px; color: #00ff9d;">KEY RATIOS</h4><div class="metric-grid">';
+            for (const [key, val] of Object.entries(data.ratios)) {
+                ratiosHtml += `
+                    <div class="metric-card">
+                        <div class="metric-label">${key}</div>
+                        <div class="metric-value">${val}x</div>
+                    </div>`;
+            }
+            ratiosHtml += '</div>';
+
+            const validationClass = data.validation.identity_check === "PASS" ? "pass" : "fail";
+            const validationHtml = `
+                <div style="margin-top: 20px; padding: 10px; border: 1px solid #333; border-radius: 4px;">
+                    <div class="metric-label">ACCOUNTING IDENTITY CHECK</div>
+                    <div class="metric-value ${validationClass}">
+                        ${data.validation.identity_check} (Delta: ${data.validation.identity_delta.toFixed(2)})
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('quantContent').innerHTML = metricsHtml + ratiosHtml + validationHtml;
+        }
+
+        function renderRisk(data) {
+            const statusColor = data.recommendation === "APPROVE" ? "pass" : "warning";
+            document.getElementById('riskStatus').textContent = data.recommendation;
+            document.getElementById('riskStatus').className = statusColor;
+
+            let html = `
+                <h4>EXECUTIVE SUMMARY</h4>
+                <p>${data.executive_summary}</p>
+
+                <h4>COVENANT ANALYSIS</h4>
+                <ul style="list-style: none; padding: 0;">
+            `;
+
+            for (const [test, result] of Object.entries(data.covenant_analysis)) {
+                const color = result === "PASS" ? "pass" : "fail";
+                html += `<li style="margin-bottom: 5px;">
+                    <span style="display: inline-block; width: 150px; color: #888;">${test.replace('_', ' ').toUpperCase()}</span>
+                    <span class="metric-value ${color}">${result}</span>
+                </li>`;
+            }
+            html += '</ul>';
+
+            document.getElementById('riskContent').innerHTML = html;
+        }
+
+        function renderAudit(data) {
+            let html = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            document.getElementById('auditContent').innerHTML = html;
+        }
+    </script>
+</body>
+</html>
