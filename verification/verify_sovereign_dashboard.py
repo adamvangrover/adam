@@ -29,8 +29,13 @@ def verify_dashboard():
             # Wait for Ticker List to populate
             page.wait_for_selector(".ticker-item")
 
-            # Click MSFT
-            page.click("text=MSFT")
+            # Verify new tickers are present
+            assert page.is_visible("text=TSLA")
+            assert page.is_visible("text=META")
+            print("New Tickers (TSLA, META) verified.")
+
+            # Click TSLA
+            page.click("text=TSLA")
             time.sleep(1) # Allow fetch and render
 
             # Verify Chart Canvas exists
@@ -44,7 +49,7 @@ def verify_dashboard():
             # Verify Quant Data Loaded (Look for Revenue Label)
             # The new dashboard puts "Revenue" in .metric-label
             assert page.is_visible("text=Revenue")
-            print("MSFT Quantitative Data verified.")
+            print("Quantitative Data verified.")
 
             # Verify Risk Data Loaded (New Classified Look)
             assert page.is_visible("text=CLASSIFIED // INTERNAL USE ONLY")
