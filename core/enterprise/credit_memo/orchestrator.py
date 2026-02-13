@@ -56,6 +56,11 @@ class CreditMemoOrchestrator:
         historicals = spreading_engine.get_historicals(spread)
         dcf = spreading_engine.calculate_dcf(spread)
 
+        # 3.2 Advanced Quant: Capital Structure (New)
+        ratings = spreading_engine.get_credit_ratings(borrower_name)
+        debt = spreading_engine.get_debt_facilities(borrower_name)
+        equity = spreading_engine.get_equity_data(borrower_name)
+
         # 4. Risk (Analysis)
         risk_out = self.risk.execute({"financial_spread": spread, "graph_context": graph_data})
         risks = risk_out.get("identified_risks", [])
@@ -107,7 +112,10 @@ class CreditMemoOrchestrator:
             },
             historical_financials=[h.model_dump() for h in historicals],
             dcf_analysis=dcf,
-            risk_score=75.0 if spread.leverage_ratio < 4.0 else 45.0
+            risk_score=75.0 if spread.leverage_ratio < 4.0 else 45.0,
+            credit_ratings=ratings,
+            debt_facilities=debt,
+            equity_data=equity
         )
 
         # 7. Audit Logging (Pass/Fail Check)

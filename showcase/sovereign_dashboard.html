@@ -630,6 +630,9 @@
         </div>
     </div>
 
+    <script src="js/nav.js"></script>
+    <script src="js/mock_data.js"></script>
+    <script src="js/universal_loader.js"></script>
     <script>
         const TICKERS = ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "TSLA", "META"];
         let chartInstance = null;
@@ -773,28 +776,95 @@
             document.querySelectorAll('.ticker-item').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
 
-            try {
-                // Fetch Artifacts with cache busting
-                const ts = new Date().getTime();
-                const [spread, memo, audit, report] = await Promise.all([
-                    fetch(`data/sovereign_artifacts/${ticker}_spread.json?t=${ts}`).then(r => r.json()),
-                    fetch(`data/sovereign_artifacts/${ticker}_memo.json?t=${ts}`).then(r => r.json()),
-                    fetch(`data/sovereign_artifacts/${ticker}_audit.json?t=${ts}`).then(r => r.json()),
-                    fetch(`data/sovereign_artifacts/${ticker}_report.json?t=${ts}`).then(r => r.ok ? r.json() : null)
-                ]);
+try {
+                let data = null;
+                let reportData = null;
 
-                renderQuant(spread);
-                renderRisk(memo);
-                renderAudit(audit);
-                renderValuation(spread);
+                // --- TIER 1: Universal Loader (Main Branch Strategy) ---
+                if (window.universalLoader && typeof window.universalLoader.loadSovereignData === 'function') {
+                    try {
+                        console.log(`[System 1] Attempting Universal Loader for ${ticker}...`);
+                        const universalResult = await window.universalLoader.loadSovereignData(ticker);
+                        
+                        // Validation: Ensure we actually got the artifacts we need
+                        if (universalResult && universalResult.spread && universalResult.memo) {
+                            data = universalResult;
+                            reportData = universalResult.report || null; // Extract report if bundled
+                        }
+                    } catch (loaderErr) {
+                        console.warn("[System 1] Universal Loader failed, switching to Direct Fetch.", loaderErr);
+                    }
+                }
 
-                if (report) {
-                    currentDCFState.report_data = report;
+                // --- TIER 2: Direct Artifact Fetch (Feature Branch Strategy) ---
+                if (!data) {
+                    console.log(`[System 1] Attempting Direct Artifact Fetch for ${ticker}...`);
+                    const ts = new Date().getTime(); // Cache busting
+                    
+                    // We wrap this in its own try/catch so if it fails, we catch it below to trigger System 2
+                    const [spread, memo, audit, report] = await Promise.all([
+                        fetch(`data/sovereign_artifacts/${ticker}_spread.json?t=${ts}`).then(r => { if(!r.ok) throw new Error('Spread 404'); return r.json(); }),
+                        fetch(`data/sovereign_artifacts/${ticker}_memo.json?t=${ts}`).then(r => { if(!r.ok) throw new Error('Memo 404'); return r.json(); }),
+                        fetch(`data/sovereign_artifacts/${ticker}_audit.json?t=${ts}`).then(r => r.ok ? r.json() : null), // Audit optional
+                        fetch(`data/sovereign_artifacts/${ticker}_report.json?t=${ts}`).then(r => r.ok ? r.json() : null)  // Report optional
+                    ]);
+
+                    data = { spread, memo, audit: audit || {} };
+                    reportData = report;
+                }
+
+                // --- RENDER PIPELINE (Unified) ---
+                if (data && data.spread && data.memo) {
+                    // 1. Render Core Modules
+                    renderQuant(data.spread);
+                    renderRisk(data.memo);
+                    renderAudit(data.audit || []); // Handle optional audit
+                    renderValuation(data.spread);
+
+                    // 2. Handle Report Data (Specific to Feature Branch)
+                    if (reportData) {
+                        currentDCFState.report_data = reportData;
+                        // If report modal is currently open, refresh it
+                        if (document.getElementById('reportOverlay').classList.contains('active')) {
+                             renderReportTabs(reportData);
+                        }
+                    } else {
+                        currentDCFState.report_data = null; // Clear old data if none found
+                    }
+
+                } else {
+                    throw new Error("Incomplete data artifacts from both sources.");
                 }
 
             } catch (e) {
+                // --- TIER 3: System 2 Mock Engine (Offline Fallback) ---
+                console.warn(`[System 1] Network pipeline failed (${e.message}). Engaging System 2 Mock Engine...`);
+                
+                // Fallback to synthetic generator defined in previous turn
+                const mockData = System2_MockEngine.generateArtifacts(ticker);
+                
+                renderQuant(mockData);
+                renderRisk(mockData);
+                renderAudit(mockData);
+                renderValuation(mockData);
+                renderReportTabs(mockData); // Pre-load mock report
+                currentDCFState.report_data = mockData; // Ensure tabs work
+                
+                // Visual Indicator of Mock Mode
+                document.querySelector('.status-bar').innerHTML = `
+                    <div style="display: flex; align-items: center; color: #ffaa00;">
+                        <div class="led" style="background: #ffaa00; box-shadow: 0 0 5px #ffaa00;"></div>
+                        <span>ADAM SOVEREIGN NETWORK: OFFLINE (SIMULATION MODE)</span>
+                    </div>
+                    <div><span>LATENCY: 0ms</span> | <span>LOCAL MOCK</span></div>
+                `;
+            }
+
+            } catch (e) {
                 console.error("Error loading data:", e);
-                alert("Failed to load artifacts. Ensure you have run 'scripts/run_sovereign_pipeline.py'.");
+                // alert("Failed to load artifacts. Ensure you have run 'scripts/run_sovereign_pipeline.py' or check mock data.");
+                // Provide a visual fallback or error message in the UI instead of alert
+                document.getElementById('quantContent').innerHTML = `<div style="padding:20px; color:red;">DATA LOAD FAILURE: ${e.message}</div>`;
             }
         }
 

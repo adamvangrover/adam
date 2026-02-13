@@ -395,6 +395,51 @@ def create_app(config_name='default'):
         ])
 
     # ---------------------------------------------------------------------------- #
+    # Sovereign Credit Endpoints (Live Agent Pipeline)
+    # ---------------------------------------------------------------------------- #
+
+    @app.route('/api/credit/generate', methods=['POST'])
+    @jwt_required(optional=True) # Optional for demo convenience, typically required
+    def generate_credit_memo():
+        """
+        Triggers the Live Credit Pipeline for a given ticker.
+        If the pipeline fails, returns an error status allowing frontend fallback.
+        """
+        data = request.get_json()
+        ticker = data.get('ticker')
+        name = data.get('name', 'Unknown')
+        sector = data.get('sector', 'Technology')
+
+        if not ticker:
+            return jsonify({'error': 'Ticker required'}), 400
+
+        try:
+            # Lazy import to avoid circular deps during startup
+            from core.pipelines.credit_pipeline import CreditPipeline
+
+            pipeline = CreditPipeline()
+            # Run async pipeline in sync context
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            result = loop.run_until_complete(pipeline.run(ticker, name, sector))
+            loop.close()
+
+            return jsonify({
+                "status": "success",
+                "mode": "live_compute",
+                "data": result['source_data'], # Return structured data for frontend rendering
+                "memo": result['memo']
+            })
+
+        except Exception as e:
+            app.logger.error(f"Credit Pipeline Failed: {e}", exc_info=True)
+            return jsonify({
+                "status": "error",
+                "message": str(e),
+                "fallback": True
+            }), 500
+
+    # ---------------------------------------------------------------------------- #
     # Credit Sentinel Endpoints (4-Layered Framework)
     # ---------------------------------------------------------------------------- #
 
