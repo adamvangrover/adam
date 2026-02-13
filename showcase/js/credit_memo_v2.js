@@ -1,51 +1,58 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // ------------------------------------------------------------------
-    // State & Config
-    // ------------------------------------------------------------------
+document.addEventListener('DOMContentLoaded', async () => {
+    // --- State Management ---
     let library = {};
     let selectedBorrower = null;
-    let agentLogInterval = null;
+    let currentMemoData = null;
+    let isEditMode = false;
+    let currentChart = null;
 
     const elements = {
         borrowerSelect: document.getElementById('borrower-select'),
         generateBtn: document.getElementById('generate-btn'),
-        memoContainer: document.getElementById('memo-content'),
-        memoPlaceholder: document.getElementById('memo-placeholder'),
+        editBtn: document.getElementById('edit-btn'),
+        exportBtn: document.getElementById('export-btn'),
+        memoContainer: document.getElementById('memo-container'), // Main scrollable area
+        memoContent: document.getElementById('memo-content'),     // Inner content div
         evidenceViewer: document.getElementById('pdf-mock-canvas'),
         terminal: document.getElementById('agent-terminal'),
-        docIdLabel: document.getElementById('doc-id-label'),
-        modeIndicator: document.querySelector('.header-nav span span') // "SOVEREIGN_AI_V2"
+        docIdLabel: document.getElementById('doc-id-label') || document.createElement('div'), // Safety fallback
+        modeIndicator: document.querySelector('.header-nav span span') 
     };
 
-    // ------------------------------------------------------------------
-    // Initialization
-    // ------------------------------------------------------------------
+    // --- Initialization ---
     async function init() {
         log("System", "Initializing CreditOS v2.4...", "info");
 
         try {
-            // Load Full Library
-            // Fallback to tech_credit_data.json if library is missing (safety)
-            let res = await fetch('data/credit_memo_library.json');
-            if (!res.ok) {
-                log("System", "Full library not found, loading Tech subset...", "warn");
-                res = await fetch('data/tech_credit_data.json');
+            // Load Library
+            const res = await fetch('data/credit_memo_library.json');
+            if (res.ok) {
+                library = await res.json(); // Array or Object? Handling both.
+                
+                // Normalize if array
+                if (Array.isArray(library)) {
+                    const libObj = {};
+                    library.forEach(item => libObj[item.id] = item);
+                    library = libObj;
+                }
+
+                // Populate Dropdown
+                Object.values(library).forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item.file; // Using filename as key to load actual data
+                    opt.innerText = `${item.borrower_name} (Risk: ${item.risk_score})`;
+                    opt.dataset.ticker = item.ticker || "UNK";
+                    opt.dataset.name = item.borrower_name;
+                    elements.borrowerSelect.appendChild(opt);
+                });
+                
+                log("Archivist", `Loaded ${Object.keys(library).length} entity profiles.`, "success");
+            } else {
+                throw new Error("Library not found");
             }
-            library = await res.json();
-
-            // Populate Dropdown
-            // Sort by key
-            const sortedKeys = Object.keys(library).sort();
-            sortedKeys.forEach(key => {
-                const item = library[key];
-                const ticker = item.borrower_details.ticker || "UNKNOWN";
-                const opt = document.createElement('option');
-                opt.value = key;
-                opt.innerText = `${key} (${ticker})`;
-                elements.borrowerSelect.appendChild(opt);
-            });
-
-            log("Archivist", `Loaded ${Object.keys(library).length} entity profiles.`, "success");
+            
+            // Load Audit Logs (Background)
+            loadAuditLogs();
 
         } catch (e) {
             log("System", "Failed to load artifact library.", "error");
@@ -53,249 +60,287 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ------------------------------------------------------------------
-    // Event Listeners
-    // ------------------------------------------------------------------
-    elements.generateBtn.addEventListener('click', runAnalysis);
+    // --- Event Listeners ---
+    if(elements.generateBtn) elements.generateBtn.addEventListener('click', runAnalysis);
+    if(elements.editBtn) elements.editBtn.addEventListener('click', toggleEditMode);
+    if(elements.exportBtn) elements.exportBtn.addEventListener('click', () => window.print());
 
-    // ------------------------------------------------------------------
-    // Core Workflow
-    // ------------------------------------------------------------------
+    // --- Core Workflow ---
     async function runAnalysis() {
-        const borrowerName = elements.borrowerSelect.value;
-        if (!borrowerName) {
-            alert("Please select a target entity.");
-            return;
-        }
-
-        // Default to cached data
-        let data = library[borrowerName];
-        const ticker = data.borrower_details.ticker;
-        const sector = data.borrower_details.sector;
+        const filename = elements.borrowerSelect.value;
+        if (!filename) { alert("Please select a target entity."); return; }
+        
+        const option = elements.borrowerSelect.options[elements.borrowerSelect.selectedIndex];
+        const ticker = option.dataset.ticker;
+        const name = option.dataset.name;
 
         // Reset UI
-        elements.memoContainer.innerHTML = '';
-        elements.memoContainer.style.display = 'none';
-        elements.memoPlaceholder.style.display = 'flex';
-        elements.memoPlaceholder.innerHTML = `<h3 style="color:var(--neon-cyan)">INITIALIZING AGENT SWARM...</h3>`;
+        elements.memoContent.innerHTML = '';
         clearTerminal();
-
-        // LIVE MODE ATTEMPT
-        let isLive = false;
-        try {
-            log("Orchestrator", "Attempting Live Pipeline Connection...", "info");
-
-            // Note: In a real scenario, we might check a "use_live" checkbox.
-            // For now, we try live, fallback to cache.
-            const apiRes = await fetch('/api/credit/generate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ticker: ticker, name: borrowerName, sector: sector })
-            });
-
-            if (apiRes.ok) {
-                const apiData = await apiRes.json();
-                if (apiData.status === 'success') {
-                    log("Orchestrator", "Live Pipeline Connected. Executing...", "success");
-                    data = apiData.data; // Use live data
-                    isLive = true;
-                    elements.modeIndicator.innerText = "LIVE_COMPUTE_NODE";
-                    elements.modeIndicator.style.color = "var(--neon-pink)";
-                } else {
-                    throw new Error(apiData.message);
-                }
-            } else {
-                throw new Error(`API Status: ${apiRes.status}`);
-            }
-        } catch (e) {
-            log("Orchestrator", `Live Connection Failed (${e.message}). Reverting to Cached Artifacts.`, "warn");
-            elements.modeIndicator.innerText = "CACHED_ARTIFACT_MODE";
-            elements.modeIndicator.style.color = "var(--neon-cyan)";
-        }
-
-        selectedBorrower = data;
-
+        
         // 1. Retrieval Phase
         await simulateAgentTask("Archivist", [
             `Querying Vector DB for ${ticker}...`,
-            `Found 10-K (${new Date().getFullYear()}) - ${data.documents[0].page_count} pages.`,
-            `Extracting relevant chunks (MD&A, Risk Factors)...`,
-            `Retrieving Knowledge Graph nodes for sector: ${data.borrower_details.sector}...`
-        ], 800);
+            `Found 10-K (${new Date().getFullYear()}) - Indexing...`,
+            `Extracting relevant chunks (MD&A, Risk Factors)...`
+        ], 600);
 
-        // 2. Spreading Phase
-        const table = data.documents[0].chunks.find(c=>c.type==='financial_table');
-        const assets = table ? table.content_json.total_assets : 'N/A';
+        // 2. Load Data (Simulating "Live" Fetch)
+        try {
+            const path = filename.includes('/') ? filename : `data/${filename}`;
+            const res = await fetch(path);
+            if (!res.ok) throw new Error("File not found");
+            currentMemoData = await res.json();
+            selectedBorrower = currentMemoData; // Sync state
+        } catch(e) {
+            log("System", "Error loading memo data", "error");
+            return;
+        }
 
+        // 3. Quant Phase
+        const assets = currentMemoData.historical_financials?.[0]?.total_assets || 'N/A';
         await simulateAgentTask("Quant", [
             `OCR-ing Financial Tables...`,
             `Mapping line items to FIBO ontology...`,
             `Validating Balance Sheet: Assets (${assets}) = Liab + Equity...`,
-            `PASS: Checksum valid.`,
-            `Calculating EBITDA Ratios...`
-        ], 1000);
+            `PASS: Checksum valid.`
+        ], 800);
 
-        // 3. Synthesis Phase
+        // 4. Synthesis Phase
         await simulateAgentTask("Writer", [
-            `Loading Prompt: commercial_credit_v1.yaml...`,
             `Synthesizing Executive Summary...`,
             `Injecting Citations...`,
-            `Running Audit Checks (Citation Density)... PASS.`
-        ], 1200);
+            `Compiling Final Report...`
+        ], 800);
 
-        // Render Final Memo
-        renderMemo(selectedBorrower);
-        log("Orchestrator", `Analysis Complete. Mode: ${isLive ? 'LIVE' : 'CACHED'}`, "success");
+        // Render
+        renderMemo(currentMemoData);
+        log("Orchestrator", `Analysis Complete for ${name}`, "success");
     }
 
-    // ------------------------------------------------------------------
-    // Rendering Logic
-    // ------------------------------------------------------------------
-    function renderMemo(data) {
-        elements.memoPlaceholder.style.display = 'none';
-        elements.memoContainer.style.display = 'block';
+    // --- Rendering Logic ---
+    function renderMemo(memo) {
+        const contentDiv = elements.memoContent;
+        contentDiv.innerHTML = '';
+        contentDiv.className = "memo-paper"; // Apply the paper CSS class
 
-        const docs = data.documents[0];
-        const chunks = docs.chunks;
+        // Header
+        const riskColor = memo.risk_score < 60 ? 'red' : (memo.risk_score < 80 ? 'orange' : 'green');
+        const header = document.createElement('div');
+        header.innerHTML = `
+            <h1 class="editable-content">${memo.borrower_name}</h1>
+            <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 30px; font-family: var(--font-mono); font-size: 0.8rem; color: #666;">
+                <span>DATE: ${new Date(memo.report_date).toLocaleDateString()}</span>
+                <span>RISK SCORE: <b style="color: ${riskColor}">${memo.risk_score}/100</b></span>
+                <span>ID: ${memo.borrower_name.substring(0,3).toUpperCase()}-${Math.floor(Math.random()*10000)}</span>
+            </div>
+        `;
+        contentDiv.appendChild(header);
 
-        // Helper to find chunks
-        const getChunksByType = (t) => chunks.filter(c => c.type === t);
-        const narratives = getChunksByType('narrative');
-        const risks = getChunksByType('risk_factor');
-        const table = getChunksByType('financial_table')[0];
+        // Financial Snapshot & Chart (Merged Feature)
+        if (memo.financial_ratios) {
+            const finDiv = document.createElement('div');
+            finDiv.style.marginBottom = '30px';
+            finDiv.style.background = '#f9f9f9';
+            finDiv.style.padding = '20px';
+            finDiv.style.border = '1px solid #ddd';
 
-        // Citation Helper
-        const cite = (chunk) => `<span class="citation-tag" onclick="viewEvidence('${docs.doc_id}', '${chunk.chunk_id}')">[${docs.doc_id}:${chunk.chunk_id}]</span>`;
-
-        let html = `
-            <div class="memo-header">
-                <div>
-                    <div class="memo-title">${data.borrower_details.name}</div>
-                    <div style="font-size: 0.8rem; color: #888;">TICKER: <span style="color:white">${data.borrower_details.ticker}</span> | RATING: <span style="color:var(--neon-green)">${data.borrower_details.rating}</span></div>
+            finDiv.innerHTML = `
+                <h3 style="margin-top: 0; font-family: 'Arial'; font-size: 0.9rem; text-transform: uppercase;">Financial Snapshot</h3>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; font-family: var(--font-mono); font-size: 0.8rem; margin-bottom: 20px;">
+                    <div><b>Leverage:</b> ${memo.financial_ratios.leverage_ratio?.toFixed(2)}x</div>
+                    <div><b>EBITDA:</b> ${formatCurrency(memo.financial_ratios.ebitda)}</div>
+                    <div><b>Revenue:</b> ${formatCurrency(memo.financial_ratios.revenue)}</div>
+                    <div><b>DSCR:</b> ${memo.financial_ratios.dscr?.toFixed(2)}x</div>
                 </div>
-                <div style="text-align: right; font-size: 0.7rem; color: #555;">
-                    GENERATED: ${new Date().toISOString().split('T')[0]}<br>
-                    CONFIDENCE: 98.4%
+                <div style="height: 250px; width: 100%;">
+                    <canvas id="finChart"></canvas>
+                </div>
+            `;
+            contentDiv.appendChild(finDiv);
+            
+            // Render Chart after DOM insertion
+            setTimeout(() => {
+                if(memo.historical_financials) renderFinChart(memo.historical_financials);
+            }, 0);
+        }
+
+        // Sections
+        if (memo.sections) {
+            memo.sections.forEach(section => {
+                const sectionDiv = document.createElement('div');
+                let contentHtml = section.content.replace(/\n/g, '<br>');
+                // Citations
+                contentHtml = contentHtml.replace(/\[Ref:\s*(.*?)\]/g, (match, docId) => {
+                     return `<span class="citation-tag" onclick="viewEvidence('${docId}', 'chunk_001')">${docId}</span>`; // Fallback chunk ID
+                });
+
+                sectionDiv.innerHTML = `
+                    <h2 class="editable-content">${section.title}</h2>
+                    <div class="editable-content" style="text-align: justify;">${contentHtml}</div>
+                `;
+                contentDiv.appendChild(sectionDiv);
+            });
+        }
+
+        // DCF (Interactive)
+        if (memo.dcf_analysis) {
+            renderDCF(memo.dcf_analysis, contentDiv);
+        }
+        
+        // Risk Quant
+        renderRiskQuant(memo, contentDiv);
+
+        if (isEditMode) applyEditMode();
+    }
+
+    function renderFinChart(data) {
+        const ctx = document.getElementById('finChart');
+        if (!ctx) return;
+        
+        if (currentChart) currentChart.destroy();
+
+        // Data prep (assuming newest first in array)
+        const chartData = [...data].reverse();
+
+        currentChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: chartData.map(d => d.period),
+                datasets: [
+                    {
+                        label: 'Revenue',
+                        data: chartData.map(d => d.revenue),
+                        backgroundColor: 'rgba(0, 243, 255, 0.5)',
+                        borderColor: 'rgba(0, 243, 255, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'EBITDA',
+                        data: chartData.map(d => d.ebitda),
+                        backgroundColor: 'rgba(0, 255, 65, 0.5)',
+                        borderColor: 'rgba(0, 255, 65, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+
+    function renderDCF(dcf, container) {
+        const dcfDiv = document.createElement('div');
+        dcfDiv.innerHTML = `<h2>Annex B: Valuation (Interactive)</h2>`;
+        
+        dcfDiv.innerHTML += `
+            <div style="background: #f0f0f0; padding: 15px; border: 1px dashed #999; margin-bottom: 20px;">
+                <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 10px;">
+                    <label>WACC (%): <input type="number" id="dcf-wacc" value="${(dcf.wacc*100).toFixed(1)}" step="0.1" style="width:60px"></label>
+                    <label>Growth (%): <input type="number" id="dcf-growth" value="${(dcf.growth_rate*100).toFixed(1)}" step="0.1" style="width:60px"></label>
+                    <button onclick="window.recalculateDCF()" style="padding: 2px 8px; font-size: 0.7rem;">UPDATE</button>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 1rem;">
+                    <div>Implied Share Price: <span id="dcf-share-price" style="font-weight: bold; color: green;">$${dcf.share_price.toFixed(2)}</span></div>
+                    <div>Enterprise Value: <span id="dcf-ev" style="font-weight: bold; color: blue;">${formatCurrency(dcf.enterprise_value)}</span></div>
                 </div>
             </div>
-
-            <h2>Executive Summary</h2>
-            <p>${narratives[0] ? narratives[0].content + ' ' + cite(narratives[0]) : 'No narrative data found.'}</p>
-            <p>${narratives[1] ? narratives[1].content + ' ' + cite(narratives[1]) : ''}</p>
-
-            <h2>Financial Analysis</h2>
-            <p>The company demonstrates robust financial health. ${table ? cite(table) : ''}</p>
-
-            ${table ? `
-            <table style="width: 100%; border-collapse: collapse; margin: 20px 0; border: 1px solid #333; font-family: var(--font-mono); font-size: 0.85rem;">
-                <tr style="background: rgba(255,255,255,0.1); border-bottom: 1px solid #444;">
-                    <th style="text-align: left; padding: 8px;">Metric ($B)</th>
-                    <th style="text-align: right; padding: 8px;">2025</th>
-                </tr>
-                <tr><td style="padding: 8px; border-bottom: 1px solid #222;">Total Assets</td><td style="text-align: right; padding: 8px; border-bottom: 1px solid #222;">${table.content_json.total_assets}</td></tr>
-                <tr><td style="padding: 8px; border-bottom: 1px solid #222;">Total Liabilities</td><td style="text-align: right; padding: 8px; border-bottom: 1px solid #222;">${table.content_json.total_liabilities}</td></tr>
-                <tr><td style="padding: 8px; border-bottom: 1px solid #222;">Total Equity</td><td style="text-align: right; padding: 8px; border-bottom: 1px solid #222;">${table.content_json.total_equity}</td></tr>
-                <tr><td style="padding: 8px; color: var(--neon-cyan);">EBITDA</td><td style="text-align: right; padding: 8px; color: var(--neon-cyan);">${table.content_json.ebitda}</td></tr>
-            </table>
-            ` : '<p>No financial table extracted.</p>'}
-
-            <h2>Key Risk Factors</h2>
-            <ul>
-                ${risks.map(r => `<li>${r.content} ${cite(r)}</li>`).join('')}
-            </ul>
-
-            <h2>Conclusion</h2>
-            <p>Based on the analysis of credit fundamentals and market positioning, we recommend maintaining the current exposure limit.</p>
         `;
-
-        elements.memoContainer.innerHTML = html;
-
-        // Expose viewEvidence globally
-        window.viewEvidence = (docId, chunkId) => renderEvidence(docId, chunkId);
+        container.appendChild(dcfDiv);
+    }
+    
+    function renderRiskQuant(memo, container) {
+         // Simple PD logic from Left Side
+         const debt = memo.historical_financials?.[0]?.total_liabilities || 0;
+         const equity = memo.historical_financials?.[0]?.total_equity || 0;
+         const assets = debt + equity;
+         const leverage = assets > 0 ? debt / assets : 0;
+         const pd = (leverage * 0.05).toFixed(4);
+         
+         const div = document.createElement('div');
+         div.innerHTML = `
+            <h2>Risk Model Output</h2>
+            <div style="font-family: var(--font-mono); font-size: 0.8rem; border: 1px solid #ccc; padding: 10px;">
+                <div>Probability of Default (PD): ${(pd*100).toFixed(2)}%</div>
+                <div>Loss Given Default (LGD): 45%</div>
+                <div>Expected Loss: ${formatCurrency(debt * pd * 0.45)}</div>
+            </div>
+         `;
+         container.appendChild(div);
     }
 
-    function renderEvidence(docId, chunkId) {
-        if (!selectedBorrower) return;
+    // --- Evidence Viewer (Merged) ---
+    window.viewEvidence = (docId, chunkId) => {
+        const viewer = elements.evidenceViewer;
+        viewer.innerHTML = ''; // Clear
 
-        const doc = selectedBorrower.documents.find(d => d.doc_id === docId);
-        const chunk = doc.chunks.find(c => c.chunk_id === chunkId);
+        // 1. Find Data
+        let doc, chunk;
+        if(currentMemoData && currentMemoData.documents) {
+             doc = currentMemoData.documents.find(d => d.doc_id === docId);
+             chunk = doc?.chunks.find(c => c.chunk_id === chunkId);
+        }
 
-        if (!chunk) return;
-
-        elements.docIdLabel.innerText = `${docId} | Page ${chunk.page}`;
-
-        // Clear Viewer
-        elements.evidenceViewer.innerHTML = '';
-
-        // Create "Page"
+        // 2. Create Page Container
         const page = document.createElement('div');
         page.style.width = '100%';
-        page.style.height = '800px'; // Mock height
+        page.style.height = '1000px';
         page.style.background = '#fff';
         page.style.position = 'relative';
-        page.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
+        page.style.padding = '40px';
+        page.style.boxSizing = 'border-box';
+        
+        // 3. Mock Text Background
+        page.innerHTML = `<div style="color: #ddd; font-size: 6px; overflow:hidden; height:100%; word-break: break-all;">
+            ${"CONTENT ".repeat(5000)}
+        </div>`;
 
-        // Mock Page Text content (faded background text)
-        page.innerHTML = `
-            <div style="padding: 40px; color: #ccc; font-family: serif; font-size: 10px; overflow: hidden; height: 100%;">
-                ${Array(50).fill("lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua").join(' ')}
-            </div>
-        `;
+        // 4. BBox Highlight
+        if (chunk && chunk.bbox) {
+            const [x0, y0, x1, y1] = chunk.bbox;
+            const bbox = document.createElement('div');
+            bbox.className = 'bbox-highlight'; // Uses CSS from previous step
+            bbox.style.left = `${x0}px`;
+            bbox.style.top = `${y0}px`;
+            bbox.style.width = `${x1 - x0}px`;
+            bbox.style.height = `${y1 - y0}px`;
+            
+            const label = document.createElement('div');
+            label.className = 'bbox-label';
+            label.innerText = chunk.type.toUpperCase();
+            bbox.appendChild(label);
+            
+            // Overlay actual text for readability
+            const textOverlay = document.createElement('div');
+            textOverlay.style.background = "rgba(255,255,255,0.9)";
+            textOverlay.style.color = "black";
+            textOverlay.style.fontSize = "12px";
+            textOverlay.style.height = "100%";
+            textOverlay.style.overflow = "hidden";
+            textOverlay.innerText = chunk.content;
+            bbox.appendChild(textOverlay);
 
-        // Create BBox
-        const [x0, y0, x1, y1] = chunk.bbox;
-        const bbox = document.createElement('div');
-        bbox.className = 'bbox-highlight';
-        bbox.style.left = `${x0}px`;
-        bbox.style.top = `${y0}px`;
-        bbox.style.width = `${x1 - x0}px`;
-        bbox.style.height = `${y1 - y0}px`;
+            page.appendChild(bbox);
+            
+            // Scroll to it
+            setTimeout(() => bbox.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+        } else {
+            // Fallback for missing bbox
+            page.innerHTML += `<div style="position:absolute; top:100px; left:50px; background:yellow; padding:10px; color:black;">Evidence Loaded: ${docId}</div>`;
+        }
 
-        const label = document.createElement('div');
-        label.className = 'bbox-label';
-        label.innerText = chunk.type.toUpperCase();
-        bbox.appendChild(label);
+        viewer.appendChild(page);
+        log("Frontend", `User viewed evidence ${docId}`, "audit");
+    };
 
-        // Inject Content into BBox (to simulate readable text)
-        const contentOverlay = document.createElement('div');
-        contentOverlay.style.position = 'absolute';
-        contentOverlay.style.top = '0';
-        contentOverlay.style.left = '0';
-        contentOverlay.style.width = '100%';
-        contentOverlay.style.height = '100%';
-        contentOverlay.style.background = 'rgba(255, 255, 255, 0.9)';
-        contentOverlay.style.color = 'black';
-        contentOverlay.style.fontSize = '12px';
-        contentOverlay.style.padding = '5px';
-        contentOverlay.style.overflow = 'hidden';
-        contentOverlay.innerText = chunk.content; // Show actual text
-        bbox.appendChild(contentOverlay);
-
-        page.appendChild(bbox);
-        elements.evidenceViewer.appendChild(page);
-
-        // Scroll to view
-        bbox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-        log("Frontend", `User inspected evidence: ${chunkId}`, "audit");
-    }
-
-    // ------------------------------------------------------------------
-    // Helpers
-    // ------------------------------------------------------------------
+    // --- Helpers ---
     function log(agent, message, type="info") {
-        const time = new Date().toLocaleTimeString();
         const div = document.createElement('div');
-        div.className = `log-entry ${type}`;
-
-        let color = "#888";
-        if (agent === "Archivist") color = "#00f3ff";
-        if (agent === "Quant") color = "#ff00ff";
-        if (agent === "Writer") color = "#00ff41";
-        if (agent === "Orchestrator") color = "white";
-
-        div.innerHTML = `<span class="log-timestamp">[${time}]</span><span class="log-agent" style="color:${color}">${agent}</span><span class="log-message">${message}</span>`;
-
+        div.className = `log-entry ${type}`; // Uses CSS from previous step
+        div.innerHTML = `<span class="log-timestamp">[${new Date().toLocaleTimeString()}]</span><span class="log-agent">${agent}</span><span class="log-message">${message}</span>`;
         elements.terminal.appendChild(div);
         elements.terminal.scrollTop = elements.terminal.scrollHeight;
     }
@@ -304,7 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.terminal.innerHTML = '';
     }
 
-    function simulateAgentTask(agent, messages, delayPerMessage) {
+    function simulateAgentTask(agent, messages, delay) {
         return new Promise(resolve => {
             let i = 0;
             const interval = setInterval(() => {
@@ -315,10 +360,60 @@ document.addEventListener('DOMContentLoaded', () => {
                     log(agent, messages[i]);
                     i++;
                 }
-            }, delayPerMessage);
+            }, delay);
         });
     }
 
-    // Run Init
+    function formatCurrency(val) {
+        if (!val) return '-';
+        return val >= 1000 ? `$${(val/1000).toFixed(1)}B` : `$${val.toFixed(0)}M`;
+    }
+
+    function toggleEditMode() {
+        isEditMode = !isEditMode;
+        const btn = elements.editBtn;
+        if (isEditMode) {
+            btn.classList.add('editing-active');
+            btn.innerHTML = 'SAVE CHANGES';
+            applyEditMode();
+        } else {
+            btn.classList.remove('editing-active');
+            btn.innerHTML = 'EDIT MODE';
+            document.querySelectorAll('.editable-content').forEach(el => el.contentEditable = "false");
+        }
+    }
+
+    function applyEditMode() {
+        document.querySelectorAll('.editable-content').forEach(el => el.contentEditable = "true");
+    }
+    
+    // Expose DCF recalc to window since it's called by inline onclick
+    window.recalculateDCF = function() {
+        if (!currentMemoData || !currentMemoData.dcf_analysis) return;
+        const wacc = parseFloat(document.getElementById('dcf-wacc').value) / 100;
+        const growth = parseFloat(document.getElementById('dcf-growth').value) / 100;
+        
+        // Mock Calc
+        const basePrice = currentMemoData.dcf_analysis.share_price;
+        const originalWacc = currentMemoData.dcf_analysis.wacc;
+        const factor = originalWacc / wacc; // Simple inverse relationship for demo
+        const newPrice = basePrice * factor;
+        const newEV = currentMemoData.dcf_analysis.enterprise_value * factor;
+        
+        document.getElementById('dcf-share-price').textContent = `$${newPrice.toFixed(2)}`;
+        document.getElementById('dcf-ev').textContent = formatCurrency(newEV);
+    };
+    
+    function loadAuditLogs() {
+        // Mock loading logs
+        fetch('data/credit_memo_audit_log.json')
+            .then(res => res.json())
+            .then(logs => {
+                logs.slice(-5).forEach(l => log("System", `[AUDIT] ${l.action}`, "audit"));
+            })
+            .catch(e => console.log("No audit logs found"));
+    }
+
+    // Start
     init();
 });

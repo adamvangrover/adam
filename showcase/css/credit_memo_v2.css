@@ -1,28 +1,39 @@
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=JetBrains+Mono:wght@300;400;700&display=swap');
 
 :root {
+    /* Base Colors */
     --bg-dark: #050505;
-    --glass-panel: rgba(10, 15, 20, 0.90);
+    --bg-panel: #0a0f14;
+    --glass-panel: rgba(10, 15, 20, 0.95);
     --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+    --border-color: #333;
 
+    /* Neon Accents */
     --neon-cyan: #00f3ff;
     --neon-pink: #ff00ff;
     --neon-green: #00ff41;
     --neon-amber: #ffbf00;
+    --neon-magenta: #ff00ff; /* Keeping alias for compatibility */
 
+    /* Text */
     --text-primary: #e0e0e0;
+    --text-muted: #666;
     --text-dim: #707070;
 
+    /* Fonts */
     --font-mono: 'JetBrains Mono', monospace;
     --font-display: 'Share Tech Mono', monospace;
+    --font-sans: 'Inter', sans-serif;
 }
 
 body {
     margin: 0;
+    padding: 0;
     background-color: var(--bg-dark);
     color: var(--text-primary);
-    font-family: var(--font-mono);
+    font-family: var(--font-mono); /* Default to mono for cyber feel */
     overflow: hidden;
+    height: 100vh;
 }
 
 /* CRT Overlay Effect */
@@ -36,20 +47,24 @@ body {
     z-index: 9999;
 }
 
-/* Layout */
+/* --- Layout Grid --- */
 #app-container {
     display: grid;
-    grid-template-columns: 280px 1fr 350px; /* Sidebar | Main | Evidence/Log */
-    grid-template-rows: 60px 1fr 30px;      /* Header | Content | Footer */
+    grid-template-columns: 260px 1fr 350px; /* Sidebar | Main | Evidence/Log */
+    grid-template-rows: 50px 1fr 30px;      /* Header | Content | Footer */
+    grid-template-areas:
+        "header header header"
+        "left main right"
+        "footer footer footer";
     height: 100vh;
     width: 100vw;
     gap: 1px;
     background: #111; /* Grid gap color */
 }
 
-/* Header */
+/* --- Header --- */
 header {
-    grid-column: 1 / -1;
+    grid-area: header;
     background: var(--glass-panel);
     border-bottom: var(--glass-border);
     display: flex;
@@ -64,13 +79,14 @@ header {
     font-size: 1.5rem;
     color: var(--text-primary);
     text-shadow: 0 0 5px rgba(0, 243, 255, 0.5);
+    letter-spacing: 2px;
 }
 .brand span { color: var(--neon-cyan); }
 
-/* Sidebar */
-aside.left-panel {
-    grid-row: 2;
-    background: rgba(8, 8, 10, 0.95);
+/* --- Left Sidebar --- */
+.left-panel {
+    grid-area: left;
+    background: var(--bg-panel);
     border-right: var(--glass-border);
     padding: 20px;
     display: flex;
@@ -88,6 +104,7 @@ aside.left-panel {
     font-size: 0.75rem;
     color: var(--neon-cyan);
     text-transform: uppercase;
+    font-family: var(--font-mono);
     letter-spacing: 1px;
 }
 
@@ -100,9 +117,10 @@ select, button {
     font-size: 0.85rem;
     transition: all 0.2s;
     cursor: pointer;
+    outline: none;
 }
 
-select:hover, button:hover {
+select:hover, select:focus, button:hover {
     border-color: var(--neon-cyan);
     box-shadow: 0 0 8px rgba(0, 243, 255, 0.2);
 }
@@ -118,14 +136,16 @@ button.primary {
 button.primary:hover {
     background: var(--neon-cyan);
     color: black;
+    box-shadow: 0 0 10px var(--neon-cyan);
 }
 
-/* Main Content (Memo) */
+/* --- Main Content (Memo) --- */
 main {
-    grid-row: 2;
+    grid-area: main;
     background: #08080a;
     position: relative;
     overflow: hidden;
+    padding: 0;
     display: flex;
     flex-direction: column;
 }
@@ -140,64 +160,59 @@ main {
 }
 
 .memo-paper {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid #222;
-    padding: 40px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    background: #fff; /* White paper look */
+    color: #000;
+    padding: 50px;
     min-height: 800px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.7);
+    font-family: 'Georgia', serif; /* Serif for document content */
+    font-size: 0.95rem;
+    line-height: 1.6;
 }
 
-.memo-header {
-    border-bottom: 2px solid var(--neon-cyan);
+.memo-paper h1 {
+    font-family: 'Arial', sans-serif;
+    border-bottom: 3px solid #000;
+    padding-bottom: 15px;
     margin-bottom: 30px;
-    padding-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
-}
-.memo-title {
-    font-family: var(--font-display);
     font-size: 2rem;
-    color: white;
     text-transform: uppercase;
 }
 
-h2 {
-    color: var(--neon-cyan);
-    font-size: 1.1rem;
-    border-bottom: 1px solid #333;
+.memo-paper h2 {
+    font-family: 'Arial', sans-serif;
+    font-size: 1.2rem;
+    color: #333;
+    border-bottom: 1px solid #ccc;
     padding-bottom: 5px;
     margin-top: 30px;
     text-transform: uppercase;
 }
 
-p, li {
-    font-size: 0.9rem;
-    line-height: 1.6;
-    color: #ccc;
-    margin-bottom: 15px;
-}
-
+/* Citations in Memo */
 .citation-tag {
-    color: var(--neon-amber);
-    font-size: 0.75rem;
-    border: 1px solid rgba(255, 191, 0, 0.3);
-    padding: 0 4px;
-    margin-left: 4px;
+    color: #b45309; /* Darker amber for white paper */
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    border: 1px solid rgba(180, 83, 9, 0.3);
+    padding: 1px 4px;
+    margin-left: 2px;
     cursor: pointer;
-    background: rgba(255, 191, 0, 0.05);
+    background: rgba(251, 191, 36, 0.1);
     transition: all 0.2s;
     vertical-align: super;
+    text-decoration: none;
+    border-radius: 2px;
 }
 .citation-tag:hover {
-    background: var(--neon-amber);
-    color: black;
+    background: #b45309;
+    color: white;
 }
 
-/* Right Panel (Evidence + Terminal) */
-aside.right-panel {
-    grid-row: 2;
-    background: #0a0a0c;
+/* --- Right Panel --- */
+.right-panel {
+    grid-area: right;
+    background: var(--bg-panel);
     border-left: var(--glass-border);
     display: flex;
     flex-direction: column;
@@ -208,16 +223,19 @@ aside.right-panel {
     padding: 10px 15px;
     background: rgba(255, 255, 255, 0.05);
     border-bottom: 1px solid #222;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
     font-weight: bold;
     color: var(--text-dim);
     text-transform: uppercase;
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
+/* Evidence Viewer */
 #evidence-viewer {
-    flex: 2;
+    flex: 2; /* Takes more space than terminal */
     background: #111;
     position: relative;
     overflow: hidden;
@@ -229,13 +247,13 @@ aside.right-panel {
     height: 100%;
     overflow: auto;
     position: relative;
-    background: #fff; /* Paper color */
+    background: #fff;
     color: black;
     padding: 20px;
     box-sizing: border-box;
 }
 
-/* BBox Highlight */
+/* BBox Highlighting */
 .bbox-highlight {
     position: absolute;
     background: rgba(255, 191, 0, 0.2);
@@ -244,6 +262,7 @@ aside.right-panel {
     pointer-events: none;
     animation: pulse-border 2s infinite;
 }
+
 .bbox-label {
     position: absolute;
     top: -18px;
@@ -253,6 +272,7 @@ aside.right-panel {
     font-size: 0.6rem;
     padding: 2px 4px;
     font-weight: bold;
+    font-family: var(--font-mono);
 }
 
 @keyframes pulse-border {
@@ -261,20 +281,22 @@ aside.right-panel {
     100% { border-color: var(--neon-amber); box-shadow: 0 0 5px var(--neon-amber); }
 }
 
-/* Agent Terminal */
+/* --- Agent Terminal --- */
 #agent-terminal {
-    flex: 1;
+    flex: 1; /* Takes remaining space */
     background: #000;
     padding: 10px;
     overflow-y: auto;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
     border-top: 1px solid var(--neon-green);
 }
 
 .log-entry {
     margin-bottom: 4px;
-    opacity: 0.8;
+    opacity: 0.9;
+    border-bottom: 1px solid #111;
+    padding-bottom: 2px;
 }
 .log-timestamp { color: #555; margin-right: 8px; }
 .log-agent { color: var(--neon-green); font-weight: bold; margin-right: 8px; }
@@ -282,18 +304,19 @@ aside.right-panel {
 .log-entry.error .log-message { color: var(--neon-pink); }
 .log-entry.audit .log-agent { color: var(--neon-amber); }
 
-/* Footer */
+/* --- Footer --- */
 footer {
-    grid-column: 1 / -1;
-    background: #050505;
+    grid-area: footer;
+    background: var(--bg-panel);
     border-top: var(--glass-border);
     display: flex;
     align-items: center;
+    justify-content: space-between;
     padding: 0 20px;
     font-size: 0.7rem;
-    color: #444;
-    justify-content: space-between;
+    color: var(--text-muted);
 }
+
 .status-dot {
     width: 8px; height: 8px;
     background: var(--neon-green);
@@ -301,4 +324,43 @@ footer {
     display: inline-block;
     margin-right: 5px;
     box-shadow: 0 0 5px var(--neon-green);
+}
+
+/* --- Utility / Financial Tables --- */
+.fin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    margin-top: 15px;
+    border: 1px solid #ccc;
+}
+.fin-table th {
+    text-align: left;
+    background: #f0f0f0;
+    border-bottom: 2px solid #000;
+    padding: 8px;
+}
+.fin-table td {
+    border-bottom: 1px solid #eee;
+    padding: 6px 8px;
+}
+.fin-table td.num {
+    text-align: right;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #0a0f14;
+}
+::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--neon-cyan);
 }
