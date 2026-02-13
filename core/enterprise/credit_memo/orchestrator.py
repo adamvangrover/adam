@@ -3,11 +3,12 @@ import logging
 import uuid
 from datetime import datetime
 
-from .model import CreditMemo, CreditMemoSection, Citation, AuditLogEntry
+from .model import CreditMemo, CreditMemoSection, Citation, AuditLogEntry, DCFAnalysis
 from .agents import ArchivistAgent, QuantAgent, RiskOfficerAgent, WriterAgent
 from .audit_logger import audit_logger
 from .prompt_registry import registry as prompt_registry
 from .auditor import AuditAgent
+from .spreading_engine import spreading_engine # Import global instance
 
 class CreditMemoOrchestrator:
     """
@@ -42,11 +43,18 @@ class CreditMemoOrchestrator:
         chunks = archivist_out.get("evidence_chunks", [])
         graph_data = archivist_out.get("graph_context", [])
 
-        # 3. Quant (Spreading)
+        # 3. Quant (Spreading & Financials)
         # Simulate raw text extraction
         raw_text = "ASSETS: 5000\nLIABILITIES: 3000\nEQUITY: 2000" if "TechCorp" in borrower_name else ""
         quant_out = self.quant.execute({"borrower_name": borrower_name, "raw_financial_text": raw_text})
         spread = quant_out.get("financial_spread")
+
+        # 3.1 Advanced Quant: Historicals & DCF
+        # Note: QuantAgent normally calls spreading_engine internally, but for this demo
+        # we access the engine logic directly or extend the agent.
+        # Here we extend the workflow explicitly.
+        historicals = spreading_engine.get_historicals(spread)
+        dcf = spreading_engine.calculate_dcf(spread)
 
         # 4. Risk (Analysis)
         risk_out = self.risk.execute({"financial_spread": spread, "graph_context": graph_data})
@@ -70,15 +78,35 @@ class CreditMemoOrchestrator:
             borrower_name=borrower_name,
             executive_summary=exec_summary,
             sections=[
-                CreditMemoSection(title="Executive Summary", content=exec_summary, citations=citations),
-                CreditMemoSection(title="Key Risks & Mitigants", content=risk_text, citations=[]),
-                CreditMemoSection(title="Financial Analysis", content=f"EBITDA: ${spread.ebitda}M | Leverage: {spread.leverage_ratio:.1f}x", citations=[])
+                CreditMemoSection(
+                    title="Executive Summary",
+                    content=exec_summary,
+                    citations=citations,
+                    author_agent="Writer"
+                ),
+                CreditMemoSection(
+                    title="Key Risks & Mitigants",
+                    content=risk_text,
+                    citations=[],
+                    author_agent="Risk Officer"
+                ),
+                CreditMemoSection(
+                    title="Financial Analysis",
+                    content=f"EBITDA: ${spread.ebitda}M | Leverage: {spread.leverage_ratio:.1f}x",
+                    citations=[],
+                    author_agent="Quant"
+                )
             ],
             financial_ratios={
                 "leverage_ratio": spread.leverage_ratio,
                 "dscr": spread.dscr,
-                "current_ratio": spread.current_ratio
+                "current_ratio": spread.current_ratio,
+                "revenue": spread.revenue,
+                "ebitda": spread.ebitda,
+                "net_income": spread.net_income
             },
+            historical_financials=[h.model_dump() for h in historicals],
+            dcf_analysis=dcf,
             risk_score=75.0 if spread.leverage_ratio < 4.0 else 45.0
         )
 

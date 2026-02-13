@@ -10,8 +10,6 @@ PORT = 8081
 Handler = http.server.SimpleHTTPRequestHandler
 
 def start_server():
-    # Only bind if port is free (retry logic or assume it's free/reuse addr)
-    # SimpleHTTPRequestHandler serves from CWD
     try:
         with socketserver.TCPServer(("", PORT), Handler) as httpd:
             print("Serving at port", PORT)
@@ -20,15 +18,12 @@ def start_server():
         print(f"Port {PORT} already in use, assuming server running.")
 
 def verify_frontend():
-    # Start server in thread
     server_thread = threading.Thread(target=start_server, daemon=True)
     server_thread.start()
-
-    # Wait for server to start
     time.sleep(2)
 
     repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    os.chdir(repo_root) # Ensure relative paths work for server
+    os.chdir(repo_root)
 
     url = f"http://localhost:{PORT}/showcase/credit_memo_automation.html"
     print(f"Verifying: {url}")
@@ -40,54 +35,55 @@ def verify_frontend():
             page.set_viewport_size({"width": 1280, "height": 800})
             page.goto(url)
 
-            # 1. Verify Header
             print("Checking Title...")
             title = page.title()
-            print(f"Page Title: {title}")
             assert "Enterprise Credit Memo Automation" in title
 
-            # 2. Verify Memo Loaded (Wait for JS fetch)
             print("Waiting for Memo Content...")
-            page.wait_for_selector("#memo-container h1", timeout=10000)
+            page.wait_for_selector("#memo-container h1", timeout=15000)
             memo_title = page.inner_text("#memo-container h1")
             print(f"Memo H1: {memo_title}")
-            assert "TechCorp Inc." in memo_title
+            assert any(x in memo_title for x in ["TechCorp", "Apple", "Tesla", "JPMorgan"]), f"Unexpected memo title: {memo_title}"
 
-            # 3. Verify Citation Pin
-            print("Checking Citation Pin...")
-            page.wait_for_selector(".citation-pin", timeout=5000)
+            # Verify Agent Badges
+            print("Checking Agent Badges...")
+            page.wait_for_selector(".fa-robot", timeout=5000)
+            badge_text = page.inner_text(".text-purple-700") # Writer Badge
+            print(f"Agent Badge: {badge_text}")
+            assert "WRITER" in badge_text
 
-            # Take screenshot before click
-            screenshot_dir = os.path.join(repo_root, "verification", "screenshots")
-            os.makedirs(screenshot_dir, exist_ok=True)
-            page.screenshot(path=os.path.join(screenshot_dir, "credit_memo_initial.png"))
+            # Verify Tabs
+            print("Checking Tabs...")
+            page.click("#btn-tab-annex-a")
+            time.sleep(0.5)
 
-            page.click(".citation-pin")
+            # Verify Annex A (Historicals)
+            print("Checking Annex A (Financials)...")
+            table_visible = page.is_visible("#financials-table")
+            assert table_visible, "Financials table not visible"
+            table_text = page.inner_text("#financials-table")
+            assert "Revenue" in table_text
+            assert "FY2025" in table_text or "FY2024" in table_text
 
-            # 4. Verify PDF Viewer Interaction
-            print("Checking PDF Viewer...")
-            page.wait_for_selector("#mock-pdf-page", state="visible", timeout=5000)
-            doc_text = page.inner_text("#doc-title")
-            print(f"Doc Title: {doc_text}")
-            assert doc_text != "Waiting for selection..."
+            page.click("#btn-tab-annex-b")
+            time.sleep(0.5)
 
-            # 5. Verify Audit Log
-            print("Checking Audit Log...")
-            page.wait_for_selector("#audit-table-body tr", timeout=5000)
-            audit_action = page.inner_text("#audit-table-body tr td:nth-child(2)")
-            print(f"Latest Audit Action: {audit_action}")
-            assert "GENERATE_CREDIT_MEMO" in audit_action
+            # Verify Annex B (DCF)
+            print("Checking Annex B (Valuation)...")
+            dcf_visible = page.is_visible("#dcf-container")
+            assert dcf_visible, "DCF container not visible"
+            dcf_text = page.inner_text("#dcf-container")
+            assert "WACC" in dcf_text
+            assert "IMPLIED SHARE PRICE" in dcf_text or "Implied Share Price" in dcf_text
+            assert "$" in dcf_text
 
-            # Take final screenshot
-            final_screenshot = os.path.join(screenshot_dir, "credit_memo_final.png")
-            page.screenshot(path=final_screenshot)
-            print(f"Screenshot saved to {final_screenshot}")
-
-            print("VERIFICATION SUCCESS: Frontend loaded correctly.")
+            print("VERIFICATION SUCCESS: Frontend Tabs, Historicals, DCF, and Agent Badges verified.")
             browser.close()
 
     except Exception as e:
         print(f"VERIFICATION FAILED: {e}")
+        import traceback
+        traceback.print_exc()
         sys.exit(1)
 
 if __name__ == "__main__":

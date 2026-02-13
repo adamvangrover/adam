@@ -49,24 +49,64 @@
             </div>
         </div>
 
-        <!-- Left: Credit Memo Document -->
+        <!-- Left: Credit Memo Document & Annexes -->
         <div class="flex-1 flex flex-col border-r border-slate-700/50">
+            <!-- Tabs Header -->
             <div class="h-12 border-b border-slate-800 bg-[#0a101d] flex items-center justify-between px-4">
-                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest"><i class="fas fa-file-alt mr-2"></i>Generated Memo</span>
+                <div class="flex gap-4 h-full">
+                    <button id="btn-tab-memo" class="tab-btn h-full px-4 text-xs font-bold text-blue-400 border-b-2 border-blue-500 uppercase tracking-widest transition" onclick="switchTab('memo')"><i class="fas fa-file-alt mr-2"></i>Memo</button>
+                    <button id="btn-tab-annex-a" class="tab-btn h-full px-4 text-xs font-bold text-slate-400 hover:text-slate-200 uppercase tracking-widest transition border-b-2 border-transparent" onclick="switchTab('annex-a')"><i class="fas fa-table mr-2"></i>Annex A: Financials</button>
+                    <button id="btn-tab-annex-b" class="tab-btn h-full px-4 text-xs font-bold text-slate-400 hover:text-slate-200 uppercase tracking-widest transition border-b-2 border-transparent" onclick="switchTab('annex-b')"><i class="fas fa-chart-line mr-2"></i>Annex B: Valuation</button>
+                </div>
                 <div class="flex gap-2">
                     <button class="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded transition"><i class="fas fa-download mr-1"></i> Export PDF</button>
                 </div>
             </div>
 
-            <div class="flex-1 overflow-y-auto p-8 bg-[#0f172a] relative">
-                <!-- Paper Effect -->
-                <div class="max-w-3xl mx-auto bg-white text-slate-900 p-12 min-h-full shadow-2xl relative" id="memo-container">
-                    <!-- Placeholder / Initial State -->
-                    <div class="flex flex-col items-center justify-center h-full text-slate-400 opacity-50">
-                        <i class="fas fa-file-invoice fa-3x mb-4"></i>
-                        <p>Select a report from the library to view.</p>
+            <!-- Tab Content Area -->
+            <div class="flex-1 overflow-y-auto bg-[#0f172a] relative">
+
+                <!-- Tab: Memo -->
+                <div id="tab-memo" class="p-8 min-h-full">
+                    <div class="max-w-3xl mx-auto bg-white text-slate-900 p-12 min-h-full shadow-2xl relative" id="memo-container">
+                        <!-- Placeholder -->
+                        <div class="flex flex-col items-center justify-center h-full text-slate-400 opacity-50">
+                            <i class="fas fa-file-invoice fa-3x mb-4"></i>
+                            <p>Select a report from the library to view.</p>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Tab: Annex A (Financials) -->
+                <div id="tab-annex-a" class="hidden p-8 h-full">
+                    <div class="max-w-4xl mx-auto bg-[#1e293b] rounded-lg border border-slate-700 p-6 shadow-xl h-full flex flex-col">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-lg font-bold text-white font-mono"><i class="fas fa-table text-blue-400 mr-2"></i>Historical Financials</h2>
+                            <span class="text-xs text-slate-500 font-mono">Source: 10-K / 10-Q Filings</span>
+                        </div>
+                        <div class="flex-1 overflow-auto">
+                            <table class="w-full text-left font-mono text-xs border-collapse" id="financials-table">
+                                <!-- JS Injected -->
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Annex B (Valuation) -->
+                <div id="tab-annex-b" class="hidden p-8 h-full">
+                    <div class="max-w-4xl mx-auto bg-[#1e293b] rounded-lg border border-slate-700 p-6 shadow-xl h-full overflow-y-auto">
+                         <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-lg font-bold text-white font-mono"><i class="fas fa-calculator text-emerald-400 mr-2"></i>Discounted Cash Flow (DCF)</h2>
+                            <span class="text-xs text-slate-500 font-mono">Method: 5-Year Projection + Terminal Value</span>
+                        </div>
+
+                        <!-- DCF Content Container -->
+                        <div id="dcf-container" class="space-y-8">
+                            <!-- JS Injected -->
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 

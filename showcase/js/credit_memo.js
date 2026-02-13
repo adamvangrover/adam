@@ -7,6 +7,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
+// Helper for formatting millions/billions
+const formatCurrency = (val) => {
+    if (val === undefined || val === null) return 'N/A';
+    if (Math.abs(val) >= 1000) return '$' + (val / 1000).toFixed(1) + 'B';
+    return '$' + val.toFixed(0) + 'M';
+};
+
+// Helper for formatting currency no suffix
+const formatCurrencyRaw = (val) => {
+    if (val === undefined || val === null) return 'N/A';
+    return '$' + val.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
+};
+
 async function loadLibrary() {
     const res = await fetch('data/credit_memo_library.json');
     if (!res.ok) throw new Error("Failed to load library");
@@ -47,18 +60,33 @@ async function loadLibrary() {
     });
 }
 
+// Global Memo Object to hold state for tabs
+let currentMemo = null;
+
 async function loadCreditMemo(filename) {
-    // Assuming filename is relative to data/
-    // The library generator produces filenames like credit_memo_TechCorp_Inc.json
-    // But the fetch needs correct path
     const path = filename.includes('/') ? filename : `data/${filename}`;
 
     const res = await fetch(path);
     if (!res.ok) throw new Error(`Failed to load memo: ${path}`);
     const memo = await res.json();
+    currentMemo = memo; // Store for tab access if needed, though we render all at once usually
 
+    // 1. Render Memo Tab
+    renderMemoTab(memo);
+
+    // 2. Render Annex A (Financials)
+    renderAnnexA(memo);
+
+    // 3. Render Annex B (DCF)
+    renderAnnexB(memo);
+
+    // Reset to Memo Tab
+    switchTab('memo');
+}
+
+function renderMemoTab(memo) {
     const container = document.getElementById('memo-container');
-    container.innerHTML = ''; // Clear
+    container.innerHTML = '';
 
     // Header
     const header = document.createElement('div');
@@ -88,11 +116,23 @@ async function loadCreditMemo(filename) {
              </div>
              <div class="bg-slate-50 p-3 rounded border border-slate-200 text-center">
                 <div class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">DSCR</div>
-                <div class="text-lg font-mono font-bold text-slate-700">${memo.financial_ratios.dscr.toFixed(2)}x</div>
+                <div class="text-lg font-mono font-bold text-slate-700">${memo.financial_ratios.dscr > 100 ? '>100x' : memo.financial_ratios.dscr.toFixed(2) + 'x'}</div>
              </div>
              <div class="bg-slate-50 p-3 rounded border border-slate-200 text-center">
                 <div class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">Current Ratio</div>
                 <div class="text-lg font-mono font-bold text-slate-700">${memo.financial_ratios.current_ratio.toFixed(2)}x</div>
+             </div>
+             <div class="bg-slate-50 p-3 rounded border border-slate-200 text-center">
+                <div class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">Revenue</div>
+                <div class="text-lg font-mono font-bold text-slate-700">${formatCurrency(memo.financial_ratios.revenue)}</div>
+             </div>
+             <div class="bg-slate-50 p-3 rounded border border-slate-200 text-center">
+                <div class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">EBITDA</div>
+                <div class="text-lg font-mono font-bold text-slate-700">${formatCurrency(memo.financial_ratios.ebitda)}</div>
+             </div>
+             <div class="bg-slate-50 p-3 rounded border border-slate-200 text-center">
+                <div class="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-1">Net Income</div>
+                <div class="text-lg font-mono font-bold text-slate-700">${formatCurrency(memo.financial_ratios.net_income)}</div>
              </div>
         </div>
     `;
@@ -107,7 +147,6 @@ async function loadCreditMemo(filename) {
 
         // Regex for citations [Ref: doc_id]
         contentHtml = contentHtml.replace(/\[Ref:\s*(.*?)\]/g, (match, docId) => {
-            // Truncate docId if too long
             const displayId = docId.length > 15 ? docId.substring(0, 12) + '...' : docId;
             return `<span class="citation-pin bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded text-[10px] font-mono cursor-pointer hover:bg-blue-200 transition border border-blue-200 align-middle ml-1" onclick="viewEvidence('${docId}')" title="View Source: ${docId}"><i class="fas fa-search mr-1 text-[8px]"></i>${displayId}</span>`;
         });
@@ -115,10 +154,21 @@ async function loadCreditMemo(filename) {
         // Enhance list items
         contentHtml = contentHtml.replace(/- (.*?)(<br>|$)/g, '<li class="ml-4 mb-2 text-slate-700 list-disc">$1</li>');
 
+        // Agent Badge Logic
+        const agentColors = {
+            "Writer": "bg-purple-100 text-purple-700 border-purple-200",
+            "Risk Officer": "bg-red-100 text-red-700 border-red-200",
+            "Quant": "bg-emerald-100 text-emerald-700 border-emerald-200",
+            "Archivist": "bg-amber-100 text-amber-700 border-amber-200"
+        };
+        const agent = section.author_agent || "Writer";
+        const badgeClass = agentColors[agent] || agentColors["Writer"];
+        const badgeHtml = `<span class="ml-2 text-[9px] px-1.5 py-0.5 rounded border ${badgeClass} uppercase font-mono tracking-wider opacity-80"><i class="fas fa-robot mr-1"></i>${agent}</span>`;
 
         secDiv.innerHTML = `
-            <h2 class="text-sm font-bold text-slate-400 uppercase tracking-widest border-b border-slate-200 pb-2 mb-4 flex items-center gap-2">
-                <i class="fas fa-caret-right text-blue-500"></i> ${section.title}
+            <h2 class="text-sm font-bold text-slate-400 uppercase tracking-widest border-b border-slate-200 pb-2 mb-4 flex items-center">
+                <i class="fas fa-caret-right text-blue-500 mr-2"></i> ${section.title}
+                ${badgeHtml}
             </h2>
             <div class="text-sm text-slate-600 leading-relaxed font-serif text-justify">
                 ${contentHtml}
@@ -127,6 +177,158 @@ async function loadCreditMemo(filename) {
         container.appendChild(secDiv);
     });
 }
+
+function renderAnnexA(memo) {
+    const table = document.getElementById('financials-table');
+    table.innerHTML = '';
+
+    if (!memo.historical_financials || memo.historical_financials.length === 0) {
+        table.innerHTML = '<tr><td class="p-4 text-slate-400 italic">No historical data available.</td></tr>';
+        return;
+    }
+
+    // Sort by Period (FY23, FY24, FY25) - usually reverse order in list
+    // Let's assume input order is correct (FY25, FY24, FY23)
+    const data = memo.historical_financials;
+    const columns = data.map(d => d.period);
+
+    // Header Row
+    const thead = document.createElement('thead');
+    thead.className = "text-slate-500 border-b border-slate-700";
+    let headerHtml = '<th class="p-3 w-1/4">Metric</th>';
+    columns.forEach(col => headerHtml += `<th class="p-3 text-right">${col}</th>`);
+    thead.innerHTML = `<tr>${headerHtml}</tr>`;
+    table.appendChild(thead);
+
+    // Rows
+    const metrics = [
+        { key: "revenue", label: "Revenue" },
+        { key: "ebitda", label: "EBITDA" },
+        { key: "net_income", label: "Net Income" },
+        { key: "total_assets", label: "Total Assets" },
+        { key: "total_liabilities", label: "Total Liabilities" },
+        { key: "total_equity", label: "Total Equity" },
+        { key: "leverage_ratio", label: "Leverage (x)", format: (v) => v.toFixed(2) + 'x' },
+        { key: "current_ratio", label: "Current Ratio (x)", format: (v) => v.toFixed(2) + 'x' }
+    ];
+
+    const tbody = document.createElement('tbody');
+    metrics.forEach(metric => {
+        const tr = document.createElement('tr');
+        tr.className = "border-b border-slate-800/50 hover:bg-slate-800/30";
+
+        let rowHtml = `<td class="p-3 font-bold text-slate-300">${metric.label}</td>`;
+
+        data.forEach(periodData => {
+            const val = periodData[metric.key];
+            let displayVal = 'N/A';
+            if (val !== undefined && val !== null) {
+                if (metric.format) {
+                    displayVal = metric.format(val);
+                } else {
+                    displayVal = formatCurrency(val);
+                }
+            }
+            rowHtml += `<td class="p-3 text-right text-slate-400">${displayVal}</td>`;
+        });
+
+        tr.innerHTML = rowHtml;
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+}
+
+function renderAnnexB(memo) {
+    const container = document.getElementById('dcf-container');
+    container.innerHTML = '';
+
+    if (!memo.dcf_analysis) {
+        container.innerHTML = '<div class="text-slate-400 italic">No DCF analysis available.</div>';
+        return;
+    }
+
+    const dcf = memo.dcf_analysis;
+
+    // 1. Assumptions & Output Cards
+    const assumptionsHtml = `
+        <div class="grid grid-cols-4 gap-4">
+             <div class="bg-slate-800/50 p-4 rounded border border-slate-700">
+                <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">WACC</div>
+                <div class="text-xl font-bold text-white font-mono">${(dcf.wacc * 100).toFixed(1)}%</div>
+             </div>
+             <div class="bg-slate-800/50 p-4 rounded border border-slate-700">
+                <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Term Growth</div>
+                <div class="text-xl font-bold text-white font-mono">${(dcf.growth_rate * 100).toFixed(1)}%</div>
+             </div>
+             <div class="bg-slate-800/50 p-4 rounded border border-slate-700">
+                <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Implied Share Price</div>
+                <div class="text-xl font-bold text-emerald-400 font-mono">$${dcf.share_price.toFixed(2)}</div>
+             </div>
+             <div class="bg-slate-800/50 p-4 rounded border border-slate-700">
+                <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Enterprise Value</div>
+                <div class="text-xl font-bold text-blue-400 font-mono">${formatCurrency(dcf.enterprise_value)}</div>
+             </div>
+        </div>
+    `;
+
+    // 2. Projection Table
+    const tableHtml = `
+        <div class="mt-8">
+            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Projected Free Cash Flow (5-Year)</h3>
+            <table class="w-full text-left font-mono text-xs border-collapse">
+                <thead class="text-slate-500 border-b border-slate-700">
+                    <tr>
+                        <th class="p-2">Period</th>
+                        <th class="p-2 text-right">Year 1</th>
+                        <th class="p-2 text-right">Year 2</th>
+                        <th class="p-2 text-right">Year 3</th>
+                        <th class="p-2 text-right">Year 4</th>
+                        <th class="p-2 text-right">Year 5</th>
+                    </tr>
+                </thead>
+                <tbody class="text-slate-300">
+                    <tr class="border-b border-slate-800/50">
+                        <td class="p-2 font-bold">Unlevered FCF</td>
+                        ${dcf.free_cash_flow.map(v => `<td class="p-2 text-right">${formatCurrency(v)}</td>`).join('')}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    // 3. Terminal Value
+    const terminalHtml = `
+        <div class="mt-8 p-4 bg-slate-800/30 rounded border border-slate-700 flex justify-between items-center">
+             <div>
+                <div class="text-sm font-bold text-slate-300">Terminal Value Calculation</div>
+                <div class="text-[10px] text-slate-500 font-mono mt-1">Exit Multiple / Gordon Growth Method</div>
+             </div>
+             <div class="text-right">
+                <div class="text-2xl font-bold text-white font-mono">${formatCurrency(dcf.terminal_value)}</div>
+                <div class="text-[10px] text-slate-500">Present Value: ${formatCurrency(dcf.terminal_value / Math.pow(1+dcf.wacc, 5))}</div>
+             </div>
+        </div>
+    `;
+
+    container.innerHTML = assumptionsHtml + tableHtml + terminalHtml;
+}
+
+// Tab Switching Logic
+window.switchTab = function(tabName) {
+    // Hide all
+    ['memo', 'annex-a', 'annex-b'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.add('hidden');
+        const btn = document.getElementById(`btn-tab-${t}`);
+        btn.classList.remove('border-blue-500', 'text-blue-400');
+        btn.classList.add('border-transparent', 'text-slate-400');
+    });
+
+    // Show target
+    document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+    const activeBtn = document.getElementById(`btn-tab-${tabName}`);
+    activeBtn.classList.remove('border-transparent', 'text-slate-400');
+    activeBtn.classList.add('border-blue-500', 'text-blue-400');
+};
 
 async function loadAuditLog() {
     const res = await fetch('data/credit_memo_audit_log.json');
@@ -165,7 +367,33 @@ window.viewEvidence = function(docId) {
 
     viewer.querySelector('.text-center').classList.add('hidden');
     mockPage.classList.remove('hidden');
-    docTitle.textContent = docId;
+
+    // Determine Type Badge
+    let type = "DOC";
+    let color = "bg-slate-500";
+    if (docId.includes("10-K") || docId.includes("10-Q")) { type = "FILING"; color = "bg-blue-500"; }
+    else if (docId.includes("Credit_Agreement") || docId.includes("Revolver")) { type = "LEGAL"; color = "bg-purple-500"; }
+    else if (docId.includes("Risk") || docId.includes("Report")) { type = "RESEARCH"; color = "bg-amber-500"; }
+    else if (docId.includes("Earnings")) { type = "TRANSCRIPT"; color = "bg-emerald-500"; }
+
+    docTitle.innerHTML = `<span class="${color} text-white px-1 rounded mr-2 text-[9px] font-bold">${type}</span>${docId}`;
+
+    // Update Snippet Text based on docId context (Simulated Retrieval)
+    const pageText = mockPage.querySelectorAll('p');
+    if (docId.includes("Credit_Agreement")) {
+        pageText[0].textContent = "SECTION 6.01. Financial Covenants. (a) Consolidated Leverage Ratio. The Borrower will not permit the Consolidated Leverage Ratio as of the last day of any fiscal quarter to exceed 3.50 to 1.00.";
+        pageText[1].textContent = "(b) Consolidated Interest Coverage Ratio. The Borrower will not permit the Consolidated Interest Coverage Ratio as of the last day of any fiscal quarter to be less than 3.00 to 1.00.";
+        pageText[2].textContent = "SECTION 6.02. Liens. The Borrower will not, and will not permit any Subsidiary to, create, incur, assume or permit to exist any Lien on any property or asset now owned or hereafter acquired by it, or assign or sell any income or revenues (including accounts receivable) or rights in respect of any thereof.";
+    } else if (docId.includes("10-K") || docId.includes("10-Q")) {
+        pageText[0].textContent = "ITEM 1A. RISK FACTORS. Our business, financial condition and results of operations could be materially and adversely affected by a number of factors, including the following: Global economic conditions and geopolitical tensions could adversely affect our business.";
+        pageText[1].textContent = "We operate in highly competitive markets and subject to rapid technological change. If we are unable to compete effectively, our financial results could be adversely affected. ";
+        pageText[2].textContent = "MANAGEMENT'S DISCUSSION AND ANALYSIS. Net sales increased 11% year-over-year, primarily driven by strong performance in our Services segment and higher demand in emerging markets.";
+    } else {
+        pageText[0].textContent = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        pageText[1].textContent = "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
+        pageText[2].textContent = "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.";
+    }
+
 
     // Simulate different highlight positions based on docId simple hash
     let hash = 0;
@@ -173,13 +401,13 @@ window.viewEvidence = function(docId) {
         hash = docId.charCodeAt(i) + ((hash << 5) - hash);
     }
 
-    const randomTop = 10 + (Math.abs(hash) % 70);
+    const randomTop = 10 + (Math.abs(hash) % 40); // Keep it higher up
     const randomLeft = 10 + (Math.abs(hash) % 40);
 
     highlight.style.top = `${randomTop}%`;
     highlight.style.left = `${randomLeft}%`;
-    highlight.style.width = '40%';
-    highlight.style.height = '10%';
+    highlight.style.width = '60%';
+    highlight.style.height = '15%';
 
     mockPage.classList.add('ring-2', 'ring-blue-500');
     setTimeout(() => mockPage.classList.remove('ring-2', 'ring-blue-500'), 500);

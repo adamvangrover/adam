@@ -14,6 +14,7 @@ class EvidenceChunk(BaseModel):
     page_number: int
     bbox: List[float]  # [x0, y0, x1, y1] normalized coordinates (0-1)
     confidence: float = 1.0
+    chunk_type: str = "Unstructured" # e.g., "Credit Agreement", "10-K", "Financial Table"
 
 class Citation(BaseModel):
     """
@@ -27,6 +28,35 @@ class CreditMemoSection(BaseModel):
     title: str
     content: str
     citations: List[Citation] = []
+    author_agent: str = "Writer" # e.g., "Risk Officer", "Quant", "Archivist"
+
+class DCFAnalysis(BaseModel):
+    """
+    Deterministic Discounted Cash Flow Analysis.
+    """
+    free_cash_flow: List[float] # Projected FCF for 5 years
+    growth_rate: float
+    wacc: float
+    terminal_value: float
+    enterprise_value: float
+    equity_value: float
+    share_price: float
+
+class FinancialSpread(BaseModel):
+    """
+    Standardized financial template (FIBO-aligned).
+    """
+    total_assets: float
+    total_liabilities: float
+    total_equity: float
+    revenue: float
+    ebitda: float
+    net_income: float
+    interest_expense: float
+    dscr: float
+    leverage_ratio: float
+    current_ratio: float
+    period: str
 
 class CreditMemo(BaseModel):
     """
@@ -37,6 +67,8 @@ class CreditMemo(BaseModel):
     executive_summary: str
     sections: List[CreditMemoSection] = []
     financial_ratios: Dict[str, float] = {}
+    historical_financials: List[Dict[str, Any]] = [] # List of FinancialSpread dictionaries
+    dcf_analysis: Optional[DCFAnalysis] = None
     risk_score: float
 
 class AuditLogEntry(BaseModel):
