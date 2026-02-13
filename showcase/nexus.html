@@ -72,6 +72,27 @@
             opacity: 1;
             font-weight: bold;
         }
+
+        /* Styles for Command Bar */
+        .search-input {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .sim-btn {
+            background: linear-gradient(45deg, #1e3a8a, #1e40af);
+            border: 1px solid #3b82f6;
+            transition: all 0.3s ease;
+        }
+        .sim-btn:hover {
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
     </style>
 </head>
 <body class="h-screen flex flex-col">
@@ -83,6 +104,18 @@
             <i class="fas fa-globe-americas text-amber-500 text-xl"></i>
             <h1 class="text-xl tracking-widest font-bold">ADAM <span class="text-amber-500">NEXUS</span> <span class="text-xs text-zinc-500">| SOVEREIGN SIMULATION LAYER</span></h1>
         </div>
+
+        <!-- Center Command Bar -->
+        <div class="flex-1 max-w-2xl mx-10 flex gap-2">
+            <div class="relative flex-1">
+                <i class="fas fa-search absolute left-3 top-2.5 text-zinc-600 text-sm"></i>
+                <input type="text" id="nexus-search" class="search-input w-full px-4 pl-9 py-1 rounded text-sm h-8" placeholder="QUERY NODE OR FACTION..." onkeydown="if(event.key === 'Enter') handleSearch()">
+            </div>
+            <button onclick="triggerSimulation()" class="sim-btn text-white px-4 py-1 rounded text-xs font-bold tracking-wider flex items-center gap-2">
+                <i class="fas fa-microchip"></i> RUN MONTE CARLO
+            </button>
+        </div>
+
         <div class="flex items-center gap-6 text-sm">
             <div class="flex items-center gap-2">
                 <span class="text-zinc-500">SIMULATION CONFIDENCE:</span>
@@ -123,10 +156,22 @@
                     resource conflicts or ideological friction.
                 </p>
             </div>
+
+            <!-- Simulation Results Overlay -->
+            <div id="sim-results" class="absolute top-10 right-10 w-[450px] glass-panel border-l-4 border-l-blue-600 hidden z-50 shadow-2xl bg-zinc-900/95">
+                <div class="p-3 border-b border-zinc-800 flex justify-between items-center bg-blue-900/20">
+                    <h3 class="font-bold text-blue-400 text-sm tracking-widest"><i class="fas fa-project-diagram mr-2"></i>MONTE CARLO PROJECTION</h3>
+                    <button onclick="closeSimResults()" class="text-zinc-500 hover:text-white"><i class="fas fa-times"></i></button>
+                </div>
+                <!-- Sim Content -->
+                <div class="p-4 font-mono text-xs text-zinc-300 whitespace-pre-wrap leading-relaxed h-[400px] overflow-y-auto" id="sim-content">
+                    Initializing Quantum State...
+                </div>
+            </div>
         </div>
 
         <!-- Inspector Panel (Right) -->
-        <aside id="node-inspector" class="absolute right-0 top-0 h-full w-80 glass-panel transform translate-x-full transition-transform duration-300 z-40 border-l border-zinc-800 flex flex-col">
+        <aside id="node-inspector" class="absolute right-0 top-0 h-full w-80 glass-panel transform translate-x-full transition-transform duration-300 z-40 border-l border-zinc-800 flex flex-col bg-zinc-900/95">
             <div class="p-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-900">
                 <h3 class="font-bold text-amber-500" id="insp-title">Node Inspector</h3>
                 <button onclick="closeInspector()" class="text-zinc-500 hover:text-white"><i class="fas fa-times"></i></button>
@@ -139,15 +184,20 @@
     </main>
 
     <script src="js/mock_data.js"></script>
+    <script src="js/nexus_simulation.js"></script>
     <script>
         // Init Global Data (Simulated fetch)
         let network = null;
         let chart = null;
         let simulationData = null;
+        let graphNodes = null;
 
         async function initNexus() {
             try {
-                const res = await fetch('data/nexus_simulation.json');
+                await window.nexusSimulator.init();
+
+                // Add timestamp to prevent caching
+                const res = await fetch('data/nexus_simulation.json?t=' + new Date().getTime());
                 simulationData = await res.json();
 
                 initGraph(simulationData.graph);
@@ -162,9 +212,12 @@
 
         function initGraph(graphData) {
             const container = document.getElementById('nexus-network');
+            graphNodes = new vis.DataSet(graphData.nodes);
+            const edges = new vis.DataSet(graphData.edges);
+
             const data = {
-                nodes: new vis.DataSet(graphData.nodes),
-                edges: new vis.DataSet(graphData.edges)
+                nodes: graphNodes,
+                edges: edges
             };
             const options = {
                 nodes: {
@@ -194,7 +247,7 @@
             network.on("click", function(params) {
                 if(params.nodes.length > 0) {
                     const nodeId = params.nodes[0];
-                    const node = data.nodes.get(nodeId);
+                    const node = graphNodes.get(nodeId);
                     openInspector(node);
                 } else {
                     closeInspector();
@@ -263,13 +316,13 @@
                 <div class="space-y-4">
                     <div class="p-3 bg-zinc-800/50 rounded border border-zinc-700">
                         <div class="text-[10px] text-zinc-500 uppercase">Status</div>
-                        <div class="text-sm font-mono text-white">${node.title}</div>
+                        <div class="text-sm font-mono text-white">${node.title || node.label}</div>
                     </div>
 
                     <div>
                         <div class="text-[10px] text-zinc-500 uppercase mb-2">Simulated Intent</div>
                         <div class="text-xs font-mono text-green-400 p-2 bg-black rounded border border-green-900/30">
-                            "Simulating strategic moves based on ideology ${node.group}..."
+                            "Simulating strategic moves based on ideology ${node.group || 'unknown'}..."
                         </div>
                     </div>
 
@@ -331,6 +384,80 @@
             } catch (e) {
                 // Silent fail polling
             }
+        }
+
+        // --- NEW INTERACTIVITY FUNCTIONS ---
+
+        function handleSearch() {
+            const query = document.getElementById('nexus-search').value;
+            if(!query) return;
+
+            const matches = window.nexusSimulator.search(query);
+
+            if(matches.length > 0 && network && graphNodes) {
+                const allNodes = graphNodes.get();
+                const matchedNode = allNodes.find(n => n.label === matches[0]);
+
+                if(matchedNode) {
+                    network.selectNodes([matchedNode.id]);
+                    network.focus(matchedNode.id, {
+                        scale: 1.2,
+                        animation: true
+                    });
+                    openInspector(matchedNode);
+                } else {
+                    // Try to simulate even if not on graph (Shadow Faction)
+                    triggerSimulation();
+                }
+            } else {
+                // Allow simulation of non-graph entities (Shadow Factions)
+                if (matches.length > 0) {
+                    triggerSimulation();
+                } else {
+                    alert("No entity found matching query: " + query);
+                }
+            }
+        }
+
+        function triggerSimulation() {
+            const query = document.getElementById('nexus-search').value;
+            const panel = document.getElementById('sim-results');
+            const content = document.getElementById('sim-content');
+
+            panel.classList.remove('hidden');
+            content.innerHTML = `<div class="animate-pulse text-blue-400">
+                > INITIALIZING QUANTUM CORE...<br>
+                > LOADING PROBABILITY VECTORS...<br>
+                > RESOLVING CAUSAL CHAINS...
+            </div>`;
+
+            setTimeout(() => {
+                try {
+                    const results = window.nexusSimulator.runMonteCarlo(query);
+                    const report = window.nexusSimulator.generateScenarioText(results);
+
+                    content.innerText = "";
+                    let i = 0;
+                    const speed = 1; // Faster typing
+                    function typeWriter() {
+                        if (i < report.length) {
+                            content.innerText += report.charAt(i);
+                            i++;
+                            // Scroll to bottom
+                            content.scrollTop = content.scrollHeight;
+                            setTimeout(typeWriter, speed);
+                        }
+                    }
+                    typeWriter();
+
+                } catch(e) {
+                    content.innerText = "Simulation Failed: " + e.message;
+                }
+            }, 800);
+        }
+
+        function closeSimResults() {
+            document.getElementById('sim-results').classList.add('hidden');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
