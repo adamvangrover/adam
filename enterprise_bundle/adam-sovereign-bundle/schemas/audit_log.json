@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Audit Log",
+  "description": "Schema for regulatory reporting.",
+  "type": "object",
+  "properties": {
+    "timestamp": {"type": "string", "format": "date-time"},
+    "event_type": {"type": "string", "enum": ["QUERY", "DECISION", "ERROR"]},
+    "agent_id": {"type": "string"},
+    "details": {"type": "object"},
+    "status": {"type": "string", "enum": ["SUCCESS", "FAILURE", "PENDING"]}
+  },
+  "required": ["timestamp", "event_type", "agent_id"]
+}

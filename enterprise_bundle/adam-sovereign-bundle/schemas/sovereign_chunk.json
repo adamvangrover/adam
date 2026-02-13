@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Sovereign Chunk",
+  "description": "A text chunk with immutable linkage to its source PDF location.",
+  "type": "object",
+  "required": ["chunk_id", "doc_id", "text", "spatial_context"],
+  "properties": {
+    "chunk_id": {"type": "string", "format": "uuid"},
+    "doc_id": {"type": "string", "format": "uuid"},
+    "text": {"type": "string"},
+    "embedding_vector": {
+      "type": "array",
+      "items": {"type": "number"},
+      "minItems": 1536
+    },
+    "spatial_context": {
+      "type": "object",
+      "properties": {
+        "page_number": {"type": "integer"},
+        "bounding_box": {
+          "type": "array",
+          "items": {"type": "number"},
+          "description": "[x_min, y_min, x_max, y_max]"
+        }
+      }
+    }
+  }
+}
