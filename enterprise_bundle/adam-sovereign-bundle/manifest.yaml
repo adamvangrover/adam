@@ -1,0 +1,17 @@
+package: adam-sovereign-credit
+version: 1.0.0
+license: PROPRIETARY-BANK-INTERNAL
+architecture: glass_box_rag
+
+security_constraints:
+  allow_public_internet: false
+  pii_redaction_level: strict
+  audit_logging: synchronous
+
+dependencies:
+  vector_store: milvus>=2.3
+  graph_store: neo4j>=5.0
+  foundation_model:
+    provider: azure_openai
+    model: gpt-4-32k
+    api_version: "2024-02-15-preview"
