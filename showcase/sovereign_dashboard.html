@@ -258,6 +258,9 @@
             <p style="color: #888; margin: 0;">Glass Box Transparency Engine // v1.1.0 // <span style="color: #00ff9d;">CYBERPUNK PROTOCOL</span></p>
         </div>
         <div class="header-controls">
+            <button id="upload-btn" class="badge" style="background:none; border: 1px solid #444; color: #00ff9d; cursor:pointer; margin-right: 10px; font-family: inherit;">UPLOAD JSON</button>
+            <button id="download-btn" class="badge" style="background:none; border: 1px solid #444; color: #00ccff; cursor:pointer; margin-right: 10px; font-family: inherit;">DOWNLOAD JSON</button>
+            <input type="file" id="json-upload" style="display:none" accept=".json" />
             <a href="index.html" class="badge" style="text-decoration: none; border: 1px solid #444; padding: 8px 15px;">&larr; EXIT TO MAIN</a>
         </div>
     </header>
@@ -319,43 +322,86 @@
         </div>
     </div>
 
+    <script src="js/universal_loader.js"></script>
     <script>
-        const TICKERS = ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA"];
+        const DEFAULT_TICKERS = ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA"];
         let chartInstance = null;
+        let currentData = null;
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (window.UniversalLoader) {
+                await window.UniversalLoader.init();
+            }
+
             const list = document.getElementById('tickerList');
-            TICKERS.forEach(ticker => {
+            // Populate from library + default sovereign list
+            const lib = window.UniversalLoader ? window.UniversalLoader.getLibrary() : [];
+            const tickers = [...new Set([...DEFAULT_TICKERS, ...lib.map(i => i.ticker)])];
+
+            tickers.forEach(ticker => {
                 const li = document.createElement('li');
                 li.className = 'ticker-item';
-                li.innerHTML = `<span>${ticker}</span><span class="ticker-status">SECURE</span>`;
+                // Find status
+                const item = lib.find(i => i.ticker === ticker);
+                const status = item ? (item.risk_score > 80 ? 'SECURE' : 'WATCH') : 'UNKNOWN';
+
+                li.innerHTML = `<span>${ticker}</span><span class="ticker-status">${status}</span>`;
                 li.onclick = () => loadTicker(ticker, li);
                 list.appendChild(li);
             });
 
             // Load first by default
-            if (TICKERS.length > 0) {
-                loadTicker(TICKERS[0], list.firstChild);
+            if (tickers.length > 0) {
+                loadTicker(tickers[0], list.firstChild);
             }
+
+            // Handlers
+            document.getElementById('download-btn').onclick = () => {
+                 if (!currentData) { alert("No data loaded."); return; }
+                 const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentData, null, 2));
+                 const anchor = document.createElement('a');
+                 anchor.href = dataStr;
+                 anchor.download = `sovereign_model_${currentData.ticker}.json`;
+                 document.body.appendChild(anchor);
+                 anchor.click();
+                 anchor.remove();
+            };
+
+            document.getElementById('upload-btn').onclick = () => document.getElementById('json-upload').click();
+
+            document.getElementById('json-upload').onchange = (e) => {
+                 const file = e.target.files[0];
+                 if (!file) return;
+                 const reader = new FileReader();
+                 reader.onload = (ev) => {
+                     try {
+                         const json = JSON.parse(ev.target.result);
+                         const normalized = window.UniversalLoader.validateAndNormalize(json);
+                         if (normalized) {
+                             currentData = normalized;
+                             renderQuant(normalized);
+                             renderRisk(normalized);
+                             renderAudit(normalized);
+                             alert(`Loaded model for ${normalized.ticker}`);
+                         } else { alert("Invalid model format."); }
+                     } catch (err) { alert("Parse error."); }
+                 };
+                 reader.readAsText(file);
+            };
         });
 
         async function loadTicker(ticker, element) {
             // Update UI State
             document.querySelectorAll('.ticker-item').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
+            if(element) element.classList.add('active');
 
             try {
-                // Fetch Artifacts with cache busting
-                const ts = new Date().getTime();
-                const [spread, memo, audit] = await Promise.all([
-                    fetch(`data/sovereign_artifacts/${ticker}_spread.json?t=${ts}`).then(r => r.json()),
-                    fetch(`data/sovereign_artifacts/${ticker}_memo.json?t=${ts}`).then(r => r.json()),
-                    fetch(`data/sovereign_artifacts/${ticker}_audit.json?t=${ts}`).then(r => r.json())
-                ]);
+                const data = await window.UniversalLoader.loadEntity(ticker);
+                currentData = data;
 
-                renderQuant(spread);
-                renderRisk(memo);
-                renderAudit(audit);
+                renderQuant(data);
+                renderRisk(data);
+                renderAudit(data);
 
             } catch (e) {
                 console.error("Error loading data:", e);
@@ -364,16 +410,21 @@
         }
 
         function renderQuant(data) {
-            document.getElementById('fiscalYear').textContent = `FY ${data.fiscal_year}`;
+            const financials = data.financials;
+            document.getElementById('fiscalYear').textContent = `FY ${financials.history[0]?.fiscal_year || financials.history[0]?.period || '--'}`;
 
             // 1. Chart Rendering
             const ctx = document.getElementById('financialChart').getContext('2d');
             if (chartInstance) chartInstance.destroy();
 
-            const history = data.history || [];
-            const labels = history.map(h => h.fiscal_year);
-            const revenues = history.map(h => h.revenue / 1000); // in Billions
-            const ebitdas = history.map(h => h.ebitda / 1000);
+            const history = financials.history || [];
+            // Sort history? Sovereign pipeline usually gives sorted. Unified schema does as well.
+            // Ensure oldest first for chart
+            const sortedHistory = [...history].sort((a,b) => (a.fiscal_year || a.period) > (b.fiscal_year || b.period) ? 1 : -1);
+
+            const labels = sortedHistory.map(h => h.fiscal_year || h.period);
+            const revenues = sortedHistory.map(h => (h.revenue || 0) / 1000); // in Billions if data is in millions
+            const ebitdas = sortedHistory.map(h => (h.ebitda || 0) / 1000);
 
             chartInstance = new Chart(ctx, {
                 type: 'line',
@@ -417,13 +468,13 @@
             // 2. Growth Metrics
             const growthDiv = document.getElementById('growthMetrics');
             let growthHtml = '';
-            if (data.growth_metrics) {
-                for (const [key, val] of Object.entries(data.growth_metrics)) {
+            if (financials.growth_metrics) {
+                for (const [key, val] of Object.entries(financials.growth_metrics)) {
                     const colorClass = val >= 0 ? 'text-green' : 'text-red';
                     growthHtml += `
                         <div class="metric-card">
                             <div class="metric-label">${key}</div>
-                            <div class="metric-value ${colorClass}">${val}%</div>
+                            <div class="metric-value ${colorClass}">${typeof val === 'number' ? val.toFixed(1) : val}%</div>
                         </div>`;
                 }
             }
@@ -432,53 +483,67 @@
             // 3. Ratios
             const ratioDiv = document.getElementById('ratioMetrics');
             let ratioHtml = '';
-            for (const [key, val] of Object.entries(data.ratios)) {
+            for (const [key, val] of Object.entries(financials.ratios)) {
                 ratioHtml += `
                     <div class="metric-card">
                         <div class="metric-label">${key}</div>
-                        <div class="metric-value">${val}x</div>
+                        <div class="metric-value">${typeof val === 'number' ? val.toFixed(2) : val}x</div>
                     </div>`;
             }
             ratioDiv.innerHTML = ratioHtml;
 
             // 4. Validation
-            const validationClass = data.validation.identity_check === "PASS" ? "text-green" : "text-red";
+            const valData = financials.validation || { identity_check: "N/A", identity_delta: 0 };
+            const validationClass = valData.identity_check === "PASS" ? "text-green" : "text-red";
             document.getElementById('validationBox').innerHTML = `
                 <div class="metric-label">CRYPTOGRAPHIC ACCOUNTING VERIFICATION</div>
                 <div class="metric-value ${validationClass}">
-                    ${data.validation.identity_check} <span style="font-size:0.8em; color:#666;">(Delta: ${data.validation.identity_delta.toFixed(2)})</span>
+                    ${valData.identity_check} <span style="font-size:0.8em; color:#666;">(Delta: ${valData.identity_delta.toFixed(2)})</span>
                 </div>
             `;
         }
 
         function renderRisk(data) {
-            const statusColor = data.recommendation === "APPROVE" ? "pass" : "warn";
+            const statusColor = data.recommendation === "APPROVE" || data.rating.startsWith("A") ? "pass" : "warn";
+
+            // Map sections
+            const execSummary = data.sections.find(s => s.title === "Executive Summary")?.content || data.summary;
+            const covenantSection = data.sections.find(s => s.title === "Covenant Analysis");
+
+            let covenantHtml = '';
+            if (covenantSection) {
+                try {
+                    const covs = JSON.parse(covenantSection.content);
+                    for (const [test, result] of Object.entries(covs)) {
+                        const color = result === "PASS" ? "text-green" : "text-red";
+                        covenantHtml += `<li style="margin-bottom: 5px; font-size: 0.9em; display: flex; justify-content: space-between; border-bottom: 1px dotted #333; padding-bottom: 2px;">
+                            <span style="color: #888;">${test.replace('_', ' ').toUpperCase()}</span>
+                            <span class="${color} font-bold">${result}</span>
+                        </li>`;
+                    }
+                } catch(e) { covenantHtml = '<li>No structured covenant data.</li>'; }
+            } else {
+                covenantHtml = '<li>No covenant analysis available.</li>';
+            }
 
             let html = `
                 <div class="memo-header">
                     <div style="font-size: 0.8em; color: #666;">CLASSIFIED // INTERNAL USE ONLY</div>
-                    <div style="font-size: 1.2em; font-weight: bold; margin-top: 5px;">${data.title.toUpperCase()}</div>
-                    <div style="font-size: 0.8em; color: #888;">DATE: ${data.date}</div>
+                    <div style="font-size: 1.2em; font-weight: bold; margin-top: 5px;">${data.name.toUpperCase()}</div>
+                    <div style="font-size: 0.8em; color: #888;">DATE: ${data.report_date}</div>
                 </div>
-                <div class="stamp ${statusColor}">${data.recommendation}</div>
+                <div class="stamp ${statusColor}">${data.rating}</div>
 
                 <div style="margin-bottom: 15px;">
                     <div class="metric-label">EXECUTIVE SUMMARY</div>
-                    <p style="font-size: 0.9em; line-height: 1.4; color: #ddd;">${data.executive_summary}</p>
+                    <p style="font-size: 0.9em; line-height: 1.4; color: #ddd;">${execSummary}</p>
                 </div>
 
                 <div class="metric-label">COVENANT ANALYSIS</div>
                 <ul style="list-style: none; padding: 0; margin-top: 5px;">
+                    ${covenantHtml}
+                </ul>
             `;
-
-            for (const [test, result] of Object.entries(data.covenant_analysis)) {
-                const color = result === "PASS" ? "text-green" : "text-red";
-                html += `<li style="margin-bottom: 5px; font-size: 0.9em; display: flex; justify-content: space-between; border-bottom: 1px dotted #333; padding-bottom: 2px;">
-                    <span style="color: #888;">${test.replace('_', ' ').toUpperCase()}</span>
-                    <span class="${color} font-bold">${result}</span>
-                </li>`;
-            }
-            html += '</ul>';
 
             document.getElementById('riskContent').innerHTML = html;
         }
@@ -487,40 +552,23 @@
             const list = document.getElementById('auditContent');
             list.innerHTML = '';
 
-            const events = [
-                {
-                    time: data.timestamp,
-                    agent: "ORCHESTRATOR",
-                    action: "PIPELINE_INIT",
-                    status: "success",
-                    detail: "Pipeline execution started"
-                },
-                {
-                    time: data.timestamp, // In real system, would be slightly later
-                    agent: "QUANT_AGENT",
-                    action: data.quant_audit.action,
-                    status: data.quant_audit.status === "SUCCESS" ? "success" : "warning",
-                    detail: data.quant_audit.details
-                },
-                {
-                    time: data.timestamp,
-                    agent: "RISK_OFFICER",
-                    action: data.risk_audit.action,
-                    status: data.risk_audit.status === "SUCCESS" ? "success" : "warning",
-                    detail: data.risk_audit.details
-                }
-            ];
+            const logs = data.audit_log || [];
 
-            events.forEach(event => {
+            logs.forEach(event => {
                 const li = document.createElement('li');
-                li.className = `audit-item ${event.status}`;
+                const statusClass = event.status === "SUCCESS" || event.status === "PASS" ? "success" : "warning";
+                li.className = `audit-item ${statusClass}`;
                 li.innerHTML = `
-                    <div class="audit-time">${event.time}</div>
-                    <div class="audit-action">${event.agent} :: ${event.action}</div>
-                    <div class="audit-detail">${event.detail}</div>
+                    <div class="audit-time">${event.timestamp}</div>
+                    <div class="audit-action">${event.action}</div>
+                    <div class="audit-detail">Status: ${event.status}</div>
                 `;
                 list.appendChild(li);
             });
+
+            if (logs.length === 0) {
+                 list.innerHTML = '<li class="audit-item warning"><div class="audit-detail">No audit logs found.</div></li>';
+            }
         }
     </script>
 </body>

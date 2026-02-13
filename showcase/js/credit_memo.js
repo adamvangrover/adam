@@ -1,402 +1,467 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // --- State Management ---
-    let mockData = {};
-    let libraryIndex = [];
     let currentMemo = null;
 
     const elements = {
-        generateBtn: document.getElementById('generate-btn'),
-        memoPanel: document.getElementById('memo-panel'),
-        memoContent: document.getElementById('memo-content'),
-        evidencePanel: document.getElementById('evidence-panel'),
         pdfViewer: document.getElementById('pdf-viewer'),
-        closeEvidenceBtn: document.getElementById('close-evidence'),
-        progressContainer: document.getElementById('progress-container'),
-        progressFill: document.getElementById('progress-fill'),
-        progressText: document.getElementById('progress-text'),
-        agentStatus: document.getElementById('agent-status'),
-        auditLogPanel: document.getElementById('audit-log-panel'),
-        auditLogContent: document.getElementById('audit-log-content'), // mapped to tbody in HTML
-        borrowerSelect: document.getElementById('borrower-select'),
-        libraryList: document.getElementById('library-list') // Assuming sidebar has a list container
+        mockPdfPage: document.getElementById('mock-pdf-page'),
+        docTitle: document.getElementById('doc-title'),
+
+        // Audit
+        auditTableBody: document.getElementById('audit-table-body'),
+
+        // Sidebar
+        libraryList: document.getElementById('library-list'),
+
+        // Tabs
+        tabBtns: {
+            memo: document.getElementById('btn-tab-memo'),
+            annexA: document.getElementById('btn-tab-annex-a'),
+            annexB: document.getElementById('btn-tab-annex-b')
+        },
+        tabContents: {
+            memo: document.getElementById('tab-memo'),
+            annexA: document.getElementById('tab-annex-a'),
+            annexB: document.getElementById('tab-annex-b')
+        },
+
+        // Containers
+        memoContainer: document.getElementById('memo-container'),
+        financialsTable: document.getElementById('financials-table'),
+        dcfContainer: document.getElementById('dcf-container')
     };
 
     // --- Initialization ---
     try {
-        await Promise.all([loadMockData(), loadLibraryIndex()]);
-        renderLibraryList();
-        logAudit("System", "Ready", "Credit Memo Orchestrator initialized.");
+        if (window.UniversalLoader) {
+            await window.UniversalLoader.init();
+            renderLibraryList();
+            injectControls();
+            logAudit("System", "Ready", "Credit Memo Orchestrator initialized.");
+        } else {
+            console.error("UniversalLoader not found!");
+        }
     } catch (e) {
         console.error("Initialization failed:", e);
     }
 
-    // --- Event Listeners ---
-    if(elements.generateBtn) elements.generateBtn.addEventListener('click', startGeneration);
-    if(elements.closeEvidenceBtn) elements.closeEvidenceBtn.addEventListener('click', hideEvidence);
-    
-    // Tab Switching (Global Delegate)
+    // --- Global Tab Switcher ---
     window.switchTab = (tabName) => {
-        document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.tab-btn').forEach(el => {
-            el.style.borderBottom = '2px solid transparent';
-            el.style.color = 'var(--text-secondary)';
+        // Hide all contents
+        Object.values(elements.tabContents).forEach(el => el.classList.add('hidden'));
+        
+        // Reset all buttons
+        Object.values(elements.tabBtns).forEach(el => {
+            el.classList.remove('text-blue-400', 'border-blue-500');
+            el.classList.add('text-slate-400', 'border-transparent');
         });
         
-        const target = document.getElementById(`tab-${tabName}`);
-        if(target) target.style.display = 'block';
-        
+        // Activate target
+        const content = document.getElementById(`tab-${tabName}`);
         const btn = document.getElementById(`btn-tab-${tabName}`);
-        if(btn) {
-            btn.style.borderBottom = '2px solid var(--accent-color)';
-            btn.style.color = 'var(--accent-color)';
+
+        if (content) content.classList.remove('hidden');
+        if (btn) {
+            btn.classList.remove('text-slate-400', 'border-transparent');
+            btn.classList.add('text-blue-400', 'border-blue-500');
         }
     };
 
-    // --- Data Loading ---
-    async function loadMockData() {
-        // Fallback or local load
-        try {
-            const res = await fetch('data/credit_mock_data.json');
-            mockData = await res.json();
-        } catch(e) { console.warn("Mock data fetch failed, using internal fallback"); }
-    }
+    // --- Core Logic ---
 
-    async function loadLibraryIndex() {
-        try {
-            const res = await fetch('data/credit_memo_library.json');
-            libraryIndex = await res.json();
-        } catch(e) { console.warn("Library index fetch failed"); }
-    }
-
-    // --- Core Logic: Simulation (Left Side) ---
-    function startGeneration() {
-        const borrower = elements.borrowerSelect ? elements.borrowerSelect.value : "Apple Inc.";
-        
-        // UI Reset
-        elements.memoContent.innerHTML = ''; 
-        elements.progressContainer.style.display = 'block';
-        hideEvidence();
-
-        // Simulate Enterprise Agent Workflow
-        simulateAgent("Archivist", `Retrieving ${borrower} EDGAR filings...`, 0, 800)
-            .then(() => simulateAgent("Quant", "Normalizing EBITDA & spreading comps...", 33, 1200))
-            .then(() => simulateAgent("Risk Officer", " analyzing covenant compliance...", 66, 1000))
-            .then(() => simulateAgent("Writer", "Synthesizing executive summary...", 90, 1500))
-            .then(() => {
-                elements.progressContainer.style.display = 'none';
-                
-                // Check if we have pre-generated JSON for this, else use mock data fallback
-                const libraryEntry = libraryIndex.find(i => i.borrower_name === borrower || i.id === borrower);
-                if (libraryEntry) {
-                    loadCreditMemo(libraryEntry.file);
-                } else if (mockData[borrower]) {
-                    renderMemoFromMock(mockData[borrower]);
-                } else {
-                    // Fallback to first mock entry if specific selection missing
-                    renderMemoFromMock(Object.values(mockData)[0]);
-                }
-                
-                logAudit("Orchestrator", "Complete", `Memo generated for ${borrower}`);
-            });
-    }
-
-    function simulateAgent(agentName, statusText, progressStart, duration) {
-        return new Promise(resolve => {
-            if(elements.progressText) elements.progressText.innerText = `${agentName} Active`;
-            if(elements.agentStatus) elements.agentStatus.innerText = statusText;
-            if(elements.progressFill) elements.progressFill.style.width = `${progressStart}%`;
-
-            logAudit(agentName, "Start", statusText);
-
-            setTimeout(() => {
-                logAudit(agentName, "Complete", "Task finished");
-                resolve();
-            }, duration);
-        });
-    }
-
-    // --- Core Logic: Rendering (Right Side Logic + Cyber Styling) ---
-    
-    // 1. Sidebar Library
     function renderLibraryList() {
         if(!elements.libraryList) return;
         elements.libraryList.innerHTML = '';
         
-        libraryIndex.forEach(item => {
+        const library = window.UniversalLoader.getLibrary();
+
+        library.forEach(item => {
             const itemDiv = document.createElement('div');
-            itemDiv.style.padding = '10px';
-            itemDiv.style.borderBottom = '1px solid var(--glass-border)';
-            itemDiv.style.cursor = 'pointer';
-            itemDiv.style.opacity = '0.8';
+            itemDiv.className = "p-3 border-b border-slate-800 hover:bg-[#1e293b] cursor-pointer transition group";
             
-            const scoreColor = item.risk_score < 60 ? '#ff4444' : (item.risk_score < 80 ? '#ffbb33' : '#00C851');
+            const scoreColor = item.risk_score > 80 ? 'text-emerald-400' : (item.risk_score > 60 ? 'text-yellow-400' : 'text-red-400');
             
             itemDiv.innerHTML = `
-                <div style="display:flex; justify-content:space-between; color: white; font-weight:bold;">
-                    <span>${item.borrower_name}</span>
-                    <span style="color:${scoreColor}">${item.risk_score}</span>
+                <div class="flex justify-between items-center mb-1">
+                    <span class="text-xs font-bold text-white group-hover:text-blue-400 transition">${item.name}</span>
+                    <span class="text-[10px] font-mono ${scoreColor}">${item.risk_score}</span>
                 </div>
-                <div style="font-size:0.8em; color: var(--text-secondary); margin-top:4px;">
-                    ${new Date(item.report_date).toLocaleDateString()}
+                <div class="flex justify-between items-center text-[10px] text-slate-500">
+                    <span>${item.ticker}</span>
+                    <span>${item.sector}</span>
                 </div>
             `;
             
-            itemDiv.onclick = () => {
-                startGeneration(); // Re-run simulation for effect, or direct load: loadCreditMemo(item.file);
-            };
-            
+            itemDiv.onclick = () => loadEntity(item.id);
             elements.libraryList.appendChild(itemDiv);
         });
     }
 
-    async function loadCreditMemo(filename) {
+    async function loadEntity(id) {
+        logAudit("Orchestrator", "Loading", `Fetching artifacts for ${id}...`);
+
+        // Simulate loading state if desired
+        elements.memoContainer.innerHTML = `<div class="flex flex-col items-center justify-center h-full text-blue-400 animate-pulse"><i class="fas fa-circle-notch fa-spin fa-3x mb-4"></i><p>Running Analysis...</p></div>`;
+
         try {
-            const path = filename.includes('/') ? filename : `data/${filename}`;
-            const res = await fetch(path);
-            const memo = await res.json();
-            currentMemo = memo;
-            renderFullMemoUI(memo);
-        } catch(e) {
-            console.error("Could not load memo file:", e);
+            const data = await window.UniversalLoader.loadEntity(id);
+            currentMemo = data;
+
+            // Artificial delay for effect
+            await new Promise(r => setTimeout(r, 600));
+
+            renderMemo(data);
+            renderFinancials(data);
+            renderValuation(data);
+            renderAuditLog(data);
+
+            logAudit("Orchestrator", "Complete", `Report generated for ${data.name}`);
+
+        } catch (e) {
+            console.error("Load failed", e);
+            elements.memoContainer.innerHTML = `<p class="text-red-500">Error loading data.</p>`;
         }
     }
 
-    // 2. Main Memo Render
-    function renderFullMemoUI(memo) {
-        // Tab Navigation HTML
-        const tabsHtml = `
-            <div style="display: flex; gap: 20px; border-bottom: 1px solid var(--glass-border); margin-bottom: 20px;">
-                <div id="btn-tab-memo" class="tab-btn" onclick="switchTab('memo')" style="padding: 10px; cursor: pointer; color: var(--accent-color); border-bottom: 2px solid var(--accent-color);">Memo</div>
-                <div id="btn-tab-financials" class="tab-btn" onclick="switchTab('financials')" style="padding: 10px; cursor: pointer; color: var(--text-secondary);">Financials</div>
-                <div id="btn-tab-dcf" class="tab-btn" onclick="switchTab('dcf')" style="padding: 10px; cursor: pointer; color: var(--text-secondary);">Valuation (DCF)</div>
+    // --- Rendering ---
+
+    function renderMemo(data) {
+        let html = `
+            <div class="border-b-2 border-slate-900 pb-6 mb-8">
+                <div class="flex justify-between items-end mb-2">
+                    <h1 class="text-3xl font-bold text-slate-900 font-mono tracking-tighter editable-field">${data.name.toUpperCase()}</h1>
+                    <span class="text-sm font-bold bg-slate-900 text-white px-3 py-1 rounded">${data.rating}</span>
+                </div>
+                <div class="flex gap-4 text-xs text-slate-500 font-mono uppercase tracking-widest">
+                    <span>${data.ticker}</span>
+                    <span>|</span>
+                    <span>${data.sector}</span>
+                    <span>|</span>
+                    <span>${new Date(data.report_date).toLocaleDateString()}</span>
+                </div>
             </div>
         `;
 
-        // Content Containers
-        const contentHtml = `
-            <div id="tab-memo" class="tab-content" style="display:block;">${generateMemoHtml(memo)}</div>
-            <div id="tab-financials" class="tab-content" style="display:none;">${generateFinancialsHtml(memo)}</div>
-            <div id="tab-dcf" class="tab-content" style="display:none;">${generateDcfHtml(memo)}</div>
-        `;
+        data.sections.forEach((section, index) => {
+            let content = section.content;
 
-        elements.memoContent.innerHTML = tabsHtml + contentHtml;
-        elements.memoContent.style.display = 'block';
+            // Replace [Ref] or similar if present in content, though Unified schema likely has clean text or simple refs.
+            // Let's support a simple [DocID] pattern for highlighting
+            // content = content.replace(/\[(.*?)\]/g, `<span class="text-blue-600 font-bold cursor-pointer hover:underline" onclick="viewEvidence('$1')">[$1]</span>`);
+
+            html += `
+                <div class="mb-8" data-section-index="${index}">
+                    <h3 class="text-sm font-bold text-blue-900 uppercase tracking-widest border-b border-blue-100 pb-2 mb-4 editable-field">${section.title}</h3>
+                    <div class="text-xs leading-relaxed text-slate-700 font-serif text-justify space-y-2 whitespace-pre-line editable-field">
+                        ${content}
+                    </div>
+                </div>
+            `;
+        });
+
+        elements.memoContainer.innerHTML = html;
     }
 
-    // 3. HTML Generators (Adapting Right Side Logic to Left Side CSS)
-    function generateMemoHtml(memo) {
-        // Fallback for simple mock data structure vs complex library structure
-        const name = memo.borrower_name || memo.borrower_details?.name;
-        const rating = memo.rating || memo.borrower_details?.rating || "N/A";
-        const sector = memo.sector || memo.borrower_details?.sector || "General";
-        const sections = memo.sections || []; 
+    function renderFinancials(data) {
+        const table = elements.financialsTable;
+        if (!table) return;
+        table.innerHTML = '';
 
-        let html = `<h1 style="margin:0;">${name}</h1>`;
-        html += `<div style="font-size: 0.9em; color: var(--text-secondary); margin-bottom: 20px;">
-                    Rating: <span style="color: var(--accent-color)">${rating}</span> | Sector: ${sector}
-                 </div>`;
-
-        // Generate Sections
-        if (sections.length > 0) {
-            sections.forEach(sec => {
-                // Citation logic
-                let content = sec.content.replace(/\[Ref:\s*(.*?)\]/g, (match, docId) => {
-                     return `<span class="citation-tag" onclick="viewEvidence('${docId}')"><i class="fas fa-search"></i> ${docId}</span>`;
-                });
-                
-                html += `<h2 style="color: var(--accent-color); border-bottom: 1px solid var(--glass-border); padding-bottom: 5px; margin-top: 25px;">${sec.title}</h2>`;
-                html += `<p style="line-height: 1.6; color: #d0d0d0;">${content}</p>`;
-            });
-        } else if (memo.documents) {
-            // Fallback for mock data structure
-            const doc = memo.documents[0];
-            doc.chunks.forEach(chunk => {
-                if(chunk.type === 'narrative') {
-                     html += `<p>${chunk.content} <span class="citation-tag" onclick="renderEvidence('${memo.borrower_details.name}', '${doc.doc_id}', '${chunk.chunk_id}')">[${doc.doc_id}]</span></p>`;
-                }
-            });
+        const history = data.financials.history;
+        if (!history || history.length === 0) {
+            table.innerHTML = '<tr><td class="p-4 text-slate-500">No structured financial data available.</td></tr>';
+            return;
         }
-        return html;
-    }
 
-    function generateFinancialsHtml(memo) {
-        if (!memo.historical_financials) return '<p>No structured financial data.</p>';
-        
-        let html = `<h3 style="color:white;">Historical Performance</h3>`;
-        html += `<table style="width:100%; border-collapse: collapse; margin-top:15px; font-family: monospace;">`;
-        
         // Headers
-        const periods = memo.historical_financials.map(d => d.period);
-        html += `<thead style="color: var(--text-secondary); border-bottom: 1px solid var(--glass-border);"><tr><th style="text-align:left; padding:10px;">Metric</th>${periods.map(p => `<th style="text-align:right; padding:10px;">${p}</th>`).join('')}</tr></thead>`;
+        const periods = history.map(h => h.period || h.fiscal_year);
+        let thead = `<thead class="bg-[#0f172a] text-slate-400"><tr><th class="p-3">Metric</th>${periods.map(p => `<th class="p-3 text-right">${p}</th>`).join('')}<th class="p-3 text-right">Trend</th></tr></thead>`;
         
         // Rows
         const metrics = [
-            { key: "revenue", label: "Revenue" },
+            { key: "revenue", label: "Total Revenue" },
             { key: "ebitda", label: "EBITDA" },
             { key: "net_income", label: "Net Income" },
-            { key: "leverage_ratio", label: "Leverage (x)", fmt: (v) => v.toFixed(2) + 'x' }
+            { key: "total_assets", label: "Total Assets" },
+            { key: "total_debt", label: "Total Debt" }
         ];
 
-        html += `<tbody>`;
+        let tbody = `<tbody class="divide-y divide-slate-700/50 text-slate-300">`;
         metrics.forEach(m => {
-            html += `<tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">`;
-            html += `<td style="padding:10px; color: var(--accent-color);">${m.label}</td>`;
-            memo.historical_financials.forEach(period => {
-                let val = period[m.key];
-                val = m.fmt ? m.fmt(val) : formatCurrency(val);
-                html += `<td style="text-align:right; padding:10px;">${val}</td>`;
+            tbody += `<tr><td class="p-3 font-bold text-blue-400">${m.label}</td>`;
+            let values = [];
+            history.forEach(h => {
+                let val = h[m.key];
+                if (val === undefined) val = h[m.key.replace("total_", "")] || 0; // fallback
+                values.push(val);
+                tbody += `<td class="p-3 text-right font-mono">${formatCurrency(val)}</td>`;
             });
-            html += `</tr>`;
+
+            // Simple Sparkline (HTML/CSS Bar)
+            const max = Math.max(...values, 1);
+            const trendHtml = `<div class="flex items-end justify-end gap-[1px] h-6 w-16 opacity-70">
+                ${values.map(v => `<div class="w-2 bg-emerald-500" style="height: ${(v/max)*100}%"></div>`).join('')}
+            </div>`;
+
+            tbody += `<td class="p-3 text-right">${trendHtml}</td></tr>`;
         });
-        html += `</tbody></table>`;
-        return html;
+        tbody += `</tbody>`;
+
+        table.innerHTML = thead + tbody;
     }
 
-    function generateDcfHtml(memo) {
-        if (!memo.dcf_analysis) return '<p>No valuation data.</p>';
-        const dcf = memo.dcf_analysis;
+    function renderValuation(data) {
+        const container = elements.dcfContainer;
+        if (!container) return;
+
+        const dcf = data.valuation.dcf;
         
-        return `
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;">
-                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 4px;">
-                    <div style="font-size: 0.8em; color: var(--text-secondary);">Enterprise Value</div>
-                    <div style="font-size: 1.5em; color: var(--accent-color); font-weight: bold;">${formatCurrency(dcf.enterprise_value)}</div>
+        container.innerHTML = `
+            <div class="grid grid-cols-2 gap-6">
+                <div class="bg-[#0a101d] p-6 rounded border border-slate-700">
+                    <div class="text-xs text-slate-500 uppercase tracking-widest mb-2">Enterprise Value</div>
+                    <div class="text-2xl font-bold text-white font-mono" id="val-ev">${formatCurrency(dcf.enterprise_value)}</div>
                 </div>
-                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 4px;">
-                    <div style="font-size: 0.8em; color: var(--text-secondary);">Implied Share Price</div>
-                    <div style="font-size: 1.5em; color: #00C851; font-weight: bold;">$${dcf.share_price.toFixed(2)}</div>
+                <div class="bg-[#0a101d] p-6 rounded border border-slate-700">
+                    <div class="text-xs text-slate-500 uppercase tracking-widest mb-2">Implied Share Price</div>
+                    <div class="text-2xl font-bold text-emerald-400 font-mono" id="val-share-price">$${dcf.share_price.toFixed(2)}</div>
                 </div>
             </div>
-            <div style="font-family: monospace; font-size: 0.9em; color: var(--text-secondary);">
-                WACC: ${(dcf.wacc * 100).toFixed(1)}% | Terminal Growth: ${(dcf.growth_rate * 100).toFixed(1)}%
+
+            <div class="bg-[#0a101d] p-6 rounded border border-slate-700 mt-6">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Assumptions (Interactive)</h3>
+                <div class="grid grid-cols-2 gap-8 text-sm font-mono">
+                    <div class="flex flex-col gap-2">
+                        <div class="flex justify-between">
+                             <span class="text-slate-500">WACC</span>
+                             <span class="text-blue-400" id="lbl-wacc">${(dcf.wacc * 100).toFixed(1)}%</span>
+                        </div>
+                        <input type="range" min="4" max="15" step="0.1" value="${dcf.wacc * 100}" class="w-full accent-blue-500 cursor-pointer" oninput="updateValuation(this.value, 'wacc')">
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Terminal Growth</span>
+                            <span class="text-blue-400" id="lbl-growth">${(dcf.growth_rate * 100).toFixed(1)}%</span>
+                        </div>
+                        <input type="range" min="0" max="8" step="0.1" value="${dcf.growth_rate * 100}" class="w-full accent-emerald-500 cursor-pointer" oninput="updateValuation(this.value, 'growth')">
+                    </div>
+                </div>
             </div>
         `;
+        
+        // attach updater to window for simplicity
+        window.updateValuation = (val, type) => {
+            if (!currentMemo) return;
+            const dcf = currentMemo.valuation.dcf;
+            
+            let wacc = dcf.wacc;
+            let growth = dcf.growth_rate;
+            
+            if (type === 'wacc') {
+                wacc = parseFloat(val) / 100;
+                document.getElementById('lbl-wacc').innerText = val + "%";
+            } else {
+                growth = parseFloat(val) / 100;
+                document.getElementById('lbl-growth').innerText = val + "%";
+            }
+
+            // Simplified DCF sensitivity logic
+            // Sensitivity Factor: 1% WACC change ~ 15% value change (inverse)
+            // 1% Growth change ~ 10% value change
+
+            const originalWacc = dcf.wacc || 0.08;
+            const originalGrowth = dcf.growth_rate || 0.02;
+            const baseEV = dcf.enterprise_value;
+            const basePrice = dcf.share_price;
+
+            const waccDelta = originalWacc - wacc; // Lower WACC = Higher Value
+            const growthDelta = growth - originalGrowth; // Higher Growth = Higher Value
+
+            const multiplier = 1 + (waccDelta * 15) + (growthDelta * 10);
+            const newEV = baseEV * multiplier;
+            const newPrice = basePrice * multiplier;
+
+            document.getElementById('val-ev').innerText = formatCurrency(newEV);
+            document.getElementById('val-share-price').innerText = "$" + newPrice.toFixed(2);
+        };
     }
 
-    // --- Evidence Viewer Logic (Merged) ---
-
-    // 1. Specific Coordinate Renderer (Left Side Style)
-    window.renderEvidence = (borrowerName, docId, chunkId) => {
-        const data = mockData[borrowerName] || Object.values(mockData)[0]; // Fallback
-        const doc = data?.documents?.find(d => d.doc_id === docId);
-        const chunk = doc?.chunks?.find(c => c.chunk_id === chunkId);
+    function renderAuditLog(data) {
+        const tbody = elements.auditTableBody;
+        if (!tbody) return;
+        tbody.innerHTML = '';
         
-        if (doc && chunk) {
-            setupPdfViewer(docId, chunk.page);
-            // Draw BBox
-            const [x0, y0, x1, y1] = chunk.bbox;
-            const highlight = document.createElement('div');
-            highlight.className = 'bbox-highlight';
-            // Scale coords if necessary, assuming 1000px height base
-            highlight.style.left = `${x0}px`;
-            highlight.style.top = `${y0}px`;
-            highlight.style.width = `${x1 - x0}px`;
-            highlight.style.height = `${y1 - y0}px`;
-            
-            const label = document.createElement('div');
-            label.innerText = chunk.type.toUpperCase();
-            label.style.background = 'var(--accent-color)';
-            label.style.color = 'black';
-            label.style.fontSize = '10px';
-            label.style.position = 'absolute';
-            label.style.top = '-15px';
-            
-            highlight.appendChild(label);
-            document.getElementById('pdf-page-container').appendChild(highlight);
-            highlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            logAudit("Frontend", "Evidence", `Displayed precise artifact ${chunkId}`);
+        data.audit_log.forEach(entry => {
+            logAudit("System", entry.action, `Status: ${entry.status}`);
+        });
+    }
+
+    // --- Evidence Viewer ---
+
+    // We can expose this to be called from onclick handlers in the HTML content
+    window.viewEvidence = (docId) => {
+        const viewer = elements.pdfViewer;
+        const mockPage = elements.mockPdfPage;
+        const title = elements.docTitle;
+        
+        if (title) title.innerText = docId || "Document Preview";
+        
+        // Show the mock page
+        if (mockPage) {
+            mockPage.classList.remove('hidden');
+            // Randomize position of highlight for effect
+            const highlight = document.getElementById('highlight-box');
+            if (highlight) {
+                highlight.style.top = `${Math.random() * 60 + 10}%`;
+                highlight.style.height = `${Math.random() * 20 + 5}%`;
+            }
         }
     };
 
-    // 2. Generic Viewer (Right Side Style)
-    window.viewEvidence = (docId) => {
-        setupPdfViewer(docId, 1);
-        
-        // Simulated highlight for generic docs
-        const highlight = document.createElement('div');
-        highlight.className = 'bbox-highlight';
-        highlight.style.left = '10%';
-        highlight.style.top = '20%';
-        highlight.style.width = '80%';
-        highlight.style.height = '100px';
-        document.getElementById('pdf-page-container').appendChild(highlight);
-        logAudit("Frontend", "Evidence", `Opened document ${docId}`);
-    };
-
-    function setupPdfViewer(docId, pageNum) {
-        elements.evidencePanel.classList.add('active');
-        elements.evidencePanel.style.width = '50%';
-        
-        // Clear previous
-        elements.pdfViewer.innerHTML = '';
-        
-        const pageDiv = document.createElement('div');
-        pageDiv.id = 'pdf-page-container';
-        pageDiv.className = 'pdf-page'; // Uses CSS from previous step
-        pageDiv.style.background = '#fff'; 
-        pageDiv.style.color = '#000';
-        pageDiv.style.position = 'relative';
-        pageDiv.style.minHeight = '1000px';
-        pageDiv.style.padding = '40px';
-        
-        pageDiv.innerHTML = `
-            <div style="border-bottom: 2px solid #ccc; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between;">
-                <span style="font-weight: bold;">${docId}</span>
-                <span>Page ${pageNum}</span>
-            </div>
-            <div style="font-family: serif; color: #444; line-height: 1.8;">
-                <p><strong>UNITED STATES SECURITIES AND EXCHANGE COMMISSION</strong></p>
-                <p>Form 10-K</p>
-                <br>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
-                <br>
-                <p>[Simulated Document Content for Contextual Verification]</p>
-            </div>
-        `;
-        
-        elements.pdfViewer.appendChild(pageDiv);
-    }
-
-    function hideEvidence() {
-        elements.evidencePanel.classList.remove('active');
-        elements.evidencePanel.style.width = '0';
-    }
-
     // --- Utilities ---
+
     function logAudit(actor, action, details) {
-        if (!elements.auditLogContent) return;
+        if (!elements.auditTableBody) return;
         
         const time = new Date().toLocaleTimeString();
         const tr = document.createElement('tr');
-        tr.style.borderBottom = '1px solid #333';
+        tr.className = "hover:bg-slate-800/50 transition";
+
+        const statusColor = details.toLowerCase().includes('success') ? 'text-emerald-400' : 'text-slate-400';
+
         tr.innerHTML = `
-            <td style="padding: 5px; color: #666; font-size: 0.8em;">${time}</td>
-            <td style="padding: 5px; color: var(--accent-color); font-weight: bold;">${actor}</td>
-            <td style="padding: 5px; color: #ccc;">${action}</td>
-            <td style="padding: 5px; color: #888;">${details}</td>
+            <td class="p-3 border-b border-slate-800/50 text-slate-500">${time}</td>
+            <td class="p-3 border-b border-slate-800/50 font-bold text-blue-400">${actor} :: ${action}</td>
+            <td class="p-3 border-b border-slate-800/50 ${statusColor}">${details}</td>
         `;
-        elements.auditLogContent.insertBefore(tr, elements.auditLogContent.firstChild);
+        elements.auditTableBody.insertBefore(tr, elements.auditTableBody.firstChild);
     }
-    
+
     function formatCurrency(val) {
-        if (val === undefined || val === null) return 'N/A';
+        if (val === undefined || val === null) return '-';
         if (Math.abs(val) >= 1000) return '$' + (val / 1000).toFixed(1) + 'B';
         return '$' + val.toFixed(1) + 'M';
     }
-    
-    // Internal Helper for Mock Data rendering fallback
-    function renderMemoFromMock(data) {
-        // Quick adapter to map mock data structure to full UI
-        const adapter = {
-            borrower_name: data.borrower_details.name,
-            borrower_details: data.borrower_details,
-            documents: data.documents,
-            sections: [
-                { title: "Executive Summary", content: data.documents[0].chunks.find(c=>c.type==='narrative')?.content || "Analysis pending." },
-                { title: "Risk Factors", content: "Risk factors analyzed from 10-K filing." }
-            ]
-        };
-        currentMemo = adapter;
-        renderFullMemoUI(adapter);
+
+    // --- Edit & Persistence Controls ---
+    let isEditMode = false;
+
+    function injectControls() {
+        const headerTools = document.querySelector('.h-12 .flex.gap-2');
+        if (headerTools) {
+             // Load
+            const uploadBtn = document.createElement('button');
+            uploadBtn.className = "px-3 py-1 bg-slate-700 hover:bg-slate-600 text-white text-xs rounded transition mr-2";
+            uploadBtn.innerHTML = '<i class="fas fa-upload mr-1"></i> Load';
+            uploadBtn.onclick = () => document.getElementById('json-upload-v1').click();
+            headerTools.prepend(uploadBtn);
+
+            // Save JSON
+            const jsonBtn = document.createElement('button');
+            jsonBtn.className = "px-3 py-1 bg-slate-700 hover:bg-slate-600 text-white text-xs rounded transition mr-2";
+            jsonBtn.innerHTML = '<i class="fas fa-download mr-1"></i> Save JSON';
+            jsonBtn.onclick = downloadState;
+            headerTools.prepend(jsonBtn);
+
+            // Edit
+            const editBtn = document.createElement('button');
+            editBtn.className = "px-3 py-1 bg-slate-700 hover:bg-slate-600 text-white text-xs rounded transition mr-2";
+            editBtn.innerHTML = '<i class="fas fa-pen mr-1"></i> Edit';
+            editBtn.onclick = function() { toggleEditMode(this); };
+            headerTools.prepend(editBtn);
+
+            // Hidden Input
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.id = 'json-upload-v1';
+            fileInput.style.display = 'none';
+            fileInput.accept = '.json';
+            fileInput.onchange = uploadState;
+            headerTools.appendChild(fileInput);
+        }
     }
+
+    function toggleEditMode(btn) {
+        isEditMode = !isEditMode;
+        const els = document.querySelectorAll('.editable-field');
+        els.forEach(el => {
+            el.contentEditable = isEditMode;
+            el.classList.toggle('bg-yellow-50', isEditMode);
+            el.classList.toggle('p-2', isEditMode); // add padding
+            el.classList.toggle('rounded', isEditMode);
+            el.classList.toggle('text-slate-900', isEditMode); // Ensure contrast
+            if (!isEditMode) el.classList.remove('bg-yellow-50', 'p-2', 'rounded', 'text-slate-900');
+        });
+
+        if (isEditMode) {
+             btn.innerHTML = '<i class="fas fa-save mr-1"></i> Save Changes';
+             btn.classList.add('bg-emerald-600', 'hover:bg-emerald-500');
+             btn.classList.remove('bg-slate-700', 'hover:bg-slate-600');
+        } else {
+             saveDOMToState();
+             btn.innerHTML = '<i class="fas fa-pen mr-1"></i> Edit';
+             btn.classList.remove('bg-emerald-600', 'hover:bg-emerald-500');
+             btn.classList.add('bg-slate-700', 'hover:bg-slate-600');
+        }
+    }
+
+    function saveDOMToState() {
+        if (!currentMemo) return;
+
+        const titleEl = document.querySelector('h1.editable-field');
+        if (titleEl) currentMemo.name = titleEl.innerText;
+
+        const sectionDivs = document.querySelectorAll('div[data-section-index]');
+        sectionDivs.forEach(div => {
+            const idx = div.dataset.sectionIndex;
+            const titleEl = div.querySelector('h3.editable-field');
+            const contentEl = div.querySelector('div.editable-field');
+
+            if (currentMemo.sections[idx]) {
+                if (titleEl) currentMemo.sections[idx].title = titleEl.innerText;
+                if (contentEl) currentMemo.sections[idx].content = contentEl.innerText;
+            }
+        });
+        logAudit("System", "Save", "Changes persisted to local state.");
+    }
+
+    function downloadState() {
+        if (!currentMemo) { alert("No report loaded."); return; }
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentMemo, null, 2));
+        const anchor = document.createElement('a');
+        anchor.href = dataStr;
+        anchor.download = `credit_memo_${currentMemo.ticker || "report"}.json`;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        logAudit("System", "Export", "Report exported to JSON.");
+    }
+
+    function uploadState(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const json = JSON.parse(e.target.result);
+                const normalized = window.UniversalLoader.validateAndNormalize(json);
+                if (normalized) {
+                    currentMemo = normalized;
+                    renderMemo(normalized);
+                    renderFinancials(normalized);
+                    renderValuation(normalized);
+                    renderAuditLog(normalized);
+                    logAudit("System", "Load", `Loaded state from ${file.name}`);
+                } else {
+                    alert("Invalid JSON format.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Error parsing JSON.");
+            }
+        };
+        reader.readAsText(file);
+    }
+
 });
