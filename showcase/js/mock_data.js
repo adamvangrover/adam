@@ -1,4 +1,282 @@
 window.MOCK_DATA = {
+  "credit_memo_library": [
+  {
+    "id": "Apple_Inc",
+    "borrower_name": "Apple Inc.",
+    "ticker": "AAPL",
+    "sector": "Technology",
+    "report_date": "2026-02-13T01:31:38.446Z",
+    "risk_score": 75.0,
+    "summary": "Apple Inc. (Technology) presents a stable credit profile with a BBB rating. Key drivers include revenue from cloud adoption and normalizing hardware sales.",
+    "borrower_details": {
+      "name": "Apple Inc.",
+      "ticker": "AAPL",
+      "sector": "Technology",
+      "rating": "BBB"
+    },
+    "documents": [
+      {
+        "doc_id": "doc_AAPL_10K_2026",
+        "title": "AAPL 10-K",
+        "page_count": 50,
+        "chunks": [
+          {
+            "chunk_id": "chunk_001",
+            "type": "header",
+            "page": 1,
+            "bbox": [50, 30, 400, 60],
+            "content": "Apple Inc. (AAPL) - FORM 10-K"
+          },
+          {
+            "chunk_id": "chunk_002",
+            "type": "narrative",
+            "page": 6,
+            "bbox": [50, 384, 550, 657],
+            "content": "Revenue driven by cloud adoption (AAPL specific context)."
+          },
+          {
+            "chunk_id": "chunk_003",
+            "type": "narrative",
+            "page": 9,
+            "bbox": [50, 248, 550, 733],
+            "content": "AI integration boosting margins (AAPL specific context)."
+          },
+          {
+            "chunk_id": "chunk_004",
+            "type": "narrative",
+            "page": 5,
+            "bbox": [50, 328, 550, 679],
+            "content": "Hardware sales normalizing (AAPL specific context)."
+          },
+          {
+            "chunk_id": "chunk_005",
+            "type": "financial_table",
+            "page": 25,
+            "bbox": [50, 200, 550, 500],
+            "content": "Consolidated Financial Statements",
+            "content_json": {
+              "total_assets": 455.0,
+              "total_liabilities": 269.0,
+              "total_equity": 186.0,
+              "ebitda": 72.0,
+              "total_debt": 106.0,
+              "interest_expense": 9.1
+            }
+          },
+          {
+            "chunk_id": "chunk_006",
+            "type": "risk_factor",
+            "page": 15,
+            "bbox": [50, 367, 550, 714],
+            "content": "Risk Factor: Supply chain disruption"
+          },
+          {
+            "chunk_id": "chunk_007",
+            "type": "risk_factor",
+            "page": 19,
+            "bbox": [50, 509, 550, 737],
+            "content": "Risk Factor: Rapid technological obsolescence"
+          },
+          {
+            "chunk_id": "chunk_008",
+            "type": "risk_factor",
+            "page": 18,
+            "bbox": [50, 111, 550, 720],
+            "content": "Risk Factor: Data privacy regulation"
+          }
+        ]
+      }
+    ],
+    "market_data": {
+      "sentiment": 0.5562661191442066,
+      "trend": "Bullish"
+    }
+  },
+  {
+    "id": "Microsoft_Corp",
+    "borrower_name": "Microsoft Corp",
+    "ticker": "MSFT",
+    "sector": "Technology",
+    "report_date": "2026-02-13T01:31:38.448Z",
+    "risk_score": 92.0,
+    "summary": "Microsoft Corp maintains a pristine AAA rating. The analysis highlights significant margins driven by AI integration and a strong balance sheet.",
+    "borrower_details": {
+      "name": "Microsoft Corp",
+      "ticker": "MSFT",
+      "sector": "Technology",
+      "rating": "AAA"
+    },
+    "documents": [
+      {
+        "doc_id": "doc_MSFT_10K_2026",
+        "title": "MSFT 10-K",
+        "page_count": 50,
+        "chunks": [
+          {
+            "chunk_id": "chunk_001",
+            "type": "header",
+            "page": 1,
+            "bbox": [50, 30, 400, 60],
+            "content": "Microsoft Corp (MSFT) - FORM 10-K"
+          },
+          {
+            "chunk_id": "chunk_002",
+            "type": "narrative",
+            "page": 10,
+            "bbox": [50, 577, 550, 750],
+            "content": "Revenue driven by cloud adoption (MSFT specific context)."
+          },
+          {
+            "chunk_id": "chunk_003",
+            "type": "narrative",
+            "page": 10,
+            "bbox": [50, 370, 550, 674],
+            "content": "AI integration boosting margins (MSFT specific context)."
+          },
+          {
+            "chunk_id": "chunk_004",
+            "type": "narrative",
+            "page": 10,
+            "bbox": [50, 303, 550, 738],
+            "content": "Hardware sales normalizing (MSFT specific context)."
+          },
+          {
+            "chunk_id": "chunk_005",
+            "type": "financial_table",
+            "page": 25,
+            "bbox": [50, 200, 550, 500],
+            "content": "Consolidated Financial Statements",
+            "content_json": {
+              "total_assets": 301.0,
+              "total_liabilities": 240.0,
+              "total_equity": 61.0,
+              "ebitda": 56.0,
+              "total_debt": 98.0,
+              "interest_expense": 6.02
+            }
+          },
+          {
+            "chunk_id": "chunk_006",
+            "type": "risk_factor",
+            "page": 17,
+            "bbox": [50, 427, 550, 688],
+            "content": "Risk Factor: Supply chain disruption"
+          },
+          {
+            "chunk_id": "chunk_007",
+            "type": "risk_factor",
+            "page": 15,
+            "bbox": [50, 245, 550, 707],
+            "content": "Risk Factor: Rapid technological obsolescence"
+          },
+          {
+            "chunk_id": "chunk_008",
+            "type": "risk_factor",
+            "page": 15,
+            "bbox": [50, 229, 550, 698],
+            "content": "Risk Factor: Data privacy regulation"
+          }
+        ]
+      }
+    ],
+    "market_data": {
+      "sentiment": 0.8582996295554622,
+      "trend": "Bearish"
+    }
+  },
+  {
+    "id": "JPMorgan_Chase",
+    "borrower_name": "JPMorgan Chase",
+    "ticker": "JPM",
+    "sector": "Financial",
+    "report_date": "2026-02-13T01:31:38.456Z",
+    "risk_score": 85.0,
+    "summary": "JPMorgan Chase (AA) demonstrates resilience despite interest rate volatility. Trading revenue has outperformed, contributing to a strong $68.0B EBITDA.",
+    "borrower_details": {
+      "name": "JPMorgan Chase",
+      "ticker": "JPM",
+      "sector": "Financial",
+      "rating": "AA"
+    },
+    "documents": [
+      {
+        "doc_id": "doc_JPM_10K_2026",
+        "title": "JPM 10-K",
+        "page_count": 50,
+        "chunks": [
+          {
+            "chunk_id": "chunk_001",
+            "type": "header",
+            "page": 1,
+            "bbox": [50, 30, 400, 60],
+            "content": "JPMorgan Chase (JPM) - FORM 10-K"
+          },
+          {
+            "chunk_id": "chunk_002",
+            "type": "narrative",
+            "page": 4,
+            "bbox": [50, 486, 550, 699],
+            "content": "Net interest income expanded (JPM specific context)."
+          },
+          {
+            "chunk_id": "chunk_003",
+            "type": "narrative",
+            "page": 7,
+            "bbox": [50, 297, 550, 737],
+            "content": "Investment banking fees muted (JPM specific context)."
+          },
+          {
+            "chunk_id": "chunk_004",
+            "type": "narrative",
+            "page": 3,
+            "bbox": [50, 220, 550, 749],
+            "content": "Trading revenue outperformed (JPM specific context)."
+          },
+          {
+            "chunk_id": "chunk_005",
+            "type": "financial_table",
+            "page": 25,
+            "bbox": [50, 200, 550, 500],
+            "content": "Consolidated Financial Statements",
+            "content_json": {
+              "total_assets": 473.0,
+              "total_liabilities": 291.0,
+              "total_equity": 182.0,
+              "ebitda": 68.0,
+              "total_debt": 213.0,
+              "interest_expense": 9.46
+            }
+          },
+          {
+            "chunk_id": "chunk_006",
+            "type": "risk_factor",
+            "page": 17,
+            "bbox": [50, 273, 550, 680],
+            "content": "Risk Factor: Interest rate volatility"
+          },
+          {
+            "chunk_id": "chunk_007",
+            "type": "risk_factor",
+            "page": 16,
+            "bbox": [50, 423, 550, 652],
+            "content": "Risk Factor: Credit default rise"
+          },
+          {
+            "chunk_id": "chunk_008",
+            "type": "risk_factor",
+            "page": 15,
+            "bbox": [50, 483, 550, 740],
+            "content": "Risk Factor: Regulatory capital requirements"
+          }
+        ]
+      }
+    ],
+    "market_data": {
+      "sentiment": 0.4238490822842891,
+      "trend": "Bullish"
+    }
+  }
+  ],
   "stats": {
     "version": "23.5",
     "status": "HYBRID_ONLINE",

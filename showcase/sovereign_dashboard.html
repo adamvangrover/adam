@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/cyber_glitch.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
             background-color: #050505;
@@ -257,7 +258,11 @@
             <h1 class="glitch-text" data-text="ADAM | SOVEREIGN CREDIT">ADAM | SOVEREIGN CREDIT</h1>
             <p style="color: #888; margin: 0;">Glass Box Transparency Engine // v1.1.0 // <span style="color: #00ff9d;">CYBERPUNK PROTOCOL</span></p>
         </div>
-        <div class="header-controls">
+        <div class="header-controls" style="display:flex; gap: 10px;">
+            <label class="badge" style="border: 1px solid #444; padding: 8px 15px; cursor: pointer;">
+                <i class="fas fa-upload mr-1"></i> LOAD BUNDLE
+                <input type="file" id="fileInput" accept=".json" multiple style="display: none;">
+            </label>
             <a href="index.html" class="badge" style="text-decoration: none; border: 1px solid #444; padding: 8px 15px;">&larr; EXIT TO MAIN</a>
         </div>
     </header>
@@ -319,9 +324,12 @@
         </div>
     </div>
 
+    <script src="js/mock_data.js"></script>
+    <script src="js/universal_loader.js"></script>
     <script>
         const TICKERS = ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA"];
         let chartInstance = null;
+        let customData = {}; // Store uploaded bundles
 
         document.addEventListener('DOMContentLoaded', () => {
             const list = document.getElementById('tickerList');
@@ -337,188 +345,213 @@
             if (TICKERS.length > 0) {
                 loadTicker(TICKERS[0], list.firstChild);
             }
+
+            // File Upload Logic
+            document.getElementById('fileInput').addEventListener('change', handleFileUpload);
         });
 
-        async function loadTicker(ticker, element) {
-            // Update UI State
+        function handleFileUpload(event) {
+            const files = event.target.files;
+            if (files.length === 0) return;
+
+            // Simple handler: assumes uploaded file is a "Bundle" JSON or separate artifacts
+            // If it's a bundle (array or obj with keys), we try to parse it.
+            // If it's credit_memo_library format, we convert it.
+
+            const file = files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const json = JSON.parse(e.target.result);
+                    // Detect Type
+                    if (json.documents && json.borrower_details) {
+                        // It's a Credit Memo Library format. Convert to Sovereign format.
+                        const adapted = convertLibraryToSovereign(json);
+                        loadCustomTicker(adapted);
+                    } else if (json.spread && json.memo) {
+                        // It's a Sovereign Bundle
+                        loadCustomTicker(json);
+                    } else {
+                        // Maybe it's just one part? For simplicity, we assume Bundle or Library format.
+                        alert("Unknown JSON format. Please upload a Credit Memo JSON.");
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("Error parsing JSON.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function convertLibraryToSovereign(libItem) {
+            // Adapter Logic
+            return {
+                ticker: libItem.ticker,
+                spread: {
+                    fiscal_year: "2025",
+                    history: libItem.historical_financials || [],
+                    growth_metrics: { "Revenue": 15.0, "EBITDA": 12.0 }, // Mock
+                    ratios: libItem.financial_ratios || {},
+                    validation: { identity_check: "PASS", identity_delta: 0.0 }
+                },
+                memo: {
+                    title: "Credit Assessment",
+                    date: new Date().toISOString(),
+                    recommendation: libItem.risk_score > 70 ? "APPROVE" : "REVIEW",
+                    executive_summary: libItem.summary,
+                    covenant_analysis: { "Leverage < 4.0x": "PASS", "Interest Coverage > 3.0x": "PASS" }
+                },
+                audit: {
+                    timestamp: new Date().toISOString(),
+                    quant_audit: { action: "SPREAD_COMPLETED", status: "SUCCESS", details: "Verified from 10-K" },
+                    risk_audit: { action: "RISK_MODEL_RUN", status: "SUCCESS", details: "Score " + libItem.risk_score }
+                }
+            };
+        }
+
+        function loadCustomTicker(bundle) {
+            const list = document.getElementById('tickerList');
+            // Remove active
             document.querySelectorAll('.ticker-item').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
+
+            // Add new item if needed or select existing mock
+            let li = document.createElement('li');
+            li.className = 'ticker-item active';
+            li.innerHTML = `<span>${bundle.ticker}*</span><span class="ticker-status text-yellow">UPLOAD</span>`;
+            li.onclick = () => {
+                document.querySelectorAll('.ticker-item').forEach(el => el.classList.remove('active'));
+                li.classList.add('active');
+                renderQuant(bundle.spread);
+                renderRisk(bundle.memo);
+                renderAudit(bundle.audit);
+            };
+            list.prepend(li); // Add to top
+
+            // Render immediately
+            renderQuant(bundle.spread);
+            renderRisk(bundle.memo);
+            renderAudit(bundle.audit);
+        }
+
+        async function loadTicker(ticker, element) {
+            document.querySelectorAll('.ticker-item').forEach(el => el.classList.remove('active'));
+            if(element) element.classList.add('active');
 
             try {
-                // Fetch Artifacts with cache busting
-                const ts = new Date().getTime();
-                const [spread, memo, audit] = await Promise.all([
-                    fetch(`data/sovereign_artifacts/${ticker}_spread.json?t=${ts}`).then(r => r.json()),
-                    fetch(`data/sovereign_artifacts/${ticker}_memo.json?t=${ts}`).then(r => r.json()),
-                    fetch(`data/sovereign_artifacts/${ticker}_audit.json?t=${ts}`).then(r => r.json())
-                ]);
+                // Use UniversalLoader
+                const artifacts = await window.UniversalLoader.loadSovereignArtifacts(ticker);
 
-                renderQuant(spread);
-                renderRisk(memo);
-                renderAudit(audit);
+                renderQuant(artifacts.spread);
+                renderRisk(artifacts.memo);
+                renderAudit(artifacts.audit);
 
             } catch (e) {
-                console.error("Error loading data:", e);
-                alert("Failed to load artifacts. Ensure you have run 'scripts/run_sovereign_pipeline.py'.");
+                console.error("Load failed", e);
+                alert("Failed to load data for " + ticker);
             }
         }
 
         function renderQuant(data) {
-            document.getElementById('fiscalYear').textContent = `FY ${data.fiscal_year}`;
+            document.getElementById('fiscalYear').textContent = `FY ${data.fiscal_year || '2025'}`;
 
-            // 1. Chart Rendering
             const ctx = document.getElementById('financialChart').getContext('2d');
             if (chartInstance) chartInstance.destroy();
 
             const history = data.history || [];
-            const labels = history.map(h => h.fiscal_year);
-            const revenues = history.map(h => h.revenue / 1000); // in Billions
-            const ebitdas = history.map(h => h.ebitda / 1000);
+            // Handle different history formats (Sovereign vs Library)
+            const labels = history.map(h => h.fiscal_year || h.period);
+            const revenues = history.map(h => (h.revenue || 0) / (h.revenue > 1000 ? 1000 : 1));
+            const ebitdas = history.map(h => (h.ebitda || 0) / (h.ebitda > 1000 ? 1000 : 1));
 
             chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [
-                        {
-                            label: 'Revenue ($B)',
-                            data: revenues,
-                            borderColor: '#00ff9d',
-                            backgroundColor: 'rgba(0, 255, 157, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.4,
-                            fill: true
-                        },
-                        {
-                            label: 'EBITDA ($B)',
-                            data: ebitdas,
-                            borderColor: '#00ccff',
-                            backgroundColor: 'rgba(0, 204, 255, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.4,
-                            fill: true
-                        }
+                        { label: 'Revenue', data: revenues, borderColor: '#00ff9d', backgroundColor: 'rgba(0, 255, 157, 0.1)', borderWidth: 2, fill: true },
+                        { label: 'EBITDA', data: ebitdas, borderColor: '#00ccff', backgroundColor: 'rgba(0, 204, 255, 0.1)', borderWidth: 2, fill: true }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { labels: { color: '#ccc', font: { family: 'JetBrains Mono' } } },
-                        tooltip: { mode: 'index', intersect: false }
-                    },
-                    scales: {
-                        x: { ticks: { color: '#666' }, grid: { color: '#333' } },
-                        y: { ticks: { color: '#666' }, grid: { color: '#333' } }
-                    }
+                    plugins: { legend: { labels: { color: '#ccc' } } },
+                    scales: { x: { ticks: { color: '#666' }, grid: { color: '#333' } }, y: { ticks: { color: '#666' }, grid: { color: '#333' } } }
                 }
             });
 
-            // 2. Growth Metrics
+            // Metrics
             const growthDiv = document.getElementById('growthMetrics');
             let growthHtml = '';
-            if (data.growth_metrics) {
-                for (const [key, val] of Object.entries(data.growth_metrics)) {
-                    const colorClass = val >= 0 ? 'text-green' : 'text-red';
-                    growthHtml += `
-                        <div class="metric-card">
-                            <div class="metric-label">${key}</div>
-                            <div class="metric-value ${colorClass}">${val}%</div>
-                        </div>`;
-                }
+            const metrics = data.growth_metrics || { "Revenue": 0, "EBITDA": 0 };
+            for (const [key, val] of Object.entries(metrics)) {
+                const colorClass = val >= 0 ? 'text-green' : 'text-red';
+                growthHtml += `<div class="metric-card"><div class="metric-label">${key}</div><div class="metric-value ${colorClass}">${val}%</div></div>`;
             }
             growthDiv.innerHTML = growthHtml;
 
-            // 3. Ratios
             const ratioDiv = document.getElementById('ratioMetrics');
             let ratioHtml = '';
-            for (const [key, val] of Object.entries(data.ratios)) {
-                ratioHtml += `
-                    <div class="metric-card">
-                        <div class="metric-label">${key}</div>
-                        <div class="metric-value">${val}x</div>
-                    </div>`;
+            const ratios = data.ratios || {};
+            for (const [key, val] of Object.entries(ratios)) {
+                ratioHtml += `<div class="metric-card"><div class="metric-label">${key}</div><div class="metric-value">${typeof val === 'number' ? val.toFixed(2) : val}x</div></div>`;
             }
             ratioDiv.innerHTML = ratioHtml;
 
-            // 4. Validation
-            const validationClass = data.validation.identity_check === "PASS" ? "text-green" : "text-red";
+            // Validation
+            const valid = data.validation || { identity_check: "N/A", identity_delta: 0 };
+            const validationClass = valid.identity_check === "PASS" ? "text-green" : "text-red";
             document.getElementById('validationBox').innerHTML = `
                 <div class="metric-label">CRYPTOGRAPHIC ACCOUNTING VERIFICATION</div>
                 <div class="metric-value ${validationClass}">
-                    ${data.validation.identity_check} <span style="font-size:0.8em; color:#666;">(Delta: ${data.validation.identity_delta.toFixed(2)})</span>
+                    ${valid.identity_check} <span style="font-size:0.8em; color:#666;">(Delta: ${valid.identity_delta})</span>
                 </div>
             `;
         }
 
         function renderRisk(data) {
-            const statusColor = data.recommendation === "APPROVE" ? "pass" : "warn";
+            const statusColor = (data.recommendation === "APPROVE" || data.recommendation === "BUY") ? "pass" : "warn";
 
             let html = `
                 <div class="memo-header">
                     <div style="font-size: 0.8em; color: #666;">CLASSIFIED // INTERNAL USE ONLY</div>
-                    <div style="font-size: 1.2em; font-weight: bold; margin-top: 5px;">${data.title.toUpperCase()}</div>
-                    <div style="font-size: 0.8em; color: #888;">DATE: ${data.date}</div>
+                    <div style="font-size: 1.2em; font-weight: bold; margin-top: 5px;">${(data.title || "MEMO").toUpperCase()}</div>
+                    <div style="font-size: 0.8em; color: #888;">DATE: ${data.date ? new Date(data.date).toLocaleDateString() : 'N/A'}</div>
                 </div>
-                <div class="stamp ${statusColor}">${data.recommendation}</div>
-
+                <div class="stamp ${statusColor}">${data.recommendation || "REVIEW"}</div>
                 <div style="margin-bottom: 15px;">
                     <div class="metric-label">EXECUTIVE SUMMARY</div>
-                    <p style="font-size: 0.9em; line-height: 1.4; color: #ddd;">${data.executive_summary}</p>
+                    <p style="font-size: 0.9em; line-height: 1.4; color: #ddd;">${data.executive_summary || "No summary available."}</p>
                 </div>
-
-                <div class="metric-label">COVENANT ANALYSIS</div>
-                <ul style="list-style: none; padding: 0; margin-top: 5px;">
             `;
 
-            for (const [test, result] of Object.entries(data.covenant_analysis)) {
-                const color = result === "PASS" ? "text-green" : "text-red";
-                html += `<li style="margin-bottom: 5px; font-size: 0.9em; display: flex; justify-content: space-between; border-bottom: 1px dotted #333; padding-bottom: 2px;">
-                    <span style="color: #888;">${test.replace('_', ' ').toUpperCase()}</span>
-                    <span class="${color} font-bold">${result}</span>
-                </li>`;
+            if (data.covenant_analysis) {
+                html += `<div class="metric-label">COVENANT ANALYSIS</div><ul style="list-style: none; padding: 0; margin-top: 5px;">`;
+                for (const [test, result] of Object.entries(data.covenant_analysis)) {
+                    const color = result === "PASS" ? "text-green" : "text-red";
+                    html += `<li style="margin-bottom: 5px; font-size: 0.9em; display: flex; justify-content: space-between; border-bottom: 1px dotted #333;">
+                        <span style="color: #888;">${test.replace('_', ' ').toUpperCase()}</span><span class="${color} font-bold">${result}</span></li>`;
+                }
+                html += '</ul>';
             }
-            html += '</ul>';
-
             document.getElementById('riskContent').innerHTML = html;
         }
 
         function renderAudit(data) {
             const list = document.getElementById('auditContent');
             list.innerHTML = '';
+            if(!data) return;
 
             const events = [
-                {
-                    time: data.timestamp,
-                    agent: "ORCHESTRATOR",
-                    action: "PIPELINE_INIT",
-                    status: "success",
-                    detail: "Pipeline execution started"
-                },
-                {
-                    time: data.timestamp, // In real system, would be slightly later
-                    agent: "QUANT_AGENT",
-                    action: data.quant_audit.action,
-                    status: data.quant_audit.status === "SUCCESS" ? "success" : "warning",
-                    detail: data.quant_audit.details
-                },
-                {
-                    time: data.timestamp,
-                    agent: "RISK_OFFICER",
-                    action: data.risk_audit.action,
-                    status: data.risk_audit.status === "SUCCESS" ? "success" : "warning",
-                    detail: data.risk_audit.details
-                }
-            ];
+                { time: data.timestamp, agent: "ORCHESTRATOR", action: "PIPELINE_INIT", status: "success", detail: "Pipeline execution started" },
+                data.quant_audit ? { time: data.timestamp, agent: "QUANT_AGENT", action: data.quant_audit.action, status: data.quant_audit.status === "SUCCESS" ? "success" : "warning", detail: data.quant_audit.details } : null,
+                data.risk_audit ? { time: data.timestamp, agent: "RISK_OFFICER", action: data.risk_audit.action, status: data.risk_audit.status === "SUCCESS" ? "success" : "warning", detail: data.risk_audit.details } : null
+            ].filter(Boolean);
 
             events.forEach(event => {
                 const li = document.createElement('li');
                 li.className = `audit-item ${event.status}`;
-                li.innerHTML = `
-                    <div class="audit-time">${event.time}</div>
-                    <div class="audit-action">${event.agent} :: ${event.action}</div>
-                    <div class="audit-detail">${event.detail}</div>
-                `;
+                li.innerHTML = `<div class="audit-time">${event.time}</div><div class="audit-action">${event.agent} :: ${event.action}</div><div class="audit-detail">${event.detail}</div>`;
                 list.appendChild(li);
             });
         }

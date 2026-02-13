@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="css/credit_memo_v2.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <style>
+        .editing-active [contenteditable] { border: 1px dashed var(--neon-cyan); background: rgba(0, 243, 255, 0.1); padding: 5px; }
+        .action-btn { background: transparent; border: 1px solid #444; color: #888; padding: 5px 10px; cursor: pointer; font-family: 'JetBrains Mono', monospace; font-size: 0.7em; margin-right: 5px; }
+        .action-btn:hover { border-color: var(--neon-cyan); color: var(--neon-cyan); }
+    </style>
 </head>
 <body>
     <div class="crt-overlay"></div>
@@ -19,8 +24,10 @@
                 <span style="color: #666; font-size: 0.8rem;">PROTOCOL: <span style="color: var(--neon-cyan)">SOVEREIGN_AI_V2</span></span>
             </div>
             <div class="user-profile">
-                <i class="fas fa-user-circle" style="color: #444; margin-right: 5px;"></i>
-                <span style="font-size: 0.8rem; color: #888;">CREDIT_OFFICER_01</span>
+                <button id="edit-btn" class="action-btn"><i class="fas fa-edit"></i> EDIT</button>
+                <label class="action-btn"><i class="fas fa-upload"></i> LOAD <input type="file" id="upload-json" style="display:none"></label>
+                <button id="export-btn" class="action-btn"><i class="fas fa-download"></i> SAVE</button>
+                <span style="font-size: 0.8rem; color: #888; margin-left: 10px;">CREDIT_OFFICER_01</span>
             </div>
         </header>
 
@@ -40,14 +47,6 @@
                     <option value="full">Full Credit Memo (10-K)</option>
                     <option value="flash">Flash Update (Earnings)</option>
                     <option value="covenant">Covenant Compliance</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <label class="control-label">Model Config</label>
-                <select id="model-select">
-                    <option value="gpt-4">Azure OpenAI GPT-4 (Private)</option>
-                    <option value="claude-3">Anthropic Claude 3 (Secure)</option>
                 </select>
             </div>
 
@@ -109,10 +108,12 @@
         <!-- Footer -->
         <footer>
             <span>© 2026 ADAM FINANCIAL SYSTEMS | SOVEREIGN ARCHITECTURE</span>
-            <span>v2.4.1-RC3</span>
+            <span>v2.4.2-EDITABLE</span>
         </footer>
     </div>
 
+    <script src="js/mock_data.js"></script>
+    <script src="js/universal_loader.js"></script>
     <script src="js/credit_memo_v2.js"></script>
 </body>
 </html>
