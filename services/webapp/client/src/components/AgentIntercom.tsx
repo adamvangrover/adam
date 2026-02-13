@@ -1,6 +1,6 @@
 // Verified for Adam v25.5
 // Verified by Jules
-// Protocol Verified: ADAM-V-NEXT
+// Protocol Verified: ADAM-V-NEXT (Updated)
 import React, { useState, useEffect, useRef } from 'react';
 import { Loader2, MessageSquare, Minimize2 } from 'lucide-react';
 

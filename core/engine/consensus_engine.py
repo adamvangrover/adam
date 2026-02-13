@@ -1,6 +1,6 @@
 # Verified for Adam v25.5
 # Reviewed by Jules
-# Protocol Verified: ADAM-V-NEXT
+# Protocol Verified: ADAM-V-NEXT (Updated)
 from typing import List, Dict, Any, Optional
 import json
 import logging
