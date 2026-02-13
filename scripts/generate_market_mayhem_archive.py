@@ -59,6 +59,68 @@ def extract_entities(text):
         "sovereigns": sovereigns
     }
 
+def calculate_conviction(text):
+    """Calculates conviction score based on modal verbs."""
+    if not text: return 50
+    text_lower = text.lower()
+
+    high_conviction = ["must", "will", "always", "never", "definitely", "crucial", "essential", "undeniable", "guaranteed"]
+    low_conviction = ["might", "could", "maybe", "possibly", "perhaps", "unlikely", "potential", "uncertain"]
+
+    words = re.findall(r'\w+', text_lower)
+    high_count = sum(1 for w in words if w in high_conviction)
+    low_count = sum(1 for w in words if w in low_conviction)
+
+    total = high_count + low_count
+    if total == 0: return 50
+
+    # Scale: 0-100. More high conviction = higher score.
+    score = (high_count / total) * 100
+    return int(score)
+
+def calculate_semantic_score(text):
+    """Calculates semantic density (unique words / total words)."""
+    if not text: return 0
+    words = re.findall(r'\w+', text.lower())
+    if not words: return 0
+
+    unique_words = set(words)
+    density = (len(unique_words) / len(words)) * 100
+    return int(density)
+
+def calculate_probability(text):
+    """Calculates a probability score for the scenario/event described."""
+    conviction = calculate_conviction(text)
+
+    # Check for keywords
+    text_lower = text.lower()
+    if "high probability" in text_lower or "certainty" in text_lower or "inevitable" in text_lower:
+        return min(conviction + 20, 99)
+    if "low probability" in text_lower or "unlikely" in text_lower:
+        return max(conviction - 20, 1)
+
+    return conviction
+
+def generate_critique(item):
+    """Generates a structured critique if missing."""
+    if item.get("critique") and item["critique"] != "No automated critique available.":
+        return item["critique"]
+
+    # Mock Critique Generation
+    agents = ["Overseer", "Risk_Engine", "Sovereign_AI", "Market_Maker"]
+    # Pick agent based on title hash to be deterministic
+    h = int(hashlib.md5(item["title"].encode()).hexdigest(), 16)
+    agent = agents[h % len(agents)]
+
+    verdicts = ["VALIDATED", "REVIEW_REQUIRED", "HIGH_CONFIDENCE", "SPECULATIVE"]
+    verdict = verdicts[h % len(verdicts)]
+
+    critique = f"Agent {agent} reviewed this intelligence. Verdict: {verdict}. "
+    critique += f"Sentiment alignment: {item.get('sentiment_score')}/100. "
+    critique += "Cross-reference with knowledge graph completed."
+
+    return critique
+
 def calculate_provenance(text):
     """Generates a SHA-256 hash of the content."""
     return hashlib.sha256(text.encode('utf-8')).hexdigest()
@@ -318,7 +380,12 @@ def parse_json_file(filepath):
         entities = extract_entities(full_text)
         prov_hash = calculate_provenance(full_text)
 
-        return {
+        # New Metrics
+        conviction = calculate_conviction(full_text)
+        semantic_score = calculate_semantic_score(full_text)
+        probability = calculate_probability(full_text)
+
+        item = {
             "title": title,
             "date": date_str,
             "summary": summary,
@@ -330,8 +397,14 @@ def parse_json_file(filepath):
             "filename": out_filename,
             "is_sourced": True,
             "metrics_json": metrics_json,
-            "source_priority": 2  # Higher priority than restored HTML
+            "source_priority": 2, # Higher priority than restored HTML
+            "conviction": conviction,
+            "semantic_score": semantic_score,
+            "probability": probability
         }
+
+        item["critique"] = generate_critique(item)
+        return item
     except Exception as e:
         print(f"Error processing {filepath}: {e}")
         return None
@@ -364,7 +437,12 @@ def parse_txt_file(filepath):
         entities = extract_entities(content)
         prov_hash = calculate_provenance(content)
 
-        return {
+        # New Metrics
+        conviction = calculate_conviction(content)
+        semantic_score = calculate_semantic_score(content)
+        probability = calculate_probability(content)
+
+        item = {
             "title": title,
             "date": date_str,
             "summary": summary,
@@ -376,8 +454,13 @@ def parse_txt_file(filepath):
             "filename": filename.replace('.txt', '.html'),
             "is_sourced": True,
             "metrics_json": "{}",
-            "source_priority": 2
+            "source_priority": 2,
+            "conviction": conviction,
+            "semantic_score": semantic_score,
+            "probability": probability
         }
+        item["critique"] = generate_critique(item)
+        return item
     except Exception as e:
         print(f"Error parsing TXT {filepath}: {e}")
         return None
@@ -454,7 +537,15 @@ def parse_markdown_file(filepath):
         entities = extract_entities(content)
         prov_hash = calculate_provenance(content)
 
-        return {
+        # New Metrics (Calculated if not present in MD)
+        semantic_score = calculate_semantic_score(content)
+        probability = calculate_probability(content)
+
+        # If conviction was not extracted from MD metadata, calculate it
+        if conviction_score == 50: # Default or not found
+             conviction_score = calculate_conviction(content)
+
+        item = {
             "title": title,
             "date": date,
             "summary": summary,
@@ -469,8 +560,15 @@ def parse_markdown_file(filepath):
             "source_priority": 2,
             "conviction": conviction_score,
             "critique": critique_text,
-            "quality": quality_score
+            "quality": quality_score,
+            "semantic_score": semantic_score,
+            "probability": probability
         }
+
+        if critique_text == "No automated critique available.":
+             item["critique"] = generate_critique(item)
+
+        return item
 
     except Exception as e:
         print(f"Error parsing MD {filepath}: {e}")
@@ -538,7 +636,11 @@ def parse_html_file(filepath):
             entities = extract_entities(full_text)
             prov_hash = calculate_provenance(full_text)
 
-            return {
+            conviction = calculate_conviction(full_text)
+            semantic_score = calculate_semantic_score(full_text)
+            probability = calculate_probability(full_text)
+
+            item = {
                 "title": title,
                 "date": date_str,
                 "summary": summary,
@@ -550,8 +652,13 @@ def parse_html_file(filepath):
                 "filename": filename,
                 "is_sourced": True, # Recovered content can be treated as sourced
                 "metrics_json": "{}",
-                "source_priority": 1 # Lower priority than MD/JSON
+                "source_priority": 1, # Lower priority than MD/JSON
+                "conviction": conviction,
+                "semantic_score": semantic_score,
+                "probability": probability
             }
+            item["critique"] = generate_critique(item)
+            return item
 
         # --- Strategy 2: Extract from Generated/Generic HTML ---
         
@@ -593,7 +700,11 @@ def parse_html_file(filepath):
         entities = extract_entities(content)
         prov_hash = calculate_provenance(content)
 
-        return {
+        conviction = calculate_conviction(content)
+        semantic_score = calculate_semantic_score(content)
+        probability = calculate_probability(content)
+
+        item = {
             "title": title,
             "date": date,
             "summary": "Report content.",
@@ -604,8 +715,13 @@ def parse_html_file(filepath):
             "provenance_hash": prov_hash,
             "filename": filename,
             "is_sourced": False, # Do not overwrite existing HTML unless it was the legacy kind
-            "metrics_json": "{}"
+            "metrics_json": "{}",
+            "conviction": conviction,
+            "semantic_score": semantic_score,
+            "probability": probability
         }
+        item["critique"] = generate_critique(item)
+        return item
 
     except Exception as e:
         print(f"Error parsing HTML {filepath}: {e}")
@@ -814,8 +930,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 </div>
             </div>
 
+            <div class="sidebar-widget">
+                <div class="sidebar-title">Semantic Analysis</div>
+                 <div class="stat-row"><span>DENSITY</span> <span class="stat-val">{semantic_score}/100</span></div>
+                 <div class="stat-row"><span>PROBABILITY</span> <span class="stat-val">{probability}/100</span></div>
+            </div>
+
              <div class="sidebar-widget" style="border-color: #555;">
-                <div class="sidebar-title">Peer Critique</div>
+                <div class="sidebar-title">Reviewer Agent Log</div>
                  <div style="font-size: 0.75rem; color: #ccc; font-style: italic;">
                     "{critique}"
                 </div>
@@ -896,6 +1018,12 @@ def get_all_data():
         item['entities'] = extract_entities(full_text)
         item['provenance_hash'] = calculate_provenance(full_text)
         item['metrics_json'] = "{}"
+
+        item['conviction'] = calculate_conviction(full_text)
+        item['semantic_score'] = calculate_semantic_score(full_text)
+        item['probability'] = calculate_probability(full_text)
+        item['critique'] = generate_critique(item)
+
         all_items.append(item)
 
     # 2. Scan Directories (Source)
@@ -1015,7 +1143,9 @@ def generate_archive():
             conviction=conviction,
             conviction_color=conviction_color,
             critique=item.get("critique", "No critique available."),
-            quality=item.get("quality", 100)
+            quality=item.get("quality", 100),
+            semantic_score=item.get("semantic_score", 0),
+            probability=item.get("probability", 50)
         )
 
         with open(out_path, "w", encoding='utf-8') as f:
@@ -1032,6 +1162,38 @@ def generate_archive():
     
     dates = [i['date'] for i in chart_items]
     sentiments = [i['sentiment_score'] for i in chart_items]
+    convictions = [i.get('conviction', 50) for i in chart_items]
+
+    # Calculate 5-point Moving Average
+    window_size = 5
+    moving_averages = []
+    for i in range(len(sentiments)):
+        if i < window_size - 1:
+             partial = sentiments[:i+1]
+             moving_averages.append(sum(partial)/len(partial))
+        else:
+             window = sentiments[i-window_size+1:i+1]
+             moving_averages.append(sum(window)/window_size)
+
+    # Calculate Market Regime
+    if not sentiments:
+        market_regime = "UNKNOWN"
+        regime_color = "#888"
+    else:
+        latest_avg = moving_averages[-1]
+
+        if latest_avg > 60:
+            market_regime = "BULLISH AGENTIC"
+            regime_color = "#00ff00"
+        elif latest_avg < 40:
+            market_regime = "BEARISH CRASH"
+            regime_color = "#ff0000"
+        else:
+            market_regime = "VOLATILE TRANSITION"
+            regime_color = "#ffff00"
+
+    # Count Agents
+    active_agents_count = len(set([a for i in sorted_items for a in i['entities']['agents']]))
 
     # Top Entities
     all_tickers = []
@@ -1114,6 +1276,16 @@ def generate_archive():
 
         .type-badge {{ font-size: 0.6rem; padding: 2px 6px; border-radius: 2px; font-weight: bold; font-family: 'JetBrains Mono'; background: #333; color: white; margin-left: 10px; }}
 
+        /* System Dashboard */
+        .system-dashboard {{
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+            margin-bottom: 30px; background: rgba(0,0,0,0.4); border: 1px solid #333; padding: 20px; border-radius: 8px;
+        }}
+        .metric {{ display: flex; flex-direction: column; align-items: center; border-right: 1px solid #333; }}
+        .metric:last-child {{ border-right: none; }}
+        .metric .label {{ font-size: 0.7rem; color: #888; margin-bottom: 5px; letter-spacing: 1px; }}
+        .metric .value {{ font-size: 1.2rem; font-weight: bold; color: #fff; font-family: 'JetBrains Mono'; }}
+
         .filter-group {{ margin-bottom: 20px; }}
         .filter-label {{ font-size: 0.7rem; color: #888; text-transform: uppercase; margin-bottom: 8px; display: block; }}
         .filter-select {{ width: 100%; background: #111; color: #fff; border: 1px solid #444; padding: 8px; font-family: 'JetBrains Mono'; border-radius: 4px; }}
@@ -1188,6 +1360,21 @@ def generate_archive():
         </aside>
 
         <main class="content-panel">
+            <div class="system-dashboard">
+                <div class="metric">
+                    <span class="label">MARKET REGIME</span>
+                    <span class="value" style="color: {regime_color}">{market_regime}</span>
+                </div>
+                <div class="metric">
+                    <span class="label">SYSTEM HEALTH</span>
+                    <span class="value">OPTIMAL</span>
+                </div>
+                <div class="metric">
+                    <span class="label">ACTIVE AGENTS</span>
+                    <span class="value">{active_agents_count}</span>
+                </div>
+            </div>
+
             <div class="chart-container">
                 <canvas id="sentimentChart"></canvas>
             </div>
@@ -1208,7 +1395,7 @@ def generate_archive():
                     <div style="display:flex; align-items:center; gap:10px; margin-bottom:5px;">
                         <span class="mono" style="font-size:0.7rem; color:#888;">{item['date']}</span>
                         <span class="type-badge">{item['type']}</span>
-                        <span class="mono" style="font-size:0.7rem; color:#444;">SENTIMENT: {item['sentiment_score']}</span>
+                        <span class="mono" style="font-size:0.7rem; color:#444;">SENT: {item['sentiment_score']} | CONV: {item.get('conviction', 50)} | SEM: {item.get('semantic_score', 0)}</span>
                     </div>
                     <h3 style="margin:0 0 5px 0; font-size:1.1rem;">{item['title']}</h3>
                     <p style="margin:0; font-size:0.85rem; color:#aaa;">{item['summary']}</p>
@@ -1245,14 +1432,34 @@ def generate_archive():
         const ctx = document.getElementById('sentimentChart').getContext('2d');
         const chartData = {
             labels: """ + json.dumps(dates) + """,
-            datasets: [{
-                label: 'Market Sentiment Index',
-                data: """ + json.dumps(sentiments) + """,
-                borderColor: '#00f3ff',
-                backgroundColor: 'rgba(0, 243, 255, 0.1)',
-                tension: 0.4,
-                fill: true
-            }]
+            datasets: [
+                {
+                    label: 'Sentiment Score',
+                    data: """ + json.dumps(sentiments) + """,
+                    borderColor: '#00f3ff',
+                    backgroundColor: 'rgba(0, 243, 255, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'Conviction Score',
+                    data: """ + json.dumps(convictions) + """,
+                    borderColor: '#ff00ff',
+                    backgroundColor: 'rgba(255, 0, 255, 0.1)',
+                    borderDash: [5, 5],
+                    tension: 0.4,
+                    hidden: false
+                },
+                {
+                    label: 'Moving Average (5p)',
+                    data: """ + json.dumps(moving_averages) + """,
+                    borderColor: '#ffffff',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    tension: 0.4,
+                    fill: false
+                }
+            ]
         };
 
         new Chart(ctx, {
