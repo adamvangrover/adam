@@ -70,12 +70,21 @@ class AdamNavigator {
     _resolvePaths() {
         const scriptTag = document.querySelector('script[src*="nav.js"]');
         const dataRoot = scriptTag ? scriptTag.getAttribute('data-root') : null;
+        const src = scriptTag ? scriptTag.getAttribute('src') : '';
         
         this.rootPath = dataRoot || '.';
-        const cleanRoot = this.rootPath.replace(/\/$/, '');
-        this.showcasePath = `${cleanRoot}/showcase`;
         
-        console.log(`[AdamNavigator] Environment: ${this.isGitHub ? 'GITHUB' : 'LOCAL'} | Root: ${this.rootPath}`);
+        // Adaptive Path Resolution
+        if (src.includes('js/nav.js') && !src.includes('showcase/')) {
+             // We are likely inside the showcase directory already
+             this.showcasePath = '.';
+        } else {
+             // We are likely at repo root or deeper nested with explicit path
+             const cleanRoot = this.rootPath.replace(/\/$/, '');
+             this.showcasePath = `${cleanRoot}/showcase`;
+        }
+
+        console.log(`[AdamNavigator] Environment: ${this.isGitHub ? 'GITHUB' : 'LOCAL'} | Root: ${this.rootPath} | Showcase: ${this.showcasePath}`);
     }
 
     /**

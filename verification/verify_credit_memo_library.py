@@ -6,7 +6,7 @@ import os
 import sys
 from playwright.sync_api import sync_playwright
 
-PORT = 8082
+PORT = 8084
 Handler = http.server.SimpleHTTPRequestHandler
 
 def start_server():

@@ -1,16 +1,23 @@
 {
   "borrower_name": "JPMorgan Chase",
-  "report_date": "2026-02-13T00:37:35.453806",
-  "executive_summary": "The borrower JPMorgan Chase presents a mixed credit profile. Financial performance shows strong EBITDA ($90000.0M) but elevated leverage (12.3x).  [Ref: JPM_10K_2025.pdf]",
+  "report_date": "2026-02-13T02:01:48.680864",
+  "executive_summary": "The borrower JPMorgan Chase presents a BB credit profile. Financial performance shows strong EBITDA ($90000.0M) with leverage at 12.3x. Market sentiment is bullish.  [Ref: JPM_10K_2025.pdf]",
   "sections": [
     {
       "title": "Executive Summary",
-      "content": "The borrower JPMorgan Chase presents a mixed credit profile. Financial performance shows strong EBITDA ($90000.0M) but elevated leverage (12.3x).  [Ref: JPM_10K_2025.pdf]",
+      "content": "The borrower JPMorgan Chase presents a BB credit profile. Financial performance shows strong EBITDA ($90000.0M) with leverage at 12.3x. Market sentiment is bullish.  [Ref: JPM_10K_2025.pdf]",
       "citations": [
         {
           "doc_id": "JPM_10K_2025.pdf",
-          "chunk_id": "1e53e70f-afd3-41ab-8c39-303cfe990cba",
-          "page_number": 5
+          "chunk_id": "436a882a-2920-41bc-9663-a276657c1ee3",
+          "page_number": 5,
+          "bbox": [
+            0.15,
+            0.2,
+            0.85,
+            0.3
+          ],
+          "text_snippet": "Net Interest Income (NII) rose 12% to record level..."
         }
       ]
     },
@@ -30,5 +37,68 @@
     "dscr": 999.0,
     "current_ratio": 1.1
   },
-  "risk_score": 45.0
+  "risk_score": 45.0,
+  "sentiment_score": 70.0,
+  "conviction_score": 65.0,
+  "credit_rating": "BB",
+  "price_target": 195.0,
+  "price_level": "Fair Value",
+  "market_cap": 580000.0,
+  "enterprise_value": 600000.0,
+  "debt_ratings": [
+    {
+      "facility_type": "Revolving Credit Facility",
+      "rating": "BBB-",
+      "recovery_rating": "RR1 (95%)",
+      "amount_outstanding": 370000.0
+    },
+    {
+      "facility_type": "Senior Secured Notes",
+      "rating": "BB",
+      "recovery_rating": "RR3 (60%)",
+      "amount_outstanding": 3330000.0
+    }
+  ],
+  "system_two_notes": "System 2 Correction: Market sentiment ignores high leverage risk. Lowering conviction.",
+  "score_attributions": {
+    "Valuation": {
+      "agent_id": "Quant",
+      "model_version": "Quant-v2.2 (DCF Enhanced)",
+      "timestamp": "2026-02-13T02:01:48.680719",
+      "justification": "Valuation derived from DCF (WACC/Terminal Value) and Comparable Multiples.",
+      "key_factors": [
+        "NII tailwinds",
+        "Defensive balance sheet",
+        "P/TBV: 2.1x"
+      ]
+    },
+    "Risk Score": {
+      "agent_id": "RiskOfficer",
+      "model_version": "RiskOfficer-v1.5 (Facility Notching)",
+      "timestamp": "2026-02-13T02:01:48.680743",
+      "justification": "Assigned Corporate Rating BB and facility ratings based on LGD/RR models.",
+      "key_factors": [
+        "High Leverage (>4.0x)"
+      ]
+    },
+    "Sentiment": {
+      "agent_id": "MarketAnalyst",
+      "model_version": "MarketAnalyst-v3.0",
+      "timestamp": "2026-02-13T02:01:48.680754",
+      "justification": "Sentiment derived from news flow and analyst dispersion.",
+      "key_factors": [
+        "Sector Rotation into Value",
+        "Rate Hike Beneficiary"
+      ]
+    },
+    "System Two": {
+      "agent_id": "SystemTwo",
+      "model_version": "SystemTwo-v1.0 (Metacognition)",
+      "timestamp": "2026-02-13T02:01:48.680835",
+      "justification": "Review of coherence between financial metrics and qualitative signals.",
+      "key_factors": [
+        "lowered_conviction_score"
+      ]
+    }
+  }
 }

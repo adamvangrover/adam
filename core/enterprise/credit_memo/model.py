@@ -15,6 +15,17 @@ class EvidenceChunk(BaseModel):
     bbox: List[float]  # [x0, y0, x1, y1] normalized coordinates (0-1)
     confidence: float = 1.0
 
+class Attribution(BaseModel):
+    """
+    Represents the attribution for a specific score or decision.
+    Protocol: Explainable AI (XAI)
+    """
+    agent_id: str
+    model_version: str
+    timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
+    justification: str
+    key_factors: List[str] = []
+
 class Citation(BaseModel):
     """
     A citation linking a claim to a specific evidence chunk.
@@ -22,11 +33,22 @@ class Citation(BaseModel):
     doc_id: str
     chunk_id: str
     page_number: int
+    bbox: Optional[List[float]] = None
+    text_snippet: Optional[str] = None
 
 class CreditMemoSection(BaseModel):
     title: str
     content: str
     citations: List[Citation] = []
+
+class DebtFacilityRating(BaseModel):
+    """
+    Represents a credit rating for a specific debt facility.
+    """
+    facility_type: str # e.g., "Senior Secured Term Loan B", "Senior Unsecured Notes"
+    rating: str # e.g., "BBB-"
+    recovery_rating: Optional[str] = None # e.g., "RR1" (90-100%)
+    amount_outstanding: Optional[float] = None # In Millions
 
 class CreditMemo(BaseModel):
     """
@@ -37,7 +59,26 @@ class CreditMemo(BaseModel):
     executive_summary: str
     sections: List[CreditMemoSection] = []
     financial_ratios: Dict[str, float] = {}
+
+    # New Fields
     risk_score: float
+    sentiment_score: float = Field(default=50.0)
+    conviction_score: float = Field(default=50.0)
+    credit_rating: str = "NR"
+
+    # Valuation
+    price_target: Optional[float] = None
+    price_level: Optional[str] = None # "Undervalued", "Fair Value", "Overvalued"
+    market_cap: Optional[float] = None # Total Market Value (Equity Value)
+    enterprise_value: Optional[float] = None
+
+    # Debt Structure
+    debt_ratings: List[DebtFacilityRating] = []
+
+    system_two_notes: Optional[str] = None # System Two output
+
+    # XAI Attribution Map (Metric Name -> Attribution)
+    score_attributions: Dict[str, Attribution] = {}
 
 class AuditLogEntry(BaseModel):
     """
@@ -55,3 +96,6 @@ class AuditLogEntry(BaseModel):
     citations_count: int
     validation_status: str  # PASS/FAIL/WARNING
     validation_errors: List[str] = []
+
+    # New: Full Reasoning Trace
+    attribution_trace: Dict[str, Any] = {}

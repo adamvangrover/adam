@@ -69,12 +69,19 @@ class AdamNavigator {
     _resolvePaths() {
         const scriptTag = document.querySelector('script[src*="nav.js"]');
         const dataRoot = scriptTag ? scriptTag.getAttribute('data-root') : null;
+        const src = scriptTag ? scriptTag.getAttribute('src') : '';
 
         this.rootPath = dataRoot || '.';
-        const cleanRoot = this.rootPath.replace(/\/$/, '');
-        this.showcasePath = `${cleanRoot}/showcase`;
 
-        console.log(`[AdamNavigator] Environment: ${this.isGitHub ? 'GITHUB' : 'LOCAL'} | Root: ${this.rootPath}`);
+        // Adaptive Path Resolution (Fix for Showcase nesting)
+        if (src.includes('js/nav') && !src.includes('showcase/') && !dataRoot) {
+             this.showcasePath = '.';
+        } else {
+             const cleanRoot = this.rootPath.replace(/\/$/, '');
+             this.showcasePath = `${cleanRoot}/showcase`;
+        }
+
+        console.log(`[AdamNavigator] Environment: ${this.isGitHub ? 'GITHUB' : 'LOCAL'} | Root: ${this.rootPath} | Showcase: ${this.showcasePath}`);
     }
 
     /**

@@ -29,12 +29,21 @@ const PromptAlpha = {
     init: async function() {
         console.log("Initializing Prompt Alpha...");
         
-        try {
-            await this.fetchData();
-        } catch (e) {
-            console.warn("Live fetch failed, switching to Mock Data", e);
+        // Auto-switch to MOCK on localhost to avoid CORS errors in showcase
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+        if (isLocal) {
+            console.log("Local environment detected. Defaulting to MOCK data.");
             this.state.mode = 'MOCK';
             this.loadMockData();
+        } else {
+            try {
+                await this.fetchData();
+            } catch (e) {
+                console.warn("Live fetch failed, switching to Mock Data", e);
+                this.state.mode = 'MOCK';
+                this.loadMockData();
+            }
         }
 
         this.renderTicker();

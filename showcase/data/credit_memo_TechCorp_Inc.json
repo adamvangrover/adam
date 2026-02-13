@@ -1,16 +1,23 @@
 {
   "borrower_name": "TechCorp Inc.",
-  "report_date": "2026-02-13T00:37:35.443186",
-  "executive_summary": "The borrower TechCorp Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($350.0M) but elevated leverage (8.6x).  [Ref: TechCorp_10K_2025.pdf]",
+  "report_date": "2026-02-13T02:01:48.674483",
+  "executive_summary": "The borrower TechCorp Inc. presents a BB credit profile. Financial performance shows strong EBITDA ($350.0M) with leverage at 8.6x. Market sentiment is bearish.  [Ref: TechCorp_10K_2025.pdf]",
   "sections": [
     {
       "title": "Executive Summary",
-      "content": "The borrower TechCorp Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($350.0M) but elevated leverage (8.6x).  [Ref: TechCorp_10K_2025.pdf]",
+      "content": "The borrower TechCorp Inc. presents a BB credit profile. Financial performance shows strong EBITDA ($350.0M) with leverage at 8.6x. Market sentiment is bearish.  [Ref: TechCorp_10K_2025.pdf]",
       "citations": [
         {
           "doc_id": "TechCorp_10K_2025.pdf",
-          "chunk_id": "d3f819a7-bd79-4a4f-9897-5cbca63f6c02",
-          "page_number": 3
+          "chunk_id": "541562cb-0a0d-4c79-bc4a-fd9d49375e9b",
+          "page_number": 3,
+          "bbox": [
+            0.1,
+            0.2,
+            0.9,
+            0.3
+          ],
+          "text_snippet": "TechCorp reported a 15% decline in EBITDA due to r..."
         }
       ]
     },
@@ -30,5 +37,68 @@
     "dscr": 7.0,
     "current_ratio": 1.5
   },
-  "risk_score": 45.0
+  "risk_score": 35.0,
+  "sentiment_score": 30.0,
+  "conviction_score": 60.0,
+  "credit_rating": "BB",
+  "price_target": 42.0,
+  "price_level": "Undervalued",
+  "market_cap": 4200.0,
+  "enterprise_value": 7200.0,
+  "debt_ratings": [
+    {
+      "facility_type": "Revolving Credit Facility",
+      "rating": "BBB-",
+      "recovery_rating": "RR1 (95%)",
+      "amount_outstanding": 300.0
+    },
+    {
+      "facility_type": "Senior Secured Notes",
+      "rating": "BB",
+      "recovery_rating": "RR3 (60%)",
+      "amount_outstanding": 2700.0
+    }
+  ],
+  "system_two_notes": "System 2 Verified: No inconsistencies found.",
+  "score_attributions": {
+    "Valuation": {
+      "agent_id": "Quant",
+      "model_version": "Quant-v2.2 (DCF Enhanced)",
+      "timestamp": "2026-02-13T02:01:48.674332",
+      "justification": "Valuation derived from DCF (WACC/Terminal Value) and Comparable Multiples.",
+      "key_factors": [
+        "Sum-of-parts valuation discount",
+        "High Leverage Penalty applied to WACC"
+      ]
+    },
+    "Risk Score": {
+      "agent_id": "RiskOfficer",
+      "model_version": "RiskOfficer-v1.5 (Facility Notching)",
+      "timestamp": "2026-02-13T02:01:48.674383",
+      "justification": "Assigned Corporate Rating BB and facility ratings based on LGD/RR models.",
+      "key_factors": [
+        "High Leverage (>4.0x)",
+        "Connected Party Risk: NextGen AI Ltd."
+      ]
+    },
+    "Sentiment": {
+      "agent_id": "MarketAnalyst",
+      "model_version": "MarketAnalyst-v3.0",
+      "timestamp": "2026-02-13T02:01:48.674397",
+      "justification": "Sentiment derived from news flow and analyst dispersion.",
+      "key_factors": [
+        "Inventory Correction",
+        "Cyclical Downturn"
+      ]
+    },
+    "System Two": {
+      "agent_id": "SystemTwo",
+      "model_version": "SystemTwo-v1.0 (Metacognition)",
+      "timestamp": "2026-02-13T02:01:48.674445",
+      "justification": "Review of coherence between financial metrics and qualitative signals.",
+      "key_factors": [
+        "Consistent Profile"
+      ]
+    }
+  }
 }

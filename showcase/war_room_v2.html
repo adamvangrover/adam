@@ -163,9 +163,12 @@
         // --- API Integration ---
         async function fetchLiveData() {
             try {
-                const res = await fetch('/api/synthesizer/confidence');
+                // Check if API is available (only in Python integrated mode)
+                // Otherwise fallback to mock immediately to avoid 404 console noise in static showcase
+                const res = await fetch('/api/synthesizer/confidence', { method: 'HEAD' });
                 if (res.ok) {
-                    const data = await res.json();
+                    const dataRes = await fetch('/api/synthesizer/confidence');
+                    const data = await dataRes.json();
 
                     // Update internal data model with live pulse
                     if(data.pulse && data.pulse.indices) {
@@ -179,9 +182,12 @@
                     }
 
                     console.log("WarRoom: Live Data Sync Complete");
+                } else {
+                    throw new Error("API Offline");
                 }
             } catch(e) {
-                console.log("WarRoom: Live Data Offline, using simulation.");
+                // Silent fallback
+                // console.log("WarRoom: Live Data Offline, using simulation.");
             }
         }
 
