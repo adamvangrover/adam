@@ -24,32 +24,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         log("System", "Initializing CreditOS v2.4...", "info");
 
         try {
-            // Load Library
-            const res = await fetch('data/credit_memo_library.json');
-            if (res.ok) {
-                library = await res.json(); // Array or Object? Handling both.
-                
-                // Normalize if array
-                if (Array.isArray(library)) {
-                    const libObj = {};
-                    library.forEach(item => libObj[item.id] = item);
-                    library = libObj;
-                }
+            // Load Library via Universal Loader
+            const libArray = await window.universalLoader.loadLibrary();
 
-                // Populate Dropdown
-                Object.values(library).forEach(item => {
-                    const opt = document.createElement('option');
-                    opt.value = item.file; // Using filename as key to load actual data
-                    opt.innerText = `${item.borrower_name} (Risk: ${item.risk_score})`;
-                    opt.dataset.ticker = item.ticker || "UNK";
-                    opt.dataset.name = item.borrower_name;
-                    elements.borrowerSelect.appendChild(opt);
-                });
+            // Normalize to object for local lookups if needed, or just use for dropdown
+            library = {};
+            libArray.forEach(item => {
+                // Ensure we have an ID
+                const id = item.id || item.borrower_name.replace(/ /g, '_');
+                library[id] = item;
                 
-                log("Archivist", `Loaded ${Object.keys(library).length} entity profiles.`, "success");
-            } else {
-                throw new Error("Library not found");
-            }
+                const opt = document.createElement('option');
+                // Use ID as value if file is missing, but prefer file if available logic elsewhere expects it.
+                // However, updated loader prefers ID or Filename.
+                // Original used item.file. Let's use item.id for cleaner lookup,
+                // but universalLoader.loadCreditMemo handles filename or ID.
+                opt.value = item.id;
+                opt.innerText = `${item.borrower_name} (Risk: ${item.risk_score})`;
+                opt.dataset.ticker = item.ticker || "UNK";
+                opt.dataset.name = item.borrower_name;
+                elements.borrowerSelect.appendChild(opt);
+            });
+
+            log("Archivist", `Loaded ${libArray.length} entity profiles.`, "success");
             
             // Load Audit Logs (Background)
             loadAuditLogs();
@@ -87,12 +84,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // 2. Load Data (Simulating "Live" Fetch)
         try {
-            const path = filename.includes('/') ? filename : `data/${filename}`;
-            const res = await fetch(path);
-            if (!res.ok) throw new Error("File not found");
-            currentMemoData = await res.json();
+            currentMemoData = await window.universalLoader.loadCreditMemo(filename);
+            if (!currentMemoData) throw new Error("File not found");
             selectedBorrower = currentMemoData; // Sync state
         } catch(e) {
+            console.error(e);
             log("System", "Error loading memo data", "error");
             return;
         }

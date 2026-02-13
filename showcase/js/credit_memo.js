@@ -24,7 +24,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- 2. Initialization ---
     try {
-        await Promise.all([loadMockData(), loadLibraryIndex()]);
+        // await Promise.all([loadMockData(), loadLibraryIndex()]); // Legacy
+        await loadLibraryIndex();
         renderLibraryList();
         logAudit("System", "Ready", "Credit Memo Orchestrator initialized.");
     } catch (e) {
@@ -60,31 +61,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // --- 4. Data Loading ---
-    async function loadMockData() {
-        try {
-            const res = await fetch('data/credit_mock_data.json');
-            mockData = await res.json();
-        } catch(e) { console.warn("Mock data fetch failed, using internal fallback"); }
-    }
+    // loadMockData removed - handled by UniversalLoader
 
     async function loadLibraryIndex() {
         try {
-            const res = await fetch('data/credit_memo_library.json');
-            libraryIndex = await res.json();
-        } catch(e) { console.warn("Library index fetch failed"); }
+            libraryIndex = await window.universalLoader.loadLibrary();
+        } catch(e) { console.warn("Library index fetch failed", e); }
     }
 
-    async function loadCreditMemo(filename) {
+    async function loadCreditMemo(identifier) {
         try {
-            const path = filename.includes('/') ? filename : `data/${filename}`;
-            const res = await fetch(path);
-            if (!res.ok) throw new Error(`Failed to load: ${path}`);
-            const memo = await res.json();
-            currentMemo = memo;
-            renderFullMemoUI(memo);
+            const memo = await window.universalLoader.loadCreditMemo(identifier);
+            if (!memo) throw new Error("No data found");
+
+            // Check if data is already in the final structure (has financials)
+            if (memo.historical_financials && Array.isArray(memo.historical_financials) && memo.historical_financials.length > 0) {
+                 currentMemo = memo;
+                 renderFullMemoUI(memo);
+            } else {
+                 // Fallback to adapter for partial data
+                 renderMemoFromMock(memo);
+            }
         } catch(e) {
             console.error("Could not load memo file:", e);
-            logAudit("System", "Error", `Failed to load ${filename}`);
+            logAudit("System", "Error", `Failed to load ${identifier}`);
         }
     }
 
@@ -105,17 +105,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             .then(() => {
                 if(elements.progressContainer) elements.progressContainer.style.display = 'none';
                 
-                // Check if we have pre-generated JSON for this, else use mock data fallback
-                const libraryEntry = libraryIndex.find(i => i.borrower_name === borrower || i.id === borrower);
-                
-                if (libraryEntry && libraryEntry.file) {
-                    loadCreditMemo(libraryEntry.file);
-                } else if (mockData[borrower]) {
-                    renderMemoFromMock(mockData[borrower]);
-                } else {
-                    // Fallback to first mock entry
-                    renderMemoFromMock(Object.values(mockData)[0]);
-                }
+                // Load data using Universal Loader
+                loadCreditMemo(borrower);
                 
                 logAudit("Orchestrator", "Complete", `Memo generated for ${borrower}`);
             });

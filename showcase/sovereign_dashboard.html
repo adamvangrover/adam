@@ -319,6 +319,9 @@
         </div>
     </div>
 
+    <script src="js/nav.js"></script>
+    <script src="js/mock_data.js"></script>
+    <script src="js/universal_loader.js"></script>
     <script>
         const TICKERS = ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA"];
         let chartInstance = null;
@@ -345,21 +348,21 @@
             element.classList.add('active');
 
             try {
-                // Fetch Artifacts with cache busting
-                const ts = new Date().getTime();
-                const [spread, memo, audit] = await Promise.all([
-                    fetch(`data/sovereign_artifacts/${ticker}_spread.json?t=${ts}`).then(r => r.json()),
-                    fetch(`data/sovereign_artifacts/${ticker}_memo.json?t=${ts}`).then(r => r.json()),
-                    fetch(`data/sovereign_artifacts/${ticker}_audit.json?t=${ts}`).then(r => r.json())
-                ]);
+                const data = await window.universalLoader.loadSovereignData(ticker);
 
-                renderQuant(spread);
-                renderRisk(memo);
-                renderAudit(audit);
+                if (data && data.spread && data.memo && data.audit) {
+                    renderQuant(data.spread);
+                    renderRisk(data.memo);
+                    renderAudit(data.audit);
+                } else {
+                    throw new Error("Incomplete data artifacts");
+                }
 
             } catch (e) {
                 console.error("Error loading data:", e);
-                alert("Failed to load artifacts. Ensure you have run 'scripts/run_sovereign_pipeline.py'.");
+                // alert("Failed to load artifacts. Ensure you have run 'scripts/run_sovereign_pipeline.py' or check mock data.");
+                // Provide a visual fallback or error message in the UI instead of alert
+                document.getElementById('quantContent').innerHTML = `<div style="padding:20px; color:red;">DATA LOAD FAILURE: ${e.message}</div>`;
             }
         }
 
