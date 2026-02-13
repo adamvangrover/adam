@@ -58,6 +58,31 @@ class FinancialSpread(BaseModel):
     current_ratio: float
     period: str
 
+class CreditRating(BaseModel):
+    agency: str
+    rating: str
+    outlook: str
+    date: str
+
+class DebtFacility(BaseModel):
+    facility_type: str
+    amount_committed: float
+    amount_drawn: float
+    interest_rate: str
+    maturity_date: str
+    snc_rating: str = "Pass"
+    drc: float = 1.0 # 0-100%
+    ltv: float = 0.5 # 0-100%
+    conviction_score: float = 0.9 # 0-100%
+
+class EquityMarketData(BaseModel):
+    market_cap: float
+    share_price: float
+    volume_avg_30d: float
+    pe_ratio: float
+    dividend_yield: float
+    beta: float
+
 class CreditMemo(BaseModel):
     """
     The complete Credit Memo document.
@@ -70,6 +95,9 @@ class CreditMemo(BaseModel):
     historical_financials: List[Dict[str, Any]] = [] # List of FinancialSpread dictionaries
     dcf_analysis: Optional[DCFAnalysis] = None
     risk_score: float
+    credit_ratings: List[CreditRating] = []
+    debt_facilities: List[DebtFacility] = []
+    equity_data: Optional[EquityMarketData] = None
 
 class AuditLogEntry(BaseModel):
     """

@@ -80,6 +80,9 @@ async function loadCreditMemo(filename) {
     // 3. Render Annex B (DCF)
     renderAnnexB(memo);
 
+    // 4. Render Annex C (Cap Structure)
+    renderAnnexC(memo);
+
     // Reset to Memo Tab
     switchTab('memo');
 }
@@ -95,12 +98,23 @@ function renderMemoTab(memo) {
     // Calculate color for risk
     const scoreColor = memo.risk_score < 60 ? 'text-red-600' : (memo.risk_score < 80 ? 'text-yellow-600' : 'text-emerald-600');
 
+    // Rating HTML
+    let ratingHtml = '';
+    if (memo.credit_ratings && memo.credit_ratings.length > 0) {
+         ratingHtml = `<div class="mt-2 text-right space-y-1">`;
+         memo.credit_ratings.forEach(r => {
+             ratingHtml += `<div class="text-[10px] font-mono text-slate-400"><span class="font-bold text-slate-300">${r.agency}:</span> <span class="${r.rating.startsWith('A') ? 'text-emerald-400' : 'text-yellow-400'}">${r.rating}</span> (${r.outlook})</div>`;
+         });
+         ratingHtml += `</div>`;
+    }
+
     header.innerHTML = `
         <div class="flex justify-between items-start">
             <h1 class="text-3xl font-bold font-serif text-slate-900 mb-2">${memo.borrower_name}</h1>
             <div class="text-right">
                 <div class="text-xs text-slate-500 font-mono uppercase tracking-wider">Risk Score</div>
                 <div class="text-2xl font-bold font-mono ${scoreColor}">${memo.risk_score}/100</div>
+                ${ratingHtml}
             </div>
         </div>
         <div class="flex justify-between text-sm text-slate-500 font-mono mt-2">
@@ -313,14 +327,136 @@ function renderAnnexB(memo) {
     container.innerHTML = assumptionsHtml + tableHtml + terminalHtml;
 }
 
+function renderAnnexC(memo) {
+    const container = document.getElementById('cap-structure-container');
+    container.innerHTML = '';
+
+    // 1. Equity Market Data
+    if (memo.equity_data) {
+        const eq = memo.equity_data;
+        const equityHtml = `
+            <div class="mb-8">
+                 <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Equity Market Data</h3>
+                 <div class="grid grid-cols-3 gap-4">
+                     <div class="bg-slate-800/50 p-4 rounded border border-slate-700">
+                        <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Market Cap</div>
+                        <div class="text-xl font-bold text-white font-mono">${formatCurrency(eq.market_cap)}</div>
+                     </div>
+                     <div class="bg-slate-800/50 p-4 rounded border border-slate-700">
+                        <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Share Price</div>
+                        <div class="text-xl font-bold text-emerald-400 font-mono">$${eq.share_price.toFixed(2)}</div>
+                     </div>
+                     <div class="bg-slate-800/50 p-4 rounded border border-slate-700">
+                        <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">P/E Ratio</div>
+                        <div class="text-xl font-bold text-blue-400 font-mono">${eq.pe_ratio.toFixed(1)}x</div>
+                     </div>
+                     <div class="bg-slate-800/50 p-4 rounded border border-slate-700">
+                        <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Dividend Yield</div>
+                        <div class="text-xl font-bold text-white font-mono">${eq.dividend_yield.toFixed(2)}%</div>
+                     </div>
+                     <div class="bg-slate-800/50 p-4 rounded border border-slate-700">
+                        <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Beta</div>
+                        <div class="text-xl font-bold text-white font-mono">${eq.beta.toFixed(2)}</div>
+                     </div>
+                     <div class="bg-slate-800/50 p-4 rounded border border-slate-700">
+                        <div class="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Avg Vol (30d)</div>
+                        <div class="text-xl font-bold text-slate-300 font-mono">${formatCurrencyRaw(eq.volume_avg_30d)}</div>
+                     </div>
+                </div>
+            </div>
+        `;
+        container.innerHTML += equityHtml;
+    }
+
+    // 2. Debt Facilities
+    if (memo.debt_facilities && memo.debt_facilities.length > 0) {
+        const debtHtml = `
+            <div>
+                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Debt Facilities</h3>
+                <table class="w-full text-left font-mono text-xs border-collapse">
+                    <thead class="text-slate-500 border-b border-slate-700">
+                        <tr>
+                            <th class="p-2 w-1/4">Facility Type</th>
+                            <th class="p-2 text-right">Committed</th>
+                            <th class="p-2 text-right">Drawn</th>
+                            <th class="p-2 text-right">Rate</th>
+                            <th class="p-2 text-right">Maturity</th>
+                            <th class="p-2 text-center">SNC Rating</th>
+                            <th class="p-2 text-center">DRC</th>
+                            <th class="p-2 text-center">LTV</th>
+                            <th class="p-2 text-center">Conviction</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-slate-300">
+                        ${memo.debt_facilities.map(d => {
+                            // Color logic for SNC
+                            let sncClass = "bg-emerald-500/20 text-emerald-400 border-emerald-500/50";
+                            if (d.snc_rating === "Special Mention") sncClass = "bg-yellow-500/20 text-yellow-400 border-yellow-500/50";
+                            else if (d.snc_rating === "Substandard") sncClass = "bg-orange-500/20 text-orange-400 border-orange-500/50";
+                            else if (d.snc_rating === "Doubtful" || d.snc_rating === "Loss") sncClass = "bg-red-500/20 text-red-400 border-red-500/50";
+
+                            // DRC Bar
+                            const drcPct = (d.drc || 0) * 100;
+                            const drcColor = drcPct > 80 ? 'bg-emerald-500' : (drcPct > 50 ? 'bg-yellow-500' : 'bg-red-500');
+
+                            // LTV Bar (Inverse logic usually, lower is better, but let's just show raw)
+                            const ltvPct = (d.ltv || 0) * 100;
+                            const ltvColor = ltvPct < 60 ? 'bg-emerald-500' : (ltvPct < 80 ? 'bg-yellow-500' : 'bg-red-500');
+
+                            // Conviction Bar
+                            const convPct = (d.conviction_score || 0) * 100;
+                             const convColor = convPct > 80 ? 'bg-blue-500' : (convPct > 50 ? 'bg-purple-500' : 'bg-slate-500');
+
+                            return `
+                            <tr class="border-b border-slate-800/50 hover:bg-slate-800/30">
+                                <td class="p-2 font-bold text-slate-200">${d.facility_type}</td>
+                                <td class="p-2 text-right">${formatCurrency(d.amount_committed)}</td>
+                                <td class="p-2 text-right text-slate-400">${formatCurrency(d.amount_drawn)}</td>
+                                <td class="p-2 text-right text-emerald-400">${d.interest_rate}</td>
+                                <td class="p-2 text-right">${d.maturity_date}</td>
+                                <td class="p-2 text-center">
+                                    <span class="px-2 py-0.5 rounded border text-[9px] uppercase font-bold tracking-wider ${sncClass}">${d.snc_rating}</span>
+                                </td>
+                                <td class="p-2 align-middle">
+                                    <div class="w-16 bg-slate-700 h-1.5 rounded-full ml-auto mr-auto relative group cursor-help">
+                                        <div class="${drcColor} h-1.5 rounded-full" style="width: ${drcPct}%"></div>
+                                        <span class="absolute -top-6 left-1/2 -translate-x-1/2 bg-black text-white text-[9px] px-1 py-0.5 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">${drcPct.toFixed(0)}% Capacity</span>
+                                    </div>
+                                </td>
+                                <td class="p-2 align-middle">
+                                    <div class="w-16 bg-slate-700 h-1.5 rounded-full ml-auto mr-auto relative group cursor-help">
+                                        <div class="${ltvColor} h-1.5 rounded-full" style="width: ${ltvPct}%"></div>
+                                         <span class="absolute -top-6 left-1/2 -translate-x-1/2 bg-black text-white text-[9px] px-1 py-0.5 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">${ltvPct.toFixed(0)}% LTV</span>
+                                    </div>
+                                </td>
+                                <td class="p-2 align-middle">
+                                    <div class="w-16 bg-slate-700 h-1.5 rounded-full ml-auto mr-auto relative group cursor-help">
+                                        <div class="${convColor} h-1.5 rounded-full" style="width: ${convPct}%"></div>
+                                         <span class="absolute -top-6 left-1/2 -translate-x-1/2 bg-black text-white text-[9px] px-1 py-0.5 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">${convPct.toFixed(0)}% Conviction</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        `}).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+        container.innerHTML += debtHtml;
+    } else {
+        container.innerHTML += '<div class="text-slate-400 italic">No debt facility data available.</div>';
+    }
+}
+
 // Tab Switching Logic
 window.switchTab = function(tabName) {
     // Hide all
-    ['memo', 'annex-a', 'annex-b'].forEach(t => {
+    ['memo', 'annex-a', 'annex-b', 'annex-c'].forEach(t => {
         document.getElementById(`tab-${t}`).classList.add('hidden');
         const btn = document.getElementById(`btn-tab-${t}`);
-        btn.classList.remove('border-blue-500', 'text-blue-400');
-        btn.classList.add('border-transparent', 'text-slate-400');
+        if(btn) {
+            btn.classList.remove('border-blue-500', 'text-blue-400');
+            btn.classList.add('border-transparent', 'text-slate-400');
+        }
     });
 
     // Show target
