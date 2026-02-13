@@ -1,44 +1,48 @@
 from playwright.sync_api import sync_playwright
-import os
 
-def verify_archive():
+def verify_archive_update():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
 
-        # Verify Archive Page
-        archive_path = os.path.abspath("showcase/market_mayhem_archive.html")
-        page.goto(f"file://{archive_path}")
-        print(f"Loaded {archive_path}")
+        # Navigate to Archive
+        page.goto("http://localhost:8000/market_mayhem_archive.html")
+        page.wait_for_load_state("networkidle")
 
-        # Check title
-        assert "MARKET MAYHEM ARCHIVE" in page.title()
+        # Search for the new entry
+        item = page.locator(".archive-item").filter(has_text="MARKET MAYHEM: The Weekly Briefing").first
+        if not item.is_visible():
+            print("FAILED: Could not find the new archive item.")
+            browser.close()
+            return
 
-        # Check for 2025 header
-        page.locator(".year-header", has_text="2025 ARCHIVE").wait_for()
+        print("SUCCESS: Found the new archive item.")
 
-        # Check for specific report
-        page.locator(".archive-item", has_text="Nvidia Corporation (NVDA) Report").first.wait_for()
+        # Click the access button within that item
+        item.get_by_role("link", name="ACCESS").click()
 
-        page.screenshot(path="verification_images/archive_page.png")
-        print("Screenshot saved to verification_images/archive_page.png")
+        # Wait for navigation
+        page.wait_for_load_state("networkidle")
 
-        # Verify Report Page
-        report_path = os.path.abspath("showcase/nvda_company_report_20250226.html")
-        page.goto(f"file://{report_path}")
-        print(f"Loaded {report_path}")
+        # Verify content of the new page
+        title = page.title()
+        expected_title = "ADAM v24.1 :: MARKET MAYHEM: The Weekly Briefing"
+        if title != expected_title:
+            print(f"FAILED: Title mismatch. Expected '{expected_title}', got '{title}'")
+        else:
+            print("SUCCESS: Title matches.")
 
-        # Check title
-        assert "Nvidia Corporation (NVDA) Report" in page.locator("h1.title").text_content()
+        # Check for specific content
+        if page.get_by_text("The Dow has finally punched through the psychological 50,000 barrier").count() > 0:
+             print("SUCCESS: Content verified.")
+        else:
+             print("FAILED: Content mismatch.")
 
-        # Check content
-        assert "Executive Summary" in page.content()
-        assert "315" in page.content() # Price target
-
-        page.screenshot(path="verification_images/report_page.png")
-        print("Screenshot saved to verification_images/report_page.png")
+        # Screenshot
+        page.screenshot(path="verification/archive_verification_manual.png", full_page=True)
+        print("Screenshot saved to verification/archive_verification_manual.png")
 
         browser.close()
 
 if __name__ == "__main__":
-    verify_archive()
+    verify_archive_update()

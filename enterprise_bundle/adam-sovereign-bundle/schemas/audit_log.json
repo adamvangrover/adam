@@ -1,14 +1,36 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Audit Log",
-  "description": "Schema for regulatory reporting.",
+  "description": "Schema for regulatory audit logs and compliance reporting.",
   "type": "object",
   "properties": {
-    "timestamp": {"type": "string", "format": "date-time"},
-    "event_type": {"type": "string", "enum": ["QUERY", "DECISION", "ERROR"]},
-    "agent_id": {"type": "string"},
-    "details": {"type": "object"},
-    "status": {"type": "string", "enum": ["SUCCESS", "FAILURE", "PENDING"]}
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "event_type": {
+      "type": "string",
+      "description": "The classification of the event (maps to 'action').",
+      "enum": ["QUERY", "DECISION", "ERROR", "GENERATION"]
+    },
+    "agent_id": {
+      "type": "string",
+      "description": "Unique identifier for the agent or actor initiating the event."
+    },
+    "status": {
+      "type": "string",
+      "description": "Outcome of the operation.",
+      "enum": ["SUCCESS", "FAILURE", "PENDING"]
+    },
+    "details": {
+      "type": "object",
+      "description": "Contextual payload, including input arguments or error traces."
+    }
   },
-  "required": ["timestamp", "event_type", "agent_id"]
+  "required": [
+    "timestamp",
+    "event_type",
+    "agent_id",
+    "status"
+  ]
 }
