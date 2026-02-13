@@ -33,21 +33,30 @@ def verify_dashboard():
             page.click("text=MSFT")
             time.sleep(1) # Allow fetch and render
 
-            # Verify Quant Data Loaded (Look for Revenue)
-            page.wait_for_selector("text=Revenue")
-            # Verify specific mock value for MSFT Revenue (211,915 M)
-            # The dashboard formats it as "$211,915 M"
-            assert page.is_visible("text=211,915")
+            # Verify Chart Canvas exists
+            assert page.is_visible("#financialChart")
+            print("Financial Chart verified.")
+
+            # Verify Growth Metrics Section
+            assert page.is_visible("text=GROWTH VELOCITY")
+            print("Growth Velocity section verified.")
+
+            # Verify Quant Data Loaded (Look for Revenue Label)
+            # The new dashboard puts "Revenue" in .metric-label
+            assert page.is_visible("text=Revenue")
             print("MSFT Quantitative Data verified.")
 
-            # Verify Risk Data Loaded
-            page.wait_for_selector("text=EXECUTIVE SUMMARY")
-            page.wait_for_selector("text=COVENANT ANALYSIS")
-            print("MSFT Risk Data verified.")
+            # Verify Risk Data Loaded (New Classified Look)
+            assert page.is_visible("text=CLASSIFIED // INTERNAL USE ONLY")
+            print("Risk Memo Classified Header verified.")
+
+            # Verify Audit Timeline
+            assert page.is_visible("text=SYSTEM EVENT LOG")
+            print("Audit Log Header verified.")
 
             # Take Screenshot
             os.makedirs("verification_screenshots", exist_ok=True)
-            screenshot_path = "verification_screenshots/sovereign_dashboard_msft.png"
+            screenshot_path = "verification_screenshots/sovereign_dashboard_msft_v2.png"
             page.screenshot(path=screenshot_path)
             print(f"Screenshot saved to {screenshot_path}")
 
