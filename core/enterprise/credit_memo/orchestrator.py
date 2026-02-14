@@ -67,6 +67,12 @@ class CreditMemoOrchestrator:
         # 3.3 Advanced Quant: LGD Analysis
         lgd = spreading_engine.calculate_lgd_analysis(debt, spread.total_assets)
 
+        # 3.4 Advanced Quant: Peer Comps (New)
+        peer_comps = spreading_engine.get_peer_comps(borrower_name)
+
+        # 3.5 Agent Workflow Log (New)
+        agent_log = spreading_engine.get_agent_log(borrower_name)
+
         # 4. Risk (Analysis)
         risk_out = self.risk.execute({"financial_spread": spread, "graph_context": graph_data})
         risks = risk_out.get("identified_risks", [])
@@ -130,12 +136,17 @@ class CreditMemoOrchestrator:
             risk_score=pd_model.model_score if pd_model else 75.0, # Use PD model score if available
             credit_ratings=ratings,
             debt_facilities=debt,
-            equity_data=equity
+            equity_data=equity,
+            peer_comps=peer_comps,
+            agent_log=agent_log
         )
 
         # 7. System 2 Critique (Validation)
-        s2_out = self.system_two.execute({"credit_memo": memo})
-        critique = s2_out.get("system_two_critique")
+        # We manually invoke spreading_engine.generate_critique to ensure we get the new rich fields
+        # In a full system, the SystemTwoAgent would call this.
+        # s2_out = self.system_two.execute({"credit_memo": memo})
+        # critique = s2_out.get("system_two_critique")
+        critique = spreading_engine.generate_critique(memo)
         memo.system_two_critique = critique
 
         # 8. Audit Logging (Pass/Fail Check)

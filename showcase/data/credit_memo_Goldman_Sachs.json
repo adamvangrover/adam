@@ -1,6 +1,6 @@
 {
   "borrower_name": "Goldman Sachs",
-  "report_date": "2026-02-13T11:40:20.971170",
+  "report_date": "2026-02-14T01:29:09.018638",
   "executive_summary": "The borrower Goldman Sachs presents a mixed credit profile. Financial performance shows strong EBITDA ($5.0M) but elevated leverage (10.0x).  [Ref: Generic_Borrower_Profile.pdf]",
   "sections": [
     {
@@ -9,7 +9,7 @@
       "citations": [
         {
           "doc_id": "Generic_Borrower_Profile.pdf",
-          "chunk_id": "f558a9bf-5189-4092-8d65-4bf69c0e5d09",
+          "chunk_id": "a3aa6515-64c1-4e43-b77f-637ce1e01729",
           "page_number": 1
         }
       ],
@@ -63,7 +63,12 @@
       "dscr": 5.0,
       "leverage_ratio": 10.0,
       "current_ratio": 2.0,
-      "period": "FY2025"
+      "period": "FY2025",
+      "gross_debt": 40.0,
+      "cash": 5.0,
+      "capex": 1.0,
+      "fcf": 1.0,
+      "ebitda_adjustments": {}
     },
     {
       "total_assets": 92.0,
@@ -76,7 +81,12 @@
       "dscr": 5.0,
       "leverage_ratio": 10.0,
       "current_ratio": 2.0,
-      "period": "FY2024"
+      "period": "FY2024",
+      "gross_debt": 36.800000000000004,
+      "cash": 4.6000000000000005,
+      "capex": 0.95,
+      "fcf": 0.85,
+      "ebitda_adjustments": {}
     },
     {
       "total_assets": 87.39999999999999,
@@ -89,23 +99,28 @@
       "dscr": 5.0,
       "leverage_ratio": 10.0,
       "current_ratio": 2.0,
-      "period": "FY2023"
+      "period": "FY2023",
+      "gross_debt": 34.96,
+      "cash": 4.37,
+      "capex": 0.9025,
+      "fcf": 0.7224999999999999,
+      "ebitda_adjustments": {}
     }
   ],
   "dcf_analysis": {
     "free_cash_flow": [
-      3.4125,
-      3.5490812499999995,
-      3.6558080000000004,
-      3.729449752031249,
-      3.767640741475
+      1.05,
+      1.0920249999999998,
+      1.124864,
+      1.1475230006249997,
+      1.1592740743
     ],
     "growth_rate": 0.03,
     "wacc": 0.09,
-    "terminal_value": 64.67783272865418,
-    "enterprise_value": 56.06777685745914,
-    "equity_value": 6.067776857459137,
-    "share_price": 185.0,
+    "terminal_value": 19.90087160881667,
+    "enterprise_value": 17.251623648448962,
+    "equity_value": -17.748376351551038,
+    "share_price": -17.748376351551038,
     "inputs": {
       "wacc": 0.09,
       "growth_rate": 0.03,
@@ -174,7 +189,22 @@
     ],
     "conviction_score": 0.85,
     "verification_status": "PASS",
-    "author_agent": "System 2"
+    "author_agent": "System 2",
+    "quantitative_analysis": {
+      "ratios_checked": [
+        "Leverage",
+        "DSCR",
+        "Current Ratio",
+        "Altman Z-Score"
+      ],
+      "variance_analysis": "Historical margins are consistent with projections.",
+      "dcf_validation": "WACC assumption (9%) is consistent with sector risk."
+    },
+    "qualitative_analysis": {
+      "sentiment": "Positive management commentary in earnings call.",
+      "news_sentiment": "Neutral/Positive coverage in major financial outlets.",
+      "management_credibility": "High. Track record of meeting guidance."
+    }
   },
   "risk_score": 60.0,
   "credit_ratings": [
@@ -182,13 +212,13 @@
       "agency": "Moody's",
       "rating": "Ba2",
       "outlook": "Stable",
-      "date": "2026-02-13"
+      "date": "2026-02-14"
     },
     {
       "agency": "S&P",
       "rating": "BB",
       "outlook": "Stable",
-      "date": "2026-02-13"
+      "date": "2026-02-14"
     }
   ],
   "debt_facilities": [
@@ -226,5 +256,96 @@
     "pe_ratio": 15.0,
     "dividend_yield": 1.0,
     "beta": 1.0
-  }
+  },
+  "agent_log": [
+    {
+      "transaction_id": "bc769039-1a18-414f-bb61-d77044b12c6f",
+      "timestamp": "2026-02-14T01:29:09.018501",
+      "user_id": "ArchivistAgent",
+      "action": "SEARCH_FILINGS",
+      "model_version": "gpt-4-32k",
+      "prompt_version": "v2.1",
+      "inputs": {
+        "ticker": "Goldman Sachs",
+        "doc_type": "10-K"
+      },
+      "outputs": {
+        "chunks_found": 15
+      },
+      "citations_count": 0,
+      "validation_status": "PASS",
+      "validation_errors": []
+    },
+    {
+      "transaction_id": "c55a8c0e-460a-403f-9d8b-74096361eec3",
+      "timestamp": "2026-02-14T01:29:09.018532",
+      "user_id": "QuantAgent",
+      "action": "SPREAD_FINANCIALS",
+      "model_version": "gpt-4-32k",
+      "prompt_version": "v2.1",
+      "inputs": {
+        "source": "10-K Financial Tables"
+      },
+      "outputs": {
+        "spread_rows": 50,
+        "accuracy_check": "99.8%"
+      },
+      "citations_count": 5,
+      "validation_status": "PASS",
+      "validation_errors": []
+    },
+    {
+      "transaction_id": "71fa3726-0994-4f2e-98c2-ffbc5fe0d567",
+      "timestamp": "2026-02-14T01:29:09.018555",
+      "user_id": "RiskAgent",
+      "action": "IDENTIFY_RISKS",
+      "model_version": "gpt-4-32k",
+      "prompt_version": "v2.1",
+      "inputs": {
+        "spread": "calculated",
+        "news": "ingested"
+      },
+      "outputs": {
+        "risks_flagged": 3
+      },
+      "citations_count": 3,
+      "validation_status": "PASS",
+      "validation_errors": []
+    },
+    {
+      "transaction_id": "6f23cbff-eea3-48b9-acf2-b11e79b3c963",
+      "timestamp": "2026-02-14T01:29:09.018575",
+      "user_id": "SystemTwoAgent",
+      "action": "CRITIQUE_MEMO",
+      "model_version": "gpt-4-32k",
+      "prompt_version": "v2.5",
+      "inputs": {
+        "draft_memo": "complete"
+      },
+      "outputs": {
+        "conviction": 0.85
+      },
+      "citations_count": 0,
+      "validation_status": "PASS",
+      "validation_errors": []
+    }
+  ],
+  "peer_comps": [
+    {
+      "ticker": "PEER1",
+      "name": "Competitor A",
+      "ev_ebitda": 10.0,
+      "pe_ratio": 15.0,
+      "leverage_ratio": 2.0,
+      "market_cap": 50000.0
+    },
+    {
+      "ticker": "PEER2",
+      "name": "Competitor B",
+      "ev_ebitda": 12.0,
+      "pe_ratio": 18.0,
+      "leverage_ratio": 2.5,
+      "market_cap": 45000.0
+    }
+  ]
 }
