@@ -1,6 +1,6 @@
 {
   "borrower_name": "Apple Inc.",
-  "report_date": "2026-02-13T02:55:10.464462",
+  "report_date": "2026-02-13T11:40:20.963415",
   "executive_summary": "The borrower Apple Inc. presents a mixed credit profile. Financial performance shows strong EBITDA ($132000.0M) but elevated leverage (2.2x).  [Ref: AAPL_10Q_FY25_Q1.pdf]",
   "sections": [
     {
@@ -9,7 +9,7 @@
       "citations": [
         {
           "doc_id": "AAPL_10Q_FY25_Q1.pdf",
-          "chunk_id": "0d3a1212-ba47-4b82-8e63-86095f384263",
+          "chunk_id": "c7afd71e-c577-4094-8189-d06b1a0181fc",
           "page_number": 6
         }
       ],
@@ -17,7 +17,7 @@
     },
     {
       "title": "Key Risks & Mitigants",
-      "content": "Key Risks:\n- CONNECTED PARTY RISK: Google (Alphabet) via Apple Inc. -> Google (Alphabet) is High risk.\n- CONNECTED PARTY RISK: European Commission via Apple Inc. -> European Commission is High risk.\n",
+      "content": "Key Risks:\n- CONNECTED PARTY RISK: European Commission via Apple Inc. -> European Commission is High risk.\n- CONNECTED PARTY RISK: Google (Alphabet) via Apple Inc. -> Google (Alphabet) is High risk.\n",
       "citations": [],
       "author_agent": "Risk Officer"
     },
@@ -27,6 +27,21 @@
       "citations": [],
       "author_agent": "Quant"
     }
+  ],
+  "key_strengths": [
+    "Market leading position in core segment.",
+    "Strong EBITDA generation ($132000.0M).",
+    "Diversified customer base."
+  ],
+  "key_weaknesses": [
+    "Elevated leverage at 2.2x.",
+    "Exposure to cyclical end-markets.",
+    "Recent management turnover."
+  ],
+  "mitigants": [
+    "Strong free cash flow conversion.",
+    "Demonstrated ability to deleverage.",
+    "Sponsor support."
   ],
   "financial_ratios": {
     "leverage_ratio": 2.20530303030303,
@@ -90,9 +105,88 @@
     "terminal_value": 1707494.7840364703,
     "enterprise_value": 1480189.309036921,
     "equity_value": 1189089.309036921,
-    "share_price": 185.0
+    "share_price": 185.0,
+    "inputs": {
+      "wacc": 0.09,
+      "growth_rate": 0.03,
+      "tax_rate_proxy": 0.35,
+      "capex_margin": 0.05
+    }
   },
-  "risk_score": 75.0,
+  "pd_model": {
+    "input_factors": {
+      "Leverage Ratio": 2.20530303030303,
+      "DSCR": 33.84615384615385,
+      "Liquidity (Current Ratio)": 0.98,
+      "EBITDA Margin": 0.3375959079283887
+    },
+    "model_score": 80.0,
+    "implied_rating": "A",
+    "one_year_pd": 0.001,
+    "five_year_pd": 0.01
+  },
+  "lgd_analysis": {
+    "seniority_structure": [
+      {
+        "tranche": "Revolving Credit Facility",
+        "amount": 10000.0,
+        "recovery_est": "90%"
+      },
+      {
+        "tranche": "Senior Unsecured Notes (2030)",
+        "amount": 2500.0,
+        "recovery_est": "70%"
+      },
+      {
+        "tranche": "Senior Unsecured Notes (2040)",
+        "amount": 1500.0,
+        "recovery_est": "60%"
+      },
+      {
+        "tranche": "Term Loan A",
+        "amount": 5000.0,
+        "recovery_est": "80%"
+      }
+    ],
+    "recovery_rate_assumption": 0.75,
+    "loss_given_default": 0.25
+  },
+  "scenario_analysis": {
+    "scenarios": [
+      {
+        "name": "Bear Case",
+        "probability": 0.2,
+        "revenue_growth": -0.05,
+        "ebitda_margin": 0.2,
+        "implied_share_price": 105.0
+      },
+      {
+        "name": "Base Case",
+        "probability": 0.5,
+        "revenue_growth": 0.05,
+        "ebitda_margin": 0.3,
+        "implied_share_price": 150.0
+      },
+      {
+        "name": "Bull Case",
+        "probability": 0.3,
+        "revenue_growth": 0.12,
+        "ebitda_margin": 0.35,
+        "implied_share_price": 210.0
+      }
+    ],
+    "weighted_share_price": 159.0
+  },
+  "system_two_critique": {
+    "critique_points": [
+      "Credit thesis aligns with macro outlook.",
+      "Valuation assumptions appear conservative."
+    ],
+    "conviction_score": 0.85,
+    "verification_status": "PASS",
+    "author_agent": "System 2"
+  },
+  "risk_score": 80.0,
   "credit_ratings": [
     {
       "agency": "Moody's",
@@ -123,7 +217,9 @@
       "snc_rating": "Pass",
       "drc": 1.0,
       "ltv": 0.0,
-      "conviction_score": 0.98
+      "conviction_score": 0.98,
+      "lgd": 0.1,
+      "recovery_rate": 0.9
     },
     {
       "facility_type": "Senior Unsecured Notes (2030)",
@@ -134,7 +230,9 @@
       "snc_rating": "Pass",
       "drc": 1.0,
       "ltv": 0.1,
-      "conviction_score": 0.95
+      "conviction_score": 0.95,
+      "lgd": 0.3,
+      "recovery_rate": 0.7
     },
     {
       "facility_type": "Senior Unsecured Notes (2040)",
@@ -145,7 +243,9 @@
       "snc_rating": "Pass",
       "drc": 1.0,
       "ltv": 0.1,
-      "conviction_score": 0.92
+      "conviction_score": 0.92,
+      "lgd": 0.4,
+      "recovery_rate": 0.6
     },
     {
       "facility_type": "Term Loan A",
@@ -156,7 +256,9 @@
       "snc_rating": "Pass",
       "drc": 1.0,
       "ltv": 0.2,
-      "conviction_score": 0.9
+      "conviction_score": 0.9,
+      "lgd": 0.2,
+      "recovery_rate": 0.8
     }
   ],
   "equity_data": {
