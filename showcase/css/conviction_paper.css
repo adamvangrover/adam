@@ -1,0 +1,180 @@
+:root {
+    --paper-bg: #fdfbf7;
+    --paper-shadow: 0 0 20px rgba(0,0,0,0.5);
+    --ink-color: #222;
+    --accent-red: #cc0000;
+    --font-serif: 'Georgia', 'Times New Roman', serif;
+    --font-mono: 'Courier New', monospace;
+    --binder-bg: #1a1a1a;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--binder-bg);
+    color: var(--ink-color);
+    font-family: var(--font-serif);
+    overflow-x: hidden;
+}
+
+/* Binder View Navigation */
+.binder-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: #111;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    box-sizing: border-box;
+    z-index: 1000;
+    border-bottom: 2px solid #333;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.binder-btn {
+    background: #333;
+    color: #fff;
+    border: 1px solid #555;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    text-transform: uppercase;
+}
+.binder-btn:hover {
+    background: #444;
+    border-color: #888;
+}
+.binder-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.print-btn {
+    background: #000;
+    color: #fff;
+    border: 1px solid #fff;
+}
+.print-btn:hover {
+    background: #fff;
+    color: #000;
+}
+
+/* Paper Sheet Container */
+.binder-container {
+    margin-top: 80px;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 50px;
+    min-height: calc(100vh - 130px);
+}
+
+.paper-sheet {
+    width: 210mm; /* A4 width */
+    min-height: 297mm; /* A4 height */
+    background: var(--paper-bg);
+    padding: 25mm;
+    box-sizing: border-box;
+    box-shadow: var(--paper-shadow);
+    position: relative;
+    font-size: 12pt;
+    line-height: 1.6;
+}
+
+/* Texture Effect */
+.paper-sheet::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg width='4' height='4' viewBox='0 0 4 4' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 3h1v1H1V3zm2-2h1v1H3V1z' fill='%23000000' fill-opacity='0.02' fill-rule='evenodd'/%3E%3C/svg%3E");
+    pointer-events: none;
+}
+
+/* Typography */
+h1.headline {
+    font-family: var(--font-serif);
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-align: center;
+    text-transform: uppercase;
+    border-bottom: 3px double var(--ink-color);
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+}
+
+h2 {
+    font-family: var(--font-serif);
+    font-size: 1.4rem;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 5px;
+    margin-top: 30px;
+}
+
+.meta-header {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    border-bottom: 1px solid #000;
+    padding-bottom: 5px;
+    margin-bottom: 20px;
+}
+
+.conviction-stamp {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    border: 3px solid var(--accent-red);
+    color: var(--accent-red);
+    font-family: 'Stencil', var(--font-mono);
+    font-size: 1.5rem;
+    padding: 10px;
+    transform: rotate(-15deg);
+    opacity: 0.8;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.footer-note {
+    margin-top: 50px;
+    font-size: 0.8rem;
+    text-align: center;
+    font-style: italic;
+    color: #666;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+}
+
+/* Print Styles */
+@media print {
+    body {
+        background: #fff;
+    }
+    .binder-nav {
+        display: none;
+    }
+    .binder-container {
+        margin: 0;
+        display: block;
+    }
+    .paper-sheet {
+        box-shadow: none;
+        margin: 0;
+        width: 100%;
+        min-height: auto;
+        page-break-after: always;
+        padding: 0; /* Let printer handle margins or keep padding if needed */
+    }
+    .paper-sheet::before {
+        display: none; /* Remove texture for clean print */
+    }
+}

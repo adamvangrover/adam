@@ -105,6 +105,15 @@ async def async_main():
                 if user_input.lower() in ["exit", "quit"]:
                     break
 
+                # Runtime Seed Injection
+                if user_input.startswith("/seed "):
+                    new_prompt = user_input[len("/seed "):].strip()
+                    if new_prompt:
+                        context["system_prompt"] = new_prompt
+                        print("Adam> System Prompt Updated (Runtime Seed Injected).")
+                        logger.info(f"Runtime Seed Injected: {new_prompt[:50]}...")
+                        continue
+
                 if not user_input.strip():
                     continue
 

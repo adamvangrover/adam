@@ -1097,6 +1097,14 @@ def generate_archive():
 
     sorted_items = get_all_data()
 
+    # Dump JSON Index for Conviction Paper Viewer
+    json_path = os.path.join("showcase/data", "market_mayhem_index.json")
+    # Ensure directory exists
+    os.makedirs(os.path.dirname(json_path), exist_ok=True)
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(sorted_items, f, default=str, indent=2)
+    print(f"Generated Index JSON: {json_path}")
+
     # 3. Generate HTML Reports (Only for sourced items that need generation)
     print(f"Generating report pages for sourced items...")
     count = 0
