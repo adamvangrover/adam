@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM :: SYSTEM TERMINAL</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #050b14;
+            color: #00ff00;
+            font-family: 'JetBrains Mono', monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .crt::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        .header {
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .terminal-window {
+            flex-grow: 1;
+            overflow-y: auto;
+            border: 1px solid #333;
+            background: rgba(0, 20, 0, 0.3);
+            padding: 15px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .prompt-area {
+            border-top: 1px solid #333;
+            padding-top: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-line {
+            background: transparent;
+            border: none;
+            color: #00ff00;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            flex-grow: 1;
+            margin-left: 10px;
+            outline: none;
+        }
+
+        .system-prompt-display {
+            border: 1px dashed #00ff00;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 0.8rem;
+            color: #ccc;
+        }
+
+        .blink { animation: blinker 1s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
+
+        .log-entry { margin-bottom: 5px; }
+        .log-user { color: #fff; }
+        .log-system { color: #00ff00; }
+        .log-error { color: #ff0000; }
+        .log-info { color: #00ccff; }
+
+    </style>
+</head>
+<body class="crt">
+
+    <div class="header">
+        <span>ADAM v30.0 :: CORE TERMINAL</span>
+        <span><a href="market_mayhem_rebuild.html" style="color: #00ff00; text-decoration: none;">[EXIT]</a></span>
+    </div>
+
+    <div class="system-prompt-display">
+        <strong style="color:#00ff00">ACTIVE SYSTEM PROMPT:</strong><br>
+        <span id="currentPrompt">You are Adam, an advanced autonomous financial intelligence system. Your goal is to analyze market data, identify risks, and maximize alpha while maintaining strict risk controls.</span>
+    </div>
+
+    <div class="terminal-window" id="terminalOutput">
+        <div class="log-entry log-system">System initialized.</div>
+        <div class="log-entry log-system">Connected to Meta-Orchestrator v2.5.</div>
+        <div class="log-entry log-info">Type '/help' for commands.</div>
+        <div class="log-entry log-info">Type '/seed <new_prompt>' to inject runtime instructions.</div>
+    </div>
+
+    <div class="prompt-area">
+        <span>root@adam:~$</span>
+        <input type="text" class="input-line" id="cmdInput" autofocus autocomplete="off">
+    </div>
+
+    <script>
+        const input = document.getElementById('cmdInput');
+        const output = document.getElementById('terminalOutput');
+        const promptDisplay = document.getElementById('currentPrompt');
+
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const cmd = input.value;
+                processCommand(cmd);
+                input.value = '';
+            }
+        });
+
+        function log(msg, type='log-system') {
+            const div = document.createElement('div');
+            div.className = `log-entry ${type}`;
+            div.textContent = msg;
+            output.appendChild(div);
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function processCommand(cmd) {
+            log(`root@adam:~$ ${cmd}`, 'log-user');
+
+            if (!cmd.trim()) return;
+
+            const parts = cmd.trim().split(' ');
+            const command = parts[0].toLowerCase();
+            const args = parts.slice(1).join(' ');
+
+            setTimeout(() => {
+                if (command === '/help') {
+                    log("Available Commands:", 'log-info');
+                    log("  /seed <text>   - Inject new system prompt (Runtime)", 'log-info');
+                    log("  /status        - Show system status", 'log-info');
+                    log("  /clear         - Clear terminal", 'log-info');
+                    log("  /reset         - Reset system prompt to default", 'log-info');
+                } else if (command === '/seed') {
+                    if (!args) {
+                        log("Error: Missing prompt text. Usage: /seed <text>", 'log-error');
+                    } else {
+                        log("Injecting seed...", 'log-system');
+                        setTimeout(() => {
+                            promptDisplay.textContent = args;
+                            promptDisplay.style.color = '#ff00ff'; // visual cue
+                            setTimeout(() => promptDisplay.style.color = '#ccc', 500);
+                            log("System Prompt Updated Successfully.", 'log-system');
+                            log(`New Directive: "${args}"`, 'log-info');
+                        }, 500);
+                    }
+                } else if (command === '/status') {
+                    log("System: ONLINE", 'log-system');
+                    log("CPU: 12% | MEM: 45GB | NET: 10Gbps", 'log-system');
+                    log("Active Agents: 14", 'log-system');
+                } else if (command === '/clear') {
+                    output.innerHTML = '';
+                } else if (command === '/reset') {
+                    promptDisplay.textContent = "You are Adam, an advanced autonomous financial intelligence system. Your goal is to analyze market data, identify risks, and maximize alpha while maintaining strict risk controls.";
+                    log("System Prompt Reset to Default.", 'log-system');
+                } else {
+                    log(`Command not found: ${command}`, 'log-error');
+                }
+            }, 200); // Fake latency
+        }
+    </script>
+</body>
+</html>
