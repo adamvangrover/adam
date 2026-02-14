@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         progressText: document.getElementById('progress-text'),
         agentStatus: document.getElementById('agent-status'),
         auditLogPanel: document.getElementById('audit-log-panel'),
-        auditLogContent: document.getElementById('audit-log-content'),
+        auditLogContent: document.getElementById('audit-table-body'),
         borrowerSelect: document.getElementById('borrower-select'),
         libraryList: document.getElementById('library-list')
     };
@@ -70,6 +70,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             const memo = await window.universalLoader.loadCreditMemo(identifier);
             if (!memo) throw new Error("No data found");
 
+            console.log("Loaded Memo Keys:", Object.keys(memo));
+            if(memo.agent_log) console.log("Agent Log Length:", memo.agent_log.length);
+            else console.log("Agent Log Missing");
+
             currentMemo = memo;
 
             if (memo.historical_financials && Array.isArray(memo.historical_financials)) {
@@ -77,6 +81,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else {
                  renderMemoFromMock(memo);
             }
+
+            // NEW: Render Persistent Agent Log
+            if (memo.agent_log && elements.auditLogContent) {
+                elements.auditLogContent.innerHTML = ''; // Clear session log
+                memo.agent_log.reverse().forEach(entry => {
+                   const time = new Date(entry.timestamp).toLocaleTimeString();
+                   const tr = document.createElement('tr');
+                   tr.style.borderBottom = '1px solid var(--glass-border, #333)';
+                   tr.innerHTML = `
+                        <td style="padding: 8px; color: var(--text-secondary, #666); font-size: 0.8em; font-family:monospace;">${time}</td>
+                        <td style="padding: 8px; color: var(--accent-color, #007bff); font-weight: bold;">${entry.user_id}</td>
+                        <td style="padding: 8px; color: var(--text-primary, #ccc);">${entry.action}</td>
+                        <td style="padding: 8px; color: var(--text-secondary, #888); font-size: 0.9em;">${JSON.stringify(entry.outputs).substring(0, 40)}...</td>
+                   `;
+                   elements.auditLogContent.appendChild(tr);
+                });
+            }
+
         } catch(e) {
             console.error("Could not load memo file:", e);
             logAudit("System", "Error", `Failed to load ${identifier}`);
@@ -105,9 +127,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             .then(() => simulateAgent("Quant", "Spreading financials...", 33, 1200))
             .then(() => simulateAgent("Risk Officer", "Analyzing risks...", 66, 1000))
             .then(() => simulateAgent("System 2", "Validating & Critiquing...", 90, 1500))
-            .then(() => {
+            .then(async () => {
+                console.log("Workflow finished. Loading memo...");
+                await loadCreditMemo(borrower);
+                console.log("Memo loaded. Hiding progress...");
                 if(elements.progressContainer) elements.progressContainer.style.display = 'none';
-                loadCreditMemo(borrower);
                 logAudit("Orchestrator", "Complete", `Memo generated.`);
             });
     }
@@ -118,10 +142,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             if(elements.agentStatus) elements.agentStatus.innerText = statusText;
             if(elements.progressFill) elements.progressFill.style.width = `${progressStart}%`;
 
-            logAudit(agentName, "Start", statusText);
+            // Only log if we are in a "live" simulation mode, otherwise the persistent log takes over
+            // logAudit(agentName, "Start", statusText);
 
             setTimeout(() => {
-                logAudit(agentName, "Complete", "Task finished");
+                // logAudit(agentName, "Complete", "Task finished");
                 resolve();
             }, duration);
         });
@@ -167,7 +192,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         if(memoContainer) memoContainer.innerHTML = generateMemoHtml(memo);
 
         const finTable = document.getElementById('financials-table');
-        if(finTable) finTable.innerHTML = generateFinancialsTableContent(memo);
+        if(finTable) {
+             finTable.innerHTML = generateFinancialsTableContent(memo);
+
+             // NEW: Financial Adjustments Panel
+             const existingPanel = document.getElementById('fin-adjustments-panel');
+             if(existingPanel) existingPanel.remove();
+
+             const adjPanel = document.createElement('div');
+             adjPanel.id = 'fin-adjustments-panel';
+             adjPanel.className = "mt-6 border-t border-slate-700/50 pt-6";
+             adjPanel.innerHTML = generateFinancialAdjustmentsHtml(memo);
+
+             finTable.parentElement.parentElement.appendChild(adjPanel); // Append to card container
+             setupFinancialListeners(memo);
+        }
 
         const dcfContainer = document.getElementById('dcf-container');
         if(dcfContainer) dcfContainer.innerHTML = generateDcfHtml(memo);
@@ -215,7 +254,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const sections = memo.sections || [];
         sections.forEach(sec => {
             let content = sec.content.replace(/\[Ref:\s*(.*?)\]/g, (match, docId) => {
-                 return `<span class="citation-tag bg-blue-50 text-blue-600 px-1 rounded cursor-pointer hover:bg-blue-100 transition" onclick="viewEvidence('${docId}')"><i class="fas fa-search mr-1"></i>[${docId}]</span>`;
+                 // Look up citation metadata
+                 const citation = sec.citations ? sec.citations.find(c => c.doc_id === docId) : null;
+                 const chunkId = citation ? citation.chunk_id : '';
+                 const page = citation ? citation.page_number : 1;
+
+                 return `<span class="citation-tag bg-blue-50 text-blue-600 px-1 rounded cursor-pointer hover:bg-blue-100 transition" onclick="viewEvidence('${docId}', '${chunkId}', ${page})"><i class="fas fa-search mr-1"></i>[${docId}]</span>`;
             });
 
             html += `
@@ -252,7 +296,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             { key: "revenue", label: "Revenue" },
             { key: "ebitda", label: "EBITDA" },
             { key: "net_income", label: "Net Income" },
-            { key: "leverage_ratio", label: "Leverage (x)", fmt: (v) => v.toFixed(2) + 'x' },
+            { key: "gross_debt", label: "Gross Debt" },
+            { key: "cash", label: "Cash & Equiv." },
+            { key: "leverage_ratio", label: "Net Leverage (x)", fmt: (v) => v.toFixed(2) + 'x' },
             { key: "dscr", label: "DSCR (x)", fmt: (v) => v.toFixed(2) + 'x' }
         ];
 
@@ -262,6 +308,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             html += `<td class="p-3 text-blue-400 font-bold">${m.label}</td>`;
             memo.historical_financials.forEach(period => {
                 let val = period[m.key];
+                if (val === undefined) val = 0;
                 val = m.fmt ? m.fmt(val) : formatCurrency(val);
                 html += `<td class="p-3 text-right text-slate-300">${val}</td>`;
             });
@@ -269,6 +316,89 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         html += `</tbody>`;
         return html;
+    }
+
+    // NEW: Financial Adjustments HTML
+    function generateFinancialAdjustmentsHtml(memo) {
+        const latest = memo.historical_financials[0];
+        const adjustments = latest.ebitda_adjustments || {};
+
+        return `
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest"><i class="fas fa-sliders-h mr-2"></i>Financial Adjustments (Client-Side)</h3>
+                <button id="btn-recalc-fin" class="text-xs bg-blue-900/50 text-blue-400 border border-blue-500/30 px-3 py-1 rounded hover:bg-blue-800/50 transition">
+                    <i class="fas fa-sync-alt mr-1"></i> Recalculate
+                </button>
+            </div>
+            <div class="grid grid-cols-2 gap-6">
+                <div class="bg-slate-800/30 p-4 rounded border border-slate-700/50">
+                    <h4 class="text-xs text-slate-500 uppercase mb-3">EBITDA Add-backs</h4>
+                    <div class="space-y-3" id="ebitda-adj-inputs">
+                        ${Object.entries(adjustments).map(([k,v]) => `
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm text-slate-400">${k}</span>
+                                <input type="number" class="bg-slate-900 border border-slate-700 rounded w-24 px-2 py-1 text-right text-xs text-white font-mono adj-input" data-key="${k}" value="${v}">
+                            </div>
+                        `).join('')}
+                        <div class="flex justify-between items-center pt-2 border-t border-slate-700/50">
+                            <span class="text-sm text-emerald-400 font-bold">Adj. EBITDA</span>
+                            <span class="text-sm text-emerald-400 font-mono font-bold" id="output-adj-ebitda">${formatCurrency(latest.ebitda)}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-slate-800/30 p-4 rounded border border-slate-700/50">
+                    <h4 class="text-xs text-slate-500 uppercase mb-3">Cash Flow Inputs</h4>
+                    <div class="flex justify-between items-center mb-2">
+                         <span class="text-sm text-slate-400">Capex</span>
+                         <input type="number" id="input-capex" class="bg-slate-900 border border-slate-700 rounded w-24 px-2 py-1 text-right text-xs text-white font-mono" value="${latest.capex || 0}">
+                    </div>
+                    <div class="flex justify-between items-center mb-2">
+                         <span class="text-sm text-slate-400">Cash Interest</span>
+                         <input type="number" id="input-interest" class="bg-slate-900 border border-slate-700 rounded w-24 px-2 py-1 text-right text-xs text-white font-mono" value="${latest.interest_expense || 0}">
+                    </div>
+                    <div class="mt-4 pt-2 border-t border-slate-700/50">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-blue-400 font-bold">Free Cash Flow</span>
+                            <span class="text-sm text-blue-400 font-mono font-bold" id="output-fcf">${formatCurrency(latest.fcf || 0)}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function setupFinancialListeners(memo) {
+        const btn = document.getElementById('btn-recalc-fin');
+        if(!btn) return;
+
+        btn.addEventListener('click', () => {
+            const latest = memo.historical_financials[0];
+            let baseEbitda = latest.ebitda;
+
+            let currentAdjSum = 0;
+            document.querySelectorAll('.adj-input').forEach(inp => {
+                currentAdjSum += parseFloat(inp.value) || 0;
+            });
+
+            let originalAdjSum = 0;
+            if(latest.ebitda_adjustments) {
+                Object.values(latest.ebitda_adjustments).forEach(v => originalAdjSum += v);
+            }
+
+            // New EBITDA = Original EBITDA - Original Adj + New Adj
+            const newEbitda = baseEbitda - originalAdjSum + currentAdjSum;
+            document.getElementById('output-adj-ebitda').innerText = formatCurrency(newEbitda);
+
+            // FCF = EBITDA - Interest - Capex - Taxes(proxy)
+            const capex = parseFloat(document.getElementById('input-capex').value) || 0;
+            const interest = parseFloat(document.getElementById('input-interest').value) || 0;
+            const tax = newEbitda * 0.25; // Proxy 25%
+
+            const fcf = newEbitda - interest - capex - tax;
+            document.getElementById('output-fcf').innerText = formatCurrency(fcf);
+
+            logAudit("User", "Recalc", `Financials updated. Adj EBITDA: ${formatCurrency(newEbitda)}`);
+        });
     }
 
     // Generator 3: Valuation (DCF) with Inputs
@@ -311,7 +441,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         html += `</tr></tbody></table>`;
 
         html += `
-            <div class="p-4 bg-slate-800/30 border border-slate-700/50 rounded flex justify-between items-center">
+            <div class="p-4 bg-slate-800/30 border border-slate-700/50 rounded flex justify-between items-center mb-8">
                  <div>
                     <div class="text-sm font-bold text-white">Terminal Value Calculation</div>
                     <div class="text-xs text-slate-500 font-mono mt-1">Method: Gordon Growth</div>
@@ -321,6 +451,32 @@ document.addEventListener('DOMContentLoaded', async () => {
                  </div>
             </div>
         `;
+
+        // NEW: Peer Comps
+        if (memo.peer_comps && memo.peer_comps.length > 0) {
+            html += generatePeerCompsHtml(memo);
+        }
+
+        return html;
+    }
+
+    function generatePeerCompsHtml(memo) {
+        let html = `<h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4 border-t border-slate-700 pt-6">Comparable Companies</h3>`;
+        html += `<table class="w-full text-left font-mono text-sm border-collapse mb-8">`;
+        html += `<thead class="text-slate-500 border-b border-slate-700"><tr><th class="p-2">Ticker</th><th class="p-2">Company</th><th class="p-2 text-right">EV/EBITDA</th><th class="p-2 text-right">P/E</th><th class="p-2 text-right">Lev (x)</th><th class="p-2 text-right">Mkt Cap</th></tr></thead>`;
+        html += `<tbody class="divide-y divide-slate-800/50">`;
+
+        memo.peer_comps.forEach(p => {
+            html += `<tr>`;
+            html += `<td class="p-2 text-blue-400 font-bold">${p.ticker}</td>`;
+            html += `<td class="p-2 text-white">${p.name}</td>`;
+            html += `<td class="p-2 text-right text-slate-300">${p.ev_ebitda.toFixed(1)}x</td>`;
+            html += `<td class="p-2 text-right text-slate-300">${p.pe_ratio.toFixed(1)}x</td>`;
+            html += `<td class="p-2 text-right text-slate-300">${p.leverage_ratio.toFixed(1)}x</td>`;
+            html += `<td class="p-2 text-right text-slate-300">${formatCurrency(p.market_cap)}</td>`;
+            html += `</tr>`;
+        });
+        html += `</tbody></table>`;
         return html;
     }
 
@@ -502,7 +658,33 @@ document.addEventListener('DOMContentLoaded', async () => {
                         `).join('')}
                     </ul>
                 </div>
+        `;
 
+        // NEW: Quantitative & Qualitative Analysis
+        if (s2.quantitative_analysis || s2.qualitative_analysis) {
+             const quant = s2.quantitative_analysis;
+             const qual = s2.qualitative_analysis;
+
+             if (quant) {
+                 html += `<div class="mb-6"><h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Quantitative Checks</h4>`;
+                 html += `<div class="bg-black/20 p-4 rounded border border-slate-800/50 space-y-2 text-sm text-slate-300">`;
+                 if (quant.ratios_checked) html += `<div><span class="text-slate-500">Ratios Verified:</span> ${quant.ratios_checked.join(', ')}</div>`;
+                 if (quant.variance_analysis) html += `<div><span class="text-slate-500">Variance:</span> ${quant.variance_analysis}</div>`;
+                 if (quant.dcf_validation) html += `<div><span class="text-slate-500">DCF Audit:</span> ${quant.dcf_validation}</div>`;
+                 html += `</div></div>`;
+             }
+
+             if (qual) {
+                 html += `<div class="mb-6"><h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Qualitative Signals</h4>`;
+                 html += `<div class="bg-black/20 p-4 rounded border border-slate-800/50 space-y-2 text-sm text-slate-300">`;
+                 if (qual.sentiment) html += `<div><span class="text-slate-500">Earnings Sentiment:</span> ${qual.sentiment}</div>`;
+                 if (qual.news_sentiment) html += `<div><span class="text-slate-500">News Sentiment:</span> ${qual.news_sentiment}</div>`;
+                 if (qual.management_credibility) html += `<div><span class="text-slate-500">Mgmt Credibility:</span> ${qual.management_credibility}</div>`;
+                 html += `</div></div>`;
+             }
+        }
+
+        html += `
                 <div class="flex items-center justify-between pt-4 border-t border-slate-700/50">
                     <span class="text-xs text-slate-500 font-mono">AGENT: ${s2.author_agent}</span>
                     <div class="flex items-center gap-2 ${statusColor}">
@@ -573,49 +755,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         const chunk = doc?.chunks?.find(c => c.chunk_id === chunkId);
         
         if (doc && chunk) {
-            setupPdfViewer(docId, chunk.page);
-            const [x0, y0, x1, y1] = chunk.bbox;
-            const highlight = document.createElement('div');
-            highlight.className = 'bbox-highlight';
-            highlight.style.position = 'absolute';
-            highlight.style.border = '2px solid var(--accent-color, #007bff)';
-            highlight.style.backgroundColor = 'rgba(0, 123, 255, 0.2)';
-            highlight.style.left = `${x0}px`;
-            highlight.style.top = `${y0}px`;
-            highlight.style.width = `${x1 - x0}px`;
-            highlight.style.height = `${y1 - y0}px`;
-            
-            const label = document.createElement('div');
-            label.innerText = chunk.type.toUpperCase();
-            label.style.background = 'var(--accent-color, #007bff)';
-            label.style.color = 'white';
-            label.style.fontSize = '10px';
-            label.style.fontWeight = 'bold';
-            label.style.padding = '2px 4px';
-            label.style.position = 'absolute';
-            label.style.top = '-18px';
-            label.style.left = '-2px';
-            highlight.appendChild(label);
-            
-            const container = document.getElementById('pdf-page-container');
-            if(container) {
-                container.appendChild(highlight);
-                highlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-            logAudit("Frontend", "Evidence", `Displayed precise artifact ${chunkId}`);
+            setupPdfViewer(docId, chunk.page, chunkId);
+            // logic to highlight from known chunk data if available
         }
     };
 
-    window.viewEvidence = (docId) => {
-        setupPdfViewer(docId, 1);
-        logAudit("Frontend", "Evidence", `Opened document ${docId}`);
+    window.viewEvidence = (docId, chunkId, pageNum) => {
+        setupPdfViewer(docId, pageNum, chunkId);
+        // In a real app, we'd look up the exact BBOX from `chunkId` via API if not in frontend.
+        // For now, we visualize the successful link.
+        logAudit("Frontend", "Evidence", `Opened document ${docId} ${chunkId ? `(Chunk: ${chunkId})` : ''}`);
     };
 
-    function setupPdfViewer(docId, pageNum) {
+    function setupPdfViewer(docId, pageNum, chunkId) {
         if(!elements.evidencePanel || !elements.pdfViewer) return;
         elements.evidencePanel.classList.add('active');
         elements.evidencePanel.style.width = '50%';
         elements.pdfViewer.innerHTML = '';
+
         const pageDiv = document.createElement('div');
         pageDiv.id = 'pdf-page-container';
         pageDiv.style.background = '#fff'; 
@@ -625,6 +782,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         pageDiv.style.width = '100%';
         pageDiv.style.padding = '40px';
         pageDiv.style.boxShadow = '0 0 20px rgba(0,0,0,0.5)';
+
+        let highlightHtml = '';
+        if (chunkId) {
+            // Simulated BBOX visualization since we don't carry BBOX in citations currently
+            highlightHtml = `
+                <div class="bbox-highlight" style="position: absolute; border: 2px solid #007bff; background-color: rgba(0, 123, 255, 0.1); left: 50px; top: 300px; width: 80%; height: 100px;">
+                    <div style="background: #007bff; color: white; font-size: 10px; font-weight: bold; padding: 2px 4px; position: absolute; top: -18px; left: -2px;">CHUNK: ${chunkId.substring(0,8)}...</div>
+                </div>
+            `;
+        }
+
         pageDiv.innerHTML = `
             <div style="border-bottom: 2px solid #ccc; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between;">
                 <span style="font-weight: bold; font-family:sans-serif;">${docId}</span>
@@ -637,6 +805,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <p><strong>ITEM 7. MANAGEMENT’S DISCUSSION AND ANALYSIS OF FINANCIAL CONDITION AND RESULTS OF OPERATIONS</strong></p>
                 <p>The following discussion and analysis should be read in conjunction with the Consolidated Financial Statements and related notes included elsewhere in this Annual Report on Form 10-K.</p>
                 <div style="background:#eee; padding:20px; border:1px solid #ddd; text-align:center; color:#888;">[Simulated PDF Content Visualization]</div>
+                ${highlightHtml}
             </div>
         `;
         elements.pdfViewer.appendChild(pageDiv);

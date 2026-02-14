@@ -1,6 +1,7 @@
 from typing import Dict, List, Any
-from .model import FinancialSpread, DCFAnalysis, CreditRating, DebtFacility, EquityMarketData, PDModel, LGDAnalysis, Scenario, ScenarioAnalysis, SystemTwoCritique, CreditMemo
+from .model import FinancialSpread, DCFAnalysis, CreditRating, DebtFacility, EquityMarketData, PDModel, LGDAnalysis, Scenario, ScenarioAnalysis, SystemTwoCritique, CreditMemo, PeerComp, AuditLogEntry
 import random
+import uuid
 from datetime import datetime, timedelta
 
 class SpreadingEngine:
@@ -14,6 +15,13 @@ class SpreadingEngine:
         """
         name_lower = borrower_name.lower()
 
+        # Default extended fields
+        gross_debt = 0.0
+        cash = 0.0
+        capex = 0.0
+        fcf = 0.0
+        ebitda_adjustments = {"Restructuring": 0.0, "SBC": 0.0}
+
         if "apple" in name_lower:
             # Apple Inc. (FY2025 Q1 - Period Ending Dec 2024)
             assets = 379300.0
@@ -23,6 +31,12 @@ class SpreadingEngine:
             ebitda = 132000.0
             net_income = 102000.0
             interest = 3900.0
+
+            gross_debt = 105000.0
+            cash = 60000.0
+            capex = 12000.0
+            fcf = 90000.0
+            ebitda_adjustments = {"Stock Based Comp": 8000.0, "Litigation": 500.0}
 
             return FinancialSpread(
                 total_assets=assets,
@@ -35,7 +49,12 @@ class SpreadingEngine:
                 dscr=ebitda / interest if interest > 0 else 999.0,
                 leverage_ratio=liabilities / ebitda if ebitda > 0 else 0.0,
                 current_ratio=0.98,
-                period="FY2025 Q1"
+                period="FY2025 Q1",
+                gross_debt=gross_debt,
+                cash=cash,
+                capex=capex,
+                fcf=fcf,
+                ebitda_adjustments=ebitda_adjustments
             )
 
         elif "tesla" in name_lower:
@@ -48,6 +67,12 @@ class SpreadingEngine:
             net_income = 8400.0
             interest = 150.0
 
+            gross_debt = 5000.0
+            cash = 25000.0
+            capex = 9000.0
+            fcf = 3500.0
+            ebitda_adjustments = {"Stock Based Comp": 2500.0, "Reg Credits": -1500.0}
+
             return FinancialSpread(
                 total_assets=assets,
                 total_liabilities=liabilities,
@@ -59,7 +84,12 @@ class SpreadingEngine:
                 dscr=ebitda / interest if interest > 0 else 999.0,
                 leverage_ratio=liabilities / ebitda if ebitda > 0 else 0.0,
                 current_ratio=1.70,
-                period="FY2024 Q3"
+                period="FY2024 Q3",
+                gross_debt=gross_debt,
+                cash=cash,
+                capex=capex,
+                fcf=fcf,
+                ebitda_adjustments=ebitda_adjustments
             )
 
         elif "jpmorgan" in name_lower or "chase" in name_lower:
@@ -83,7 +113,12 @@ class SpreadingEngine:
                 dscr=999.0,
                 leverage_ratio=liabilities / equity,
                 current_ratio=1.1,
-                period="FY2024 Q4"
+                period="FY2024 Q4",
+                gross_debt=200000.0,
+                cash=500000.0,
+                capex=5000.0,
+                fcf=51000.0,
+                ebitda_adjustments={}
             )
 
         elif "techcorp" in name_lower:
@@ -103,7 +138,12 @@ class SpreadingEngine:
                 dscr=350.0 / 50.0,
                 leverage_ratio=3000.0 / 350.0,
                 current_ratio=1.5,
-                period="FY2025 Mock"
+                period="FY2025 Mock",
+                gross_debt=1800.0,
+                cash=200.0,
+                capex=50.0,
+                fcf=150.0,
+                ebitda_adjustments={"Synergies": 50.0}
             )
         else:
             return FinancialSpread(
@@ -117,7 +157,12 @@ class SpreadingEngine:
                 dscr=5.0,
                 leverage_ratio=10.0,
                 current_ratio=2.0,
-                period="FY2025"
+                period="FY2025",
+                gross_debt=40.0,
+                cash=5.0,
+                capex=1.0,
+                fcf=1.0,
+                ebitda_adjustments={}
             )
 
     def get_historicals(self, current_spread: FinancialSpread) -> List[FinancialSpread]:
@@ -137,6 +182,11 @@ class SpreadingEngine:
         fy_minus_1.revenue *= 0.90 # Slower growth
         fy_minus_1.ebitda *= 0.88 # Margin expansion in current year
         fy_minus_1.net_income *= 0.85
+        if fy_minus_1.gross_debt: fy_minus_1.gross_debt *= factor
+        if fy_minus_1.cash: fy_minus_1.cash *= factor
+        if fy_minus_1.capex: fy_minus_1.capex *= 0.95
+        if fy_minus_1.fcf: fy_minus_1.fcf *= 0.85
+
         historicals.append(fy_minus_1)
 
         # FY-2
@@ -149,6 +199,11 @@ class SpreadingEngine:
         fy_minus_2.revenue *= 0.92
         fy_minus_2.ebitda *= 0.90
         fy_minus_2.net_income *= 0.88
+        if fy_minus_2.gross_debt: fy_minus_2.gross_debt *= factor
+        if fy_minus_2.cash: fy_minus_2.cash *= factor
+        if fy_minus_2.capex: fy_minus_2.capex *= 0.95
+        if fy_minus_2.fcf: fy_minus_2.fcf *= 0.85
+
         historicals.append(fy_minus_2)
 
         return historicals
@@ -162,8 +217,11 @@ class SpreadingEngine:
         wacc = 0.09 # 9% WACC
 
         # Estimate Free Cash Flow (FCF) ~ EBITDA * (1-Tax) - CapEx (Proxy)
-        # Simple Proxy: FCF = EBITDA * 0.65
-        base_fcf = current_spread.ebitda * 0.65
+        # Use existing FCF if available, else calc
+        if current_spread.fcf and current_spread.fcf > 0:
+            base_fcf = current_spread.fcf
+        else:
+            base_fcf = current_spread.ebitda * 0.65
 
         projected_fcf = []
         for i in range(1, 6):
@@ -186,7 +244,9 @@ class SpreadingEngine:
 
         # Equity Value = EV - Debt + Cash (Simplified: EV - Liabilities)
         # Note: Liabilities is a proxy for Debt here
-        equity_value = enterprise_value - current_spread.total_liabilities
+        debt = current_spread.gross_debt if current_spread.gross_debt else current_spread.total_liabilities
+        cash = current_spread.cash if current_spread.cash else 0.0
+        equity_value = enterprise_value - debt + cash
 
         # Implied Share Price (Mock Share Count)
         # Assume share count such that price is realistic (e.g., ~$150-200)
@@ -623,8 +683,98 @@ class SpreadingEngine:
         return SystemTwoCritique(
             critique_points=critique_points,
             conviction_score=conviction,
-            verification_status="PASS" if conviction > 0.7 else "REVIEW_REQUIRED"
+            verification_status="PASS" if conviction > 0.7 else "REVIEW_REQUIRED",
+            quantitative_analysis={
+                "ratios_checked": ["Leverage", "DSCR", "Current Ratio", "Altman Z-Score"],
+                "variance_analysis": "Historical margins are consistent with projections.",
+                "dcf_validation": "WACC assumption (9%) is consistent with sector risk."
+            },
+            qualitative_analysis={
+                "sentiment": "Positive management commentary in earnings call.",
+                "news_sentiment": "Neutral/Positive coverage in major financial outlets.",
+                "management_credibility": "High. Track record of meeting guidance."
+            }
         )
+
+    def get_peer_comps(self, ticker: str) -> List[PeerComp]:
+        """
+        Returns mock comparable companies for valuation.
+        """
+        if "AAPL" in ticker or "Apple" in ticker:
+            return [
+                PeerComp(ticker="MSFT", name="Microsoft", ev_ebitda=22.5, pe_ratio=32.0, leverage_ratio=0.5, market_cap=3100000.0),
+                PeerComp(ticker="GOOGL", name="Alphabet", ev_ebitda=18.0, pe_ratio=24.0, leverage_ratio=0.1, market_cap=2000000.0),
+                PeerComp(ticker="AMZN", name="Amazon", ev_ebitda=25.0, pe_ratio=40.0, leverage_ratio=1.2, market_cap=1800000.0)
+            ]
+        elif "TSLA" in ticker:
+            return [
+                PeerComp(ticker="TM", name="Toyota", ev_ebitda=8.0, pe_ratio=10.0, leverage_ratio=4.0, market_cap=250000.0),
+                PeerComp(ticker="BYD", name="BYD Co", ev_ebitda=15.0, pe_ratio=18.0, leverage_ratio=2.5, market_cap=80000.0),
+                PeerComp(ticker="RIVN", name="Rivian", ev_ebitda=-5.0, pe_ratio=-10.0, leverage_ratio=0.5, market_cap=12000.0)
+            ]
+        else:
+             return [
+                PeerComp(ticker="PEER1", name="Competitor A", ev_ebitda=10.0, pe_ratio=15.0, leverage_ratio=2.0, market_cap=50000.0),
+                PeerComp(ticker="PEER2", name="Competitor B", ev_ebitda=12.0, pe_ratio=18.0, leverage_ratio=2.5, market_cap=45000.0)
+            ]
+
+    def get_agent_log(self, ticker: str) -> List[AuditLogEntry]:
+        """
+        Generates a simulated agent workflow log.
+        """
+        logs = []
+        user = "Orchestrator"
+        ver = "gpt-4-32k"
+
+        # 1. Archivist
+        logs.append(AuditLogEntry(
+            user_id="ArchivistAgent",
+            action="SEARCH_FILINGS",
+            model_version=ver,
+            prompt_version="v2.1",
+            inputs={"ticker": ticker, "doc_type": "10-K"},
+            outputs={"chunks_found": 15},
+            citations_count=0,
+            validation_status="PASS"
+        ))
+
+        # 2. Quant
+        logs.append(AuditLogEntry(
+            user_id="QuantAgent",
+            action="SPREAD_FINANCIALS",
+            model_version=ver,
+            prompt_version="v2.1",
+            inputs={"source": "10-K Financial Tables"},
+            outputs={"spread_rows": 50, "accuracy_check": "99.8%"},
+            citations_count=5,
+            validation_status="PASS"
+        ))
+
+        # 3. Risk
+        logs.append(AuditLogEntry(
+            user_id="RiskAgent",
+            action="IDENTIFY_RISKS",
+            model_version=ver,
+            prompt_version="v2.1",
+            inputs={"spread": "calculated", "news": "ingested"},
+            outputs={"risks_flagged": 3},
+            citations_count=3,
+            validation_status="PASS"
+        ))
+
+        # 4. System 2
+        logs.append(AuditLogEntry(
+            user_id="SystemTwoAgent",
+            action="CRITIQUE_MEMO",
+            model_version=ver,
+            prompt_version="v2.5",
+            inputs={"draft_memo": "complete"},
+            outputs={"conviction": 0.85},
+            citations_count=0,
+            validation_status="PASS"
+        ))
+
+        return logs
 
 # Global Instance
 spreading_engine = SpreadingEngine()
