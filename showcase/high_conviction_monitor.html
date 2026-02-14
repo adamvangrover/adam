@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADAM v26.0 :: HIGH CONVICTION MONITOR</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="js/nav.js" defer></script>
+    <script src="js/system2_judge.js"></script>
+    <style>
+        body { background-color: #050b14; color: #e0e0e0; font-family: 'Inter', sans-serif; }
+        .monitor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            margin-left: 0; /* Nav will handle this via body class */
+        }
+
+        .asset-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #334155;
+            border-radius: 4px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .asset-card:hover {
+            border-color: #00f3ff;
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+        }
+
+        .card-header {
+            padding: 15px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.3);
+        }
+        .symbol { font-family: 'JetBrains Mono', monospace; font-size: 1.2rem; font-weight: bold; color: #fff; }
+        .price-target { font-family: 'JetBrains Mono', monospace; color: #00ff9d; font-weight: bold; }
+
+        .card-body { padding: 15px; }
+
+        .metric-row {
+            display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.8rem; color: #94a3b8;
+        }
+        .metric-val { color: #e2e8f0; font-weight: 600; font-family: 'JetBrains Mono'; }
+
+        .judge-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #334155;
+        }
+        .judge-label { font-size: 0.7rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .critique-text { font-size: 0.8rem; color: #cbd5e1; line-height: 1.4; font-style: italic; }
+
+        .conviction-badge {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .tag {
+            display: inline-block; padding: 2px 6px; font-size: 0.65rem; border: 1px solid #334155;
+            border-radius: 3px; margin-right: 5px; color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <div style="padding: 20px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1 class="text-2xl font-bold text-white tracking-wider font-mono">HIGH CONVICTION MONITOR</h1>
+            <div class="text-xs text-slate-400 font-mono">SYSTEM 2 OVERSIGHT // LIVE SCORING</div>
+        </div>
+        <div class="text-right">
+            <div class="text-xs text-slate-500">JUDGE MODEL</div>
+            <div class="text-cyan-400 font-mono text-sm">v26.0.1 (ACTIVE)</div>
+        </div>
+    </div>
+
+    <div class="monitor-grid" id="grid">
+        <!-- Cards Injected Here -->
+    </div>
+
+    <script>
+        // High Conviction Data Feed
+        const TARGETS = [
+            {
+                symbol: "NVDA",
+                name: "NVIDIA Corp",
+                sector: "Industrial AI",
+                price: 135.50,
+                target: 165.00,
+                thesis_points: [
+                    "Blackwell supply chain dominance confirmed",
+                    "Sovereign AI demand floor",
+                    "Capex check: Hyperscalers spending $660B"
+                ],
+                data_sources: ["Goldman Sachs", "Supply Chain Checks", "TSMC Earnings"]
+            },
+            {
+                symbol: "MSFT",
+                name: "Microsoft Corp",
+                sector: "Industrial AI",
+                price: 410.20,
+                target: 480.00,
+                thesis_points: [
+                    "Copilot seat-to-consumption pivot",
+                    "Azure infrastructure constraints easing"
+                ],
+                data_sources: ["Gartner", "Azure Blog"]
+            },
+            {
+                symbol: "CRM",
+                name: "Salesforce",
+                sector: "Legacy SaaS",
+                price: 260.00,
+                target: 220.00,
+                thesis_points: [
+                    "Seat compression risk high",
+                    "Agentforce adoption lagging expectations"
+                ],
+                data_sources: ["Customer Surveys", "Churn Analysis"]
+            },
+            {
+                symbol: "BTC",
+                name: "Bitcoin",
+                sector: "Crypto",
+                price: 98500,
+                target: 120000,
+                thesis_points: [
+                    "Sovereign treasury adoption",
+                    "Energy monetization thesis"
+                ],
+                data_sources: ["On-chain Flows", "ETF Inflows"]
+            },
+            {
+                symbol: "AWAV",
+                name: "AlphaWave",
+                sector: "Cyber",
+                price: 42.50,
+                target: 65.00,
+                thesis_points: [
+                    "Project Aegis DoD contract confirmed",
+                    "Zero-trust mandate tailwinds"
+                ],
+                data_sources: ["DoD Press Release", "GovSpending.gov"]
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const judge = new System2Judge();
+            const monitor = new RealtimeMonitor();
+            const grid = document.getElementById('grid');
+
+            TARGETS.forEach(asset => {
+                // 1. Run System 2 Evaluation
+                const eval = judge.evaluateConviction(asset);
+                const critique = judge.generateCritique(eval, asset);
+                const color = judge.getScoreColor(eval.score);
+
+                // 2. Get Realtime Data
+                const liveData = monitor.calculateDelta(asset.symbol, asset.target);
+                const livePrice = liveData ? `$${liveData.current.toLocaleString()}` : "N/A";
+                const upside = liveData ? liveData.percent : "--";
+
+                // 3. Build Card
+                const card = document.createElement('div');
+                card.className = 'asset-card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div>
+                            <div class="symbol">${asset.symbol} <span style="font-size:0.8rem; color:${color}; margin-left:10px;">${livePrice}</span></div>
+                            <div style="font-size:0.7rem; color:#aaa;">${asset.name}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div class="price-target">$${asset.target.toLocaleString()}</div>
+                            <div style="font-size:0.6rem; color:#666;">TARGET (${upside})</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="metric-row">
+                            <span>Sector</span>
+                            <span class="metric-val text-white">${asset.sector}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>Conviction Score</span>
+                            <span class="conviction-badge" style="background:${color}20; color:${color}; border:1px solid ${color};">${eval.score}/100</span>
+                        </div>
+
+                        <div style="margin: 10px 0;">
+                            ${asset.thesis_points.map(p => `<div class="text-xs text-slate-400 mb-1">• ${p}</div>`).join('')}
+                        </div>
+
+                        <div style="margin-bottom: 10px;">
+                            ${asset.data_sources.map(s => `<span class="tag">${s}</span>`).join('')}
+                        </div>
+
+                        <div class="judge-section">
+                            <div class="judge-label"><i class="fas fa-gavel"></i> SYSTEM 2 VERDICT</div>
+                            <div class="critique-text">${critique}</div>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        });
+    </script>
+</body>
+</html>
