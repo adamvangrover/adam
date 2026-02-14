@@ -41,6 +41,7 @@ class DCFAnalysis(BaseModel):
     enterprise_value: float
     equity_value: float
     share_price: float
+    inputs: Dict[str, float] = {} # Interactive inputs for frontend customization
 
 class FinancialSpread(BaseModel):
     """
@@ -74,6 +75,8 @@ class DebtFacility(BaseModel):
     drc: float = 1.0 # 0-100%
     ltv: float = 0.5 # 0-100%
     conviction_score: float = 0.9 # 0-100%
+    lgd: float = 0.4 # Loss Given Default (0-1)
+    recovery_rate: float = 0.6 # Recovery Rate (0-1)
 
 class EquityMarketData(BaseModel):
     market_cap: float
@@ -83,6 +86,44 @@ class EquityMarketData(BaseModel):
     dividend_yield: float
     beta: float
 
+class PDModel(BaseModel):
+    """
+    Probability of Default Model outputs.
+    """
+    input_factors: Dict[str, float] # e.g., "Leverage": 0.3, "Coverage": 0.4
+    model_score: float # 0-100
+    implied_rating: str
+    one_year_pd: float
+    five_year_pd: float
+
+class LGDAnalysis(BaseModel):
+    """
+    Loss Given Default Analysis.
+    """
+    seniority_structure: List[Dict[str, Any]] # Tranches with recovery estimates
+    recovery_rate_assumption: float
+    loss_given_default: float
+
+class Scenario(BaseModel):
+    name: str
+    probability: float
+    revenue_growth: float
+    ebitda_margin: float
+    implied_share_price: float
+
+class ScenarioAnalysis(BaseModel):
+    scenarios: List[Scenario]
+    weighted_share_price: float
+
+class SystemTwoCritique(BaseModel):
+    """
+    System 2 Critique points and conviction score.
+    """
+    critique_points: List[str]
+    conviction_score: float
+    verification_status: str
+    author_agent: str = "System 2"
+
 class CreditMemo(BaseModel):
     """
     The complete Credit Memo document.
@@ -91,9 +132,16 @@ class CreditMemo(BaseModel):
     report_date: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
     executive_summary: str
     sections: List[CreditMemoSection] = []
+    key_strengths: List[str] = []
+    key_weaknesses: List[str] = []
+    mitigants: List[str] = []
     financial_ratios: Dict[str, float] = {}
     historical_financials: List[Dict[str, Any]] = [] # List of FinancialSpread dictionaries
     dcf_analysis: Optional[DCFAnalysis] = None
+    pd_model: Optional[PDModel] = None
+    lgd_analysis: Optional[LGDAnalysis] = None
+    scenario_analysis: Optional[ScenarioAnalysis] = None
+    system_two_critique: Optional[SystemTwoCritique] = None
     risk_score: float
     credit_ratings: List[CreditRating] = []
     debt_facilities: List[DebtFacility] = []

@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 
 from .model import CreditMemo, CreditMemoSection, Citation, AuditLogEntry, DCFAnalysis
-from .agents import ArchivistAgent, QuantAgent, RiskOfficerAgent, WriterAgent
+from .agents import ArchivistAgent, QuantAgent, RiskOfficerAgent, WriterAgent, SystemTwoAgent
 from .audit_logger import audit_logger
 from .prompt_registry import registry as prompt_registry
 from .auditor import AuditAgent
@@ -20,6 +20,7 @@ class CreditMemoOrchestrator:
         self.quant = QuantAgent("Quant")
         self.risk = RiskOfficerAgent("RiskOfficer")
         self.writer = WriterAgent("Writer")
+        self.system_two = SystemTwoAgent("SystemTwo")
         self.auditor = AuditAgent()
 
     def generate_credit_memo(self, borrower_name: str, query: str = "", user_id: str = "system") -> CreditMemo:
@@ -48,6 +49,8 @@ class CreditMemoOrchestrator:
         raw_text = "ASSETS: 5000\nLIABILITIES: 3000\nEQUITY: 2000" if "TechCorp" in borrower_name else ""
         quant_out = self.quant.execute({"borrower_name": borrower_name, "raw_financial_text": raw_text})
         spread = quant_out.get("financial_spread")
+        pd_model = quant_out.get("pd_model")
+        scenario_analysis = quant_out.get("scenario_analysis")
 
         # 3.1 Advanced Quant: Historicals & DCF
         # Note: QuantAgent normally calls spreading_engine internally, but for this demo
@@ -60,6 +63,9 @@ class CreditMemoOrchestrator:
         ratings = spreading_engine.get_credit_ratings(borrower_name)
         debt = spreading_engine.get_debt_facilities(borrower_name)
         equity = spreading_engine.get_equity_data(borrower_name)
+
+        # 3.3 Advanced Quant: LGD Analysis
+        lgd = spreading_engine.calculate_lgd_analysis(debt, spread.total_assets)
 
         # 4. Risk (Analysis)
         risk_out = self.risk.execute({"financial_spread": spread, "graph_context": graph_data})
@@ -77,8 +83,11 @@ class CreditMemoOrchestrator:
         exec_summary = writer_out.get("executive_summary", "")
         risk_text = writer_out.get("risk_section", "")
         citations = writer_out.get("citations", [])
+        strengths = writer_out.get("key_strengths", [])
+        weaknesses = writer_out.get("key_weaknesses", [])
+        mitigants = writer_out.get("mitigants", [])
 
-        # 6. Construct Memo
+        # 6. Construct Memo (Draft)
         memo = CreditMemo(
             borrower_name=borrower_name,
             executive_summary=exec_summary,
@@ -112,14 +121,25 @@ class CreditMemoOrchestrator:
             },
             historical_financials=[h.model_dump() for h in historicals],
             dcf_analysis=dcf,
-            risk_score=75.0 if spread.leverage_ratio < 4.0 else 45.0,
+            pd_model=pd_model,
+            lgd_analysis=lgd,
+            scenario_analysis=scenario_analysis,
+            key_strengths=strengths,
+            key_weaknesses=weaknesses,
+            mitigants=mitigants,
+            risk_score=pd_model.model_score if pd_model else 75.0, # Use PD model score if available
             credit_ratings=ratings,
             debt_facilities=debt,
             equity_data=equity
         )
 
-        # 7. Audit Logging (Pass/Fail Check)
-        # Run System 2 Audit
+        # 7. System 2 Critique (Validation)
+        s2_out = self.system_two.execute({"credit_memo": memo})
+        critique = s2_out.get("system_two_critique")
+        memo.system_two_critique = critique
+
+        # 8. Audit Logging (Pass/Fail Check)
+        # Run System 2 Audit (using old auditor for compliance checks)
         audit_result = self.auditor.audit_generation(memo, chunks)
 
         audit_entry = AuditLogEntry(

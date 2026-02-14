@@ -1,5 +1,5 @@
 from typing import Dict, List, Any
-from .model import FinancialSpread, DCFAnalysis, CreditRating, DebtFacility, EquityMarketData
+from .model import FinancialSpread, DCFAnalysis, CreditRating, DebtFacility, EquityMarketData, PDModel, LGDAnalysis, Scenario, ScenarioAnalysis, SystemTwoCritique, CreditMemo
 import random
 from datetime import datetime, timedelta
 
@@ -201,7 +201,13 @@ class SpreadingEngine:
             terminal_value=terminal_val,
             enterprise_value=enterprise_value,
             equity_value=equity_value,
-            share_price=share_price
+            share_price=share_price,
+            inputs={
+                "wacc": wacc,
+                "growth_rate": growth_rate,
+                "tax_rate_proxy": 0.35,
+                "capex_margin": 0.05
+            }
         )
 
     def get_credit_ratings(self, borrower_name: str) -> List[CreditRating]:
@@ -257,7 +263,9 @@ class SpreadingEngine:
                     snc_rating="Pass",
                     drc=1.0, # Strong cash flow
                     ltv=0.0, # Unsecured
-                    conviction_score=0.98
+                    conviction_score=0.98,
+                    lgd=0.1,
+                    recovery_rate=0.9
                 ),
                 DebtFacility(
                     facility_type="Senior Unsecured Notes (2030)",
@@ -268,7 +276,9 @@ class SpreadingEngine:
                     snc_rating="Pass",
                     drc=1.0,
                     ltv=0.1,
-                    conviction_score=0.95
+                    conviction_score=0.95,
+                    lgd=0.3,
+                    recovery_rate=0.7
                 ),
                 DebtFacility(
                     facility_type="Senior Unsecured Notes (2040)",
@@ -279,7 +289,9 @@ class SpreadingEngine:
                     snc_rating="Pass",
                     drc=1.0,
                     ltv=0.1,
-                    conviction_score=0.92
+                    conviction_score=0.92,
+                    lgd=0.4,
+                    recovery_rate=0.6
                 ),
                 DebtFacility(
                     facility_type="Term Loan A",
@@ -290,7 +302,9 @@ class SpreadingEngine:
                     snc_rating="Pass",
                     drc=1.0,
                     ltv=0.2,
-                    conviction_score=0.90
+                    conviction_score=0.90,
+                    lgd=0.2,
+                    recovery_rate=0.8
                 )
             ]
         elif "tesla" in name:
@@ -304,7 +318,9 @@ class SpreadingEngine:
                     snc_rating="Pass",
                     drc=0.9,
                     ltv=0.4, # Secured by inventory/AR
-                    conviction_score=0.88
+                    conviction_score=0.88,
+                    lgd=0.15,
+                    recovery_rate=0.85
                 ),
                 DebtFacility(
                     facility_type="Convertible Senior Notes",
@@ -315,7 +331,9 @@ class SpreadingEngine:
                     snc_rating="Pass",
                     drc=0.85,
                     ltv=0.3,
-                    conviction_score=0.85
+                    conviction_score=0.85,
+                    lgd=0.5,
+                    recovery_rate=0.5
                 ),
                 DebtFacility(
                     facility_type="Auto ABS Facilities",
@@ -326,7 +344,9 @@ class SpreadingEngine:
                     snc_rating="Pass",
                     drc=0.95,
                     ltv=0.8,
-                    conviction_score=0.92
+                    conviction_score=0.92,
+                    lgd=0.05,
+                    recovery_rate=0.95
                 )
             ]
         elif "techcorp" in name:
@@ -340,7 +360,9 @@ class SpreadingEngine:
                     snc_rating="Special Mention",
                     drc=0.4,
                     ltv=0.7,
-                    conviction_score=0.45
+                    conviction_score=0.45,
+                    lgd=0.2,
+                    recovery_rate=0.8
                 ),
                 DebtFacility(
                     facility_type="Term Loan B",
@@ -351,7 +373,9 @@ class SpreadingEngine:
                     snc_rating="Substandard",
                     drc=0.35,
                     ltv=0.85,
-                    conviction_score=0.30
+                    conviction_score=0.30,
+                    lgd=0.4,
+                    recovery_rate=0.6
                 ),
                 DebtFacility(
                     facility_type="Mezzanine Debt",
@@ -362,7 +386,9 @@ class SpreadingEngine:
                     snc_rating="Doubtful",
                     drc=0.1,
                     ltv=0.95,
-                    conviction_score=0.15
+                    conviction_score=0.15,
+                    lgd=0.9,
+                    recovery_rate=0.1
                 )
             ]
         else:
@@ -376,7 +402,9 @@ class SpreadingEngine:
                     snc_rating="Pass",
                     drc=0.8,
                     ltv=0.5,
-                    conviction_score=0.7
+                    conviction_score=0.7,
+                    lgd=0.3,
+                    recovery_rate=0.7
                  ),
                  DebtFacility(
                     facility_type="Term Loan",
@@ -387,7 +415,9 @@ class SpreadingEngine:
                     snc_rating="Pass",
                     drc=0.75,
                     ltv=0.6,
-                    conviction_score=0.75
+                    conviction_score=0.75,
+                    lgd=0.4,
+                    recovery_rate=0.6
                  )
             ]
 
@@ -442,6 +472,159 @@ class SpreadingEngine:
                 dividend_yield=1.0,
                 beta=1.0
             )
+
+    # --- New Methods for Advanced Credit Features ---
+
+    def calculate_pd_model(self, spread: FinancialSpread, sector: str = "General") -> PDModel:
+        """
+        Generates Probability of Default metrics.
+        """
+        # Simple scoring logic
+        score = 80.0
+
+        # Penalize leverage
+        if spread.leverage_ratio > 4.0:
+            score -= 20
+        elif spread.leverage_ratio > 3.0:
+            score -= 10
+
+        # Penalize low DSCR
+        if spread.dscr < 1.25:
+            score -= 25
+        elif spread.dscr < 1.5:
+            score -= 10
+
+        # Cap score
+        score = max(0.0, min(100.0, score))
+
+        # Map to rating
+        rating = "BBB"
+        pd_1y = 0.005
+        pd_5y = 0.03
+
+        if score > 90:
+            rating = "AAA"
+            pd_1y = 0.0001
+            pd_5y = 0.001
+        elif score > 80:
+            rating = "AA"
+            pd_1y = 0.0005
+            pd_5y = 0.005
+        elif score > 70:
+            rating = "A"
+            pd_1y = 0.001
+            pd_5y = 0.01
+        elif score > 60:
+            rating = "BBB"
+            pd_1y = 0.005
+            pd_5y = 0.03
+        elif score > 50:
+            rating = "BB"
+            pd_1y = 0.02
+            pd_5y = 0.10
+        else:
+            rating = "B-"
+            pd_1y = 0.08
+            pd_5y = 0.25
+
+        return PDModel(
+            input_factors={
+                "Leverage Ratio": spread.leverage_ratio,
+                "DSCR": spread.dscr,
+                "Liquidity (Current Ratio)": spread.current_ratio,
+                "EBITDA Margin": spread.ebitda / spread.revenue if spread.revenue > 0 else 0.0
+            },
+            model_score=score,
+            implied_rating=rating,
+            one_year_pd=pd_1y,
+            five_year_pd=pd_5y
+        )
+
+    def calculate_lgd_analysis(self, debt_facilities: List[DebtFacility], assets: float) -> LGDAnalysis:
+        """
+        Calculates LGD based on simple waterfall.
+        """
+        # Mock logic
+        avg_recovery = 0.6
+        if debt_facilities:
+            total_rec = sum([d.recovery_rate for d in debt_facilities])
+            avg_recovery = total_rec / len(debt_facilities)
+
+        tranches = []
+        for d in debt_facilities:
+            tranches.append({
+                "tranche": d.facility_type,
+                "amount": d.amount_committed,
+                "recovery_est": f"{d.recovery_rate*100:.0f}%"
+            })
+
+        return LGDAnalysis(
+            seniority_structure=tranches,
+            recovery_rate_assumption=avg_recovery,
+            loss_given_default=1.0 - avg_recovery
+        )
+
+    def generate_scenarios(self, spread: FinancialSpread) -> ScenarioAnalysis:
+        """
+        Generates 3 scenarios: Bear, Base, Bull.
+        """
+        base_price = 150.0 # Mock reference
+
+        scenarios = [
+            Scenario(
+                name="Bear Case",
+                probability=0.20,
+                revenue_growth=-0.05,
+                ebitda_margin=0.20,
+                implied_share_price=base_price * 0.7
+            ),
+            Scenario(
+                name="Base Case",
+                probability=0.50,
+                revenue_growth=0.05,
+                ebitda_margin=0.30,
+                implied_share_price=base_price
+            ),
+            Scenario(
+                name="Bull Case",
+                probability=0.30,
+                revenue_growth=0.12,
+                ebitda_margin=0.35,
+                implied_share_price=base_price * 1.4
+            )
+        ]
+
+        weighted_price = sum([s.implied_share_price * s.probability for s in scenarios])
+
+        return ScenarioAnalysis(
+            scenarios=scenarios,
+            weighted_share_price=weighted_price
+        )
+
+    def generate_critique(self, memo: CreditMemo) -> SystemTwoCritique:
+        """
+        Simulates a System 2 critique.
+        """
+        critique_points = []
+        conviction = 0.85
+
+        if memo.risk_score < 60:
+            critique_points.append("High leverage requires stricter covenant validation.")
+            critique_points.append("Review management's deleveraging plan credibility.")
+            conviction = 0.60
+        else:
+            critique_points.append("Credit thesis aligns with macro outlook.")
+            critique_points.append("Valuation assumptions appear conservative.")
+
+        if not memo.dcf_analysis:
+            critique_points.append("Missing DCF analysis reduces valuation certainty.")
+            conviction -= 0.1
+
+        return SystemTwoCritique(
+            critique_points=critique_points,
+            conviction_score=conviction,
+            verification_status="PASS" if conviction > 0.7 else "REVIEW_REQUIRED"
+        )
 
 # Global Instance
 spreading_engine = SpreadingEngine()
