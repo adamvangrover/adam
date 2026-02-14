@@ -10,6 +10,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/nav.js" defer></script>
+    <script src="js/universal_loader.js"></script>
+    <script src="js/mock_data.js"></script>
     <style>
         :root {
             --primary-color: #00f3ff;
@@ -265,8 +267,13 @@
                 </div>
             </div>
 
-            <div class="chart-container">
-                <canvas id="sentimentChart"></canvas>
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 30px;">
+                <div class="chart-container" style="margin-bottom: 0;">
+                    <canvas id="sentimentChart"></canvas>
+                </div>
+                <div class="chart-container" style="margin-bottom: 0;">
+                    <canvas id="correlationChart"></canvas>
+                </div>
             </div>
 
             <div id="archiveGrid">
@@ -5910,9 +5917,26 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
         }
 
         // --- System Monitor Logic ---
-        function initSystemMonitor() {
+        async function initSystemMonitor() {
             try {
-                const data = window.MARKET_DATA.v23_knowledge_graph.nodes;
+                let marketData = null;
+
+                // Attempt Load via Universal Loader
+                if (window.universalLoader && window.universalLoader.loadMarketMayhem) {
+                    marketData = await window.universalLoader.loadMarketMayhem();
+                }
+
+                // Fallback to inline if loader fails or returns null
+                if (!marketData && window.MARKET_DATA) {
+                    marketData = window.MARKET_DATA;
+                }
+
+                if (!marketData) {
+                    console.warn("No Market Data available.");
+                    return;
+                }
+
+                const data = marketData.v23_knowledge_graph.nodes;
 
                 // Regime
                 document.getElementById('sys-regime').textContent = data.macro_ecosystem.regime_classification.status.toUpperCase();
@@ -5929,14 +5953,68 @@ Hello Q2! The first quarter is in the books, and the bulls are clearly in charge
                 document.getElementById('sys-conviction-val').textContent = `${convLevel}/10`;
                 document.getElementById('sys-conviction-bar').style.width = `${convLevel * 10}%`;
 
+                // Init Correlation Chart (Visualization of Strategy)
+                initCorrelationChart(data);
+
             } catch (e) {
                 console.error("Failed to init System Monitor:", e);
             }
         }
 
+        function initCorrelationChart(data) {
+            const ctx = document.getElementById('correlationChart').getContext('2d');
+
+            // Extract convictions from equity analysis
+            const convictions = data.equity_analysis.valuation_engine.conviction_list || [];
+
+            const scatterData = convictions.map(c => ({
+                x: Math.random() * 100, // Mock "Sentiment"
+                y: c.target,            // Target Price
+                r: 10 + Math.random() * 20, // Conviction Size
+                label: c.ticker
+            }));
+
+            new Chart(ctx, {
+                type: 'bubble',
+                data: {
+                    datasets: [{
+                        label: 'Conviction Matrix',
+                        data: scatterData,
+                        backgroundColor: 'rgba(0, 243, 255, 0.5)',
+                        borderColor: '#00f3ff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'TARGET CONVICTION MATRIX', color: '#888', font: { family: 'JetBrains Mono' } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.raw.label + ": $" + context.raw.y;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            title: { display: true, text: 'Target Price ($)', color:'#666' },
+                            grid: { color: '#333' }, ticks: { color: '#666' }
+                        },
+                        x: {
+                            title: { display: true, text: 'Market Sentiment (0-100)', color:'#666' },
+                            grid: { color: '#333' }, ticks: { color: '#666' }
+                        }
+                    }
+                }
+            });
+        }
+
         // Init
         document.addEventListener('DOMContentLoaded', () => {
-            initSystemMonitor();
+            initSystemMonitor(); // Now async
             initSemanticEngine();
             initConvictionMeters();
         });

@@ -171,11 +171,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // 1. Tab Navigation
         const tabsHtml = `
-            <div style="display: flex; gap: 20px; border-bottom: 1px solid var(--glass-border, rgba(255,255,255,0.1)); margin-bottom: 20px;">
-                <div id="btn-tab-memo" class="tab-btn" onclick="switchTab('memo')" style="padding: 10px; cursor: pointer; color: var(--accent-color, #007bff); border-bottom: 2px solid var(--accent-color, #007bff);">Memo</div>
-                <div id="btn-tab-financials" class="tab-btn" onclick="switchTab('financials')" style="padding: 10px; cursor: pointer; color: var(--text-secondary, #888);">Financials</div>
-                <div id="btn-tab-dcf" class="tab-btn" onclick="switchTab('dcf')" style="padding: 10px; cursor: pointer; color: var(--text-secondary, #888);">Valuation (DCF)</div>
-                <div id="btn-tab-cap" class="tab-btn" onclick="switchTab('cap')" style="padding: 10px; cursor: pointer; color: var(--text-secondary, #888);">Cap Structure</div>
+            <div style="display: flex; gap: 20px; border-bottom: 1px solid var(--glass-border, rgba(255,255,255,0.1)); margin-bottom: 20px; overflow-x: auto;">
+                <div id="btn-tab-memo" class="tab-btn" onclick="switchTab('memo')" style="padding: 10px; cursor: pointer; color: var(--accent-color, #007bff); border-bottom: 2px solid var(--accent-color, #007bff); white-space: nowrap;">Memo</div>
+                <div id="btn-tab-financials" class="tab-btn" onclick="switchTab('financials')" style="padding: 10px; cursor: pointer; color: var(--text-secondary, #888); white-space: nowrap;">Financials</div>
+                <div id="btn-tab-dcf" class="tab-btn" onclick="switchTab('dcf')" style="padding: 10px; cursor: pointer; color: var(--text-secondary, #888); white-space: nowrap;">Valuation (DCF)</div>
+                <div id="btn-tab-cap" class="tab-btn" onclick="switchTab('cap')" style="padding: 10px; cursor: pointer; color: var(--text-secondary, #888); white-space: nowrap;">Cap Structure</div>
+                <div id="btn-tab-risk" class="tab-btn" onclick="switchTab('risk')" style="padding: 10px; cursor: pointer; color: var(--text-secondary, #888); white-space: nowrap;">Risk Quant</div>
+                <div id="btn-tab-sys2" class="tab-btn" onclick="switchTab('sys2')" style="padding: 10px; cursor: pointer; color: var(--text-secondary, #888); white-space: nowrap;">System 2</div>
             </div>
         `;
 
@@ -185,10 +187,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div id="tab-financials" class="tab-content" style="display:none;">${generateFinancialsHtml(memo)}</div>
             <div id="tab-dcf" class="tab-content" style="display:none;">${generateDcfHtml(memo)}</div>
             <div id="tab-cap" class="tab-content" style="display:none;">${generateCapStructureHtml(memo)}</div>
+            <div id="tab-risk" class="tab-content" style="display:none;">${generateRiskQuantHtml(memo)}</div>
+            <div id="tab-sys2" class="tab-content" style="display:none;">${generateSystem2Html(memo)}</div>
         `;
 
         elements.memoContent.innerHTML = tabsHtml + contentHtml;
         elements.memoContent.style.display = 'block';
+
+        // Initialize Charts
+        initRiskCharts(memo);
     }
 
     // --- 7. Generators (HTML Builders) ---
@@ -413,6 +420,108 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         
         return html;
+    }
+
+    // Generator 5: Risk Quant
+    function generateRiskQuantHtml(memo) {
+        return `
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 4px;">
+                    <h3 style="color:var(--text-primary); margin-bottom:10px;">Probability of Default (PD)</h3>
+                    <div style="height: 200px;">
+                        <canvas id="pdChart"></canvas>
+                    </div>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 4px;">
+                    <h3 style="color:var(--text-primary); margin-bottom:10px;">Loss Given Default (LGD)</h3>
+                    <div style="display:flex; flex-direction:column; justify-content:center; height:100%; align-items:center;">
+                        <div style="font-size:3em; font-weight:bold; color:#ff4444;">${((memo.risk_metrics?.lgd || 0.45) * 100).toFixed(1)}%</div>
+                        <div style="color:var(--text-secondary);">Recovery Rate: ${((1 - (memo.risk_metrics?.lgd || 0.45)) * 100).toFixed(1)}%</div>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top:20px; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 4px;">
+                <h3 style="color:var(--text-primary); margin-bottom:10px;">Scenario Analysis</h3>
+                <table style="width:100%; text-align:left; color:var(--text-secondary);">
+                    <thead><tr><th>Scenario</th><th>PD Shock</th><th>Rev Impact</th><th>Rating Impact</th></tr></thead>
+                    <tbody>
+                        <tr><td>Recession (Bear)</td><td style="color:#ff4444;">+150 bps</td><td style="color:#ff4444;">-12.5%</td><td>Downgrade (2 notches)</td></tr>
+                        <tr><td>Base Case</td><td>0 bps</td><td>+3.2%</td><td>Stable</td></tr>
+                        <tr><td>Expansion (Bull)</td><td style="color:#00C851;">-50 bps</td><td style="color:#00C851;">+8.5%</td><td>Upgrade Watch</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    // Generator 6: System 2
+    function generateSystem2Html(memo) {
+        const critique = memo.system2_critique || {
+            strengths: ["Strong market position", "Robust cash flow"],
+            weaknesses: ["High leverage", "Sector headwinds"],
+            verdict: "The automated analysis is directionally correct but may underestimate the impact of recent regulatory changes.",
+            confidence: 0.85
+        };
+
+        return `
+            <div style="background: rgba(100, 0, 255, 0.1); border: 1px solid #663399; padding: 20px; border-radius: 4px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+                    <h3 style="color:#a020f0; margin:0;"><i class="fas fa-brain"></i> System 2 Critique</h3>
+                    <span style="background:#4b0082; color:white; padding:2px 8px; border-radius:4px; font-size:0.8em;">Confidence: ${(critique.confidence * 100).toFixed(0)}%</span>
+                </div>
+                <p style="color:var(--text-primary); font-style:italic; border-left: 3px solid #a020f0; padding-left: 10px; margin-bottom: 20px;">
+                    "${critique.verdict}"
+                </p>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                    <div>
+                        <h4 style="color:#00C851;">Strengths</h4>
+                        <ul style="color:var(--text-secondary); padding-left:20px;">
+                            ${critique.strengths.map(s => `<li>${s}</li>`).join('')}
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 style="color:#ff4444;">Weaknesses</h4>
+                        <ul style="color:var(--text-secondary); padding-left:20px;">
+                            ${critique.weaknesses.map(w => `<li>${w}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function initRiskCharts(memo) {
+        setTimeout(() => {
+            const ctx = document.getElementById('pdChart');
+            if(ctx && window.Chart) {
+                // Destroy existing instance if any (rudimentary check, better handled by tracking instances)
+                if (window.myPdChart) window.myPdChart.destroy();
+
+                window.myPdChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
+                        datasets: [{
+                            label: 'Cumulative PD (%)',
+                            data: memo.risk_metrics?.pd_term || [0.5, 1.2, 2.1, 3.5, 5.0],
+                            backgroundColor: 'rgba(255, 68, 68, 0.5)',
+                            borderColor: '#ff4444',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#888' } },
+                            x: { grid: { display: false }, ticks: { color: '#888' } }
+                        }
+                    }
+                });
+            }
+        }, 100);
     }
 
     // --- 8. Evidence Viewer Logic ---

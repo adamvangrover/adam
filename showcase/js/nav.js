@@ -68,14 +68,30 @@ class AdamNavigator {
      * Critical for sub-directory navigation.
      */
     _resolvePaths() {
+        // Robust Path Resolution Priority:
+        // 1. Explicit data-root attribute on nav.js script tag
+        // 2. Inference from window.location (if deep nested)
+        // 3. Default to current directory (.)
+
         const scriptTag = document.querySelector('script[src*="nav.js"]');
         const dataRoot = scriptTag ? scriptTag.getAttribute('data-root') : null;
         
         this.rootPath = dataRoot || '.';
         const cleanRoot = this.rootPath.replace(/\/$/, '');
-        this.showcasePath = `${cleanRoot}/showcase`;
         
-        console.log(`[AdamNavigator] Environment: ${this.isGitHub ? 'GITHUB' : 'LOCAL'} | Root: ${this.rootPath}`);
+        // Handle case where we are already inside 'showcase' (common for sub-pages)
+        // This prevents double-nesting (e.g. showcase/showcase/...)
+        if (window.location.pathname.includes('/showcase/') && !dataRoot) {
+             this.showcasePath = '.';
+             this.rootPath = '..';
+        } else {
+             this.showcasePath = `${cleanRoot}/showcase`;
+        }
+
+        // Cleanup double slashes
+        this.showcasePath = this.showcasePath.replace(/([^:]\/)\/+/g, "$1");
+
+        console.log(`[AdamNavigator] Environment: ${this.isGitHub ? 'GITHUB' : 'LOCAL'} | Root: ${this.rootPath} | Showcase: ${this.showcasePath}`);
     }
 
     /**
@@ -136,6 +152,7 @@ class AdamNavigator {
             { name: 'Credit Automation', icon: 'fa-file-invoice-dollar', link: 'credit_memo_automation.html' },
             { name: 'Credit Analyst', icon: 'fa-user-tie', link: 'credit_memo_v2.html' },
             { name: 'Sovereign Dashboard', icon: 'fa-globe-americas', link: 'sovereign_dashboard.html' },
+            { name: 'Market Mayhem', icon: 'fa-newspaper', link: 'market_mayhem_archive_v24.html' },
             { type: 'divider' },
             { name: 'Trading Platform', icon: 'fa-chart-line', link: 'trading.html' },
             { name: 'Robo Advisor', icon: 'fa-robot', link: 'robo_advisor.html' },
