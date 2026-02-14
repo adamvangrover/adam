@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if(elements.closeEvidenceBtn) elements.closeEvidenceBtn.addEventListener('click', hideEvidence);
     
     window.switchTab = (tabName) => {
-        document.querySelectorAll('#tab-memo, #tab-annex-a, #tab-annex-b, #tab-annex-c, #tab-risk-quant, #tab-system-2').forEach(el => {
+        document.querySelectorAll('#tab-memo, #tab-annex-a, #tab-annex-b, #tab-annex-c, #tab-risk-quant, #tab-system-2, #tab-forecast').forEach(el => {
             el.classList.add('hidden');
         });
         
@@ -180,6 +180,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const sys2Container = document.getElementById('system-2-container');
         if(sys2Container) sys2Container.innerHTML = generateSystemTwoHtml(memo);
+
+        const forecastContainer = document.getElementById('forecast-container');
+        if(forecastContainer) forecastContainer.innerHTML = generateForecastHtml(memo);
 
         // Setup DCF listeners
         setupDCFListeners(memo);
@@ -512,6 +515,73 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
             </div>
         `;
+        return html;
+    }
+
+    // Generator 7: Forecast (New)
+    function generateForecastHtml(memo) {
+        if (!memo.debt_repayment_forecast && !memo.facility_ratings) return '<p class="text-slate-500 italic">No forecast data available.</p>';
+
+        let html = '';
+
+        if (memo.debt_repayment_forecast && memo.debt_repayment_forecast.length > 0) {
+            html += `<div class="mb-8">
+                <h3 class="text-sm font-bold text-blue-400 uppercase tracking-widest mb-4 border-b border-slate-700 pb-2">Debt Repayment Forecast (5-Year)</h3>
+                <table class="w-full text-left font-mono text-xs border-collapse">
+                    <thead class="text-slate-500 border-b border-slate-700">
+                        <tr>
+                            <th class="p-2">Year</th>
+                            <th class="p-2 text-right">Opening Balance</th>
+                            <th class="p-2 text-right">Principal</th>
+                            <th class="p-2 text-right">Interest</th>
+                            <th class="p-2 text-right">Total Service</th>
+                            <th class="p-2 text-right">Closing Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/50">`;
+
+            memo.debt_repayment_forecast.forEach(row => {
+                html += `<tr>
+                    <td class="p-2 text-white font-bold">${row.year}</td>
+                    <td class="p-2 text-right text-slate-400">${formatCurrency(row.opening_balance)}</td>
+                    <td class="p-2 text-right text-emerald-400">${formatCurrency(row.principal_payment)}</td>
+                    <td class="p-2 text-right text-yellow-400">${formatCurrency(row.interest_payment)}</td>
+                    <td class="p-2 text-right text-white">${formatCurrency(row.total_debt_service)}</td>
+                    <td class="p-2 text-right text-slate-300">${formatCurrency(row.closing_balance)}</td>
+                </tr>`;
+            });
+            html += `</tbody></table></div>`;
+        }
+
+        if (memo.facility_ratings && memo.facility_ratings.length > 0) {
+            html += `<div>
+                <h3 class="text-sm font-bold text-purple-400 uppercase tracking-widest mb-4 border-b border-slate-700 pb-2">Facility Ratings & Regulatory Capital</h3>
+                <div class="grid grid-cols-1 gap-4">`;
+
+            memo.facility_ratings.forEach(fac => {
+                const ratingColor = fac.snc_rating === "Pass" ? "text-emerald-400 border-emerald-500" : "text-yellow-400 border-yellow-500";
+                html += `<div class="bg-slate-800/30 p-4 rounded border border-slate-700/50 flex justify-between items-center">
+                    <div>
+                        <div class="text-white font-bold text-sm mb-1">${fac.facility_type}</div>
+                        <div class="text-xs text-slate-500">Regulatory Weight: <span class="text-white">${fac.regulatory_capital_weight}</span></div>
+                    </div>
+                    <div class="text-right space-y-1">
+                        <div class="text-xs text-slate-400">SNC Rating</div>
+                        <div class="font-mono font-bold ${ratingColor} border px-2 py-0.5 rounded text-xs inline-block">${fac.snc_rating}</div>
+                    </div>
+                    <div class="text-right space-y-1">
+                        <div class="text-xs text-slate-400">1-Year PD</div>
+                        <div class="font-mono text-white text-xs">${(fac.pd_1y * 100).toFixed(2)}%</div>
+                    </div>
+                    <div class="text-right space-y-1">
+                        <div class="text-xs text-slate-400">LGD</div>
+                        <div class="font-mono text-white text-xs">${(fac.lgd * 100).toFixed(0)}%</div>
+                    </div>
+                </div>`;
+            });
+            html += `</div></div>`;
+        }
+
         return html;
     }
 

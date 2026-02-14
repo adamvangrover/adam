@@ -2,6 +2,12 @@ from typing import Dict, List, Any
 from .model import FinancialSpread, DCFAnalysis, CreditRating, DebtFacility, EquityMarketData, PDModel, LGDAnalysis, Scenario, ScenarioAnalysis, SystemTwoCritique, CreditMemo
 import random
 from datetime import datetime, timedelta
+import sys
+import os
+
+# Ensure we can import from core
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../..')))
+from core.pipelines.mock_edgar import MockEdgar
 
 class SpreadingEngine:
     """
@@ -11,9 +17,37 @@ class SpreadingEngine:
     def spread_financials(self, borrower_name: str, raw_data: str) -> FinancialSpread:
         """
         Parses raw text (simulating OCR output) and normalizes it.
+        Now attempts to fetch from MockEdgar (System 1) first.
         """
         name_lower = borrower_name.lower()
 
+        # 1. Attempt Retrieval from MockEdgar (Golden Source)
+        # Try to match name to ticker
+        ticker = None
+        for t, data in MockEdgar.FINANCIALS_DB.items():
+            if data["company_name"].lower() in name_lower or t.lower() in name_lower:
+                ticker = t
+                break
+
+        if ticker:
+            fin_data = MockEdgar.get_latest_financials(ticker)
+
+            # Map MockEdgar dict to FinancialSpread model
+            return FinancialSpread(
+                total_assets=fin_data.get("total_assets", 0.0),
+                total_liabilities=fin_data.get("total_liabilities", 0.0),
+                total_equity=fin_data.get("total_equity", 0.0),
+                revenue=fin_data.get("revenue", 0.0),
+                ebitda=fin_data.get("ebitda", 0.0),
+                net_income=fin_data.get("ebitda", 0.0) * 0.65, # Proxy
+                interest_expense=fin_data.get("interest_expense", 0.0),
+                dscr=fin_data["ratios"].get("interest_coverage", 999.0),
+                leverage_ratio=fin_data["ratios"].get("debt_to_equity", 0.0), # Approximation
+                current_ratio=fin_data["ratios"].get("current_ratio", 1.0),
+                period=f"FY{fin_data.get('fiscal_year', 2026)}"
+            )
+
+        # 2. Fallback to Hardcoded Logic (Legacy System)
         if "apple" in name_lower:
             # Apple Inc. (FY2025 Q1 - Period Ending Dec 2024)
             assets = 379300.0
@@ -128,7 +162,16 @@ class SpreadingEngine:
 
         # FY-1
         fy_minus_1 = current_spread.model_copy()
-        fy_minus_1.period = f"FY{int(current_spread.period[2:6])-1}" if "FY" in current_spread.period else "Prior Year"
+        if "FY" in current_spread.period and len(current_spread.period) >= 6:
+             try:
+                 year_str = current_spread.period[2:6]
+                 year = int(year_str)
+                 fy_minus_1.period = f"FY{year-1}"
+             except:
+                 fy_minus_1.period = "Prior Year"
+        else:
+             fy_minus_1.period = "Prior Year"
+
         # Simulate ~5-10% smaller previous year
         factor = 0.92
         fy_minus_1.total_assets *= factor
@@ -141,7 +184,16 @@ class SpreadingEngine:
 
         # FY-2
         fy_minus_2 = fy_minus_1.model_copy()
-        fy_minus_2.period = f"FY{int(current_spread.period[2:6])-2}" if "FY" in current_spread.period else "Prior Year - 1"
+        if "FY" in fy_minus_1.period and len(fy_minus_1.period) >= 6:
+             try:
+                 year_str = fy_minus_1.period[2:6]
+                 year = int(year_str)
+                 fy_minus_2.period = f"FY{year-1}"
+             except:
+                 fy_minus_2.period = "Prior Year - 1"
+        else:
+             fy_minus_2.period = "Prior Year - 1"
+
         factor = 0.95
         fy_minus_2.total_assets *= factor
         fy_minus_2.total_liabilities *= factor
@@ -563,6 +615,50 @@ class SpreadingEngine:
             recovery_rate_assumption=avg_recovery,
             loss_given_default=1.0 - avg_recovery
         )
+
+    def generate_debt_repayment_forecast(self, spread: FinancialSpread, debt_facilities: List[DebtFacility]) -> List[Dict[str, Any]]:
+        """
+        Generates a 5-year debt repayment forecast.
+        """
+        forecast = []
+        start_year = datetime.now().year
+
+        total_debt = sum([d.amount_drawn for d in debt_facilities])
+        # Simple straight-line amortization proxy for display
+        yearly_principal = total_debt * 0.10 # Assume 10% principal paydown per year
+
+        for i in range(5):
+            year = start_year + i
+            interest = total_debt * 0.05 # Mock 5% interest
+
+            # Reduce debt for next year
+            total_debt = max(0, total_debt - yearly_principal)
+
+            forecast.append({
+                "year": year,
+                "opening_balance": total_debt + yearly_principal,
+                "principal_payment": yearly_principal,
+                "interest_payment": interest,
+                "total_debt_service": yearly_principal + interest,
+                "closing_balance": total_debt
+            })
+
+        return forecast
+
+    def generate_facility_ratings(self, debt_facilities: List[DebtFacility]) -> List[Dict[str, Any]]:
+        """
+        Generates detailed ratings per facility.
+        """
+        ratings = []
+        for facility in debt_facilities:
+            ratings.append({
+                "facility_type": facility.facility_type,
+                "snc_rating": facility.snc_rating,
+                "pd_1y": 0.015, # Mock facility level PD
+                "lgd": facility.lgd,
+                "regulatory_capital_weight": "100%" if facility.snc_rating == "Pass" else "150%"
+            })
+        return ratings
 
     def generate_scenarios(self, spread: FinancialSpread) -> ScenarioAnalysis:
         """

@@ -147,6 +147,10 @@ class CreditMemo(BaseModel):
     debt_facilities: List[DebtFacility] = []
     equity_data: Optional[EquityMarketData] = None
 
+    # New Fields
+    debt_repayment_forecast: List[Dict[str, Any]] = []
+    facility_ratings: List[Dict[str, Any]] = []
+
 class AuditLogEntry(BaseModel):
     """
     A rigorous audit log entry for compliance.

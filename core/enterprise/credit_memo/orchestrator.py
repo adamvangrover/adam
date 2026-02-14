@@ -67,6 +67,10 @@ class CreditMemoOrchestrator:
         # 3.3 Advanced Quant: LGD Analysis
         lgd = spreading_engine.calculate_lgd_analysis(debt, spread.total_assets)
 
+        # 3.4 Advanced Quant: Forecasting & Granular Ratings
+        debt_forecast = spreading_engine.generate_debt_repayment_forecast(spread, debt)
+        facility_ratings = spreading_engine.generate_facility_ratings(debt)
+
         # 4. Risk (Analysis)
         risk_out = self.risk.execute({"financial_spread": spread, "graph_context": graph_data})
         risks = risk_out.get("identified_risks", [])
@@ -130,7 +134,9 @@ class CreditMemoOrchestrator:
             risk_score=pd_model.model_score if pd_model else 75.0, # Use PD model score if available
             credit_ratings=ratings,
             debt_facilities=debt,
-            equity_data=equity
+            equity_data=equity,
+            debt_repayment_forecast=debt_forecast,
+            facility_ratings=facility_ratings
         )
 
         # 7. System 2 Critique (Validation)
