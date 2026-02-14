@@ -120,6 +120,33 @@ class UniversalLoader {
         // Return partials or null if completely missing
         return failed && Object.keys(results).length > 0 ? results : null;
     }
+
+    /**
+     * Loads Market Mayhem Data
+     */
+    async loadMarketMayhem() {
+        try {
+            const res = await fetch(`${this.basePath}market_mayhem.json`);
+            if (res.ok) return await res.json();
+            throw new Error("Network fetch failed");
+        } catch (e) {
+            console.warn("[UniversalLoader] Falling back for Market Mayhem");
+            // Check global variable first (legacy support from inline scripts)
+            if (window.MARKET_DATA) return window.MARKET_DATA;
+            // Check mockData
+            if (this.mockData.market_mayhem) return this.mockData.market_mayhem;
+
+            // Minimal fallback structure to prevent crashes
+            return {
+                v23_knowledge_graph: {
+                    nodes: {
+                        macro_ecosystem: { regime_classification: { status: "OFFLINE", inflation_vector: "N/A" } },
+                        strategic_synthesis: { final_verdict: { recommendation: "HOLD", conviction_level: 5 } }
+                    }
+                }
+            };
+        }
+    }
 }
 
 // Global Instance
